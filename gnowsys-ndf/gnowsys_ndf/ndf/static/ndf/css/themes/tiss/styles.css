@@ -10114,7 +10114,15 @@ aside#help p, aside#help h5, aside#help h6 {
   font-size: small;
   height: 2rem;
 }
-/* line 1130, ../../../scss/_app_styles.scss */
+/* line 1121, ../../../scss/_app_styles.scss */
+.rcard .action .add-to-collection {
+  opacity: 0.5;
+}
+/* line 1124, ../../../scss/_app_styles.scss */
+.rcard .action .add-to-collection:hover {
+  opacity: 1;
+}
+/* line 1138, ../../../scss/_app_styles.scss */
 .rcard .image {
   position: relative;
   background-color: #E1E1E1;
@@ -10122,7 +10130,7 @@ aside#help p, aside#help h5, aside#help h6 {
   height: 8em;
   overflow: hidden;
 }
-/* line 1139, ../../../scss/_app_styles.scss */
+/* line 1147, ../../../scss/_app_styles.scss */
 .rcard .image .title {
   position: absolute;
   bottom: 0;
@@ -10132,24 +10140,27 @@ aside#help p, aside#help h5, aside#help h6 {
   width: 100%;
   box-shadow: 0px -25px 25px -20px gray inset;
   text-transform: uppercase;
-  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
+  font-family: Open Sans Bold;
 }
-/* line 1152, ../../../scss/_app_styles.scss */
+/* line 1160, ../../../scss/_app_styles.scss */
 .rcard .image img {
   border-radius: 2px 2px 0 0;
   display: block;
   margin: 0 auto;
   opacity: 0.9;
   height: 8em;
-  filter: blur(0.25px);
+  filter: brightness(0.75);
+  -webkit-filter: brightness(0.75);
 }
-/* line 1163, ../../../scss/_app_styles.scss */
+/* line 1172, ../../../scss/_app_styles.scss */
 .rcard .image img:hover {
-  filter: blur(0px);
+  filter: brightness(1);
+  -webkit-filter: brightness(1);
   transform: translate3d(0, 0, 0);
-  transition: filter 0.3s ease;
+  transition: filter 1s ease;
 }
-/* line 1170, ../../../scss/_app_styles.scss */
+/* line 1181, ../../../scss/_app_styles.scss */
 .rcard .image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -10163,51 +10174,51 @@ aside#help p, aside#help h5, aside#help h6 {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1187, ../../../scss/_app_styles.scss */
+/* line 1198, ../../../scss/_app_styles.scss */
 .rcard .image i.file:before {
   content: "\f18e";
 }
-/* line 1188, ../../../scss/_app_styles.scss */
+/* line 1199, ../../../scss/_app_styles.scss */
 .rcard .image i.page:before {
   content: "\f18e";
 }
-/* line 1189, ../../../scss/_app_styles.scss */
+/* line 1200, ../../../scss/_app_styles.scss */
 .rcard .image i.collection:before {
   content: "\f18a";
 }
-/* line 1191, ../../../scss/_app_styles.scss */
+/* line 1202, ../../../scss/_app_styles.scss */
 .rcard .image i.documents:before {
   content: "\f18b";
 }
-/* line 1192, ../../../scss/_app_styles.scss */
+/* line 1203, ../../../scss/_app_styles.scss */
 .rcard .image i.pdf:before {
   content: "\f18b";
 }
-/* line 1193, ../../../scss/_app_styles.scss */
+/* line 1204, ../../../scss/_app_styles.scss */
 .rcard .image i.text:before {
   content: "\f18e";
 }
-/* line 1194, ../../../scss/_app_styles.scss */
+/* line 1205, ../../../scss/_app_styles.scss */
 .rcard .image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1195, ../../../scss/_app_styles.scss */
+/* line 1206, ../../../scss/_app_styles.scss */
 .rcard .image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1196, ../../../scss/_app_styles.scss */
+/* line 1207, ../../../scss/_app_styles.scss */
 .rcard .image i.images:before {
   content: "\f125";
 }
-/* line 1197, ../../../scss/_app_styles.scss */
+/* line 1208, ../../../scss/_app_styles.scss */
 .rcard .image i.audios:before, .rcard .image i.audio:before {
   content: "\f17b";
 }
-/* line 1198, ../../../scss/_app_styles.scss */
+/* line 1209, ../../../scss/_app_styles.scss */
 .rcard .image i.videos:before, .rcard .image i.video:before {
   content: "\f20e";
 }
-/* line 1201, ../../../scss/_app_styles.scss */
+/* line 1212, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-style: solid;
   border-width: 0 70px 40px 0;
@@ -10220,59 +10231,59 @@ aside#help p, aside#help h5, aside#help h6 {
   z-index: 1;
   opacity: 0.75;
 }
-/* line 1214, ../../../scss/_app_styles.scss */
+/* line 1225, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-color: transparent #333 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #333333 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1219, ../../../scss/_app_styles.scss */
+/* line 1230, ../../../scss/_app_styles.scss */
 .rcard .published.card-label {
   border-color: transparent #43ac6a transparent transparent;
   border-color: rgba(255, 255, 255, 0) #43ac6a rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1223, ../../../scss/_app_styles.scss */
+/* line 1234, ../../../scss/_app_styles.scss */
 .rcard .published.card-label .label-text:before {
   content: "\221A";
   margin-left: 5px;
   font-size: larger;
 }
-/* line 1231, ../../../scss/_app_styles.scss */
+/* line 1242, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label {
   border-color: transparent #a9b2b3 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #a9b2b3 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1235, ../../../scss/_app_styles.scss */
+/* line 1246, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label .label-text:before {
   content: "Draft";
 }
-/* line 1240, ../../../scss/_app_styles.scss */
+/* line 1251, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1244, ../../../scss/_app_styles.scss */
+/* line 1255, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label .label-text:before {
   content: "Deleted";
 }
-/* line 1249, ../../../scss/_app_styles.scss */
+/* line 1260, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label {
   border-color: transparent #0eacb5 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #0eacb5 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1253, ../../../scss/_app_styles.scss */
+/* line 1264, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label .label-text:before {
   content: "Mod";
 }
-/* line 1256, ../../../scss/_app_styles.scss */
+/* line 1267, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label {
   border-color: transparent #000 transparent transparent;
   border-color: rgba(255, 255, 255, 0) black rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1260, ../../../scss/_app_styles.scss */
+/* line 1271, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label .label-text:before {
   content: "hidden";
 }
-/* line 1263, ../../../scss/_app_styles.scss */
+/* line 1274, ../../../scss/_app_styles.scss */
 .rcard .label-text {
   color: #fff;
   font-size: 0.75rem;
