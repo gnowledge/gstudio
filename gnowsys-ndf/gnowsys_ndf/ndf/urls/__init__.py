@@ -134,6 +134,7 @@ urlpatterns = patterns('',
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
 
     url(r'^(?P<group_id>[^/]+)/repository/?$', 'gnowsys_ndf.ndf.views.methods.repository', name='repository'),
+    url(r'^get_gridfs_resource/(?P<gridfs_id>[^/]+)/?$', 'gnowsys_ndf.ndf.views.file.get_gridfs_resource', name='get_gridfs_resource'),
 
     # django-registration
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
