@@ -40,7 +40,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time,get_group_name_id
-from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
+from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
@@ -5987,3 +5987,49 @@ def get_detailed_report(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
+
+def program_event_list(request, group_id):
+    """
+    * Renders a list of all 'programs'
+    """
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    course_coll = None
+    enr_ce_coll = []
+    list_of_pe = []
+
+    pe_gst = node_collection.one({'_type': "GSystemType", 'name': "ProgramEventGroup"})
+
+    # program events
+    title = pe_gst.name
+
+    pe_coll = node_collection.find({'member_of': pe_gst._id})
+    for each_pe in pe_coll:
+        list_of_hierarchy = get_prior_node_hierarchy(each_pe._id)
+        if list_of_hierarchy:
+            pe_obj = list_of_hierarchy[len(list_of_hierarchy)-1]
+        if pe_obj not in list_of_pe:
+            list_of_pe.append(pe_obj)
+    if request.user.id:
+        userid = int(request.user.id)
+        for each in list_of_pe:
+            if userid in each.author_set:
+                if each not in enr_ce_coll:
+                    enr_ce_coll.append(each)        
+        # enr_ce_coll = node_collection.find({'$in': list_of_pe,'author_set': int(request.user.id)}).sort('last_update', -1)
+
+    ce_coll = node_collection.find({'member_of': pe_gst._id})
+
+    return render_to_response("ndf/course.html",
+                            {'title': title,
+                             'course_gst': pe_gst,
+                             'course_coll': list_of_pe,
+                             'groupid': group_id, 'group_id': group_id,
+                             'ce_coll':list_of_pe,
+                             'enr_ce_coll':enr_ce_coll,
+                            },
+                            context_instance=RequestContext(request)
+                            )     
