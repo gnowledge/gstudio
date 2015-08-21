@@ -4,6 +4,14 @@
 
 <div class="rcard">
 
+{% if first_arg and second_arg and third_arg %}
+  <a href="{% url url_name first_arg second_arg third_arg %}">
+{% elif first_arg and second_arg %}
+  <a href="{% url url_name first_arg second_arg %}">
+{% elif first_arg %}
+  <a href="{% url url_name first_arg %}">
+{% endif %}
+
   <div class="image">
   <div class="{{resource.status|lower}} card-label">
     <div class="label-text"></div>
@@ -23,8 +31,9 @@
       <i class="{{resource.member_of_names_list.0|lower}}"></i>
     {% endif %}
 
-    <span class="title">{{resource.name}}</span>
+    <span class="title">{% firstof resource.altnames resource.name %}</span>
   </div>
+</a>
 
   <div class="content">
 
@@ -41,7 +50,7 @@
       <div>
         <h4 class="text-center card-content-title"><small>Tags</small></h4>
         {# {{resource.tags.0}} #}
-        <div class="">
+        <div>
         {% comment %}
           
           {# <div class="label secondary">{{resource.tags.0}}</div>
@@ -55,11 +64,12 @@
         {% endcomment %}
           {% for each_tag in resource.tags %}
             {% if forloop.counter < 7 %}
-              <div class="label secondary">{{each_tag}}</div>
+              <div class="label secondary"><a href="{% url 'tag_info' group_id each_tag %}">
+              {{each_tag}}</a></div>
             {% endif %}
           {% endfor %}
           {% if resource.tags|length > 6 %}
-            +{{ resource.tags|length|add:"-6"}} more
+            <small>+{{ resource.tags|length|add:"-6"}} more...</small>
           {% endif %}
         
         </div>
@@ -71,16 +81,17 @@
       <div>
         <h4 class="text-center card-content-title"><small>Properties</small></h4>
         
-          {% for each_attr_key, each_attr_val in attr_set_dict.items %}
-            {% if forloop.counter < 4 %}
-              <b>{{each_attr_key}}</b>: {{each_attr_val}}<br/>
-            {% else %}
-              .
+          <small>
+            {% for each_attr_key, each_attr_val in attr_set_dict.items %}
+              {% if forloop.counter < 3 %}
+                <b>{{each_attr_key}}</b>: {{each_attr_val}}<br/>
+              {% endif %}
+            {% endfor %}
+            {% if resource.attribute_set|length > 2 %}
+              +{{ resource.attribute_set|length|add:"-2"}} more...
             {% endif %}
-          {% endfor %}
+          </small>
         
-        {# {{attr_set_dict.source}} #}
-        {{resource.member_of_names_list}}
       </div>
     {% endif %}
 
@@ -97,7 +108,11 @@
   <!-- end of content -->
 
   <div class="action">
-    {# <a href='#'>{{resource.created_at}}</a> #}
-    By {{resource.created_by|get_username}} at {{resource.created_at|date:"d M Y"}}
+    By <a href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}">
+      {{resource.created_by|get_username|truncatechars:"10"}}
+    </a> at {{resource.created_at|date:"d M Y"}}
+    <span class="add-to-collection right" title="Add to collection">
+      <input type="checkbox" style="margin:0;" class="filenode" name="filenode" value="{{resource.pk}}">
+    </span>
   </div>
 </div>

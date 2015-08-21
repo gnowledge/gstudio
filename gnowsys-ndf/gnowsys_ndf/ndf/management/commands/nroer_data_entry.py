@@ -904,14 +904,14 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
 
     # th_id: thumbnail id
     th_id = create_resource_gsystem(updated_res_data)
-    # print "th_id: ", th_id
+    print "th_id: ", th_id
     
     th_obj = node_collection.one({'_id': ObjectId(th_id)})
     th_gridfs_id = th_obj.fs_file_ids[1]
-    # print "th_gridfs_id: ", th_gridfs_id
+    print "th_gridfs_id: ", th_gridfs_id
 
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
-    # print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
+    print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
     node_fs_file_ids = node_obj.fs_file_ids
 
     if len(node_fs_file_ids) == 1:
@@ -919,7 +919,7 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
     elif len(node_fs_file_ids) > 1:
         node_fs_file_ids[1] = ObjectId(th_gridfs_id)
 
-    # print "node_fs_file_ids: ", node_fs_file_ids
+    print "node_fs_file_ids: ", node_fs_file_ids
 
     node_collection.collection.update(
                                         {'_id': ObjectId(node_id)},
