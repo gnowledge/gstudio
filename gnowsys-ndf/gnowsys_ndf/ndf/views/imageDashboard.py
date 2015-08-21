@@ -15,7 +15,7 @@ from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.settings import META_TYPE, GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
-from gnowsys_ndf.ndf.views.methods import get_node_metadata
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, node_thread_access, create_thread_for_node
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id 
 gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
@@ -203,6 +203,9 @@ def image_detail(request, group_id, _id):
     if img_node._type == "GSystemType":
 	return imageDashboard(request, group_id, _id)
     img_node.get_neighbourhood(img_node.member_of)
+    thread_node = None
+    allow_to_comment = None
+    thread_node, allow_to_comment = node_thread_access(group_id, img_node)
 
     imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
                                               '_type': 'File','fs_file_ids': {'$ne': []}, 
@@ -220,6 +223,8 @@ def image_detail(request, group_id, _id):
     return render_to_response("ndf/image_detail.html",
                                   { 'node': img_node,
                                     'group_id': group_id, 'nav_list':nav_li,
+                                    'node_has_thread': thread_node,
+                                    'allow_to_comment':allow_to_comment,
                                     'groupid':group_id, 'imageCollection': imageCollection
                                   },
                                   context_instance = RequestContext(request)
@@ -252,8 +257,10 @@ def image_edit(request,group_id,_id):
     title = GST_IMAGE.name
     if request.method == "POST":
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
-
         img_node.save(is_changed=get_node_common_fields(request, img_node, group_id, GST_IMAGE),groupid=group_id)
+        thread_create_val = request.POST.get("thread_create",'')
+        if thread_create_val == "Yes":
+            return_status = create_thread_for_node(request,group_id, img_node)
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             get_node_metadata(request,img_node)
             teaches_list = request.POST.get('teaches_list','') # get the teaches list 
@@ -268,7 +275,7 @@ def image_edit(request,group_id,_id):
 
             return HttpResponseRedirect(reverse('image_detail', kwargs={'group_id': group_id, '_id': img_node._id}))
         else:
-            url = "/"+ group_id +"/?selected="+str(img_node._id)+"#view_page"
+            url = "/"+ str(group_id) +"/?selected="+str(img_node._id)+"#view_page"
             return HttpResponseRedirect(url)
     else:
         img_node.get_neighbourhood(img_node.member_of)
