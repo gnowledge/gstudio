@@ -84,16 +84,16 @@ def convertVideo(userid, file_id, filename):
     fd.close()
     # -- convert tmp_file tmp_webm file in local disk
     if files.filename.endswith('.webm') == False:
-        input_filename = str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
-        output_filename = str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")
+        input_filename = str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
+        output_filename = str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".webm")
         proc = subprocess.Popen(['ffmpeg', '-y', '-i', input_filename,output_filename])
         proc.wait()
-        files = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")
+        files = open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".webm")
     else : 
-        files = open("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
+        files = open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
     
     filetype = "video"
-    oxData = ox.avinfo("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
+    oxData = ox.avinfo("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
     duration = oxData['duration'] # fetching duration of video by python ox
     duration = int(duration)
     secs, mins, hrs = 00, 00, 00
@@ -112,15 +112,15 @@ def convertVideo(userid, file_id, filename):
 	videoDuration = "00:00:30"
     else :
     	videoDuration = "00:00:00"    	
-    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # GScreating thumbnail of video using ffmpeg
+    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".png")]) # GScreating thumbnail of video using ffmpeg
     proc.wait()
-    background = Image.open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")
+    background = Image.open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".png")
     fore = Image.open(MEDIA_ROOT + "ndf/images/poster.jpg")
     background.paste(fore, (120, 100))
     draw = ImageDraw.Draw(background)
     draw.text((120, 100), durationTime, (255, 255, 255)) # drawing duration time on thumbnail image
-    background.save("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
-    thumbnailvideo = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
+    background.save("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+"Time.png")
+    thumbnailvideo = open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+"Time.png")
     
     webmfiles = files
     '''storing thumbnail of video with duration in saved object'''

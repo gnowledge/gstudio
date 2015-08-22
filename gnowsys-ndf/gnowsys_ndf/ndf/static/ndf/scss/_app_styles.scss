@@ -1046,3 +1046,242 @@ aside#help{
         font-weight: bold;
     }
 }
+
+
+.rcard {
+  overflow: hidden;
+  color: #272727;
+  // height: 17rem;
+  // box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
+  // border-radius: 2px;
+  // border: solid 0.5px #E1E1E1;
+  background-color: #f5f5f5;
+
+  &:hover{
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    transition: box-shadow 0.5s ease;
+  }
+
+  .title {
+    // line-height: 3rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+
+  .content {
+    padding: 0.5rem 2rem;
+    // font-weight: 300;
+    border-radius: 0 0 2px 2px;
+    overflow: hidden;
+    height: 7.25rem;
+
+    .slick-slider{
+      margin-bottom: 0;
+    }
+
+    .slick-prev{
+      left: 0.25rem;
+
+      &:before{
+        // content: "<";
+        color: #ccc;
+      }
+    }
+
+    .slick-next{
+      right: 0.25rem;
+
+      &:before{
+        // content: ">";
+        color: #ccc;
+      }
+    }
+
+    .card-content-title{
+      width: 100%; 
+      border-bottom: 1px solid #808080;
+      line-height: 0.25em;
+      margin: 10px 0 20px;
+
+      small{
+        padding: 0 10px;
+        background-color: #f5f5f5
+      }
+    }
+  }
+
+  .action {
+    border-top: 1px solid rgba(160, 160, 160, 0.2);
+    padding: 0.25rem 0.5rem;
+    color: gray;
+    font-size: small;
+    height: 2rem;
+
+    .add-to-collection{
+      opacity: 0.5;
+
+      &:hover{
+        opacity: 1;
+      }
+    }
+  }
+
+  a {
+    // color: #ffab40;
+    // margin-right: 1.3rem;
+    // transition: color 0.3s ease;
+    // text-transform: uppercase;
+    // text-decoration: none;
+  }
+
+  .image {
+    position: relative;
+    background-color: #E1E1E1;
+    box-shadow: 0px -35px 35px -20px rgb(128, 128, 128) inset;
+    height: 8em;
+    overflow: hidden;
+
+    &:hover{}
+
+    .title {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      padding: 0.25rem 1rem;
+      color: #fff;
+      width: 100%;
+      box-shadow: 0px -25px 25px -20px rgb(128, 128, 128) inset;
+      text-transform: uppercase;
+      text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
+      font-family: Open Sans Bold;
+    }
+
+    img {
+      border-radius: 2px 2px 0 0;
+      display: block;
+      margin: 0 auto;
+      opacity: 0.9;
+      height: 8em;
+      // filter: blur(0.25px);
+      // filter: contrast(4);
+      // filter: grayscale(0.1);
+      filter: brightness(0.75);
+      -webkit-filter: brightness(0.75);
+
+      &:hover{
+        // filter: blur(0px);
+        filter: brightness(1);
+        -webkit-filter: brightness(1);
+        transform: translate3d(0, 0, 0);
+        transition: filter 1s ease;
+      }
+    }
+
+    i{
+      font-size: 7rem;
+      opacity: 0.75;
+      display: block;
+      margin: -15px auto;
+      text-align: center;
+      color: gray;
+      font-family: "foundation-icons";
+      font-style: normal;
+      font-variant: normal;
+      text-transform: none;
+      text-decoration: inherit;      
+      // line-height: 1;
+      // display: inline-block;
+      // font-weight: normal;
+    }
+
+    i.file:before{ content: "\f18e"; }
+    i.page:before{ content: "\f18e"; }
+    i.collection:before{ content: "\f18a"; }
+    // i.application:before{ content: "\f189"; }
+    i.documents:before{ content: "\f18b"; }
+    i.pdf:before{ content: "\f18b"; }
+    i.text:before{ content: "\f18e"; }
+    i.interactives:before{ content: "\f1b2"; }
+    i.ebooks:before{ content: "\f11e"; }
+    i.images:before{ content: "\f125"; }
+    i.audios:before, i.audio:before{ content: "\f17b"; }
+    i.videos:before, i.video:before{ content: "\f20e"; }
+  }
+
+  .card-label { 
+    border-style: solid; 
+    border-width: 0 70px 40px 0;  
+    float:right; 
+    height: 0px; 
+    width: 0px;
+    transform:rotate(360deg);
+    position: absolute;
+    right: 0px;
+    z-index: 1;
+    opacity: 0.75;
+  }
+
+  .card-label {
+      border-color: transparent #333 transparent transparent;
+      border-color: rgba(255,255,255,0) #333 rgba(255,255,255,0) rgba(255,255,255,0);
+    }
+
+  .published.card-label {
+      border-color: transparent $success-color transparent transparent;
+      border-color: rgba(255,255,255,0) $success-color rgba(255,255,255,0) rgba(255,255,255,0);
+
+      .label-text:before{
+        // content: url('/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-annotate.svg');
+        content: "\221A";
+        margin-left: 5px;
+        font-size: larger;
+      }
+    }
+
+  .draft.card-label {
+      border-color: transparent $secondary-color transparent transparent;
+      border-color: rgba(255,255,255,0) $secondary-color rgba(255,255,255,0) rgba(255,255,255,0);
+
+      .label-text:before{
+        content: "Draft";
+      }
+    }
+
+  .deleted.card-label {
+      border-color: transparent $alert-color transparent transparent;
+      border-color: rgba(255,255,255,0) $alert-color rgba(255,255,255,0) rgba(255,255,255,0);
+
+      .label-text:before{
+        content: "Deleted";
+      }
+    }
+  
+  .moderation.card-label {
+      border-color: transparent $primary-color transparent transparent;
+      border-color: rgba(255,255,255,0) $primary-color rgba(255,255,255,0) rgba(255,255,255,0);
+
+      .label-text:before{ content: "Mod"; }
+    }
+  
+  .hidden.card-label {
+      border-color: transparent #000 transparent transparent;
+      border-color: rgba(255,255,255,0) #000 rgba(255,255,255,0) rgba(255,255,255,0);
+
+      .label-text:before{ content: "hidden"; }
+    }
+  
+  .label-text {
+    color: #fff; 
+    font-size: 0.75rem; 
+    font-weight: bold; 
+    position: relative; 
+    right: -35px; 
+    // top: 2px; 
+    white-space: nowrap;
+    transform: rotate(30deg);
+  } 
+}
+
+
+

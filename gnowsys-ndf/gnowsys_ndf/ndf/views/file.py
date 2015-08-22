@@ -1561,3 +1561,13 @@ def file_edit(request,group_id,_id):
                                 },
                                   context_instance=RequestContext(request)
                               )
+
+
+def get_gridfs_resource(request, gridfs_id):
+
+    # print gridfs_id
+
+    f = node_collection.find_one({'_type': 'File'})
+    gridfs_obj = f.fs.files.get(ObjectId(gridfs_id))
+
+    return HttpResponse(gridfs_obj.read(), content_type=gridfs_obj.content_type)

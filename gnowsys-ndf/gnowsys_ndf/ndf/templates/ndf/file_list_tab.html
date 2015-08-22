@@ -22,7 +22,11 @@
   <!-- Existing card list-->
   {% for each_res in resource_type %}      
     <!-- #{#%# get_grid_fs_object each_res as grid_fs_obj %} -->
+    <li class="card-image-wrapper">
+      {% include 'ndf/card.html' with resource=each_res url_name=detail_urlname first_arg=group_id second_arg=each_res.pk %}
+    </li>
 
+    {% comment %}
     <li class="card">
       {% if grouptype == "Moderated" %}
         {% if each_res.status == "DRAFT" %}
@@ -68,13 +72,7 @@
 	      -->
 	      {% endif %}
               <img src="{% url 'getFileThumbnail' group_id each_res.pk %}" alt="No thumbnail available!"/>
-             {% comment %}
-             <!--
-              <video width="100px" src="{% url 'getFileThumbnail' group_id each_res.pk %}">
-               No thumbnail available!
-              </video>
-             -->
-             {% endcomment %}
+             
             {% else %}
               <span class="fi-page-filled" style="font-size:40px"></span>
             {% endif %}
@@ -112,6 +110,8 @@
 
       </div>
     </li>
+    {% endcomment %}
+
       <!-- end new -->      
 
     {% empty %}
@@ -156,3 +156,22 @@
   {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
 
 {% endif %}
+
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
+<link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
+<script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
+
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('.content').slick({
+    // dots: true,
+    infinite: true,
+    arrows: true,
+    speed: 500,
+    // fade: true,
+    cssEase: 'linear'
+  });
+    
+  })
+</script>

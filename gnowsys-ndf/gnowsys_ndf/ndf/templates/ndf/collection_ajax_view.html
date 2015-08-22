@@ -1,13 +1,10 @@
 {% load ndf_tags %}
 {% load i18n %}
-{% load cache %}
 
 {% block head %}
 
-  {% cache 3600 collection_view_static_files %}
   <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> 
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
-  {% endcache %}
     
   <script type="text/javascript">
     $(document).ready(function() {      
@@ -208,7 +205,9 @@
 
   {% endif %}
   <!-- <b class="current">{{node.name}}</b> -->
-  <h4 class="">{{node.name}}</h4>
-  <div>
-    <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
-  </div>
+  {% if node.collection_set %}
+    <h4 class="">{{node.name}}</h4>
+    <div>
+      <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
+    </div>
+  {% endif %}
