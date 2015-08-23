@@ -437,7 +437,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       # Remove this when publish button is setup on interface
       person_gs.status = u"PUBLISHED"
 
-    person_gs.save(is_changed=is_changed)
+    person_gs.save(is_changed=is_changed,groupid=group_id)
     for each_rel in person_gs.relation_set:
       if each_rel and "officer_incharge_of" in each_rel:
         existing_colg = each_rel["officer_incharge_of"]
@@ -573,7 +573,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
         # required modules defined for Program Officers under MIS GApp
         if auth_node.agency_type != u"Program Officer":
           auth_node.agency_type = u"Program Officer"
-          auth_node.save()
+          auth_node.save(groupid=group_id)
 
       if "Program Officer" in person_gs.member_of_names_list:
         # If Person node (GSystem) is of Program Officer type

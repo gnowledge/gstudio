@@ -1,72 +1,30 @@
 {% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff from ndf_tags %}
-
-<style type="text/css">
-  #search_text {
-    border-bottom: solid thin gray;
-    background-color: #383838;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    padding: none !important;
-    color: #fff !important;
-    height: inherit;
-    box-shadow: none;
-  }
-
-::-webkit-input-placeholder {
-   color: gray;
-}
-
-:-moz-placeholder { /* Firefox 18- */
-   color: gray;  
-}
-
-::-moz-placeholder {  /* Firefox 19+ */
-   color: gray;  
-}
-
-:-ms-input-placeholder {  
-   color: gray;  
-}
-#search_text:focus{
-    /*color: white !important;*/
-    border-bottom-color: white;
-    transition: 1s ease-out;
-}
-
-#search-submit{
-  background-color: #383838;
-  color: gray;
-}
-#search-submit:hover {
-  color: white;
-  background-color: gray;
-  transition: 0.8s ease-out;
-}
-
-</style>
 {% load i18n %}
 {% load cache %}
 
   {% get_group_object groupid as group_object %}
   <!-- <div class="contain-to-grid sticky"> -->
-  <div class="row" id="top-headers">
+  <div id="top-headers">
 
     <!-- top LHS logo -->
     {% cache 3600 site_logo %}
-    <a class="large-2 small-5 medium-5 columns logo" href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+    <!--{# <a class="large-2 small-5 medium-5 columns logo" href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
       <img src="{{site.LOGO}}">
-    </a>
+    </a> #}-->
     {% endcache %}
 
     <!-- two menus headers -->
-    <div class="large-10 small-7 medium-7 columns two-nav-container">
+    {# <div class="large-12 small-7 medium-7 columns two-nav-container"> #}
     
       <!-- first menu header  -->
-      <nav class="top-bar " data-topbar role="navigation">
+      <nav class="top-bar" id="first-header" data-topbar role="navigation">
 
         <ul class="title-area">
-          <li class="name"> </li>
+          <li class="name"> 
+            <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+              <img src="{{site.LOGO}}">
+            </a></h1>
+          </li>
           <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
           <li class="toggle-topbar"><a href="#"><span>{% trans "Menu" %}</span></a></li>
         </ul>
@@ -335,13 +293,13 @@
       <!-- start of second nav  or group level header-->
       <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %}" id="group-level-header">
 
-        <nav class="top-bar" data-topbar data-options="sticky_on: large" role="navigation">
+        <nav class="top-bar" id="second-header" data-topbar data-options="sticky_on: large" role="navigation">
         <!-- don't show this app bar for groups with editable moderated -->
         {% if "ModeratingGroup" not in group_object.member_of_names_list and "CourseEventGroup" not in group_object.member_of_names_list %}
         {% if not is_ac_url %}
         {% if request.path != "/welcome" %}
           <!-- #{#% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %} -->
-          <ul class="title-area">
+          <ul class="title-area text-center">
             <li class="name">
               <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home"></i></a></h1>
               <!-- <i class="fi-home"></i> -->
@@ -402,10 +360,10 @@
                   name="search_form" method="GET" >
               
                   <div class="row collapse">
-                    <div class="large-9 small-10 columns">
+                    <div class="large-11 small-10 columns">
                       <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
                     </div>
-                    <div class="large-3 small-2 columns">
+                    <div class="large-1 small-2 columns">
                       <button type="submit" class="tiny button" value="" id="search-submit">
                         <i class="fi-magnifying-glass"></i>
                       </button>
@@ -435,7 +393,7 @@
                   {% if request.path|length > 6 and "repository" not in request.path %}
                     {% if "/partner/" not in request.path %}
                     <!-- <ul class="button-group nroer-menu"> -->
-                    <li class="divider"></li>
+                    <li class=""></li>
                     {% for each_gapp in nroer_menu.gapps %}
                       {% for k, v in each_gapp.items %}
                         <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
@@ -465,42 +423,16 @@
         {% else %}
         
         <ul class="title-area">
-          <li class="name" ><h1><a href="#">Invitation to CLIx</a></h1></li>
+          <li class="name" ><h1><a href="#"></a></h1></li>
         </ul>
         
-        <!-- Right Nav Section -->
-        {% if user.is_authenticated %}
-        {% get_user_object request.user.id as user_obj %}
-
-        {% check_is_gstaff groupid user_obj as gstaff_access %}
-        {% if not gstaff_access %}
-          <section>
-
-          <ul class="right" >
-          {% user_access_policy groupid request.user as user_access %} 
-
-            <li>
-            {% if user_access == "allow" %}
-              <input class="enroll-btn button large" type="button" value="ENROLLED" disabled="disabled">
-            {% else %}
-            {% if allow_to_join %}
-              <input class="enroll-btn button large" type="button" value="ENROLL">
-            {% else %}
-              <input class="enroll-btn button large" type="button" value="ENROLLMENT CLOSED" disabled="disabled">
-            {% endif %}
-            {% endif %}
-            </li>
-          </ul> 
-          </section>
-          {% endif %}
-        {% endif %}
         {% endif %} <!-- end of "group's edit_policy" urls check -->
         </nav>
       </div>
 
       <!-- end of second nav -->
 
-    </div>
+    {# </div> #}
     <!-- end of section appointed for two header's -->
   </div>
   <!-- end of LOGO + top header's -->
