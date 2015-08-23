@@ -10,12 +10,15 @@ from shutil import move as SHUTIL_MOVE
 # imports from third-party app(s)
 
 # imports from project-app(s)
-from gnowsys_ndf.settings import PROJECT_ROOT
+
+# NOTE: Please write all import(s) from settings file, inside the function(s)
+# wherever it is required. For e.g., refer get_project_abspath() function.
 
 
 def get_project_abspath():
     """Returns absolute path of this project-directory.
     """
+    from gnowsys_ndf.settings import PROJECT_ROOT
     return PROJECT_ROOT.split('gnowsys-ndf')[0]
 
 

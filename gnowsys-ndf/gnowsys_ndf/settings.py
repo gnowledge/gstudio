@@ -1,9 +1,18 @@
 # Django settings for gnowsys-ndf project.
+
+# imports from python libraries
+import os
+
+# imports from core django libraries
 from django.conf import global_settings
 # from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
-import os
+
+# imports from third-party app(s)
 import djcelery
+
+from gnowsys_ndf.ndf.utils import (is_dir_exists, ensure_dir, get_current_dbs_path,
+    move_file_or_dirctory)
 
 DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1"]
@@ -259,6 +268,20 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Example: "/home/<user-name>/data/"
 # Don't edit this below path
 GSTUDIO_DATA_ROOT = os.path.join(os.path.expanduser("~/"), 'gstudio_data')
+
+try:
+    if not is_dir_exists(GSTUDIO_DATA_ROOT):
+        ensure_dir(GSTUDIO_DATA_ROOT)
+        print "\nGSTUDIO_DATA_ROOT path: {0}... created succesfully.".format(GSTUDIO_DATA_ROOT)
+        for each_path in get_current_dbs_path().values():
+            if each_path:
+                # If exists, then only move.
+                move_file_or_dirctory(each_path, GSTUDIO_DATA_ROOT)
+                print "  {0} moved succesfully to {1}".format(os.path.basename(each_path), GSTUDIO_DATA_ROOT)
+        print ""
+except Exception as e:
+    pass
+    # raise Exception("\nException (settings.GSTUDIO_DATA_ROOT): {0}\n".format(str(e)))
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
