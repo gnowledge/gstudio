@@ -227,9 +227,60 @@ class Node(DjangoDocument):
         'rating':[{'score':int,
                   'user_id':int,
                   'ip_address':basestring}],
-    	'snapshot':dict
+        'snapshot':dict
     }
-    
+
+    indexes = [
+        {
+            # 1: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('name', INDEX_ASCENDING)
+            ]
+        }, {
+            # 2: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('created_by', INDEX_ASCENDING)
+            ]
+        }, {
+            # 3: Single index
+            'fields': [
+                ('group_set', INDEX_ASCENDING)
+            ]
+        }, {
+            # 4: Single index
+            'fields': [
+                ('member_of', INDEX_ASCENDING)
+            ]
+        }, {
+            # 5: Single index
+            'fields': [
+                ('name', INDEX_ASCENDING)
+            ]
+        }, {
+            # 6: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('status', INDEX_ASCENDING), \
+                ('access_policy', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 7: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('status', INDEX_ASCENDING), \
+                ('access_policy', INDEX_ASCENDING), ('created_at' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 8: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 9: Compound index
+            'fields': [
+                ('status', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, 
+    ]
+
     required_fields = ['name', '_type'] # 'group_set' to be included
                                         # here after the default
                                         # 'Administration' group is
@@ -1112,6 +1163,21 @@ class GSystem(Node):
         'license': basestring       # contains license/s in string format
     }
 
+
+    indexes = [
+        {
+            # 10: Single index
+            'fields': [
+                ('attribute_set', INDEX_ASCENDING)
+            ]
+        }, {
+            # 11: Single index
+            'fields': [
+                ('relation_set', INDEX_ASCENDING)
+            ]
+        }
+    ]
+
     use_dot_notation = True
 
 
@@ -1128,6 +1194,15 @@ class File(GSystem):
             'unit': unicode
         }  # dict used to hold file size in int and unit palace in term of KB,MB,GB
     }
+
+    indexes = [
+        {
+            # 12: Single index
+            'fields': [
+                ('mime_type', INDEX_ASCENDING)
+            ]
+        }
+    ]
 
     gridfs = {
         'containers': ['files']
@@ -1583,8 +1658,6 @@ class Analytics(DjangoDocument):
 
   def identity(self):
     return self.__unicode__()
-
-
 
 
 #  TRIPLE CLASS DEFINITIONS
