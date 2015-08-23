@@ -332,7 +332,7 @@ ul#navigation li a.last {
                   {% check_is_gstaff groupid request.user as is_gstaff %}
                   {% if is_gstaff %}
                       <li><a href="{% url edit_url group_id %}" class="tiny button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li><br>
-                      <li><a href="{% url 'program_event_list' group_id %}" class="tiny button"> {% trans "List Programs" %}</a></li><br>
+                      <li><a href="{% url 'program' group_id %}" class="tiny button"> {% trans "List Programs" %}</a></li><br>
                   {% endif %}
 
 
