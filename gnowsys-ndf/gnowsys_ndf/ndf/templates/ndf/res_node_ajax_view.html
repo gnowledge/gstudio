@@ -266,6 +266,17 @@
   </div>
   {% get_sg_member_of node.pk as list_of_sg_member_of %}
   {% if "CourseEventGroup" not in node.member_of_names_list and "ProgramEventGroup" not in list_of_sg_member_of %}
+  {% user_access_policy group_id request.user as user_access %}
+  {% if user_access == "allow" %}
+    <div class="medium-6 columns">
+      {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
+        <div>
+        {% include "ndf/rating.html" %} 
+        </div><br/>
+      {% endif %}
+    </div>
+  {% endif %} 
+
     <div class="content" id="view-discussion">
         {% get_node group_id as group_obj %}
         {% if "CourseEventGroup" not in group_obj.member_of_names_list %}
@@ -288,20 +299,21 @@
     </ul>
     {% endif %}
 </section>
-  {% check_is_gstaff groupid request.user as is_gstaff %}
-  {% if is_gstaff %}
-  {% if "CourseEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
-      <section class="medium-2 columns"> 
+    {% check_is_gstaff groupid request.user as is_gstaff %}
+    {% if is_gstaff %}
+      {% if "CourseEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
+          <section class="medium-2 columns"> 
             <div class="row">         
-            <div class="medium-6 columns">
-            <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit hide"><i class="fi-pencil"></i> {% trans "Edit " %}{{sg_type}}</a>
-            {% include "ndf/invite_users.html" %}
-            {% include "ndf/invite_admins.html" %}
-        </div></div>  
-    </section>  
-  {% else %} 
+              <div class="medium-6 columns">
+                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit hide"><i class="fi-pencil"></i> {% trans "Edit " %}{{sg_type}}</a>
+                {% include "ndf/invite_users.html" %}
+                {% include "ndf/invite_admins.html" %}
+              </div>
+            </div>  
+          </section>  
+      {% else %} 
 
-    {% get_edit_url node.pk as edit_url %}
-      <li><a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li>
-  {% endif %} 
-  {% endif %} 
+        {% get_edit_url node.pk as edit_url %}
+          <li><a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li>
+      {% endif %} 
+    {% endif %} 
