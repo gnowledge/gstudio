@@ -33,3 +33,25 @@ def delete_resource(request,group_id):
 	else:
 		return HttpResponse("Nothing Deleted.")
 	return HttpResponse("Deleted Successfully")
+
+
+def restore_resource(request, group_id):
+	# NOTE: purge of themes need to be handled differently.
+	# all the collection hierarchy needs to be purged in this case.
+
+	node_id = request.GET.getlist('node_id', '')[0]
+
+	if node_id:
+
+		node_to_be_restore = node_collection.one({'_id': ObjectId(node_id)})
+		# print "==========", node_to_be_restore.snapshot.keys()
+		
+		if node_to_be_restore.snapshot.keys():
+		
+			node_to_be_restore.group_set = [ObjectId(i) for i in node_to_be_restore.snapshot.keys()]
+			node_to_be_restore.save()
+			# print "--- ", node_to_be_restore.group_set
+		
+			return HttpResponse(1)
+
+	return HttpResponse(0)

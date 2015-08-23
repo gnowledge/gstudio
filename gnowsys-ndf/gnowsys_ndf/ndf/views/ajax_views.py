@@ -41,8 +41,8 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time,get_group_name_id
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
@@ -149,8 +149,21 @@ def collection_nav(request, group_id):
 
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
-    if "CourseEventGroup" in group_obj.member_of_names_list:
+    sg_type = None
+    list_of_sg_member_of = get_sg_member_of(group_id)
+    thread_node = None
+    allow_to_comment = None
+
+    if "CourseEventGroup" in group_obj.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of:
+      node_obj.get_neighbourhood(node_obj.member_of)
+
       template = "ndf/res_node_ajax_view.html"
+      if "ProgramEventGroup" in list_of_sg_member_of:
+        sg_type = "ProgramEventGroup"
+      elif "CourseEventGroup" in list_of_sg_member_of:
+        sg_type = "CourseEventGroup"
+      thread_node, allow_to_comment = node_thread_access(group_obj._id, node_obj)
+
     nav_list = request.POST.getlist("nav[]", '')
     n_list = request.POST.get("nav", '')
 
@@ -199,6 +212,9 @@ def collection_nav(request, group_id):
                                   'group_id': group_id,
                                   'groupid':group_id,
                                   'breadcrumbs_list':breadcrumbs_list,
+                                  'sg_type': sg_type,
+                                  'allow_to_comment': allow_to_comment,
+                                  'thread_node': thread_node,
                                   'app_id': node_id, 'topic':topic, 'nav_list':nav_list
                                 },
                                 context_instance = RequestContext(request)
@@ -265,13 +281,13 @@ def shelf(request, group_id):
           shelf_gs.name = unicode(shelf)
           shelf_gs.created_by = int(request.user.id)
           shelf_gs.member_of.append(shelf_gst._id)
-          shelf_gs.save()
+          shelf_gs.save(groupid=group_id)
 
           shelf_R = triple_collection.collection.GRelation()
           shelf_R.subject = ObjectId(auth._id)
           shelf_R.relation_type = has_shelf_RT
           shelf_R.right_subject = ObjectId(shelf_gs._id)
-          shelf_R.save()
+          shelf_R.save(groupid=group_id)
         else:
           if shelf_add:
             shelf_item = ObjectId(shelf_add)
@@ -846,7 +862,7 @@ def add_sub_themes(request, group_id):
         node = node_collection.collection.GSystem()
         # get_node_common_fields(request, node, group_id, theme_GST)
 
-        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_item_GST))
+        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_item_GST),groupid=group_id)
         node.reload()
         # Add this sub-theme into context nodes collection_set
         node_collection.collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -877,7 +893,7 @@ def add_theme_item(request, group_id):
 
       theme_item_node = node_collection.collection.GSystem()
 
-      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST))
+      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST),groupid=group_id)
       theme_item_node.reload()
 
       # Add this theme item into context theme's collection_set
@@ -906,7 +922,7 @@ def add_topics(request, group_id):
         node = node_collection.collection.GSystem()
         # get_node_common_fields(request, node, group_id, topic_GST)
 
-        node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST))
+        node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST),groupid=group_id)
         node.reload()
         # Add this topic into context nodes collection_set
         node_collection.collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -940,11 +956,13 @@ def add_page(request, group_id):
 
     if name not in collection_list:
         page_node = node_collection.collection.GSystem()
-        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page),groupid=group_id)
         page_node.status = u"PUBLISHED"
         page_node.save()
+
         context_node.collection_set.append(page_node._id)
-        context_node.save()
+        context_node.save(groupid=group_id)
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
@@ -999,8 +1017,8 @@ def add_file(request, group_id):
                                 context_node.collection_set.append(old_file_node._id)
                                 old_file_node.status = u"PUBLISHED"
                                 old_file_node.prior_node.append(context_node._id)
-                                old_file_node.save()
-                                context_node.save()
+                                old_file_node.save(groupid=group_id)
+                                context_node.save(groupid=group_id)
                 else:
                         # If availbale ,then return to the topic page
                         return HttpResponseRedirect(url_name)
@@ -1014,10 +1032,10 @@ def add_file(request, group_id):
         file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
         file_obj.prior_node.append(context_node._id)
         file_obj.status = u"PUBLISHED"
-        file_obj.save()
+        file_obj.save(groupid=group_id)
         context_node.collection_set.append(file_obj._id)
-        file_obj.save()
-        context_node.save()
+        file_obj.save(groupid=group_id)
+        context_node.save(groupid=group_id)
     return HttpResponseRedirect(url_name)
 
 
@@ -1186,7 +1204,7 @@ def change_group_settings(request,group_id):
                 group_node.disclosure_policy = disclosure_policy
                 group_node.encryption_policy = encryption_policy
                 group_node.modified_by = int(request.user.id)
-                group_node.save()
+                group_node.save(groupid=group_id)
                 return HttpResponse("changed successfully")
         except:
             return HttpResponse("failed")
@@ -1255,7 +1273,7 @@ def make_module_set(request, group_id):
                     if(check == 'True'):
                         return HttpResponse("This module already Exists")
                     else:
-                        gsystem_obj.save()
+                        gsystem_obj.save(groupid=group_id)
                         create_relation_of_module(node._id, gsystem_obj._id)
                         create_version_of_module(gsystem_obj._id,node._id)
                         check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
@@ -1432,7 +1450,7 @@ def graph_nodes(request, group_id):
   exception_items = [
                       "name", "content", "_id", "login_required", "attribute_set", "relation_set",
                       "member_of", "status", "comment_enabled", "start_publication",
-                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set", "access_policy",
+                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set", "access_policy", "snapshot",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language",
                       "property_order", "rating", "apps_list", "annotations", "instance of"
@@ -2164,7 +2182,7 @@ def remove_user_from_author_set(request, group_id):
         if node.created_by == request.user.id:
             node.author_set.remove(user_id)
             can_remove = True
-            node.save()
+            node.save(groupid=group_id)
 
             if node.author_set:
                 for each in node.author_set:
@@ -2282,7 +2300,7 @@ def annotationlibInSelText(request, group_id):
     }
     sg_obj.annotations.append(ann)
   
-  sg_obj.save()
+  sg_obj.save(groupid=group_id)
 
   return HttpResponse(json.dumps(sg_obj.annotations))
 
@@ -4698,7 +4716,7 @@ def edit_task_title(request, group_id):
         title = request.POST.get('title',"")
 	task = node_collection.find_one({'_id':ObjectId(taskid)})
         task.name = title
-	task.save()
+	task.save(groupid=group_id)
         return HttpResponse(task.name)
     else:
 	raise Http404
@@ -4718,7 +4736,7 @@ def edit_task_content(request, group_id):
     	usrname = request.user.username
     	filename = slugify(task.name) + "-" + usrname + "-"
     	task.content = org2html(content_org, file_prefix=filename)
-	task.save()
+	task.save(groupid=group_id)
         return HttpResponse(task.content)
     else:
 	raise Http404
@@ -4788,7 +4806,7 @@ def save_time(request, group_id, node):
      name_arr = name.split("--")
      new_name = unicode(str(name_arr[0]) + "--" + str(name_arr[1]) + "--" + str(start_time))
      event_node.name = new_name
-     event_node.save() 
+     event_node.save(groupid=group_id) 
   return HttpResponse("Session rescheduled") 
 
 @get_execution_time

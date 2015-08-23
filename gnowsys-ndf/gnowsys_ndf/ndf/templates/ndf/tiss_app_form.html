@@ -1,0 +1,308 @@
+{% load cache %}
+{% block head %}
+  <meta charset="utf-8" />
+
+  <!-- Set the viewport width to device width for mobile -->
+  <meta name="viewport" content="width=device-width" />
+
+  <style type="text/css">
+    .testing *{
+      font-size: 1px !important;
+    }
+
+    .fullWidth {
+      width: 100%;
+      max-width: initial;      
+    }
+
+    table.no-border {
+      margin: 0 !important;
+      /*border: 1px solid black !important;*/
+      border: none !important;
+      /*border-radius: 0 !important;*/
+    }
+
+    table {
+      display: block;
+      margin: 0 !important;
+      border-spacing: 0;
+    }
+
+
+
+    td, th {
+      font-size: 12px !important;
+    }
+    
+  </style>
+
+{% endblock %}
+
+{% block body_content %}
+
+
+  <div id="testing" style="margin-right:2px;">
+    <!-- Header -->
+    <br>
+    <div class="text-center" style="margin-bottom:0.125rem;">
+    {% cache 3600 tiss_form_header  %}
+      <img src="http://studio.tiss.edu/static/ndf/images/tiss_form_header.png" width="530px">
+    {% endcache %}
+
+    {% if node.user_photo %}
+      {% cache 3600 node.user_photo %}
+      <img src="http://studio.tiss.edu/{{groupid}}/file/readDoc/{{node.user_photo}}" width="100px" style="display:inline-block;margin-top:2rem;">
+      {% endcache %}
+    {% endif %}
+    </div>
+    Form No. {{node.enrollment_code}}
+    <!-- Course -->
+    <table class="fullWidth" style="margin-top:0.25rem;">
+      <tbody>
+        <tr>
+          <td width="2%">I.</td>
+          <td width="35%">Organization</td></br>
+          <td width="1%"></td>
+          <td width="62%"></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Name of College</td>
+          <td>:</td>
+          <td>{{node.student_belongs_to_college.0.name}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Personal -->
+    <table class="fullWidth">
+      <tbody>
+        <tr>
+          <td width="2%">II.</td>
+          <td width="35%">Personal</td>
+          <td width="1%"></td>
+          <td width="62%" colspan="3"></td>
+          <!-- <th></th> -->
+          <!-- <th></th> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>First Name</td>
+          <td>:</td>
+          <td colspan="3">{{node.first_name}}</td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>Middle Name</td>
+          <td>:</td>
+          <td colspan="3">{{node.middle_name|default_if_none:""}}</td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>Last Name</td>
+          <td>:</td>
+          <td colspan="3">{{node.last_name|default_if_none:""}}</td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>Sex</td>
+          <td>:</td>
+          <td colspan="3">
+          	{{node.gender}}
+          </td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>Date of Birth</td>
+          <td>:</td>
+          <td width="38%" colspan="3">{% if node.dob %}{{node.dob|date:"d-m-Y"}}{% endif %}</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Religion</td>
+          <td>:</td>
+          <td width="35%">{{node.religion|default_if_none:""}}</td>
+          <td width="48%" colspan="2">Caste Category : {{node.student_of_caste_category.0.name|default_if_none:""}}</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>E-mail ID</td>
+          <td>:</td>
+          <td colspan="3">{{node.email_id|default_if_none:""}}</td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>Mobile No.</td>
+          <td>:</td>
+          <td width="35%">{{node.mobile_number|default_if_none:""}}</td>
+          <td width="48%" colspan="2 "></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Alternate No./Landline</td>
+          <td>:</td>
+          <td colspan="3">{{node.alternate_number|default_if_none:"  -  "}}</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Languages Known</td>
+          <td>:</td>
+          <td colspan="3">
+          {% for each_lang in node.languages_known %}{{each_lang}}&nbsp; {% endfor %}</td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>Aadhaar Card No. </td>
+          <td>:</td>
+          <td colspan="3">{{node.aadhar_id|default_if_none:""}}</td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Address -->
+    <table class="fullWidth last">
+      <tbody>
+        <tr>
+          <td width="2%">III.</td>
+          <td width="35%">Address</td>
+          <td width="1%"></td>
+          <td width="62%" colspan="3"></td>
+          <!-- <th></th> -->
+          <!-- <th></th> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>House/Street</td>
+          <td>:</td>
+          <td colspan="3">{{node.house_street|default_if_none:""}}</td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>Village</td>
+          <td>:</td>
+          <td colspan="3">{{node.village|default_if_none:""}}</td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>Taluka</td>
+          <td>:</td>
+          <td width="35%">{{node.taluka|default_if_none:""}}</td>
+          <td width="48%" colspan="2">Town/City : {{node.town_city|default_if_none:""}}</td>
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>State</td>
+          <td>:</td>
+          <td width="35%">{{node.person_belongs_to_state.0.name|default_if_none:""}}</td>
+          <td width="48%" colspan="2">District : {{node.person_belongs_to_district.0.name|default_if_none:""}}</td>
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>Pin Code</td>
+          <td>:</td>
+          <td colspan="3">{{node.pin_code|default_if_none:""}}</td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+      </tbody>
+    </table>
+<!--   </div>
+
+  <div id="testing_2">
+ -->    <!-- Educational -->
+    <table class="fullWidth">
+      <tbody>
+        <tr>
+          <td width="2%">IV.</td>
+          <td width="35%">Educational</td>
+          <td width="1%"></td>
+          <td width="62%" colspan="3"></td>
+          <!-- <th></th> -->
+          <!-- <th></th> -->
+        </tr>
+        <tr>
+          <td></td>
+          <td>Year of Passing XII</td>
+          <td>:</td>
+          <td width="20%">{{node.12_passing_year|date:"d-m-Y"}}</td>
+          <td width="63%" colspan="2">Year of Study (I/II/III) : {{node.degree_year|default_if_none:""}}</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Name of Degree</td>
+          <td>:</td>
+          <td width="20%">{{node.degree_name|default_if_none:""}}</td>
+          <td width="63%" colspan="2">Stream/Subject : {{node.degree_specialization|default_if_none:""}}</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="nss_reg_td">Are you registered with NSS?</td>
+          <td>:</td>
+          <td width="20%">{% if node.is_nss_registered %}Yes{% else %}No {% endif %} </td>
+          <td width="63%" colspan="2">College Roll No. : {{node.college_enroll_num|default_if_none:""}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Declaration -->
+    <table class="fullWidth last">
+      <tbody>
+        <tr>
+          <td width="2%">V.</td>
+          <td width="35%">Declaration</td>
+          <td width="73%"></td>
+        </tr>
+        <tr>
+          <td colspan="3" style="line-height:5px;" class="declration_td">
+              I, {{node.name}}, declare that the information furnished in this application form is complete and accurate. I have thoroughly understood the NUSSD Programme and course structure. I hereby agree to undergo fieldwork in organization(s) as specified by NUSSD from time to time as part of training. I agree to enroll for the NUSSD Programme and abide by the rules and regulations of the institution.
+          </td>
+          <!-- <td></td> -->
+          <!-- <td></td> -->
+        </tr>
+        <tr>
+          <td width="35%" colspan="2">
+              {% if node.signature %}
+              {% cache 3600 node.signature signature %}
+            	 <img src="/{{groupid}}/file/readDoc/{{node.signature}}" width="125px" style="margin-left:3rem;">
+               {% endcache %}
+              {% endif %}
+		      </td>
+		      <!-- <td></td> -->
+          <td width="35%" class="text-right">{{node.registration_date|date:"d-m-Y"}}</td>
+
+        </tr>
+
+        <tr>
+          <td></td>
+          <td class="text-left">Signature of applicant</td>
+          <td class="text-right">Date</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+
+{% endblock %}
+
+

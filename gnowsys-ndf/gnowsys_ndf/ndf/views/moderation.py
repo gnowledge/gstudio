@@ -121,9 +121,10 @@ def all_under_moderation(request, group_id):
 	group_obj = get_group_name_id(group_id, get_obj=True)
 	if not group_obj.edit_policy == 'EDITABLE_MODERATED':
 		raise Http404('Group is not EDITABLE_MODERATED')
-
-	mod_group_instance = CreateGroup(request)
-	list_of_sg_mn = mod_group_instance.get_all_subgroups_member_of_list(group_obj._id)
+	list_of_sg_mn = get_sg_member_of(group_id)
+	# mod_group_instance = CreateGroup(request)
+	# print "\n\n list_of_sg_mn",list_of_sg_mn
+	# list_of_sg_mn = mod_group_instance.get_all_subgroups_member_of_list(group_obj._id)
 	if "ProgramEventGroup" in list_of_sg_mn:
 		sg_member_of = "ProgramEventGroup"
 		mod_group_instance = CreateEventGroup(request)
@@ -228,7 +229,7 @@ def approve_resource(request, group_id):
 					group_set_details_dict['newly_appended_group_id'],\
 					 node_obj._id)
 			# node_obj.modified_by = int(request.user.id)
-			node_obj.save()
+			node_obj.save(groupid=group_id)
 
 			flag = 1
 		else:
