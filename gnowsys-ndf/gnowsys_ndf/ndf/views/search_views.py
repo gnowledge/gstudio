@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_execution_time,create_gattribute, create_grelation, get_group_name_id
 from django.template import RequestContext
 #from stemming.porter2 import stem
 
@@ -55,12 +55,12 @@ def search_page(request, group_id):
 	# 			group_id = str(auth._id)
 	# else:
 	# 	pass
-
-
 	try:
-	    group_id = ObjectId(group_id)
+		group_id = ObjectId(group_id)
 	except:
-	    group_name, group_id = get_group_name_id(group_id)
+		group_name, group_id = get_group_name_id(group_id)
+
+
 
 	context_to_return = getRenderableContext(group_id)
 	return render(request, 'ndf/search_page.html', context_to_return)
@@ -159,15 +159,19 @@ def results_search(request, group_id, return_only_dict = None):
 	userid = request.user.id
 	# print "\n------\n", request.GET
 
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-		if group_ins:
-			group_id = str(group_ins._id)
-		else: 
-			auth = node_collection.one({'_type': 'Author', 'created_by': unicode(userid) })
-    		if auth :
-				group_id = str(auth._id)
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(group_id) is False :
+	# 	group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+	# 	if group_ins:
+	# 		group_id = str(group_ins._id)
+	# 	else: 
+	# 		auth = node_collection.one({'_type': 'Author', 'created_by': unicode(userid) })
+ #    		if auth :
+	# 			group_id = str(auth._id)
+	try:
+		group_id = ObjectId(group_id)
+	except:group_name, group_id = get_group_name_id(group_id)
+	
 
 	# INTIALISE THE FLAGS FOR SEARCHING BY NAME / TAGS / CONTENTS
 	user = ""		# stores username

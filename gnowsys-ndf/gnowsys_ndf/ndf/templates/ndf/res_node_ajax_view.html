@@ -294,6 +294,7 @@
       <section class="medium-2 columns"> 
             <div class="row">         
             <div class="medium-6 columns">
+
             <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit hide"><i class="fi-pencil"></i> {% trans "Edit " %}{{sg_type}}</a>
             {% include "ndf/invite_users.html" %}
             {% include "ndf/invite_admins.html" %}
@@ -302,6 +303,6 @@
   {% else %} 
 
     {% get_edit_url node.pk as edit_url %}
-      <li><a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li>
+      <li><a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny  button edit small-4 columns large-1 columns end"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li>
   {% endif %} 
   {% endif %} 
