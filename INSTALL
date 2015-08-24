@@ -160,7 +160,7 @@
       > python manage.py syncdb
       > python manage.py filldb
       > python manage.py sync_existing_documents
-      > python manage.py ensure_index
+      > python manage.py create_index
       > python manage.py runserver
 
       NOTE: For creating structure related to Course & MIS,
