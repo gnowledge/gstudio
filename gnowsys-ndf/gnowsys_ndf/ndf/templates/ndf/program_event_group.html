@@ -60,6 +60,8 @@
 {% endblock %}
 
 {% block meta_content %}
+      <a href="{% url 'program' parent_groupid_of_pe %}" class="tiny button"> {% trans "Events" %}</a>
+
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
         <span><a class="tiny button" href="{% url 'page_create_edit' node.pk %}?program_res=True">{% trans "Add Page" %}</a></span>
