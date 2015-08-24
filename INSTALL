@@ -14,7 +14,7 @@
 
       > sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv ipython libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg2theora
 
-  [2] Get latest version of gstudio-mongokit - Try one of the following commands:
+  [2] Get latest version of gstudio-mongokit using one of the following commands:
 
       (1) git clone https://github.com/gnowledge/gstudio.git
       (2) git clone git@github.com:gnowledge/gstudio.git  
@@ -107,18 +107,21 @@
           (c) sudo apt-get install python-software-properties python g++ make nodejs
 
       (4) Installing Bower:
-          sudo npm install -g bower
+          > sudo npm install -g bower
 
       (5) To install JS/CSS dependencies:
-          cd gstudio/gnowsys-ndf  # Navigate to project-root
-          bower install           # Install depenedencies
+          > cd gstudio/gnowsys-ndf  # Navigate to project-root
+          > bower install           # Install depenedencies
 
   [9] Install Search Dependencies:
-      (1) Run following command: pip install -U pyyaml nltk
+      (1) Run following command:
+      > pip install -U pyyaml nltk
 
-      (2) Activate the environment: source bin/activate
+      (2) Activate the environment:
+      > source bin/activate
 
-      (3) Go to project-root: cd gstudio/gnowsys-ndf  # directory containing manage.py
+      (3) Go to project-root:
+      > cd gstudio/gnowsys-ndf  # directory containing manage.py
 
       (4) Run ipython [or python] shell
 
@@ -170,7 +173,7 @@
       gstudio on your browser. Enjoy.  
 
 
-* Follow gstudio UPDATE(S)
+* Follow gstudio UPDATE(s)
 
   Since gstudio is frequently updated, please obtain the latest code
   from project's git repository. After each update run above specified
@@ -196,7 +199,7 @@
           > compass watch
 
 
-* Help querie(s) / Suggestion(s)
+* Help query(ies) / Suggestion(s)
 
   Any issues with this procedure or you need any further help, or to
   file bugs etc. visit us in the mailing list:
