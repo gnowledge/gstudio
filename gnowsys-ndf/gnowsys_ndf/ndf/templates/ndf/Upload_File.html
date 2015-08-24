@@ -200,6 +200,8 @@
 							{% endfor %}
 						</div>
 					</div>
+					<small>({% trans "ctr + click to select multiple values" %})</small>
+					<br/>
 					<br/>
 					<div class ="row">
 						<div class="large-2 columns">
@@ -246,7 +248,7 @@
 		
 		<input type="hidden" name="user" value="{{user.id}}">
 		<input type="hidden" name="page_url" value="{{page_url}}">
-		<input type="submit" id="submitpostid" value="Submit" class="button round medium">
+		<input type="submit" id="submitpostid" value="Submit" class="button medium expand">
 		<p id="message" style="display:none"> 
 			{% trans "Depending on the size of file/s and your Internet speed, upload process may take time. Please do not close this window." %} <br/>
 			{% trans "Please upload videos in webm format. If you upload videos of other formats, it will take longer to publish them." %} 
