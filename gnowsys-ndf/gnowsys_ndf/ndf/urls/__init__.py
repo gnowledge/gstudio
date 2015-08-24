@@ -50,6 +50,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/forum', include('gnowsys_ndf.ndf.urls.forum')),
     (r'^(?P<group_id>[^/]+)/quiz', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
+    (r'^(?P<group_id>[^/]+)/program', include('gnowsys_ndf.ndf.urls.program')),
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
     (r'^(?P<group_id>[^/]+)/search', include('gnowsys_ndf.ndf.urls.search_urls')),
     (r'^(?P<group_name>[^/]+)/task', include('gnowsys_ndf.ndf.urls.task')),
@@ -134,6 +135,7 @@ urlpatterns = patterns('',
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
 
     url(r'^(?P<group_id>[^/]+)/repository/?$', 'gnowsys_ndf.ndf.views.methods.repository', name='repository'),
+    url(r'^get_gridfs_resource/(?P<gridfs_id>[^/]+)/?$', 'gnowsys_ndf.ndf.views.file.get_gridfs_resource', name='get_gridfs_resource'),
 
     # django-registration
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),

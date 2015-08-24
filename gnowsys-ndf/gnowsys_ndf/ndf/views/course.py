@@ -47,63 +47,58 @@ def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
     """
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False:
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else:
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth:
-                group_id = str(auth._id)
-    else:
-        pass
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False:
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else:
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth:
+    #             group_id = str(auth._id)
+    # else:
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     app_id = None
     app_id = app._id
     course_coll = None
     all_course_coll = None
     ann_course_coll = None
     enrolled_course_coll = []
+    enr_ce_coll = []
     course_enrollment_status = None
     app_set_id = None
-    if course_id is None:
-        course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
-        if course_ins:
-            course_id = str(course_ins._id)
+    course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
+    if course_ins:
+        course_id = str(course_ins._id)
 
     app_set = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
     app_set_id = app_set._id
+    ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
 
     # Course search view
     title = GST_COURSE.name
 
     if request.user.id:
         course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"})
+        enr_ce_coll = node_collection.find({'member_of': ce_gst._id,'author_set': int(request.user.id)}).sort('last_update', -1)
 
-        all_course_coll = node_collection.find({'member_of': {'$in': [GST_COURSE._id,GST_ACOURSE._id]},
-                                'group_set': ObjectId(group_id),'status':{'$in':[u"PUBLISHED",u"DRAFT"]}})
-
-
-        auth_node = node_collection.one({'_type': "Author", 'created_by': int(request.user.id)})
-	'''
-        if auth_node.attribute_set:
-            for each in auth_node.attribute_set:
-                if each and "course_enrollment_status" in each:
-                    course_enrollment_dict = each["course_enrollment_status"]
-                    course_enrollment_status = [ObjectId(each) for each in course_enrollment_dict]
-                    enrolled_course_coll = node_collection.find({'_id': {'$in': course_enrollment_status}})
-	'''
-    ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id, 'group_set': ObjectId(group_id),'status':u"PUBLISHED"})
-
-
+    ce_coll = node_collection.find({'member_of': ce_gst._id})
     return render_to_response("ndf/course.html",
                             {'title': title,
                              'app_id': app_id, 'course_gst': GST_COURSE,
+                            'req_from_course':True,
                              'app_set_id': app_set_id,
                              'searching': True, 'course_coll': course_coll,
                              'groupid': group_id, 'group_id': group_id,
                              'all_course_coll': all_course_coll,
+                             'ce_coll':ce_coll,
+                             'enr_ce_coll':enr_ce_coll,
                              'enrolled_course_coll': enrolled_course_coll,
                              'ann_course_coll': ann_course_coll
                             },
@@ -1707,4 +1702,3 @@ def enroll_to_course(request, group_id):
         group_obj.save()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
-

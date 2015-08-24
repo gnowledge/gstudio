@@ -4095,6 +4095,8 @@ def repository(request, group_id):
     gapp_metatype = node_collection.one({"_type": "MetaType", "name": "GAPP"})
 
     gapps_list = [i.values()[0] for i in GSTUDIO_NROER_GAPPS]
+    gapps_list.insert(gapps_list.index('program'), 'event')
+    gapps_list.pop(gapps_list.index('program'))
     # print gapps_list
 
     gapps_obj_list = []
