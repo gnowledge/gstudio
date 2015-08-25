@@ -277,7 +277,7 @@
     </div>
   {% endif %} 
 
-    <div class="content" id="view-discussion">
+    <div class="content small-12 columns"  id="view-discussion">
         {% get_node group_id as group_obj %}
         {% if "CourseEventGroup" not in group_obj.member_of_names_list %}
           {% get_thread_node node.pk as thread_node %}
