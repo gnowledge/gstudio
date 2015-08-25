@@ -498,8 +498,8 @@ class CreateModeratedGroup(CreateSubGroup):
         # referenced while creating new moderated sub-groups.
         self.altnames = {
             'ModeratingGroup': [u'Clearing House', u'Curation House'],
-            'ProgramEventGroup': [u'Clearing House', u'Curation House'],
-            'CourseEventGroup': [u'Clearing House', u'Curation House']
+            'ProgramEventGroup': [u'Screening House', u'Selection House'],
+            'CourseEventGroup': [u'Screening House', u'Selection House']
         }
 
 
@@ -1005,7 +1005,7 @@ class CreateEventGroup(CreateModeratedGroup):
         super(CreateEventGroup, self).__init__(request)
         self.request = request
 
-    def set_event_and_enrollment_dates(self, request, group_id):
+    def set_event_and_enrollment_dates(self, request, group_id, parent_group_obj):
         '''
         Sets Start-Date, End-Date, Start-Enroll-Date, End-Enroll-Date
         - Takes required dates from request object.
@@ -1014,6 +1014,9 @@ class CreateEventGroup(CreateModeratedGroup):
 
         # retrieves node_id. means it's edit operation of existing group.
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
+        self.add_subgroup_to_parents_postnode(parent_group_obj._id, group_obj._id, "Event")
+        # group_obj.prior_node.append(parent_group_obj._id)
+        # group_obj.save()
 
         # if "ProgramEventGroup" not in group_obj.member_of_names_list:
         #     node_collection.collection.update({'_id': group_obj._id},
@@ -1393,6 +1396,7 @@ class EventGroupCreateEditHandler(View):
                 mod_group = CreateCourseEventGroup(request)
                 moderation_level = -1
             parent_group_obj = group_obj
+
             # calling method to create new group
             result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id,)
         if result[0]:
@@ -1403,7 +1407,7 @@ class EventGroupCreateEditHandler(View):
             # group_obj.prior_node.append(parent_group_obj._id)
             # group_obj.save()
             # parent_group_obj.save()
-            date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id)
+            date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
             if date_result[0]:
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
@@ -1744,6 +1748,7 @@ def group_dashboard(request, group_id=None):
   group_obj.get_neighbourhood(group_obj.member_of)
   course_structure_exists = False
   files_cur = None
+  parent_groupid_of_pe = None
   list_of_sg_member_of = get_sg_member_of(group_obj._id)
   # print "\n\n list_of_sg_member_of", list_of_sg_member_of
   files_cur = None
@@ -1751,6 +1756,7 @@ def group_dashboard(request, group_id=None):
   if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
       sg_type = "ProgramEventGroup"
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+      parent_groupid_of_pe = node_collection.one({'_type':"Group","post_node": group_obj._id})._id
       alternate_template = "ndf/program_event_group.html"
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
@@ -1797,6 +1803,7 @@ def group_dashboard(request, group_id=None):
                                                        'selected': selected,
                                                        'files_cur': files_cur,
                                                        'sg_type': sg_type,
+                                                       'parent_groupid_of_pe':parent_groupid_of_pe,
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
