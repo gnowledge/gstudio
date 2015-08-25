@@ -138,8 +138,8 @@ urlpatterns = patterns('',
     url(r'^get_gridfs_resource/(?P<gridfs_id>[^/]+)/?$', 'gnowsys_ndf.ndf.views.file.get_gridfs_resource', name='get_gridfs_resource'),
 
     # django-registration
-    url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
-    url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform}),
+    url(r'^accounts/password/change/done/', auth_views.password_change_done, {'template_name': 'registration/password_change_done.html'}, name='password_change_done'),
+    url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform, 'template_name': 'registration/password_change_form.html'}),
     url(r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form': UserResetform},name='password_reset_confirm'),
     url(r'^accounts/password/reset/complete/$', auth_views.password_reset_complete, name='password_reset_complete'),
     url(r'^accounts/password/reset/done/$',auth_views.password_reset_done,name="password_reset_done"),

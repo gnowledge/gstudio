@@ -10293,3 +10293,10 @@ aside#help p, aside#help h5, aside#help h6 {
   white-space: nowrap;
   transform: rotate(30deg);
 }
+
+/* line 1288, ../../../scss/_app_styles.scss */
+.compulsory:after {
+  content: '*';
+  color: red;
+  font-size: smaller;
+}

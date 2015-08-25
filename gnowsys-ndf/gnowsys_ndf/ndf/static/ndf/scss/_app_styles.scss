@@ -1283,5 +1283,12 @@ aside#help{
   } 
 }
 
+.compulsory{
 
+  &:after{
+    content: '*';
+    color: red;
+    font-size: smaller;
+  }
+}
 
