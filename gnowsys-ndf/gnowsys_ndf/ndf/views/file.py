@@ -787,6 +787,10 @@ def submitDoc(request, group_id):
             # if isinstance(f, list):
                 f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
 
+                thread_create_val = request.POST.get("thread_create",'')
+
+                if thread_create_val == "Yes":
+                  return_status = create_thread_for_node(reaquest,group_id, fileobj)
 
             # print "=============== : ", f
             try:
@@ -959,9 +963,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             fileobj.location = map_geojson_data
 
             fileobj.save(groupid=group_id)
-            thread_create_val = request.POST.get("thread_create",'')
-            if thread_create_val == "Yes":
-              return_status = create_thread_for_node(reaquest,group_id, fileobj)
             if source:
               # create gattribute for file with source value
               source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
