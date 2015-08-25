@@ -498,8 +498,8 @@ class CreateModeratedGroup(CreateSubGroup):
         # referenced while creating new moderated sub-groups.
         self.altnames = {
             'ModeratingGroup': [u'Clearing House', u'Curation House'],
-            'ProgramEventGroup': [u'Clearing House', u'Curation House'],
-            'CourseEventGroup': [u'Clearing House', u'Curation House']
+            'ProgramEventGroup': [u'Screening House', u'Selection House'],
+            'CourseEventGroup': [u'Screening House', u'Selection House']
         }
 
 
