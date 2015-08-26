@@ -227,7 +227,7 @@ class Node(DjangoDocument):
         'rating':[{'score':int,
                   'user_id':int,
                   'ip_address':basestring}],
-	'snapshot':dict
+    	'snapshot':dict
     }
     
     required_fields = ['name', '_type'] # 'group_set' to be included
@@ -379,7 +379,7 @@ class Node(DjangoDocument):
         return self.__unicode__()
 
     def save(self, *args, **kwargs):
-        if "is_changed" in kwargs:
+	if "is_changed" in kwargs:
             if not kwargs["is_changed"]:
                 #print "\n ", self.name, "(", self._id, ") -- Nothing has changed !\n\n"
                 return
@@ -508,7 +508,12 @@ class Node(DjangoDocument):
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
                 raise RuntimeError(err)
-
+	#gets the last version no.
+        rcsno = history_manager.get_current_version(self)
+	#update the snapshot feild
+	if kwargs.get('groupid'):
+		node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+		
     # User-Defined Functions
     def get_possible_attributes(self, gsystem_type_id_or_list):
         """Returns user-defined attribute(s) of given node which belongs to

@@ -36,8 +36,8 @@ work_exp,Year of Experience if Any,basestring,[],"[""Voluntary Teacher"", ""Mast
 is_tot_attended,Did you attend TOT?,bool,[],"[""Voluntary Teacher""]",TRUE,TRUE,[],,
 tot_when,When did you attend TOT?,list,"[""datetime.datetime""]","[""Voluntary Teacher""]",TRUE,TRUE,[],,
 nxt_mon_sch,Schedule for Next Few Month,basestring,[],"[""Voluntary Teacher""]",FALSE,TRUE,[],,
-start_time,Start Time,datetime.datetime,[],"[""Event"", ""Announced Course"",""Group""]",TRUE,FALSE,"[""d/m/Y H:i"", ""date_month_day_year""]",DD/MM/YYYY HH:MM,
-end_time,End Time,datetime.datetime,[],"[""Event"", ""Announced Course"",""Group""]",TRUE,FALSE,"[""d/m/Y H:i"", ""date_month_day_year""]",DD/MM/YYYY HH:MM,
+start_time,Start Time,datetime.datetime,[],"[""Event"", ""Announced Course"",""Group"",""Twist""]",TRUE,FALSE,"[""d/m/Y H:i"", ""date_month_day_year""]",DD/MM/YYYY HH:MM,
+end_time,End Time,datetime.datetime,[],"[""Event"", ""Announced Course"",""Group"",""Twist""]",TRUE,FALSE,"[""d/m/Y H:i"", ""date_month_day_year""]",DD/MM/YYYY HH:MM,
 attendees,Attendence,list,"[""ObjectId""]","[""Event""]",TRUE,TRUE,[],,
 nussd_course_type,Course Type,IS(),"[""General"",""Foundation Course"", ""Level-1 Domain"", ""Level-2 Domain""]","[""NUSSD Course"", ""Course"", ""Voluntary Teacher"", ""Master Trainer"", ""Classroom Session"", ""Exam"", ""StudentCourseEnrollment""]",TRUE,TRUE,[],,
 course_code,Course Code,basestring,[],"[""NUSSD Course"", ""Announced Course""]",TRUE,TRUE,"[""text"", ""course_code_check""]","Combination of alphabets, numbers and hyphen",10

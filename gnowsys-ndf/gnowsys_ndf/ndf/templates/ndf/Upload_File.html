@@ -45,7 +45,7 @@
 				</div>
 				<div class="large-9 columns">				
 					<label>{% trans "Title of File" %}</label>
-					<input type="text" name="docTitle" id ="docTitle" tabindex=2  placeholder="Enter Title of File" required>
+					<input type="text" name="docTitle" id ="docTitle" tabindex=2  placeholder="Title of File" required>
 					<small class="error">Please provide the title of the resource.</small>
 				</div>
 			</div>
@@ -53,12 +53,12 @@
 
 		<!-- other details -->
 		<fieldset style="background:#ccc;">
-			<legend style="background:#10c1cb">{% trans "Enter Details" %}</legend>
+			<legend style="background:#10c1cb">{% trans "Details" %}</legend>
 
 			<div class ="row">
 				<div class="large-5 columns">
-					<b>Add Description</b>
-					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}
+					<b class="compulsory">Add Description</b>
+					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Describe the file" %}
 
 					<div class="row">
 					
@@ -100,7 +100,7 @@
 				<div class="large-7 columns">
 					<div class ="row">
 						<div class="large-4 columns">
-							<b>Set Language</b>
+							<b class="compulsory">Language</b>
 							<select name="lan" tabindex=3 required>
 								<option value="">--- Select Language ---</option>
 								{% get_language_info_list for LANGUAGES as languages %}
@@ -118,18 +118,21 @@
 							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand"> <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 							</a>
 						</div>
+						<!-- 
 						<div class="large-4 columns">
 							<b>Set Privacy</b><br/>
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
 							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
 							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
-						</div>
+						</div> -->
+						<input id="PUBLIC" name="login-mode" value="PUBLIC" type="hidden" >
+						
 					</div>
 					<br/>
 					<div class ="row">
 						<div class="large-4 columns">
-							<b>Target Audience</b>
+							<b class="compulsory">Target Audience</b>
 							{% get_metadata_values as metadata %}
 	  						{% for k,v in metadata.items %}
 	  						{% if k == "audience" %}
@@ -162,7 +165,7 @@
 						{% endcomment %}
 
 						<div class="large-4 columns">
-							<b>Subject</b>
+							<b class="compulsory">Subject</b>
 							{% get_metadata_values as metadata %}
 	  						{% for k,v in metadata.items %}
 	  						{% if k == "educationalsubject" %}
@@ -171,6 +174,7 @@
 			        			{% for opts in v %}
 									<option>{% trans opts %}</option>
 								{% endfor %}
+								<option>Not Sure</option>
 							</select>
 							<small class="error">Please select resource Subject</small>
 
@@ -179,7 +183,7 @@
 						</div>
 
 						<div class="large-4 columns">
-							<b>Educational Level</b>
+							<b class="compulsory">Educational Level</b>
 							{% get_metadata_values as metadata %}
 	  						{% for k,v in metadata.items %}
 	  						{% if k == "educationallevel" %}
@@ -188,6 +192,7 @@
 			        			{% for opts in v %}
 									<option>{% trans opts %}</option>
 								{% endfor %}
+								<option>Not Sure</option>
 							</select>
 							<small class="error">Please select resource audience</small>
 
@@ -195,6 +200,8 @@
 							{% endfor %}
 						</div>
 					</div>
+					<small>({% trans "ctr + click to select multiple values" %})</small>
+					<br/>
 					<br/>
 					<div class ="row">
 						<div class="large-2 columns">
@@ -221,7 +228,7 @@
 							<b>Source</b>
 						</div>
 						<div class="large-10 columns">
-							<input id="source_id" name="Source" type="text" placeholder="Enter source name" tabindex="8"/>
+							<input id="source_id" name="Source" type="text" placeholder="Owner of the file" tabindex="8"/>
 						</div>
 					</div>
 
@@ -230,7 +237,7 @@
 							<b>Based on url</b>
 						</div>
 						<div class="large-9 columns">
-							<input id="based_on_id" name="based_url" type="text" placeholder="Enter valid url" tabindex="9"/>
+							<input id="based_on_id" name="based_url" type="text" placeholder="Web Address (url) of the file if you sourced it from a website" tabindex="9"/>
 						</div>
 					</div>
 
@@ -241,7 +248,7 @@
 		
 		<input type="hidden" name="user" value="{{user.id}}">
 		<input type="hidden" name="page_url" value="{{page_url}}">
-		<input type="submit" id="submitpostid" value="Submit" class="button round medium">
+		<input type="submit" id="submitpostid" value="Submit" class="button medium expand">
 		<p id="message" style="display:none"> 
 			{% trans "Depending on the size of file/s and your Internet speed, upload process may take time. Please do not close this window." %} <br/>
 			{% trans "Please upload videos in webm format. If you upload videos of other formats, it will take longer to publish them." %} 

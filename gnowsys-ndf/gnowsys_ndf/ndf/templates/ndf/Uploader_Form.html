@@ -6,10 +6,23 @@
 
 {% block meta_content %} 
 	<!-- This content displayed into the left panel to display the info/hrlp document -->
-	<h3>{% trans "Uploader Form" %}</h3>
-	<p class="text-justify subheader">
-        {% trans "You can upload <b>files</b> of any format to your group library." %}
-    </p>
+	<h3>{% trans "Contribute File" %}</h3>
+	<ul class="text-justify subheader">
+		<li>
+	        {% trans "You can contribute only Open Educational Resources" %}
+			({% trans "Copyrighted material cannot be contributed" %})
+		</li>
+		<li>
+			{% trans "You can upload files of any format" %}
+		</li>
+		<li>
+		
+			 {% trans "All files get uploaded under the CC-BY-SA licence (This license lets others remix, tweak, and build upon your work even for commercial purposes, as long as they credit you and license their new creations under the identical terms) unless you chose a different licence" %}
+		</li>
+		<li>
+			{% trans "Please visit" %} https://creativecommons.org/licenses/ {% trans "and" %} http://www.gnu.org/licenses/fdl-1.3.en.html {% trans "to learn more about licenses" %}
+		</li>
+    </ul>
 
 {% endblock %} 
 

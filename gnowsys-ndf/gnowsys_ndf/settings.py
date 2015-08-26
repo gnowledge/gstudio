@@ -308,7 +308,7 @@ LOCALE_PATHS = (os.path.join(os.path.dirname(__file__), '..','conf/locale/'),)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = 'gnowsys_ndf/ndf/static/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -623,10 +623,10 @@ GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Moderation", "
 
 GSTUDIO_NROER_MENU = [{"Repository": []}, {"Partners": ["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
 
-GSTUDIO_NROER_GAPPS = [{"Themes": "topics"}, {"eLibrary": "e-library"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "event"}]
+GSTUDIO_NROER_GAPPS = [{"Themes": "topics"}, {"eLibrary": "e-library"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "program"}]
 
 GSTUDIO_NROER_MENU_MAPPINGS = {
-            "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",
+            "States": "State Partners", "Institutions": "Institutional Partners", "Individuals": "Individual Partners",
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
 
@@ -680,8 +680,6 @@ WETUBE_PASSWORD = "gl@b$@)we!ube"
 #Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
-
-
 
 # this has to be at last
 # just put every thing above it

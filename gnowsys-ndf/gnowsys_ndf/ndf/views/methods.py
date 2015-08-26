@@ -989,13 +989,13 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     #  org-content
     if node.content_org != content_org:
-        node.content_org = content_org
+        node.content_org = unicode(content_org)
 
         # Required to link temporary files with the current user who is
         # modifying this document
         usrname = request.user.username
         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-        node.content = org2html(content_org, file_prefix=filename)
+        node.content = unicode(org2html(content_org, file_prefix=filename))
         is_changed = True
 
     # visited_location in author class
@@ -1020,7 +1020,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
             else:
                 user_group_location['visited_location'] = user_last_visited_location
-                user_group_location.save()
+                user_group_location.save(groupid=group_id)
 
     if is_changed:
         node.status = unicode("DRAFT")
@@ -1674,7 +1674,7 @@ def get_node_metadata(request, node, **kwargs):
                         updated_ga_nodes.append(temp_res)
               
                 else:
-                    create_gattribute(node._id, at, field_value)
+                    create_gattribute(node._id, at, unicode(field_value))
     
     if "is_changed" in kwargs:
         return updated_ga_nodes
@@ -2224,7 +2224,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"
-
+            # print "\n",info_message
             relation_type_node_name = relation_type_node.name
             relation_type_node_inverse_name = relation_type_node.inverse_name
 
@@ -2300,6 +2300,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             info_message = " %(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            # print "\n",info_message
 
             node_collection.collection.update({
                 "_id": subject_id, "relation_set." + relation_type_node_name: {'$exists': True}
@@ -2562,7 +2563,6 @@ def set_all_urls(member_of):
 		url = u"None"
 	return url
 ###############################################	###############################################    
-
 
 @get_execution_time
 def get_user_group(userObject):
@@ -3941,9 +3941,10 @@ def delete_node(
                     # print "\n 10 >> node found as File; nodes in GridFS : ", len(node_to_be_deleted.fs_file_ids)
                     if node_to_be_deleted.fs_file_ids:
                         for each in node_to_be_deleted.fs_file_ids:
-                            if node_to_be_deleted.fs.files.exists(each):
+                            if node_to_be_deleted.fs.files.exists(each) and node_collection.find({'fs_file_ids': {'$in': [each]} }).count() == 1:
                                 # print "\tdeleting node in GridFS : ", each
                                 node_to_be_deleted.fs.files.delete(each)
+
 
                 # Finally delete the node
                 node_to_be_deleted.delete()
@@ -4094,6 +4095,8 @@ def repository(request, group_id):
     gapp_metatype = node_collection.one({"_type": "MetaType", "name": "GAPP"})
 
     gapps_list = [i.values()[0] for i in GSTUDIO_NROER_GAPPS]
+    gapps_list.insert(gapps_list.index('program'), 'event')
+    gapps_list.pop(gapps_list.index('program'))
     # print gapps_list
 
     gapps_obj_list = []
@@ -4113,4 +4116,144 @@ def repository(request, group_id):
                               context_instance=RequestContext(request)
                             )
 
+def create_thread_for_node(request, group_id, node):
+	"""
+      Accepts:
+       * ObjectId of group.
+       * node - Page/File GSystem
 
+      Actions:
+       * Finds the thread_node associated with passed node.
+       * Creates ATs release_response and thread_interaction_type for thread_node
+       * If dates set for thread, created ATs start_time and end_time for thread_node
+       * Creates RT has_thread between node and thread_node
+
+      Returns:
+        * Success - True/False
+
+	"""
+	if request.method == "POST":
+		release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
+		interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
+		start_time = request.POST.get("thread_start_date", '')
+		if start_time:
+			start_time = datetime.strptime(start_time, "%d/%m/%Y")
+		end_time = request.POST.get("thread_close_date", '')
+		if end_time:
+			end_time = datetime.strptime(end_time, "%d/%m/%Y")
+		twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
+		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
+		has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+		if thread_obj:
+			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': []}}, upsert = False, multi = False)
+			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
+			node.reload()
+			thread_obj.reload()
+			# print "\n\n Found old model thread node existing"
+		else:
+			thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
+			# print "\n\n Found updated thread node existing"
+		if thread_obj:
+			if thread_obj.name != u"Thread of "+ unicode(node.name):
+				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
+				thread_obj.reload()
+		else:
+			# print "\n\n Creating new thread node"
+			thread_obj = node_collection.collection.GSystem()
+
+			thread_obj.name = u"Thread of " + unicode(node.name)
+			thread_obj.status = u"PUBLISHED"
+
+			thread_obj.created_by = int(request.user.id)
+			thread_obj.modified_by = int(request.user.id)
+			thread_obj.contributors.append(int(request.user.id))
+
+			thread_obj.member_of.append(ObjectId(twist_gst._id))
+			# thread_obj.prior_node.append(ObjectId(node._id))
+			thread_obj.group_set.append(ObjectId(group_id))
+
+			thread_obj.save()
+			# creating GRelation
+			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
+			node.reload()
+			thread_obj.reload()
+			# print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
+			# print "\n\n thread", node._id, "--", node.relation_set
+		if release_response_val:
+			rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
+			release_response_val = eval(release_response_val)
+			create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+		if interaction_type_val:
+			thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
+			create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+		if start_time and end_time:
+			start_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'start_time'})
+			end_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'end_time'})
+			create_gattribute(thread_obj._id, start_time_at, start_time)
+			create_gattribute(thread_obj._id, end_time_at, end_time)
+
+		thread_obj.reload()
+		# print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
+		return True
+
+def node_thread_access(group_id, node):
+    """
+      Accepts:
+       * ObjectId of group.
+       * node - Page/File GSystem
+
+      Actions:
+       * Finds the thread_node associated with passed node.
+       * Validation for discussion based on start_time and end_time, if exists
+
+      Returns:
+       * thread_node - used in discussion.html
+       * success (i.e True/False)
+    """
+    has_thread_node = None
+    thread_start_time = None
+    thread_end_time = None
+    allow_to_comment = True  # default set to True to allow commenting if no date is set for thread
+
+    if "has_thread" in node:
+        if node['has_thread']:
+                has_thread_node = node['has_thread'][0]
+    if has_thread_node:
+        if has_thread_node.attribute_set:
+            for each_attr in has_thread_node.attribute_set:
+                if each_attr and 'start_time' in each_attr:
+                    thread_start_time = each_attr['start_time']
+                if each_attr and 'end_time' in each_attr:
+                    thread_end_time = each_attr['end_time']
+    if thread_start_time and thread_end_time:
+        curr_date_time = datetime.now()
+        if curr_date_time < thread_start_time or curr_date_time > thread_end_time:
+            allow_to_comment = False
+    return has_thread_node,allow_to_comment
+
+def get_prior_node_hierarchy(oid):
+    """pass the node's ObjectId and get list of objects in hierarchy
+    
+    Args:
+        oid (TYPE): mongo ObjectId
+    
+    Returns:
+        list: List of objects starts from passed node till top node
+    """
+    hierarchy_list = []
+    prev_obj_id = ObjectId(oid)
+
+    while prev_obj_id:
+        try:
+            prev_obj = node_collection.one({'_id': prev_obj_id})
+            prev_obj_id = prev_obj.prior_node[0]
+            # print prev_obj.name
+    
+        except:
+            # print "===", prev_obj.name
+            prev_obj_id = None
+    
+        finally:
+            hierarchy_list.append(prev_obj)
+
+    return hierarchy_list
