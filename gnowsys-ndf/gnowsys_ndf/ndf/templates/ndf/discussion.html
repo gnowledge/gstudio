@@ -57,7 +57,7 @@
 
         <div class="row">
           <div class="reply-btn small-2  small-text-left large-2 columns" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))">{% trans "Delete" %}</div>
-          <div class='reply-btn text-right small-2 small-text-left large-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
+          <div class='reply-btn  small-2 small-text-left large-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
           {% trans "Reply" %}
           </div>
           <div class="small-12 large-6  columns"> <small>{{ each_reply.last_update }}</small> </div>
@@ -227,10 +227,10 @@
     + "<label>" + data[6] + "</label></a></div>"
     + "<div class='small-9 columns'>"+ data[3] + filesContent +"</div></div>"
     + "<div class='row'><div class='small-8 columns'><small>"+ data[7] + "</small></div>"
-    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'Delete' %}</div>"
+    + "<div class='reply-btn small-2 small-text-left columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'Delete' %}</div>"
     + "<div data-org-content='"
     + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-    + data[1] + "' class='reply-btn text-right small-2 columns'>{% trans  'Reply' %} </div></div></div>"
+    + data[1] + "' class='reply-btn  small-2 small-text-left columns'>{% trans  'Reply' %} </div></div></div>"
     return htmlReply;
   }
   function addReply(sourceObj)
