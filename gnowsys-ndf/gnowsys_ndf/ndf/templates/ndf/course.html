@@ -14,17 +14,17 @@
     <h4 class="subheader">
         {{course_gst.name}}
     </h4>
-{% if is_gstaff %}
-  {% if req_from_course %}
-        <a class="small button" href="{% url 'create_edit' group_name_tag %}">
-          <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
-        </a>
-  {% else %}
-        <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="small button">
-          <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
-        </a>
+  {% if is_gstaff %}
+    {% if req_from_course %}
+          <a class="small button" href="{% url 'create_edit' group_name_tag %}">
+            <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
+          </a>
+    {% else %}
+          <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="small button">
+            <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
+          </a>
+    {% endif %}
   {% endif %}
-{% endif %}
 {% endblock %}
 
 

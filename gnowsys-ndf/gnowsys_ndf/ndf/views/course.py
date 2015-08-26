@@ -28,7 +28,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
@@ -47,23 +47,14 @@ def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
     """
-    # ins_objectid = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False:
-    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else:
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth:
-    #             group_id = str(auth._id)
-    # else:
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
 
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+    group_obj_post_node_list = []
     app_id = None
     app_id = app._id
     course_coll = None
@@ -73,22 +64,31 @@ def course(request, group_id, course_id=None):
     enr_ce_coll = []
     course_enrollment_status = None
     app_set_id = None
+    query = {}
+
     course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
+
     if course_ins:
         course_id = str(course_ins._id)
 
+    group_obj_post_node_list = group_obj.post_node
     app_set = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
     app_set_id = app_set._id
     ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
 
     # Course search view
     title = GST_COURSE.name
-
+    query = {'member_of': ce_gst._id,'_id':{'$in': group_obj_post_node_list},'group_type':u"PUBLIC"}
     if request.user.id:
         course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"})
-        enr_ce_coll = node_collection.find({'member_of': ce_gst._id,'author_set': int(request.user.id)}).sort('last_update', -1)
+        enr_ce_coll = node_collection.find({'member_of': ce_gst._id,'author_set': int(request.user.id),'_id':{'$in': group_obj_post_node_list}}).sort('last_update', -1)
 
-    ce_coll = node_collection.find({'member_of': ce_gst._id})
+        user_access =  user_access_policy(group_id ,request.user)
+        if user_access == "allow":
+            # show PRIVATE CourseEvent
+            query.update({'group_type': {'$in':[u"PRIVATE",u"PUBLIC"]}})
+
+    ce_coll = node_collection.find(query)
     return render_to_response("ndf/course.html",
                             {'title': title,
                              'app_id': app_id, 'course_gst': GST_COURSE,

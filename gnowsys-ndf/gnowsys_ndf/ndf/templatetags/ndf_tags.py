@@ -12,6 +12,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
+
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
@@ -1545,12 +1547,12 @@ def get_group_type(group_id, user):
 
                         else:
                             error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                            raise Http404(error_message)
+                            raise PermissionDenied(error_message)
 
                     else:
                         # Anonymous user found which cannot access groups other than Public
                         error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                        raise Http404(error_message)
+                        raise PermissionDenied(error_message)
 
             else:
                 # If Group is not found with either given ObjectId or name in the database
@@ -1562,8 +1564,11 @@ def get_group_type(group_id, user):
 
         return True
 
-    except Exception as e:
-        raise Http404(e)
+    except PermissionDenied as e:
+		raise PermissionDenied(e)
+
+    except Http404 as e:
+		raise Http404(e)
 
 
 @get_execution_time

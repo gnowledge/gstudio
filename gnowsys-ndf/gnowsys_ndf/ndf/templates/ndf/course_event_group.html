@@ -110,7 +110,6 @@
           {% endif %}
       </dl>
 
-
       <!-- Right Nav Section -->
       {% if request.user.is_authenticated and not gstaff_access %}
           <section>
@@ -130,7 +129,6 @@
             </ul> 
           </section>
         {% endif %}
-
 
     <div class="row">
       
@@ -247,5 +245,4 @@
     .css('float','left');
     $(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder')
 
-  $("#group-level-header").addClass("hide");
 {% endblock %}
