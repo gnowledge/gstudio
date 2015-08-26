@@ -7,7 +7,16 @@
 {% block title %} {{groups_category}} {% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader">{{groups_category}}</h2>
+
+  <h2 class="subheader">
+    {% if app_gst.altnames and app_gst.altnames != "None" %}
+      {{app_gst.altnames}}
+    {% else %}
+      {{app_gst.name}}
+    {% endif%}
+  </h2>
+  {{app_gst.content|default_if_none:''|safe}}
+
 {% endblock %}
 
 
@@ -126,10 +135,10 @@
 
   {% empty %}
     {% if not searching %}
-      <div class="row">
+      <div class="center">
         <div class="small-12 columns">
 	{% blocktrans with groups_category as grps_category %}
-        <h5>There are no partners created yet.<b>Be the first to create a {{ grps_category }}!</b></h5>
+        <h5>There are no {{ grps_category }} created yet.<b>Be the first to create a {{ grps_category }}!</b></h5>
 	{% endblocktrans %}
         </div>
       </div>

@@ -26,7 +26,7 @@
 
 
 {% block help_content %}
-<p>The Forum is a place for discussion. You can create a new one for your idea and build on it with the help of others.</p>
+<p>{ % trans 'The Forum is a place for discussion. You can create a new one for your idea and build on it with the help of others' %}.</p>
 {% endblock %}
 
 
@@ -60,21 +60,21 @@
 
 <header class="row">
   <dl class="tabs" data-tab data-options="deep_linking:true">
-    <dd class="active"><a href="#panel2-1"><i class="fi-comment-quotes gray-text"></i> All Forums {% if existing_forums|length %}({{ existing_forums|length }}){% endif %}</a></dd>
+    <dd class="active"><a href="#panel2-1"><i class="fi-comment-quotes gray-text"></i> {% trans 'All Forums' %} {% if existing_forums|length %}({{ existing_forums|length }}){% endif %}</a></dd>
   </dl>
 </header>
 
 {% if searching and existing_forums.count > 0 %}
 <div class="row">
   <div class="small-12 columns end">
-    <p>Search Results: <span class="label success round">Found {{existing_forums.count}} {{title|lower}}{{existing_forums.count|pluralize}}.</span></p>
+    <p>Search Results: <span class="label success round"> {% trans 'Found' %} {{existing_forums.count}} {{title|lower}}{{existing_forums.count|pluralize}}.</span></p>
   </div>
 </div>
 
 {% elif searching and existing_forums.count == 0 %}
 <div class="row">
   <div class="small-12 columns">
-    <p>Search Results: <span class="label alert">No {{title|lower}}{{existing_forums.count|pluralize}} matched your search criteria!!!</span></p>
+    <p>{% trans 'Search Results' %}: <span class="label alert">No {{title|lower}}{{existing_forums.count|pluralize}} {%trans 'matched your search criteria' %}!!!</span></p>
   </div>  
 </div>  
 
@@ -116,13 +116,13 @@
     <footer>
         
         <div class="age">
-         {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
-          by <span href="#" class="user" data-gnow="">{{ each.user_details_dict.created_by }}</span> 
+         {{ each.member_of_names_list|join:', ' }} {% trans 'created' %} {{each.created_at|timesince}}{% trans 'ago' %} 
+          {% trans by %} <span href="#" class="user" data-gnow="">{{ each.user_details_dict.created_by }}</span> 
         
         </div>
         
-      <span><i class="fi-torsos-all gray-text"> </i> <strong>{{each.contributors|length}}</strong> <span class="gray-text">Contributor{{each.contributors|pluralize}}</span></span>
-      <span class="right"><i class="fi-shuffle gray-text"> </i> <strong>{{each.threads}}</strong> <span class="gray-text">Thread{{each.threads|pluralize}}</span></span> 
+      <span><i class="fi-torsos-all gray-text"> </i> <strong>{{each.contributors|length}}</strong> <span class="gray-text">{% trans 'Contributor' %}{{each.contributors|pluralize}}</span></span>
+      <span class="right"><i class="fi-shuffle gray-text"> </i> <strong>{{each.threads}}</strong> <span class="gray-text">{% trans Thread %}{{each.threads|pluralize}}</span></span> 
     </footer>
 </a>
         

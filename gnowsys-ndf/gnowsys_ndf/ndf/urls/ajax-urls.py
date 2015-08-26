@@ -16,6 +16,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^add_files/', 'add_file', name='add_file'),
     url(r'^deleteThemes/', 'delete_themes', name='delete_themes'),
     url(r'^add_Topics/', 'add_topics', name='add_topics'),
+    url(r'^Collection_create/', 'collection_create', name='collection_create'),
     url(r'^get_tree_hierarchy/(?P<node_id>[\w-]+)$', 'get_tree_hierarchy', name='get_tree_hierarchy'),
     url(r'^get_collection/(?P<node_id>[\w-]+)$', 'get_collection', name='get_collection'),
     url(r'^get_contents/', 'get_topic_contents', name='get_topic_contents'),
@@ -40,6 +41,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^remove_user_from_author_set/', 'remove_user_from_author_set', name="remove_user_from_author_set"),
     url(r'^get_data_for_user_drawer/', 'get_data_for_user_drawer', name='get_data_for_user_drawer'),
     url(r'^get_data_for_batch_drawer/', 'get_data_for_batch_drawer', name='get_data_for_batch_drawer'),
+    
 
                        # Ajax-urls required for MIS --------------------------------
 

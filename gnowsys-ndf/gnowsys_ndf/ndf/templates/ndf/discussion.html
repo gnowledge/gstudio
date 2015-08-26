@@ -1,48 +1,70 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% load cache %}
-
+{% get_group_name groupid as group_name_tag %}
+{% user_access_policy groupid request.user as user_access %}
+{% get_attribute_value node.pk 'release_response' as resp_val %}
+{% get_attribute_value node.pk 'thread_interaction_type' as thr_int_type %}
 <div>
-
   <br/>
-  <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
-    {% if all_replies %}
-      Initiate New Discussion Thread
+    {% if allow_to_comment %}
+      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
+        {% if thr_int_type %}
+          {{thr_int_type}}
+        {% else %}
+          Comment
+        {% endif %}
+      </div>
     {% else %}
-      Initiate discussion on {{ node.name }}
+        Interaction Not Available
     {% endif %}
-  </div>
 
   <div id="replies-area">
 
     <!-- populating replies -->
+    {% check_is_gstaff groupid request.user as is_gstaff %}
+
     {% for each_reply in all_replies %}
+      {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
+      <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
+        <div class="row"> 
+          <div class="small-3 columns">
+            <a class="text-center" href="{% url 'dashboard' each_reply.userid %}">
+              <span class="align-center"><i class="fi-torso"></i></span>
+              <label>{{ each_reply.username }}</label>
+            </a>
+          </div>
+          <div class="small-9 columns">
+            {% spaceless %}
+            {{each_reply.HTMLcontent | safe }}
+            {% endspaceless %}
+          </div>
 
-    <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
+          {% for node in each_reply.collection_set  %}
+          <div style="margin: 1em;">
+            
+          {{node.mime_type}}
+          <br/>
+          <a class="th" style="" href="{% url 'read_file' group_id node node.name %}">
+             {% if 'image' in node.mime_type  %}
+              <img style="height:100px;" src="{% url 'getFileThumbnail' group_id node.pk %}" />
+              {% endif %}
+            <p>{{node.name}}</p>
+          </a>  
+          </div>
+          {% endfor %}
+        </div>
 
-      <div class="row"> 
-        <div class="small-3 columns">
-          <a class="text-center" href="/home/{{each_reply.userid}}/dashboard">
-            <span class="align-center"><i class="fi-torso"></i></span>
-            <label>{{ each_reply.username }}</label>
-          </a>
+        <div class="row">
+          <div class="small-8 columns"> <small>{{ each_reply.last_update }}</small> </div>
+          <div class="reply-btn small-2 columns" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))">{% trans "Delete" %}</div>
+          <div class='reply-btn reply-btn-class text-right small-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
+            {% trans "Reply" %}
+          </div>
         </div>
-        <div class="small-9 columns">
-          {% spaceless %}
-          {{each_reply.HTMLcontent | safe }}
-          {% endspaceless %}
-        </div>
+
       </div>
-
-      <div class="row">
-        <div class="small-8 columns"> <small>{{ each_reply.last_update }}</small> </div>
-        <div class="reply-btn small-2 columns" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))">{% trans "delete" %}</div>
-        <div class='reply-btn text-right small-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
-          {% trans "reply" %}
-        </div>
-      </div>
-
-    </div>
+      {% endif %}
 
     {% endfor %}
     <!-- END of populating replies -->
@@ -51,8 +73,13 @@
   <!-- orgitdown container -->
   <div id="org" style="" class="reveal-modal small" data-reveal>
     <!-- Reply : -->
-    <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
+    <textarea id="orgitdownreps" name="content_org" placeholder="{% trans 'Enter your reply text here.'%}"></textarea>
     <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
+    {% if sg_type != "Event" %}
+      <input type="file" id="uploaded-files" style="" value="" multiple>
+    {% else %}
+      <input type="file" id="uploaded-files" style="" value="" multiple class="hide">
+    {% endif %}
     <input type="hidden" id="prior-node" style="visibility:hidden" value="">
     <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
   </div>
@@ -64,7 +91,6 @@
 
   // for discussion tab
   // storing ndf_tags return values in JS variables
-  {% user_access_policy groupid request.user as user_access %}
   var user_access = "{{ user_access }}"; // "allow" or "disallow"
 
   {% edit_policy groupid node request.user as status %}
@@ -80,11 +106,11 @@
   {% if request.user.is_authenticated %}
     $("#orgitdownreps").orgitdown(mySettings);
   {% endif %}
-  
+
   function createDiscussion()
   {
 
-    // if( user_access == "allow" && edit_policy == "allow" )
+    if( user_access == "allow"){
     if( is_user_authenticated )
     {  
       {% if request.user.is_authenticated %}
@@ -99,7 +125,6 @@
 
             if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
             {
-
                 // $("#create-discussion").hide();
 
                 // changing method to behave same as sub-reply button
@@ -132,17 +157,21 @@
       else
       {
         // alert("To start discussion you need to login and be the member of this group.");
-        alert("Login to start discussion");
+        alert("{% trans 'Login to start discussion' %}");
       }
-
     }
+  else{
+        alert("Only group members can comment.");
+
+  }
+  }
   // --- END of createDiscussion()
 
 
   // function called by "Add Reply" and "Reply" buttons to open editor
   function openOrgEditor(sourceObj)
   {
-    // if( user_access == "allow" && edit_policy == "allow" )
+    if( user_access == "allow"){
     if( is_user_authenticated )
     {
 
@@ -176,8 +205,13 @@
     else
     {
       // alert("To start discussion you need to login and be the member of this group.");
-      alert("Login to start discussion.");
+      alert(" {% trans 'Login to start discussion.' %} ");
     }
+  }
+  else{
+      alert("Only group members can reply to comment.");
+
+  }
   }
 
 
@@ -186,29 +220,46 @@
     var totalReplies = $("#replies-area div.disc-replies:visible").length;
     if(totalReplies == 0)
     {
-      $(".view-discussion span").fadeOut().fadeIn().html("Begin Discussion");
-      $("#create-discussion").text("Initiate discussion on " + $("h1 span.node[itemprop]").text().trim());
+      $(".view-discussion span").fadeOut().fadeIn().html(" {% trans 'Begin Discussion' %}");
+      $("#create-discussion").text("{% trans 'Comment' %}" + $("h1 span.node[itemprop]").text().trim());
     }
     else
     {
-      $(".view-discussion span").fadeOut().fadeIn().html("Join Discussion ("+totalReplies+")");
+      $(".view-discussion span").fadeOut().fadeIn().html("{% trans 'Join Discussion' %}("+totalReplies+")");
     }
   }
 
 
   function createReplyHTML(replyStyle, data)
   {
+    var files = data[8];
+    // console.log(files)
+    filesContent = ""
+    files.forEach(function(f){
+        // console.log("=========")
+        // console.log(f)
+        var mime_type = f[1];
+
+        filesContent += "<div style='margin: 1em;'>"+ f[1] +"<br/>"+
+        "<a class='th' href='/{{group_id}}/file/readDoc/"+f[0]+"/"+f[2]+"'>";
+
+        if(mime_type.indexOf("image") >= 0){
+          filesContent += "<img style='height: 100px;' src='/{{group_id}}/file/thumbnail/"+ f[0] +"'/>";}
+
+        filesContent += "<p>" + f[2] + "</p></a></div>";
+        // console.log(filesContent);
+    });
     var htmlReply = "<div style='"+ replyStyle +"' data-reply-id='"+ data[1] +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
     + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
     + "<span class='align-center'><i class='fi-torso'></i></span>"
     + "<label>" + data[6] + "</label></a></div>"
-    + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
+    + "<div class='small-9 columns'>"+ data[3] + filesContent +"</div></div>"
 
     + "<div class='row'><div class='small-8 columns'><small>"+ data[7] + "</small></div>"
-    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>delete</div>"
+    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'Delete' %}</div>"
     + "<div data-org-content='"
     + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-    + data[1] + "' class='reply-btn text-right small-2 columns'> reply </div></div></div>"
+    + data[1] + "' class='reply-btn text-right small-2 columns'>{% trans  'Reply' %} </div></div></div>"
 
     return htmlReply;
   }
@@ -219,11 +270,26 @@
     $('#org').foundation('reveal', 'close');
 
     var priorNodeId = $("#prior-node").val(),
-        replyContent = $("#orgitdownreps").val().trim();
+        replyContent = $("#orgitdownreps:visible").val().trim();
 
     // If reply is non empty - make ajax to save reply.
     if( (replyContent.length > 0) && (priorNodeId.length == 24) )
     {
+
+      docs_list = new FormData();
+      var all_files = document.getElementById("uploaded-files");
+      var docs_count = all_files.files.length;
+
+      for(var i = 0; i < docs_count; i++)
+        {
+          docs_list.append("upload"+i, all_files.files[i]);
+          // console.log(all_files.files[i]);
+        }
+
+        docs_list.append('upload_cnt', docs_count)
+        docs_list.append('csrfmiddlewaretoken','{{csrf_token}}');
+        docs_list.append('reply_text_content', replyContent)
+        docs_list.append('prior_node_id', priorNodeId)
 
       $.ajax({
         
@@ -231,13 +297,9 @@
 
         url: "{% url 'discussion_reply' group_id node.pk %}",
 
-        data: { 
-
-          "csrfmiddlewaretoken": "{{ csrf_token }}",
-          "prior_node_id": priorNodeId,
-          "reply_text_content": replyContent
-
-        },
+        data: docs_list,
+        processData: false, 
+        contentType: false,
 
         success: function(data){
             
@@ -252,7 +314,7 @@
               if(priorNodeId == "{{ node.pk }}")  // main reply
               {
                 // change the text of Start discussion and make it visible
-                $("#create-discussion").html("Initiate New Discussion Thread");                
+                $("#create-discussion").html("Comment");                
                 // $("#create-discussion").fadeIn();
 
                 //sample format of data = [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
@@ -271,10 +333,11 @@
               }
               // updating tab-text
               updateDiscussionTabText();
+              // location.reload();
             }
             else if( data[0] == "no_content" ){
               
-              alert("Please provide the reply content.")
+              alert("{% trans 'Please provide the reply content.' %}")
             }
             else { alert(data) }
           }
@@ -282,7 +345,7 @@
     }
     else // content is not provided
     {
-      alert("Please provide the reply content.")
+      alert(" {% trans 'Please provide the reply content.' %}")
     } // --- END of IF-ELSE
   
   } // --- END of addReply()
@@ -302,11 +365,11 @@
 
       if(nodesToDeleteArr.length > 1)
       {
-        deleteConfirm = confirm("Along with this reply, total of: " + nodesToDeleteArr.length + " replies would get deleted.\nClick 'OK' to delete. Else click on 'Cancel'");
+        deleteConfirm = confirm("{% trans 'Along with this reply, total of' %}: " + nodesToDeleteArr.length + "{% trans 'replies would get deleted.\nClick 'OK' to delete. Else click on 'Cancel'' %} ");
       }
       else
       {
-        deleteConfirm = confirm("Are you sure to delete this reply ?\nClick 'OK' to delete.");
+        deleteConfirm = confirm("{% trans 'Are you sure to delete this reply ?\nClick 'OK' to delete.' %} ");
       }
 
       if(deleteConfirm)
@@ -337,7 +400,7 @@
     }
     else
     {
-      alert("To delete this reply, you need to be login and author of this reply.");
+      alert("{% trans 'To delete this reply, you need to be login and author of this reply.' %}");
     }
   }
 

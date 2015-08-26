@@ -37,9 +37,9 @@ if f[-1] == "ATs.json" or f[-1] == "RTs.json" or f[-1] == "STs.json":
 else:
   json_file = ""
 
-SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files")
+SCHEMA_ROOT = os.path.join( os.path.dirname(__file__))
 
-log_list = [] # To hold intermediate error and information messages
+log_list = []  # To hold intermediate error and information messages
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
 ###############################################################################
@@ -285,7 +285,34 @@ class Command(BaseCommand):
         else:
           print " GList ("+glc_node_name+") container already created !"
           info_message += "\n GList ("+glc_node_name+") container already created !"
+	
+	page_node = node_collection.find_one({"name":"Page"})
+	page_node_instance = ['Info page','Blog page','Wiki page']
+	instance_nodes = node_collection.find({"name":{"$in":page_node_instance}})
+	for i in instance_nodes:
+		if not page_node._id in i.type_of:
+			i.type_of.append(page_node._id)
+			i.save()
+		else:
+			print "Page " + ""+ i.name + "" +" instance already updated."
 
+
+        Group_node = node_collection.collection.Group();
+        node_doc =node_collection.one({'$and':[{'_type': u'Group'},{'name': u'Trash'}]})
+        if node_doc is None:
+	        Group_node.name = unicode('Trash')
+        	Group_node.status = unicode('PUBLISHED')
+        	Group_node.created_by = 1
+	        Group_node.modified_by = 1
+	        Group_node.access_policy = unicode("PRIVATE")
+        	Group_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
+        	Group_node.disclosure_policy=unicode('DISCLOSED_TO_MEM')
+        	Group_node.visibility_policy=unicode('NOT_ANNOUNCED')
+        	Group_node.encryption_policy=unicode('NOT_ENCRYPTED')
+        	Group_node.edit_policy =unicode('NON_EDITABLE')
+        	Group_node.save()
+        else:
+        	print "Trash Group already created."	
         print "\n"
         info_message += "\n\n"
         log_list.append(info_message)

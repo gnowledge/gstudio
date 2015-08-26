@@ -23,17 +23,22 @@
   <header class="row event">
     <section class="medium-12 columns" >
       <h2>
-        <span class='node'>{{node.name}}</span>      
-        <small class="label-list"> 
+        <span class='node'>{{node.name}}
+        {% if "Student" in node.member_of_names_list %}
+          - {{node.enrollment_code}}
+        {% endif %}
+        </span>
+<!--         <small class="label-list"> 
         {% for tag in node.tags %}
         <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
         {% endfor %}
         </small>      
+ -->
       </h2>
 
       <dl class="row tabs" data-tab data-options="deep_linking:true">
         {% for tab_details in property_order_list %}
-        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to add {{tab_details.0}} details...">
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to see {{tab_details.0}} details.">
           <a href="#panel_{{tab_details.0}}">{{tab_details.0}}</a>
         </dd>
         {% endfor %}
@@ -73,9 +78,33 @@
               <label>{{field.altnames}}</label>
             </div>
             <div class="small-7 end columns">
-              {% if field.type == "RelationType" %}
-                {% for details in field.value %}
-                <label>{{details.name}}</label>
+              {% if field.altnames == "Caste" or field.altnames == "District" or field.altnames == "State" or field.altnames == "College ( Graduation )" %}
+                <label>{{field.value.0.name|title}}</label>
+              {% elif field.altnames == "Languages Known" %}
+                {% for each_lang in field.value %}
+                  <label>{{each_lang|title}}</label>
+                {% endfor %}
+
+              {% elif field.altnames == "College(s)" %}
+                {% for each_colg in field.value %}
+                  <label>{{each_colg.name}} </label>
+                {% endfor %}
+
+              {% elif field.altnames == "Volunteer to teach Course in College"  %}
+                {% for course_colg in field.value %}
+                  <label>{{course_colg.0.name|title}} - {{course_colg.1.name|title}}</label>
+                {% endfor %}
+
+              {% elif field.altnames == "Voluntary Teacher: Minimum qualifications requirement"  %}
+                {% for min_qual in field.value %}
+                  {% for key,val in min_qual.items %}
+                    <label>{{key|title}} 
+                    {% for reqd_qual in val %}
+                       - {{reqd_qual}}</label>
+                    {% empty %}
+                       - Not specified</label>
+                    {% endfor %}
+                  {% endfor %}
                 {% endfor %}
               {% else %}
                 <label>{{field.value|title}}</label>
@@ -119,14 +148,18 @@
       </div> <!-- End of class="tabs-content" -->
   
     </section>
-
     <section class="medium-3 columns">
+    {% if "Student" in node.member_of_names_list %}
+      <div><input type="button" value="PRINT" class="print-btn small button"></div>
+    {% endif %}
+
       <div class="panel">
         <p>
         {{ node.member_of_names_list.0 }} 
         Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
         <br>
-        <small>
+
+<!--         <small>
           <a href="#view-changes"><i class="fi-clock"></i> Versions </a>
           {% for seq_no, version_no in node.version_dict.items|slice:"-6:" reversed %}
           <abbr title="Version #{{version_no}}">
@@ -140,6 +173,7 @@
           </abbr> 
           {% endfor %}
         </small>
+ -->
       </p>
       </div>
 
@@ -218,11 +252,41 @@
   </div>
 
 </div>
-
+<br>
+<div class="printable-data-div hide">
+  {% include "ndf/tiss_app_form.html" %}
+</div>
 {% endblock %}
 
 {% block script %}
 // <script type="text/javascript">
+$(document).on('click',".print-btn",function(){
+    printDiv("testing");
+    // printDiv("testing_2");
+  });
+function printDiv(divID) {
+    //Get the HTML of div
+    var divElements = document.getElementById(divID).innerHTML;
+    //Get the HTML of whole page
+    var oldPage = document.body.innerHTML;
+
+    //Reset the page's HTML with div's HTML only
+    document.body.innerHTML = "<html><body>" + divElements + "</body></html>";
+    //Print Page
+    document.body.style.marginLeft = '2rem';
+    document.body.style.marginRight = '2rem';
+    $("body table tbody tr td").css("lineHeight","0.125rem");
+    $("body .declration_td,.nss_reg_td").css("lineHeight","1.125rem");
+        
+    setTimeout(function(){
+       window.print();
+       document.body.innerHTML = oldPage;
+       document.body.style.marginLeft = '0rem';
+       document.body.style.marginRight = '0rem';
+       $("body table tbody tr td").css("lineHeight","1.125rem");
+       location.reload();
+    }, 5000);        
+}
 
 $(document).on('click',".checkedAll",function(){
   if($(this).is(":checked")==true){
@@ -343,6 +407,4 @@ $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[d
   map.invalidateSize();  
 });
 
-
-// </script>
 {% endblock %}	

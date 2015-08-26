@@ -1665,8 +1665,8 @@ select {
   padding: 0.875rem 1.5rem 0.875rem 0.875rem;
   font-size: 0.8125rem;
   transition: opacity 300ms ease-out;
-  background-color: #0eacb5;
-  border-color: #0c949c;
+  background-color: #2980b9;
+  border-color: #236e9f;
   color: white;
 }
 /* line 115, ../../../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
@@ -1708,9 +1708,9 @@ select {
 }
 /* line 122, ../../../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.secondary {
-  background-color: #a9b2b3;
-  border-color: #909b9c;
-  color: white;
+  background-color: #bebebe;
+  border-color: #a3a3a3;
+  color: #404040;
 }
 /* line 123, ../../../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.warning {
@@ -1722,7 +1722,7 @@ select {
 .alert-box.info {
   background-color: #fff0a5;
   border-color: #ffe66a;
-  color: #383e3e;
+  color: #404040;
 }
 /* line 125, ../../../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.alert-close {
@@ -2267,9 +2267,9 @@ select {
   margin-left: 0;
   list-style: none;
   border-style: solid;
-  border-width: 1px;
-  background-color: #10c1cb;
-  border-color: #0eaeb7;
+  border-width: 0;
+  background-color: #fafafa;
+  border-color: #e1e1e1;
   border-radius: 5px;
 }
 /* line 122, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
@@ -2279,7 +2279,7 @@ select {
   font-size: 0.6875rem;
   line-height: 0.6875rem;
   text-transform: uppercase;
-  color: white;
+  color: #2980b9;
 }
 /* line 68, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *:hover a, .breadcrumbs > *:focus a {
@@ -2287,17 +2287,17 @@ select {
 }
 /* line 70, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > * a {
-  color: white;
+  color: #2980b9;
 }
 /* line 75, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *.current {
   cursor: default;
-  color: white;
+  color: #333333;
 }
 /* line 78, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *.current a {
   cursor: default;
-  color: white;
+  color: #333333;
 }
 /* line 84, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *.current:hover, .breadcrumbs > *.current:hover a, .breadcrumbs > *.current:focus, .breadcrumbs > *.current:focus a {
@@ -2321,7 +2321,7 @@ select {
 /* line 102, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *:before {
   content: "/";
-  color: #555555;
+  color: #aaaaaa;
   margin: 0 0.75rem;
   position: relative;
   top: 1px;
@@ -2358,14 +2358,14 @@ button, .button {
   padding-bottom: 1.0625rem;
   padding-left: 2rem;
   font-size: 1rem;
-  background-color: #0eacb5;
-  border-color: #0b8a91;
+  background-color: #2980b9;
+  border-color: #216694;
   color: white;
   transition: background-color 300ms ease-out;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button:hover, button:focus, .button:hover, .button:focus {
-  background-color: #0b8a91;
+  background-color: #216694;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button:hover, button:focus, .button:hover, .button:focus {
@@ -2373,13 +2373,13 @@ button:hover, button:focus, .button:hover, .button:focus {
 }
 /* line 223, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary, .button.secondary {
-  background-color: #a9b2b3;
-  border-color: #859192;
-  color: white;
+  background-color: #bebebe;
+  border-color: #989898;
+  color: #333333;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary:hover, button.secondary:focus, .button.secondary:hover, .button.secondary:focus {
-  background-color: #859192;
+  background-color: #989898;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary:hover, button.secondary:focus, .button.secondary:hover, .button.secondary:focus {
@@ -2491,8 +2491,8 @@ button.round, .button.round {
 }
 /* line 240, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled, button[disabled], .button.disabled, .button[disabled] {
-  background-color: #0eacb5;
-  border-color: #0b8a91;
+  background-color: #2980b9;
+  border-color: #216694;
   color: white;
   cursor: default;
   opacity: 0.7;
@@ -2500,7 +2500,7 @@ button.disabled, button[disabled], .button.disabled, .button[disabled] {
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
-  background-color: #0b8a91;
+  background-color: #216694;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
@@ -2508,20 +2508,20 @@ button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[dis
 }
 /* line 179, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
-  background-color: #0eacb5;
+  background-color: #2980b9;
 }
 /* line 241, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary, button[disabled].secondary, .button.disabled.secondary, .button[disabled].secondary {
-  background-color: #a9b2b3;
-  border-color: #859192;
-  color: white;
+  background-color: #bebebe;
+  border-color: #989898;
+  color: #333333;
   cursor: default;
   opacity: 0.7;
   box-shadow: none;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
-  background-color: #859192;
+  background-color: #989898;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
@@ -2529,7 +2529,7 @@ button.disabled.secondary:hover, button.disabled.secondary:focus, button[disable
 }
 /* line 179, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
-  background-color: #a9b2b3;
+  background-color: #bebebe;
 }
 /* line 242, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.success, button[disabled].success, .button.disabled.success, .button[disabled].success {
@@ -4343,7 +4343,7 @@ fieldset {
 /* line 273, ../../../bower_components/foundation/scss/foundation/components/_forms.scss */
 fieldset legend {
   font-weight: bold;
-  background: white;
+  background: inherit;
   padding: 0 0.1875rem;
   margin: 0;
   margin-left: -0.1875rem;
@@ -4546,7 +4546,7 @@ label.error {
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_icon-bar.scss */
 .icon-bar > *:hover {
-  background: #0eacb5;
+  background: #2980b9;
 }
 /* line 170, ../../../bower_components/foundation/scss/foundation/components/_icon-bar.scss */
 .icon-bar > * label {
@@ -4910,7 +4910,7 @@ kbd {
   margin-bottom: inherit;
   padding: 0.25rem 0.5rem 0.25rem;
   font-size: 0.6875rem;
-  background-color: #0eacb5;
+  background-color: #2980b9;
   color: #666666;
 }
 /* line 96, ../../../bower_components/foundation/scss/foundation/components/_labels.scss */
@@ -4938,8 +4938,8 @@ kbd {
 }
 /* line 102, ../../../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.secondary, .secondary.label-list:empty:before {
-  background-color: #a9b2b3;
-  color: #666666;
+  background-color: #bebebe;
+  color: #333333;
 }
 /* line 103, ../../../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.info, .info.label-list:empty:before {
@@ -5365,14 +5365,14 @@ ul.pagination li.unavailable:hover a, ul.pagination li.unavailable a:focus, ul.p
 }
 /* line 68, ../../../bower_components/foundation/scss/foundation/components/_pagination.scss */
 ul.pagination li.current a, ul.pagination li.current button {
-  background: #0eacb5;
+  background: #2980b9;
   color: white;
   font-weight: bold;
   cursor: default;
 }
 /* line 75, ../../../bower_components/foundation/scss/foundation/components/_pagination.scss */
 ul.pagination li.current a:hover, ul.pagination li.current a:focus, ul.pagination li.current button:hover, ul.pagination li.current button:focus {
-  background: #0eacb5;
+  background: #2980b9;
 }
 /* line 136, ../../../bower_components/foundation/scss/foundation/components/_pagination.scss */
 ul.pagination li {
@@ -5396,10 +5396,10 @@ ul.pagination li {
 .panel {
   border-style: solid;
   border-width: 1px;
-  border-color: #c6f8fb;
+  border-color: #cde4f4;
   margin-bottom: 1.25rem;
   padding: 1.25rem;
-  background: #f9feff;
+  background: #fafdfe;
   color: #333333;
 }
 /* line 54, ../../../bower_components/foundation/scss/foundation/components/_panels.scss */
@@ -5427,10 +5427,10 @@ ul.pagination li {
 .panel.callout {
   border-style: solid;
   border-width: 1px;
-  border-color: #bbf6fa;
+  border-color: #c5e0f2;
   margin-bottom: 1.25rem;
   padding: 1.25rem;
-  background: #edfdfe;
+  background: #f1f8fc;
   color: #333333;
 }
 /* line 54, ../../../bower_components/foundation/scss/foundation/components/_panels.scss */
@@ -5456,7 +5456,7 @@ ul.pagination li {
 }
 /* line 83, ../../../bower_components/foundation/scss/foundation/components/_panels.scss */
 .panel.callout a:not(.button) {
-  color: #0eacb5;
+  color: #2980b9;
 }
 /* line 88, ../../../bower_components/foundation/scss/foundation/components/_panels.scss */
 .panel.radius {
@@ -5534,13 +5534,13 @@ ul.pagination li {
 }
 /* line 61, ../../../bower_components/foundation/scss/foundation/components/_progress-bars.scss */
 .progress .meter {
-  background: #0eacb5;
+  background: #2980b9;
   height: 100%;
   display: block;
 }
 /* line 64, ../../../bower_components/foundation/scss/foundation/components/_progress-bars.scss */
 .progress.secondary .meter {
-  background: #a9b2b3;
+  background: #bebebe;
   height: 100%;
   display: block;
 }
@@ -5619,12 +5619,12 @@ ul.pagination li {
 }
 /* line 146, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.radius .range-slider-handle {
-  background: #0eacb5;
+  background: #2980b9;
   border-radius: 5px;
 }
 /* line 115, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.radius .range-slider-handle:hover {
-  background: #0c979f;
+  background: #2471a3;
 }
 /* line 148, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.round {
@@ -5633,12 +5633,12 @@ ul.pagination li {
 }
 /* line 150, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.round .range-slider-handle {
-  background: #0eacb5;
+  background: #2980b9;
   border-radius: 1000px;
 }
 /* line 115, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.round .range-slider-handle:hover {
-  background: #0c979f;
+  background: #2471a3;
 }
 /* line 152, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.disabled, .range-slider[disabled] {
@@ -5648,13 +5648,13 @@ ul.pagination li {
 }
 /* line 154, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.disabled .range-slider-handle, .range-slider[disabled] .range-slider-handle {
-  background: #0eacb5;
+  background: #2980b9;
   cursor: default;
   opacity: 0.7;
 }
 /* line 115, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.disabled .range-slider-handle:hover, .range-slider[disabled] .range-slider-handle:hover {
-  background: #0c979f;
+  background: #2471a3;
 }
 
 /* line 157, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
@@ -5662,7 +5662,7 @@ ul.pagination li {
   display: inline-block;
   position: absolute;
   height: 0.875rem;
-  background: #a8b0b1;
+  background: #bcbcbc;
 }
 
 /* line 163, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
@@ -5677,11 +5677,11 @@ ul.pagination li {
   cursor: pointer;
   -ms-touch-action: manipulation;
   touch-action: manipulation;
-  background: #0eacb5;
+  background: #2980b9;
 }
 /* line 115, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider-handle:hover {
-  background: #0c979f;
+  background: #2471a3;
 }
 
 /* line 165, ../../../bower_components/foundation/scss/foundation/components/_reveal.scss */
@@ -6097,7 +6097,7 @@ dialog[open] {
 .sub-nav li.active a {
   border-radius: 3px;
   font-weight: normal;
-  background: #0eacb5;
+  background: #2980b9;
   padding: 0.1875rem 1rem;
   cursor: default;
   color: white;
@@ -6106,7 +6106,7 @@ dialog[open] {
 .sub-nav dt.active a:hover,
 .sub-nav dd.active a:hover,
 .sub-nav li.active a:hover {
-  background: #0c949c;
+  background: #236e9f;
 }
 
 /* line 204, ../../../bower_components/foundation/scss/foundation/components/_switches.scss */
@@ -6164,7 +6164,7 @@ dialog[open] {
 }
 /* line 102, ../../../bower_components/foundation/scss/foundation/components/_switches.scss */
 .switch input:checked + label {
-  background: #0eacb5;
+  background: #2980b9;
 }
 /* line 106, ../../../bower_components/foundation/scss/foundation/components/_switches.scss */
 .switch input:checked + label:after {
@@ -6195,7 +6195,7 @@ dialog[open] {
 }
 /* line 155, ../../../bower_components/foundation/scss/foundation/components/_switches.scss */
 .switch input:checked + label {
-  background: #0eacb5;
+  background: #2980b9;
 }
 /* line 118, ../../../bower_components/foundation/scss/foundation/components/_switches.scss */
 .switch.large label {
@@ -6347,7 +6347,7 @@ table tr td {
   outline: none;
   display: block;
   background-color: inherit;
-  color: #08676d;
+  color: #194d6f;
   padding: 0.4rem 0.8rem;
   font-family: "Source Sans Pro", "Open Sans", "Ubuntu", "FreeSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1rem;
@@ -6359,7 +6359,7 @@ table tr td {
 /* line 55, ../../../bower_components/foundation/scss/foundation/components/_tabs.scss */
 .tabs dd.active a, .tabs .tab-title.active a {
   background-color: inherit;
-  color: #08676d;
+  color: #194d6f;
 }
 /* line 64, ../../../bower_components/foundation/scss/foundation/components/_tabs.scss */
 .tabs.radius dd:first-child a, .tabs.radius .tab:first-child a {
@@ -6458,7 +6458,7 @@ table tr td {
 }
 /* line 49, ../../../bower_components/foundation/scss/foundation/components/_thumbs.scss */
 .th:hover, .th:focus {
-  box-shadow: 0 0 6px 1px rgba(14, 172, 181, 0.5);
+  box-shadow: 0 0 6px 1px rgba(41, 128, 185, 0.5);
 }
 /* line 63, ../../../bower_components/foundation/scss/foundation/components/_thumbs.scss */
 .th.radius {
@@ -6475,8 +6475,8 @@ table tr td {
 }
 /* line 45, ../../../bower_components/foundation/scss/foundation/components/_tooltips.scss */
 .has-tip:hover, .has-tip:focus {
-  border-bottom: dotted 1px #064d51;
-  color: #0eacb5;
+  border-bottom: dotted 1px #123a53;
+  color: #2980b9;
 }
 /* line 51, ../../../bower_components/foundation/scss/foundation/components/_tooltips.scss */
 .has-tip.tip-left, .has-tip.tip-right {
@@ -6529,8 +6529,8 @@ table tr td {
 }
 /* line 95, ../../../bower_components/foundation/scss/foundation/components/_tooltips.scss */
 .tooltip.opened {
-  color: #0eacb5 !important;
-  border-bottom: dotted 1px #064d51 !important;
+  color: #2980b9 !important;
+  border-bottom: dotted 1px #123a53 !important;
 }
 
 /* line 101, ../../../bower_components/foundation/scss/foundation/components/_tooltips.scss */
@@ -6797,13 +6797,13 @@ meta.foundation-mq-topbar {
   font-size: 1rem;
   padding-right: 16.66667px;
   padding-left: 16.66667px;
-  background-color: #0eacb5;
-  border-color: #0b8a91;
+  background-color: #2980b9;
+  border-color: #216694;
   color: white;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button:hover, .top-bar-section ul li > a.button:focus {
-  background-color: #0b8a91;
+  background-color: #216694;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button:hover, .top-bar-section ul li > a.button:focus {
@@ -6811,13 +6811,13 @@ meta.foundation-mq-topbar {
 }
 /* line 325, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > a.button.secondary {
-  background-color: #a9b2b3;
-  border-color: #859192;
-  color: white;
+  background-color: #bebebe;
+  border-color: #989898;
+  color: #333333;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button.secondary:hover, .top-bar-section ul li > a.button.secondary:focus {
-  background-color: #859192;
+  background-color: #989898;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button.secondary:hover, .top-bar-section ul li > a.button.secondary:focus {
@@ -6870,13 +6870,13 @@ meta.foundation-mq-topbar {
   font-size: 1rem;
   padding-right: 16.66667px;
   padding-left: 16.66667px;
-  background-color: #0eacb5;
-  border-color: #0b8a91;
+  background-color: #2980b9;
+  border-color: #216694;
   color: white;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button:hover, .top-bar-section ul li > button:focus {
-  background-color: #0b8a91;
+  background-color: #216694;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button:hover, .top-bar-section ul li > button:focus {
@@ -6884,13 +6884,13 @@ meta.foundation-mq-topbar {
 }
 /* line 337, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > button.secondary {
-  background-color: #a9b2b3;
-  border-color: #859192;
-  color: white;
+  background-color: #bebebe;
+  border-color: #989898;
+  color: #333333;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button.secondary:hover, .top-bar-section ul li > button.secondary:focus {
-  background-color: #859192;
+  background-color: #989898;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button.secondary:hover, .top-bar-section ul li > button.secondary:focus {
@@ -6941,17 +6941,17 @@ meta.foundation-mq-topbar {
 /* line 344, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li:hover:not(.has-form) > a {
   background-color: #555555;
-  background: #075b60;
+  background: #143f5c;
   color: white;
 }
 /* line 354, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li.active > a {
-  background: #10c1cb;
+  background: #2b87c2;
   color: white;
 }
 /* line 357, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li.active > a:hover {
-  background: #10c1cb;
+  background: #2b87c2;
   color: white;
 }
 /* line 365, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7131,7 +7131,7 @@ meta.foundation-mq-topbar {
   /* line 492, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.hover > a:not(.button) {
     background-color: #555555;
-    background: #075b60;
+    background: #143f5c;
     color: white;
   }
   /* line 501, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7143,18 +7143,18 @@ meta.foundation-mq-topbar {
   /* line 505, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li:not(.has-form) a:not(.button):hover {
     background-color: #555555;
-    background: #075b60;
+    background: #143f5c;
   }
   /* line 514, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.active:not(.has-form) a:not(.button) {
     padding: 0 16.66667px;
     line-height: 50px;
     color: white;
-    background: #10c1cb;
+    background: #2b87c2;
   }
   /* line 519, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.active:not(.has-form) a:not(.button):hover {
-    background: #10c1cb;
+    background: #2b87c2;
     color: white;
   }
   /* line 531, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7239,7 +7239,7 @@ meta.foundation-mq-topbar {
   .top-bar-section .dropdown li:not(.has-form):not(.active):hover > a:not(.button) {
     color: white;
     background-color: #555555;
-    background: #075b60;
+    background: #143f5c;
   }
   /* line 604, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .dropdown li label {
@@ -7288,12 +7288,12 @@ meta.foundation-mq-topbar {
   /* line 657, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .no-js .top-bar-section ul li:hover > a {
     background-color: #555555;
-    background: #075b60;
+    background: #143f5c;
     color: white;
   }
   /* line 666, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .no-js .top-bar-section ul li:active > a {
-    background: #10c1cb;
+    background: #2b87c2;
     color: white;
   }
   /* line 674, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7576,13 +7576,13 @@ td {
 /* Default Link Styles */
 /* line 217, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a {
-  color: #08676d;
+  color: #194d6f;
   text-decoration: none;
   line-height: inherit;
 }
 /* line 223, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a:hover, a:focus {
-  color: #043436;
+  color: #0c2638;
 }
 /* line 230, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a img {
@@ -7704,10 +7704,10 @@ code {
   font-family: Consolas, "Liberation Mono", Courier, monospace;
   font-weight: normal;
   color: #333333;
-  background-color: #e5e8e8;
+  background-color: #ebebeb;
   border-width: 1px;
   border-style: solid;
-  border-color: #cdd2d2;
+  border-color: #d4d4d4;
   padding: 0.125rem 0.3125rem 0.0625rem;
 }
 
@@ -9101,93 +9101,34 @@ th.hide-for-touch {
   height: 130px;
 }
 
-/* line 29, ../../../scss/_nroer_styles.scss */
-article.landing {
-  padding-top: 8%;
-}
-
-/* For landing page */
-/* line 35, ../../../scss/_nroer_styles.scss */
-#landing > header {
-  background-image: url("/static/ndf/css/themes/nroer/home_banner.jpg");
-  position: relative;
-  z-index: 50;
-  background-color: #0A253A;
-  padding: 1rem 0 1rem 0;
-  border-bottom: 2px solid #00CEFD;
-}
-/* line 43, ../../../scss/_nroer_styles.scss */
-#landing > header .logo {
-  color: #555;
-  text-align: center;
-  padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.8);
-}
-/* line 48, ../../../scss/_nroer_styles.scss */
-#landing > header .logo img {
-  max-width: 75%;
-  margin-bottom: 0.5rem;
-}
-/* line 53, ../../../scss/_nroer_styles.scss */
-#landing > header .logo h1, #landing > header .logo article h1:not(.subheader) div input, article h1:not(.subheader) div #landing > header .logo input {
-  font-size: 1.2rem;
-  line-height: 1;
-  font-weight: bold;
-  text-transform: uppercase;
-  color: white;
-}
-
-/* line 66, ../../../scss/_nroer_styles.scss */
+/* line 31, ../../../scss/_nroer_styles.scss */
 .landing {
   position: relative;
 }
-/* line 69, ../../../scss/_nroer_styles.scss */
+/* line 34, ../../../scss/_nroer_styles.scss */
 .landing h2 {
   margin-top: 2rem;
 }
 
-/* line 74, ../../../scss/_nroer_styles.scss */
-section.promo {
-  background-color: rgba(0, 0, 0, 0.9);
-  border-bottom: 4px solid #00CEFD;
-}
-/* line 77, ../../../scss/_nroer_styles.scss */
-section.promo .meta {
-  padding-left: 2rem;
-  padding-right: 2rem;
-}
-/* line 80, ../../../scss/_nroer_styles.scss */
-section.promo .meta h4 {
-  color: white;
-}
-
-/* line 87, ../../../scss/_nroer_styles.scss */
-ul.partner img {
-  max-height: 150px;
-}
-
-/* line 92, ../../../scss/_nroer_styles.scss */
+/* line 40, ../../../scss/_nroer_styles.scss */
 div.banner {
   padding: 0 2rem;
-  margin-bottom: 2rem;
-  border: 2px solid #12d9e4;
-  border-width: 2px 0;
 }
-/* line 97, ../../../scss/_nroer_styles.scss */
+/* line 45, ../../../scss/_nroer_styles.scss */
 div.banner > * {
-  background-color: #0eacb5;
+  background-color: #2980b9;
   color: #eee;
   margin: 0;
 }
-/* line 99, ../../../scss/_nroer_styles.scss */
+/* line 47, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide {
   padding: 1rem;
   margin: 0;
-  background-color: #0c969d;
+  background-color: #2472a4;
   height: 24em !important;
-  height: 50vh !important;
+  min-height: 50vh !important;
 }
-/* line 105, ../../../scss/_nroer_styles.scss */
+/* line 54, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .slide-back-image {
   position: absolute;
   font-size: 17rem;
@@ -9197,56 +9138,56 @@ div.banner > * .slide .slide-back-image {
   opacity: 0.08;
   right: 7%;
 }
-/* line 114, ../../../scss/_nroer_styles.scss */
+/* line 63, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .count-box {
   font-size: 120%;
   font-size: 1.35vw;
   opacity: 0.8;
   padding-bottom: 1em;
 }
-/* line 120, ../../../scss/_nroer_styles.scss */
+/* line 69, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .count-box .count {
   font-size: 1.75vw;
   padding-right: 5px;
 }
-/* line 124, ../../../scss/_nroer_styles.scss */
+/* line 73, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .count-box a {
   font-size: 1.35vw;
 }
-/* line 129, ../../../scss/_nroer_styles.scss */
+/* line 78, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .quotes {
   opacity: 0.75;
   font-family: "Times new Roman";
   font-size: 200%;
   font-size: 3vw;
 }
-/* line 136, ../../../scss/_nroer_styles.scss */
+/* line 85, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .slide-2-icons {
   opacity: 0.5;
   font-size: 280%;
   font-size: 3vw;
 }
-/* line 144, ../../../scss/_nroer_styles.scss */
+/* line 93, ../../../scss/_nroer_styles.scss */
 div.banner > * h2, div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
   color: white;
 }
-/* line 147, ../../../scss/_nroer_styles.scss */
+/* line 96, ../../../scss/_nroer_styles.scss */
 div.banner > * h2 {
   font-size: 280%;
   font-size: 3vw;
 }
-/* line 151, ../../../scss/_nroer_styles.scss */
+/* line 100, ../../../scss/_nroer_styles.scss */
 div.banner > * h3 {
   font-size: 180%;
   font-size: 2vw;
 }
-/* line 155, ../../../scss/_nroer_styles.scss */
+/* line 104, ../../../scss/_nroer_styles.scss */
 div.banner > * blockquote {
   font-size: 120%;
   font-size: 1.35vw;
   font-style: italic;
 }
-/* line 160, ../../../scss/_nroer_styles.scss */
+/* line 109, ../../../scss/_nroer_styles.scss */
 div.banner > * p {
   color: white;
   font-size: 120%;
@@ -9336,7 +9277,7 @@ pre {
 
 /* Effects */
 /* line 87, ../../../scss/_app_styles.scss */
-.drop-shadow, #landing > header {
+.drop-shadow {
   -webkit-box-shadow: 0px 0px 5px 1px black;
   box-shadow: 0px 0px 5px 1px black;
 }
@@ -9376,7 +9317,7 @@ pre {
 }
 /* line 116, ../../../scss/_app_styles.scss */
 .rating-bar.unrated:checked ~ label:before {
-  color: #a9b2b3;
+  color: #bebebe;
 }
 /* line 122, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] {
@@ -9436,11 +9377,6 @@ pre {
   text-shadow: 0 0 1px #333;
 }
 
-/* line 182, ../../../scss/_app_styles.scss */
-body a:visited {
-  color: #1d484a;
-}
-
 /* line 190, ../../../scss/_app_styles.scss */
 body {
   background-color: #fafafa;
@@ -9448,90 +9384,138 @@ body {
 
 /* line 194, ../../../scss/_app_styles.scss */
 #top-headers {
-  background-color: black;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 /* line 198, ../../../scss/_app_styles.scss */
-#top-headers div.two-nav-container {
-  padding: 0;
+#top-headers #first-header.top-bar {
+  background-color: #dadfe1;
 }
-/* line 202, ../../../scss/_app_styles.scss */
-#top-headers ul.dropdown {
-  box-shadow: 0px 2px 5px black;
-}
-/* line 206, ../../../scss/_app_styles.scss */
-#top-headers a.logo {
-  height: 100px;
-  margin: 0;
-}
-/* line 210, ../../../scss/_app_styles.scss */
-#top-headers a.logo img {
-  margin: 10% auto;
-  display: block;
-}
-/* line 216, ../../../scss/_app_styles.scss */
-#top-headers a.logo:hover {
-  background-color: #383838;
+/* line 204, ../../../scss/_app_styles.scss */
+#top-headers #first-header.top-bar .title-area a:hover {
+  box-shadow: inset 0px 100px 50px #fff;
   transition: 0.8s all;
 }
-/* line 222, ../../../scss/_app_styles.scss */
+/* line 212, ../../../scss/_app_styles.scss */
+#top-headers #first-header.top-bar .top-bar-section li a.active:not(.button) {
+  color: #fff;
+}
+/* line 214, ../../../scss/_app_styles.scss */
+#top-headers #first-header.top-bar .top-bar-section li a:not(.button), #top-headers #first-header.top-bar .top-bar-section li {
+  background-color: #dadfe1;
+  color: #2b2c2d;
+}
+/* line 221, ../../../scss/_app_styles.scss */
+#top-headers #first-header.top-bar .top-bar-section li a:not(.button):hover, #top-headers #first-header.top-bar .top-bar-section li:not(.has-form):hover {
+  background-color: #143f5c !important;
+  color: #fff;
+}
+/* line 229, ../../../scss/_app_styles.scss */
 #top-headers #group-level-header {
-  border-top: solid thin black;
+  opacity: 0.9;
+  background-color: #E1E1E1;
 }
-/* line 226, ../../../scss/_app_styles.scss */
-#top-headers #group-level-header .top-bar {
-  background-color: #383838;
+/* line 234, ../../../scss/_app_styles.scss */
+#top-headers #group-level-header:hover {
+  opacity: 1;
+  transition: 0.3s all;
+  box-shadow: 0px 2px 3px #E1E1E1;
 }
-/* line 230, ../../../scss/_app_styles.scss */
-#top-headers #group-level-header .top-bar ul.title-area h1:hover, #top-headers #group-level-header .top-bar ul.title-area article h1:not(.subheader) div input:hover, article h1:not(.subheader) div #top-headers #group-level-header .top-bar ul.title-area input:hover {
-  background-color: #4e4e4e;
+/* line 240, ../../../scss/_app_styles.scss */
+#top-headers #group-level-header #second-header.top-bar {
+  background-color: #fafafa;
+  border-top: solid thin gray;
+  height: 52px;
 }
-/* line 237, ../../../scss/_app_styles.scss */
-#top-headers #group-level-header .top-bar-section li.active:not(.has-form) > a:not(.button) {
-  background-color: #096f75 !important;
+/* line 250, ../../../scss/_app_styles.scss */
+#top-headers #group-level-header #second-header.top-bar .top-bar-section li.active a:not(.button), #top-headers #group-level-header #second-header.top-bar .top-bar-section li.active {
+  background-color: #fafafa !important;
+  color: #000;
+  border-bottom: solid 1px gray !important;
 }
-/* line 241, ../../../scss/_app_styles.scss */
-#top-headers #group-level-header .top-bar-section li a:not(.button), #top-headers #group-level-header .top-bar-section li {
-  background-color: #383838;
-}
-/* line 245, ../../../scss/_app_styles.scss */
-#top-headers #group-level-header .top-bar-section li a:not(.button):hover, #top-headers #group-level-header .top-bar-section li:hover {
-  background-color: #075b60 !important;
-}
-
-/* line 255, ../../../scss/_app_styles.scss */
-.top-bar a.language.button {
-  padding: 5px 10px;
-  margin-top: 2px;
-  background-color: #888;
-  color: black;
+/* line 256, ../../../scss/_app_styles.scss */
+#top-headers #group-level-header #second-header.top-bar .top-bar-section li.active a:not(.button):hover, #top-headers #group-level-header #second-header.top-bar .top-bar-section li.active:hover {
+  background-color: #143f5c !important;
 }
 /* line 260, ../../../scss/_app_styles.scss */
-.top-bar a.language.button:hover {
-  background-color: white;
-  color: black;
+#top-headers #group-level-header #second-header.top-bar .top-bar-section li.active:not(.has-form) > a:not(.button) {
+  background-color: #184c6e;
 }
-/* line 266, ../../../scss/_app_styles.scss */
-.top-bar ul.language-selector {
-  height: 50px;
-  float: right;
-  margin: 0;
+/* line 265, ../../../scss/_app_styles.scss */
+#top-headers #group-level-header #second-header.top-bar .top-bar-section li a:not(.button), #top-headers #group-level-header #second-header.top-bar .top-bar-section li {
+  background-color: #fafafa;
+  color: gray;
 }
 /* line 272, ../../../scss/_app_styles.scss */
-.top-bar .active {
-  background-color: #0b838a !important;
+#top-headers #group-level-header #second-header.top-bar .top-bar-section li a:not(.button):hover, #top-headers #group-level-header #second-header.top-bar .top-bar-section li:not(.has-form):hover {
+  background-color: #143f5c;
+  color: #fff;
 }
-/* line 296, ../../../scss/_app_styles.scss */
+/* line 280, ../../../scss/_app_styles.scss */
+#top-headers ul.dropdown {
+  box-shadow: 0px 2px 5px black;
+  opacity: 1;
+}
+/* line 285, ../../../scss/_app_styles.scss */
+#top-headers #search_text {
+  border-bottom: solid thin #E1E1E1;
+  background-color: #fafafa;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: none !important;
+  /*color: #fff !important;*/
+  height: inherit;
+  box-shadow: none;
+  top: 10px;
+}
+/* line 297, ../../../scss/_app_styles.scss */
+#top-headers #search_text:focus {
+  border-bottom-color: #2b2c2d;
+  transition: 1s ease-out;
+}
+/* line 303, ../../../scss/_app_styles.scss */
+#top-headers #search-submit {
+  background-color: #fafafa;
+  top: 10px;
+  position: absolute;
+  left: -30px;
+  opacity: 0.3;
+  color: black;
+}
+/* line 313, ../../../scss/_app_styles.scss */
+#top-headers #search-submit:hover {
+  opacity: 1;
+  color: white;
+  background-color: gray;
+  transition: 0.8s ease-out;
+}
+/* line 320, ../../../scss/_app_styles.scss */
+#top-headers ul.title-area a {
+  width: 150px;
+  color: gray;
+}
+/* line 324, ../../../scss/_app_styles.scss */
+#top-headers ul.title-area a:hover {
+  box-shadow: inset 0px 75px 50px #2b2c2d;
+  color: #fafafa;
+  transition: 0.8s all;
+}
+
+/* line 364, ../../../scss/_app_styles.scss */
+.top-bar .active {
+  background-color: #1c5880 !important;
+}
+/* line 370, ../../../scss/_app_styles.scss */
 .top-bar .logout {
   background-color: #f04124 !important;
 }
-/* line 300, ../../../scss/_app_styles.scss */
+/* line 374, ../../../scss/_app_styles.scss */
 .top-bar .logout:hover {
   background-color: #d32a0e !important;
   transition: background-color 400ms ease-out;
 }
 
-/* line 308, ../../../scss/_app_styles.scss */
+/* line 416, ../../../scss/_app_styles.scss */
 body > footer {
   padding: 20px 0;
   position: relative;
@@ -9539,56 +9523,56 @@ body > footer {
   min-height: 170px;
   background-color: rgba(0, 0, 0, 0.8);
 }
-/* line 316, ../../../scss/_app_styles.scss */
+/* line 424, ../../../scss/_app_styles.scss */
 body > footer section:first-child {
   border-bottom: 1px solid #222;
   margin-bottom: 1rem;
 }
-/* line 320, ../../../scss/_app_styles.scss */
+/* line 429, ../../../scss/_app_styles.scss */
 body > footer a {
   color: #bbbbbb !important;
 }
-/* line 322, ../../../scss/_app_styles.scss */
+/* line 431, ../../../scss/_app_styles.scss */
 body > footer a:hover {
   color: #eee !important;
 }
-/* line 326, ../../../scss/_app_styles.scss */
+/* line 436, ../../../scss/_app_styles.scss */
 body > footer strong a {
   border-bottom: 1px dotted #555;
 }
 
-/* line 332, ../../../scss/_app_styles.scss */
+/* line 442, ../../../scss/_app_styles.scss */
 .coll-arrows {
   cursor: pointer;
   display: block;
   padding: 0.5rem;
 }
-/* line 337, ../../../scss/_app_styles.scss */
+/* line 447, ../../../scss/_app_styles.scss */
 .coll-arrows:hover {
   background-color: #D3D3D3;
 }
 
 /* Sections */
-/* line 344, ../../../scss/_app_styles.scss */
+/* line 454, ../../../scss/_app_styles.scss */
 main > nav {
   border-top: 3px solid black;
   position: relative;
   z-index: 10;
 }
-/* line 348, ../../../scss/_app_styles.scss */
+/* line 458, ../../../scss/_app_styles.scss */
 main > nav > .button-bar {
-  background-color: #10c1cb;
+  background-color: #2b87c2;
   /* Hide icons till we can retreive custom icons from the system */
 }
-/* line 350, ../../../scss/_app_styles.scss */
+/* line 460, ../../../scss/_app_styles.scss */
 main > nav > .button-bar .button-group {
   margin: 0;
 }
-/* line 352, ../../../scss/_app_styles.scss */
+/* line 462, ../../../scss/_app_styles.scss */
 main > nav > .button-bar .button-group.tools {
   padding: 5px;
 }
-/* line 358, ../../../scss/_app_styles.scss */
+/* line 468, ../../../scss/_app_styles.scss */
 main > nav > .button-bar li .button {
   border: none;
   font-size: 0.8rem;
@@ -9597,139 +9581,139 @@ main > nav > .button-bar li .button {
   color: black;
   margin: 0;
 }
-/* line 362, ../../../scss/_app_styles.scss */
+/* line 472, ../../../scss/_app_styles.scss */
 main > nav > .button-bar li .button.home {
   font-weight: bold;
 }
-/* line 365, ../../../scss/_app_styles.scss */
+/* line 475, ../../../scss/_app_styles.scss */
 main > nav > .button-bar li .button.settings, main > nav > .button-bar li .button#toggle-help {
   padding: 6px 10px;
   color: #333;
   background-color: rgba(255, 255, 255, 0.3);
 }
-/* line 370, ../../../scss/_app_styles.scss */
+/* line 480, ../../../scss/_app_styles.scss */
 main > nav > .button-bar li .button.settings:hover, main > nav > .button-bar li .button#toggle-help:hover {
   background-color: rgba(0, 0, 0, 0.2);
   color: white;
 }
-/* line 375, ../../../scss/_app_styles.scss */
+/* line 485, ../../../scss/_app_styles.scss */
 main > nav > .button-bar li .button#toggle-help {
   background-color: inherit;
 }
-/* line 379, ../../../scss/_app_styles.scss */
+/* line 489, ../../../scss/_app_styles.scss */
 main > nav > .button-bar li .button.settings:after {
   border: none;
 }
-/* line 387, ../../../scss/_app_styles.scss */
+/* line 497, ../../../scss/_app_styles.scss */
 main > nav > .button-bar li .button:hover {
   color: white;
 }
-/* line 393, ../../../scss/_app_styles.scss */
+/* line 503, ../../../scss/_app_styles.scss */
 main > nav > .button-bar li.active .button {
-  background-color: #0eacb5;
+  background-color: #2980b9;
   color: white;
 }
-/* line 401, ../../../scss/_app_styles.scss */
+/* line 511, ../../../scss/_app_styles.scss */
 main > nav > .button-bar .app i {
   display: none !important;
 }
 
-/* line 413, ../../../scss/_app_styles.scss */
+/* line 523, ../../../scss/_app_styles.scss */
 main > aside > div h2 {
   color: #111;
 }
-/* line 416, ../../../scss/_app_styles.scss */
+/* line 526, ../../../scss/_app_styles.scss */
 main > aside > div h3 {
   font-size: 1.2rem;
   font-weight: normal;
   color: #222;
 }
-/* line 421, ../../../scss/_app_styles.scss */
+/* line 531, ../../../scss/_app_styles.scss */
 main > aside > div h4 {
   font-size: 1rem;
   color: #222;
 }
-/* line 424, ../../../scss/_app_styles.scss */
+/* line 534, ../../../scss/_app_styles.scss */
 main > aside > div h4 span {
   display: none;
 }
-/* line 427, ../../../scss/_app_styles.scss */
+/* line 537, ../../../scss/_app_styles.scss */
 main > aside > div h4:hover span {
   display: inline;
 }
-/* line 431, ../../../scss/_app_styles.scss */
+/* line 541, ../../../scss/_app_styles.scss */
 main > aside > div h5, main > aside > div h6 {
   margin: 0;
 }
-/* line 435, ../../../scss/_app_styles.scss */
+/* line 545, ../../../scss/_app_styles.scss */
 main > aside > div .f-dropdown.content {
   width: auto;
   padding: 0;
   border: 1px solid #222;
 }
-/* line 439, ../../../scss/_app_styles.scss */
+/* line 549, ../../../scss/_app_styles.scss */
 main > aside > div .f-dropdown.content .item {
   width: 70px;
 }
-/* line 443, ../../../scss/_app_styles.scss */
+/* line 553, ../../../scss/_app_styles.scss */
 main > aside > div header {
-  padding: 10px;
+  padding: 0 10px;
 }
-/* line 446, ../../../scss/_app_styles.scss */
+/* line 556, ../../../scss/_app_styles.scss */
 main > aside > div footer {
   background-color: #222;
   min-height: 1rem;
 }
-/* line 449, ../../../scss/_app_styles.scss */
+/* line 559, ../../../scss/_app_styles.scss */
 main > aside > div footer label {
   font-size: 0.7rem;
 }
-/* line 462, ../../../scss/_app_styles.scss */
+/* line 572, ../../../scss/_app_styles.scss */
 main > aside > div .side-nav.collection {
   background-color: #444;
   padding: 0;
-  border-bottom: 2px solid #10c1cb;
+  border-bottom: 2px solid #2b87c2;
   margin: 0;
 }
-/* line 467, ../../../scss/_app_styles.scss */
+/* line 577, ../../../scss/_app_styles.scss */
 main > aside > div .side-nav.collection li {
   border-bottom: 1px solid #555;
 }
-/* line 469, ../../../scss/_app_styles.scss */
+/* line 579, ../../../scss/_app_styles.scss */
 main > aside > div .side-nav.collection li a {
   border-left: 2px solid black;
 }
-/* line 472, ../../../scss/_app_styles.scss */
+/* line 582, ../../../scss/_app_styles.scss */
 main > aside > div .side-nav.collection li.active a, main > aside > div .side-nav.collection li a:hover {
   color: white !important;
-  border-left: 2px solid #10c1cb;
-  background-color: #10c1cb;
+  border-left: 2px solid #2b87c2;
+  background-color: #2b87c2;
 }
 
-/* line 485, ../../../scss/_app_styles.scss */
+/* line 595, ../../../scss/_app_styles.scss */
 article {
   position: relative;
   z-index: 1;
   min-height: 400px;
   overflow-x: visible;
 }
-/* line 490, ../../../scss/_app_styles.scss */
+/* line 600, ../../../scss/_app_styles.scss */
 article > header, article form > header {
   padding: 15px;
   background-color: #f0f0f0;
 }
-/* line 503, ../../../scss/_app_styles.scss */
+/* line 613, ../../../scss/_app_styles.scss */
 article h1:not(.subheader) .tabs {
   display: inline-block;
   position: relative;
   bottom: -0.5rem;
 }
-/* line 509, ../../../scss/_app_styles.scss */
+/* line 619, ../../../scss/_app_styles.scss */
 article h1:not(.subheader) div, article h1:not(.subheader) div input:not(.subheader) div {
   display: inline-block;
   position: relative;
 }
-/* line 512, ../../../scss/_app_styles.scss */
+/* line 622, ../../../scss/_app_styles.scss */
 article h1:not(.subheader) div input {
   height: 200%;
   font-style: italic;
@@ -9739,13 +9723,13 @@ article h1:not(.subheader) div input {
   border-bottom: 2px dotted #222;
   background-color: inherit;
 }
-/* line 522, ../../../scss/_app_styles.scss */
+/* line 632, ../../../scss/_app_styles.scss */
 article h1:not(.subheader) div input:hover {
   background-color: white;
 }
 
 /* Card block */
-/* line 532, ../../../scss/_app_styles.scss */
+/* line 642, ../../../scss/_app_styles.scss */
 .card > * {
   position: relative;
   background-color: white;
@@ -9756,91 +9740,91 @@ article h1:not(.subheader) div input:hover {
   opacity: 0.9;
   overflow: hidden;
 }
-/* line 544, ../../../scss/_app_styles.scss */
+/* line 654, ../../../scss/_app_styles.scss */
 .card > * > a {
   color: inherit;
   display: block;
   position: relative;
   z-index: 200;
 }
-/* line 550, ../../../scss/_app_styles.scss */
+/* line 660, ../../../scss/_app_styles.scss */
 .card > * > a b {
   font-family: Georgia, Serif;
 }
-/* line 555, ../../../scss/_app_styles.scss */
+/* line 665, ../../../scss/_app_styles.scss */
 .card > *.published {
   opacity: 1;
   background-color: #e6f9ee;
 }
-/* line 560, ../../../scss/_app_styles.scss */
+/* line 670, ../../../scss/_app_styles.scss */
 .card > *.published hr {
   border-color: #7ee2a8;
 }
-/* line 565, ../../../scss/_app_styles.scss */
+/* line 675, ../../../scss/_app_styles.scss */
 .card > *.moderation {
   opacity: 1;
   background-color: #efefef;
 }
-/* line 570, ../../../scss/_app_styles.scss */
+/* line 680, ../../../scss/_app_styles.scss */
 .card > *.moderation hr {
   border-color: #bcbcbc;
 }
-/* line 575, ../../../scss/_app_styles.scss */
+/* line 685, ../../../scss/_app_styles.scss */
 .card > *.unapproved {
   opacity: 1;
   border-style: solid;
   border-color: #f04124;
 }
-/* line 581, ../../../scss/_app_styles.scss */
+/* line 691, ../../../scss/_app_styles.scss */
 .card > *:hover {
   border-style: solid;
   opacity: 1;
 }
-/* line 587, ../../../scss/_app_styles.scss */
+/* line 697, ../../../scss/_app_styles.scss */
 .card > *:hover i {
   opacity: 0.3;
 }
-/* line 590, ../../../scss/_app_styles.scss */
+/* line 700, ../../../scss/_app_styles.scss */
 .card > *:hover footer .age {
   display: block;
 }
-/* line 595, ../../../scss/_app_styles.scss */
+/* line 705, ../../../scss/_app_styles.scss */
 .card > * > i {
   position: absolute;
   top: -10px;
   right: 10px;
   font-size: 3rem;
-  color: #0eacb5;
+  color: #2980b9;
   opacity: 0.3;
 }
-/* line 604, ../../../scss/_app_styles.scss */
+/* line 714, ../../../scss/_app_styles.scss */
 .card > * .preview {
   float: left;
   padding-right: 5px;
   padding-top: 4px;
 }
-/* line 609, ../../../scss/_app_styles.scss */
+/* line 719, ../../../scss/_app_styles.scss */
 .card > * header {
   overflow: hidden;
 }
-/* line 612, ../../../scss/_app_styles.scss */
+/* line 722, ../../../scss/_app_styles.scss */
 .card > * h5 {
   white-space: nowrap;
   text-overflow: ellipsis;
   margin-bottom: 0;
 }
-/* line 617, ../../../scss/_app_styles.scss */
+/* line 727, ../../../scss/_app_styles.scss */
 .card > * .label, .card > * .label-list:empty:before {
   opacity: 0.5;
 }
-/* line 620, ../../../scss/_app_styles.scss */
+/* line 730, ../../../scss/_app_styles.scss */
 .card > * p {
   color: #555;
   height: 80px;
   background-repeat: no-repeat;
   font-size: 80%;
 }
-/* line 626, ../../../scss/_app_styles.scss */
+/* line 736, ../../../scss/_app_styles.scss */
 .card > * .th {
   margin: 20px auto;
   width: 80px;
@@ -9848,23 +9832,23 @@ article h1:not(.subheader) div input:hover {
   overflow: hidden;
   display: none;
 }
-/* line 632, ../../../scss/_app_styles.scss */
+/* line 742, ../../../scss/_app_styles.scss */
 .card > * .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 636, ../../../scss/_app_styles.scss */
+/* line 746, ../../../scss/_app_styles.scss */
 .card > * .th img {
   width: 100%;
 }
-/* line 640, ../../../scss/_app_styles.scss */
+/* line 750, ../../../scss/_app_styles.scss */
 .card > * footer {
   margin-top: 1rem;
   font-size: 70%;
   clear: both;
   color: #e01818;
 }
-/* line 645, ../../../scss/_app_styles.scss */
+/* line 755, ../../../scss/_app_styles.scss */
 .card > * footer .age {
   display: none;
   position: absolute;
@@ -9874,7 +9858,7 @@ article h1:not(.subheader) div input:hover {
   width: 100%;
 }
 
-/* line 656, ../../../scss/_app_styles.scss */
+/* line 766, ../../../scss/_app_styles.scss */
 .edit-card {
   position: relative;
   background-color: white;
@@ -9883,36 +9867,36 @@ article h1:not(.subheader) div input:hover {
 }
 
 /* Content Tabs */
-/* line 669, ../../../scss/_app_styles.scss */
+/* line 779, ../../../scss/_app_styles.scss */
 article .tabs {
   display: inline-block;
 }
-/* line 671, ../../../scss/_app_styles.scss */
+/* line 781, ../../../scss/_app_styles.scss */
 article .tabs dd a {
   border-radius: 4px;
   border: 1px transparent;
 }
-/* line 675, ../../../scss/_app_styles.scss */
+/* line 785, ../../../scss/_app_styles.scss */
 article .tabs dd.active a {
-  color: #10c1cb;
+  color: #2b87c2;
   border: 1px solid;
 }
-/* line 679, ../../../scss/_app_styles.scss */
+/* line 789, ../../../scss/_app_styles.scss */
 article .tabs dd:hover a {
-  color: #10c1cb;
+  color: #2b87c2;
 }
-/* line 683, ../../../scss/_app_styles.scss */
+/* line 793, ../../../scss/_app_styles.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
-/* line 689, ../../../scss/_app_styles.scss */
+/* line 799, ../../../scss/_app_styles.scss */
 article section.content {
   background-color: white;
   border: 1px solid #eee;
 }
 
-/* line 696, ../../../scss/_app_styles.scss */
+/* line 806, ../../../scss/_app_styles.scss */
 .card > div:hover {
   box-shadow: 0 0 10px lightgray;
   transition: 0.9s;
@@ -9921,31 +9905,31 @@ article section.content {
 }
 
 /* Default card */
-/* line 704, ../../../scss/_app_styles.scss */
+/* line 814, ../../../scss/_app_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 709, ../../../scss/_app_styles.scss */
+/* line 819, ../../../scss/_app_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
 /* Inline label list */
-/* line 717, ../../../scss/_app_styles.scss */
+/* line 827, ../../../scss/_app_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 721, ../../../scss/_app_styles.scss */
+/* line 831, ../../../scss/_app_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
   background-color: transparent;
 }
-/* line 729, ../../../scss/_app_styles.scss */
+/* line 839, ../../../scss/_app_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   background-color: transparent;
   padding: 2px;
@@ -9953,20 +9937,20 @@ article section.content {
 
 /*************************** 2. Custom CSS overrides ***********************/
 /* Content area */
-/* line 738, ../../../scss/_app_styles.scss */
+/* line 848, ../../../scss/_app_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 742, ../../../scss/_app_styles.scss */
+/* line 852, ../../../scss/_app_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
 }
-/* line 746, ../../../scss/_app_styles.scss */
+/* line 856, ../../../scss/_app_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
 
-/* line 758, ../../../scss/_app_styles.scss */
+/* line 868, ../../../scss/_app_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -9987,44 +9971,44 @@ textarea {
   }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 778, ../../../scss/_app_styles.scss */
+/* line 888, ../../../scss/_app_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 783, ../../../scss/_app_styles.scss */
+/* line 893, ../../../scss/_app_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 786, ../../../scss/_app_styles.scss */
+/* line 896, ../../../scss/_app_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 789, ../../../scss/_app_styles.scss */
+/* line 899, ../../../scss/_app_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 792, ../../../scss/_app_styles.scss */
+/* line 902, ../../../scss/_app_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 796, ../../../scss/_app_styles.scss */
+/* line 906, ../../../scss/_app_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 800, ../../../scss/_app_styles.scss */
+/* line 910, ../../../scss/_app_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 808, ../../../scss/_app_styles.scss */
+/* line 918, ../../../scss/_app_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -10032,13 +10016,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 815, ../../../scss/_app_styles.scss */
+/* line 925, ../../../scss/_app_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 820, ../../../scss/_app_styles.scss */
+/* line 930, ../../../scss/_app_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -10052,13 +10036,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 830, ../../../scss/_app_styles.scss */
+/* line 940, ../../../scss/_app_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 835, ../../../scss/_app_styles.scss */
+/* line 945, ../../../scss/_app_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -10069,7 +10053,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 846, ../../../scss/_app_styles.scss */
+/* line 956, ../../../scss/_app_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -10082,7 +10066,7 @@ input.node-title {
 
 /****************** CUSTOM *********************/
 /* UI Button */
-/* line 861, ../../../scss/_app_styles.scss */
+/* line 971, ../../../scss/_app_styles.scss */
 .ui.button {
   margin-right: 0.5rem;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -10092,69 +10076,320 @@ input.node-title {
   padding: 0.5vw 0.75vw;
   z-index: 500;
 }
-/* line 872, ../../../scss/_app_styles.scss */
+/* line 982, ../../../scss/_app_styles.scss */
 .ui.button label {
   color: #666;
 }
-/* line 875, ../../../scss/_app_styles.scss */
+/* line 985, ../../../scss/_app_styles.scss */
 .ui.button small {
   margin-left: 2px;
   display: inline;
 }
-/* line 879, ../../../scss/_app_styles.scss */
+/* line 989, ../../../scss/_app_styles.scss */
 .ui.button:hover, .ui.button:active {
   border-color: rgba(255, 255, 255, 0.2);
   background-color: rgba(0, 0, 0, 0.9);
 }
-/* line 882, ../../../scss/_app_styles.scss */
+/* line 992, ../../../scss/_app_styles.scss */
 .ui.button:hover label, .ui.button:active label {
   color: #ddd;
 }
-/* line 885, ../../../scss/_app_styles.scss */
+/* line 995, ../../../scss/_app_styles.scss */
 .ui.button:hover small, .ui.button:active small {
   display: inline;
 }
-/* line 888, ../../../scss/_app_styles.scss */
+/* line 998, ../../../scss/_app_styles.scss */
 .ui.button:hover:focus, .ui.button:active:focus {
   font-weight: bold;
 }
 
-/* line 897, ../../../scss/_app_styles.scss */
+/* line 1007, ../../../scss/_app_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 900, ../../../scss/_app_styles.scss */
+/* line 1010, ../../../scss/_app_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
 }
 
-/* line 907, ../../../scss/_app_styles.scss */
+/* line 1017, ../../../scss/_app_styles.scss */
 .align-center {
   margin: 0 auto;
   display: block;
 }
 
-/* line 913, ../../../scss/_app_styles.scss */
+/* line 1023, ../../../scss/_app_styles.scss */
 #profile-img {
   height: 40px;
   margin-right: 5px;
 }
 
-/* line 922, ../../../scss/_app_styles.scss */
+/* line 1032, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies {
   padding: 10px;
-  background-color: #dffbfd;
+  background-color: #bedcf0;
   width: 27em;
   max-width: 40em;
   margin-left: 48px;
   margin-top: 10px;
 }
-/* line 931, ../../../scss/_app_styles.scss */
+/* line 1041, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn {
   cursor: pointer;
 }
-/* line 935, ../../../scss/_app_styles.scss */
+/* line 1045, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn:hover {
   font-weight: bold;
+}
+
+/* line 1051, ../../../scss/_app_styles.scss */
+.rcard {
+  overflow: hidden;
+  color: #272727;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  background-color: #f5f5f5;
+}
+/* line 1061, ../../../scss/_app_styles.scss */
+.rcard:hover {
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.5s ease;
+}
+/* line 1066, ../../../scss/_app_styles.scss */
+.rcard .title {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+/* line 1072, ../../../scss/_app_styles.scss */
+.rcard .content {
+  padding: 0.5rem 2rem;
+  border-radius: 0 0 2px 2px;
+  overflow: hidden;
+  height: 7.25rem;
+}
+/* line 1079, ../../../scss/_app_styles.scss */
+.rcard .content .slick-slider {
+  margin-bottom: 0;
+}
+/* line 1083, ../../../scss/_app_styles.scss */
+.rcard .content .slick-prev {
+  left: 0.25rem;
+}
+/* line 1086, ../../../scss/_app_styles.scss */
+.rcard .content .slick-prev:before {
+  color: #ccc;
+}
+/* line 1092, ../../../scss/_app_styles.scss */
+.rcard .content .slick-next {
+  right: 0.25rem;
+}
+/* line 1095, ../../../scss/_app_styles.scss */
+.rcard .content .slick-next:before {
+  color: #ccc;
+}
+/* line 1101, ../../../scss/_app_styles.scss */
+.rcard .content .card-content-title {
+  width: 100%;
+  border-bottom: 1px solid #808080;
+  line-height: 0.25em;
+  margin: 10px 0 20px;
+}
+/* line 1107, ../../../scss/_app_styles.scss */
+.rcard .content .card-content-title small {
+  padding: 0 10px;
+  background-color: whitesmoke;
+}
+/* line 1114, ../../../scss/_app_styles.scss */
+.rcard .action {
+  border-top: 1px solid rgba(160, 160, 160, 0.2);
+  padding: 0.25rem 0.5rem;
+  color: gray;
+  font-size: small;
+  height: 2rem;
+}
+/* line 1121, ../../../scss/_app_styles.scss */
+.rcard .action .add-to-collection {
+  opacity: 0.5;
+}
+/* line 1124, ../../../scss/_app_styles.scss */
+.rcard .action .add-to-collection:hover {
+  opacity: 1;
+}
+/* line 1138, ../../../scss/_app_styles.scss */
+.rcard .image {
+  position: relative;
+  background-color: #E1E1E1;
+  box-shadow: 0px -35px 35px -20px gray inset;
+  height: 8em;
+  overflow: hidden;
+}
+/* line 1147, ../../../scss/_app_styles.scss */
+.rcard .image .title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 0.25rem 1rem;
+  color: #fff;
+  width: 100%;
+  box-shadow: 0px -25px 25px -20px gray inset;
+  text-transform: uppercase;
+  text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
+  font-family: Open Sans Bold;
+}
+/* line 1160, ../../../scss/_app_styles.scss */
+.rcard .image img {
+  border-radius: 2px 2px 0 0;
+  display: block;
+  margin: 0 auto;
+  opacity: 0.9;
+  height: 8em;
+  filter: brightness(0.75);
+  -webkit-filter: brightness(0.75);
+}
+/* line 1172, ../../../scss/_app_styles.scss */
+.rcard .image img:hover {
+  filter: brightness(1);
+  -webkit-filter: brightness(1);
+  transform: translate3d(0, 0, 0);
+  transition: filter 1s ease;
+}
+/* line 1181, ../../../scss/_app_styles.scss */
+.rcard .image i {
+  font-size: 7rem;
+  opacity: 0.75;
+  display: block;
+  margin: -15px auto;
+  text-align: center;
+  color: gray;
+  font-family: "foundation-icons";
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  text-decoration: inherit;
+}
+/* line 1198, ../../../scss/_app_styles.scss */
+.rcard .image i.file:before {
+  content: "\f18e";
+}
+/* line 1199, ../../../scss/_app_styles.scss */
+.rcard .image i.page:before {
+  content: "\f18e";
+}
+/* line 1200, ../../../scss/_app_styles.scss */
+.rcard .image i.collection:before {
+  content: "\f18a";
+}
+/* line 1202, ../../../scss/_app_styles.scss */
+.rcard .image i.documents:before {
+  content: "\f18b";
+}
+/* line 1203, ../../../scss/_app_styles.scss */
+.rcard .image i.pdf:before {
+  content: "\f18b";
+}
+/* line 1204, ../../../scss/_app_styles.scss */
+.rcard .image i.text:before {
+  content: "\f18e";
+}
+/* line 1205, ../../../scss/_app_styles.scss */
+.rcard .image i.interactives:before {
+  content: "\f1b2";
+}
+/* line 1206, ../../../scss/_app_styles.scss */
+.rcard .image i.ebooks:before {
+  content: "\f11e";
+}
+/* line 1207, ../../../scss/_app_styles.scss */
+.rcard .image i.images:before {
+  content: "\f125";
+}
+/* line 1208, ../../../scss/_app_styles.scss */
+.rcard .image i.audios:before, .rcard .image i.audio:before {
+  content: "\f17b";
+}
+/* line 1209, ../../../scss/_app_styles.scss */
+.rcard .image i.videos:before, .rcard .image i.video:before {
+  content: "\f20e";
+}
+/* line 1212, ../../../scss/_app_styles.scss */
+.rcard .card-label {
+  border-style: solid;
+  border-width: 0 70px 40px 0;
+  float: right;
+  height: 0px;
+  width: 0px;
+  transform: rotate(360deg);
+  position: absolute;
+  right: 0px;
+  z-index: 1;
+  opacity: 0.75;
+}
+/* line 1225, ../../../scss/_app_styles.scss */
+.rcard .card-label {
+  border-color: transparent #333 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #333333 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1230, ../../../scss/_app_styles.scss */
+.rcard .published.card-label {
+  border-color: transparent #43ac6a transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #43ac6a rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1234, ../../../scss/_app_styles.scss */
+.rcard .published.card-label .label-text:before {
+  content: "\221A";
+  margin-left: 5px;
+  font-size: larger;
+}
+/* line 1242, ../../../scss/_app_styles.scss */
+.rcard .draft.card-label {
+  border-color: transparent #bebebe transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #bebebe rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1246, ../../../scss/_app_styles.scss */
+.rcard .draft.card-label .label-text:before {
+  content: "Draft";
+}
+/* line 1251, ../../../scss/_app_styles.scss */
+.rcard .deleted.card-label {
+  border-color: transparent #f04124 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1255, ../../../scss/_app_styles.scss */
+.rcard .deleted.card-label .label-text:before {
+  content: "Deleted";
+}
+/* line 1260, ../../../scss/_app_styles.scss */
+.rcard .moderation.card-label {
+  border-color: transparent #2980b9 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #2980b9 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1264, ../../../scss/_app_styles.scss */
+.rcard .moderation.card-label .label-text:before {
+  content: "Mod";
+}
+/* line 1267, ../../../scss/_app_styles.scss */
+.rcard .hidden.card-label {
+  border-color: transparent #000 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) black rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1271, ../../../scss/_app_styles.scss */
+.rcard .hidden.card-label .label-text:before {
+  content: "hidden";
+}
+/* line 1274, ../../../scss/_app_styles.scss */
+.rcard .label-text {
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  position: relative;
+  right: -35px;
+  white-space: nowrap;
+  transform: rotate(30deg);
+}
+
+/* line 1288, ../../../scss/_app_styles.scss */
+.compulsory:after {
+  content: '*';
+  color: red;
+  font-size: smaller;
 }

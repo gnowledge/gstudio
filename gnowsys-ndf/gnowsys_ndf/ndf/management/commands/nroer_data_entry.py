@@ -37,7 +37,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
-from gnowsys_ndf.ndf.management.commands.data_entry import perform_eval_type
+from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import add_to_collection_set
 
 ##############################################################################
 
@@ -46,12 +46,23 @@ SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files")
 log_list = []  # To hold intermediate errors
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
-file_gst = node_collection.one({"name": "File"})
+file_gst = node_collection.one({'_type': 'GSystemType', "name": "File"})
 home_group = node_collection.one({"name": "home", "_type": "Group"})
-theme_gst = node_collection.one({"name": "Theme"})
-theme_item_gst = node_collection.one({"name": "theme_item"})
-topic_gst = node_collection.one({"name": "Topic"})
+theme_gst = node_collection.one({'_type': 'GSystemType', "name": "Theme"})
+theme_item_gst = node_collection.one({'_type': 'GSystemType', "name": "theme_item"})
+topic_gst = node_collection.one({'_type': 'GSystemType', "name": "Topic"})
 nroer_team_id = 1
+
+# setting variable:
+# If set true, despite of having file nlob in gridfs, it fetches concern File which contains this _id in it's fs_file_ids field and returns it.
+# If set False, returns None
+update_file_exists_in_gridfs = True
+
+# INFO notes:
+# http://172.16.0.252/sites/default/files/nroer_resources/ (for room no 012)
+# http://192.168.1.102/sites/default/files/nroer_resources/ (for whole ncert campus)
+# http://125.23.112.5/sites/default/files/nroer_resources/ (for public i.e outside campus)
+
 resource_link_common = "http://125.23.112.5/sites/default/files/nroer_resources/"
 
 class Command(BaseCommand):
@@ -259,6 +270,61 @@ def cast_to_data_type(value, data_type):
     return casted_value
 
 
+def get_id_from_hierarchy(hier_list):
+    """
+    method to check hierarchy of theme-topic.
+    returns - ObjectId or None
+    
+    Args:
+        hier_list (list):
+        # e.g:
+        # [u'NCF', u'Biology', u'Living world', u'Biological classification']
+    
+    Returns: ObjectId or None
+        - If hierarchy found to be correct, _id/ObjectId will be returned.
+        - else None will be returned.
+    """
+
+    theme = hier_list[0]
+    topic = hier_list[-1:][0]
+    theme_items_list = hier_list[1:-1]
+
+    theme_node = node_collection.one({'name': {'$regex': "^" + unicode(theme) + "$", '$options': 'i'}, 'group_set': {'$in': [home_group._id]}, 'member_of': theme_gst._id })
+
+    if not theme_node:
+        return None
+
+    node_id = theme_node._id
+    node = theme_node
+
+    for each_item in theme_items_list:
+        node = node_collection.one({
+                    'name': {'$regex': "^" + unicode(each_item) + "$", '$options': 'i'},
+                    'prior_node': {'$in': [node_id]},
+                    'member_of': {'$in': [theme_item_gst._id]},
+                    'group_set': {'$in': [home_group._id]}
+                })
+
+        # print each_item, "===", node.name
+        if not node:
+            return None
+
+        node_id = node._id
+
+    # print topic, "node_id : ", node_id 
+
+    # fetching a theme-item node
+    topic_node = node_collection.one({
+                'name': {'$regex': "^" + unicode(topic) + "$", '$options': 'i'},
+                'group_set': {'$in': [home_group._id]},
+                'member_of': {'$in': [topic_gst._id]},
+                'prior_node': {'$in': [node_id]}
+            })
+
+    if topic_node:
+        return topic_node._id        
+
+
 def parse_data_create_gsystem(json_file_path):
     json_file_content = ""
 
@@ -365,6 +431,30 @@ def parse_data_create_gsystem(json_file_path):
 
             # calling method to create File GSystems
             nodeid = create_resource_gsystem(parsed_json_document)
+
+
+            collection_name = parsed_json_document.get('collection', '')
+
+            if collection_name:
+
+                collection_node = node_collection.one({
+                        '_type': 'File',
+                        'group_set': {'$in': [home_group._id]},
+                        'name': unicode(collection_name)
+                    })
+
+                if collection_node:
+                    add_to_collection_set(collection_node, nodeid)
+
+            thumbnail_url = parsed_json_document.get('thumbnail')
+            # print "thumbnail_url : ", thumbnail_url
+
+            if thumbnail_url:
+                try:
+                    attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document)
+                except:
+                    pass
+
             # print type(nodeid), "-------", nodeid, "\n"
 
             # starting processing for the attributes and relations saving
@@ -470,7 +560,10 @@ def parse_data_create_gsystem(json_file_path):
 
                 gst_possible_relations_dict = node.get_possible_relations(file_gst._id)
 
+
                 # processing each entry in relation_list
+                # print "=== relation_list : ", relation_list
+
                 for key in relation_list:
                   is_relation = True
 
@@ -481,103 +574,105 @@ def parse_data_create_gsystem(json_file_path):
 
                         if json_document[key]:
 
-                            # -----------------------------
-                            hierarchy_output = None
-                            def _get_id_from_hierarchy(hier_list, oid=None):
-                                '''
-                                Returns the last hierarchical element's ObjectId.
-                                Arguments to be passes is list of unicode names.
-                                e.g.
-                                hier_list = [u'NCF', u'Science', u'Physical world', u'Materials', u'States of matter', u'Liquids']
-                                '''
-                                # print oid
-                                if len(hier_list) >= 2:
-                                    # print hier_list, "len(hier_list) : ", len(hier_list)
-                                    # object_exist = ""
-                                    try:
-                                        if oid:
-                                            curr_oid = node_collection.one({ "_id": oid })
-                                            # print "curr_oid._id", curr_oid._id
+                            # # -----------------------------
+                            # hierarchy_output = None
+                            # def _get_id_from_hierarchy(hier_list, oid=None):
+                            #     '''
+                            #     Returns the last hierarchical element's ObjectId.
+                            #     Arguments to be passes is list of unicode names.
+                            #     e.g.
+                            #     hier_list = [u'NCF', u'Science', u'Physical world', u'Materials', u'States of matter', u'Liquids']
+                            #     '''
+                            #     # print oid
+                            #     if len(hier_list) >= 2:
+                            #         # print hier_list, "len(hier_list) : ", len(hier_list)
+                            #         # object_exist = ""
+                            #         try:
+                            #             if oid:
+                            #                 curr_oid = node_collection.one({ "_id": oid })
+                            #                 # print "curr_oid._id", curr_oid._id
 
-                                        else:
-                                            row_list = []
+                            #             else:
+                            #                 row_list = []
 
-                                            for e in hier_list:
-                                                row_list.append(e)
+                            #                 for e in hier_list:
+                            #                     row_list.append(e)
 
-                                            curr_oid = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                            #                 curr_oid = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
 
-                                        if curr_oid:
-                                            # object_exist = True
-                                            next_oid = node_collection.one({ 
-                                                                      "name": hier_list[1],
-                                                                      'group_set': {'$all': [ObjectId(home_group._id)]},
-                                                                      'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
-                                                                      '_id': {'$in': curr_oid.collection_set }
-                                                                      })
+                            #             if curr_oid:
+                            #                 # object_exist = True
+                            #                 next_oid = node_collection.one({ 
+                            #                                           "name": hier_list[1],
+                            #                                           'group_set': {'$all': [ObjectId(home_group._id)]},
+                            #                                           'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
+                            #                                           '_id': {'$in': curr_oid.collection_set }
+                            #                                           })
 
                                         
-                                            # print "||||||", next_oid.name
-                                            hier_list.remove(hier_list[0])
-                                            # print "calling _get_id_from_hierarchy(", hier_list,", ", next_oid._id,")" 
+                            #                 # print "||||||", next_oid.name
+                            #                 hier_list.remove(hier_list[0])
+                            #                 # print "calling _get_id_from_hierarchy(", hier_list,", ", next_oid._id,")" 
 
-                                            _get_id_from_hierarchy(hier_list, next_oid._id)
+                            #                 _get_id_from_hierarchy(hier_list, next_oid._id)
       
-                                        else:
-                                            error_message = "!! ObjectId of curr_oid does not found."
-                                            print error_message
-                                            log_list.append(error_message)
+                            #             else:
+                            #                 error_message = "!! ObjectId of curr_oid does not found."
+                            #                 print error_message
+                            #                 log_list.append(error_message)
 
-                                    except Exception as e:
-                                        error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
-                                        # print error_message
-                                        log_list.append(error_message)
+                            #         except Exception as e:
+                            #             error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
+                            #             # print error_message
+                            #             log_list.append(error_message)
 
-                                else:
-                                    global hierarchy_output
-                                    hierarchy_output = oid
-                                    # print "return oid: ", oid
+                            #     else:
+                            #         print "==== return oid: ", oid
+                            #         global hierarchy_output
+                            #         hierarchy_output = oid
 
-                                return hierarchy_output
+                            #     print "==== hierarchy_output"
+                            #     return hierarchy_output
+                            #     print "==== hierarchy_output"
 
-                                # -----------------------------                  
+                            #     # -----------------------------                  
                           
-                                # if len(hier_list) == 1:
-                                #     if oid:
-                                #       print "oid: ", oid
-                                #       return oid
-                                #     else:
-                                #       # print "else - hier_list : ", hier_list
-                                #       temp_obj = node_collection.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                #       # temp_obj = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                #       # print temp_obj
-                                #       if temp_obj.count() > 0:
-                                #           for e in temp_obj:
-                                #               if e.prior_node:
-                                #                   for k in e.prior_node:
-                                #                       obj = node_collection.one({'_id':ObjectId(k) })
-                                #                       # print "\nitem: ",row_list[len(row_list)-2],"\n"
-                                #                       if obj.name == row_list[len(row_list)-2]:
-                                #                           # print e._id
-                                #                           return e._id
+                            #     # if len(hier_list) == 1:
+                            #     #     if oid:
+                            #     #       print "oid: ", oid
+                            #     #       return oid
+                            #     #     else:
+                            #     #       # print "else - hier_list : ", hier_list
+                            #     #       temp_obj = node_collection.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                            #     #       # temp_obj = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                            #     #       # print temp_obj
+                            #     #       if temp_obj.count() > 0:
+                            #     #           for e in temp_obj:
+                            #     #               if e.prior_node:
+                            #     #                   for k in e.prior_node:
+                            #     #                       obj = node_collection.one({'_id':ObjectId(k) })
+                            #     #                       # print "\nitem: ",row_list[len(row_list)-2],"\n"
+                            #     #                       if obj.name == row_list[len(row_list)-2]:
+                            #     #                           # print e._id
+                            #     #                           return e._id
 
-                                #           return None
-                                #       else:
-                                #           return None
-                                #       # if temp_obj:
-                                #       #   return temp_obj._id
-                                #       # else:
-                                #       #   return None
+                            #     #           return None
+                            #     #       else:
+                            #     #           return None
+                            #     #       # if temp_obj:
+                            #     #       #   return temp_obj._id
+                            #     #       # else:
+                            #     #       #   return None
 
-                                #   # if any one of the item of hierarchy does not exist in database then:
-                                # elif not object_exist:
-                                #     temp_obj = node_collection.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                #     if temp_obj:
-                                #       return temp_obj._id
-                                #     else:
-                                #       return None
+                            #     #   # if any one of the item of hierarchy does not exist in database then:
+                            #     # elif not object_exist:
+                            #     #     temp_obj = node_collection.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                            #     #     if temp_obj:
+                            #     #       return temp_obj._id
+                            #     #     else:
+                            #     #       return None
 
-                              # -------------- END of _get_id_from_hierarchy() ---------------                  
+                            #   # -------------- END of _get_id_from_hierarchy() ---------------                  
 
                             # most often the data is hierarchy sep by ":"
                             if ":" in json_document[key]:
@@ -589,7 +684,10 @@ def parse_data_create_gsystem(json_file_path):
                                     formatted_list.append(v.strip())
 
                                 right_subject_id = []
-                                rsub_id = _get_id_from_hierarchy(formatted_list)
+                                # print "~~~~~~~~~~~", formatted_list
+                                # rsub_id = _get_id_from_hierarchy(formatted_list)
+                                rsub_id = get_id_from_hierarchy(formatted_list)
+                                # print "=== rsub_id : ", rsub_id
                                 hierarchy_output = None
 
                                 # checking every item in hierarchy exist and leaf node's _id found
@@ -727,35 +825,52 @@ def create_resource_gsystem(resource_data):
     # fcol = get_database()[File.collection_name]
     # fileobj = fcol.File()
 
-    fileobj = node_collection.collection.File()
+    # fileobj = node_collection.collection.File()
 
-    check_obj_by_name = node_collection.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
+    # there can be two different files with same name.
+    # e.g: "The Living World" exists with epub, document, audio etc.
+    # hence not to check by name.
+    # check_obj_by_name = node_collection.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
     # print "\n====", check_obj_by_name, "==== ", fileobj.fs.files.exists({"md5":filemd5})
 
+    check_file_in_gridfs = gridfs_collection.find_one({"md5": filemd5})
     # even though file resource exists as a GSystem or in gridfs return None
-    if fileobj.fs.files.exists({"md5": filemd5}) or check_obj_by_name:
+    # if fileobj.fs.files.exists({"md5": filemd5})  # or check_obj_by_name:
+    if check_file_in_gridfs:
         
         # coll_oid = get_database()['fs.files']
-        cur_oid = gridfs_collection.find_one({"md5": filemd5})
+        # cur_oid = gridfs_collection.find_one({"md5": filemd5})
         
         # printing appropriate error message
-        if check_obj_by_name:
-            info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the home group. (Ref _id: '"+ str(check_obj_by_name._id) + "' )"
-            print info_message
-            log_list.append(str(info_message))
-            return check_obj_by_name._id
+        # if check_obj_by_name:
+        #     info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the home group. (Ref _id: '"+ str(check_obj_by_name._id) + "' )"
+        #     print info_message
+        #     log_list.append(str(info_message))
+        #     return check_obj_by_name._id
 
-        elif cur_oid:
-            info_message = "\n- Resource file exists in gridfs having id: '" + str(cur_oid["_id"]) + "'"
-            print info_message
-            log_list.append(str(info_message))
-            return None
+        # elif cur_oid:
+        info_message = "\n- Resource file exists in gridfs having id: '" + \
+        str(check_file_in_gridfs["_id"]) + "'"
+        print info_message
+        log_list.append(str(info_message))
 
-        else:
-            info_message = "\n- Resource file does not exists in database"
-            print info_message
-            log_list.append(str(info_message))
-            return None
+        if update_file_exists_in_gridfs:
+            file_obj = node_collection.one({'_type': 'File', 'fs_file_ids': {'$in': [ObjectId(check_file_in_gridfs['_id'])]} })
+
+            if file_obj:
+                info_message = "\n- Returning file _id despite of having in gridfs"
+                print info_message
+                log_list.append(str(info_message))
+
+                return file_obj._id
+
+        return None
+
+        # else:
+        #     info_message = "\n- Resource file does not exists in database"
+        #     print info_message
+        #     log_list.append(str(info_message))
+        #     return None
 
     else:  # creating new resource
 
@@ -775,3 +890,38 @@ def create_resource_gsystem(resource_data):
 
         # print "\n----------", fileobj
         return fileobj_oid
+
+
+def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
+    
+    updated_res_data = resource_data.copy()
+
+    updated_res_data['resource_link'] = thumbnail_url
+    updated_res_data['name'] = u'thumbnail'
+    
+    updated_res_data['content_org'] = ''
+    updated_res_data['tags'] = []
+
+    # th_id: thumbnail id
+    th_id = create_resource_gsystem(updated_res_data)
+    print "th_id: ", th_id
+    
+    th_obj = node_collection.one({'_id': ObjectId(th_id)})
+    th_gridfs_id = th_obj.fs_file_ids[1]
+    print "th_gridfs_id: ", th_gridfs_id
+
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
+    node_fs_file_ids = node_obj.fs_file_ids
+
+    if len(node_fs_file_ids) == 1:
+        node_fs_file_ids.append(ObjectId(th_gridfs_id))
+    elif len(node_fs_file_ids) > 1:
+        node_fs_file_ids[1] = ObjectId(th_gridfs_id)
+
+    print "node_fs_file_ids: ", node_fs_file_ids
+
+    node_collection.collection.update(
+                                        {'_id': ObjectId(node_id)},
+                                        {'$set': {'fs_file_ids': node_fs_file_ids}}
+                                    )

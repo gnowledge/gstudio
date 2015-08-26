@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils import simplejson
-from online_status.utils import encode_json     
+from online_status.utils import encode_json
 
 from mongokit import paginator
 try:
@@ -26,7 +26,7 @@ from gnowsys_ndf.ndf.models import Node, GSystemType
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.models import GSystemType, Node 
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_file_node,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_file_node,get_execution_time,get_group_name_id
 from gnowsys_ndf.ndf.views.methods import parse_template_data, create_gattribute, create_grelation
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 
@@ -43,18 +43,19 @@ def task(request, group_name, task_id=None):
     """Renders a list of all 'task' available within the database.
     
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_name) is False :
-      group_ins = node_collection.find_one({'_type': "Group","name": group_name})
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if group_ins:
-        group_id = str(group_ins._id)
-      else :
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-          group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_name) is False :
+    #   group_ins = node_collection.find_one({'_type': "Group","name": group_name})
+    #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #   if group_ins:
+    #     group_id = str(group_ins._id)
+    #   else :
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if auth :
+    #       group_id = str(auth._id)
+    # else :
+    #     pass
+    group_name, group_id = get_group_name_id(group_name)
 
     GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
     title = "Task"
@@ -624,6 +625,7 @@ def create_task_at_rt(request,rt_list,at_list,task_node,assign,group_name,group_
             # newattribute.object_value = field_value
             object_value = field_value
     
+
           # newattribute.save()
           ga_node = create_gattribute(subject, attributetype_key, object_value)
       
@@ -706,18 +708,24 @@ def task_collection(request,group_name,task_id=None,each_page=1):
 def delete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_name) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_name})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_name) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_name})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     pageurl = request.GET.get("next", "")
     try:
         node = node_collection.one({'_id': ObjectId(_id)})
@@ -752,19 +760,24 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     history = []
     subtask = []
     group_name=group_name
-    ins_objectid  = ObjectId()
+    # ins_objectid  = ObjectId()
     task=[]
-    if ins_objectid.is_valid(group_name) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_name})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # if ins_objectid.is_valid(group_name) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_name})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+        
     
     #section to get the Tasks 
     group = node_collection.find_one({'_id': ObjectId(group_id)})

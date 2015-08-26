@@ -3,8 +3,11 @@ from django.conf import global_settings
 # from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
 import os
+import djcelery
+
 DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1"]
+
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
@@ -305,7 +308,7 @@ LOCALE_PATHS = (os.path.join(os.path.dirname(__file__), '..','conf/locale/'),)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = 'gnowsys_ndf/ndf/static/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -388,6 +391,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # 'django.core.context_processors.csrf',
 )
 
+djcelery.setup_loader()
+CELERY_RESULT_BACKEND = "mongodb"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_IMPORTS = ("gnowsys_ndf.ndf.views.tasks",)
+BROKER_URL = 'mongodb://localhost:27017/' + DATABASES['mongodb']['NAME']
+
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
     'django.contrib.auth',
@@ -413,6 +422,7 @@ INSTALLED_APPS = (
     'jsonrpc',
     'registration_email',
     'memcache_admin',
+    'djcelery',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -613,10 +623,10 @@ GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Moderation", "
 
 GSTUDIO_NROER_MENU = [{"Repository": []}, {"Partners": ["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
 
-GSTUDIO_NROER_GAPPS = [{"Curated Zone": "topics"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "event"}, {"eLibrary": "e-library"}]
+GSTUDIO_NROER_GAPPS = [{"Themes": "topics"}, {"eLibrary": "e-library"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "program"}]
 
 GSTUDIO_NROER_MENU_MAPPINGS = {
-            "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",
+            "States": "State Partners", "Institutions": "Institutional Partners", "Individuals": "Individual Partners",
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
 
@@ -632,12 +642,10 @@ GSTUDIO_GROUP_MODERATION_LEVEL = 1
 # allowed moderation levels
 GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
 
-try:
-    from local_settings import *
-    # print "Local settings applied"
-except:
-    # print "Default settings applied"
-    pass
+GSTUDIO_LICENCE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "OTHERS"]
+
+GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
+
 
 # #textb
 # import warnings
@@ -670,6 +678,16 @@ CACHES = {
 WETUBE_USERNAME = "glab"
 WETUBE_PASSWORD = "gl@b$@)we!ube"
 #Captcha settings
-CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.math_challenge'
+CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
 
+# this has to be at last
+# just put every thing above it
+try:
+    from local_settings import *
+    # print "Local settings applied"
+except:
+    # print "Default settings applied"
+    pass
+
+# ========= nothing to be added below this line ===========

@@ -1,27 +1,30 @@
-{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar from ndf_tags %}
-
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of from ndf_tags %}
 {% load i18n %}
 {% load cache %}
 
   {% get_group_object groupid as group_object %}
   <!-- <div class="contain-to-grid sticky"> -->
-  <div class="row" id="top-headers">
+  <div id="top-headers">
 
     <!-- top LHS logo -->
     {% cache 3600 site_logo %}
-    <a class="large-2 small-5 medium-5 columns drop-shadow logo" href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+    <!--{# <a class="large-2 small-5 medium-5 columns logo" href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
       <img src="{{site.LOGO}}">
-    </a>
+    </a> #}-->
     {% endcache %}
 
     <!-- two menus headers -->
-    <div class="large-10 small-7 medium-7 columns two-nav-container">
+    {# <div class="large-12 small-7 medium-7 columns two-nav-container"> #}
     
       <!-- first menu header  -->
-      <nav class="top-bar drop-shadow" data-topbar role="navigation">
+      <nav class="top-bar" id="first-header" data-topbar role="navigation">
 
         <ul class="title-area">
-          <li class="name"> </li>
+          <li class="name"> 
+            <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+              <img src="{{site.LOGO}}">
+            </a></h1>
+          </li>
           <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
           <li class="toggle-topbar"><a href="#"><span>{% trans "Menu" %}</span></a></li>
         </ul>
@@ -89,6 +92,18 @@
         </ul>
         <!-- -END of NROER level one menu -->
       {% else %}
+      {% if "CourseEventGroup" in group_object.member_of_names_list %}
+      <ul class="left">
+
+        <!-- Current group selector -->
+        <li class="group">
+          <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
+            {{group_object.name|truncatechars:20}}
+          </a>
+          </li>
+          </ul>
+      {% else %}
+
       <ul class="left">
 
         <!-- Current group selector -->
@@ -96,7 +111,6 @@
           <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
             {{group_object.name|truncatechars:20}}
           </a>
-          
           <!-- If logged in show user groups -->
           {% if user.is_authenticated %}
           {% get_user_group request.user group_object.name as groups %}
@@ -140,13 +154,14 @@
 
       </ul>
       {% endif %}
+      {% endif %}
       <!-- {#% endcache %} -->
 
       <!-- Closes Left Nav section -->
 
-       <!-- Right Nav Section -->
+      <!-- Right Nav Section -->
       <ul class="right">
-
+{% comment %}
       <!-- Language selector--> 
       <li class="has-form"> 
         <a href="#" class="rounded language button"  data-reveal-id="languageModal">{{request.LANGUAGE_CODE}}</a>  
@@ -168,18 +183,17 @@
                   <a class="close-reveal-modal">&#215;</a>
             </form>
 
-            {% comment %}       
             <!--                       {% get_languages as lan %} -->
             <!--                   <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>     -->
             <!--                   <h3>Secondary language</h3> -->
             <!--                   <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>       -->
             <!--                   <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/> -->
             <!--                   <a class="close-reveal-modal">&#215;</a> -->
-            {% endcomment %}
 
           </div> 
         </li>
         <!-- end of language selector -->
+{% endcomment %}
 
         <!-- If logged in show user options -->
         {% if user.is_authenticated %}
@@ -205,6 +219,9 @@
                 
             <li class="text-center">
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
+            </li>
+            <li class="text-center">
+              <a href='/{{group_id}}/analytics/summary'>{% trans "Analytics" %}</a>
             </li>
             {% if user.is_superuser %}
               <li class="text-center">
@@ -239,15 +256,34 @@
           as redirection-url was of logout; similar case with password-reset!
         -->
         
-        <li class="has-form">
-          <a class="button" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
-            <i class="fi-key"></i> {% trans "Login" %}
+        <li>
+          <a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+            <i class="fi-key"></i>&nbsp; {% trans "Login" %}
           </a>
         </li>
         {% endif %}
-        </ul>  
+        </ul>
         <!-- Closes Right Nav section -->
 
+        <ul class="right">
+          <li class="has-dropdown">
+            <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
+            <ul class="dropdown">
+
+              {% for lang in LANGUAGES %}
+                <li>
+                  <form action="/i18n/setlang/" method="POST">
+                    {% csrf_token %}
+                    <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+                    <input type="hidden"  name="language" value="{{ lang.0 }}">
+                    <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                  </form>
+                </li>
+              {% endfor %}
+
+            </ul>
+          </li>
+        </ul>
         </section>
 
       </nav>
@@ -255,117 +291,188 @@
 
       <!-- =========| divider between two nav's/header's |=========== -->
       <!-- start of second nav  or group level header-->
-      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %} drop-shadow" id="group-level-header">
+      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %}" id="group-level-header">
 
-        <nav class="top-bar" data-topbar data-options="sticky_on: large" role="navigation">
+        <nav class="top-bar" id="second-header" data-topbar data-options="sticky_on: large" role="navigation">
         <!-- don't show this app bar for groups with editable moderated -->
-        {% if "ModeratingGroup" not in group_object.member_of_names_list %}
-        {% if not is_ac_url %}
-        {% if request.path != "/welcome" %}
-          <!-- #{#% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %} -->
-          <ul class="title-area">
-            <li class="name">
-              <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home"></i></a></h1>
-              <!-- <i class="fi-home"></i> -->
-            </li>
-            <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar menu-icon"><a href="#"><span>{% trans "APPS" %}</span></a></li>
-          </ul>
+        {% get_sg_member_of group_object.pk as list_of_sg_member_of %}
+        {% if "ModeratingGroup" not in group_object.member_of_names_list and "CourseEventGroup" not in group_object.member_of_names_list and "ProgramEventGroup" not in list_of_sg_member_of or not group_object.member_of_names_list %}
+          {% if not is_ac_url %}
+            {% if request.path != "/welcome" %}
+              <!-- #{#% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %} -->
+              <ul class="title-area text-center">
+                <li class="name">
+                  <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home"></i></a></h1>
+                  <!-- <i class="fi-home"></i> -->
+                </li>
+                <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+                <li class="toggle-topbar menu-icon"><a href="#"><span>{% trans "APPS" %}</span></a></li>
+              </ul>
 
-          <section class="top-bar-section">
-            <!-- Right Nav Section -->
+              <section class="top-bar-section">
+                <!-- Right Nav Section -->
 
-            <ul class="right" id="group-search-update">
-              <!-- update/about of group -->
-              <li class="">
-                {% if group_name_tag %}
-                
-                  {% if not "/partner/" in request.path %}
-                  <!-- while listing the partners and/or groups cards dont show any text -->
-                    {% if "/dashboard/group" in request.path %}
-                      <a title="About - {{ group_object.name }}" href="{% url 'groupchange' group_object.name %}">
-                        <i class="fi-record"></i> {% trans "About" %}
-                      </a>
-                    {% else %}
-                      <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
-                        <i class="fi-results"></i> {% trans "Updates" %}
-                      </a>
-                    {% endif %}
-                  {% endif %}
-
-                {% endif %}
-              </li>
-              <!-- END of update/about of group -->
-
-              <!-- search in the app bar -->
-              <li class="has-form">
-                <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
-                  name="search_form" method="GET" >
-                  <div class="row collapse">
-                    <div class="large-9 small-10 columns">
-                      <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
-                    </div>
-                    <div class="large-3 small-2 columns">
-                      <button type="submit" class="tiny button" value="" ><i class="fi-magnifying-glass"></i></button>
-                    </div>
-                  </div>
-                </form>
-              </li>
-              <!-- END of search in the app bar -->
-
-              <!-- <li class="has-dropdown">
-                <a href="#">Right Button Dropdown</a>
-                <ul class="dropdown">
-                  <li><a href="#">First link in dropdown</a></li>
-                  <li class="active"><a href="#">Active link in dropdown</a></li>
-                </ul>
-              </li> -->
-            </ul>
-
-            <ul class="left" id="group-apps">
-              <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
-              {% if site.SITE_NAME == "NROER" %} 
-              
-                {% if group_name_tag == "home" %}
-                <!-- NROER level-two menu -->
-                  {% if request.path|length > 6 and "repository" not in request.path %}
-                    {% if "/partner/" not in request.path %}
-                    <!-- <ul class="button-group nroer-menu"> -->
-                    <li class="divider"></li>
-                    {% for each_gapp in nroer_menu.gapps %}
-                      {% for k, v in each_gapp.items %}
-                        <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
-                          <!-- <a class="button" {#% if v %#} href="{#% url 'GAPPS' group_name_tag v %#}" {#% endif %#}> -->
-                          <a class="" {% if v %} href="{% url v group_name_tag %}" {% endif %}>
-                            {{k}}
+                <ul class="right" id="group-search-update">
+                  <!-- update/about of group -->
+                  <li>
+                    {% if group_name_tag %}
+                    
+                      {% if not "/partner/" in request.path %}
+                      <!-- while listing the partners and/or groups cards dont show any text -->
+                        {% if "/dashboard/group" in request.path %}
+                          <a title="About - {{ group_object.name }}" href="{% url 'groupchange' group_object.name %}">
+                            <i class="fi-record"></i> {% trans "About" %}
                           </a>
+
+                        {% else %}
+                          <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
+                            <i class="fi-results"></i> {% trans "Updates" %}
+                          </a>
+                           <li>
+                    <a href="/{{group_id}}/feeds/updates/" class="">
+                      <i class="fi-rss"></i>
+
+                    </a>
+                  </li>
+                         
+                        {% endif %}
+                      {% endif %}
+
+                    {% endif %}
+                  </li>
+                  <!-- END of update/about of group -->
+
+                  <!-- search in the app bar -->
+                  <!-- <li class="has-form">
+                    <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                      name="search_form" method="GET" >
+                      <div class="row collapse">
+                        <div class="large-9 small-10 columns">
+                          <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
+                        </div>
+                        <div class="large-3 small-2 columns">
+                          <button type="submit" class="tiny button" value="" ><i class="fi-magnifying-glass"></i></button>
+                        </div>
+                      </div>
+                    </form>
+                  </li> -->
+                  <li class="has-form">
+                    <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                      name="search_form" method="GET" >
+                  
+                      <div class="row collapse">
+                        <div class="large-11 small-10 columns">
+                          <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
+                        </div>
+                        <div class="large-1 small-2 columns">
+                          <button type="submit" class="tiny button" value="" id="search-submit">
+                            <i class="fi-magnifying-glass"></i>
+                          </button>
+                        </div>
+                      </div>
+
+                    </form>
+                  </li>
+                  
+                  <!-- END of search in the app bar -->
+
+                  <!-- <li class="has-dropdown">
+                    <a href="#">Right Button Dropdown</a>
+                    <ul class="dropdown">
+                      <li><a href="#">First link in dropdown</a></li>
+                      <li class="active"><a href="#">Active link in dropdown</a></li>
+                    </ul>
+                  </li> -->
+                </ul>
+
+                <ul class="left" id="group-apps">
+                  <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
+                  {% if site.SITE_NAME == "NROER" %} 
+                  
+                    {% if group_name_tag == "home" %}
+                    <!-- NROER level-two menu -->
+                      {% if request.path|length > 6 and "repository" not in request.path %}
+                        {% if "/partner/" not in request.path %}
+                        <!-- <ul class="button-group nroer-menu"> -->
+                        <li class=""></li>
+                        {% for each_gapp in nroer_menu.gapps %}
+                          {% for k, v in each_gapp.items %}
+                            <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
+                              <!-- <a class="button" {#% if v %#} href="{#% url 'GAPPS' group_name_tag v %#}" {#% endif %#}> -->
+                              <a class="" {% if v %} href="{% url v group_name_tag %}" {% endif %}>
+                                {{k}}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        {% endfor %}
+                        <!-- </ul> -->
+                      {% endif %}
+                      {% endif %}
+                    {% else %}
+                      {% get_gapps_iconbar request groupid %}
+                    {% endif %}
+                  <!-- END of NROER level two menu -->
+                  {% else %}
+                    {% get_gapps_iconbar request groupid %}
+                  {% endif %}
+                </ul>
+
+              </section>
+              <!-- {#% endcache %} -->
+            {% endif %} <!-- end of "/welcome" landing page check -->
+          {% endif %} <!-- end of "accounts" urls check -->
+        {% else %}
+            {% if "ModeratingGroup" not in group_object.member_of_names_list %}
+                <section class="medium-3 columns">
+                    <h5>{{group_object.name}}</h5>
+                </section>
+
+                {% get_attribute_value group_object.pk 'start_time' as event_start_time %}
+                {% get_attribute_value group_object.pk 'end_time' as event_end_time %}
+                {% get_attribute_value group_object.pk 'start_time' as event_start_enroll %}
+                {% get_attribute_value group_object.pk 'end_time' as event_end_enroll %}
+                
+                <section class="medium-4 columns">
+                    <label>Event</label>
+                    <label> Start: {{event_start_time|date:"d M Y"}} &nbsp;&nbsp; End: {{event_end_time|date:"d M Y"}}</label>
+                </section>
+
+                <section class="medium-4 columns">
+                    <label>Enrollment</label>
+                    <label> Start: {{event_start_enroll|date:"d M Y"}} &nbsp;&nbsp; End: {{event_end_enroll|date:"d M Y"}}</label>
+                </section>
+                <!-- Right Nav Section -->
+                {% if user.is_authenticated %}
+                  {% get_user_object request.user.id as user_obj %}
+                  {% check_is_gstaff groupid user_obj as gstaff_access %}
+                  {% if not gstaff_access %}
+                    <section>
+                      <ul class="right" >
+                      {% user_access_policy groupid request.user as user_access %} 
+                        <li>
+                        {% if user_access == "allow" %}
+                          <input class="enroll-btn button tiny" type="button" value="ENROLLED" disabled="disabled">
+                        {% else %}
+                          {% if allow_to_join %}
+                            <input class="enroll-btn button tiny" type="button" value="ENROLL">
+                          {% else %}
+                            <input class="button tiny" type="button" value="ENROLL" disabled="disabled">
+                          {% endif %}
+                        {% endif %}
                         </li>
-                      {% endfor %}
-                    {% endfor %}
-                    <!-- </ul> -->
+                      </ul> 
+                    </section>
                   {% endif %}
-                  {% endif %}
-                {% else %}
-                  {% get_gapps_iconbar request groupid %}
                 {% endif %}
-              <!-- END of NROER level two menu -->
-              {% else %}
-                {% get_gapps_iconbar request groupid %}
-              {% endif %}
-            </ul>
 
-          </section>
-          <!-- {#% endcache %} -->
-        {% endif %} <!-- end of "/welcome" landing page check -->
-        {% endif %} <!-- end of "accounts" urls check -->
-        </nav>
-
+            {% endif %}
         {% endif %} <!-- end of "group's edit_policy" urls check -->
+        </nav>
       </div>
 
       <!-- end of second nav -->
 
-    </div>
+    {# </div> #}
     <!-- end of section appointed for two header's -->
   </div>
   <!-- end of LOGO + top header's -->

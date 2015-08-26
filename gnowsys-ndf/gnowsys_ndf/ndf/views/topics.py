@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.models import Node, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata,create_grelation
 
 #######################################################################################################################################
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
@@ -34,20 +34,10 @@ app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
 @get_execution_time
 def themes(request, group_id, app_id=None, app_set_id=None):
     
-    # ins_objectid  = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False :
-    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else :
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth :
-    #             group_id = str(auth._id)
-    # else :
-    #     pass
-
-    group_name, group_id = get_group_name_id(group_id)
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     if app_id is None:
         # app_ins = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
@@ -91,6 +81,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     nodes = ""
     unfold_tree = request.GET.get('unfold','')
     selected = request.GET.get('selected','')
+    tree = request.GET.get('tree','collapsible')
     unfold = "false"
 
     # topics_GST = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
@@ -129,8 +120,8 @@ def themes(request, group_id, app_id=None, app_set_id=None):
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
     return render_to_response("ndf/theme.html",
-                               {'theme_GST_id':theme_GST._id, 'themes_cards': themes_cards,
-                               'group_id': group_id,'groupid': group_id,'node': node,'shelf_list': shelf_list,'shelves': shelves,
+                               {'theme_GST_id':theme_GST._id, 'theme_GST':theme_GST, 'themes_cards': themes_cards, 'theme_GST':theme_GST,
+                               'group_id': group_id,'groupid': group_id,'node': node,'shelf_list': shelf_list,'shelves': shelves, 'tree': tree,
                                'nodes':nodes_dict,'app_id': app_id,'app_name': appName,"selected": selected,
                                'title': title,'themes_list_items': themes_list_items,
                                'themes_hierarchy': themes_hierarchy, 'unfold': unfold,
@@ -141,6 +132,48 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     )       
 
 
+def list_themes(request, group_id):
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    title = theme_GST.name
+    
+    nodes = node_collection.find({
+        'member_of': {'$all': [theme_GST._id]},
+        'group_set':{'$all': [ObjectId(group_id)]}
+        },
+        {'_id': 1, 'name': 1, 'created_by': 1, 'created_at': 1})
+    
+    return render_to_response("ndf/list_themes.html",
+                            { 
+                                'groupid': group_id,
+                                'group_id': group_id,
+                                'nodes': nodes,
+                                'theme_GST': theme_GST
+                            },
+                            context_instance = RequestContext(request) )
+
+
+def delete_theme(request, group_id, theme_id):
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    trash_group = node_collection.one({'_type': 'Group', 'name': 'Trash'})
+
+    theme_to_be_deleted = node_collection.one({'_id': ObjectId(theme_id)})
+    theme_to_be_deleted.group_set = [ObjectId(trash_group._id)]
+    theme_to_be_deleted.save()
+    # print trash_group._id,"  ", theme_to_be_deleted.group_set
+
+    return HttpResponseRedirect( reverse('list_themes', kwargs={"group_id": group_id} ))
+
+
 global list_trans_coll
 list_trans_coll = []
 coll_set_dict={}
@@ -149,18 +182,23 @@ coll_set_dict={}
 def theme_topic_create_edit(request, group_id, app_set_id=None):
 
     #####################
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     ###################### 
     
     nodes_dict = []
@@ -648,6 +686,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 global list_trans_coll
                 list_trans_coll = []
                 trans_coll_list = get_coll_set(str(app_GST._id))
+                print LANGUAGES 
                 return render_to_response("ndf/translation_page.html",
 	                                  {'group_id': group_id,'groupid': group_id,'title': title, 'node': app_GST, 'lan':LANGUAGES, 'list1':trans_coll_list
 	                           },context_instance = RequestContext(request)
@@ -667,7 +706,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
         )
         
     return render_to_response("ndf/theme.html",
-                       {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards,
+                       {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards, 'theme_GST':theme_GST, 'theme_GST':theme_GST,
                             'shelf_list': shelf_list,'shelves': shelves,
                             'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,'appId':app._id,
                             'nodes_list': nodes_list,'title': title,'node': node, 'parent_nodes_collection': parent_nodes_collection,
@@ -712,6 +751,7 @@ def topic_detail_view(request, group_id, app_Id=None):
             group_id = str(auth._id)
   else :
     pass
+    
   ###################### 
 
   obj = node_collection.one({'_id': ObjectId(app_Id)})
@@ -724,7 +764,8 @@ def topic_detail_view(request, group_id, app_Id=None):
   nav_l=request.GET.get('nav_li','')
   breadcrumbs_list = []
   nav_li = ""
-
+  #a temp. variable which stores the lookup for append method
+  breadcrumbs_list_append_temp=breadcrumbs_list.append
   if nav_l:
     nav_li = nav_l
     nav_l = str(nav_l).split(",")
@@ -739,9 +780,9 @@ def topic_detail_view(request, group_id, app_Id=None):
             if each_obj.prior_node:
                 theme_obj = node_collection.one({'_id': ObjectId(each_obj.prior_node[0] ) })
                 theme_id = theme_obj._id
-                breadcrumbs_list.append( (str(theme_obj._id), theme_obj.name) )
+                breadcrumbs_list_append_temp( (str(theme_obj._id), theme_obj.name) )
 
-        breadcrumbs_list.append( (str(each_obj._id), each_obj.name) )
+        breadcrumbs_list_append_temp( (str(each_obj._id), each_obj.name) )
 
 
 
@@ -752,6 +793,8 @@ def topic_detail_view(request, group_id, app_Id=None):
 
   ###shelf###
   shelves = []
+  #a temp. variable which stores the lookup for append method
+  shelves_append_temp=shelves.append
   shelf_list = {}
   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
@@ -763,12 +806,14 @@ def topic_detail_view(request, group_id, app_Id=None):
 	  if shelf:
 	    for each in shelf:
 	        shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)}) 
-	        shelves.append(shelf_name)
+	        shelves_append_temp(shelf_name)
 
 	        shelf_list[shelf_name.name] = []
+	        #a temp. variable which stores the lookup for append method
+                shelf_list_shlefname_append_temp=shelf_list[shelf_name.name].append
 	        for ID in shelf_name.collection_set:
 	        	shelf_item = node_collection.one({'_id': ObjectId(ID) })
-	        	shelf_list[shelf_name.name].append(shelf_item.name)
+	        	shelf_list_shlefname_append_temp(shelf_item.name)
 
 	  else:
 	    shelves = []
