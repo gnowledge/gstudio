@@ -1756,7 +1756,9 @@ def group_dashboard(request, group_id=None):
   if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
       sg_type = "ProgramEventGroup"
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
-      parent_groupid_of_pe = node_collection.one({'_type':"Group","post_node": group_obj._id})._id
+      parent_groupid_of_pe = node_collection.one({'_type':"Group","post_node": group_obj._id})
+      if parent_groupid_of_pe:
+        parent_groupid_of_pe = parent_groupid_of_pe._id
       alternate_template = "ndf/program_event_group.html"
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
