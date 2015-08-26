@@ -124,11 +124,47 @@ def convertVideo(userid, file_id, filename):
     
     webmfiles = files
     '''storing thumbnail of video with duration in saved object'''
-    tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
+    th_gridfs_id = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="image/png") 
+
+    # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':th_gridfs_id}})
+
+    # print "fileobj.fs_file_ids: ", fileobj.fs_file_ids
+    node_fs_file_ids = fileobj.fs_file_ids
+
+    if len(node_fs_file_ids) == 1:
+        node_fs_file_ids.append(ObjectId(th_gridfs_id))
+    elif len(node_fs_file_ids) > 1:
+        node_fs_file_ids[1] = ObjectId(th_gridfs_id)
+
+    # print "node_fs_file_ids: ", node_fs_file_ids
+
+    node_collection.collection.update(
+                                        {'_id': ObjectId(fileobj._id)},
+                                        {'$set': {'fs_file_ids': node_fs_file_ids}}
+                                    )
+
     
-    node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
     if filename.endswith('.webm') == False:
-        tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+
+
+        vid_gridfs_id = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+
+        fileobj.reload()
+        # print "fileobj.fs_file_ids: ", fileobj.fs_file_ids
+        node_fs_file_ids = fileobj.fs_file_ids
+
+        if len(node_fs_file_ids) == 2:
+            node_fs_file_ids.append(ObjectId(vid_gridfs_id))
+        elif len(node_fs_file_ids) > 2:
+            node_fs_file_ids[2] = ObjectId(vid_gridfs_id)
+
+        # print "node_fs_file_ids: ", node_fs_file_ids
+
+        node_collection.collection.update(
+                                            {'_id': ObjectId(fileobj._id)},
+                                            {'$set': {'fs_file_ids': node_fs_file_ids}}
+                                        )
 
         # --saving webm video id into file object
-        node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+        # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':vid_gridfs_id}})
+
