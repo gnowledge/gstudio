@@ -48,12 +48,12 @@
     <header class="row" data-tab data-options="deep_linking:true">
       <dl class="tabs " data-tab role="tablist">
 
-        <dd class="tab-title active" role="presentational" ><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">{% if req_from_course %}{% trans "CourseEvents" %}{% else %}{% trans "ProgramEvents" %}{% endif %}</a></dd>
+        <dd class="tab-title active" role="presentational" ><a href="#all_events" role="tab" tabindex="0" aria-selected="true" controls="all_events">{% if req_from_course %}{% trans "CourseEvents" %}{% else %}{% trans "ProgramEvents" %}{% endif %}</a></dd>
         {% if request.user.is_authenticated  and not is_gstaff %}
-          <dd class="tab-title" role="presentational" ><a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" controls="panel2-2">{% if req_from_course %}{% trans "My Courses" %}{% else %}{% trans "My Programs" %}{% endif %}</a></dd>
+          <dd class="tab-title" role="presentational" ><a href="#my_events" role="tab" tabindex="0" aria-selected="false" controls="my_events">{% if req_from_course %}{% trans "My Courses" %}{% else %}{% trans "My Programs" %}{% endif %}</a></dd>
         {% endif %}    
         {% if req_from_course and is_gstaff %}
-            <dd class="tab-title" role="presentational" ><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" controls="panel2-3">{% trans "Courses" %}</a></dd>
+            <dd class="tab-title" role="presentational" ><a href="#courses" role="tab" tabindex="0" aria-selected="false" controls="courses">{% trans "Courses" %}</a></dd>
         {% endif %}
 
       </dl>
@@ -61,7 +61,7 @@
 
     <div class="tabs-content ">
 
-      <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-1">
+      <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="all_events">
 
         {% for course in ce_coll %}
           <li class="card">
@@ -111,7 +111,7 @@
         {% endfor %}
       </section>
 
-      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-2">
+      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="my_events">
 
         {% for course in enr_ce_coll %}
           <li class="card">
@@ -163,7 +163,7 @@
 
 
 
-      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-3">
+      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="courses">
 
         {% for course in course_coll %}
           <li class="card">
@@ -175,7 +175,6 @@
                     </b>
                   </div>
                 </div>
-                <span data-tooltip title="Course"></span>
                 <hr/>
                 <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
               </a>
