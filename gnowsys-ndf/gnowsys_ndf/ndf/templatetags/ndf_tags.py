@@ -472,10 +472,8 @@ def get_relation_value(node_id, grel):
 	if node_id:
 		node = node_collection.one({'_id': ObjectId(node_id) })
 		grel = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
-		q = {'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id}
-		print "\n q=--- ",q
 		if node and grel:
-			node_grel = triple_collection.one(q)
+			node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id})
 	# print "\n\n node_grel",node_grel
 	if node_grel:
 		grel_val = node_grel.right_subject
