@@ -11,9 +11,9 @@
 
 {% block meta_content %}
   {% check_is_gstaff groupid request.user as is_gstaff %}
-    <h4 class="subheader">
-        {{course_gst.name}}
-    </h4>
+    <h2 class="subheader">
+        {{title}}
+    </h2>
   {% if is_gstaff %}
     {% if req_from_course %}
           <a class="small button" href="{% url 'create_edit' group_name_tag %}">
