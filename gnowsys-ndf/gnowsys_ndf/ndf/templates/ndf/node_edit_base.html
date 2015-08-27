@@ -74,7 +74,7 @@ i.remove-tag{
 
 {% block body_content %}
 
-<form data-abide id="form-edit-node" method="POST" action="">    
+<form data-abide id="form-edit-node" method="POST" action="" enctype="multipart/form-data">    
     
     <header> 
 	    <div class="row">
@@ -277,6 +277,9 @@ i.remove-tag{
 	            </div> 
 			</div>  
 			{% endif %}
+			<div class="row">
+				{% block upload_logo %} {% endblock %} 
+			</div>
 
 			<div class="row">
 				<div class="small-8 columns">
@@ -319,7 +322,8 @@ i.remove-tag{
 
 			    	</span>
 		    	</div>
-	    	</div>      
+	    	</div>   
+
     	</div>
     
     {% block prior_node %}
