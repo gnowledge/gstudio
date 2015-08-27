@@ -153,3 +153,8 @@
   {% endif %} <!-- is creator/superuser check -->
 
 {% endblock%}
+
+{% block script %}
+{{block.super}}
+$("#group-level-header").addClass("hide");
+{% endblock %}
