@@ -12,6 +12,10 @@
 
 {% block title %} {{title}} {% endblock %}
 
+{% block concern_information %}
+<a href="{% url 'groupchange' top_group_name %}" class="button">Go to '{{top_group_name}}' Event</a>
+{% endblock %}
+
 {% block body_content %}
 	
   {% if request.user.id == node.created_by or user.is_superuser %}
@@ -21,7 +25,7 @@
     <h4> "{{node.name}}" resource is successfully uploaded!</h4>
     <h4><small>
      As resource has been uploaded in the Moderated group, it will undergo moderation process and then published to "{{top_group_name}}". We will intimate you as on when resource gets published to this group.
-     Till that time resource is accesible to your user group.
+     Till that time, resource is accesible to your user group.
     </small></h4>
     <br/>
       
