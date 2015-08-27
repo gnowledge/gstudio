@@ -341,8 +341,29 @@ def create_moderator_task(request, group_id, node_id, \
 				# delete the task associated with the resource
 				if task_id:
 					task_node = node_collection.one({'_id': ObjectId(task_id)})
-					del_status, del_status_msg = delete_node(
-						node_id=task_node._id, deletion_type=0)
+					# del_status, del_status_msg = delete_node(
+					# node_id=task_node._id, deletion_type=0)
+					url = u"http://" + site + "/"+ unicode(group_obj._id) \
+						+ u"/file/" + unicode(node_obj._id.__str__())
+
+					task_content_org = u"\n\nThis task is CLOSED.\n " \
+								"However, you may find the moderated resource at following link: \n" \
+								+ unicode(url)
+					task_dict = {
+					    "name": task_node.name,
+					    "group_set": [group_obj._id],
+					    "created_by": node_obj.created_by,
+					    "modified_by": request.user.id,
+					    "contributors": [request.user.id],
+					    "content_org": unicode(task_content_org),
+					    "created_by_name": unicode(request.user.username),
+					    "Status": u"CLOSED",
+					    "Priority": u"Normal",
+					    "Assignee": list(group_obj.group_admin[:]),
+					    "has_type": task_type_list
+					}
+					task_obj = create_task(task_dict, task_type_creation)
+
 				list_of_recipients_ids = []
 				list_of_recipients_ids.extend(group_obj.group_admin)
 				list_of_recipients_ids.append(node_obj.created_by)
