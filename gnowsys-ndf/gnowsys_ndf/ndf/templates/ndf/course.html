@@ -48,9 +48,9 @@
     <header class="row" data-tab data-options="deep_linking:true">
       <dl class="tabs " data-tab role="tablist">
 
-        <dd class="tab-title active" role="presentational" ><a href="#all_events" role="tab" tabindex="0" aria-selected="true" controls="all_events">{% if req_from_course %}{% trans "CourseEvents" %}{% else %}{% trans "ProgramEvents" %}{% endif %}</a></dd>
+        <dd class="tab-title active" role="presentational" ><a href="#all_events" role="tab" tabindex="0" aria-selected="true" controls="all_events">{% if req_from_course %}{% trans "eCourse" %}{% else %}{% trans "Events" %}{% endif %}</a></dd>
         {% if request.user.is_authenticated  and not is_gstaff %}
-          <dd class="tab-title" role="presentational" ><a href="#my_events" role="tab" tabindex="0" aria-selected="false" controls="my_events">{% if req_from_course %}{% trans "My Courses" %}{% else %}{% trans "My Programs" %}{% endif %}</a></dd>
+          <dd class="tab-title" role="presentational" ><a href="#my_events" role="tab" tabindex="0" aria-selected="false" controls="my_events">{% if req_from_course %}{% trans "My eCourses" %}{% else %}{% trans "My Events" %}{% endif %}</a></dd>
         {% endif %}    
         {% if req_from_course and is_gstaff %}
             <dd class="tab-title" role="presentational" ><a href="#courses" role="tab" tabindex="0" aria-selected="false" controls="courses">{% trans "Courses" %}</a></dd>
