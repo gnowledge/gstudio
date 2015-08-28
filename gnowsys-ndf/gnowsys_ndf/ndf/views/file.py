@@ -835,7 +835,8 @@ def submitDoc(request, group_id):
                     fileobj = node_collection.one({'_id': ObjectId(f)})
                     # newly appended group id in group_set is at last
                     t = create_moderator_task(request, fileobj.group_set[0], fileobj._id,on_upload=True)
-                    return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': fileobj.group_set[1], 'node_id': f }))
+                    # return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': fileobj.group_set[1], 'node_id': f }))
+                    return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_id, 'node_id': f }))
                 else:
                     # print "----------5-----------", f
 
