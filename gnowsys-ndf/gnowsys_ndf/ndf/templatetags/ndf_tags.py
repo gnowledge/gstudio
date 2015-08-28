@@ -2811,7 +2811,7 @@ def get_sg_member_of(group_id):
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
 	# print group_obj.name
 	# Fetch post_node of group
-	if group_obj.post_node:
+	if "post_node" in group_obj:
 		post_node_id_list = group_obj.post_node
 
 		if post_node_id_list:
