@@ -101,7 +101,7 @@ i.remove-tag{
         
 	    <div class="row">
 
-	      	<dl class="tabs pill large-12 columns select">
+	      	<dl class="tabs pill large-12 columns select" id = "tabs">
 
 				<dd class="active node_tab" title="Click here to add Name, Description, Privacy and Tags">
 		  		<!-- change name of collection tab overide block in your code -->
@@ -117,7 +117,7 @@ i.remove-tag{
 				</dd>
 				<!-- change name of metadata tab overide block in your code -->
 				<dd class="meta_tab" title="Click here to add/edit metadata">
-				  	<a>{% trans "Metadata" %} </a> 
+				  	<a href="#tab2">{% trans "Metadata" %} </a> 
 				</dd>  
 				<dd class="teaches_tab" title="Click here to add/edit teaches">
 				 	<a>{% trans "Teaches" %} </a> 
@@ -405,44 +405,40 @@ i.remove-tag{
 	  			<div class="small-6 columns">			  	
 			  		<label>
 			  			{% if k == "educationaluse" %}
-			  				<h5>{% trans "Educational Use :" %} </h5> 
-			  			{% elif k == "interactivitytype" %}
-			  				<h5>{% trans "Interactivity Type: " %}</h5> 
-			  			{% elif k == "educationallevel" %}
-			  				<h5>{% trans "Educational Level:" %} </h5> 
-			  			{% elif k == "educationalsubject" %}
-			  				<h5>{% trans "Educational Subject:" %} </h5> 
-			  			{% elif k == "timerequired" %}
-			  				<h5>{% trans "Time Required: " %}</h5> 
-			  			{% elif k == "audience" %}
-			  				<h5>{% trans "Target Audience:" %} </h5> 
-			  			{% elif k == "textcomplexity" %}
-			  				<h5>{% trans "Text Complexity" %}</h5>  
-			  			{% elif k == "age_range" %}			
-		         			<h5>{% trans "Age Range:" %}</h5>
-		         		{% elif k == "readinglevel" %}
-		         			<h5>{% trans "Reading Level:" %} </h5> 
-		         		{% elif k == "language" %}			
-		         			<h5>{% trans "Educational Language:" %}</h5>
-	         			{% elif k == "curricular" %}			
-		         			<h5>{% trans "Curricular:" %}</h5>
-	         			{% elif k == "educationalalignment" %}			
-		         			<h5>{% trans "Educational Alignment:" %}</h5>
-		         		{% endif %}     
+						<h5 >{% trans "Educational Use:" %} </h5> 
+						{% elif k == "interactivitytype" %}
+						<h5>{% trans "Interactivity Type: " %}</h5> 
+						{% elif k == "educationallevel" %}
+						<h5  class= "compulsory" required>{% trans "Educational Level:" %} </h5>
+						{% elif k == "educationalsubject" %}
+						<h5 class= "compulsory" required>{% trans "Educational Subject:" %} </h5>
+						{% elif k == "timerequired" %}
+						<h5>{% trans "Time Required: " %}</h5> 
+						{% elif k == "audience" %}
+						<h5>{% trans "Target Audience:" %} </h5> 
+						{% elif k == "textcomplexity" %}
+						<h5>{% trans "Text Complexity" %}</h5>  
+						{% elif k == "age_range" %}			
+						<h5>{% trans "Age Range:" %}</h5>
+						{% elif k == "readinglevel" %}
+						<h5>{% trans "Reading Level:" %} </h5> 
+						{% elif k == "language" %}			
+						<h5>{% trans "Educational Language:" %}</h5>
+						{% elif k == "curricular" %}			
+						<h5>{% trans "Curricular:" %}</h5>
+						{% elif k == "educationalalignment" %}			
+						<h5>{% trans "Educational Alignment:" %}</h5>
+						{% endif %}      
 
 		         		{% get_attribute_value node.pk k as attr_val %} <!-- saurabh -->
-		         		{% if k == "educationalalignment" %}
-		         			<select name="{{k}}" id = "educational">
-		         		{% else %}
-		         			<select name="{{k}}" id ="educational">
-		         		{% endif %}	
-		         			<option></option>
-		        			{% for opts in v %}
-	        					{% if opts == attr_val %}	        				
-									<option selected>{% trans opts %}</option>
-								{% else %}
-									<option>{% trans opts %}</option>
-								{% endif %}
+		         		<select name="{{k}}" id ="{{k}}">
+							<option></option>
+							{% for opts in v %}
+							{% if opts == attr_val %}	        				
+							<option selected>{% trans opts %}</option>
+							{% else %}
+							<option>{% trans opts %}</option>
+							{% endif %}
 							{% endfor %}
 						</select>
 					</label>
@@ -459,7 +455,7 @@ i.remove-tag{
 			<div class="small-12 large-4 columns">
 				<label>
 					<h5>{% trans "License: " %} </h5> 
-					<input name="license" type="text" value="{{node.license}}">		  	
+					<input name="license" type="text" value="{{node.license | default_if_none:'CC-By_SA'}}">		  	
 				</label>
 			</div>
 			<div class="small-12 large-4 columns">
@@ -1323,6 +1319,10 @@ i.remove-tag{
 	addTagBtn.onkeypress = addTag;
 
 	$("#save-node").click(function(event) {
+		
+
+
+
                       
       	pn_arr = []
 		cn_arr = []
@@ -1402,6 +1402,22 @@ i.remove-tag{
     	{
           $("#message").css("display", "none");
 	    }
+
+
+		if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
+			console.log('inside if ');
+
+			//pass empty array to unlock any locked tabs
+			console.log('save node clicked');
+			$('#tabs').find('a[href="#tab2"]').trigger('click');
+			$("#message").css("display", "block");
+			$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+			
+			
+			
+			event.preventDefault();
+
+		}
 
 	    updateAllTags();
 	});
