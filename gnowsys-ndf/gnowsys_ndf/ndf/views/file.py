@@ -369,6 +369,23 @@ def file(request, group_id, file_id=None, page_no=1):
       pandora_pages = all_videos["result_pages"]
       get_member_set = all_videos["result_cur"]
 
+      collection_pages_cur = node_collection.find({
+                  'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                    'group_set': {'$all': [ObjectId(group_id)]},
+                                    '$or': [
+                                        {'access_policy': u"PUBLIC"},
+                                        {'$and': [
+                                            {'access_policy': u"PRIVATE"},
+                                            {'created_by': request.user.id}
+                                        ]
+                                     }
+                                    ],
+                                    'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                }).sort("last_update", -1)
+
+      coll_page_count = collection_pages_cur.count() if collection_pages_cur else 0
+      collection_pages = paginator.Paginator(collection_pages_cur, page_no, no_of_objs_pp)
+
       #for each in get_member_set:
   
        #  pandora_video_id.append(each['_id'])
@@ -387,6 +404,8 @@ def file(request, group_id, file_id=None, page_no=1):
       datavisual.append({"name":"Image","count":imageCollection.count()})
       datavisual.append({"name":"Video","count":videoCollection.count()})
       #datavisual.append({"name":"Pandora Video","count":pandoraCollection.count()})
+      if collection_pages_cur:
+          datavisual.append({"name":"Collections","count": coll_page_count})
       datavisual = json.dumps(datavisual)
 
       return render_to_response("ndf/file.html", 
@@ -399,6 +418,7 @@ def file(request, group_id, file_id=None, page_no=1):
                                  'files': files_pc, 'docCollection': docs_pc, 'imageCollection': images_pc, 'page_nodes':pages_pc,
                                  'videoCollection': videos_pc, 'pandoravideoCollection':pandoravideoCollection, 
                                  'pandoraCollection':get_member_set,'is_video':is_video,'groupid': group_id,
+                                 'collection_pages': collection_pages, 'collection': collection_pages_cur,
                                  'group_id':group_id,"datavisual":datavisual, "detail_urlname": "file_detail"
                                 }, 
                                 context_instance = RequestContext(request))
@@ -610,6 +630,30 @@ def paged_file_objs(request, group_id, filetype, page_no):
             if app == "File":
                 result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp, "all_videos")
 
+        elif filetype == "Collections":
+            if app == "File":
+                detail_urlname = "page_details"
+                result_cur = node_collection.find({
+                          'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+                                            '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                    {'access_policy': u"PRIVATE"},
+                                                    {'created_by': request.user.id}
+                                                ]
+                                             }
+                                            ],
+                                            'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                        }).sort("last_update", -1)
+                # print "=====================", result_cur.count()
+
+                result_paginated_cur = result_cur
+                result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+                result_dict = {"result_cur": result_cur, "result_pages": result_pages, "result_paginated_cur": "", "result_count": ""}
+                # print "=====================", result_pages
+
+
             # elif app == "E-Library":
             #     vid_Collection = node_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Videos"}).sort("last_update", -1)
             #     video = []
@@ -664,6 +708,8 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
 
         #     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+
+        # result_dict = {"result_cur": "", "result_pages":"", "result_paginated_cur": "", "result_count": ""}
 
         if app == "File":
             result_cur = result_dict["result_cur"]
