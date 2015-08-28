@@ -305,7 +305,8 @@
           <section class="medium-2 columns"> 
             <div class="row">         
               <div class="medium-6 columns">
-                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit hide"><i class="fi-pencil"></i> {% trans "Edit " %}{{sg_type}}</a>
+                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit"><i class="fi-pencil"></i> {% trans "Edit " %}{{sg_type}}</a>
+              <br/><br/>
                 {% include "ndf/invite_users.html" %}
                 {% include "ndf/invite_admins.html" %}
               </div>
