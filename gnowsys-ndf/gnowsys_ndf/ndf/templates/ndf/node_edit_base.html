@@ -401,7 +401,7 @@ i.remove-tag{
 		  	{% get_metadata_values as metadata %}
 	  		{% for k,v in metadata.items %}
 	  		  
-  											<!-- Original DIV Strats here -->
+  											
 	  			<div class="small-6 columns">			  	
 			  		<label>
 			  			{% if k == "educationaluse" %}
@@ -430,7 +430,7 @@ i.remove-tag{
 						<h5>{% trans "Educational Alignment:" %}</h5>
 						{% endif %}      
 
-		         		{% get_attribute_value node.pk k as attr_val %} <!-- saurabh -->
+		         		{% get_attribute_value node.pk k as attr_val %} 
 		         		<select name="{{k}}" id ="{{k}}">
 							<option></option>
 							{% for opts in v %}
