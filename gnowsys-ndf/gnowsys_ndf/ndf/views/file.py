@@ -5,6 +5,7 @@ import magic
 import subprocess
 import mimetypes
 import os
+import datetime
 import tempfile
 # import re
 import ast
@@ -43,7 +44,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls ,create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls ,create_gattribute, node_thread_access, create_thread_for_node
 from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
 from gnowsys_ndf.ndf.views.tasks import convertVideo
@@ -692,6 +693,9 @@ def uploadDoc(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     if request.method == "GET":
+        program_res = request.GET.get("program_res", "")
+        if program_res:
+          program_res = eval(program_res)
         page_url = request.GET.get("next", "")
         # template = "ndf/UploadDoc.html"
 
@@ -701,9 +705,9 @@ def uploadDoc(request, group_id):
             template = "ndf/Uploader_Form.html"
 
     if  page_url:
-        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id})
+        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id, 'program_res':program_res})
     else:
-        variable = RequestContext(request, {'groupid':group_id,'group_id':group_id})
+        variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'program_res':program_res})
     return render_to_response(template, variable)
       
     
@@ -783,6 +787,10 @@ def submitDoc(request, group_id):
             # if isinstance(f, list):
                 f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
 
+                thread_create_val = request.POST.get("thread_create",'')
+
+                if thread_create_val == "Yes":
+                  return_status = create_thread_for_node(reaquest,group_id, fileobj)
 
             # print "=============== : ", f
             try:
@@ -954,9 +962,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
 
             fileobj.location = map_geojson_data
 
-
             fileobj.save(groupid=group_id)
-
             if source:
               # create gattribute for file with source value
               source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
@@ -986,7 +992,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
               # create gattribute for file with 'educationaluse' value
               basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
               basedUrl = create_gattribute(fileobj._id, basedonurl_AT, Based_url)                
-
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
             node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': objectid}})
@@ -1309,9 +1314,10 @@ def file_detail(request, group_id, _id):
         #grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
         #return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
     else:
-         raise Http404 
-
-
+         raise Http404
+    thread_node = None
+    allow_to_comment = None
+    thread_node, allow_to_comment = node_thread_access(group_id, file_node)
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
     shelves = []
     shelf_list = {}
@@ -1352,6 +1358,8 @@ def file_detail(request, group_id, _id):
                                 'groupid':group_id,
                                 'annotations' : annotations,
                                 'shelf_list': shelf_list,
+                                'allow_to_comment':allow_to_comment,
+                                'node_has_thread': thread_node,
                                 'shelves': shelves, 'nav_list':nav_li,
                                 'imageCollection':imageCollection
                               },
@@ -1522,6 +1530,10 @@ def file_edit(request,group_id,_id):
 
         # get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE),groupid=group_id)
+
+        thread_create_val = request.POST.get("thread_create",'')
+        if thread_create_val == "Yes":
+          return_status = create_thread_for_node(request,group_id, file_node)
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             # To fill the metadata info while creating and editing file node
             metadata = request.POST.get("metadata_info", '')
@@ -1534,7 +1546,7 @@ def file_edit(request,group_id,_id):
 
             return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         else:
-            url = "/"+ group_id +"/?selected="+str(file_node._id)+"#view_page"
+            url = "/"+ str(group_id) +"/?selected="+str(file_node._id)+"#view_page"
             return HttpResponseRedirect(url)
 
     else:
@@ -1550,3 +1562,13 @@ def file_edit(request,group_id,_id):
                                 },
                                   context_instance=RequestContext(request)
                               )
+
+
+def get_gridfs_resource(request, gridfs_id):
+
+    # print gridfs_id
+
+    f = node_collection.find_one({'_type': 'File'})
+    gridfs_obj = f.fs.files.get(ObjectId(gridfs_id))
+
+    return HttpResponse(gridfs_obj.read(), content_type=gridfs_obj.content_type)

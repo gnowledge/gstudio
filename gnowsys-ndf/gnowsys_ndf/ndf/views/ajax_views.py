@@ -40,9 +40,9 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time,get_group_name_id
-from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
+from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
@@ -149,8 +149,21 @@ def collection_nav(request, group_id):
 
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
-    if "CourseEventGroup" in group_obj.member_of_names_list:
+    sg_type = None
+    list_of_sg_member_of = get_sg_member_of(group_id)
+    thread_node = None
+    allow_to_comment = None
+
+    if "CourseEventGroup" in group_obj.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of:
+      node_obj.get_neighbourhood(node_obj.member_of)
+
       template = "ndf/res_node_ajax_view.html"
+      if "ProgramEventGroup" in list_of_sg_member_of:
+        sg_type = "ProgramEventGroup"
+      elif "CourseEventGroup" in list_of_sg_member_of:
+        sg_type = "CourseEventGroup"
+      thread_node, allow_to_comment = node_thread_access(group_obj._id, node_obj)
+
     nav_list = request.POST.getlist("nav[]", '')
     n_list = request.POST.get("nav", '')
 
@@ -199,6 +212,9 @@ def collection_nav(request, group_id):
                                   'group_id': group_id,
                                   'groupid':group_id,
                                   'breadcrumbs_list':breadcrumbs_list,
+                                  'sg_type': sg_type,
+                                  'allow_to_comment': allow_to_comment,
+                                  'thread_node': thread_node,
                                   'app_id': node_id, 'topic':topic, 'nav_list':nav_list
                                 },
                                 context_instance = RequestContext(request)

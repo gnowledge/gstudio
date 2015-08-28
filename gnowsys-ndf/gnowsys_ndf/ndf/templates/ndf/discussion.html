@@ -1,62 +1,70 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% load cache %}
-
+{% get_group_name groupid as group_name_tag %}
+{% user_access_policy groupid request.user as user_access %}
+{% get_attribute_value node.pk 'release_response' as resp_val %}
+{% get_attribute_value node.pk 'thread_interaction_type' as thr_int_type %}
 <div>
-
   <br/>
-  <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
-    {% if all_replies %}
-        Comment
+    {% if allow_to_comment %}
+      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
+        {% if thr_int_type %}
+          {{thr_int_type}}
+        {% else %}
+          Comment
+        {% endif %}
+      </div>
     {% else %}
-      Comment on {{ node.name }}
+        Interaction Not Available
     {% endif %}
-  </div>
 
   <div id="replies-area">
 
     <!-- populating replies -->
+    {% check_is_gstaff groupid request.user as is_gstaff %}
+
     {% for each_reply in all_replies %}
+      {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
+      <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
+        <div class="row"> 
+          <div class="small-3 columns">
+            <a class="text-center" href="{% url 'dashboard' each_reply.userid %}">
+              <span class="align-center"><i class="fi-torso"></i></span>
+              <label>{{ each_reply.username }}</label>
+            </a>
+          </div>
+          <div class="small-9 columns">
+            {% spaceless %}
+            {{each_reply.HTMLcontent | safe }}
+            {% endspaceless %}
+          </div>
 
-    <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
+          {% for node in each_reply.collection_set  %}
+          <div style="margin: 1em;">
+            
+          {{node.mime_type}}
+          <br/>
+          <a class="th" style="" href="{% url 'read_file' group_id node node.name %}">
+             {% if 'image' in node.mime_type  %}
+              <img style="height:100px;" src="{% url 'getFileThumbnail' group_id node.pk %}" />
+              {% endif %}
+            <p>{{node.name}}</p>
+          </a>  
+          </div>
+          {% endfor %}
+        </div>
 
-      <div class="row"> 
-        <div class="small-3 columns">
-          <a class="text-center" href="/home/{{each_reply.userid}}/dashboard">
-            <span class="align-center"><i class="fi-torso"></i></span>
-            <label>{{ each_reply.username }}</label>
-          </a>
-        </div>
-        <div class="small-9 columns">
-          {% spaceless %}
-          {{each_reply.HTMLcontent | safe }}
-          {% endspaceless %}
+        <div class="row">
+          <div class="small-8 columns"> <small>{{ each_reply.last_update }}</small> </div>
+          <div class="reply-btn small-2 columns" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))">{% trans "Delete" %}</div>
+          <div class='reply-btn reply-btn-class text-right small-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
+            {% trans "Reply" %}
+          </div>
         </div>
 
-        {% for node in each_reply.collection_set  %}
-        <div style="margin: 1em;">
-          
-        {{node.mime_type}}
-        <br/>
-        <a class="th" style="" href="{% url 'read_file' group_id node node.name %}">
-           {% if 'image' in node.mime_type  %}
-            <img style="height:100px;" src="{% url 'getFileThumbnail' group_id node.pk %}" />
-          {% endif %}
-          <p>{{node.name}}</p>
-        </a>  
-        </div>
-        {% endfor %}
       </div>
-
-      <div class="row">
-        <div class="small-8 columns"> <small>{{ each_reply.last_update }}</small> </div>
-        <div class="reply-btn small-2 columns" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))">{% trans "delete" %}</div>
-        <div class='reply-btn text-right small-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
-          {% trans "reply" %}
-        </div>
-      </div>
-
-    </div>
+      {% endif %}
 
     {% endfor %}
     <!-- END of populating replies -->
@@ -67,7 +75,11 @@
     <!-- Reply : -->
     <textarea id="orgitdownreps" name="content_org" placeholder="{% trans 'Enter your reply text here.'%}"></textarea>
     <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
-    <input type="file" id="uploaded-files" style="" value="" multiple>
+    {% if sg_type != "Event" %}
+      <input type="file" id="uploaded-files" style="" value="" multiple>
+    {% else %}
+      <input type="file" id="uploaded-files" style="" value="" multiple class="hide">
+    {% endif %}
     <input type="hidden" id="prior-node" style="visibility:hidden" value="">
     <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
   </div>
@@ -79,7 +91,6 @@
 
   // for discussion tab
   // storing ndf_tags return values in JS variables
-  {% user_access_policy groupid request.user as user_access %}
   var user_access = "{{ user_access }}"; // "allow" or "disallow"
 
   {% edit_policy groupid node request.user as status %}
@@ -96,7 +107,6 @@
     $("#orgitdownreps").orgitdown(mySettings);
   {% endif %}
 
-  
   function createDiscussion()
   {
 
@@ -115,7 +125,6 @@
 
             if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
             {
-
                 // $("#create-discussion").hide();
 
                 // changing method to behave same as sub-reply button
@@ -247,10 +256,10 @@
     + "<div class='small-9 columns'>"+ data[3] + filesContent +"</div></div>"
 
     + "<div class='row'><div class='small-8 columns'><small>"+ data[7] + "</small></div>"
-    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'delete' %}</div>"
+    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'Delete' %}</div>"
     + "<div data-org-content='"
     + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-    + data[1] + "' class='reply-btn text-right small-2 columns'>{% trans  'reply' %} </div></div></div>"
+    + data[1] + "' class='reply-btn text-right small-2 columns'>{% trans  'Reply' %} </div></div></div>"
 
     return htmlReply;
   }
@@ -324,7 +333,7 @@
               }
               // updating tab-text
               updateDiscussionTabText();
-              location.reload();
+              // location.reload();
             }
             else if( data[0] == "no_content" ){
               
