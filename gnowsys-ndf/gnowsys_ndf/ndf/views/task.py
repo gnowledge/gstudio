@@ -774,9 +774,9 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     # else :
     #     pass
     try:
-        group_id = ObjectId(group_id)
+        group_id = ObjectId(group_name)
     except:
-        group_name, group_id = get_group_name_id(group_id)
+        group_name, group_id = get_group_name_id(group_name)
         
     
     #section to get the Tasks 
