@@ -11,10 +11,11 @@
 {% endblock %}
 
 {% block title %} {{title}} {% endblock %}
-
+{% comment %}
 {% block concern_information %}
 <a href="{% url 'groupchange' top_group_name %}" class="button">Go to '{{top_group_name}}' Event</a>
 {% endblock %}
+{% endcomment %}
 
 {% block body_content %}
 	
@@ -46,9 +47,6 @@
         {% else %}
           <div class='{% if node.status == "PUBLISHED" %}published{% endif %}'>
         {% endif %} 
-
-        <a href="{% url 'file_detail' request.user.username node %}">
-
           <div class="row">
             <div class="small-8 column">
               <b>
@@ -96,7 +94,6 @@
                 by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
               </div>
             </footer>
-            </a>
 
             <div class="label-list small-12 columns">
               {% for tag in node.tags|slice:":3" %}
@@ -154,7 +151,3 @@
 
 {% endblock%}
 
-{% block script %}
-{{block.super}}
-$("#group-level-header").addClass("hide");
-{% endblock %}
