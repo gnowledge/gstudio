@@ -1764,17 +1764,19 @@ def group_dashboard(request, group_id=None):
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
       alternate_template = "ndf/course_event_group.html"
-      page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-      blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
-      if group_obj.collection_set:
-          course_structure_exists = True
-      if request.user.id:
-          blog_pages = node_collection.find({
-                'member_of':page_gst._id,
-                'type_of': blogpage_gst._id,
-                'group_set': group_obj._id
-            }).sort('last_update', -1)
+  if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
+      if "CourseEventGroup" in group_obj.member_of_names_list or u"ProgramEventGroup" in list_of_sg_member_of:
+          page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+          blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+          files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+          if group_obj.collection_set:
+              course_structure_exists = True
+          if request.user.id:
+              blog_pages = node_collection.find({
+                    'member_of':page_gst._id,
+                    'type_of': blogpage_gst._id,
+                    'group_set': group_obj._id
+                }).sort('last_update', -1)
   allow_to_join = True
   if 'end_enroll' in group_obj:
       if group_obj.end_enroll:
