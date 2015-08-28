@@ -291,11 +291,13 @@
 
       <!-- =========| divider between two nav's/header's |=========== -->
       <!-- start of second nav  or group level header-->
+      {% get_sg_member_of group_object.pk as list_of_sg_member_of %}
+      {% if "CourseEventGroup" not in group_object.member_of_names_list and "ProgramEventGroup" not in list_of_sg_member_of or site.SITE_NAME == "NROER" %}
+
       <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %}" id="group-level-header">
 
         <nav class="top-bar" id="second-header" data-topbar data-options="sticky_on: large" role="navigation">
         <!-- don't show this app bar for groups with editable moderated -->
-        {% get_sg_member_of group_object.pk as list_of_sg_member_of %}
         {% if "ModeratingGroup" not in group_object.member_of_names_list %}
           {% if not is_ac_url %}
             {% if request.path != "/welcome" %}
@@ -423,6 +425,7 @@
         </nav>
       </div>
 
+      {% endif %}
       <!-- end of second nav -->
 
     {# </div> #}
