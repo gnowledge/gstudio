@@ -409,9 +409,9 @@ i.remove-tag{
 						{% elif k == "interactivitytype" %}
 						<h5>{% trans "Interactivity Type: " %}</h5> 
 						{% elif k == "educationallevel" %}
-						<h5  class= "compulsory" required>{% trans "Educational Level:" %} </h5>
+						<h5  class= "compulsory">{% trans "Educational Level:" %} </h5>
 						{% elif k == "educationalsubject" %}
-						<h5 class= "compulsory" required>{% trans "Educational Subject:" %} </h5>
+						<h5 class= "compulsory">{% trans "Educational Subject:" %} </h5>
 						{% elif k == "timerequired" %}
 						<h5>{% trans "Time Required: " %}</h5> 
 						{% elif k == "audience" %}
@@ -1403,22 +1403,14 @@ i.remove-tag{
           $("#message").css("display", "none");
 	    }
 
-
+    {% if not ce_id %}
 		if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
-			console.log('inside if ');
-
-			//pass empty array to unlock any locked tabs
-			console.log('save node clicked');
 			$('#tabs').find('a[href="#tab2"]').trigger('click');
 			$("#message").css("display", "block");
 			$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
-			
-			
-			
 			event.preventDefault();
-
 		}
-
+	{% endif %}
 	    updateAllTags();
 	});
 
