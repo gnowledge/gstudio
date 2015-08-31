@@ -270,6 +270,7 @@ factory_relation_types = [
     }
 ]
 
+
 #factory data is data which is required while intialization of the database first time
 factory_data = [ {'_type':'Group','name':'home'}]
 
