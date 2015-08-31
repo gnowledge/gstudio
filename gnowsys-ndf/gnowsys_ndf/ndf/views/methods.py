@@ -2063,8 +2063,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
   ga_node = None
   info_message = ""
   old_object_value = None
-  print "attribute_type_node", attribute_type_node
-
   ga_node = triple_collection.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
     # Code for creation
