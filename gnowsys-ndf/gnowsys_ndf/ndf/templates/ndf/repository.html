@@ -15,7 +15,7 @@
 
 	.app-card{
 		width: 17rem;
-		min-height: 15rem;
+		min-height: 12rem;
 		margin: 20px 1rem;
 		background-color: #efefef;
 		border: thin solid lightgray;
@@ -35,6 +35,7 @@
 		font-size: 7em;
 		z-index: 0;
 		opacity: 0.1;
+		margin-top: -35px;
 		/*padding-top: 2rem;*/
 	}
 
@@ -55,8 +56,14 @@
 	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-3">
 		{% for each_gapp in gapps_obj_list %}
 			<li>
-				<a class="app-card text-center" href="{% url each_gapp.name|lower group_id %}">
-					<h4>{{ each_gapp.altnames }}</h4>
+				<a class="app-card text-center" 
+				{% if each_gapp.name|lower == "event" %}
+					href="{% url 'program' group_id %}"
+				{% else %}
+					href="{% url each_gapp.name|lower group_id %}"
+				{% endif %}
+				>
+					<h4>{% firstof each_gapp.altnames each_gapp.name %}</h4>
 					<hr/>
 					<i class="icons {{ each_gapp.url }}"></i>
 					<p>{{ each_gapp.content|safe }}</p>

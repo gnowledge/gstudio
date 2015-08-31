@@ -6,6 +6,7 @@
 {% block title %} Upload Document {% endblock %}
 
 {% block head %}
+
 <!-- Dropzonejs : Enable dropping of files with thumbnails and progress bar http://www.dropzonejs.com/ MIT LICENSE-->
 
 <!--
@@ -105,7 +106,7 @@ i.remove-tag{
 
 		<fieldset>
 			<legend>{% trans "Add Description" %}</legend>
-			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}
+			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter description here" %}
 			
 		</fieldset>
 		<!-- <fieldset>
@@ -123,7 +124,6 @@ i.remove-tag{
 								
 							<span  class="subheader small-2 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
 							</span>
-
 							</h3>
 							<div class="small-9 columns">
 							<div class="row collapse">
@@ -157,6 +157,7 @@ i.remove-tag{
 			    	</span>
 		    	</div>
 	    	</div>  
+		<div class="row">
 		<fieldset class="medium-4 columns">
 			<legend>Visibility</legend>
 			<div class="row">
@@ -192,6 +193,7 @@ i.remove-tag{
 					</div>
 				</div>
 		</fieldset>
+		</div>
 		<input type="hidden" name="user" value="{{user.id}}">
 		<input type="hidden" name="page_url" value="{{page_url}}">
 		<input type="submit" id="submitpostid" value="Submit" class="button small-10  small-push-1 column">
@@ -199,8 +201,6 @@ i.remove-tag{
 			<br/>
 			{% trans "Please upload videos in webm format. If you upload videos of other formats, it will take longer to publish them." %} </p>
 		</form>
-
-
 
 		{% else %}
 		<p><em>{% trans "You are not an authorised user. Please login to upload files." %} </em></p>
@@ -246,6 +246,9 @@ i.remove-tag{
 
 
 	});
+	{% if program_res %}
+    	$("#group-level-header").addClass("hide");
+    {% endif %}
 
 
 	var tags = document.getElementById("tags_id");

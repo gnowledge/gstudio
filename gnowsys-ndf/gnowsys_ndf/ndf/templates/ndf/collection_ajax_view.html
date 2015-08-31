@@ -1,13 +1,10 @@
 {% load ndf_tags %}
 {% load i18n %}
-{% load cache %}
 
 {% block head %}
 
-  {% cache 3600 collection_view_static_files %}
   <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> 
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
-  {% endcache %}
     
   <script type="text/javascript">
     $(document).ready(function() {      
@@ -90,7 +87,7 @@
                 }
             }
             var nav_list = parent_arr.reverse();
-            if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent"){
+            if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit"){
 
             // alert(nav_list);
             // alert("node_type");
@@ -119,7 +116,7 @@
                   // else if (node_type == "Course"){
                   //   window.history.pushState("", "", "/{{group_id}}/course/course_detail/{{node.pk}}"+"?selected="+node.id+"");
                   // }
-                  if (node_type == "CourseEventGroup"){
+                  if (node_type == "CourseEventGroup" || node_type == "ProgramEventGroup"){
                     window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");
                     $(".view_page_link").trigger('click')
                   }
@@ -208,7 +205,9 @@
 
   {% endif %}
   <!-- <b class="current">{{node.name}}</b> -->
-  <h4 class="">{{node.name}}</h4>
-  <div>
-    <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
-  </div>
+  {% if node.collection_set %}
+    <h4 class="">{{node.name}}</h4>
+    <div>
+      <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
+    </div>
+  {% endif %}

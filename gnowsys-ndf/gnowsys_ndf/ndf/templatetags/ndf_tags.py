@@ -12,6 +12,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
+
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
@@ -148,6 +150,10 @@ def get_node_type(node):
    if node:
       obj = node_collection.find_one({"_id": ObjectId(node._id)})
       nodetype=node.member_of_names_list[0]
+      if "Group" == nodetype:
+        pe = get_sg_member_of(node._id)
+        if "ProgramEventGroup" in pe:
+          return "ProgramEventGroup"
       return nodetype
    else:
       return ""
@@ -826,7 +832,6 @@ def thread_reply_count( oid ):
 # global variable to count thread's total reply
 # global_disc_rep_counter = 0	
 # global_disc_all_replies = []
-reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
 @get_execution_time
 @register.assignment_tag
 def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
@@ -834,25 +839,33 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 	Method to count total replies for the disc.
 	'''
 
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False:
-		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else:
-			auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-			if auth :
-				group_id = str(auth._id)
-	else:
-		pass
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_name, group_id = get_group_name_id(group_id)
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(group_id) is False:
+	# 	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 	if group_ins:
+	# 		group_id = str(group_ins._id)
+	# 	else:
+	# 		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 		if auth :
+	# 			group_id = str(auth._id)
+	# else:
+	# 	pass
 
+	reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
+	oid_obj = node_collection.one({'_id':ObjectId(oid)})
+	# print "\n\n oid_obj----",oid_obj.name
 	# thr_rep = node_collection.find({'$and':[ {'_type':'GSystem'}, {'prior_node':ObjectId(oid)}, {'member_of':ObjectId(reply_st._id)} ]})#.sort({'created_at': -1})
 	thr_rep = node_collection.find({'_type':'GSystem', 'group_set':ObjectId(group_id), 'prior_node':ObjectId(oid), 'member_of':ObjectId(reply_st._id)}).sort('created_at', -1)
 
 	# to acces global_disc_rep_counter as global and not as local
 	# global global_disc_rep_counter 
 	# global global_disc_all_replies
+	# print "\n\n thr_rep",thr_rep.count()
 
 	if thr_rep and (thr_rep.count() > 0):
 
@@ -1534,12 +1547,12 @@ def get_group_type(group_id, user):
 
                         else:
                             error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                            raise Http404(error_message)
+                            raise PermissionDenied(error_message)
 
                     else:
                         # Anonymous user found which cannot access groups other than Public
                         error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                        raise Http404(error_message)
+                        raise PermissionDenied(error_message)
 
             else:
                 # If Group is not found with either given ObjectId or name in the database
@@ -1551,8 +1564,11 @@ def get_group_type(group_id, user):
 
         return True
 
-    except Exception as e:
-        raise Http404(e)
+    except PermissionDenied as e:
+		raise PermissionDenied(e)
+
+    except Http404 as e:
+		raise Http404(e)
 
 
 @get_execution_time
@@ -2770,7 +2786,7 @@ def get_sg_member_of(group_id):
 		group_id, group_name = get_group_name_id(group_id)
 
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
-
+	# print group_obj.name
 	# Fetch post_node of group
 	if group_obj.post_node:
 		post_node_id_list = group_obj.post_node
@@ -2779,7 +2795,9 @@ def get_sg_member_of(group_id):
 			# getting parent's sub group's member_of in a list
 			for each_sg in post_node_id_list:
 				each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
-				sg_member_of_list.extend(each_sg_node.member_of_names_list)
+				if each_sg_node:
+					sg_member_of_list.extend(each_sg_node.member_of_names_list)
+	# print "\n\n sg_member_of_list---",sg_member_of_list
 	return sg_member_of_list
 
 def get_objectid_name(nodeid):
@@ -2863,3 +2881,17 @@ def get_breadcrumb(url):
 
 	# print 'path : ', path
 	return {'path': path if (len(path) > 1) else []}
+
+
+
+@get_execution_time
+@register.assignment_tag
+def get_thread_node(node_id):
+	node_obj = node_collection.one({'_id': ObjectId(node_id)})
+	thread_obj = None
+	if node_obj.relation_set:
+		for rel in node_obj.relation_set:
+			if rel and 'has_thread' in rel:
+				thread_obj = rel['has_thread'][0]
+	# print "\n\nthread_obj--",thread_obj
+	return thread_obj

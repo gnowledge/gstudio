@@ -21,6 +21,10 @@
 {% block script %}
 {{ block.super }}
 // <script type="text/javascript">
+{% get_sg_member_of group_id as list_of_sg_member_of %}
+{% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of%}
+	$("#group-level-header").addClass("hide");
+{% endif %}
 
 function approveResource (oid) {
 	var msg = "Resource having ID: " + String(oid) + " will be approved from this group\n\n- Press 'OK' to Approve the resource\n- Press 'Cancel' to cancel the action"
