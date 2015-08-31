@@ -617,7 +617,7 @@ GSTUDIO_RESOURCES_TIME_REQUIRED = ["0-2M", "2-5M", "5-15M", "15-45M"]
 
 GSTUDIO_RESOURCES_AGE_RANGE = ["5-10", "11-20", "21-30", "31-40", "41 and above"]
 
-GSTUDIO_RESOURCES_READING_LEVEL = []
+GSTUDIO_RESOURCES_READING_LEVEL = ["Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary"]
 
 GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Moderation", "Other"]
 

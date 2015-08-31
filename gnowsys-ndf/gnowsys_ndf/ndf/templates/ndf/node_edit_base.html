@@ -101,7 +101,7 @@ i.remove-tag{
         
 	    <div class="row">
 
-	      	<dl class="tabs pill large-12 columns select">
+	      	<dl class="tabs pill large-12 columns select" id = "tabs">
 
 				<dd class="active node_tab" title="Click here to add Name, Description, Privacy and Tags">
 		  		<!-- change name of collection tab overide block in your code -->
@@ -117,7 +117,7 @@ i.remove-tag{
 				</dd>
 				<!-- change name of metadata tab overide block in your code -->
 				<dd class="meta_tab" title="Click here to add/edit metadata">
-				  	<a>{% trans "Metadata" %} </a> 
+				  	<a href="#tab2">{% trans "Metadata" %} </a> 
 				</dd>  
 				<dd class="teaches_tab" title="Click here to add/edit teaches">
 				 	<a>{% trans "Teaches" %} </a> 
@@ -349,33 +349,33 @@ i.remove-tag{
 		
 		{% cache 3600 node_edit_base_coll_type_radio request.LANGUAGE_CODE %}
 
-		<div class="choose" style="display:none;">
+		<div class="choose" style="display:none">
 		  	
 			<div class="row">
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns" >
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Page"/>
 			      {% trans "Page" %} <i class="step fi-page-filled"></i></span>
 			    </div>
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="File" />
 			      {% trans "File" %} <i class="step fi-book"></i></span>
 			    </div>
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Image" />
 			      {% trans "Image" %} <i class="step fi-photo"></i>
 			      </span>
 			    </div>
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Video" />
 			      {% trans "Video" %} <i class="step fi-video"></i>
 			      </span>
 			    </div>
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Pandora Video" />
 			      {% trans "Pandora" %} <i class="step fi-video"></i>
 			      </span>
 			    </div>	    
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="QuizObj" />
 			      {% trans "Quiz" %} <i class="step fi-pencil"></i>
 			      </span>
@@ -398,71 +398,80 @@ i.remove-tag{
     {% endblock %}
     
 	{% cache 300 node_edit_base_metadata request.LANGUAGE_CODE %}
-    <div class="content contents" id="panel-metadata" style="width:95%; display:none;" >      
+    <div class="content contents panel" id="panel-metadata" style="width:100%; display:none;" >      
       	<div class="row">
-		  	<h4>{% trans "Please add or edit Metadata" %} </h4>
+		  	<div class="small-12 large-12 columns"><h4>{% trans "Please add or edit Metadata" %} </h4></div>
 
 		  	{% get_metadata_values as metadata %}
 	  		{% for k,v in metadata.items %}
+	  		  
+  											
 	  			<div class="small-6 columns">			  	
 			  		<label>
 			  			{% if k == "educationaluse" %}
-			  				<h5>{% trans "Educational Use:" %} </h5> 
-			  			{% elif k == "interactivitytype" %}
-			  				<h5>{% trans "Interactivity Type: " %}</h5> 
-			  			{% elif k == "educationallevel" %}
-			  				<h5>{% trans "Educational Level:" %} </h5> 
-			  			{% elif k == "educationalsubject" %}
-			  				<h5>{% trans "Educational Subject:" %} </h5> 
-			  			{% elif k == "timerequired" %}
-			  				<h5>{% trans "Time Required: " %}</h5> 
-			  			{% elif k == "audience" %}
-			  				<h5>{% trans "Target Audience:" %} </h5> 
-			  			{% elif k == "textcomplexity" %}
-			  				<h5>{% trans "Text Complexity" %}</h5>  
-			  			{% elif k == "age_range" %}			
-		         			<h5>{% trans "Age Range:" %}</h5>
-		         		{% elif k == "readinglevel" %}
-		         			<h5>{% trans "Reading Level:" %} </h5> 
-		         		{% endif %}
+						<h5 >{% trans "Educational Use:" %} </h5> 
+						{% elif k == "interactivitytype" %}
+						<h5>{% trans "Interactivity Type: " %}</h5> 
+						{% elif k == "educationallevel" %}
+						<h5  class= "compulsory">{% trans "Educational Level:" %} </h5>
+						{% elif k == "educationalsubject" %}
+						<h5 class= "compulsory">{% trans "Educational Subject:" %} </h5>
+						{% elif k == "timerequired" %}
+						<h5>{% trans "Time Required: " %}</h5> 
+						{% elif k == "audience" %}
+						<h5>{% trans "Target Audience:" %} </h5> 
+						{% elif k == "textcomplexity" %}
+						<h5>{% trans "Text Complexity" %}</h5>  
+						{% elif k == "age_range" %}			
+						<h5>{% trans "Age Range:" %}</h5>
+						{% elif k == "readinglevel" %}
+						<h5>{% trans "Reading Level:" %} </h5> 
+						{% elif k == "language" %}			
+						<h5>{% trans "Educational Language:" %}</h5>
+						{% elif k == "curricular" %}			
+						<h5>{% trans "Curricular:" %}</h5>
+						{% elif k == "educationalalignment" %}			
+						<h5>{% trans "Educational Alignment:" %}</h5>
+						{% endif %}      
 
-		         		{% get_attribute_value node.pk k as attr_val %}
-		         		<select name="{{k}}">
-		         			<option></option>
-		        			{% for opts in v %}
-	        					{% if opts == attr_val %}	        				
-									<option selected>{% trans opts %}</option>
-								{% else %}
-									<option>{% trans opts %}</option>
-								{% endif %}
+		         		{% get_attribute_value node.pk k as attr_val %} 
+		         		<select name="{{k}}" id ="{{k}}">
+							<option></option>
+							{% for opts in v %}
+							{% if opts == attr_val %}	        				
+							<option selected>{% trans opts %}</option>
+							{% else %}
+							<option>{% trans opts %}</option>
+							{% endif %}
 							{% endfor %}
 						</select>
 					</label>
 				</div>
+				
 		  	{% endfor %}
-		  	<div class="small-6 columns">			  	
+  		<div class=" small-12 large-12 columns">
+		  	<div class="small-12 large-4 columns">			  	
 		  		<label>
 					<h5>{% trans "Based on Url: " %} </h5> 
 					<input name="basedonurl" type="text" value="{{node.basedonurl}}">		  	
 				</label>
 			</div>
-		  	
-		</div>
-		<div class="row">
-			<div class="small-6 columns">
+			<div class="small-12 large-4 columns">
 				<label>
 					<h5>{% trans "License: " %} </h5> 
-					<input name="license" type="text" value="{{node.license}}">		  	
+					<input name="license" type="text" value="{{node.license | default_if_none:'CC-By_SA'}}">		  	
 				</label>
 			</div>
-			<div class="small-6 columns">
+			<div class="small-12 large-4 columns">
 				<label>
 					<h5>{% trans "Source: " %} </h5> 
 					<input name="source" type="text" value="{{node.source}}">		  	
 				</label>
 			</div>
-		</div>
-		<div id="metadata_info"></div>
+		</div>	
+	</div>
+			
+	<div id="metadata_info"></div>
 	</div>	
 	{% endcache %}
 
@@ -1314,6 +1323,10 @@ i.remove-tag{
 	addTagBtn.onkeypress = addTag;
 
 	$("#save-node").click(function(event) {
+		
+
+
+
                       
       	pn_arr = []
 		cn_arr = []
@@ -1394,6 +1407,14 @@ i.remove-tag{
           $("#message").css("display", "none");
 	    }
 
+    {% if not ce_id %}
+		if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
+			$('#tabs').find('a[href="#tab2"]').trigger('click');
+			$("#message").css("display", "block");
+			$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+			event.preventDefault();
+		}
+	{% endif %}
 	    updateAllTags();
 	});
 
@@ -1495,4 +1516,16 @@ i.remove-tag{
 
 </script>
 
+{% endblock %}
+
+{% block document_ready %}
+	{{block.super}}
+
+	$("input[id='educational']").each(function(){
+		$(this).attr("required", "");
+		$(this).css("width", "98%");
+		$(this).css("float", "left");
+		$(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+		$(this).after("<i style='color:red; float:left display:inline'>*</i>");
+	});
 {% endblock %}

@@ -2063,6 +2063,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
   ga_node = None
   info_message = ""
   old_object_value = None
+  print "attribute_type_node", attribute_type_node
 
   ga_node = triple_collection.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
@@ -4182,7 +4183,7 @@ def create_thread_for_node(request, group_id, node):
 		if release_response_val:
 			rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
 			release_response_val = eval(release_response_val)
-			create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+                        create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
 		if interaction_type_val:
 			thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
 			create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)

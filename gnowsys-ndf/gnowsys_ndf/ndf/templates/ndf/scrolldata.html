@@ -21,27 +21,25 @@
    
    <div class="container-div  selFile" style="height:50px; background-color:#f7fcfb;">
     <div id="top_list"  style="position:relative; top:15px;" >
-      <div id="name-div"  style=" position:absolute;   word-wrap: break-word; float:left; ">
+      <div id="name-div"  style=" position:absolute; width:7.2%;  word-wrap:break-word; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; float:left; ">
           
           <a href="{% url 'dashboard' i.created_by %}"> {{i.user_details_dict.created_by}} </a>
       </div>
-
-      <div id="action" style=" position:relative; left:6%; float:left;">
-         has  {{i.activity}}
-     </div> 
-     <div id="create_type"  style=" position:relative; left:6.5%; word-wrap: break-word; width:auto; float:left; " >
-        
-        {% if res_type != "event_app_instance_detail" %}
-        <a href="{% url res_type groupid i.pk   %}"> {{i.name}} </a>
-         
-        {% else %}
-        {% get_event_type i as app_set_id %}
-         <a href="{% url res_type groupid app_set_id i.pk  %}">{{i.name}} </a>         
-        {% endif %}
-     </div>
-     <div id="performed on" class="small-2 column"  style=" position:relative; word-wrap: float:left; break-word; width:auto; left:6%;" >
-           {{i.created_at|timesince}} ago
-     </div>
+      <div id="action" style=" position:relative; left:7.5%; float:left;">
+           has  {{i.activity}}
+      </div> 
+      <div id="create_type"  style=" position:relative; left:8%; word-wrap:break-word; width:auto; float:left;" >
+          {% if res_type != "event_app_instance_detail" %}
+                <a href="{% url res_type groupid i.pk   %}"> {{i.name}} </a>
+                 
+          {% else %}
+              {% get_event_type i as app_set_id %}
+                 <a href="{% url res_type groupid app_set_id i.pk  %}">{{i.name}} </a>         
+          {% endif %}
+      </div>
+       <div id="performed on" class="small-2 column"  style=" position:relative; word-wrap: float:left; break-word; width:auto; left:7.5%;" >
+            {{i.created_at|timesince}} ago
+      </div>
      <div  align="right" style="position:relative; right:4%; top:-15px;" >
         {% if 'image' in i.mime_type %}
         <a href="{% url res_type groupid i.pk   %}"> <div> <img src="{% url 'getFileThumbnail' group_id i.pk %}" style="height:50px; width:50px;"> </div>

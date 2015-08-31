@@ -277,7 +277,7 @@
     </div>
   {% endif %} 
 
-    <div class="content" id="view-discussion">
+    <div class="content small-12 columns"  id="view-discussion">
         {% get_node group_id as group_obj %}
         {% if "CourseEventGroup" not in group_obj.member_of_names_list %}
           {% get_thread_node node.pk as thread_node %}
@@ -318,3 +318,4 @@
           <li><a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li>
       {% endif %} 
     {% endif %} 
+
