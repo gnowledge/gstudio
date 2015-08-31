@@ -77,7 +77,7 @@
   {% get_group_name groupid as group_name_tag %}
  <div class="row"  id="new" style="margin-top: 0.5rem">
   	<!-- Users General Information -->
-        <div class="small-2 columns">
+        <div class="small-12 large-2 columns">
                   <div class="text-center">
                       {% if prof_pic_obj %}
                                 <div class="div-height">
@@ -98,7 +98,7 @@
                                   <div class="row" >
                                     <div class="small-12 columns" >
                                       <br>
-                                      <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px; " value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
+                                      <input type="button" class="button tiny expand margin-p5" id="btnUploadProfilePic" style="font-size:15px; " value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
                                     </div>
                                   </div>
                               {% endif %}
@@ -130,7 +130,7 @@
                   </div>
         </div>  
           
-        <div class="small-10 columns">
+        <div class="small-12 large-10 columns">
                 <dl class="tabs" data-tab >
                 <dd class="active"><a href="#view-profile" id='p5'> Profile </a> </dd>
                 <dd ><a href="#group" id="p1">Groups </a></dd>

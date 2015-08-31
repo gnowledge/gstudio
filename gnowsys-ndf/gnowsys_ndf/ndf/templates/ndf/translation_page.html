@@ -6,7 +6,10 @@
 {% block title %} {{ node.name }} {% endblock %}
 
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+{%block  style%}
 
+
+{%endblock%}
 {% block body_content %}
 
 {% if title %}
@@ -145,18 +148,18 @@
         <div class="row">
           <div class="medium-8 columns">
             {% if "Theme" in each.member_of_names_list %}
-            {% trans "Theme" %} :  {{each.name}}
+            <div class= "right">{% trans "Theme" %} </div>  {{each.name}}
             <input type="hidden" id="name_id" name="name" value="{{node.name}}">
             <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
             <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
             {% else %}
             {% if "theme_item" in each.member_of_names_list %}
-            {% trans "Theme Item" %} :  {{each.name}}
+            <div class="right">{% trans "Theme Item" %}</div>   {{each.name}}
             <input type="hidden" id="name_id" name="name" value="{{node.name}}">
             <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
             <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
             {% else %}
-            {% trans "Topic" %}:  {{each.name}}
+            <div class="right">{% trans "Topic" %}</div>  {{each.name}}
             <input type="hidden" id="name_id" name="name" value="{{node.name}}">
             <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
             <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
