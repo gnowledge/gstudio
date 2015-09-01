@@ -2880,9 +2880,13 @@ def get_breadcrumb(url):
 
 			# --- first element: group name ---
 			first_el = url_list[0]
-			first_group_name, group_id = get_group_name_id(first_el)
+			group_obj = get_group_name_id(first_el, get_obj=True)
 			# print "00000000000000000", first_el
-			first_group_url = '/' + first_group_name
+			first_group_name = group_obj.altnames if group_obj.altnames else group_obj.name
+			first_group_url = '/' + group_obj.name
+			if group_obj.name == 'home':
+				first_group_url += '/repository'
+
 			path.append({'name': first_group_name, 'link': first_group_url})
 			# print path
 			
