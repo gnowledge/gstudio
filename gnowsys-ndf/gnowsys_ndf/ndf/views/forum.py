@@ -196,7 +196,7 @@ def create_forum(request, group_id):
         #     end_dt[end_time.name]=en_date
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
-        colf.save()
+        colf.save(groupid=group_id)
 
         ''' server_sync '''
         capture_data(file_object=colf, file_data=None, content_type='forum_page')
@@ -321,7 +321,7 @@ def edit_forum(request,group_id,forum_id):
         #     end_dt[end_time.name]=en_date
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
-        colf.save()
+        colf.save(groupid=group_id)
         
         ''' server_sync '''
         capture_data(file_object=colf, file_data=None, content_type='forum_edit')
@@ -532,7 +532,7 @@ def create_thread(request, group_id, forum_id):
             colrep.contributors.append(usrid)
 
         colrep.group_set.append(colg._id)
-        colrep.save()
+        colrep.save(groupid=group_id)
 
         ''' server_sync '''
         capture_data(file_object=colrep, file_data=None, content_type='forum_thread_new')
@@ -691,7 +691,8 @@ def add_node(request, group_id):
             colrep.contributors.append(usrid)
         
         colrep.group_set.append(colg._id)
-        colrep.save()
+
+        colrep.save(groupid=group_id)
 
         ''' server_sync '''
         capture_data(file_object=colrep, file_data=None, content_type='forum_reply')
@@ -773,18 +774,23 @@ def get_profile_pic(username):
 def delete_forum(request,group_id,node_id,relns=None):
     """ Changing status of forum to HIDDEN
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     
     node=node_collection.one({'_id':ObjectId(node_id)})
@@ -882,18 +888,23 @@ def delete_thread(request,group_id,forum_id,node_id):
 @login_required   
 @get_execution_time
 def edit_thread(request,group_id,forum_id,thread_id):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     forum=node_collection.one({'_id':ObjectId(forum_id)})
     thread=node_collection.one({'_id':ObjectId(thread_id)}) 
     exstng_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
@@ -914,11 +925,11 @@ def edit_thread(request,group_id,forum_id,thread_id):
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
             thread.content = org2html(content_org, file_prefix=filename)
-        thread.save() 
+
+        thread.save(groupid=group_id) 
 
         ''' server_sync '''
         capture_data(file_object=thread, file_data=None, content_type='thread_edit')
-
         link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(thread._id)
         for each in colg.author_set:
             if each != colg.created_by:
@@ -972,7 +983,11 @@ def delete_reply(request,group_id,forum_id,thread_id,node_id):
     # else :
     #     pass
 
-    group_name, group_id = get_group_name_id(group_id)
+    #group_name, group_id = get_group_name_id(group_id)
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     activity = ""
 

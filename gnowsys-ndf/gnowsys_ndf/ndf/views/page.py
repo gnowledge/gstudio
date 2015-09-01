@@ -1,7 +1,8 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
-import multiprocessing as mp 
+import datetime
+import multiprocessing as mp
 from difflib import HtmlDiff
 
 ''' -- imports from installed packages -- '''
@@ -32,8 +33,8 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_execution_time,parse_data
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
-from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id, server_sync
+from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string, node_thread_access
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id, create_thread_for_node,capture_data
 
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
@@ -50,6 +51,8 @@ app = gst_page
 #######################################################################################################################################
 # VIEWS DEFINED FOR GAPP -- 'PAGE'
 #######################################################################################################################################
+
+
 @get_execution_time
 def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
@@ -132,7 +135,7 @@ def page(request, group_id, app_id=None):
                                           'group_set': {'$all': [ObjectId(group_id)]},
                                           'status': {'$nin': ['HIDDEN']}
                                       }).sort('last_update', -1)
-    
+
       return render_to_response("ndf/page_list.html",
                                 {'title': title, 
                                  'appId':app._id,'shelf_list': shelf_list,'shelves': shelves,
@@ -143,14 +146,13 @@ def page(request, group_id, app_id=None):
       )
 
     elif gst_page._id == ObjectId(app_id):
-	    # Page list view 
-      # code for moderated Groups
-      group_type = node_collection.one({'_id': ObjectId(group_id)})
-      group_info=group_type_info(group_id)
-      node = node_collection.find({'member_of':ObjectId(app_id)})
-      title = gst_page.name
       '''
       if  group_info == "Moderated":
+	# Page list view
+        # code for moderated Groups
+        group_type = node_collection.one({'_id': ObjectId(group_id)})
+        group_info=group_type_info(group_id)
+	node = node_collection.find({'member_of':ObjectId(app_id)})
         title = gst_page.name
         node=group_type.prior_node[0]
         page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
@@ -163,11 +165,11 @@ def page(request, group_id, app_id=None):
                                      'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
                                     }, 
                                     context_instance=RequestContext(request))
-        
-      elif group_info == "BaseModerated":
-      #code for parent Groups
-        node = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]}, 
-                                       'group_set': {'$all': [ObjectId(group_id)]},                                           
+
+        elif group_info == "BaseModerated":
+	  #code for parent Groups
+          node = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
+                                       'group_set': {'$all': [ObjectId(group_id)]},
                                        'status': {'$nin': ['HIDDEN']}
                                       }).sort('last_update', -1)
 	
@@ -190,7 +192,7 @@ def page(request, group_id, app_id=None):
         Below query returns only those documents:
         (a) which are pages,
         (b) which belongs to given group,
-        (c) which has status either as DRAFT or PUBLISHED, and 
+        (c) which has status either as DRAFT or PUBLISHED, and
         (d) which has access_policy either as PUBLIC or if PRIVATE then it's created_by must be the logged-in user
       """
       page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
@@ -238,22 +240,27 @@ def page(request, group_id, app_id=None):
               page_node,ver=get_versioned_page(node)
             elif node.status == u"PUBLISHED":
               page_node = node
-	    '''	
-      
+    	'''
+
       annotations = json.dumps(page_node.annotations)
       page_node.get_neighbourhood(page_node.member_of)
-      return render_to_response('ndf/page_details.html', 
-                                  { 'node': page_node,
-                                    'appId':app._id,
-                                    'group_id': group_id,
-                                    'shelf_list': shelf_list,
-                                    'annotations': annotations,
-                                    'shelves': shelves,
-                                    'groupid':group_id
-                                  },
-                                  context_instance = RequestContext(request)
-        )        
+      thread_node = None
+      allow_to_comment = None
 
+      thread_node, allow_to_comment = node_thread_access(group_id, page_node)
+      return render_to_response('ndf/page_details.html',
+                                {'node': page_node,
+                                  'node_has_thread': thread_node,
+                                  'appId': app._id,
+                                  'group_id': group_id,
+                                  'shelf_list': shelf_list,
+                                  'allow_to_comment':allow_to_comment,
+                                  'annotations': annotations,
+                                  'shelves': shelves,
+                                  'groupid': group_id
+                                },
+                                context_instance = RequestContext(request)
+      )        
 
 
 @login_required
@@ -275,18 +282,22 @@ def create_edit_page(request, group_id, node_id=None):
     # else :
     #     pass
     group_name, group_id = get_group_name_id(group_id)
-    ce_id = request.GET.get('course_event_id')
-    res = request.GET.get('res')
+    ce_id = request.GET.get('course_event_id','')
+    res = request.GET.get('res','')
+    program_res = request.GET.get('program_res','')
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
                           'groupid': group_id,
                           'ce_id': ce_id,
-                          'res':res
+                          'res':res,
+                          'program_res':program_res
                       }
-    
+
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
+    thread = None
+    url_name = "/home"
     # for each in available_nodes:
     #   nodes_list.append(str((each.name).strip().lower()))
     # loop replaced by a list comprehension
@@ -298,40 +309,70 @@ def create_edit_page(request, group_id, node_id=None):
         page_node = node_collection.collection.GSystem()
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
-	page_type = request.POST.getlist("type_of",'')
+        page_type = request.POST.getlist("type_of",'')
+        
         ce_id = request.POST.get("ce_id",'')
         res = request.POST.get("res",'')
+        program_res = request.POST.get('program_res','')
+
+        # we are fetching the value of release_response flag
+        # if this is set, it means, we can proceed to create a thread node
+        # for the current page node.
+        thread_create_val = request.POST.get("thread_create",'')
+        # print "\n\n thread_create_val", thread_create_val
+
+        #program_res and res are boolean values
+        if program_res:
+            program_res = eval(program_res)
+
         if res:
             res = eval(res)
-        if ce_id:
-                if res == None:
-                    blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-                    page_node.type_of = [blogpage_gst._id]
-                    page_node.status = u"PUBLISHED"
-        else:
 
-        	if page_type:
-        		objid= page_type[0]
-        		if not ObjectId(objid) in page_node.type_of:
-        			page_type1=[]
-        			page_type1.append(ObjectId(objid))
-        			page_node.type_of = page_type1
-        			page_node.type_of
-	page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+        if page_type:
+            objid= page_type[0]
+            if not ObjectId(objid) in page_node.type_of:
+                page_type1=[]
+                page_type1.append(ObjectId(objid))
+                page_node.type_of = page_type1
+                page_node.type_of
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+        # if course event grp's id is passed, it means
+        # its a blog page added in notebook and hence set type_of field as "Blog page"
+        if ce_id:
+            blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+            page_node.type_of = [blogpage_gst._id]
+
+        # if the page created is as a resource in course or program event,
+        # set status to PUBLISHED by default
+        # one major reason for this, ONLY published nodes can be replicated.
+        if res or program_res:
+            page_node.status = u"PUBLISHED"
+
         page_node.save()
+        # if page is created in program event, add page_node to group's collection set
+        if program_res:
+            group_obj = node_collection.one({'_id': ObjectId(group_id)})
+            group_obj.collection_set.append(page_node._id)        
+            group_obj.save()
 
+        if thread_create_val == "Yes":
+	        return_status = create_thread_for_node(request,group_id, page_node)
         # To fill the metadata info while creating and editing page node
-        metadata = request.POST.get("metadata_info", '') 
-        if ce_id:
-          url_name = "/" + ce_id +"/#journal-tab"
-          if res:
-            url_name = "/" + ce_id +"/?selected=" + str(page_node._id)+ "#journal-tab"
-          return HttpResponseRedirect(url_name)
+        metadata = request.POST.get("metadata_info", '')
+        if ce_id or res or program_res:
+            url_name = "/" + group_name + "/" + str(page_node._id)
+            if ce_id:
+                url_name = "/" + group_name + "/#journal-tab"
+            if res or program_res:
+                url_name = "/" + group_name + "/?selected=" + str(page_node._id) + "#view_page"
+            # print "\n\n url_name---",url_name
+            return HttpResponseRedirect(url_name)
         if metadata:
-          # Only while metadata editing
-          if metadata == "metadata":
-            if page_node:
-              get_node_metadata(request,page_node)
+            # Only while metadata editing
+            if metadata == "metadata":
+                if page_node:
+                    get_node_metadata(request,page_node)
         # End of filling metadata
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
@@ -341,61 +382,70 @@ def create_edit_page(request, group_id, node_id=None):
 
             #page_node,ver=get_page(request,page_node)
             page_node.get_neighbourhood(page_node.member_of)
+
             context_variables['node'] = page_node
-            context_variables['groupid']=group_id
-            context_variables['group_id']=group_id
-	#fetch Page instances
-	Page_node = node_collection.find_one({"name":"Page"})
-	page_instances = node_collection.find({"type_of":Page_node._id})
-	page_ins_list = [i for i in page_instances]
-        context_variables['page_instance'] = page_ins_list  
+            context_variables['groupid'] = group_id
+            context_variables['group_id'] = group_id
+    	# fetch Page instances
+    	# Page_node = node_collection.find_one({'_type':"GSystemType","name":"Page"})
+    	page_instances = node_collection.find({"type_of": gst_page._id})
+    	page_ins_list = [i for i in page_instances]
+        context_variables['page_instance'] = page_ins_list
         context_variables['nodes_list'] = json.dumps(nodes_list)
-           
+        # print "\n\n context_variables----\n",context_variables
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
                               )
 
 
-@login_required    
+@login_required
 @get_execution_time
 def delete_page(request, group_id, node_id):
     """Change the status to Hidden.
-    
+
     Just hide the page from users!
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+    	group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id}))
-
 
 
 @get_execution_time
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
@@ -405,7 +455,7 @@ def translate_node(request,group_id,node_id=None):
         get_type=get_resource_type(request, node_id)
         page_node = eval("node_collection.collection"+"."+ get_type)()
         get_translate_common_fields(request, get_type,page_node, group_id, gst_page,node_id)
-        page_node.save()
+        page_node.save(groupid=group_id)
         # add triple to the GRelation 
         # then append this ObjectId of GRelation instance in respective subject and object Nodes' relation_set field.
         relation_type = node_collection.one({'_type': 'RelationType', 'name': 'translation_of'})
@@ -454,36 +504,41 @@ def translate_node(request,group_id,node_id=None):
                               context_instance = RequestContext(request)
     )      
 
-from gnowsys_ndf.ndf.views.methods import capture_data
+
 @get_execution_time
 def publish_page(request,group_id,node):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     node = node_collection.one({'_id': ObjectId(node)})
     group = node_collection.one({'_id': ObjectId(group_id)})
     if group.post_node:
         node.status=unicode("PUBLISHED")
-        node.save('UnderModeration')
+        node.save('UnderModeration',groupid=group_id)
     else:
         page_node,v=get_page(request,node)
         node.content = unicode(page_node.content)
         node.content_org = unicode(page_node.content_org)
         node.status = unicode("PUBLISHED")
         node.modified_by = int(request.user.id)
-        node.save()
+        node.save(groupid=group_id)
 
     capture_data(file_object=node, file_data=None, content_type='page')
+
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
     # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    

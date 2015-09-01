@@ -74,35 +74,65 @@
 {% endblock %}
 
 {% block body_content %}
-	<div id="view-page"></div>
+{% if user.is_authenticated %}
+  {% get_user_object request.user.id as user_obj %}
+  {% check_is_gstaff groupid user_obj as gstaff_access %}
+{% endif %}
+
+	<div id="view-page">
+    
+  </div>
+	<div id="view-page" class="small-12 large-12 columns"></div>
+    <div class="small-12 columns">
       <dl class="tabs" data-tab data-options="deep_linking:true"  > 
 
           {% user_access_policy node.pk request.user as user_access %} 
 
-            <dd class="tab-title active">
-              <a href="#about-tab"><i class="fi-info"></i> {% trans "About" %}</a>
+            <dd class="tab-title active ">
+              <a href="#about-tab"><i class="fi-info "></i> {% trans "About" %}</a>
             </dd>
             <dd class="tab-title">
               <a href="#view_page" class="view_page_link"><i class="fi-list-thumbnails"></i> {% trans "Activities" %}</a>
             </dd>
 
           {% if user_access == "allow" %}
-            <dd class="tab-title">
-              <a href="#journal-tab"><i class="fi-page-edit"></i> {% trans "Note Book" %}</a>
+            <dd class="tab-title ">
+              <a href="#journal-tab"><i class="fi-page-edit "></i> {% trans "Note Book" %}</a>
             </dd>
 
             <dd class="tab-title">
-              <a href="#gallery-tab"><i class="fi-photo"></i> {% trans "Gallery" %}</a>
+              <a href="#gallery-tab"><i class="fi-photo "></i> {% trans "Gallery" %}</a>
             </dd>
 
-            <dd class="tab-title">
-              <a href="#analytics-tab"><i class="fi-graph-trend"></i> {% trans "Analytics" %}</a>
+            <dd class="tab-title ">
+              <a href="#analytics-tab"><i class="fi-graph-trend "></i> {% trans "Analytics" %}</a>
             </dd>
           {% endif %}
       </dl>
+
+      <!-- Right Nav Section -->
+      {% if request.user.is_authenticated and not gstaff_access %}
+          <section>
+            <ul class="right" >
+            {% user_access_policy groupid request.user as user_access %} 
+              <li>
+              {% if user_access == "allow" %}
+                <input class="enroll-btn button tiny" type="button" value="ENROLLED" disabled="disabled">
+              {% else %}
+                {% if allow_to_join %}
+                  <input class="enroll-btn button tiny" type="button" value="ENROLL">
+                {% else %}
+                  <input class="enroll-btn button tiny" type="button" value="ENROLLMENT NOT OPEN" disabled="disabled">
+                {% endif %}
+              {% endif %}
+              </li>
+            </ul> 
+          </section>
+        {% endif %}
+
     <div class="row">
       
-		<section class="medium-12 columns content">
+		<section class="small-12 medium-12 columns content">
       <div class="tabs-content">
         <!-- Tab content -->
         <div class="content active" id="about-tab">
@@ -118,26 +148,31 @@
         {% if user_access == "allow" %}
 
         <div class="content" id="journal-tab">
-            <div class="row">
-              <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="round button small" style="float:right"> Add Blog </a>
+            <div>
+              <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="button small" style="float:right"> Add Page </a>
             </div>
             <div class="row all_blogs">
             	{% for each_blog in blog_pages %}
                 <div class="blogpage"  style="margin-left:10px;">
-                  <h4><u>{{each_blog.name}}</u></h4>
-                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}">Edit</a>
+                  <h4>
+                    <a href="{% url 'page_details' group_id each_blog.pk %}">{{each_blog.name}}</a>
+                  </h4>
+                  {% if request.user.id == each_blog.created_by or gstaff_access %}
+
+                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}"> Edit </a>
+                  {% endif %}
                   <span>
                   Created at {{each_blog.created_at}}
-                  by {{request.user.username}}
                   </span>
                   <div>
                     {{each_blog.html_content|safe}}
                   </div>
                 </div>
+                <hr/>
               {% empty %}
                 <div class="blogpage"  style="margin-left:10px;">
                   <h4><u>
-                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}">Start writing blogs </a>
+                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}">Start writing Pages </a>
                   </u></h4>
                 </div>
               {% endfor %}
@@ -146,8 +181,6 @@
         <div class="content" id="gallery-tab">
                 <div class="row">
                       {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
-
-
                 </div>
         </div>
 
@@ -170,6 +203,7 @@
     </section>
   
   	</div>
+
 {% endblock %}
 
 

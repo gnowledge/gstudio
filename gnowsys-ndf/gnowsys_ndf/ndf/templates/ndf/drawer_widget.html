@@ -35,7 +35,7 @@
   <div class="row">
 
     <!-- LHS Resources drawer -->
-    <div class="small-6 columns resource-drawer">
+    <div class="small-5 large-6 columns resource-drawer">
       
       <ul class="{{widget_for}} pricing-table drawer1" id="{{widget_for}}_drawer1">        
 
@@ -43,7 +43,7 @@
 
         {% if drawer1 != "None" %}
         <li class="price">
-            <input type="text" class="margin-0 search_items" id="{{widget_for}}_search" placeholder="Type atleast 3 characters to search"/>            
+            <input type="text" class="margin-0 search_items" id="{{widget_for}}_search" placeholder="{% trans 'Type atleast 3 characters to search' %}"/>            
         </li>
         
         <div class="push-3 searching" style="display:none;"><progress></progress></div>
@@ -130,7 +130,7 @@
 
                     <!-- for  << previous  text -->
                     <li class="arrow">
-                      <a class="next_prev" name="{{page_info.previous_page}}">&laquo; Previous</a>
+                      <a class="next_prev" name="{{page_info.previous_page}}">&laquo; {% trans 'Previous' %}</a>
                     </li>
 
                     <!-- for page 1, page 2 and ... -->
@@ -187,7 +187,7 @@
 
                     <!-- for text Next >> -->
                     <li class="arrow">
-                      <a class="next_prev" name="{{page_info.next_page}}">Next &raquo;</a>
+                      <a class="next_prev" name="{{page_info.next_page}}">{% trans 'Next' %} &raquo;</a>
                     </li>
                 
                   {% endif %}
@@ -205,7 +205,7 @@
     </div>
 
     <!-- For arrows Up, Down, Left, Right -->
-    <div class="small-1 columns  text-center" >     
+    <div class="small-2 large-1 columns  text-center" >     
 
       {% if not selection %}
         <br/><br/><br/><br/>
@@ -243,7 +243,7 @@
    </div>
 
    <!-- For collection created on RHS -->
-    <div class="small-5 columns resource-drawer">
+    <div class="small-5 large-5 columns resource-drawer">
 
       <ul class="{{widget_for}} pricing-table" id="{{widget_for}}_drawer2">        
         {% if drawer2 != "None" %}
@@ -279,7 +279,7 @@
                 <!-- <div class="small-7 columns text-right"> -->
                 {% if "Author" not in value.member_of_names_list %}
                 <div class="small-12 columns text-left" style="padding-top:3px">
-                  <i class="posted-by">{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
+                  <i class="posted-by">{{ value.member_of_names_list|join:', ' }} {% trans 'by' %} <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> {% trans 'on' %} {{value.created_at|date:"j F Y"}} </i>
                 </div>     
                 {% endif %}
               </div>
@@ -303,14 +303,14 @@
   <!-- End of Collection created on RHS -->
   {% if is_RT == "RelationType" %}
     <div id="move_list"  class="text-center">    
-      <input type='button' id='{{widget_for}}_move_all_right' value='Move ALL to Right' class='button round small'>
-      <input type='button' id='{{widget_for}}_move_all_left' value='Move ALL to Left' class='button round small'>
+      <input type='button' id='{{widget_for}}_move_all_right' value="{% trans 'Move ALL to Right' %}" class='button round small'>
+      <input type='button' id='{{widget_for}}_move_all_left' value="{% trans 'Move ALL to Left' %}" class='button round small'>
     </div>  
   {% endif %}
 
   {% if widget_for == "Group" %}
     <div class="text-right"> 
-      <input type='button' id='{{widget_for}}_button' value='Save' class='button round small'>
+      <input type='button' id='{{widget_for}}_button' value="{% trans 'Save' %}" class='button round small'>
     </div>  
   {% endif %}
 
@@ -383,7 +383,7 @@
     $("#{{widget_for}}_drawer1 li.selected-resource").removeClass("selected-resource");
 
     if (selectedOpts.length == 0) {
-      alert("Nothing to move.");
+      alert("{% trans 'Nothing to move.' %}");
     }
 
     // $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
@@ -416,7 +416,7 @@
     $("#{{widget_for}}_drawer2 li.selected-resource").removeClass("selected-resource");
 
     if (selectedOpts.length == 0) {
-      alert("Nothing to move.");
+      alert("{% trans 'Nothing to move.' %}");
     }
 
     $("#{{widget_for}}_drawer1").append($(selectedOpts).clone(true));
@@ -585,7 +585,7 @@
     $("#{{widget_for}}_move_all_left").click(function(event) {
       var all_li_ele = $("#{{widget_for}}_drawer2 li")
       if (all_li_ele.length == 0) {
-        alert("Nothing to move.");
+        alert("{% trans 'Nothing to move.' %}");
         return;
       }
       if($(all_li_ele).hasClass("selected-resource")){
@@ -600,7 +600,7 @@
     $("#{{widget_for}}_move_all_right").click(function(event) {
       var all_li_ele = $("#{{widget_for}}_drawer1 li:not(:first-child)")
       if (all_li_ele.length == 0) {
-        alert("Nothing to move.");
+        alert("{% trans 'Nothing to move.' %}");
         return;
       }
       if($(all_li_ele).hasClass("selected-resource")){

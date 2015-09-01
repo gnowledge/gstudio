@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_execution_time,create_gattribute, create_grelation, get_group_name_id
 from django.template import RequestContext
 #from stemming.porter2 import stem
 
@@ -43,18 +43,24 @@ class Encoder(json.JSONEncoder):
 
 # DISPLAYS THE SEARCH PAGE - USEFUL ONLY IF COMING TO THE SEARCH PAGE FROM THE OUTSIDE
 def search_page(request, group_id):
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else:
-	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    		if auth :
-				group_id = str(auth._id)
-	else:
-		pass
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(group_id) is False :
+	# 	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+	# 	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 	if group_ins:
+	# 		group_id = str(group_ins._id)
+	# 	else:
+	#     		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	#     		if auth :
+	# 			group_id = str(auth._id)
+	# else:
+	# 	pass
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_name, group_id = get_group_name_id(group_id)
+
+
 
 	context_to_return = getRenderableContext(group_id)
 	return render(request, 'ndf/search_page.html', context_to_return)
@@ -99,18 +105,23 @@ def search_query(request, group_id):
 	col = get_database()[Node.collection_name]
 
 	# SCRIPT FOR CONVERTING GROUP NAME RECEIVED TO OBJECTID 
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else:
-	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    		if auth :
-				group_id = str(auth._id)
-	else:
-		pass
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(group_id) is False :
+	# 	group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+	# 	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 	if group_ins:
+	# 		group_id = str(group_ins._id)
+	# 	else:
+	#     		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	#     		if auth :
+	# 			group_id = str(auth._id)
+	# else:
+	# 	pass
+
+	try:
+	    group_id = ObjectId(group_id)
+	except:
+	    group_name, group_id = get_group_name_id(group_id)
 
 	memList = populate_list_of_members()						# memList holds the list of all authors 
 	return render(request, 'ndf/search_home.html', {"groupid":group_id, "authors":memList}, context_instance=RequestContext(request))
@@ -148,15 +159,19 @@ def results_search(request, group_id, return_only_dict = None):
 	userid = request.user.id
 	# print "\n------\n", request.GET
 
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-		if group_ins:
-			group_id = str(group_ins._id)
-		else: 
-			auth = node_collection.one({'_type': 'Author', 'created_by': unicode(userid) })
-    		if auth :
-				group_id = str(auth._id)
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(group_id) is False :
+	# 	group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+	# 	if group_ins:
+	# 		group_id = str(group_ins._id)
+	# 	else: 
+	# 		auth = node_collection.one({'_type': 'Author', 'created_by': unicode(userid) })
+ #    		if auth :
+	# 			group_id = str(auth._id)
+	try:
+		group_id = ObjectId(group_id)
+	except:group_name, group_id = get_group_name_id(group_id)
+	
 
 	# INTIALISE THE FLAGS FOR SEARCHING BY NAME / TAGS / CONTENTS
 	user = ""		# stores username
@@ -1060,18 +1075,23 @@ def get_users(request, group_id):
 
 def get_node_info(request, group_id, node_name):
 
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else:
-	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    		if auth :
-				group_id = str(auth._id)
-	else:
-		pass
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(group_id) is False :
+	# 	group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+	# 	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 	if group_ins:
+	# 		group_id = str(group_ins._id)
+	# 	else:
+	#     		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	#     		if auth :
+	# 			group_id = str(auth._id)
+	# else:
+	# 	pass
+
+	try:
+	    group_id = ObjectId(group_id)
+	except:
+	    group_name, group_id = get_group_name_id(group_id)
 
 
 	is_list = False
@@ -1120,18 +1140,24 @@ def get_node_info2(request, group_id, node_id):
 	This view displays the info about a node - the basic fields - name, created_by, last_update as well as all the GAttributes.
 	Useful for GSystems that dont have an output .html template
 	"""
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else:
-	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    		if auth :
-				group_id = str(auth._id)
-	else:
-		pass
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(group_id) is False :
+	# 	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+	# 	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 	if group_ins:
+	# 		group_id = str(group_ins._id)
+	# 	else:
+	#     		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	#     		if auth :
+	# 			group_id = str(auth._id)
+	# else:
+	# 	pass
+
+	try:
+	    group_id = ObjectId(group_id)
+	except:
+	    group_name, group_id = get_group_name_id(group_id)
+        
 
 	sg_node = node_collection.one({"_id": ObjectId(node_id)})
 	GSTypes = sg_node.member_of

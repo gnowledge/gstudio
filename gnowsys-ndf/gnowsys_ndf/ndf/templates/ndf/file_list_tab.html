@@ -4,7 +4,7 @@
 {% if searching and resource_type.count > 0 %}
   <div class="row">
     <div class="small-12 columns end">
-    	<p>{% trans "Search Results:" %} <span class="label success round">Found {{resource_type.count}} {{title|lower}}{{resource_type.count|pluralize}}.</span></p>
+    	<p>{% trans "Search Results:" %} <span class="label success round">{% trans 'Found' %} {{resource_type.count}} {{title|lower}}{{resource_type.count|pluralize}}.</span></p>
     </div>
   </div>
 {% elif searching and resource_type.count == 0 %}
@@ -22,7 +22,11 @@
   <!-- Existing card list-->
   {% for each_res in resource_type %}      
     <!-- #{#%# get_grid_fs_object each_res as grid_fs_obj %} -->
+    <li class="card-image-wrapper">
+      {% include 'ndf/card.html' with resource=each_res url_name=detail_urlname first_arg=group_id second_arg=each_res.pk %}
+    </li>
 
+    {% comment %}
     <li class="card">
       {% if grouptype == "Moderated" %}
         {% if each_res.status == "DRAFT" %}
@@ -53,7 +57,7 @@
             </b>
           </div>
           <div class="small-4 column">
-            {% if "image" in each_res.mime_type %}
+            {% if "image" in each_res.mime_type or each_res.fs_file_ids.1 %}
               <img src="{% url 'getFileThumbnail' group_id each_res.pk %}" alt="No thumbnail available!" />
             {% elif "audio" in each_res.mime_type %}
               <span class="fi-music" style="font-size:40px"></span>
@@ -63,16 +67,12 @@
             {% elif "video" in each_res.mime_type and each_res.member_of_names_list|join:', ' != "Pandora_video" %}
 	      {% get_source_id each_res.pk as source_id %}
 	      {% if source_id %}
+	      <!--
               <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
+	      -->
 	      {% endif %}
               <img src="{% url 'getFileThumbnail' group_id each_res.pk %}" alt="No thumbnail available!"/>
-             {% comment %}
-             <!--
-              <video width="100px" src="{% url 'getFileThumbnail' group_id each_res.pk %}">
-               No thumbnail available!
-              </video>
-             -->
-             {% endcomment %}
+             
             {% else %}
               <span class="fi-page-filled" style="font-size:40px"></span>
             {% endif %}
@@ -87,9 +87,9 @@
         </footer>
         <footer>
             <div class="age">
-              {{ each_res.member_of_names_list|join:', ' }} created {{each_res.created_at|timesince}} ago 
+              {{ each_res.member_of_names_list|join:', ' }}{% trans 'created' %} {{each_res.created_at|timesince}} {% trans 'ago' %} 
               <br/>
-            <span><strong>{{each_res.contributors|length}}</strong> Contributor{{each_res.contributors|pluralize}} | </span>
+            <span><strong>{{each_res.contributors|length}}</strong> {% trans 'Contributor' %}{{each_res.contributors|pluralize}} | </span>
               by <span class="user" href="{% url 'dashboard' each_res.created_by %}" data-gnow="">{{each_res.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
             </div>
           </footer>
@@ -110,6 +110,8 @@
 
       </div>
     </li>
+    {% endcomment %}
+
       <!-- end new -->      
 
     {% empty %}
@@ -119,7 +121,7 @@
             {% if res_type_name == "collection" %}
               <h5> {% trans "This group doesn't have any collections." %}</h5>
             {% elif filter_result == "False" %}
-              <h5> {% trans "Sorry, No resources found with selected filters :(" %}</h5>
+              <h5> {% trans "Sorry, No resources found with selected filters" %} :( </h5>
             {% else %}
               {% if not dont_show_error %}
               {% if "CourseEventGroup" in node.member_of_names_list %}
@@ -154,3 +156,23 @@
   {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
 
 {% endif %}
+
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
+<link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
+<script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
+
+
+<script type="text/javascript">
+  $(document).ready(function () {
+
+      $('.rcard .content').slick({
+      // dots: true,
+      infinite: true,
+      arrows: true,
+      speed: 500,
+      // fade: true,
+      cssEase: 'linear'
+    });
+    
+  })
+</script>

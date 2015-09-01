@@ -7,18 +7,22 @@ from gnowsys_ndf.ndf.views.methods import get_execution_time
 
 @get_execution_time
 def index(request, group_id):
-	ins_objectid  = ObjectId()
-    	if ins_objectid.is_valid(group_id) is False :
-        	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      	if group_ins:
-       		group_id = str(group_ins._id)
-      	else :
-        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-         	group_id = str(auth._id)
-    	else :
-        	pass
+	# ins_objectid  = ObjectId()
+ #    	if ins_objectid.is_valid(group_id) is False :
+ #        	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+ #        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+ #      	if group_ins:
+ #       		group_id = str(group_ins._id)
+ #      	else :
+ #        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+ #        if auth :
+ #         	group_id = str(auth._id)
+ #    	else :
+ #        	pass
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_name, group_id = get_group_name_id(group_id)
 	
 	tag_coll = []
 	selected_topic = None
@@ -44,19 +48,23 @@ def index(request, group_id):
 
 @get_execution_time
 def details(request, group_id, topic_id):
-	ins_objectid  = ObjectId()
-	group_ins = None
-    	if ins_objectid.is_valid(group_id) is False :
-        	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      	if group_ins:
-       		group_id = str(group_ins._id)
-      	else :
-        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-         	group_id = str(auth._id)
-    	else :
-        	pass
+	# ins_objectid  = ObjectId()
+	# group_ins = None
+ #    	if ins_objectid.is_valid(group_id) is False :
+ #        	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+ #        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+ #      	if group_ins:
+ #       		group_id = str(group_ins._id)
+ #      	else :
+ #        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+ #        if auth :
+ #         	group_id = str(auth._id)
+ #    	else :
+ #        	pass
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_name, group_id = get_group_name_id(group_id)
 
 	selected_topic = node_collection.one({"_type":u"GSystem", "_id":ObjectId(topic_id)})
 	topic_coll = node_collection.find({"_type": u"GSystem"})
@@ -87,19 +95,23 @@ def details(request, group_id, topic_id):
 
 @get_execution_time
 def tag_view_list(request, group_id, topic_id, tag):
-	ins_objectid  = ObjectId()
-	group_ins = None
-    	if ins_objectid.is_valid(group_id) is False :
-        	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      	if group_ins:
-       		group_id = str(group_ins._id)
-      	else :
-        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-         	group_id = str(auth._id)
-    	else :
-        	pass
+	# ins_objectid  = ObjectId()
+	# group_ins = None
+ #    	if ins_objectid.is_valid(group_id) is False :
+ #        	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+ #        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+ #      	if group_ins:
+ #       		group_id = str(group_ins._id)
+ #      	else :
+ #        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+ #        if auth :
+ #         	group_id = str(auth._id)
+ #    	else :
+ #        	pass
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_name, group_id = get_group_name_id(group_id)
 
 	all_topic = node_collection.find({"_type": u"GSystem"})
 	topic_coll=['None']	

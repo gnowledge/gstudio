@@ -22,4 +22,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.file',
                        # url(r'^/data-review/save/$', 'data_review_save', name='data_review_save'),
                        url(r'^/edit/(?P<_id>[\w-]+)$', 'file_edit', name='file_edit'),
                        url(r'^/(?P<filetype>[\w-]+)/page-no=(?P<page_no>\d+)/$', 'paged_file_objs', name='paged_file_objs'),
+                       url(r'^/file_content/$', 'file_content', name='file_content'),
 )
+

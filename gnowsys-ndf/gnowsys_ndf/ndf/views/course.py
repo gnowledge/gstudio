@@ -28,7 +28,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
@@ -47,63 +47,58 @@ def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
     """
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False:
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else:
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth:
-                group_id = str(auth._id)
-    else:
-        pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+    group_obj_post_node_list = []
     app_id = None
     app_id = app._id
     course_coll = None
     all_course_coll = None
     ann_course_coll = None
     enrolled_course_coll = []
+    enr_ce_coll = []
     course_enrollment_status = None
     app_set_id = None
-    if course_id is None:
-        course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
-        if course_ins:
-            course_id = str(course_ins._id)
+    query = {}
 
+    course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
+
+    if course_ins:
+        course_id = str(course_ins._id)
+
+    group_obj_post_node_list = group_obj.post_node
     app_set = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
     app_set_id = app_set._id
+    ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
 
     # Course search view
     title = GST_COURSE.name
-
+    query = {'member_of': ce_gst._id,'_id':{'$in': group_obj_post_node_list},'group_type':u"PUBLIC"}
     if request.user.id:
         course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"})
+        enr_ce_coll = node_collection.find({'member_of': ce_gst._id,'author_set': int(request.user.id),'_id':{'$in': group_obj_post_node_list}}).sort('last_update', -1)
 
-        all_course_coll = node_collection.find({'member_of': {'$in': [GST_COURSE._id,GST_ACOURSE._id]},
-                                'group_set': ObjectId(group_id),'status':{'$in':[u"PUBLISHED",u"DRAFT"]}})
+        user_access =  user_access_policy(group_id ,request.user)
+        if user_access == "allow":
+            # show PRIVATE CourseEvent
+            query.update({'group_type': {'$in':[u"PRIVATE",u"PUBLIC"]}})
 
-
-        auth_node = node_collection.one({'_type': "Author", 'created_by': int(request.user.id)})
-	'''
-        if auth_node.attribute_set:
-            for each in auth_node.attribute_set:
-                if each and "course_enrollment_status" in each:
-                    course_enrollment_dict = each["course_enrollment_status"]
-                    course_enrollment_status = [ObjectId(each) for each in course_enrollment_dict]
-                    enrolled_course_coll = node_collection.find({'_id': {'$in': course_enrollment_status}})
-	'''
-    ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id, 'group_set': ObjectId(group_id),'status':u"PUBLISHED"})
-
-
+    ce_coll = node_collection.find(query)
     return render_to_response("ndf/course.html",
                             {'title': title,
                              'app_id': app_id, 'course_gst': GST_COURSE,
+                            'req_from_course':True,
                              'app_set_id': app_set_id,
                              'searching': True, 'course_coll': course_coll,
                              'groupid': group_id, 'group_id': group_id,
                              'all_course_coll': all_course_coll,
+                             'ce_coll':ce_coll,
+                             'enr_ce_coll':enr_ce_coll,
                              'enrolled_course_coll': enrolled_course_coll,
                              'ann_course_coll': ann_course_coll
                             },
@@ -145,7 +140,7 @@ def create_edit(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
-        course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE))
+        course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE),groupid=group_id)
         create_gattribute(course_node._id, at_course_type, u"General")
         return HttpResponseRedirect(reverse('course', kwargs={'group_id': group_id}))
 
@@ -486,7 +481,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                     course_gs.content_org = cnode_for_content.content_org
                     course_gs.content = cnode_for_content.html_content
 
-                    course_gs.save(is_changed=is_changed)
+                    course_gs.save(is_changed=is_changed,groupid=group_id)
 
                     # [B] Store AT and/or RT field(s) of given course-node
                     for tab_details in property_order_list:
@@ -574,7 +569,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 # Remove this when publish button is setup on interface
                 course_gs.status = u"PUBLISHED"
 
-            course_gs.save(is_changed=is_changed)
+            course_gs.save(is_changed=is_changed,groupid=group_id)
 
             # [B] Store AT and/or RT field(s) of given course-node
             for tab_details in property_order_list:
@@ -1116,7 +1111,7 @@ def save_course_section(request, group_id):
         cs_new.contributors.append(int(request.user.id))
         course_node = node_collection.one({"_id": ObjectId(course_node_id)})
         cs_new.prior_node.append(ObjectId(course_node._id))
-        cs_new.save()
+        cs_new.save(groupid=group_id)
         node_collection.collection.update({'_id': course_node._id}, {'$push': {'collection_set': cs_new._id }}, upsert=False, multi=False)
         response_dict["success"] = True
         response_dict["cs_new_id"] = str(cs_new._id)
@@ -1167,7 +1162,7 @@ def save_course_sub_section(request, group_id):
 
         cs_node = node_collection.one({"_id": ObjectId(cs_node_id)})
         css_new.prior_node.append(cs_node._id)
-        css_new.save()
+        css_new.save(groupid=group_id)
         node_collection.collection.update({'_id': cs_node._id}, {'$push': {'collection_set': css_new._id }}, upsert=False, multi=False)
         response_dict["success"] = True
         response_dict["css_new_id"] = str(css_new._id)
@@ -1191,7 +1186,7 @@ def change_node_name(request, group_id):
         new_name = request.POST.get("new_name", '')
         node = node_collection.one({"_id": ObjectId(node_id)})
         node.name = new_name.strip()
-        node.save()
+        node.save(groupid=group_id)
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
@@ -1432,7 +1427,7 @@ def save_resources(request, group_id):
             cu_new.contributors.append(int(request.user.id))
 
             cu_new.prior_node.append(css_node._id)
-            cu_new.save()
+            cu_new.save(groupid=group_id)
             response_dict["create_new_unit"] = True
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
 
@@ -1491,7 +1486,7 @@ def create_edit_unit(request, group_id):
             cu_node.status = u"PUBLISHED"
             cu_node.contributors.append(int(request.user.id))
             cu_node.prior_node.append(css_node._id)
-            cu_node.save()
+            cu_node.save(groupid=group_id)
             response_dict["unit_node_id"] = str(cu_node._id)
         node_collection.collection.update({'_id': cu_node._id}, {'$set': {'name': unit_name}}, upsert=False, multi=False)
 
@@ -1674,12 +1669,13 @@ def add_course_file(request, group_id):
 
     for k in new_list:
         cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
-        file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
-        file_obj.prior_node.append(context_node._id)
-        file_obj.status = u"PUBLISHED"
-        file_obj.save()
-        context_node.collection_set.append(file_obj._id)
-        file_obj.save()
+        if cur_oid and 'docid' in cur_oid:
+            file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
+            file_obj.prior_node.append(context_node._id)
+            file_obj.status = u"PUBLISHED"
+            file_obj.save()
+            context_node.collection_set.append(file_obj._id)
+            file_obj.save()
         context_node.save()
     return HttpResponseRedirect(url_name)
 
@@ -1706,4 +1702,3 @@ def enroll_to_course(request, group_id):
         group_obj.save()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
-
