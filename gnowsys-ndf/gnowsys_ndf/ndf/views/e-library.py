@@ -271,10 +271,10 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		# print "query_dict : ", query_dict
 
 		files = node_collection.find({												
-										'member_of': ObjectId(GST_FILE._id), 
+										'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 										# '_type': 'File',
 										# 'fs_file_ids': {'$ne': []}, 
-										'group_set': ObjectId(group_id), 
+										'group_set': {'$all': [ObjectId(group_id)]},
 										'$and': query_dict,
 										'$or': [
 												{ 'access_policy': u"PUBLIC" },
