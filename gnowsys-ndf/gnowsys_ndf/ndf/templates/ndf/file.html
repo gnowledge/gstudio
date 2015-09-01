@@ -252,10 +252,10 @@
 
 {% block body_content %}
   
-  {# {% if files.count > 1  and title == "E-Library" %} #}
+  {% if files.count > 1  and title == "E-Library" %}
     {% get_filters_data "File" as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
-  {# {% endif %} #}
+  {% endif %}
 
   <div class="tabs-content gallery">
 
