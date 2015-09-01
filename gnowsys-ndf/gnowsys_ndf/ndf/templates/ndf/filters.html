@@ -96,11 +96,14 @@
 							<option value='{{val.value}}'
 							data-primary-type='{{val.data_type}}'
 							data-gstudio-type='{{val.type}}' data-name-field='{{key}}'>
-								{% if val.altnames %}
-									{{val.altnames}}
-								{% else %}
-									{{key}}
-								{% endif %}
+								{% comment %}
+									{# {% if val.altnames %}
+										{{val.altnames}}
+									{% else %}
+										{{key}}
+									{% endif %} #}
+								{% endcomment %}
+								{% firstof val.altnames key %}
 							</option>
 						{% endfor %}
 						<!-- generating <option>'s of following type
