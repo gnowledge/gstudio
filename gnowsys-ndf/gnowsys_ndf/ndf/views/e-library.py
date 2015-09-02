@@ -137,6 +137,24 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 		# print educationaluse_stats
 		result_paginated_cur = files
 		result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+
+	collection_pages_cur = node_collection.find({
+									'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                    'group_set': {'$all': [ObjectId(group_id)]},
+                                    '$or': [
+                                        {'access_policy': u"PUBLIC"},
+                                        {'$and': [
+                                            {'access_policy': u"PRIVATE"},
+                                            {'created_by': request.user.id}
+                                        ]
+                                     }
+                                    ],
+                                    'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                }).sort("last_update", -1)
+
+	coll_page_count = collection_pages_cur.count() if collection_pages_cur else 0
+	collection_pages = paginator.Paginator(collection_pages_cur, page_no, no_of_objs_pp)
+
 	datavisual.append({"name":"Doc", "count": educationaluse_stats.get("Documents", 0)})
 	datavisual.append({"name":"Page", "count": educationaluse_stats.get("Pages", 0)})
 	datavisual.append({"name":"Image","count": educationaluse_stats.get("Images", 0)})
@@ -144,6 +162,8 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	datavisual.append({"name":"Interactives","count": educationaluse_stats.get("Interactives", 0)})
 	datavisual.append({"name":"Audios","count": educationaluse_stats.get("Audios", 0)})
 	datavisual.append({"name":"eBooks","count": educationaluse_stats.get("eBooks", 0)})
+	if collection_pages_cur:
+		datavisual.append({"name":"Collections","count": coll_page_count})
 	datavisual = json.dumps(datavisual)
 
 	return render_to_response("ndf/resource_list.html", 
@@ -154,6 +174,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 								 "detail_urlname": "file_detail", 'ebook_pages': educationaluse_stats.get("eBooks", 0),'page_count': pageCollection.count(),
 								 'file_pages': result_pages, 'image_pages': educationaluse_stats.get("Images", 0), 'interactive_pages': educationaluse_stats.get("Interactives", 0), 'educationaluse_stats': json.dumps(educationaluse_stats),
 								 'doc_pages': educationaluse_stats.get("Documents", 0), 'video_pages': educationaluse_stats.get("Videos", 0), 'audio_pages': educationaluse_stats.get("Audios", 0),
+								 'collection_pages': collection_pages, 'collection': collection_pages_cur,
 								 'groupid': group_id, 'group_id':group_id,"datavisual":datavisual,'page_nodes':pageCollection
 								}, 
 								context_instance = RequestContext(request))
@@ -163,10 +184,12 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 	'''
 	Method to implement pagination in File and E-Library app.
 	'''
+	# print "\n\n\nfiletype : ", filetype
 	if request.is_ajax() and request.method == "POST":
 		group_name, group_id = get_group_name_id(group_id)
 
 		no_of_objs_pp = 24
+		result_pages = None
 
 		filters = request.POST.get("filters", "")
 		filters = json.loads(filters)
@@ -176,30 +199,56 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		query_dict = [{}]
 		detail_urlname = "file_detail"
 		if filetype != "all":
-			if filetype == "Pages":
-				detail_urlname = "page_details"
-				result_cur = node_collection.find({'member_of': GST_PAGE._id,
-                                    '_type': 'GSystem',
-                                    'group_set': {'$all': [ObjectId(group_id)]},
-                                    '$or': [
-                                        {'access_policy': u"PUBLIC"},
-                                        {'$and': [
-                                            {'access_policy': u"PRIVATE"},
-                                            {'created_by': request.user.id}
-                                        ]
-                                     }
-                                    ]
-                                }).sort("last_update", -1)
+			# if filetype == "Pages":
+			# 	detail_urlname = "page_details"
+			# 	result_cur = node_collection.find({'member_of': GST_PAGE._id,
+   #                                  '_type': 'GSystem',
+   #                                  'group_set': {'$all': [ObjectId(group_id)]},
+   #                                  '$or': [
+   #                                      {'access_policy': u"PUBLIC"},
+   #                                      {'$and': [
+   #                                          {'access_policy': u"PRIVATE"},
+   #                                          {'created_by': request.user.id}
+   #                                      ]
+   #                                   }
+   #                                  ]
+   #                              }).sort("last_update", -1)
 
-				result_paginated_cur = result_cur
-				result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+			# 	result_paginated_cur = result_cur
+			# 	result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+
+			# elif filetype == "Collections":
+			if filetype == "Collections":
+				pass
+				# detail_urlname = "page_details"
+				# result_cur = node_collection.find({
+				# 					'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+    #                                 'group_set': {'$all': [ObjectId(group_id)]},
+    #                                 '$or': [
+    #                                     {'access_policy': u"PUBLIC"},
+    #                                     {'$and': [
+    #                                         {'access_policy': u"PRIVATE"},
+    #                                         {'created_by': request.user.id}
+    #                                     ]
+    #                                  }
+    #                                 ],
+    #                                 'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+    #                             }).sort("last_update", -1)
+				# # print "=====================", result_cur.count()
+
+				# result_paginated_cur = result_cur
+				# result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+				# # print "=====================", result_pages
+
+				# query_dict.append({ 'collection_set': {'$exists': "true", '$not': {'$size': 0} } })
 			else:
 				query_dict.append({"attribute_set.educationaluse": filetype})
 
+		# print filters
 		if filters:
+			temp_list = []
 			for each in filters:
 				filter_grp = each["$or"]
-				temp_list = []
 				for each_filter in filter_grp:
 					temp_dict = {}
 					each_filter["selFieldText"] = cast_to_data_type(each_filter["selFieldText"], each_filter["selFieldPrimaryType"])
@@ -222,10 +271,10 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		# print "query_dict : ", query_dict
 
 		files = node_collection.find({												
-										'member_of': ObjectId(GST_FILE._id), 
-										'_type': 'File',
-										'fs_file_ids': {'$ne': []}, 
-										'group_set': ObjectId(group_id), 
+										'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+										# '_type': 'File',
+										# 'fs_file_ids': {'$ne': []}, 
+										'group_set': {'$all': [ObjectId(group_id)]},
 										'$and': query_dict,
 										'$or': [
 												{ 'access_policy': u"PUBLIC" },
@@ -240,30 +289,54 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 	  
 		educationaluse_stats = {}
 
-		if filetype == "Pages":
-			filter_result = "True" if (result_cur.count() > 0) else "False"
-		else:
-			if files:
+		# if filetype == "Pages":
+		# 	filter_result = "True" if (result_cur.count() > 0) else "False"
+		# else:
+		if files:# and not result_pages:
+			# print "=======", educationaluse_stats
 
-				eu_list = []  # count
-				for each in files:
-					eu_list += [i.get("educationaluse") for i in each.attribute_set if i.has_key("educationaluse")]
+			eu_list = []  # count
+			collection_set_count = 0
+			for each in files:
+				eu_list += [i.get("educationaluse") for i in each.attribute_set if i.has_key("educationaluse")]
+				collection_set_count += 1 if each.collection_set else 0
 
-				files.rewind()
+			files.rewind()
 
-				if set(eu_list):
-					if len(set(eu_list)) > 1:
-						educationaluse_stats = dict((x, eu_list.count(x)) for x in set(eu_list))
-					elif len(set(eu_list)) == 1:
-						educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
-					educationaluse_stats["all"] = files.count()
+			if set(eu_list):
+				if len(set(eu_list)) > 1:
+					educationaluse_stats = dict((x, eu_list.count(x)) for x in set(eu_list))
+				elif len(set(eu_list)) == 1:
+					educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
+				educationaluse_stats["all"] = files.count()
+				educationaluse_stats["Collections"] = collection_set_count
+			
+			result_paginated_cur = files
+			result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
-				
-				result_paginated_cur = files
+		filter_result = "True" if (files.count() > 0) else "False"
+
+		if filetype == "Collections":
+				detail_urlname = "page_details"
+				result_cur = node_collection.find({
+									'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                    'group_set': {'$all': [ObjectId(group_id)]},
+									'$and': query_dict,
+                                    '$or': [
+                                        {'access_policy': u"PUBLIC"},
+                                        {'$and': [
+                                            {'access_policy': u"PRIVATE"},
+                                            {'created_by': request.user.id}
+                                        ]
+                                     }
+                                    ],
+                                    'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                }).sort("last_update", -1)
+				# print "=====================", result_cur.count()
+
+				result_paginated_cur = result_cur
 				result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
-			filter_result = "True" if (files.count() > 0) else "False"
-				
 		# if filetype == "all":
 		#     if files:
 		#         result_paginated_cur = files
@@ -292,9 +365,10 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 
 		#     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
-		
-		
-		return render_to_response ("ndf/file_list_tab.html", { "filter_result": filter_result,
+		# print "educationaluse_stats: ", educationaluse_stats
+
+		return render_to_response ("ndf/file_list_tab.html", {
+				"filter_result": filter_result,
 				"group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
 				'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
 				"resource_type": result_paginated_cur, "detail_urlname": detail_urlname, 
