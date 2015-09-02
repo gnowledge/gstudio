@@ -1329,7 +1329,7 @@ def file_detail(request, group_id, _id):
       return file(request, group_id, _id)
 
     file_template = ""
-    if file_node.mime_type:
+    if file_node.has_key('mime_type') and file_node.mime_type:
         if file_node.mime_type == 'video':      
             file_template = "ndf/video_detail.html"
         elif 'image' in file_node.mime_type:
@@ -1360,7 +1360,8 @@ def file_detail(request, group_id, _id):
         #grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
         #return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
     else:
-         raise Http404
+         # raise Http404
+         file_template = "ndf/document_detail.html"
     thread_node = None
     allow_to_comment = None
     thread_node, allow_to_comment = node_thread_access(group_id, file_node)
