@@ -984,7 +984,13 @@
 
   <footer>
     <p><small>
-      <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
+      <em>{% trans "Contributed by" %} 
+      {% for each_user in node.contributors %}
+        <a href="{% url 'dashboard' each_user %}">
+          {{ node.user_details_dict.contributors|join:', ' }}
+        </a>
+      {% endfor %}
+      </em> on {{node.last_update}}
     </small></p>
   </footer>
         
