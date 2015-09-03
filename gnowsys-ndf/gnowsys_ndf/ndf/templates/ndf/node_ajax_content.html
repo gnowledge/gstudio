@@ -37,8 +37,7 @@
 
   {% if node.status == 'MODERATION' %}
     <h4><small>
-      {% trans
-      'Note: Following Resource is Under Moderation -' %}
+      {% trans 'Note: Following Resource is Under Moderation -' %}
       <a href="{% url 'moderation_status' group_id node.pk %}">{% trans 'Check the current status of Moderation' %}</a>
     </small></h4>
   {% endif %}

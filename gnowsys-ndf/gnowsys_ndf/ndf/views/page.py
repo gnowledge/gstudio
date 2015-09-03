@@ -353,9 +353,8 @@ def create_edit_page(request, group_id, node_id=None):
         # if the page created is as a resource in course or program event,
         # set status to PUBLISHED by default
         # one major reason for this, ONLY published nodes can be replicated.
-        if res or program_res:
+        if res or program_res or ce_id:
             page_node.status = u"PUBLISHED"
-
         page_node.save()
         # if page is created in program event, add page_node to group's collection set
         if program_res:
