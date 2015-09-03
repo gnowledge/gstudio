@@ -466,6 +466,29 @@ def get_attribute_value(node_id, attr):
 
 
 @get_execution_time
+@register.assignment_tag
+def get_relation_value(node_id, grel):
+	node_grel = None
+	if node_id:
+		node = node_collection.one({'_id': ObjectId(node_id) })
+		grel = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
+		if node and grel:
+			node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id})
+	# print "\n\n node_grel",node_grel
+	if node_grel:
+		grel_val = node_grel.right_subject
+		grel_id = node_grel._id
+		grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+	else:
+		grel_val_node = ""
+		grel_id = ""
+
+	# print "grel_val_node: ",grel_val_node,"\n"
+	# returns right_subject of grelation and GRelation _id 
+	return grel_val_node, grel_id
+
+
+@get_execution_time
 @register.inclusion_tag('ndf/drawer_widget.html')
 def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kwargs):
 	drawers = None
@@ -2788,7 +2811,7 @@ def get_sg_member_of(group_id):
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
 	# print group_obj.name
 	# Fetch post_node of group
-	if group_obj.post_node:
+	if "post_node" in group_obj:
 		post_node_id_list = group_obj.post_node
 
 		if post_node_id_list:
