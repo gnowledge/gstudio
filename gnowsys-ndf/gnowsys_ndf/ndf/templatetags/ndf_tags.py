@@ -2843,8 +2843,8 @@ def get_breadcrumb(url):
 			# print "00000000000000000", first_el
 			first_group_name = group_obj.altnames if group_obj.altnames else group_obj.name
 			first_group_url = '/' + group_obj.name
-			if group_obj.name == 'home':
-				first_group_url += '/repository'
+			# if group_obj.name == 'home':
+			# 	first_group_url += '/repository'
 
 			path.append({'name': first_group_name, 'link': first_group_url})
 			# print path
