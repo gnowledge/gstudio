@@ -11,11 +11,9 @@
 {% endblock %}
 
 {% block title %} {{title}} {% endblock %}
-{% comment %}
 {% block concern_information %}
-<a href="{% url 'groupchange' top_group_name %}" class="button">Go to '{{top_group_name}}' Event</a>
+<a href="{% url 'groupchange' group_name_tag %}" class="button">{{group_name_tag}}</a>
 {% endblock %}
-{% endcomment %}
 
 {% block body_content %}
 	

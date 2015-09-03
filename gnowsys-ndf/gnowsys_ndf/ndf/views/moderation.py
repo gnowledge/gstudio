@@ -36,6 +36,11 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val
 @login_required
 def moderation_status(request, group_id, node_id):
 
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     node = node_collection.one({'_id': ObjectId(node_id)})
 
     if not node:  # invalid ObjectId
