@@ -1593,12 +1593,11 @@ def cast_to_data_type(value, data_type):
 
     value = value.strip()
     casted_value = value
-
     if data_type == "unicode":
         casted_value = unicode(value)
 
     elif data_type == "basestring":
-        casted_value = str(value)
+        casted_value = unicode(value)
 
     elif (data_type == "int") and str(value):
         casted_value = int(value) if (str.isdigit(str(value))) else value
@@ -1667,7 +1666,6 @@ def get_node_metadata(request, node, **kwargs):
             if at:
 
                 field_value = cast_to_data_type(field_value, at["data_type"])
-
                 if "is_changed" in kwargs:
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
                     if temp_res["is_changed"]:  # if value is true

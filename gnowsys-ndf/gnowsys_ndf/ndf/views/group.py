@@ -1014,7 +1014,8 @@ class CreateEventGroup(CreateModeratedGroup):
 
         # retrieves node_id. means it's edit operation of existing group.
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        self.add_subgroup_to_parents_postnode(parent_group_obj._id, group_obj._id, "Event")
+        if parent_group_obj._id != group_obj._id:
+            self.add_subgroup_to_parents_postnode(parent_group_obj._id, group_obj._id, "Event")
         # group_obj.prior_node.append(parent_group_obj._id)
         # group_obj.save()
 
@@ -1094,9 +1095,6 @@ class CreateCourseEventGroup(CreateEventGroup):
             rt_group_has_course_event = node_collection.one({'_type': "RelationType", 'name': "group_has_course_event"})
             group_obj = node_collection.one({'_id': ObjectId(group_id)})
             create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
-            if "CourseEventGroup" not in group_obj.member_of_names_list:
-                group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
-                group_obj.save()
             self.ce_set_up(request, course_node, group_obj)
 
     def ce_set_up(self, request, node, group_obj):
@@ -1412,6 +1410,9 @@ class EventGroupCreateEditHandler(View):
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
+                    group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
+                    group_obj.save()
+
                 group_name = group_obj.name
                 url_name = 'groupchange'
             else:
@@ -1756,24 +1757,26 @@ def group_dashboard(request, group_id=None):
   if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
       sg_type = "ProgramEventGroup"
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
-      parent_groupid_of_pe = node_collection.one({'_type':"Group","post_node": group_obj._id})
+      parent_groupid_of_pe = node_collection.find_one({'_type':"Group","post_node": group_obj._id})
       if parent_groupid_of_pe:
         parent_groupid_of_pe = parent_groupid_of_pe._id
       alternate_template = "ndf/program_event_group.html"
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
       alternate_template = "ndf/course_event_group.html"
-      page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-      blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
-      if group_obj.collection_set:
-          course_structure_exists = True
-      if request.user.id:
-          blog_pages = node_collection.find({
-                'member_of':page_gst._id,
-                'type_of': blogpage_gst._id,
-                'group_set': group_obj._id
-            }).sort('last_update', -1)
+  if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
+      if "CourseEventGroup" in group_obj.member_of_names_list or u"ProgramEventGroup" in list_of_sg_member_of:
+          page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+          blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+          files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+          if group_obj.collection_set:
+              course_structure_exists = True
+          if request.user.id:
+              blog_pages = node_collection.find({
+                    'member_of':page_gst._id,
+                    'type_of': blogpage_gst._id,
+                    'group_set': group_obj._id
+                }).sort('last_update', -1)
   allow_to_join = True
   if 'end_enroll' in group_obj:
       if group_obj.end_enroll:
