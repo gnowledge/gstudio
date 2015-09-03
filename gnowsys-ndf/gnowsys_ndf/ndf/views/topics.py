@@ -81,6 +81,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     nodes = ""
     unfold_tree = request.GET.get('unfold','')
     selected = request.GET.get('selected','')
+    # print "selected: ", selected
     tree = request.GET.get('tree','collapsible')
     unfold = "false"
 
@@ -119,7 +120,6 @@ def themes(request, group_id, app_id=None, app_set_id=None):
         # else:
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
-    print "AsdfasDF"
     return render_to_response("ndf/theme.html",
                                {'theme_GST_id':theme_GST._id, 'theme_GST':theme_GST, 'themes_cards': themes_cards, 'theme_GST':theme_GST,
                                'group_id': group_id,'groupid': group_id,'node': node,'shelf_list': shelf_list,'shelves': shelves, 'tree': tree,
