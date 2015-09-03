@@ -11,6 +11,9 @@
 {% endblock %}
 
 {% block title %} {{title}} {% endblock %}
+{% block concern_information %}
+<a href="{% url 'groupchange' group_name_tag %}" class="button">{{group_name_tag}}</a>
+{% endblock %}
 
 {% block body_content %}
 	
@@ -21,7 +24,7 @@
     <h4> "{{node.name}}" resource is successfully uploaded!</h4>
     <h4><small>
      As resource has been uploaded in the Moderated group, it will undergo moderation process and then published to "{{top_group_name}}". We will intimate you as on when resource gets published to this group.
-     Till that time resource is accesible to your user group.
+     Till that time, resource is accesible to your user group.
     </small></h4>
     <br/>
       
@@ -42,9 +45,6 @@
         {% else %}
           <div class='{% if node.status == "PUBLISHED" %}published{% endif %}'>
         {% endif %} 
-
-        <a href="{% url 'file_detail' request.user.username node %}">
-
           <div class="row">
             <div class="small-8 column">
               <b>
@@ -92,7 +92,6 @@
                 by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
               </div>
             </footer>
-            </a>
 
             <div class="label-list small-12 columns">
               {% for tag in node.tags|slice:":3" %}
@@ -149,3 +148,4 @@
   {% endif %} <!-- is creator/superuser check -->
 
 {% endblock%}
+

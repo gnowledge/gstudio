@@ -49,35 +49,33 @@
   </div>
 
 <header class="row page">
-   <section class="medium-8 columns name-section" >
+  <section class="medium-8 columns name-section" >
     <h3>
       <span class='node'>{{node.name}}</span>
-      <!-- <span><a class="fi-pencil " href="{% url 'create_edit' group_id node.pk %}"></a></span> -->
-
-      <!-- This button publishes the drafted resource -->
-
+      {% check_is_gstaff groupid request.user as is_gstaff %}
+      {% if is_gstaff %}
+        <span data-tooltip title="Edit this Course"><a class="fi-pencil" href="{% url 'create_edit' group_id node.pk %}">Edit</a></span>
+      {% endif %}
     </h3>
-      <small>
-            <div class="age">
-              {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-              by <a class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
-            <!-- <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span> -->
-            <!-- <a href=""><i class="fi-clock"></i> {% trans "View history" %}</a> -->
-            </div>
 
+      <small>
+          <div class="age">
+            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+            by <a class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
+          <!-- <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span> -->
+          <!-- <a href=""><i class="fi-clock"></i> {% trans "View history" %}</a> -->
+          </div>
       </small>
-   </section>
-   <section class="medium-3 columns name-section" >
+
+  </section>
+  <section class="medium-3 columns name-section" >
 
     {% if node_type == "Course" %}
-      {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
         <span><a class="tiny publish-btn button" href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{node.pk}}">{% trans "Announce" %}</a></span>
         <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
       {% endif %}
     {% endif %}
-
-
   </section>
 </header>
 

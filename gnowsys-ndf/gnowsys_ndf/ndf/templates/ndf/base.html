@@ -55,6 +55,7 @@
   {% check_accounts_url request.path as is_ac_url %}
 
   {% include "ndf/header.html" %}
+  {% block extended_header %}{% endblock %}
 
   <div class="workspace">
     <div class="off-canvas-wrap" data-offcanvas>

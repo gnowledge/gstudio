@@ -37,8 +37,7 @@
 
   {% if node.status == 'MODERATION' %}
     <h4><small>
-      {% trans
-      'Note: Following Resource is Under Moderation -' %}
+      {% trans 'Note: Following Resource is Under Moderation -' %}
       <a href="{% url 'moderation_status' group_id node.pk %}">{% trans 'Check the current status of Moderation' %}</a>
     </small></h4>
   {% endif %}
@@ -985,7 +984,7 @@
 
   <footer>
     <p><small>
-      <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> at {{node.last_update}}
+      <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
     </small></p>
   </footer>
         
