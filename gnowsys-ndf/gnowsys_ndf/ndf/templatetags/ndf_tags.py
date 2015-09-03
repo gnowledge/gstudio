@@ -1317,10 +1317,16 @@ def get_all_resources(request,node_id):
                 if val:
                         keys.append(key)
                         for res in val:
-                                if res.language == request.LANGUAGE_CODE:
-                                        res_dict[key]['fallback_lang'].append(res)
-                                else:
-                                        res_dict[key]['other_languages'].append(res)
+
+                        	# following if condition is temp patch.
+                        	# actually for this condition to get work, we need to have \
+                        	# uniform data-type/format for storing in language field.
+                        	# currently, we are also using any of: code or name or tuple.
+                        	# e.g: "en" or "English" or ("en", "English")
+                            if (len(res.language) == len(request.LANGUAGE_CODE)) and (res.language != request.LANGUAGE_CODE):
+                                    res_dict[key]['other_languages'].append(res)
+                            else:
+                                    res_dict[key]['fallback_lang'].append(res)
                                         
         for k1,v1 in res_dict.items():
                 if k1 not in keys :
