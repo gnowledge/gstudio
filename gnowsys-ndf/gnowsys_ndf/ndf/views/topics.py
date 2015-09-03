@@ -82,7 +82,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     unfold_tree = request.GET.get('unfold','')
     selected = request.GET.get('selected','')
     # print "selected: ", selected
-    tree = request.GET.get('tree','collapsible')
+    tree = request.GET.get('tree', 'hierarchical')
     unfold = "false"
 
     # topics_GST = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
