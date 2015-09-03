@@ -15,13 +15,15 @@
   {% if breadcrumbs_list %}
   <ul class="breadcrumbs"> 
     {% for e in breadcrumbs_list %}
-      <li>
       {% if node.pk != e.0 %}
-        <a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a>
-      {% else %} 
-        {{e.1}} 
-      {% endif %}
+      <li>
+        <a class="theme-breadcrumb" id="{{e.0}}">{{e.1}}</a>
       </li>
+      {% else %} 
+      <li class="current">
+        {{e.1}}
+      </li>
+      {% endif %}
     {% endfor %}
   </ul>
   {% elif node.teaches %}
@@ -680,8 +682,7 @@
                   {% for k,v in val.items %}
                     {% if k == "fallback_lang" %}
                       {% for each in v %}
-                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
-                        &nbsp;&nbsp;
+                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" class="button secondary tiny"> {{each.name}} </a>
                       {% endfor %}
                     {% elif k == "other_languages" %}
                       {% if v %}
