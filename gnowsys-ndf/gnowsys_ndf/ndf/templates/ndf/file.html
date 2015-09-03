@@ -132,6 +132,8 @@
           </dd><br/>
         {% endif %}
 
+          
+        {% comment %}
         <!-- eBooks -->
         {% if ebook_pages %}
           <dd data-filetype="eBooks">
@@ -144,6 +146,7 @@
             </a>
           </dd><br/>
         {% endif %}
+        {% endcomment %}
         
         <!-- Audio -->
         {% if audio_pages %}
@@ -334,16 +337,17 @@
 
 
     <!-- Tab View 4 - e-book -->
-    {% if ebook_pages %}
-      <div class="content" id="view-ebook" data-filetype="eBooks">
-        {% if title == "E-Library" %}
-          <a href='{% url "elib_paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
-        {% else %}
-          <a href='{% url "paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
-        {% endif %}
-      </div>
-    {% endif %}
-
+    {% comment %}
+      {% if ebook_pages %}
+        <div class="content" id="view-ebook" data-filetype="eBooks">
+          {% if title == "E-Library" %}
+            <a href='{% url "elib_paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+          {% else %}
+            <a href='{% url "paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endcomment %}
 
     <!-- Tab View 5 - Audios -->
     {% if audio_pages %}
