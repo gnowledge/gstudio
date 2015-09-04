@@ -135,10 +135,10 @@
 
   {% empty %}
     {% if not searching %}
-      <div class="row">
+      <div class="center">
         <div class="small-12 columns">
 	{% blocktrans with groups_category as grps_category %}
-        <h5>There are no partners created yet.<b>Be the first to create a {{ grps_category }}!</b></h5>
+        <h5>There are no {{ grps_category }} created yet.<b>Be the first to create a {{ grps_category }}!</b></h5>
 	{% endblocktrans %}
         </div>
       </div>

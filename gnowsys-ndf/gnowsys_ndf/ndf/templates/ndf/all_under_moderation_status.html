@@ -51,3 +51,11 @@
   </div>
 
 {% endblock %}
+
+{% block script %}
+{{block.super}}
+  {% get_sg_member_of groupid as list_of_sg_member_of %}
+  {% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of%}
+    $("#group-level-header").addClass("hide");
+  {% endif %}
+{% endblock %}

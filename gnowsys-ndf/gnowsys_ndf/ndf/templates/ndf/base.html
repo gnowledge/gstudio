@@ -55,6 +55,7 @@
   {% check_accounts_url request.path as is_ac_url %}
 
   {% include "ndf/header.html" %}
+  {% block extended_header %}{% endblock %}
 
   <div class="workspace">
     <div class="off-canvas-wrap" data-offcanvas>
@@ -101,10 +102,17 @@
           <article class="medium-10 columns">
             <!-- The actual body content -->
             <!-- Url redirection -->
+  
+
+            {% block breadcrumb %} 
+              {% get_breadcrumb request.path %}
+            {% endblock breadcrumb %}
+
 
             {% get_group_type request.path request.user as group_type %}
             
             {% if group_type %}
+
             {% block body_content %} {% endblock %} 
             {% block extra_content %}  {% endblock %}  
             {% endif %}

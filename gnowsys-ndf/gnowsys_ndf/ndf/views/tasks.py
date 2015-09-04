@@ -84,16 +84,16 @@ def convertVideo(userid, file_id, filename):
     fd.close()
     # -- convert tmp_file tmp_webm file in local disk
     if files.filename.endswith('.webm') == False:
-        input_filename = str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
-        output_filename = str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")
+        input_filename = str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
+        output_filename = str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".webm")
         proc = subprocess.Popen(['ffmpeg', '-y', '-i', input_filename,output_filename])
         proc.wait()
-        files = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")
+        files = open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".webm")
     else : 
-        files = open("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
+        files = open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
     
     filetype = "video"
-    oxData = ox.avinfo("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
+    oxData = ox.avinfo("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
     duration = oxData['duration'] # fetching duration of video by python ox
     duration = int(duration)
     secs, mins, hrs = 00, 00, 00
@@ -112,23 +112,59 @@ def convertVideo(userid, file_id, filename):
 	videoDuration = "00:00:30"
     else :
     	videoDuration = "00:00:00"    	
-    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # GScreating thumbnail of video using ffmpeg
+    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".png")]) # GScreating thumbnail of video using ffmpeg
     proc.wait()
-    background = Image.open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")
+    background = Image.open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".png")
     fore = Image.open(MEDIA_ROOT + "ndf/images/poster.jpg")
     background.paste(fore, (120, 100))
     draw = ImageDraw.Draw(background)
     draw.text((120, 100), durationTime, (255, 255, 255)) # drawing duration time on thumbnail image
-    background.save("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
-    thumbnailvideo = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
+    background.save("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+"Time.png")
+    thumbnailvideo = open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+"Time.png")
     
     webmfiles = files
     '''storing thumbnail of video with duration in saved object'''
-    tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
+    th_gridfs_id = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="image/png") 
+
+    # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':th_gridfs_id}})
+
+    # print "fileobj.fs_file_ids: ", fileobj.fs_file_ids
+    node_fs_file_ids = fileobj.fs_file_ids
+
+    if len(node_fs_file_ids) == 1:
+        node_fs_file_ids.append(ObjectId(th_gridfs_id))
+    elif len(node_fs_file_ids) > 1:
+        node_fs_file_ids[1] = ObjectId(th_gridfs_id)
+
+    # print "node_fs_file_ids: ", node_fs_file_ids
+
+    node_collection.collection.update(
+                                        {'_id': ObjectId(fileobj._id)},
+                                        {'$set': {'fs_file_ids': node_fs_file_ids}}
+                                    )
+
     
-    node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
     if filename.endswith('.webm') == False:
-        tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+
+
+        vid_gridfs_id = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+
+        fileobj.reload()
+        # print "fileobj.fs_file_ids: ", fileobj.fs_file_ids
+        node_fs_file_ids = fileobj.fs_file_ids
+
+        if len(node_fs_file_ids) == 2:
+            node_fs_file_ids.append(ObjectId(vid_gridfs_id))
+        elif len(node_fs_file_ids) > 2:
+            node_fs_file_ids[2] = ObjectId(vid_gridfs_id)
+
+        # print "node_fs_file_ids: ", node_fs_file_ids
+
+        node_collection.collection.update(
+                                            {'_id': ObjectId(fileobj._id)},
+                                            {'$set': {'fs_file_ids': node_fs_file_ids}}
+                                        )
 
         # --saving webm video id into file object
-        node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+        # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':vid_gridfs_id}})
+

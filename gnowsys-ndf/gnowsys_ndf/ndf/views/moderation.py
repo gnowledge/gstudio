@@ -36,6 +36,11 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val
 @login_required
 def moderation_status(request, group_id, node_id):
 
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     node = node_collection.one({'_id': ObjectId(node_id)})
 
     if not node:  # invalid ObjectId
@@ -121,9 +126,10 @@ def all_under_moderation(request, group_id):
 	group_obj = get_group_name_id(group_id, get_obj=True)
 	if not group_obj.edit_policy == 'EDITABLE_MODERATED':
 		raise Http404('Group is not EDITABLE_MODERATED')
-
-	mod_group_instance = CreateGroup(request)
-	list_of_sg_mn = mod_group_instance.get_all_subgroups_member_of_list(group_obj._id)
+	list_of_sg_mn = get_sg_member_of(group_id)
+	# mod_group_instance = CreateGroup(request)
+	# print "\n\n list_of_sg_mn",list_of_sg_mn
+	# list_of_sg_mn = mod_group_instance.get_all_subgroups_member_of_list(group_obj._id)
 	if "ProgramEventGroup" in list_of_sg_mn:
 		sg_member_of = "ProgramEventGroup"
 		mod_group_instance = CreateEventGroup(request)
@@ -340,8 +346,29 @@ def create_moderator_task(request, group_id, node_id, \
 				# delete the task associated with the resource
 				if task_id:
 					task_node = node_collection.one({'_id': ObjectId(task_id)})
-					del_status, del_status_msg = delete_node(
-						node_id=task_node._id, deletion_type=0)
+					# del_status, del_status_msg = delete_node(
+					# node_id=task_node._id, deletion_type=0)
+					url = u"http://" + site + "/"+ unicode(group_obj._id) \
+						+ u"/file/" + unicode(node_obj._id.__str__())
+
+					task_content_org = u"\n\nThis task is CLOSED.\n " \
+								"However, you may find the moderated resource at following link: \n" \
+								+ unicode(url)
+					task_dict = {
+					    "name": task_node.name,
+					    "group_set": [group_obj._id],
+					    "created_by": node_obj.created_by,
+					    "modified_by": request.user.id,
+					    "contributors": [request.user.id],
+					    "content_org": unicode(task_content_org),
+					    "created_by_name": unicode(request.user.username),
+					    "Status": u"CLOSED",
+					    "Priority": u"Normal",
+					    "Assignee": list(group_obj.group_admin[:]),
+					    "has_type": task_type_list
+					}
+					task_obj = create_task(task_dict, task_type_creation)
+
 				list_of_recipients_ids = []
 				list_of_recipients_ids.extend(group_obj.group_admin)
 				list_of_recipients_ids.append(node_obj.created_by)

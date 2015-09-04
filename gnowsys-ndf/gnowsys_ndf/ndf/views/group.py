@@ -498,8 +498,8 @@ class CreateModeratedGroup(CreateSubGroup):
         # referenced while creating new moderated sub-groups.
         self.altnames = {
             'ModeratingGroup': [u'Clearing House', u'Curation House'],
-            'ProgramEventGroup': [u'Clearing House', u'Curation House'],
-            'CourseEventGroup': [u'Clearing House', u'Curation House']
+            'ProgramEventGroup': [u'Screening House', u'Selection House'],
+            'CourseEventGroup': [u'Screening House', u'Selection House']
         }
 
 
@@ -1005,7 +1005,7 @@ class CreateEventGroup(CreateModeratedGroup):
         super(CreateEventGroup, self).__init__(request)
         self.request = request
 
-    def set_event_and_enrollment_dates(self, request, group_id):
+    def set_event_and_enrollment_dates(self, request, group_id, parent_group_obj):
         '''
         Sets Start-Date, End-Date, Start-Enroll-Date, End-Enroll-Date
         - Takes required dates from request object.
@@ -1014,6 +1014,10 @@ class CreateEventGroup(CreateModeratedGroup):
 
         # retrieves node_id. means it's edit operation of existing group.
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
+        if parent_group_obj._id != group_obj._id:
+            self.add_subgroup_to_parents_postnode(parent_group_obj._id, group_obj._id, "Event")
+        # group_obj.prior_node.append(parent_group_obj._id)
+        # group_obj.save()
 
         # if "ProgramEventGroup" not in group_obj.member_of_names_list:
         #     node_collection.collection.update({'_id': group_obj._id},
@@ -1091,9 +1095,6 @@ class CreateCourseEventGroup(CreateEventGroup):
             rt_group_has_course_event = node_collection.one({'_type': "RelationType", 'name': "group_has_course_event"})
             group_obj = node_collection.one({'_id': ObjectId(group_id)})
             create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
-            if "CourseEventGroup" not in group_obj.member_of_names_list:
-                group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
-                group_obj.save()
             self.ce_set_up(request, course_node, group_obj)
 
     def ce_set_up(self, request, node, group_obj):
@@ -1110,7 +1111,7 @@ class CreateCourseEventGroup(CreateEventGroup):
             group_obj.content = node.content
             group_obj.content_org = node.content_org
             group_obj.save()
-            self.call_setup(node, group_obj, group_obj)
+            self.call_setup(request, node, group_obj, group_obj)
             return True
 
         except Exception as e:
@@ -1145,12 +1146,12 @@ class CreateCourseEventGroup(CreateEventGroup):
             # print e
             return False
 
-    def call_setup(self, node, prior_node_obj, group_obj):
+    def call_setup(self, request, node, prior_node_obj, group_obj):
         if node.collection_set:
             if "CourseUnit" in node.member_of_names_list:
                 for each_res in node.collection_set:
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
-                    new_res = self.replicate_resource(each_res_node, group_obj)
+                    new_res = self.replicate_resource(request, each_res_node, group_obj)
                     prior_node_obj.collection_set.append(new_res._id)
                     # below code changes the group_set of resources
                     # i.e cross-publication
@@ -1164,9 +1165,9 @@ class CreateCourseEventGroup(CreateEventGroup):
                     name_arg = each_node.name
                     member_of_name_str = each_node.member_of_names_list[0]
                     new_node = self.create_corresponding_gsystem(name_arg,member_of_name_str, prior_node_obj, group_obj)
-                    self.call_setup(each_node, new_node, group_obj)
+                    self.call_setup(request, each_node, new_node, group_obj)
 
-    def replicate_resource(self, node, group_obj):
+    def replicate_resource(self, request, node, group_obj):
         try:
             if "Page" in node.member_of_names_list:
                 new_gsystem = node_collection.collection.GSystem()
@@ -1187,6 +1188,7 @@ class CreateCourseEventGroup(CreateEventGroup):
             new_gsystem.content_org = node.content_org
             new_gsystem.content = node.content
             new_gsystem.save()
+            return_status = create_thread_for_node(request, group_obj._id, new_gsystem)
             return new_gsystem
 
         except Exception as e:
@@ -1392,27 +1394,31 @@ class EventGroupCreateEditHandler(View):
                 mod_group = CreateCourseEventGroup(request)
                 moderation_level = -1
             parent_group_obj = group_obj
+
             # calling method to create new group
             result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id,)
         if result[0]:
             # operation success: create ATs
             group_obj = result[1]
             # to make PE/CE as sub groups of the grp from which it is created.
-            parent_group_obj.post_node.append(group_obj._id)
-            group_obj.prior_node.append(parent_group_obj._id)
-            group_obj.save()
-            parent_group_obj.save()
-            date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id)
+            # parent_group_obj.post_node.append(group_obj._id)
+            # group_obj.prior_node.append(parent_group_obj._id)
+            # group_obj.save()
+            # parent_group_obj.save()
+            date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
             if date_result[0]:
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
+                    group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
+                    group_obj.save()
+
                 group_name = group_obj.name
                 url_name = 'groupchange'
             else:
                 # operation fail: redirect to group-listing
                 group_name = 'home'
-                url_name = 'group'
+                url_name = 'group'  
         else:
             # operation fail: redirect to group-listing
             group_name = 'home'
@@ -1743,58 +1749,43 @@ def group_dashboard(request, group_id=None):
   group_obj.get_neighbourhood(group_obj.member_of)
   course_structure_exists = False
   files_cur = None
+  parent_groupid_of_pe = None
   list_of_sg_member_of = get_sg_member_of(group_obj._id)
   # print "\n\n list_of_sg_member_of", list_of_sg_member_of
   files_cur = None
-  if "CourseEventGroup" in group_obj.member_of_names_list:
-      forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
-      twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
-      page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-      blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+  sg_type = None
+  if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
+      sg_type = "ProgramEventGroup"
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
-      if group_obj.collection_set:
-          course_structure_exists = True
+      parent_groupid_of_pe = node_collection.find_one({'_type':"Group","post_node": group_obj._id})
+      if parent_groupid_of_pe:
+        parent_groupid_of_pe = parent_groupid_of_pe._id
+      alternate_template = "ndf/program_event_group.html"
+  if "CourseEventGroup" in group_obj.member_of_names_list:
+      sg_type = "CourseEventGroup"
       alternate_template = "ndf/course_event_group.html"
-
-      existing_forums = node_collection.find({
-                                    'member_of': forum_gst._id,
-                                    'group_set': ObjectId(group_obj._id), 
-                                    }).sort('created_at', -1)
-      if request.user.id:
-          blog_pages = node_collection.find({
-                'member_of':page_gst._id,
-                'type_of': blogpage_gst._id,
-                'group_set': group_obj._id
-            }).sort('last_update', -1)
-      for each in existing_forums:
-
-      		temp_forum = {}
-      		temp_forum['name'] = each.name
-      		temp_forum['created_at'] = each.created_at
-      		temp_forum['tags'] = each.tags
-      		temp_forum['member_of_names_list'] = each.member_of_names_list
-      		temp_forum['user_details_dict'] = each.user_details_dict
-      		temp_forum['html_content'] = each.html_content
-      		temp_forum['contributors'] = each.contributors
-      		temp_forum['id'] = each._id
-      		temp_forum['threads'] = node_collection.find({
-                                                      '$and':[
-                                                      				{'member_of': twist_gst._id},
-                                                              {'_type': 'GSystem'},
-                                                              {'prior_node': ObjectId(each._id)}
-                                                              ], 
-                                                      'status': {'$nin': ['HIDDEN']} 
-                                                      }).count()
-          
-      		list_of_unit_events.append(temp_forum)
-
+  if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
+      if "CourseEventGroup" in group_obj.member_of_names_list or u"ProgramEventGroup" in list_of_sg_member_of:
+          page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+          blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+          files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+          if group_obj.collection_set:
+              course_structure_exists = True
+          if request.user.id:
+              blog_pages = node_collection.find({
+                    'member_of':page_gst._id,
+                    'type_of': blogpage_gst._id,
+                    'group_set': group_obj._id
+                }).sort('last_update', -1)
   allow_to_join = True
   if 'end_enroll' in group_obj:
-      last_enrollment_date = group_obj.end_enroll
-      if last_enrollment_date:
-        curr_date_time = datetime.now()
-        if curr_date_time >= last_enrollment_date:
-            allow_to_join = False
+      if group_obj.end_enroll:
+          last_enrollment_date = group_obj.end_enroll
+          last_enrollment_date = last_enrollment_date.date()
+          if last_enrollment_date:
+            curr_date_time = datetime.now().date()
+            if last_enrollment_date < curr_date_time:
+                allow_to_join = False
   property_order_list = []
   if "group_of" in group_obj:
     if group_obj['group_of']:
@@ -1816,6 +1807,8 @@ def group_dashboard(request, group_id=None):
                                                        'blog_pages':blog_pages,
                                                        'selected': selected,
                                                        'files_cur': files_cur,
+                                                       'sg_type': sg_type,
+                                                       'parent_groupid_of_pe':parent_groupid_of_pe,
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,

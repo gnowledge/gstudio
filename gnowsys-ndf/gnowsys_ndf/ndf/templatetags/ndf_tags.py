@@ -12,6 +12,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
+
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
@@ -148,6 +150,10 @@ def get_node_type(node):
    if node:
       obj = node_collection.find_one({"_id": ObjectId(node._id)})
       nodetype=node.member_of_names_list[0]
+      if "Group" == nodetype:
+        pe = get_sg_member_of(node._id)
+        if "ProgramEventGroup" in pe:
+          return "ProgramEventGroup"
       return nodetype
    else:
       return ""
@@ -457,6 +463,29 @@ def get_attribute_value(node_id, attr):
 
 	# print "attr_val: ",attr_val,"\n"
 	return attr_val
+
+
+@get_execution_time
+@register.assignment_tag
+def get_relation_value(node_id, grel):
+	node_grel = None
+	if node_id:
+		node = node_collection.one({'_id': ObjectId(node_id) })
+		grel = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
+		if node and grel:
+			node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id})
+	# print "\n\n node_grel",node_grel
+	if node_grel:
+		grel_val = node_grel.right_subject
+		grel_id = node_grel._id
+		grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+	else:
+		grel_val_node = ""
+		grel_id = ""
+
+	# print "grel_val_node: ",grel_val_node,"\n"
+	# returns right_subject of grelation and GRelation _id 
+	return grel_val_node, grel_id
 
 
 @get_execution_time
@@ -826,7 +855,6 @@ def thread_reply_count( oid ):
 # global variable to count thread's total reply
 # global_disc_rep_counter = 0	
 # global_disc_all_replies = []
-reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
 @get_execution_time
 @register.assignment_tag
 def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
@@ -834,25 +862,33 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 	Method to count total replies for the disc.
 	'''
 
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False:
-		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else:
-			auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-			if auth :
-				group_id = str(auth._id)
-	else:
-		pass
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_name, group_id = get_group_name_id(group_id)
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(group_id) is False:
+	# 	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 	if group_ins:
+	# 		group_id = str(group_ins._id)
+	# 	else:
+	# 		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 		if auth :
+	# 			group_id = str(auth._id)
+	# else:
+	# 	pass
 
+	reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
+	oid_obj = node_collection.one({'_id':ObjectId(oid)})
+	# print "\n\n oid_obj----",oid_obj.name
 	# thr_rep = node_collection.find({'$and':[ {'_type':'GSystem'}, {'prior_node':ObjectId(oid)}, {'member_of':ObjectId(reply_st._id)} ]})#.sort({'created_at': -1})
 	thr_rep = node_collection.find({'_type':'GSystem', 'group_set':ObjectId(group_id), 'prior_node':ObjectId(oid), 'member_of':ObjectId(reply_st._id)}).sort('created_at', -1)
 
 	# to acces global_disc_rep_counter as global and not as local
 	# global global_disc_rep_counter 
 	# global global_disc_all_replies
+	# print "\n\n thr_rep",thr_rep.count()
 
 	if thr_rep and (thr_rep.count() > 0):
 
@@ -1281,10 +1317,16 @@ def get_all_resources(request,node_id):
                 if val:
                         keys.append(key)
                         for res in val:
-                                if res.language == request.LANGUAGE_CODE:
-                                        res_dict[key]['fallback_lang'].append(res)
-                                else:
-                                        res_dict[key]['other_languages'].append(res)
+
+                        	# following if condition is temp patch.
+                        	# actually for this condition to get work, we need to have \
+                        	# uniform data-type/format for storing in language field.
+                        	# currently, we are also using any of: code or name or tuple.
+                        	# e.g: "en" or "English" or ("en", "English")
+                            if (len(res.language) == len(request.LANGUAGE_CODE)) and (res.language != request.LANGUAGE_CODE):
+                                    res_dict[key]['other_languages'].append(res)
+                            else:
+                                    res_dict[key]['fallback_lang'].append(res)
                                         
         for k1,v1 in res_dict.items():
                 if k1 not in keys :
@@ -1534,12 +1576,12 @@ def get_group_type(group_id, user):
 
                         else:
                             error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                            raise Http404(error_message)
+                            raise PermissionDenied(error_message)
 
                     else:
                         # Anonymous user found which cannot access groups other than Public
                         error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                        raise Http404(error_message)
+                        raise PermissionDenied(error_message)
 
             else:
                 # If Group is not found with either given ObjectId or name in the database
@@ -1551,8 +1593,11 @@ def get_group_type(group_id, user):
 
         return True
 
-    except Exception as e:
-        raise Http404(e)
+    except PermissionDenied as e:
+		raise PermissionDenied(e)
+
+    except Http404 as e:
+		raise Http404(e)
 
 
 @get_execution_time
@@ -1613,6 +1658,16 @@ def get_user_object(user_id):
 	except Exception as e:
 		print "User Not found in User Table",e
 	return user_obj
+
+
+@get_execution_time
+@register.filter
+def get_username(user_id):
+	try:
+		return User.objects.get(id=user_id).username
+	except:
+		return user_id
+
 
 @get_execution_time
 @register.assignment_tag
@@ -2737,7 +2792,7 @@ def get_filters_data(gst_name):
 
 	# additional filters:
 
-	filter_dict["language"] = { 
+	filter_dict["Language"] = { 
 								"data_type": "basestring", "type": "field",
 								"value": json.dumps(static_mapping["language"]) 
 							}
@@ -2760,16 +2815,18 @@ def get_sg_member_of(group_id):
 		group_id, group_name = get_group_name_id(group_id)
 
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
-
+	# print group_obj.name
 	# Fetch post_node of group
-	if group_obj.post_node:
+	if "post_node" in group_obj:
 		post_node_id_list = group_obj.post_node
 
 		if post_node_id_list:
 			# getting parent's sub group's member_of in a list
 			for each_sg in post_node_id_list:
 				each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
-				sg_member_of_list.extend(each_sg_node.member_of_names_list)
+				if each_sg_node:
+					sg_member_of_list.extend(each_sg_node.member_of_names_list)
+	# print "\n\n sg_member_of_list---",sg_member_of_list
 	return sg_member_of_list
 
 def get_objectid_name(nodeid):
@@ -2787,3 +2844,87 @@ def is_empty(val):
     else :
     	return 0
 
+
+@get_execution_time
+@register.inclusion_tag('ndf/breadcrumb.html')
+def get_breadcrumb(url):
+
+	url = url.strip()
+
+	exception_list= [ 
+						'welcome', 'accounts', 'admin', '/dashboard',
+						'/partner/partners', '/partner/groups', '/group/'
+					]
+	path = []
+	apps = GAPPS + ['repository']
+
+	# print "===========", map(lambda x: x in url.lower(), exception_list)
+	if not any(map(lambda x: x in url.lower(), exception_list)):
+		# print url
+
+		url_list = filter(lambda x: x != "", url.split('/'))
+
+		try:
+
+			# --- first element: group name ---
+			first_el = url_list[0]
+			group_obj = get_group_name_id(first_el, get_obj=True)
+			# print "00000000000000000", first_el
+			first_group_name = group_obj.altnames if group_obj.altnames else group_obj.name
+			first_group_url = '/' + group_obj.name
+			# if group_obj.name == 'home':
+			# 	first_group_url += '/repository'
+
+			path.append({'name': first_group_name, 'link': first_group_url})
+			# print path
+			
+			# --- second element: app name ---
+			second_el = url_list[1]
+			if any(map(lambda x: x == second_el, [i.lower() for i in apps])):
+				try:
+					temp_obj = node_collection.one({'_type': 'GSystemType',
+						'name': {'$regex': second_el, '$options': 'i'} })
+					second_app_name = temp_obj.altnames if temp_obj.altnames else temp_obj.name
+				except:
+					second_app_name = second_el
+				# print second_el,"second_app_name: ", second_app_name
+				second_app_url = first_group_url + '/' + second_el
+				path.append({'name': second_app_name, 'link': second_app_url})
+			
+				# --- third element: object/instance id ---
+				third_el = url_list[2]
+				if ObjectId.is_valid(third_el):
+					node_obj = node_collection.one({'_id': ObjectId(third_el)})
+					third_node_name = node_obj.name
+					third_node_url = second_app_name + '/' + third_el
+					path.append({'name': third_node_name, 'link': third_node_url})
+				# else:
+				# 	third_node_name = 
+
+				# --- fourth element: object/instance id ---
+				fourth_el = url_list[3]
+				if ObjectId.is_valid(fourth_el):
+					node_obj = node_collection.one({'_id': ObjectId(fourth_el)})
+					fourth_node_name = node_obj.name
+					fourth_node_url = second_app_name + '/' + fourth_el
+					path.append({'name': fourth_node_name, 'link': fourth_node_url})
+
+		except:
+			pass
+
+	# print 'path : ', path
+	return {'path': path if (len(path) > 1) else []}
+
+
+
+@get_execution_time
+@register.assignment_tag
+def get_thread_node(node_id):
+	node_obj = node_collection.one({'_id': ObjectId(node_id)})
+	thread_obj = None
+	if node_obj.relation_set:
+		for rel in node_obj.relation_set:
+			if rel and 'has_thread' in rel:
+				thread_obj = rel['has_thread'][0]
+	# print "\n\nthread_obj--",thread_obj
+	return thread_obj

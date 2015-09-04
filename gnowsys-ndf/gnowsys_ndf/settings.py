@@ -617,16 +617,16 @@ GSTUDIO_RESOURCES_TIME_REQUIRED = ["0-2M", "2-5M", "5-15M", "15-45M"]
 
 GSTUDIO_RESOURCES_AGE_RANGE = ["5-10", "11-20", "21-30", "31-40", "41 and above"]
 
-GSTUDIO_RESOURCES_READING_LEVEL = []
+GSTUDIO_RESOURCES_READING_LEVEL = ["Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary"]
 
 GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Moderation", "Other"]
 
 GSTUDIO_NROER_MENU = [{"Repository": []}, {"Partners": ["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
 
-GSTUDIO_NROER_GAPPS = [{"Themes": "topics"}, {"eLibrary": "e-library"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "event"}]
+GSTUDIO_NROER_GAPPS = [{"Themes": "topics"}, {"eLibrary": "e-library"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "program"}]
 
 GSTUDIO_NROER_MENU_MAPPINGS = {
-            "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",
+            "States": "State Partners", "Institutions": "Institutional Partners", "Individuals": "Individual Partners",
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
 

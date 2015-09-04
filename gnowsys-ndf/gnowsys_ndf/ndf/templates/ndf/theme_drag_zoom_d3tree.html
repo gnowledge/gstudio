@@ -329,7 +329,7 @@
         x = -source.y0;
         y = -source.x0;
         x = x * scale + viewerWidth / 4;
-        y = y * scale + viewerHeight / 2;
+        y = y * scale + viewerHeight / 2.5;
         d3.select('#theme-drag-zoom-tree g').transition()
             .duration(duration)
             .attr("transform", "translate(" + x + "," + y + ")scale(" + scale + ")");

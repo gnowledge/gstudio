@@ -3,40 +3,32 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
-
 {% block title %} {{title}} {% endblock %}
 
 {% block help_content %}
-<p>{% blocktrans %} "About Course... <em>Coming soon..</em>" {% endblocktrans %}</p>
 {% endblock %}
 
 
 {% block meta_content %}
-
-  <a href="{% url course_gst.name|lower group_name_tag %}">
+  {% check_is_gstaff groupid request.user as is_gstaff %}
     <h2 class="subheader">
-      {% if course_gst.altnames and course_gst.altnames != "None" %}
-        {{course_gst.altnames}}
-      {% else %}
-        {{course_gst.name}}
-      {% endif%}
+        {{title}}
     </h2>
-    {{course_gst.content|default_if_none:""|safe}}
-  </a>
-
-  {% if user.is_authenticated %}
-    {% user_access_policy groupid request.user as user_access %}
-    {% if user_access == "allow" %}
-      <a class="small button" href="{% url 'create_edit' group_name_tag %}">
-        <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
-      </a>
+  {% if is_gstaff %}
+    {% if req_from_course %}
+          <a class="small button" href="{% url 'create_edit' group_name_tag %}">
+            <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
+          </a>
+    {% else %}
+          <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="small button">
+            <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
+          </a>
     {% endif %}
   {% endif %}
 {% endblock %}
 
 
 {% block search_content %}
-  {% include "ndf/node_search_base.html" %}
 {% endblock %}
 
 
@@ -45,259 +37,186 @@
 
 
 {% block body_content %}
-
+  
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% user_access_policy groupid request.user as user_access %}
+    <!-- 
+      Tab 1 - All CourseEvents  (Displayed to all : Anonymous, Authenticated, Group member/admin/owner, SuperUser)
+      Tab 2 - User enrolled CourseEvents
+      Tab 3 - Courses
+    -->
     <header class="row" data-tab data-options="deep_linking:true">
-    <dl class="tabs " data-tab role="tablist">
-    {% if user.is_authenticated %}
-      {% user_access_policy groupid request.user as user_access %}
-      {% if user_access == "allow" %}
-          <dd class="tab-title" role="presentational" ><a href="#panel2-2" role="tab" tabindex="0"aria-selected="false" controls="panel2-2">{% trans "Courses" %}</a></dd>
-    {% endif %}    
-    {% endif %}    
-    </dl>
+      <dl class="tabs " data-tab role="tablist">
+
+        <dd class="tab-title active" role="presentational" ><a href="#all_events" role="tab" tabindex="0" aria-selected="true" controls="all_events">{% if req_from_course %}{% trans "eCourse" %}{% else %}{% trans "Events" %}{% endif %}</a></dd>
+        {% if request.user.is_authenticated  and not is_gstaff %}
+          <dd class="tab-title" role="presentational" ><a href="#my_events" role="tab" tabindex="0" aria-selected="false" controls="my_events">{% if req_from_course %}{% trans "My eCourses" %}{% else %}{% trans "My Events" %}{% endif %}</a></dd>
+        {% endif %}    
+        {% if req_from_course and is_gstaff %}
+            <dd class="tab-title" role="presentational" ><a href="#courses" role="tab" tabindex="0" aria-selected="false" controls="courses">{% trans "Courses" %}</a></dd>
+        {% endif %}
+
+      </dl>
     </header>
 
-    <div class="tabs-content small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-    {% if user.is_authenticated %}
+    <div class="tabs-content ">
 
-      {% user_access_policy groupid request.user as user_access %}
-      {% if user_access == "allow" %}
-          <section role="tabpanel" aria-hidden="false" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-1">
-            {% for course in all_course_coll %}
+      <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="all_events">
 
-              <li class="card">
-                {% if course.status == "DRAFT" %}
-                  <div class="draft course">
-                {% elif course.status == "PUBLISHED" %}
-                  <div class="published course">
-                {% endif %}
-
-                  <a href="{% url 'course_detail' group_name_tag course %}">
-                    <div class="row">
-                      <div class="small-8 column">
-                        <b>{{course.name}}</b>
-                        {% if course.status == "PUBLISHED" %}
-                        <span data-tooltip title="Announced Course"><i class="fi-volume"></i></span>
-                        {% endif %}
-                      </div>
-                    </div>
-                    <hr/>
-                    <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-                  </a>
-
-                    <footer>
-                      <div class="age">
-                        {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-                        <br/>
-                        by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-                      </div>
-                      <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
-                    </footer>
-
-                  <div class="label-list small-12 columns">
-                    {% for tag in course.tags|slice:":3" %}
-                    <a href="{% url 'tag_info' group_name_tag tag %}">
-                      <span class="label" style="background-color:yellow">{{tag}}</span>
-                    </a>{% endfor %}
-                  </div>
-                    <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-                </div>
-              </li>        
-
-            {% empty %}
+        {% for course in ce_coll %}
+          <li class="card">
+              <div class="published course">
+              <a href="{% url 'groupchange' course.name %}">
                 <div class="row">
-                  <div class="small-12 columns">
-                    <h5>
-                     {% blocktrans %}
-                          This group doesn't have any courses. <b>Be the first to create a course!</b>
-                          {% endblocktrans %}
-                    </h5>
+                  <div class="small-8 column">
+                    <b>{{course.name}}
+                    </b>
                   </div>
                 </div>
-            
-            {% endfor %}
-          </section>
-      
-          <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-2">
-              {% for course in course_coll %}
-                <li class="card">
-                  {% if course.status == "DRAFT" %}
-                    <div class="draft course">
-                  {% elif course.status == "PUBLISHED" %}
-                    <div class="published course">
-                  {% endif %}
+                <span data-tooltip title="Course Event"></span>
+                <hr/>
+                <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+              </a>
 
-                    <a href="{% url 'course_detail' group_name_tag course %}">
-                      <div class="row">
-                        <div class="small-8 column">
-                          <b>{{course.name}}
-                          </b>
-                        </div>
-                      </div>
-                      <hr/>
-                      <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-                    </a>
-
-                      <footer>
-                        <div class="age">
-                          {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-                          <br/>
-                          by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-                        </div>
-                        <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
-                      </footer>
-
-                    <div class="label-list small-12 columns">
-                      {% for tag in course.tags|slice:":3" %}
-                      <a href="{% url 'tag_info' group_name_tag tag %}">
-                        <span class="label" style="background-color:yellow">{{tag}}</span>
-                      </a>{% endfor %}
-                    </div>
-                      <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+                <footer>
+                  <div class="age">
+                    {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
+                    <br/>
+                    by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
                   </div>
-                </li>        
+                  <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
+                </footer>
 
-              {% empty %}
-                  <div class="row">
-                    <div class="small-12 columns">
-                      <h5>
-                       {% blocktrans %}
-                            This group doesn't have any courses. <b>Be the first to create a course!</b>
-                            {% endblocktrans %}
-                      </h5>
-                    </div>
-                  </div>
-              
-              {% endfor %}
-          </section>
-      {% else %}
-          <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-4">
-              {% for course in enrolled_course_coll %}
-                <li class="card">
-                  {% if course.status == "DRAFT" %}
-                    <div class="draft course">
-                  {% elif course.status == "PUBLISHED" %}
-                    <div class="published course">
-                  {% endif %}
-
-                    <a href="{% url 'course_detail' group_name_tag course %}">
-                      <div class="row">
-                        <div class="small-8 column">
-                          <b>{{course.name}}
-                          </b>
-                        </div>
-                      </div>
-                      <hr/>
-                      <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-                    </a>
-
-                      <footer>
-                        <div class="age">
-                          {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-                          <br/>
-                          by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-                        </div>
-                        <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
-                      </footer>
-
-                    <div class="label-list small-12 columns">
-                      {% for tag in course.tags|slice:":3" %}
-                      <a href="{% url 'tag_info' group_name_tag tag %}">
-                        <span class="label" style="background-color:yellow">{{tag}}</span>
-                      </a>{% endfor %}
-                    </div>
-                      <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-                  </div>
-                </li>        
-
-              {% empty %}
-                  <div class="row">
-                    <div class="small-12 columns">
-                      <h5>
-                        {% blocktrans %}
-                          You are not enrolled to any course yet.
-                        {% endblocktrans %}
-                      </h5>
-                    </div>
-                  </div>
-              
-              {% endfor %}
-          
-          </section> 
-      {% endif %}
-    
-
-      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-3">
-    {% else %}
-      <section role="tabpanel" aria-hidden="true" class="active content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-3">
-    {% endif %}  
-          {% for course in ann_course_coll %}
-            <li class="card">
-                <div class="published course">
-                <a href="{% url 'course_detail' group_name_tag course %}">
-                  <div class="row">
-                    <div class="small-8 column">
-                      <b>{{course.name}}
-                      </b>
-                    </div>
-                  </div>
-                  <span data-tooltip title="Announced Course"><i class="fi-volume"></i></span>
-                  <hr/>
-                  <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-                </a>
-
-                  <footer>
-                    <div class="age">
-                      {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-                      <br/>
-                      by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-                    </div>
-                    <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
-                  </footer>
-
-                <div class="label-list small-12 columns">
-                  {% for tag in course.tags|slice:":3" %}
-                  <a href="{% url 'tag_info' group_name_tag tag %}">
-                    <span class="label" style="background-color:yellow">{{tag}}</span>
-                  </a>{% endfor %}
-                </div>
-                  <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+              <div class="label-list small-12 columns">
+                {% for tag in course.tags|slice:":3" %}
+                <a href="{% url 'tag_info' group_name_tag tag %}">
+                  <span class="label" style="background-color:yellow">{{tag}}</span>
+                </a>{% endfor %}
               </div>
-            </li>        
+                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+            </div>
+          </li>        
 
-          {% empty %}
-              <div class="row">
-                <div class="small-12 columns">
-                  <h5>
-                    {% if user_access == "allow" %}
-                      {% blocktrans %}
-                        This group doesn't have any Announced courses. <b>Be the first to Announce a course!</b>
-                      {% endblocktrans %}
-                    {% else %}
-                      {% blocktrans %}
-                        This group doesn't have any Announced courses.
-                      {% endblocktrans %}
-                    {% endif %}
-                  </h5>
-                </div>
+        {% empty %}
+            <div class="row">
+              <div class="small-12 columns">
+                <h5> 
+                {% if req_from_course %}No Course Available!
+                {% else %}No Program Available!
+                {% endif %}
+                </h5>
               </div>
-          
-          {% endfor %}
+            </div>
+        
+        {% endfor %}
       </section>
 
-    
-    </div>
+      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="my_events">
 
+        {% for course in enr_ce_coll %}
+          <li class="card">
+              <div class="course">
+              <a href="{% url 'groupchange' course.name %}">
+                <div class="row">
+                  <div class="small-8 column">
+                    <b>{{course.name}}
+                    </b>
+                  </div>
+                </div>
+                <span data-tooltip title="Course"></span>
+                <hr/>
+                <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+              </a>
+
+                <footer>
+                  <div class="age">
+                    {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
+                    <br/>
+                    by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
+                  </div>
+                  <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
+                </footer>
+
+              <div class="label-list small-12 columns">
+                {% for tag in course.tags|slice:":3" %}
+                <a href="{% url 'tag_info' group_name_tag tag %}">
+                  <span class="label" style="background-color:yellow">{{tag}}</span>
+                </a>{% endfor %}
+              </div>
+                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+            </div>
+          </li>        
+
+        {% empty %}
+            <div class="row">
+              <div class="small-12 columns">
+                <h5>
+                {% if req_from_course %}Not Enrolled to Any Courses!
+                {% else %}Not Enrolled to Any Programs!
+                {% endif %}
+                </h5>
+              </div>
+            </div>
+        
+        {% endfor %}
+      </section>
+
+
+
+      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="courses">
+
+        {% for course in course_coll %}
+          <li class="card">
+              <div class="course">
+              <a href="{% url 'course_detail' group_name_tag course %}">
+                <div class="row">
+                  <div class="small-8 column">
+                    <b>{{course.name}}
+                    </b>
+                  </div>
+                  {% get_relation_value course.pk 'has_logo' as logo_img_and_grel%}
+                    {% if logo_img_and_grel.0 %}
+                      {% get_node logo_img as logo_img_and_grel.0 %}
+                      <img src="{% url 'get_gridfs_resource' logo_img_and_grel.0.fs_file_ids.1 %}" alt="" />
+                    {% endif %}
+
+                </div>
+                <hr/>
+                <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+              </a>
+
+                <footer>
+                  <div class="age">
+                    {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
+                    <br/>
+                    by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
+                  </div>
+                  <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
+                </footer>
+
+              <div class="label-list small-12 columns">
+                {% for tag in course.tags|slice:":3" %}
+                <a href="{% url 'tag_info' group_name_tag tag %}">
+                  <span class="label" style="background-color:yellow">{{tag}}</span>
+                </a>{% endfor %}
+              </div>
+                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+            </div>
+          </li>        
+
+        {% empty %}
+            <div class="row">
+              <div class="small-12 columns">
+                <h5> No Course Created!
+                </h5>
+              </div>
+            </div>
+        
+        {% endfor %}
+      </section>
 
   {% paginate %}
 
 {% endblock %}
 
 
-{% block document_ready %}
-  {{block.super}}
-  {% if not user.is_authenticated %}
-    $(".my_courses_class").removeClass("active")
-    $(".ann_course_class").addClass("active")
-  {% endif %}
-{% endblock %}
