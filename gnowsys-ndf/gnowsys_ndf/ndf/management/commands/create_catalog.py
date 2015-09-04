@@ -33,15 +33,14 @@ class Command(BaseCommand):
 		'''
 def  get_metatypes():
 	node = node_collection.find({"_type":"MetaType"})
-	print node.count()
 	metatypeslist = [i._id for i in node]
-	print "the metatype",metatypeslist
 	return metatypeslist		
 
 def  get_gsystems(GSystemTypeList):
 	var = {"_type": "GSystemType","name":{"$in":GSystemTypeList}}  
 	Systemtypes = node_collection.find(var,{"_id":1})
 	Systemtypelist = [i._id for i in Systemtypes]
+		
 	'''
 	cmd = "mongoexport --db studio-dev --collection Nodes -q '" + '%s'  % var + "' --out Schema/GSystemType.json"
 	subprocess.Popen(cmd,stderr=subprocess.STDOUT,shell=True)
@@ -69,15 +68,30 @@ def get_attributetypes(AttributeTypeList):
 	return attributetypelist
 def  get_factory_data(Factory_data):
 	data_list = []
+	GlistItems = []
 	for i in factory_data:
 		var = str(i)
 		var = var.replace("'",'"')
 		node = node_collection.find(i)
 		data_list.append(node[0]._id)
+	# get the Glist container and its collection_set values
+	glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
+        Glisttypes = node_collection.find({'member_of':ObjectId(glist._id)})
+	if Glisttypes:
+		for i in Glisttypes:
+			if i not in data_list:
+				print i.name
+				data_list.append(i._id)
+				if i.collection_set:
+					GlistItems.extend(i.collection_set)
+	if GlistItems:
+		data_list.extend(GlistItems)						
+	
 	'''
 		cmd = "mongoexport --db studio-dev --collection Nodes -q '" + '%s'  % var + "' --out Schema/" + str(i["name"]) + "." +"json" + ""
 		subprocess.Popen(cmd,stderr=subprocess.STDOUT,shell=True)
 	'''
+
 	return data_list
 		# take the rcs of the data
 		
@@ -113,7 +127,6 @@ def make_rcs_dir(final_list):
 						elif a._type == 'AttributeType':
 							Attributetypenodes.append(file_node)
 						elif a._type == 'MetaType': 
-							print "asdf",a 
 							metatype.append(file_node)
 					elif a._type not in filter_list:
 						file_node = get_version_document(a,rel_path,'1.1')
@@ -124,7 +137,6 @@ def make_rcs_dir(final_list):
 	make_catalog(Relationtypenodes,'RelationType')
 	make_catalog(Attributetypenodes,'AttributeType')	
 	make_catalog(factorydatanode,'factorydata')
-	print metatype
 	make_catalog(metatype,'metatype')	
 	
 def make_catalog(file_node,data_type):
