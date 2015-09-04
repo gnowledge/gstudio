@@ -108,12 +108,17 @@
                                 {% csrf_token %}
                                     <input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
                                     <input type="text" id="txtSelectedFiles" readonly="" class="small-12 columns margin-p5">
-                                        <input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 small-centered columns button tiny margin-p5" />
-                                            <input type="hidden" name="type" value="profile_pic">           
-                                            <input type="hidden" name="user" value="{{usr}}">         
-                                              <p id="message" style="display:none">
-                                          {% trans "Please wait for uploading profile picture" %}
-                                        </p>
+
+                                    <div class="row upload_cancel_div">
+                                        <input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 columns button tiny margin-p5" />
+                                        <input type="button" class="small-6 columns button tiny margin-p5" id="btnUploadCancel" style="font-size:15px; " value="Cancel">
+                                    </div>
+
+                                    <input type="hidden" name="type" value="profile_pic">           
+                                    <input type="hidden" name="user" value="{{usr}}">         
+                                    <p id="message" style="display:none">
+                                      {% trans "Please wait for uploading profile picture" %}
+                                    </p>
                                 </form>
                             </div>
                        {% endif %}
@@ -364,6 +369,11 @@
     $("#docFile").trigger("click");
   });
 
+  $("#btnUploadCancel").click(function() {
+    $("#pic_div").addClass("hide");
+    $("#docFile").val("");
+  });
+
   $("#btnUploadProPages createdfilePic").click(function() {
     $("#docFile").trigger("click");
   });
@@ -390,7 +400,8 @@
   $("#submitpostid").click(function() {
     if($("#docFile").val() != "") { 
       $("#message").show();
-      $("#submitpostid").hide();
+      $(".upload_cancel_div").addClass("hide");
+      $("#btnUploadProfilePic").attr("disabled", "disabled");
     }
 
     else {
