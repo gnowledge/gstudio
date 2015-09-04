@@ -586,7 +586,7 @@ def create_task(request,task_id,group_id):
         parent_object.post_node = [task_node._id]
         parent_object.save(groupid=group_id)
     task_node.save(groupid=group_id)
-	capture_data(file_object=task_node, file_data=None, content_type='task_create') 
+    capture_data(file_object=task_node, file_data=None, content_type='task_create') 
 
     return task_node
 
