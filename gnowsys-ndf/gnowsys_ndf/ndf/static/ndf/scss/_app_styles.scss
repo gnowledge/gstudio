@@ -205,7 +205,7 @@ body{
           // background-color: scale-color($topbar-bg-color, $lightness: 5%);
           box-shadow: inset 0px 100px 50px #fff;
           // box-shadow: inset 0px 100px 50px scale-color($theme-color-invert, $lightness: 10%);
-          transition: 0.8s all;
+          // transition: 0.8s all;
       }
     }
 
@@ -233,8 +233,15 @@ body{
 
     &:hover{
       opacity: 1;
-      transition: 0.3s all;
+      transition: 0.1s all;
       box-shadow: 0px 2px 3px #E1E1E1;
+    }
+
+    #group-apps{
+
+      .back-btn.fi-play:before{
+        transform: rotate( 180deg );
+      }
     }
 
     #second-header.top-bar {
@@ -1176,7 +1183,7 @@ aside#help{
         filter: brightness(1);
         -webkit-filter: brightness(1);
         transform: translate3d(0, 0, 0);
-        transition: filter 1s ease;
+        transition: all 1.5s ease;
       }
     }
 
