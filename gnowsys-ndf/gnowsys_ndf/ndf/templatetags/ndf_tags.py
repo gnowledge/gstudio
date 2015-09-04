@@ -466,6 +466,29 @@ def get_attribute_value(node_id, attr):
 
 
 @get_execution_time
+@register.assignment_tag
+def get_relation_value(node_id, grel):
+	node_grel = None
+	if node_id:
+		node = node_collection.one({'_id': ObjectId(node_id) })
+		grel = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
+		if node and grel:
+			node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id})
+	# print "\n\n node_grel",node_grel
+	if node_grel:
+		grel_val = node_grel.right_subject
+		grel_id = node_grel._id
+		grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+	else:
+		grel_val_node = ""
+		grel_id = ""
+
+	# print "grel_val_node: ",grel_val_node,"\n"
+	# returns right_subject of grelation and GRelation _id 
+	return grel_val_node, grel_id
+
+
+@get_execution_time
 @register.inclusion_tag('ndf/drawer_widget.html')
 def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kwargs):
 	drawers = None
@@ -1294,10 +1317,16 @@ def get_all_resources(request,node_id):
                 if val:
                         keys.append(key)
                         for res in val:
-                                if res.language == request.LANGUAGE_CODE:
-                                        res_dict[key]['fallback_lang'].append(res)
-                                else:
-                                        res_dict[key]['other_languages'].append(res)
+
+                        	# following if condition is temp patch.
+                        	# actually for this condition to get work, we need to have \
+                        	# uniform data-type/format for storing in language field.
+                        	# currently, we are also using any of: code or name or tuple.
+                        	# e.g: "en" or "English" or ("en", "English")
+                            if (len(res.language) == len(request.LANGUAGE_CODE)) and (res.language != request.LANGUAGE_CODE):
+                                    res_dict[key]['other_languages'].append(res)
+                            else:
+                                    res_dict[key]['fallback_lang'].append(res)
                                         
         for k1,v1 in res_dict.items():
                 if k1 not in keys :
@@ -2763,7 +2792,7 @@ def get_filters_data(gst_name):
 
 	# additional filters:
 
-	filter_dict["language"] = { 
+	filter_dict["Language"] = { 
 								"data_type": "basestring", "type": "field",
 								"value": json.dumps(static_mapping["language"]) 
 							}
@@ -2788,7 +2817,7 @@ def get_sg_member_of(group_id):
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
 	# print group_obj.name
 	# Fetch post_node of group
-	if group_obj.post_node:
+	if "post_node" in group_obj:
 		post_node_id_list = group_obj.post_node
 
 		if post_node_id_list:
@@ -2839,9 +2868,13 @@ def get_breadcrumb(url):
 
 			# --- first element: group name ---
 			first_el = url_list[0]
-			first_group_name, group_id = get_group_name_id(first_el)
+			group_obj = get_group_name_id(first_el, get_obj=True)
 			# print "00000000000000000", first_el
-			first_group_url = '/' + first_group_name
+			first_group_name = group_obj.altnames if group_obj.altnames else group_obj.name
+			first_group_url = '/' + group_obj.name
+			# if group_obj.name == 'home':
+			# 	first_group_url += '/repository'
+
 			path.append({'name': first_group_name, 'link': first_group_url})
 			# print path
 			

@@ -42,7 +42,7 @@ def program_event_list(request, group_id):
     pe_gst = node_collection.one({'_type': "GSystemType", 'name': "ProgramEventGroup"})
 
     # program events
-    title = pe_gst.name
+    title = "Events"
 
     pe_coll = node_collection.find({'member_of': pe_gst._id})
     for each_pe in pe_coll:
