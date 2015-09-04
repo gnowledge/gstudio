@@ -403,24 +403,25 @@ ul#navigation li a.last {
             {% else %}
               
               {% if user_is_joined == "joined" or  user_is_joined == "author" %}
-
-                {% if node.member_of_names_list.0 == "File" %}
-                  <a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny button">
-                    <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
-                  </a>
-                {% else %}
-                  {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
-                    <a href="{% url create_url group_name_tag app_id %}" class="tiny button">
-                      <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                {% if node.status != 'MODERATION' %}
+                  {% if node.member_of_names_list.0 == "File" %}
+                    <a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny button">
+                      <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                     </a>
-                  {% elif node.member_of_names_list.0 == "Term" %}
-                    <a href="{% url create_url group_name_tag %}" class="tiny button">
-                      <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} Topic</span>
-                    </a>
-                  {% elif node.member_of_names_list.0 != "Group" and node.member_of_names_list.0 != "ProgramEventGroup" and node.member_of_names_list.0 != "CourseEventGroup" and node.member_of_names_list.0 != "ModeratingGroup" %}
-                    <a href="{% url create_url group_name_tag %}" class="tiny button">
-                      <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
-                    </a>
+                  {% else %}
+                    {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
+                      <a href="{% url create_url group_name_tag app_id %}" class="tiny button">
+                        <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                      </a>
+                    {% elif node.member_of_names_list.0 == "Term" %}
+                      <a href="{% url create_url group_name_tag %}" class="tiny button">
+                        <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} Topic</span>
+                      </a>
+                    {% elif node.member_of_names_list.0 != "Group" and node.member_of_names_list.0 != "ProgramEventGroup" and node.member_of_names_list.0 != "CourseEventGroup" and node.member_of_names_list.0 != "ModeratingGroup" %}
+                      <a href="{% url create_url group_name_tag %}" class="tiny button">
+                        <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                      </a>
+                    {% endif %}
                   {% endif %}
                 {% endif %}
               {% endif %}
@@ -667,6 +668,8 @@ ul#navigation li a.last {
  -->
 <script type="text/javascript">
 
+{% comment %}
+  
   // fileResources = document.querySelectorAll('.file-resource');
   // for (var i = fileResources.length - 1; i >= 0; i--) 
   // {
@@ -711,6 +714,7 @@ ul#navigation li a.last {
   //     })
   //   }
   // }
+{% endcomment %}
 
   // publishing resource in other groups
   var data_list = []
@@ -749,7 +753,7 @@ ul#navigation li a.last {
       });
   });
 
-  $(".current").click(function() {
+  $(".theme-breadcrumb").click(function() {
 
     var nav_list = "{{nav_list}}";
     {% get_node_type original_node as node_type %}  

@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
+{% block title %}{% trans 'Search' %}{% endblock %}
 {% block concern_information %}
     <div id="search_help" align="justify">
       <h3><strong>Search Help</strong></h3>
@@ -18,9 +19,9 @@
 
 <hr>
       <div id="results" width="100%" style="position:relative">
-			
-			
-			</div>
+      
+      
+      </div>
 
 <div id="pages">
   
@@ -28,15 +29,15 @@
 <hr>
 <dl class="accordion" data-accordion>
     <dd class="accordion-navigation" data-options="deep_linking:true">
-          <a href="#panel1">Search</a>
-          <div id="panel1" class="content active">
+          <a href="#panel1" style="background-color: #2980B9; color:#FFF">Search</a>
+          <div id="panel1" class="content active small-12 large-4 columns">
             
                        <!-- <h1>Search</h1> -->
 
                       <form name="search_form" method="GET" action="{% url 'results' groupid %}">
                         {% csrf_token %}
                         Enter the value to be searched:
-                        <input type="text" name="search_text" id="search_text" required>
+                        <input type="text" class="small-2 columns" name="search_text" id="search_text" required>
                         <h5> Search by: </h5>
                         <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />Name
                         <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />Tags 
@@ -51,10 +52,10 @@
 
                         <input type="submit" class="button" name="subButton2" id="subButton2" value="Submit" />
                       </form>
-		
-						
+    
+            
           </div>
-		
+    
     </dd>
 </dl>
 <script>
@@ -101,9 +102,9 @@
     }
     
     function parse_data_kwd(sData) {
-	$("#panel1").addClass("active");
+  $("#panel1").addClass("active");
         $("#panel2").removeClass("active");
-  	
+    
       // -------------------------------- SEARCH BY NAME ------------------------------------------- //
       var a = sData.exact.name.length;
         html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';      
@@ -234,7 +235,7 @@
       
       $("#results").html(html_div[page_no]);
 
-      pages = "<h6>Pages:</h6><hr>";
+      pages = "<div style='font-weight:bold; color:#6F6F6F'>Pages:</div><hr>";
       if(results_in_current_page>0){
         pages += "<ul style='float:left; list-style-type:none;'>";
         for (i=0; i < cur_page+1; i++) {
@@ -294,7 +295,7 @@
                 card_html += '<div class="label-list">';
                 
                 card_html += '</div>';
-          	card_html += '<a href=' + GSystem_link + ' target="_blank"> ';
+            card_html += '<a href=' + GSystem_link + ' target="_blank"> ';
                 card_html += '<h4>'+name;
                   card_html += '<div>';
                     card_html += '<small class="subheader">';
@@ -309,15 +310,15 @@
             
       
           card_html += '</div>';
-		card_html += '</a>';
+    card_html += '</a>';
         card_html += '</li>';
 
       return card_html;  
   }
     
     function parse_data_adv(sData) {
-	$("#panel2").addClass("active");
-  	$("#panel1").removeClass("active");
+  $("#panel2").addClass("active");
+    $("#panel1").removeClass("active");
   
       var a = sData.length;
 

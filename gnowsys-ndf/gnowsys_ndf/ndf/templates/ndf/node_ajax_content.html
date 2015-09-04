@@ -15,13 +15,15 @@
   {% if breadcrumbs_list %}
   <ul class="breadcrumbs"> 
     {% for e in breadcrumbs_list %}
-      <li>
       {% if node.pk != e.0 %}
-        <a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a>
-      {% else %} 
-        {{e.1}} 
-      {% endif %}
+      <li>
+        <a class="theme-breadcrumb" id="{{e.0}}">{{e.1}}</a>
       </li>
+      {% else %} 
+      <li class="current">
+        {{e.1}}
+      </li>
+      {% endif %}
     {% endfor %}
   </ul>
   {% elif node.teaches %}
@@ -37,8 +39,7 @@
 
   {% if node.status == 'MODERATION' %}
     <h4><small>
-      {% trans
-      'Note: Following Resource is Under Moderation -' %}
+      {% trans 'Note: Following Resource is Under Moderation -' %}
       <a href="{% url 'moderation_status' group_id node.pk %}">{% trans 'Check the current status of Moderation' %}</a>
     </small></h4>
   {% endif %}
@@ -315,7 +316,7 @@
                 <!-- Orbit image slider only for image and video collections--> 
                 
                 <ul data-orbit data-options="variable_height: true;timer:false;">
-                  <li class="active">
+                  <li class="active small-12 large-columns">
                     <center>                   
                     {% if 'image' in node.mime_type %}
                     <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
@@ -681,8 +682,7 @@
                   {% for k,v in val.items %}
                     {% if k == "fallback_lang" %}
                       {% for each in v %}
-                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
-                        &nbsp;&nbsp;
+                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" class="button secondary tiny"> {{each.name}} </a>
                       {% endfor %}
                     {% elif k == "other_languages" %}
                       {% if v %}
@@ -985,7 +985,13 @@
 
   <footer>
     <p><small>
-      <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> at {{node.last_update}}
+      <em>{% trans "Contributed by" %} 
+      {% for each_user in node.contributors %}
+        <a href="{% url 'dashboard' each_user %}">
+          {{ node.user_details_dict.contributors|join:', ' }}
+        </a>
+      {% endfor %}
+      </em> on {{node.last_update}}
     </small></p>
   </footer>
         

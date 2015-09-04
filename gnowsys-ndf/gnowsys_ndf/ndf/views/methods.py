@@ -1593,12 +1593,11 @@ def cast_to_data_type(value, data_type):
 
     value = value.strip()
     casted_value = value
-
     if data_type == "unicode":
         casted_value = unicode(value)
 
     elif data_type == "basestring":
-        casted_value = str(value)
+        casted_value = unicode(value)
 
     elif (data_type == "int") and str(value):
         casted_value = int(value) if (str.isdigit(str(value))) else value
@@ -1667,7 +1666,6 @@ def get_node_metadata(request, node, **kwargs):
             if at:
 
                 field_value = cast_to_data_type(field_value, at["data_type"])
-
                 if "is_changed" in kwargs:
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
                     if temp_res["is_changed"]:  # if value is true
@@ -4182,7 +4180,7 @@ def create_thread_for_node(request, group_id, node):
 		if release_response_val:
 			rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
 			release_response_val = eval(release_response_val)
-			create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+                        create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
 		if interaction_type_val:
 			thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
 			create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)

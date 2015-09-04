@@ -277,7 +277,7 @@
     </div>
   {% endif %} 
 
-    <div class="content" id="view-discussion">
+    <div class="content small-12 columns"  id="view-discussion">
         {% get_node group_id as group_obj %}
         {% if "CourseEventGroup" not in group_obj.member_of_names_list %}
           {% get_thread_node node.pk as thread_node %}
@@ -305,7 +305,8 @@
           <section class="medium-2 columns"> 
             <div class="row">         
               <div class="medium-6 columns">
-                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit hide"><i class="fi-pencil"></i> {% trans "Edit " %}{{sg_type}}</a>
+                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit"><i class="fi-pencil"></i> {% trans "Edit " %}{{sg_type}}</a>
+              <br/><br/>
                 {% include "ndf/invite_users.html" %}
                 {% include "ndf/invite_admins.html" %}
               </div>
@@ -317,3 +318,4 @@
           <li><a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li>
       {% endif %} 
     {% endif %} 
+

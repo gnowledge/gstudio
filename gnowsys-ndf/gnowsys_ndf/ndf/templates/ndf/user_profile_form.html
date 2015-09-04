@@ -12,7 +12,8 @@
 
 {% get_metadata_values as values%}
 <div class = "information-div" style="position:relative; ">
-			<div style=" position:relative; float:left; width:45%; border-radius: 1px; box-shadow:1px 0.3px 0.6px 1.2px rgba(9,9,9,0.2);" style="position:relative;">
+			<!-- <div style=" position:relative; float:left; width:45%; border-radius: 1px; box-shadow:1px 0.3px 0.6px 1.2px rgba(9,9,9,0.2);" style="position:relative;"> -->
+			<div class="small-12 large-5 columns" style="  border: 1px ; box-shadow:1px 0.3px 0.6px 1.2px rgba(9,9,9,0.2);" >
 				<!-- space to fill the information -->
 				<div align="center">
 						<div class="row" align="left" >
@@ -27,7 +28,9 @@
 							</div> -->
 
 							<div class="small-3 large-3 columns" style="left:1% width:auto">
+							{% if request.user.id == author.created_by %}
 								<a class="fi-pencil" onclick="load_profile()"> Edit</a>
+							{% endif %}
 							</div>
 						</div>
 						

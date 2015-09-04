@@ -57,21 +57,27 @@ app = gst_page
 def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id}) 
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id}) 
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 
-        if group_ins:
-            group_id = str(group_ins._id)
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
 
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+        
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     if app_id is None:  
         app_ins = node_collection.find_one({'_type': "GSystemType", "name": "Page"})
         if app_ins:
@@ -353,9 +359,8 @@ def create_edit_page(request, group_id, node_id=None):
         # if the page created is as a resource in course or program event,
         # set status to PUBLISHED by default
         # one major reason for this, ONLY published nodes can be replicated.
-        if res or program_res:
+        if res or program_res or ce_id:
             page_node.status = u"PUBLISHED"
-
         page_node.save()
         # if page is created in program event, add page_node to group's collection set
         if program_res:
