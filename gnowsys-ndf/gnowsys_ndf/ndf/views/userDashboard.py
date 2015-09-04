@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
+
 import ast
 try:
     from bson import ObjectId
@@ -93,62 +94,72 @@ def uDashboard(request, group_id):
           Access_policy=["PUBLIC"]  
           exclued_from_public =  ObjectId(task_gst._id)  
 
-    grel = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': grel._id, 'status': u"DELETED"})
-    if all_old_prof_pics:
-        for each_grel in all_old_prof_pics:
-            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
-            old_profile_pics.append(n)
+    has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
     if request.method == "POST" :
+        file_uploaded = request.FILES.get("has_profile_pic", "")
+        choose_from_existing_pic = request.POST.get("old_pic_ele","")
         """
         This will take the image uploaded by user and it searches if its already availale in gridfs 
         using its md5 
         """
-        has_profile_pic_str = "has_profile_pic"
-        pp = None
+        # has_profile_pic_str = "has_profile_pic"
+        # pp = None
 
-        if has_profile_pic_str in request.FILES:
-            pp = request.FILES[has_profile_pic_str]
-            has_profile_pic = node_collection.one({'_type': "RelationType", 'name': has_profile_pic_str})
+        # if has_profile_pic_str in request.FILES:
+        if file_uploaded:
+            fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            if fileobj:
+                profile_pic_image = node_collection.one({'_id': ObjectId(fileobj)})
+                gr_node = create_grelation(auth._id, has_profile_pic_rt, profile_pic_image._id)
 
-            # Find md5
-            pp_md5 = hashlib.md5(pp.read()).hexdigest()
-            pp.seek(0)
+            # pp = request.FILES[has_profile_pic_str]
 
-            # Check whether this md5 exists in file collection
-            gridfs_node = gridfs_collection.one({'md5': pp_md5})
-            if gridfs_node:
-                # md5 exists
-                right_subject = gridfs_node["docid"]
+            # # Find md5
+            # pp_md5 = hashlib.md5(pp.read()).hexdigest()
+            # pp.seek(0)
 
-                # Check whether already selected
-                is_already_selected = triple_collection.one(
-                    {'subject': auth._id, 'status': u"PUBLISHED", 'right_subject': right_subject}
-                )
+            # # Check whether this md5 exists in file collection
+            # gridfs_node = gridfs_collection.one({'md5': pp_md5})
+            # if gridfs_node:
+            #     # md5 exists
+            #     right_subject = gridfs_node["docid"]
 
-                if is_already_selected:
-                    # Already selected found
-                    # Signify already selected
-                    is_already_selected = gridfs_node["filename"]
+            #     # Check whether already selected
+            #     is_already_selected = triple_collection.one(
+            #         {'subject': auth._id, 'status': u"PUBLISHED", 'right_subject': right_subject}
+            #     )
 
-                else:
-                    # Already uploaded found
-                    # Reset already uploaded as to be selected
-                    profile_pic_image = create_grelation(auth._id, has_profile_pic, right_subject)
+            #     if is_already_selected:
+            #         # Already selected found
+            #         # Signify already selected
+            #         is_already_selected = gridfs_node["filename"]
 
-                profile_pic_image = node_collection.one({'_type': "File", '_id': right_subject})
+            #     else:
+            #         # Already uploaded found
+            #         # Reset already uploaded as to be selected
+            #         profile_pic_image = create_grelation(auth._id, has_profile_pic, right_subject)
 
-            else:
-                # Otherwise (md5 doesn't exists)
-                # Upload image
-                # submitDoc(request, group_id)
-                #save_file(each,title,userid,group_object._id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-                field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
-                if field_value:
-                    profile_pic_image = node_collection.one({'_type': "File", '_id': ObjectId(field_value)})
-                # Create new grelation and append it to that along with given user
-                if profile_pic_image:
-                    gr_node = create_grelation(auth._id, has_profile_pic, profile_pic_image._id)
+            #     profile_pic_image = node_collection.one({'_type': "File", '_id': right_subject})
+            # else:
+            #     # Otherwise (md5 doesn't exists)
+            #     # Upload image
+            #     # submitDoc(request, group_id)
+            #     #save_file(each,title,userid,group_object._id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+            #     field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
+            #     if field_value:
+            #         profile_pic_image = node_collection.one({'_type': "File", '_id': ObjectId(field_value)})
+            #     # Create new grelation and append it to that along with given user
+            #     if profile_pic_image:
+            #         gr_node = create_grelation(auth._id, has_profile_pic, profile_pic_image._id)  
+        elif choose_from_existing_pic:
+            # update status of old GRelation
+            # old_pic_gr = triple_collection.one({'_type': "GRelation",
+            #      "subject": auth._id, 'relation_type.$id': grel._id,
+            #      'right_subject': ObjectId(choose_from_existing_pic)})
+            # old_pic_gr.status = u"PUBLISHED"
+            # old_pic_gr.save()
+            profile_pic_image = node_collection.one({'_id': ObjectId(choose_from_existing_pic)})
+            gr_node = create_grelation(auth._id, has_profile_pic_rt, profile_pic_image._id)
 
     dashboard_count = {}
     group_list = []
@@ -279,6 +290,12 @@ def uDashboard(request, group_id):
                     )
 
                     break
+
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            old_profile_pics.append(n)
 
     forum_create_rate = forum_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
     file_create_rate = file_cur.count() * GSTUDIO_RESOURCES_CREATION_RATING
