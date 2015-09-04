@@ -23,7 +23,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
 
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time, get_group_name_id
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity,get_execution_time
 
@@ -61,7 +61,6 @@ def userpref(request,group_id):
         auth.save(groupid=group_id)
     return HttpResponse("Success")
 
-@login_required
 @get_execution_time
 def uDashboard(request, group_id):
     usrid = int(group_id) 
@@ -435,20 +434,25 @@ def group_dashboard(request, group_id):
     """
     profile_pic_image = None
     has_profile_pic_str = ""
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
     
-    if ObjectId.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_id)})
-        if group_ins:
-            group_id = group_ins._id
+    # if ObjectId.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_id)})
+    #     if group_ins:
+    #         group_id = group_ins._id
     
     if request.method == "POST" :
         """

@@ -117,9 +117,9 @@
 	<br/>
     <!-- <br/> -->
     <div>
-    {% if tree == "hierarchical" %}
-		{% if user.is_authenticated %}
-    		{% if user_access == "allow" %}
+    {% if tree == "hierarchical" and user_access == "allow" and user.is_authenticated %}
+		{# {% if user.is_authenticated %} #}
+    		{# {% if user_access == "allow" %} #}
     		
 				<div>
 
@@ -158,8 +158,8 @@
 
 		      	</div>		
 
-    		{% endif %}
-		{% endif %}
+    		{# {% endif %} #}
+		{# {% endif %} #}
 	{% endif %}
 	</div>
 
@@ -195,8 +195,7 @@
 
 		<br/>
 		<br/>
-
-		{% cache 300 theme_tree node.pk request.LANGUAGE_CODE tree unfold %}
+		{% cache 300 theme_tree node.pk request.LANGUAGE_CODE tree unfold selected %}
 
 			{% include "ndf/hierarchy_tree.html" %}
 			<div id="app-set-item" class="themes hide" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}">
