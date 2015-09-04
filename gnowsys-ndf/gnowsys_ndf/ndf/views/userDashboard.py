@@ -75,6 +75,8 @@ def uDashboard(request, group_id):
 
     has_profile_pic = None
     profile_pic_image = None
+    old_profile_pics = []
+
     is_already_selected = None
 
     task_gst = node_collection.one(
@@ -90,9 +92,13 @@ def uDashboard(request, group_id):
     else:
           Access_policy=["PUBLIC"]  
           exclued_from_public =  ObjectId(task_gst._id)  
-	    
-    
-     
+
+    grel = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': grel._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            old_profile_pics.append(n)
     if request.method == "POST" :
         """
         This will take the image uploaded by user and it searches if its already availale in gridfs 
@@ -304,6 +310,7 @@ def uDashboard(request, group_id):
             'dashboard_count': dashboard_count, 'show_only_pie': show_only_pie,
             'datavisual': json.dumps(datavisual),
             'total_activity_rating': total_activity_rating,
+            'old_profile_pics':old_profile_pics,
             'site_name': GSTUDIO_SITE_NAME,
          },
         context_instance=RequestContext(request)
