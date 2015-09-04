@@ -7,6 +7,8 @@ nodelist=[]
 user_list = []
 group_set = []
 member_of = []
+prior_node_list = []
+post_node_list = []
 fs_file_ids = []
 Gattribute_ids = []
 Grelations_ids = []
@@ -41,6 +43,10 @@ class Command(BaseCommand):
 						get_file_node_details(i)
 					if i.collection_set:
 						get_collection_node_ids(i)
+					if i.prior_node:
+						get_prior_node(i)
+					if i.post_node:
+						get_prior_node(i)
 					if i.attribute_set:
 						#fetch attribute_type
 						for j in i.attribute_set:
@@ -61,13 +67,14 @@ class Command(BaseCommand):
 												      [ {"name":unicode(j.keys()[0])},	{"inverse_name":unicode(j.keys()[0])}],"_type":"RelationType"})
 				
 								value_node = triple_collection.find_one({"_type": "GRelation", "subject": i._id, "relation_type.$id": rel_node._id})
-								if value_node:	 	
-									Grelations_ids.extend(value_node._id) 
+								if value_node:	 
+									print value_node	
+									Grelations_ids.append(value_node._id) 
 									if type(attr.object_value) not in  [datetime.datetime,unicode,int] :
 										try:
-											Grelations_value.extend(value_node.object_value)
+											Grelations_value.extend(value_node.right_subject)
 										except:
-											Grelations_value.append(value_node.object_value)		
+											Grelations_value.append(value_node.right_subject)		
 				query_list = []
 				commandlist=[]
 				query ={}
@@ -171,11 +178,11 @@ def get_file_node_details(node):
 		if 'fs_file_ids' == i:
 			fs_file_ids.extend(node['fs_file_ids'])
 		if 'group_set' == i:
-			for i in node.group_set:
-				node = node_collection.find_one({"_id":ObjectId(i)})
-				if node:
-					if node._type != unicode('Author'):
-						group_set.extend(node.group_set)
+			for j in node.group_set:
+				group_node = node_collection.find_one({"_id":ObjectId(j)})
+				if group_node:
+					if group_node._type != unicode('Author'):
+						group_set.extend(group_node.group_set)
 		if 'author_set' == i:
 		        user_list.extend(node.author_set)			
 	return node
@@ -183,11 +190,11 @@ def get_file_node_details(node):
 def get_page_node_details(node):
 	for i in node:
 		if 'group_set' == i:
-			for i in node.group_set:
-				node = node_collection.find_one({"_id":ObjectId(i)})
-				if node:
-					if node._type != unicode('Author'):
-						group_set.extend(node.group_set)
+			for j in node.group_set:
+				group_node = node_collection.find_one({"_id":ObjectId(j)})
+				if group_node:
+					if group_node._type != unicode('Author'):
+						group_set.extend(group_node.group_set)
 		if 'author_set' == i:
 		        user_list.extend(node.author_set)			
 	return node
@@ -198,5 +205,21 @@ def get_collection_node_ids(node):
 		new_node = node_collection.find_one({"_id":ObjectId(i)})
 		if new_node:
 		        if new_node.collection_set:
-			        get_collection_node_ids(new_node)	
+			        get_collection_node_ids(new_node)
+
+def get_prior_node(node):
+	for i in node.prior_node:
+		prior_node_list.append(i)
+		new_node = node_collection.find_one({"_id":ObjectId(i)})
+		if new_node:
+			if new_node.prior_node:
+				get_prior_node(new_node)
+def get_prior_node(node):	
+	for i in node.post_node:
+		post_node_list.append(i)
+		new_node = node_collection.find_one({"_id":ObjectId(i)})
+		if new_node:
+			if new_node.post_node:
+				get_prior_node(new_node)
+	
 
