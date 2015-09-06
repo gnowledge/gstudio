@@ -134,7 +134,7 @@
                         </div>
                     {% endif %}
                     <div id="prof_pic_prop" class="reveal-modal medium" data-reveal style="height:500px;"> 
-                        <a href="" id="upload_photo">
+                        <a href="#" id="upload_photo">
                           <div id="upload-photo-div" class="text-center">
                             <label id="upload_photo_lbl" class="fi-upload">Upload New Photo</label>
                           </div>
@@ -477,6 +477,7 @@
 	$("#submitpostid").click(function() {
 		upload_from_existing = $("#old_pic_ele").length
 		if($("#docFile").val() != "" || upload_from_existing > 0) { 
+			$("#prof_pic_prop").foundation('reveal', 'close');
 			$("#message").show();
 			$(".upload_cancel_div").addClass("hide");
 			$("#btnUploadProfilePic").attr("disabled", "disabled");
