@@ -76,6 +76,9 @@ def uDashboard(request, group_id):
 
     has_profile_pic = None
     profile_pic_image = None
+    current_user_obj = None
+    usr_fname = None
+    usr_lname = None
     old_profile_pics = []
 
     is_already_selected = None
@@ -194,8 +197,10 @@ def uDashboard(request, group_id):
             {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':usrid}
         ).sort('last_update', -1).limit(10)
                    dashboard_count.update({'Task': task_cur.count()})
-  
-   
+        
+        current_user_obj = User.objects.get(id=current_user)
+        usr_fname = current_user_obj.first_name
+        usr_lname = current_user_obj.last_name
     group_cur = node_collection.find(
         {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
         '$or': [{'group_admin': int(usrid)}, {'author_set': int(usrid)}]}).sort('last_update', -1).limit(10)
@@ -318,8 +323,10 @@ def uDashboard(request, group_id):
         "ndf/uDashboard.html",
         {
             'usr': current_user, 'username': usrname, 'user_id': usrid,
+            'usr_fname':usr_fname, 'usr_lname':usr_lname,
             'DOJ': date_of_join, 'author': auth, 'group_id': group_id,
             'groupid': group_id, 'group_name': group_name,
+            'current_user_obj':current_user_obj,
             'already_set': is_already_selected, 'user_groups': group_cur,
             'prof_pic_obj': profile_pic_image, 'user_task': task_cur,
             'group_count': group_cur.count(), 'page_count': page_cur.count(),
@@ -636,10 +643,13 @@ def group_dashboard(request, group_id):
 
 def user_profile(request,group_id):
 	from django.contrib.auth.models import User
-	if request.method == "POST":
-		
+	auth_node = node_collection.one({"_id":ObjectId(group_id)})
+	user_dict={}
+	user_details = User.objects.get(id=request.user.id)
+	user_dict['fname'] = user_details.first_name
+	user_dict['lname']  = user_details.last_name
 
-		Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
+	if request.method == "POST":
 		user = User.objects.get(id=request.user.id)
 		user_data = request.POST.getlist('forminputData[]','')
 		user_select_data = request.POST.getlist('formselectData[]','')
@@ -647,34 +657,33 @@ def user_profile(request,group_id):
 			a=ast.literal_eval(i)
 			if  a.get('first_name',None) != None:
 			  	user.first_name = a['first_name']
+			  	user_dict['fname'] = user.first_name
 			if a.get('last_name',None) != None:
 				user.last_name = a['last_name']
+			  	user_dict['lname'] = user.last_name
 		user.save()
 		for i in user_select_data:
 			a=ast.literal_eval(i)
-                        if  a.get('language_proficiency','') :
-				Author_group['language_proficiency'] = a.get('language_proficiency','')	
+			if  a.get('language_proficiency','') :
+				auth_node['language_proficiency'] = a.get('language_proficiency','')	
 			if  a.get('subject_proficiency',''):			
-				Author_group['subject_proficiency'] =  a.get('subject_proficiency','')
-		Author_group.save()	 
-		return HttpResponse("Details Successfully Updated")
+				auth_node['subject_proficiency'] =  a.get('subject_proficiency','')
+		auth_node.save()
+		user_dict['node'] = auth_node
+		user_dict['success'] = True
+		return HttpResponse(json.dumps(user_dict,cls=NodeJSONEncoder))
 	else:
-		user={}		
-		Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
-		user_details = User.objects.get(id=request.user.id)
-		user['first_name'] = user_details.first_name
-		user['last_name']  = user_details.last_name	
- 	return render_to_response(	"ndf/user_profile_form.html",
-					{'group_id':group_id,'node':Author_group,'user':user},
-					context_instance=RequestContext(request)
-		
-	)
+		user_dict['node'] = auth_node
+		return render_to_response(  "ndf/user_profile_form.html",
+				{'group_id':group_id,'node':auth_node,'user':json.dumps(user_dict,cls=NodeJSONEncoder)},
+				context_instance=RequestContext(request)
+		)
 
 def user_data_profile(request,group_id):
 	user = {}
-	Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
+	auth_node = node_collection.one({"_id":ObjectId(group_id)})
 	user_details = User.objects.get(id=request.user.id)
 	user['first_name'] = user_details.first_name
 	user['last_name']  = user_details.last_name
-	user['node'] = Author_group
+	user['node'] = auth_node
 	return HttpResponse(json.dumps(user,cls=NodeJSONEncoder))
