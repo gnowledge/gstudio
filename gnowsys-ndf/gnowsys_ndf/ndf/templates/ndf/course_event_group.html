@@ -214,7 +214,7 @@
                     <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}"> Edit </a>
                   {% endif %}
                   <span>
-                  Created at {{each_blog.created_at}}
+                  Created by {{each_blog.created_by|get_username}} at {{each_blog.created_at}}
                   </span>
                   <div>
                     {{each_blog.html_content|safe}}
