@@ -29,7 +29,9 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'unpublished_entry','meta_type':'factory_types'},
                          {'name':'booklet','meta_type':'factory_types'},
                          {'name':'GList','meta_type':'factory_types'},
-                         {'name':'ProgramEventGroup','meta_type':'factory_types'},
+			 {'name':'GListItem','meta_type':'factory_types'},
+			 {'name':'Group','meta_type':'factory_types'},	
+			 {'name':'ProgramEventGroup','meta_type':'factory_types'},
                          {'name':'CourseEventGroup','meta_type':'factory_types'},
                          {'name':'PartnerGroup','meta_type':'factory_types'},
                          {'name':'ModeratingGroup','meta_type':'factory_types'},
@@ -269,3 +271,11 @@ factory_relation_types = [
         }
     }
 ]
+
+
+#factory data is data which is required while intialization of the database first time
+factory_data = [ {'_type':'Group','name':'home'}
+		
+	       ]
+
+
