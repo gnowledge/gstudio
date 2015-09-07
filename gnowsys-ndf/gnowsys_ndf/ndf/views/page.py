@@ -152,14 +152,15 @@ def page(request, group_id, app_id=None):
       )
 
     elif gst_page._id == ObjectId(app_id):
+      group_type = node_collection.one({'_id': ObjectId(group_id)})
+      group_info=group_type_info(group_id)
+      node = node_collection.find({'member_of':ObjectId(app_id)})
+      title = gst_page.name
+        	
       '''
       if  group_info == "Moderated":
 	# Page list view
         # code for moderated Groups
-        group_type = node_collection.one({'_id': ObjectId(group_id)})
-        group_info=group_type_info(group_id)
-	node = node_collection.find({'member_of':ObjectId(app_id)})
-        title = gst_page.name
         node=group_type.prior_node[0]
         page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
                                              'group_set': {'$all': [ObjectId(node)]},
