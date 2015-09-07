@@ -506,12 +506,18 @@
 
 {% block document_ready %}
 	{% if already_set %}
-		var message = "{{already_set}} {% trans 'image is already selected, choose different image !!!' %}"
+    var message = "{{already_set}} {% trans 'image is already selected, choose different image !!!' %}"
+    $("#alertModalLabel").text(message);
+    $("#alertModal").addClass("alert");
+    $("#alertModal").foundation('reveal', 'open');
+  {% endif %}
+
+  $('#docFile').val("");
+  {% if not success %}
+		var message = {% trans 'Something went wrong. Please try after some timme !!!' %}"
 		$("#alertModalLabel").text(message);
 		$("#alertModal").addClass("alert");
 		$("#alertModal").foundation('reveal', 'open');
-	{% endif %}
-
-	$('#docFile').val("");
+    {% endif %}
   
 {% endblock %}

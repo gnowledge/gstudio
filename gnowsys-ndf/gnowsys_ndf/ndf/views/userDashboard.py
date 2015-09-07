@@ -79,6 +79,7 @@ def uDashboard(request, group_id):
     current_user_obj = None
     usr_fname = None
     usr_lname = None
+    success_state = True
     old_profile_pics = []
 
     is_already_selected = None
@@ -113,8 +114,11 @@ def uDashboard(request, group_id):
             fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
             if fileobj:
                 profile_pic_image = node_collection.one({'_id': ObjectId(fileobj)})
-                gr_node = create_grelation(auth._id, has_profile_pic_rt, profile_pic_image._id)
-
+                # The 'if' below is required in case file node is deleted but exists in grid_fs
+                if profile_pic_image:
+	                gr_node = create_grelation(auth._id, has_profile_pic_rt, profile_pic_image._id)
+	            else:
+	            	success_state = False
             # pp = request.FILES[has_profile_pic_str]
 
             # # Find md5
@@ -323,6 +327,7 @@ def uDashboard(request, group_id):
         "ndf/uDashboard.html",
         {
             'usr': current_user, 'username': usrname, 'user_id': usrid,
+            'success': success_state,
             'usr_fname':usr_fname, 'usr_lname':usr_lname,
             'DOJ': date_of_join, 'author': auth, 'group_id': group_id,
             'groupid': group_id, 'group_name': group_name,
