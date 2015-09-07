@@ -43,8 +43,11 @@ from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import add
 
 SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files")
 
+log_file_not_found = []
+log_file_not_found.append("######### Script ran on : " + time.strftime("%c") + " #########\n------------------------------------------------------------\n")
+
 log_list = []  # To hold intermediate errors
-log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
+log_list.append("######### Script ran on : " + time.strftime("%c") + " #########\n############################################################\n")
 
 file_gst = node_collection.one({'_type': 'GSystemType', "name": "File"})
 home_group = node_collection.one({"name": "home", "_type": "Group"})
@@ -171,9 +174,7 @@ class Command(BaseCommand):
         finally:
             if log_list:
 
-                log_list.append("\n =====================================\
-                    ======================= End of Iteration ============\
-                    ================================================\n")
+                log_list.append("\n ============================================================ End of Iteration ============================================================\n\n\n")
                 # print log_list
 
                 log_file_name = args[0].rstrip("csv") + "log"
@@ -181,6 +182,19 @@ class Command(BaseCommand):
                 # print log_file_path
                 with open(log_file_path, 'a') as log_file:
                     log_file.writelines(log_list)
+
+            if log_file_not_found:
+
+                log_file_not_found.append("============================== End of Iteration =====================================\n\n\n")
+                log_file_not_found.append("-------------------------------------------------------------------------------------\n")
+
+                log_file_name = args[0].replace('.', '_FILES_NOT_FOUND.').rstrip("csv") + "log"
+                log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+                # print log_file_path
+                with open(log_file_path, 'a') as log_file:
+                    log_file.writelines(log_file_not_found)
+
+
 
   # --- End of handle() ---
 
@@ -431,11 +445,11 @@ def parse_data_create_gsystem(json_file_path):
 
             # calling method to create File GSystems
             nodeid = create_resource_gsystem(parsed_json_document)
-
+            # print "nodeid : ", nodeid
 
             collection_name = parsed_json_document.get('collection', '')
 
-            if collection_name:
+            if collection_name and nodeid:
 
                 collection_node = node_collection.one({
                         '_type': 'File',
@@ -449,7 +463,7 @@ def parse_data_create_gsystem(json_file_path):
             thumbnail_url = parsed_json_document.get('thumbnail')
             # print "thumbnail_url : ", thumbnail_url
 
-            if thumbnail_url:
+            if thumbnail_url and nodeid:
                 try:
                     attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document)
                 except:
@@ -776,7 +790,7 @@ def parse_data_create_gsystem(json_file_path):
 
               # print relation_list
             else:
-                info_message = "\n!! Either resource is already created or file is already saved into gridfs/DB"
+                info_message = "\n!! Either resource is already created or file is already saved into gridfs/DB or file not found"
                 print info_message
                 log_list.append(str(info_message))
 
@@ -804,7 +818,19 @@ def create_resource_gsystem(resource_data):
     log_list.append(info_message)
     print "  (Might take some time. please hold on ...)\n"
 
-    files = urllib2.urlopen(resource_link)
+    try:
+        files = urllib2.urlopen(resource_link)
+    except Exception, e:
+        error_message = "\n!! File Not Found at: " + resource_link
+        log_list.append(error_message)
+
+        file_not_found_msg = "\nFile with following details not found: \n"
+        file_not_found_msg += "- Name     : " + resource_data["name"] + "\n"
+        file_not_found_msg += "- File Name: " + resource_data["file_name"] + "\n"
+        file_not_found_msg += "- URL      : " + resource_link + "\n\n"
+        log_file_not_found.append(file_not_found_msg)
+        return None
+
     files = io.BytesIO(files.read())
     files.name = filename
 
@@ -904,14 +930,14 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
 
     # th_id: thumbnail id
     th_id = create_resource_gsystem(updated_res_data)
-    print "th_id: ", th_id
+    # print "th_id: ", th_id
     
     th_obj = node_collection.one({'_id': ObjectId(th_id)})
     th_gridfs_id = th_obj.fs_file_ids[1]
-    print "th_gridfs_id: ", th_gridfs_id
+    # print "th_gridfs_id: ", th_gridfs_id
 
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
-    print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
+    # print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
     node_fs_file_ids = node_obj.fs_file_ids
 
     if len(node_fs_file_ids) == 1:
@@ -919,7 +945,7 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
     elif len(node_fs_file_ids) > 1:
         node_fs_file_ids[1] = ObjectId(th_gridfs_id)
 
-    print "node_fs_file_ids: ", node_fs_file_ids
+    # print "node_fs_file_ids: ", node_fs_file_ids
 
     node_collection.collection.update(
                                         {'_id': ObjectId(node_id)},
