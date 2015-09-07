@@ -116,9 +116,9 @@ def uDashboard(request, group_id):
                 profile_pic_image = node_collection.one({'_id': ObjectId(fileobj)})
                 # The 'if' below is required in case file node is deleted but exists in grid_fs
                 if profile_pic_image:
-	                gr_node = create_grelation(auth._id, has_profile_pic_rt, profile_pic_image._id)
-	            else:
-	            	success_state = False
+                    gr_node = create_grelation(auth._id, has_profile_pic_rt, profile_pic_image._id)
+                else:
+                    success_state = False
             # pp = request.FILES[has_profile_pic_str]
 
             # # Find md5
