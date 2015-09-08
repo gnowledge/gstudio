@@ -15,15 +15,13 @@
   {% if breadcrumbs_list %}
   <ul class="breadcrumbs"> 
     {% for e in breadcrumbs_list %}
-      {% if node.pk != e.0 %}
       <li>
-        <a class="theme-breadcrumb" id="{{e.0}}">{{e.1}}</a>
-      </li>
+      {% if node.pk != e.0 %}
+        <a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a>
       {% else %} 
-      <li class="current">
-        {{e.1}}
-      </li>
+        {{e.1}} 
       {% endif %}
+      </li>
     {% endfor %}
   </ul>
   {% elif node.teaches %}
@@ -56,13 +54,10 @@
   {% endif %}
   </h2>
       
-  <h1 class="subheader">
+      {% if topic %}
     <dl class="tabs" data-tab> 
 
-      {% if topic %}
       <!-- Basic Description -->
-      <dd class="active page-view view_list"><a class="view-page" href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
-
       <!-- Filter view for Topics -->
       <dd class="filters-view">
         <nav id="nav">
@@ -165,53 +160,11 @@
         <li class="view_list" id="Interactives"><a><i class="fi-arrows-compress"></i> {#% trans "Interactives" %#} </a></li>  
       </ul>
       -->
-        
-      {% else %}
-      <!-- Basic Description -->
-      <dd class="tab-title active page-view"><a class="view-page" href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
-      {% endif %}
+      
     
-      <!-- Discussion -->
-      {% if "Group" not in node.member_of_names_list %}
-
-        {% if node|is_File or node|is_Page %}         
-        <!-- calling ndf tags for discussion replies -->
-        {% get_thread_node node.pk as thread_node %}
-        {% if thread_node %}
-            {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-        {% else %}
-          {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-        {% endif %}
-
-        <dd class="tab-title discussion-view"><a class="view-discussion" href="#view-discussion"><i class="fi-comment"></i>
-          {% if all_replies %}
-            <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
-              {% trans "Join Discussion" %} ({{ all_replies | length }})
-            </span>
-          {% else %}            
-            <span title="{% trans 'Be the first to start a discussion' %}">
-              {% trans "Begin Discussion" %}
-            </span>
-          {% endif %}
-        </a></dd>
-        {% endif %}
-      <!-- -END of Discussion -->
-
-      {% comment %}
-        {% else %}
-        <!-- If its group then show management tab only for group admins and superuser-->
-          {% check_group node as is_group %}
-          {% if is_group %}
-            {% check_is_gstaff groupid request.user as is_gstaff %}
-            {% if is_gstaff %}
-              <dd class="tab-title manage-view"><a class="view-manage" href="#view-manage"><i class="fi-wrench"></i> {% trans "Management" %}</a></dd>
-            {% endif %}
-          {% endif %}
-      {% endcomment %}
-
-      {% endif %}
+      
     </dl>
-  </h1>
+      {% endif %}
   <!-- new  -->
 
   {% if schema.0 %}
@@ -272,10 +225,10 @@
                   {% else %}
                   <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
                   }
-    	            {% endif %}
+                  {% endif %}
                   {% endfor %}
                 </div>
-    	          {% endif %}
+                {% endif %}
                 {% endif %}
               </div>
               -->
@@ -308,7 +261,7 @@
             {% get_grid_fs_object node as grid_fs_obj %}
 
             <!-- New Implementation -->
-            {% trans 'Resource Type' %}: {{node.mime_type}}<br/><br/>          
+            {% trans 'Resource Type' %}: {{node.mime_type}}<br/>          
             
             {% if node.collection_set %} 
 
@@ -323,7 +276,7 @@
                       <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
                       </a>
                     {% elif 'video' in node.mime_type %}
-            		     <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
+                     <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
                         <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">    
                         <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
                         <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
@@ -411,13 +364,13 @@
               {% elif 'video' in node.mime_type %}
 
               {% comment "commented getting video from wetube" %}
-            		{% get_source_id node.pk as source_id %}
-            		{% if source_id %}
+                {% get_source_id node.pk as source_id %}
+                {% if source_id %}
                             <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
                               <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
                               {% trans "Your browser does not support the video tag." %}
                             </video>
-            		{% else %}
+                {% else %}
               {% endcomment %}
 
                 <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
@@ -439,6 +392,11 @@
                 <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                 <br/>
                 <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">{% trans 'Full screen view' %}</a>
+
+                <p class="large-text-right"><small>
+                  <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
+                </small></p>
+
               {% elif 'epub' in node.mime_type %}
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
@@ -471,6 +429,7 @@
                   </h2>
                 </div>
                 
+
                 <script>
                   // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
                   var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}", {
@@ -590,7 +549,50 @@
             {% endif %}
             {% endwith %}
           </div>
-          
+          <!-- Discussion -->
+            <div class="accordion" data-accordion  >
+
+                <dd class="accordion-navigation">
+                   {% if "Group" not in node.member_of_names_list %}
+                    {% if node|is_File or node|is_Page %}         
+                    <!-- calling ndf tags for discussion replies -->
+                    {% get_thread_node node.pk as thread_node %}
+                    {% if thread_node %}
+                        {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                    {% else %}
+                      {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                    {% endif %}
+
+                   <a class="tab-title discussion-view large-text-center" href="#view-discussion"><i class="fi-comment"></i>
+                       {% if all_replies %}
+                        <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
+                          {% trans "Join Discussion" %} ({{ all_replies | length }})
+                        </span>
+                      {% else %}            
+                        <span title="{% trans 'Be the first to start a discussion' %}">
+                          {% trans "Begin Discussion" %}
+                        </span>
+                      {% endif %}</a>
+                    <dd>
+                <div class="content" id="view-discussion">
+                      <!-- discussion content area -->
+                    {% get_thread_node node.pk as thread_node %}
+
+                    {% if thread_node %}
+                    {% get_node thread_node as thread_node_obj %}
+                          {% include 'ndf/discussion.html' with node=thread_node_obj %}
+                    {% else %}            
+                        {% include 'ndf/discussion.html' %}
+                    {% endif %}
+                      <!-- END of discussion content area -->     
+                    </div>
+
+                   </dd>
+                    {% endif %}
+                    {% endif %}
+             </dd>
+            </div>
+    <!-- End of Discussion --> 
           <br/>
           
           <div>
@@ -613,7 +615,7 @@
               </tbody>
             </table>
             {% endif %}
-        	</div>
+          </div>
         </div>
         
         <!-- Resource contents of topic -->
@@ -682,7 +684,8 @@
                   {% for k,v in val.items %}
                     {% if k == "fallback_lang" %}
                       {% for each in v %}
-                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" class="button secondary tiny"> {{each.name}} </a>
+                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
+                        &nbsp;&nbsp;
                       {% endfor %}
                     {% elif k == "other_languages" %}
                       {% if v %}
@@ -696,7 +699,7 @@
                              {{each.name}} </a>&nbsp;
                             &nbsp;&nbsp;
                           {% endfor %}
-                        </fieldset>	      
+                        </fieldset>       
                       {% endif %}
                     {% endif %}
                   {% endfor %}
@@ -771,7 +774,7 @@
               <div id="panel1a" class="content active">
               <table id="panel1a" align ="center" style="width:80%; border-width:0px; height: 200px; display: block;overflow-y: scroll;">
                 <tbody>
-    	   
+         
                 {% get_json node.pk as jsonobj %}
                 {% str_to_dict jsonobj as obj %}
                 {% for key, value in obj.items %}
@@ -793,12 +796,12 @@
                 {{value}}
                 {% endif %}
                 </td>
-                {% else %}	     
+                {% else %}       
                 Not set</td>
                 {% endif %}
                 </tr>
                 {% endif %}
-                {% endfor %}	    
+                {% endfor %}      
                 </tbody>
               </table>
               </div>
@@ -965,36 +968,16 @@
         {% endcomment %}
         <!-- /////////////////// -->
 
-        <div class="content" id="view-discussion">
-          <!-- discussion content area -->
-        {% get_thread_node node.pk as thread_node %}
-
-        {% if thread_node %}
-        {% get_node thread_node as thread_node_obj %}
-              {% include 'ndf/discussion.html' with node=thread_node_obj %}
-        {% else %}            
-            {% include 'ndf/discussion.html' %}
-        {% endif %}
-          <!-- END of discussion content area -->     
-        </div>
-
+        
       </div><!-- end of tab's content -->
     </section>
   
   </div>
 
   <footer>
-    <p><small>
-      <em>{% trans "Contributed by" %} 
-      {% for each_user in node.contributors %}
-        <a href="{% url 'dashboard' each_user %}">
-          {{ node.user_details_dict.contributors|join:', ' }}
-        </a>
-      {% endfor %}
-      </em> on {{node.last_update}}
-    </small></p>
+    
   </footer>
-        
+
   <!-- schema ends here -->
   <!-- end new -->
 

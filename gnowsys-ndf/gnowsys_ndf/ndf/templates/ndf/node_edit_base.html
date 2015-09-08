@@ -1407,8 +1407,13 @@ i.remove-tag{
     	{
           $("#message").css("display", "none");
 	    }
-
-    {% if not ce_id %}
+	  {% get_site_name_from_settings as site_name %}
+    {% comment %}
+    	
+    
+    {% if "Page" in node.member_of_names_list or "File" in node.member_of_names_list%}
+    {% endcomment %}
+	{% if site_name == "NROER" %}
 		if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
 			$('#tabs').find('a[href="#tab2"]').trigger('click');
 			$("#message").css("display", "block");
