@@ -7,7 +7,7 @@ import json
 class Command(BaseCommand):
     help = "setup the initial database"
     def handle(self,*args,**options):
-		file_names = ['GSystemType.json','factorydata','metatype.json','AttributeType.json','RelationType.json']
+		file_names = ['GSystemType.json','factorydata.json','metatype.json','AttributeType.json','RelationType.json']
 		for i in file_names:	
 			PROJECT_ROOT = os.path.abspath(os.path.dirname(os.pardir))
 			refcatpath = os.path.join(PROJECT_ROOT + '/GRef.cat./' + i)
@@ -44,6 +44,7 @@ class Command(BaseCommand):
 							oid_list_str = values.__str__()
 							if '$oid' in oid_list_str:
 								for oid_dict in values:
+									print oid_dict	
 									oid_ObjectId = ObjectId(oid_dict['$oid'])
 									oid_ObjectId_list.append(oid_ObjectId)
 
