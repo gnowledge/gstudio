@@ -6,6 +6,7 @@ from bson.json_util import dumps,loads
 from bson import json_util
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.rcslib import RCS
+from gnowsys_ndf.settings import GAPPS
 import json
 rcs = RCS()
 hr = HistoryManager()
@@ -18,6 +19,7 @@ class Command(BaseCommand):
 		final_list = []
 		
 		GSystemTypeList = [i['name'] for i in factory_gsystem_types]
+		GSystemTypeList.extend(list(GAPPS))
 		RelationTypeList = [ i.keys()[0] for i in  factory_relation_types ]
 		AttributeTypeList = [ i.keys()[0] for i in  factory_attribute_types ]
 		metatypes = get_metatypes()	
@@ -37,9 +39,10 @@ def  get_metatypes():
 	return metatypeslist		
 
 def  get_gsystems(GSystemTypeList):
-	var = {"_type": "GSystemType","name":{"$in":GSystemTypeList}}  
-	Systemtypes = node_collection.find(var,{"_id":1})
-	Systemtypelist = [i._id for i in Systemtypes]
+	var = {"name":{"$in":GSystemTypeList}}  
+	Systemtypes = node_collection.find(var,{"_id":1,"name":1})
+	exceptionlist = ['ProgramEventGroup', 'CourseEventGroup','Event']
+	Systemtypelist = [i._id for i in Systemtypes if i.name not in exceptionlist ]
 		
 	'''
 	cmd = "mongoexport --db studio-dev --collection Nodes -q '" + '%s'  % var + "' --out Schema/GSystemType.json"
@@ -80,7 +83,6 @@ def  get_factory_data(Factory_data):
 	if Glisttypes:
 		for i in Glisttypes:
 			if i not in data_list:
-				print i.name
 				data_list.append(i._id)
 				if i.collection_set:
 					GlistItems.extend(i.collection_set)
@@ -119,7 +121,7 @@ def make_rcs_dir(final_list):
 				if a:
 					filter_list = ['GSystemType','RelationType','AttributeType','MetaType']
 					if a._type  in filter_list:
-						file_node = get_version_document(a,rel_path)
+						file_node = get_version_document(a,rel_path,'1.1')
 						if a._type == 'GSystemType':
 							GSystemtypenodes.append(file_node)
 						elif a._type == 'RelationType':
@@ -129,7 +131,11 @@ def make_rcs_dir(final_list):
 						elif a._type == 'MetaType': 
 							metatype.append(file_node)
 					elif a._type not in filter_list:
-						file_node = get_version_document(a,rel_path,'1.1')
+						if a._type == "Group":
+							file_node = get_version_document(a,rel_path,'1.1')
+						else:
+							file_node = get_version_document(a,rel_path)
+						
 						factorydatanode.append(file_node)					
 			
 	#start making catalog 	
