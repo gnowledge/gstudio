@@ -38,21 +38,26 @@ class Command(BaseCommand):
 				elif i == 'AttributeType.json':
 					node = node_collection.collection.AttributeType()
 				if converted_data['name'] not in ['NUSSD Course','QuizItem']:
-					for key, values in converted_data.items():
-						if values and type(values) == list:
-							oid_ObjectId_list = []
-							oid_list_str = values.__str__()
-							if '$oid' in oid_list_str:
-								for oid_dict in values:
-									print oid_dict	
-									oid_ObjectId = ObjectId(oid_dict['$oid'])
-									oid_ObjectId_list.append(oid_ObjectId)
+					try:
+						for key, values in converted_data.items():
+							if values and type(values) == list:
+								oid_ObjectId_list = []
+								oid_list_str = values.__str__()
+								if '$oid' in oid_list_str:
+									for oid_dict in values:
+										print  type(oid_dict)
+										print oid_dict,converted_data['name']	
+										oid_ObjectId = ObjectId(oid_dict['$oid'])
+										oid_ObjectId_list.append(oid_ObjectId)
 
-								node[key] = oid_ObjectId_list
+									node[key] = oid_ObjectId_list
 							
-						else:
-							if key != "_type":
-								node[key] = values
+							else:
+								if key != "_type":
+									node[key] = values
+					except:
+						if key != "_type":
+							node[key] = values
 					node.save()
 					
 						
