@@ -289,7 +289,10 @@
       </nav>
       <!-- closing of first nav -->
 
+
       <!-- =========| divider between two nav's/header's |=========== -->
+
+
       <!-- start of second nav  or group level header-->
       {% get_sg_member_of group_object.pk as list_of_sg_member_of %}
       {% if "CourseEventGroup" not in group_object.member_of_names_list and "ProgramEventGroup" not in list_of_sg_member_of or site.SITE_NAME == "NROER" %}
@@ -304,8 +307,11 @@
               <!-- #{#% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %} -->
               <ul class="title-area text-center">
                 <li class="name">
-                  <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home"></i></a></h1>
-                  <!-- <i class="fi-home"></i> -->
+                  <h1>
+                    <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+                      <i class="fi-home"></i>
+                    </a>
+                  </h1>
                 </li>
                 <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
                 <li class="toggle-topbar menu-icon"><a href="#"><span>{% trans "APPS" %}</span></a></li>
@@ -388,13 +394,15 @@
 
                 <ul class="left" id="group-apps">
                   <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
+                  <li class="" onclick="history.back()">
+                    <a href=""><i class="fi-play back-btn"></i> BACK</a>
+                  </li>
                   {% if site.SITE_NAME == "NROER" %} 
                     {% if group_name_tag == "home" or "CourseEventGroup" in group_object.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
                     <!-- NROER level-two menu -->
                       {% if "repository" not in request.path %}
                         {% if "/partner/" not in request.path %}
                         <!-- <ul class="button-group nroer-menu"> -->
-                        <li class=""></li>
                         {% for each_gapp in nroer_menu.gapps %}
                           {% for k, v in each_gapp.items %}
                             <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>

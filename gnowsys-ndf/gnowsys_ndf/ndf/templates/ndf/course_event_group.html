@@ -74,7 +74,7 @@
 {% endblock %}
 {% block extended_header %}
     {% get_sg_member_of group_object.pk as list_of_sg_member_of %}
-    <div>
+    <div class="row">
 
       {% if "CourseEventGroup" in group_object.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
           <nav>
@@ -126,10 +126,10 @@
 {% endblock %}
 
 {% block body_content %}
-{% if user.is_authenticated %}
-  {% get_user_object request.user.id as user_obj %}
-  {% check_is_gstaff groupid user_obj as gstaff_access %}
-{% endif %}
+  {% if user.is_authenticated %}
+    {% get_user_object request.user.id as user_obj %}
+    {% check_is_gstaff groupid user_obj as gstaff_access %}
+  {% endif %}
 
 	<div id="view-page">
     
@@ -255,6 +255,7 @@
     </section>
   
   	</div>
+    </div>
 
 {% endblock %}
 
