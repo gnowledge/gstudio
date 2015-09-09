@@ -406,7 +406,7 @@ i.remove-tag{
 	  		{% for k,v in metadata.items %}
 	  		  
   											
-	  			<div class="small-6 columns">			  	
+	  			<div class="small-12 large-6 columns">			  	
 			  		<label>
 			  			{% if k == "educationaluse" %}
 						<h5 >{% trans "Educational Use:" %} </h5> 
@@ -1407,8 +1407,9 @@ i.remove-tag{
     	{
           $("#message").css("display", "none");
 	    }
-
-    {% if not ce_id %}
+	  {% get_site_name_from_settings as site_name %}
+    
+	{%  if site_name == "NROER" and title == "Page" or "File" in node.member_of_names_list    %}
 		if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
 			$('#tabs').find('a[href="#tab2"]').trigger('click');
 			$("#message").css("display", "block");
