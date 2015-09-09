@@ -10,7 +10,7 @@ from gnowsys_ndf.settings import GAPPS
 import json
 rcs = RCS()
 hr = HistoryManager()
-StsGSystemlist = ['Announced Course','CourseSection','CourseSubSection']		
+StsGSystemlist = ['Announced Course','CourseSection','CourseSubSection','CourseSectionEvent','CourseUnit','Course']		
 class Command(BaseCommand):
 
 	def handle(self,*args,**options):
@@ -21,12 +21,21 @@ class Command(BaseCommand):
 		GSystemTypeList = [i['name'] for i in factory_gsystem_types]
 		GSystemTypeList.extend(list(GAPPS))
 		GSystemTypeList.extend(StsGSystemlist)
-		RelationTypeList = [ i.keys()[0] for i in  factory_relation_types ]
+		#AttributeType
+		extraattributes = [ i['name'] for i in attribute_types ]
 		AttributeTypeList = [ i.keys()[0] for i in  factory_attribute_types ]
+		AttributeTypeList.extend(extraattributes)
+		AttributeTypeList = get_attributetypes(AttributeTypeList)
+		
 		metatypes = get_metatypes()	
 		GSystemTypeList = get_gsystems(GSystemTypeList)
+		#RelationType
+		extrrelations = [ i['name'] for i in relation_types ]
+		RelationTypeList = [ i.keys()[0] for i in  factory_relation_types ]
+		RelationTypeList.extend(extrrelations)
 		RelationTypeList = get_relationtypes(RelationTypeList)
-		AttributeTypeList = get_attributetypes(AttributeTypeList)
+		
+
 		datalist = get_factory_data(factory_data)
 		final_list  = datalist + AttributeTypeList +  RelationTypeList  + GSystemTypeList + metatypes
 		#send it for making the rcs of all the nodes
@@ -44,7 +53,8 @@ def  get_gsystems(GSystemTypeList):
 	Systemtypelist =[]
 	var = {"name":{"$in":GSystemTypeList}}  
 	Systemtypes = node_collection.find(var)
-	
+	Systemtypelist = [i._id for i in Systemtypes  ]
+	'''
 	for i in Systemtypes:
 		if i.name != "Event":
 			Systemtypelist.append(i._id)
@@ -54,9 +64,9 @@ def  get_gsystems(GSystemTypeList):
 	
 	#Systemtypes.reload()
 	#exceptionlist = ['Event']
-	# = [i._id for i in Systemtypes if i.name not in exceptionlist ]
+	Systemtypelist = [i._id for i in Systemtypes if i.name not in exceptionlist ]
 	Systemtypelist.extend(lisst)
-	
+	'''
 	'''
 	cmd = "mongoexport --db studio-dev --collection Nodes -q '" + '%s'  % var + "' --out Schema/GSystemType.json"
 	subprocess.Popen(cmd,stderr=subprocess.STDOUT,shell=True)
@@ -65,13 +75,20 @@ def  get_gsystems(GSystemTypeList):
 def GSystem_node(node):
 	Gsystem_type_defination = []
 	for i,v in node.items():
+		print i,v	
 		if type(v) == list:
 			if v is not None:	
 				for j in v:
 					if type(j) == list:
-						print i,j		
+						print "one more listing zone", i,j
+								
 					if isinstance(j,type(node_collection.collection.RelationType())) or isinstance(j,type(node_collection.collection.AttributeType())):
+						print "asdfafas" ,j._id
 						Gsystem_type_defination.append(j._id)
+					if isinstance(j,ObjectId):
+						if ObjectId(j) not in Gsystem_type_defination:							
+							Gsystem_type_defination.append(ObjectId(j))
+						
 						
 	return Gsystem_type_defination
 					 		
@@ -140,8 +157,14 @@ def make_rcs_dir(final_list):
 	for i in final_list:	
 		#get rcs files path and copy them to the current dir:
 		if type(i)!= int:
-			
+				
 				a = node_collection.find_one({"_id":ObjectId(i)})
+
+				with open('file_log.txt', 'a') as outfile:
+					outfile.write(a.name)
+					outfile.write("  ")	
+					outfile.write(a._type)	
+					outfile.write("\n")		
 				if a:
 					rel_path = hr.get_file_path(a)
 					path = rel_path + ",v"

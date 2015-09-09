@@ -7,7 +7,7 @@ import json
 class Command(BaseCommand):
     help = "setup the initial database"
     def handle(self,*args,**options):
-		file_names = ['GSystemType.json','factorydata.json','metatype.json','AttributeType.json','RelationType.json']
+		file_names = ['metatype.json','AttributeType.json','RelationType.json','GSystemType.json','factorydata.json']
 		for i in file_names:	
 			PROJECT_ROOT = os.path.abspath(os.path.dirname(os.pardir))
 			refcatpath = os.path.join(PROJECT_ROOT + '/GRef.cat./' + i)
@@ -24,43 +24,50 @@ class Command(BaseCommand):
 			parsed_json_document = []
 			for j,json_data in enumerate(json_documents_list):
 				converted_data = node_collection.from_json(json.dumps(json_data))
-				if i ==  'GSystemType.json':
-					node = node_collection.collection.GSystemType()
-				elif i == 'factorydata.json':
-					if json_data['_type'] == 'Group':
-						node = node_collection.collection.Group()
-					else:					
-						node = node_collection.collection.GSystem()
-				elif i == 'metatype.json':
-					node = node_collection.collection.MetaType()
-				elif i == 'RelationType.json': 
-					node = node_collection.collection.RelationType()
-				elif i == 'AttributeType.json':
-					node = node_collection.collection.AttributeType()
-				if converted_data['name'] not in ['NUSSD Course','QuizItem']:
-					try:
-						for key, values in converted_data.items():
-							if values and type(values) == list:
-								oid_ObjectId_list = []
-								oid_list_str = values.__str__()
-								if '$oid' in oid_list_str:
-									for oid_dict in values:
-										print  type(oid_dict)
-										print oid_dict,converted_data['name']	
-										oid_ObjectId = ObjectId(oid_dict['$oid'])
-										oid_ObjectId_list.append(oid_ObjectId)
+				#check if node already exist
+				existing_node = node_collection.one({"_id":ObjectId(converted_data["_id"])})	
+				if existing_node is None:
+					if i ==  'GSystemType.json':
+						node = node_collection.collection.GSystemType()
+					elif i == 'factorydata.json':
+						if json_data['_type'] == 'Group':
+							node = node_collection.collection.Group()
+						else:					
+							node = node_collection.collection.GSystem()
+					elif i == 'metatype.json':
+						node = node_collection.collection.MetaType()
+					elif i == 'RelationType.json': 
+						node = node_collection.collection.RelationType()
+					elif i == 'AttributeType.json':
+						node = node_collection.collection.AttributeType()
+					if converted_data['name'] not in ['NUSSD Course','QuizItem','Meeting']:
+					
+							for key, values in converted_data.items():
+								if values and type(values) == list:
+									oid_ObjectId_list = []
+									oid_list_str = values.__str__()
+									if key == 'attribute_type_set' or key == 'relation_type_set':
+										value = []	
+										if values is not None:
+											value = process_list(values)
+											node[key] = value
+									elif '$oid' in oid_list_str:
+										for oid_dict in values:
+											oid_ObjectId = ObjectId(oid_dict['$oid'])
+											oid_ObjectId_list.append(oid_ObjectId)
 
-									node[key] = oid_ObjectId_list
+										node[key] = oid_ObjectId_list
+									 
 							
-							else:
-								if key != "_type":
-									node[key] = values
-					except:
-						if key != "_type":
-							node[key] = values
-					node.save()
+								else:
+									if key != "_type":
+										node[key] = values
 					
 						
+							node.save()
+					
+				else:
+					print "Node already present !!!"		
 
 
 
@@ -68,7 +75,17 @@ class Command(BaseCommand):
 
 
 
+def process_list(val_list):
+	node_list = []
+ 	for i in val_list:
+                print ObjectId(i['_id']['$oid'])
+		node = node_collection.one({"_id":ObjectId(i['_id']['$oid'])})
+		if node:
+			node_list.append(node)
+	return node_list
 
+def process_dict():
+	pass
 
 
 

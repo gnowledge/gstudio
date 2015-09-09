@@ -277,5 +277,21 @@ factory_relation_types = [
 factory_data = [ {'_type':'Group','name':'home'}
 		
 	       ]
+attribute_types = [{'_type':'AttributeType','name':'start_enroll'},
+		   {'_type':'AttributeType','name':'end_enroll'},
+                   {'_type':'AttributeType','name':'nussd_course_type'},				 
+   		   {'_type': 'AttributeType', 'name': 'course_structure_minutes'},
+		   {'_type': 'AttributeType', 'name': 'max_marks'},
+		   {'_type': 'AttributeType', 'name': 'min_marks'},		                 	
+		   {'_type': 'AttributeType', 'name': 'course_structure_assignment'},
+		   {'_type': 'AttributeType', 'name': 'course_structure_assessment'}
+			
+]
+
+relation_types = [{'_type':'RelationType','name':'group_has_course_event'},
+		{'_type': "RelationType", 'name': "has_logo"},
+			
+
+]
 
 
