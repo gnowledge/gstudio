@@ -753,7 +753,7 @@ ul#navigation li a.last {
       });
   });
 
-  $(".theme-breadcrumb").click(function() {
+  $(".current").click(function() {
 
     var nav_list = "{{nav_list}}";
     {% get_node_type original_node as node_type %}  
@@ -991,6 +991,8 @@ ul#navigation li a.last {
   function adjustIframeHt(){
 
     var iframeBodyHt = $("iframe").contents().find("body").height();
+    var docHeight = $(window).height();
+    docHeight -= docHeight * 0.10;
     $("iframe").height(iframeBodyHt + 50);
     
     var changedHt;
@@ -998,7 +1000,8 @@ ul#navigation li a.last {
     setTimeout(function(){
 
       changedHt = $("iframe").contents().find("body").height();
-      if(changedHt > iframeBodyHt) { adjustIframeHt() }
+      // if(changedHt > iframeBodyHt) { adjustIframeHt() }
+      if(changedHt < docHeight) { adjustIframeHt();console.log("docHeight",docHeight); console.log("changedHt",changedHt); }
 
     }, 4000 );
   }
