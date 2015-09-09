@@ -514,7 +514,7 @@
 
   $('#docFile').val("");
   {% if not success %}
-    var message = {% trans 'Something went wrong. Please try after some timme !!!' %}"
+    var message = "{% trans 'Something went wrong. Please try after some time !!!' %}"
     $("#alertModalLabel").text(message);
     $("#alertModal").addClass("alert");
     $("#alertModal").foundation('reveal', 'open');
