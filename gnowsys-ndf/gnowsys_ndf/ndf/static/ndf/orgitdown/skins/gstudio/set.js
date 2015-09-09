@@ -29,7 +29,7 @@ var mySettings = {
 	        {separator:'---------------' },
                 {name:'Insert Embed Html', replaceWith:'\n#+BEGIN_HTML \n#+END_HTML\n' },
                 {name:'Close',call:'close' },
-		{name:'Cite',key:'C',openWith:'[fn:{number}:',closeWith:']'}
+		// {name:'Cite',key:'D',openWith:'[fn:{number}:',closeWith:']'}
 		//{name:'Clean', className:'clean', replaceWith:function(orgitdown) { return orgitdown.selection.replace(/<(.*?)>/g, "") } }		
 		//{name:'Preview', className:'preview',  call:'preview'}
 	]

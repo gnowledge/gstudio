@@ -1407,16 +1407,16 @@ i.remove-tag{
     	{
           $("#message").css("display", "none");
 	    }
-	  {% get_site_name_from_settings as site_name %}
-    
-	{%  if site_name == "NROER" and title == "Page" or "File" in node.member_of_names_list    %}
-		if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
-			$('#tabs').find('a[href="#tab2"]').trigger('click');
-			$("#message").css("display", "block");
-			$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
-			event.preventDefault();
-		}
-	{% endif %}
+ //  {% get_site_name_from_settings as site_name %}
+    	
+	// {%  if site_name == "NROER" and title == "Page" or "File" in node.member_of_names_list    %}
+	// 	if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
+	// 		$('#tabs').find('a[href="#tab2"]').trigger('click');
+	// 		$("#message").css("display", "block");
+	// 		$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+	// 		event.preventDefault();
+	// 	}
+	// {% endif %}
 	    updateAllTags();
 	});
 
