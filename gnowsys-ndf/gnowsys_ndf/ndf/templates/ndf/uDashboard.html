@@ -184,7 +184,7 @@
               
         <div class="small-12 large-10 columns">
       <h3>
-        {% trans "Welcome "%} {{current_user_obj.first_name}} !
+        {% trans "Welcome "%} {% firstof current_user_obj.first_name current_user_obj.email %} !
       </h3>
 
             <dl class="tabs" data-tab >
