@@ -904,7 +904,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
       this will create file object and save files in gridfs collection
     """
-    server_sync = kwargs["server_sync"]
+    server_sync = kwargs.get("server_sync",None)
     global count, first_object
     
     # overwritting count and first object by sending arguments kwargs (count=0, first_object="") 
@@ -1139,7 +1139,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             # This function captures the data and a decorater is put on this function so that node to be saved in the parent function
             # can be sent as a mail to the mailing-list
             if not server_sync:
-              print 'capture_data called'
               capture_data(file_object=fileobj, file_data=files, content_type=filetype1)
 
             return fileobj._id, is_video
