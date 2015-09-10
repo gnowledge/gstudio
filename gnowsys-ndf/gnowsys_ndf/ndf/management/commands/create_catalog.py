@@ -173,7 +173,10 @@ def make_rcs_dir(final_list):
 				if a:
 					filter_list = ['GSystemType','RelationType','AttributeType','MetaType']
 					if a._type  in filter_list:
-						file_node = get_version_document(a,rel_path)
+						try:
+							file_node = get_version_document(a,rel_path)		
+						except:
+							file_node = a	
 						if a._type == 'GSystemType':
 							GSystemtypenodes.append(file_node)
 						elif a._type == 'RelationType':
@@ -184,9 +187,15 @@ def make_rcs_dir(final_list):
 							metatype.append(file_node)
 					elif a._type not in filter_list:
 						if a._type == "Group":
-							file_node = get_version_document(a,rel_path,'1.1')
+							try:
+								file_node = get_version_document(a,rel_path,'1.1')
+							except:
+								file_node = a
 						else:
-							file_node = get_version_document(a,rel_path)
+							try:	
+								file_node = get_version_document(a,rel_path)
+							except:
+								file_node = a	
 						
 						factorydatanode.append(file_node)					
 			
