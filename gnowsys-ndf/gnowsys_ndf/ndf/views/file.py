@@ -907,6 +907,11 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
     
     global count, first_object
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     
     # overwritting count and first object by sending arguments kwargs (count=0, first_object="") 
     # this is to prevent from forming collection of first object containing subsequent objects.
@@ -931,6 +936,18 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             if kwargs["oid"]:
                 # gridfs_collection = get_database()['fs.files']
                 cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+                # Fetch file node by docid
+                file_node = node_collection.one({'_id': ObjectId(cur_oid['docid'])})
+                # Check if already existing file is uploaded in same group as earlier
+                if ObjectId(group_id) not in file_node.group_set:
+                    # if not, add current request group_id in group_set of file_node
+                    file_node.group_set.append(ObjectId(group_id))
+                    file_node.last_update = datetime.datetime.now()
+                    file_node.modified_by = int(userid)
+                    file_node.save()
+                    # This change is made in order to fetch file nodes 
+                    # from a group 
+
                 # returning only ObjectId (of GSystem containing file info) in dict format.
                 # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
                 return cur_oid["docid"], 'True'
@@ -1000,6 +1017,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     filename_content = slugify(title) + "-" + usrname + "-"
                     fileobj.content = org2html(content_org, file_prefix=filename_content)
                 if tags:
+                    # print "\n\n tags",tags
                     if not type(tags) is list:
                         tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                     fileobj.tags = tags
@@ -1112,6 +1130,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 
             '''storing thumbnail of image in saved object'''
+            # print "\n\n filetype------",filetype
             if 'image' in filetype:
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
                 thumbnailimg = convert_image_thumbnail(files)
