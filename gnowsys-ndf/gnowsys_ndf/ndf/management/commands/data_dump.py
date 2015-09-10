@@ -24,7 +24,7 @@ class Command(BaseCommand):
                 #db = get_database()
                 #files = db['fs.files']
                 #chunks = db['fs.chunks']
-                #follow the recursive stretagy go till the depth of the node take their induvidual dumps and then finally of the main groups
+                #follow the recursive stretagy go till the depth of the snode take their induvidual dumps and then finally of the main groups
                 Group_node = node_collection.find_one({"_type":"Group","name":unicode(Group_name)}) 
 		if Group_node:
 				#all the nodes having Group id
@@ -68,7 +68,6 @@ class Command(BaseCommand):
 				
 								value_node = triple_collection.find_one({"_type": "GRelation", "subject": i._id, "relation_type.$id": rel_node._id})
 								if value_node:	 
-									print value_node	
 									Grelations_ids.append(value_node._id) 
 									if type(attr.object_value) not in  [datetime.datetime,unicode,int] :
 										try:
@@ -84,7 +83,7 @@ class Command(BaseCommand):
 				f_list = [ObjectId(i) for i in fs_file_ids ]
 				at_files = '{"_id":{"$in":%s}}' % Gattribute_value
 				at_files = at_files.replace("'",'"')
-				cmd = "mongoexport --db "+ db_name + " --collection Nodes -q '" + '%s'  % at_files + "' --out backup/at_files.json"
+				cmd = "mongoexport --db "+ db_name + " --	collection Nodes -q '" + '%s'  % at_files + "' --out backup/at_files.json"
 				commandlist.append(cmd)
 				
 

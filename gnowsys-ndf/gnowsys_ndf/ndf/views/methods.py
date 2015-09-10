@@ -153,7 +153,6 @@ def server_sync(func):
         
         check_command = 'gpg --list-keys | grep -o "'+SYNCDATA_KEY_PUB+'"'
         std_out= subprocess.call([check_command],shell=True)
-        print std_out
         #code to check if SYNCDATA_KEY_PUB in local settings.py is a pub which is present in the gpg database of the system
         #if not, change WILL NOT be captured
         #std_out will have shell command return code =0 (success) 1 (failure)
@@ -175,7 +174,6 @@ def server_sync(func):
         # the actual file
         file_data = kwargs['file_data'] 
         # the node file
-        print "file_data",file_data
         node = kwargs['file_object'] 
         # content-type of the file
         content_type = kwargs['content_type'] 
