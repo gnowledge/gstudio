@@ -20,6 +20,10 @@
     cursor:pointer;
   }
 
+  #upload_form_div{
+    display: inline-block;
+  }
+
   .tab{
     padding-left: 2em;
     background-color:yellow !important;
@@ -29,6 +33,11 @@
     padding-left: 4em;
   }
 
+  div.reveal-modal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
 
   .all_blogs{
       overflow-y: auto;
@@ -130,10 +139,11 @@
     {% get_user_object request.user.id as user_obj %}
     {% check_is_gstaff groupid user_obj as gstaff_access %}
   {% endif %}
-
-	<div id="view-page">
-    
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+      <label id="alertModalLabel"></label>
+      <a class="close-reveal-modal">&#215;</a>
   </div>
+
 	<div id="view-page" class="small-12 large-12 columns"></div>
     <div class="small-12 columns">
       <dl class="tabs" data-tab data-options="deep_linking:true"  > 
@@ -200,8 +210,8 @@
         {% if user_access == "allow" %}
 
         <div class="content" id="journal-tab">
-            <div>
-              <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="button small" style="float:right"> Add Page </a>
+            <div class="text-right">
+                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="button small"> Add Page </a>
             </div>
             <div class="row all_blogs">
             	{% for each_blog in blog_pages %}
@@ -231,9 +241,21 @@
             </div>
         </div>
         <div class="content" id="gallery-tab">
-                <div class="row">
-                      {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
-                </div>
+            <div id="upload_form_div" class="text-right">
+
+                <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
+                    {% csrf_token %}
+                    <input type="file" name="doc[]" id="docFile"/>
+                    <div class="save_cancel hide">
+                      <input type="submit" id="submitpostid" class="tiny button" value="Save"/>
+                      <input type="button" id="btnUploadCancel" class="tiny button" value="Cancel"/>
+                    </div>
+                </form>
+
+            </div>
+            <div class="row">
+                  {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
+            </div>
         </div>
 
         <div class="content" id="analytics-tab">
@@ -263,6 +285,50 @@
 
 {% block script %}
 
+  // Cancel/Abort Upload-------------------------------------------------------------
+  $("#btnUploadCancel").click(function() {
+    $(".save_cancel").addClass("hide");
+    $("#docFile").val("");
+  });
+
+  
+  //Upload file action validation ---------------------------------------------------------------
+  $(document).on('change','#docFile',function(){
+    $(".save_cancel").removeClass("hide");
+    file_mime_type = this.files[0].type;
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $(".save_cancel").addClass("hide");
+      $('#docFile').val(this.value);
+      var message = "{% trans 'Only image files can be uploaded!' %}"
+      $("#alertModalLabel").text(message);
+      $("#alertModal").addClass("alert");
+      $("#alertModal").foundation('reveal', 'open');
+    }
+  });
+
+  // Update profile photo -----------------------------------------------------------------------
+  $("#submitpostid").click(function() {
+    if($("#docFile").val() != "") { 
+      $("#message").show();
+      $(".save_cancel").addClass("hide");
+      var message = "{% trans 'Please wait your file is uploading..' %}"
+      $("#alertModalLabel").text(message);
+      $("#alertModal").addClass("success");
+      $("#alertModal").foundation('reveal', 'open');
+    }
+
+    else {
+      var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
+      $("#alertModalLabel").text(message);
+      $("#alertModal").addClass("warning");
+      $("#alertModal").foundation('reveal', 'open');
+      $(".save_cancel").addClass("hide");
+      return false;
+    }
+  });
+
+  
   $(document).on('click','.enroll-btn',function(){
     //trigger the ajax call to enroll
       $.ajax({
