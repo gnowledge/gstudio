@@ -508,15 +508,15 @@ def server_sync(mail):
                                 
                 else:
                     # for pages
-					
+					'''	
 					if json_data._type == 'GAttribute':
 						temp_node = triple_collection.collection.GAttribute()
 					elif json_data._type == 'GRelation':                
 						temp_node = triple_collection.collection.GRelation()
-					elif json_data._type == 'Group':                
-						temp_node = triple_collection.collection.Group()
-					else:
-						temp_node = node_collection.collection.GSystem()
+					elif json_data._type == 'GRelation':                
+						temp_node = triple_collection.collection.GRelation()
+					else:'''
+					temp_node = node_collection.collection.GSystem()
 					temp_dict = {}
 					''' dictionary creation '''
 					for key, values in json_data.items():
