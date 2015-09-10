@@ -508,15 +508,20 @@ def server_sync(mail):
                                 
                 else:
                     # for pages
-                    temp_node = node_collection.collection.GSystem()
-                                    
-                    temp_dict = {}
-                    ''' dictionary creation '''
-                    for key, values in json_data.items():
-                        temp_dict[key] = values
+					
+					if json_data._type == 'GAttribute':
+						temp_node = triple_collection.collection.GAttribute()
+					elif json_data._type == 'GRelation':                
+						temp_node = triple_collection.collection.GRelation()
+					else:
+						temp_node = node_collection.collection.GSystem()
+					temp_dict = {}
+					''' dictionary creation '''
+					for key, values in json_data.items():
+						temp_dict[key] = values
 
-                    temp_node.update(temp_dict)
-                    temp_node.save()
+					temp_node.update(temp_dict)
+					temp_node.save()
 
 @get_execution_time
 def get_mails_in_box(mailboxname, username, mail_type, displayFrom):

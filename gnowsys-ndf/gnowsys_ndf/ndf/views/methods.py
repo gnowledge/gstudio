@@ -168,13 +168,14 @@ def server_sync(func):
 
         ''' Get current date and time to timestamp json and the document being captured by this function.
          This done so that files in syncdata folder will have unique name'''
-        timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_")
+        timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.now().microsecond)
 
 
         ''' To fetch the data about the node '''
         # the actual file
         file_data = kwargs['file_data'] 
         # the node file
+        print "file_data",file_data
         node = kwargs['file_object'] 
         # content-type of the file
         content_type = kwargs['content_type'] 
@@ -202,7 +203,7 @@ def server_sync(func):
         
         print '+' * 20
         print node_data_path
-
+        	
         if 'image' in content_type or 'video' in content_type:
             # To make the fs_file_ids filed set empty
             if file_data:
@@ -238,7 +239,6 @@ def server_sync(func):
         p1 = path_MailClient + 'syncdata/'
         
         if not os.path.exists(p1):
-            print "asdfsafsadfsd"
             os.makedirs(p1)
         
         p1 = path_MailClient + 'sent_syncdata_files/'
@@ -2092,7 +2092,7 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
             gr_node.status = u"PUBLISHED"
             gr_node.save()
             # ''' server_sync '''
-            # capture_data(file_object=gr_node, file_data=None, content_type='grelation_list_creation')
+            capture_data(file_object=gr_node, file_data=None, content_type='grelation_list_creation')
 
 
 @get_execution_time
@@ -2450,7 +2450,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
             ga_node.save()
             print 'IN CREATE_GATTRIBUTE'
             # ''' server_sync '''
-            # capture_data(file_object=ga_node, file_data=None, content_type='gattribute_create')
+            capture_data(file_object=ga_node, file_data=None, content_type='gattribute_create')
 
             if object_value == u"None":
                 info_message = " GAttribute (" + ga_node.name + \
@@ -2484,7 +2484,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 ga_node.save()
                 
                 # ''' server_sync '''
-                # capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
+                capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
                 
                 info_message = " GAttribute (" + ga_node.name + \
                     ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -2534,7 +2534,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                         ga_node.save()
                         
                         # ''' server_sync '''
-                        # capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
+                        capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
 
                         info_message = " GAttribute (" + ga_node.name + \
                             ") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
@@ -2613,7 +2613,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.status = u"PUBLISHED"
             gr_node.save()
             ''' server_sync '''
-            # capture_data(file_object=gr_node, file_data=None, content_type='grelation_create')
+            capture_data(file_object=gr_node, file_data=None, content_type='grelation_create')
 
             
             gr_node_name = gr_node.name
@@ -2687,7 +2687,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.save()
 
             ''' server_sync '''
-            # capture_data(file_object=gr_node, file_data=None, content_type='gattribute_update_delete_to_published')
+            capture_data(file_object=gr_node, file_data=None, content_type='gattribute_update_delete_to_published')
 
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
@@ -2820,7 +2820,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     n.save()
         
                     ''' server_sync '''
-                    # capture_data(file_object=n, file_data=None, content_type='deletion')
+                    capture_data(file_object=n, file_data=None, content_type='deletion')
 
                     info_message = " MultipleGRelation: GRelation (" + n.name + \
                         ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -2933,7 +2933,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         node.save()
 
                         ''' server_sync '''
-                        # capture_data(file_object=node, file_data=None, content_type='delete')
+                        capture_data(file_object=node, file_data=None, content_type='delete')
 
                         node_collection.collection.update({
                             '_id': subject_id, 'relation_set.' + relation_type_node_name: {'$exists': True}
@@ -3037,7 +3037,7 @@ def create_discussion(request, group_id, node_id):
             thread_obj.save()
 
             ''' server_sync '''
-            # capture_data(file_object=thread_obj, file_data=None, content_type='discussion_create')
+            capture_data(file_object=thread_obj, file_data=None, content_type='discussion_create')
             
             # creating GRelation
             # create_grelation(node_id, relation_type, twist_st)
@@ -3059,7 +3059,6 @@ def create_discussion(request, group_id, node_id):
 # to add discussion replie
 @get_execution_time
 def discussion_reply(request, group_id, node_id):
-
     try:
 
         prior_node = request.POST.get("prior_node_id", "")
@@ -3099,7 +3098,7 @@ def discussion_reply(request, group_id, node_id):
             reply_obj.save()
 
             ''' server_sync '''
-            # capture_data(file_object=reply_obj, file_data=None, content_type='discussion_reply')
+            capture_data(file_object=reply_obj, file_data=None, content_type='discussion_reply')
 
             formated_time = reply_obj.created_at.strftime(
                 "%B %d, %Y, %I:%M %p")
@@ -3170,7 +3169,7 @@ def discussion_delete_reply(request, group_id):
         if temp_reply:
             deleted_replies.append(temp_reply._id.__str__())
             temp_reply.delete()
-
+    capture_data(file_object=temp_reply, file_data=None, content_type='delete_reply')
     return HttpResponse(json.dumps(deleted_replies))
 
 @get_execution_time

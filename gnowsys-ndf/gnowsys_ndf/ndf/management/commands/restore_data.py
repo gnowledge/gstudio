@@ -40,7 +40,7 @@ class Command(BaseCommand):
 						node = node_collection.collection.RelationType()
 					elif i == 'AttributeType.json':
 						node = node_collection.collection.AttributeType()
-					if converted_data['name'] not in ['NUSSD Course','QuizItem','Meeting']:
+					if converted_data['name']:
 					
 							for key, values in converted_data.items():
 								if values and type(values) == list:
@@ -84,8 +84,6 @@ def process_list(val_list):
 			node_list.append(node)
 	return node_list
 
-def process_dict():
-	pass
 
 
 
