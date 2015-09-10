@@ -41,8 +41,9 @@ class Command(BaseCommand):
 					elif i == 'AttributeType.json':
 						node = node_collection.collection.AttributeType()
 					if converted_data['name']:
-							if converted_data['modified_by'] is None:
-								converted_data['modified_by'] = 1	
+							
+							converted_data['modified_by'] = 1
+							converted_data['created_by'] = 1	
 							
 							for key, values in converted_data.items():
 								
