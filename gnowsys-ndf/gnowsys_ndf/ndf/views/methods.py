@@ -1213,7 +1213,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # tags
     # if tags:
     tags_list = []
-
     if tags:
         for tag in tags.split(","):
             tag = unicode(tag.strip())
@@ -1221,9 +1220,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
             if tag:
                 tags_list.append(tag)
 
-    if set(node.tags) != set(tags_list):
-        node.tags = tags_list
-        is_changed = True
+        if set(node.tags) != set(tags_list):
+            node.tags = tags_list
+            is_changed = True
+      
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
         changed = build_collection(
