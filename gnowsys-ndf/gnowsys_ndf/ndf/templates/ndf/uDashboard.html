@@ -43,6 +43,7 @@
                     <label id="upload_photo_lbl" class="fi-upload">Upload New Photo</label>
                   </div>
                 </a>
+                {% if old_profile_pics %}
                 <fieldset id="existing-photo-fieldset">
                     <legend id="choose_photo_lbl">Choose Any Existing Photo</legend>
                     <div class="existing-photo-div"  style="display:inline-block;overflow-y: auto;height:320px;">
@@ -56,6 +57,7 @@
                       {% endfor %}
                     </div>
                 </fieldset>
+                {% endif %}
                 <div id="pic_div" class="hide row">
                     <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
                         {% csrf_token %}
@@ -189,10 +191,10 @@
 
             <dl class="tabs" data-tab >
                 <dd class="active"><a href="#view-profile" id='p5' class="fi-torso"> Profile </a> </dd>
-                <dd ><a href="#group" id="p1" class="fi-torsos-all">Groups </a></dd>
-                {% if user_task %}<dd><a href="#AssignedTasks" id="p2" class="fi-checkbox">Assigned Tasks </a></dd> {% endif %}
-                <dd ><a href="#Activity" id="p3" class="fi-info">My Activities </a></dd>      
-                <dd ><a href="#view-scheduler-calendar" id="p4" class="fi-calendar">Events </a></dd>
+                <dd ><a href="#group" id="p1" class="fi-torsos-all"> Groups </a></dd>
+                {% if user_task %}<dd><a href="#AssignedTasks" id="p2" class="fi-checkbox"> Assigned Tasks </a></dd> {% endif %}
+                <dd ><a href="#Activity" id="p3" class="fi-info"> My Activities </a></dd>      
+                <dd ><a href="#view-scheduler-calendar" id="p4" class="fi-calendar"> Events </a></dd>
             </dl>
             <div class="tabs-content">
                 <div class="content" id="view-scheduler-calendar">
@@ -486,7 +488,6 @@
       $("#alertModal").addClass("success");
       $("#alertModal").foundation('reveal', 'open');
     }
-
     else {
       var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
       $("#alertModalLabel").text(message);
@@ -513,11 +514,13 @@
   {% endif %}
 
   $('#docFile').val("");
+  {% comment %}
   {% if not success %}
-    var message = {% trans 'Something went wrong. Please try after some timme !!!' %}"
+    var message = "{% trans 'Something went wrong. Please try after some time !!!' %}"
     $("#alertModalLabel").text(message);
     $("#alertModal").addClass("alert");
     $("#alertModal").foundation('reveal', 'open');
   {% endif %}
+  {% endcomment %}
   
 {% endblock %}
