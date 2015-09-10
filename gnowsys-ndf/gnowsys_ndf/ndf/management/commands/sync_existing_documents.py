@@ -635,10 +635,9 @@ class Command(BaseCommand):
     glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
     node = node_collection.find({'member_of':ObjectId(glist._id),"name":{'$in':['Eventtype','CollegeEvents']}}) 
     for i in node:
-        if i is None:
-            i.modified_by = 1
-            i.save()
-            print "Updated",i.name,"'s modified by feild from null to 1"
+        i.modified_by = 1
+        i.save()
+        print "Updated",i.name,"'s modified by feild from null to 1"
 
     print "\n------- Discussion thread for Page and File GST successfully completed-------\n"
     print "\n\n Pages/Files that were not able to updated\t", pages_files_not_updated

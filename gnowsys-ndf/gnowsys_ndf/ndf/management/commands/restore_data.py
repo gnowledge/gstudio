@@ -46,7 +46,7 @@ class Command(BaseCommand):
 								if values and type(values) == list:
 									oid_ObjectId_list = []
 									oid_list_str = values.__str__()
-									if key == 'attribute_type_set' or key == 'relation_type_set':
+									if key == 'attribute_type_set' or key == 'relation_type_set' or key == 'meta_type_set':
 										value = []	
 										if values is not None:
 											value = process_list(values)
@@ -77,7 +77,7 @@ class Command(BaseCommand):
 
 def process_list(val_list):
 	node_list = []
- 	for i in val_list:
+	for i in val_list:
                 print ObjectId(i['_id']['$oid'])
 		node = node_collection.one({"_id":ObjectId(i['_id']['$oid'])})
 		if node:
