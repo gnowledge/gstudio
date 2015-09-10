@@ -176,7 +176,8 @@ def make_rcs_dir(final_list):
 						try:
 							file_node = get_version_document(a,rel_path)		
 						except:
-							file_node = a	
+							a.save()
+							file_node = get_version_document(a,rel_path)	 
 						if a._type == 'GSystemType':
 							GSystemtypenodes.append(file_node)
 						elif a._type == 'RelationType':
@@ -190,12 +191,14 @@ def make_rcs_dir(final_list):
 							try:
 								file_node = get_version_document(a,rel_path,'1.1')
 							except:
-								file_node = a
+								a.save()
+								file_node = get_version_document(a,rel_path,'1.1')
 						else:
 							try:	
 								file_node = get_version_document(a,rel_path)
 							except:
-								file_node = a	
+								a.save()
+								file_node = get_version_document(a,rel_path)	
 						
 						factorydatanode.append(file_node)					
 			
