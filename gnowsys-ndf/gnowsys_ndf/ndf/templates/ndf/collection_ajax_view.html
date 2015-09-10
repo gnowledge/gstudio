@@ -39,7 +39,6 @@
     
 
     function doc(){
-
       var $tree = $('.collection');
       var arr = [];  
       {% get_node_type node as node_type %}  
@@ -75,7 +74,7 @@
 
             // Bellow code manipulates the parent hierarchy of clicked node in a tree
             while (parent_node) {
-                if (parent_node.name !== undefined){           
+                if (parent_node.name !== undefined){  
                   $tree.tree('openNode', parent_node);
                   parent_node = parent_node.parent;
                   if (parent_node.name !== undefined){
@@ -87,7 +86,7 @@
                 }
             }
             var nav_list = parent_arr.reverse();
-            if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit"){
+            if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
 
             // alert(nav_list);
             // alert("node_type");
@@ -131,7 +130,18 @@
           }
         }
       );
-      
+      if (window.location.pathname.search("add_units") > -1) {
+          update_url = false;
+          $tree.tree({
+            selectable: false,
+          });
+          $tree.unbind('tree.open')
+          $tree.unbind('tree.select')
+          
+      } else {
+          update_url = true;
+      }      
+
     }
 
     // This function takes id of clicked "related" node and redirect to its page with its proper breadcrumbs
