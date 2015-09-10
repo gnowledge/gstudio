@@ -46,7 +46,7 @@ class Command(BaseCommand):
 					if i.prior_node:
 						get_prior_node(i)
 					if i.post_node:
-						get_prior_node(i)
+						get_post_node(i)
 					if i.attribute_set:
 						#fetch attribute_type
 						for j in i.attribute_set:
@@ -214,12 +214,12 @@ def get_prior_node(node):
 		if new_node:
 			if new_node.prior_node:
 				get_prior_node(new_node)
-def get_prior_node(node):	
+def get_post_node(node):	
 	for i in node.post_node:
 		post_node_list.append(i)
 		new_node = node_collection.find_one({"_id":ObjectId(i)})
 		if new_node:
 			if new_node.post_node:
-				get_prior_node(new_node)
+				get_post_node(new_node)
 	
 
