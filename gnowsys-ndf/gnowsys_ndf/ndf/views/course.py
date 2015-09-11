@@ -122,6 +122,7 @@ def create_edit(request, group_id, node_id=None):
     #             group_id = str(auth._id)
     # else:
     #     pass
+    print "//////////////////////////////////????"
     try:
         group_id = ObjectId(group_id)
     except:
@@ -140,7 +141,7 @@ def create_edit(request, group_id, node_id=None):
 
     else:
         course_node = node_collection.collection.GSystem()
-
+    print "asdfasdfsadfasfsafasfsdfS"
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(GST_COURSE._id),'group_set': ObjectId(group_id),'status':{"$in":[u"DRAFT",u"PUBLISHED"]}})
 
     nodes_list = []
@@ -151,6 +152,7 @@ def create_edit(request, group_id, node_id=None):
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE),groupid=group_id)
+	capture_data(file_object=course_node, file_data=None, content_type='create_course')
         create_gattribute(course_node._id, at_course_type, u"General")
         
         # adding thumbnail 

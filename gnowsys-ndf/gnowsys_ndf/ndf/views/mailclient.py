@@ -435,9 +435,14 @@ def server_sync(mail):
         
         for file_path in list_of_decrypted_attachments:
             if file_path[-4:] == 'json':
-                json_file_path = file_path
+		json_file_path = file_path
+		print "first section", file_path
+                
             else:
+		
                 file_object_path = file_path
+		print "second section",file_path
+                
 
         node_exists = False
         with open(json_file_path,'r') as json_file:
@@ -454,6 +459,7 @@ def server_sync(mail):
                 path = os.path.abspath(os.path.dirname(settings_dir3))
                 #may throw error        
                 conn = sqlite3.connect(path + '/example-sqlite3.db')
+		print "the json data",json_data
                 user_id = json_data[u'created_by']
                 query = 'select username from auth_user where id=\''+str(user_id)+'\''
                 cursor = conn.execute(query)
@@ -464,13 +470,14 @@ def server_sync(mail):
             username=None
             for row in cursor:
                 username = row[0]    
-            
+            print "to see",file_object_path
             if file_object_path != '':
                 ''' for the creation of the file object '''
                 with open(file_object_path,'rb+') as to_be_saved_file:
                     req_groupid = None
                     for obj in json_data["group_set"]:
                         temp_obj = node_collection.one({"_id": obj, "_type" : "Group" })
+			print temp_obj
                         if temp_obj is not None:
                             req_groupid = obj
                             break
@@ -496,7 +503,7 @@ def server_sync(mail):
             else:
                 # We need to check from the _type what we have that needs to be saved
                 temp_node = node_collection.one({"_id" : json_data["_id"]})
-                                
+                print "this part would work"                
                 if temp_node is not None:
                     temp_dict = {}
                     for key, values in json_data.items():
@@ -508,6 +515,7 @@ def server_sync(mail):
                                 
                 else:
                     # for pages
+					print json_data	
 					'''	
 					if json_data._type == 'GAttribute':
 						temp_node = triple_collection.collection.GAttribute()
