@@ -309,6 +309,34 @@
     }
   });
 
+  $(document).on('click','.save_date',function(){
+    date_val = $("#release_date").val()
+    css_id_val = $("#css_id").val()
+    console.log(date_val)
+    console.log(css_id_val)
+    $.ajax({
+      url: "{% url 'set_release_date_css' node.pk %}",
+
+      data: {
+        'date_val':date_val,
+        'css_id': css_id_val,
+        'csrfmiddlewaretoken': "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      success: function(data){
+        console.log(data)
+          success_state = data["success"]
+          if(success_state){
+            location.reload();
+          }
+      },
+    });//end of ajax
+
+  })
   
   $(document).on('click','.enroll-btn',function(){
     //trigger the ajax call to enroll
