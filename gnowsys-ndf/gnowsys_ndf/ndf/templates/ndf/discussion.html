@@ -5,6 +5,8 @@
 {% user_access_policy groupid request.user as user_access %}
 {% get_attribute_value node.pk 'release_response' as resp_val %}
 {% get_attribute_value node.pk 'thread_interaction_type' as thr_int_type %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
+
 <div>
   <br/>
     {% if allow_to_comment %}
@@ -22,7 +24,6 @@
   <div id="replies-area" style="overflow-x:auto;">
 
     <!-- populating replies -->
-    {% check_is_gstaff groupid request.user as is_gstaff %}
 
     {% for each_reply in all_replies %}
       {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
@@ -56,7 +57,9 @@
         </div>
 
         <div class="row">
+        {% if request.user.id == each_reply.userid or is_gstaff %}
           <div class="reply-btn small-2  small-text-left large-2 columns" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))">{% trans "Delete" %}</div>
+        {% endif %}
           <div class='reply-btn  small-2 small-text-left large-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
           {% trans "Reply" %}
           </div>
