@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
-# from django.template.defaultfilters import slugify
+from django.template.defaultfilters import slugify
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
