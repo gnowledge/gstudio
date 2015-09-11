@@ -550,49 +550,22 @@
             {% endwith %}
           </div>
           <!-- Discussion -->
-            <div class="accordion" data-accordion  >
-
-                <dd class="accordion-navigation">
-                   {% if "Group" not in node.member_of_names_list %}
-                    {% if node|is_File or node|is_Page %}         
-                    <!-- calling ndf tags for discussion replies -->
+                <div class="content" id="view-discussion">
+                  <!-- discussion content area -->
+                  {% if node.discussion_enable %}
                     {% get_thread_node node.pk as thread_node %}
                     {% if thread_node %}
                         {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                    {% else %}
-                      {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                    {% endif %}
-
-                   <a class="tab-title discussion-view large-text-center" href="#view-discussion"><i class="fi-comment"></i>
-                       {% if all_replies %}
-                        <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
-                          {% trans "Join Discussion" %} ({{ all_replies | length }})
-                        </span>
-                      {% else %}            
-                        <span title="{% trans 'Be the first to start a discussion' %}">
-                          {% trans "Begin Discussion" %}
-                        </span>
-                      {% endif %}</a>
-                    <dd>
-                <div class="content" id="view-discussion">
-                      <!-- discussion content area -->
-                    {% get_thread_node node.pk as thread_node %}
-
-                    {% if thread_node %}
-                    {% get_node thread_node as thread_node_obj %}
-                          {% include 'ndf/discussion.html' with node=thread_node_obj %}
+                        {% get_node thread_node as thread_node_obj %}
+                        {% include 'ndf/discussion.html' with node=thread_node_obj sg_type="Event" %}
                     {% else %}            
-                        {% include 'ndf/discussion.html' %}
+                        {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                        {% include 'ndf/discussion.html' with sg_type="Event" %}
                     {% endif %}
-                      <!-- END of discussion content area -->     
-                    </div>
+                  {% endif %}
 
-                   </dd>
-                    {% endif %}
-                    {% endif %}
-             </dd>
-            </div>
-    <!-- End of Discussion --> 
+                  <!-- END of discussion content area -->     
+                </div>
           <br/>
           
           <div>
