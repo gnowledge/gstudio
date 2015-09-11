@@ -630,7 +630,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 course_gs.status = u"PUBLISHED"
 
             course_gs.save(is_changed=is_changed,groupid=group_id)
-            capture_data(file_object=course_node, file_data=None, content_type='create_course')
+            capture_data(file_object=course_gs, file_data=None, content_type='create_course')
 
             # [B] Store AT and/or RT field(s) of given course-node
             for tab_details in property_order_list:
@@ -1177,7 +1177,7 @@ def save_course_section(request, group_id):
         course_node = node_collection.one({"_id": ObjectId(course_node_id)})
         cs_new.prior_node.append(ObjectId(course_node._id))
         cs_new.save(groupid=group_id)
-	capture_data(file_object=course_node, file_data=None, content_type='Create_CourseSection')
+	capture_data(file_object=cs_new, file_data=None, content_type='Create_CourseSection')
         node_collection.collection.update({'_id': course_node._id}, {'$push': {'collection_set': cs_new._id }}, upsert=False, multi=False)
         response_dict["success"] = True
         response_dict["cs_new_id"] = str(cs_new._id)
@@ -1497,7 +1497,7 @@ def save_resources(request, group_id):
 
             cu_new.prior_node.append(css_node._id)
             cu_new.save(groupid=group_id)
-            capture_data(file_object = cu_node, file_data=None, content_type='Courseunit')
+            capture_data(file_object = cu_new, file_data=None, content_type='Courseunit')
             response_dict["create_new_unit"] = True
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
 
