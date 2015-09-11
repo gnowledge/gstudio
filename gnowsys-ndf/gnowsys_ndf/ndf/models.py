@@ -179,7 +179,9 @@ class Node(DjangoDocument):
         'prior_node': [ObjectId], 
         'post_node': [ObjectId],
         
-        'language': unicode,
+        # 'language': unicode,  # previously it was unicode.
+        'language': (basestring, basestring),  # Tuple are converted into a simple list
+                                               # ref: https://github.com/namlook/mongokit/wiki/Structure#tuples
 
         'type_of': [ObjectId], # check required: only ObjectIDs of GSystemType 
         'member_of': [ObjectId], # check required: only ObjectIDs of
@@ -234,7 +236,11 @@ class Node(DjangoDocument):
                                         # here after the default
                                         # 'Administration' group is
                                         # ready.
-    default_values = {'created_at': datetime.datetime.utcnow, 'status': u'DRAFT'}
+    default_values = {
+                        'created_at': datetime.datetime.utcnow,
+                        'status': u'DRAFT',
+                        'language': (u'en', u'English')
+                    }
     use_dot_notation = True
     
     ########## Setter(@x.setter) & Getter(@property) ##########
