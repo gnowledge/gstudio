@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
-# from django.template.defaultfilters import slugify
+from django.template.defaultfilters import slugify
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
@@ -241,7 +241,6 @@ class CreateGroup(object):
             group_obj = self.get_group_fields(group_name, **kwargs)
 
             try:
-                print "out of variable"
                 group_obj.save()
                 capture_data(file_object=group_obj,file_data=None, content_type='group_created')
             except Exception, e:
@@ -398,7 +397,6 @@ class CreateSubGroup(CreateGroup):
             group_obj = self.get_subgroup_fields(parent_group_id, sub_group_name, sg_member_of, **kwargs)
 
             try:
-                print "deko"
                 group_obj.save()
                 capture_data(file_object=group_obj, file_data=None, content_type = 'subgroupcreated')
             except Exception, e:
@@ -459,7 +457,6 @@ class CreateSubGroup(CreateGroup):
             # adding normal sub-group to collection_set of parent group:
             if sg_member_of == 'Group':
                 parent_group_object.collection_set.append(ObjectId(sub_group_id))
-            print "sadfasfsadfsadf"
             parent_group_object.save()
             capture_data(file_object=parent_group_object, file_data=None, content_type='parent_group_updated')		
             return True
@@ -525,7 +522,6 @@ class CreateModeratedGroup(CreateSubGroup):
             # values will be taken from POST form fields
             group_obj = self.get_group_fields(group_name, node_id=node_id)
             try:
-                print "sadfasdfsadfasdfasfffffff"
                 group_obj.save()
                 capture_data(file_object=group_obj, file_data=None, content_type='parent_group_updated')
             except Exception, e:
@@ -958,7 +954,6 @@ class CreateModeratedGroup(CreateSubGroup):
 
                         each_group_res.group_set = group_set
                         each_group_res.status = u'PUBLISHED'
-                        print "00000"
                         each_group_res.save()
 
                     # updating current sub-group with above stated changes:
@@ -1120,7 +1115,6 @@ class CreateCourseEventGroup(CreateEventGroup):
             group_obj.content = node.content
             group_obj.content_org = node.content_org
             group_obj.save()
-            print "coming here"
             capture_data(file_object=group_obj, file_data=None, content_type='Course_Event Sub groups')
             self.call_setup(request, node, group_obj, group_obj)
             return True
@@ -1148,13 +1142,11 @@ class CreateCourseEventGroup(CreateEventGroup):
             new_gsystem.created_by = int(self.user_id)
             new_gsystem.contributors.append(int(self.user_id))
             new_gsystem.save()
-            print "llll"
             gs_under_coll_set_of_obj.collection_set.append(new_gsystem._id)
             gs_under_coll_set_of_obj.save()
             capture_data(file_object=gs_under_coll_set_of_obj, file_data=None, content_type='CourseGsystemCreated')
             new_gsystem.prior_node.append(gs_under_coll_set_of_obj._id)
             new_gsystem.save()
-            print "coming here 2 "
             capture_data(file_object=new_gsystem, file_data=None, content_type='CourseGsystemCreated')
             return new_gsystem
         except Exception as e:
@@ -1173,7 +1165,6 @@ class CreateCourseEventGroup(CreateEventGroup):
                     # each_res_node.group_set.append(group_obj._id)
                     # prior_node_obj.collection_set.append(each_res_node._id)
                     # node.save()
-                    print "asfsafsadfsadggfhfh"
                     prior_node_obj.save()
                     capture_data(file_object=prior_node_obj, file_data=None, content_type='Course_Unit_prior_Node')
                     
@@ -1206,9 +1197,11 @@ class CreateCourseEventGroup(CreateEventGroup):
             new_gsystem.content_org = node.content_org
             new_gsystem.content = node.content
             new_gsystem.save()
-            print "kkkkkkk"
             capture_data(file_object=new_gsystem, file_data=None, content_type='replicate_announced_resources')
-            return_status = create_thread_for_node(request, group_obj._id, new_gsystem)
+            discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+            create_gattribute(new_gsystem._id, discussion_enable_at, False)
+            new_gsystem.reload()
+            # return_status = create_thread_for_node(request, group_obj._id, new_gsystem)
             return new_gsystem
 
         except Exception as e:
@@ -1423,7 +1416,6 @@ class EventGroupCreateEditHandler(View):
             if sg_type == "CourseEventGroup":
                 group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
                 group_obj.save()
-                print "coming here 5"
             # to make PE/CE as sub groups of the grp from which it is created.
             # parent_group_obj.post_node.append(group_obj._id)
             # group_obj.prior_node.append(parent_group_obj._id)
@@ -1436,7 +1428,6 @@ class EventGroupCreateEditHandler(View):
                     mod_group.initialize_course_event_structure(request, group_obj._id)
                     group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
                     group_obj.save()
-                    print "loving here"
                     capture_data(file_object=group_obj, file_data=None, content_type='set_CourseEventGroup_date')
 
                 group_name = group_obj.name

@@ -13,6 +13,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
 
 class Command(BaseCommand):
@@ -596,40 +597,64 @@ class Command(BaseCommand):
     reply_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Reply'})
     rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
     thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     print "\n Total pages and files found : ", page_file_cur.count()
     for idx, each_node in enumerate(page_file_cur):
         try:
-            # print "\nPage# ",idx, "\t - ", each_node._id, '\t - ' , each_node.name
+            # print "\nPage# ",idx, "\t - ", each_node._id, '\t - ' , each_node.name, each_node.attribute_set
             release_response_val = True
             interaction_type_val = unicode('Comment')
             userid = each_node.created_by
-            thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(each_node._id) })
+            thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(each_node._id)})
+            release_response_status = False
+            thread_interaction_type_status = False
+            discussion_enable_status = False
+            has_thread_status = False
+            if get_attribute_value(each_node._id,"discussion_enable") != "":
+                discussion_enable_status = True
+            if get_relation_value(each_node._id,"has_thread") != "":
+                has_thread_status = True
 
             if thread_obj:
-                # print "thread_obj exists ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
                 reply_cur = node_collection.find({'prior_node': each_node._id, 'member_of': reply_gst._id})
                 if reply_cur:
                     for each_rep in reply_cur:
                         node_collection.collection.update({'_id': each_rep._id},{'$set':{'prior_node':[thread_obj._id]}}, upsert = False, multi = False)
                         each_rep.reload()
-                node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': [each_node._id]}}, upsert = False, multi = False)
-                thread_obj.reload()
-
-                # print "thread_obj updated ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
+                if thread_obj.name == each_node.name:
+                    node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': [each_node._id]}}, upsert = False, multi = False)
+                    thread_obj.reload()
+                if not discussion_enable_status:
+                    create_gattribute(each_node._id, discussion_enable_at, True)
+                    each_node.reload()
                 # creating GRelation
-                gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
-                if release_response_val:
-                    create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
-                if interaction_type_val:
-                    create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+                if not has_thread_status:
+                    gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
+                    each_node.reload()
+                if get_attribute_value(thread_obj._id,"release_response") != "":
+                    release_response_status = True
+                if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
+                    thread_interaction_type_status = True
 
-                each_node.reload()
-                thread_obj.reload()
+                if not release_response_status:
+                    if release_response_val:
+                        create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+                        thread_obj.reload()
+
+                if not thread_interaction_type_status:
+                    if interaction_type_val:
+                        create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+                        thread_obj.reload()
                 # print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
+            else:   
+                if not discussion_enable_status:
+                    create_gattribute(each_node._id, discussion_enable_at, False)
+                    # print "\n\n discussion_enable False"
         except Exception as e:
+
             pages_files_not_updated.append(each_node._id)
-            print "\n\nError occurred for page ", each_node._id, "--", each_node.name
-            print e
+            # print "\n\nError occurred for page ", each_node._id, "--", each_node.name
+            # print e, each_node._id
             pass
     # Correct Eventype and CollegeEventtype Node  by setting their modified by field
     glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})

@@ -259,8 +259,14 @@ def image_edit(request,group_id,_id):
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
         img_node.save(is_changed=get_node_common_fields(request, img_node, group_id, GST_IMAGE),groupid=group_id)
         thread_create_val = request.POST.get("thread_create",'')
+
+        discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
+            create_gattribute(img_node._id, discussion_enable_at, True)
             return_status = create_thread_for_node(request,group_id, img_node)
+        else:
+            create_gattribute(img_node._id, discussion_enable_at, False)
+
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             get_node_metadata(request,img_node)
             teaches_list = request.POST.get('teaches_list','') # get the teaches list 

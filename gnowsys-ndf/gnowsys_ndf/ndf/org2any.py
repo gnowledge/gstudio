@@ -10,6 +10,7 @@
 from tempfile import NamedTemporaryFile
 from subprocess import call
 import urllib
+from django.template.defaultfilters import slugify
 import commands
 from gnowsys_ndf.settings import EMACS_INIT_FILE_PATH
 
@@ -47,6 +48,7 @@ def org2html(org_content, file_prefix="", file_delete=True):
                                       + "\n#+TITLE: \n"
 
         org_content_for_file = org_content.replace("\r", "")
+        file_prefix = slugify(file_prefix)
 
         # Creating a temporary file with ".org" extension 
         file_suffix=".org"        # ".org" suffix must; otherwise emacs command won't work!

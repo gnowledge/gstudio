@@ -467,48 +467,51 @@ def get_metadata_values():
 @get_execution_time
 @register.assignment_tag
 def get_attribute_value(node_id, attr):
+	try:
+		node_attr = None
+		if node_id:
+			node = node_collection.one({'_id': ObjectId(node_id) })
+			gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr) })
+	        # print "node: ",node.name,"\n"
+	        # print "attr: ",attr,"\n"
 
-	node_attr = None
-	if node_id:
-		node = node_collection.one({'_id': ObjectId(node_id) })
-		gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr) })
-        # print "node: ",node.name,"\n"
-        # print "attr: ",attr,"\n"
+			if node and gattr:
+				node_attr = triple_collection.one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})	
 
-		if node and gattr:
-			node_attr = triple_collection.one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id})	
+		if node_attr:
+			attr_val = node_attr.object_value
+		else:
+			attr_val = ""
 
-	if node_attr:
-		attr_val = node_attr.object_value
-	else:
-		attr_val = ""
-
-	# print "attr_val: ",attr_val,"\n"
-	return attr_val
-
+		# print "attr_val: ",attr_val,"\n"
+		return attr_val
+	except:
+		return attr_val
 
 @get_execution_time
 @register.assignment_tag
 def get_relation_value(node_id, grel):
-	node_grel = None
-	if node_id:
-		node = node_collection.one({'_id': ObjectId(node_id) })
-		grel = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
-		if node and grel:
-			node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id})
-	# print "\n\n node_grel",node_grel
-	if node_grel:
-		grel_val = node_grel.right_subject
-		grel_id = node_grel._id
-		grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
-	else:
-		grel_val_node = ""
-		grel_id = ""
+	try:
+		node_grel = None
+		if node_id:
+			node = node_collection.one({'_id': ObjectId(node_id) })
+			grel = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
+			if node and grel:
+				node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id,'status':"PUBLISHED"})
+		# print "\n\n node_grel",node_grel
+		if node_grel:
+			grel_val = node_grel.right_subject
+			grel_id = node_grel._id
+			grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+		else:
+			grel_val_node = ""
+			grel_id = ""
 
-	# print "grel_val_node: ",grel_val_node,"\n"
-	# returns right_subject of grelation and GRelation _id 
-	return grel_val_node, grel_id
-
+		# print "grel_val_node: ",grel_val_node,"\n"
+		# returns right_subject of grelation and GRelation _id 
+		return grel_val_node, grel_id
+	except:
+		return grel_val_node, grel_id
 
 @get_execution_time
 @register.inclusion_tag('ndf/drawer_widget.html')
