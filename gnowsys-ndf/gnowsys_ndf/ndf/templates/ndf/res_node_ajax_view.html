@@ -293,7 +293,7 @@
           {% if node.discussion_enable == True %}
             {% if thread_node %}
                 {% get_node thread_node as thread_node_obj %}
-                {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
                 {% include 'ndf/discussion.html' with node=thread_node_obj %}
             {% endif %}
           {% endif %}

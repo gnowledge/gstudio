@@ -4142,7 +4142,7 @@ def create_thread_for_node(request, group_id, node):
 		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
 		has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
 		if thread_obj:
-			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': []}}, upsert = False, multi = False)
+			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
 			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
 			node.reload()
 			thread_obj.reload()
@@ -4164,8 +4164,9 @@ def create_thread_for_node(request, group_id, node):
 			thread_obj.created_by = int(request.user.id)
 			thread_obj.modified_by = int(request.user.id)
 			thread_obj.contributors.append(int(request.user.id))
-
+			thread_obj.prior_node.append(node._id)
 			thread_obj.member_of.append(ObjectId(twist_gst._id))
+
 			# thread_obj.prior_node.append(ObjectId(node._id))
 			thread_obj.group_set.append(ObjectId(group_id))
 
