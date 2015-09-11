@@ -2548,7 +2548,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                         ga_node.status = u"PUBLISHED"
                         ga_node.save()
                         ''' server_sync '''
-                        # capture_data(file_object=ga_node, file_data=None, content_type='gattribute_publish')
+                        capture_data(file_object=ga_node, file_data=None, content_type='gattribute_publish')
 
 
                         info_message = " GAttribute (" + \

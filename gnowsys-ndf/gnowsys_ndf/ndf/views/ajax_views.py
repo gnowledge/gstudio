@@ -960,9 +960,10 @@ def add_page(request, group_id):
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page),groupid=group_id)
         page_node.status = u"PUBLISHED"
         page_node.save()
-
+	capture_data(file_object = page_node, file_data=None, content_type='create_page_create')
         context_node.collection_set.append(page_node._id)
         context_node.save(groupid=group_id)
+	capture_data(file_object = context_node, file_data=None, content_type='context_node_append')
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 

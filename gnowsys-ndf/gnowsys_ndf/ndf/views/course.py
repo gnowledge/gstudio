@@ -187,6 +187,7 @@ def create_edit(request, group_id, node_id=None):
                     # print del_status, "--", del_status_msg
 
             fileobj,fs = save_file(f,f.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+	    capture_data(file_object = fileobj, file_data=None, content_type='create_unit')
             if fileobj:
                 rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
                 # print "\n creating GRelation has_logo\n"
@@ -1228,6 +1229,7 @@ def save_course_sub_section(request, group_id):
         cs_node = node_collection.one({"_id": ObjectId(cs_node_id)})
         css_new.prior_node.append(cs_node._id)
         css_new.save(groupid=group_id)
+        capture_data(file_object = css_new, file_data = None, content_type = 'Create_CourseSubSection')
         node_collection.collection.update({'_id': cs_node._id}, {'$push': {'collection_set': css_new._id }}, upsert=False, multi=False)
         response_dict["success"] = True
         response_dict["css_new_id"] = str(css_new._id)
@@ -1252,6 +1254,7 @@ def change_node_name(request, group_id):
         node = node_collection.one({"_id": ObjectId(node_id)})
         node.name = new_name.strip()
         node.save(groupid=group_id)
+	capture_data(file_object = node, file_data=None, content_type='Create_CourseSection')
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
@@ -1282,6 +1285,7 @@ def change_order(request, group_id):
         a, b = collection_set_list.index(ObjectId(node_id_up)), collection_set_list.index(ObjectId(node_id_down))
         collection_set_list[b], collection_set_list[a] = collection_set_list[a], collection_set_list[b]
         node_collection.collection.update({'_id': parent_node._id}, {'$set': {'collection_set': collection_set_list }}, upsert=False, multi=False)
+	
         parent_node.reload()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
@@ -1493,6 +1497,7 @@ def save_resources(request, group_id):
 
             cu_new.prior_node.append(css_node._id)
             cu_new.save(groupid=group_id)
+            capture_data(file_object = cu_node, file_data=None, content_type='Courseunit')
             response_dict["create_new_unit"] = True
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
 
@@ -1552,6 +1557,7 @@ def create_edit_unit(request, group_id):
             cu_node.contributors.append(int(request.user.id))
             cu_node.prior_node.append(css_node._id)
             cu_node.save(groupid=group_id)
+            capture_data(file_object = cu_node, file_data=None, content_type='create_unit')
             response_dict["unit_node_id"] = str(cu_node._id)
         node_collection.collection.update({'_id': cu_node._id}, {'$set': {'name': unit_name}}, upsert=False, multi=False)
 
@@ -1718,7 +1724,10 @@ def add_course_file(request, group_id):
             file_node.save()
             context_node.collection_set.append(file_node._id)
             file_node.save()
+            capture_data(file_object = file_node, file_data=None, content_type='add_course_file')
         context_node.save()
+	capture_data(file_object = context_node, file_data=None, content_type='add_course_file')
+	
     return HttpResponseRedirect(url_name)
 
 
