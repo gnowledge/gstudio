@@ -172,25 +172,6 @@
           {% endif %}
       </dl>
 
-      <!-- Right Nav Section -->
-      {% if request.user.is_authenticated and not gstaff_access %}
-          <section>
-            <ul class="right" >
-            {% user_access_policy groupid request.user as user_access %} 
-              <li>
-              {% if user_access == "allow" %}
-                <input class="enroll-btn button tiny" type="button" value="ENROLLED" disabled="disabled">
-              {% else %}
-                {% if allow_to_join %}
-                  <input class="enroll-btn button tiny" type="button" value="ENROLL">
-                {% else %}
-                  <input class="enroll-btn button tiny" type="button" value="ENROLLMENT NOT OPEN" disabled="disabled">
-                {% endif %}
-              {% endif %}
-              </li>
-            </ul> 
-          </section>
-        {% endif %}
 
     <div class="row">
       
