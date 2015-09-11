@@ -422,6 +422,9 @@ def server_sync(mail):
         
         ''' Code to decrypt every attachment and create a list with the file paths of decrypted attachments'''
         list_of_decrypted_attachments = []
+	print "before sort",all_attachments
+	sorted(all_attachments)
+	print "after sorting",all_attachments
         for attachment in all_attachments:
             filename = attachment.document.path
             op_file_name = filename.split('_sig')[0]            
@@ -433,153 +436,128 @@ def server_sync(mail):
         print '##**'*30
 	import time 
 	
-        print list_of_decrypted_attachments
+        print "hello",list_of_decrypted_attachments
         
         for file_path in list_of_decrypted_attachments:
-	    print file_path	
-            if file_path[-4:] == 'json':
+	    if file_path[-4:] == 'json':
 		json_file_path = file_path
 		print "first section", file_path
-                
             else:
-		
-                file_object_path = file_path
+		file_object_path = file_path
 		print "second section",file_path
                 
 
-        node_exists = False
-        with open(json_file_path,'r') as json_file:
-            json_data = json_file.read()
-            json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
-            json_data = json_util.loads(json_data[1:-1])
-            # print json_data
-                            
-            cursor= None
-            hey = True                            
-            if hey:
-                settings_dir1 = os.path.dirname(__file__)
-                settings_dir2 = os.path.dirname(settings_dir1)
-                settings_dir3 = os.path.dirname(settings_dir2)
-                path = os.path.abspath(os.path.dirname(settings_dir3))
-                #may throw error        
-                #conn = sqlite3.connect(path + '/example-sqlite3.db')
-		print "the json data",json_data
-                #user_id = json_data[u'created_by']
-		user_id = 1
-                query = 'select username from auth_user where id=\''+str(user_id)+'\''
-                #cursor = conn.execute(query)
+	    node_exists = False
+	    with open(json_file_path,'r') as json_file:
+	            json_data = json_file.read()
+	            json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
+	            json_data = json_util.loads(json_data[1:-1])
+	            # print json_data
+	                            
+	            cursor= None
+	            hey = True                            
+	            if hey:
+	                settings_dir1 = os.path.dirname(__file__)
+	                settings_dir2 = os.path.dirname(settings_dir1)
+	                settings_dir3 = os.path.dirname(settings_dir2)
+	                path = os.path.abspath(os.path.dirname(settings_dir3))
+	                #may throw error        
+	                #conn = sqlite3.connect(path + '/example-sqlite3.db')
+		        print "the json data",json_data
+	                #user_id = json_data[u'created_by']
+		        user_id = 1
+	                query = 'select username from auth_user where id=\''+str(user_id)+'\''
+	                #cursor = conn.execute(query)
 
-            else:
-                "hello"
-            username=None
-            username = 'mukesh'
-            '''    
-            for row in cursor:
-                username = row[0]  '''  
-            print "to see",file_object_path
-            if file_object_path != '':
-                ''' for the creation of the file object '''
-                with open(file_object_path,'rb+') as to_be_saved_file:
-                    req_groupid = None
-                    for obj in json_data["group_set"]:
-                        temp_obj = node_collection.one({"_id": obj, "_type" : "Group" })
-			print temp_obj
-                        if temp_obj is not None:
-                            req_groupid = obj
-                            break
+	            else:
+	                "hello"
+	            username=None
+	            username = 'mukesh'
+	            '''    
+	            for row in cursor:
+	                username = row[0]  '''  
+	            if file_object_path != '':
+	                ''' for the creation of the file object '''
+	                with open(file_object_path,'rb+') as to_be_saved_file:
+	                    req_groupid = None
+	                    for obj in json_data["group_set"]:
+	                        temp_obj = node_collection.one({"_id": obj, "_type" : "Group" })
+			        print temp_obj
+	                        if temp_obj is not None:
+	                            req_groupid = obj
+	                            break
 
-                    to_be_saved_file = io.BytesIO(to_be_saved_file.read())
-                    to_be_saved_file.name = json_data["name"]
+	                    to_be_saved_file = io.BytesIO(to_be_saved_file.read())
+	                    to_be_saved_file.name = json_data["name"]
 
-                    node_id, is_video = save_file(to_be_saved_file, json_data["name"], json_data["created_by"], req_groupid, json_data["content_org"], json_data["tags"], json_data["mime_type"].split('/')[1], json_data["language"], username, json_data["access_policy"],server_sync=True,object_id=json_data["_id"],oid=True)
+	                    node_id, is_video = save_file(to_be_saved_file, json_data["name"], json_data["created_by"], req_groupid, json_data["content_org"], json_data["tags"], json_data["mime_type"].split('/')[1], json_data["language"], username, json_data["access_policy"],server_sync=True,object_id=json_data["_id"],oid=True)
 
-                    if type(node_id) == list:
-                        node_id = node_id[1]
-                    print "the crashin point"                 
-                    node_to_update = node_collection.one({ "_id": ObjectId(node_id) })
-                                    
-                    temp_dict = {}
-                    for key, values in json_data.items():
-                        if key != 'fs_file_ids':
-                            temp_dict[key] = values
-                
-                    node_to_update.update(temp_dict)
-                    node_to_update.save()
-                            
-            else:
-                # We need to check from the _type what we have that needs to be saved
-		if json_data['_type'] == 'GAttribute' or json_data['_type'] == 'GRelation':
-			temp_node = triple_collection.one({"_id": ObjectId(json_data["_id"])})
-		else:
-			temp_node = node_collection.one({"_id" : ObjectId(json_data["_id"])})
-                if temp_node is not None:
-                    temp_dict = {}
-		    for key, values in json_data.items():
-                        if key != u'fs_file_ids':
-                            temp_dict[key] = values
+	                    if type(node_id) == list:
+	                        node_id = node_id[1]
+	                    print "the crashin point"                 
+	                    node_to_update = node_collection.one({ "_id": ObjectId(node_id) })
+	                                    
+	                    temp_dict = {}
+	                    for key, values in json_data.items():
+	                        if key != 'fs_file_ids':
+	                            temp_dict[key] = values
+	                
+	                    node_to_update.update(temp_dict)
+	                    node_to_update.save()
+	                            
+	            else:
+	                # We need to check from the _type what we have that needs to be saved
+		        if json_data['_type'] == 'GAttribute' or json_data['_type'] == 'GRelation':
+			        temp_node = triple_collection.one({"_id": ObjectId(json_data["_id"])})
+		        else:
+			        temp_node = node_collection.one({"_id" : ObjectId(json_data["_id"])})
+	                if temp_node is not None:
+	                    temp_dict = {}
+		            for key, values in json_data.items():
+	                        if key != u'fs_file_ids':
+	                            temp_dict[key] = values
 
-                    temp_node.update(temp_dict)
-                    temp_node.save()
-                                
-                else:
-                    # for pages
-					print  "asdfsadf",json_data	
-					if json_data['_type'] == 'GAttribute':
-						temp_node = triple_collection.collection.GAttribute()
-						print "GAttribute",temp_node
-                                                temp_dict = {}
-						for key,values in json_data.items():
+	                    temp_node.update(temp_dict)
+	                    temp_node.save()
+	                                
+	                else:
+	                    # for pages
+					        if json_data['_type'] == 'GAttribute':
+                                                                temp_node = triple_collection.collection.GAttribute()
+						                print "GAttribute",temp_node
+	                                                        temp_dict = {}
+						                for key,values in json_data.items():
+	                                                                if key != 'name':          
+                                                                                if key == 'attribute_type':                     
+                                                                                        node = node_collection.one({"_id":ObjectId(json_data['attribute_type']['_id'])})
+                                                                                        if node:
+                                                                                                temp_node[key] = node
+                                                                                else:
+	                                                                	        temp_dict[key] = values
+	                                                        temp_node.update(temp_dict)
+	                                                        try:
+						                        temp_node.save()
+	                                                        except:         
+	                                                                for i,v in temp_dict.items():  
+	                                                                        temp_node[i] = v
+	                                                                temp_node.save()
+	                                                        '''                
+						                elif json_data['_type'] == 'GRelation':                
+							                temp_node = triple_collection.collection.GRelation()
+							                print "GAttribute",temp_node'''
                                                         
-                                                        if key == 'attribute_type':
-                                                                print json_data['attribute_type']['_id']
-                                                                '''
-								at = node_collection.collection.AttributeType()
-                                                                
-                                                                print val
-                                                                at.name = unicode(val['name'])
-                                                                at.created_by = 1
-                                                                at.modified_by = 1
-                                                                at.member_of.append(val['member_of'])                
-                                                                at.subject_type.append(val['subject_type'])
-                                                                at.contributors.append(user_id)
-                                                                at.data_type = val['data_type']
-                                                                at.status = u"PUBLISHED"
-                                                                at._id = ObjectId(val['_id'])
-                                                                at.save()
-                                                                '''
-                                                                node = node_collection.one({"_id":ObjectId(json_data['attribute_type']['_id'])})
-                                                                print "Attribute Type",node
-                                                                temp_node[key] = node       
-                                                                
-                                                        print key        
-							if key != 'name':                                                 
-                                                        	temp_dict[key] = values
-                                                temp_node.update(temp_dict)
-                                                print temp_node
-                                                try:
-					                temp_node.save()
-                                                except:         
-                                                        for i,v in temp_dict.items():  
-                                                                temp_node[i] = v
-                                                        print "after all this",type(temp_node)
-                                                        temp_node.save()
-                                                print "after save"
-                                                '''                
-					        elif json_data['_type'] == 'GRelation':                
-						        temp_node = triple_collection.collection.GRelation()
-						        print "GAttribute",temp_node'''
-					else:
-						temp_node = node_collection.collection.GSystem()
-					        temp_dict = {}
-					        ''' dictionary creation '''
-					
-						for key, values in json_data.items():
-							print key,values
-							temp_dict[key] = values
+					        else:
+						        temp_node = node_collection.collection.GSystem()
+						        temp_dict = {}
+						        ''' dictionary creation '''
+				
+						        for key, values in json_data.items():
+							        print key,values
+							        temp_dict[key] = values
 
-						temp_node.update(temp_dict)
-						temp_node.save()
-                time.sleep(10)
+						        temp_node.update(temp_dict)
+						        temp_node.save()
+	                time.sleep(10)
 
 @get_execution_time
 def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
@@ -655,6 +633,9 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
 
                 print len(all_mails)
                 # To manage the mails that comes as a part of the server-sync technique
+                print all_mails
+                all_mails = sorted(all_mails)                        
+                print "all_mails",all_mails
                 for mail in all_mails:
                     server_sync(mail)
 
