@@ -832,11 +832,15 @@ def submitDoc(request, group_id):
             # check if file is already uploaded file
             # if isinstance(f, list):
                 f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
-
+                fileobj = node_collection.one({'_id': ObjectId(f)})
                 thread_create_val = request.POST.get("thread_create",'')
-
+                discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
                 if thread_create_val == "Yes":
+                  create_gattribute(fileobj._id, discussion_enable_at, True)
+
                   return_status = create_thread_for_node(reaquest,group_id, fileobj)
+                else:
+                  create_gattribute(fileobj._id, discussion_enable_at, False)
 
             # print "=============== : ", f
             try:
@@ -1599,8 +1603,13 @@ def file_edit(request,group_id,_id):
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE),groupid=group_id)
 
         thread_create_val = request.POST.get("thread_create",'')
+        discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
+          create_gattribute(file_node._id, discussion_enable_at, True)
           return_status = create_thread_for_node(request,group_id, file_node)
+        else:
+          create_gattribute(file_node._id, discussion_enable_at, False)
+
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             # To fill the metadata info while creating and editing file node
             metadata = request.POST.get("metadata_info", '')
