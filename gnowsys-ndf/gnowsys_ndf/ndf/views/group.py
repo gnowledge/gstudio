@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
-# from django.template.defaultfilters import slugify
+from django.template.defaultfilters import slugify
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
@@ -1189,7 +1189,10 @@ class CreateCourseEventGroup(CreateEventGroup):
             new_gsystem.content_org = node.content_org
             new_gsystem.content = node.content
             new_gsystem.save()
-            return_status = create_thread_for_node(request, group_obj._id, new_gsystem)
+            discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+            create_gattribute(new_gsystem._id, discussion_enable_at, False)
+            new_gsystem.reload()
+            # return_status = create_thread_for_node(request, group_obj._id, new_gsystem)
             return new_gsystem
 
         except Exception as e:
