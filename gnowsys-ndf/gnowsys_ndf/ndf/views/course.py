@@ -122,7 +122,6 @@ def create_edit(request, group_id, node_id=None):
     #             group_id = str(auth._id)
     # else:
     #     pass
-    print "//////////////////////////////////????"
     try:
         group_id = ObjectId(group_id)
     except:
@@ -141,7 +140,6 @@ def create_edit(request, group_id, node_id=None):
 
     else:
         course_node = node_collection.collection.GSystem()
-    print "asdfasdfsadfasfsafasfsdfS"
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(GST_COURSE._id),'group_set': ObjectId(group_id),'status':{"$in":[u"DRAFT",u"PUBLISHED"]}})
 
     nodes_list = []
@@ -542,6 +540,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                     course_gs.content = cnode_for_content.html_content
 
                     course_gs.save(is_changed=is_changed,groupid=group_id)
+		    capture_data(file_object=course_gs, file_data=None, content_type='create_course')	
 
                     # [B] Store AT and/or RT field(s) of given course-node
                     for tab_details in property_order_list:
@@ -630,6 +629,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 course_gs.status = u"PUBLISHED"
 
             course_gs.save(is_changed=is_changed,groupid=group_id)
+            capture_data(file_object=course_node, file_data=None, content_type='create_course')
 
             # [B] Store AT and/or RT field(s) of given course-node
             for tab_details in property_order_list:
@@ -1176,6 +1176,7 @@ def save_course_section(request, group_id):
         course_node = node_collection.one({"_id": ObjectId(course_node_id)})
         cs_new.prior_node.append(ObjectId(course_node._id))
         cs_new.save(groupid=group_id)
+	capture_data(file_object=course_node, file_data=None, content_type='Create_CourseSection')
         node_collection.collection.update({'_id': course_node._id}, {'$push': {'collection_set': cs_new._id }}, upsert=False, multi=False)
         response_dict["success"] = True
         response_dict["cs_new_id"] = str(cs_new._id)
