@@ -14,6 +14,7 @@
     
   <script type="text/javascript">
     $(document).ready(function() {      
+      {% check_is_gstaff groupid request.user as is_gstaff %}
 
       // Funtion for loading tree for showing collection list left side panel
       doc();
@@ -25,7 +26,6 @@
         changeYear: true,
         dateFormat: 'dd/mm/yy',
         defaultDate: '0',
-        minDate: '0'
       });
 
     });
@@ -62,9 +62,12 @@
       $tree.tree({
         selectable: true,
         onCreateLi: function(node, $li) {
+        {% if is_gstaff %}
           if(node.node_type=="CourseSubSectionEvent"){
-            $li.find('.jqtree-title').after(' <span class="fi-widget"></span> &nbsp;');                 
+            $li.find('.jqtree-title').after('<span class="fi-widget"></span> &nbsp;');                 
           }
+        {% endif %}
+
         }
       });
 
@@ -164,17 +167,6 @@
             }
             $("#view_page").append(ol_elem)
           }
-          else if(node['node_type']=="CourseSubSectionEvent"){
-            if("start_time_val" in node){
-              $("#release_date").val(node.start_time_val)
-            }
-            else{
-              $("#release_date").val("")
-            }
-            $(".view_page_link").trigger('click')
-            $("#date_reveal_modal").foundation('reveal', 'open');
-            $("#css_id").val(node.id)
-          }
         });
       if (window.location.pathname.search("add_units") > -1) {
           update_url = false;
@@ -193,6 +185,18 @@
       $(".save_date").attr("disabled",false);
     })
     
+    $(document).on("click", ".fi-widget", function(){
+        var node = $('.collection').tree('getSelectedNode');
+        if("start_time_val" in node){
+          $("#release_date").val(node.start_time_val)
+        }
+        else{
+          $("#release_date").val("")
+        }
+        $(".view_page_link").trigger('click')
+        $("#date_reveal_modal").foundation('reveal', 'open');
+        $("#css_id").val(node.id)
+    })
 
     // This function takes id of clicked "related" node and redirect to its page with its proper breadcrumbs
     // nav_li manipulates the navigation path of that topic in theme map
@@ -271,7 +275,6 @@
   {% endif %}
   <!-- <b class="current">{{node.name}}</b> -->
   {% if node.collection_set %}
-    <h4 class="">{{node.name}}</h4>
     <div>
       <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
     </div>
