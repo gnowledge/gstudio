@@ -28,5 +28,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.course',
                         url(r'^/remove/$', 'remove_resource_from_unit', name='remove_resource_from_unit'),
                         url(r'^/add_course_file/$', 'add_course_file', name='add_course_file'),
                         url(r'^/enroll_to_course/$', 'enroll_to_course', name='enroll_to_course'),
+                        url(r'^/set_release_date_css/$', 'set_release_date_css', name='set_release_date_css'),
                        
                        )
