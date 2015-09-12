@@ -316,8 +316,6 @@
   $(document).on('click','.save_date',function(){
     date_val = $("#release_date").val()
     css_id_val = $("#css_id").val()
-    console.log(date_val)
-    console.log(css_id_val)
     $.ajax({
       url: "{% url 'set_release_date_css' node.pk %}",
 
@@ -332,7 +330,6 @@
       dataType: "json",
 
       success: function(data){
-        console.log(data)
           success_state = data["success"]
           if(success_state){
             location.reload();
