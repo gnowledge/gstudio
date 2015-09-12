@@ -1233,6 +1233,9 @@ def save_course_sub_section(request, group_id):
         css_new.save(groupid=group_id)
         capture_data(file_object = css_new, file_data = None, content_type = 'Create_CourseSubSection')
         node_collection.collection.update({'_id': cs_node._id}, {'$push': {'collection_set': css_new._id }}, upsert=False, multi=False)
+	cs_node = node_collection.one({"_id": ObjectId(cs_node_id)})
+	capture_data(file_object=cs_node, file_data=None, content_type='Update_course_node')
+        
         response_dict["success"] = True
         response_dict["css_new_id"] = str(css_new._id)
         return HttpResponse(json.dumps(response_dict))
@@ -1502,15 +1505,17 @@ def save_resources(request, group_id):
             capture_data(file_object = cu_new, file_data=None, content_type='Courseunit')
             response_dict["create_new_unit"] = True
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
-
-        if cu_new._id not in css_node.collection_set:
+	if cu_new._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
 
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
-        cu_new.reload()
+	cu_new.reload()
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
-
+	print "unit save resource",cu_new
+	cu = node_collection.find({"_id":ObjectId(cu_new._id)})
+	capture_data(file_object=cu, file_data=None, content_type='Update_course_node')
+        
         return HttpResponse(json.dumps(response_dict))
 
 
@@ -1565,7 +1570,10 @@ def create_edit_unit(request, group_id):
 
         if cu_node._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_node._id}}, upsert=False, multi=False)
-
+	cu = node_collection.one({"_id":ObjectId(cu_node._id)})
+	print  "capturing data",cu
+	capture_data(file_object=cu_new, file_data=None, content_type='Update_course_node')
+        
         return HttpResponse(json.dumps(response_dict))
 
 
@@ -1685,7 +1693,9 @@ def remove_resource_from_unit(request, group_id):
 
         if unit_node.collection_set and res_id:
               node_collection.collection.update({'_id': unit_node._id}, {'$pull': {'collection_set': ObjectId(res_id)}}, upsert=False, multi=False)
-
+	unit_node = node_collection.one({'_id': ObjectId(unit_node_id)})
+	capture_data(file_object=cu_new, file_data=None, content_type='Update_course_node')
+        
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
@@ -1728,6 +1738,7 @@ def add_course_file(request, group_id):
             file_node.save()
             capture_data(file_object = file_node, file_data=None, content_type='add_course_file')
         context_node.save()
+	print "should give the latest one",context_node
 	capture_data(file_object = context_node, file_data=None, content_type='add_course_file')
 	
     return HttpResponseRedirect(url_name)
