@@ -1512,9 +1512,8 @@ def save_resources(request, group_id):
 	cu_new.reload()
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
-	print "unit save resource",cu_new
-	cu = node_collection.find({"_id":ObjectId(cu_new._id)})
-	capture_data(file_object=cu, file_data=None, content_type='Update_course_node')
+	css_node = node_collection.find({"_id":ObjectId(css_node._id)})
+	capture_data(file_object=css_node, file_data=None, content_type='Update_course_node')
         
         return HttpResponse(json.dumps(response_dict))
 
