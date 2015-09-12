@@ -494,7 +494,6 @@ def server_sync(mail):
 
 	                    if type(node_id) == list:
 	                        node_id = node_id[1]
-	                    print "the crashin point"                 
 	                    node_to_update = node_collection.one({ "_id": ObjectId(node_id) })
 	                                    
 	                    temp_dict = {}
@@ -522,13 +521,17 @@ def server_sync(mail):
 	                                
 	                else:
 	                    # for pages
-					        if json_data['_type'] == 'GAttribute':
-                                                                temp_node = triple_collection.collection.GAttribute()
+					        if json_data['_type'] in ['GAttribute','GRelation']:
+								if json_data['_type'] == 'GAttribute':
+                                                                	temp_node = triple_collection.collection.GAttribute()
+								elif json_data['_type'] == 'GRelation':
+									temp_node = triple_collection.collection.GRelation()
 						                print "GAttribute",temp_node
 	                                                        temp_dict = {}
 						                for key,values in json_data.items():
 	                                                                if key != 'name':          
-                                                                                if key == 'attribute_type':                     
+                                                                                if key in ['attribute_type','relation_type']:
+                     
                                                                                         node = node_collection.one({"_id":ObjectId(json_data['attribute_type']['_id'])})
                                                                                         if node:
                                                                                                 temp_node[key] = node
@@ -541,13 +544,13 @@ def server_sync(mail):
 	                                                                for i,v in temp_dict.items():  
 	                                                                        temp_node[i] = v
 	                                                                temp_node.save()
-	                                                        '''                
-						                elif json_data['_type'] == 'GRelation':                
-							                temp_node = triple_collection.collection.GRelation()
-							                print "GAttribute",temp_node'''
+	                                                        
                                                         
 					        else:
-						        temp_node = node_collection.collection.GSystem()
+							if json_data['_type'] == 'Group':
+						        	temp_node = node_collection.collection.Group()
+							else:				
+								temp_node = node_collection.collection.GSystem()
 						        temp_dict = {}
 						        ''' dictionary creation '''
 				
