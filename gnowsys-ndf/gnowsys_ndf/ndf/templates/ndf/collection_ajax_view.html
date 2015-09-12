@@ -172,7 +172,7 @@
               $("#release_date").val("")
             }
             $(".view_page_link").trigger('click')
-            $("#alertModal").foundation('reveal', 'open');
+            $("#date_reveal_modal").foundation('reveal', 'open');
             $("#css_id").val(node.id)
           }
         });
@@ -189,7 +189,9 @@
       }      
 
     }
-
+    $(document).on("change", "#release_date", function(){
+      $(".save_date").attr("disabled",false);
+    })
     
 
     // This function takes id of clicked "related" node and redirect to its page with its proper breadcrumbs
@@ -276,17 +278,18 @@
 
     <!-- start date -->
 
-    <div id="alertModal" class="reveal-modal medium alert-box success radius" data-reveal data-alert>
-      <p id="alertModalLabel"></p>
+    <div id="date_reveal_modal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
       <div class="row release_date_div text-center">
           <div class="small-3 columns">
-            {% trans 'Release Date' %}
+            <label>
+              {% trans 'Release Date' %}
+            </label>
           </div>
           <div class="small-3 columns end">
             <input type="text" id="release_date" name="release_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year">      
           </div>
           <div class="small-3 columns end">
-              <input type="button" value="Save" class="save_date button small">
+              <input type="button" value="Save" class="save_date button small" disabled="disabled">
           </div>
           <input type="hidden" name="css_id" id="css_id" value="">
       </div>
