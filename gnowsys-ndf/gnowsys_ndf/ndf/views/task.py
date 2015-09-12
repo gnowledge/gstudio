@@ -846,13 +846,13 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
                 if int(choice) == int(3):
                     message="No Task Created"
                     auth1 = node_collection.one({'_type': 'Author', 'created_by': each.created_by })   
-                    if auth:    		
-                        if auth.name == auth1.name:
+                    if auth1:    		
+                        if request.user.username == auth1.name:
                             task_list.append(dict(attr_value))
                 
                 if int(choice) == int(4):
                     message="Nothing Assigned"
-                    attr1 = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type.$id": attributetype_key1._id, "object_value": request.user.username})
+                    attr1 = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type.$id": attributetype_key1._id, "object_value": request.user.id})
                     if attr1:
                         task_list.append(dict(attr_value))
                 

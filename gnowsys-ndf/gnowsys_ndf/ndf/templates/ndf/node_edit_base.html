@@ -481,7 +481,7 @@ i.remove-tag{
 		</div>
 
 	    <div class="row yes_no_disc_div">
-	      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction :" %}</h5>
+	      <div class="large-2 medium-4 columns"><h5 class="compulsory">{% trans "Interaction : " %}</h5>
 	      </div>
 	      <div class="large-pull-4 large-6 medium-8 columns">
 			<input type="radio" name="thread_create" value="Yes">Yes &nbsp;&nbsp;
@@ -804,7 +804,6 @@ i.remove-tag{
 
 	// doument ready function
 	$(document).ready(function(){
-
 		$(".assesses_tab").hide();
 		$(".teaches_tab").hide();
 		$(".prior_node_tab").hide();
@@ -833,12 +832,16 @@ i.remove-tag{
 				$("#name_id").attr("disabled",true)
 			{% endif %}
 
+			{% if node.discussion_enable == False %}
+				$("input[name='thread_create'][value='No']").attr("checked","checked");
+			{% endif %}
 			{% if 'has_thread' in node %}
 				{% with node.has_thread.0 as disc_thread_node %}
 					{% if disc_thread_node %}
 						$("input[name='thread_create'][value='Yes']").attr("checked","checked");
 						$("input[name='thread_create']").trigger("change");
-						$(".yes_no_disc_div").addClass("hide");
+						$("input[name='thread_create']").attr("disabled",true);
+						// $(".yes_no_disc_div").addClass("hide");
 
 						{% get_attribute_value disc_thread_node.pk 'release_response' as resp_val %}
 						{% get_attribute_value disc_thread_node.pk 'thread_interaction_type' as thr_int_type %}
@@ -1324,12 +1327,7 @@ i.remove-tag{
 	addTagBtn.onkeypress = addTag;
 
 	$("#save-node").click(function(event) {
-		
-
-
-
-                      
-      	pn_arr = []
+		pn_arr = []
 		cn_arr = []
 		md_arr = [] //for adding module
 		tch_arr=[]  // for teaches
@@ -1407,16 +1405,27 @@ i.remove-tag{
     	{
           $("#message").css("display", "none");
 	    }
+	// {% get_site_name_from_settings as site_name %}
+       
+       // {%  if site_name == "NROER" and title == "Page" or "File" in node.member_of_names_list    %}
+       //      if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
+       //              $('#tabs').find('a[href="#tab2"]').trigger('click');
+       //              $("#message").css("display", "block");
+       //              $("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+       //              event.preventDefault();
+       //      }
+       // {% endif %}
 
-    {% if not ce_id %}
-		if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
-			$('#tabs').find('a[href="#tab2"]').trigger('click');
+	$("input[name='thread_create']").attr("disabled",false);
+	{% if title == "Page" or "File" in node.member_of_names_list %}
+		if (!$("input[name='thread_create']:checked").val()) {
+			$('.thread_prop_tab').trigger('click');
 			$("#message").css("display", "block");
 			$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
 			event.preventDefault();
 		}
 	{% endif %}
-	    updateAllTags();
+    updateAllTags();
 	});
 
 
@@ -1521,7 +1530,6 @@ i.remove-tag{
 
 {% block document_ready %}
 	{{block.super}}
-
 	$("input[id='educational']").each(function(){
 		$(this).attr("required", "");
 		$(this).css("width", "98%");

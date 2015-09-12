@@ -113,7 +113,7 @@
           // ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
           if (sData.exact.name[i].link != null) {
             type = alterType(sData.exact.name[i].link);
-            console.log(type);
+            // console.log(type);
 
             GSystem_link = assignLink(type, sData.exact.name[i].link.toLowerCase(), sData.exact.name[i]._id);
             html_div[cur_page] += generateCard(sData.exact.name[i].name, type, sData.exact.name[i].created_by, sData.exact.name[i].last_update, GSystem_link);
@@ -297,12 +297,12 @@
             card_html += '<div class="row">';
                   card_html += '<div class="small-12 columns">';                            
                       card_html += '<b>';
-                        card_html += '<h5>'+name;
+                        card_html += '<h4>'+name;
                       card_html += '</b>';
                   card_html += '</div>';
                   card_html += '</div>';
             card_html += '<hr/>';
-            card_html += GSystem_type + ", last modified: " + last_modified;
+            card_html += GSystem_type + '</br>' + "last modified: " + last_modified;
             card_html += '<div class="age">';
                 card_html += 'by <span data-gnow="" class="user" href="#"><i class="fi-torso"></i>' + created_by + '</span>';
             card_html += '</div>';
@@ -394,7 +394,7 @@
 
   $('#Groups').change(function(){
     var Group_names = String($("#Groups").val());
-    console.log(Group_names);
+    
 
     $.ajax({
           type: "GET",
@@ -451,7 +451,7 @@
   var GSystem_name = [];
   $("#search_text_rel").keyup(function(e){
 
-    console.log(e.which);
+    // console.log(e.which);
     var searchKey = $("#search_text_rel").val();
     words = searchKey.split(' ');
     cur_word = words[words.length-1];

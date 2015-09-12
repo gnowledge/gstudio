@@ -368,8 +368,13 @@ def create_edit_page(request, group_id, node_id=None):
             group_obj.collection_set.append(page_node._id)        
             group_obj.save()
 
+        discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
-	        return_status = create_thread_for_node(request,group_id, page_node)
+          create_gattribute(page_node._id, discussion_enable_at, True)
+          return_status = create_thread_for_node(request,group_id, page_node)
+        else:
+          create_gattribute(page_node._id, discussion_enable_at, False)
+
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
         if ce_id or res or program_res:

@@ -970,16 +970,16 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # tags
     # if tags:
     tags_list = []
+    if tags:
+        for tag in tags.split(","):
+            tag = unicode(tag.strip())
 
-    for tag in tags.split(","):
-        tag = unicode(tag.strip())
+            if tag:
+                tags_list.append(tag)
 
-        if tag:
-            tags_list.append(tag)
-
-    if set(node.tags) != set(tags_list):
-        node.tags = tags_list
-        is_changed = True
+        if set(node.tags) != set(tags_list):
+            node.tags = tags_list
+            is_changed = True
       
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
@@ -4142,7 +4142,7 @@ def create_thread_for_node(request, group_id, node):
 		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
 		has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
 		if thread_obj:
-			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': []}}, upsert = False, multi = False)
+			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
 			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
 			node.reload()
 			thread_obj.reload()
@@ -4164,8 +4164,9 @@ def create_thread_for_node(request, group_id, node):
 			thread_obj.created_by = int(request.user.id)
 			thread_obj.modified_by = int(request.user.id)
 			thread_obj.contributors.append(int(request.user.id))
-
+			thread_obj.prior_node.append(node._id)
 			thread_obj.member_of.append(ObjectId(twist_gst._id))
+
 			# thread_obj.prior_node.append(ObjectId(node._id))
 			thread_obj.group_set.append(ObjectId(group_id))
 
@@ -4224,7 +4225,7 @@ def node_thread_access(group_id, node):
                     thread_end_time = each_attr['end_time']
     if thread_start_time and thread_end_time:
         curr_date_time = datetime.now()
-        if curr_date_time < thread_start_time or curr_date_time > thread_end_time:
+        if curr_date_time.date() < thread_start_time.date() or curr_date_time.date() > thread_end_time.date():
             allow_to_comment = False
     return has_thread_node,allow_to_comment
 
