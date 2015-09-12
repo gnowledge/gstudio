@@ -1178,7 +1178,9 @@ def save_course_section(request, group_id):
         cs_new.prior_node.append(ObjectId(course_node._id))
         cs_new.save(groupid=group_id)
 	capture_data(file_object=cs_new, file_data=None, content_type='Create_CourseSection')
-        node_collection.collection.update({'_id': course_node._id}, {'$push': {'collection_set': cs_new._id }}, upsert=False, multi=False)
+	node_collection.collection.update({'_id': course_node._id}, {'$push': {'collection_set': cs_new._id }}, upsert=False, multi=False)
+	course_node = node_collection.one({"_id": ObjectId(course_node_id)})
+	capture_data(file_object=course_node, file_data=None, content_type='Update_course_node')
         response_dict["success"] = True
         response_dict["cs_new_id"] = str(cs_new._id)
         return HttpResponse(json.dumps(response_dict))
