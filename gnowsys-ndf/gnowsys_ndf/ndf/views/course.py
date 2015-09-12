@@ -1513,6 +1513,7 @@ def save_resources(request, group_id):
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
 	css_node = node_collection.one({"_id":css_node._id})
+	print css_node
 	capture_data(file_object=css_node, file_data=None, content_type='Update_course_node')
         
         return HttpResponse(json.dumps(response_dict))
@@ -1569,9 +1570,9 @@ def create_edit_unit(request, group_id):
 
         if cu_node._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_node._id}}, upsert=False, multi=False)
-	cu = node_collection.one({"_id":ObjectId(cu_node._id)})
-	print  "capturing data",cu
-	capture_data(file_object=cu, file_data=None, content_type='Update_course_node')
+	css = node_collection.one({"_id":ObjectId(css_node._id)})
+	print "fetched css node",css
+	capture_data(file_object = css, file_data=None, content_type='Update_course_node')
         
         return HttpResponse(json.dumps(response_dict))
 
