@@ -1741,3 +1741,16 @@ def enroll_to_course(request, group_id):
         group_obj.save()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
+
+def set_release_date_css(request, group_id):
+	response_dict = {"success": False}
+	if request.is_ajax() and request.method == "POST":
+		css_node_id = request.POST.get("css_id", "")
+		date_val = request.POST.get("date_val", "")
+		if date_val:
+			start_date_val = datetime.datetime.strptime(date_val, "%d/%m/%Y")
+		start_date_AT = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
+		create_gattribute(ObjectId(css_node_id), start_date_AT, start_date_val)
+		response_dict["success"] = True
+		return HttpResponse(json.dumps(response_dict))
+

@@ -33,11 +33,17 @@
     padding-left: 4em;
   }
 
-  div.reveal-modal > label {
+  #alertModal > label {
     color: white;
     font-weight: bold;
     font-size: 1rem;
   }
+
+  .collection{
+    overflow-y: auto !important;
+    height: 300px;
+    border: none !important;
+   }
 
   .all_blogs{
       overflow-y: auto;
@@ -57,8 +63,6 @@
       border-style: solid;
   }
 
-
-
 {% endblock %}
 
 {% block head %}
@@ -71,7 +75,7 @@
 {% endblock %}
 
 {% block meta_content %}
-  <h3>Course Outline</h3>
+  <h4>Course Outline</h4>
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
         <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
@@ -88,7 +92,7 @@
       {% if "CourseEventGroup" in group_object.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
           <nav>
               <section class="medium-3 columns text-center">
-              <a href="{% url 'groupchange' group_object.name %}"><b>{% firstof group_object.altnames group_object.name %} </b></a>
+              <a href="{% url 'groupchange' group_object.name %}"><h5>{% firstof group_object.altnames group_object.name %} </h5></a>
               </section>
 
               {% get_attribute_value group_object.pk 'start_time' as event_start_time %}
@@ -130,7 +134,7 @@
               {% endif %}
           </nav>
       {% endif %}
-
+      <hr>
     </div>
 {% endblock %}
 
@@ -309,6 +313,31 @@
     }
   });
 
+  $(document).on('click','.save_date',function(){
+    date_val = $("#release_date").val()
+    css_id_val = $("#css_id").val()
+    $.ajax({
+      url: "{% url 'set_release_date_css' node.pk %}",
+
+      data: {
+        'date_val':date_val,
+        'css_id': css_id_val,
+        'csrfmiddlewaretoken': "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      success: function(data){
+          success_state = data["success"]
+          if(success_state){
+            location.reload();
+          }
+      },
+    });//end of ajax
+
+  })
   
   $(document).on('click','.enroll-btn',function(){
     //trigger the ajax call to enroll
