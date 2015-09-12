@@ -1572,7 +1572,7 @@ def create_edit_unit(request, group_id):
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_node._id}}, upsert=False, multi=False)
 	cu = node_collection.one({"_id":ObjectId(cu_node._id)})
 	print  "capturing data",cu
-	capture_data(file_object=cu_new, file_data=None, content_type='Update_course_node')
+	capture_data(file_object=cu, file_data=None, content_type='Update_course_node')
         
         return HttpResponse(json.dumps(response_dict))
 
@@ -1694,7 +1694,7 @@ def remove_resource_from_unit(request, group_id):
         if unit_node.collection_set and res_id:
               node_collection.collection.update({'_id': unit_node._id}, {'$pull': {'collection_set': ObjectId(res_id)}}, upsert=False, multi=False)
 	unit_node = node_collection.one({'_id': ObjectId(unit_node_id)})
-	capture_data(file_object=cu_new, file_data=None, content_type='Update_course_node')
+	capture_data(file_object=unit_node, file_data=None, content_type='Update_course_node')
         
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
