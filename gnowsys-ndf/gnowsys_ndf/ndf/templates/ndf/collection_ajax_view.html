@@ -61,6 +61,7 @@
 
       $tree.tree({
         selectable: true,
+        keyboardSupport: false,
         onCreateLi: function(node, $li) {
         {% if is_gstaff %}
           if(node.node_type=="CourseSubSectionEvent"){
