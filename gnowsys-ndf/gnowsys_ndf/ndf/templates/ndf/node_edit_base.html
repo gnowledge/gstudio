@@ -83,7 +83,11 @@ i.remove-tag{
 					{% if node %}
 						{% trans "Editing " %} {{title}} : {{node.name}}
 					{% else %}
+					{% if blog_type %}
+						{% trans "Create New Blog" %} :
+					{% else %}
 						{% trans "Create New " %} {{title}} :
+						{% endif  %}
 					{% endif %} 
 				</span></h3>
 
@@ -128,13 +132,10 @@ i.remove-tag{
 				</dd>	
 				{% endif %}
 				{% if not blog_type %}
-					{% check_is_gstaff groupid request.user as is_gstaff %}
-					{% if is_gstaff %}
-						{% if title == "Page" or "File" in node.member_of_names_list %}
-							<dd class="thread_prop_tab" title="Click here to add/edit properties of Thread">
-							  	<a>{% trans "Interaction Settings" %} </a> 
-							</dd>  
-						{% endif %}
+					{% if title == "Page" or "File" in node.member_of_names_list %}
+						<dd class="thread_prop_tab" title="Click here to add/edit properties of Thread">
+						  	<a>{% trans "Interaction Settings" %} </a> 
+						</dd>  
 					{% endif %}
 				{% else %}
 					<input type="hidden" name="blog_type" value="{{blog_type}}">
