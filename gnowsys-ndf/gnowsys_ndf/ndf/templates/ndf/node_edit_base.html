@@ -83,7 +83,11 @@ i.remove-tag{
 					{% if node %}
 						{% trans "Editing " %} {{title}} : {{node.name}}
 					{% else %}
+					{% if blog_type %}
+						{% trans "Create New Blog" %} :
+					{% else %}
 						{% trans "Create New " %} {{title}} :
+						{% endif  %}
 					{% endif %} 
 				</span></h3>
 
