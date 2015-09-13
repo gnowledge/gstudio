@@ -240,7 +240,7 @@ class Command(BaseCommand):
     assignee_at = node_collection.one(
         {'_type': "AttributeType", 'name': "Assignee"}
     )
-
+    assignee_at = False
     if assignee_at:
         res = 0
         assignee_cur = triple_collection.find(
@@ -570,13 +570,13 @@ class Command(BaseCommand):
     gstpage_node = node_collection.find_one({"name":"Page"})
     gstwiki = node_collection.find_one({"name":"Wiki page"})
 
-    page_nodes = node_collection.find({"member_of":gstpage_node._id})
-    for i in page_nodes:
-        if gstwiki._id not in i.type_of:
-            i.type_of.append(gstwiki._id)
-            i.save()
-        else:
-            print i.name,"Page already Updated"	
+    # page_nodes = node_collection.find({"member_of":gstpage_node._id})
+    # for i in page_nodes:
+    #     if gstwiki._id not in i.type_of:
+    #         i.type_of.append(gstwiki._id)
+    #         i.save()
+    #     else:
+    #         print i.name,"Page already Updated"	
 
     nodes = node_collection.find({"_type":"Author",
 			'$or':[{'language_proficiency':{'$exists':False}},{'subject_proficiency':{'$exists':False}}]}) 
@@ -588,7 +588,8 @@ class Command(BaseCommand):
 
     # Add attributes to discussion thread for every page node.
     # If thread does not exist, create it.
-    pages_files_not_updated = []
+    # pages_files_not_updated = []
+    pages_files_not_updated = {}
     page_gst = node_collection.one( { '_type': "GSystemType", 'name': "Page" })
     file_gst = node_collection.one( { '_type': "GSystemType", 'name': "File" } )
     page_file_cur = node_collection.find( { 'member_of': {'$in':[page_gst._id, file_gst._id]} , 'status': { '$in': [u'DRAFT', u'PUBLISHED']}} ).sort('last_update', -1)
@@ -652,8 +653,8 @@ class Command(BaseCommand):
                     # print "\n\n discussion_enable False"
         except Exception as e:
 
-            pages_files_not_updated.append(each_node._id)
-            # print "\n\nError occurred for page ", each_node._id, "--", each_node.name
+            pages_files_not_updated[str(each_node._id)] = str(e)
+            print "\n\nError occurred for page ", each_node._id, "--", each_node.name,"--",e
             # print e, each_node._id
             pass
     # Correct Eventype and CollegeEventtype Node  by setting their modified by field
