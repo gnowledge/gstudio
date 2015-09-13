@@ -422,10 +422,8 @@ def server_sync(mail):
         
         ''' Code to decrypt every attachment and create a list with the file paths of decrypted attachments'''
         list_of_decrypted_attachments = []
-	print "before sort",all_attachments
 	sorted(all_attachments)
-	print "after sorting",all_attachments
-        for attachment in all_attachments:
+	for attachment in all_attachments:
             filename = attachment.document.path
             op_file_name = filename.split('_sig')[0]            
             print 'output file name of decrypted attachment : \n %s' % op_file_name            
@@ -455,28 +453,28 @@ def server_sync(mail):
 	            # print json_data
 	                            
 	            cursor= None
-	            hey = True                            
-	            if hey:
+                    user_id = 0
+	            try:
 	                settings_dir1 = os.path.dirname(__file__)
 	                settings_dir2 = os.path.dirname(settings_dir1)
 	                settings_dir3 = os.path.dirname(settings_dir2)
 	                path = os.path.abspath(os.path.dirname(settings_dir3))
 	                #may throw error        
 	                #conn = sqlite3.connect(path + '/example-sqlite3.db')
-		        print "the json data",json_data
-	                #user_id = json_data[u'created_by']
-		        user_id = 1
-	                query = 'select username from auth_user where id=\''+str(user_id)+'\''
+		        #user_id = json_data[u'created_by']
+		        #user_id = 1
+	                #query = 'select username from auth_user where id=\''+str(user_id)+'\''
 	                #cursor = conn.execute(query)
-
-	            else:
-	                "hello"
-	            username=None
-	            username = 'mukesh'
-	            '''    
-	            for row in cursor:
-	                username = row[0]  '''  
-	            if file_object_path != '':
+			user_id = json_data[u'created_by']
+		    except Exception as error:
+	                print error
+                    username = None                        
+                    if user_id:
+                        try:    
+	                        username = User.objects.get(pk=val).username	
+                        except:
+                                username = None
+                    if file_object_path != '':
 	                ''' for the creation of the file object '''
 	                with open(file_object_path,'rb+') as to_be_saved_file:
 	                    req_groupid = None
