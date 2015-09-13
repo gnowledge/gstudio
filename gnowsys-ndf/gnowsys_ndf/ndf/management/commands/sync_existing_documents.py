@@ -240,7 +240,7 @@ class Command(BaseCommand):
     assignee_at = node_collection.one(
         {'_type': "AttributeType", 'name': "Assignee"}
     )
-
+    assignee_at = False
     if assignee_at:
         res = 0
         assignee_cur = triple_collection.find(
