@@ -570,13 +570,13 @@ class Command(BaseCommand):
     gstpage_node = node_collection.find_one({"name":"Page"})
     gstwiki = node_collection.find_one({"name":"Wiki page"})
 
-    page_nodes = node_collection.find({"member_of":gstpage_node._id})
-    for i in page_nodes:
-        if gstwiki._id not in i.type_of:
-            i.type_of.append(gstwiki._id)
-            i.save()
-        else:
-            print i.name,"Page already Updated"	
+    # page_nodes = node_collection.find({"member_of":gstpage_node._id})
+    # for i in page_nodes:
+    #     if gstwiki._id not in i.type_of:
+    #         i.type_of.append(gstwiki._id)
+    #         i.save()
+    #     else:
+    #         print i.name,"Page already Updated"	
 
     nodes = node_collection.find({"_type":"Author",
 			'$or':[{'language_proficiency':{'$exists':False}},{'subject_proficiency':{'$exists':False}}]}) 
