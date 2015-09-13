@@ -64,7 +64,7 @@
         keyboardSupport: false,
         onCreateLi: function(node, $li) {
         {% if is_gstaff %}
-          if(node.node_type=="CourseSubSectionEvent"){
+          if(node.node_type=="CourseSubSectionEvent" && window.location.pathname.search("add_units") == -1){
             $li.find('.jqtree-title').after('<span class="fi-widget"></span> &nbsp;');                 
           }
         {% endif %}
