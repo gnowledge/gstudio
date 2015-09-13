@@ -6,6 +6,27 @@
 {% get_attribute_value node.pk 'release_response' as resp_val %}
 {% get_attribute_value node.pk 'thread_interaction_type' as thr_int_type %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
+{% block head %}
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  
+  <!-- Scripts and stylesheets for SideComments -->
+  <!-- <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script> -->
+  <!-- <link rel="stylesheet" type"text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css"> -->
+
+  {% if user.is_authenticated %}
+    <!-- orgitdown! -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+    <!-- orgitdown! toolbar settings -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+    <!-- orgitdown! skin -->
+    <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+  {% endif %}
+
+{% endblock %}
+
 
 <div>
   <br/>
