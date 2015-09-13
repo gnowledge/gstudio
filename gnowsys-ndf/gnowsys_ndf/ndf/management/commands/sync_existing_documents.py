@@ -609,11 +609,11 @@ class Command(BaseCommand):
             thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(each_node._id)})
             release_response_status = False
             thread_interaction_type_status = False
-            discussion_enable_status = False
+            # discussion_enable_status = False
             has_thread_status = False
-            if get_attribute_value(each_node._id,"discussion_enable") != "":
-                discussion_enable_status = True
-            if get_relation_value(each_node._id,"has_thread") != "":
+            # if get_attribute_value(each_node._id,"discussion_enable") != "":
+            #     discussion_enable_status = True
+            if get_relation_value(each_node._id,"has_thread") != ("",""):
                 has_thread_status = True
 
             if thread_obj:
@@ -625,9 +625,8 @@ class Command(BaseCommand):
                 if thread_obj.name == each_node.name:
                     node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': [each_node._id]}}, upsert = False, multi = False)
                     thread_obj.reload()
-                if not discussion_enable_status:
-                    create_gattribute(each_node._id, discussion_enable_at, True)
-                    each_node.reload()
+                create_gattribute(each_node._id, discussion_enable_at, True)
+                each_node.reload()
                 # creating GRelation
                 if not has_thread_status:
                     gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
@@ -648,9 +647,8 @@ class Command(BaseCommand):
                         thread_obj.reload()
                 # print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
             else:   
-                if not discussion_enable_status:
-                    create_gattribute(each_node._id, discussion_enable_at, False)
-                    # print "\n\n discussion_enable False"
+                create_gattribute(each_node._id, discussion_enable_at, False)
+                # print "\n\n discussion_enable False"
         except Exception as e:
 
             pages_files_not_updated[str(each_node._id)] = str(e)
