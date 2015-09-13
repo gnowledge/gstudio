@@ -468,6 +468,7 @@ def get_metadata_values():
 @register.assignment_tag
 def get_attribute_value(node_id, attr):
 	try:
+		attr_val = ""
 		node_attr = None
 		if node_id:
 			node = node_collection.one({'_id': ObjectId(node_id) })
@@ -480,9 +481,6 @@ def get_attribute_value(node_id, attr):
 
 		if node_attr:
 			attr_val = node_attr.object_value
-		else:
-			attr_val = ""
-
 		# print "attr_val: ",attr_val,"\n"
 		return attr_val
 	except:
@@ -492,6 +490,8 @@ def get_attribute_value(node_id, attr):
 @register.assignment_tag
 def get_relation_value(node_id, grel):
 	try:
+		grel_val_node = ""
+		grel_id = ""
 		node_grel = None
 		if node_id:
 			node = node_collection.one({'_id': ObjectId(node_id) })
@@ -503,14 +503,10 @@ def get_relation_value(node_id, grel):
 			grel_val = node_grel.right_subject
 			grel_id = node_grel._id
 			grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
-		else:
-			grel_val_node = ""
-			grel_id = ""
-
 		# print "grel_val_node: ",grel_val_node,"\n"
 		# returns right_subject of grelation and GRelation _id 
 		return grel_val_node, grel_id
-	except:
+	except Exception as e:
 		return grel_val_node, grel_id
 
 @get_execution_time
