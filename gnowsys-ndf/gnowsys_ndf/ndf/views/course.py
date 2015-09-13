@@ -1738,7 +1738,6 @@ def add_course_file(request, group_id):
             file_node.save()
             capture_data(file_object = file_node, file_data=None, content_type='add_course_file')
         context_node.save()
-	print "should give the latest one",context_node
 	capture_data(file_object = context_node, file_data=None, content_type='add_course_file')
 	
     return HttpResponseRedirect(url_name)

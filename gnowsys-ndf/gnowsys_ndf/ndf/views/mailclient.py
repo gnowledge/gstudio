@@ -507,6 +507,7 @@ def server_sync(mail):
 	            else:
 	                # We need to check from the _type what we have that needs to be saved
 		        if json_data['_type'] == 'GAttribute' or json_data['_type'] == 'GRelation':
+				print "coming here"
 			        temp_node = triple_collection.one({"_id": ObjectId(json_data["_id"])})
 		        else:
 			        temp_node = node_collection.one({"_id" : ObjectId(json_data["_id"])})
@@ -531,8 +532,11 @@ def server_sync(mail):
 						                for key,values in json_data.items():
 	                                                                if key != 'name':          
                                                                                 if key in ['attribute_type','relation_type']:
-                     
-                                                                                        node = node_collection.one({"_id":ObjectId(json_data['attribute_type']['_id'])})
+											if key == 'attribute_type':
+									                                                                                        												node = node_collection.one({"_id":ObjectId(json_data['attribute_type']['_id'])})
+											elif key == 'relation_type':
+												print "working here"
+												node = node_collection.one({"_id":ObjectId(json_data['relation_type']['_id'])})
                                                                                         if node:
                                                                                                 temp_node[key] = node
                                                                                 else:
@@ -560,7 +564,7 @@ def server_sync(mail):
 
 						        temp_node.update(temp_dict)
 						        temp_node.save()
-	                time.sleep(10)
+	                time.sleep(3)
 
 @get_execution_time
 def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
