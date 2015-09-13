@@ -647,9 +647,8 @@ class Command(BaseCommand):
                         thread_obj.reload()
                 # print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
             else:   
-                if not discussion_enable_status:
-                    create_gattribute(each_node._id, discussion_enable_at, False)
-                    # print "\n\n discussion_enable False"
+                create_gattribute(each_node._id, discussion_enable_at, False)
+                # print "\n\n discussion_enable False"
         except Exception as e:
 
             pages_files_not_updated[str(each_node._id)] = str(e)
