@@ -33,9 +33,9 @@
     {% if allow_to_comment %}
       <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button small" style="margin-bottom:0;">
         {% if thr_int_type %}
-          {{thr_int_type}}
+          {{thr_int_type}} ({{all_replies|length }})
         {% else %}
-          Comment
+          Comment ({{all_replies|length }})
         {% endif %}
       </div>
     {% else %}
