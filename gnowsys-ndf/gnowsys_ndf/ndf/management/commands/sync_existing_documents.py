@@ -11,7 +11,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -23,6 +23,29 @@ class Command(BaseCommand):
 
   def handle(self, *args, **options):
     # Keep latest changes in field(s) to be added at top
+
+    # Updating language fields data type:
+    # - Firstly, replacing None to ('en', 'English')
+    node_collection.collection.update({ '_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']}, 'language': None }, {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
+
+    all_nodes = node_collection.find({'_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']} })
+
+    all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
+    all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
+
+    # iterating over each document in the cursor:
+    # - Secondly, replacing invalid language values to valid tuple from settings
+    for each_node in all_nodes:
+        if each_node.language and (each_node.language in all_languages_concanated):
+            for each_lang in all_languages:
+                if each_node.language in each_lang:
+                    # printing msg without checking update result for performance. 
+                    print "Updated language field of: ", each_node.name 
+                    print "\tFrom", each_node.language, " to: ", each_lang, '\n'
+                    node_collection.collection.update({'_id': each_node._id}, {"$set": {"language": each_lang}}, upsert=False, multi=False)
+
+    # --- END of Language processing ---
+
 
     # adding all activated and logged-in user's id into author_set of "home" group ---
     all_authors = node_collection.find({"_type": "Author"})
