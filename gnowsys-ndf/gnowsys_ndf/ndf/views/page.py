@@ -295,6 +295,7 @@ def create_edit_page(request, group_id, node_id=None):
     #     pass
     group_name, group_id = get_group_name_id(group_id)
     ce_id = request.GET.get('course_event_id','')
+    blog_type = request.GET.get('blog_type','')
     res = request.GET.get('res','')
     program_res = request.GET.get('program_res','')
     context_variables = { 'title': gst_page.name,
@@ -302,7 +303,8 @@ def create_edit_page(request, group_id, node_id=None):
                           'groupid': group_id,
                           'ce_id': ce_id,
                           'res':res,
-                          'program_res':program_res
+                          'program_res':program_res,
+                          'blog_type': blog_type
                       }
 
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
@@ -325,6 +327,8 @@ def create_edit_page(request, group_id, node_id=None):
         page_type = request.POST.getlist("type_of",'')
         
         ce_id = request.POST.get("ce_id",'')
+        blog_type = request.POST.get('blog_type','')
+
         res = request.POST.get("res",'')
         program_res = request.POST.get('program_res','')
 
@@ -341,6 +345,8 @@ def create_edit_page(request, group_id, node_id=None):
         if res:
             res = eval(res)
 
+        if blog_type:
+            blog_type = eval(blog_type)
         if page_type:
             objid= page_type[0]
             if not ObjectId(objid) in page_node.type_of:
@@ -352,7 +358,8 @@ def create_edit_page(request, group_id, node_id=None):
 
         # if course event grp's id is passed, it means
         # its a blog page added in notebook and hence set type_of field as "Blog page"
-        if ce_id:
+        # print "\n\n blog_type---",blog_type
+        if blog_type:
             blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
             page_node.type_of = [blogpage_gst._id]
 
@@ -369,7 +376,7 @@ def create_edit_page(request, group_id, node_id=None):
             group_obj.save()
 
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-        if thread_create_val == "Yes":
+        if thread_create_val == "Yes" or blog_type:
           create_gattribute(page_node._id, discussion_enable_at, True)
           return_status = create_thread_for_node(request,group_id, page_node)
         else:
