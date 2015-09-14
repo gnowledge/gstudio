@@ -270,9 +270,11 @@
   {% if user_access == "allow" %}
     <div class="medium-6 columns">
       {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
+        {% comment %}
         <div>
         {% include "ndf/rating.html" %} 
         </div><br/>
+        {% endcomment %}
       {% endif %}
     </div>
   {% endif %} 
