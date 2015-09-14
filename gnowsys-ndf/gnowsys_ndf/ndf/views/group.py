@@ -1404,8 +1404,8 @@ class EventGroupCreateEditHandler(View):
             if sg_type == "ProgramEventGroup":
                 mod_group = CreateProgramEventGroup(request)
             elif sg_type == "CourseEventGroup":
-                mod_group = CreateCourseEventGroup(request)
                 moderation_level = -1
+                mod_group = CreateCourseEventGroup(request)
             parent_group_obj = group_obj
 
             # calling method to create new group
