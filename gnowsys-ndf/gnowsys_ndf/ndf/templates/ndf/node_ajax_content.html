@@ -42,7 +42,7 @@
     </small></h4>
   {% endif %}
 
-  <h2>
+  <h3>
     <span itemprop="{{schema.1.name}}" class='node'> {% firstof node.altnames node.name %} </span>
     {# {% if node.altnames %}{{node.altnames}}{% else %}{{node.name}}{% endif %} #}
     
@@ -52,7 +52,7 @@
       &nbsp;&nbsp;&nbsp;<span data-tooltip title= "{% blocktrans %} Only you can see the latest changes in this {{node.member_of_names_list.0}}. Click on 'Publish' to let others see. {% endblocktrans %}" ><span style='position:relative; color: gray;'>{% trans 'DRAFT' %}</span></span>
     {% endif %}
   {% endif %}
-  </h2>
+  </h3>
       
       {% if topic %}
     <dl class="tabs" data-tab> 
@@ -62,7 +62,7 @@
       <dd class="filters-view">
         <nav id="nav">
           <ul id="navigation">
-            <li><a href="#" class="view-filters"><i class="fi-list"></i> {% trans "Filter based on" %} </a>
+            <li><a href="#" class="view-filters"><i class ="fi-filter"></i> {% trans "Filter based on" %} </a>
               <ul id="view-elements">
                 {% get_metadata_values as metadata %}
                 {% for k,v in metadata.items %}
@@ -265,7 +265,7 @@
               {% trans 'Resource Type' %}: {{node.mime_type}}<br/>          
             {% endcomment %}
             
-            {% if node.collection_set %} 
+            {% if node.collection_set and node.pk|is_media_collection %} 
 
               {% if 'image' in node.mime_type or 'video' in node.mime_type %}
                 <!-- Orbit image slider only for image and video collections--> 
