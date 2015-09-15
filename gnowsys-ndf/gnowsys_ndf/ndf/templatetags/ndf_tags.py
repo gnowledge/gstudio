@@ -1323,7 +1323,7 @@ def get_all_resources(request,node_id):
                         	# currently, we are also using any of: code or name or tuple.
                         	# e.g: "en" or "English" or ("en", "English")
                             # if (len(res.language) == len(request.LANGUAGE_CODE)) and (res.language != request.LANGUAGE_CODE):
-                            if isinstance(res.language, (list, tuple)) and len(res.language) > 1 res.language[0] != request.LANGUAGE_CODE
+                            if isinstance(res.language, (list, tuple)) and len(res.language) > 1 and (res.language[0] != request.LANGUAGE_CODE):
                                     res_dict[key]['other_languages'].append(res)
                             else:
                                     res_dict[key]['fallback_lang'].append(res)
