@@ -736,7 +736,6 @@ def get_gapps_iconbar(request, group_id):
             if node:
                 i += 1
                 gapps[i] = {"id": node["_id"], "name": node["name"].lower()}
-        print group_obj,"grp obj"
         if group_obj and group_obj._type == "Author":
 			# user_gapps = ["page", "file"]
 			user_gapps = [gapp_name.lower() for gapp_name in GSTUDIO_USER_GAPPS_LIST]

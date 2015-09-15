@@ -1815,7 +1815,6 @@ def group_dashboard(request, group_id=None):
       property_order_list = get_property_order_with_value(group_obj['group_of'][0])
 
   annotations = json.dumps(group_obj.annotations)
-  
   default_template = "ndf/groupdashboard.html"
   return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
                                                        'group_id':group_id, 'user':request.user, 
