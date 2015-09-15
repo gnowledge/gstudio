@@ -2928,3 +2928,33 @@ def get_thread_node(node_id):
 				thread_obj = rel['has_thread'][0]
 	# print "\n\nthread_obj--",thread_obj
 	return thread_obj
+
+
+
+@get_execution_time
+@register.filter
+def is_media_collection(node_id):
+    """To check whether all the items of collection_set are
+    of Image or of Video.
+    
+    Args:
+        node_id (ObjectId): _id of node whose collection_set to be checked for.
+    
+    Returns:
+        bool: Returns True if all the items are of type Image or Video.
+        Else returns False.
+    """
+
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+
+    if node_obj.collection_set:
+	    cur = node_collection.find({'_id': {'$in': node_obj.collection_set} })
+    
+	    mimetype_list = [f.mime_type for f in cur if (f.mime_type and (f.mime_type.split('/')[0].lower() in ['image', 'video']) )]
+	    # print "==", mimetype_list
+
+	    # print len(node_obj.collection_set), len(mimetype_list) 
+	    if len(node_obj.collection_set) == len(mimetype_list):
+		    return True
+    return False
+
