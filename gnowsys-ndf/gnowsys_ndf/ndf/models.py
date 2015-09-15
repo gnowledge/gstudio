@@ -239,7 +239,7 @@ class Node(DjangoDocument):
     default_values = {
                         'created_at': datetime.datetime.utcnow,
                         'status': u'DRAFT',
-                        'language': (u'en', u'English')
+                        'language': ('en', 'English')
                     }
     use_dot_notation = True
     
