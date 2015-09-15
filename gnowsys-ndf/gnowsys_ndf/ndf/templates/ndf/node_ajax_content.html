@@ -403,13 +403,13 @@
                 <!-- <script type="text/javascript" src="https://raw.githubusercontent.com/futurepress/epub.js/master/build/libs/zip.min.js"></script> -->
 
                 <div class="row">
-                  <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
+                  <h4 class="small-4 columns redirection" onclick="Book.prevPage();">
                     <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
-                  </h2>
+                  </h4>
                   <div class="small-8 columns text-center"></div>
-                  <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
+                  <h4 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
                     <small>Next <i class="fi-arrow-right"></i></small>
-                  </h2>
+                  </h4>
                 </div>
                 
                 <div class="row ebook-container border-thin-lightgray">
@@ -417,16 +417,16 @@
                 </div>
                 
                 <div class="row">
-                  <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
-                    <small class="fi-arrow-left">{% trans 'Previous' %}</small>
-                  </h2>
+                  <h4 class="small-4 columns redirection" onclick="Book.prevPage();">
+                    <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
+                  </h4>
 
                   <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                     {% trans 'Download' %}"{{ grid_fs_obj.filename }}"
                   </a>
-                  <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
+                  <h4 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
                     <small>Next <i class="fi-arrow-right"></i></small>
-                  </h2>
+                  </h4>
                 </div>
                 
 
