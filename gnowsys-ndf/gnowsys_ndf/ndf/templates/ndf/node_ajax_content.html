@@ -261,7 +261,9 @@
             {% get_grid_fs_object node as grid_fs_obj %}
 
             <!-- New Implementation -->
-            {% trans 'Resource Type' %}: {{node.mime_type}}<br/>          
+            {% comment %}
+              {% trans 'Resource Type' %}: {{node.mime_type}}<br/>          
+            {% endcomment %}
             
             {% if node.collection_set %} 
 
