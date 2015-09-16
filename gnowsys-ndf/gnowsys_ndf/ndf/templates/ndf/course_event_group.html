@@ -49,7 +49,6 @@
       overflow-y: auto;
       height:500px;
   }
-
   .jqtree-tree .jqtree-title {
       margin: 5px;
       font-size: 15px;
@@ -196,7 +195,7 @@
 
         <div class="content" id="journal-tab">
             <div class="text-right">
-                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="button small"> Add Page </a>
+                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button small"> Add Page </a>
             </div>
             <div class="row all_blogs">
             	{% for each_blog in blog_pages %}
@@ -206,7 +205,7 @@
                   </h4>
                   {% if request.user.id == each_blog.created_by or gstaff_access %}
 
-                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}"> Edit </a>
+                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}&blog_type=True"> Edit </a>
                   {% endif %}
                   <span>
                   Created by {{each_blog.created_by|get_username}} at {{each_blog.created_at}}
@@ -219,7 +218,7 @@
               {% empty %}
                 <div class="blogpage"  style="margin-left:10px;">
                   <h4><u>
-                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}">Start writing Pages </a>
+                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True">Start writing Pages </a>
                   </u></h4>
                 </div>
               {% endfor %}
