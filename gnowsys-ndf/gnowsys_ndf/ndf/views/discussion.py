@@ -46,16 +46,15 @@ from datetime import datetime, timedelta, date
 from collections import OrderedDict
 col = db[Benchmark.collection_name]
 
-history_manager = HistoryManager()
-theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
-theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
-topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+# history_manager = HistoryManager()
+# theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
+# theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
+# topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
-
-grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
-ins_objectid = ObjectId()
+# grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
+# ins_objectid = ObjectId()
 
 @login_required
 @get_execution_time
@@ -222,6 +221,7 @@ def discussion_reply(request, group_id, node_id):
             # print "===========", reply
 
             # ---------- mail/notification sending -------
+            '''
             node = node_collection.one({"_id": ObjectId(node_id)})
             node_creator_user_obj = User.objects.get(id=node.created_by)
             node_creator_user_name = node_creator_user_obj.username
@@ -252,7 +252,7 @@ def discussion_reply(request, group_id, node_id):
             notification.send(to_user_list, render_label, {"from_user": from_user})
 
             # ---------- END of mail/notification sending ---------
-
+            '''
             return HttpResponse( reply )
 
         else: # no reply content

@@ -8,28 +8,97 @@
 
   {% blocktrans %}<b>Dashboard</b> shows users' own activities in the site.{% endblocktrans %}<br><br>
   <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}</b><br> 
-   <a href="#" data-reveal-id="activity-statistics" class="tiny button">
-      {% trans "Activity Ratings" %}
-   </a>
+  
+     {% if site_name == "NROER" %}
+     <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown"> {% trans 'Become Partner' %} </button><br> 
+     <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true"> 
+       <li><a href="/home/partner/create_partner/"> {% trans 'State' %} </a> </li>
+       <li><a href="/home/partner/create_partner/"> {% trans 'Institutional' %} </a> </li> 
+       <li><a href="/home/partner/create_partner/"> {% trans 'Individuals' %} </a></li>
+     </ul>
+  {% endif %}
+  {% endcomment %}
+    <div class="text-center">
+        {% if prof_pic_obj %}
+            <div class="div-height">
+                <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
+            </div>
+        {% else %}
+            <div class="div-height">
+                <i class="fi-torso style2 text-center"></i>
+            </div>
+        
+        {% endif %}   
+        {% if user.is_authenticated %}
+            {% if user_id == usr %}
+                <div class="row" >
+                  <div class="small-12 columns" >
+                    <input type="button" class="button tiny expand margin-p5 btn-font" id="btnUploadProfilePic"  value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
+                  </div>
+                </div>
+            {% endif %}
+            <div id="prof_pic_prop" class="reveal-modal medium" data-reveal style="height:500px;"> 
+                <a href="#" id="upload_photo">
+                  <div id="upload-photo-div" class="text-center">
+                    <label id="upload_photo_lbl" class="fi-upload">Upload New Photo</label>
+                  </div>
+                </a>
+                {% if old_profile_pics %}
+                <fieldset id="existing-photo-fieldset">
+                    <legend id="choose_photo_lbl">Choose Any Existing Photo</legend>
+                    <div class="existing-photo-div"  style="display:inline-block;overflow-y: auto;height:320px;">
+                      {% for each_prof_pic in old_profile_pics %}
+                        <div class="old_img">
+                          <img src="{% url 'getFileThumbnail' group_id each_prof_pic.pk %}" style="height:150px;width:100px;" />
+                          <div class="prof_pic_select">
+                          <input type="button" value="Use this" class="button tiny use_old_img_btn" onclick="update_img('{{each_prof_pic.pk}}')" />
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                </fieldset>
+                {% endif %}
+                <div id="pic_div" class="hide row">
+                    <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
+                        {% csrf_token %}
+                        <input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
+                        <div class="upload_cancel_div">
+                            <img id="img_preview" src="#" alt="New profile photo" />
+                            <input type="submit" id="submitpostid" value="Save" style="margin-left:2rem;" class="button tiny margin-p5" />
+                            <input type="button" class="button tiny margin-p5" id="btnUploadCancel" value="Cancel">
+                        </div>
+                        <input type="hidden" name="type" value="profile_pic">           
+                        <input type="hidden" name="user" value="{{usr}}">         
+                    </form>
+                </div>
+                <p id="message" style="display:none">
+                  {% trans "Your profile photo is uploading. Please wait.." %}
+                </p>
 
-{% comment %}
+                <a class="close-reveal-modal">&#215;</a>
+            </div>
 
-   {% if site_name == "NROER" %}
-   <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown"> {% trans 'Become Partner' %} </button><br> 
-   <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true"> 
-     <li><a href="/home/partner/create_partner/"> {% trans 'State' %} </a> </li>
-     <li><a href="/home/partner/create_partner/"> {% trans 'Institutional' %} </a> </li> 
-     <li><a href="/home/partner/create_partner/"> {% trans 'Individuals' %} </a></li>
-   </ul>
-{% endif %}
-{% endcomment %}
+        {% endif %}
+    </div>
 
-<div class="small reveal-modal" id="activity-statistics" data-reveal>
-	  {% include "ndf/file_statistics.html" %}
-      <a href="#" class="close-reveal-modal">&#215;</a>
-</div>
-{% endblock %}
+    <div class="action-btn-div">
+    <span class="fi-graph-bar">
+      <a href="#" data-reveal-id="activity-statistics" class="user_actions">{% trans "Activity Ratings" %}</a>
+    </span>
+  </div>
+  <div class="small reveal-modal" id="activity-statistics" data-reveal>
+    {% include "ndf/file_statistics.html" %}
+    <a href="#" class="close-reveal-modal">&#215;</a>
+  </div>
 
+  {% if user.is_superuser %}
+    <div class="action-btn-div">
+      <span class="fi-trash">
+        <a href="/Trash/data-review" class="user_actions">Trash</a>
+      </span>
+    </div>
+  {% endif %}  
+  {% endblock %}
 
 {% block style %}
   .resource-drawer { 
@@ -117,7 +186,7 @@
               
         <div class="small-12 large-10 columns">
       <h3>
-        {% trans "Welcome "%} {{current_user_obj.first_name}} !
+        {% trans "Welcome "%} {% firstof current_user_obj.first_name current_user_obj.email %} !
       </h3>
 
             <dl class="tabs" data-tab >
@@ -316,7 +385,6 @@
       </div>
     -->
 
-
 {% endblock %}
 
 {% block script %}
@@ -446,11 +514,13 @@
   {% endif %}
 
   $('#docFile').val("");
+  {% comment %}
   {% if not success %}
     var message = "{% trans 'Something went wrong. Please try after some time !!!' %}"
     $("#alertModalLabel").text(message);
     $("#alertModal").addClass("alert");
     $("#alertModal").foundation('reveal', 'open');
   {% endif %}
+  {% endcomment %}
   
 {% endblock %}

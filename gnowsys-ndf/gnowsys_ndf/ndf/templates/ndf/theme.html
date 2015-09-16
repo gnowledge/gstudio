@@ -7,7 +7,18 @@
 
 {% get_group_name groupid as group_name_tag %}
 
-{% block title %} {{ title }} {% endblock %}
+{% block title %} {{ title  }} {% endblock %}
+ {% block style %}
+
+
+ @media screen and (max-width: 600px) {
+  .collapsible_tree {
+    visibility: hidden;
+    display: none;
+  
+  }
+  
+}{% endblock %}
 
 {% block head %}  
 
@@ -174,9 +185,9 @@
 
 	{% if themes_hierarchy and node %}
 
-		<div style="float:left; font-size: 2em; line-height: 0.8;"> {{node.name}}</div> 
+		<div style="float:left; font-size: 2em; line-height: 0.8;" > {{node.name}}</div> 
 
-        <div style="float:right;  margin:0 2em;">
+        <div style="float:right; margin:0 2em;" >
 
 			<a class="collapsible_tree {% if tree == 'collapsible' or not tree %} highlight {% endif %}" style="">
 				{% trans "Theme" %} {% trans "Graph" %}
