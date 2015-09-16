@@ -178,7 +178,6 @@ def make_catalog(file_node,data_type):
 		os.makedirs(refcatpath)
 	for i in file_node:
 		file_path = refcatpath + "/" + str(i['name']) + ".json" 
-		print file_path,"+++++++++++++++"
 		with open(file_path, 'w') as outfile:
 			json.dump(i, outfile,ensure_ascii=True,indent=4,
 		                                  sort_keys=False)
