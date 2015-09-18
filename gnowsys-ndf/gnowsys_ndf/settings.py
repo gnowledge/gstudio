@@ -3,8 +3,11 @@ from django.conf import global_settings
 # from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
 import os
+import djcelery
+
 DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1"]
+
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
@@ -259,7 +262,7 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
-        'NAME': 'studio-dev',
+        'NAME': 'meta-mongodb',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -305,7 +308,7 @@ LOCALE_PATHS = (os.path.join(os.path.dirname(__file__), '..','conf/locale/'),)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = 'gnowsys_ndf/ndf/static/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -388,6 +391,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # 'django.core.context_processors.csrf',
 )
 
+djcelery.setup_loader()
+CELERY_RESULT_BACKEND = "mongodb"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_IMPORTS = ("gnowsys_ndf.ndf.views.tasks",)
+BROKER_URL = 'mongodb://localhost:27017/' + DATABASES['mongodb']['NAME']
+
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
     'django.contrib.auth',
@@ -402,6 +411,7 @@ INSTALLED_APPS = (
     'djangoratings',
     'notification',
     'pagination',
+    'captcha',	
     # 'gnowsys_ndf.mobwrite',       #textb
     # 'south',                      #textb
     # 'django_extensions',          #textb
@@ -412,6 +422,7 @@ INSTALLED_APPS = (
     'jsonrpc',
     'registration_email',
     'memcache_admin',
+    'djcelery',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -529,7 +540,6 @@ GSTUDIO_SITE_LANDING_PAGE = "udashboard"  # possible values are 'home' and 'udas
 GSTUDIO_SITE_HOME_PAGE = None  # it is url rendered on template. e.g: "/welcome". Default is: "/home"
 GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" etc. (Override it in local_settings)
 # GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
-
 # Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY = True
 
@@ -607,16 +617,16 @@ GSTUDIO_RESOURCES_TIME_REQUIRED = ["0-2M", "2-5M", "5-15M", "15-45M"]
 
 GSTUDIO_RESOURCES_AGE_RANGE = ["5-10", "11-20", "21-30", "31-40", "41 and above"]
 
-GSTUDIO_RESOURCES_READING_LEVEL = []
+GSTUDIO_RESOURCES_READING_LEVEL = ["Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary"]
 
 GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Moderation", "Other"]
 
 GSTUDIO_NROER_MENU = [{"Repository": []}, {"Partners": ["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
 
-GSTUDIO_NROER_GAPPS = [{"Curated Zone": "topics"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "event"}, {"eLibrary": "e-library"}]
+GSTUDIO_NROER_GAPPS = [{"Themes": "topics"}, {"eLibrary": "e-library"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "program"}]
 
 GSTUDIO_NROER_MENU_MAPPINGS = {
-            "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",
+            "States": "State Partners", "Institutions": "Institutional Partners", "Individuals": "Individual Partners",
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
 
@@ -629,12 +639,13 @@ GSTUDIO_RESOURCES_REPLY_RATING = 2
 # the level of moderation means level of sub mode group hierarchy
 GSTUDIO_GROUP_MODERATION_LEVEL = 1
 
-try:
-    from local_settings import *
-    # print "Local settings applied"
-except:
-    # print "Default settings applied"
-    pass
+# allowed moderation levels
+GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
+
+GSTUDIO_LICENCE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "OTHERS"]
+
+GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
+
 
 # #textb
 # import warnings
@@ -666,3 +677,17 @@ CACHES = {
 
 WETUBE_USERNAME = "glab"
 WETUBE_PASSWORD = "gl@b$@)we!ube"
+#Captcha settings
+CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
+
+# this has to be at last
+# just put every thing above it
+try:
+    from local_settings import *
+    # print "Local settings applied"
+except:
+    # print "Default settings applied"
+    pass
+
+# ========= nothing to be added below this line ===========

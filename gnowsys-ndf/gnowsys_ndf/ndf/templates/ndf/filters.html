@@ -1,7 +1,8 @@
+{% load i18n %}
 <style type="text/css">
 
 	div#filter-area {
-		border: dashed thistle;
+		border: solid thin thistle;
  		border-radius: 5px;
 		padding: 0 5px 5px 5px;
 		margin-left: -10px;
@@ -87,33 +88,36 @@
 		 -->
 		<div class="small-12 columns" id="create-filter">
 			<div class="row">
-				<div class="small-2 columns text-right"><h5>Select filter</h5></div>
-				<div class="small-4 columns">
+				<div class="small-12 large-2 columns small-text-left  large-text-right"><h5> {% trans 'Filter Resources' %}</h5></div>
+				<div class="small-12 large-2 columns">
 					<select name="filter-field-name">
-						<option value="initial-select"> -- Select -- </option>
+						<option value="initial-select"> -- {% trans 'Select' %} -- </option>
 						{% for key, val in filter_dict.items %}
 							<option value='{{val.value}}'
 							data-primary-type='{{val.data_type}}'
 							data-gstudio-type='{{val.type}}' data-name-field='{{key}}'>
-								{% if val.altnames %}
-									{{val.altnames}}
-								{% else %}
-									{{key}}
-								{% endif %}
+								{% comment %}
+									{# {% if val.altnames %}
+										{{val.altnames}}
+									{% else %}
+										{{key}}
+									{% endif %} #}
+								{% endcomment %}
+								{% firstof val.altnames key %}
 							</option>
 						{% endfor %}
 						<!-- generating <option>'s of following type
-						<option value='["abc1", "abc2", "abc3"]'>ABC</option>
+						<option value='["abc1", "abc2", "abc3"]'>ABC</option>	
 						<option value='["lmn1", "lmn2", "lmn3"]'>LMN</option>
 						<option value=''>XYZ</option>
 						-->
 					</select>
 				</div>
-				<div class="small-4 columns">
+				<div class="small-12 large-2 columns">
 					<select name="filter-field-value"  
 					onblur="$(this).css('height', '')"
 					onfocus="$(this).css('height', '6em')" multiple>
-						<option value=""> -- Select -- </option>
+						<option value=""> -- {% trans 'Select' %} -- </option>
 						 <!-- 
 						<option value="ABC">ABCABCABC</option>
 						<option value="LMN">LMNLMNLMN</option>
@@ -121,8 +125,8 @@
 						 -->
 					</select>				
 				</div>
-				<div class="small-1 small-pull-1 columns">
-					<input type="button" class="button tiny" value="Apply filter" id="filter-btn">
+				<div class="small-12 large-6  columns">
+					<input type="button" class="button tiny" value="{% trans 'Filter' %}" id="filter-btn">
 				</div>
 			</div>
 		</div>
@@ -201,7 +205,7 @@
 		}
 		else if( !ffValues || ffValues == "[]" )  // handling key with no values
 		{
-			alert("No values for the key : " + ffName);
+			alert("{% trans 'No values for the key' %} : " + ffName);
 		}
 	})
 
@@ -326,7 +330,7 @@
 
 					var closeBtn = document.createElement("i");
 					closeBtn.className = "fi-x-circle remove-filter";
-					closeBtn.title = "Remove this filter";
+					closeBtn.title = "{% trans 'Remove this filter' %}";
 					closeBtn.onclick = function(){
 						$(this).parent().fadeOut("slow", function(){
 							$(this).detach();
@@ -361,7 +365,7 @@
 				}
 				else  // handling selection of already existing filter
 				{
-					alert('Filter - [ "' + filterText + '" ] is already applied !');
+					alert('Filter - [ "' + filterText + '" ] {% trans 'is already applied' %} !');
 				}
 
 				// make the height of second select to initial
@@ -411,7 +415,7 @@
 		}
 		else  // handling no filter is selected
 		{
-		 	alert("Please select the proper filter first !"); 
+		 	alert("{% trans 'Please select the proper filter first' %} !"); 
 		}
 
 	})

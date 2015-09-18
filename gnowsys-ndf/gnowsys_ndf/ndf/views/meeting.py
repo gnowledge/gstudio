@@ -72,19 +72,24 @@ def output(request, group_id, meetingid):
 def dashb(request, group_id):                                                                           #ramkarnani
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False:
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else:
-        group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_id)})
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False:
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else:
+    #     group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_id)})
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+        
     online_users = cache.get(CACHE_USERS)
     online_users = simplejson.dumps(online_users, default=encode_json)	
     #print "\n inside meeting \n"
@@ -128,7 +133,7 @@ def invite_meeting(request, group_id, meetingid):                               
             ret = set_notif_val(request,group_id,msg,activ,bx)
             if bx.id not in colg.author_set:
                 colg.author_set.append(bx.id)
-                colg.save()
+                colg.save(groupid=group_id)
             if ret :
                 return HttpResponse("success")
 

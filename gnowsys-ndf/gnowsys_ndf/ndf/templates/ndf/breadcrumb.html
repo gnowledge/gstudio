@@ -1,0 +1,24 @@
+{% load i18n %}
+{% load get_site_name_from_settings from ndf_tags %}
+
+{% get_site_name_from_settings as site_name %}
+
+{% if path and not site_name == 'NROER' %}
+
+	<ul class="breadcrumbs">
+		{% for each_br in path %}
+			
+			{% if forloop.last %} 
+				<li class="current">
+					<a href="#"> {{each_br.name}} </a>
+				</li>
+			{% else %}
+				<li>
+					<a href="{{each_br.link}}"> {{each_br.name}} </a>
+				</li>
+			{% endif %}
+
+		{% endfor %}
+	</ul>
+
+{% endif %}

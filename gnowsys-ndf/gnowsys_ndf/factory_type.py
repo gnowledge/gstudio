@@ -29,10 +29,15 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'unpublished_entry','meta_type':'factory_types'},
                          {'name':'booklet','meta_type':'factory_types'},
                          {'name':'GList','meta_type':'factory_types'},
-                         {'name':'ProgramEventGroup','meta_type':'factory_types'},
+			 {'name':'GListItem','meta_type':'factory_types'},
+			 {'name':'Group','meta_type':'factory_types'},	
+			 {'name':'ProgramEventGroup','meta_type':'factory_types'},
                          {'name':'CourseEventGroup','meta_type':'factory_types'},
                          {'name':'PartnerGroup','meta_type':'factory_types'},
-                         {'name':'ModeratingGroup','meta_type':'factory_types'}
+                         {'name':'ModeratingGroup','meta_type':'factory_types'},
+                         {'name':'Info page','meta_type':'factory_types'},
+			 {'name':'Blog page','meta_type':'factory_types'},
+			 {'name':'Wiki page','meta_type':'factory_types'}
                         ]
 
 
@@ -118,10 +123,10 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                            {'educationallevel':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video'],
                                                 'data_type':'list',
                                                 'meta_type':'factory_types'}},
-                           {'educationalalignment':{'gsystem_names_list':['Quiz','QuizItem','Topic','File','Page','NUSSD Course', 'Pandora_video'],
+                           {'educationalalignment':{'gsystem_names_list':['Quiz','QuizItem','Topic','File','Page','NUSSD Course', 'Pandora_video', 'Theme'],
                                                     'data_type':'basestring',
                                                     'meta_type':'factory_types'}},
-                           {'curricular':{'gsystem_names_list':['File','Page', 'Pandora_video'],
+                           {'curricular':{'gsystem_names_list':['File','Page', 'Pandora_video', 'Theme'],
                                          'data_type':'bool',
                                          'meta_type':'factory_types'}},
                            {'source':{'gsystem_names_list':['File', 'Page', 'Pandora_video'],
@@ -130,10 +135,25 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                            {'adaptation_of':{'gsystem_names_list':['File','Page', 'Pandora_video'],
                                              'data_type':'basestring',
                                              'meta_type':'factory_types'}},
+                           {'name_eng':{'gsystem_names_list':['File', 'Page', 'Pandora_video'],
+                                      'data_type':'basestring',
+                                      'meta_type':'factory_types'}},
+                           {'description_eng':{'gsystem_names_list':['File','Page','Pandora_video'],
+                                      'data_type':'basestring',
+                                      'meta_type':'factory_types'}}, 
                            {'BibTex_entry':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
                                             'data_type':'basestring',
                                             'meta_type':'factory_types'}},
                            {'Citation':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
+                                        'data_type':'basestring',
+                                        'meta_type':'factory_types'}},
+                           {'discussion_enable':{'gsystem_names_list':['Page','File'],
+                                        'data_type':'bool',
+                                        'meta_type':'factory_types'}},
+                           {'release_response':{'gsystem_names_list':['Twist'],
+                                        'data_type':'bool',
+                                        'meta_type':'factory_types'}},
+                           {'thread_interaction_type':{'gsystem_names_list':['Twist'],
                                         'data_type':'basestring',
                                         'meta_type':'factory_types'}},
                            {'entry_list':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
@@ -254,3 +274,11 @@ factory_relation_types = [
         }
     }
 ]
+
+
+#factory data is data which is required while intialization of the database first time
+factory_data = [ {'_type':'Group','name':'home'}
+		
+	       ]
+
+

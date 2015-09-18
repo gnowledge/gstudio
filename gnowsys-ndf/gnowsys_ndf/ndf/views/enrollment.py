@@ -355,7 +355,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                     enrollment_gs.last_update = datetime.datetime.today()
                     enrollment_gs.status = u"PUBLISHED"
-                    enrollment_gs.save()
+                    enrollment_gs.save(groupid=group_id)
 
                 enrollment_task_ids = None
                 each_enrollment_task_node = None
@@ -372,7 +372,11 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     for each_enrollment_task in enrollment_task_ids:
                         if not updated_one_task:
                             each_enrollment_task_node = node_collection.one({'_id': ObjectId(each_enrollment_task)})
-                            task_status = each_enrollment_task_node.attribute_set[0]['Status']
+                            if each_enrollment_task_node.attribute_set:
+                                for each_attr_task in each_enrollment_task_node.attribute_set:
+                                    if each_attr_task and 'Status' in each_attr_task:
+                                        task_status = each_attr_task['Status']
+                            # task_status = each_enrollment_task_node.attribute_set[0]['Status']
 
                             if task_status in list_of_task_status:
                                 task_dict = {}
@@ -587,7 +591,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                     enrollment_gs.last_update = datetime.datetime.today()
                     enrollment_gs.status = u"PUBLISHED"
-                    enrollment_gs.save()
+                    enrollment_gs.save(groupid=group_id)
 
                 enrollment_task_ids = None
                 each_enrollment_task_node = None

@@ -25,18 +25,22 @@ def version_node(request, group_id, node_id, version_no = None):
     In compared version-view, comparitive information in tabular form about the node 
     for the given version-numbers is provided.
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     d=diff_match_patch()    
     view = ""          # either single or compare
@@ -219,7 +223,7 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
      node.content_org=doc2.content_org
      node.content=doc2.content
      node.modified_by=request.user.id
-     node.save()
+     node.save(groupid=group_id)
      #update_mobwrite = update_mobwrite_content_org(node)
      ver=history_manager.get_current_version(node)
      view='merge'
@@ -252,7 +256,7 @@ def revert_doc(request,group_id,node_id,version_1):
             except:
 		node[attr] =node[attr]
    node.modified_by=request.user.id
-   node.save()
+   node.save(groupid=group_id)
    view ='revert'
    ver=history_manager.get_current_version(node)
    selected_versions=selected_versions = {"1": version_1, "2": ""}

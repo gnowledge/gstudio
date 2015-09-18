@@ -72,7 +72,7 @@ def adminDashboardClass(request, class_name="GSystem"):
                 relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
 
 	if class_name in ("GSystem","File"):
-      		group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set ]
+      		group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(group_set),"Creation":each.created_at})
         elif class_name in ("GAttribute","GRelation"):
             objects_details.append({"Id":each._id,"Title":each.name,"Type":"","Author":"","Creation":""})
@@ -143,7 +143,7 @@ def adminDashboardEdit(request):
                 node['relation_type_set'] = typelist
 
 
-        node.save()     
+        node.save(groupid=group_id)     
         return StreamingHttpResponse(node.name+" edited successfully")
     except Exception as e:
           return StreamingHttpResponse(e)

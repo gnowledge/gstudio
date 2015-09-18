@@ -8,6 +8,8 @@
 
 {% block head %}
 
+  <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
+
 
 <script type="text/javascript" >
   var chk_login = "{{ user }}";
@@ -26,7 +28,6 @@
   }); });
 
 
-<!-- Ajax for removing user from  List  -->
   $(document).on('click',".button.alert.small.remove",function(){
   user_id = $(this).attr("id")
   node_id = $('#node_id').val()
@@ -36,8 +37,11 @@
   success: function(data){
   $('#firstModal').html(data); },
   });}); 
+  {% get_sg_member_of groupid as list_of_sg_member_of %}
+  {% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
+    $("#group-level-header").addClass("hide");
+  {% endif %}
   });
-<!-- End Ajax -->
 
 
 </script> 
@@ -158,7 +162,6 @@ $(document).ready(function()
     {% endif %}   
 
   </div>
-
 {% endblock %}
 {% endcache %}
 <!-- end of meta_content block -->
@@ -218,7 +221,6 @@ $(document).ready(function()
   {% check_is_gstaff groupid request.user as is_gstaff %}
   {% if is_gstaff %}
     {% include "ndf/invite_users.html" %}
-
     {% include "ndf/invite_admins.html" %}
   {% endif %} 
 
@@ -267,8 +269,3 @@ $(document).ready(function()
     $('#search_text').val(search_key);
   </script>
 -->
-
-
-
-
-2

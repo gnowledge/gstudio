@@ -1,0 +1,3 @@
+{% for x in obj.obj|slice:":1" %}
+	{{x|title}} {{obj.action.key}} : {{node.name}}
+{% endfor %}

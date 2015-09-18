@@ -13,7 +13,13 @@
 
   .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; }
 
-  .tabs dd.active{ width: 100%; }
+  .tabs dd { width: 100%; }
+
+  .tabs dd a { padding-right: 0; width: 100%; }
+
+  .count { position: absolute; right: 5px; opacity: 0.75; }
+
+  .panel > .side-nav > .tabs i {margin-right: 0.5rem;}
 
 {% endblock %}
 
@@ -44,65 +50,90 @@
 
 <!-- left top panel -->
 {% block meta_content %}
-  <h2 class="subheader">{% trans title %}</h2>
+
+  <a href="{% url app_gst.name|lower group_name_tag %}">
+    <h2 class="subheader">
+      {% if app_gst.altnames and app_gst.altnames != "None" %}
+         {% trans app_gst.altnames %}
+      {% else %}
+        {% trans app_gst.name %}
+      {% endif%}
+    </h2>
+    {{app_gst.content|default_if_none:""|safe}}
+  </a>
+
 {% endblock %}
 
 
 {% block related_content %}
   {% check_user_join request groupid as user_is_joined %}
 
-  <div class="panel" style="background-color:#ddd;">
-    
-    <!-- radio buttons for E-Library app: CR and XCR -->
-    {% comment %}
-    <!-- 
-    {% if title == "E-Library" %}
-      <input type="radio" name="crxcr" value="cr" id="cr-rad" title="Curricular">
-        <label for="cr-rad" title="Curricular">CR</label>
-      <input type="radio" name="crxcr" value="xcr" id="xcr-rad" title="Extra Curricular">
-        <label for="xcr-rad" title="Extra Curricular">XCR</label>
-    {% endif %}
-    -->
-    {% endcomment %}  
+  <div class="panel" style="background-color:#ddd; padding: 0.25rem;">
     
     <ul class="side-nav">
       <dl class="tabs" data-tab >
 
-        <!-- all files -->
-        <dd class="active" data-filetype="all">
-          <a href="#view-all">
-            <i class="fi-eye"></i>
-            {% trans "All files" %}
+        <!-- Collections -->
+        <dd  class="active" data-filetype="Collections">
+          <a href="#view-collection"><i class="fi-page-multiple"></i>
+            {% trans "Collections" %}
             <span class="count">
-              {% if file_pages.count > 0 %} ({{ file_pages.count }}) {% endif %}
+              {% if collection_pages %} {{ collection.count }} {% endif %}
             </span>
           </a>
         </dd><br/>
 
+        <!-- all files -->
+        <dd data-filetype="all">
+          <a href="#view-all">
+            <i class="fi-eye"></i>
+            {% trans "All files" %}
+            <span class="count text-right">
+              {% if file_pages.count > 0 %} {{ file_pages.count }} {% endif %}
+            </span>
+          </a>
+        </dd>
+
         <!-- Documents -->
         <dd data-filetype="Documents">
           <a href="#view-doc">
-            <i class="fi-page-filled"></i>
+            <i class="fi-page-doc"></i>
             {% trans "Documents" %}
             <span class="count">
-              {% if doc_pages %} ({{ doc_pages }}) {% endif %}
+              {% if doc_pages %} {{ doc_pages }} {% endif %}
             </span>
           </a>
         </dd><br/>
+
+        {% comment %}
+          
+        <!-- Pages -->
+        <dd data-filetype="Pages">
+          <a href="#view-page">
+            <i class="fi-page-filled"></i>
+            {% trans "Pages" %}
+            <span class="count">
+              {% if page_count %} {{ page_count }} {% endif %}
+            </span>
+          </a>
+        </dd><br/>   
+        {% endcomment %}
         
         <!-- Interactives -->
         {% if interactive_pages %}
           <dd data-filetype="Interactives">
             <a href="#view-interactive">
-              <i class="fi-arrows-compress"></i>
+              <i class="fi-shuffle"></i>
               {% trans "Interactives" %}
               <span class="count">
-                ({{ interactive_pages }})
+                {{ interactive_pages }}
               </span>
             </a>
           </dd><br/>
         {% endif %}
 
+          
+        {% comment %}
         <!-- eBooks -->
         {% if ebook_pages %}
           <dd data-filetype="eBooks">
@@ -110,11 +141,12 @@
               <i class="fi-book"></i>
               {% trans "eBooks" %}
               <span class="count">
-                ({{ ebook_pages }})
+                {{ ebook_pages }}
               </span>
             </a>
           </dd><br/>
         {% endif %}
+        {% endcomment %}
         
         <!-- Audio -->
         {% if audio_pages %}
@@ -123,7 +155,7 @@
               <i class="fi-music"></i>
               {% trans "Audios" %}
               <span class="count">
-                {% if audio_pages %} ({{ audio_pages }}) {% endif %}
+                {% if audio_pages %} {{ audio_pages }} {% endif %}
               </span>
             </a>
           </dd><br/>
@@ -134,7 +166,7 @@
           <a href="#view-image"><i class="fi-camera"></i>
             {% trans "Images" %}
             <span class="count">
-              {% if image_pages %} ({{ image_pages }}) {% endif %}
+              {% if image_pages %} {{ image_pages }} {% endif %}
             </span>
           </a>
         </dd><br/>
@@ -146,7 +178,7 @@
             <a href="#view-video"><i class="fi-video"></i>
               {% trans "Videos" %}
               <span class="count">
-                {% if video_pages %}({{ video_pages }}) {% endif %}
+                {% if video_pages %} {{ video_pages }} {% endif %}
               </span>
             </a>
           </dd><br/>
@@ -171,49 +203,39 @@
             <a href="#view-pandora-video"><i class="fi-video"></i>
               {% trans "Videos" %}
               <span class="count">
-                {% if video_pages %}({{ video_pages }}){% endif %}
+                {% if video_pages %} {{ video_pages }} {% endif %}
               </span>
             </a>
           </dd><br/>
         {% endif %}
 
-        {% if title != "E-Library" %}
-          <dd>
-            <a href="#view-collection">
-              <i class="fi-page-multiple"></i> {% trans "Collections" %}
-            </a>
-          </dd><br/>
-        {% endif %}
-
+        <dd>
+        
       </dl><br/>
 
       {% if user.is_authenticated %}
       {% if user_is_joined == "joined" or user_is_joined == "author" %}
-      <b>{% trans "Actions" %}</b><br/><br/>
+      <!-- <b>{% trans "Actions" %}</b><br/><br/> -->
       
-        {% user_access_policy groupid request.user as user_access %}
-        {% if user_access == "allow" %}
-          
-          <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny round button">
+          <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny expand button">
             {% trans "Upload File" %}
-          </a><br/><br/>
-          
-        {% endif %}
-      
+          </a><br/>
 
-      <b>{% trans "Review" %}</b><br/><br/>
-      
+        {% comment %}
         {% user_access_policy groupid request.user as user_access %}
         {% if user_access == "allow" %}
+        {% endcomment %}
 
-          <a href="{% url 'data_review' group_name_tag %}" class="tiny round button">
+        {% if user.is_superuser %}
+          <!-- <b>{% trans "Review" %}</b> -->
+            <a href="{% url 'data_review' group_name_tag %}" class="tiny button expand">
             {% trans "Data Review" %}
           </a>
         {% endif %}
       {% endif %}
       {% endif %}
 
-      <a href="#" data-reveal-id="library-statistics" class="tiny round button">
+      <a href="#" data-reveal-id="library-statistics" class="tiny button expand">
         {% trans "File Statistics" %}
       </a>
       <div class="medium reveal-modal" id="library-statistics" data-reveal>
@@ -221,6 +243,10 @@
         <a class="close-reveal-modal">&#215;</a>
       </div>
 
+      <div class="coll_label row" style="display:none;">
+        <span class="small-12 columns">Create Collection</span>
+        <div class="small-11 columns"><input type="text" class="coll_value" placeholder="Enter collection name" name="coll_name"/></div><a class="create_coll"><span class="fi-check" style="color:green;"></span></a>
+      </div>
     </ul>
   </div>
 {% endblock %}
@@ -251,13 +277,31 @@
 
     {% group_type_info groupid request.user as grouptype %}
 
+    <div class="content row active" id="view-collection" data-filetype="Collections">
+
+      {% include "ndf/file_list_tab.html" with resource_type=collection detail_urlname="page_details" filetype="Collections" res_type_name="" page_info=collection_pages %}
+
+    </div>
+
     <!-- Tab View #1 - All -->
+    {% comment %}
     <div class="content row active" id="view-all" data-filetype="all">
 
       {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
 
     </div>
+    {% endcomment %}
+      
+    <!-- Tab View #1 - All -->
+    <div class="content" id="view-all" data-filetype="all">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "all" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "all" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
 
+      
     <!-- Tab View 2 - Documents -->
     <div class="content" id="view-doc" data-filetype="Documents">
       {% if title == "E-Library" %}
@@ -266,6 +310,18 @@
         <a href='{% url "paged_file_objs" group_name_tag "Documents" 1 %}' class="first-load">1</a>
       {% endif %}
     </div>
+
+    {% comment %}
+      
+    <!-- Tab View 2 - Pages -->
+    <div class="content" id="view-page" data-filetype="Pages">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Pages" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Pages" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
+    {% endcomment %}
 
 
     <!-- Tab View 3 - Interactives -->
@@ -281,16 +337,17 @@
 
 
     <!-- Tab View 4 - e-book -->
-    {% if ebook_pages %}
-      <div class="content" id="view-ebook" data-filetype="eBooks">
-        {% if title == "E-Library" %}
-          <a href='{% url "elib_paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
-        {% else %}
-          <a href='{% url "paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
-        {% endif %}
-      </div>
-    {% endif %}
-
+    {% comment %}
+      {% if ebook_pages %}
+        <div class="content" id="view-ebook" data-filetype="eBooks">
+          {% if title == "E-Library" %}
+            <a href='{% url "elib_paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+          {% else %}
+            <a href='{% url "paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endcomment %}
 
     <!-- Tab View 5 - Audios -->
     {% if audio_pages %}
@@ -330,11 +387,21 @@
         {% endif %}
       </div>
       
+      {% comment %}
       <div class="content" id="view-collection" data-filetype="collection">
-        {% get_resource_collection groupid title as file_collections %}
+        {% get_resource_collection groupid "File" as file_collections %}
 
         {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" filetype="collection" res_type_name="collection" %}
+
+        {% if title == "E-Library" %}
+          <a href='{% url "elib_paged_file_objs" group_name_tag "Collections" 1 %}' class="first-load">1</a>
+        {% else %}
+          <a href='{% url "paged_file_objs" group_name_tag "Collections" 1 %}' class="first-load">1</a>
+        {% endif %}
+
       </div>
+      {% endcomment %}
+
 
     </div>
 
@@ -343,6 +410,54 @@
 
   {% block script %}
   // <script type="text/javascript">
+
+    $(document).on('change','.filenode',function(){
+
+        var checked = $('.filenode:checked').length;
+        if (checked){
+          $(".coll_label").css("display", "block");          
+        }
+        else{
+          $(".coll_label").css("display", "none");          
+        }
+        
+    });
+
+    $('.create_coll').click(function() {
+
+      var coll_arr = []
+      var coll_node = $(".coll_value").val()
+      $('.filenode:checked').each(function() {
+        coll_arr.push($(this).val());
+      });
+
+      var r = confirm("Do you want to save the collection of selected elements");
+      if (r == true) {
+          x = "Your collection is saved successfully";
+          $.ajax({
+            type: "POST",
+            url: "{% url 'collection_create' group_id %}",
+            datatype: "html",
+            data:{
+              collection: coll_arr,
+              name: coll_node,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+              
+              location.href = "{% url 'e-library' group_name_tag %}";
+
+            }
+          });
+
+          
+      } else {
+          x = "Cancelled";
+      }
+      
+      
+          
+    });
 
     // pagination ajax  
     $('ul.pagination a').click(function(e)
@@ -359,7 +474,8 @@
 
       var tabDivId = $(this).children("a").attr("href");
 
-      if((tabDivId != "#view-collection") && (tabDivId != "view-pandora-video"))
+      // if((tabDivId != "#view-collection") && (tabDivId != "view-pandora-video"))
+      if(tabDivId != "view-pandora-video")
       {
         var pageAnchor = $(tabDivId).children("a.first-load")[0];
         if(! pageAnchor)
@@ -398,7 +514,10 @@
 
     // getting already added filers as an array of objects, holding entire properties of it.
     {% if title == "E-Library" %}
-      var filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+      var filtersObjArr = {};
+      if (getFiltersObjsInAndOrFormat){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+      }
     {% endif %}
 
     var tabContainerDiv = $(pageAnchor).closest("div.content");
@@ -476,11 +595,11 @@
       var c = this.getAttribute("data-filetype");
 
       if(educationaluse_stats.hasOwnProperty(c)){
-        $(this).find("a > span.count:visible").fadeOut().fadeIn().text( "(" + educationaluse_stats[c] + ")");
+        $(this).find("a > span.count:visible").text(educationaluse_stats[c]);
       }
       else
       {
-        $(this).find("a > span.count:visible").fadeOut().fadeIn().text("(0)");
+        $(this).find("a > span.count:visible").text("0");
       }
 
     });

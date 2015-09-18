@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.views.generic import RedirectView
 from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.analytics import *
 
 try:
     from bson import ObjectId
@@ -22,6 +23,7 @@ from gnowsys_ndf.ndf.models import node_collection
 ###################################################
 #   V I E W S   D E F I N E D   F O R   H O M E   #
 ###################################################
+
 @get_execution_time
 def homepage(request, group_id):
     
@@ -56,7 +58,7 @@ def homepage(request, group_id):
                     auth.group_affiliation = temp_details.details_to_hold['group_affiliation']
             except e as Exception:
                 print "error in getting node_holder details for an author"+str(e)
-            auth.save()
+            auth.save(groupid=group_id)
 
             # as on when user gets register on platform make user member of two groups:
             # 1: his/her own username group. 2: "home" group
@@ -65,7 +67,7 @@ def homepage(request, group_id):
             # being user is log-in for first time on site after registration,
             # directly add user's id into author_set of home group without anymore checking overhead.
             home_group_obj.author_set.append(request.user.id)
-            home_group_obj.save()
+            home_group_obj.save(groupid=group_id)
             
 
         if GSTUDIO_SITE_LANDING_PAGE == "home":
@@ -94,7 +96,7 @@ def landing_page(request):
                                 context_instance=RequestContext(request)
                             )
     else:
-        return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home", "groupid": "home"}) )
+        return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home"}) )
 
 
 

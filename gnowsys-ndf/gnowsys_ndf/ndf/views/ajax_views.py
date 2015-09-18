@@ -7,7 +7,7 @@ import time
 import ast
 import json
 import math
-import multiprocessing
+import multiprocessing 
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -39,10 +39,12 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time
-from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
+from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
@@ -101,6 +103,29 @@ def terms_list(request, group_id):
             context_instance=RequestContext(request)
         )
 
+
+# This ajax view creates the page collection of selected nodes from list view
+@get_execution_time
+def collection_create(request, group_id):
+  '''
+  This ajax view creates the page collection of selected nodes from list view
+  '''  
+  if request.is_ajax() and request.method == "POST":
+    Collections = request.POST.getlist("collection[]", '')
+    # name is comming from post request ajax
+    
+
+    gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    page_node = node_collection.collection.GSystem()
+    page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+    for each in Collections:
+      node_collection.collection.update({'_id': page_node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
+
+    # print page_node,"\n"
+    return HttpResponse("success")
+
+
             
 # This ajax view renders the output as "node view" by clicking on collections
 @get_execution_time
@@ -112,7 +137,7 @@ def collection_nav(request, group_id):
     node_id = request.POST.get("node_id", '')
     curr_node_id = request.POST.get("curr_node", '')
     node_type = request.POST.get("nod_type", '')
-
+    template = "ndf/node_ajax_view.html"
     breadcrumbs_list = []
     curr_node_obj = node_collection.one({'_id': ObjectId(curr_node_id)})
     if node_type == "Topic":
@@ -123,7 +148,24 @@ def collection_nav(request, group_id):
           breadcrumbs_list.append((str(prior._id), prior.name))
 
     topic = ""
+
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    sg_type = None
+    list_of_sg_member_of = get_sg_member_of(group_id)
+    thread_node = None
+    allow_to_comment = None
+
+    if "CourseEventGroup" in group_obj.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of:
+      node_obj.get_neighbourhood(node_obj.member_of)
+
+      template = "ndf/res_node_ajax_view.html"
+      if "ProgramEventGroup" in list_of_sg_member_of:
+        sg_type = "ProgramEventGroup"
+      elif "CourseEventGroup" in list_of_sg_member_of:
+        sg_type = "CourseEventGroup"
+      thread_node, allow_to_comment = node_thread_access(group_obj._id, node_obj)
+
     nav_list = request.POST.getlist("nav[]", '')
     n_list = request.POST.get("nav", '')
 
@@ -166,12 +208,15 @@ def collection_nav(request, group_id):
           else:
             breadcrumbs_list.remove(e)
     # print "breadcrumbs_list: ",breadcrumbs_list,"\n"
-    return render_to_response('ndf/node_ajax_view.html', 
+    return render_to_response(template, 
                                 { 'node': node_obj,
                                   'original_node':curr_node_obj,
                                   'group_id': group_id,
                                   'groupid':group_id,
                                   'breadcrumbs_list':breadcrumbs_list,
+                                  'sg_type': sg_type,
+                                  'allow_to_comment': allow_to_comment,
+                                  'thread_node': thread_node,
                                   'app_id': node_id, 'topic':topic, 'nav_list':nav_list
                                 },
                                 context_instance = RequestContext(request)
@@ -238,13 +283,13 @@ def shelf(request, group_id):
           shelf_gs.name = unicode(shelf)
           shelf_gs.created_by = int(request.user.id)
           shelf_gs.member_of.append(shelf_gst._id)
-          shelf_gs.save()
+          shelf_gs.save(groupid=group_id)
 
           shelf_R = triple_collection.collection.GRelation()
           shelf_R.subject = ObjectId(auth._id)
           shelf_R.relation_type = has_shelf_RT
           shelf_R.right_subject = ObjectId(shelf_gs._id)
-          shelf_R.save()
+          shelf_R.save(groupid=group_id)
         else:
           if shelf_add:
             shelf_item = ObjectId(shelf_add)
@@ -637,7 +682,7 @@ def get_topic_contents(request, group_id):
 def get_collection_list(collection_list, node):
   inner_list = []
   error_list = []
-  
+  inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
   if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -651,9 +696,9 @@ def get_collection_list(collection_list, node):
               inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
               if inner_sub_list:
-                inner_list.append(inner_sub_list[0])
+                inner_list_append_temp(inner_sub_list[0])
               else:
-                inner_list.append(inner_sub_dict)
+                inner_list_append_temp(inner_sub_dict)
 
               cl.update({'children': inner_list })
       else:
@@ -720,10 +765,10 @@ def get_tree_hierarchy(request, group_id, node_id):
 ##### bellow part is for manipulating nodes collections#####
 
 @get_execution_time
-def get_inner_collection(collection_list, node):
+def get_inner_collection(collection_list, node, gstaff_access):
   inner_list = []
   error_list = []
-
+  inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
   if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -733,43 +778,81 @@ def get_inner_collection(collection_list, node):
             node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
             inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
             inner_sub_list = [inner_sub_dict]
-            inner_sub_list = get_inner_collection(inner_sub_list, col_obj)
-
+            inner_sub_list = get_inner_collection(inner_sub_list, col_obj, gstaff_access)
+            if "CourseSubSectionEvent" == node_type:
+              start_date_val = get_attribute_value(col_obj._id, "start_time")
+              if start_date_val:
+                curr_date_val = datetime.datetime.now().date()
+                start_date_val = start_date_val.date()
+                if curr_date_val >= start_date_val or gstaff_access:
+                    inner_sub_dict.update({'start_time_val':start_date_val.strftime("%d/%m/%Y")})
+                else:
+                    # do not send this CSS
+                    inner_sub_list.remove(inner_sub_dict)
+                    # pass
             if inner_sub_list:
-              inner_list.append(inner_sub_list[0])
-            else:
-              inner_list.append(inner_sub_dict)
+              inner_list_append_temp(inner_sub_list[0])
+            elif "CourseSubSectionEvent" != node_type:
+              inner_list_append_temp(inner_sub_dict)
 
             cl.update({'children': inner_list })
       else:
         error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
         print "\n " + error_message
-
     return collection_list
 
   else:
     return collection_list
+
 
 @get_execution_time
 def get_collection(request, group_id, node_id):
   node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
   collection_list = []
+  gstaff_access = False
+  gstaff_access = check_is_gstaff(group_id,request.user)
+  # collection_list_append_temp=collection_list.append
+  # print "\n\n gstaff_access---",gstaff_access
+  for each in node.collection_set:
+    obj = node_collection.one({'_id': ObjectId(each) })
+    if obj:
+      node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+      collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
 
-  if node:
-    if node.collection_set:
-      for each in node.collection_set:
-        obj = node_collection.one({'_id': ObjectId(each) })
-        if obj:
-          node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-          collection_list.append({'name': obj.name, 'id': obj.pk,'node_type': node_type})
-          collection_list = get_inner_collection(collection_list, obj)
+      collection_list = get_inner_collection(collection_list, obj, gstaff_access)
+ # def a(p,q,r):
+#		collection_list.append({'name': p, 'id': q,'node_type': r})
+  #this empty list will have the Process objects as its elements
+  # processes=[]
+  #Function used by Processes implemented below
+  # def multi_(lst):
 
+  #   for each in lst:
+  #     obj = node_collection.one({'_id': ObjectId(each) })
+  #     if obj:
+  #       node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+  #       collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
 
+  #       collection_list = get_inner_collection(collection_list, obj)
+  		  #collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+	
+  # if node and node.collection_set:
+  #   t=len(node.collection_set)
+  #   x=multiprocessing.cpu_count()#returns no of cores in the cpu 
+  #   n2=t/x#divides the list into those many parts
+  #   #Process object is created.The list after being partioned is also given as an argument. 
+    
+  #   for i in range(x):
+  #     processes.append(multiprocessing.Process(target=multi_,args=(node.collection_set[i*n2:(i+1)*n2], )))
+  #   for i in range(x):
+  #     processes[i].start()#each Process started
+  #   for i in range(x):
+  #     processes[i].join()#each Process converges
   data = collection_list
 
   return HttpResponse(json.dumps(data))
-# ###End of manipulating nodes collection####
+
 
 @get_execution_time
 def add_sub_themes(request, group_id):
@@ -791,7 +874,7 @@ def add_sub_themes(request, group_id):
         node = node_collection.collection.GSystem()
         # get_node_common_fields(request, node, group_id, theme_GST)
 
-        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_item_GST))
+        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_item_GST),groupid=group_id)
         node.reload()
         # Add this sub-theme into context nodes collection_set
         node_collection.collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -822,7 +905,7 @@ def add_theme_item(request, group_id):
 
       theme_item_node = node_collection.collection.GSystem()
 
-      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST))
+      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST),groupid=group_id)
       theme_item_node.reload()
 
       # Add this theme item into context theme's collection_set
@@ -851,7 +934,7 @@ def add_topics(request, group_id):
         node = node_collection.collection.GSystem()
         # get_node_common_fields(request, node, group_id, topic_GST)
 
-        node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST))
+        node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST),groupid=group_id)
         node.reload()
         # Add this topic into context nodes collection_set
         node_collection.collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -866,7 +949,6 @@ def add_topics(request, group_id):
 @get_execution_time
 def add_page(request, group_id):
   if request.is_ajax() and request.method == "POST":
-
     context_node_id = request.POST.get("context_node", '')
     css_node_id = request.POST.get("css_node", '')
     unit_name = request.POST.get("unit_name", '')
@@ -886,9 +968,13 @@ def add_page(request, group_id):
 
     if name not in collection_list:
         page_node = node_collection.collection.GSystem()
-        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page),groupid=group_id)
+        page_node.status = u"PUBLISHED"
+        page_node.save()
+
         context_node.collection_set.append(page_node._id)
-        context_node.save()
+        context_node.save(groupid=group_id)
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
@@ -943,8 +1029,8 @@ def add_file(request, group_id):
                                 context_node.collection_set.append(old_file_node._id)
                                 old_file_node.status = u"PUBLISHED"
                                 old_file_node.prior_node.append(context_node._id)
-                                old_file_node.save()
-                                context_node.save()
+                                old_file_node.save(groupid=group_id)
+                                context_node.save(groupid=group_id)
                 else:
                         # If availbale ,then return to the topic page
                         return HttpResponseRedirect(url_name)
@@ -958,10 +1044,10 @@ def add_file(request, group_id):
         file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
         file_obj.prior_node.append(context_node._id)
         file_obj.status = u"PUBLISHED"
-        file_obj.save()
+        file_obj.save(groupid=group_id)
         context_node.collection_set.append(file_obj._id)
-        file_obj.save()
-        context_node.save()
+        file_obj.save(groupid=group_id)
+        context_node.save(groupid=group_id)
     return HttpResponseRedirect(url_name)
 
 
@@ -1130,7 +1216,7 @@ def change_group_settings(request,group_id):
                 group_node.disclosure_policy = disclosure_policy
                 group_node.encryption_policy = encryption_policy
                 group_node.modified_by = int(request.user.id)
-                group_node.save()
+                group_node.save(groupid=group_id)
                 return HttpResponse("changed successfully")
         except:
             return HttpResponse("failed")
@@ -1199,7 +1285,7 @@ def make_module_set(request, group_id):
                     if(check == 'True'):
                         return HttpResponse("This module already Exists")
                     else:
-                        gsystem_obj.save()
+                        gsystem_obj.save(groupid=group_id)
                         create_relation_of_module(node._id, gsystem_obj._id)
                         create_version_of_module(gsystem_obj._id,node._id)
                         check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
@@ -1374,9 +1460,9 @@ def graph_nodes(request, group_id):
   node_metadata ='{"screen_name":"' + page_node.name + '",  "title":"' + page_node.name + '",  "_id":"'+ str(page_node._id) +'", "refType":"GSystem"}, '
   node_relations = ''
   exception_items = [
-                      "name", "content", "_id", "login_required", "attribute_set",
+                      "name", "content", "_id", "login_required", "attribute_set", "relation_set",
                       "member_of", "status", "comment_enabled", "start_publication",
-                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set",
+                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set", "access_policy", "snapshot",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language",
                       "property_order", "rating", "apps_list", "annotations", "instance of"
@@ -2108,7 +2194,7 @@ def remove_user_from_author_set(request, group_id):
         if node.created_by == request.user.id:
             node.author_set.remove(user_id)
             can_remove = True
-            node.save()
+            node.save(groupid=group_id)
 
             if node.author_set:
                 for each in node.author_set:
@@ -2226,7 +2312,7 @@ def annotationlibInSelText(request, group_id):
     }
     sg_obj.annotations.append(ann)
   
-  sg_obj.save()
+  sg_obj.save(groupid=group_id)
 
   return HttpResponse(json.dumps(sg_obj.annotations))
 
@@ -2363,7 +2449,7 @@ def get_students(request, group_id):
       else:
         # Otherwise, append given group's ObjectId
         group_set_to_check.append(groupid)
-
+      university_id = None
       if university_id:
         university_id = ObjectId(university_id)
         university = node_collection.one({'_id': university_id}, {'name': 1})
@@ -2502,7 +2588,7 @@ def get_students(request, group_id):
 
       # Column headers to be displayed on html
       column_headers = [
-          ('University', 'University'),
+          #('University', 'University'),
           ('College ( Graduation )', 'College'),
           ("Name", "Name"),
           ("Enrollment Code", "Enr Code"),
@@ -3068,9 +3154,8 @@ def get_districts(request, group_id):
         }).sort('name', 1)
 
         if cur_districts.count():
-          for d in cur_districts:
-            districts.append([str(d.subject), d.name.split(" -- ")[0]])
-
+          #loop replaced by a list comprehension
+          districts=[[str(d.subject), d.name.split(" -- ")[0]] for d in cur_districts]
         else:
           error_message = "No districts found"
           raise Exception(error_message)
@@ -4559,110 +4644,79 @@ def mp_approve_students(student_cur, course_ids, course_enrollment_status_text, 
         p.join()
 
     return resultlist
+# ====================================================================================================
+
 
 @get_execution_time
 def get_students_for_batches(request, group_id):
-  """
-  This view returns ...
+    """
+    This view returns ...
 
-  Arguments:
-  group_id - ObjectId of the currently selected group
-  Returns:
-  A dictionary consisting of following key-value pairs:-
-  success - Boolean giving the state of ajax call
-  message - Basestring giving the error/information message
-  """
-  response_dict = {'success': False, 'message': ""}
-  b_arr=[]
-  try:
-    if request.is_ajax() and request.method == "GET":
-      btn_id = request.GET.get('btn_id', "")
-      batch_id = request.GET.get('node_id', "")
-      ac_id = request.GET.get('ac_id', "")
+    Arguments:
+    group_id - ObjectId of the currently selected group
+    Returns:
+    A dictionary consisting of following key-value pairs:-
+    success - Boolean giving the state of ajax call
+    message - Basestring giving the error/information message
+    """
+    response_dict = {'success': False, 'message': ""}
+    result_set = None
+    query = {}
+    try:
+        if request.is_ajax() and request.method == "POST":
+            ann_course_id = unicode(request.POST.get('ac_id', ""))
+            added_ids_list = request.POST.getlist('added_ids_list[]', "")
+            if added_ids_list:
+                added_ids_list = list(set(added_ids_list))
+            search_text = unicode(request.POST.get('search_text', ""))
+            stud_gst = node_collection.one({'_type': "GSystemType", 'name': "Student"})
+            query.update({'member_of': stud_gst._id})
+            if added_ids_list:
+                added_ids_list = [ObjectId(each) for each in added_ids_list]
+                query.update({'_id': {'$nin': added_ids_list}})
+            query.update({'name': {'$regex': search_text, '$options': "i"}})
+            query.update({'attribute_set.course_enrollment_status.' + ann_course_id: 'Enrollment Approved'})
+            response_dict["success"] = True
+            rec = node_collection.collection.aggregate([{'$match': query},
+                                      {'$project': {'_id': 0,
+                                                    'stud_id': '$_id',
+                                                    'enrollment_code': '$attribute_set.enrollment_code',
+                                                    'name': '$name',
+                                                    # 'email_id': '$attribute_set.email_id',
+                                                    # 'phone': '$attribute_set.mobile_number',
+                                                    'year_of_study': '$attribute_set.degree_year',
+                                                    'degree': '$attribute_set.degree_specialization',
+                                                    # 'college': '$relation_set.student_belongs_to_college',
+                                                    # 'college_roll_num': '$attribute_set.college_enroll_num',
+                                                    # 'university': '$relation_set.student_belongs_to_university',
+                                      }},
+                                      {'$sort': {'enrollment_code': 1}}
+            ])
+            result_set = rec['result']
+            # Column headers to be displayed on json_data
+            column_headers = [
+                        ('enrollment_code', 'Enr Code'),
+                        ("name", "Name"),
+                        ("degree", "Degree/Stream"),
+                        ("year_of_study", "Year of Study"),
+            ]
 
-      batch_name_index = 1
-      batches_for_same_course = []
-      all_batches_in_grp = []
-      batch_mem_dict = {}
-      batch_member_list = []
-      
-      batch_gst = node_collection.one({'_type':"GSystemType", 'name':"Batch"})
+            students_count = len(result_set)
+            response_dict["students_data_set"] = result_set
+            response_dict["success"] = True
+            response_dict["students_count"] = students_count
+            response_dict["column_headers"] = column_headers
+            return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+        else:
+            error_message = "BatchFetchError: Either not an ajax call or not a GET request!!!"
+            response_dict["message"] = json_datarror_message
+            return HttpResponse(json.dumps(response_dict))
 
-      batch_for_group = node_collection.find({'member_of': batch_gst._id, 'relation_set.has_course': ObjectId(ac_id)})
-      
-      for each1 in batch_for_group:
-        existing_batch = node_collection.one({'_id': ObjectId(each1._id)})
-        batch_name_index += 1
-        for each2 in each1.relation_set:
-          if "has_batch_member" in each2:
-            batch_member_list.extend(each2['has_batch_member'])
-            break
-        each1.get_neighbourhood(each1.member_of)
-        batch_mem_dict[each1.name] = each1
-      
-      # College's ObjectId is required, if student record can't be found 
-      # using group's ObjectId
-      # A use-case where records created via csv file appends MIS_admin group's 
-      # ObjectId in group_set field & not college-group's ObjectId
-      ann_course = node_collection.one({'_id': ObjectId(ac_id)}, {'relation_set.acourse_for_college': 1,"relation_set.course_has_enrollment":1})
-      sce_id = None
-      for rel in ann_course.relation_set:
-        if rel and "course_has_enrollment" in rel:
-          sce_id = rel["course_has_enrollment"][0]
-          break
+    except Exception as e:
+        error_message = "BatchFetchError: " + str(e) + "!!!"
+        response_dict["message"] = error_message
+        return HttpResponse(json.dumps(response_dict))
 
-      sce_node = node_collection.one({"_id":ObjectId(sce_id)},{"attribute_set.has_approved":1})
-
-      approved_students_list = []
-      for attr in sce_node.attribute_set:
-        if attr and "has_approved" in attr:
-          approved_students_list = attr["has_approved"]
-          break
-
-      approve_not_in_batch_studs = [stud_id for stud_id in approved_students_list if stud_id not in batch_member_list]
-
-      student = node_collection.one({'_type': "GSystemType", 'name': "Student"})
-
-      res = node_collection.find(
-        {
-          '_id': {"$in": approve_not_in_batch_studs},
-          'member_of': student._id
-          # '$or': [
-          #   {'group_set': ObjectId(group_id)},
-          #   {'relation_set.student_belongs_to_college': college_id}
-          # ],
-          # 'relation_set.selected_course': ObjectId(ac_id)
-        },
-        {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
-      ).sort("name", 1) 
-
-
-      drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
-      drawer_template_context["widget_for"] = "new_create_batch"
-      drawer_widget = render_to_string(
-        'ndf/drawer_widget.html', 
-        drawer_template_context,
-        context_instance = RequestContext(request)
-      )
-
-      response_dict["success"] = True
-      response_dict["drawer_widget"] = drawer_widget
-      response_dict["student_count"] = res.count()
-      response_dict["batch_name_index"] = batch_name_index
-      response_dict["batches_for_same_course"] = json.dumps(batch_mem_dict, cls=NodeJSONEncoder)
-
-      return HttpResponse(json.dumps(response_dict))
-    else:
-      error_message = "Batch Drawer: Either not an ajax call or not a GET request!!!"
-      response_dict["message"] = error_message
-      return HttpResponse(json.dumps(response_dict))
-
-  except Exception as e:
-    error_message = "Batch Drawer: " + str(e) + "!!!"
-    response_dict["message"] = error_message
-    return HttpResponse(json.dumps(response_dict))
-
-# ====================================================================================================
 
 @get_execution_time
 def edit_task_title(request, group_id):
@@ -4674,7 +4728,7 @@ def edit_task_title(request, group_id):
         title = request.POST.get('title',"")
 	task = node_collection.find_one({'_id':ObjectId(taskid)})
         task.name = title
-	task.save()
+	task.save(groupid=group_id)
         return HttpResponse(task.name)
     else:
 	raise Http404
@@ -4694,7 +4748,7 @@ def edit_task_content(request, group_id):
     	usrname = request.user.username
     	filename = slugify(task.name) + "-" + usrname + "-"
     	task.content = org2html(content_org, file_prefix=filename)
-	task.save()
+	task.save(groupid=group_id)
         return HttpResponse(task.content)
     else:
 	raise Http404
@@ -4702,7 +4756,14 @@ def edit_task_content(request, group_id):
 @get_execution_time
 def insert_picture(request, group_id):
     if request.is_ajax():
-        resource_list=node_collection.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'name': 1})
+        resource_list=node_collection.find(
+          {
+            '_type' : 'File',
+            'group_set': {'$in': [ObjectId(group_id)]},
+            'mime_type' : u"image/jpeg" 
+          },
+          {'name': 1})
+
         resources=list(resource_list)
         n=[]
         for each in resources:
@@ -4757,7 +4818,7 @@ def save_time(request, group_id, node):
      name_arr = name.split("--")
      new_name = unicode(str(name_arr[0]) + "--" + str(name_arr[1]) + "--" + str(start_time))
      event_node.name = new_name
-     event_node.save() 
+     event_node.save(groupid=group_id) 
   return HttpResponse("Session rescheduled") 
 
 @get_execution_time
@@ -4972,7 +5033,7 @@ def event_assginee(request, group_id, app_set_instance_id=None):
       performance_record_dict = {}
       marks_dict = {}
       student_node = node_collection.find_one({"_id":ObjectId(a['Name'])})
-      
+
       for i in student_node.attribute_set:
           if unicode('student_event_details') in i.keys():
             student_dict.update(i['student_event_details'])
@@ -5433,6 +5494,9 @@ def page_scroll(request,group_id,page):
        page='1'  
     if int(page) != int(tot_page) and int(page) != int(1):
         page=int(page)+1
+    # temp. variables which stores the lookup for append method
+    user_activity_append_temp=user_activity.append
+    files_list_append_temp=files_list.append
     for each in (paged_resources.page(int(page))).object_list:
             if each.created_by == each.modified_by :
                if each.last_update == each.created_at:
@@ -5443,9 +5507,9 @@ def page_scroll(request,group_id,page):
                activity =  'created'
         
             if each._type == 'Group':
-               user_activity.append(each)
+               user_activity_append_temp(each)
             each.update({'activity':activity})
-            files_list.append(each)
+            files_list_append_temp(each)
             
  else:
       page=0           
@@ -5934,3 +5998,4 @@ def get_detailed_report(request, group_id):
     error_message = "ReportFetchError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+

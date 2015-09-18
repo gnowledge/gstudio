@@ -11,6 +11,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.tasks import task_set_notify_val
 import json
 
 try:
@@ -39,22 +40,11 @@ def get_user(username):
     else:
         return 0
 
-
 # A general function used to send all kinds of notifications
 @get_execution_time
 def set_notif_val(request,group_id,msg,activ,bx):
     # A general function used to send all kinds of notifications
-    try:
-        group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        site=sitename.name.__str__()
-        objurl="http://test"
-        render = render_to_string("notification/label.html",{'sender':request.user.username,'activity':activ,'conjunction':'-','object':group_obj,'site':site,'link':objurl})
-        notification.create_notice_type(render, msg, "notification")
-        notification.send([bx], render, {"from_user": request.user})
-        return True
-    except Exception as e:
-        print "Error in sending notification- "+str(e)
-        return False
+    return task_set_notify_val.delay(request.user.id, str(group_id), msg, activ, bx.id)
 
 # Send invitation to any user to join or unsubscribe
 @get_execution_time
@@ -77,7 +67,7 @@ def send_invitation(request,group_id):
             ret = set_notif_val(request,group_id,msg,activ,bx)
             if bx.id not in colg.author_set:
                 colg.author_set.append(bx.id)
-                colg.save()
+                colg.save(groupid=group_id)
         if ret :
             return HttpResponse("success")
         else:
@@ -114,7 +104,7 @@ def notify_remove_user(request,group_id):
     ret = set_notif_val(request,group_id,msg,activ,bx)
     colg.author_set.remove(bx.id)
     colg.modified_by = int(request.user.id)
-    colg.save()
+    colg.save(groupid=group_id)
     if ret:
         return HttpResponse("success")
     else:
@@ -145,7 +135,7 @@ def invite_users(request,group_id):
                         if each not in node.author_set:
                             new_users.append(each)
                             node.author_set.append(each);
-                node.save()
+                node.save(groupid=group_id)
                 
                 # Send invitations according to not_status variable
                 activ="invitation to join in group"
@@ -166,7 +156,7 @@ def invite_users(request,group_id):
                     node.author_set.remove(each)
                     msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+"'"
                     set_notif_val(request,group_id,msg,activ,bx)
-                node.save()
+                node.save(groupid=group_id)
             return HttpResponse("Success")
         else:
             coll_obj_list = []
@@ -191,6 +181,7 @@ def invite_users(request,group_id):
 
 @get_execution_time
 def invite_admins(request,group_id):
+    #inorder to be a group admin, the user must be member of that group
     try:
         sending_user=request.user
         node = node_collection.one({'_id': ObjectId(group_id)})
@@ -214,7 +205,7 @@ def invite_admins(request,group_id):
                         if each not in node.group_admin:
                             new_users.append(each)
                             node.group_admin.append(each);
-                node.save()
+                node.save(groupid=group_id)
                 
                 # Send invitations according to not_status variable
                 activ="invitation to join in group"
@@ -235,7 +226,7 @@ def invite_admins(request,group_id):
                     node.group_admin.remove(each)
                     msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+" as admin'"
                     set_notif_val(request,group_id,msg,activ,bx)
-                node.save()
+                node.save(groupid=group_id)
             return HttpResponse("Success")
         else:
             coll_obj_list = []
@@ -246,11 +237,13 @@ def invite_admins(request,group_id):
             st=[]
             user_grps=get_all_user_groups()
             usergrps=[]
+            subscribed=get_all_subscribed_users(group_id)
             for each in user_grps:
                 usergrps.append(each.created_by)
             for each in users:
                 if each.id != owner and each.id not in node.group_admin and each.id in usergrps:
-                   st.append(each)
+                    if each.id in subscribed:
+                        st.append(each)
                 else:
                     if each.id !=owner and each.id in usergrps:
                         coll_obj_list.append(each)

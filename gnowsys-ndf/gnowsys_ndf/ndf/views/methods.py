@@ -12,6 +12,7 @@ from django.core.cache import cache
 
 from mongokit import paginator
 import mongokit
+import json
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
@@ -22,6 +23,8 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
+from django.contrib.sites.models import Site
+from django.template.loader import render_to_string
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
@@ -34,6 +37,7 @@ import ast
 import string
 import json
 import locale
+import multiprocessing as mp 
 from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
@@ -48,13 +52,13 @@ topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
+
 grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
 ins_objectid = ObjectId()
 
 def get_execution_time(f):
    if BENCHMARK == 'ON': 
 
-  
 	    def wrap(*args,**kwargs):
 	        time1 = time.time()
 	        total_parm_size = 0
@@ -68,14 +72,50 @@ def get_execution_time(f):
 	        benchmark_node =  col.Benchmark()
 	        benchmark_node.time_taken = unicode(str(time_diff))
 	        benchmark_node.name = unicode(f.func_name)
+	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
+	        try :
+	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
+	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
+	        except : 
+	        	pass
+	        try :
+	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
+	        except : 
+	        	pass
+	        try :
+	        	benchmark_node.user = unicode(args[0].user.username)
+	        except :
+	        	pass
 	        benchmark_node.parameters = unicode(total_param)
 	        benchmark_node.size_of_parameters = unicode(total_parm_size)
 	        benchmark_node.last_update = datetime.today()
-	        #benchmark_node.functionOplength = unicode(getsizeof(ret))
 	        try:
 	        	benchmark_node.calling_url = unicode(args[0].path)
-	        except:	
-	        	pass 
+	        	url = benchmark_node.calling_url.split("/")
+	        	
+	        	if url[1] != "" : 
+	        		group = url[1]
+	        		benchmark_node.group = group
+	        		try :
+	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+	        			if bool(n) :
+	        				benchmark_node.group = group;
+	        		except :
+	        			group_name, group = get_group_name_id(group)
+	        			benchmark_node.group = str(group)
+	        	else :
+	        		pass
+
+	        	if url[2] == "" : 
+	        		benchmark_node.action = None
+	        	else : 
+	        		benchmark_node.action = url[2]
+		        	if url[3] != '' : 
+		        		benchmark_node.action +=  str('/'+url[3])
+		        	else : 
+		        		pass
+	        except : 
+	        	pass
 	        benchmark_node.save()
 	        return ret
    if BENCHMARK == 'ON': 
@@ -163,7 +203,179 @@ def get_group_name_id(group_name_or_id, get_obj=False):
         return None, None
 
 
+
 @get_execution_time
+def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
+   '''
+        creates a task for assignee
+   '''
+   try:
+           usr=request.user.id
+           task_node = collection.GSystem()
+           GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'}) 	
+           grp=collection.Node.one({'_id':ObjectId(group_id)})
+           if not grp:
+                   return
+           else:
+                   group_name=grp.name
+           if request.method == "POST": # create 
+                   task_node.name = unicode(task_dict['name'])
+                   task_node.content_org = unicode(task_dict['content_org'])
+                   task_node.created_by=usr
+                   if GST_TASK._id not in task_node.member_of:
+                           task_node.member_of.append(GST_TASK._id)
+                   if usr not in task_node.contributors:
+                           task_node.contributors.append(request.user.id)
+                   if group_id not in task_node.group_set:
+                           task_node.group_set.append(grp._id)
+                   task_node.status=u'DRAFT'
+                   task_node.url= u'task'
+                   task_node.language=u'en'
+                   contr=[]
+                   contr.append(usr)
+                   task_node.contributors=contr
+                   parent = task_dict['parent']
+                   Status = task_dict['Status']
+                   Start_date = task_dict['start_time']
+                   Priority = task_dict['Priority']
+                   Due_date = task_dict['end_time']
+                   Estimated_time = task_dict['Estimated_time']
+                   watchers = task_dict['watchers']
+                   if watchers:
+                           for each_watchers in watchers.split(','):
+                                   bx=User.objects.get(username=each_watchers)
+                                   task_node.author_set.append(bx.id)
+                   task_node.save()
+                   # filename = task_node.name 
+                   # task_node.content = org2html(task_dict['content_org'], file_prefix=filename)
+                   # task_node.save() 
+                   if parent: # prior node saving
+                           task_node.prior_node = [ObjectId(parent)]
+                           parent_object = collection.Node.find_one({'_id':ObjectId(parent)})
+                           parent_object.post_node = [task_node._id]
+                           parent_object.save()
+                           task_node.save()
+                   for each in attribute_list:
+                           if task_dict.has_key(str(each)) :
+                                   if not task_dict[each] == "":
+                                           attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
+                                           newattribute = collection.GAttribute()
+                                           newattribute.subject = task_node._id
+                                           newattribute.attribute_type = attributetype_key
+                                           if type(task_dict[each]) == date_time.datetime :
+                                                   newattribute.name= task_dict['name']+"--"+str(each)+"--"+str(task_dict[str(each)])
+                                        
+                                           else:
+                                                   if each == 'Assignee':
+                                                           usr_ob=User.objects.get(id=task_dict['Assignee'])
+                                                           if usr_ob:
+                                                                   newattribute.name= task_dict['name']+"--"+str(each)+"--"+usr_ob.username
+                                                   else:
+                                                           newattribute.name= task_dict['name']+"--"+str(each)+"--"+unicode(task_dict[str(each)])
+                                           if each == 'start_time' or each == 'end_time':
+                                                   newattribute.object_value=task_dict[str(each)]
+                                           else:
+                                                   if each == 'Assignee':
+                                                           usr_ob=User.objects.get(id=task_dict['Assignee'])
+                                                           if usr_ob:
+                                                                   newattribute.object_value = unicode(usr_ob.username)
+                                                   else:
+                                                           newattribute.object_value = unicode(task_dict[str(each)])
+                                           newattribute.save()
+                   if task_dict['Assignee'] :	
+                            activ="task reported"
+                            msg="Task -"+task_node.name+"- has been reported by "+"\n     - Status: "+task_dict['Status']+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
+                            bx=User.objects.get(id=task_dict['Assignee'])
+                            site=sitename.name.__str__()
+                            objurl="http://test"
+                            render = render_to_string("notification/label.html",{'sender':request.user.username,'activity':activ,'conjunction':'-','object':group_id,'site':site,'link':objurl})
+                            notification.create_notice_type(render, msg, "notification")
+                            notification.send([bx], render, {"from_user": request.user})
+
+           return task_node
+   except Exception as e:
+           print "Exception in create_task "+ str(e)
+
+def create_task_for_activity(request,group_id,activity_dict,get_assignee_list,set_notif_val):
+    """Creates a task for an activity and notify assignee.
+    """
+    try:
+        ins_objectid  = ObjectId()
+        if ins_objectid.is_valid(group_id) is False :
+            group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+            if group_ins:
+                group_id = str(group_ins._id)
+            else:
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                if auth:
+                    group_id=str(auth._id)
+        elif ins_objectid.is_valid(group_id) is True :
+            group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+            if group_ins:
+                group_id = str(group_ins._id)
+        grp=collection.Node.one({'_id':ObjectId(group_id)})
+        group_name=grp.name
+        at_list = ["Status", "start_time", "Priority", "end_time", "Assignee"]
+        task_dict=activity_dict
+        assignee=grp.created_by
+        task_dict['Assignee']=assignee
+        main_task=create_task(request,group_id,task_dict,set_notif_val,at_list)
+        if not main_task:
+                return
+        if not get_assignee_list:
+                return
+        if len(get_assignee_list) == 1 : #Single assignee 
+                #IF IT'S SINGLE ASSIGNEE CREATE A SINGLE TASK ON ASSIGNEE
+                assignee=get_assignee_list[0]
+                task_dict['Assignee']=assignee
+                one_task=create_task(request,group_id,task_dict,set_notif_val,at_list)
+                return
+        else:
+                task_collection_list=[]
+                if len(get_assignee_list) > 1 : #task collection 
+                        #CREATE A GROUP TASK (TASK_COLLECTION)
+                        for each in get_assignee_list:
+                                if not each == grp.created_by and not request.user.id == each: # check if uploaded user is not moderator or creator 
+                                        task_dict['Assignee']=each
+                                        task=create_task(request,group_id,task_dict,set_notif_val,at_list)
+                                        if task:
+                                                task_collection_list.append(task._id)
+                        if task_collection_list:
+                                op = collection.update({'_id': ObjectId(main_task._id)}, {'$set': {'collection_set': task_collection_list}})
+        return
+    except Exception as e:
+        print "Exception in create_task_for_activity "+str(e)
+
+
+def get_all_subscribed_users(group_id):
+  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  ins_objectid  = ObjectId()
+  all_users=[]
+  if ins_objectid.is_valid(group_id) :
+    if grp.author_set:
+      all_users=grp.author_set
+    if grp.created_by in all_users:
+      all_users.remove(grp.created_by)
+  return all_users
+  
+def get_all_admins(group_id):
+  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  return grp.group_admin
+
+
+def check_if_moderated_group(group_id):
+  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  ins_objectid  = ObjectId()
+  print "edtpol",grp.edit_policy
+  if ins_objectid.is_valid(group_id) :
+    if grp.edit_policy == "EDITABLE_MODERATED":
+      return True
+    else:
+      return False
+  else:
+    return False
+
+
 def check_delete(main):
   try:
 
@@ -227,12 +439,28 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
         # Then append their names in list of GApps to be excluded
         if already_selected_gapps:
             gapps_list_remove = gapps_list.remove
-            for each_gapp in already_selected_gapps:
+            #Function used by Processes implemented below
+            def multi_(lst):
+              for each_gapp in lst:
                 gapp_name = each_gapp["name"]
 
                 if gapp_name in gapps_list:
                     gapps_list_remove(gapp_name)
-
+            #this empty list will have the Process objects as its elements
+            processes=[]
+            n1=len(already_selected_gapps)
+            lst1=already_selected_gapps
+            #returns no of cores in the cpu
+            x=mp.cpu_count()
+            #divides the list into those many parts
+            n2=n1/x
+            #Process object is created.The list after being partioned is also given as an argument. 
+            for i in range(x):
+              processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2],)))
+            for i in range(x):
+              processes[i].start() #each Process started 
+            for i in range(x):
+              processes[i].join() #each Process converges
     # Find all GAPPs
     meta_type = node_collection.one({
         "_type": "MetaType", "name": META_TYPE[0]
@@ -458,7 +686,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 
       elif checked == "RelationType" or checked == "CourseUnits":
         # Special case used while dealing with RelationType widget
-        if kwargs.has_key("left_drawer_content"):
+        if "left_drawer_content" in kwargs:
           drawer = kwargs["left_drawer_content"]
     else:
       # For heterogeneous collection
@@ -488,9 +716,12 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id not in nlist:
           dict1[each._id] = each
 
-      for oid in nlist:
-        obj = node_collection.one({'_id': oid})
-        dict2.append(obj)
+      #loop replaced by a list comprehension
+      dict2=[node_collection.one({'_id': oid}) for oid in nlist]
+
+      # for oid in nlist:
+      #   obj = node_collection.one({'_id': oid})
+      #   dict2.append(obj)
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -501,10 +732,15 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id != nid:
           if each._id not in nlist:
             dict1[each._id] = each
+      #loop replaced by a list comprehension    
+      dict2=[node_collection.one({'_id': oid})  for oid in nlist]
           
-      for oid in nlist: 
-        obj = node_collection.one({'_id': oid})
-        dict2.append(obj)
+      	
+      # for oid in nlist:
+      #   obj = node_collection.one({'_id': oid})
+      #   dict2.append(obj)
+      
+      
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -735,18 +971,17 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # tags
     # if tags:
     tags_list = []
+    if tags:
+        for tag in tags.split(","):
+            tag = unicode(tag.strip())
 
-    for tag in tags.split(","):
-        tag = unicode(tag.strip())
+            if tag:
+                tags_list.append(tag)
 
-        if tag:
-            tags_list.append(tag)
-
-    if set(node.tags) != set(tags_list):
-        node.tags = tags_list
-        is_changed = True
+        if set(node.tags) != set(tags_list):
+            node.tags = tags_list
+            is_changed = True
       
-
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
         changed = build_collection(node, check_collection, right_drawer_list, checked)
@@ -754,16 +989,15 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
             is_changed = True
 
     #  org-content
-    if content_org:
-        if node.content_org != content_org:
-            node.content_org = content_org
+    if node.content_org != content_org:
+        node.content_org = unicode(content_org)
 
-            # Required to link temporary files with the current user who is
-            # modifying this document
-            usrname = request.user.username
-            filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-            node.content = org2html(content_org, file_prefix=filename)
-            is_changed = True
+        # Required to link temporary files with the current user who is
+        # modifying this document
+        usrname = request.user.username
+        filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+        node.content = unicode(org2html(content_org, file_prefix=filename))
+        is_changed = True
 
     # visited_location in author class
     if node.location != map_geojson_data:
@@ -787,7 +1021,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
             else:
                 user_group_location['visited_location'] = user_last_visited_location
-                user_group_location.save()
+                user_group_location.save(groupid=group_id)
 
     if is_changed:
         node.status = unicode("DRAFT")
@@ -814,11 +1048,12 @@ def build_collection(node, check_collection, right_drawer_list, checked):
       if node.prior_node != right_drawer_list:
         i = 0
         node.prior_node=[]
+	node_prior_node_append_temp=node.prior_node.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
           if node_obj:
-            node.prior_node.append(node_id)
+            node_prior_node_append_temp(node_id)
           
           i = i+1
         # print "\n Changed: prior_node"
@@ -839,14 +1074,16 @@ def build_collection(node, check_collection, right_drawer_list, checked):
         i = 0
         node.collection_set = []
         # checking if each _id in collection_list is valid or not
+	nlist_append_temp=nlist.append #a temp. variable which stores the lookup for append method
+	node_collection_set_append_temp=node.collection_set.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
           if node_obj:
             if node_id not in nlist:
-              nlist.append(node_id)  
+              nlist_append_temp(node_id)  
             else:
-              node.collection_set.append(node_id)  
+              node_collection_set_append_temp(node_id)  
               # After adding it to collection_set also make the 'node' as prior node for added collection element
               node_collection.collection.update({'_id': ObjectId(node_id), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
           
@@ -854,7 +1091,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
 
         for each in nlist:
           if each not in node.collection_set:
-            node.collection_set.append(each)
+            node_collection_set_append_temp(each)
             node.status = u"PUBLISHED"
             node.save()
             # After adding it to collection_set also make the 'node' as prior node for added collection element
@@ -1031,6 +1268,33 @@ def build_collection(node, check_collection, right_drawer_list, checked):
   else:
     return False
 
+"""
+@get_execution_time
+def get_versioned_page(node):
+    rcs = RCS()
+    fp = history_manager.get_file_path(node)
+    cmd= 'rlog  %s' % \
+  (fp)
+    rev_no =""
+    proc1=subprocess.Popen(cmd,shell=True,
+        stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline,b''):
+      if line.find('revision')!=-1 and line.find('selected') == -1:
+          rev_no=string.split(line,'revision')
+          rev_no=rev_no[1].strip( '\t\n\r')
+          rev_no=rev_no.split()[0]
+      if line.find('status')!=-1:
+          up_ind=line.find('status')
+          if line.find(('PUBLISHED'),up_ind) !=-1:
+	             rev_no=rev_no.split()[0]
+               node=history_manager.get_version_document(node,rev_no)
+               proc1.kill()
+               return (node,rev_no)    
+      if rev_no == '1.1':
+           node=history_manager.get_version_document(node,'1.1')
+           proc1.kill()
+           return(node,'1.1')
+"""
 
 @get_execution_time
 def get_versioned_page(node):
@@ -1049,15 +1313,14 @@ def get_versioned_page(node):
       if line.find('status')!=-1:
           up_ind=line.find('status')
           if line.find(('PUBLISHED'),up_ind) !=-1:
-	       rev_no=rev_no.split()[0]
-               node=history_manager.get_version_document(node,rev_no)
-               proc1.kill()
-               return (node,rev_no)    
+           rev_no=rev_no.split()[0]
+           node=history_manager.get_version_document(node,rev_no)
+           proc1.kill()
+           return (node,rev_no)   
       if rev_no == '1.1':
            node=history_manager.get_version_document(node,'1.1')
            proc1.kill()
            return(node,'1.1')
-
 
 
 @get_execution_time
@@ -1129,14 +1392,13 @@ def get_page(request,node):
                         
 			return(node1,ver1)		
 	    
-  else:
-         
+  else: 
         # if node._type == "GSystem" and node1.status == "DRAFT":
         #     if node1.created_by ==request.user.id:
         #           return (node2,ver2)
         #      else:
 	#	   return (node2,ver2)
-         return (node1,ver1)
+        return (node1,ver1)
 
 @get_execution_time
 def check_page_first_creation(request,node):
@@ -1192,8 +1454,8 @@ def tag_info(request, group_id, tagname=None):
             cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
                                         'group_set':ObjectId(group_id)
                   })
-            for every in cur:
-                search_result.append(every)
+            #loop replaced by a list comprehension
+            search_result=[every for every in cur]
 
     # Autheticate user can see all public files
     elif request.user.is_authenticated():
@@ -1215,8 +1477,8 @@ def tag_info(request, group_id, tagname=None):
                                             {'created_by': userid},
                                           ]
                                       })
-            for every in cur:
-                search_result.append(every)
+            #loop replaced by a list comprehension
+            search_result=[every for every in cur]
 
     else:  # Unauthenticated user can see all public files.
         group_node = node_collection.one({'_id': ObjectId(group_id)})
@@ -1227,8 +1489,8 @@ def tag_info(request, group_id, tagname=None):
                                                'status': u'PUBLISHED'
                                             }
                                      )
-                for every in cur:
-                    search_result.append(every)
+                #loop replaced by a list comprehension
+                search_result=[every for every in cur]
 
     if search_result:
         total = len(search_result)
@@ -1332,12 +1594,11 @@ def cast_to_data_type(value, data_type):
 
     value = value.strip()
     casted_value = value
-
     if data_type == "unicode":
         casted_value = unicode(value)
 
     elif data_type == "basestring":
-        casted_value = str(value)
+        casted_value = unicode(value)
 
     elif (data_type == "int") and str(value):
         casted_value = int(value) if (str.isdigit(str(value))) else value
@@ -1406,14 +1667,13 @@ def get_node_metadata(request, node, **kwargs):
             if at:
 
                 field_value = cast_to_data_type(field_value, at["data_type"])
-
                 if "is_changed" in kwargs:
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
                     if temp_res["is_changed"]:  # if value is true
                         updated_ga_nodes.append(temp_res)
               
                 else:
-                    create_gattribute(node._id, at, field_value)
+                    create_gattribute(node._id, at, unicode(field_value))
     
     if "is_changed" in kwargs:
         return updated_ga_nodes
@@ -1458,18 +1718,22 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   """
   if not isinstance(at_rt_objectid_or_attr_name_list, list):
     at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
-
+  #a temp. variable which stores the lookup for append method
+  type_of_set_append_temp=type_of_set.append  
   if not type_of_set:
     node["property_order"] = []
+    #a temp. variable which stores the lookup for append method
+    node_property_order_append_temp=node["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
       for type_of in gst["type_of"]:
         if type_of not in type_of_set:
-          type_of_set.append(type_of)
+          type_of_set_append_temp(type_of)
 
       for po in gst["property_order"]:
         if po not in node["property_order"]:
-          node["property_order"].append(po)
+          node_property_order_append_temp(po)    
+          
 
   BASE_FIELD_METADATA = {
     'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
@@ -1481,6 +1745,8 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   }
 
   widget_data_list = []
+  #a temp. variable which stores the lookup for append method
+  widget_data_list_append_temp=widget_data_list.append
   for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
     if type(at_rt_objectid_or_attr_name) == ObjectId: #ObjectId.is_valid(at_rt_objectid_or_attr_name):
       # For attribute-field(s) and/or relation-field(s)
@@ -1540,7 +1806,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
         data_type = node.structure[field.name]
         value = node[field.name]
 
-      widget_data_list.append({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
+      widget_data_list_append_temp({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
                               '_id': field._id, 
                               'data_type': data_type,
                               'name': field.name, 'altnames': altnames,
@@ -1551,7 +1817,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
       # For node's base-field(s)
 
       # widget_data_list.append([node['member_of'], BASE_FIELD_METADATA[at_rt_objectid_or_attr_name], node[at_rt_objectid_or_attr_name]])
-      widget_data_list.append({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
+      widget_data_list_append_temp({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
                               'data_type': node.structure[at_rt_objectid_or_attr_name],
                               'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
                               'value': node[at_rt_objectid_or_attr_name],
@@ -1579,21 +1845,25 @@ def get_property_order_with_value(node):
     
     demo["property_order"] = []
     type_of_set = []
+    #temp. variables which stores the lookup for append method
+    type_of_set_append_temp=type_of_set.append
+    demo_prop_append_temp=demo["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
       for type_of in gst["type_of"]:
         if type_of not in type_of_set:
-          type_of_set.append(type_of)
+          type_of_set_append_temp(type_of)
 
       for po in gst["property_order"]:
         if po not in demo["property_order"]:
-          demo["property_order"].append(po)
+          demo_prop_append_temp(po)
 
     demo.get_neighbourhood(node["member_of"])
-
+    #a temp. variable which stores the lookup for append method
+    new_property_order_append_temp=new_property_order.append
     for tab_name, list_field_id_or_name in demo['property_order']:
       list_field_set = get_widget_built_up_data(list_field_id_or_name, demo, type_of_set)
-      new_property_order.append([tab_name, list_field_set])
+      new_property_order_append_temp([tab_name, list_field_set])
 
     demo["property_order"] = new_property_order
   
@@ -1604,9 +1874,11 @@ def get_property_order_with_value(node):
       
       if type_of_nodes.count():
         demo["property_order"] = []
+        #a temp. variable which stores the lookup for append method
+        demo_prop_append_temp=demo["property_order"].append
         for to in type_of_nodes:
           for po in to["property_order"]:
-            demo["property_order"].append(po)
+            demo_prop_append_temp(po)
 
       node_collection.collection.update({'_id': demo._id}, {'$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
 
@@ -1790,7 +2062,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
   ga_node = None
   info_message = ""
   old_object_value = None
-
   ga_node = triple_collection.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
     # Code for creation
@@ -1951,7 +2222,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"
-
+            # print "\n",info_message
             relation_type_node_name = relation_type_node.name
             relation_type_node_inverse_name = relation_type_node.inverse_name
 
@@ -2027,6 +2298,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             info_message = " %(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            # print "\n",info_message
 
             node_collection.collection.update({
                 "_id": subject_id, "relation_set." + relation_type_node_name: {'$exists': True}
@@ -2289,172 +2561,6 @@ def set_all_urls(member_of):
 		url = u"None"
 	return url
 ###############################################	###############################################    
-
-
-@login_required
-@get_execution_time
-def create_discussion(request, group_id, node_id):
-  '''
-  Method to create discussion thread for File and Page.
-  '''
-
-  try:
-
-    twist_st = node_collection.one({'_type':'GSystemType', 'name':'Twist'})
-
-    node = node_collection.one({'_id': ObjectId(node_id)})
-
-    # group = node_collection.one({'_id':ObjectId(group_id)})
-
-    thread = node_collection.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
-    
-    if not thread:
-      
-      # retriving RelationType
-      # relation_type = node_collection.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
-      
-      # Creating thread with the name of node
-      thread_obj = node_collection.collection.GSystem()
-
-      thread_obj.name = unicode(node.name)
-      thread_obj.status = u"PUBLISHED"
-
-      thread_obj.created_by = int(request.user.id)
-      thread_obj.modified_by = int(request.user.id)
-      thread_obj.contributors.append(int(request.user.id))
-
-      thread_obj.member_of.append(ObjectId(twist_st._id))
-      thread_obj.prior_node.append(ObjectId(node_id))
-      thread_obj.group_set.append(ObjectId(group_id))
-      
-      thread_obj.save()
-
-      # creating GRelation
-      # create_grelation(node_id, relation_type, twist_st)
-      response_data = [ "thread-created", str(thread_obj._id) ]
-
-      return HttpResponse(json.dumps(response_data))
-
-    else:
-      response_data =  [ "Thread-exist", str(thread._id) ]
-      return HttpResponse(json.dumps(response_data))
-  
-  except Exception as e:
-    
-    error_message = "\n DiscussionThreadCreateError: " + str(e) + "\n"
-    raise Exception(error_message)
-    # return HttpResponse("server-error")
-
-
-# to add discussion replie
-@get_execution_time
-def discussion_reply(request, group_id, node_id):
-
-    try:
-
-        prior_node = request.POST.get("prior_node_id", "")
-        content_org = request.POST.get("reply_text_content", "") # reply content
-
-        # process and save node if it reply has content  
-        if content_org:
-      
-            user_id = int(request.user.id)
-            user_name = unicode(request.user.username)
-
-            # auth = node_collection.one({'_type': 'Author', 'name': user_name })
-            reply_st = node_collection.one({ '_type': 'GSystemType', 'name': 'Reply'})
-            
-            # creating empty GST and saving it
-            reply_obj = node_collection.collection.GSystem()
-
-            reply_obj.name = unicode("Reply of:" + str(prior_node))
-            reply_obj.status = u"PUBLISHED"
-
-            reply_obj.created_by = user_id
-            reply_obj.modified_by = user_id
-            reply_obj.contributors.append(user_id)
-
-            reply_obj.member_of.append(ObjectId(reply_st._id))
-            reply_obj.prior_node.append(ObjectId(prior_node))
-            reply_obj.group_set.append(ObjectId(group_id))
-        
-            reply_obj.content_org = unicode(content_org)
-            filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
-            reply_obj.content = org2html(content_org, file_prefix=filename)
-        
-            # saving the reply obj
-            reply_obj.save()
-
-            formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
-            
-            # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
-            reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder )
-
-            # ---------- mail/notification sending -------
-            node = node_collection.one({"_id": ObjectId(node_id)})
-            node_creator_user_obj = User.objects.get(id=node.created_by)
-            node_creator_user_name = node_creator_user_obj.username
-
-            site = Site.objects.get(pk=1)
-            site = site.name.__str__()
-            
-            from_user = user_name
-
-            to_user_list = [node_creator_user_obj]
-
-            msg = "\n\nDear " + node_creator_user_name + ",\n\n" + \
-                  "A reply has been added in discussion under the " + \
-                  node.member_of_names_list[0] + " named: '" + \
-                  node.name + "' by '" + user_name + "'."
-
-            activity = "Discussion Reply"
-            render_label = render_to_string(
-                "notification/label.html",
-                {
-                    # "sender": from_user,
-                    "activity": activity,
-                    "conjunction": "-",
-                    "link": "url_link"
-                }
-            )
-            notification.create_notice_type(render_label, msg, "notification")
-            notification.send(to_user_list, render_label, {"from_user": from_user})
-
-            # ---------- END of mail/notification sending ---------
-
-            return HttpResponse( reply )
-
-        else: # no reply content
-
-            return HttpResponse(json.dumps(["no_content"]))      
-
-    except Exception as e:
-      
-        error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
-        raise Exception(error_message)
-
-        return HttpResponse(json.dumps(["Server Error"]))
-
-
-@get_execution_time
-def discussion_delete_reply(request, group_id):
-
-    nodes_to_delete = json.loads(request.POST.get("nodes_to_delete", "[]"))
-    
-    reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
-
-    deleted_replies = []
-    
-    for each_reply in nodes_to_delete:
-        temp_reply = node_collection.one({"_id": ObjectId(each_reply)})
-        
-        if temp_reply:
-            deleted_replies.append(temp_reply._id.__str__())
-            temp_reply.delete()
-        
-    return HttpResponse(json.dumps(deleted_replies))
-
-
 
 @get_execution_time
 def get_user_group(userObject):
@@ -3833,9 +3939,10 @@ def delete_node(
                     # print "\n 10 >> node found as File; nodes in GridFS : ", len(node_to_be_deleted.fs_file_ids)
                     if node_to_be_deleted.fs_file_ids:
                         for each in node_to_be_deleted.fs_file_ids:
-                            if node_to_be_deleted.fs.files.exists(each):
+                            if node_to_be_deleted.fs.files.exists(each) and node_collection.find({'fs_file_ids': {'$in': [each]} }).count() == 1:
                                 # print "\tdeleting node in GridFS : ", each
                                 node_to_be_deleted.fs.files.delete(each)
+
 
                 # Finally delete the node
                 node_to_be_deleted.delete()
@@ -3986,6 +4093,8 @@ def repository(request, group_id):
     gapp_metatype = node_collection.one({"_type": "MetaType", "name": "GAPP"})
 
     gapps_list = [i.values()[0] for i in GSTUDIO_NROER_GAPPS]
+    gapps_list.insert(gapps_list.index('program'), 'event')
+    gapps_list.pop(gapps_list.index('program'))
     # print gapps_list
 
     gapps_obj_list = []
@@ -4004,3 +4113,170 @@ def repository(request, group_id):
                               },
                               context_instance=RequestContext(request)
                             )
+
+def create_thread_for_node(request, group_id, node):
+	"""
+      Accepts:
+       * ObjectId of group.
+       * node - Page/File GSystem
+
+      Actions:
+       * Finds the thread_node associated with passed node.
+       * Creates ATs release_response and thread_interaction_type for thread_node
+       * If dates set for thread, created ATs start_time and end_time for thread_node
+       * Creates RT has_thread between node and thread_node
+
+      Returns:
+        * Success - True/False
+
+	"""
+	if request.method == "POST":
+		from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+		# release_response_status = False
+		# thread_interaction_type_status = False
+		# thread_start_time_status = False
+		# thread_end_time_status = False
+		has_thread_status = False
+		if get_relation_value(node._id,"has_thread") != ("",""):
+			has_thread_status = True
+
+		release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
+		interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
+		start_time = request.POST.get("thread_start_date", '')
+		if start_time:
+			start_time = datetime.strptime(start_time, "%d/%m/%Y")
+		end_time = request.POST.get("thread_close_date", '')
+		if end_time:
+			end_time = datetime.strptime(end_time, "%d/%m/%Y")
+		twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
+		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
+		has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+		if thread_obj:
+			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
+			thread_obj.reload()
+			# print "\n\n Found old model thread node existing"
+		else:
+			thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
+			# print "\n\n Found updated thread node existing"
+		if thread_obj:
+			if thread_obj.name != u"Thread of "+ unicode(node.name):
+				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
+				thread_obj.reload()
+				# print "\n\n thread_obj found -- name update if needed"
+		else:
+			# print "\n\n Creating new thread node"
+			thread_obj = node_collection.collection.GSystem()
+
+			thread_obj.name = u"Thread of " + unicode(node.name)
+			thread_obj.status = u"PUBLISHED"
+
+			thread_obj.created_by = int(request.user.id)
+			thread_obj.modified_by = int(request.user.id)
+			thread_obj.contributors.append(int(request.user.id))
+			thread_obj.prior_node.append(node._id)
+			thread_obj.member_of.append(ObjectId(twist_gst._id))
+			# thread_obj.prior_node.append(ObjectId(node._id))
+			thread_obj.group_set.append(ObjectId(group_id))
+			thread_obj.save()
+		'''
+		if thread_obj:
+			if get_attribute_value(thread_obj._id,"release_response") != "":
+				release_response_status = True
+			if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
+				thread_interaction_type_status = True
+			if get_attribute_value(thread_obj._id,"start_time") != "":
+				thread_start_time_status = True
+			if get_attribute_value(thread_obj._id,"end_time") != "":
+				thread_end_time_status = True
+		print "\n thread_end_time_status---",thread_end_time_status
+		print "\n thread_start_time_status---",thread_start_time_status
+		print "\n release_response_status---",release_response_status
+		print "\n thread_interaction_type_status---",thread_interaction_type_status
+		print "\n has_thread_status---",has_thread_status
+		'''
+		if not has_thread_status:
+			# creating GRelation
+			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
+			node.reload()
+			thread_obj.reload()
+			# print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
+			# print "\n\n node", node._id, "--", node.relation_set
+		if release_response_val:
+			rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
+			release_response_val = eval(release_response_val)
+			create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+		if interaction_type_val:
+			thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
+			create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+
+		if start_time and end_time:
+			start_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'start_time'})
+			end_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'end_time'})
+			create_gattribute(thread_obj._id, start_time_at, start_time)
+			create_gattribute(thread_obj._id, end_time_at, end_time)
+
+		thread_obj.reload()
+		# print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
+		return True
+
+def node_thread_access(group_id, node):
+    """
+      Accepts:
+       * ObjectId of group.
+       * node - Page/File GSystem
+
+      Actions:
+       * Finds the thread_node associated with passed node.
+       * Validation for discussion based on start_time and end_time, if exists
+
+      Returns:
+       * thread_node - used in discussion.html
+       * success (i.e True/False)
+    """
+    has_thread_node = None
+    thread_start_time = None
+    thread_end_time = None
+    allow_to_comment = True  # default set to True to allow commenting if no date is set for thread
+
+    if "has_thread" in node:
+        if node['has_thread']:
+                has_thread_node = node['has_thread'][0]
+    if has_thread_node:
+        if has_thread_node.attribute_set:
+            for each_attr in has_thread_node.attribute_set:
+                if each_attr and 'start_time' in each_attr:
+                    thread_start_time = each_attr['start_time']
+                if each_attr and 'end_time' in each_attr:
+                    thread_end_time = each_attr['end_time']
+    if thread_start_time and thread_end_time:
+        curr_date_time = datetime.now()
+        if curr_date_time.date() < thread_start_time.date() or curr_date_time.date() > thread_end_time.date():
+            allow_to_comment = False
+    return has_thread_node,allow_to_comment
+
+def get_prior_node_hierarchy(oid):
+    """pass the node's ObjectId and get list of objects in hierarchy
+    
+    Args:
+        oid (TYPE): mongo ObjectId
+    
+    Returns:
+        list: List of objects starts from passed node till top node
+    """
+    hierarchy_list = []
+    prev_obj_id = ObjectId(oid)
+
+    while prev_obj_id:
+        try:
+            prev_obj = node_collection.one({'_id': prev_obj_id})
+            prev_obj_id = prev_obj.prior_node[0]
+            # print prev_obj.name
+    
+        except:
+            # print "===", prev_obj.name
+            prev_obj_id = None
+    
+        finally:
+            hierarchy_list.append(prev_obj)
+
+    return hierarchy_list
