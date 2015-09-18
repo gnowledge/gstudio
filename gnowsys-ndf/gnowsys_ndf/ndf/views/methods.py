@@ -42,6 +42,7 @@ from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
 from collections import OrderedDict
+
 col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
@@ -970,16 +971,16 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # tags
     # if tags:
     tags_list = []
+    if tags:
+        for tag in tags.split(","):
+            tag = unicode(tag.strip())
 
-    for tag in tags.split(","):
-        tag = unicode(tag.strip())
+            if tag:
+                tags_list.append(tag)
 
-        if tag:
-            tags_list.append(tag)
-
-    if set(node.tags) != set(tags_list):
-        node.tags = tags_list
-        is_changed = True
+        if set(node.tags) != set(tags_list):
+            node.tags = tags_list
+            is_changed = True
       
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
@@ -2061,7 +2062,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
   ga_node = None
   info_message = ""
   old_object_value = None
-
   ga_node = triple_collection.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
     # Code for creation
@@ -4131,6 +4131,15 @@ def create_thread_for_node(request, group_id, node):
 
 	"""
 	if request.method == "POST":
+		from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+		# release_response_status = False
+		# thread_interaction_type_status = False
+		# thread_start_time_status = False
+		# thread_end_time_status = False
+		has_thread_status = False
+		if get_relation_value(node._id,"has_thread") != ("",""):
+			has_thread_status = True
+
 		release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
 		interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
 		start_time = request.POST.get("thread_start_date", '')
@@ -4143,9 +4152,7 @@ def create_thread_for_node(request, group_id, node):
 		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
 		has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
 		if thread_obj:
-			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': []}}, upsert = False, multi = False)
-			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
-			node.reload()
+			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
 			thread_obj.reload()
 			# print "\n\n Found old model thread node existing"
 		else:
@@ -4155,6 +4162,7 @@ def create_thread_for_node(request, group_id, node):
 			if thread_obj.name != u"Thread of "+ unicode(node.name):
 				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
 				thread_obj.reload()
+				# print "\n\n thread_obj found -- name update if needed"
 		else:
 			# print "\n\n Creating new thread node"
 			thread_obj = node_collection.collection.GSystem()
@@ -4165,25 +4173,42 @@ def create_thread_for_node(request, group_id, node):
 			thread_obj.created_by = int(request.user.id)
 			thread_obj.modified_by = int(request.user.id)
 			thread_obj.contributors.append(int(request.user.id))
-
+			thread_obj.prior_node.append(node._id)
 			thread_obj.member_of.append(ObjectId(twist_gst._id))
 			# thread_obj.prior_node.append(ObjectId(node._id))
 			thread_obj.group_set.append(ObjectId(group_id))
-
 			thread_obj.save()
+		'''
+		if thread_obj:
+			if get_attribute_value(thread_obj._id,"release_response") != "":
+				release_response_status = True
+			if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
+				thread_interaction_type_status = True
+			if get_attribute_value(thread_obj._id,"start_time") != "":
+				thread_start_time_status = True
+			if get_attribute_value(thread_obj._id,"end_time") != "":
+				thread_end_time_status = True
+		print "\n thread_end_time_status---",thread_end_time_status
+		print "\n thread_start_time_status---",thread_start_time_status
+		print "\n release_response_status---",release_response_status
+		print "\n thread_interaction_type_status---",thread_interaction_type_status
+		print "\n has_thread_status---",has_thread_status
+		'''
+		if not has_thread_status:
 			# creating GRelation
 			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
 			node.reload()
 			thread_obj.reload()
 			# print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
-			# print "\n\n thread", node._id, "--", node.relation_set
+			# print "\n\n node", node._id, "--", node.relation_set
 		if release_response_val:
 			rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
 			release_response_val = eval(release_response_val)
-                        create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+			create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
 		if interaction_type_val:
 			thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
 			create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+
 		if start_time and end_time:
 			start_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'start_time'})
 			end_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'end_time'})
@@ -4225,7 +4250,7 @@ def node_thread_access(group_id, node):
                     thread_end_time = each_attr['end_time']
     if thread_start_time and thread_end_time:
         curr_date_time = datetime.now()
-        if curr_date_time < thread_start_time or curr_date_time > thread_end_time:
+        if curr_date_time.date() < thread_start_time.date() or curr_date_time.date() > thread_end_time.date():
             allow_to_comment = False
     return has_thread_node,allow_to_comment
 

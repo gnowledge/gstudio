@@ -20,6 +20,10 @@
     cursor:pointer;
   }
 
+  #upload_form_div{
+    display: inline-block;
+  }
+
   .tab{
     padding-left: 2em;
     background-color:yellow !important;
@@ -29,12 +33,22 @@
     padding-left: 4em;
   }
 
+  #alertModal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .collection{
+    overflow-y: auto !important;
+    height: 300px;
+    border: none !important;
+   }
 
   .all_blogs{
       overflow-y: auto;
       height:500px;
   }
-
   .jqtree-tree .jqtree-title {
       margin: 5px;
       font-size: 15px;
@@ -48,11 +62,11 @@
       border-style: solid;
   }
 
-
-
 {% endblock %}
 
 {% block head %}
+    <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
+
     <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
     <!-- orgitdown! toolbar settings -->
     <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
@@ -62,7 +76,7 @@
 {% endblock %}
 
 {% block meta_content %}
-  <h3>Course Outline</h3>
+  <h4>Course Outline</h4>
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
         <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
@@ -74,12 +88,12 @@
 {% endblock %}
 {% block extended_header %}
     {% get_sg_member_of group_object.pk as list_of_sg_member_of %}
-    <div>
+    <div class="row">
 
       {% if "CourseEventGroup" in group_object.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
           <nav>
               <section class="medium-3 columns text-center">
-              <a href="{% url 'groupchange' group_object.name %}"><b>{% firstof group_object.altnames group_object.name %} </b></a>
+              <a href="{% url 'groupchange' group_object.name %}"><h5>{% firstof group_object.altnames group_object.name %} </h5></a>
               </section>
 
               {% get_attribute_value group_object.pk 'start_time' as event_start_time %}
@@ -121,19 +135,20 @@
               {% endif %}
           </nav>
       {% endif %}
-
+      <hr>
     </div>
 {% endblock %}
 
 {% block body_content %}
-{% if user.is_authenticated %}
-  {% get_user_object request.user.id as user_obj %}
-  {% check_is_gstaff groupid user_obj as gstaff_access %}
-{% endif %}
-
-	<div id="view-page">
-    
+  {% if user.is_authenticated %}
+    {% get_user_object request.user.id as user_obj %}
+    {% check_is_gstaff groupid user_obj as gstaff_access %}
+  {% endif %}
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+      <label id="alertModalLabel"></label>
+      <a class="close-reveal-modal">&#215;</a>
   </div>
+
 	<div id="view-page" class="small-12 large-12 columns"></div>
     <div class="small-12 columns">
       <dl class="tabs" data-tab data-options="deep_linking:true"  > 
@@ -162,25 +177,6 @@
           {% endif %}
       </dl>
 
-      <!-- Right Nav Section -->
-      {% if request.user.is_authenticated and not gstaff_access %}
-          <section>
-            <ul class="right" >
-            {% user_access_policy groupid request.user as user_access %} 
-              <li>
-              {% if user_access == "allow" %}
-                <input class="enroll-btn button tiny" type="button" value="ENROLLED" disabled="disabled">
-              {% else %}
-                {% if allow_to_join %}
-                  <input class="enroll-btn button tiny" type="button" value="ENROLL">
-                {% else %}
-                  <input class="enroll-btn button tiny" type="button" value="ENROLLMENT NOT OPEN" disabled="disabled">
-                {% endif %}
-              {% endif %}
-              </li>
-            </ul> 
-          </section>
-        {% endif %}
 
     <div class="row">
       
@@ -200,8 +196,8 @@
         {% if user_access == "allow" %}
 
         <div class="content" id="journal-tab">
-            <div>
-              <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="button small" style="float:right"> Add Page </a>
+            <div class="text-right">
+                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button small"> Add Page </a>
             </div>
             <div class="row all_blogs">
             	{% for each_blog in blog_pages %}
@@ -211,10 +207,10 @@
                   </h4>
                   {% if request.user.id == each_blog.created_by or gstaff_access %}
 
-                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}"> Edit </a>
+                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}&blog_type=True"> Edit </a>
                   {% endif %}
                   <span>
-                  Created at {{each_blog.created_at}}
+                  Created by {{each_blog.created_by|get_username}} at {{each_blog.created_at}}
                   </span>
                   <div>
                     {{each_blog.html_content|safe}}
@@ -224,16 +220,28 @@
               {% empty %}
                 <div class="blogpage"  style="margin-left:10px;">
                   <h4><u>
-                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}">Start writing Pages </a>
+                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True">Start writing Pages </a>
                   </u></h4>
                 </div>
               {% endfor %}
             </div>
         </div>
         <div class="content" id="gallery-tab">
-                <div class="row">
-                      {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
-                </div>
+            <div id="upload_form_div" class="text-right">
+
+                <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
+                    {% csrf_token %}
+                    <input type="file" name="doc[]" id="docFile"/>
+                    <div class="save_cancel hide">
+                      <input type="submit" id="submitpostid" class="tiny button" value="Save"/>
+                      <input type="button" id="btnUploadCancel" class="tiny button" value="Cancel"/>
+                    </div>
+                </form>
+
+            </div>
+            <div class="row">
+                  {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
+            </div>
         </div>
 
         <div class="content" id="analytics-tab">
@@ -255,6 +263,7 @@
     </section>
   
   	</div>
+    </div>
 
 {% endblock %}
 
@@ -262,6 +271,75 @@
 
 {% block script %}
 
+  // Cancel/Abort Upload-------------------------------------------------------------
+  $("#btnUploadCancel").click(function() {
+    $(".save_cancel").addClass("hide");
+    $("#docFile").val("");
+  });
+
+  
+  //Upload file action validation ---------------------------------------------------------------
+  $(document).on('change','#docFile',function(){
+    $(".save_cancel").removeClass("hide");
+    file_mime_type = this.files[0].type;
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $(".save_cancel").addClass("hide");
+      $('#docFile').val(this.value);
+      var message = "{% trans 'Only image files can be uploaded!' %}"
+      $("#alertModalLabel").text(message);
+      $("#alertModal").addClass("alert");
+      $("#alertModal").foundation('reveal', 'open');
+    }
+  });
+
+  // Update profile photo -----------------------------------------------------------------------
+  $("#submitpostid").click(function() {
+    if($("#docFile").val() != "") { 
+      $("#message").show();
+      $(".save_cancel").addClass("hide");
+      var message = "{% trans 'Please wait your file is uploading..' %}"
+      $("#alertModalLabel").text(message);
+      $("#alertModal").addClass("success");
+      $("#alertModal").foundation('reveal', 'open');
+    }
+
+    else {
+      var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
+      $("#alertModalLabel").text(message);
+      $("#alertModal").addClass("warning");
+      $("#alertModal").foundation('reveal', 'open');
+      $(".save_cancel").addClass("hide");
+      return false;
+    }
+  });
+
+  $(document).on('click','.save_date',function(){
+    date_val = $("#release_date").val()
+    css_id_val = $("#css_id").val()
+    $.ajax({
+      url: "{% url 'set_release_date_css' node.pk %}",
+
+      data: {
+        'date_val':date_val,
+        'css_id': css_id_val,
+        'csrfmiddlewaretoken': "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      success: function(data){
+          success_state = data["success"]
+          if(success_state){
+            location.reload();
+          }
+      },
+    });//end of ajax
+
+  })
+  
   $(document).on('click','.enroll-btn',function(){
     //trigger the ajax call to enroll
       $.ajax({

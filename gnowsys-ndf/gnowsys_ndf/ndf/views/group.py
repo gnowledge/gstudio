@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
-# from django.template.defaultfilters import slugify
+from django.template.defaultfilters import slugify
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
@@ -27,6 +27,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -1188,7 +1189,10 @@ class CreateCourseEventGroup(CreateEventGroup):
             new_gsystem.content_org = node.content_org
             new_gsystem.content = node.content
             new_gsystem.save()
-            return_status = create_thread_for_node(request, group_obj._id, new_gsystem)
+            discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+            create_gattribute(new_gsystem._id, discussion_enable_at, False)
+            new_gsystem.reload()
+            # return_status = create_thread_for_node(request, group_obj._id, new_gsystem)
             return new_gsystem
 
         except Exception as e:
@@ -1391,8 +1395,8 @@ class EventGroupCreateEditHandler(View):
             if sg_type == "ProgramEventGroup":
                 mod_group = CreateProgramEventGroup(request)
             elif sg_type == "CourseEventGroup":
-                mod_group = CreateCourseEventGroup(request)
                 moderation_level = -1
+                mod_group = CreateCourseEventGroup(request)
             parent_group_obj = group_obj
 
             # calling method to create new group
@@ -1400,6 +1404,9 @@ class EventGroupCreateEditHandler(View):
         if result[0]:
             # operation success: create ATs
             group_obj = result[1]
+            if sg_type == "CourseEventGroup":
+                group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
+                group_obj.save()
             # to make PE/CE as sub groups of the grp from which it is created.
             # parent_group_obj.post_node.append(group_obj._id)
             # group_obj.prior_node.append(parent_group_obj._id)
@@ -1410,8 +1417,6 @@ class EventGroupCreateEditHandler(View):
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
-                    group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
-                    group_obj.save()
 
                 group_name = group_obj.name
                 url_name = 'groupchange'
@@ -1768,7 +1773,7 @@ def group_dashboard(request, group_id=None):
       if "CourseEventGroup" in group_obj.member_of_names_list or u"ProgramEventGroup" in list_of_sg_member_of:
           page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
           blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-          files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+          files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"}).sort("last_update",-1)
           if group_obj.collection_set:
               course_structure_exists = True
           if request.user.id:
@@ -2182,3 +2187,26 @@ def create_sub_group(request,group_id):
       return render_to_response("ndf/create_sub_group.html", {'groupid':group_id,'maingroup':grpname,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
   except Exception as e:
       print "Exception in create subgroup "+str(e)
+
+
+
+
+@get_execution_time
+def upload_using_save_file(request,group_id):
+    from gnowsys_ndf.ndf.views.file import save_file
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    usrid = request.user.id
+    url_name = "/"+str(group_id)
+    for key,value in request.FILES.items():
+        fname=unicode(value.__dict__['_name'])
+        # print "key=",key,"value=",value,"fname=",fname
+        fileobj,fs=save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
+        file_obj=node_collection.find_one({'_id': ObjectId(fileobj)})
+        if file_obj:
+            url_name = "/"+str(group_id)+"/#gallery-tab"
+        return HttpResponseRedirect(url_name)

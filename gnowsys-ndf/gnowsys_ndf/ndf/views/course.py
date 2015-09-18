@@ -1705,39 +1705,16 @@ def add_course_file(request, group_id):
             node_collection.collection.update({'_id': ObjectId(context_node_id)}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
 
         new_list = []
+        file_uploaded = request.FILES.get("doc", "")
         # For checking the node is already available in gridfs or not
-        for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-            fileobj = node_collection.collection.File()
-            filemd5 = hashlib.md5(each.read()).hexdigest()
-            if not fileobj.fs.files.exists({"md5": filemd5}):
-                # If not available append to the list for making the collection for topic below
-                new_list.append(each)
-            else:
-                # If file exists, PUBLISH it and add to collection set
-                cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
-                old_file_node = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
-                if old_file_node._id not in context_node.collection_set:
-                        context_node.collection_set.append(old_file_node._id)
-                        old_file_node.status = u"PUBLISHED"
-                        old_file_node.prior_node.append(context_node._id)
-                        old_file_node.save()
-                        context_node.save()
-        # After taking new_lst[] , now go for saving the files
-        # save_file(new_list,"File", request.user.id, group_id, content_org=None, tags=None, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, request=None, map_geojson_data=[])
-
-        submitDoc(request, group_id)
-
-    # After file gets saved , that file's id should be saved in collection_set of context topic node
-
-    for k in new_list:
-        cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
-        if cur_oid and 'docid' in cur_oid:
-            file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
-            file_obj.prior_node.append(context_node._id)
-            file_obj.status = u"PUBLISHED"
-            file_obj.save()
-            context_node.collection_set.append(file_obj._id)
-            file_obj.save()
+        if file_uploaded:
+            fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            file_node = node_collection.find_one({'_id': ObjectId(fileobj)})
+            file_node.prior_node.append(context_node._id)
+            file_node.status = u"PUBLISHED"
+            file_node.save()
+            context_node.collection_set.append(file_node._id)
+            file_node.save()
         context_node.save()
     return HttpResponseRedirect(url_name)
 
@@ -1764,3 +1741,16 @@ def enroll_to_course(request, group_id):
         group_obj.save()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
+
+def set_release_date_css(request, group_id):
+	response_dict = {"success": False}
+	if request.is_ajax() and request.method == "POST":
+		css_node_id = request.POST.get("css_id", "")
+		date_val = request.POST.get("date_val", "")
+		if date_val:
+			start_date_val = datetime.datetime.strptime(date_val, "%d/%m/%Y")
+		start_date_AT = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
+		create_gattribute(ObjectId(css_node_id), start_date_AT, start_date_val)
+		response_dict["success"] = True
+		return HttpResponse(json.dumps(response_dict))
+

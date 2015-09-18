@@ -307,19 +307,20 @@ ul#navigation li a.last {
 {% include "ndf/node_ajax_content.html" %}
 
 <section class="medium-3 columns"> 
+{% get_group_object groupid as group_object %}
 
-{% if 'CourseEventGroup' not in group_object.member_of_names_list or not group_object.member_of_names_list %}
     
   <!-- Modal links for associated views like graphs and map-->
   <ul class="side-nav">
     <div class="panel" style="background-color:#ddd;">
-      {% get_group_object groupid as group_object %}
       {% user_access_policy groupid request.user as user_access %} 
       
       {% if user.is_authenticated %}
         <b>{% trans "Actions" %}</b><br/>
         <div class="row">         
         <div class="medium-6 columns">
+        {% if 'CourseEventGroup' not in group_object.member_of_names_list or not group_object.member_of_names_list %}
+
           {% edit_policy groupid node request.user as status %}
           {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
 
@@ -428,6 +429,14 @@ ul#navigation li a.last {
             {% endif %}
           </div>
         </div>
+        {% else %}
+            {% get_edit_url node.pk as edit_url %}
+            {% check_is_gstaff groupid request.user as is_gstaff %}
+            {% if is_gstaff %}
+                <li><a href="{% url edit_url group_id node.pk %}" class="tiny button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li><br>
+            {% endif %}
+        {% endif %}
+
       {% endif %}
     <div class ="rows">
        {% if user.is_authenticated and "Group" in group_object.member_of_names_list%} 
@@ -506,7 +515,7 @@ ul#navigation li a.last {
           {% endif %}
       {% endif %}
 
-      {% ifequal group_object.edit_policy "EDITABLE_MODERATED" %}
+      {% if group_object.edit_policy == "EDITABLE_MODERATED" and "CourseEventGroup" not in group_object.member_of_names_list %}
         {% if request.user.id in group_object.group_admin or request.user.is_superuser or request.user.id == group_object.created_by %}
           {% if 'ModeratingGroup' in group_object.member_of_names_list or 'ProgramEventGroup' in group_object.member_of_names_list or 'CourseEventGroup' in group_object.member_of_names_list and 'Group' not in group_object.member_of_names_list %}
 
@@ -521,7 +530,7 @@ ul#navigation li a.last {
             </a>
           {% endif %} 
         {% endif %} 
-      {% endifequal %}
+      {% endif %}
 
       <!-- This button converts collection into module -->
       {% comment %}
@@ -576,8 +585,7 @@ ul#navigation li a.last {
           <span class="label">{% trans "No tags defined" %}</span>
         {% endif %}
       </div>
-{% endif %}
-
+      
     <!--       </div>       this ends panel div with bgcolor grey-->
 
     {% if group_object.edit_policy != "EDITABLE_MODERATED" or "CourseEventGroup" in group_object.member_of_names_list %}
@@ -753,7 +761,7 @@ ul#navigation li a.last {
       });
   });
 
-  $(".theme-breadcrumb").click(function() {
+  $(".current").click(function() {
 
     var nav_list = "{{nav_list}}";
     {% get_node_type original_node as node_type %}  
@@ -991,6 +999,8 @@ ul#navigation li a.last {
   function adjustIframeHt(){
 
     var iframeBodyHt = $("iframe").contents().find("body").height();
+    var docHeight = $(window).height();
+    docHeight -= docHeight * 0.10;
     $("iframe").height(iframeBodyHt + 50);
     
     var changedHt;
@@ -998,8 +1008,10 @@ ul#navigation li a.last {
     setTimeout(function(){
 
       changedHt = $("iframe").contents().find("body").height();
-      if(changedHt > iframeBodyHt) { adjustIframeHt() }
-
+      // if(changedHt > iframeBodyHt) { adjustIframeHt() }
+      if(changedHt < docHeight) {
+        adjustIframeHt();
+      }
     }, 4000 );
   }
 
