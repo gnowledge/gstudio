@@ -235,12 +235,16 @@
 
 				success:function(data)
 					{   
-						if (data == 'Details Successfully Updated')
-							{
+						data = JSON.parse(data)
+						if (data['success'])
+							{	
 								$('#user_profile_edit').hide()
-		  						$('.information-div').show()
-		  						load_information()
-		  					}
+								$(".fname").html(data['fname'])
+								$(".lname").html(data['lname'])
+								$("#language_proficiency_info").html(data['node']['language_proficiency'])
+								$("#subject_proficiency_info").html(data['node']['subject_proficiency'])
+		      						$('.information-div').show()
+							}
 					}
 			   });
 		

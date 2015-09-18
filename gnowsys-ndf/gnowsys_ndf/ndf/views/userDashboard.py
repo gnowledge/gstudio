@@ -661,7 +661,6 @@ def user_profile(request,group_id):
 		user_select_data = request.POST.getlist('formselects[]','')
 		for i in user_data:
 			a=ast.literal_eval(i)
-			print a
 			if  a.get('first_name',None) != None:
 			  	user.first_name = a['first_name']
 			  	user_dict['fname'] = user.first_name
@@ -669,12 +668,14 @@ def user_profile(request,group_id):
 				user.last_name = a['last_name']
 			  	user_dict['lname'] = user.last_name
 		user.save()
+		print user_select_data
 		for i in user_select_data:
 			a=ast.literal_eval(i)
-			if  a.get('language_proficiency','') :
-				auth_node['language_proficiency'] = a.get('language_proficiency','')	
-			if  a.get('subject_proficiency',''):			
-				auth_node['subject_proficiency'] =  a.get('subject_proficiency','')
+			if  a.get('language_proficiency',None) != None:
+				auth_node['language_proficiency'] = list(a.get('language_proficiency',''))
+				print auth_node['language_proficiency']	
+			if  a.get('subject_proficiency',None) != None:			
+				auth_node['subject_proficiency'] =  list(a.get('subject_proficiency',''))
 		auth_node.save()
 		user_dict['node'] = auth_node
 		user_dict['success'] = True
