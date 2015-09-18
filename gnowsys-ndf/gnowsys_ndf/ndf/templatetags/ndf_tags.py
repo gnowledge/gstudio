@@ -768,6 +768,7 @@ def get_nroer_menu(request, group_name):
 
 		# handling conditions of "e-library" = "file" and vice-versa.
 		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
+		selected_gapp = "topics" if (selected_gapp == "topic_details") else selected_gapp
 
 		# for deciding/confirming selected gapp
 		for each_gapp in gapps:
