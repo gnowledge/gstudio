@@ -5,6 +5,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   
   {% if user.is_authenticated %}
+    <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
+
     <!-- orgitdown! -->
     <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
     <!-- orgitdown! toolbar settings -->
@@ -34,7 +36,7 @@
 
   .selected-resource { background-color:lightgray !important ; }
 
-  li{
+  .edit_li{
     list-style: none;
   }
 
@@ -270,9 +272,11 @@
   {% if user_access == "allow" %}
     <div class="medium-6 columns">
       {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
+        {% comment %}
         <div>
         {% include "ndf/rating.html" %} 
         </div><br/>
+        {% endcomment %}
       {% endif %}
     </div>
   {% endif %} 
@@ -319,7 +323,7 @@
       {% else %} 
 
         {% get_edit_url node.pk as edit_url %}
-          <li><a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li>
+          <li class="edit_li"><a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li>
       {% endif %} 
     {% endif %} 
 
