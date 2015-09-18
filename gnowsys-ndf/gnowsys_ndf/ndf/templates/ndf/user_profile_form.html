@@ -47,7 +47,7 @@
 					<label > <h6> {% trans 'Language proficiency' %} </h6> </label>
 				</div>
 				<div class="small-4 large-2 columns end">
-					<label id="language_proficiency_info">{{author.language_proficiency}}</label>
+					<label id="language_proficiency_info">{{author.language_proficiency|join:","}}</label>
 				</div>
 			</div>
 
@@ -57,7 +57,7 @@
 				</div>
 				
 				<div class="small-4 columns large-2 end"> 
-					<label id="subject_proficiency_info">{{author.subject_proficiency}}</label>
+					<label id="subject_proficiency_info">{{author.subject_proficiency|join:","}}</label>
 				</div>
 			</div>
 
@@ -155,7 +155,7 @@
 					<select name="language_proficiency" id="language_proficiency" multiple style="height:5%;">
 						<option  value=" "> --- Select --- </option>
 						{% for i in values.language %}
-							{% if author.language_proficiency == i %}
+							{% if   i in author.language_proficiency %}
 								<option name = '{{i}}' value="{{i}}" selected="true"> {% trans  i  %}</option>
 							{% else %}
 							<option name = '{{i}}' value="{{i}}"> {% trans  i  %}</option>
@@ -175,7 +175,7 @@
 					<select name="subject_proficiency" id="subject_proficiency" multiple style="height:5%;">
 						<option  value=" "> --- Select --- </option>
 						{% for i in values.educationalsubject %}
-							{% if author.subject_proficiency == i %}
+							{% if i in  author.subject_proficiency %}
 								<option name = '{{i}}' value="{{i}}" selected="true"> {% trans  i  %}</option>
 							{% else %}
 								<option name = '{{i}}' value="{{i}}"> {% trans i %} </option>
@@ -241,8 +241,8 @@
 								$('#user_profile_edit').hide()
 								$(".fname").html(data['fname'])
 								$(".lname").html(data['lname'])
-								$("#language_proficiency_info").html(data['node']['language_proficiency'])
-								$("#subject_proficiency_info").html(data['node']['subject_proficiency'])
+								$("#language_proficiency_info").html(data['node']['language_proficiency'].join(','))
+								$("#subject_proficiency_info").html(data['node']['subject_proficiency'].join(','))
 		      						$('.information-div').show()
 							}
 					}
@@ -312,7 +312,6 @@ $(document).ready()
 	
 	// Edit Profile-----------------------------------------
 	$(".edit_profile-btn").click(function() {
-		alert("coming")
 		$('#user_profile_edit').show()
 		$('.information-div').hide()
 	});

@@ -668,12 +668,10 @@ def user_profile(request,group_id):
 				user.last_name = a['last_name']
 			  	user_dict['lname'] = user.last_name
 		user.save()
-		print user_select_data
 		for i in user_select_data:
 			a=ast.literal_eval(i)
 			if  a.get('language_proficiency',None) != None:
 				auth_node['language_proficiency'] = list(a.get('language_proficiency',''))
-				print auth_node['language_proficiency']	
 			if  a.get('subject_proficiency',None) != None:			
 				auth_node['subject_proficiency'] =  list(a.get('subject_proficiency',''))
 		auth_node.save()
