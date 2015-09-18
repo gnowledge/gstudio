@@ -208,10 +208,10 @@
 		$('#user_profile_edit').find("select[name]").each(function (index, node)
 		 {
 			values = []
-			for ( i=0 ;i<=node.selectedOptions.length;i++)
-			     {  
-			     	if (node[i].selected) {
-			     		 values.push(String('"'+node[i].value+'"'));
+			for ( i=0 ;i<node.selectedOptions.length;i++)
+			     {  c = node
+				if (node.selectedOptions[i].selected) {
+                                         values.push(String('"'+node.selectedOptions[i].value+'"'));
 		  		}
 			     }
 			if (node.name !=  '--- Select ---')
@@ -241,7 +241,9 @@
 								$('#user_profile_edit').hide()
 								$(".fname").html(data['fname'])
 								$(".lname").html(data['lname'])
-								$("#language_proficiency_info").html(data['node']['language_proficiency'].join(','))								$("#subject_proficiency_info").html(data['node']['subject_proficiency'].join(','))								$('.information-div').show()
+								$("#language_proficiency_info").html(data['node']['language_proficiency'].join(','))								
+                                                                $("#subject_proficiency_info").html(data['node']['subject_proficiency'].join(','))								
+                                                                $('.information-div').show()
 							}
 					}
 			   });
