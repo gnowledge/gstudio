@@ -4,6 +4,12 @@
 
 {% block title %} Repository {% endblock %}
 
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
+<link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
+<script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
+
+{% endblock head %}
 
 {% block meta_content %}
   <a href="{% url 'e-book' group_name_tag %}" title="Click to go to ebooks">
@@ -30,6 +36,13 @@
   <!-- Existing card list-->
   {% for node in all_ebooks %}
 
+  <li class="card-image-wrapper">
+    {% include 'ndf/card.html' with resource=node url_name='page_details' first_arg=group_name_tag second_arg=node.pk %}
+  </li>
+
+  {% comment %}
+    
+{# 
       <li class="card">
         {% if grouptype == "Moderated" %}
           {% if node.status == "DRAFT" %}
@@ -71,7 +84,9 @@
 
         </div>
       </li>
- 
+  #}
+  {% endcomment %}
+
   {% endfor %}
 
 </ul>
