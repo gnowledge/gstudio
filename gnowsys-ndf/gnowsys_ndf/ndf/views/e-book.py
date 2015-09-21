@@ -30,7 +30,8 @@ def ebook_listing(request, group_id, page_no=1):
 	except: 
 		group_name, group_id = get_group_name_id(group_id)
         
-	all_ebooks = node_collection.find({"_type": "File", "attribute_set.educationaluse": "eBooks"})
+	all_ebooks = node_collection.find({"_type": "File", "attribute_set.educationaluse": "eBooks", 'collection_set': {'$exists': "true", '$not': {'$size': 0} }})
+
 	ebooks_page_info = paginator.Paginator(all_ebooks, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
 	return render_to_response("ndf/ebook.html", {
