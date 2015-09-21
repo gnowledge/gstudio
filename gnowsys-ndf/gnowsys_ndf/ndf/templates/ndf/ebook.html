@@ -77,3 +77,9 @@
 </ul>
 
 {% endblock %}
+
+{% block extra_content %} 
+
+  {% include 'ndf/pagination.html' with urlname="e-book_paged" first_arg=group_name_tag second_arg=""  third_arg="" page_info=page_info %}
+
+{% endblock %}
