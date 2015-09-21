@@ -682,7 +682,11 @@ WETUBE_PASSWORD = "gl@b$@)we!ube"
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
 
-# this has to be at last
+# the no of cards/objects/instances to be render of app (listing view).
+GSTUDIO_NO_OF_OBJS_PP = 24
+
+# ----------------------------------------------------------------------------
+# following has to be at last
 # just put every thing above it
 try:
     from local_settings import *
