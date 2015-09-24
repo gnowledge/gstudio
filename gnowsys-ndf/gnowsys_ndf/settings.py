@@ -680,7 +680,7 @@ WETUBE_USERNAME = "glab"
 WETUBE_PASSWORD = "gl@b$@)we!ube"
 #Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
-CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
 
 # the no of cards/objects/instances to be render of app (listing view).
 GSTUDIO_NO_OF_OBJS_PP = 24
