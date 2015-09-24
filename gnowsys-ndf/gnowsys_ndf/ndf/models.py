@@ -1213,7 +1213,8 @@ class Author(Group):
         'preferred_languages': dict,          # preferred languages for users like preferred lang. , fall back lang. etc.
         'group_affiliation': basestring,
 	'language_proficiency':basestring,
-	'subject_proficiency':basestring
+	'subject_proficiency':basestring #,
+    # TODO: add a field: preffered_display_name, 22-39-15, kedar2a
     }
 
     use_dot_notation = True
