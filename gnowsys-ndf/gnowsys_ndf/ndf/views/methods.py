@@ -25,6 +25,7 @@ from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
+from gnowsys_ndf.settings import SYNCDATA_KEY_PUB
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
