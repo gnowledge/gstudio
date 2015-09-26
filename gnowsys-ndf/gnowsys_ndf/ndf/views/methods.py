@@ -123,6 +123,189 @@ def get_execution_time(f):
    if BENCHMARK == 'OFF':
         return f
 
+import json
+import bson
+import shutil
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.core.mail import EmailMessage
+
+def server_sync(func):
+    def wrap(*args, **kwargs):
+        ret = func(*args, **kwargs)
+
+        
+        #do a regex check on SYNCDATA_KEY_PUB, if it contains anything other than letters and nos DONOT run the subprocess.call()
+        # function as this can be a potential security LOOPHOLE
+        #if pub is found to be invalid changes WILL NOT be captured
+        searchObj = re.search( r'[^A-Za-z0-9]', SYNCDATA_KEY_PUB, re.M|re.I)
+        if searchObj:
+            print "Invalid character found in SYNCDATA_KEY_PUB. Please ensure valid existing PUB has been added to local_settings.py", searchObj.group()
+            return            
+        
+        check_command = 'gpg --list-keys | grep -o "'+SYNCDATA_KEY_PUB+'"'
+        std_out= subprocess.call([check_command],shell=True)
+        #code to check if SYNCDATA_KEY_PUB in local settings.py is a pub which is present in the gpg database of the system
+        #if not, change WILL NOT be captured
+        #std_out will have shell command return code =0 (success) 1 (failure)
+        if str(std_out) == '1':
+            error_obj =  "Given pub = %s is not in gpg database of your system. Failed to capture changes for syncdata" % SYNCDATA_KEY_PUB
+            print '**'*30
+            print '\n'*3
+            print error_obj
+            print '\n'*3
+            print '**'*30
+            return
+
+        ''' Get current date and time to timestamp json and the document being captured by this function.
+         This done so that files in syncdata folder will have unique name'''
+        timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.now().microsecond)
+
+
+        ''' To fetch the data about the node '''
+        # the actual file
+        file_data = kwargs['file_data'] 
+        # the node file
+        node = kwargs['file_object'] 
+        # content-type of the file
+        content_type = kwargs['content_type'] 
+
+        ''' path where the json file that contains the information about node is located ''' 
+        settings_dir1 = os.path.dirname(__file__)
+        settings_dir2 = os.path.dirname(settings_dir1)
+        settings_dir3 = os.path.dirname(settings_dir2)
+        gen_path = os.path.abspath(os.path.dirname(settings_dir3))
+
+        print '+' * 20
+        print gen_path
+
+        file_path = ""
+        file_name_filtered = ""
+        if file_data:
+            file_name_filtered = file_data.name
+            special_char = ['!','?','$','%','$','#','&','*','(',')','   ','|',';','\"','<','>','~','`','[',']','{','}',' ']
+            for i in special_char:
+                file_name_filtered = file_name_filtered.replace(i,'')
+            file_path = gen_path + '/' + str(file_name_filtered)
+        
+        node_data_path = gen_path + '/node_data.json'
+        # subject += str(node._id)
+        
+        print '+' * 20
+        print node_data_path
+          
+        if 'image' in content_type or 'video' in content_type:
+            # To make the fs_file_ids filed set empty
+            if file_data:
+                node.fs_file_ids = []
+                # pass the image data as attachment
+                file_data.seek(0)
+                # path = default_storage.save(file_path, ContentFile(file_data.read()))
+                with open(file_path,'wb+') as outfile:
+                    outfile.write(file_data.read())
+
+
+        else:
+            #the other documents which need only the json data to be sent
+            if file_data:
+                node.fs_file_ids = []
+                file_data.seek(0)
+                file_path = gen_path + '/' + str(file_name_filtered)
+                # path = default_storage.save(file_path, ContentFile(file_data.read()))
+                with open(file_path,'wb+') as outfile:
+                    outfile.write(file_data.read())
+        
+        ''' Code to sign the document file, prefix timestamp to document file name and move it to syncdata folder '''
+        path1 = os.path.dirname(__file__)
+        path2 = os.path.dirname(path1)
+        
+        settings_dir = os.path.dirname(__file__)
+        PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+        path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
+        
+        if not os.path.exists(path_MailClient):
+            os.makedirs(path_MailClient)
+        
+        p1 = path_MailClient + 'syncdata/'
+        
+        if not os.path.exists(p1):
+            os.makedirs(p1)
+        
+        p1 = path_MailClient + 'sent_syncdata_files/'
+        
+        if not os.path.exists(p1):
+            os.makedirs(p1)
+
+        dst = str(path2) + "/MailClient/syncdata"
+
+        print '+' * 20
+        print dst
+
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+
+        path_for_this_capture = dst + '/' + timestamp
+        
+        print '+' * 20
+        print path_for_this_capture
+
+        if not os.path.exists(path_for_this_capture):
+            os.makedirs(path_for_this_capture)
+
+        if file_data:
+            
+            # '.gpg' in output file name is later used to split the filename and obtain original file name in received attachments in 
+            # 'server_sync()' function of mailclient.py views file
+            
+            #make filename.extension --> filename_extension since finally the name should be filename_extension.gpg
+            op_file_name = file_path.split(file_name_filtered)[0]+ timestamp + '_' + file_name_filtered + '_sig'
+            print ':' * 20
+            print op_file_name
+            print ':' * 20
+            print file_path
+            command = 'gpg -u ' + SYNCDATA_KEY_PUB + ' --output ' + op_file_name + ' --sign ' + file_path
+            subprocess.call([command],shell=True)
+            src = op_file_name
+
+            print '+' * 20
+            print src
+            shutil.move(src,path_for_this_capture)
+            # mail.attach_file(file_path)         
+        
+        print 'JSON'
+        node_json = bson.json_util.dumps(node)
+        with open(node_data_path,'w') as outfile:
+            json.dump(node_json, outfile)
+        
+        ''' Run command to sign the json file, rename and move to syncdata folder'''
+        #add _sig otherwise django_mailbox scrambles file name
+        json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
+        command = 'gpg -u ' + SYNCDATA_KEY_PUB + ' --output ' + json_op_file_name + ' --sign ' + node_data_path
+        subprocess.call([command],shell=True)
+        src = json_op_file_name
+        shutil.move(src,path_for_this_capture)
+        # mail.attach_file(json_op_file_name)
+        
+        # mail.attach_file(node_data_path)
+        # mail.subject = subject + str(node._id)
+        #mail.send()
+
+        os.remove(node_data_path)
+        # os.remove(json_op_file_name)
+        if file_data:
+            os.remove(file_path)
+            # os.remove(op_file_name)
+        return ret
+    return wrap
+
+@get_execution_time
+@server_sync
+def capture_data(file_object=None, file_data=None, content_type=None):
+    '''
+    Serves as an itermediate function to capture the node details and allow
+    the decorator to send the created/updated node through E-Mail
+    '''
+    pass
 
 @get_execution_time
 def get_group_name_id(group_name_or_id, get_obj=False):
