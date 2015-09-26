@@ -43,3 +43,9 @@ def get_latest_git_hash():
 	# gitproc = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'], stdout = subprocess.PIPE)
 	# (stdout, _) = gitproc.communicate()
 	return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'])
+
+
+@get_execution_time
+@register.filter
+def get_type(value):
+    return type(value)
