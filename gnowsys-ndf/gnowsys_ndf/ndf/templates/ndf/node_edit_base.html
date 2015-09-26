@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load ndf_tags %}
+{% load simple_filters %}
 {% load cache %}
 
 {% block title %}   
@@ -15,62 +16,63 @@
 {% cache 3600 node_edit_base style %}
 {% block style %}
 
-.divider-line { font-size: xx-large; color:lightgray; }
-.line-height-2 { line-height:2; }
-.line-height-2pt5 { line-height:2.5; }
-.fontsize-x-large { font-size: x-large; }
+	.divider-line { font-size: xx-large; color:lightgray; }
+	.line-height-2 { line-height:2; }
+	.line-height-2pt5 { line-height:2.5; }
+	.fontsize-x-large { font-size: x-large; }
 
-.margin-0 { margin: 0 !important ;}
+	.margin-0 { margin: 0 !important ;}
 
-.resource-drawer { 
-border-color: #D3D3D3; border-style: solid; 
-padding: 0 !important; 
-overflow-y: auto;
-}
+	.resource-drawer { 
+	border-color: #D3D3D3; border-style: solid; 
+	padding: 0 !important; 
+	overflow-y: auto;
+	}
 
-.resource-drawer li.bullet-item:hover{
-background-color: #ecf0f1; cursor:pointer;
-}
+	.resource-drawer li.bullet-item:hover{
+	background-color: #ecf0f1; cursor:pointer;
+	}
 
-.posted-by{ color: #808080; font-size: small; }
+	.posted-by{ color: #808080; font-size: small; }
 
-.selected-resource { background-color:lightgray !important ; }
+	.selected-resource { background-color:lightgray !important ; }
 
-.resource-type-image {
-height:40px; 		
-background-repeat:no-repeat; background-size: 48px 48px
-}
+	.resource-type-image {
+	height:40px; 		
+	background-repeat:no-repeat; background-size: 48px 48px
+	}
 
-#tags_error{
-	color: red;
-}
+	#tags_error{
+		color: red;
+	}
 
-div.tags{ 
-	/*padding: 5px 10px; */
-	margin: 2px 5px;
-	/*color: white;*/
-	font-size: 1em;
-	border: solid thin #FFD400;
-}
+	div.tags{ 
+		/*padding: 5px 10px; */
+		margin: 2px 5px;
+		/*color: white;*/
+		font-size: 1em;
+		border: solid thin #FFD400;
+	}
 
-i.remove-tag{
-	padding-left: 8px;
-	font-size: 1.1em;
-	cursor: pointer;
-}
+	i.remove-tag{
+		padding-left: 8px;
+		font-size: 1.1em;
+		cursor: pointer;
+	}
 
 {% endblock %}
 {% endcache %}
- {% block head %}
+
+{% block head %}
 	{{block.super}}
-{% if title == "Page" or "File" in node.member_of_names_list %}
-  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
-  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
- {% endif %}
- {% endblock %}
+	{% if title == "Page" or "File" in node.member_of_names_list %}
+	  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+	  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+	{% endif %}
+{% endblock %}
 
 {% block body_content %}
 
@@ -238,9 +240,13 @@ i.remove-tag{
 	                    </div>
 	                	<div class="large-8 columns">
 	               			<select name="lan">
-                                       {% get_language_info_list for LANGUAGES as languages %}
-                                       {% for language in languages %}
-                                       <option value="{{language.code}}">{% trans language.name %}</option>{% endfor %}</select>
+                               {% get_language_info_list for LANGUAGES as languages %}
+                               {% for language in languages %}
+                           		<option value="{{language.code}}" {% ifequal node.language.0  language.code %} selected=selected {% endifequal %}>
+                               		{% trans language.name %}
+                               	</option>
+                               	{% endfor %}
+                            </select>
 	                    </div>
 	                </div>
 	                
