@@ -28,9 +28,11 @@ class Command(BaseCommand):
 					str_end	  = (line[str_start:].find(')')) + str_start 
 					raw_string = line[str_start:str_end+1]
 					if line.find('.Triples') != -1:	
-						child_collection_ids.append(raw_string)
+						if raw_string not in child_collection_ids:
+							child_collection_ids.append(raw_string)
 					if line.find('.Nodes') != -1:
-						Parent_collection_ids.append(raw_string)
+						if raw_string not in Parent_collection_ids:
+							Parent_collection_ids.append(raw_string)
 				except Exception as e:
 					print e
 
@@ -41,6 +43,11 @@ def process_parent_node(Parent_collection_ids):
 		i = (i[i.find('\''):i[i.find('\''):].find(')') + i.find('\'')]).strip('\'')
 		node = node_collection.find_one({"_id":ObjectId(str(i))})
 		capture_data(file_object=node, file_data=None, content_type='Genral')
+		#create log file
+		with open("Registry.txt", 'a') as outfile:
+			print node['name']	
+			outfile.write(str(str(node["created_at"])) + "  " + str(node["_id"]) + "  " +str(node.get("snapshot",0)) + "\n")
+			
 		
 def process_dependent_collection(dependent_collection):
 	for i in dependent_collection:
