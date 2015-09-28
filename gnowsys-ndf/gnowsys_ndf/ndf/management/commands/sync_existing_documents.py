@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     # Updating language fields data type:
     # - Firstly, replacing None to ('en', 'English')
-    node_collection.collection.update({ '_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']}, 'language': None }, {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
+    node_collection.collection.update({ '_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']}, 'language': {'$in': [None, '', u'']} }, {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
 
     all_nodes = node_collection.find({'_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']} })
 
