@@ -17,6 +17,7 @@ import json
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -230,7 +231,7 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
                            task_node.group_set.append(grp._id)
                    task_node.status=u'DRAFT'
                    task_node.url= u'task'
-                   task_node.language=u'en'
+                   task_node.language = ('en', 'English')
                    contr=[]
                    contr.append(usr)
                    task_node.contributors=contr
@@ -796,7 +797,7 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
       node.member_of.append(node_type._id)
  
   node.name = unicode(name)
-  node.language=unicode(language)
+  node.language = get_language_tuple(language)
  
   node.modified_by = usrid
   if access_policy:
@@ -936,9 +937,12 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     #  language
     if language:
-        node.language = unicode(language)
+        node.language = get_language_tuple(language)
+        # print "=========", node.language
+        is_changed = True
     else:
-        node.language = u"en"
+        node.language = ('en', 'English')
+        is_changed = True
 
     #  access_policy
     if access_policy:
@@ -4280,3 +4284,32 @@ def get_prior_node_hierarchy(oid):
             hierarchy_list.append(prev_obj)
 
     return hierarchy_list
+
+
+def get_language_tuple(lang):
+    """
+    from input argument of language code of language name
+    get the std matching tuple from settings.
+    
+    Returns:
+        tuple: (<language code>, <language name>)
+    
+    Args:
+        lang (str or unicode): it is the one of item from tuple.
+        It may either language-code or language-name.
+    """
+
+    all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
+    all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
+
+    # iterating over each document in the cursor:
+    # - Secondly, replacing invalid language values to valid tuple from settings
+    if lang in all_languages_concanated:
+        for each_lang in all_languages:
+            if lang in each_lang:
+                return each_lang
+
+    # as a default return: ('en', 'English')
+    return ('en', 'English')
+
+    
