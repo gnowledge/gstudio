@@ -4,6 +4,12 @@
 
 {% block title %} Repository {% endblock %}
 
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
+<link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
+<script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
+
+{% endblock head %}
 
 {% block meta_content %}
   <a href="{% url 'e-book' group_name_tag %}" title="Click to go to ebooks">
@@ -18,7 +24,7 @@
   {{ebook_gst.content|default_if_none:""|safe}}
 {% endblock %}
 
-
+{% comment %}
 {% block body_content %}
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
@@ -30,50 +36,26 @@
   <!-- Existing card list-->
   {% for node in all_ebooks %}
 
-      <li class="card">
-        {% if grouptype == "Moderated" %}
-          {% if node.status == "DRAFT" %}
-            <div class="draft ebook">
-          {% elif node.status == "PUBLISHED" %}
-            <div class="published ebook">
-          {% endif %}
-        {% else %}
-          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} ebook'>
-        {% endif %} 
+    <li class="card-image-wrapper">
+      {% include 'ndf/card.html' with resource=node url_name='page_details' first_arg=group_name_tag second_arg=node.pk %}
+    </li>
 
-          <a href="{% url 'page_details' group_name_tag node %}">
-          <div class="row">
-            <div class="small-10 columns">                             
-                <b>
-                  {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-                </b>
-            </div>
-          </div>
-          <hr/>
-          {% if node.status == "PUBLISHED" or node.created_by == request.user.id %}
-          <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-          {% endif %}
-          <footer>
-            <div class="age">
-              {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-              <br/>
-              by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-            </div>
-            <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
-          </footer>
-          </a>
-
-          <div class="label-list small-12 columns">
-          {% for tag in node.tags|slice:":3" %}
-            <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
-          {% endfor %}
-          </div>
-
-        </div>
-      </li>
- 
   {% endfor %}
 
 </ul>
 
 {% endblock %}
+
+{% block extra_content %} 
+
+  {% include 'ndf/pagination.html' with urlname="e-book_paged" first_arg=group_name_tag second_arg=""  third_arg="" page_info=page_info %}
+
+{% endblock %}
+{% endcomment %}
+{# ===================================== #}
+
+{% block body_content %}
+  
+  {% include "ndf/file_list_tab.html" with resource_type=all_ebooks detail_urlname="page_details" filetype="ebook" res_type_name="" page_info=page_info %}
+
+{% endblock body_content %}

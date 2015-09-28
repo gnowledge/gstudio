@@ -24,7 +24,8 @@
       </li>
     {% endfor %}
   </ul>
-  {% elif node.teaches %}
+    
+  {% comment %}
   <ul class="breadcrumbs">
     <li>
         {% for each_topic in node.teaches %}
@@ -32,7 +33,25 @@
         {% endfor %}
     </li>
   </ul>
-
+  {% endcomment %}
+  {% endif %}
+  
+  {% if node.teaches %}
+    <div class="hide teaches-block">
+          
+      <h5 class="subheader">Teaches:</h5>
+      <ul >
+        {% for each_topic in node.teaches %}
+          <li>
+            <a href="{% url 'topic_details' group_name_tag each_topic.pk %}" style="color:black;">{% trans each_topic.name %}</a>
+          </li>
+        {% endfor %}
+      </ul>
+      <script type="text/javascript">
+      document.querySelector('main.row > aside section').appendChild(document.querySelector('div.hide.teaches-block'));
+      document.querySelector('div.hide.teaches-block').classList.remove('hide');
+      </script>
+    </div>
   {% endif %}
 
   {% if node.status == 'MODERATION' %}
@@ -42,7 +61,7 @@
     </small></h4>
   {% endif %}
 
-  <h2>
+  <h3>
     <span itemprop="{{schema.1.name}}" class='node'> {% firstof node.altnames node.name %} </span>
     {# {% if node.altnames %}{{node.altnames}}{% else %}{{node.name}}{% endif %} #}
     
@@ -52,7 +71,7 @@
       &nbsp;&nbsp;&nbsp;<span data-tooltip title= "{% blocktrans %} Only you can see the latest changes in this {{node.member_of_names_list.0}}. Click on 'Publish' to let others see. {% endblocktrans %}" ><span style='position:relative; color: gray;'>{% trans 'DRAFT' %}</span></span>
     {% endif %}
   {% endif %}
-  </h2>
+  </h3>
       
       {% if topic %}
     <dl class="tabs" data-tab> 
@@ -62,13 +81,13 @@
       <dd class="filters-view">
         <nav id="nav">
           <ul id="navigation">
-            <li><a href="#" class="view-filters"><i class="fi-list"></i> {% trans "Filter based on" %} </a>
+            <li><a href="#" class="view-filters"><i class ="fi-filter"></i> {% trans "Filter based on" %} </a>
               <ul id="view-elements">
                 {% get_metadata_values as metadata %}
                 {% for k,v in metadata.items %}
                   {% if k == "educationallevel" %}            
                     <li>
-                      <a> {% trans "Educational Level" %} &raquo;</a>
+                      <a> {% trans "Level" %} &raquo;</a>
                       <ul>
                         {% for opts in v %}
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
@@ -77,7 +96,7 @@
                     </li> 
                   {% elif k == "educationalsubject" %}
                     <li>
-                      <a> {% trans "Educational Subject" %} &raquo;</a>
+                      <a> {% trans "Subject" %} &raquo;</a>
                       <ul>
                         {% for opts in v %}
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
@@ -86,7 +105,7 @@
                     </li>
                   {% elif k == "educationaluse" %}
                     <li>
-                      <a> {% trans "Educational Use" %} &raquo;</a>
+                      <a> {% trans "Resource Type" %} &raquo;</a>
                       <ul>
                         {% for opts in v %}
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
@@ -125,7 +144,7 @@
                     </li>
                   {% elif k == "interactivitytype" %}
                     <li>
-                      <a> {% trans "Interactivity Type" %} &raquo;</a>
+                      <a> {% trans "Learning Type" %} &raquo;</a>
                       <ul>
                         {% for opts in v %}
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
@@ -134,7 +153,7 @@
                     </li>
                   {% elif k == "audience" %}
                     <li>
-                      <a> {% trans "Audience" %} &raquo;</a>
+                      <a> {% trans "Target Group" %} &raquo;</a>
                       <ul>
                         {% for opts in v %}
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
@@ -261,9 +280,11 @@
             {% get_grid_fs_object node as grid_fs_obj %}
 
             <!-- New Implementation -->
-            {% trans 'Resource Type' %}: {{node.mime_type}}<br/>          
+            {% comment %}
+              {% trans 'Resource Type' %}: {{node.mime_type}}<br/>          
+            {% endcomment %}
             
-            {% if node.collection_set %} 
+            {% if node.collection_set and node.pk|is_media_collection %} 
 
               {% if 'image' in node.mime_type or 'video' in node.mime_type %}
                 <!-- Orbit image slider only for image and video collections--> 
@@ -403,13 +424,13 @@
                 <!-- <script type="text/javascript" src="https://raw.githubusercontent.com/futurepress/epub.js/master/build/libs/zip.min.js"></script> -->
 
                 <div class="row">
-                  <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
+                  <h4 class="small-4 columns redirection" onclick="Book.prevPage();">
                     <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
-                  </h2>
+                  </h4>
                   <div class="small-8 columns text-center"></div>
-                  <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
+                  <h4 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
                     <small>Next <i class="fi-arrow-right"></i></small>
-                  </h2>
+                  </h4>
                 </div>
                 
                 <div class="row ebook-container border-thin-lightgray">
@@ -417,16 +438,16 @@
                 </div>
                 
                 <div class="row">
-                  <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
-                    <small class="fi-arrow-left">{% trans 'Previous' %}</small>
-                  </h2>
+                  <h4 class="small-4 columns redirection" onclick="Book.prevPage();">
+                    <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
+                  </h4>
 
                   <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                     {% trans 'Download' %}"{{ grid_fs_obj.filename }}"
                   </a>
-                  <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
+                  <h4 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
                     <small>Next <i class="fi-arrow-right"></i></small>
-                  </h2>
+                  </h4>
                 </div>
                 
 
