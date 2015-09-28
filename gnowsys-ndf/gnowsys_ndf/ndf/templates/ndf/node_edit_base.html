@@ -232,8 +232,6 @@
 
 	            </div>                
 	            	
-	    			{% cache 300 node_edit_base_lang_loc request.LANGUAGE_CODE %}
-
 	            	<div class="row">
 	                	<div class="large-4 columns">
 	                		<label class="inline">{% trans "Language" %}</label>
@@ -260,8 +258,9 @@
 							</a>
 	                    </div>
 		     		</div>
-		     		{% endcache %}
+
 		     		{% if title == "Page" %}
+		     		
 		     		<div class = "page type" >
 		     			<div class="row">
 		     			 	<div class = "small-2 columns">	
