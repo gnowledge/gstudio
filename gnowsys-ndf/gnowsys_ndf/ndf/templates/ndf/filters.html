@@ -218,6 +218,7 @@
 
 			var tempObj = new Object();
 			tempObj["selFieldValue"] 		= this.getAttribute("data-selFieldValue");;
+			tempObj["selFieldValueAltnames"] = this.getAttribute("data-value-altnames");
 			tempObj["selFieldGstudioType"] 	= this.getAttribute("data-gstudio-type");
 			tempObj["selFieldText"] 		= this.getAttribute("data-selFieldText");
 			tempObj["selFieldPrimaryType"] 	= this.getAttribute("data-primary-type");
@@ -266,18 +267,103 @@
 				tempObj[temp] = [f];
 			} 
 		});
+		// console.log(tempObj)
+		// aaa = tempObj
 
-		// creating new array with "$or" as key-name rather than comb name as in tempObj
+		// creating new array with "or" as key-name rather than comb name as in tempObj
 		filtersObjAndOrArr = new Array();
 		for(i in tempObj)
 		{
 			var o = new Object();
-			 o["$or"] = tempObj[i];
+			 o["or"] = tempObj[i];
 			 filtersObjAndOrArr.push(o);
 		}
 
 		// console.log(JSON.stringify(filtersObjAndOrArr));
 		return filtersObjAndOrArr;
+	}
+
+	function updateFilterUrl(url)
+	{
+		var filters = getFiltersObjsInAndOrFormat();
+		// alert(filters);
+
+		if ((filters.length > 0) && url) {
+			
+			filters = JSON.stringify(filters);
+
+			url = url + 'filter?selfilters=' + filters;
+		}
+		
+		window.location.href = url;
+	}
+
+	function getQueryVariable(variable)
+	{
+	       var query = window.location.search.substring(1);
+	       var vars = query.split("&");
+	       for (var i=0;i<vars.length;i++) {
+	               var pair = vars[i].split("=");
+	               if(pair[0] == variable){return decodeURI(pair[1]);}
+	       }
+	       return(false);
+	}
+
+	filtersInUrl = getQueryVariable('selfilters');
+	filtersInUrl = (typeof(filtersInUrl) == 'string')? JSON.parse(filtersInUrl): filtersInUrl;
+
+	// console.log(filtersInUrl);
+	filtersInUrlList = []
+	for (var key in filtersInUrl) {
+	  if (filtersInUrl.hasOwnProperty(key)) {
+	    // console.log(key + " -> " + JSON.stringify(filtersInUrl[key]['$or'][0]));
+	    filtersInUrlList = filtersInUrlList.concat(filtersInUrl[key]['or']);
+
+	  }
+	  
+	}
+	// console.log(filtersInUrlList);
+    filtersInUrlList.forEach(function(f){populateFilters (f.selFieldValue, f.selFieldValueAltnames, f.selFieldText, f.selFieldGstudioType, f.selFieldPrimaryType) });
+	updateFiltersCount();
+
+	function populateFilters (selFieldValue, selFieldValueAltnames, selFieldText, selFieldGstudioType, selFieldPrimaryType) {
+		
+					var filterText = selFieldValueAltnames + ": " + selFieldText;  // text to be visible as filter
+
+					// if new filter then creating it in a JS way
+					var filterDiv = document.createElement("div");
+					filterDiv.className = "filters label round";
+					filterDiv.appendChild(document.createTextNode(filterText));
+					filterDiv.setAttribute("data-selFieldValue", selFieldValue);
+					filterDiv.setAttribute("data-gstudio-type", selFieldGstudioType);
+					filterDiv.setAttribute("data-selFieldText", selFieldText);
+					filterDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+					filterDiv.setAttribute("data-value-altnames", selFieldValueAltnames);
+
+					var closeBtn = document.createElement("i");
+					closeBtn.className = "fi-x-circle remove-filter";
+					closeBtn.title = "{% trans 'Remove this filter' %}";
+					closeBtn.onclick = function(){
+						$(this).parent().fadeOut("slow", function(){
+							$(this).detach();
+							var filtersObjArr = getFiltersObjArr();
+							applyFilter(filtersObjArr);
+							updateFiltersCount();
+						});
+
+					};
+					filterDiv.appendChild(closeBtn);
+
+					// appending newly created filter element to applied-filters area
+					$("#applied-filters").append(filterDiv);
+
+					$(".remove-filter").mouseenter(function(){
+						$(this).parent("div.filters").css("text-decoration", "line-through")
+					});
+
+					$(".remove-filter").mouseleave(function(){
+						$(this).parent("div.filters").css("text-decoration", "none")
+					});
 	}
 
 	// adding filters label functionality on click of add filter button
@@ -318,40 +404,42 @@
 					// set flag to true
 					flagIsNewFilterSelected = true;
 
-					// if new filter then creating it in a JS way
-					var filterDiv = document.createElement("div");
-					filterDiv.className = "filters label round";
-					filterDiv.appendChild(document.createTextNode(filterText));
-					filterDiv.setAttribute("data-selFieldValue", selFieldValue);
-					filterDiv.setAttribute("data-gstudio-type", selFieldGstudioType);
-					filterDiv.setAttribute("data-selFieldText", selFieldText);
-					filterDiv.setAttribute("data-primary-type", selFieldPrimaryType);
-					filterDiv.setAttribute("data-value-altnames", selFieldValueAltnames);
+					populateFilters(selFieldValue, selFieldValueAltnames, selFieldText, selFieldGstudioType, selFieldPrimaryType);
 
-					var closeBtn = document.createElement("i");
-					closeBtn.className = "fi-x-circle remove-filter";
-					closeBtn.title = "{% trans 'Remove this filter' %}";
-					closeBtn.onclick = function(){
-						$(this).parent().fadeOut("slow", function(){
-							$(this).detach();
-							var filtersObjArr = getFiltersObjArr();
-							applyFilter(filtersObjArr);
-							updateFiltersCount();
-						});
+					// // if new filter then creating it in a JS way
+					// var filterDiv = document.createElement("div");
+					// filterDiv.className = "filters label round";
+					// filterDiv.appendChild(document.createTextNode(filterText));
+					// filterDiv.setAttribute("data-selFieldValue", selFieldValue);
+					// filterDiv.setAttribute("data-gstudio-type", selFieldGstudioType);
+					// filterDiv.setAttribute("data-selFieldText", selFieldText);
+					// filterDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+					// filterDiv.setAttribute("data-value-altnames", selFieldValueAltnames);
 
-					};
-					filterDiv.appendChild(closeBtn);
+					// var closeBtn = document.createElement("i");
+					// closeBtn.className = "fi-x-circle remove-filter";
+					// closeBtn.title = "{% trans 'Remove this filter' %}";
+					// closeBtn.onclick = function(){
+					// 	$(this).parent().fadeOut("slow", function(){
+					// 		$(this).detach();
+					// 		var filtersObjArr = getFiltersObjArr();
+					// 		applyFilter(filtersObjArr);
+					// 		updateFiltersCount();
+					// 	});
 
-					// appending newly created filter element to applied-filters area
-					$("#applied-filters").append(filterDiv);
+					// };
+					// filterDiv.appendChild(closeBtn);
 
-					$(".remove-filter").mouseenter(function(){
-						$(this).parent("div.filters").css("text-decoration", "line-through")
-					});
+					// // appending newly created filter element to applied-filters area
+					// $("#applied-filters").append(filterDiv);
 
-					$(".remove-filter").mouseleave(function(){
-						$(this).parent("div.filters").css("text-decoration", "none")
-					});
+					// $(".remove-filter").mouseenter(function(){
+					// 	$(this).parent("div.filters").css("text-decoration", "line-through")
+					// });
+
+					// $(".remove-filter").mouseleave(function(){
+					// 	$(this).parent("div.filters").css("text-decoration", "none")
+					// });
 
 					var filtersObj = new Object();
 					filtersObj["selFieldValue"] = selFieldValue;
