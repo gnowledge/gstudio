@@ -89,6 +89,7 @@ $("input[name=rating]").click(function() {
     }
     else{
         alert("{% trans 'Please login to rate this resource' %}");    
+        return false;
     }
     
 });
