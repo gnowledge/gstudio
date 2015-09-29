@@ -1,6 +1,7 @@
 {% extends "ndf/base.html" %}
 
 {% load ndf_tags %}
+{% load simple_filters %}
 
 {% block title %} Repository {% endblock %}
 
@@ -55,7 +56,24 @@
 {# ===================================== #}
 
 {% block body_content %}
-  
-  {% include "ndf/file_list_tab.html" with resource_type=all_ebooks detail_urlname="page_details" filetype="ebook" res_type_name="" page_info=page_info %}
+
+  {% get_filters_data "File" as filter_dict %}
+  {% include "ndf/filters.html" with filter_dict=filter_dict %}
+
+    {% include "ndf/file_list_tab.html" with resource_type=all_ebooks detail_urlname="page_details" filetype="ebook" res_type_name="" page_info=page_info %}
 
 {% endblock body_content %}
+
+
+{% block script %}
+// <script type="text/javascript">
+  
+function applyFilter() { if (updateFilterUrl){ updateFilterUrl("{% url 'e-book' group_name_tag %}"); } }
+
+var pageAnchors = document.querySelectorAll('ul.pagination > li > a');
+for (var i = pageAnchors.length - 1; i >= 0; i--) {
+  pageAnchors[i].href += location.search; 
+}
+
+// </script>
+{% endblock script %}
