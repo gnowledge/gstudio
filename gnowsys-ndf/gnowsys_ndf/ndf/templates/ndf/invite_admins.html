@@ -89,6 +89,16 @@ $(document).on('keydown',"#admin_colln_set_search",function(e){
         });
         //$(".searching").css("display", "none");
       }
+      else if (search_text_len == 0) {
+        $li.filter(function() {
+          if ($(this).css("display") == "none") {
+            return true;
+          }
+          else {
+            return false;
+          }
+        }).show();
+      }
 })
 
 
