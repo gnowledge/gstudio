@@ -78,7 +78,7 @@
           <a href="#view-collection"><i class="fi-page-multiple"></i>
             {% trans "Collections" %}
             <span class="count">
-              {% if collection_pages %} {{ collection.count }} {% endif %}
+              {{ collection.count }}
             </span>
           </a>
         </dd><br/>
@@ -89,7 +89,7 @@
             <i class="fi-eye"></i>
             {% trans "All files" %}
             <span class="count text-right">
-              {% if file_pages.count > 0 %} {{ file_pages.count }} {% endif %}
+              {{ file_pages.count }}
             </span>
           </a>
         </dd>
@@ -100,20 +100,19 @@
             <i class="fi-page-doc"></i>
             {% trans "Documents" %}
             <span class="count">
-              {% if doc_pages %} {{ doc_pages }} {% endif %}
+              {{ doc_pages }}
             </span>
           </a>
         </dd><br/>
 
         {% comment %}
-          
         <!-- Pages -->
         <dd data-filetype="Pages">
           <a href="#view-page">
             <i class="fi-page-filled"></i>
             {% trans "Pages" %}
             <span class="count">
-              {% if page_count %} {{ page_count }} {% endif %}
+              {{ page_count }}
             </span>
           </a>
         </dd><br/>   
@@ -149,24 +148,22 @@
         {% endcomment %}
         
         <!-- Audio -->
-        {% if audio_pages %}
-          <dd data-filetype="Audios">
-            <a href="#view-audio">
-              <i class="fi-music"></i>
-              {% trans "Audios" %}
-              <span class="count">
-                {% if audio_pages %} {{ audio_pages }} {% endif %}
-              </span>
-            </a>
-          </dd><br/>
-        {% endif %}
+        <dd data-filetype="Audios">
+          <a href="#view-audio">
+            <i class="fi-music"></i>
+            {% trans "Audios" %}
+            <span class="count">
+              {{ audio_pages }}
+            </span>
+          </a>
+        </dd><br/>
         
         <!-- Image -->
         <dd data-filetype="Images">
           <a href="#view-image"><i class="fi-camera"></i>
             {% trans "Images" %}
             <span class="count">
-              {% if image_pages %} {{ image_pages }} {% endif %}
+              {{ image_pages }}
             </span>
           </a>
         </dd><br/>
@@ -178,7 +175,7 @@
             <a href="#view-video"><i class="fi-video"></i>
               {% trans "Videos" %}
               <span class="count">
-                {% if video_pages %} {{ video_pages }} {% endif %}
+                {{ video_pages }}
               </span>
             </a>
           </dd><br/>
@@ -203,7 +200,7 @@
             <a href="#view-pandora-video"><i class="fi-video"></i>
               {% trans "Videos" %}
               <span class="count">
-                {% if video_pages %} {{ video_pages }} {% endif %}
+                {{ video_pages }}
               </span>
             </a>
           </dd><br/>

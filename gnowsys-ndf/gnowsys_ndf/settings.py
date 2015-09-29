@@ -11,39 +11,40 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
+
 LANGUAGES = (('en', 'English'), ('hi', 'Hindi'))
-"""
-('mr', 'Marathi'),('mun','Munda'),('mni','Manipuri'),('ori','Oriya'),
-('pi','Pali'),('raj','Rajasthani'),('lah','Lahnda'),('gu','Gujarati'),
-('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'), ('dra','Dravidian'),
-('gon','Gondi'), ('bra','Braj'), ('mi','Malayalam'), ('mai','Maithili'),
-('mag','Magahi'), ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'),
-('awa','Awadhi'),('sa','Sanskrit'),('sat','Santali'), ('him','Himachali'),
-('sd','Sindhi'), ('af', 'Afrikaans'), ('as','Assamese'),('ar', 'Arabic'),
-('az', 'Azerbaijani'), ('bg', 'Bulgarian'), ('be', 'Belarusian'),
-('bn', 'Bengali'), ('br', 'Breton'), ('bs', 'Bosnian'), ('ca', 'Catalan'),
-('bho','Bhojpuri'), ('cs', 'Czech'), ('cy', 'Welsh'), ('da', 'Danish'),
-('de', 'German'), ('el', 'Greek'), ('en-gb', 'British English'),
-('eo', 'Esperanto'), ('es', 'Spanish'), ('es-ar', 'Argentinian Spanish'),
-('es-mx', 'Mexican Spanish'), ('es-ni', 'Nicaraguan Spanish'),
-('es-ve', 'Venezuelan Spanish'), ('et', 'Estonian'), ('eu', 'Basque'),
-('fa', 'Persian'), ('fi', 'Finnish'), ('fr', 'French'), ('fy-nl', 'Frisian'),
-('ga', 'Irish'), ('gl', 'Galician'), ('he', 'Hebrew'),('hr', 'Croatian'),
-('hu', 'Hungarian'), ('ia', 'Interlingua'), ('id', 'Indonesian'),
-('is', 'Icelandic'), ('it', 'Italian'), ('ja', 'Japanese'), ('ka', 'Georgian'),
-('kk', 'Kazakh'), ('km', 'Khmer'), ('kn', 'Kannada'), ('ko', 'Korean'),
-('lb', 'Luxembourgish'), ('lt', 'Lithuanian'), ('lv', 'Latvian'),
-('mk', 'Macedonian'), ('ml', 'Malayalam'), ('mn', 'Mongolian'),
-('my', 'Burmese'), ('nb', 'Norwegian Bokmal'), ('ne', 'Nepali'),
-('nl', 'Dutch'), ('nn', 'Norwegian Nynorsk'), ('os', 'Ossetic'),
-('pa', 'Punjabi'), ('pl', 'Polish'), ('pt', 'Portuguese'),
-('pt-br', 'Brazilian Portuguese'), ('ro', 'Romanian'), ('ru', 'Russian'),
-('sk', 'Slovak'), ('sl', 'Slovenian'), ('sq', 'Albanian'), ('sr', 'Serbian'),
-('sr-latn', 'Serbian Latin'), ('sv', 'Swedish'), ('sw', 'Swahili'),
-('ta', 'Tamil'), ('te', 'Telugu'), ('th', 'Thai'), ('tr', 'Turkish'),
-('tt', 'Tatar'), ('udm', 'Udmurt'), ('uk', 'Ukrainian'), ('ur', 'Urdu'),
-('vi', 'Vietnamese'), ('zh-cn', 'Simplified Chinese'), ('zh-tw', 'Traditional Chinese'))
-"""
+OTHER_COMMON_LANGUAGES = [
+    ('mr', 'Marathi'),('mun','Munda'),('mni','Manipuri'),('ori','Oriya'),
+    ('pi','Pali'),('raj','Rajasthani'),('lah','Lahnda'),('gu','Gujarati'),
+    ('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'), ('dra','Dravidian'),
+    ('gon','Gondi'), ('bra','Braj'), ('mi','Malayalam'), ('mai','Maithili'),
+    ('mag','Magahi'), ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'),
+    ('awa','Awadhi'),('sa','Sanskrit'),('sat','Santali'), ('him','Himachali'),
+    ('sd','Sindhi'), ('af', 'Afrikaans'), ('as','Assamese'),('ar', 'Arabic'),
+    ('az', 'Azerbaijani'), ('bg', 'Bulgarian'), ('be', 'Belarusian'),
+    ('bn', 'Bengali'), ('br', 'Breton'), ('bs', 'Bosnian'), ('ca', 'Catalan'),
+    ('bho','Bhojpuri'), ('cs', 'Czech'), ('cy', 'Welsh'), ('da', 'Danish'),
+    ('de', 'German'), ('el', 'Greek'), ('en-gb', 'British English'),
+    ('eo', 'Esperanto'), ('es', 'Spanish'), ('es-ar', 'Argentinian Spanish'),
+    ('es-mx', 'Mexican Spanish'), ('es-ni', 'Nicaraguan Spanish'),
+    ('es-ve', 'Venezuelan Spanish'), ('et', 'Estonian'), ('eu', 'Basque'),
+    ('fa', 'Persian'), ('fi', 'Finnish'), ('fr', 'French'), ('fy-nl', 'Frisian'),
+    ('ga', 'Irish'), ('gl', 'Galician'), ('he', 'Hebrew'),('hr', 'Croatian'),
+    ('hu', 'Hungarian'), ('ia', 'Interlingua'), ('id', 'Indonesian'),
+    ('is', 'Icelandic'), ('it', 'Italian'), ('ja', 'Japanese'), ('ka', 'Georgian'),
+    ('kk', 'Kazakh'), ('km', 'Khmer'), ('kn', 'Kannada'), ('ko', 'Korean'),
+    ('lb', 'Luxembourgish'), ('lt', 'Lithuanian'), ('lv', 'Latvian'),
+    ('mk', 'Macedonian'), ('ml', 'Malayalam'), ('mn', 'Mongolian'),
+    ('my', 'Burmese'), ('nb', 'Norwegian Bokmal'), ('ne', 'Nepali'),
+    ('nl', 'Dutch'), ('nn', 'Norwegian Nynorsk'), ('os', 'Ossetic'),
+    ('pa', 'Punjabi'), ('pl', 'Polish'), ('pt', 'Portuguese'),
+    ('pt-br', 'Brazilian Portuguese'), ('ro', 'Romanian'), ('ru', 'Russian'),
+    ('sk', 'Slovak'), ('sl', 'Slovenian'), ('sq', 'Albanian'), ('sr', 'Serbian'),
+    ('sr-latn', 'Serbian Latin'), ('sv', 'Swedish'), ('sw', 'Swahili'),
+    ('ta', 'Tamil'), ('te', 'Telugu'), ('th', 'Thai'), ('tr', 'Turkish'),
+    ('tt', 'Tatar'), ('udm', 'Udmurt'), ('uk', 'Ukrainian'), ('ur', 'Urdu'),
+    ('vi', 'Vietnamese'), ('zh-cn', 'Simplified Chinese'), ('zh-tw', 'Traditional Chinese')
+]
 
 EXTRA_LANG_INFO = {
     'mr': {
@@ -679,9 +680,13 @@ WETUBE_USERNAME = "glab"
 WETUBE_PASSWORD = "gl@b$@)we!ube"
 #Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
-CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
 
-# this has to be at last
+# the no of cards/objects/instances to be render of app (listing view).
+GSTUDIO_NO_OF_OBJS_PP = 24
+
+# ----------------------------------------------------------------------------
+# following has to be at last
 # just put every thing above it
 try:
     from local_settings import *

@@ -125,8 +125,7 @@
 	</div>
 
 	{% endif %}
-	<br/>
-    <!-- <br/> -->
+
     <div>
     {% if tree == "hierarchical" and user_access == "allow" and user.is_authenticated %}
 		{# {% if user.is_authenticated %} #}
@@ -171,6 +170,24 @@
 
     		{# {% endif %} #}
 		{# {% endif %} #}
+
+	{% elif tree == "collapsible" %}
+		<h4>Using the Theme Tree:</h4>
+			
+		<ul>
+			<small>
+				<li>Expand or Collapse the map by clicking on the node(circle). </li>
+				<br/>
+				<li>Pan the map by dragging an empty part around.</li>
+				<br/>
+				<li>Zoom the map by either double clicking on an empty part or by scrolling.</li>
+				<br/>
+				<li>To zoom out hold shift when double clicking.</li>
+				<br/>
+				<li>The last node in expanded branch is a topic. Click on it to view topic details.</li>
+			</small>
+		</ul>
+
 	{% endif %}
 	</div>
 
@@ -185,7 +202,7 @@
 
 	{% if themes_hierarchy and node %}
 
-		<div style="float:left; font-size: 2em; line-height: 0.8;" > {{node.name}}</div> 
+		<div style="float:left; font-size: 2em; "> {{node.name}}</div> 
 
         <div style="float:right; margin:0 2em;" >
 
