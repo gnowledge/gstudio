@@ -26,6 +26,7 @@ from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
+from gnowsys_ndf.settings import SYNCDATA_KEY_PUB
 
 #get pub of gpg key with which to sign syncdata attachments
 from gnowsys_ndf.settings import SYNCDATA_KEY_PUB
@@ -203,7 +204,7 @@ def server_sync(func):
         
         print '+' * 20
         print node_data_path
-        	
+
         if 'image' in content_type or 'video' in content_type:
             # To make the fs_file_ids filed set empty
             if file_data:
