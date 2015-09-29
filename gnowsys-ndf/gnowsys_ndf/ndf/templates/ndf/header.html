@@ -402,8 +402,8 @@
 
                 <ul class="left" id="group-apps">
                   <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
-                  <li class="" onclick="history.back()">
-                    <a href=""><i class="fi-play back-btn"></i> BACK</a>
+                  <li class="" onclick="history.back();">
+                    <a href="javascript:window.history.back();"><i class="fi-play back-btn"></i> BACK</a>
                   </li>
                   {% if site.SITE_NAME == "NROER" %} 
                     {% if group_name_tag == "home" or "CourseEventGroup" in group_object.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}

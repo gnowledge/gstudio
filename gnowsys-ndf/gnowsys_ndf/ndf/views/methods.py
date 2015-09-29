@@ -17,6 +17,7 @@ import json
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -423,7 +424,7 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
                            task_node.group_set.append(grp._id)
                    task_node.status=u'DRAFT'
                    task_node.url= u'task'
-                   task_node.language=u'en'
+                   task_node.language = ('en', 'English')
                    contr=[]
                    contr.append(usr)
                    task_node.contributors=contr
@@ -1000,69 +1001,64 @@ def get_resource_type(request, node_id):
 
 @get_execution_time
 def get_translate_common_fields(request, get_type, node, group_id, node_type, node_id):
-    """ retrive & update the common fields required for translation of the node """
+  """ retrive & update the common fields required for translation of the node """
 
-    usrid = int(request.user.id)
-    content_org = request.POST.get('content_org')
-    tags = request.POST.get('tags')
-    name = request.POST.get('name')
-    tags = request.POST.get('tags')
-    access_policy = request.POST.get('access_policy')
-    usrid = int(request.user.id)
-    language = request.POST.get('lan')
+  usrid = int(request.user.id)
+  content_org = request.POST.get('content_org')
+  tags = request.POST.get('tags')
+  name = request.POST.get('name')
+  tags = request.POST.get('tags')
+  access_policy = request.POST.get('access_policy')
+  usrid = int(request.user.id)
+  language= request.POST.get('lan')
+  if get_type == "File":
+    get_parent_node = node_collection.one({'_id': ObjectId(node_id)})
+    get_mime_type=get_parent_node.mime_type
+    get_fs_file_ids=get_parent_node.fs_file_ids
+    node.mime_type=get_mime_type
+    node.fs_file_ids=get_fs_file_ids
+ 
+  if not ('_id' in node):
+    node.created_by = usrid
     if get_type == "File":
-        get_parent_node = node_collection.one({'_id': ObjectId(node_id)})
-        get_mime_type = get_parent_node.mime_type
-        get_fs_file_ids = get_parent_node.fs_file_ids
-        node.mime_type = get_mime_type
-        node.fs_file_ids = get_fs_file_ids
+        get_node_type = node_collection.one({"_type": "GSystemType", 'name': get_type})
+        node.member_of.append(get_node_type._id)
+        if 'image' in get_mime_type:
+          get_image_type = node_collection.one({"_type": "GSystemType", 'name': 'Image'})
+          node.member_of.append(get_image_type._id)
+        if 'video' in get_mime_type:
+          get_video_type = node_collection.one({"_type": "GSystemType", 'name': 'Video'})
+          node.member_of.append(get_video_type._id)
+        
+    else:
+      node.member_of.append(node_type._id)
+ 
+  node.name = unicode(name)
+  node.language = get_language_tuple(language)
+ 
+  node.modified_by = usrid
+  if access_policy:
+    node.access_policy = access_policy
+ 
+  if usrid not in node.contributors:
+    node.contributors.append(usrid)
 
-    if not ('_id' in node):
-        node.created_by = usrid
-        if get_type == "File":
-            get_node_type = node_collection.one(
-                {"_type": "GSystemType", 'name': get_type})
-            node.member_of.append(get_node_type._id)
-            if 'image' in get_mime_type:
-                get_image_type = node_collection.one(
-                    {"_type": "GSystemType", 'name': 'Image'})
-                node.member_of.append(get_image_type._id)
-            if 'video' in get_mime_type:
-                get_video_type = node_collection.one(
-                    {"_type": "GSystemType", 'name': 'Video'})
-                node.member_of.append(get_video_type._id)
+  group_obj = node_collection.one({'_id': ObjectId(group_id)})
+  if group_obj._id not in node.group_set:
+    node.group_set.append(group_obj._id)
+  if tags:
+    node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
-        else:
-            node.member_of.append(node_type._id)
+  if tags:
+    node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
-    node.name = unicode(name)
-    node.language = unicode(language)
-
-    node.modified_by = usrid
-    if access_policy:
-        node.access_policy = access_policy
-
-    if usrid not in node.contributors:
-        node.contributors.append(usrid)
-
-    group_obj = node_collection.one({'_id': ObjectId(group_id)})
-    if group_obj._id not in node.group_set:
-        node.group_set.append(group_obj._id)
-    if tags:
-        node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
-
-    if tags:
-        node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
-
-    if content_org:
-        node.content_org = unicode(content_org)
-        node.name = unicode(name)
-        # Required to link temporary files with the current user who is
-        # modifying this document
-        usrname = request.user.username
-        filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
-        node.content = org2html(content_org, file_prefix=filename)
-
+  if content_org:
+    node.content_org = unicode(content_org)
+    node.name=unicode(name)
+    # Required to link temporary files with the current user who is modifying this document
+    usrname = request.user.username
+    filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
+    node.content = org2html(content_org, file_prefix=filename)
 
 @get_execution_time
 def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
@@ -1177,9 +1173,12 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     #  language
     if language:
-        node.language = unicode(language)
+        node.language = get_language_tuple(language)
+        # print "=========", node.language
+        is_changed = True
     else:
-        node.language = u"en"
+        node.language = ('en', 'English')
+        is_changed = True
 
     #  access_policy
     if access_policy:
@@ -4950,3 +4949,32 @@ def get_prior_node_hierarchy(oid):
             hierarchy_list.append(prev_obj)
 
     return hierarchy_list
+
+
+def get_language_tuple(lang):
+    """
+    from input argument of language code of language name
+    get the std matching tuple from settings.
+    
+    Returns:
+        tuple: (<language code>, <language name>)
+    
+    Args:
+        lang (str or unicode): it is the one of item from tuple.
+        It may either language-code or language-name.
+    """
+
+    all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
+    all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
+
+    # iterating over each document in the cursor:
+    # - Secondly, replacing invalid language values to valid tuple from settings
+    if lang in all_languages_concanated:
+        for each_lang in all_languages:
+            if lang in each_lang:
+                return each_lang
+
+    # as a default return: ('en', 'English')
+    return ('en', 'English')
+
+    
