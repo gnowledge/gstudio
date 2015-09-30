@@ -279,7 +279,7 @@ def server_sync(func):
             src = op_file_name
 
             print '+' * 20
-            print src
+           
             shutil.move(src,path_for_this_capture)
             # mail.attach_file(file_path)         
         
@@ -295,6 +295,8 @@ def server_sync(func):
         subprocess.call([command],shell=True)
         src = json_op_file_name
         shutil.move(src,path_for_this_capture)
+        slice_registry(node["_id"],path_for_this_capture)
+        
         # mail.attach_file(json_op_file_name)
         
         # mail.attach_file(node_data_path)
@@ -4978,4 +4980,22 @@ def get_language_tuple(lang):
     # as a default return: ('en', 'English')
     return ('en', 'English')
 
-    
+def slice_registry(node_id,path_for_this_capture):
+	registry_path =  os.path.abspath(os.path.dirname(os.pardir))
+	registry_path =  os.path.join(registry_path, 'Registry.txt') 
+	file_output = open(registry_path)
+	current_line = ""
+	previouse_line = ""
+	last_line = ""
+	a = True
+	while a:
+			previouse_line = current_line
+			current_line = file_output.readline()
+			c = current_line.find(str(node_id))      
+			if c != -1:
+				a = False
+	last_line = file_output.readline() 		
+	file_output.close()
+
+	with open(path_for_this_capture + "/Registry.txt","a") as outfile:
+		outfile.write(str(current_line)+""+str(previouse_line)+"" +str(last_line))	

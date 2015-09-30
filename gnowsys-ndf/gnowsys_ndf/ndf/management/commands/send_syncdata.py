@@ -47,7 +47,9 @@ class Command(BaseCommand):
 		syncdata_folder_path = os.path.dirname(__file__).split('/management')[0] + '/MailClient/syncdata'
 		list_of_syncdata_folders = []
 		sent_folder_path = os.path.dirname(__file__).split('/management')[0] + '/MailClient/sent_syncdata_files'
-
+		
+		registry_path =  os.path.abspath(os.path.dirname(os.pardir))
+		registry_path =  os.path.join(registry_path, 'Registry.txt')
 		if not os.path.exists(sent_folder_path):
 			os.makedirs(sent_folder_path)
 
@@ -58,9 +60,8 @@ class Command(BaseCommand):
 		except Exception as error:
 			print 'File name and location is: ', str(__file__)
 			print 'Error is : ', error
-
+		
 		for folder_name in list_of_syncdata_folders:
-			print '**'*30
 			path = syncdata_folder_path + '/' + folder_name
 			list_of_syncdata_files = os.listdir(path)
 			if connected_to_internet() is True:

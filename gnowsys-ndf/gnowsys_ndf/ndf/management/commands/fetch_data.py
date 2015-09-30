@@ -7,6 +7,7 @@ from bson import json_util
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.views.methods import capture_data
+from gnowsys_ndf.local_settings import SYNCDATA_KEY_PUB
 import json
 rcs = RCS()
 hr = HistoryManager()
@@ -45,8 +46,7 @@ def process_parent_node(Parent_collection_ids):
 		capture_data(file_object=node, file_data=None, content_type='Genral')
 		#create log file
 		with open("Registry.txt", 'a') as outfile:
-			print node['name']	
-			outfile.write(str(str(node["created_at"])) + "  " + str(node["_id"]) + "  " +str(node.get("snapshot",0)) + "\n")
+			outfile.write(str(str(node["created_at"])) + "," + "_id:" + str(node["_id"]) + "," +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{0}" +"\n" )
 			
 		
 def process_dependent_collection(dependent_collection):
