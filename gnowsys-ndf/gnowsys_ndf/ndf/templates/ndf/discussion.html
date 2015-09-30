@@ -62,17 +62,20 @@
           </div>
 
           {% for node in each_reply.collection_set  %}
-          <div style="margin: 1em;">
-            
-          {{node.mime_type}}
-          <br/>
-          <a class="th" style="" href="{% url 'read_file' group_id node node.name %}">
-             {% if 'image' in node.mime_type  %}
-              <img style="height:100px;" src="{% url 'getFileThumbnail' group_id node.pk %}" />
+            <div style="margin: 1em;">
+              <br/>
+              {% if node.status != "MODERATION" %}
+              {{node.mime_type}}
+              <a class="th" style="" href="{% url 'read_file' group_id node node.name %}">
+                 {% if 'image' in node.mime_type  %}
+                      <img style="height:100px;" src="{% url 'getFileThumbnail' group_id node.pk %}" />
+                    {% endif %}
+                <p>{{node.name}}</p>
+              </a>  
+              {% else %}
+                <p>File is under moderation.<a href="/{{group_id}}/moderation/status/{{node.pk}}" target="_blank">Click here to check status</a></p>
               {% endif %}
-            <p>{{node.name}}</p>
-          </a>  
-          </div>
+            </div>
           {% endfor %}
         </div>
 
