@@ -196,10 +196,9 @@ def discussion_reply(request, group_id, node_id):
                         lstobj_collection.append(file_obj._id) 
                     except:
                         pass
-
-                    if group_object.edit_policy == 'EDITABLE_MODERATED':
-                        t = create_moderator_task(request, file_obj.group_set[0], file_obj._id,on_upload=True)
-                        # return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_object.name, 'node_id': f }))
+                    if "CourseEventGroup" not in group_object.member_of_names_list:
+                        if group_object.edit_policy == 'EDITABLE_MODERATED':
+                            t = create_moderator_task(request, file_obj.group_set[0], file_obj._id,on_upload=True)
                 # print "::: lstobj_collection: ", lstobj_collection
             # except:
                 # lstobj_collection = []
