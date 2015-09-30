@@ -1432,7 +1432,7 @@
 	    }
 	{% get_site_name_from_settings as site_name %}
        
-       {%  if site_name == "NROER" and title == "Page" or "File" in node.member_of_names_list    %}
+       {%  if site_name == "NROER"  %}
             if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
                     $('#tabs').find('a[href="#tab2"]').trigger('click');
                     $("#message").css("display", "block");
