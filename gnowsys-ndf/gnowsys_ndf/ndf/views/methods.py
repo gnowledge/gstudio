@@ -349,7 +349,7 @@ def create_task_for_activity(request,group_id,activity_dict,get_assignee_list,se
 
 
 def get_all_subscribed_users(group_id):
-  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  grp=node_collection.one({'_id':ObjectId(group_id)})
   ins_objectid  = ObjectId()
   all_users=[]
   if ins_objectid.is_valid(group_id) :
@@ -360,14 +360,14 @@ def get_all_subscribed_users(group_id):
   return all_users
   
 def get_all_admins(group_id):
-  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  grp=node_collection.one({'_id':ObjectId(group_id)})
   return grp.group_admin
 
 
 def check_if_moderated_group(group_id):
-  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  grp=node_collection.one({'_id':ObjectId(group_id)})
   ins_objectid  = ObjectId()
-  print "edtpol",grp.edit_policy
+  # print "edtpol",grp.edit_policy
   if ins_objectid.is_valid(group_id) :
     if grp.edit_policy == "EDITABLE_MODERATED":
       return True
