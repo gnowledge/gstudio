@@ -4313,3 +4313,50 @@ def get_language_tuple(lang):
     return ('en', 'English')
 
     
+def get_filter_querydict(filters):
+    """
+    After getting the filters from request,
+    this method converts it into mongo query-able.
+    suitable form. Which can be passed to '$and'.
+    
+    Args:
+        filter (JSON): It's a nested list of '$or' dicts.
+        e.g:
+        [{"$or":[{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Upper Primary","selFieldPrimaryType":"list"},{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Primary","selFieldPrimaryType":"list"}]},{"$or":[{"selFieldValue":"interactivitytype","selFieldValueAltnames":"interactivitytype","selFieldGstudioType":"attribute","selFieldText":"Expositive","selFieldPrimaryType":"basestring"}]}]
+
+
+    
+    Returns:
+        JSON: JSON format which can be directly feed to query.
+        e.g:
+        [{}, {'$or': [{u'attribute_set.educationallevel': {'$in': [u'Upper Primary']}}, {u'attribute_set.educationallevel': {'$in': [u'Primary']}}, {u'attribute_set.interactivitytype': u'Expositive'}]}, {'$or': [{u'attribute_set.educationallevel': {'$in': [u'Upper Primary']}}, {u'attribute_set.educationallevel': {'$in': [u'Primary']}}, {u'attribute_set.interactivitytype': u'Expositive'}]}]
+    """
+    query_dict = [{}]
+    for each in filters:
+          temp_list = []
+          filter_grp = each["or"]
+          for each_filter in filter_grp:
+            temp_dict = {}
+            each_filter["selFieldText"] = cast_to_data_type(each_filter["selFieldText"], each_filter["selFieldPrimaryType"])
+
+            if each_filter["selFieldPrimaryType"] == unicode("list"):
+              each_filter["selFieldText"] = {"$in": each_filter["selFieldText"]}
+
+            if each_filter["selFieldGstudioType"] == "attribute":
+
+              temp_dict["attribute_set." + each_filter["selFieldValue"]] = each_filter["selFieldText"]
+              temp_list.append(temp_dict)
+              # print "\n===temp_list : ", temp_list, "\===n"
+            elif each_filter["selFieldGstudioType"] == "field":
+              if each_filter["selFieldValue"] == 'Language':
+                each_filter["selFieldValue"] = u'language'
+                # print 'each_filter["selFieldText"]', each_filter["selFieldValue"]
+                each_filter["selFieldText"] = get_language_tuple(each_filter["selFieldText"])
+              temp_dict[each_filter["selFieldValue"]] = each_filter["selFieldText"]
+              temp_list.append(temp_dict)
+          
+          # print " ::: ",temp_list
+          if temp_list:               
+            query_dict.append({ "$or": temp_list})
+
+    return query_dict
