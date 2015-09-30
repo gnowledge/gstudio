@@ -4252,6 +4252,8 @@ def node_thread_access(group_id, node):
                     thread_start_time = each_attr['start_time']
                 if each_attr and 'end_time' in each_attr:
                     thread_end_time = each_attr['end_time']
+    else:
+        allow_to_comment = False      
     if thread_start_time and thread_end_time:
         curr_date_time = datetime.now()
         if curr_date_time.date() < thread_start_time.date() or curr_date_time.date() > thread_end_time.date():
