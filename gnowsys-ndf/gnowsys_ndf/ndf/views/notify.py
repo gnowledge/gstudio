@@ -10,7 +10,7 @@ from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
-from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_execution_time, get_all_subscribed_users
 from gnowsys_ndf.ndf.views.tasks import task_set_notify_val
 import json
 
