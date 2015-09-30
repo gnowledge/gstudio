@@ -9,6 +9,7 @@ from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.views.methods import capture_data
 from gnowsys_ndf.local_settings import SYNCDATA_KEY_PUB
 import json
+import datetime
 rcs = RCS()
 hr = HistoryManager()
 Parent_collection_ids = []
@@ -17,8 +18,24 @@ class Command(BaseCommand):
 
 	def handle(self,*args,**options):
 		#temprory time stamp
-		t = "2015-09-25T14:29:16.303+0530"
-		log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'nMatched:1 nModified:1'|grep '.Nodes\|.Triples'" % t)
+		t = "2015-09-25T14:29:16"
+		print t
+		#Read time stamp from the file
+		root_path =  os.path.abspath(os.path.dirname(os.pardir))
+		tym_scan =  os.path.join(root_path, 'Last_Scan.txt') 
+		file_output = open(tym_scan)
+		last_scan = file_output.readline()
+		if last_scan:
+			index = last_scan.find(":")
+			str1 = last_scan[index+1:]
+			t = str1.strip("\t\n\r ")
+		else:
+			print "itha"	
+			t = str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))	
+		print " \"%s\"" % t
+			
+		log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'nMatched:1 nModified:1'|grep '.Nodes\|.Triples'" % str(t))
+		print "somgin here"
 		for line in log_output:
 			print line
 			'''raw string processing code'''
@@ -39,6 +56,9 @@ class Command(BaseCommand):
 
 		process_parent_node(Parent_collection_ids)
 		process_dependent_collection(child_collection_ids)			
+		datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+		with open("Last_Scan.txt","w") as outfile:
+			outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))	
 def process_parent_node(Parent_collection_ids):
 	for i in Parent_collection_ids:
 		i = (i[i.find('\''):i[i.find('\''):].find(')') + i.find('\'')]).strip('\'')

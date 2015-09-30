@@ -555,7 +555,7 @@ def publish_page(request,group_id,node):
         node.modified_by = int(request.user.id)
         node.save(groupid=group_id)
 
-    capture_data(file_object=node, file_data=None, content_type='page')
+    #capture_data(file_object=node, file_data=None, content_type='page')
 
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':

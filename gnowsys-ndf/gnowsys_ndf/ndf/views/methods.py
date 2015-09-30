@@ -283,32 +283,35 @@ def server_sync(func):
             shutil.move(src,path_for_this_capture)
             # mail.attach_file(file_path)         
         
-        print 'JSON'
+        print 'JSON',node
         node_json = bson.json_util.dumps(node)
         with open(node_data_path,'w') as outfile:
             json.dump(node_json, outfile)
-        
+        print "wrote to the file"
         ''' Run command to sign the json file, rename and move to syncdata folder'''
         #add _sig otherwise django_mailbox scrambles file name
         json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
         command = 'gpg -u ' + SYNCDATA_KEY_PUB + ' --output ' + json_op_file_name + ' --sign ' + node_data_path
         subprocess.call([command],shell=True)
+        print "coming here"
         src = json_op_file_name
         shutil.move(src,path_for_this_capture)
-        slice_registry(node["_id"],path_for_this_capture)
+        print "sfasfsafsf"
+        #slice_registry(node["_id"],path_for_this_capture)
         
         # mail.attach_file(json_op_file_name)
         
         # mail.attach_file(node_data_path)
         # mail.subject = subject + str(node._id)
         #mail.send()
-
+        print "stop work"
         os.remove(node_data_path)
         # os.remove(json_op_file_name)
         if file_data:
             os.remove(file_path)
             # os.remove(op_file_name)
         return ret
+        print "opertation finish"
     return wrap
 
 @get_execution_time
@@ -2093,7 +2096,7 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
             gr_node.status = u"PUBLISHED"
             gr_node.save()
             # ''' server_sync '''
-            capture_data(file_object=gr_node, file_data=None, content_type='grelation_list_creation')
+            #capture_data(file_object=gr_node, file_data=None, content_type='grelation_list_creation')
 
 
 @get_execution_time
@@ -2451,7 +2454,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
             ga_node.save()
             print 'IN CREATE_GATTRIBUTE'
             # ''' server_sync '''
-            capture_data(file_object=ga_node, file_data=None, content_type='gattribute_create')
+            #capture_data(file_object=ga_node, file_data=None, content_type='gattribute_create')
 
             if object_value == u"None":
                 info_message = " GAttribute (" + ga_node.name + \
@@ -2485,7 +2488,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 ga_node.save()
                 
                 # ''' server_sync '''
-                capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
+                #capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
                 
                 info_message = " GAttribute (" + ga_node.name + \
                     ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -2535,7 +2538,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                         ga_node.save()
                         
                         # ''' server_sync '''
-                        capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
+                        #capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
 
                         info_message = " GAttribute (" + ga_node.name + \
                             ") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
@@ -2551,7 +2554,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                         ga_node.status = u"PUBLISHED"
                         ga_node.save()
                         ''' server_sync '''
-                        capture_data(file_object=ga_node, file_data=None, content_type='gattribute_publish')
+                        #capture_data(file_object=ga_node, file_data=None, content_type='gattribute_publish')
 
 
                         info_message = " GAttribute (" + \
@@ -2614,7 +2617,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.status = u"PUBLISHED"
             gr_node.save()
             ''' server_sync '''
-            capture_data(file_object=gr_node, file_data=None, content_type='grelation_create')
+            #capture_data(file_object=gr_node, file_data=None, content_type='grelation_create')
 
             
             gr_node_name = gr_node.name
@@ -2688,7 +2691,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.save()
 
             ''' server_sync '''
-            capture_data(file_object=gr_node, file_data=None, content_type='gattribute_update_delete_to_published')
+            #capture_data(file_object=gr_node, file_data=None, content_type='gattribute_update_delete_to_published')
 
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
@@ -2821,7 +2824,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     n.save()
         
                     ''' server_sync '''
-                    capture_data(file_object=n, file_data=None, content_type='deletion')
+                    #capture_data(file_object=n, file_data=None, content_type='deletion')
 
                     info_message = " MultipleGRelation: GRelation (" + n.name + \
                         ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -2934,7 +2937,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         node.save()
 
                         ''' server_sync '''
-                        capture_data(file_object=node, file_data=None, content_type='delete')
+                        #capture_data(file_object=node, file_data=None, content_type='delete')
 
                         node_collection.collection.update({
                             '_id': subject_id, 'relation_set.' + relation_type_node_name: {'$exists': True}
@@ -3038,7 +3041,7 @@ def create_discussion(request, group_id, node_id):
             thread_obj.save()
 
             ''' server_sync '''
-            capture_data(file_object=thread_obj, file_data=None, content_type='discussion_create')
+            #capture_data(file_object=thread_obj, file_data=None, content_type='discussion_create')
             
             # creating GRelation
             # create_grelation(node_id, relation_type, twist_st)
@@ -3099,7 +3102,7 @@ def discussion_reply(request, group_id, node_id):
             reply_obj.save()
 
             ''' server_sync '''
-            capture_data(file_object=reply_obj, file_data=None, content_type='discussion_reply')
+            #capture_data(file_object=reply_obj, file_data=None, content_type='discussion_reply')
 
             formated_time = reply_obj.created_at.strftime(
                 "%B %d, %Y, %I:%M %p")
@@ -3170,7 +3173,7 @@ def discussion_delete_reply(request, group_id):
         if temp_reply:
             deleted_replies.append(temp_reply._id.__str__())
             temp_reply.delete()
-    capture_data(file_object=temp_reply, file_data=None, content_type='delete_reply')
+    #capture_data(file_object=temp_reply, file_data=None, content_type='delete_reply')
     return HttpResponse(json.dumps(deleted_replies))
 
 @get_execution_time
@@ -4998,4 +5001,4 @@ def slice_registry(node_id,path_for_this_capture):
 	file_output.close()
 
 	with open(path_for_this_capture + "/Registry.txt","a") as outfile:
-		outfile.write(str(current_line)+""+str(previouse_line)+"" +str(last_line))	
+		outfile.write(str(previouse_line)+""+str(current_line)+"" +str(last_line))	

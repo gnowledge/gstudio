@@ -428,15 +428,17 @@ def server_sync(mail):
             op_file_name = filename.split('_sig')[0]            
             print 'output file name of decrypted attachment : \n %s' % op_file_name            
             command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
+            print "error point croseed"
             std_out= subprocess.call([command],shell=True)
-            list_of_decrypted_attachments.append(op_file_name)
+            if op_file_name.find(".txt") == -1:
+                list_of_decrypted_attachments.append(op_file_name)
 
         print '##**'*30
 	import time 
 	
         
         for file_path in list_of_decrypted_attachments:
-	    if file_path[-4:] == 'json':
+	    if file_path.find('.json') != -1:
 		json_file_path = file_path
             else:
 		file_object_path = file_path
@@ -462,9 +464,10 @@ def server_sync(mail):
 		        #user_id = 1
 	                #query = 'select username from auth_user where id=\''+str(user_id)+'\''
 	                #cursor = conn.execute(query)
+                        print "the path"
 			user_id = json_data[u'created_by']
 		    except Exception as error:
-	                print error
+	                print "this is error point",error
                     username = None                        
                     if user_id:
                         try:    
@@ -473,6 +476,7 @@ def server_sync(mail):
                                 username = None
                     if file_object_path != '':
 	                ''' for the creation of the file object '''
+                        print file_object_path 
 	                with open(file_object_path,'rb+') as to_be_saved_file:
 	                    req_groupid = None
 	                    for obj in json_data["group_set"]:
@@ -483,7 +487,7 @@ def server_sync(mail):
 
 	                    to_be_saved_file = io.BytesIO(to_be_saved_file.read())
 	                    to_be_saved_file.name = json_data["name"]
-
+                            print "error point node",json_data    
 	                    node_id, is_video = save_file(to_be_saved_file, json_data["name"], json_data["created_by"], req_groupid, json_data["content_org"], json_data["tags"], json_data["mime_type"].split('/')[1], json_data["language"], username, json_data["access_policy"],server_sync=True,object_id=json_data["_id"],oid=True)
 
 	                    if type(node_id) == list:
