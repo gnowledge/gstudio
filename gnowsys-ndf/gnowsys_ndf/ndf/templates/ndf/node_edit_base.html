@@ -477,12 +477,14 @@
 				<label><h5>License</h5></label>
 				<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
 				{% get_license as license %}
-				<select name="License" tabindex="7" required>
+				<select name="license"  required>
 						{% for each_license in license %}
-	        			<option value="{{each_license}}" 
-	        			{% if each_license == "CC BY-SA"%}selected{% endif %}>
-	        				{% trans each_license %}
-	        			</option>
+	        			{# <option value="{{each_license}}"  #}
+	        			{% if each_license == node.license %}
+	        				<option selected>{% trans each_license %}</option>
+	        			{% else %}>
+	        			 	<option>{% trans each_license %}</option>
+	        			{% endif %}>
 					{% endfor %}
 				</select>
 				<small class="error">Please select resource Subject</small>
