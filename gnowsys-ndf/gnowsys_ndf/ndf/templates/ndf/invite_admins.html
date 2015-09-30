@@ -2,7 +2,11 @@
 {% load i18n %}
 <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
 <link href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css" rel="stylesheet"> <!-- checked -->
-
+<style type="text/css">
+  .subscr_users_li{
+     list-style: none;
+  }
+</style>
 <script type="text/javascript">
 var addata_prefs="";
 var adnot_status="OFF";
@@ -143,7 +147,7 @@ function adget_all_data(){
 </script>
 
 <div id="subscr_admins">
-  <li>
+  <li class="subscr_users_li">
 
     <a href="#" data-reveal-id="inviteadmins" class="small button tiny ">{% trans 'Subscribe Admins' %}</a>
   </li>
