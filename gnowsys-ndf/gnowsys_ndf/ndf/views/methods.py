@@ -1623,14 +1623,18 @@ def cast_to_data_type(value, data_type):
                 casted_value = False
 
     elif (data_type == "list") and (not isinstance(value, list)):
+        # print "coming here",value      
         value = value.replace("\n", "").split(",")
         
         # check for complex list type like: [int] or [unicode]
         if isinstance(data_type, list) and len(data_type) and isinstance(data_type[0], type):
+            # print "before",value
             casted_value = [data_type[0](i.strip()) for i in value if i]
-
+            # print "casted_value",casted_value  
         else:  # otherwise normal list
+            # print "before",value
             casted_value = [i.strip() for i in value if i]
+            # print "casted_value",casted_value
 
     elif data_type == "datetime.datetime":
         # "value" should be in following example format
@@ -1672,6 +1676,7 @@ def get_node_metadata(request, node, **kwargs):
 
                 field_value = cast_to_data_type(field_value, at["data_type"])
                 if "is_changed" in kwargs:
+                    # print "field value"
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
                     if temp_res["is_changed"]:  # if value is true
                         updated_ga_nodes.append(temp_res)
