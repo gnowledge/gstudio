@@ -17,7 +17,6 @@
 
 {% block body_content %}
 	
-  <h3><i> Hello {{request.user.username}}, </i></h3>
   <h4> "{{node.name}}" - uploaded by {{node.created_by|get_username}}</h4>
 
     <h4><small>
@@ -25,7 +24,7 @@
       This resource is currently under 'Moderation'.
       {% if request.user.id == node.created_by %}
         You will get an email notification for any update on this resource.</br>
-        However, you can access it from <a href="/{{node.created_by|get_username}}/file">your work space</a>.
+        However, you can access it from <a href="/{{node.created_by|get_username}}/file/{{node.pk}}" target="_blank">your work space</a>.
       {% endif %}
   {% else %}
      This resource is successfully moderated and has been published to "{{top_group_name}}".
