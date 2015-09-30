@@ -411,33 +411,18 @@ def store_mails(mails, path):
     return
 
 def server_sync(mail):
-    if 'SYNCDATA' in mail.subject:
-        all_attachments = mail.attachments.all()
-        all_attachments_path = []
-                        
-        json_file_path = ''
-        file_object_path = ''
-
-        
-        
-        ''' Code to decrypt every attachment and create a list with the file paths of decrypted attachments'''
-        list_of_decrypted_attachments = []
-	sorted(all_attachments)
-	for attachment in all_attachments:
-            filename = attachment.document.path
-            op_file_name = filename.split('_sig')[0]            
-            print 'output file name of decrypted attachment : \n %s' % op_file_name            
-            command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
-            print "error point croseed"
-            std_out= subprocess.call([command],shell=True)
-            if op_file_name.find(".txt") == -1:
-                list_of_decrypted_attachments.append(op_file_name)
-
+    #if 'SYNCDATA' in mail.subject:
+    a = True
+    json_file_path = ''
+    file_object_path = ''
+    if a:       
         print '##**'*30
 	import time 
 	
         
-        for file_path in list_of_decrypted_attachments:
+        #for file_path in list_of_decrypted_attachments:
+        for file_path in mail:
+            print file_path    
 	    if file_path.find('.json') != -1:
 		json_file_path = file_path
             else:
@@ -1507,3 +1492,4 @@ def unique_mailbox_id(request,group_id):
                 'success' : success,
         })
         return render_to_response(template,variable)
+

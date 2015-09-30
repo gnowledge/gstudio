@@ -14,6 +14,8 @@ rcs = RCS()
 hr = HistoryManager()
 Parent_collection_ids = []
 child_collection_ids = []
+processing_list_ids = []	
+
 class Command(BaseCommand):
 
 	def handle(self,*args,**options):
@@ -34,10 +36,9 @@ class Command(BaseCommand):
 			t = str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))	
 		print " \"%s\"" % t
 			
-		log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'nMatched:1 nModified:1'|grep '.Nodes\|.Triples'" % str(t))
+		log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'WRITE'|grep '.Nodes\|.Triples'" % str(t))
 		print "somgin here"
 		for line in log_output:
-			print line
 			'''raw string processing code'''
 			str_start = line.find('_id')
 			str_start = (line[str_start:].find('ObjectId')) + str_start
@@ -45,28 +46,41 @@ class Command(BaseCommand):
 				try:
 					str_end	  = (line[str_start:].find(')')) + str_start 
 					raw_string = line[str_start:str_end+1]
+					
+					'''	
 					if line.find('.Triples') != -1:	
 						if raw_string not in child_collection_ids:
-							child_collection_ids.append(raw_string)
+							processing_list_ids.append(raw_string)
 					if line.find('.Nodes') != -1:
 						if raw_string not in Parent_collection_ids:
-							Parent_collection_ids.append(raw_string)
+							Parent_collection_ids.append(raw_string)	
+					'''	
+					if line.find("ToReduceDocs") == -1:	
+						if line.find('.Triples') != -1 or line.find('.Nodes') != -1 :	
+							if raw_string not in processing_list_ids:
+								processing_list_ids.append(raw_string)
 				except Exception as e:
 					print e
 
-		process_parent_node(Parent_collection_ids)
-		process_dependent_collection(child_collection_ids)			
+		process_parent_node(processing_list_ids)
+		#process_dependent_collection(child_collection_ids)			
 		datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 		with open("Last_Scan.txt","w") as outfile:
 			outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))	
 def process_parent_node(Parent_collection_ids):
 	for i in Parent_collection_ids:
 		i = (i[i.find('\''):i[i.find('\''):].find(')') + i.find('\'')]).strip('\'')
-		node = node_collection.find_one({"_id":ObjectId(str(i))})
-		capture_data(file_object=node, file_data=None, content_type='Genral')
+		if i != '':
+			node = node_collection.find_one({"_id":ObjectId(str(i))})
+		if node:
+			capture_data(file_object=node, file_data=None, content_type='Genral')
+		else:
+			node = triple_collection.find_one({"_id":ObjectId(str(i))})	
+			capture_data(file_object=node, file_data=None, content_type='Genral')
 		#create log file
-		with open("Registry.txt", 'a') as outfile:
-			outfile.write(str(str(node["created_at"])) + "," + "_id:" + str(node["_id"]) + "," +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{0}" +"\n" )
+		if node:
+			with open("Registry.txt", 'a') as outfile:
+				outfile.write(str("_id:" + str(node["_id"]) + "," +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{0}" +"\n" ))
 			
 		
 def process_dependent_collection(dependent_collection):
