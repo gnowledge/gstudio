@@ -274,7 +274,7 @@
                 <label>Enrollment duration</label>
                  From <i>{{event_start_enroll|date:"d-M-Y"}}</i> to <i> {{event_end_enroll|date:"d-M-Y"}}</i>
             </section>
-            </div>
+            </div><hr>
         {% endif %}
 
 			{% with node.html_content|safe as description %}
@@ -329,13 +329,11 @@
     {% if is_gstaff %}
       {% if "CourseEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
           <section class="medium-2 columns"> 
-            <div class="row">         
-              <div class="medium-6 columns">
-                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit"><i class="fi-pencil"></i> {% trans "Edit " %}{{sg_type}}</a>
+            <div class="row">
+                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit"><i class="fi-pencil"></i> {% trans "Edit " %}{% if sg_type == "ProgramEventGroup" %}{% trans "Event" %}{% else %}{% trans "eCourse" %}{% endif %}</a>
               <br/><br/>
                 {% include "ndf/invite_users.html" %}
                 {% include "ndf/invite_admins.html" %}
-              </div>
             </div>  
           </section>  
       {% else %} 
