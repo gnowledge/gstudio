@@ -422,13 +422,13 @@
 						{% elif k == "interactivitytype" %}
 						<h5>{% trans "Interactivity Type: " %}</h5> 
 						{% elif k == "educationallevel" %}
-						<h5  class= "compulsory">{% trans "Educational Level:" %} </h5>
+						<h5 class= "compulsory">{% trans "Educational Level:" %} </h5>
 						{% elif k == "educationalsubject" %}
 						<h5 class= "compulsory">{% trans "Educational Subject:" %} </h5>
 						{% elif k == "timerequired" %}
 						<h5>{% trans "Time Required: " %}</h5> 
 						{% elif k == "audience" %}
-						<h5>{% trans "Target Audience:" %} </h5> 
+						<h5 class= "compulsory">{% trans "Target Audience:" %} </h5> 
 						{% elif k == "textcomplexity" %}
 						<h5>{% trans "Text Complexity" %}</h5>  
 						{% elif k == "age_range" %}			
@@ -444,14 +444,15 @@
 						{% endif %}      
 
 		         		{% get_attribute_value node.pk k as attr_val %} 
+
 		         		<select name="{{k}}" id ="{{k}}">
-							<option></option>
-							{% for opts in v %}
-							{% if opts == attr_val %}	        				
-							<option selected>{% trans opts %}</option>
-							{% else %}
-							<option>{% trans opts %}</option>
-							{% endif %}
+							<option> --Select-- </option>
+							{% for opts in v %} 
+								{% if opts == attr_val|stringformat:"s" or opts in attr_val  %}	        				
+								<option selected>{% trans opts %}</option>
+								{% else %}
+								<option>{% trans opts %}</option>
+								{% endif %}
 							{% endfor %}
 						</select>
 					</label>
@@ -467,16 +468,29 @@
 			</div>
 			<div class="small-12 large-4 columns">
 				<label>
-					<h5>{% trans "License: " %} </h5> 
-					<input name="license" type="text" value="{{node.license | default_if_none:'CC-By_SA'}}">		  	
-				</label>
-			</div>
-			<div class="small-12 large-4 columns">
-				<label>
 					<h5>{% trans "Source: " %} </h5> 
 					<input name="source" type="text" value="{{node.source}}">		  	
 				</label>
 			</div>
+
+			<div class="small-12 large-4 columns">
+				<label><h5>License</h5></label>
+				<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
+				{% get_license as license %}
+				<select name="license"  required>
+						{% for each_license in license %}
+	        			{# <option value="{{each_license}}"  #}
+	        			{% if each_license == node.license %}
+	        				<option selected>{% trans each_license %}</option>
+	        			{% else %}>
+	        			 	<option>{% trans each_license %}</option>
+	        			{% endif %}>
+					{% endfor %}
+				</select>
+				<small class="error">Please select resource Subject</small>
+
+			</div>
+			
 		</div>	
 	</div>
 			
@@ -1416,16 +1430,16 @@
     	{
           $("#message").css("display", "none");
 	    }
-	// {% get_site_name_from_settings as site_name %}
+	{% get_site_name_from_settings as site_name %}
        
-       // {%  if site_name == "NROER" and title == "Page" or "File" in node.member_of_names_list    %}
-       //      if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
-       //              $('#tabs').find('a[href="#tab2"]').trigger('click');
-       //              $("#message").css("display", "block");
-       //              $("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
-       //              event.preventDefault();
-       //      }
-       // {% endif %}
+       {%  if site_name == "NROER"  %}
+            if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
+                    $('#tabs').find('a[href="#tab2"]').trigger('click');
+                    $("#message").css("display", "block");
+                    $("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+                    event.preventDefault();
+            }
+       {% endif %}
 
 	$("input[name='thread_create']").attr("disabled",false);
 	{% if not blog_type %}
