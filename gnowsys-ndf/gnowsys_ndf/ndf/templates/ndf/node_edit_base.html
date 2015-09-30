@@ -446,7 +446,7 @@
 		         		{% get_attribute_value node.pk k as attr_val %} 
 
 		         		<select name="{{k}}" id ="{{k}}">
-							<option></option>
+							<option> --Select-- </option>
 							{% for opts in v %} 
 								{% if opts == attr_val|stringformat:"s" or opts in attr_val  %}	        				
 								<option selected>{% trans opts %}</option>
@@ -468,16 +468,27 @@
 			</div>
 			<div class="small-12 large-4 columns">
 				<label>
-					<h5>{% trans "License: " %} </h5> 
-					<input name="license" type="text" value=" {% firstof node.license 'CC-By_SA'%} ">		  	
-				</label>
-			</div>
-			<div class="small-12 large-4 columns">
-				<label>
 					<h5>{% trans "Source: " %} </h5> 
 					<input name="source" type="text" value="{{node.source}}">		  	
 				</label>
 			</div>
+
+			<div class="small-12 large-4 columns">
+				<label><h5>License</h5></label>
+				<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
+				{% get_license as license %}
+				<select name="License" tabindex="7" required>
+						{% for each_license in license %}
+	        			<option value="{{each_license}}" 
+	        			{% if each_license == "CC BY-SA"%}selected{% endif %}>
+	        				{% trans each_license %}
+	        			</option>
+					{% endfor %}
+				</select>
+				<small class="error">Please select resource Subject</small>
+
+			</div>
+			
 		</div>	
 	</div>
 			
