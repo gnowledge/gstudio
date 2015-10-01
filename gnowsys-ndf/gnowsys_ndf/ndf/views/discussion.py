@@ -22,7 +22,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
-from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_execution_time,capture_data
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.notification import models as notification
 from django.contrib.sites.models import Site
@@ -97,7 +97,7 @@ def create_discussion(request, group_id, node_id):
       thread_obj.group_set.append(ObjectId(group_id))
       
       thread_obj.save()
-
+      capture_data(file_object=thread_obj, file_data=None, content_type='discussion_create')   		
       # creating GRelation
       # create_grelation(node_id, relation_type, twist_st)
       response_data = [ "thread-created", str(thread_obj._id) ]
@@ -200,7 +200,7 @@ def discussion_reply(request, group_id, node_id):
         
             # saving the reply obj
             reply_obj.save()
-
+            capture_data(file_object=reply_obj, file_data=None, content_type='discussion_reply')	
             formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
 
             files = []
@@ -282,5 +282,5 @@ def discussion_delete_reply(request, group_id):
         if temp_reply:
             deleted_replies.append(temp_reply._id.__str__())
             temp_reply.delete()
-        
+	    capture_data(file_object=temp_reply, file_data=None, content_type='delete_reply')
     return HttpResponse(json.dumps(deleted_replies))

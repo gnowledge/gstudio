@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 
 from django.views.generic import TemplateView
 
@@ -9,7 +9,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.file',
                        url(r'^/submitDoc/', 'submitDoc', name='submitDoc'),
                        url(r'^/submit/', 'submitDoc', name='submitDoc'),
                        url(r'^/documentList/', 'GetDoc', name='documentList'),
-                       url(r'^/readDoc/(?P<_id>[\w-]+)/(?:(?P<file_name>[^/]+))?$', 'readDoc', name='read_file'),
+                       url(r'^/readDoc/', include('gnowsys_ndf.ndf.urls.readDoc')),
                        url(r'^/search/$', 'file_search', name='file_search'),
                        url(r'^/details/(?P<_id>[\w-]+)$', 'file_detail', name='file_detail'),
                        url(r'^/(?P<_id>[\w-]+)$', 'file_detail', name='file_detail'),
@@ -24,3 +24,4 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.file',
                        url(r'^/(?P<filetype>[\w-]+)/page-no=(?P<page_no>\d+)/$', 'paged_file_objs', name='paged_file_objs'),
                        url(r'^/file_content/$', 'file_content', name='file_content'),
 )
+
