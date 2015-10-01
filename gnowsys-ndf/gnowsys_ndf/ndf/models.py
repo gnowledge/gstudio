@@ -179,7 +179,9 @@ class Node(DjangoDocument):
         'prior_node': [ObjectId], 
         'post_node': [ObjectId],
         
-        'language': unicode,
+        # 'language': unicode,  # previously it was unicode.
+        'language': (basestring, basestring),  # Tuple are converted into a simple list
+                                               # ref: https://github.com/namlook/mongokit/wiki/Structure#tuples
 
         'type_of': [ObjectId], # check required: only ObjectIDs of GSystemType 
         'member_of': [ObjectId], # check required: only ObjectIDs of
@@ -233,7 +235,11 @@ class Node(DjangoDocument):
                                         # here after the default
                                         # 'Administration' group is
                                         # ready.
-    default_values = {'created_at': datetime.datetime.utcnow, 'status': u'DRAFT'}
+    default_values = {
+                        'created_at': datetime.datetime.utcnow,
+                        'status': u'DRAFT',
+                        'language': ('en', 'English')
+                    }
     use_dot_notation = True
     
     ########## Setter(@x.setter) & Getter(@property) ##########
@@ -1206,7 +1212,8 @@ class Author(Group):
         'preferred_languages': dict,          # preferred languages for users like preferred lang. , fall back lang. etc.
         'group_affiliation': basestring,
 	'language_proficiency':basestring,
-	'subject_proficiency':basestring
+	'subject_proficiency':basestring #,
+    # TODO: add a field: preffered_display_name, 22-39-15, kedar2a
     }
 
     use_dot_notation = True

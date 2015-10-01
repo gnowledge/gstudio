@@ -17,6 +17,7 @@ import json
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -423,7 +424,7 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
                            task_node.group_set.append(grp._id)
                    task_node.status=u'DRAFT'
                    task_node.url= u'task'
-                   task_node.language=u'en'
+                   task_node.language = ('en', 'English')
                    contr=[]
                    contr.append(usr)
                    task_node.contributors=contr
@@ -541,7 +542,7 @@ def create_task_for_activity(request,group_id,activity_dict,get_assignee_list,se
 
 
 def get_all_subscribed_users(group_id):
-  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  grp=node_collection.one({'_id':ObjectId(group_id)})
   ins_objectid  = ObjectId()
   all_users=[]
   if ins_objectid.is_valid(group_id) :
@@ -552,14 +553,14 @@ def get_all_subscribed_users(group_id):
   return all_users
   
 def get_all_admins(group_id):
-  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  grp=node_collection.one({'_id':ObjectId(group_id)})
   return grp.group_admin
 
 
 def check_if_moderated_group(group_id):
-  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  grp=node_collection.one({'_id':ObjectId(group_id)})
   ins_objectid  = ObjectId()
-  print "edtpol",grp.edit_policy
+  # print "edtpol",grp.edit_policy
   if ins_objectid.is_valid(group_id) :
     if grp.edit_policy == "EDITABLE_MODERATED":
       return True
@@ -1011,32 +1012,20 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
     usrid = int(request.user.id)
     language = request.POST.get('lan')
     if get_type == "File":
-        get_parent_node = node_collection.one({'_id': ObjectId(node_id)})
-        get_mime_type = get_parent_node.mime_type
-        get_fs_file_ids = get_parent_node.fs_file_ids
-        node.mime_type = get_mime_type
-        node.fs_file_ids = get_fs_file_ids
-
-    if not ('_id' in node):
-        node.created_by = usrid
-        if get_type == "File":
-            get_node_type = node_collection.one(
-                {"_type": "GSystemType", 'name': get_type})
-            node.member_of.append(get_node_type._id)
-            if 'image' in get_mime_type:
-                get_image_type = node_collection.one(
-                    {"_type": "GSystemType", 'name': 'Image'})
-                node.member_of.append(get_image_type._id)
-            if 'video' in get_mime_type:
-                get_video_type = node_collection.one(
-                    {"_type": "GSystemType", 'name': 'Video'})
-                node.member_of.append(get_video_type._id)
-
-        else:
-            node.member_of.append(node_type._id)
-
+        get_node_type = node_collection.one({"_type": "GSystemType", 'name': get_type})
+        node.member_of.append(get_node_type._id)
+        if 'image' in get_mime_type:
+          get_image_type = node_collection.one({"_type": "GSystemType", 'name': 'Image'})
+          node.member_of.append(get_image_type._id)
+        if 'video' in get_mime_type:
+          get_video_type = node_collection.one({"_type": "GSystemType", 'name': 'Video'})
+          node.member_of.append(get_video_type._id)
+        
+    else:
+      node.member_of.append(node_type._id)
+ 
     node.name = unicode(name)
-    node.language = unicode(language)
+    node.language = get_language_tuple(language)
 
     node.modified_by = usrid
     if access_policy:
@@ -1056,12 +1045,12 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
 
     if content_org:
         node.content_org = unicode(content_org)
-        node.name = unicode(name)
-        # Required to link temporary files with the current user who is
-        # modifying this document
+        node.name=unicode(name)
+        # Required to link temporary files with the current user who is modifying this document
         usrname = request.user.username
         filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
         node.content = org2html(content_org, file_prefix=filename)
+
 
 
 @get_execution_time
@@ -1092,6 +1081,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         content_org = request.POST.get('content_org')
         tags = request.POST.get('tags','')
     language = request.POST.get('lan')
+    license = request.POST.get('license')
     sub_theme_name = request.POST.get("sub_theme_name", '')
     add_topic_name = request.POST.get("add_topic_name", '')
     is_changed = False
@@ -1177,9 +1167,12 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     #  language
     if language:
-        node.language = unicode(language)
+        node.language = get_language_tuple(language)
+        # print "=========", node.language
+        is_changed = True
     else:
-        node.language = u"en"
+        node.language = ('en', 'English')
+        is_changed = True
 
     #  access_policy
     if access_policy:
@@ -1245,6 +1238,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     if node.location != map_geojson_data:
         node.location = map_geojson_data  # Storing location data
         is_changed = True
+
+    if node.license != license:
+        node.license = license
+        is_changed = True 
 
     if user_last_visited_location:
         user_last_visited_location = list(
@@ -1995,14 +1992,18 @@ def cast_to_data_type(value, data_type):
                 casted_value = False
 
     elif (data_type == "list") and (not isinstance(value, list)):
+        # print "coming here",value      
         value = value.replace("\n", "").split(",")
 
         # check for complex list type like: [int] or [unicode]
         if isinstance(data_type, list) and len(data_type) and isinstance(data_type[0], type):
+            # print "before",value
             casted_value = [data_type[0](i.strip()) for i in value if i]
-
+            # print "casted_value",casted_value  
         else:  # otherwise normal list
+            # print "before",value
             casted_value = [i.strip() for i in value if i]
+            # print "casted_value",casted_value
 
     elif data_type == "datetime.datetime":
         # "value" should be in following example format
@@ -2048,8 +2049,7 @@ def get_node_metadata(request, node, **kwargs):
 
                 field_value = cast_to_data_type(field_value, at["data_type"])
                 if "is_changed" in kwargs:
-                    temp_res = create_gattribute(
-                        node._id, at, field_value, is_changed=True)
+                    temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
                     if temp_res["is_changed"]:  # if value is true
                         updated_ga_nodes.append(temp_res)
 
@@ -4918,6 +4918,8 @@ def node_thread_access(group_id, node):
                     thread_start_time = each_attr['start_time']
                 if each_attr and 'end_time' in each_attr:
                     thread_end_time = each_attr['end_time']
+    else:
+        allow_to_comment = False      
     if thread_start_time and thread_end_time:
         curr_date_time = datetime.now()
         if curr_date_time.date() < thread_start_time.date() or curr_date_time.date() > thread_end_time.date():
@@ -4950,3 +4952,79 @@ def get_prior_node_hierarchy(oid):
             hierarchy_list.append(prev_obj)
 
     return hierarchy_list
+
+
+def get_language_tuple(lang):
+    """
+    from input argument of language code of language name
+    get the std matching tuple from settings.
+    
+    Returns:
+        tuple: (<language code>, <language name>)
+    
+    Args:
+        lang (str or unicode): it is the one of item from tuple.
+        It may either language-code or language-name.
+    """
+
+    all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
+    all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
+
+    # iterating over each document in the cursor:
+    # - Secondly, replacing invalid language values to valid tuple from settings
+    if lang in all_languages_concanated:
+        for each_lang in all_languages:
+            if lang in each_lang:
+                return each_lang
+
+    # as a default return: ('en', 'English')
+    return ('en', 'English')
+
+    
+def get_filter_querydict(filters):
+    """
+    After getting the filters from request,
+    this method converts it into mongo query-able.
+    suitable form. Which can be passed to '$and'.
+    
+    Args:
+        filter (JSON): It's a nested list of '$or' dicts.
+        e.g:
+        [{"$or":[{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Upper Primary","selFieldPrimaryType":"list"},{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Primary","selFieldPrimaryType":"list"}]},{"$or":[{"selFieldValue":"interactivitytype","selFieldValueAltnames":"interactivitytype","selFieldGstudioType":"attribute","selFieldText":"Expositive","selFieldPrimaryType":"basestring"}]}]
+
+
+    
+    Returns:
+        JSON: JSON format which can be directly feed to query.
+        e.g:
+        [{}, {'$or': [{u'attribute_set.educationallevel': {'$in': [u'Upper Primary']}}, {u'attribute_set.educationallevel': {'$in': [u'Primary']}}, {u'attribute_set.interactivitytype': u'Expositive'}]}, {'$or': [{u'attribute_set.educationallevel': {'$in': [u'Upper Primary']}}, {u'attribute_set.educationallevel': {'$in': [u'Primary']}}, {u'attribute_set.interactivitytype': u'Expositive'}]}]
+    """
+    query_dict = [{}]
+    for each in filters:
+          temp_list = []
+          filter_grp = each["or"]
+          for each_filter in filter_grp:
+            temp_dict = {}
+            each_filter["selFieldText"] = cast_to_data_type(each_filter["selFieldText"], each_filter["selFieldPrimaryType"])
+
+            if each_filter["selFieldPrimaryType"] == unicode("list"):
+              each_filter["selFieldText"] = {"$in": each_filter["selFieldText"]}
+
+            if each_filter["selFieldGstudioType"] == "attribute":
+
+              temp_dict["attribute_set." + each_filter["selFieldValue"]] = each_filter["selFieldText"]
+              temp_list.append(temp_dict)
+              # print "\n===temp_list : ", temp_list, "\===n"
+            elif each_filter["selFieldGstudioType"] == "field":
+              if each_filter["selFieldValue"] == 'Language':
+                each_filter["selFieldValue"] = u'language'
+                # print 'each_filter["selFieldText"]', each_filter["selFieldValue"]
+                each_filter["selFieldText"] = get_language_tuple(each_filter["selFieldText"])
+              temp_dict[each_filter["selFieldValue"]] = each_filter["selFieldText"]
+              temp_list.append(temp_dict)
+          
+          # print " ::: ",temp_list
+          if temp_list:               
+            query_dict.append({ "$or": temp_list})
+
+    return query_dict

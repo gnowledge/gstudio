@@ -36,7 +36,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MED
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id,capture_data  # , get_page
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id,capture_data,get_language_tuple  # , get_page
 
 try:
     from bson import ObjectId
@@ -975,7 +975,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             fileobj.name = unicode(title)
 
             if language:
-                fileobj.language = unicode(language)
+                # fileobj.language = unicode(language)
+                fileobj.language = get_language_tuple(language)
             fileobj.created_by = int(userid)
 
             fileobj.modified_by = int(userid)

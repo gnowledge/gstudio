@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load ndf_tags %}
+{% load simple_filters %}
 {% load cache %}
 
 {% block title %}   
@@ -15,62 +16,63 @@
 {% cache 3600 node_edit_base style %}
 {% block style %}
 
-.divider-line { font-size: xx-large; color:lightgray; }
-.line-height-2 { line-height:2; }
-.line-height-2pt5 { line-height:2.5; }
-.fontsize-x-large { font-size: x-large; }
+	.divider-line { font-size: xx-large; color:lightgray; }
+	.line-height-2 { line-height:2; }
+	.line-height-2pt5 { line-height:2.5; }
+	.fontsize-x-large { font-size: x-large; }
 
-.margin-0 { margin: 0 !important ;}
+	.margin-0 { margin: 0 !important ;}
 
-.resource-drawer { 
-border-color: #D3D3D3; border-style: solid; 
-padding: 0 !important; 
-overflow-y: auto;
-}
+	.resource-drawer { 
+	border-color: #D3D3D3; border-style: solid; 
+	padding: 0 !important; 
+	overflow-y: auto;
+	}
 
-.resource-drawer li.bullet-item:hover{
-background-color: #ecf0f1; cursor:pointer;
-}
+	.resource-drawer li.bullet-item:hover{
+	background-color: #ecf0f1; cursor:pointer;
+	}
 
-.posted-by{ color: #808080; font-size: small; }
+	.posted-by{ color: #808080; font-size: small; }
 
-.selected-resource { background-color:lightgray !important ; }
+	.selected-resource { background-color:lightgray !important ; }
 
-.resource-type-image {
-height:40px; 		
-background-repeat:no-repeat; background-size: 48px 48px
-}
+	.resource-type-image {
+	height:40px; 		
+	background-repeat:no-repeat; background-size: 48px 48px
+	}
 
-#tags_error{
-	color: red;
-}
+	#tags_error{
+		color: red;
+	}
 
-div.tags{ 
-	/*padding: 5px 10px; */
-	margin: 2px 5px;
-	/*color: white;*/
-	font-size: 1em;
-	border: solid thin #FFD400;
-}
+	div.tags{ 
+		/*padding: 5px 10px; */
+		margin: 2px 5px;
+		/*color: white;*/
+		font-size: 1em;
+		border: solid thin #FFD400;
+	}
 
-i.remove-tag{
-	padding-left: 8px;
-	font-size: 1.1em;
-	cursor: pointer;
-}
+	i.remove-tag{
+		padding-left: 8px;
+		font-size: 1.1em;
+		cursor: pointer;
+	}
 
 {% endblock %}
 {% endcache %}
- {% block head %}
+
+{% block head %}
 	{{block.super}}
-{% if title == "Page" or "File" in node.member_of_names_list %}
-  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
-  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
- {% endif %}
- {% endblock %}
+	{% if title == "Page" or "File" in node.member_of_names_list %}
+	  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+	  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+	{% endif %}
+{% endblock %}
 
 {% block body_content %}
 
@@ -230,17 +232,19 @@ i.remove-tag{
 
 	            </div>                
 	            	
-	    			{% cache 300 node_edit_base_lang_loc request.LANGUAGE_CODE %}
-
 	            	<div class="row">
 	                	<div class="large-4 columns">
 	                		<label class="inline">{% trans "Language" %}</label>
 	                    </div>
 	                	<div class="large-8 columns">
 	               			<select name="lan">
-                                       {% get_language_info_list for LANGUAGES as languages %}
-                                       {% for language in languages %}
-                                       <option value="{{language.code}}">{% trans language.name %}</option>{% endfor %}</select>
+                               {% get_language_info_list for LANGUAGES as languages %}
+                               {% for language in languages %}
+                           		<option value="{{language.code}}" {% ifequal node.language.0  language.code %} selected=selected {% endifequal %}>
+                               		{% trans language.name %}
+                               	</option>
+                               	{% endfor %}
+                            </select>
 	                    </div>
 	                </div>
 	                
@@ -254,8 +258,9 @@ i.remove-tag{
 							</a>
 	                    </div>
 		     		</div>
-		     		{% endcache %}
+
 		     		{% if title == "Page" %}
+		     		
 		     		<div class = "page type" >
 		     			<div class="row">
 		     			 	<div class = "small-2 columns">	
@@ -417,13 +422,13 @@ i.remove-tag{
 						{% elif k == "interactivitytype" %}
 						<h5>{% trans "Interactivity Type: " %}</h5> 
 						{% elif k == "educationallevel" %}
-						<h5  class= "compulsory">{% trans "Educational Level:" %} </h5>
+						<h5 class= "compulsory">{% trans "Educational Level:" %} </h5>
 						{% elif k == "educationalsubject" %}
 						<h5 class= "compulsory">{% trans "Educational Subject:" %} </h5>
 						{% elif k == "timerequired" %}
 						<h5>{% trans "Time Required: " %}</h5> 
 						{% elif k == "audience" %}
-						<h5>{% trans "Target Audience:" %} </h5> 
+						<h5 class= "compulsory">{% trans "Target Audience:" %} </h5> 
 						{% elif k == "textcomplexity" %}
 						<h5>{% trans "Text Complexity" %}</h5>  
 						{% elif k == "age_range" %}			
@@ -439,14 +444,15 @@ i.remove-tag{
 						{% endif %}      
 
 		         		{% get_attribute_value node.pk k as attr_val %} 
+
 		         		<select name="{{k}}" id ="{{k}}">
-							<option></option>
-							{% for opts in v %}
-							{% if opts == attr_val %}	        				
-							<option selected>{% trans opts %}</option>
-							{% else %}
-							<option>{% trans opts %}</option>
-							{% endif %}
+							<option> --Select-- </option>
+							{% for opts in v %} 
+								{% if opts == attr_val|stringformat:"s" or opts in attr_val  %}	        				
+								<option selected>{% trans opts %}</option>
+								{% else %}
+								<option>{% trans opts %}</option>
+								{% endif %}
 							{% endfor %}
 						</select>
 					</label>
@@ -462,16 +468,29 @@ i.remove-tag{
 			</div>
 			<div class="small-12 large-4 columns">
 				<label>
-					<h5>{% trans "License: " %} </h5> 
-					<input name="license" type="text" value="{{node.license | default_if_none:'CC-By_SA'}}">		  	
-				</label>
-			</div>
-			<div class="small-12 large-4 columns">
-				<label>
 					<h5>{% trans "Source: " %} </h5> 
 					<input name="source" type="text" value="{{node.source}}">		  	
 				</label>
 			</div>
+
+			<div class="small-12 large-4 columns">
+				<label><h5>License</h5></label>
+				<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
+				{% get_license as license %}
+				<select name="license"  required>
+						{% for each_license in license %}
+	        			{# <option value="{{each_license}}"  #}
+	        			{% if each_license == node.license %}
+	        				<option selected>{% trans each_license %}</option>
+	        			{% else %}>
+	        			 	<option>{% trans each_license %}</option>
+	        			{% endif %}>
+					{% endfor %}
+				</select>
+				<small class="error">Please select resource Subject</small>
+
+			</div>
+			
 		</div>	
 	</div>
 			
@@ -1411,16 +1430,16 @@ i.remove-tag{
     	{
           $("#message").css("display", "none");
 	    }
-	// {% get_site_name_from_settings as site_name %}
+	{% get_site_name_from_settings as site_name %}
        
-       // {%  if site_name == "NROER" and title == "Page" or "File" in node.member_of_names_list    %}
-       //      if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0){
-       //              $('#tabs').find('a[href="#tab2"]').trigger('click');
-       //              $("#message").css("display", "block");
-       //              $("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
-       //              event.preventDefault();
-       //      }
-       // {% endif %}
+       {%  if site_name == "NROER"  %}
+            if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
+                    $('#tabs').find('a[href="#tab2"]').trigger('click');
+                    $("#message").css("display", "block");
+                    $("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+                    event.preventDefault();
+            }
+       {% endif %}
 
 	$("input[name='thread_create']").attr("disabled",false);
 	{% if not blog_type %}

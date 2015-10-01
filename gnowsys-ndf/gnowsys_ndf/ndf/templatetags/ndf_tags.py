@@ -149,8 +149,8 @@ def get_group_agency_types():
 
 @get_execution_time
 @register.assignment_tag
-def get_licence():
-   return GSTUDIO_LICENCE
+def get_license():
+   return GSTUDIO_LICENSE
 
 
 @get_execution_time
@@ -790,6 +790,7 @@ def get_nroer_menu(request, group_name):
 
 		# handling conditions of "e-library" = "file" and vice-versa.
 		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
+		selected_gapp = "topics" if (selected_gapp == "topic_details") else selected_gapp
 
 		# for deciding/confirming selected gapp
 		for each_gapp in gapps:
@@ -1344,7 +1345,8 @@ def get_all_resources(request,node_id):
                         	# uniform data-type/format for storing in language field.
                         	# currently, we are also using any of: code or name or tuple.
                         	# e.g: "en" or "English" or ("en", "English")
-                            if (len(res.language) == len(request.LANGUAGE_CODE)) and (res.language != request.LANGUAGE_CODE):
+                            # if (len(res.language) == len(request.LANGUAGE_CODE)) and (res.language != request.LANGUAGE_CODE):
+                            if isinstance(res.language, (list, tuple)) and len(res.language) > 1 and (res.language[0] != request.LANGUAGE_CODE):
                                     res_dict[key]['other_languages'].append(res)
                             else:
                                     res_dict[key]['fallback_lang'].append(res)
@@ -2966,3 +2968,32 @@ def get_thread_node(node_id):
 				thread_obj = rel['has_thread'][0]
 	# print "\n\nthread_obj--",thread_obj
 	return thread_obj
+
+@get_execution_time
+@register.filter
+def is_media_collection(node_id):
+    """To check whether all the items of collection_set are
+    of Image or of Video.
+    
+    Args:
+        node_id (ObjectId): _id of node whose collection_set to be checked for.
+    
+    Returns:
+        bool: Returns True if all the items are of type Image or Video.
+        Else returns False.
+    """
+
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+
+    if node_obj.collection_set:
+	    cur = node_collection.find({'_id': {'$in': node_obj.collection_set} })
+    
+	    mimetype_list = [f.mime_type for f in cur if (f.mime_type and (f.mime_type.split('/')[0].lower() in ['image', 'video']) )]
+	    # print "==", mimetype_list
+
+	    # print len(node_obj.collection_set), len(mimetype_list) 
+	    if len(node_obj.collection_set) == len(mimetype_list):
+		    return True
+    return False
+
+

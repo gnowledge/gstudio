@@ -62,6 +62,10 @@
       border-style: solid;
   }
 
+  li.enroll-btn-li{
+    list-style: none;
+  }
+
 {% endblock %}
 
 {% block head %}
@@ -87,56 +91,6 @@
   </div>
 {% endblock %}
 {% block extended_header %}
-    {% get_sg_member_of group_object.pk as list_of_sg_member_of %}
-    <div class="row">
-
-      {% if "CourseEventGroup" in group_object.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
-          <nav>
-              <section class="medium-3 columns text-center">
-              <a href="{% url 'groupchange' group_object.name %}"><h5>{% firstof group_object.altnames group_object.name %} </h5></a>
-              </section>
-
-              {% get_attribute_value group_object.pk 'start_time' as event_start_time %}
-              {% get_attribute_value group_object.pk 'end_time' as event_end_time %}
-              {% get_attribute_value group_object.pk 'start_enroll' as event_start_enroll %}
-              {% get_attribute_value group_object.pk 'end_enroll' as event_end_enroll %}
-              
-              <section class="medium-4 columns">
-                  <label>Event</label>
-                  <label> Start: {{event_start_time|date:"d M Y"}} &nbsp;&nbsp; End: {{event_end_time|date:"d M Y"}}</label>
-              </section>
-
-              <section class="medium-4 columns">
-                  <label>Enrollment</label>
-                  <label> Start: {{event_start_enroll|date:"d M Y"}} &nbsp;&nbsp; End: {{event_end_enroll|date:"d M Y"}}</label>
-              </section>
-              <!-- Right Nav Section -->
-              {% if user.is_authenticated %}
-                {% get_user_object request.user.id as user_obj %}
-                {% check_is_gstaff groupid user_obj as gstaff_access %}
-                {% if not gstaff_access %}
-                  <section>
-                    <ul class="right" >
-                    {% user_access_policy groupid request.user as user_access %} 
-                      <li>
-                      {% if user_access == "allow" %}
-                        <input class="enroll-btn button tiny" type="button" value="ENROLLED" disabled="disabled">
-                      {% else %}
-                        {% if allow_to_join %}
-                          <input class="enroll-btn button tiny" type="button" value="ENROLL">
-                        {% else %}
-                          <input class="button tiny" type="button" value="ENROLL" disabled="disabled">
-                        {% endif %}
-                      {% endif %}
-                      </li>
-                    </ul> 
-                  </section>
-                {% endif %}
-              {% endif %}
-          </nav>
-      {% endif %}
-      <hr>
-    </div>
 {% endblock %}
 
 {% block body_content %}
@@ -177,6 +131,27 @@
           {% endif %}
       </dl>
 
+          <!-- Right Nav Section for enrollment -->
+          {% if user.is_authenticated %}
+            {% get_user_object request.user.id as user_obj %}
+            {% check_is_gstaff groupid user_obj as gstaff_access %}
+            {% if not gstaff_access %}
+                <ul class="right">
+                {% user_access_policy groupid request.user as user_access %} 
+                  <li class="enroll-btn-li">
+                  {% if user_access == "allow" %}
+                    <input class="enroll-btn button tiny" type="button" value="ENROLLED" disabled="disabled">
+                  {% else %}
+                    {% if allow_to_join %}
+                      <input class="enroll-btn button tiny" type="button" value="ENROLL">
+                    {% else %}
+                      <input class="button tiny" type="button" value="ENROLL" disabled="disabled">
+                    {% endif %}
+                  {% endif %}
+                  </li>
+                </ul> 
+            {% endif %}
+          {% endif %}
 
     <div class="row">
       

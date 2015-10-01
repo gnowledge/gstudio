@@ -145,7 +145,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                             if key in ("name","inverse_name"):
                                 new_instance_type[key] = unicode(request.POST.get(key+"_trans",""))
                                 language= request.POST.get('lan')
-                                new_instance_type.language=language
+                                new_instance_type.language = get_language_tuple(language)
                                 
                             else:
                                 new_instance_type[key] = unicode(request.POST.get(key,""))
