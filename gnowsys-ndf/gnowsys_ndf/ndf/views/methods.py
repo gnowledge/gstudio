@@ -283,22 +283,18 @@ def server_sync(func):
             shutil.move(src,path_for_this_capture)
             # mail.attach_file(file_path)         
         
-        print 'JSON',node
+        print 'JSON'
         node_json = bson.json_util.dumps(node)
-        with open(node_data_path,'w') as outfile:
+	with open(node_data_path,'w') as outfile:
             json.dump(node_json, outfile)
-        print "wrote to the file"
         ''' Run command to sign the json file, rename and move to syncdata folder'''
         #add _sig otherwise django_mailbox scrambles file name
-        json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
+	json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
         command = 'gpg -u ' + SYNCDATA_KEY_PUB + ' --output ' + json_op_file_name + ' --sign ' + node_data_path
         subprocess.call([command],shell=True)
-        print "coming here"
-        src = json_op_file_name
+	src = json_op_file_name
         shutil.move(src,path_for_this_capture)
-        print "sfasfsafsf"
-        #slice_registry(node["_id"],path_for_this_capture)
-        
+	slice_registry(node["_id"],path_for_this_capture)
         # mail.attach_file(json_op_file_name)
         
         # mail.attach_file(node_data_path)
@@ -4997,8 +4993,11 @@ def slice_registry(node_id,path_for_this_capture):
 			c = current_line.find(str(node_id))      
 			if c != -1:
 				a = False
+			if current_line == "":	
+				break
 	last_line = file_output.readline() 		
 	file_output.close()
 
 	with open(path_for_this_capture + "/Registry.txt","a") as outfile:
 		outfile.write(str(previouse_line)+""+str(current_line)+"" +str(last_line))	
+	print "end"
