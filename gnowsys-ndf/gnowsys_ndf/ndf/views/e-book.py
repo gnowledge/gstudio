@@ -22,7 +22,8 @@ from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 
 # GST_IMAGE = node_collection.one({'_type':'GSystemType', 'name': u"Image"})
 ebook_gst = node_collection.one({'_type':'GSystemType', 'name': u"E-Book"})
-
+GST_FILE = node_collection.one({'_type':'GSystemType', 'name': u"File"})
+GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': u'Page'})
 
 @get_execution_time
 def ebook_listing(request, group_id, page_no=1):
@@ -40,16 +41,34 @@ def ebook_listing(request, group_id, page_no=1):
 	if selfilters:
 		selfilters = json.loads(selfilters)
 		query_dict = get_filter_querydict(selfilters)
-		# print "\n----\n", query_dict
-	else:
-		query_dict.append({'collection_set': {'$exists': "true", '$not': {'$size': 0} }})
+	# else:
+	# 	query_dict.append({'collection_set': {'$exists': "true", '$not': {'$size': 0} }})
         
-	all_ebooks = node_collection.find({
-			"_type": "File",
-			"attribute_set.educationaluse": "eBooks",
-			'$and': query_dict
-			# , 'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-		})
+	# print "\n----\n", query_dict
+	# all_ebooks = node_collection.find({
+	# 		# "_type": "File",
+	# 		# "attribute_set.educationaluse": "eBooks",
+	# 		'$and': query_dict,
+	# 		'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+	# 	})
+
+	all_ebooks = node_collection.find({												
+								'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+								# '_type': 'File',
+								# 'fs_file_ids': {'$ne': []}, 
+								'group_set': {'$in': [ObjectId(group_id)]},
+								'attribute_set.educationaluse': 'eBooks',
+								'$and': query_dict,
+								'$or': [
+										{ 'access_policy': u"PUBLIC" },
+										{ '$and': [
+													{'access_policy': u"PRIVATE"}, 
+													{'created_by': request.user.id}
+												]
+										}
+									],
+								'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+								}).sort("last_update", -1)
 
 	ebooks_page_info = paginator.Paginator(all_ebooks, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
