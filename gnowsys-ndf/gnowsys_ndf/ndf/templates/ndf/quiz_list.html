@@ -61,15 +61,12 @@
    {% user_access_policy groupid request.user as user_access %}
    {% if user_access == "allow" %}
       
-   <a href="{% url 'quiz_create' group_name_tag %}" class="button small">
-+ {% trans "Add" %} {{title}} </a>
-<a href="{% url 'quiz_item_create' group_name_tag %}" class="button small">
-+ {% trans "Add" %} {{title}} {% trans "Item" %} 
-</a>
-
+    <a href="{% url 'quiz_create' group_name_tag %}" class="button small">+ {% trans "Add" %} {{title}} </a>
+    <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small">+ {% trans "Add" %} {{title}} {% trans "Item" %}</a>
   {% endif %}
   {% endif %}
 </div>
+
 </header>
 
 <div class="row">

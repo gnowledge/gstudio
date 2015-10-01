@@ -242,6 +242,7 @@ class CreateGroup(object):
 
             try:
                 group_obj.save()
+                capture_data(file_object=group_obj,file_data=None, content_type='group_created')
             except Exception, e:
                 return False, e
 
@@ -397,6 +398,7 @@ class CreateSubGroup(CreateGroup):
 
             try:
                 group_obj.save()
+                capture_data(file_object=group_obj, file_data=None, content_type = 'subgroupcreated')
             except Exception, e:
                 # if any errors return tuple with False and error
                 return False, e
@@ -455,8 +457,8 @@ class CreateSubGroup(CreateGroup):
             # adding normal sub-group to collection_set of parent group:
             if sg_member_of == 'Group':
                 parent_group_object.collection_set.append(ObjectId(sub_group_id))
-
             parent_group_object.save()
+            capture_data(file_object=parent_group_object, file_data=None, content_type='parent_group_updated')		
             return True
 
         # sub-groups "_id" already exists in parent_group.
@@ -521,6 +523,7 @@ class CreateModeratedGroup(CreateSubGroup):
             group_obj = self.get_group_fields(group_name, node_id=node_id)
             try:
                 group_obj.save()
+                capture_data(file_object=group_obj, file_data=None, content_type='parent_group_updated')
             except Exception, e:
                 # if any errors return tuple with False and error
                 # print e
@@ -1112,6 +1115,7 @@ class CreateCourseEventGroup(CreateEventGroup):
             group_obj.content = node.content
             group_obj.content_org = node.content_org
             group_obj.save()
+            capture_data(file_object=group_obj, file_data=None, content_type='Course_Event Sub groups')
             self.call_setup(request, node, group_obj, group_obj)
             return True
 
@@ -1140,8 +1144,10 @@ class CreateCourseEventGroup(CreateEventGroup):
             new_gsystem.save()
             gs_under_coll_set_of_obj.collection_set.append(new_gsystem._id)
             gs_under_coll_set_of_obj.save()
+            capture_data(file_object=gs_under_coll_set_of_obj, file_data=None, content_type='CourseGsystemCreated')
             new_gsystem.prior_node.append(gs_under_coll_set_of_obj._id)
             new_gsystem.save()
+            capture_data(file_object=new_gsystem, file_data=None, content_type='CourseGsystemCreated')
             return new_gsystem
         except Exception as e:
             # print e
@@ -1160,6 +1166,8 @@ class CreateCourseEventGroup(CreateEventGroup):
                     # prior_node_obj.collection_set.append(each_res_node._id)
                     # node.save()
                     prior_node_obj.save()
+                    capture_data(file_object=prior_node_obj, file_data=None, content_type='Course_Unit_prior_Node')
+                    
             else:
                 for each in node.collection_set:
                     each_node = node_collection.one({'_id': ObjectId(each)})
@@ -1189,6 +1197,7 @@ class CreateCourseEventGroup(CreateEventGroup):
             new_gsystem.content_org = node.content_org
             new_gsystem.content = node.content
             new_gsystem.save()
+            capture_data(file_object=new_gsystem, file_data=None, content_type='replicate_announced_resources')
             discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
             create_gattribute(new_gsystem._id, discussion_enable_at, False)
             new_gsystem.reload()
@@ -1417,6 +1426,9 @@ class EventGroupCreateEditHandler(View):
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
+                    group_obj.member_of = [ObjectId(courseevent_group_gst._id)]
+                    group_obj.save()
+                    capture_data(file_object=group_obj, file_data=None, content_type='set_CourseEventGroup_date')
 
                 group_name = group_obj.name
                 url_name = 'groupchange'
@@ -1803,7 +1815,6 @@ def group_dashboard(request, group_id=None):
       property_order_list = get_property_order_with_value(group_obj['group_of'][0])
 
   annotations = json.dumps(group_obj.annotations)
-  
   default_template = "ndf/groupdashboard.html"
   return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
                                                        'group_id':group_id, 'user':request.user, 
