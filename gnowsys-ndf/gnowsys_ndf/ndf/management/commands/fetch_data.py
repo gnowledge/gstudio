@@ -36,7 +36,7 @@ class Command(BaseCommand):
 			t = str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))	
 		print " \"%s\"" % t
 			
-		log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'WRITE'|grep '.Nodes\|.Triples'" % str(t))
+		log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'WRITE'|grep 'studio-dev.Nodes\|studio-dev.Triples'" % str(t))
 		print "somgin here"
 		for line in log_output:
 			'''raw string processing code'''

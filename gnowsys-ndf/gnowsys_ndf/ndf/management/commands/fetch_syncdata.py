@@ -51,11 +51,10 @@ class Command(BaseCommand):
 				syncdata_mails_list = metabox.get_new_mail()
 				if syncdata_mails_list:
 					for mail in syncdata_mails_list:
-						text,data = process_mails(mail)
-						received_registries += text
+						text,data,serverdir = process_mails(mail)
+						received_registries += serverdir
 						received_data += data			
-					chain_registry(received_registries)
-					print received_data
+					check_and_chain_registry(received_registries)
 					server_sync(received_data)		
 				else:
 					print 'No new mails received'
@@ -81,16 +80,61 @@ def process_mails(mail):
 		op_file_name = filename.split('_sig')[0]            
 		print 'output file name of decrypted attachment : \n %s' % op_file_name            
 		command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
-		print "error point croseed"
 		std_out= subprocess.call([command],shell=True)
 		list_of_decrypted_attachments.append(op_file_name)
-    	return fetch_registry(list_of_decrypted_attachments)    
-
-def fetch_registry(file_list):
+    	return fetch_registry(list_of_decrypted_attachments,mail)    
+import os
+def fetch_registry(file_list,mail):
     registryfile = [i for i in file_list if i.find(".txt")!= -1]
     datafile = [ i for i in file_list if i.find(".json") != -1]
-    print "the datafile",datafile
-    return  registryfile,datafile   
-def chain_registry(file_list):
-	print file_list
+    # store this registry and data in different folder according to thei server name
+    subject = mail.subject
+    serverid = subject.split('_')[0]
+    registryno = subject.split('_')[2]
+    if os.path.exists(serverid) == False:
+        os.mkdir(serverid)
+    #enter inside the directory
+    manage_path = os.path.abspath(os.path.dirname(os.pardir))
+    #directory path
+    serverdir = os.path.join(manage_path,serverid+"/" +str(registryno)+"/")
+    path_val = os.path.exists(serverdir)
+    if path_val == False:
+		os.makedirs(serverdir)
+    cp = "cp  -u " + str(registryfile[0]) + " " + serverdir + "/"  
+    subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
+    cp = "cp  -u " + str(datafile[0]) + " " + serverdir + "/"  
+    subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)	
+    return  registryfile,datafile,serverdir 
+def check_and_chain_registry(file_list):
+    '''
+    ac = [int(i) for i in file_list]
+    outranged = False
+    for (n1,n2) in zip(ac[:-1],ac[1:]):
+        print n1,n2
+        if n1+1 != n2:
+            outranged = True    
+            break:  
+    '''        
+    print file_list
+    filewrite = []
+    first_file =""
+    second_file = ""
+    for i in file_list:
+        print "the file path",i
+        for dir_, _, files in os.walk(i):
+            for filename in files:
+                if filename.find(".txt") != -1:
+                    print filename
+                    filepath =  os.path.join(dir_, filename)
+        print "the fiel path",filepath            
+        second_file = first_file
+        reg_file = open(filepath)
+    	first_file = registry_file.readlines()
+        if first_file and second_file:
+            merge_file_index = list(set(second_file[2] + first_file[1]))
+            filewrite += merge_file_index
+    with ("chainedfile.txt","a") as outfile:
+        outfile.write(filewrite)        
+
+
         
