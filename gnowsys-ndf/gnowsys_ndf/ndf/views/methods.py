@@ -4990,8 +4990,6 @@ def get_language_tuple(lang):
     # as a default return: ('en', 'English')
     return ('en', 'English')
 
-<<<<<<< HEAD
-    
 def get_filter_querydict(filters):
     """
     After getting the filters from request,
@@ -5039,7 +5037,7 @@ def get_filter_querydict(filters):
             query_dict.append({ "$or": temp_list})
 
     return query_dict
-=======
+
 def slice_registry(node_id,path_for_this_capture):
 	registry_path =  os.path.abspath(os.path.dirname(os.pardir))
 	registry_path =  os.path.join(registry_path, 'Registry.txt') 
@@ -5061,5 +5059,5 @@ def slice_registry(node_id,path_for_this_capture):
 
 	with open(path_for_this_capture + "/Registry.txt","a") as outfile:
 		outfile.write(str(previouse_line)+""+str(current_line)+"" +str(last_line))	
-	print "end"
->>>>>>> 32726d38ca8e6865836f5b6cc5354b7a42b90148
+	
+

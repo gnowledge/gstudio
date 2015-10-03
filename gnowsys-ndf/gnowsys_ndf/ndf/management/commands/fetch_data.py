@@ -25,19 +25,18 @@ class Command(BaseCommand):
 		#Read time stamp from the file
 		root_path =  os.path.abspath(os.path.dirname(os.pardir))
 		tym_scan =  os.path.join(root_path, 'Last_Scan.txt') 
-		file_output = open(tym_scan)
-		last_scan = file_output.readline()
-		if last_scan:
+		print tym_scan
+		if os.path.exists(tym_scan):
+			file_output = open(tym_scan)
+			last_scan = file_output.readline()
 			index = last_scan.find(":")
 			str1 = last_scan[index+1:]
 			t = str1.strip("\t\n\r ")
 		else:
-			print "itha"	
 			t = str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))	
 		print " \"%s\"" % t
-			
-		log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'WRITE'|grep '.Nodes\|.Triples'" % str(t))
-		print "somgin here"
+				
+		log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'WRITE'|grep 'studio-dev.Nodes\|studio-dev.Triples'" % str(t))
 		for line in log_output:
 			'''raw string processing code'''
 			str_start = line.find('_id')
@@ -57,30 +56,45 @@ class Command(BaseCommand):
 					'''	
 					if line.find("ToReduceDocs") == -1:	
 						if line.find('.Triples') != -1 or line.find('.Nodes') != -1 :	
-							if raw_string not in processing_list_ids:
-								processing_list_ids.append(raw_string)
+							if (raw_string) not in processing_list_ids:
+								processing_list_ids.append((raw_string,line[0:line.find(' ')]))
 				except Exception as e:
 					print e
 
-		process_parent_node(processing_list_ids)
+		process_parent_node(processing_list_ids,t)
 		#process_dependent_collection(child_collection_ids)			
 		datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+		'''
 		with open("Last_Scan.txt","w") as outfile:
-			outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))	
-def process_parent_node(Parent_collection_ids):
+			outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))	'''
+def process_parent_node(Parent_collection_ids,last_scan):
+	root_path =  os.path.abspath(os.path.dirname(os.pardir))
+	file_scan =  os.path.join(root_path, 'receivedfile')
 	for i in Parent_collection_ids:
-		i = (i[i.find('\''):i[i.find('\''):].find(')') + i.find('\'')]).strip('\'')
-		if i != '':
-			node = node_collection.find_one({"_id":ObjectId(str(i))})
-		if node:
-			capture_data(file_object=node, file_data=None, content_type='Genral')
+		id = i[0]
+		id = (id[id.find('\''):id[id.find('\''):].find(')') + id.find('\'')]).strip('\'')
+		time = i[1]
+		time = time.split('.')[0]
+		#After last scan of this machine if that data reside in this system 
+		#check its insertion tym
+		#if nodes log tym is more tha insert tym add it to the new log file
+		#log_output =  os.popen("cat  %s|awk '$0 > \"%s\"'|grep '%s'|awk '$0 > \"%s\"'" %  (file_scan,str(last_scan),id,time))
+		log_output =  os.popen("cat  %s|awk '$0 > \"%s\"'|grep '%s'" %  (file_scan,str(last_scan),id)).readlines()
+		if log_output:
+			#concide that that id was sent from the another server
+			allowed = False
+			for i in log_output:
+				registrytime = i[0:i.index(',')]
+				print time,registrytime
+				if registrytime > time  :
+					allowed = True
+					break	
+			if  allowed ==  True:
+					print "id",id,log_output
+					#capture_id_data(id,time)
 		else:
-			node = triple_collection.find_one({"_id":ObjectId(str(i))})	
-			capture_data(file_object=node, file_data=None, content_type='Genral')
-		#create log file
-		if node:
-			with open("Registry.txt", 'a') as outfile:
-				outfile.write(str("_id:" + str(node["_id"]) + "," +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{0}" +"\n" ))
+				print "Nodes Generated from this server",id
+				#capture_id_data(id,time)		
 			
 		
 def process_dependent_collection(dependent_collection):
@@ -89,4 +103,19 @@ def process_dependent_collection(dependent_collection):
 		if i != '':
 			node = triple_collection.find_one({"_id":ObjectId(str(i))})
 		capture_data(file_object=node, file_data=None, content_type='Genral')
-        
+
+
+def capture_id_data(id,time):
+	if id != '':
+		node = node_collection.find_one({"_id":ObjectId(str(id))})
+		if node:
+			pass
+		else:
+			node = triple_collection.find_one({"_id":ObjectId(str(id))})	
+			
+		#create log file
+
+		if node:
+			with open("Registry.txt", 'a') as outfile:
+				outfile.write(str(time + ", _id:" + str(node["_id"]) + ", " +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{1}" +"\n" ))
+		capture_data(file_object=node, file_data=None, content_type='Genral')         

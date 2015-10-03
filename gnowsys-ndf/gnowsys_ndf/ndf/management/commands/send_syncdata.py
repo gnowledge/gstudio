@@ -6,7 +6,7 @@ import shutil
 import urllib2
 from subprocess import call
 from django.core.mail import EmailMessage
-from gnowsys_ndf.settings import SYNCDATA_SENDING_EMAIL_ID, SYNCDATA_FROM_EMAIL_ID
+from gnowsys_ndf.settings import SYNCDATA_SENDING_EMAIL_ID, SYNCDATA_FROM_EMAIL_ID,SYNCDATA_KEY_PUB
 
 def sorted_ls(path):
     '''
@@ -61,13 +61,15 @@ class Command(BaseCommand):
 			print 'File name and location is: ', str(__file__)
 			print 'Error is : ', error
 		
-		for folder_name in list_of_syncdata_folders:
+		for i,folder_name in enumerate(list_of_syncdata_folders):
+			send_counter = "%06d" % i
 			path = syncdata_folder_path + '/' + folder_name
 			list_of_syncdata_files = os.listdir(path)
 			if connected_to_internet() is True:
 				mail = EmailMessage()
 				tstamp = folder_name
-				mail.subject= "SYNCDATA_"+tstamp
+				#mail.subject= str(SYNCDATA_KEY_PUB) + "SYNCDATA_"+tstamp
+				mail.subject= str(SYNCDATA_KEY_PUB) + "_SYNCDATA_"+send_counter+"_"+tstamp	
 
 				folder_empty = 1
 				for filename in list_of_syncdata_files:
