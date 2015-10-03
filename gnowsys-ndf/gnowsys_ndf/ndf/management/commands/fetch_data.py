@@ -64,9 +64,8 @@ class Command(BaseCommand):
 		process_parent_node(processing_list_ids,t)
 		#process_dependent_collection(child_collection_ids)			
 		datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-		'''
 		with open("Last_Scan.txt","w") as outfile:
-			outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))	'''
+			outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))
 def process_parent_node(Parent_collection_ids,last_scan):
 	root_path =  os.path.abspath(os.path.dirname(os.pardir))
 	file_scan =  os.path.join(root_path, 'receivedfile')
