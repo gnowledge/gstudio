@@ -52,9 +52,11 @@ class Command(BaseCommand):
 				if syncdata_mails_list:
 					for mail in syncdata_mails_list:
 						text,data,serverdir = process_mails(mail)
-						received_registries += serverdir
+                                                #received_registries += serverdir
+                                                if serverdir not in received_registries:         
+                                                        received_registries.append(serverdir)                            
 						received_data += data			
-					check_and_chain_registry(received_registries)
+					#check_and_chain_registry(received_registries)
 					server_sync(received_data)		
 				else:
 					print 'No new mails received'
@@ -129,12 +131,14 @@ def check_and_chain_registry(file_list):
         print "the fiel path",filepath            
         second_file = first_file
         reg_file = open(filepath)
-    	first_file = registry_file.readlines()
+    	first_file = reg_file.readlines()
         if first_file and second_file:
-            merge_file_index = list(set(second_file[2] + first_file[1]))
+            #merge_file_index = list(set(second_file[2] + first_file[1]))
+            merge_file_index = list(set(second_file + first_file))
             filewrite += merge_file_index
-    with ("chainedfile.txt","a") as outfile:
-        outfile.write(filewrite)        
+    with open("chainedfile.txt","a") as outfile:
+        for i in filewrite:
+            outfile.write(i)        
 
 
         
