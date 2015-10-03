@@ -91,10 +91,10 @@ def process_parent_node(Parent_collection_ids,last_scan):
 					break	
 			if  allowed ==  True:
 					print "id",id,log_output
-					#capture_id_data(id,time)
+					capture_id_data(id,time)
 		else:
 				print "Nodes Generated from this server",id
-				#capture_id_data(id,time)		
+				capture_id_data(id,time)		
 			
 		
 def process_dependent_collection(dependent_collection):
