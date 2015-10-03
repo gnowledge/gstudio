@@ -390,7 +390,7 @@ def create_edit_page(request, group_id, node_id=None):
             # Only while metadata editing
             if metadata == "metadata":
                 if page_node:
-                    get_node_metadata(request,page_node)
+                    get_node_metadata(request,page_node,is_changed=True)
         # End of filling metadata
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
