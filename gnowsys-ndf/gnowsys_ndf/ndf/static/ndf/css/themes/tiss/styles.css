@@ -10304,3 +10304,8 @@ aside#help p, aside#help h5, aside#help h6 {
   color: red;
   font-size: smaller;
 }
+
+/* line 1304, ../../../scss/_app_styles.scss */
+.text-gray {
+  color: gray;
+}
