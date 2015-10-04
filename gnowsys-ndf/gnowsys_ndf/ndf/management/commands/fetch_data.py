@@ -80,25 +80,26 @@ def process_parent_node(Parent_collection_ids,last_scan):
 		#if nodes log tym is more tha insert tym add it to the new log file
 		#log_output =  os.popen("cat  %s|awk '$0 > \"%s\"'|grep '%s'|awk '$0 > \"%s\"'" %  (file_scan,str(last_scan),id,time))
 		#print node_skipped_after_capture,id
-		#if id not in node_skipped_after_capture: 
-		log_output =  os.popen("cat  %s|awk '$0 > \"%s\"'|grep '%s'" %  (file_scan,str(last_scan),id)).readlines()
-		node_skipped_after_capture.append(id)
-		if log_output:
-			#concide that that id was sent from the another server
-			allowed = False
-			for i in log_output:
-				registrytime = i[0:i.index(',')]
-				print time,registrytime
-				if time > registrytime:
-					allowed = True
-					break	
-			if  allowed ==  True:
-					print "id",id,log_output
+		if id not in node_skipped_after_capture: 
+			log_output =  os.popen("cat  %s|awk '$0 > \"%s\"'|grep '%s'" %  (file_scan,str(last_scan),id)).readlines()
+			if log_output:
+				allowed = False
+				for i in log_output:
+					registrytime = i[0:i.index(',')]
+					if time > registrytime:
+						print "the time that matched",time,registrytime	
+						allowed = True
+						break	
+				if  allowed ==  True:
+						print "id",id,log_output
+						capture_id_data(id,time)
+						node_skipped_after_capture.append(id)
+			else:
+					print "Nodes Generated from this server",id
 					capture_id_data(id,time)
-		else:
-				print "Nodes Generated from this server",id
-				capture_id_data(id,time)		
-			
+					node_skipped_after_capture.append(id)
+						
+				
 		
 def process_dependent_collection(dependent_collection):
 	for i in dependent_collection:
