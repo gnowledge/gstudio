@@ -24,7 +24,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
 
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time, get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time, get_group_name_id,get_language_tuple
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity,get_execution_time
 
@@ -671,7 +671,10 @@ def user_profile(request,group_id):
 		for i in user_select_data:
 			a=ast.literal_eval(i)
 			if  a.get('language_proficiency',None) != None:
-				auth_node['language_proficiency'] = list(a.get('language_proficiency',''))
+				auth_node['language_proficiency'] = []
+				for k in a.get('language_proficiency',''):
+					language = get_language_tuple(k)
+					auth_node['language_proficiency'].append(language)
 			if  a.get('subject_proficiency',None) != None:			
 				auth_node['subject_proficiency'] =  list(a.get('subject_proficiency',''))
 		auth_node.save()
