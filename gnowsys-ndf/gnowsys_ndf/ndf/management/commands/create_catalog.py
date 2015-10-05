@@ -6,10 +6,11 @@ from bson.json_util import dumps,loads
 from bson import json_util
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.rcslib import RCS
+from gnowsys_ndf.settings import GAPPS
 import json
 rcs = RCS()
 hr = HistoryManager()
-		
+StsGSystemlist = ['Announced Course','CourseSection','CourseSubSection','CourseSectionEvent','CourseUnit','Course']		
 class Command(BaseCommand):
 
 	def handle(self,*args,**options):
@@ -18,12 +19,23 @@ class Command(BaseCommand):
 		final_list = []
 		
 		GSystemTypeList = [i['name'] for i in factory_gsystem_types]
-		RelationTypeList = [ i.keys()[0] for i in  factory_relation_types ]
+		GSystemTypeList.extend(list(GAPPS))
+		GSystemTypeList.extend(StsGSystemlist)
+		#AttributeType
+		extraattributes = [ i['name'] for i in attribute_types ]
 		AttributeTypeList = [ i.keys()[0] for i in  factory_attribute_types ]
+		AttributeTypeList.extend(extraattributes)
+		AttributeTypeList = get_attributetypes(AttributeTypeList)
+		
 		metatypes = get_metatypes()	
 		GSystemTypeList = get_gsystems(GSystemTypeList)
+		#RelationType
+		extrrelations = [ i['name'] for i in relation_types ]
+		RelationTypeList = [ i.keys()[0] for i in  factory_relation_types ]
+		RelationTypeList.extend(extrrelations)
 		RelationTypeList = get_relationtypes(RelationTypeList)
-		AttributeTypeList = get_attributetypes(AttributeTypeList)
+		
+
 		datalist = get_factory_data(factory_data)
 		final_list  = datalist + AttributeTypeList +  RelationTypeList  + GSystemTypeList + metatypes
 		#send it for making the rcs of all the nodes
@@ -37,15 +49,14 @@ def  get_metatypes():
 	return metatypeslist		
 
 def  get_gsystems(GSystemTypeList):
-	var = {"_type": "GSystemType","name":{"$in":GSystemTypeList}}  
-	Systemtypes = node_collection.find(var,{"_id":1})
-	Systemtypelist = [i._id for i in Systemtypes]
-		
-	'''
-	cmd = "mongoexport --db studio-dev --collection Nodes -q '" + '%s'  % var + "' --out Schema/GSystemType.json"
-	subprocess.Popen(cmd,stderr=subprocess.STDOUT,shell=True)
-	'''
+	lisst = []
+	Systemtypelist =[]
+	var = {"name":{"$in":GSystemTypeList}}  
+	Systemtypes = node_collection.find(var)
+	Systemtypelist = [i._id for i in Systemtypes  ]
 	return Systemtypelist	
+					 		
+		
 def get_relationtypes(RelationTypeList):
 	var = {"_type": "RelationType","name":{"$in":RelationTypeList}} 
 	'''var = var.replace("'",'"')'''
@@ -56,6 +67,7 @@ def get_relationtypes(RelationTypeList):
 	relationtype = node_collection.find(var,{"_id":1})
 	relationtypelist = [i._id for i in relationtype ]
 	return relationtypelist
+
 def get_attributetypes(AttributeTypeList):
 	var = {"_type": "AttributeType","name":{"$in":AttributeTypeList}} 
 	'''
@@ -66,6 +78,7 @@ def get_attributetypes(AttributeTypeList):
 	attributetype = node_collection.find(var,{"_id":1})
 	attributetypelist = [i._id for i in attributetype]
 	return attributetypelist
+
 def  get_factory_data(Factory_data):
 	data_list = []
 	GlistItems = []
@@ -80,7 +93,6 @@ def  get_factory_data(Factory_data):
 	if Glisttypes:
 		for i in Glisttypes:
 			if i not in data_list:
-				print i.name
 				data_list.append(i._id)
 				if i.collection_set:
 					GlistItems.extend(i.collection_set)
@@ -109,28 +121,46 @@ def make_rcs_dir(final_list):
 	for i in final_list:	
 		#get rcs files path and copy them to the current dir:
 		if type(i)!= int:
-			
-				a = node_collection.find_one({"_id":ObjectId(i)})
-				if a:
-					rel_path = hr.get_file_path(a)
-					path = rel_path + ",v"
-					#cp = "cp  -u " + path + " " +" --parents " + rcs_path + "/" 
-					#subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
-				if a:
-					filter_list = ['GSystemType','RelationType','AttributeType','MetaType']
-					if a._type  in filter_list:
-						file_node = get_version_document(a,rel_path)
-						if a._type == 'GSystemType':
-							GSystemtypenodes.append(file_node)
-						elif a._type == 'RelationType':
-							Relationtypenodes.append(file_node)
-						elif a._type == 'AttributeType':
-							Attributetypenodes.append(file_node)
-						elif a._type == 'MetaType': 
-							metatype.append(file_node)
-					elif a._type not in filter_list:
-						file_node = get_version_document(a,rel_path,'1.1')
-						factorydatanode.append(file_node)					
+				
+			a = node_collection.find_one({"_id":ObjectId(i)})
+
+			if a:
+				rel_path = hr.get_file_path(a)
+				path = rel_path + ",v"
+				#cp = "cp  -u " + path + " " +" --parents " + rcs_path + "/" 
+				#subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
+			if a:
+				filter_list = ['GSystemType','RelationType','AttributeType','MetaType']
+				if a._type  in filter_list:
+					try:
+						file_node = get_version_document(a,rel_path)		
+					except:
+						a.save()
+						file_node = get_version_document(a,rel_path)	 
+					if a._type == 'GSystemType':
+						GSystemtypenodes.append(file_node)
+					elif a._type == 'RelationType':
+						Relationtypenodes.append(file_node)
+					elif a._type == 'AttributeType':
+						Attributetypenodes.append(file_node)
+					elif a._type == 'MetaType': 
+						metatype.append(file_node)
+				elif a._type not in filter_list:
+					if a._type == "Group":
+						try:
+							file_node = get_version_document(a,rel_path,'1.1')
+						except:
+							#if rcs doesn't exist in the system then create it.
+							a.save()
+							file_node = get_version_document(a,rel_path,'1.1')
+					else:
+						try:	
+							file_node = get_version_document(a,rel_path)
+						except:
+							a.save()
+							file_node = get_version_document(a,rel_path)	
+					
+					factorydatanode.append(file_node)					
 			
 	#start making catalog 	
 	make_catalog(GSystemtypenodes,'GSystemType')
@@ -142,13 +172,15 @@ def make_rcs_dir(final_list):
 def make_catalog(file_node,data_type):
 	''' make folder called catalog '''
 	PROJECT_ROOT = os.path.abspath(os.path.dirname(os.pardir))
-	refcatpath = os.path.join(PROJECT_ROOT + '/GRef.cat.')
+	refcatpath = os.path.join(PROJECT_ROOT + '/GRef.cat' + '/' + data_type)
 	path_val = os.path.exists(refcatpath)
 	if path_val == False:		
 		os.makedirs(refcatpath)
-	with open('GRef.cat./' + data_type+ ".json", 'w') as outfile:
-		json.dump(file_node, outfile,ensure_ascii=True,indent=4,
-                                          sort_keys=False)
+	for i in file_node:
+		file_path = refcatpath + "/" + str(i['name']) + ".json" 
+		with open(file_path, 'w') as outfile:
+			json.dump(i, outfile,ensure_ascii=True,indent=4,
+		                                  sort_keys=False)
 	file_node = []
 def get_version_document(document,rel_path,version=""):
 	if version == "":
@@ -158,3 +190,7 @@ def get_version_document(document,rel_path,version=""):
 		json_data = version_file.read()
 	rcs.checkin(rel_path)
 	return json.loads(json_data)
+
+     
+
+

@@ -193,7 +193,8 @@ class Command(BaseCommand):
           glist_container = node_collection.collection.GSystem()
           glist_container.name=u"Eventtype"
           glist_container.status = u"PUBLISHED"
-          glist_container.created_by=user_id
+          glist_container.created_by = user_id
+          glist_container.modified_by = user_id	
           glist_container.member_of.append(glist._id)
           glist_container.save()
           print "\n Eventtype Created."
@@ -203,6 +204,7 @@ class Command(BaseCommand):
             node.name=u"CollegeEvents"
             node.status = u"PUBLISHED"
             node.created_by=user_id
+            node.modified_by=user_id
             node.member_of.append(glist._id)
             node.save()
             print "\n CollegeEvents Created."
