@@ -65,11 +65,49 @@ $.ajax({
 }); 
 }
 
+$(document).on('keydown',"#collection_set_search",function(e){
+      if (e.keyCode == 8) {
+        // If backspace pressed, then show all
+        search_text_len = 0;
+      }
+      var $li = $("#collection_set_search").parents("li").nextAll("li.bullet-item")
+      if(e.keyCode==13){
+        var search_text = (this.value).toLowerCase().trim();
+        var search_text_len = (search_text.length + 1);
+
+      }
+      if (search_text_len>0) {
+        // $(".searching").css("display", "block");
+        $li.each(function() {
+          val_chk = $(this).text().toLowerCase().search(search_text)  
+          if (val_chk != -1) {
+            $(this).css("display", "block");
+          }     
+          else{
+            $(this).css("display", "none");
+          }
+        });
+        // $(".searching").css("display", "none");
+      }
+      else if (search_text_len == 0) {
+        $li.filter(function() {
+          if ($(this).css("display") == "none") {
+            return true;
+          }
+          else {
+            return false;
+          }
+        }).show();
+      }
+
+})
+
+
 $(document).on('click',"#subscr_users",function() {
 
  $('#inviteusers #collection_set_drawer1').html("");
  $('#inviteusers #collection_set_drawer2').html("");
- $('#inviteusers #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans "Type here to search users" %}" id="collection_set_search" class="margin-0"></li>');
+ $('#inviteusers #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans "Type here and press enter to search users" %}" id="collection_set_search" class="margin-0"></li>');
 
 var url="/{{node}}/group/notify/invite_users/"
  $.getJSON( url, function( data ) {
@@ -103,9 +141,15 @@ function get_all_data(){
 
 
 </script>
+<style type="text/css">
+  .subscr_users_li{
+     list-style: none;
+  }
+</style>
+
 
 <div id="subscr_users">
-<li>
+<li class="subscr_users_li">
   <a href="#" data-reveal-id="inviteusers" class="button tiny">
     {% trans 'Subscribe Users' %}
   </a>

@@ -17,7 +17,8 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import Node, GRelation,GSystemType,File,Triple
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, get_execution_time
+# from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 # from gnowsys_ndf.ndf.org2any import org2html
 
 #######################################################################################################################################
@@ -248,7 +249,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		if filters:
 			temp_list = []
 			for each in filters:
-				filter_grp = each["$or"]
+				filter_grp = each["or"]
 				for each_filter in filter_grp:
 					temp_dict = {}
 					each_filter["selFieldText"] = cast_to_data_type(each_filter["selFieldText"], each_filter["selFieldPrimaryType"])
