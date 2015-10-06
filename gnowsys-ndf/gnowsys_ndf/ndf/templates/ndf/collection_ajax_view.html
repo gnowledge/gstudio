@@ -120,7 +120,10 @@
                   // else if (node_type == "Topic"){
                   //   window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
                   // }
-                                      
+                  if (node_type == "ProgramEventGroup"){
+                    window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");
+                    $(".view_page_link").trigger('click')
+                  }
                   $("#view_page").html(data);
                 }
             });
