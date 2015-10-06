@@ -43,7 +43,7 @@ from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
@@ -850,7 +850,12 @@ def get_collection(request, group_id, node_id):
   #   for i in range(x):
   #     processes[i].join()#each Process converges
   data = collection_list
-
+  updated_data = []
+  # print "\n node.member_of_names_list",node.member_of_names_list
+  if "CourseEventGroup" in node.member_of_names_list:
+    get_course_units_tree(data,updated_data)
+    data = updated_data
+  # print data
   return HttpResponse(json.dumps(data))
 
 
