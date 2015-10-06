@@ -939,11 +939,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     #  language
     if language:
         node.language = get_language_tuple(language)
-        print "=========node.language-==========\n", node.language
+        # print "=========node.language-==========\n", node.language
         is_changed = True
     else:
         node.language = get_language_tuple(u"en")
-        node.language = ("en","English")
+        # node.language = ("en","English")
         is_changed = True
 
     #  access_policy
