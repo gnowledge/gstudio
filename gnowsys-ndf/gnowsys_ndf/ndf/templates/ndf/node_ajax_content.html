@@ -6,11 +6,123 @@
 {% get_group_name groupid as group_name_tag %}
 
 
-<div class="row page" itemscope itemtype="{{schema.1.type}}">
-      
+<div class="row page" itemscope itemtype="{{schema.1.type}}"> 
+  
   <section class="medium-9 columns">
 
   {% block breadcrumb %} {% get_breadcrumb request.path %} {% endblock breadcrumb %}
+  <ul>
+      <!--  Fliter now on right hand side of page   -->
+       {% if topic %}
+        <dl class="tabs" style="float: right; height: 1px;" data-tab> 
+
+          <!-- Basic Description -->
+          <!-- Filter view for Topics -->
+          <dd class="filters-view">
+            <nav id="nav">
+              <ul id="navigation">
+                <li><a href="#" class="view-filters"><i class ="fi-filter"></i> {% trans "Filter based on" %} </a>
+                  <ul id="view-elements">
+                    {% get_metadata_values as metadata %}
+                    {% for k,v in metadata.items %}
+                      {% if k == "educationallevel" %}            
+                        <li>
+                          <a> {% trans "Level" %} &raquo;</a>
+                          <ul>
+                            {% for opts in v %}
+                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </li> 
+                      {% elif k == "educationalsubject" %}
+                        <li>
+                          <a> {% trans "Subject" %} &raquo;</a>
+                          <ul>
+                            {% for opts in v %}
+                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </li>
+                      {% elif k == "educationaluse" %}
+                        <li>
+                          <a> {% trans "Resource Type" %} &raquo;</a>
+                          <ul>
+                            {% for opts in v %}
+                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </li>
+                        <!-- Commented bellow filters for time being will be using this filter at different place "So dont remove this code" -->
+                        {% comment %}                    
+                      <!-- {% elif k == "textcomplexity" %}
+                        <li>
+                          <a> {% trans "Text Complexity" %} &raquo;</a>
+                          <ul>
+                            {% for opts in v %}
+                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </li> 
+                      {% elif k == "educationalalignment" %}
+                        <li>
+                          <a> {% trans "Educational Alignment" %} &raquo;</a>
+                          <ul>
+                            {% for opts in v %}
+                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </li> -->
+                        {% endcomment %}                    
+                      {% elif k == "language" %}
+                        <li>
+                          <a> {% trans "Language" %} &raquo;</a>
+                          <ul>
+                            {% for opts in v %}
+                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </li>
+                      {% elif k == "interactivitytype" %}
+                        <li>
+                          <a> {% trans "Learning Type" %} &raquo;</a>
+                          <ul>
+                            {% for opts in v %}
+                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </li>
+                      {% elif k == "audience" %}
+                        <li>
+                          <a> {% trans "Target Group" %} &raquo;</a>
+                          <ul>
+                            {% for opts in v %}
+                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </li>
+                      {% endif %}
+
+                    {% endfor %}
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+          </dd>
+
+          <!--
+          <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
+          <ul id="hover1" class="f-dropdown" data-dropdown-content>
+            <li class="view_list" id="Images"><a><i class="fi-photo"></i> {#% trans "Images" %#} </a></li> 
+            <li class="view_list" id="Videos"><a><i class="fi-play-circle"></i> {#% trans "Videos" %#} </a></li>  
+            <li class="view_list" id="Audios"><a><i class="fi-music"></i> {#% trans "Audios" %#} </a></li>  
+            <li class="view_list" id="Documents"><a><i class="fi-page-filled"></i> {#% trans "Documents" %#} </a></li>  
+            <li class="view_list" id="Interactives"><a><i class="fi-arrows-compress"></i> {#% trans "Interactives" %#} </a></li>  
+          </ul>
+          -->
+          </dl>
+      {% endif %}
+      <!--  End of Filter-->
+  </ul>
 
   {% if breadcrumbs_list %}
   <ul class="breadcrumbs"> 
@@ -62,7 +174,8 @@
   {% endif %}
 
   <h3>
-    <span itemprop="{{schema.1.name}}" class='node'> {% firstof node.altnames node.name %} </span>
+    {# <span itemprop="{{schema.1.name}}" class='node'> {% firstof node.altnames node.name %} </span> #}
+
     {# {% if node.altnames %}{{node.altnames}}{% else %}{{node.name}}{% endif %} #}
     
   {% if node %}
@@ -73,117 +186,7 @@
   {% endif %}
   </h3>
       
-      {% if topic %}
-    <dl class="tabs" data-tab> 
 
-      <!-- Basic Description -->
-      <!-- Filter view for Topics -->
-      <dd class="filters-view">
-        <nav id="nav">
-          <ul id="navigation">
-            <li><a href="#" class="view-filters"><i class ="fi-filter"></i> {% trans "Filter based on" %} </a>
-              <ul id="view-elements">
-                {% get_metadata_values as metadata %}
-                {% for k,v in metadata.items %}
-                  {% if k == "educationallevel" %}            
-                    <li>
-                      <a> {% trans "Level" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li> 
-                  {% elif k == "educationalsubject" %}
-                    <li>
-                      <a> {% trans "Subject" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% elif k == "educationaluse" %}
-                    <li>
-                      <a> {% trans "Resource Type" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                    <!-- Commented bellow filters for time being will be using this filter at different place "So dont remove this code" -->
-                    {% comment %}                    
-                  <!-- {% elif k == "textcomplexity" %}
-                    <li>
-                      <a> {% trans "Text Complexity" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li> 
-                  {% elif k == "educationalalignment" %}
-                    <li>
-                      <a> {% trans "Educational Alignment" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li> -->
-                    {% endcomment %}                    
-                  {% elif k == "language" %}
-                    <li>
-                      <a> {% trans "Language" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% elif k == "interactivitytype" %}
-                    <li>
-                      <a> {% trans "Learning Type" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% elif k == "audience" %}
-                    <li>
-                      <a> {% trans "Target Group" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% endif %}
-
-                {% endfor %}
-              </ul>
-            </li>
-          </ul>
-        </nav>
-      </dd>
-
-      <!--
-      <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
-      <ul id="hover1" class="f-dropdown" data-dropdown-content>
-        <li class="view_list" id="Images"><a><i class="fi-photo"></i> {#% trans "Images" %#} </a></li> 
-        <li class="view_list" id="Videos"><a><i class="fi-play-circle"></i> {#% trans "Videos" %#} </a></li>  
-        <li class="view_list" id="Audios"><a><i class="fi-music"></i> {#% trans "Audios" %#} </a></li>  
-        <li class="view_list" id="Documents"><a><i class="fi-page-filled"></i> {#% trans "Documents" %#} </a></li>  
-        <li class="view_list" id="Interactives"><a><i class="fi-arrows-compress"></i> {#% trans "Interactives" %#} </a></li>  
-      </ul>
-      -->
-      
-    
-      
-    </dl>
-      {% endif %}
   <!-- new  -->
 
   {% if schema.0 %}
@@ -421,8 +424,7 @@
               {% elif 'epub' in node.mime_type %}
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
-                <!-- <script type="text/javascript" src="https://raw.githubusercontent.com/futurepress/epub.js/master/build/libs/zip.min.js"></script> -->
-
+               
                 <div class="row">
                   <h4 class="small-4 columns redirection" onclick="Book.prevPage();">
                     <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
@@ -520,12 +522,18 @@
                 <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
               {% endif %}
                   <span class="fi-download large"> {% trans "Download " %} </span>
+
                 </a>
               
             {% endif %}
 
             <!-- End New -->          
-      
+              <div class="right">
+                      {% if node.mime_type %}
+                        <i>{% trans 'Resource Type' %}: {{node.mime_type}}</i><br/>
+                        
+                     {% endif %}
+              </div>
           {% endif %}
           
           {% block add_fields %} {% endblock %}

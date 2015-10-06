@@ -128,8 +128,8 @@ def get_group_agency_types():
 
 @get_execution_time
 @register.assignment_tag
-def get_licence():
-   return GSTUDIO_LICENCE
+def get_license():
+   return GSTUDIO_LICENSE
 
 
 @get_execution_time
