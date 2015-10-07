@@ -119,13 +119,23 @@ var url="/{{node}}/group/notify/invite_admins/"
    if(index == 0)
     {
      $.each(drawer_elements.drawer1, function(index, element) {
-        $('#inviteadmins #admin_colln_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        name_field1 = element.username
+        if (element.email){
+          name_field1 += " [ "+ element.email+" ]"
+        }
+
+
+        $('#inviteadmins #admin_colln_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+name_field1+"</li>");
       });
    }
    if(index == 1)
     {
     $.each(drawer_elements.drawer2, function(index, element) {
-        $('#inviteadmins #admin_colln_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        name_field2 = element.username
+        if (element.email){
+          name_field2 += " [ "+ element.email+" ]"
+        }
+        $('#inviteadmins #admin_colln_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+name_field2+"</li>");
       });
     }
 
