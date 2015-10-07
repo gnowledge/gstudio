@@ -9,18 +9,18 @@ class Command(BaseCommand):
     def handle(self,*args,**options):
 		file_names = ['metatype.json','AttributeType.json','RelationType.json','GSystemType.json','factorydata.json']
 		for i in file_names:	
+			json_documents_list = []	
 			PROJECT_ROOT = os.path.abspath(os.path.dirname(os.pardir))
-			refcatpath = os.path.join(PROJECT_ROOT + '/GRef.cat./' + i)
+			refcatpath = os.path.join(PROJECT_ROOT + '/GRef.cat/' + i)
 			path_val = os.path.exists(refcatpath)
 			if path_val:
-				with open(refcatpath, 'r') as json_file:
-					json_data = json_file.read()
-				json_documents_list = json.loads(json_data)
-				
-			# Process data in proper format
-			
-			
-			# process data based on the structure type			
+				for dir_, _, files in os.walk(refcatpath):
+				    for filename in files:
+					filepath =  os.path.join(dir_, filename)
+					with open(filepath, 'r') as json_file:
+						json_data = json_file.read()
+					json_documents_list.append(json.loads(json_data))
+					
 			parsed_json_document = []
 			for j,json_data in enumerate(json_documents_list):
 				converted_data = node_collection.from_json(json.dumps(json_data))
@@ -88,7 +88,16 @@ def process_list(val_list):
 			node_list.append(node)
 	return node_list
 
+def process_list(val_list):
+	node_list = []
+	for i in val_list:
+                node = node_collection.one({"_id":ObjectId(i['_id']['$oid'])})
+		if node:
+			node_list.append(node)
+	return node_list
 
+					
+						
 
 
 

@@ -157,7 +157,6 @@ def make_rcs_dir(final_list):
 	for i in final_list:	
 		#get rcs files path and copy them to the current dir:
 		if type(i)!= int:
-				
 				a = node_collection.find_one({"_id":ObjectId(i)})
 
 				with open('file_log.txt', 'a') as outfile:
@@ -201,6 +200,7 @@ def make_rcs_dir(final_list):
 								file_node = get_version_document(a,rel_path)	
 						
 						factorydatanode.append(file_node)					
+
 			
 	#start making catalog 	
 	make_catalog(GSystemtypenodes,'GSystemType')
@@ -212,13 +212,15 @@ def make_rcs_dir(final_list):
 def make_catalog(file_node,data_type):
 	''' make folder called catalog '''
 	PROJECT_ROOT = os.path.abspath(os.path.dirname(os.pardir))
-	refcatpath = os.path.join(PROJECT_ROOT + '/GRef.cat.')
+	refcatpath = os.path.join(PROJECT_ROOT + '/GRef.cat' + '/' + data_type)
 	path_val = os.path.exists(refcatpath)
 	if path_val == False:		
 		os.makedirs(refcatpath)
-	with open('GRef.cat./' + data_type+ ".json", 'w') as outfile:
-		json.dump(file_node, outfile,ensure_ascii=True,indent=4,
-                                          sort_keys=False)
+	for i in file_node:
+		file_path = refcatpath + "/" + str(i['name']) + ".json" 
+		with open(file_path, 'w') as outfile:
+			json.dump(i, outfile,ensure_ascii=True,indent=4,
+		                                  sort_keys=False)
 	file_node = []
 def get_version_document(document,rel_path,version=""):
 	if version == "":
@@ -228,3 +230,7 @@ def get_version_document(document,rel_path,version=""):
 		json_data = version_file.read()
 	rcs.checkin(rel_path)
 	return json.loads(json_data)
+
+     
+
+
