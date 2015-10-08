@@ -121,19 +121,27 @@
               $(".view_page_link").trigger('click')
               $("#view_page").html("")
               var lbl_name = document.createElement('label');
-              lbl_name.innerHTML = node.name + " contains following : ";
               lbl_name.style.fontSize = "20px"
-              $("#view_page").append(lbl_name);
-              var ol_elem = document.createElement('OL');
-              ol_elem.id = "res_container";
-              if (node){  
-                for(var i=0;i<node.children.length;i++){
-                  var elem2 = document.createElement('LI');
-                  elem2.innerHTML = node.children[i].name;
-                  elem2.className = "res_name"
-                  $(ol_elem).append(elem2)
+              if(node.children.length>0){
+                lbl_name.innerHTML = node.name + " contains following : ";
+                $("#view_page").append(lbl_name);
+                var ol_elem = document.createElement('OL');
+                ol_elem.id = "res_container";
+                if (node){  
+                  for(var i=0;i<node.children.length;i++){
+                    var elem2 = document.createElement('LI');
+                    elem2.innerHTML = node.children[i].name;
+                    elem2.className = "res_name"
+                    $(ol_elem).append(elem2)
+                  }
                 }
               }
+              else{
+                lbl_name.innerHTML = node.name + " contains no files yet!";
+                $("#view_page").append(lbl_name);
+
+              }
+
               $("#view_page").append(ol_elem)
             }
           }
