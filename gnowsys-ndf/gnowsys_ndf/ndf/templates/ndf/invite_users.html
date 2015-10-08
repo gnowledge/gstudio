@@ -115,21 +115,14 @@ var url="/{{node}}/group/notify/invite_users/"
    if(index == 0)
     {
      $.each(drawer_elements.drawer1, function(index, element) {
-        name_field1 = element.username
-        if (element.email){
-          name_field1 += " [ "+ element.email+" ]"
-        }
-
+        name_field1 = element.username + "<br><i>"+element.email+"</i>"
         $('#inviteusers #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+name_field1+"</li>");
       });
    }
    if(index == 1)
     {
     $.each(drawer_elements.drawer2, function(index, element) {
-        name_field2 = element.username
-        if (element.email){
-          name_field2 += " [ "+ element.email+" ]"
-        }
+        name_field2 = element.username + "<br><i>"+element.email+"</i>"
         $('#inviteusers #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+name_field2+"</li>");
       });
     }
@@ -166,7 +159,7 @@ function get_all_data(){
 
 <div id="inviteusers" class="reveal-modal " data-reveal >
      
-     {% blocktrans %}<h2>Select users</h2>{% endblocktrans %}
+     {% blocktrans %}<h2>Select Users</h2>{% endblocktrans %}
       <div id="module_drawer" >
         {% include "ndf/drawer_widget.html" with widget_for="collection_set"  %}
       </div>
