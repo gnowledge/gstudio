@@ -91,7 +91,7 @@
                 }
             }
             nele = node.element
-            collapse_tree(nele);
+            collapse_tree(node,nele);
             var nav_list = parent_arr.reverse();
             if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
               // alert(nav_list);
@@ -118,23 +118,23 @@
               $('article').unblock()
             }
             else if(node['node_type']=="CourseUnitEvent"){
-            $(".view_page_link").trigger('click')
-            $("#view_page").html("")
-            var lbl_name = document.createElement('label');
-            lbl_name.innerHTML = node.name + " contains following : ";
-            lbl_name.style.fontSize = "20px"
-            $("#view_page").append(lbl_name);
-            var ol_elem = document.createElement('OL');
-            ol_elem.id = "res_container";
-            if (node){  
-              for(var i=0;i<node.children.length;i++){
-                var elem2 = document.createElement('LI');
-                elem2.innerHTML = node.children[i].name;
-                elem2.className = "res_name"
-                $(ol_elem).append(elem2)
+              $(".view_page_link").trigger('click')
+              $("#view_page").html("")
+              var lbl_name = document.createElement('label');
+              lbl_name.innerHTML = node.name + " contains following : ";
+              lbl_name.style.fontSize = "20px"
+              $("#view_page").append(lbl_name);
+              var ol_elem = document.createElement('OL');
+              ol_elem.id = "res_container";
+              if (node){  
+                for(var i=0;i<node.children.length;i++){
+                  var elem2 = document.createElement('LI');
+                  elem2.innerHTML = node.children[i].name;
+                  elem2.className = "res_name"
+                  $(ol_elem).append(elem2)
+                }
               }
-            }
-            $("#view_page").append(ol_elem)
+              $("#view_page").append(ol_elem)
             }
           }
           else{
@@ -150,38 +150,38 @@
           });
           $tree.unbind('tree.open')
           $tree.unbind('tree.select')
-          
       } else {
           update_url = true;
       }      
 
     }
     
-    function collapse_tree(curr_ele){
+    function collapse_tree(node_item, curr_ele){
       //Collapse other trees
       // Fetch the current openNode as curr_ele
-      // console.log(curr_ele)
-      $(curr_ele).removeClass("jqtree-closed")
+      // console.log(node_item.node_type)
+      if(node_item.node_type=="CourseUnitEvent"){
+        $(curr_ele).removeClass("jqtree-closed")
 
-      //Get all li ele other than curr_ele and close them
-      other_ele = $("li.jqtree-folder").not(curr_ele)
+        //Get all li ele other than curr_ele and close them
+        other_ele = $("li.jqtree-folder").not(curr_ele)
 
-      // console.log(other_ele.length) // This length is no. of li ele closed.
-      hide_tree(other_ele);
+        // console.log(other_ele.length) // This length is no. of li ele closed.
+        hide_tree(other_ele);
 
-      /*
-      Open curr_ele
-       This is done explicitly in order to  
-          - to removeClass 'jqtree-closed',
-          - change the text (arrow indicating Open/Close)
-          - ul holds the chidlren of curr_ele (i.e resources in Unit)
-          which otherwise does not opens the node.
-      */
-      $(curr_ele).find("a.jqtree-toggler")
-                  .removeClass("jqtree-closed")
-                  .text("▼")
-      $(curr_ele).find("ul").css("display","block")
-
+        /*
+        Open curr_ele
+         This is done explicitly in order to  
+            - to removeClass 'jqtree-closed',
+            - change the text (arrow indicating Open/Close)
+            - ul holds the chidlren of curr_ele (i.e resources in Unit)
+            which otherwise does not opens the node.
+        */
+        $(curr_ele).find("a.jqtree-toggler")
+                    .removeClass("jqtree-closed")
+                    .text("▼")
+        $(curr_ele).find("ul").css("display","block")
+      }
     }
 
     function hide_tree(ele_obj){
