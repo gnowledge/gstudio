@@ -36,7 +36,7 @@ class Command(BaseCommand):
 			t = str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))	
 		print " \"%s\"" % t
 				
-		log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'WRITE'|grep 'studio-dev.Nodes\|studio-dev.Triples'" % str(t))
+		log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'WRITE'|grep 'recv-data.Nodes\|recv-data.Triples'" % str(t))
 		for line in log_output:
 			'''raw string processing code'''
 			str_start = line.find('_id')
@@ -64,6 +64,7 @@ class Command(BaseCommand):
 		process_parent_node(processing_list_ids,t)
 		#process_dependent_collection(child_collection_ids)			
 		datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+		slice_registry(t)
 		with open("Last_Scan.txt","w") as outfile:
 			outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))
 def process_parent_node(Parent_collection_ids,last_scan):
@@ -122,4 +123,36 @@ def capture_id_data(id,time):
 		if node:
 			with open("Registry.txt", 'a') as outfile:
 				outfile.write(str(time + ", _id:" + str(node["_id"]) + ", " +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{1}" +"\n" ))
-		capture_data(file_object=node, file_data=None, content_type='Genral')         
+		capture_data(file_object=node, file_data=None, content_type='Genral')       
+
+
+def slice_registry(time):
+	manage_path =  os.path.abspath(os.path.dirname(os.pardir))
+	registry_path =  os.path.join(manage_path, 'Registry.txt') 
+	if time == "":
+		time = "0000-00-00T00:00:00"
+	'''	
+	file_output = open(registry_path)
+	current_line = ""
+	previouse_line = ""
+	last_line = ""
+	a = True
+	#Old code to create previouse and post node information
+	#with every sending node
+	
+	while a:
+			previouse_line = current_line
+			current_line = file_output.readline()
+			c = current_line.find(str(node_id))      
+			if c != -1:
+				a = False
+			if current_line == "":	
+				break
+	last_line = file_output.readline() 		
+	file_output.close()
+	'''
+	log_output =  os.popen("cat  %s|awk '$0 > \"%s\"'" %  (registry_path,str(time))).read()
+	with open(manage_path + "/Info_Registry.txt","w") as outfile:
+		outfile.write(log_output)	
+	
+  
