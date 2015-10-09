@@ -7,7 +7,6 @@
 
   <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
-
     
   <script type="text/javascript">
     $(document).ready(function() {      
@@ -51,7 +50,7 @@
 
       $tree.tree({
         selectable: true,
-        keyboardSupport: false,
+        keyboardSupport: false
       });
 
       // This "tree.open" event helps to open the particular node from browser url
@@ -71,6 +70,7 @@
       $tree.bind(          
         'tree.select',
         function(event) {
+          if(event.node){
             // The clicked node is 'event.node
             var node = event.node;
             var parent_arr = [];
@@ -90,7 +90,9 @@
                   break;
                 }
             }
+            collapse_tree(node);
             var nav_list = parent_arr.reverse();
+            if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
             // alert(nav_list);
             // alert("node_type");
             $.ajax({
@@ -117,18 +119,95 @@
                   // else if (node_type == "Course"){
                   //   window.history.pushState("", "", "/{{group_id}}/course/course_detail/{{node.pk}}"+"?selected="+node.id+"");
                   // }
-                  // else if (node_type == "Topic"){
-                  //   window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
-                  // }
-                  if (node_type == "ProgramEventGroup"){
+                  if (node_type == "CourseEventGroup" || node_type == "ProgramEventGroup"){
                     window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");
                     $(".view_page_link").trigger('click')
                   }
+                  // else if (node_type == "Topic"){
+                  //   window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
+                  // }
+                                      
                   $("#view_page").html(data);
                 }
             });
             $('article').unblock()
+            }
+            else if(node['node_type']=="CourseUnitEvent"){
+              $(".view_page_link").trigger('click')
+              $("#view_page").html("")
+              var lbl_name = document.createElement('label');
+              lbl_name.style.fontSize = "20px"
+              if(node.hasChildren()){
+                lbl_name.innerHTML = node.name + " contains following : ";
+                $("#view_page").append(lbl_name);
+                var ol_elem = document.createElement('OL');
+                ol_elem.id = "res_container";
+                if (node){  
+                  for(var i=0;i<node.children.length;i++){
+                    var elem2 = document.createElement('LI');
+                    elem2.innerHTML = node.children[i].name;
+                    elem2.className = "res_name"
+                    $(ol_elem).append(elem2)
+                  }
+                }
+              }
+              else{
+                lbl_name.innerHTML = node.name + " contains no files yet!";
+                $("#view_page").append(lbl_name);
+              }
+              $("#view_page").append(ol_elem)
+            }
+          }
+          else{
+            var close_nele = event.previous_node
+            unselect_treenode(close_nele)
+          }
+
         });
+      if (window.location.pathname.search("add_units") > -1) {
+          update_url = false;
+          $tree.tree({
+            selectable: false,
+          });
+          $tree.unbind('tree.open')
+          $tree.unbind('tree.select')
+          
+      } else {
+          update_url = true;
+      }      
+
+    }
+    function get_all_siblings(node_item){
+      if(node_item.parent){
+        var all_childrens = node_item.parent.children
+        return all_childrens
+      }
+    }
+
+    function collapse_tree(node_item){
+      var $tree = $('.collection');
+      // $tree.tree('openNode', node_item);
+      var all_nodes = $tree.tree('getTree');
+      var all_siblings = get_all_siblings(node_item)
+
+      for(var i=0;i<all_siblings.length;i++){
+        if(all_siblings[i]!=node_item){
+          close_child_nodes($tree,all_siblings[i]);
+          $tree.tree('closeNode', all_siblings[i]);
+        }
+      }
+    }
+
+    function close_child_nodes(tree,node_item){
+      all_child_nodes = node_item.children
+      for(var c=0;c<all_child_nodes.length;c++){
+        tree.tree('closeNode', all_child_nodes[c]);
+      }
+    }
+
+    function unselect_treenode(closing_node){
+      var $tree = $('.collection');
+      $tree.tree('closeNode', closing_node);
     }
 
     // This function takes id of clicked "related" node and redirect to its page with its proper breadcrumbs

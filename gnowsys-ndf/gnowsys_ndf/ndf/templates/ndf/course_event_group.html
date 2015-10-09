@@ -68,6 +68,10 @@
     <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
     <!-- orgitdown! toolbar settings -->
     <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+
+    <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+    <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+    <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
     <!-- orgitdown! skin -->
     <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 
@@ -82,7 +86,7 @@
       {% endif %}
   
   <div id="view_collection">
-    {% include "ndf/course_collection_tree.html" %}  
+    {% include "ndf/collection_ajax_view.html" %}  
   </div>
 {% endblock %}
 {% block extended_header %}
@@ -265,6 +269,14 @@
 
 <script>
 {% block script %}
+  $(".date_month_day_year").datepicker({ 
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'dd/mm/yy',
+    defaultDate: '0'
+  });
+
+
   $(document).on("change", ".date_month_day_year", function(){
     $(".save_date").attr("disabled",false);
   })
