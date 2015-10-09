@@ -10,6 +10,7 @@ from gnowsys_ndf.ndf.views.methods import capture_data
 from gnowsys_ndf.local_settings import SYNCDATA_KEY_PUB
 import json
 import datetime
+import shutil
 rcs = RCS()
 hr = HistoryManager()
 Parent_collection_ids = []
@@ -71,11 +72,12 @@ def process_parent_node(Parent_collection_ids,last_scan):
 	root_path =  os.path.abspath(os.path.dirname(os.pardir))
 	file_scan =  os.path.join(root_path, 'receivedfile')
 	node_skipped_after_capture = []
-	for i in Parent_collection_ids:
+	for k,i in enumerate(Parent_collection_ids):
+		packet_sequence = "%06d" % k
 		id = i[0]
 		id = (id[id.find('\''):id[id.find('\''):].find(')') + id.find('\'')]).strip('\'')
-		time = i[1]
-		time = time.split('.')[0]
+		time_with_microsec = i[1]
+		time = time_with_microsec.split('.')[0]
 		#After last scan of this machine if that data reside in this system 
 		#check its insertion tym
 		#if nodes log tym is more tha insert tym add it to the new log file
@@ -93,11 +95,11 @@ def process_parent_node(Parent_collection_ids,last_scan):
 						break	
 				if  allowed ==  True:
 						print "id",id,log_output
-						capture_id_data(id,time)
+						capture_id_data(id,time_with_microsec)
 						node_skipped_after_capture.append(id)
 			else:
 					print "Nodes Generated from this server",id
-					capture_id_data(id,time)
+					capture_id_data(id,time_with_microsec)
 					node_skipped_after_capture.append(id)
 						
 				
@@ -110,7 +112,7 @@ def process_dependent_collection(dependent_collection):
 		capture_data(file_object=node, file_data=None, content_type='Genral')
 
 
-def capture_id_data(id,time):
+def capture_id_data(id,time_with_microsec):
 	if id != '':
 		node = node_collection.find_one({"_id":ObjectId(str(id))})
 		if node:
@@ -122,8 +124,8 @@ def capture_id_data(id,time):
 
 		if node:
 			with open("Registry.txt", 'a') as outfile:
-				outfile.write(str(time + ", _id:" + str(node["_id"]) + ", " +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{1}" +"\n" ))
-		capture_data(file_object=node, file_data=None, content_type='Genral')       
+				outfile.write(str(time_with_microsec + "_" + str(node["_id"]) + ", " +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{1}" +"\n" ))
+		capture_data(file_object=node, file_data=None, content_type='Genral',time=time_with_microsec)       
 
 
 def slice_registry(time):
@@ -153,6 +155,59 @@ def slice_registry(time):
 	'''
 	log_output =  os.popen("cat  %s|awk '$0 > \"%s\"'" %  (registry_path,str(time))).read()
 	with open(manage_path + "/Info_Registry.txt","w") as outfile:
-		outfile.write(log_output)	
+		outfile.write("Start \n")		
+		outfile.write(log_output)
+		outfile.write("End")	
+	log_output =  os.popen("cat  %s|awk '$0 > \"%s\"'" %  (registry_path,str(time))).readlines()
+	manage_path =  os.path.abspath(os.path.dirname(os.pardir))
+	#file to copy
+	manage_path =  os.path.abspath(os.path.dirname(os.pardir))
+	registry_path = os.path.join(manage_path,'Info_Registry.txt')
+	#loop around to fill the destination data
+	for i,j in enumerate(log_output):
+		dst = str(manage_path) + "/gnowsys_ndf/ndf/MailClient/syncdata"
+		file_name = j[0:j.index(',')]
+		dst = dst +"/" +str(file_name)
+		if  file_name not in ['Start','End']:
+			data=get_neighbours(file_name,registry_path)
+			file_path = create_file(dst,data)
+			'''
+			cp = "cp  -u " + str(file_path) + " " + dst + "/"  
+			subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
+			'''
+	#delete the Info_Registry after copying
+	#os.remove(registry_path)
+def create_file(file_path,data,mode="w"):
+	#create_file with given data
+	with open(file_path + "/Info",mode) as outfile:
+		for i in data:
+			outfile.write(i)
+	return file_path + "/Info"
 	
-  
+def get_neighbours(file_name,registry_path):
+	#get previouse and next line of the match 
+	# from the defined file path
+	file_output = open(registry_path)
+	current_line = ""
+	previouse_line = ""
+	last_line = ""
+	a = True
+	data = []
+	#Old code to create previouse and post node information
+	#with every sending node
+	while a:
+			previouse_line = current_line
+			current_line = file_output.readline()
+			c = current_line.find(str(file_name))      
+			if c != -1:
+				a = False
+			if current_line == "":	
+				break
+	last_line = file_output.readline()
+	file_output.close()
+	#written file path to copy
+	data.append(previouse_line)
+	data.append(current_line)
+	data.append(last_line)	
+	return data 
+	
