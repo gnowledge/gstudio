@@ -255,7 +255,7 @@ def server_sync(func):
         if not os.path.exists(dst):
             os.makedirs(dst)
 
-        path_for_this_capture = dst + '/' + timestamp
+        path_for_this_capture = dst + '/' + timestamp +"_"+ str(node["_id"])
         
         print '+' * 20
         print path_for_this_capture
@@ -294,8 +294,7 @@ def server_sync(func):
         subprocess.call([command],shell=True)
 	src = json_op_file_name
         shutil.move(src,path_for_this_capture)
-	slice_registry(node["_id"],path_for_this_capture)
-        # mail.attach_file(json_op_file_name)
+	# mail.attach_file(json_op_file_name)
         
         # mail.attach_file(node_data_path)
         # mail.subject = subject + str(node._id)
@@ -5037,27 +5036,4 @@ def get_filter_querydict(filters):
             query_dict.append({ "$or": temp_list})
 
     return query_dict
-
-def slice_registry(node_id,path_for_this_capture):
-	registry_path =  os.path.abspath(os.path.dirname(os.pardir))
-	registry_path =  os.path.join(registry_path, 'Registry.txt') 
-	file_output = open(registry_path)
-	current_line = ""
-	previouse_line = ""
-	last_line = ""
-	a = True
-	while a:
-			previouse_line = current_line
-			current_line = file_output.readline()
-			c = current_line.find(str(node_id))      
-			if c != -1:
-				a = False
-			if current_line == "":	
-				break
-	last_line = file_output.readline() 		
-	file_output.close()
-
-	with open(path_for_this_capture + "/Registry.txt","a") as outfile:
-		outfile.write(str(previouse_line)+""+str(current_line)+"" +str(last_line))	
-	
 

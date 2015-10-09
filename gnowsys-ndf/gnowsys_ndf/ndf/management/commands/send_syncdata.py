@@ -48,8 +48,8 @@ class Command(BaseCommand):
 		list_of_syncdata_folders = []
 		sent_folder_path = os.path.dirname(__file__).split('/management')[0] + '/MailClient/sent_syncdata_files'
 		
-		registry_path =  os.path.abspath(os.path.dirname(os.pardir))
-		registry_path =  os.path.join(registry_path, 'Registry.txt')
+		manage_path =  os.path.abspath(os.path.dirname(os.pardir))
+		registry_path =  os.path.join(manage_path, 'Info_Registry.txt')
 		if not os.path.exists(sent_folder_path):
 			os.makedirs(sent_folder_path)
 
@@ -69,11 +69,14 @@ class Command(BaseCommand):
 				mail = EmailMessage()
 				tstamp = folder_name
 				#mail.subject= str(SYNCDATA_KEY_PUB) + "SYNCDATA_"+tstamp
-				mail.subject= str(SYNCDATA_KEY_PUB) + "_SYNCDATA_"+send_counter+"_"+tstamp	
+				mail.subject= str(SYNCDATA_KEY_PUB) + "_SYNCDATA_"+tstamp	
 
 				folder_empty = 1
 				for filename in list_of_syncdata_files:
 					file_path = path + '/' + filename
+					#attch Info registry with every mail
+					print "the registry",registry_path
+					mail.attach_file(registry_path)
 					mail.attach_file(file_path)
 					folder_empty = 0
 					print file_path
