@@ -1,7 +1,9 @@
 {% load ndf_tags %}
 {% load i18n %}
+{% load cache %}
 
 {% block head %}
+{% cache 360 static_collection_tree_head %}  <!-- cache static dependencies for a hour -->
   <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> 
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
 
@@ -10,9 +12,10 @@
   <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
   <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
-
+{% endcache %}
     
   <script type="text/javascript">
+
     $(document).ready(function() {      
       {% check_is_gstaff groupid request.user as is_gstaff %}
 
@@ -90,8 +93,7 @@
                   break;
                 }
             }
-            nele = node.element
-            collapse_tree(node,nele);
+            collapse_tree(node);
             var nav_list = parent_arr.reverse();
             if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
               // alert(nav_list);
@@ -122,7 +124,7 @@
               $("#view_page").html("")
               var lbl_name = document.createElement('label');
               lbl_name.style.fontSize = "20px"
-              if(node.children.length>0){
+              if(node.hasChildren()){
                 lbl_name.innerHTML = node.name + " contains following : ";
                 $("#view_page").append(lbl_name);
                 var ol_elem = document.createElement('OL');
@@ -147,8 +149,8 @@
           }
           else{
             // console.log(event.previous_node.element)
-            close_nele = event.previous_node.element
-            hide_tree($(close_nele))
+            var close_nele = event.previous_node
+            unselect_treenode(close_nele)
           }
         });
       if (window.location.pathname.search("add_units") > -1) {
@@ -164,42 +166,28 @@
 
     }
     
-    function collapse_tree(node_item, curr_ele){
-      //Collapse other trees
-      // Fetch the current openNode as curr_ele
-      // console.log(node_item.node_type)
-      if(node_item.node_type=="CourseUnitEvent"){
-        $(curr_ele).removeClass("jqtree-closed")
-
-        //Get all li ele other than curr_ele and close them
-        other_ele = $("li.jqtree-folder").not(curr_ele)
-
-        // console.log(other_ele.length) // This length is no. of li ele closed.
-        hide_tree(other_ele);
-
-        /*
-        Open curr_ele
-         This is done explicitly in order to  
-            - to removeClass 'jqtree-closed',
-            - change the text (arrow indicating Open/Close)
-            - ul holds the chidlren of curr_ele (i.e resources in Unit)
-            which otherwise does not opens the node.
-        */
-        $(curr_ele).find("a.jqtree-toggler")
-                    .removeClass("jqtree-closed")
-                    .text("▼")
-        $(curr_ele).find("ul").css("display","block")
+    function collapse_tree(node_item){
+      var $tree = $('.collection');
+      // $tree.tree('openNode', node_item);
+      // all_nodes = []
+      var all_nodes = $tree.tree('getTree');
+      if (!node_item.hasChildren()){
+        node_item = node_item.parent
+      }
+      // var all_cu = getNodesByProperty('node_type','CourseUnitEvent');
+      for(var i=0;i<all_nodes.children.length;i++){
+        // console.log(all_nodes.children[i],"-----i---",i)
+        if(all_nodes.children[i]!=node_item){
+          $tree.tree('closeNode', all_nodes.children[i]);
+        }
       }
     }
 
-    function hide_tree(ele_obj){
-      ele_obj.addClass("jqtree-closed")
-      ele_obj.find("a.jqtree-toggler")
-                  .addClass("jqtree-closed")
-                  .text("►")
-      ele_obj.find("ul").css("display","none")
-
+    function unselect_treenode(closing_node){
+      var $tree = $('.collection');
+      $tree.tree('closeNode', closing_node);
     }
+
   </script>
 
 <style type="text/css">
