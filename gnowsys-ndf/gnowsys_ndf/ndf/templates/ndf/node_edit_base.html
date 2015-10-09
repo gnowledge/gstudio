@@ -410,7 +410,7 @@
     <div class="content contents panel" id="panel-metadata" style="width:100%; display:none;" >      
       	<div class="row">
 		  	<div class="small-12 large-12 columns"><h4>{% trans "Please add or edit Metadata" %} </h4></div>
-
+		  	<!-- Educational Language is Removed from ndf tags and here  __ Saurabh -->
 		  	{% get_metadata_values as metadata %}
 	  		{% for k,v in metadata.items %}
 	  		  
@@ -434,9 +434,7 @@
 						{% elif k == "age_range" %}			
 						<h5>{% trans "Age Range:" %}</h5>
 						{% elif k == "readinglevel" %}
-						<h5>{% trans "Reading Level:" %} </h5> 
-						{% elif k == "language" %}			
-						<h5>{% trans "Educational Language:" %}</h5>
+						<h5>{% trans "Reading Level:" %} </h5>  
 						{% elif k == "curricular" %}			
 						<h5>{% trans "Curricular:" %}</h5>
 						{% elif k == "educationalalignment" %}			
