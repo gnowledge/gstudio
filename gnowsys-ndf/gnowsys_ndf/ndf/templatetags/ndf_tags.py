@@ -2960,3 +2960,22 @@ def is_media_collection(node_id):
 		    return True
     return False
 
+@get_execution_time
+@register.assignment_tag
+def get_all_subsections_of_course(group_id, node_id):
+	node_obj = node_collection.one({'_id': ObjectId(node_id)})
+	css = []
+	if node_obj.collection_set:
+		for each_node in node_obj.collection_set:
+			each_node_obj = node_collection.one({'_id': ObjectId(each_node)})
+			if "CourseSectionEvent" in each_node_obj.member_of_names_list:
+				if each_node_obj.collection_set:
+					for each_node in each_node_obj.collection_set:
+						each_css = node_collection.one({'_id': ObjectId(each_node)})
+						if "CourseSubSectionEvent" in each_css.member_of_names_list:
+							d = {'name':str(each_css.name),'id':str(each_css._id)}
+							date_val = get_attribute_value(each_css._id,"start_time")
+							if date_val:
+								d['start_time'] = date_val.strftime("%d/%m/%Y")
+							css.append(d)
+	return css

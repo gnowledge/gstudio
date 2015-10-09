@@ -6,11 +6,7 @@
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
 
   <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
-  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
-
     
   <script type="text/javascript">
     $(document).ready(function() {      
@@ -21,13 +17,6 @@
 
       // Function for manipulating tree when user visits to page directly via browser url
       TreeTillNode();
-      $(".date_month_day_year").datepicker({ 
-        changeMonth: true,
-        changeYear: true,
-        dateFormat: 'dd/mm/yy',
-        defaultDate: '0'
-      });
-
     });
 
     function TreeTillNode () {
@@ -61,15 +50,7 @@
 
       $tree.tree({
         selectable: true,
-        keyboardSupport: false,
-        onCreateLi: function(node, $li) {
-        {% if is_gstaff %}
-          if(node.node_type=="CourseSubSectionEvent" && window.location.pathname.search("add_units") == -1){
-            $li.find('.jqtree-title').after("<span data-tooltip title='Set Release date'><i class='fi-widget'></i></span> &nbsp;");
-          }
-        {% endif %}
-
-        }
+        keyboardSupport: false
       });
 
       // This "tree.open" event helps to open the particular node from browser url
@@ -81,7 +62,7 @@
             if (arr.indexOf(node_id) < 0){
               arr.push(node_id);  
             }
-
+            $tree.tree('selectNode', node);
         }
       );
 
@@ -89,6 +70,7 @@
       $tree.bind(          
         'tree.select',
         function(event) {
+          if(event.node){
             // The clicked node is 'event.node
             var node = event.node;
             var parent_arr = [];
@@ -108,6 +90,7 @@
                   break;
                 }
             }
+            collapse_tree(node);
             var nav_list = parent_arr.reverse();
             if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
             // alert(nav_list);
@@ -148,26 +131,38 @@
                 }
             });
             $('article').unblock()
-          }
-          else if(node['node_type']=="CourseUnitEvent"){
-            $(".view_page_link").trigger('click')
-            $("#view_page").html("")
-            var lbl_name = document.createElement('label');
-            lbl_name.innerHTML = node.name + " contains following : ";
-            lbl_name.style.fontSize = "20px"
-            $("#view_page").append(lbl_name);
-            var ol_elem = document.createElement('OL');
-            ol_elem.id = "res_container";
-            if (node){  
-              for(var i=0;i<node.children.length;i++){
-                var elem2 = document.createElement('LI');
-                elem2.innerHTML = node.children[i].name;
-                elem2.className = "res_name"
-                $(ol_elem).append(elem2)
-              }
             }
-            $("#view_page").append(ol_elem)
+            else if(node['node_type']=="CourseUnitEvent"){
+              $(".view_page_link").trigger('click')
+              $("#view_page").html("")
+              var lbl_name = document.createElement('label');
+              lbl_name.style.fontSize = "20px"
+              if(node.hasChildren()){
+                lbl_name.innerHTML = node.name + " contains following : ";
+                $("#view_page").append(lbl_name);
+                var ol_elem = document.createElement('OL');
+                ol_elem.id = "res_container";
+                if (node){  
+                  for(var i=0;i<node.children.length;i++){
+                    var elem2 = document.createElement('LI');
+                    elem2.innerHTML = node.children[i].name;
+                    elem2.className = "res_name"
+                    $(ol_elem).append(elem2)
+                  }
+                }
+              }
+              else{
+                lbl_name.innerHTML = node.name + " contains no files yet!";
+                $("#view_page").append(lbl_name);
+              }
+              $("#view_page").append(ol_elem)
+            }
           }
+          else{
+            var close_nele = event.previous_node
+            unselect_treenode(close_nele)
+          }
+
         });
       if (window.location.pathname.search("add_units") > -1) {
           update_url = false;
@@ -182,22 +177,38 @@
       }      
 
     }
-    $(document).on("change", "#release_date", function(){
-      $(".save_date").attr("disabled",false);
-    })
-    
-    $(document).on("click", ".fi-widget", function(){
-        var node = $('.collection').tree('getSelectedNode');
-        if("start_time_val" in node){
-          $("#release_date").val(node.start_time_val)
+    function get_all_siblings(node_item){
+      if(node_item.parent){
+        var all_childrens = node_item.parent.children
+        return all_childrens
+      }
+    }
+
+    function collapse_tree(node_item){
+      var $tree = $('.collection');
+      // $tree.tree('openNode', node_item);
+      var all_nodes = $tree.tree('getTree');
+      var all_siblings = get_all_siblings(node_item)
+
+      for(var i=0;i<all_siblings.length;i++){
+        if(all_siblings[i]!=node_item){
+          close_child_nodes($tree,all_siblings[i]);
+          $tree.tree('closeNode', all_siblings[i]);
         }
-        else{
-          $("#release_date").val("")
-        }
-        $(".view_page_link").trigger('click')
-        $("#date_reveal_modal").foundation('reveal', 'open');
-        $("#css_id").val(node.id)
-    })
+      }
+    }
+
+    function close_child_nodes(tree,node_item){
+      all_child_nodes = node_item.children
+      for(var c=0;c<all_child_nodes.length;c++){
+        tree.tree('closeNode', all_child_nodes[c]);
+      }
+    }
+
+    function unselect_treenode(closing_node){
+      var $tree = $('.collection');
+      $tree.tree('closeNode', closing_node);
+    }
 
     // This function takes id of clicked "related" node and redirect to its page with its proper breadcrumbs
     // nav_li manipulates the navigation path of that topic in theme map
@@ -278,26 +289,6 @@
   {% if node.collection_set %}
     <div>
       <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
-    </div>
-
-    <!-- start date -->
-
-    <div id="date_reveal_modal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
-      <div class="row release_date_div text-center">
-          <div class="small-3 columns">
-            <label>
-              {% trans 'Release Date' %}
-            </label>
-          </div>
-          <div class="small-3 columns end">
-            <input type="text" id="release_date" name="release_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year">      
-          </div>
-          <div class="small-3 columns end">
-              <input type="button" value="Save" class="save_date button small" disabled="disabled">
-          </div>
-          <input type="hidden" name="css_id" id="css_id" value="">
-      </div>
-      <a class="close-reveal-modal">&#215;</a>
     </div>
 
   {% endif %}
