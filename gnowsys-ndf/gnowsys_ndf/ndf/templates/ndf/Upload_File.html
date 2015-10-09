@@ -209,12 +209,12 @@
 						</div>
 						<div class="large-10 columns">
 							<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
-							{% get_licence as licence %}
+							{% get_license as license %}
 							<select name="License" tabindex="7" required>
-		  						{% for each_licence in licence %}
-				        			<option value="{{each_licence}}" 
+		  						{% for each_license in license %}
+				        			<option value="{{each_license}}" 
 				        			{% if each_license == "CC BY-SA"%}selected{% endif %}>
-				        				{% trans each_licence %}
+				        				{% trans each_license %}
 				        			</option>
 								{% endfor %}
 							</select>
