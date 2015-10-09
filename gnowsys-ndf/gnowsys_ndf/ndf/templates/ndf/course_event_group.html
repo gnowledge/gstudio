@@ -69,10 +69,11 @@
     <!-- orgitdown! toolbar settings -->
     <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
 
-    <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
     <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+    <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
     <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
     <!-- orgitdown! skin -->
+
     <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 
 {% endblock %}
@@ -267,16 +268,7 @@
 {% endblock %}
 
 
-<script>
 {% block script %}
-  $(".date_month_day_year").datepicker({ 
-    changeMonth: true,
-    changeYear: true,
-    dateFormat: 'dd/mm/yy',
-    defaultDate: '0'
-  });
-
-
   $(document).on("change", ".date_month_day_year", function(){
     $(".save_date").attr("disabled",false);
   })
@@ -394,6 +386,21 @@
       });//end of ajax
   })
 
+  // On close event of reveal-modal (alertModal) -------------------------------------------------------------
+    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
+      // Reset reveal-modal content & it's setting
+      $("#alertModalLabel").text("<p>Please select course type.</p>");
+      $("#alertModal")
+        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+        .addClass("medium")
+    });
+  $(".date_month_day_year").datepicker({ 
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'dd/mm/yy',
+    defaultDate: '0'
+  });
+
   $("main.row > aside.columns")
     .removeClass("medium-2")
     .addClass('medium-3').addClass("large-3");
@@ -405,14 +412,4 @@
     .css('float','left');
     $(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder')
 
-  // On close event of reveal-modal (alertModal) -------------------------------------------------------------
-    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
-      // Reset reveal-modal content & it's setting
-      $("#alertModalLabel").text("<p>Please select course type.</p>");
-      $("#alertModal")
-        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
-        .addClass("medium")
-    });
-
 {% endblock %}
-</script>
