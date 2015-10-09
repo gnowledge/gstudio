@@ -212,7 +212,7 @@
 							{% get_license as license %}
 							<select name="License" tabindex="7" required>
 		  						{% for each_license in license %}
-				        			<option value="{{each_licence}}" 
+				        			<option value="{{each_license}}" 
 				        			{% if each_license == "CC BY-SA"%}selected{% endif %}>
 				        				{% trans each_license %}
 				        			</option>
