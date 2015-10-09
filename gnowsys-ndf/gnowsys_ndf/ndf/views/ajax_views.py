@@ -1669,7 +1669,8 @@ def set_drawer_widget_for_users(st, coll_obj_list):
     for each in st:
        dic = {}
        dic['id'] = str(each.id)
-       dic['name'] = each.email  # username
+       dic['email'] = each.email  # username
+       dic['username'] = each.username  # username
        d1.append(dic)
     draw1['drawer1'] = d1
     data_list.append(draw1)
@@ -1677,8 +1678,11 @@ def set_drawer_widget_for_users(st, coll_obj_list):
     for each in coll_obj_list:
        dic = {}
        dic['id'] = str(each.id)
-       dic['name'] = each.email  # username
+       # dic['name'] = each.email  # username
+       dic['email'] = each.email  # username
+       dic['username'] = each.username  # username
        d2.append(dic)
+
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return data_list
