@@ -11,6 +11,7 @@ import subprocess
 from django_mailbox.models import Mailbox
 from gnowsys_ndf.settings import SYNCDATA_FETCHING_EMAIL_ID, SYNCDATA_FETCHING_EMAIL_ID_PASSWORD, SYNCDATA_FETCHING_IMAP_SERVER_ADDRESS
 from gnowsys_ndf.ndf.views.mailclient import server_sync
+import os
 
 def connected_to_internet(url='http://www.google.com/', timeout=2):
 	try:
@@ -55,9 +56,11 @@ class Command(BaseCommand):
                                                 #received_registries += serverdir
                                                 if serverdir not in received_registries:         
                                                         received_registries.append(serverdir)                            
-						received_data += data			
-					#check_and_chain_registry(received_registries)
-					server_sync(received_data)		
+						received_data += data	
+                                        result=check_and_chain_registry(received_registries)
+                                        if result == True:
+					   server_sync(received_data)
+                                           delete(received_registries)		
 				else:
 					print 'No new mails received'
 			metabox.delete()
@@ -68,6 +71,7 @@ class Command(BaseCommand):
 			print str(error)
 
 def process_mails(mail):
+    #place files in server related directory
 	all_attachments = mail.attachments.all()
 	all_attachments_path = []
 	json_file_path = ''
@@ -85,7 +89,7 @@ def process_mails(mail):
 		std_out= subprocess.call([command],shell=True)
 		list_of_decrypted_attachments.append(op_file_name)
     	return fetch_registry(list_of_decrypted_attachments,mail)    
-import os
+
 def fetch_registry(file_list,mail):
     registryfile = [i for i in file_list if i.find(".txt")!= -1]
     datafile = [ i for i in file_list if i.find(".json") != -1]
@@ -93,12 +97,16 @@ def fetch_registry(file_list,mail):
     subject = mail.subject
     serverid = subject.split('_')[0]
     registryno = subject.split('_')[2]
+    subject_split = subject.split('_')[-6:]
+    print subject_split
+    folder_name = "_".join(subject_split)
     if os.path.exists(serverid) == False:
         os.mkdir(serverid)
     #enter inside the directory
     manage_path = os.path.abspath(os.path.dirname(os.pardir))
     #directory path
-    serverdir = os.path.join(manage_path,serverid+"/" +str(registryno)+"/")
+    server_folder = os.path.join(manage_path,serverid+"/")
+    serverdir = os.path.join(server_folder,str(folder_name)+"/")
     path_val = os.path.exists(serverdir)
     if path_val == False:
 		os.makedirs(serverdir)
@@ -106,39 +114,58 @@ def fetch_registry(file_list,mail):
     subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
     cp = "cp  -u " + str(datafile[0]) + " " + serverdir + "/"  
     subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)	
-    return  registryfile,datafile,serverdir 
+    return  registryfile,datafile,server_folder
+
 def check_and_chain_registry(file_list):
-    '''
-    ac = [int(i) for i in file_list]
-    outranged = False
-    for (n1,n2) in zip(ac[:-1],ac[1:]):
-        print n1,n2
-        if n1+1 != n2:
-            outranged = True    
-            break:  
-    '''        
+    #os.popen("grep -r 'view' *").read()
+    #code considers that files are coming from single server only
+    filepath = ""
+    directories = []
+    missing_data_files = []
     print file_list
-    filewrite = []
-    first_file =""
-    second_file = ""
     for i in file_list:
-        print "the file path",i
-        for dir_, _, files in os.walk(i):
+        for dir_,_i,files in os.walk(i):                
             for filename in files:
                 if filename.find(".txt") != -1:
-                    print filename
-                    filepath =  os.path.join(dir_, filename)
-        print "the fiel path",filepath            
-        second_file = first_file
-        reg_file = open(filepath)
-    	first_file = reg_file.readlines()
-        if first_file and second_file:
-            #merge_file_index = list(set(second_file[2] + first_file[1]))
-            merge_file_index = list(set(second_file + first_file))
-            filewrite += merge_file_index
-    with open("chainedfile.txt","a") as outfile:
-        for i in filewrite:
-            outfile.write(i)        
+                   filepath = os.path.join(dir_,filename)
+                   break
+    #this line should look into individual servers                   
+    directories += os.listdir(file_list[0])               
+    registryopen = open(filepath)
+    #file open
+    directories = [(i.split('_')[-1]) for i in directories]
+    print directories
+    for i in  registryopen:
+        line = i
+        objectid =  line[line.find("_id")+4:line[line.find("_id")+4:].find(",")+line.find("_id")+4]
+        objectid = objectid.strip('\'')
+        if objectid in directories:
+            print "do nothing match happend"
+        else:
+            print "didnot find the match"
+            missing_data_files.append(objectid)
+    registryopen.close()
 
+    if missing_data_files:
+        for i in missing_data_files:
+            request_for_packet(i)           
+        return False
+    else:
+        return True    
+
+def delete(file_list):
+    #delete files which all are synced
+    for  i in file_list:
+        shutil.rmtree(i)
+
+def request_for_packet(packet_name):
+    #print coming here
+    mail = EmailMessage()
+    # check the from address from which mail is coming 
+    # and send a request to that mail servers to request the 
+    # missing packet
+    mail.to = ['mukesh_5501@yahoo.com','mrunal.upload@gmail.com']
+    mail.subject = "Request" +"_" +str(packet_name)
+    mail.send()     
 
         
