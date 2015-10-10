@@ -1177,10 +1177,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     #  language
     if language:
         node.language = get_language_tuple(language)
-        # print "=========", node.language
+        # print "=========node.language-==========\n", node.language
         is_changed = True
     else:
-        node.language = ('en', 'English')
+        node.language = get_language_tuple(u"en")
+        # node.language = ("en","English")
         is_changed = True
 
     #  access_policy
@@ -5060,3 +5061,19 @@ def get_filter_querydict(filters):
             query_dict.append({ "$or": temp_list})
 
     return query_dict
+
+
+def get_course_units_tree(data,list_ele):
+    # print data
+    if type(data) == list:
+        for each_dict in data:
+            # print type(each_dict)
+            if type(each_dict) == dict:
+                # print "each_dict",each_dict
+                if each_dict['node_type']=="CourseSubSectionEvent":
+                    if 'children' in each_dict:
+                        list_ele.extend(each_dict['children'])
+                else:
+                    # print "\n each_dict---",each_dict
+                    if "children" in each_dict:
+                        get_course_units_tree(each_dict['children'],list_ele)
