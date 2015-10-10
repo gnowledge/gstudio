@@ -166,12 +166,19 @@
     </div>
   {% endif %}
 
-  {% ifequal node.member_of_names_list.0 "ProgramEventGroup" %}
-    <div class="row">
-          <h4>{% trans "Resources awaiting for moderation: " %}</h4>
-          {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
-    </div>
-  {% endifequal %}
+  {% check_group node as is_group %}
+  {% if is_group %}
+    {% if node.edit_policy == "EDITABLE_MODERATED" %}
+      <div class="row">
+      {% if files_cur.count > 0  %}
+            <h4>{% trans "Resources awaiting for moderation: " %}</h4>
+            {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
+      {% else %}
+            <h4>{% trans "Currently, there are no Resources for moderation " %}</h4>
+      {% endif %}
+      </div>
+    {% endif %}
+  {% endif %}
 
   {% if node.status == 'MODERATION' %}
     <h4><small>
