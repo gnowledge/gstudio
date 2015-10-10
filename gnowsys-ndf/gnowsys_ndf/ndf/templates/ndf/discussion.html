@@ -129,10 +129,9 @@
   {% endif %}
   function createDiscussion()
   {
-    if( user_access == "allow"){
-    if( is_user_authenticated )
-    {  
-      {% if request.user.is_authenticated %}
+    if( is_user_authenticated){
+      if( user_access == "allow" )
+      {  
         // ajax to create thread for first time.
         $.ajax({
           url: "{% url 'create_discussion' group_id node.pk %}",
@@ -163,16 +162,15 @@
           // }
         });
         // --- END ajax and create thread for first time.
-        {% endif %}
       }
       else
       {
         // alert("To start discussion you need to login and be the member of this group.");
-        alert("{% trans 'Login to start discussion' %}");
+        alert("Only group members can comment.");
       }
     }
   else{
-        alert("Only group members can comment.");
+        alert("{% trans 'Login to start discussion' %}");
   }
   }
   // --- END of createDiscussion()
