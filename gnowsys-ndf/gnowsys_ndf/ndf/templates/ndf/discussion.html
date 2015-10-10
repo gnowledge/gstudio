@@ -112,6 +112,11 @@
   <!-- end of orgit down container -->
 
 </div>
+  <div id="alertModal" class="reveal-modal large alert-box radius" data-reveal data-alert>
+      <label id="alertModalLabel"></label>
+      <a class="close-reveal-modal">&#215;</a>
+  </div>
+   <!-- TODO: include login template in overlay or a link to it: 11-10-15, katkamrachana -->
 
 <script type="text/javascript">
   // for discussion tab
@@ -166,11 +171,18 @@
       else
       {
         // alert("To start discussion you need to login and be the member of this group.");
-        alert("Only group members can comment.");
+        // alert("Only group members can comment.");
+        $("#alertModalLabel").text("Only group members can comment.");
+        $("#alertModal").addClass("warning");
+        $("#alertModal").foundation('reveal', 'open');
+
       }
     }
   else{
-        alert("{% trans 'Login to start discussion' %}");
+        $("#alertModalLabel").text("Please login to start discussion.");
+        $("#alertModal").addClass("alert");
+        $("#alertModal").foundation('reveal', 'open');
+        // alert("{% trans 'Login to start discussion' %}");
   }
   }
   // --- END of createDiscussion()
