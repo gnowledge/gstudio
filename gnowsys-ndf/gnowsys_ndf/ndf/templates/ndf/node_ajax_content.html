@@ -9,9 +9,9 @@
 <div class="row page" itemscope itemtype="{{schema.1.type}}"> 
   
   <section class="medium-9 columns">
-
   {% block breadcrumb %} {% get_breadcrumb request.path %} {% endblock breadcrumb %}
   <ul>
+
       <!--  Fliter now on right hand side of page   -->
        {% if topic %}
         <dl class="tabs" style="float: right; height: 1px;" data-tab> 
@@ -165,6 +165,13 @@
       </script>
     </div>
   {% endif %}
+
+  {% ifequal node.member_of_names_list.0 "ProgramEventGroup" %}
+    <div class="row">
+          <h4>{% trans "Resources awaiting for moderation: " %}</h4>
+          {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
+    </div>
+  {% endifequal %}
 
   {% if node.status == 'MODERATION' %}
     <h4><small>
