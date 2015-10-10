@@ -670,6 +670,8 @@ class Command(BaseCommand):
                         thread_obj.reload()
                 # print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
             else:   
+                thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
+            if not thread_obj:
                 create_gattribute(each_node._id, discussion_enable_at, False)
                 # print "\n\n discussion_enable False"
         except Exception as e:
