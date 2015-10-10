@@ -28,7 +28,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
@@ -1744,13 +1744,21 @@ def enroll_to_course(request, group_id):
 
 def set_release_date_css(request, group_id):
 	response_dict = {"success": False}
-	if request.is_ajax() and request.method == "POST":
-		css_node_id = request.POST.get("css_id", "")
-		date_val = request.POST.get("date_val", "")
-		if date_val:
-			start_date_val = datetime.datetime.strptime(date_val, "%d/%m/%Y")
-		start_date_AT = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
-		create_gattribute(ObjectId(css_node_id), start_date_AT, start_date_val)
-		response_dict["success"] = True
-		return HttpResponse(json.dumps(response_dict))
+	try:
+		if request.is_ajax() and request.method == "POST":
+			css_date_dict = request.POST.get("css_date_dict", "")
+			if css_date_dict:
+				css_date_dict = json.loads(css_date_dict)
+			# print "\n\ncss_date_dict",css_date_dict,"type--",type(css_date_dict)
+			start_date_AT = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
+			for each_css in css_date_dict:
+				if each_css['start_time']:
+					start_date_val = datetime.datetime.strptime(each_css['start_time'], "%d/%m/%Y")
+					create_gattribute(ObjectId(each_css['id']), start_date_AT, start_date_val)
+			response_dict["success"] = True
+			response_dict["message"] = "Release dates have been set successfully!"
+	except Exception as e:
+		response_dict["success"] = False
+		response_dict["message"] = "Something went wrong! Please try after some time"
+	return HttpResponse(json.dumps(response_dict))
 
