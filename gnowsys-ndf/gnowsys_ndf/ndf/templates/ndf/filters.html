@@ -65,6 +65,10 @@
 		cursor: pointer;
 	}
 
+	select[name="filter-field-value"]{
+		opacity: 0.5;
+	}
+
 </style>
 
 
@@ -106,23 +110,15 @@
 								{% firstof val.altnames key %}
 							</option>
 						{% endfor %}
-						<!-- generating <option>'s of following type
-						<option value='["abc1", "abc2", "abc3"]'>ABC</option>	
-						<option value='["lmn1", "lmn2", "lmn3"]'>LMN</option>
-						<option value=''>XYZ</option>
-						-->
+						
 					</select>
 				</div>
 				<div class="small-12 large-2 columns">
 					<select name="filter-field-value"  
 					onblur="$(this).css('height', '')"
-					onfocus="$(this).css('height', '6em')" multiple>
+					onfocus="$(this).css('height', '6em')" multiple disabled>
 						<option value=""> -- {% trans 'Select' %} -- </option>
-						 <!-- 
-						<option value="ABC">ABCABCABC</option>
-						<option value="LMN">LMNLMNLMN</option>
-						<option value="XYZ">XYZXYZXYZ</option> 
-						 -->
+						
 					</select>				
 				</div>
 				<div class="small-12 large-6  columns">
@@ -162,11 +158,26 @@
 	// to populate second <select> with "value" field of this (first <select>'s) <option>.
 	$selectName.change(function(){
 		// ff: first filter. getting the name and value field of it.
-		var ffName = $selectName.children("option:selected").attr("data-name-field").trim(),
-			ffAltnames = $selectName.children("option:selected").text().trim(),
-			ffValues = $selectName.children("option:selected").val().trim(),
-			ffPriDataType = $selectName.children("option:selected").attr("data-primary-type").trim(),
-			ffType = $selectName.children("option:selected").attr("data-gstudio-type").trim();
+		var selectedNameEl = $selectName.children("option:selected");
+
+		// if --Select-- is choosen then reset secondary selection
+		if (selectedNameEl.index() == 0) {
+
+			// making --Select-- to appear with less opacity and disabled way
+			$selectValue.children()[0].style.display = "block";
+			$selectValue.attr('disabled', true);
+			$selectValue.css('opacity', 0.5);
+
+			return false;
+		};
+
+		// console.log(selectedNameEl.attr("data-name-field").trim());
+
+		var ffName = selectedNameEl.attr("data-name-field").trim(),
+			ffAltnames = selectedNameEl.text().trim(),
+			ffValues = selectedNameEl.val().trim(),
+			ffPriDataType = selectedNameEl.attr("data-primary-type").trim(),
+			ffType = selectedNameEl.attr("data-gstudio-type").trim();
 
 		// the value is stored as a array of strings in individual <option>
 		if( ffValues != "[]" && (ffValues[0] == "[") && (ffValues[ffValues.length - 1] == "]") )
@@ -180,6 +191,8 @@
 			// as soon as second <select> is going to get populate,
 			// and it's multi-select increase it's height. 
 			$selectValue.css("height", "6em");
+			$selectValue.css("opacity", "1");
+			$selectValue.removeAttr("disabled");
 
 			// console.log(ffValues)
 			var ffValuesArr = JSON.parse(ffValues);
