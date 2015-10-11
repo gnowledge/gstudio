@@ -39,12 +39,6 @@
     font-size: 1rem;
   }
 
-  .collection{
-    overflow-y: auto !important;
-    height: 300px;
-    border: none !important;
-   }
-
   .all_blogs{
       overflow-y: auto;
       height:500px;
@@ -74,7 +68,12 @@
     <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
     <!-- orgitdown! toolbar settings -->
     <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+
+    <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+    <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+    <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
     <!-- orgitdown! skin -->
+
     <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 
 {% endblock %}
@@ -84,6 +83,7 @@
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
         <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+        <span><input type="button" class="tiny button settings" value="Settings"></span>
       {% endif %}
   
   <div id="view_collection">
@@ -239,12 +239,84 @@
   
   	</div>
     </div>
+    <!-- start date -->
+
+    <div id="date_reveal_modal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label>{% trans 'Release Date' %}</label>
+    {% get_all_subsections_of_course group_id node.pk as all_css %}
+    <script type="text/javascript">
+      var all_css_js_var = {{all_css|safe}}
+    </script>
+    {% for each_css in all_css %}
+      <div class="row release_date_div text-center">
+          <div class="small-3 columns">
+            <label>{{each_css.name}}
+            </label>
+          </div>
+          <div class="small-3 columns end">
+            <input type="text" value="{{each_css.start_time}}" placeholder="DD/MM/YYYY" readonly="" class="date_val_{{each_css.id}} date_month_day_year">
+          </div>
+      </div>
+    {% endfor %}
+    <div class="small-3 columns end">
+        <input type="button" value="Save" class="save_date button small" disabled="disabled">
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+
+    </div>
 
 {% endblock %}
 
 
-
 {% block script %}
+  $(document).on("change", ".date_month_day_year", function(){
+    $(".save_date").attr("disabled",false);
+  })
+
+  $(document).on('click','.save_date',function(){
+    $.each(all_css_js_var,function(index,css_dict){
+      if($(".date_val_"+css_dict['id']).val()){
+        css_dict['start_time'] = $(".date_val_"+css_dict['id']).val()
+      }
+      else{
+        css_dict['start_time'] = null;
+      }
+    })
+    $.ajax({
+      url: "{% url 'set_release_date_css' node.pk %}",
+
+      data: {
+        'css_date_dict':JSON.stringify(all_css_js_var),
+        'csrfmiddlewaretoken': "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      success: function(data){
+          success_state = data["success"]
+          $("#alertModalLabel").text(data["message"]);
+          if(success_state){
+            $("#alertModal").addClass("success");
+          }
+          else{
+            $("#alertModal").addClass("warning");
+          }
+          $("#alertModal").foundation('reveal', 'open');
+          location.reload();
+      },
+    });//end of ajax
+
+    // console.log(JSON.stringify(all_css_js_var))
+
+  })
+
+  // Settings-------------------------------------------------------------
+  $(".settings").click(function() {
+    $("#date_reveal_modal").foundation('reveal', 'open');
+  });
+
 
   // Cancel/Abort Upload-------------------------------------------------------------
   $("#btnUploadCancel").click(function() {
@@ -289,31 +361,6 @@
     }
   });
 
-  $(document).on('click','.save_date',function(){
-    date_val = $("#release_date").val()
-    css_id_val = $("#css_id").val()
-    $.ajax({
-      url: "{% url 'set_release_date_css' node.pk %}",
-
-      data: {
-        'date_val':date_val,
-        'css_id': css_id_val,
-        'csrfmiddlewaretoken': "{{csrf_token}}"
-      },
-
-      type: "POST",
-
-      dataType: "json",
-
-      success: function(data){
-          success_state = data["success"]
-          if(success_state){
-            location.reload();
-          }
-      },
-    });//end of ajax
-
-  })
   
   $(document).on('click','.enroll-btn',function(){
     //trigger the ajax call to enroll
@@ -338,6 +385,21 @@
         },
       });//end of ajax
   })
+
+  // On close event of reveal-modal (alertModal) -------------------------------------------------------------
+    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
+      // Reset reveal-modal content & it's setting
+      $("#alertModalLabel").text("<p>Please select course type.</p>");
+      $("#alertModal")
+        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+        .addClass("medium")
+    });
+  $(".date_month_day_year").datepicker({ 
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'dd/mm/yy',
+    defaultDate: '0'
+  });
 
   $("main.row > aside.columns")
     .removeClass("medium-2")

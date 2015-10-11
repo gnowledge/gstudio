@@ -457,7 +457,8 @@ def get_all_replies(parent):
 def get_metadata_values():
 
 	metadata = {"educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE, "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE, "curricular": GSTUDIO_RESOURCES_CURRICULAR,
-				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT, "language": GSTUDIO_RESOURCES_LANGUAGES,
+				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT, 
+				# "language": GSTUDIO_RESOURCES_LANGUAGES,
 				"timerequired": GSTUDIO_RESOURCES_TIME_REQUIRED, "audience": GSTUDIO_RESOURCES_AUDIENCE , "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY,
 				"age_range": GSTUDIO_RESOURCES_AGE_RANGE ,"readinglevel": GSTUDIO_RESOURCES_READING_LEVEL, "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT}
 	return metadata
@@ -2998,4 +2999,23 @@ def is_media_collection(node_id):
 		    return True
     return False
 
+@get_execution_time
+@register.assignment_tag
+def get_all_subsections_of_course(group_id, node_id):
+	node_obj = node_collection.one({'_id': ObjectId(node_id)})
+	css = []
+	if node_obj.collection_set:
+		for each_node in node_obj.collection_set:
+			each_node_obj = node_collection.one({'_id': ObjectId(each_node)})
+			if "CourseSectionEvent" in each_node_obj.member_of_names_list:
+				if each_node_obj.collection_set:
+					for each_node in each_node_obj.collection_set:
+						each_css = node_collection.one({'_id': ObjectId(each_node)})
+						if "CourseSubSectionEvent" in each_css.member_of_names_list:
+							d = {'name':str(each_css.name),'id':str(each_css._id)}
+							date_val = get_attribute_value(each_css._id,"start_time")
+							if date_val:
+								d['start_time'] = date_val.strftime("%d/%m/%Y")
+							css.append(d)
+	return css
 
