@@ -23,6 +23,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
+from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
@@ -498,9 +499,9 @@ class CreateModeratedGroup(CreateSubGroup):
         # maintaining dict of group types and their corresponding sub-groups altnames.
         # referenced while creating new moderated sub-groups.
         self.altnames = {
-            'ModeratingGroup': [u'Clearing House', u'Curation House'],
-            'ProgramEventGroup': [u'Screening House', u'Selection House'],
-            'CourseEventGroup': [u'Screening House', u'Selection House']
+            'ModeratingGroup': GSTUDIO_MODERATING_GROUP_ALTNAMES,
+            'ProgramEventGroup': GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES,
+            'CourseEventGroup': GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
         }
 
 
