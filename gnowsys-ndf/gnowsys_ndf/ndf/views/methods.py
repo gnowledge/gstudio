@@ -170,8 +170,8 @@ def server_sync(func):
 
         ''' Get current date and time to timestamp json and the document being captured by this function.
          This done so that files in syncdata folder will have unique name'''
-        timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.now().microsecond)
-
+        #timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.now().microsecond)
+	timestamp = kwargs['time']
 
         ''' To fetch the data about the node '''
         # the actual file
@@ -214,7 +214,7 @@ def server_sync(func):
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
-
+            
 
         else:
             #the other documents which need only the json data to be sent
@@ -254,7 +254,6 @@ def server_sync(func):
 
         if not os.path.exists(dst):
             os.makedirs(dst)
-
         path_for_this_capture = dst + '/' + timestamp +"_"+ str(node["_id"])
         
         print '+' * 20
@@ -311,7 +310,7 @@ def server_sync(func):
 
 @get_execution_time
 @server_sync
-def capture_data(file_object=None, file_data=None, content_type=None):
+def capture_data(file_object=None, file_data=None, content_type=None,time=None):
     '''
     Serves as an itermediate function to capture the node details and allow
     the decorator to send the created/updated node through E-Mail

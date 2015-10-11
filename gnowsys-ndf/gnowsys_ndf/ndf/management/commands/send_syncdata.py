@@ -69,14 +69,12 @@ class Command(BaseCommand):
 				mail = EmailMessage()
 				tstamp = folder_name
 				#mail.subject= str(SYNCDATA_KEY_PUB) + "SYNCDATA_"+tstamp
-				mail.subject= str(SYNCDATA_KEY_PUB) + "_SYNCDATA_"+tstamp	
+				mail.subject= str(SYNCDATA_KEY_PUB) + "_SYNCDATA_"+ tstamp	
 
 				folder_empty = 1
 				for filename in list_of_syncdata_files:
 					file_path = path + '/' + filename
 					#attch Info registry with every mail
-					print "the registry",registry_path
-					mail.attach_file(registry_path)
 					mail.attach_file(file_path)
 					folder_empty = 0
 					print file_path
