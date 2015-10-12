@@ -678,7 +678,14 @@ class Command(BaseCommand):
             print "\n\nError occurred for page ", each_node._id, "--", each_node.name,"--",e
             # print e, each_node._id
             pass
-
+    # Correct Eventype and CollegeEventtype Node  by setting their modified by field
+    glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
+    node = node_collection.find({'member_of':ObjectId(glist._id),"name":{'$in':['Eventtype','CollegeEvents']}}) 
+    for i in node:
+        if i is None:
+            i.modified_by = 1
+            i.save()
+            print "Updated",i.name,"'s modified by feild from null to 1"
 
     print "\n------- Discussion thread for Page and File GST successfully completed-------\n"
     print "\n\n Pages/Files that were not able to updated\t", pages_files_not_updated
