@@ -31,7 +31,7 @@ def split(str, splitter):
 
 
 @get_execution_time
-@register.simple_tag
+@register.assignment_tag
 def get_latest_git_hash():
 	"""
 	Template tag that returns latest git hash no.
