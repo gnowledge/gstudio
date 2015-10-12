@@ -433,6 +433,13 @@ def get_all_replies(parent):
 
 @get_execution_time
 @register.assignment_tag
+def get_all_possible_languages():
+	language = list(LANGUAGES)
+	all_languages = language + OTHER_COMMON_LANGUAGES
+	return all_languages
+
+@get_execution_time
+@register.assignment_tag
 def get_metadata_values():
 
 	metadata = {"educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE, "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE, "curricular": GSTUDIO_RESOURCES_CURRICULAR,
