@@ -1785,7 +1785,7 @@ def group_dashboard(request, group_id=None):
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
             }).sort('last_update', -1)
-  if group_obj.edit_policy == "EDITABLE_MODERATED" and group_obj._type != "Group":
+  if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
 
   allow_to_join = True
