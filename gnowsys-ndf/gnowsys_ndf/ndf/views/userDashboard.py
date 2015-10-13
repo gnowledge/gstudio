@@ -24,7 +24,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
 
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time, get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time, get_group_name_id,get_language_tuple
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity,get_execution_time
 
@@ -648,6 +648,7 @@ def group_dashboard(request, group_id):
 
 def user_profile(request,group_id):
 	from django.contrib.auth.models import User
+
 	auth_node = node_collection.one({"_id":ObjectId(group_id)})
 	user_dict={}
 	user_details = User.objects.get(id=request.user.id)
@@ -656,8 +657,8 @@ def user_profile(request,group_id):
 
 	if request.method == "POST":
 		user = User.objects.get(id=request.user.id)
-		user_data = request.POST.getlist('forminputData[]','')
-		user_select_data = request.POST.getlist('formselectData[]','')
+		user_data = request.POST.getlist('forminputs[]','')
+		user_select_data = request.POST.getlist('formselects[]','')
 		for i in user_data:
 			a=ast.literal_eval(i)
 			if  a.get('first_name',None) != None:
@@ -669,10 +670,13 @@ def user_profile(request,group_id):
 		user.save()
 		for i in user_select_data:
 			a=ast.literal_eval(i)
-			if  a.get('language_proficiency','') :
-				auth_node['language_proficiency'] = a.get('language_proficiency','')	
-			if  a.get('subject_proficiency',''):			
-				auth_node['subject_proficiency'] =  a.get('subject_proficiency','')
+			if  a.get('language_proficiency',None) != None:
+				auth_node['language_proficiency'] = []
+				for k in a.get('language_proficiency',''):
+					language = get_language_tuple(k)
+					auth_node['language_proficiency'].append(language)
+			if  a.get('subject_proficiency',None) != None:			
+				auth_node['subject_proficiency'] =  list(a.get('subject_proficiency',''))
 		auth_node.save()
 		user_dict['node'] = auth_node
 		user_dict['success'] = True
