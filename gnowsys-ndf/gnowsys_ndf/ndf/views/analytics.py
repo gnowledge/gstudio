@@ -928,30 +928,31 @@ def forum_activity(group_id,url,doc):
 		except :
 			author_id=n[u'created_by']
 			auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
-			if auth[u'name']==doc[u'user']:
-				created_at = n[u'created_at']
-				if (doc[u'last_update'] - created_at).seconds < 5 :
-					analytics_doc = initialize_analytics_obj(doc, group_id, 'forum')
-					analytics_doc.action = { 'key' : 'create', 'phrase' : 'created a' }
-					analytics_doc.obj['forum']['id'] = ObjectId(url[3]);
+			if auth:
+				if auth[u'name'] == doc[u'user']:
+					created_at = n[u'created_at']
+					if (doc[u'last_update'] - created_at).seconds < 5 :
+						analytics_doc = initialize_analytics_obj(doc, group_id, 'forum')
+						analytics_doc.action = { 'key' : 'create', 'phrase' : 'created a' }
+						analytics_doc.obj['forum']['id'] = ObjectId(url[3]);
 
-					forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[3])})
-					analytics_doc.obj['forum']['name'] = forum_node[u'name'];
-					analytics_doc.obj['forum']['url'] = forum_node[u'url'];
+						forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[3])})
+						analytics_doc.obj['forum']['name'] = forum_node[u'name'];
+						analytics_doc.obj['forum']['url'] = forum_node[u'url'];
 
-					analytics_doc.save();
-					return 1
-				else :
-					analytics_doc = initialize_analytics_obj(doc, group_id, 'forum')
-					analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a' }
-					analytics_doc.obj['forum']['id'] = ObjectId(url[3]);
+						analytics_doc.save();
+						return 1
+					else :
+						analytics_doc = initialize_analytics_obj(doc, group_id, 'forum')
+						analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a' }
+						analytics_doc.obj['forum']['id'] = ObjectId(url[3]);
 
-					forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[3])})
-					analytics_doc.obj['forum']['name'] = forum_node[u'name'];
-					analytics_doc.obj['forum']['url'] = forum_node[u'url'];
+						forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[3])})
+						analytics_doc.obj['forum']['name'] = forum_node[u'name'];
+						analytics_doc.obj['forum']['url'] = forum_node[u'url'];
 
-					analytics_doc.save();
-					return 1
+						analytics_doc.save();
+						return 1
 
 	return 0
 
