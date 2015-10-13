@@ -171,7 +171,7 @@
     {% if node.edit_policy == "EDITABLE_MODERATED" and "Group" not in node.member_of_names_list %}
       <div class="row">
       {% if files_cur.count > 0  %}
-            <h4>{% trans "Resources awaiting for moderation: " %}</h4>
+            <h4> {{files_cur.count}} Resource{{ files_cur.count|pluralize }} {% trans " awaiting for moderation: " %}</h4>
             {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
       {% else %}
             <h4>{% trans "Currently, there are no Resources for moderation " %}</h4>
