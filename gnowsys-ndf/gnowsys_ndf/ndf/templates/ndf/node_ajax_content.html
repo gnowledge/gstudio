@@ -168,7 +168,7 @@
 
   {% check_group node as is_group %}
   {% if is_group %}
-    {% if node.edit_policy == "EDITABLE_MODERATED" %}
+    {% if node.edit_policy == "EDITABLE_MODERATED" and "Group" not in node.member_of_names_list %}
       <div class="row">
       {% if files_cur.count > 0  %}
             <h4>{% trans "Resources awaiting for moderation: " %}</h4>
