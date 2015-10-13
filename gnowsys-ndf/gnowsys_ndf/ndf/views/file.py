@@ -799,8 +799,8 @@ def submitDoc(request, group_id):
         subject = request.POST.get("Subject", "")
         level = request.POST.get("Level", "")
 
-        subject = '' if (subject=='Not Sure') else subject
-        level = '' if (level=='Not Sure') else level
+        subject = '' if (subject=='< Not Sure >') else subject
+        level = '' if (level=='< Not Sure >') else level
 
         if map_geojson_data:
           map_geojson_data = map_geojson_data + ","
