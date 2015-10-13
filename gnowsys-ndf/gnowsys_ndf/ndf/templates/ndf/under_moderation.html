@@ -39,13 +39,13 @@
     <br/>
         <div class="row mod-status-info-div info-text">
           {% if cleared_group_objs %}
-              Approved in  '{{cleared_group_objs|join:", "}}'<br/>
+              <li>Approved in  '{{cleared_group_objs|join:", "}}'</li>
           {% endif %}
           {% if current_mod_group_obj %}
-              Currently in '{% firstof current_mod_group_obj.altnames current_mod_group_obj.name %}' <br/>
+              <li>Currently in '{% firstof current_mod_group_obj.altnames current_mod_group_obj.name %}' </li>
           {% endif %}
           {% if next_mod_group_objs %}
-              Next include(s) {{next_mod_group_objs|join:", "}}<br/>
+              <li>Next include(s) {{next_mod_group_objs|join:", "}}</li>
           {% endif %}
         </div>
         <br/>
@@ -127,14 +127,7 @@
           {% endif %}
             <!-- end new -->      
         </ul>
-  
-        {% if is_under_moderation %}
-          {% if request.user.id == node.created_by %}        
-            <a href="/{{node.created_by|get_username}}/file/{{node.pk}}" target="_blank">View this file</a>
-          {% else %}
-            {% trans 'This file is currently not accessible' %}
-          {% endif %}      
-        {% else %}
+        {% if not is_under_moderation %}
            <a href="{% url 'file_detail' top_group_obj.name node %}">View this file</a>
         {% endif %}
       
