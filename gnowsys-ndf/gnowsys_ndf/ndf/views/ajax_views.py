@@ -42,7 +42,7 @@ from gnowsys_ndf.ndf.views.file import *
 
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
-from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id,capture_data
+from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
@@ -978,10 +978,8 @@ def add_page(request, group_id):
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page),groupid=group_id)
         page_node.status = u"PUBLISHED"
         page_node.save()
-	capture_data(file_object = page_node, file_data=None, content_type='create_page_create')
         context_node.collection_set.append(page_node._id)
         context_node.save(groupid=group_id)
-	capture_data(file_object = context_node, file_data=None, content_type='context_node_append')
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 

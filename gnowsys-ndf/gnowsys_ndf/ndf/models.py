@@ -1211,9 +1211,8 @@ class Author(Group):
         'visited_location': [],
         'preferred_languages': dict,          # preferred languages for users like preferred lang. , fall back lang. etc.
         'group_affiliation': basestring,
-	'language_proficiency':basestring,
-	'subject_proficiency':basestring #,
-    # TODO: add a field: preffered_display_name, 22-39-15, kedar2a
+	'language_proficiency':list,
+	'subject_proficiency':list
     }
 
     use_dot_notation = True
@@ -1903,3 +1902,4 @@ db = get_database()
 node_collection = db[Node.collection_name].Node
 triple_collection = db[Triple.collection_name].Triple
 gridfs_collection = db["fs.files"]
+chunk_collection = db["fs.chunks"]

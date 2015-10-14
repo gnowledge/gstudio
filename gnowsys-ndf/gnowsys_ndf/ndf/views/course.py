@@ -150,7 +150,6 @@ def create_edit(request, group_id, node_id=None):
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE),groupid=group_id)
-	capture_data(file_object=course_node, file_data=None, content_type='create_course')
         create_gattribute(course_node._id, at_course_type, u"General")
         
         # adding thumbnail 
@@ -187,8 +186,7 @@ def create_edit(request, group_id, node_id=None):
                     # print del_status, "--", del_status_msg
 
             fileobj,fs = save_file(f,f.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
-	    capture_data(file_object = fileobj, file_data=None, content_type='create_unit')
-            if fileobj:
+	        if fileobj:
                 rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
                 # print "\n creating GRelation has_logo\n"
                 create_grelation(course_node._id, rt_has_logo, ObjectId(fileobj))
@@ -541,9 +539,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                     course_gs.content = cnode_for_content.html_content
 
                     course_gs.save(is_changed=is_changed,groupid=group_id)
-		    capture_data(file_object=course_gs, file_data=None, content_type='create_course')	
-
-                    # [B] Store AT and/or RT field(s) of given course-node
+		            # [B] Store AT and/or RT field(s) of given course-node
                     for tab_details in property_order_list:
                         for field_set in tab_details[1]:
                             # Fetch only Attribute field(s) / Relation field(s)
@@ -630,8 +626,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 course_gs.status = u"PUBLISHED"
 
             course_gs.save(is_changed=is_changed,groupid=group_id)
-            capture_data(file_object=course_gs, file_data=None, content_type='create_course')
-
             # [B] Store AT and/or RT field(s) of given course-node
             for tab_details in property_order_list:
                 for field_set in tab_details[1]:
@@ -1177,11 +1171,8 @@ def save_course_section(request, group_id):
         course_node = node_collection.one({"_id": ObjectId(course_node_id)})
         cs_new.prior_node.append(ObjectId(course_node._id))
         cs_new.save(groupid=group_id)
-	capture_data(file_object=cs_new, file_data=None, content_type='Create_CourseSection')
-	node_collection.collection.update({'_id': course_node._id}, {'$push': {'collection_set': cs_new._id }}, upsert=False, multi=False)
-	course_node = node_collection.one({"_id": ObjectId(course_node_id)})
-	capture_data(file_object=course_node, file_data=None, content_type='Update_course_node')
-        response_dict["success"] = True
+        node_collection.collection.update({'_id': course_node._id}, {'$push': {'collection_set': cs_new._id }}, upsert=False, multi=False)
+	    response_dict["success"] = True
         response_dict["cs_new_id"] = str(cs_new._id)
         return HttpResponse(json.dumps(response_dict))
 
@@ -1231,12 +1222,8 @@ def save_course_sub_section(request, group_id):
         cs_node = node_collection.one({"_id": ObjectId(cs_node_id)})
         css_new.prior_node.append(cs_node._id)
         css_new.save(groupid=group_id)
-        capture_data(file_object = css_new, file_data = None, content_type = 'Create_CourseSubSection')
         node_collection.collection.update({'_id': cs_node._id}, {'$push': {'collection_set': css_new._id }}, upsert=False, multi=False)
-	cs_node = node_collection.one({"_id": ObjectId(cs_node_id)})
-	capture_data(file_object=cs_node, file_data=None, content_type='Update_course_node')
-        
-        response_dict["success"] = True
+	    response_dict["success"] = True
         response_dict["css_new_id"] = str(css_new._id)
         return HttpResponse(json.dumps(response_dict))
 
@@ -1259,7 +1246,6 @@ def change_node_name(request, group_id):
         node = node_collection.one({"_id": ObjectId(node_id)})
         node.name = new_name.strip()
         node.save(groupid=group_id)
-	capture_data(file_object = node, file_data=None, content_type='Create_CourseSection')
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
@@ -1502,20 +1488,16 @@ def save_resources(request, group_id):
 
             cu_new.prior_node.append(css_node._id)
             cu_new.save(groupid=group_id)
-            capture_data(file_object = cu_new, file_data=None, content_type='Courseunit')
             response_dict["create_new_unit"] = True
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
 	if cu_new._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
 
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
-	cu_new.reload()
+        cu_new.reload()
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
-	css_node = node_collection.one({"_id":css_node._id})
-	print css_node
-	capture_data(file_object=css_node, file_data=None, content_type='Update_course_node')
-        
+	    
         return HttpResponse(json.dumps(response_dict))
 
 
@@ -1564,17 +1546,12 @@ def create_edit_unit(request, group_id):
             cu_node.contributors.append(int(request.user.id))
             cu_node.prior_node.append(css_node._id)
             cu_node.save(groupid=group_id)
-            capture_data(file_object = cu_node, file_data=None, content_type='create_unit')
             response_dict["unit_node_id"] = str(cu_node._id)
         node_collection.collection.update({'_id': cu_node._id}, {'$set': {'name': unit_name}}, upsert=False, multi=False)
 
         if cu_node._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_node._id}}, upsert=False, multi=False)
-	css = node_collection.one({"_id":ObjectId(css_node._id)})
-	print "fetched css node",css
-	capture_data(file_object = css, file_data=None, content_type='Update_course_node')
-        
-        return HttpResponse(json.dumps(response_dict))
+	    return HttpResponse(json.dumps(response_dict))
 
 
 
@@ -1693,9 +1670,7 @@ def remove_resource_from_unit(request, group_id):
 
         if unit_node.collection_set and res_id:
               node_collection.collection.update({'_id': unit_node._id}, {'$pull': {'collection_set': ObjectId(res_id)}}, upsert=False, multi=False)
-	unit_node = node_collection.one({'_id': ObjectId(unit_node_id)})
-	capture_data(file_object=unit_node, file_data=None, content_type='Update_course_node')
-        
+	    
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
@@ -1736,10 +1711,7 @@ def add_course_file(request, group_id):
             file_node.save()
             context_node.collection_set.append(file_node._id)
             file_node.save()
-            capture_data(file_object = file_node, file_data=None, content_type='add_course_file')
-        context_node.save()
-	capture_data(file_object = context_node, file_data=None, content_type='add_course_file')
-	
+    
     return HttpResponseRedirect(url_name)
 
 

@@ -908,7 +908,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
       this will create file object and save files in gridfs collection
     """
-    server_sync = kwargs.get("server_sync",None)
     global count, first_object
     try:
         group_id = ObjectId(group_id)
@@ -923,10 +922,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     
     is_video = ""
     fileobj = node_collection.collection.File()
-    
-    if server_sync:
-      fileobj["_id"] = ObjectId(kwargs["object_id"])
-
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
     size, unit = getFileSize(files)
@@ -1162,9 +1157,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             '''
             # This function captures the data and a decorater is put on this function so that node to be saved in the parent function
             # can be sent as a mail to the mailing-list
-            if not server_sync:
-              capture_data(file_object=fileobj, file_data=files, content_type=filetype1)
-
+              
             return fileobj._id, is_video
 
         except Exception as e:

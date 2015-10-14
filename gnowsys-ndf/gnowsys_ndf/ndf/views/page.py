@@ -34,7 +34,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string, node_thread_access
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id, create_thread_for_node,capture_data
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id, create_thread_for_node
 
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
@@ -554,8 +554,6 @@ def publish_page(request,group_id,node):
         node.status = unicode("PUBLISHED")
         node.modified_by = int(request.user.id)
         node.save(groupid=group_id)
-
-    #capture_data(file_object=node, file_data=None, content_type='page')
 
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
