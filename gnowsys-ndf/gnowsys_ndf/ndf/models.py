@@ -1903,3 +1903,4 @@ db = get_database()
 node_collection = db[Node.collection_name].Node
 triple_collection = db[Triple.collection_name].Triple
 gridfs_collection = db["fs.files"]
+chunk_collection = db["fs.chunks"]
