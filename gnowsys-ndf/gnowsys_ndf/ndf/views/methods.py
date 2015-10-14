@@ -170,8 +170,8 @@ def server_sync(func):
 
         ''' Get current date and time to timestamp json and the document being captured by this function.
          This done so that files in syncdata folder will have unique name'''
-        timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.now().microsecond)
-
+        #timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.now().microsecond)
+	timestamp = kwargs['time']
 
         ''' To fetch the data about the node '''
         # the actual file
@@ -214,7 +214,7 @@ def server_sync(func):
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
-
+            
 
         else:
             #the other documents which need only the json data to be sent
@@ -254,8 +254,7 @@ def server_sync(func):
 
         if not os.path.exists(dst):
             os.makedirs(dst)
-
-        path_for_this_capture = dst + '/' + timestamp
+        path_for_this_capture = dst + '/' + timestamp +"_"+ str(node["_id"])
         
         print '+' * 20
         print path_for_this_capture
@@ -294,8 +293,7 @@ def server_sync(func):
         subprocess.call([command],shell=True)
 	src = json_op_file_name
         shutil.move(src,path_for_this_capture)
-	slice_registry(node["_id"],path_for_this_capture)
-        # mail.attach_file(json_op_file_name)
+	# mail.attach_file(json_op_file_name)
         
         # mail.attach_file(node_data_path)
         # mail.subject = subject + str(node._id)
@@ -312,7 +310,7 @@ def server_sync(func):
 
 @get_execution_time
 @server_sync
-def capture_data(file_object=None, file_data=None, content_type=None):
+def capture_data(file_object=None, file_data=None, content_type=None,time=None):
     '''
     Serves as an itermediate function to capture the node details and allow
     the decorator to send the created/updated node through E-Mail
@@ -4947,29 +4945,6 @@ def get_language_tuple(lang):
     # as a default return: ('en', 'English')
     return ('en', 'English')
 
-def slice_registry(node_id,path_for_this_capture):
-	registry_path =  os.path.abspath(os.path.dirname(os.pardir))
-	registry_path =  os.path.join(registry_path, 'Registry.txt') 
-	file_output = open(registry_path)
-	current_line = ""
-	previouse_line = ""
-	last_line = ""
-	a = True
-	while a:
-			previouse_line = current_line
-			current_line = file_output.readline()
-			c = current_line.find(str(node_id))      
-			if c != -1:
-				a = False
-			if current_line == "":	
-				break
-	last_line = file_output.readline() 		
-	file_output.close()
-
-	with open(path_for_this_capture + "/Registry.txt","a") as outfile:
-		outfile.write(str(previouse_line)+""+str(current_line)+"" +str(last_line))	
-	print "end"
-    
 def get_filter_querydict(filters):
     """
     After getting the filters from request,
@@ -5017,7 +4992,6 @@ def get_filter_querydict(filters):
             query_dict.append({ "$or": temp_list})
 
     return query_dict
-
 
 def get_course_units_tree(data,list_ele):
     # print data
