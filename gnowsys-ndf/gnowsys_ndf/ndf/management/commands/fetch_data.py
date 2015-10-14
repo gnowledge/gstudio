@@ -54,7 +54,6 @@ class Command(BaseCommand):
 							collection = '.Nodes'	
 							if (raw_string) not in processing_list_ids:
 								processing_list_ids.append((raw_string,line[0:line.find(' ')],collection))
-						'''
 						elif line.find('.fs.files') != -1:
 							collection = '.fs.files'
 							if (raw_string) not in processing_list_ids:
@@ -63,7 +62,6 @@ class Command(BaseCommand):
 							collection = '.fs.chunks'
 							if (raw_string) not in processing_list_ids:
 								processing_list_ids.append((raw_string,line[0:line.find(' ')],collection))
-						'''
 				except Exception as e:
 					print e
 
