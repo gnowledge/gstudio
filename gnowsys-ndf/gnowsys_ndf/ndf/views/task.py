@@ -255,8 +255,6 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
               task_node = create_task(request,task_id,group_id)  
               create_task_at_rt(request,rt_list,at_list,task_node,i,group_name,group_id)
               collection_set_ids.append(ObjectId(task_node._id))
-              ''' server_sync '''
-              capture_data(file_object=task_node, file_data=None, content_type='task_create_edit')
           if len(Assignees)>1:
               task_node = create_task(request,task_id,group_id)
               task_node.collection_set = collection_set_ids
@@ -267,8 +265,6 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
             task_node = create_task(request,task_id,group_id)  
             create_task_at_rt(request,rt_list,at_list,task_node,Assignees,group_name,group_id)
 
-            ''' server_sync '''
-            capture_data(file_object=task_node, file_data=None, content_type='task_create_edit')
     else: #update
           task_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
           update(request,rt_list,at_list,task_node,group_id,group_name)
@@ -407,9 +403,7 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
 
         task_gs_triple_instance = create_grelation(task_node._id, node_collection.collection.RelationType(rel_type_node), field_value_list)
         task_node.reload()
-        ''' server_sync '''
-        capture_data(file_object=task_node, file_data=None, content_type='task_reload')
-
+        
       for each in at_list:
         if request.POST.get(each, ""):
           attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': each})
@@ -453,9 +447,7 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
               
               attr.object_value = field_value
               attr.save(groupid=group_id)
-              ''' server_sync '''
-              capture_data(file_object=attr, file_data=None, content_type='attr_save')
-          
+              
           else:
             # attributetype_key = node_collection.find_one({"_type":'AttributeType', 'name':each})
             # newattribute = triple_collection.collection.GAttribute()
@@ -523,16 +515,14 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
         update_node.save(groupid=group_id)
         update_node.name = unicode(task_node.name+"-update_history-"+str(update_node._id))
         update_node.save(groupid=group_id)
-	capture_data(file_object=update_node, file_data=None, content_type='node_update')
-        task_node.post_node.append(update_node._id)
+	      task_node.post_node.append(update_node._id)
         task_node.save(groupid=group_id)
         
         # patch
         GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
         get_node_common_fields(request, task_node, group_id, GST_TASK)
         task_node.save(groupid=group_id)
-	capture_data(file_object=task_node, file_data=None, content_type='node_update')
-
+	
         # End Patch        
 
 
@@ -586,8 +576,7 @@ def create_task(request,task_id,group_id):
         parent_object.post_node = [task_node._id]
         parent_object.save(groupid=group_id)
     task_node.save(groupid=group_id)
-    capture_data(file_object=task_node, file_data=None, content_type='task_create') 
-
+    
     return task_node
 
 

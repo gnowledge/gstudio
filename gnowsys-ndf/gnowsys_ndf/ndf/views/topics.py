@@ -328,8 +328,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                         sub_node = node_collection.one({'_id':ObjectId(str(n))})
                                         parent_node.collection_set.append(sub_node._id)
                                         parent_node.save(groupid=group_id)
-                                        '''server_sync'''
-                                        capture_data(file_object=parent_node, file_data=None, content_type='theme_topic_create_edit')
                                         
 
                         
@@ -358,12 +356,10 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             if not name.upper() in (theme_name.upper() for theme_name in root_themes):
                                 # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
                                 theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST),groupid=group_id)
-                                ''' server_sync '''
-                                capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change')
+                                
                         else:
                             theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST),groupid=group_id)
-                            ''' server_sync '''
-                            capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change')
+                            
 
                     if translate != "true":
                         # For storing and maintaning collection order
@@ -381,9 +377,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             i = i+1
                             
                         theme_topic_node.save(groupid=group_id) 
-                        ''' server_sync '''
-                        capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change') 
-
+                       
                         # End of storing collection
 
                     title = theme_GST.name
@@ -461,8 +455,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 if not name.upper() in (theme_name.upper() for theme_name in root_themes):
                                     # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
                                     theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST),groupid=group_id)
-                                    ''' server_sync '''
-                                    capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change')
                             else:
                                 # If editing theme item in prior_theme_collection hierarchy 
                                 if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection): 
@@ -472,9 +464,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                         else:
                             # If name not changed but other fields has changed
                             theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST),groupid=group_id)  
-
-                            ''' server_sync '''
-                            capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change')
 
 
                     if translate != "true" and collection_list:
@@ -492,8 +481,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 
                             i = i+1
                         theme_topic_node.save(groupid=group_id) 
-                        ''' server_sync '''
-                        capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change') 
                         # End of storing collection
 
                     # This will return to Themes items edit  
@@ -528,17 +515,12 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             if not name.upper() in (theme_name.upper() for theme_name in root_topics):
 
                                 theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST),groupid=group_id)
-                                ''' server_sync '''
-                                capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change')
-
+                                
                             elif topic_name.upper() == name.upper():
                                 theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST),groupid=group_id)               
-                                ''' server_sync '''
-                                capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change')
+                                
                         else:
                             theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST),groupid=group_id)
-                            ''' server_sync '''
-                            capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change')
                                                                                                                 
                         if collection_list:
                             # For storing and maintaning collection order
@@ -555,9 +537,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                     
                                 i = i+1
                             theme_topic_node.save(groupid=group_id)
-                            ''' server_sync '''
-                            capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change')
-
                             
                         title = topic_GST.name 
                         
@@ -585,9 +564,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                         
 
                         theme_topic_node.save(groupid=group_id)
-                        ''' server_sync '''
-                        capture_data(file_object=theme_topic_node, file_data=None, content_type='topic_theme_change')
-
+                        
                         if teaches_list !='':
                             teaches_list=teaches_list.split(",")
                             
