@@ -515,7 +515,7 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
         update_node.save(groupid=group_id)
         update_node.name = unicode(task_node.name+"-update_history-"+str(update_node._id))
         update_node.save(groupid=group_id)
-	      task_node.post_node.append(update_node._id)
+        task_node.post_node.append(update_node._id)
         task_node.save(groupid=group_id)
         
         # patch

@@ -186,7 +186,7 @@ def create_edit(request, group_id, node_id=None):
                     # print del_status, "--", del_status_msg
 
             fileobj,fs = save_file(f,f.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
-	        if fileobj:
+            if fileobj:
                 rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
                 # print "\n creating GRelation has_logo\n"
                 create_grelation(course_node._id, rt_has_logo, ObjectId(fileobj))
@@ -1172,7 +1172,7 @@ def save_course_section(request, group_id):
         cs_new.prior_node.append(ObjectId(course_node._id))
         cs_new.save(groupid=group_id)
         node_collection.collection.update({'_id': course_node._id}, {'$push': {'collection_set': cs_new._id }}, upsert=False, multi=False)
-	    response_dict["success"] = True
+        response_dict["success"] = True
         response_dict["cs_new_id"] = str(cs_new._id)
         return HttpResponse(json.dumps(response_dict))
 
@@ -1223,7 +1223,7 @@ def save_course_sub_section(request, group_id):
         css_new.prior_node.append(cs_node._id)
         css_new.save(groupid=group_id)
         node_collection.collection.update({'_id': cs_node._id}, {'$push': {'collection_set': css_new._id }}, upsert=False, multi=False)
-	    response_dict["success"] = True
+        response_dict["success"] = True
         response_dict["css_new_id"] = str(css_new._id)
         return HttpResponse(json.dumps(response_dict))
 
