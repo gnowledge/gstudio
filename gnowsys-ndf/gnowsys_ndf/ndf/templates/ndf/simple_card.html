@@ -61,7 +61,7 @@
 
   <div class="{{resource.status|lower}} scard-action">
     By <a href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}">
-      {{resource.created_by|get_username|truncatechars:"10"}}
-    </a> at <i>{{resource.created_at|date:"d M Y"}} </i><input type="checkbox" style="margin:0;" class="filenode" name="filenode" value="{{resource.pk}}">
+      {{resource.created_by|get_username|truncatechars:"10"}}<input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
+    </a> </br>at <i>{{resource.created_at|date:"d M Y"}} </i>
   </div>
 </div>
