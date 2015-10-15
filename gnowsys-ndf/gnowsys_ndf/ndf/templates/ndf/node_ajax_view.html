@@ -946,7 +946,7 @@ ul#navigation li a.last {
             } 
 
             // fs variable will contain the contents list for a topic each time this variable will append with new values
-            fs = fs + "{% if node.content_org %} {{node.content_org}} <hr/>{% endif %}<fieldset> <legend>"+key+"</legend>"+ cont_list +"</fieldset>";
+            fs = fs + "<fieldset> <legend>"+key+"</legend>"+ cont_list +"</fieldset>";
 
           }
 
@@ -969,7 +969,7 @@ ul#navigation li a.last {
         else{
           $("#view-info").css("display", "none");     
           // If no resource found for topic it will show bellow statement
-          var cont = "{% if node.content_org %} {{node.content_org}} <hr/>{% endif %}<b>Be the first to add a resource to this topic.</b>"
+          var cont = "<b>No resources found matching selected filter.</b>"
           $(".topic_content").css("display", "block");
           $(".topic_content").html(cont);
         }

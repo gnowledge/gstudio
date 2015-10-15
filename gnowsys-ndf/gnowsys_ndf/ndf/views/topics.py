@@ -718,6 +718,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                        },context_instance = RequestContext(request)
                               
     )
+
+
 @get_execution_time
 def get_coll_set(node):
   obj = node_collection.one({'_id': ObjectId(node)})
@@ -737,24 +739,30 @@ def get_coll_set(node):
   
                               get_coll_set(n._id)
   return list_trans_coll
+
+
 @get_execution_time
 def topic_detail_view(request, group_id, app_Id=None):
 
   #####################
-  ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-        group_id = str(group_ins._id)
-    else :
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-            group_id = str(auth._id)
-  else :
-    pass
-    
+  # ins_objectid  = ObjectId()
+  # if ins_objectid.is_valid(group_id) is False :
+  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #   if group_ins:
+  #       group_id = str(group_ins._id)
+  #   else :
+  #       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #       if auth :
+  #           group_id = str(auth._id)
+  # else :
+  #   pass
   ###################### 
+
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
 
   obj = node_collection.one({'_id': ObjectId(app_Id)})
   app = node_collection.one({'_id': ObjectId(obj.member_of[0])})
