@@ -45,7 +45,7 @@ from django.contrib.sites.models import Site
 # from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES,GSTUDIO_AUTHOR_AGENCY_TYPES
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
-
+import itertools
 register = Library()
 at_apps_list = node_collection.one({
     "_type": "AttributeType", "name": "apps_list"
@@ -428,8 +428,15 @@ def get_all_replies(parent):
 	 if parent:
 		 ex_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}],'status':{'$nin':['HIDDEN']}})
 		 ex_reply.sort('created_at',-1)
-	 return ex_reply
+	 return ex_replysimp
 
+
+@get_execution_time
+@register.assignment_tag
+def get_all_possible_languages():
+	language = list(LANGUAGES)
+	all_languages = language + OTHER_COMMON_LANGUAGES
+	return all_languages
 
 @get_execution_time
 @register.assignment_tag
@@ -2960,3 +2967,28 @@ def is_media_collection(node_id):
 		    return True
     return False
 
+@get_execution_time
+@register.assignment_tag
+def get_all_subsections_of_course(group_id, node_id):
+	node_obj = node_collection.one({'_id': ObjectId(node_id)})
+	css = []
+	if node_obj.collection_set:
+		for each_node in node_obj.collection_set:
+			each_node_obj = node_collection.one({'_id': ObjectId(each_node)})
+			if "CourseSectionEvent" in each_node_obj.member_of_names_list:
+				if each_node_obj.collection_set:
+					for each_node in each_node_obj.collection_set:
+						each_css = node_collection.one({'_id': ObjectId(each_node)})
+						if "CourseSubSectionEvent" in each_css.member_of_names_list:
+							d = {'name':str(each_css.name),'id':str(each_css._id)}
+							date_val = get_attribute_value(each_css._id,"start_time")
+							if date_val:
+								d['start_time'] = date_val.strftime("%d/%m/%Y")
+							css.append(d)
+	return css
+
+@get_execution_time
+@register.assignment_tag
+def convert_list(value):
+	#convert list of list to list
+	return list(itertools.chain(*value))
