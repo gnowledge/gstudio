@@ -35,7 +35,7 @@ except ImportError:
 
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
@@ -1720,9 +1720,10 @@ def get_Object_count(key):
 
 @get_execution_time
 @register.assignment_tag
-def get_memberof_objects_count(key,group_id):
+def get_memberof_objects_count(request, key, group_id):
 	try:
-		return node_collection.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
+		lang = list(get_language_tuple(request.LANGUAGE_CODE))
+		return node_collection.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}, 'language': lang}).count()
 	except:
 		return 'null'
 
@@ -2147,24 +2148,25 @@ def get_preferred_lang(request, group_id, nodes, node_type):
 		
 		if pref_lan.keys():
 			if pref_lan['primary'] != request.LANGUAGE_CODE:
-				uname.preferred_languages['primary'] = request.LANGUAGE_CODE
+				uname.preferred_languages['primary'] = get_language_tuple(request.LANGUAGE_CODE)
 				uname.save()
 
 		else:
 			pref_lan={}
-			pref_lan['primary']=request.LANGUAGE_CODE
-			pref_lan['default']=u"en"
-			uname.preferred_languages=pref_lan
+			pref_lan['primary'] = get_language_tuple(request.LANGUAGE_CODE)
+			pref_lan['default'] = ('en', 'English')
+			uname.preferred_languages = pref_lan
 			uname.save()   
       else:
          pref_lan={}
-         pref_lan['primary']=request.LANGUAGE_CODE
-         pref_lan['default']=u"en"
+         pref_lan['primary'] = get_language_tuple(request.LANGUAGE_CODE)
+         pref_lan['default'] = ('en', 'English')
          uname.preferred_languages=pref_lan
          uname.save()
    else:
       pref_lan={}
-      pref_lan[u'primary']=request.LANGUAGE_CODE
+      pref_lan[u'primary'] = get_language_tuple(request.LANGUAGE_CODE)
+   
       pref_lan[u'default']=u"en"
    try:
       for each in nodes:
