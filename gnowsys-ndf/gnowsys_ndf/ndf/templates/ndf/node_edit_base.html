@@ -123,7 +123,7 @@
 				</dd>
 				<!-- change name of metadata tab overide block in your code -->
 				<dd class="meta_tab" title="Click here to add/edit metadata">
-				  	<a href="#tab2">{% trans "Metadata" %} </a> 
+				  	<a>{% trans "Metadata" %} </a> 
 				</dd>  
 				<dd class="teaches_tab" title="Click here to add/edit teaches">
 				 	<a>{% trans "Teaches" %} </a> 
@@ -1432,7 +1432,8 @@
        
        {%  if site_name == "NROER"  %}
             if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
-                    $('#tabs').find('a[href="#tab2"]').trigger('click');
+                    // $('#tabs').find('a[href="#tab2"]').trigger('click');
+                    $('.meta_tab').trigger('click');
                     $("#message").css("display", "block");
                     $("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
                     event.preventDefault();
