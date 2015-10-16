@@ -202,16 +202,19 @@
 				</div>
 
 			<!-- Ratings -->
-				<div class="row tag-rating-div">
-					{% if group_object.edit_policy != "EDITABLE_MODERATED" or "CourseEventGroup" in group_object.member_of_names_list %}
-						{% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
-							<span data-tooltip title="Rating defines popularity">
-								<label class="lbl_tag lbl_field">{% trans "Rating" %}</label>
-							</span>
-							<div class="rating_template"> {% include "ndf/rating.html" %} </div>
-						{% endif %}
+				{% if group_object.edit_policy != "EDITABLE_MODERATED" or "CourseEventGroup" in group_object.member_of_names_list %}
+					{% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
+					{% get_list_of_fields node.type_of "name" as type_of_list %}
+					{% if "Info page" not in type_of_list %}
+					<div class="row tag-rating-div">
+						<span data-tooltip title="Rating defines popularity">
+							<label class="lbl_tag lbl_field">{% trans "Rating" %}</label>
+						</span>
+						<div class="rating_template"> {% include "ndf/rating.html" %} </div>
+					</div>
 					{% endif %}
-				</div>
+					{% endif %}
+				{% endif %}
 			
 			<!-- Location	-->
 				<div class="row tag-rating-div">
