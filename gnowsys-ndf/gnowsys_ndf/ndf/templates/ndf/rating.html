@@ -28,7 +28,7 @@
 
     <label class="rating-lbl" id="avg-rating" >Avg. : &nbsp;{{ratings.avg|default:"unrated"}} {% trans ' by ' %}{{ node.rating|length }} <i class="fi-torsos"></i></label></span>
 {% else %} 
-    <i><small><label class="lbl_tag" >{% trans 'Not rated yet!' %}</label></small></i>
+    <small><label class="lbl_tag" id="avg-rating" ><i>{% trans 'Not rated yet!' %}</i></label></small>
 {% endif %} 
 
 
