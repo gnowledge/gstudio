@@ -482,7 +482,7 @@ GSTUDIO_GROUP_AGENCY_TYPES = [
 ]
 
 GSTUDIO_AUTHOR_AGENCY_TYPES = [
-    "Student", "Teacher", "TeacherTrainer", "Faculty", "Researcher", "Other"
+    "Student", "Teacher", "Teacher Educator", "Faculty", "Researcher", "Other"
 ]
 
 # Varible to toggle the visibility of author_agency_type field of Author
