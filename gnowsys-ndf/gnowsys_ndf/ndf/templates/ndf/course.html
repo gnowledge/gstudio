@@ -183,6 +183,14 @@
                     <b>{{course.name}}
                     </b>
                   </div>
+                  {% get_relation_value course.pk 'has_logo' as logo_img_and_grel%}
+                    {% if logo_img_and_grel.0 %}
+                      {% get_node logo_img as logo_img_and_grel.0 %}
+                      {% if logo_img_and_grel.0.fs_file_ids.1 %}
+                        <img src="{% url 'get_gridfs_resource' logo_img_and_grel.0.fs_file_ids.1 %}" alt="" />
+                      {% endif %}
+                    {% endif %}
+
                 </div>
                 <hr/>
                 <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
