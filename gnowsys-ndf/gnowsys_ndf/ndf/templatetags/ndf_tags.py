@@ -35,7 +35,7 @@ except ImportError:
 
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
@@ -1727,9 +1727,10 @@ def get_Object_count(key):
 
 @get_execution_time
 @register.assignment_tag
-def get_memberof_objects_count(key,group_id):
+def get_memberof_objects_count(request, key, group_id):
 	try:
-		return node_collection.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
+		lang = list(get_language_tuple(request.LANGUAGE_CODE))
+		return node_collection.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}, 'language': lang}).count()
 	except:
 		return 'null'
 
@@ -2154,24 +2155,25 @@ def get_preferred_lang(request, group_id, nodes, node_type):
 		
 		if pref_lan.keys():
 			if pref_lan['primary'] != request.LANGUAGE_CODE:
-				uname.preferred_languages['primary'] = request.LANGUAGE_CODE
+				uname.preferred_languages['primary'] = get_language_tuple(request.LANGUAGE_CODE)
 				uname.save()
 
 		else:
 			pref_lan={}
-			pref_lan['primary']=request.LANGUAGE_CODE
-			pref_lan['default']=u"en"
-			uname.preferred_languages=pref_lan
+			pref_lan['primary'] = get_language_tuple(request.LANGUAGE_CODE)
+			pref_lan['default'] = ('en', 'English')
+			uname.preferred_languages = pref_lan
 			uname.save()   
       else:
          pref_lan={}
-         pref_lan['primary']=request.LANGUAGE_CODE
-         pref_lan['default']=u"en"
+         pref_lan['primary'] = get_language_tuple(request.LANGUAGE_CODE)
+         pref_lan['default'] = ('en', 'English')
          uname.preferred_languages=pref_lan
          uname.save()
    else:
       pref_lan={}
-      pref_lan[u'primary']=request.LANGUAGE_CODE
+      pref_lan[u'primary'] = get_language_tuple(request.LANGUAGE_CODE)
+   
       pref_lan[u'default']=u"en"
    try:
       for each in nodes:
@@ -2986,6 +2988,17 @@ def get_all_subsections_of_course(group_id, node_id):
 								d['start_time'] = date_val.strftime("%d/%m/%Y")
 							css.append(d)
 	return css
+
+
+@get_execution_time
+@register.assignment_tag
+def get_list_of_fields(oid_list, field_name='name'):
+	if oid_list:
+		cur = node_collection.find({'_id': {'$in': oid_list} }, {field_name: 1, '_id': 0})
+		return [doc[field_name] for doc in cur]
+	else:
+		return []
+
 
 @get_execution_time
 @register.assignment_tag

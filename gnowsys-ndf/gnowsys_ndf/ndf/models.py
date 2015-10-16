@@ -1116,9 +1116,14 @@ class GSystem(Node):
 
         'annotations': [dict],      # List of json files for annotations on the page
         'license': basestring       # contains license/s in string format
+        # TODO: Adding one more field 'origin', kedar2a, 12-sep-15
+        # 'origin': [dict]          # e.g: [import: True/False, sync_source: ss41, sync: True, function: save_file]
     }
 
     use_dot_notation = True
+
+    # TODO: Make default value for license as 'CC-BY-SA 4.0 ...', kedar2a, 12-sep-15
+    # default_values = "CC-BY-SA 4.0 unported"
 
 
 @connection.register
