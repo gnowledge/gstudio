@@ -2,10 +2,7 @@
 {% load ndf_tags %}
 {% load simple_filters %}
 <style type="text/css">
-                    
-  .rating-stars {
-      /*width:1px;*/
-  }
+          
   .rating-stars > div {
       background-image:url("/static/ndf/images/stars.png");
       height: 17px;
@@ -40,10 +37,10 @@
 
     
   </div>
-</a>
+
 
   <div class="scard-content">
-   <span class="scard-title">{% firstof resource.altnames resource.name %}</span>
+   <span class="scard-title">{% firstof resource.altnames resource.name %}</span></a>
     {% get_node_ratings request resource as ratings %}
             <div class="rating-stars center" style="width:{{ratings.avg|multiply:16}}px;"> <!-- 16px = 1 star -->
               <div></div>
