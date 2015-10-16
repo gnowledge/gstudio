@@ -77,6 +77,7 @@
         // }
         //Update the average value text
         $("#avg-rating").html("Avg. : &nbsp;"+ avgRating+" {% trans ' by ' %}"+data_dict['tot']+"<i class='fi-torsos'></i>");
+        $("#avg-rating").removeClass("lbl_tag").addClass("rating-lbl")
     }
 
     //Sets the number of stars in the rating bar
