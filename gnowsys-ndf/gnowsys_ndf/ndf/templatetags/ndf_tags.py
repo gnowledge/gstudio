@@ -45,7 +45,7 @@ from django.contrib.sites.models import Site
 # from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES,GSTUDIO_AUTHOR_AGENCY_TYPES
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
-
+import itertools
 register = Library()
 at_apps_list = node_collection.one({
     "_type": "AttributeType", "name": "apps_list"
@@ -428,8 +428,15 @@ def get_all_replies(parent):
 	 if parent:
 		 ex_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}],'status':{'$nin':['HIDDEN']}})
 		 ex_reply.sort('created_at',-1)
-	 return ex_reply
+	 return ex_replysimp
 
+
+@get_execution_time
+@register.assignment_tag
+def get_all_possible_languages():
+	language = list(LANGUAGES)
+	all_languages = language + OTHER_COMMON_LANGUAGES
+	return all_languages
 
 @get_execution_time
 @register.assignment_tag
@@ -2991,3 +2998,10 @@ def get_list_of_fields(oid_list, field_name='name'):
 		return [doc[field_name] for doc in cur]
 	else:
 		return []
+
+
+@get_execution_time
+@register.assignment_tag
+def convert_list(value):
+	#convert list of list to list
+	return list(itertools.chain(*value))
