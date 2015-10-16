@@ -2981,3 +2981,13 @@ def get_all_subsections_of_course(group_id, node_id):
 								d['start_time'] = date_val.strftime("%d/%m/%Y")
 							css.append(d)
 	return css
+
+
+@get_execution_time
+@register.assignment_tag
+def get_list_of_fields(oid_list, field_name='name'):
+	if oid_list:
+		cur = node_collection.find({'_id': {'$in': oid_list} }, {field_name: 1, '_id': 0})
+		return [doc[field_name] for doc in cur]
+	else:
+		return []
