@@ -10485,14 +10485,12 @@ aside#help p, aside#help h5, aside#help h6 {
 }
 
 /* indent settings for jqtree  */
-/* line 1474, ../../../scss/_app_styles.scss */
-.jqtree-tree .jqtree-title {
-  color: #1C4257;
-  vertical-align: middle;
-  margin-left: 1.5em;
-  display: table;
-}
-
+/*.jqtree-tree .jqtree-title {
+    color: #1C4257;
+    vertical-align: middle;
+    margin-left: 1.5em;
+    display:table;
+}*/
 /* line 1480, ../../../scss/_app_styles.scss */
 .text-gray {
   color: gray;
