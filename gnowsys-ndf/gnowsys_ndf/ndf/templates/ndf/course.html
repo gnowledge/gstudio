@@ -7,38 +7,35 @@
 
 {% block help_content %}
 {% endblock %}
-
+{% block style %}
+  {{block.super}}
+  li{
+    list-style:none;
+  }
+  .btn-width{
+    width:100% !important;
+    max-width:100% !important;
+  }
+{% endblock %}
 
 {% block meta_content %}
+
   {% check_is_gstaff groupid request.user as is_gstaff %}
     <h2 class="subheader">
         {{title}}
     </h2>
   {% if is_gstaff %}
     {% if req_from_course %}
-          <a class="small button" href="{% url 'create_edit' group_name_tag %}">
-            <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
-          </a>
+        <a class="small button" href="{% url 'create_edit' group_name_tag %}">
+          <i class="fi-plus"></i>{% trans " New Course" %} 
+        </a>
     {% else %}
-          <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="small button">
-            <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
-          </a>
+        <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="small button">
+          <i class="fi-plus"></i>{% trans " New Event" %}
+        </a>
     {% endif %}
   {% endif %}
-{% endblock %}
-
-
-{% block search_content %}
-{% endblock %}
-
-
-{% block related_content %}
-{% endblock %}
-
-
-{% block body_content %}
   
-  {% check_is_gstaff groupid request.user as is_gstaff %}
   {% user_access_policy groupid request.user as user_access %}
     <!-- 
       Tab 1 - All CourseEvents  (Displayed to all : Anonymous, Authenticated, Group member/admin/owner, SuperUser)
@@ -46,18 +43,21 @@
       Tab 3 - Courses
     -->
     <header class="row" data-tab data-options="deep_linking:true">
-      <dl class="tabs " data-tab role="tablist">
-
-        <dd class="tab-title active" role="presentational" ><a href="#all_events" role="tab" tabindex="0" aria-selected="true" controls="all_events">{% if req_from_course %}{% trans "eCourse" %}{% else %}{% trans "Events" %}{% endif %}</a></dd>
+      <ul class="vertical tabs btn-width " data-tab role="tablist">
+        <li class="active"><a href="#all_events" class="small button">{% if req_from_course %}{% trans "All eCourses" %}{% else %}{% trans "All Events" %}{% endif %}</a></li>
         {% if request.user.is_authenticated  and not is_gstaff %}
-          <dd class="tab-title" role="presentational" ><a href="#my_events" role="tab" tabindex="0" aria-selected="false" controls="my_events">{% if req_from_course %}{% trans "My eCourses" %}{% else %}{% trans "My Events" %}{% endif %}</a></dd>
+          <li><a href="#my_events" class="small button">{% if req_from_course %}{% trans "My eCourses" %}{% else %}{% trans "My Events" %}{% endif %}</a></li>
         {% endif %}    
         {% if req_from_course and is_gstaff %}
-            <dd class="tab-title" role="presentational" ><a href="#courses" role="tab" tabindex="0" aria-selected="false" controls="courses">{% trans "Courses" %}</a></dd>
+            <li><a href="#courses" class="small button">{% trans "Courses" %}</a></li>
         {% endif %}
-
-      </dl>
+      </ul>
     </header>
+
+
+{% endblock %}
+
+{% block body_content %}
 
     <div class="tabs-content ">
 
