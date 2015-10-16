@@ -186,20 +186,7 @@
       <a href="{% url 'moderation_status' group_id node.pk %}">{% trans 'Check the current status of Moderation' %}</a>
     </small></h4>
   {% endif %}
-
-  <h3>
-    {# <span itemprop="{{schema.1.name}}" class='node'> {% firstof node.altnames node.name %} </span> #}
-
-    {# {% if node.altnames %}{{node.altnames}}{% else %}{{node.name}}{% endif %} #}
     
-  {% if node %}
-    {% get_publish_policy request groupid node as group_policy %}
-    {% if group_policy == "allow" %}
-      &nbsp;&nbsp;&nbsp;<span data-tooltip title= "{% blocktrans %} Only you can see the latest changes in this {{node.member_of_names_list.0}}. Click on 'Publish' to let others see. {% endblocktrans %}" ><span style='position:relative; color: gray;'>{% trans 'DRAFT' %}</span></span>
-    {% endif %}
-  {% endif %}
-  </h3>
-      
 
   <!-- new  -->
 
@@ -241,13 +228,15 @@
   {% endfor %}
 
   <div class="row">
-    
+    {% if node %}
+        {% get_publish_policy request groupid node as group_policy %}
+      {% endif %}
     <section class="medium-12 columns content">
       <div class="tabs-content">
-        <!-- Tab content -->
-        <div class="content active commentable-section" id="view-page" data-section-id="1">
-          <div class="row">
-            {% comment %}
+        <!--  {{ group_policy }} {{ node.status|lower }} passed for watermark background to .allow.draft class --> 
+        <div class="{{ group_policy }} {{ node.status|lower }} content active commentable-section" id="view-page" data-section-id="1">
+          <div class="row">  
+          {% comment %}
               <!--
               <div class="small-4 columns">
                 {% if node.prior_node|length > 0 %}
@@ -536,9 +525,8 @@
                 <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
               {% endif %}
                   <span class="fi-download large"> {% trans "Download " %} </span>
-
+                  
                 </a>
-              
             {% endif %}
 
             <!-- End New -->          
