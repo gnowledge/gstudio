@@ -832,6 +832,11 @@ def submitDoc(request, group_id):
             # check if file is already uploaded file
             # if isinstance(f, list):
                 f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
+                try:
+                    ObjectId(f)
+                except:
+                    if isinstance(f, list):
+                        f = f[1]
                 fileobj = node_collection.one({'_id': ObjectId(f)})
                 thread_create_val = request.POST.get("thread_create",'')
                 discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
