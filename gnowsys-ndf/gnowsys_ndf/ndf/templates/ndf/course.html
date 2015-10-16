@@ -62,6 +62,11 @@
     <div class="tabs-content ">
 
       <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="all_events">
+      {% if title == "Course" %}
+        <h4>All eCourses</h4>
+      {% else %}
+        <h4>All {{title}}</h4>
+      {% endif %}
 
         {% for course in ce_coll %}
           <li class="card">
@@ -112,7 +117,11 @@
       </section>
 
       <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="my_events">
-
+      {% if title == "Course" %}
+        <h4>My eCourses</h4>
+      {% else %}
+        <h4>My {{title}}</h4>
+      {% endif %}
         {% for course in enr_ce_coll %}
           <li class="card">
               <div class="course">
@@ -164,7 +173,7 @@
 
 
       <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="courses">
-
+      <h4> All Courses</h4>
         {% for course in course_coll %}
           <li class="card">
               <div class="course">
