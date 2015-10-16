@@ -2047,11 +2047,8 @@ def check_is_gapp_for_gstaff(groupid, app_dict, user):
 @register.assignment_tag
 def get_publish_policy(request, groupid, res_node):
 	resnode = node_collection.one({"_id": ObjectId(res_node._id)})
-
 	if resnode.status == "DRAFT":
-	    
-	    # node = node_collection.one({"_id": ObjectId(groupid)})
-		
+		# node = node_collection.one({"_id": ObjectId(groupid)})
 		group_name, group_id = get_group_name_id(groupid)
 		node = node_collection.one({"_id": ObjectId(group_id)})
 		group_type = group_type_info(groupid)
@@ -2087,7 +2084,8 @@ def get_publish_policy(request, groupid, res_node):
 		          # print "\n group = allow\n"
 		          if resnode.status == "DRAFT": 
 		            return "allow"
-
+	elif resnode.status == "MODERATION":
+		return "MODERATION"
 
 @get_execution_time
 @register.assignment_tag

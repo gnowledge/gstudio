@@ -53,6 +53,7 @@
 		width: 4rem;
 		color: #194d6f;
 		/*font-weight: bold;*/
+		margin-top: 1rem;
 		font-size: 1rem !important;
 	}
 	.label > a{
@@ -90,7 +91,7 @@
 										<a href="{% url edit_url group_id %}" class="tiny button radius left-btn edit fi-pencil">{% trans " Edit" %}</a>
 									{% endif %}
 								{% else %}
-									{% if user_is_joined == "joined" or user_is_joined == "author" %}
+									{% if user_is_joined == "joined" or user_is_joined == "author" or is_gstaff %}
 										<a href="{% url edit_url group_id node %}" class="tiny button radius edit left-btn fi-pencil">{% trans " Edit" %}</a>
 									{% endif %}
 								{% endif %}
@@ -103,7 +104,7 @@
 					{% endif %}
 
 					<!-- Publish button -->
-					{% if node and "Group" in group_object.member_of_names_list %}
+					{% if node %}
 						{% get_publish_policy request groupid node as group_policy %}
 						{% if group_policy == "allow" %}
 							{% if is_group %}
@@ -113,13 +114,15 @@
 							{% else %}
 								<a href="{% url 'publish_page' group_id node %}" class="tiny button radius edit right-btn">{% trans "Publish" %}</a>
 							{% endif %}
-
-							{% else %}
-								<a class="tiny button radius edit right-btn secondary disabled">{% trans "Published" %}</a>
+						{% elif group_policy == "MODERATION" %}
+							<a class="tiny button radius edit right-btn secondary disabled">{% trans "Moderation" %}</a>
+						{% else %}
+							<a class="tiny button radius edit right-btn secondary disabled">{% trans "Published" %}</a>
 						{% endif %}
 					{% endif %}
 				</div>
 
+			{% if node.status != "MODERATION" %}
 			<!-- Delete and History -->
 				<div class="row btn-row">
 					<br/>
@@ -147,7 +150,9 @@
 			{% if not is_group %}
 
 			<!-- Translate and Cross Publish if not is_group-->
+
 				<div class="row btn-row">
+
 					<!-- Translate -->
 					{% if user.is_authenticated %}
 						{% if user_is_joined == "joined" or user_is_joined == "author" %}
@@ -157,7 +162,6 @@
 						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
 							<!-- {% switch_group_conditions request.user group_id as switch_conditions %} -->
 							<!-- If resource is already under moderation, don't show cross-publish button -->
-							{% if node.status != "MODERATION" %}
 								<span data-tooltip title="Publish this resource in other group/s" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius right-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
 								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 									<div id="switchgrp" class="content">
@@ -169,14 +173,15 @@
 									</div>
 									<a class="close-reveal-modal">&#215;</a>
 								</div>          
-							{% endif %}
+
 						{% endif %}
 
 					{% else %}
 						<input type="button" class="tiny disabled secondary button radius left-btn" value="{% trans "Translate" %}" >
-						<span data-tooltip title="Publish this resource in other group/s" class="has-tip tip-bottom"><input type="button"class="secondary disabled tiny button radius right-btn" value="{% trans 'Cross Publish' %}">
+						<span data-tooltip title="Publish this resource in other group/s" class="has-tip tip-bottom"><input type="button"class="secondary disabled tiny button radius right-btn" value="{% trans 'Cross Publish' %}"></span>
 					{% endif %}
 				</div>
+			{% endif %}
 
 			<!-- Tags row -->
 				<div class="row tag-rating-div">
