@@ -353,9 +353,7 @@
 
 			<!-- Subscribe Users and Subscribe Admins buttons-->
 			<div class="row btn-row">
-				{% if group_object.edit_policy != EDITABLE_MODERATED %}
-					{% include "ndf/invite_users.html" %}
-				{% endif %}
+				{% include "ndf/invite_users.html" %}
 				{% include "ndf/invite_admins.html" %}
 			</div>
 
