@@ -232,38 +232,40 @@ def get_languages():
 
 @get_execution_time
 @register.assignment_tag
-def get_node_ratings(request,node):
-        try:
-                user=request.user
-                node = node_collection.one({'_id': ObjectId(node._id)})
-                sum=0
-                dic={}
-                cnt=0
-                userratng=0
-                tot_ratng=0
-                for each in node.rating:
-                     if each['user_id'] == user.id:
-                             userratng=each['score']
-                     if each['user_id']==0:
-                             cnt=cnt+1
-                     sum=sum+each['score']
-                if len(node.rating)==1 and cnt==1:
-                        tot_ratng=0
-                        avg_ratng=0.0
-                else:
-                        if node.rating:
-                           tot_ratng=len(node.rating)-cnt
-                        if tot_ratng:
-                           avg_ratng=float(sum)/tot_ratng
-                        else:
-                           avg_ratng=0.0
-                dic['avg']=avg_ratng
-                dic['tot']=tot_ratng
-                dic['user_rating']=userratng
-                return dic
-        except Exception as e:
-                print "Error in get_node_ratings "+str(e)
+def get_node_ratings(request,node_id):
+	try:
+		user = request.user
+		node_obj = node_collection.one({'_id': ObjectId(node_id)})
+		total_score = 0
+		total_rating = 0
+		rating_by_user = 0
+		counter_var = 0
+		avg_rating = 0.0
+		rating_data = {}
+		for each in node_obj.rating:
+			if each['user_id'] == user.id:
+				rating_by_user = each['score']
+			if each['user_id'] == 0:
+				counter_var += 1
+			total_score = total_score + each['score']
+		if len(node_obj.rating) == 1 and counter_var == 1:
+			total_rating = 0
+		else:
+			if node_obj.rating:
+				total_rating = len(node_obj.rating) - counter_var
+			if total_rating:
+				if type(total_rating) is float:
+					total_rating = round(total_rating,1)
+				avg_rating = float(total_score)/total_rating
+				avg_rating = round(avg_rating,1)
 
+		rating_data['avg'] = avg_rating
+		rating_data['tot'] = total_rating
+		rating_data['user_rating'] = rating_by_user
+		return rating_data
+
+	except Exception as e:
+		print "Error in get_node_ratings " + str(e)
 
 @get_execution_time
 @register.assignment_tag
@@ -322,15 +324,21 @@ def get_site_info():
 @register.assignment_tag
 def check_is_user_group(group_id):
 	try:
-		lst_grps=[]
-		all_user_grps=get_all_user_groups()
-		grp = node_collection.one({'_id':ObjectId(group_id)})
-		for each in all_user_grps:
-			lst_grps.append(each.name)
-		if grp.name in lst_grps:
+		res_group_obj = get_group_name_id(group_id, True)
+		# print "\n\n res_group_obj",res_group_obj._type
+		if res_group_obj._type == "Author":
 			return True
 		else:
 			return False
+		# lst_grps=[]
+		# all_user_grps=get_all_user_groups()
+		# grp = node_collection.one({'_id':ObjectId(group_id)})
+		# for each in all_user_grps:
+		# 	lst_grps.append(each.name)
+		# if grp.name in lst_grps:
+		# 	return True
+		# else:
+		# 	return False
 	except Exception as exptn:
 		print "Exception in check_user_group "+str(exptn)
 
