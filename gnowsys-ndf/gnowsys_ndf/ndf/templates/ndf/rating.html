@@ -54,6 +54,7 @@
                    //'rating_template' is a div.class of parent template
                    // $(".rating_template").html(data);   
                    // console.log(data)
+                   data = JSON.parse(data)
                    setRating(data);
                 }
         }); 
@@ -75,7 +76,7 @@
         //     $(".rating-bar").addClass("unrated");
         // }
         //Update the average value text
-        $("#avg-rating").html(avgRating);
+        $("#avg-rating").html("Avg. : &nbsp;"+ avgRating+" {% trans ' by ' %}"+data_dict['tot']+"<i class='fi-torsos'></i>");
     }
 
     //Sets the number of stars in the rating bar
