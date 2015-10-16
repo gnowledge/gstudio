@@ -150,12 +150,9 @@ function get_all_data(){
 </style>
 
 
-<div id="subscr_users">
-<li class="subscr_users_li">
-  <a href="#" data-reveal-id="inviteusers" class="button tiny">
+  <a href="#" id="subscr_users" data-reveal-id="inviteusers" class="tiny button left-btn radius">
     {% trans 'Subscribe Users' %}
   </a>
-</li>
 
 <div id="inviteusers" class="reveal-modal " data-reveal >
      
@@ -168,6 +165,5 @@ function get_all_data(){
               
       <input type="button" id="#submitUserInvite" class="button small" value="submit" onClick="saveinvite()"> 
      <a class="close-reveal-modal group">&#215;</a>
-</div>
 </div>
 
