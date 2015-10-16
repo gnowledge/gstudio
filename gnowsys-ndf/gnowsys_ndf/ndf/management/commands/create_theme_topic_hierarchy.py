@@ -300,7 +300,7 @@ def create_object(name, member_of_id, prior_node_id=None, content_org=None, grou
     node                = node_collection.collection.GSystem()
     node.name           = unicode(name)
     node.featured       = featured
-    node.language       = u"en"
+    node.language       = ('en', 'English')
     node.access_policy  = u"PUBLIC"
     node.status         = u"PUBLISHED"
     node.modified_by    = nroer_team_id

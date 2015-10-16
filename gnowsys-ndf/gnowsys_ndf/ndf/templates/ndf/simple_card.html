@@ -41,7 +41,7 @@
 
   <div class="scard-content">
    <span class="scard-title">{% firstof resource.altnames resource.name %}</span></a>
-    {% get_node_ratings request resource as ratings %}
+    {% get_node_ratings request resource.pk as ratings %}
             <div class="rating-stars center" style="width:{{ratings.avg|multiply:16}}px;"> <!-- 16px = 1 star -->
               <div></div>
             </div>
@@ -58,7 +58,7 @@
 
   <div class="{{resource.status|lower}} scard-action">
     By <a href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}">
-      {{resource.created_by|get_username|truncatechars:"10"}}<input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
-    </a> </br>at <i>{{resource.created_at|date:"d M Y"}} </i>
+      {{resource.created_by|get_username|truncatechars:"10"}}</a> <input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
+    </br>at <i>{{resource.created_at|date:"d M Y"}} </i>
   </div>
 </div>

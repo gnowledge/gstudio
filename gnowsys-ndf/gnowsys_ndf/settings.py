@@ -646,7 +646,11 @@ GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND"
 
 GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
 
+GSTUDIO_MODERATING_GROUP_ALTNAMES = ['Clearing House', 'Curation House']
 
+GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
+
+GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 # #textb
 # import warnings
 # warnings.filterwarnings(

@@ -112,6 +112,11 @@
   <!-- end of orgit down container -->
 
 </div>
+  <div id="alertModal" class="reveal-modal large alert-box radius" data-reveal data-alert>
+      <label id="alertModalLabel"></label>
+      <a class="close-reveal-modal">&#215;</a>
+  </div>
+   <!-- TODO: include login template in overlay or a link to it: 11-10-15, katkamrachana -->
 
 <script type="text/javascript">
   // for discussion tab
@@ -129,10 +134,9 @@
   {% endif %}
   function createDiscussion()
   {
-    if( user_access == "allow"){
-    if( is_user_authenticated )
-    {  
-      {% if request.user.is_authenticated %}
+    if( is_user_authenticated){
+      if( user_access == "allow" )
+      {  
         // ajax to create thread for first time.
         $.ajax({
           url: "{% url 'create_discussion' group_id node.pk %}",
@@ -163,16 +167,22 @@
           // }
         });
         // --- END ajax and create thread for first time.
-        {% endif %}
       }
       else
       {
         // alert("To start discussion you need to login and be the member of this group.");
-        alert("{% trans 'Login to start discussion' %}");
+        // alert("Only group members can comment.");
+        $("#alertModalLabel").text("Only group members can comment.");
+        $("#alertModal").addClass("warning");
+        $("#alertModal").foundation('reveal', 'open');
+
       }
     }
   else{
-        alert("Only group members can comment.");
+        $("#alertModalLabel").text("Please login to start discussion.");
+        $("#alertModal").addClass("alert");
+        $("#alertModal").foundation('reveal', 'open');
+        // alert("{% trans 'Login to start discussion' %}");
   }
   }
   // --- END of createDiscussion()

@@ -614,7 +614,7 @@ class Command(BaseCommand):
     # pages_files_not_updated = []
     pages_files_not_updated = {}
     page_gst = node_collection.one( { '_type': "GSystemType", 'name': "Page" })
-    file_gst = node_collection.one( { '_type': "GSystemType", 'name': "File" } )
+    file_gst = node_collection.one( { '_type': "GSystemType", 'name': "File" })
     page_file_cur = node_collection.find( { 'member_of': {'$in':[page_gst._id, file_gst._id]} , 'status': { '$in': [u'DRAFT', u'PUBLISHED']}} ).sort('last_update', -1)
     has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
     twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
@@ -622,9 +622,11 @@ class Command(BaseCommand):
     rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
     thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-    print "\n Total pages and files found : ", page_file_cur.count()
+    all_count =  page_file_cur.count()
+    print "\n Total pages and files found : ", all_count
     for idx, each_node in enumerate(page_file_cur):
         try:
+            print "Processing #",idx, " of ",all_count
             # print "\nPage# ",idx, "\t - ", each_node._id, '\t - ' , each_node.name, each_node.attribute_set
             release_response_val = True
             interaction_type_val = unicode('Comment')
@@ -632,7 +634,7 @@ class Command(BaseCommand):
             thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(each_node._id)})
             release_response_status = False
             thread_interaction_type_status = False
-            # discussion_enable_status = False
+            discussion_enable_status = False
             has_thread_status = False
             # if get_attribute_value(each_node._id,"discussion_enable") != "":
             #     discussion_enable_status = True
@@ -645,11 +647,7 @@ class Command(BaseCommand):
                     for each_rep in reply_cur:
                         node_collection.collection.update({'_id': each_rep._id},{'$set':{'prior_node':[thread_obj._id]}}, upsert = False, multi = False)
                         each_rep.reload()
-                if thread_obj.name == each_node.name:
-                    node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': [each_node._id]}}, upsert = False, multi = False)
-                    thread_obj.reload()
-                create_gattribute(each_node._id, discussion_enable_at, True)
-                each_node.reload()
+
                 # creating GRelation
                 if not has_thread_status:
                     gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
@@ -658,7 +656,6 @@ class Command(BaseCommand):
                     release_response_status = True
                 if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
                     thread_interaction_type_status = True
-
                 if not release_response_status:
                     if release_response_val:
                         create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
@@ -669,8 +666,15 @@ class Command(BaseCommand):
                         create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
                         thread_obj.reload()
                 # print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
-            else:   
-                create_gattribute(each_node._id, discussion_enable_at, False)
+            else:
+                thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(each_node._id)})
+
+            if thread_obj:
+                if get_attribute_value(each_node._id,"discussion_enable") != True:
+                    create_gattribute(each_node._id, discussion_enable_at, True)
+            else:
+                if get_attribute_value(each_node._id,"discussion_enable") != False:
+                    create_gattribute(each_node._id, discussion_enable_at, False)
                 # print "\n\n discussion_enable False"
         except Exception as e:
 
