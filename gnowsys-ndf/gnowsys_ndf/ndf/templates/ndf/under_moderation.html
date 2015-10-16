@@ -9,10 +9,11 @@
   .info-text{
     margin-left:2rem !important;
   }
-  .card-thumbnail{
+  .img-mid-size, .card-thumbnail{
         margin-left:4rem !important;
         border:1px solid grey;
   }
+
 {% endblock %}
 
 {% block concern_information %}
@@ -55,7 +56,9 @@
         <ul class="small-block-grid-1 medium-block-grid-1 large-block-grid-2">
 
           {% if "image" in node.mime_type %}
-            <img src="{% url 'getFileThumbnail' group_id node.pk %}" class="card-thumbnail"  alt="No thumbnail available!" />
+          {% if node.fs_file_ids.1 %}
+            <img src="{% url 'get_gridfs_resource' node.fs_file_ids.2 %}" class="img-mid-size" alt="" />
+          {% endif %}
           {% else %}
             <li class="card">
               {% if grouptype == "Moderated" %}
