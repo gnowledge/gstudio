@@ -215,7 +215,11 @@
 			
 			<!-- Location	-->
 				<div class="row tag-rating-div">
-			        	<a data-reveal-id="view-map-widget" class="text-left"><i class="fi-marker"></i> {% trans "Location" %}</a>
+				{% if node.location %}
+		        	<a data-reveal-id="view-map-widget" class="text-left"><i class="fi-marker"></i> {% trans "Location" %}</a>
+	        	{% else %}
+		        	<a class="text-left disabled"><i class="fi-marker"></i> {% trans "Location" %}</a>
+	        	{% endif %}
 
 		    <!-- Graphs For Topics or Concept -->
 		      {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
