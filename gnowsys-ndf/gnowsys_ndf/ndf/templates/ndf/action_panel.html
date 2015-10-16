@@ -73,7 +73,6 @@
 			Translate, Cross Publish,
 			Tags
 		 -->
-		{% if group_object.edit_policy != "EDITABLE_MODERATED" %}
 		<div class="panel">
 			<!-- Edit and Publish -->
 				<div class="row btn-row">
@@ -181,7 +180,6 @@
 						<span data-tooltip title="Publish this resource in other group/s" class="has-tip tip-bottom"><input type="button"class="secondary disabled tiny button radius right-btn" value="{% trans 'Cross Publish' %}"></span>
 					{% endif %}
 				</div>
-			{% endif %}
 
 			<!-- Tags row -->
 				<div class="row tag-rating-div">
@@ -241,10 +239,10 @@
 		      {% endif %}
 	
 		        </div>
+			{% endif %}
 
 			{% endif %}
 		</div>
-		{% endif %}
 
 		<!-- PANEL 2
 		New {{node}} and Group related actions such as
