@@ -103,7 +103,12 @@
 	<div class="panel" style="background-color:#ddd;">
 	<ul class="no-bullet" id="app-set-item"> 
 
-	    {% get_memberof_objects_count theme_GST.pk groupid as count %}
+		<!--
+		There is no need of following ndf_tag - 'get_memberof_objects_count'.
+		because, nodes from back-end are according to selected language.
+		Still this needs to be checked for future use-cases.
+		-->
+	    {# {% get_memberof_objects_count request theme_GST.pk groupid as count %} #}
 
 	      <li class="selected-app-set-item"> 
 	        <div>
@@ -115,7 +120,7 @@
 
 	          {# <a href="{% url "theme_list" groupid app_id theme_GST.pk %}" style="color:#0b8a91;"> #}
 	          <a href="{% url "list_themes" group_name_tag %}">
-	            Theme ({{count}})
+	            Theme ({{nodes.count}})
 	          </a> 
 
 	        </div>
@@ -251,9 +256,15 @@
 
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-  		<!-- Existing card list-->
-        {% get_preferred_lang request group_id nodes "Theme" as nodes %}
+  		<!-- following ndf_tag is commented for time being. which is fetching the themes from relation and current selected language.
+  		Now by changing query at backend, it shows resources related to selected language.
+  		Still this needs to be checked. So do not deletethis commented ndf_tag - 'get_preferred_lang' -->
+
+        {# {% get_preferred_lang request group_id nodes "Theme" as nodes %} #}
+
 		{% group_type_info groupid request.user as grouptype %}
+
+  		<!-- Existing card list-->
 	  	{% for each in nodes %}
 
 	      <li class="card">

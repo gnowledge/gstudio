@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.models import Node, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata,create_grelation
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata,create_grelation, get_language_tuple
 
 #######################################################################################################################################
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
@@ -33,7 +33,7 @@ app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
 
 @get_execution_time
 def themes(request, group_id, app_id=None, app_set_id=None):
-    
+
     try:
         group_id = ObjectId(group_id)
     except:
@@ -114,7 +114,8 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     else:
         # This will show Themes as a card view on landing page of Topics
         themes_cards = True
-        nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+        lang = list(get_language_tuple(request.LANGUAGE_CODE))
+        nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}, 'language': lang})
         # if request.user.username:
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
         # else:
@@ -717,6 +718,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                        },context_instance = RequestContext(request)
                               
     )
+
+
 @get_execution_time
 def get_coll_set(node):
   obj = node_collection.one({'_id': ObjectId(node)})
@@ -736,24 +739,30 @@ def get_coll_set(node):
   
                               get_coll_set(n._id)
   return list_trans_coll
+
+
 @get_execution_time
 def topic_detail_view(request, group_id, app_Id=None):
 
   #####################
-  ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-        group_id = str(group_ins._id)
-    else :
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-            group_id = str(auth._id)
-  else :
-    pass
-    
+  # ins_objectid  = ObjectId()
+  # if ins_objectid.is_valid(group_id) is False :
+  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #   if group_ins:
+  #       group_id = str(group_ins._id)
+  #   else :
+  #       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #       if auth :
+  #           group_id = str(auth._id)
+  # else :
+  #   pass
   ###################### 
+
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
 
   obj = node_collection.one({'_id': ObjectId(app_Id)})
   app = node_collection.one({'_id': ObjectId(obj.member_of[0])})

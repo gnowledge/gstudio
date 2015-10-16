@@ -799,8 +799,8 @@ def submitDoc(request, group_id):
         subject = request.POST.get("Subject", "")
         level = request.POST.get("Level", "")
 
-        subject = '' if (subject=='Not Sure') else subject
-        level = '' if (level=='Not Sure') else level
+        subject = '' if (subject=='< Not Sure >') else subject
+        level = '' if (level=='< Not Sure >') else level
 
         if map_geojson_data:
           map_geojson_data = map_geojson_data + ","
@@ -968,6 +968,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
         try:
             files.seek(0)
             filetype = magic.from_buffer(files.read(100000), mime='true')  # Gusing filetype by python-magic
+            # print "\nfiletype : ", filetype, "\n"
             filetype1 = mimetypes.guess_type(files.name)[0]
             if filetype1:
                 filetype1 = filetype1
@@ -1140,12 +1141,13 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 
             '''storing thumbnail of image in saved object'''
-            # print "\n\n filetype------",filetype
+            # print "\n\n filetype------ ",filetype
             if 'image' in filetype:
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
                 thumbnailimg = convert_image_thumbnail(files)
-                tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
-                node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': tobjectid}})
+                if thumbnailimg:
+                    tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
+                    node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': tobjectid}})
 
                 files.seek(0)
                 mid_size_img = convert_mid_size_image(files)
@@ -1181,14 +1183,40 @@ def convert_image_thumbnail(files):
     """
     convert image file into thumbnail
     """
-    files.seek(0)
-    thumb_io = StringIO()
-    size = 128, 128
-    img = Image.open(StringIO(files.read()))
-    img.thumbnail(size, Image.ANTIALIAS)
-    img.save(thumb_io, "JPEG")
-    thumb_io.seek(0)
-    return thumb_io
+    try:
+        thumb_io = StringIO()
+        size = 128, 128
+        files.seek(0)
+        try:
+            img = Image.open(StringIO(files.read()))
+        except Exception, e:
+            return None
+        img.thumbnail(size, Image.ANTIALIAS)
+
+        file_type = mimetypes.guess_type(files.name)[0]
+          
+        extension = None
+        if 'jpg' in file_type or 'jpeg' in file_type: 
+          extension = 'JPEG'
+        elif 'png' in file_type:
+          extension = 'PNG'
+        elif 'svg' in file_type:
+          extension = 'SVG'
+        else:
+          temp_extension = mimetypes.guess_extension(files.name)
+          if temp_extension:
+              extension = extension.rsplit('.')[1]
+
+        if extension:
+            img.save(thumb_io, extension)
+        else:
+            img.save(thumb_io, 'JPEG')
+
+        thumb_io.seek(0)
+        return thumb_io
+
+    except Exception, e:
+        return None
 
 
 @get_execution_time
@@ -1212,34 +1240,54 @@ def convert_mid_size_image(files, **kwargs):
     """
     convert image into mid size image w.r.t. max width of 500
     """
-    files.seek(0)
-    mid_size_img = StringIO()
-    size = (500, 300)  # (width, height)
-    img = Image.open(StringIO(files.read()))
-    # img = img.resize(size, Image.ANTIALIAS)
-    # img.save(mid_size_img, "JPEG")
-    # mid_size_img.seek(0)
+    try:
+        files.seek(0)
+        mid_size_img = StringIO()
+        size = (500, 300)  # (width, height)
+        try:
+          img = Image.open(StringIO(files.read()))
+        except Exception, e:
+          return None
+        # img = img.resize(size, Image.ANTIALIAS)
+        # img.save(mid_size_img, "JPEG")
+        # mid_size_img.seek(0)
 
-    if (img.size > size) or (img.size[0] >= size[0]):
-      # both width and height are more than width:500 and height:300
-      # or
-      # width is more than width:500
-      factor = img.size[0]/500.00
-      img = img.resize((500, int(img.size[1] / factor)), Image.ANTIALIAS)
+        if (img.size > size) or (img.size[0] >= size[0]):
+          # both width and height are more than width:500 and height:300
+          # or
+          # width is more than width:500
+          factor = img.size[0]/500.00
+          img = img.resize((500, int(img.size[1] / factor)), Image.ANTIALIAS)
 
-    elif (img.size <= size) or (img.size[0] <= size[0]): 
-      img = img.resize(img.size, Image.ANTIALIAS)
+        elif (img.size <= size) or (img.size[0] <= size[0]): 
+          img = img.resize(img.size, Image.ANTIALIAS)
 
-    if "extension" in kwargs:
-      if kwargs["extension"]:
-        img.save(mid_size_img, kwargs["extension"])
+        file_type = mimetypes.guess_type(files.name)[0]
+          
+        if kwargs.get('extension', ''):
+          extension = kwargs['extension']
+        elif 'jpg' in file_type or 'jpeg' in file_type: 
+          extension = 'JPEG'
+        elif 'png' in file_type:
+          extension = 'PNG'
+        elif 'svg' in file_type:
+          extension = 'SVG'
+        else:
+          extension = mimetypes.guess_extension(files.name)
+          extension = extension.rsplit('.')[1]
 
-    else:    
-      img.save(mid_size_img, "JPEG")
+        if extension:
+            img.save(mid_size_img, extension)
 
-    mid_size_img.seek(0)
+        else:    
+          img.save(mid_size_img, "JPEG")
 
-    return mid_size_img
+        mid_size_img.seek(0)
+
+        return mid_size_img
+
+    except Exception, e:
+        return None
     
         
 
