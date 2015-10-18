@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load get_latest_git_hash from simple_filters %}
 
 <footer>
   <section class="row">
@@ -32,8 +33,8 @@
   </div>
 
   <div class="medium-10 columns">
-    <strong>{% trans "Powered by" %} <a href="https://github.com/gnowledge/gstudio" target="_blank">{% trans "Gnowsys-Studio" %}</a> {% trans "at the" %} <a href="http://www.hbcse.tifr.res.in/" target="_blank">{% trans "Homi Bhabha Centre for Science Education" %}</a>, <a href="http://www.tifr.res.in/" target="_blank">{% trans "TIFR" %}</a>.</strong>
-
-    <!--{{site.ORG_NAME |safe }}-->
+  {% get_latest_git_hash as git_commit_hash %}
+    <strong>{% trans "Powered by" %} <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">{% trans "gstudio" %} </a> {% trans "built at Gnowledge Lab" %}, <a href="http://www.hbcse.tifr.res.in/" target="_blank">{% trans "Homi Bhabha Centre for Science Education" %}</a>, <a href="http://www.tifr.res.in/" target="_blank">{% trans "TIFR" %}</a>.</strong>
+    {# <!--{{site.ORG_NAME |safe }}--> #}
   </div>
 </footer>

@@ -29,7 +29,9 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'unpublished_entry','meta_type':'factory_types'},
                          {'name':'booklet','meta_type':'factory_types'},
                          {'name':'GList','meta_type':'factory_types'},
-                         {'name':'ProgramEventGroup','meta_type':'factory_types'},
+			 {'name':'GListItem','meta_type':'factory_types'},
+			 {'name':'Group','meta_type':'factory_types'},	
+			 {'name':'ProgramEventGroup','meta_type':'factory_types'},
                          {'name':'CourseEventGroup','meta_type':'factory_types'},
                          {'name':'PartnerGroup','meta_type':'factory_types'},
                          {'name':'ModeratingGroup','meta_type':'factory_types'},
@@ -144,6 +146,9 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                                             'meta_type':'factory_types'}},
                            {'Citation':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
                                         'data_type':'basestring',
+                                        'meta_type':'factory_types'}},
+                           {'discussion_enable':{'gsystem_names_list':['Page','File'],
+                                        'data_type':'bool',
                                         'meta_type':'factory_types'}},
                            {'release_response':{'gsystem_names_list':['Twist'],
                                         'data_type':'bool',
@@ -269,3 +274,29 @@ factory_relation_types = [
         }
     }
 ]
+
+
+#factory data is data which is required while intialization of the database first time
+factory_data = [ {'_type':'Group','name':'home'},
+           	 {'_type': u'Group'},{'name': u'Trash'}	
+		
+	       ]
+attribute_types = [{'_type':'AttributeType','name':'start_enroll'},
+		   {'_type':'AttributeType','name':'end_enroll'},
+                   {'_type':'AttributeType','name':'nussd_course_type'},				 
+   		   {'_type':'AttributeType','name': 'course_structure_minutes'},
+		   {'_type':'AttributeType','name': 'max_marks'},
+		   {'_type':'AttributeType','name': 'min_marks'},		                 	
+		   {'_type':'AttributeType','name': 'course_structure_assignment'},
+		   {'_type':'AttributeType','name': 'course_structure_assessment'}
+			
+]
+
+relation_types = [{'_type':'RelationType','name':'group_has_course_event'},
+		  {'_type': "RelationType", 'name': "has_logo"},			
+
+]
+
+
+
+

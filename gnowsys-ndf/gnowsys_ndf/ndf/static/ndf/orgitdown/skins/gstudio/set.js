@@ -23,13 +23,13 @@ var mySettings = {
 		{name:'Bulleted List', openWith:'    - ', closeWith:'', multiline:true, openBlockWith:'\n', closeBlockWith:'\n'},
 		{name:'Numeric List', openWith:'    1. ', closeWith:'', multiline:true, openBlockWith:'\n', closeBlockWith:'\n'},
 		{separator:'---------------' },
-		{name:'Picture', key:'P'},
+		{name:'', key:''},
 	        //{name:'Picture', key:'P',replaceWith:'\n#+CAPTION: \n#+ATTR_HTML: width="600" \n[[http:fileName.jpg]]\n' },
 	        {name:'Link', key:'L', openWith:'[[http://your.address.com here/][Your visible link text here]]', closeWith:'', placeHolder:'' },
 	        {separator:'---------------' },
                 {name:'Insert Embed Html', replaceWith:'\n#+BEGIN_HTML \n#+END_HTML\n' },
                 {name:'Close',call:'close' },
-		{name:'Cite',key:'C',openWith:'[fn:{number}:',closeWith:']'}
+		// {name:'Cite',key:'D',openWith:'[fn:{number}:',closeWith:']'}
 		//{name:'Clean', className:'clean', replaceWith:function(orgitdown) { return orgitdown.selection.replace(/<(.*?)>/g, "") } }		
 		//{name:'Preview', className:'preview',  call:'preview'}
 	]

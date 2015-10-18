@@ -39,10 +39,12 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time,get_group_name_id
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
+from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
@@ -763,7 +765,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 ##### bellow part is for manipulating nodes collections#####
 
 @get_execution_time
-def get_inner_collection(collection_list, node):
+def get_inner_collection(collection_list, node, gstaff_access):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
@@ -776,18 +778,27 @@ def get_inner_collection(collection_list, node):
             node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
             inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
             inner_sub_list = [inner_sub_dict]
-            inner_sub_list = get_inner_collection(inner_sub_list, col_obj)
-
+            inner_sub_list = get_inner_collection(inner_sub_list, col_obj, gstaff_access)
+            if "CourseSubSectionEvent" == node_type:
+              start_date_val = get_attribute_value(col_obj._id, "start_time")
+              if start_date_val:
+                curr_date_val = datetime.datetime.now().date()
+                start_date_val = start_date_val.date()
+                if curr_date_val >= start_date_val or gstaff_access:
+                    inner_sub_dict.update({'start_time_val':start_date_val.strftime("%d/%m/%Y")})
+                else:
+                    # do not send this CSS
+                    inner_sub_list.remove(inner_sub_dict)
+                    # pass
             if inner_sub_list:
               inner_list_append_temp(inner_sub_list[0])
-            else:
+            elif "CourseSubSectionEvent" != node_type:
               inner_list_append_temp(inner_sub_dict)
 
             cl.update({'children': inner_list })
       else:
         error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
         print "\n " + error_message
-
     return collection_list
 
   else:
@@ -799,16 +810,17 @@ def get_collection(request, group_id, node_id):
   node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
   collection_list = []
+  gstaff_access = False
+  gstaff_access = check_is_gstaff(group_id,request.user)
   # collection_list_append_temp=collection_list.append
-  
+  # print "\n\n gstaff_access---",gstaff_access
   for each in node.collection_set:
     obj = node_collection.one({'_id': ObjectId(each) })
     if obj:
       node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
       collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
 
-      collection_list = get_inner_collection(collection_list, obj)
-
+      collection_list = get_inner_collection(collection_list, obj, gstaff_access)
  # def a(p,q,r):
 #		collection_list.append({'name': p, 'id': q,'node_type': r})
   #this empty list will have the Process objects as its elements
@@ -838,7 +850,12 @@ def get_collection(request, group_id, node_id):
   #   for i in range(x):
   #     processes[i].join()#each Process converges
   data = collection_list
-
+  updated_data = []
+  # print "\n node.member_of_names_list",node.member_of_names_list
+  if "CourseEventGroup" in node.member_of_names_list:
+    get_course_units_tree(data,updated_data)
+    data = updated_data
+  # print data
   return HttpResponse(json.dumps(data))
 
 
@@ -1655,7 +1672,8 @@ def set_drawer_widget_for_users(st, coll_obj_list):
     for each in st:
        dic = {}
        dic['id'] = str(each.id)
-       dic['name'] = each.email  # username
+       dic['email'] = each.email  # username
+       dic['username'] = each.username  # username
        d1.append(dic)
     draw1['drawer1'] = d1
     data_list.append(draw1)
@@ -1663,8 +1681,11 @@ def set_drawer_widget_for_users(st, coll_obj_list):
     for each in coll_obj_list:
        dic = {}
        dic['id'] = str(each.id)
-       dic['name'] = each.email  # username
+       # dic['name'] = each.email  # username
+       dic['email'] = each.email  # username
+       dic['username'] = each.username  # username
        d2.append(dic)
+
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return data_list

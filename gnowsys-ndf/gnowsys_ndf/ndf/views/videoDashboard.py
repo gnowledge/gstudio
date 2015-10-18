@@ -209,8 +209,13 @@ def video_edit(request,group_id,_id):
         # get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
         vid_node.save(is_changed=get_node_common_fields(request, vid_node, group_id, GST_VIDEO),groupid=group_id)
         thread_create_val = request.POST.get("thread_create",'')
+        discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
+            create_gattribute(vid_node._id, discussion_enable_at, True)
             return_status = create_thread_for_node(request,group_id, vid_node)
+        else:
+            create_gattribute(vid_node._id, discussion_enable_at, False)
+
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             get_node_metadata(request,vid_node)
             teaches_list = request.POST.get('teaches_list', '')  # get the teaches list

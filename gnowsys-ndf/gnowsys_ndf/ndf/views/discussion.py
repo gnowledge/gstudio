@@ -22,9 +22,10 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
-from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_execution_time, get_group_name_id
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.notification import models as notification
+from gnowsys_ndf.ndf.views.moderation import create_moderator_task
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 
@@ -46,16 +47,15 @@ from datetime import datetime, timedelta, date
 from collections import OrderedDict
 col = db[Benchmark.collection_name]
 
-history_manager = HistoryManager()
-theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
-theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
-topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+# history_manager = HistoryManager()
+# theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
+# theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
+# topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
-
-grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
-ins_objectid = ObjectId()
+# grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
+# ins_objectid = ObjectId()
 
 @login_required
 @get_execution_time
@@ -122,7 +122,12 @@ def create_discussion(request, group_id, node_id):
 def discussion_reply(request, group_id, node_id):
 
     try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
+    try:
+        group_object = node_collection.one({'_id': ObjectId(group_id)})
         prior_node = request.POST.get("prior_node_id", "")
         content_org = request.POST.get("reply_text_content", "") # reply content
 
@@ -191,7 +196,9 @@ def discussion_reply(request, group_id, node_id):
                         lstobj_collection.append(file_obj._id) 
                     except:
                         pass
-
+                    if "CourseEventGroup" not in group_object.member_of_names_list:
+                        if group_object.edit_policy == 'EDITABLE_MODERATED':
+                            t = create_moderator_task(request, file_obj.group_set[0], file_obj._id,on_upload=True)
                 # print "::: lstobj_collection: ", lstobj_collection
             # except:
                 # lstobj_collection = []
@@ -222,6 +229,7 @@ def discussion_reply(request, group_id, node_id):
             # print "===========", reply
 
             # ---------- mail/notification sending -------
+            '''
             node = node_collection.one({"_id": ObjectId(node_id)})
             node_creator_user_obj = User.objects.get(id=node.created_by)
             node_creator_user_name = node_creator_user_obj.username
@@ -252,7 +260,7 @@ def discussion_reply(request, group_id, node_id):
             notification.send(to_user_list, render_label, {"from_user": from_user})
 
             # ---------- END of mail/notification sending ---------
-
+            '''
             return HttpResponse( reply )
 
         else: # no reply content

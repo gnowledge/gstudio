@@ -12,6 +12,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
+
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
@@ -33,7 +35,7 @@ except ImportError:
 
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
@@ -43,7 +45,7 @@ from django.contrib.sites.models import Site
 # from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES,GSTUDIO_AUTHOR_AGENCY_TYPES
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
-
+import itertools
 register = Library()
 at_apps_list = node_collection.one({
     "_type": "AttributeType", "name": "apps_list"
@@ -126,8 +128,8 @@ def get_group_agency_types():
 
 @get_execution_time
 @register.assignment_tag
-def get_licence():
-   return GSTUDIO_LICENCE
+def get_license():
+   return GSTUDIO_LICENSE
 
 
 @get_execution_time
@@ -230,38 +232,40 @@ def get_languages():
 
 @get_execution_time
 @register.assignment_tag
-def get_node_ratings(request,node):
-        try:
-                user=request.user
-                node = node_collection.one({'_id': ObjectId(node._id)})
-                sum=0
-                dic={}
-                cnt=0
-                userratng=0
-                tot_ratng=0
-                for each in node.rating:
-                     if each['user_id'] == user.id:
-                             userratng=each['score']
-                     if each['user_id']==0:
-                             cnt=cnt+1
-                     sum=sum+each['score']
-                if len(node.rating)==1 and cnt==1:
-                        tot_ratng=0
-                        avg_ratng=0.0
-                else:
-                        if node.rating:
-                           tot_ratng=len(node.rating)-cnt
-                        if tot_ratng:
-                           avg_ratng=float(sum)/tot_ratng
-                        else:
-                           avg_ratng=0.0
-                dic['avg']=avg_ratng
-                dic['tot']=tot_ratng
-                dic['user_rating']=userratng
-                return dic
-        except Exception as e:
-                print "Error in get_node_ratings "+str(e)
+def get_node_ratings(request,node_id):
+	try:
+		user = request.user
+		node_obj = node_collection.one({'_id': ObjectId(node_id)})
+		total_score = 0
+		total_rating = 0
+		rating_by_user = 0
+		counter_var = 0
+		avg_rating = 0.0
+		rating_data = {}
+		for each in node_obj.rating:
+			if each['user_id'] == user.id:
+				rating_by_user = each['score']
+			if each['user_id'] == 0:
+				counter_var += 1
+			total_score = total_score + each['score']
+		if len(node_obj.rating) == 1 and counter_var == 1:
+			total_rating = 0
+		else:
+			if node_obj.rating:
+				total_rating = len(node_obj.rating) - counter_var
+			if total_rating:
+				if type(total_rating) is float:
+					total_rating = round(total_rating,1)
+				avg_rating = float(total_score)/total_rating
+				avg_rating = round(avg_rating,1)
 
+		rating_data['avg'] = avg_rating
+		rating_data['tot'] = total_rating
+		rating_data['user_rating'] = rating_by_user
+		return rating_data
+
+	except Exception as e:
+		print "Error in get_node_ratings " + str(e)
 
 @get_execution_time
 @register.assignment_tag
@@ -320,15 +324,21 @@ def get_site_info():
 @register.assignment_tag
 def check_is_user_group(group_id):
 	try:
-		lst_grps=[]
-		all_user_grps=get_all_user_groups()
-		grp = node_collection.one({'_id':ObjectId(group_id)})
-		for each in all_user_grps:
-			lst_grps.append(each.name)
-		if grp.name in lst_grps:
+		res_group_obj = get_group_name_id(group_id, True)
+		# print "\n\n res_group_obj",res_group_obj._type
+		if res_group_obj._type == "Author":
 			return True
 		else:
 			return False
+		# lst_grps=[]
+		# all_user_grps=get_all_user_groups()
+		# grp = node_collection.one({'_id':ObjectId(group_id)})
+		# for each in all_user_grps:
+		# 	lst_grps.append(each.name)
+		# if grp.name in lst_grps:
+		# 	return True
+		# else:
+		# 	return False
 	except Exception as exptn:
 		print "Exception in check_user_group "+str(exptn)
 
@@ -426,15 +436,23 @@ def get_all_replies(parent):
 	 if parent:
 		 ex_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}],'status':{'$nin':['HIDDEN']}})
 		 ex_reply.sort('created_at',-1)
-	 return ex_reply
+	 return ex_replysimp
 
+
+@get_execution_time
+@register.assignment_tag
+def get_all_possible_languages():
+	language = list(LANGUAGES)
+	all_languages = language + OTHER_COMMON_LANGUAGES
+	return all_languages
 
 @get_execution_time
 @register.assignment_tag
 def get_metadata_values():
 
 	metadata = {"educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE, "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE, "curricular": GSTUDIO_RESOURCES_CURRICULAR,
-				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT, "language": GSTUDIO_RESOURCES_LANGUAGES,
+				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT, 
+				# "language": GSTUDIO_RESOURCES_LANGUAGES,
 				"timerequired": GSTUDIO_RESOURCES_TIME_REQUIRED, "audience": GSTUDIO_RESOURCES_AUDIENCE , "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY,
 				"age_range": GSTUDIO_RESOURCES_AGE_RANGE ,"readinglevel": GSTUDIO_RESOURCES_READING_LEVEL, "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT}
 	return metadata
@@ -443,25 +461,47 @@ def get_metadata_values():
 @get_execution_time
 @register.assignment_tag
 def get_attribute_value(node_id, attr):
-
-	node_attr = None
-	if node_id:
-		node = node_collection.one({'_id': ObjectId(node_id) })
-		gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr) })
-        # print "node: ",node.name,"\n"
-        # print "attr: ",attr,"\n"
-
-		if node and gattr:
-			node_attr = triple_collection.one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id})	
-
-	if node_attr:
-		attr_val = node_attr.object_value
-	else:
+	try:
 		attr_val = ""
+		node_attr = None
+		if node_id:
+			node = node_collection.one({'_id': ObjectId(node_id) })
+			gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr) })
+	        # print "node: ",node.name,"\n"
+	        # print "attr: ",attr,"\n"
 
-	# print "attr_val: ",attr_val,"\n"
-	return attr_val
+			if node and gattr:
+				node_attr = triple_collection.one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})	
 
+		if node_attr:
+			attr_val = node_attr.object_value
+		# print "attr_val: ",attr_val,"\n"
+		return attr_val
+	except:
+		return attr_val
+
+@get_execution_time
+@register.assignment_tag
+def get_relation_value(node_id, grel):
+	try:
+		grel_val_node = ""
+		grel_id = ""
+		node_grel = None
+		if node_id:
+			node = node_collection.one({'_id': ObjectId(node_id) })
+			grel = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
+			if node and grel:
+				node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id,'status':"PUBLISHED"})
+		# print "\n\n node_grel",node_grel
+		if node_grel:
+			grel_val = node_grel.right_subject
+			grel_id = node_grel._id
+			grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+		# print "grel_val_node: ",grel_val_node,"\n"
+		# returns right_subject of grelation and GRelation _id 
+		return grel_val_node, grel_id
+	except Exception as e:
+		return grel_val_node, grel_id
 
 @get_execution_time
 @register.inclusion_tag('ndf/drawer_widget.html')
@@ -744,6 +784,7 @@ def get_nroer_menu(request, group_name):
 
 		# handling conditions of "e-library" = "file" and vice-versa.
 		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
+		selected_gapp = "topics" if (selected_gapp == "topic_details") else selected_gapp
 
 		# for deciding/confirming selected gapp
 		for each_gapp in gapps:
@@ -1292,10 +1333,17 @@ def get_all_resources(request,node_id):
                 if val:
                         keys.append(key)
                         for res in val:
-                                if res.language == request.LANGUAGE_CODE:
-                                        res_dict[key]['fallback_lang'].append(res)
-                                else:
-                                        res_dict[key]['other_languages'].append(res)
+
+                        	# following if condition is temp patch.
+                        	# actually for this condition to get work, we need to have \
+                        	# uniform data-type/format for storing in language field.
+                        	# currently, we are also using any of: code or name or tuple.
+                        	# e.g: "en" or "English" or ("en", "English")
+                            # if (len(res.language) == len(request.LANGUAGE_CODE)) and (res.language != request.LANGUAGE_CODE):
+                            if isinstance(res.language, (list, tuple)) and len(res.language) > 1 and (res.language[0] != request.LANGUAGE_CODE):
+                                    res_dict[key]['other_languages'].append(res)
+                            else:
+                                    res_dict[key]['fallback_lang'].append(res)
                                         
         for k1,v1 in res_dict.items():
                 if k1 not in keys :
@@ -1545,12 +1593,12 @@ def get_group_type(group_id, user):
 
                         else:
                             error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                            raise Http404(error_message)
+                            raise PermissionDenied(error_message)
 
                     else:
                         # Anonymous user found which cannot access groups other than Public
                         error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                        raise Http404(error_message)
+                        raise PermissionDenied(error_message)
 
             else:
                 # If Group is not found with either given ObjectId or name in the database
@@ -1562,8 +1610,11 @@ def get_group_type(group_id, user):
 
         return True
 
-    except Exception as e:
-        raise Http404(e)
+    except PermissionDenied as e:
+		raise PermissionDenied(e)
+
+    except Http404 as e:
+		raise Http404(e)
 
 
 @get_execution_time
@@ -1684,9 +1735,10 @@ def get_Object_count(key):
 
 @get_execution_time
 @register.assignment_tag
-def get_memberof_objects_count(key,group_id):
+def get_memberof_objects_count(request, key, group_id):
 	try:
-		return node_collection.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
+		lang = list(get_language_tuple(request.LANGUAGE_CODE))
+		return node_collection.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}, 'language': lang}).count()
 	except:
 		return 'null'
 
@@ -1996,11 +2048,8 @@ def check_is_gapp_for_gstaff(groupid, app_dict, user):
 @register.assignment_tag
 def get_publish_policy(request, groupid, res_node):
 	resnode = node_collection.one({"_id": ObjectId(res_node._id)})
-
 	if resnode.status == "DRAFT":
-	    
-	    # node = node_collection.one({"_id": ObjectId(groupid)})
-		
+		# node = node_collection.one({"_id": ObjectId(groupid)})
 		group_name, group_id = get_group_name_id(groupid)
 		node = node_collection.one({"_id": ObjectId(group_id)})
 		group_type = group_type_info(groupid)
@@ -2036,7 +2085,8 @@ def get_publish_policy(request, groupid, res_node):
 		          # print "\n group = allow\n"
 		          if resnode.status == "DRAFT": 
 		            return "allow"
-
+	elif resnode.status == "MODERATION":
+		return "MODERATION"
 
 @get_execution_time
 @register.assignment_tag
@@ -2111,24 +2161,25 @@ def get_preferred_lang(request, group_id, nodes, node_type):
 		
 		if pref_lan.keys():
 			if pref_lan['primary'] != request.LANGUAGE_CODE:
-				uname.preferred_languages['primary'] = request.LANGUAGE_CODE
+				uname.preferred_languages['primary'] = get_language_tuple(request.LANGUAGE_CODE)
 				uname.save()
 
 		else:
 			pref_lan={}
-			pref_lan['primary']=request.LANGUAGE_CODE
-			pref_lan['default']=u"en"
-			uname.preferred_languages=pref_lan
+			pref_lan['primary'] = get_language_tuple(request.LANGUAGE_CODE)
+			pref_lan['default'] = ('en', 'English')
+			uname.preferred_languages = pref_lan
 			uname.save()   
       else:
          pref_lan={}
-         pref_lan['primary']=request.LANGUAGE_CODE
-         pref_lan['default']=u"en"
+         pref_lan['primary'] = get_language_tuple(request.LANGUAGE_CODE)
+         pref_lan['default'] = ('en', 'English')
          uname.preferred_languages=pref_lan
          uname.save()
    else:
       pref_lan={}
-      pref_lan[u'primary']=request.LANGUAGE_CODE
+      pref_lan[u'primary'] = get_language_tuple(request.LANGUAGE_CODE)
+   
       pref_lan[u'default']=u"en"
    try:
       for each in nodes:
@@ -2758,7 +2809,7 @@ def get_filters_data(gst_name):
 
 	# additional filters:
 
-	filter_dict["language"] = { 
+	filter_dict["Language"] = { 
 								"data_type": "basestring", "type": "field",
 								"value": json.dumps(static_mapping["language"]) 
 							}
@@ -2783,7 +2834,7 @@ def get_sg_member_of(group_id):
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
 	# print group_obj.name
 	# Fetch post_node of group
-	if group_obj.post_node:
+	if "post_node" in group_obj:
 		post_node_id_list = group_obj.post_node
 
 		if post_node_id_list:
@@ -2834,9 +2885,13 @@ def get_breadcrumb(url):
 
 			# --- first element: group name ---
 			first_el = url_list[0]
-			first_group_name, group_id = get_group_name_id(first_el)
+			group_obj = get_group_name_id(first_el, get_obj=True)
 			# print "00000000000000000", first_el
-			first_group_url = '/' + first_group_name
+			first_group_name = group_obj.altnames if group_obj.altnames else group_obj.name
+			first_group_url = '/' + group_obj.name
+			# if group_obj.name == 'home':
+			# 	first_group_url += '/repository'
+
 			path.append({'name': first_group_name, 'link': first_group_url})
 			# print path
 			
@@ -2890,3 +2945,69 @@ def get_thread_node(node_id):
 				thread_obj = rel['has_thread'][0]
 	# print "\n\nthread_obj--",thread_obj
 	return thread_obj
+
+
+
+@get_execution_time
+@register.filter
+def is_media_collection(node_id):
+    """To check whether all the items of collection_set are
+    of Image or of Video.
+    
+    Args:
+        node_id (ObjectId): _id of node whose collection_set to be checked for.
+    
+    Returns:
+        bool: Returns True if all the items are of type Image or Video.
+        Else returns False.
+    """
+
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+
+    if node_obj.collection_set:
+	    cur = node_collection.find({'_id': {'$in': node_obj.collection_set} })
+    
+	    mimetype_list = [f.mime_type for f in cur if (f.mime_type and (f.mime_type.split('/')[0].lower() in ['image', 'video']) )]
+	    # print "==", mimetype_list
+
+	    # print len(node_obj.collection_set), len(mimetype_list) 
+	    if len(node_obj.collection_set) == len(mimetype_list):
+		    return True
+    return False
+
+@get_execution_time
+@register.assignment_tag
+def get_all_subsections_of_course(group_id, node_id):
+	node_obj = node_collection.one({'_id': ObjectId(node_id)})
+	css = []
+	if node_obj.collection_set:
+		for each_node in node_obj.collection_set:
+			each_node_obj = node_collection.one({'_id': ObjectId(each_node)})
+			if "CourseSectionEvent" in each_node_obj.member_of_names_list:
+				if each_node_obj.collection_set:
+					for each_node in each_node_obj.collection_set:
+						each_css = node_collection.one({'_id': ObjectId(each_node)})
+						if "CourseSubSectionEvent" in each_css.member_of_names_list:
+							d = {'name':str(each_css.name),'id':str(each_css._id)}
+							date_val = get_attribute_value(each_css._id,"start_time")
+							if date_val:
+								d['start_time'] = date_val.strftime("%d/%m/%Y")
+							css.append(d)
+	return css
+
+
+@get_execution_time
+@register.assignment_tag
+def get_list_of_fields(oid_list, field_name='name'):
+	if oid_list:
+		cur = node_collection.find({'_id': {'$in': oid_list} }, {field_name: 1, '_id': 0})
+		return [doc[field_name] for doc in cur]
+	else:
+		return []
+
+
+@get_execution_time
+@register.assignment_tag
+def convert_list(value):
+	#convert list of list to list
+	return list(itertools.chain(*value))

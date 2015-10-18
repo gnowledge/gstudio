@@ -57,21 +57,27 @@ app = gst_page
 def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id}) 
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id}) 
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 
-        if group_ins:
-            group_id = str(group_ins._id)
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
 
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+        
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     if app_id is None:  
         app_ins = node_collection.find_one({'_type': "GSystemType", "name": "Page"})
         if app_ins:
@@ -289,6 +295,7 @@ def create_edit_page(request, group_id, node_id=None):
     #     pass
     group_name, group_id = get_group_name_id(group_id)
     ce_id = request.GET.get('course_event_id','')
+    blog_type = request.GET.get('blog_type','')
     res = request.GET.get('res','')
     program_res = request.GET.get('program_res','')
     context_variables = { 'title': gst_page.name,
@@ -296,7 +303,8 @@ def create_edit_page(request, group_id, node_id=None):
                           'groupid': group_id,
                           'ce_id': ce_id,
                           'res':res,
-                          'program_res':program_res
+                          'program_res':program_res,
+                          'blog_type': blog_type
                       }
 
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
@@ -319,6 +327,8 @@ def create_edit_page(request, group_id, node_id=None):
         page_type = request.POST.getlist("type_of",'')
         
         ce_id = request.POST.get("ce_id",'')
+        blog_type = request.POST.get('blog_type','')
+
         res = request.POST.get("res",'')
         program_res = request.POST.get('program_res','')
 
@@ -335,6 +345,8 @@ def create_edit_page(request, group_id, node_id=None):
         if res:
             res = eval(res)
 
+        if blog_type:
+            blog_type = eval(blog_type)
         if page_type:
             objid= page_type[0]
             if not ObjectId(objid) in page_node.type_of:
@@ -346,16 +358,16 @@ def create_edit_page(request, group_id, node_id=None):
 
         # if course event grp's id is passed, it means
         # its a blog page added in notebook and hence set type_of field as "Blog page"
-        if ce_id:
+        # print "\n\n blog_type---",blog_type
+        if blog_type:
             blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
             page_node.type_of = [blogpage_gst._id]
 
         # if the page created is as a resource in course or program event,
         # set status to PUBLISHED by default
         # one major reason for this, ONLY published nodes can be replicated.
-        if res or program_res:
+        if res or program_res or ce_id:
             page_node.status = u"PUBLISHED"
-
         page_node.save()
         # if page is created in program event, add page_node to group's collection set
         if program_res:
@@ -363,8 +375,13 @@ def create_edit_page(request, group_id, node_id=None):
             group_obj.collection_set.append(page_node._id)        
             group_obj.save()
 
-        if thread_create_val == "Yes":
-	        return_status = create_thread_for_node(request,group_id, page_node)
+        discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+        if thread_create_val == "Yes" or blog_type:
+          create_gattribute(page_node._id, discussion_enable_at, True)
+          return_status = create_thread_for_node(request,group_id, page_node)
+        else:
+          create_gattribute(page_node._id, discussion_enable_at, False)
+
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
         if ce_id or res or program_res:
@@ -379,7 +396,7 @@ def create_edit_page(request, group_id, node_id=None):
             # Only while metadata editing
             if metadata == "metadata":
                 if page_node:
-                    get_node_metadata(request,page_node)
+                    get_node_metadata(request,page_node,is_changed=True)
         # End of filling metadata
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))

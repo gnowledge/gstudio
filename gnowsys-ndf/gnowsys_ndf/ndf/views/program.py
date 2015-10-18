@@ -33,6 +33,7 @@ def program_event_list(request, group_id):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
     course_coll = None
     enr_ce_coll = []
@@ -41,14 +42,14 @@ def program_event_list(request, group_id):
     pe_gst = node_collection.one({'_type': "GSystemType", 'name': "ProgramEventGroup"})
 
     # program events
-    title = pe_gst.name
+    title = "Events"
 
     pe_coll = node_collection.find({'member_of': pe_gst._id})
     for each_pe in pe_coll:
         list_of_hierarchy = get_prior_node_hierarchy(each_pe._id)
         if list_of_hierarchy:
             pe_obj = list_of_hierarchy[len(list_of_hierarchy)-1]
-        if pe_obj not in list_of_pe:
+        if pe_obj not in list_of_pe and pe_obj._id in group_obj.post_node:
             list_of_pe.append(pe_obj)
     if request.user.id:
         userid = int(request.user.id)

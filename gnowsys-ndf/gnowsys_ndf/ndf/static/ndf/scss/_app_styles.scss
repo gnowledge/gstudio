@@ -205,7 +205,7 @@ body{
           // background-color: scale-color($topbar-bg-color, $lightness: 5%);
           box-shadow: inset 0px 100px 50px #fff;
           // box-shadow: inset 0px 100px 50px scale-color($theme-color-invert, $lightness: 10%);
-          transition: 0.8s all;
+          // transition: 0.8s all;
       }
     }
 
@@ -233,8 +233,15 @@ body{
 
     &:hover{
       opacity: 1;
-      transition: 0.3s all;
+      transition: 0.1s all;
       box-shadow: 0px 2px 3px #E1E1E1;
+    }
+
+    #group-apps{
+
+      .back-btn.fi-play:before{
+        transform: rotate( 180deg );
+      }
     }
 
     #second-header.top-bar {
@@ -1046,20 +1053,183 @@ aside#help{
         font-weight: bold;
     }
 }
+/* Simple  Card CSS*/
+.scard {
+    /*background: #F2F2F2;*/
+    border:1px solid #AAA;
+    border-bottom:3px solid #BBB;
+    padding:0px;
+    margin:5px;
+    overflow:hidden;
+    width:85%;
+     &:hover{
+    box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
+    transition: box-shadow 0.5s ease;
+  }
+    /*float:left;*/
+
+.scard_header {
+    text-align:center;
+    position:fixed;
+    height:30px;
+    left:0px;
+    right:0px;
+    background:#FFF;
+    padding:25px 0px 5px 0px;
+    border-bottom:5px solid #CCC;
+    font-size:20px;
+    font-weight:bold;
+  }
+
+.scard-content {  
+    padding: 0.5rem;
+    border-radius: 0 0 2px 2px;
+    overflow: hidden;
+    /*height: 8.25rem;*/
+   margin-top: 8px;
+  .scard-title{
+      font-family: Open Sans Bold;
+      margin:0px;
+      /*padding:10px;*/
+      color:#6B0000;
+      /*font-size:small;*/
+      text-transform: uppercase;
+      word-wrap: normal;
+    }
+
+  }
+
+.scard-action {
+    border-top: 1px solid rgba(160, 160, 160, 0.2);
+    padding: 0.25rem 0.5rem;
+    /*color: gray;*/
+    font-size: small;
+    /*background: #A6D9CB;*/
+}
+
+ p {
+    margin:0px;
+    padding:10px;
+  }
+
+.scard-image {
+    width:100%;
+    height:30%;
+    padding:0px;
+    margin:0px;
+    background-position:center;
+    background-repeat:no-repeat;
+    position:relative;
+    overflow:hidden;
+    
+    img  {
+    border-radius: 2px 2px 0 0;
+    display: block;
+    margin: 0 auto;
+    opacity: 0.9;
+    width:100%;
+  }
+  
+  i {
+  font-size: 7rem;
+  opacity: 0.75;
+  display: block;
+  margin: -15px auto;
+  text-align: center;
+  color: gray;
+  font-family: "foundation-icons";
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  text-decoration: inherit;
+  }
+  
+  i.file:before {
+  content: "\f18e";
+  }
+  i.page:before {
+  content: "\f18e";
+  }
+  i.collection:before {
+  content: "\f18a";
+  }
+  i.documents:before {
+  content: "\f18b";
+  }
+  i.pdf:before {
+  content: "\f18b";
+  }
+  i.text:before {
+  content: "\f18e";
+  }
+  i.interactives:before {
+  content: "\f1b2";
+  }
+  i.ebooks:before {
+  content: "\f11e";
+  }
+  i.images:before {
+  content: "\f125";
+  }
+  i.audios:before, i.audio:before {
+  content: "\f17b";
+  }
+  i.videos:before, i.video:before {
+  content: "\f20e";
+  }
 
 
+}
+ .published.scard-action {
+      background: #A6D9CB;
+    }
+
+ .draft.scard-action {
+      content: "Draft";
+      background: #DCDCDC;
+      
+    }
+
+  .deleted.scard-action {
+      border-color: transparent $alert-color transparent transparent;
+      border-color: rgba(255,255,255,0) $alert-color rgba(255,255,255,0) rgba(255,255,255,0);
+    }
+  
+  .moderation.scard-action {
+      border-color: transparent $primary-color transparent transparent;
+      border-color: rgba(255,255,255,0) $primary-color rgba(255,255,255,0) rgba(255,255,255,0);
+
+      .label-text:before{ content: "Mod"; }
+    }
+
+
+.scard_footer {
+  border-top: 1px solid rgba(160, 160, 160, 0.2);
+  padding: 0.25rem 0.5rem;
+  color: gray;
+  font-size: small;
+  height: 2rem;
+  }
+
+
+
+}
+
+
+/* End Simple Card CSS*/
 .rcard {
   overflow: hidden;
   color: #272727;
   // height: 17rem;
   // box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 1px 2px 1px rgba(0,0,0,0.2);
   // border-radius: 2px;
   // border: solid 0.5px #E1E1E1;
   background-color: #f5f5f5;
+  margin: 5px;
 
   &:hover{
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
     transition: box-shadow 0.5s ease;
   }
 
@@ -1137,7 +1307,8 @@ aside#help{
 
   .image {
     position: relative;
-    background-color: #E1E1E1;
+    // background-color: #E1E1E1;
+    background-color: #ccc;
     box-shadow: 0px -35px 35px -20px rgb(128, 128, 128) inset;
     height: 8em;
     overflow: hidden;
@@ -1174,7 +1345,7 @@ aside#help{
         filter: brightness(1);
         -webkit-filter: brightness(1);
         transform: translate3d(0, 0, 0);
-        transition: filter 1s ease;
+        transition: all 1.5s ease;
       }
     }
 
@@ -1283,5 +1454,29 @@ aside#help{
   } 
 }
 
+.compulsory{
 
+  &:after{
+    content: '*';
+    color: red;
+    font-size: smaller;
+  }
+}
 
+/* Watermark background for node_ajax_content  */
+.allow.draft{
+    background-size: 10%;
+    background-repeat:repeat;
+    background-image:url("/static/ndf/images/draft-watermark.png");
+}
+
+/* indent settings for jqtree  */
+/*.jqtree-tree .jqtree-title {
+    color: #1C4257;
+    vertical-align: middle;
+    margin-left: 1.5em;
+    display:table;
+}*/
+.text-gray{
+  color: gray;
+}

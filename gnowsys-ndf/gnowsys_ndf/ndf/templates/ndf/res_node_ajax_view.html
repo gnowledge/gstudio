@@ -5,6 +5,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   
   {% if user.is_authenticated %}
+    <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
+
     <!-- orgitdown! -->
     <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
     <!-- orgitdown! toolbar settings -->
@@ -34,7 +36,7 @@
 
   .selected-resource { background-color:lightgray !important ; }
 
-  li{
+  li.subsc_users_li {
     list-style: none;
   }
 
@@ -257,6 +259,24 @@
 
     {% endif %}
     <div>
+    {% get_sg_member_of node.pk as list_of_sg_member_of %}
+      {% if "CourseEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
+            {% get_attribute_value group_object.pk 'start_time' as event_start_time %}
+            {% get_attribute_value group_object.pk 'end_time' as event_end_time %}
+            {% get_attribute_value group_object.pk 'start_enroll' as event_start_enroll %}
+            {% get_attribute_value group_object.pk 'end_enroll' as event_end_enroll %}
+            <div class="row">
+            <section class="medium-4 columns">
+                <label>Event duration</label>
+                 From <i>{{event_start_time|date:"d-M-Y"}}</i> to <i> {{event_end_time|date:"d-M-Y"}}</i>
+            </section>
+            <section  class="medium-4 columns end">
+                <label>Enrollment duration</label>
+                 From <i>{{event_start_enroll|date:"d-M-Y"}}</i> to <i> {{event_end_enroll|date:"d-M-Y"}}</i>
+            </section>
+            </div><hr>
+        {% endif %}
+
 			{% with node.html_content|safe as description %}
 			{% if description != "None" %}
 			<span itemprop="{{schema.1.description}}">{{ description }}</span>
@@ -270,30 +290,36 @@
   {% if user_access == "allow" %}
     <div class="medium-6 columns">
       {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
+        {% comment %}
         <div>
         {% include "ndf/rating.html" %} 
         </div><br/>
+        {% endcomment %}
       {% endif %}
     </div>
   {% endif %} 
 
-    <div class="content" id="view-discussion">
+    <div class="content small-12 columns"  id="view-discussion">
         {% get_node group_id as group_obj %}
-        {% if "CourseEventGroup" not in group_obj.member_of_names_list %}
-          {% get_thread_node node.pk as thread_node %}
-          {% if thread_node %}
-              {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-              {% get_node thread_node as thread_node_obj %}
-              {% include 'ndf/discussion.html' with node=thread_node_obj sg_type="Event" %}
-          {% else %}            
-              {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-              {% include 'ndf/discussion.html' with sg_type="Event" %}
-          {% endif %}
-        {% else %}
+        {% get_thread_node node.pk as thread_node %}
+        {% if thread_node %}
+            {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+            {% get_node thread_node as thread_node_obj %}
+            {% include 'ndf/discussion.html' with node=thread_node_obj %}
+        {% else %}            
             {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
             {% include 'ndf/discussion.html' %}
         {% endif %}
-
+        {% comment %}
+        {% else %}
+          {% if node.discussion_enable == True %}
+            {% if thread_node %}
+                {% get_node thread_node as thread_node_obj %}
+                {% get_disc_replies thread_node_obj.pk group_id global_disc_all_replies as all_replies %}
+                {% include 'ndf/discussion.html' with node=thread_node_obj %}
+            {% endif %}
+          {% endif %}
+        {% endcomment %}
     </div>
     </li>
     </ul>
@@ -303,17 +329,17 @@
     {% if is_gstaff %}
       {% if "CourseEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
           <section class="medium-2 columns"> 
-            <div class="row">         
-              <div class="medium-6 columns">
-                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit hide"><i class="fi-pencil"></i> {% trans "Edit " %}{{sg_type}}</a>
+            <div class="row">
+                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit"><i class="fi-pencil"></i> {% trans "Edit " %}{% if sg_type == "ProgramEventGroup" %}{% trans "Event" %}{% else %}{% trans "eCourse" %}{% endif %}</a>
+              <br/><br/>
                 {% include "ndf/invite_users.html" %}
                 {% include "ndf/invite_admins.html" %}
-              </div>
             </div>  
           </section>  
       {% else %} 
 
         {% get_edit_url node.pk as edit_url %}
-          <li><a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li>
+          <a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
       {% endif %} 
     {% endif %} 
+

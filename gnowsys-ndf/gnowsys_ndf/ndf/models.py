@@ -179,7 +179,9 @@ class Node(DjangoDocument):
         'prior_node': [ObjectId], 
         'post_node': [ObjectId],
         
-        'language': unicode,
+        # 'language': unicode,  # previously it was unicode.
+        'language': (basestring, basestring),  # Tuple are converted into a simple list
+                                               # ref: https://github.com/namlook/mongokit/wiki/Structure#tuples
 
         'type_of': [ObjectId], # check required: only ObjectIDs of GSystemType 
         'member_of': [ObjectId], # check required: only ObjectIDs of
@@ -285,7 +287,11 @@ class Node(DjangoDocument):
                                         # here after the default
                                         # 'Administration' group is
                                         # ready.
-    default_values = {'created_at': datetime.datetime.utcnow, 'status': u'DRAFT'}
+    default_values = {
+                        'created_at': datetime.datetime.utcnow,
+                        'status': u'DRAFT',
+                        'language': ('en', 'English')
+                    }
     use_dot_notation = True
     
     ########## Setter(@x.setter) & Getter(@property) ##########
@@ -1161,6 +1167,8 @@ class GSystem(Node):
 
         'annotations': [dict],      # List of json files for annotations on the page
         'license': basestring       # contains license/s in string format
+        # TODO: Adding one more field 'origin', kedar2a, 12-sep-15
+        # 'origin': [dict]          # e.g: [import: True/False, sync_source: ss41, sync: True, function: save_file]
     }
 
 
@@ -1179,6 +1187,9 @@ class GSystem(Node):
     ]
 
     use_dot_notation = True
+
+    # TODO: Make default value for license as 'CC-BY-SA 4.0 ...', kedar2a, 12-sep-15
+    # default_values = "CC-BY-SA 4.0 unported"
 
 
 @connection.register
@@ -1281,8 +1292,8 @@ class Author(Group):
         'visited_location': [],
         'preferred_languages': dict,          # preferred languages for users like preferred lang. , fall back lang. etc.
         'group_affiliation': basestring,
-	'language_proficiency':basestring,
-	'subject_proficiency':basestring
+	'language_proficiency':list,
+	'subject_proficiency':list
     }
 
     use_dot_notation = True

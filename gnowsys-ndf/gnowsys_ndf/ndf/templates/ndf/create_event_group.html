@@ -316,6 +316,9 @@ this template is modified. So for the fields in the template it supports -
         <input type="hidden" name="agency_type" value="Other">
         {% if spl_group_type == "CourseEventGroup" %}
           <input type="hidden" name="course_node_id" value="{{course_node_id}}">
+          <input type="hidden" name="moderation_level" value="-1">
+        {% else %}
+        <input type="hidden" name="moderation_level" value="2">
         {% endif %}
 
         {% if node %}
@@ -398,7 +401,7 @@ this template is modified. So for the fields in the template it supports -
       dateFormat: 'dd/mm/yy',
       yearRange: lowerYearLimit + ":" + upperYearLimit,
       defaultDate: '0',
-      minDate: '0',
+      //minDate: '0',
 
       onClose: function(dateText, inst) {
         if($(this).attr('id') == 'event_start_date' || $(this).attr('id') == 'event_end_date'){
