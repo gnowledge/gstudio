@@ -1429,28 +1429,27 @@
           $("#message").css("display", "none");
 	    }
 	{% get_site_name_from_settings as site_name %}
+	{% if not blog_type %}
        
        {%  if site_name == "NROER"  %}
             if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
                     // $('#tabs').find('a[href="#tab2"]').trigger('click');
                     $('.meta_tab').trigger('click');
                     $("#message").css("display", "block");
-                    $("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+                    $("#message").text("{% trans 'Please fill compulsory metadata fields(* marked)' %}");
                     event.preventDefault();
             }
        {% endif %}
 
 	$("input[name='thread_create']").attr("disabled",false);
-	{% if not blog_type %}
-
-	{% if title == "Page" or "File" in node.member_of_names_list %}
-		if (!$("input[name='thread_create']:checked").val()) {
-			$('.thread_prop_tab').trigger('click');
-			$("#message").css("display", "block");
-			$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
-			event.preventDefault();
-		}
-	{% endif %}
+		{% if title == "Page" or "File" in node.member_of_names_list %}
+			if (!$("input[name='thread_create']:checked").val()) {
+				$('.thread_prop_tab').trigger('click');
+				$("#message").css("display", "block");
+				$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+				event.preventDefault();
+			}
+		{% endif %}
 	{% endif %}
     updateAllTags();
 	});

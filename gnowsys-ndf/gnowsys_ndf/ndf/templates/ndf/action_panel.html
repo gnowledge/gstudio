@@ -77,30 +77,25 @@
 			<!-- Edit and Publish -->
 				<div class="row btn-row">
 					<!-- Edit button -->
-					{% if 'CourseEventGroup' not in group_object.member_of_names_list or not group_object.member_of_names_list %}
-
 						{% edit_policy groupid node request.user as status %}
 						{% if is_user_authenticated and status == "allow" and user_access == "allow" %}
-							{% if "Group" in group_object.member_of_names_list or "Author" in group_object.member_of_names_list %}
-								{% get_sg_member_of groupid as list_of_sg_member_of %}
-								{% if "ProgramEventGroup" not in list_of_sg_member_of %}
-								{% get_edit_url node.pk as edit_url %}
-								{% if is_group %}
-									{% if is_gstaff %}
-										<a href="{% url edit_url group_id %}" class="tiny button radius left-btn edit fi-pencil">{% trans " Edit" %}</a>
-									{% endif %}
-								{% else %}
-									{% if user_is_joined == "joined" or user_is_joined == "author" or is_gstaff %}
-										<a href="{% url edit_url group_id node %}" class="tiny button radius edit left-btn fi-pencil">{% trans " Edit" %}</a>
-									{% endif %}
+							{% get_sg_member_of groupid as list_of_sg_member_of %}
+							{% if "ProgramEventGroup" not in list_of_sg_member_of %}
+							{% get_edit_url node.pk as edit_url %}
+							{% if is_group %}
+								{% if is_gstaff %}
+									<a href="{% url edit_url group_id %}" class="tiny button radius left-btn edit fi-pencil">{% trans " Edit" %}</a>
 								{% endif %}
+							{% else %}
+								{% if user_is_joined == "joined" or user_is_joined == "author" or is_gstaff %}
+									<a href="{% url edit_url group_id node %}" class="tiny button radius edit left-btn fi-pencil">{% trans " Edit" %}</a>
 								{% endif %}
+							{% endif %}
 							{% endif %}
 						{% else %}
 							<input type="button" class="tiny button radius secondary edit left-btn fi-pencil disabled" value="Edit">
 						{% endif %}
 
-					{% endif %}
 
 					<!-- Publish button -->
 					{% if node %}
@@ -126,7 +121,7 @@
 				<div class="row btn-row">
 					<br/>
 					<!-- Delete button				 -->
-					{% if user.is_authenticated and "Group" in group_object.member_of_names_list%} 
+					{% if user.is_authenticated and "Group" in group_object.member_of_names_list %} 
 						{% if node.created_by == request.user.id %}
 							{% if "Page" in node.member_of_names_list %}
 								<a class="tiny button radius left-btn fi-trash" href="{% url 'trash_resource' group_id node %}">{% trans " Delete" %}</a>
@@ -221,7 +216,7 @@
 				{% if node.location %}
 		        	<a data-reveal-id="view-map-widget" class="text-left"><i class="fi-marker"></i> {% trans "Location" %}</a>
 	        	{% else %}
-		        	<a class="text-left disabled"><i class="fi-marker"></i> {% trans "Location" %}</a>
+		        	<a class="text-left disabled text-gray"><i class="fi-marker"></i> {% trans "Location" %}</a>
 	        	{% endif %}
 
 		    <!-- Graphs For Topics or Concept -->
