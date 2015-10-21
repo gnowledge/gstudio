@@ -1773,7 +1773,7 @@ def group_dashboard(request, group_id=None):
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
   # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
-  if "CourseEventGroup" in group_obj.member_of_names_list:
+  if "CourseEventGroup" in group_obj.member_of_names_list or u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
       page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
       blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
       # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"}).sort("last_update",-1)
@@ -1811,6 +1811,7 @@ def group_dashboard(request, group_id=None):
   annotations = json.dumps(group_obj.annotations)
   
   default_template = "ndf/groupdashboard.html"
+  # print "\n\n blog_pages.count------",blog_pages
   return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
                                                        'group_id':group_id, 'user':request.user, 
                                                        'shelf_list': shelf_list,
