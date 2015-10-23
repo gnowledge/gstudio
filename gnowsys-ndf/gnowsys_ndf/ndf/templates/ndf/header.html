@@ -460,7 +460,7 @@
   $(document).on('click','.feeds_btn',function(){
     if(!set_href){
       if( navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ){
-        $(this).attr('href', "{% url 'activity_feed' group_id %}")
+        $(this).attr('href', "{% url 'activity_feed' group_object.pk %}")
       }
       else{
         console.log("NOT MOZILLA");
@@ -479,7 +479,7 @@
     $(document).on("click", "#btnConfirmYes", function() {
         set_href = true;
         $("#alertModal").foundation('reveal', 'close');
-        $(".feeds_btn").attr('href', "{% url 'activity_feed' group_id %}")
+        $(".feeds_btn").attr('href', "{% url 'activity_feed' group_object.pk %}")
         $(".feeds_btn")[0].click();
     });
 
