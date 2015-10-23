@@ -1115,9 +1115,9 @@ class GSystem(Node):
         'author_set': [int],                     # List of Authors
 
         'annotations': [dict],      # List of json files for annotations on the page
-        'license': basestring       # contains license/s in string format
+        'license': basestring,       # contains license/s in string format
         # TODO: Adding one more field 'origin', kedar2a, 12-sep-15
-        # 'origin': [dict]          # e.g: [import: True/False, sync_source: ss41, sync: True, function: save_file]
+        'origin': []          # e.g: [{"csv-import": <fn name>}, {"sync_source": "<system-pub-key>"}]
     }
 
     use_dot_notation = True
