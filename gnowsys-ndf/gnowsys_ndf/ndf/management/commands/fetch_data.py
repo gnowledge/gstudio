@@ -131,8 +131,7 @@ def capture_id_data(id,time_with_microsec,collection):
 		#create log file
 
 		if node:
-                        print node['name']
-			with open("Registry.txt", 'a') as outfile:
+                        with open("Registry.txt", 'a') as outfile:
 				outfile.write(str(time_with_microsec + "_" + str(node["_id"]) + ", " +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{1}" +"\n" ))
 		        capture_data(file_object=node, file_data=None, content_type='Genral',time=time_with_microsec)       
 
