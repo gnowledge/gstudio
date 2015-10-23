@@ -20,6 +20,7 @@ from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE, GSTUDIO_SITE_
 from gnowsys_ndf.ndf.models import GSystemType, Node
 from gnowsys_ndf.ndf.models import node_collection
 
+from registration.signals import user_activated
 ###################################################
 #   V I E W S   D E F I N E D   F O R   H O M E   #
 ###################################################
@@ -28,20 +29,26 @@ from gnowsys_ndf.ndf.models import node_collection
 def homepage(request, group_id):
     
     if request.user.is_authenticated():
-        auth_obj = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
-        if auth_obj:
-            auth_type = auth_obj._id
-        auth = ""
-        auth = node_collection.one({'_type': u"Author", 'name': unicode(request.user)})            
+        # auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
+        # if auth_obj:
+        #     auth_type = auth_obj._id
+        auth = None
+        auth = node_collection.one({'_type': u"Author", 'created_by': int(request.user.id)})
+
         # This will create user document in Author collection to behave user as a group.
+        '''
+        The code below is commented whose purpose was to create Author
+        group on first-time login.
+        This functionality is implemented by using django-registration
+        signal 'user_activated'. (See 'def create_auth_grp')
         
         if auth is None:
             auth = node_collection.collection.Author()
-            
             auth.name = unicode(request.user)
             auth.email = unicode(request.user.email)
             auth.password = u""
-            auth.member_of.append(auth_type)
+            # auth.member_of.append(auth_type)
+            auth.member_of.append(auth_gst._id)
             auth.group_type = u"PUBLIC"
             auth.edit_policy = u"NON_EDITABLE"
             auth.subscription_policy = u"OPEN"
@@ -68,7 +75,7 @@ def homepage(request, group_id):
             # directly add user's id into author_set of home group without anymore checking overhead.
             home_group_obj.author_set.append(request.user.id)
             home_group_obj.save(groupid=group_id)
-            
+        '''
 
         if GSTUDIO_SITE_LANDING_PAGE == "home":
             return HttpResponseRedirect( reverse('landing_page') )
@@ -98,7 +105,56 @@ def landing_page(request):
     else:
         return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home"}) )
 
+# def create_auth_grp(sender, user, request, **kwargs):
+def create_auth_grp(user, **kwargs):
+    # print "\n\n\n user", user.__dict__
+    auth = None
+    user_id = user.id
+    auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
+    auth = node_collection.one({'_type': u"Author", 'created_by': int(user_id)})
 
+    # This will create user document in Author collection to behave user as a group.
+    if auth is None:
+        auth = node_collection.collection.Author()
+        auth.name = unicode(user.username)
+        auth.email = unicode(user.email)
+        auth.password = u""
+        auth.member_of.append(auth_gst._id)
+        auth.group_type = u"PUBLIC"
+        auth.edit_policy = u"NON_EDITABLE"
+        auth.subscription_policy = u"OPEN"
+        auth.created_by = user_id
+        auth.modified_by = user_id
+        if user_id not in auth.contributors:
+            auth.contributors.append(user_id)
+
+        # Get group_type and group_affiliation stored in node_holder for this author 
+        try:
+            temp_details = node_collection.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':user_id}]})
+            if temp_details:
+                auth.agency_type = temp_details.details_to_hold['agency_type']
+                auth.group_affiliation = temp_details.details_to_hold['group_affiliation']
+        except e as Exception:
+            print "Error in getting node_holder details for author " + str(e)
+        auth_id = ObjectId()
+        auth._id = auth_id
+        auth.save(groupid=auth._id)
+
+        # as on when user gets register on platform make user member of two groups:
+        # 1: his/her own username group. 2: "home" group
+        # adding user's id into author_set of "home" group.
+        home_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("home")})
+        # being user is log-in for first time on site after registration,
+        # directly add user's id into author_set of home group without anymore checking overhead.
+        if user_id not in home_group_obj.author_set:
+            node_collection.collection.update({'_id': home_group_obj._id}, {'$push': {'author_set': user_id }}, upsert=False, multi=False)
+            home_group_obj.reload()
+
+'''
+user_activated signal is received when the registered user activates his/her account
+using email confirmation/verification link sent.
+'''
+user_activated.connect(create_auth_grp)
 
 # This class overrides the django's default RedirectView class and allows us to redirect it into user group after user logsin   
 # class HomeRedirectView(RedirectView):
