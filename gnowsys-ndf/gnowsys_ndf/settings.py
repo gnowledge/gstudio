@@ -14,36 +14,35 @@ BENCHMARK = "ON"
 
 LANGUAGES = (('en', 'English'), ('hi', 'Hindi'))
 OTHER_COMMON_LANGUAGES = [
-    ('mr', 'Marathi'),('mun','Munda'),('mni','Manipuri'),('ori','Oriya'),
-    ('pi','Pali'),('raj','Rajasthani'),('lah','Lahnda'),('gu','Gujarati'),
-    ('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'), ('dra','Dravidian'),
-    ('gon','Gondi'), ('bra','Braj'), ('mi','Malayalam'), ('mai','Maithili'),
-    ('mag','Magahi'), ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'),
-    ('awa','Awadhi'),('sa','Sanskrit'),('sat','Santali'), ('him','Himachali'),
-    ('sd','Sindhi'), ('af', 'Afrikaans'), ('as','Assamese'),('ar', 'Arabic'),
-    ('az', 'Azerbaijani'), ('bg', 'Bulgarian'), ('be', 'Belarusian'),
-    ('bn', 'Bengali'), ('br', 'Breton'), ('bs', 'Bosnian'), ('ca', 'Catalan'),
-    ('bho','Bhojpuri'), ('cs', 'Czech'), ('cy', 'Welsh'), ('da', 'Danish'),
-    ('de', 'German'), ('el', 'Greek'), ('en-gb', 'British English'),
-    ('eo', 'Esperanto'), ('es', 'Spanish'), ('es-ar', 'Argentinian Spanish'),
+    ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
+    ('pi','Pali'), ('raj','Rajasthani'), ('gu','Gujarati'),
+    ('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'),
+    ('dra','Dravidian'), ('gon','Gondi'), ('bra','Braj'),
+    ('mi','Malayalam'), ('mai','Maithili'), ('mag','Magahi'),
+    ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'),
+    ('awa','Awadhi'), ('sa','Sanskrit'), ('sat','Santali'),
+    ('him','Himachali'), ('sd','Sindhi'), ('as','Assamese'),
+    ('ar', 'Arabic'), ('bn', 'Bengali'), ('ca', 'Catalan'),
+    ('bho','Bhojpuri'), ('da', 'Danish'), ('de', 'German'),
+    ('el', 'Greek'), ('en-gb', 'British English'), ('eo', 'Esperanto'),
+    ('es', 'Spanish'), ('es-ar', 'Argentinian Spanish'),
     ('es-mx', 'Mexican Spanish'), ('es-ni', 'Nicaraguan Spanish'),
-    ('es-ve', 'Venezuelan Spanish'), ('et', 'Estonian'), ('eu', 'Basque'),
-    ('fa', 'Persian'), ('fi', 'Finnish'), ('fr', 'French'), ('fy-nl', 'Frisian'),
-    ('ga', 'Irish'), ('gl', 'Galician'), ('he', 'Hebrew'),('hr', 'Croatian'),
-    ('hu', 'Hungarian'), ('ia', 'Interlingua'), ('id', 'Indonesian'),
-    ('is', 'Icelandic'), ('it', 'Italian'), ('ja', 'Japanese'), ('ka', 'Georgian'),
-    ('kk', 'Kazakh'), ('km', 'Khmer'), ('kn', 'Kannada'), ('ko', 'Korean'),
+    ('es-ve', 'Venezuelan Spanish'), ('et', 'Estonian'),
+    ('fa', 'Persian'), ('fi', 'Finnish'), ('fr', 'French'),
+    ('ga', 'Irish'), ('he', 'Hebrew'), ('hu', 'Hungarian'),
+    ('id', 'Indonesian'), ('is', 'Icelandic'), ('it', 'Italian'),
+    ('ja', 'Japanese'), ('ka', 'Georgian'), ('kk', 'Kazakh'),
+    ('km', 'Khmer'), ('kn', 'Kannada'), ('ko', 'Korean'),
     ('lb', 'Luxembourgish'), ('lt', 'Lithuanian'), ('lv', 'Latvian'),
     ('mk', 'Macedonian'), ('ml', 'Malayalam'), ('mn', 'Mongolian'),
-    ('my', 'Burmese'), ('nb', 'Norwegian Bokmal'), ('ne', 'Nepali'),
-    ('nl', 'Dutch'), ('nn', 'Norwegian Nynorsk'), ('os', 'Ossetic'),
+    ('my', 'Burmese'), ('ne', 'Nepali'), ('nl', 'Dutch'),
     ('pa', 'Punjabi'), ('pl', 'Polish'), ('pt', 'Portuguese'),
     ('pt-br', 'Brazilian Portuguese'), ('ro', 'Romanian'), ('ru', 'Russian'),
     ('sk', 'Slovak'), ('sl', 'Slovenian'), ('sq', 'Albanian'), ('sr', 'Serbian'),
     ('sr-latn', 'Serbian Latin'), ('sv', 'Swedish'), ('sw', 'Swahili'),
     ('ta', 'Tamil'), ('te', 'Telugu'), ('th', 'Thai'), ('tr', 'Turkish'),
-    ('tt', 'Tatar'), ('udm', 'Udmurt'), ('uk', 'Ukrainian'), ('ur', 'Urdu'),
-    ('vi', 'Vietnamese'), ('zh-cn', 'Simplified Chinese'), ('zh-tw', 'Traditional Chinese')
+    ('uk', 'Ukrainian'), ('ur', 'Urdu'), ('vi', 'Vietnamese'),
+    ('zh-cn', 'Simplified Chinese'), ('zh-tw', 'Traditional Chinese')
 ]
 
 EXTRA_LANG_INFO = {
@@ -485,7 +484,7 @@ GSTUDIO_GROUP_AGENCY_TYPES = [
 ]
 
 GSTUDIO_AUTHOR_AGENCY_TYPES = [
-    "Student", "Teacher", "TeacherTrainer", "Faculty", "Researcher", "Other"
+    "Student", "Teacher", "Teacher Educator", "Faculty", "Researcher", "Other"
 ]
 
 # Varible to toggle the visibility of author_agency_type field of Author
@@ -654,7 +653,11 @@ GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND"
 
 GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
 
+GSTUDIO_MODERATING_GROUP_ALTNAMES = ['Clearing House', 'Curation House']
 
+GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
+
+GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 # #textb
 # import warnings
 # warnings.filterwarnings(

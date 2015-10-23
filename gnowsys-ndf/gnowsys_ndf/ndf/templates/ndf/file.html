@@ -51,7 +51,7 @@
 <!-- left top panel -->
 {% block meta_content %}
 
-  <a href="{% url app_gst.name|lower group_name_tag %}">
+  <!-- {# <a href="{% url app_gst.name|lower group_name_tag %}"> #} -->
     <h2 class="subheader">
       {% if app_gst.altnames and app_gst.altnames != "None" %}
          {% trans app_gst.altnames %}
@@ -60,7 +60,7 @@
       {% endif%}
     </h2>
     {{app_gst.content|default_if_none:""|safe}}
-  </a>
+  <!-- {# </a> #} -->
 
 {% endblock %}
 
@@ -214,7 +214,7 @@
       {% if user_is_joined == "joined" or user_is_joined == "author" %}
       <!-- <b>{% trans "Actions" %}</b><br/><br/> -->
       
-          <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny expand button">
+          <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny expand button radius">
             {% trans "Upload File" %}
           </a><br/>
 
@@ -225,14 +225,14 @@
 
         {% if user.is_superuser %}
           <!-- <b>{% trans "Review" %}</b> -->
-            <a href="{% url 'data_review' group_name_tag %}" class="tiny button expand">
+            <a href="{% url 'data_review' group_name_tag %}" class="tiny button radius expand">
             {% trans "Data Review" %}
           </a>
         {% endif %}
       {% endif %}
       {% endif %}
 
-      <a href="#" data-reveal-id="library-statistics" class="tiny button expand">
+      <a href="#" data-reveal-id="library-statistics" class="tiny button radius expand">
         {% trans "File Statistics" %}
       </a>
       <div class="medium reveal-modal" id="library-statistics" data-reveal>

@@ -31,7 +31,7 @@ def split(str, splitter):
 
 
 @get_execution_time
-@register.simple_tag
+@register.assignment_tag
 def get_latest_git_hash():
 	"""
 	Template tag that returns latest git hash no.
@@ -49,3 +49,18 @@ def get_latest_git_hash():
 @register.filter
 def get_type(value):
     return type(value)
+
+@get_execution_time
+@register.filter
+def multiply(value,multiply_factor):
+	"""
+	Simple Filter for multiplication purpose
+
+	How to use:
+	value and multiply_factor are first and second argument respectively, passed through multiply filter.
+
+	Ex: ratings.avg|multiply:30 
+	    ratings.avg multiply with 30.
+
+	"""
+	return value*multiply_factor

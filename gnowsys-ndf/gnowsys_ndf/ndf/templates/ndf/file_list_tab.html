@@ -17,13 +17,14 @@
 
 
 <!-- Card -->
-<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-6">
 
   <!-- Existing card list-->
   {% for each_res in resource_type %}      
     <!-- #{#%# get_grid_fs_object each_res as grid_fs_obj %} -->
-    <li class="card-image-wrapper">
-      {% include 'ndf/card.html' with resource=each_res url_name=detail_urlname first_arg=group_id second_arg=each_res.pk %}
+    <li class="card-image-wrapper"> 
+    <!--old card-view > card.html &&  new card-view > simple_card.html  -->
+      {% include 'ndf/simple_card.html' with resource=each_res url_name=detail_urlname first_arg=group_id second_arg=each_res.pk %}
     </li>
 
     {% comment %}

@@ -48,7 +48,7 @@ except ImportError:
 
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
 from gnowsys_ndf.mobwrite.models import TextObj
 
@@ -254,38 +254,40 @@ def get_languages():
 
 @get_execution_time
 @register.assignment_tag
-def get_node_ratings(request,node):
-        try:
-                user=request.user
-                node = node_collection.one({'_id': ObjectId(node._id)})
-                sum=0
-                dic={}
-                cnt=0
-                userratng=0
-                tot_ratng=0
-                for each in node.rating:
-                     if each['user_id'] == user.id:
-                             userratng=each['score']
-                     if each['user_id']==0:
-                             cnt=cnt+1
-                     sum=sum+each['score']
-                if len(node.rating)==1 and cnt==1:
-                        tot_ratng=0
-                        avg_ratng=0.0
-                else:
-                        if node.rating:
-                           tot_ratng=len(node.rating)-cnt
-                        if tot_ratng:
-                           avg_ratng=float(sum)/tot_ratng
-                        else:
-                           avg_ratng=0.0
-                dic['avg']=avg_ratng
-                dic['tot']=tot_ratng
-                dic['user_rating']=userratng
-                return dic
-        except Exception as e:
-                print "Error in get_node_ratings "+str(e)
+def get_node_ratings(request,node_id):
+	try:
+		user = request.user
+		node_obj = node_collection.one({'_id': ObjectId(node_id)})
+		total_score = 0
+		total_rating = 0
+		rating_by_user = 0
+		counter_var = 0
+		avg_rating = 0.0
+		rating_data = {}
+		for each in node_obj.rating:
+			if each['user_id'] == user.id:
+				rating_by_user = each['score']
+			if each['user_id'] == 0:
+				counter_var += 1
+			total_score = total_score + each['score']
+		if len(node_obj.rating) == 1 and counter_var == 1:
+			total_rating = 0
+		else:
+			if node_obj.rating:
+				total_rating = len(node_obj.rating) - counter_var
+			if total_rating:
+				if type(total_rating) is float:
+					total_rating = round(total_rating,1)
+				avg_rating = float(total_score)/total_rating
+				avg_rating = round(avg_rating,1)
 
+		rating_data['avg'] = avg_rating
+		rating_data['tot'] = total_rating
+		rating_data['user_rating'] = rating_by_user
+		return rating_data
+
+	except Exception as e:
+		print "Error in get_node_ratings " + str(e)
 
 @get_execution_time
 @register.assignment_tag
@@ -344,15 +346,21 @@ def get_site_info():
 @register.assignment_tag
 def check_is_user_group(group_id):
 	try:
-		lst_grps=[]
-		all_user_grps=get_all_user_groups()
-		grp = node_collection.one({'_id':ObjectId(group_id)})
-		for each in all_user_grps:
-			lst_grps.append(each.name)
-		if grp.name in lst_grps:
+		res_group_obj = get_group_name_id(group_id, True)
+		# print "\n\n res_group_obj",res_group_obj._type
+		if res_group_obj._type == "Author":
 			return True
 		else:
 			return False
+		# lst_grps=[]
+		# all_user_grps=get_all_user_groups()
+		# grp = node_collection.one({'_id':ObjectId(group_id)})
+		# for each in all_user_grps:
+		# 	lst_grps.append(each.name)
+		# if grp.name in lst_grps:
+		# 	return True
+		# else:
+		# 	return False
 	except Exception as exptn:
 		print "Exception in check_user_group "+str(exptn)
 
@@ -1750,9 +1758,10 @@ def get_Object_count(key):
 
 @get_execution_time
 @register.assignment_tag
-def get_memberof_objects_count(key,group_id):
+def get_memberof_objects_count(request, key, group_id):
 	try:
-		return node_collection.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
+		lang = list(get_language_tuple(request.LANGUAGE_CODE))
+		return node_collection.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}, 'language': lang}).count()
 	except:
 		return 'null'
 
@@ -2062,11 +2071,8 @@ def check_is_gapp_for_gstaff(groupid, app_dict, user):
 @register.assignment_tag
 def get_publish_policy(request, groupid, res_node):
 	resnode = node_collection.one({"_id": ObjectId(res_node._id)})
-
 	if resnode.status == "DRAFT":
-	    
-	    # node = node_collection.one({"_id": ObjectId(groupid)})
-		
+		# node = node_collection.one({"_id": ObjectId(groupid)})
 		group_name, group_id = get_group_name_id(groupid)
 		node = node_collection.one({"_id": ObjectId(group_id)})
 		group_type = group_type_info(groupid)
@@ -2102,7 +2108,8 @@ def get_publish_policy(request, groupid, res_node):
 		          # print "\n group = allow\n"
 		          if resnode.status == "DRAFT": 
 		            return "allow"
-
+	elif resnode.status == "MODERATION":
+		return "MODERATION"
 
 @get_execution_time
 @register.assignment_tag
@@ -2177,24 +2184,25 @@ def get_preferred_lang(request, group_id, nodes, node_type):
 		
 		if pref_lan.keys():
 			if pref_lan['primary'] != request.LANGUAGE_CODE:
-				uname.preferred_languages['primary'] = request.LANGUAGE_CODE
+				uname.preferred_languages['primary'] = get_language_tuple(request.LANGUAGE_CODE)
 				uname.save()
 
 		else:
 			pref_lan={}
-			pref_lan['primary']=request.LANGUAGE_CODE
-			pref_lan['default']=u"en"
-			uname.preferred_languages=pref_lan
+			pref_lan['primary'] = get_language_tuple(request.LANGUAGE_CODE)
+			pref_lan['default'] = ('en', 'English')
+			uname.preferred_languages = pref_lan
 			uname.save()   
       else:
          pref_lan={}
-         pref_lan['primary']=request.LANGUAGE_CODE
-         pref_lan['default']=u"en"
+         pref_lan['primary'] = get_language_tuple(request.LANGUAGE_CODE)
+         pref_lan['default'] = ('en', 'English')
          uname.preferred_languages=pref_lan
          uname.save()
    else:
       pref_lan={}
-      pref_lan[u'primary']=request.LANGUAGE_CODE
+      pref_lan[u'primary'] = get_language_tuple(request.LANGUAGE_CODE)
+   
       pref_lan[u'default']=u"en"
    try:
       for each in nodes:
@@ -3026,6 +3034,17 @@ def get_all_subsections_of_course(group_id, node_id):
 								d['start_time'] = date_val.strftime("%d/%m/%Y")
 							css.append(d)
 	return css
+
+
+@get_execution_time
+@register.assignment_tag
+def get_list_of_fields(oid_list, field_name='name'):
+	if oid_list:
+		cur = node_collection.find({'_id': {'$in': oid_list} }, {field_name: 1, '_id': 0})
+		return [doc[field_name] for doc in cur]
+	else:
+		return []
+
 
 @get_execution_time
 @register.assignment_tag

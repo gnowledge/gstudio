@@ -87,6 +87,7 @@
 					{% else %}
 					{% if blog_type %}
 						{% trans "Create New Blog" %} :
+
 					{% else %}
 						{% trans "Create New " %} {{title}} :
 						{% endif  %}
@@ -103,6 +104,7 @@
 	    </div> 
     </header>
     {% check_group node as is_group %}
+
     <div class="edit-card">
         
 	    <div class="row">
@@ -123,7 +125,7 @@
 				</dd>
 				<!-- change name of metadata tab overide block in your code -->
 				<dd class="meta_tab" title="Click here to add/edit metadata">
-				  	<a href="#tab2">{% trans "Metadata" %} </a> 
+				  	<a>{% trans "Metadata" %} </a> 
 				</dd>  
 				<dd class="teaches_tab" title="Click here to add/edit teaches">
 				 	<a>{% trans "Teaches" %} </a> 
@@ -253,7 +255,7 @@
 	                		<label class="inline">{% trans "Location:" %}</label>
 	                    </div>
 	                	<div class="large-8 columns">
-							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand">
+							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button radius expand">
 							<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 							</a>
 	                    </div>
@@ -308,7 +310,7 @@
 						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
 					        </div>
 					        <div class="small-2 columns">
-					          <span tabindex="3" id="add-tag-btn" class="tiny button">{% trans 'Add Tag' %}</span>
+					          <span tabindex="3" id="add-tag-btn" class="tiny button radius">{% trans 'Add Tag' %}</span>
 					        </div>
 							</div>							
 
@@ -638,7 +640,7 @@
     {% endcache %}
 
     <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}"> -->
-    <input type="submit" tabindex="4" id="save-node" value=" {% trans 'Save as Draft And Preview' %}" class="button" />
+    <input type="submit" tabindex="4" id="save-node" value=" {% trans 'Save as Draft And Preview' %}" class="button radius" />
 
 </form>
 
@@ -1428,28 +1430,28 @@
     	{
           $("#message").css("display", "none");
 	    }
-	{% get_site_name_from_settings as site_name %}
+	{% if not blog_type %}
+		{% get_site_name_from_settings as site_name %}
        
-       {%  if site_name == "NROER"  %}
+		{%  if site_name == "NROER"  %}
             if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
-                    $('#tabs').find('a[href="#tab2"]').trigger('click');
+                    // $('#tabs').find('a[href="#tab2"]').trigger('click');
+                    $('.meta_tab').trigger('click');
                     $("#message").css("display", "block");
-                    $("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+                    $("#message").text("{% trans 'Please fill compulsory metadata fields(* marked)' %}");
                     event.preventDefault();
             }
-       {% endif %}
+		{% endif %}
 
 	$("input[name='thread_create']").attr("disabled",false);
-	{% if not blog_type %}
-
-	{% if title == "Page" or "File" in node.member_of_names_list %}
-		if (!$("input[name='thread_create']:checked").val()) {
-			$('.thread_prop_tab').trigger('click');
-			$("#message").css("display", "block");
-			$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
-			event.preventDefault();
-		}
-	{% endif %}
+		{% if title == "Page" or "File" in node.member_of_names_list %}
+			if (!$("input[name='thread_create']:checked").val()) {
+				$('.thread_prop_tab').trigger('click');
+				$("#message").css("display", "block");
+				$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+				event.preventDefault();
+			}
+		{% endif %}
 	{% endif %}
     updateAllTags();
 	});

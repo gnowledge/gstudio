@@ -23,6 +23,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
+from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
@@ -497,9 +498,9 @@ class CreateModeratedGroup(CreateSubGroup):
         # maintaining dict of group types and their corresponding sub-groups altnames.
         # referenced while creating new moderated sub-groups.
         self.altnames = {
-            'ModeratingGroup': [u'Clearing House', u'Curation House'],
-            'ProgramEventGroup': [u'Screening House', u'Selection House'],
-            'CourseEventGroup': [u'Screening House', u'Selection House']
+            'ModeratingGroup': GSTUDIO_MODERATING_GROUP_ALTNAMES,
+            'ProgramEventGroup': GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES,
+            'CourseEventGroup': GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
         }
 
 
@@ -1764,7 +1765,7 @@ def group_dashboard(request, group_id=None):
   sg_type = None
   if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
       sg_type = "ProgramEventGroup"
-      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+      # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
       parent_groupid_of_pe = node_collection.find_one({'_type':"Group","post_node": group_obj._id})
       if parent_groupid_of_pe:
         parent_groupid_of_pe = parent_groupid_of_pe._id
@@ -1772,19 +1773,24 @@ def group_dashboard(request, group_id=None):
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
       alternate_template = "ndf/course_event_group.html"
-  if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
-      if "CourseEventGroup" in group_obj.member_of_names_list or u"ProgramEventGroup" in list_of_sg_member_of:
-          page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-          blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-          files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"}).sort("last_update",-1)
-          if group_obj.collection_set:
-              course_structure_exists = True
-          if request.user.id:
-              blog_pages = node_collection.find({
-                    'member_of':page_gst._id,
-                    'type_of': blogpage_gst._id,
-                    'group_set': group_obj._id
-                }).sort('last_update', -1)
+  # The line below is commented in order to:
+  #     Fetch files_cur - resources under moderation in groupdahsboard.html
+  # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
+  if "CourseEventGroup" in group_obj.member_of_names_list or u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
+      page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+      blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+      # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"}).sort("last_update",-1)
+      if group_obj.collection_set:
+          course_structure_exists = True
+      if request.user.id:
+          blog_pages = node_collection.find({
+                'member_of':page_gst._id,
+                'type_of': blogpage_gst._id,
+                'group_set': group_obj._id
+            }).sort('last_update', -1)
+  if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
+      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+
   allow_to_join = True
   if 'end_enroll' in group_obj:
       if group_obj.end_enroll:
@@ -1807,6 +1813,7 @@ def group_dashboard(request, group_id=None):
 
   annotations = json.dumps(group_obj.annotations)
   default_template = "ndf/groupdashboard.html"
+  # print "\n\n blog_pages.count------",blog_pages
   return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
                                                        'group_id':group_id, 'user':request.user, 
                                                        'shelf_list': shelf_list,

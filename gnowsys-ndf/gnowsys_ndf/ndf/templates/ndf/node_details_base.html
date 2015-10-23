@@ -148,7 +148,7 @@
 
           <div id="view_add_event" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
         
-            <b>{% trans "Add events feature will be comming soon " %}</b>
+            <b>{% trans "Add events feature will be coming soon " %}</b>
 
             <a class="close-reveal-modal">&#215;</a>
           </div>
@@ -202,15 +202,19 @@ $("#add_page").click(function() {
 
 {% endblock %}
 
-{% block shelf_content %}
-  {% if user.is_authenticated %}
-    {% shelf_allowed node as allowed %}
-  
-    {% include "ndf/shelf.html" %}
-  {% else %}
-  <h4>{% trans 'Please Login to create your shelf' %}</h4>
-  {% endif %}  
-{% endblock %}
+{% comment %}
+    
+  {% block shelf_content %}
+    {% if user.is_authenticated %}
+      {% shelf_allowed node as allowed %}
+    
+      {% include "ndf/shelf.html" %}
+    {% else %}
+    <h4>{% trans 'Please Login to create your shelf' %}</h4>
+    {% endif %}  
+  {% endblock %}
+
+{% endcomment %}
 
 
 {% block breadcrumb %} 
@@ -224,6 +228,8 @@ $("#add_page").click(function() {
 
 {% block script%}
 
+{% comment %}
+  
 function addNewShelf(shelfName)
 {
   shelfNameList = [];
@@ -241,5 +247,6 @@ function addNewShelf(shelfName)
   }
 
 }
+{% endcomment %}
 
 {% endblock %}

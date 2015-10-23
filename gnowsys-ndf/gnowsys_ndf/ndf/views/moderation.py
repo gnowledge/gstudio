@@ -24,6 +24,7 @@ from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROE
 
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
@@ -36,90 +37,111 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val
 @login_required
 def moderation_status(request, group_id, node_id):
 
-    try:
-        group_id = ObjectId(group_id)
-    except:
-        group_name, group_id = get_group_name_id(group_id)
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_name, group_id = get_group_name_id(group_id)
 
-    node = node_collection.one({'_id': ObjectId(node_id)})
+	node = node_collection.one({'_id': ObjectId(node_id)})
 
-    if not node:  # invalid ObjectId
-    	return render_to_response('ndf/under_moderation.html', {
+	if not node:  # invalid ObjectId
+		return render_to_response('ndf/under_moderation.html', {
 		'group_id': group_id, 'groupid': group_id, 'title': 'Under Moderation Status',
-      }, RequestContext(request))
+		}, RequestContext(request))
 
-    node_status = node.status
-    node_group_set = node.group_set
-    current_mod_group_obj = None
-    is_under_moderation = True
-    top_group_name = ""
-    group_obj = node_collection.one({'_id': ObjectId(group_id)})
-    # mod_group_instance = CreateGroup(request)
-    # list_of_sg_mn = mod_group_instance.get_all_subgroups_member_of_list(group_obj._id)
-    # list_of_sg_member_of = get_sg_member_of(group_obj._id)
-    # print "\n\nlist_of_sg_mn-----",list_of_sg_member_of
+	node_status = node.status
+	node_group_set = node.group_set
+	current_mod_group_obj = None
+	is_under_moderation = True
+	top_group_obj = None
+	cleared_group_objs = []
+	next_mod_group_objs = []
+	group_obj = node_collection.one({'_id': ObjectId(group_id)})
+	# mod_group_instance = CreateGroup(request)
+	# list_of_sg_mn = mod_group_instance.get_all_subgroups_member_of_list(group_obj._id)
+	# list_of_sg_member_of = get_sg_member_of(group_obj._id)
+	# print "\n\nlist_of_sg_mn-----",list_of_sg_member_of
 
-    selected_group = None
-    for each_group_id in node_group_set:
-    	each_group_obj = node_collection.one({'_id': ObjectId(each_group_id), '_type': 'Group'})
-    	if each_group_obj:
-    		selected_group = each_group_obj._id
+	# selected_group = None
 
-    selected_group = selected_group if selected_group else group_id
-    selected_group_obj = node_collection.one({'_id': ObjectId(selected_group)})
-    list_of_sg_member_of = []
-    # To prevent error if resource is pulished in top_level_group
-    if "Group" in selected_group_obj.member_of_names_list:
-    	list_of_sg_member_of = get_sg_member_of(selected_group_obj._id)
+	for each_group_id in node_group_set:
+		each_group_obj = node_collection.one({'_id': ObjectId(each_group_id), '_type': 'Group'})
+		if each_group_obj:
+			# selected_group = each_group_obj._id
+			selected_group_obj = each_group_obj
 
-    # Based on the resource's current group's member_of 
-    # or if resource is in top_level_group, based on its sg_member_of
-    if "ProgramEventGroup" in selected_group_obj.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of:
-	    sg_member_of = "ProgramEventGroup"
-	    mod_group_instance = CreateEventGroup(request)
-    elif "CourseEventGroup" in selected_group_obj.member_of_names_list or "CourseEventGroup" in list_of_sg_member_of:
-	    sg_member_of = "CourseEventGroup"
-	    mod_group_instance = CreateEventGroup(request)
-    elif "ModeratingGroup" in selected_group_obj.member_of_names_list or "ModeratingGroup" in list_of_sg_member_of:
-	    sg_member_of = "ModeratingGroup"
-	    mod_group_instance = CreateModeratedGroup(request)
+	# selected_group = selected_group if selected_group else group_id
+	selected_group_obj = selected_group_obj if selected_group_obj else group_obj
+	# selected_group_obj = node_collection.one({'_id': ObjectId(selected_group)})
+	list_of_sg_member_of = []
+	# To prevent error if resource is pulished in top_level_group
+	if "Group" in selected_group_obj.member_of_names_list:
+		list_of_sg_member_of = get_sg_member_of(selected_group_obj._id)
 
+	# Based on the resource's current group's member_of 
+	# or if resource is in top_level_group, based on its sg_member_of
+	if "ProgramEventGroup" in selected_group_obj.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of:
+		sg_member_of = "ProgramEventGroup"
+		mod_group_instance = CreateEventGroup(request)
+	elif "CourseEventGroup" in selected_group_obj.member_of_names_list or "CourseEventGroup" in list_of_sg_member_of:
+		sg_member_of = "CourseEventGroup"
+		mod_group_instance = CreateEventGroup(request)
+	elif "ModeratingGroup" in selected_group_obj.member_of_names_list or "ModeratingGroup" in list_of_sg_member_of:
+		sg_member_of = "ModeratingGroup"
+		mod_group_instance = CreateModeratedGroup(request)
 
-    group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(selected_group,sg_member_of)
-    # returns result in <True, all_sub_group_list> format
+	# group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(selected_group,sg_member_of)
+	group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(selected_group_obj._id,sg_member_of)
+	# returns result in <True, all_sub_group_list> format
 
-    if group_hierarchy_result[0]:
-    	group_hierarchy_obj_list = group_hierarchy_result[1]
-    	group_hierarchy_id_list = [g._id for g in group_hierarchy_obj_list]
-    	top_group_id = group_hierarchy_id_list[0]
-    	top_group_name = group_hierarchy_obj_list[0].name
-    	# print group_hierarchy_obj_list
+	if group_hierarchy_result[0]:
+		group_hierarchy_obj_list = group_hierarchy_result[1]
+		group_hierarchy_id_list = [g._id for g in group_hierarchy_obj_list]
+		group_hierarchy_names_list = [str(g.altnames) if g.altnames else g.name for g in group_hierarchy_obj_list]
+		top_group_id = group_hierarchy_id_list[0]
+		top_group_obj = group_hierarchy_obj_list[0]
+		# cntr = 0
+		# for each_group_id in node_group_set:
+		# 	cntr += 1
+		# 	if each_group_id in group_hierarchy_id_list:
+		# 		if ObjectId(each_group_id) == ObjectId(top_group_id):
+		# 			is_under_moderation = False
+		# 		else:
+		# 			current_mod_group_obj = group_hierarchy_obj_list[cntr+1]
+		# 			is_under_moderation = True
+		if selected_group_obj != top_group_obj:
+			current_mod_group_obj = selected_group_obj
+			is_under_moderation = True
+		else:
+			is_under_moderation = False
 
-    	cntr = 0
-    	for each_group_id in node_group_set:
-    		cntr += 1
-	    	if each_group_id in group_hierarchy_id_list:
-	    		if ObjectId(each_group_id) == ObjectId(top_group_id):
-	    			is_under_moderation = False
-	    		else:
-	    			is_under_moderation = True
-	    			current_mod_group_obj = group_hierarchy_obj_list[cntr]
+		if current_mod_group_obj:
+			current_group_index = None
+			try:
+				current_group_index = group_hierarchy_names_list.index(current_mod_group_obj.name)
+			except ValueError as e:
+				current_group_index = group_hierarchy_names_list.index(current_mod_group_obj.altnames)
 
-    elif node_status == u'MODERATION':
-    	is_under_moderation = True
+			if current_group_index:
+				cleared_group_objs = group_hierarchy_names_list[1:current_group_index]
+				next_mod_group_objs = group_hierarchy_names_list[current_group_index+1:]
+	elif node_status == u'MODERATION':
+		is_under_moderation = True
+	else:
+		is_under_moderation = False
 
-    else:
-    	is_under_moderation = False
+	# print "is_under_moderation : ", is_under_moderation
+	# print "=== ", current_mod_group_obj.name
+	# print "\n\n cleared_group_objs",cleared_group_objs
+	# print "\n\n next_mod_group_objs",next_mod_group_objs
 
-    # print "is_under_moderation : ", is_under_moderation
-    # print "=== ", current_mod_group_obj._id
-
-    return render_to_response('ndf/under_moderation.html', {
+	return render_to_response('ndf/under_moderation.html', {
 		'group_id': group_id, 'groupid': group_id, 'node': node, 'title': 'Under Moderation Status',
 		'is_under_moderation': is_under_moderation, 'current_mod_group_obj': current_mod_group_obj,
-		'group_hierarchy_obj_list': group_hierarchy_obj_list, 'top_group_name': top_group_name
-      }, RequestContext(request))
-
+		'group_hierarchy_obj_list': json.dumps(group_hierarchy_obj_list,cls=NodeJSONEncoder), 'top_group_obj': top_group_obj,
+		'group_obj': group_obj, 'next_mod_group_objs':next_mod_group_objs,
+		'cleared_group_objs':cleared_group_objs
+	}, RequestContext(request))
 
 def all_under_moderation(request, group_id):
 
@@ -254,9 +276,9 @@ def create_moderator_task(request, group_id, node_id, \
 	Method to create task to group admins or moderators of the moderated groups.
 	'''
 	# def create_task(task_dict, task_type_creation="single"):
-    # task_dict
-    # - Required keys: _id[optional], name, group_set, created_by, modified_by, contributors, content_org,
-        # created_by_name, Status, Priority, start_time, end_time, Assignee, has_type
+	# task_dict
+	# - Required keys: _id[optional], name, group_set, created_by, modified_by, contributors, content_org,
+		# created_by_name, Status, Priority, start_time, end_time, Assignee, has_type
 
 	try:
 		task_dict = {}
@@ -291,19 +313,19 @@ def create_moderator_task(request, group_id, node_id, \
 								+ u'\n\nPlease moderate resource accesible at following link: \n'\
 								+ unicode(url)
 			task_dict = {
-			    "name": task_title,
-			    "group_set": [group_obj._id],
-			    "created_by": node_obj.created_by,
-			    "modified_by": request.user.id,
-			    "contributors": [request.user.id],
-			    "content_org": unicode(task_content_org),
-			    "created_by_name": unicode(request.user.username),
-			    "Status": u"New",
-			    "Priority": u"Normal",
-			    # "start_time": "",
-			    # "end_time": "",
-			    "Assignee": list(group_obj.group_admin[:]),
-			    "has_type": task_type_list
+				"name": task_title,
+				"group_set": [group_obj._id],
+				"created_by": node_obj.created_by,
+				"modified_by": request.user.id,
+				"contributors": [request.user.id],
+				"content_org": unicode(task_content_org),
+				"created_by_name": unicode(request.user.username),
+				"Status": u"New",
+				"Priority": u"Normal",
+				# "start_time": "",
+				# "end_time": "",
+				"Assignee": list(group_obj.group_admin[:]),
+				"has_type": task_type_list
 			}
 			task_obj = create_task(task_dict, task_type_creation)
 			if task_obj:
@@ -355,17 +377,17 @@ def create_moderator_task(request, group_id, node_id, \
 								"However, you may find the moderated resource at following link: \n" \
 								+ unicode(url)
 					task_dict = {
-					    "name": task_node.name,
-					    "group_set": [group_obj._id],
-					    "created_by": node_obj.created_by,
-					    "modified_by": request.user.id,
-					    "contributors": [request.user.id],
-					    "content_org": unicode(task_content_org),
-					    "created_by_name": unicode(request.user.username),
-					    "Status": u"CLOSED",
-					    "Priority": u"Normal",
-					    "Assignee": list(group_obj.group_admin[:]),
-					    "has_type": task_type_list
+						"name": task_node.name,
+						"group_set": [group_obj._id],
+						"created_by": node_obj.created_by,
+						"modified_by": request.user.id,
+						"contributors": [request.user.id],
+						"content_org": unicode(task_content_org),
+						"created_by_name": unicode(request.user.username),
+						"Status": u"CLOSED",
+						"Priority": u"Normal",
+						"Assignee": list(group_obj.group_admin[:]),
+						"has_type": task_type_list
 					}
 					task_obj = create_task(task_dict, task_type_creation)
 
@@ -534,19 +556,17 @@ def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
 
 
 def get_top_group_of_hierarchy(group_id):
-    '''
-    getting top group object of hierarchy.
-    Returns mongokit object of top group.
-    '''
-    curr_group_obj = node_collection.one({'_id': ObjectId(group_id)})
+	'''
+	getting top group object of hierarchy.
+	Returns mongokit object of top group.
+	'''
+	curr_group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
-    # loop till there is no end of prior_node or till reaching at top group.
-    while curr_group_obj and curr_group_obj.prior_node:
-        curr_group_obj = node_collection.one({'_id': curr_group_obj.prior_node[0]})
-
-        if curr_group_obj.edit_policy != 'EDITABLE_MODERATED':
-            return False, "One of the group: " + str(curr_group_obj._id) \
-             + " is not with edit_policy: EDITABLE_MODERATED."
-        
-    # send overwritten/first curr_group_obj's "_id"
-    return True, curr_group_obj
+	# loop till there is no end of prior_node or till reaching at top group.
+	while curr_group_obj and curr_group_obj.prior_node:
+		curr_group_obj = node_collection.one({'_id': curr_group_obj.prior_node[0]})
+		if curr_group_obj.edit_policy != 'EDITABLE_MODERATED':
+			return False, "One of the group: " + str(curr_group_obj._id) \
+			 + " is not with edit_policy: EDITABLE_MODERATED."
+	# send overwritten/first curr_group_obj's "_id"
+	return True, curr_group_obj
