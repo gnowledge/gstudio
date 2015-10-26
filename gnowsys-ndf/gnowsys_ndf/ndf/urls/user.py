@@ -8,5 +8,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.userDashboard',
                        url(r'^useractivity', 'user_activity', name='user_activity'),
 		       url(r'userprofiledata','user_data_profile',name='user_data_profile'),	
 		       url(r'^userprofile', 'user_profile', name='user_profile'),
+		       url(r'^upload_prof_pic', 'upload_prof_pic', name='upload_prof_pic'),
 		       url(r'^user_preference/(?P<auth_id>[\w-]+)$','user_preferences',name='user_preferences'),
 )
