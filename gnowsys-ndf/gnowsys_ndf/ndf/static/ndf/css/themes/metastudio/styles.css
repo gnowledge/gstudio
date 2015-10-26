@@ -10224,7 +10224,94 @@ aside#help p, aside#help h5, aside#help h6 {
 }
 
 /* End Simple Card CSS*/
-/* line 1220, ../../../scss/_app_styles.scss */
+/* Customized Off-Canvas */
+/* line 1222, ../../../scss/_app_styles.scss */
+#shortListDiv {
+  position: fixed;
+  top: 52px;
+  left: -250px;
+  z-index: 99;
+  -webkit-transition: left 150ms linear 0ms;
+  -moz-transition: left 150ms linear 0ms;
+  -ms-transition: left 150ms linear 0ms;
+  transition: left 150ms linear 0ms;
+  height: 100%;
+}
+
+/* line 1233, ../../../scss/_app_styles.scss */
+#shortListDiv.expanded {
+  left: 0 !important;
+  z-index: 100000000;
+  left: 150px;
+}
+
+/* line 1238, ../../../scss/_app_styles.scss */
+#shortListDiv.expanded .shortListButton {
+  right: 80px;
+  z-index: -1;
+}
+
+/* line 1243, ../../../scss/_app_styles.scss */
+#shortListDiv.animating .shortListButton {
+  -webkit-animation: shake 400ms;
+  animation: shake 400ms;
+}
+
+/* line 1247, ../../../scss/_app_styles.scss */
+#shortListDiv .shortListButton {
+  position: absolute;
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0)";
+  left: 200px;
+  top: 300px;
+  background: #99CCFF;
+  border: 1px solid #e74802;
+  /*-webkit-box-shadow:0 0 6px -1px rgba(0,0,0,0.2) inset;
+  -moz-box-shadow:0 0 6px -1px rgba(0,0,0,0.2) inset;
+  box-shadow:0 0 6px -1px rgba(0,0,0,0.2) inset;*/
+  color: #fff;
+  text-decoration: none;
+  height: 28px;
+  line-height: 28px;
+  width: 124px;
+  text-transform: none;
+  padding: 0;
+  text-align: center;
+  font-size: 14px;
+  border-radius: 0;
+  overflow: none;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+/* line 1278, ../../../scss/_app_styles.scss */
+#shortListDiv .shortListButton .text {
+  color: #f9f9f9;
+  letter-spacing: .1em;
+  float: left;
+  margin-left: 5px;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+/* line 1286, ../../../scss/_app_styles.scss */
+#shortListDiv .mainContainer {
+  background: #fff;
+  /*-webkit-box-shadow:3px 3px 17px -1px #7b7b7b;
+  -moz-box-shadow:3px 3px 17px -1px #7b7b7b;*/
+  box-shadow: 1px 1px 10px 1px #7b7b7b;
+  /*overflow-y:scroll;*/
+  text-align: center;
+  height: 100%;
+  width: 250px;
+  overflow: none;
+}
+
+/* End of Customized Off-Canvas */
+/* line 1302, ../../../scss/_app_styles.scss */
 .rcard {
   overflow: hidden;
   color: #272727;
@@ -10232,56 +10319,56 @@ aside#help p, aside#help h5, aside#help h6 {
   background-color: #f5f5f5;
   margin: 5px;
 }
-/* line 1231, ../../../scss/_app_styles.scss */
+/* line 1313, ../../../scss/_app_styles.scss */
 .rcard:hover {
   box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.5s ease;
 }
-/* line 1236, ../../../scss/_app_styles.scss */
+/* line 1318, ../../../scss/_app_styles.scss */
 .rcard .title {
   font-size: 1.1rem;
   font-weight: bold;
 }
-/* line 1242, ../../../scss/_app_styles.scss */
+/* line 1324, ../../../scss/_app_styles.scss */
 .rcard .content {
   padding: 0.5rem 2rem;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
   height: 7.25rem;
 }
-/* line 1249, ../../../scss/_app_styles.scss */
+/* line 1331, ../../../scss/_app_styles.scss */
 .rcard .content .slick-slider {
   margin-bottom: 0;
 }
-/* line 1253, ../../../scss/_app_styles.scss */
+/* line 1335, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev {
   left: 0.25rem;
 }
-/* line 1256, ../../../scss/_app_styles.scss */
+/* line 1338, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev:before {
   color: #ccc;
 }
-/* line 1262, ../../../scss/_app_styles.scss */
+/* line 1344, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next {
   right: 0.25rem;
 }
-/* line 1265, ../../../scss/_app_styles.scss */
+/* line 1347, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next:before {
   color: #ccc;
 }
-/* line 1271, ../../../scss/_app_styles.scss */
+/* line 1353, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title {
   width: 100%;
   border-bottom: 1px solid #808080;
   line-height: 0.25em;
   margin: 10px 0 20px;
 }
-/* line 1277, ../../../scss/_app_styles.scss */
+/* line 1359, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title small {
   padding: 0 10px;
   background-color: whitesmoke;
 }
-/* line 1284, ../../../scss/_app_styles.scss */
+/* line 1366, ../../../scss/_app_styles.scss */
 .rcard .action {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -10289,15 +10376,15 @@ aside#help p, aside#help h5, aside#help h6 {
   font-size: small;
   height: 2rem;
 }
-/* line 1291, ../../../scss/_app_styles.scss */
+/* line 1373, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection {
   opacity: 0.5;
 }
-/* line 1294, ../../../scss/_app_styles.scss */
+/* line 1376, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection:hover {
   opacity: 1;
 }
-/* line 1308, ../../../scss/_app_styles.scss */
+/* line 1390, ../../../scss/_app_styles.scss */
 .rcard .image {
   position: relative;
   background-color: #ccc;
@@ -10305,7 +10392,7 @@ aside#help p, aside#help h5, aside#help h6 {
   height: 8em;
   overflow: hidden;
 }
-/* line 1318, ../../../scss/_app_styles.scss */
+/* line 1400, ../../../scss/_app_styles.scss */
 .rcard .image .title {
   position: absolute;
   bottom: 0;
@@ -10318,7 +10405,7 @@ aside#help p, aside#help h5, aside#help h6 {
   text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
   font-family: Open Sans Bold;
 }
-/* line 1331, ../../../scss/_app_styles.scss */
+/* line 1413, ../../../scss/_app_styles.scss */
 .rcard .image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -10328,14 +10415,14 @@ aside#help p, aside#help h5, aside#help h6 {
   filter: brightness(0.75);
   -webkit-filter: brightness(0.75);
 }
-/* line 1343, ../../../scss/_app_styles.scss */
+/* line 1425, ../../../scss/_app_styles.scss */
 .rcard .image img:hover {
   filter: brightness(1);
   -webkit-filter: brightness(1);
   transform: translate3d(0, 0, 0);
   transition: all 1.5s ease;
 }
-/* line 1352, ../../../scss/_app_styles.scss */
+/* line 1434, ../../../scss/_app_styles.scss */
 .rcard .image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -10349,51 +10436,51 @@ aside#help p, aside#help h5, aside#help h6 {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1369, ../../../scss/_app_styles.scss */
+/* line 1451, ../../../scss/_app_styles.scss */
 .rcard .image i.file:before {
   content: "\f18e";
 }
-/* line 1370, ../../../scss/_app_styles.scss */
+/* line 1452, ../../../scss/_app_styles.scss */
 .rcard .image i.page:before {
   content: "\f18e";
 }
-/* line 1371, ../../../scss/_app_styles.scss */
+/* line 1453, ../../../scss/_app_styles.scss */
 .rcard .image i.collection:before {
   content: "\f18a";
 }
-/* line 1373, ../../../scss/_app_styles.scss */
+/* line 1455, ../../../scss/_app_styles.scss */
 .rcard .image i.documents:before {
   content: "\f18b";
 }
-/* line 1374, ../../../scss/_app_styles.scss */
+/* line 1456, ../../../scss/_app_styles.scss */
 .rcard .image i.pdf:before {
   content: "\f18b";
 }
-/* line 1375, ../../../scss/_app_styles.scss */
+/* line 1457, ../../../scss/_app_styles.scss */
 .rcard .image i.text:before {
   content: "\f18e";
 }
-/* line 1376, ../../../scss/_app_styles.scss */
+/* line 1458, ../../../scss/_app_styles.scss */
 .rcard .image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1377, ../../../scss/_app_styles.scss */
+/* line 1459, ../../../scss/_app_styles.scss */
 .rcard .image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1378, ../../../scss/_app_styles.scss */
+/* line 1460, ../../../scss/_app_styles.scss */
 .rcard .image i.images:before {
   content: "\f125";
 }
-/* line 1379, ../../../scss/_app_styles.scss */
+/* line 1461, ../../../scss/_app_styles.scss */
 .rcard .image i.audios:before, .rcard .image i.audio:before {
   content: "\f17b";
 }
-/* line 1380, ../../../scss/_app_styles.scss */
+/* line 1462, ../../../scss/_app_styles.scss */
 .rcard .image i.videos:before, .rcard .image i.video:before {
   content: "\f20e";
 }
-/* line 1383, ../../../scss/_app_styles.scss */
+/* line 1465, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-style: solid;
   border-width: 0 70px 40px 0;
@@ -10406,59 +10493,59 @@ aside#help p, aside#help h5, aside#help h6 {
   z-index: 1;
   opacity: 0.75;
 }
-/* line 1396, ../../../scss/_app_styles.scss */
+/* line 1478, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-color: transparent #333 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #333333 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1401, ../../../scss/_app_styles.scss */
+/* line 1483, ../../../scss/_app_styles.scss */
 .rcard .published.card-label {
   border-color: transparent #43ac6a transparent transparent;
   border-color: rgba(255, 255, 255, 0) #43ac6a rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1405, ../../../scss/_app_styles.scss */
+/* line 1487, ../../../scss/_app_styles.scss */
 .rcard .published.card-label .label-text:before {
   content: "\221A";
   margin-left: 5px;
   font-size: larger;
 }
-/* line 1413, ../../../scss/_app_styles.scss */
+/* line 1495, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label {
   border-color: transparent #a9b2b3 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #a9b2b3 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1417, ../../../scss/_app_styles.scss */
+/* line 1499, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label .label-text:before {
   content: "Draft";
 }
-/* line 1422, ../../../scss/_app_styles.scss */
+/* line 1504, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1426, ../../../scss/_app_styles.scss */
+/* line 1508, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label .label-text:before {
   content: "Deleted";
 }
-/* line 1431, ../../../scss/_app_styles.scss */
+/* line 1513, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label {
   border-color: transparent #0eacb5 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #0eacb5 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1435, ../../../scss/_app_styles.scss */
+/* line 1517, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label .label-text:before {
   content: "Mod";
 }
-/* line 1438, ../../../scss/_app_styles.scss */
+/* line 1520, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label {
   border-color: transparent #000 transparent transparent;
   border-color: rgba(255, 255, 255, 0) black rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1442, ../../../scss/_app_styles.scss */
+/* line 1524, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label .label-text:before {
   content: "hidden";
 }
-/* line 1445, ../../../scss/_app_styles.scss */
+/* line 1527, ../../../scss/_app_styles.scss */
 .rcard .label-text {
   color: #fff;
   font-size: 0.75rem;
@@ -10469,7 +10556,7 @@ aside#help p, aside#help h5, aside#help h6 {
   transform: rotate(30deg);
 }
 
-/* line 1459, ../../../scss/_app_styles.scss */
+/* line 1541, ../../../scss/_app_styles.scss */
 .compulsory:after {
   content: '*';
   color: red;
@@ -10477,14 +10564,14 @@ aside#help p, aside#help h5, aside#help h6 {
 }
 
 /* Watermark background for node_ajax_content  */
-/* line 1467, ../../../scss/_app_styles.scss */
+/* line 1549, ../../../scss/_app_styles.scss */
 .allow.draft {
   background-size: 10%;
   background-repeat: repeat;
   background-image: url("/static/ndf/images/draft-watermark.png");
 }
 
-/* line 1475, ../../../scss/_app_styles.scss */
+/* line 1557, ../../../scss/_app_styles.scss */
 .text-gray {
   color: gray;
 }
