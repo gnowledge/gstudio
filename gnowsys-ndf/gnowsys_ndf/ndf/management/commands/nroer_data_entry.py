@@ -36,7 +36,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, get_language_tuple
 from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import add_to_collection_set
 
 ##############################################################################
@@ -199,9 +199,7 @@ class Command(BaseCommand):
                 with open(log_file_path, 'a') as log_file:
                     log_file.writelines(log_file_not_found)
 
-
-
-  # --- End of handle() ---
+    # --- End of handle() ---
 
 
 def create_user_nroer_team():
@@ -948,15 +946,22 @@ def create_resource_gsystem(resource_data):
 
     else:  # creating new resource
 
-        files.seek(0)
-        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
-        # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
-        
         info_message = "\n- Creating resource: " + str(resource_data["name"])
         log_list.append(str(info_message))
         print info_message
         
+        files.seek(0)
+        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
+        # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
+        
         # filetype = magic.from_buffer(files.read(100000), mime = 'true')  # Gusing filetype by python-magic
+
+        node_collection.collection.update(
+                                {'_id': ObjectId(fileobj_oid)},
+                                {'$push': {'origin': {'csv-import': 'save_file'} }},
+                                upsert=False,
+                                multi=False
+                            )
 
         info_message = "\n- Created resource/GSystem object of name: '" + unicode(name) + "' having ObjectId: " + unicode(fileobj_oid) + "\n- Saved resource into gridfs. \n"
         log_list.append(info_message)
