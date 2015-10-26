@@ -54,6 +54,11 @@ home_group = node_collection.one({"name": "home", "_type": "Group"})
 theme_gst = node_collection.one({'_type': 'GSystemType', "name": "Theme"})
 theme_item_gst = node_collection.one({'_type': 'GSystemType', "name": "theme_item"})
 topic_gst = node_collection.one({'_type': 'GSystemType', "name": "Topic"})
+twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
+rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
+thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
+has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
 nroer_team_id = 1
 
 # setting variable:
@@ -471,6 +476,10 @@ def parse_data_create_gsystem(json_file_path):
 
             # print type(nodeid), "-------", nodeid, "\n"
 
+            # create thread node 
+            if isinstance(nodeid, ObjectId):
+                thread_result = create_thread_obj(nodeid)
+
             # starting processing for the attributes and relations saving
             if isinstance(nodeid, ObjectId) and attribute_relation_list:
 
@@ -795,11 +804,50 @@ def parse_data_create_gsystem(json_file_path):
                 log_list.append(str(info_message))
 
                 continue
-
         except Exception as e:
             error_message = "\n While creating ("+str(json_document['name'])+") got following error...\n " + str(e)
             print error_message # Keep it!
             log_list.append(str(error_message))
+
+def create_thread_obj(node_id):
+    '''
+    Creates thread object.
+        RT : has_thread
+        AT : release_response, thread_interaction_type
+    '''
+    try:
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        release_response_val = True
+        interaction_type_val = unicode('Comment')
+        thread_obj = None
+        thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node_obj._id)})
+
+        if thread_obj == None:
+            # print "\n\n Creating new thread node"
+            thread_obj = node_collection.collection.GSystem()
+            thread_obj.name = u"Thread_of_" + unicode(node_obj.name)
+            thread_obj.status = u"PUBLISHED"
+            thread_obj.created_by = int(nroer_team_id)
+            thread_obj.modified_by = int(nroer_team_id)
+            thread_obj.contributors.append(int(nroer_team_id))
+            thread_obj.member_of.append(ObjectId(twist_gst._id))
+            thread_obj.group_set.append(home_group._id)
+            thread_obj.save()
+            # creating GRelation
+            gr = create_grelation(node_obj._id, has_thread_rt, thread_obj._id)
+            create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+            create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+            create_gattribute(node_obj._id, discussion_enable_at, True)
+            thread_obj.reload()
+            node_obj.reload()
+            # print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
+            info_message = "\n- Successfully created thread obj - " + thread_obj._id.__str__() +" for - " + node_obj._id.__str__()
+            print info_message
+            log_list.append(str(info_message))
+    except Exception as e:
+        info_message = "\n- Error occurred while creating thread obj for - " + node_obj._id.__str__() +" - " + str(e)
+        print info_message
+        log_list.append(str(info_message))
 
 
 def create_resource_gsystem(resource_data):
