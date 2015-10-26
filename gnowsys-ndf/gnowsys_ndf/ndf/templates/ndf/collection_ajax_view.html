@@ -230,9 +230,16 @@
   }
 
   .collection > ul li:nth-child(odd) { background: #ddd; }
-  .collection > ul li { padding-left: 22px ;  /*Hanging Indednt Setting*/ 
+ /* .collection > ul li { padding-left: 22px ; 
   text-indent: -32px ;
-   }
+ }*/
+ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
+    position: relative;
+     padding-left: 22px;
+    text-indent:-32px;
+
+}
+
     
   #view_collection legend{
     text-align: center;

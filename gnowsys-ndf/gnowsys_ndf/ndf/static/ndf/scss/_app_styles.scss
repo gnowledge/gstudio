@@ -1086,12 +1086,12 @@ aside#help{
     border-radius: 0 0 2px 2px;
     overflow: hidden;
     /*height: 8.25rem;*/
-   margin-top: 8px;
+   margin-top: 1px;
   .scard-title{
       font-family: Open Sans Bold;
       margin:0px;
       /*padding:10px;*/
-      color:#6B0000;
+      color:#4B0000;
       /*font-size:small;*/
       text-transform: uppercase;
       word-wrap: normal;
@@ -1219,7 +1219,7 @@ aside#help{
 /* End Simple Card CSS*/
 
 /* Customized Off-Canvas */
-#shortListDiv {
+#help-canvas-menu {
     position:fixed;
     top:52px;
     left:-250px;
@@ -1230,21 +1230,21 @@ aside#help{
     transition:left 150ms linear 0ms;
     height:100%;
 }
-#shortListDiv.expanded {
+#help-canvas-menu.expanded {
     left:0!important;
     z-index:100000000;
     left:150px;
 }
-#shortListDiv.expanded .shortListButton {
+#help-canvas-menu.expanded .help-button {
     right:80px;
     z-index:-1;
 }
 
-#shortListDiv.animating .shortListButton {
+#help-canvas-menu.animating .help-button {
     -webkit-animation:shake 400ms;
     animation:shake 400ms;
 }
-#shortListDiv .shortListButton {
+#help-canvas-menu .help-button {
     position:absolute;
     -webkit-transform:rotate(-90deg);
     -moz-transform:rotate(-90deg);
@@ -1254,11 +1254,7 @@ aside#help{
     -ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=0)";
     left:200px;
     top:300px;
-    background:#99CCFF;
-    border:1px solid #e74802;
-    /*-webkit-box-shadow:0 0 6px -1px rgba(0,0,0,0.2) inset;
-    -moz-box-shadow:0 0 6px -1px rgba(0,0,0,0.2) inset;
-    box-shadow:0 0 6px -1px rgba(0,0,0,0.2) inset;*/
+    background:$primary-color;
     color:#fff;
     text-decoration:none;
     height:28px;
@@ -1271,19 +1267,22 @@ aside#help{
     border-radius:0;
     overflow:none;
     border-top-left-radius:5px;
-    border-top-right-radius:5px
+    border-top-right-radius:5px;
+
 }
-
-
-#shortListDiv .shortListButton .text {
+#help-canvas-menu .help-button-text{
+    font-size:18px;
+}
+#help-canvas-menu .help-button .text {
     color:#f9f9f9;
     letter-spacing:.1em;
     float:left;
     margin-left:5px;
-    text-shadow:0 0 1px rgba(0,0,0,0.35)
+    text-shadow:0 0 1px rgba(0,0,0,0.35);
+
 }
 
-#shortListDiv .mainContainer {
+#help-canvas-menu .mainContainer {
     background:#fff;
     /*-webkit-box-shadow:3px 3px 17px -1px #7b7b7b;
     -moz-box-shadow:3px 3px 17px -1px #7b7b7b;*/
@@ -1293,6 +1292,8 @@ aside#help{
     height:100%;
     width:250px;
     overflow: none;
+
+
 }
 
 
