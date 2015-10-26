@@ -5,8 +5,8 @@
   {% get_group_object groupid as group_object %}
   <!-- <div class="contain-to-grid sticky"> -->
 
-  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
-    <p id="alertModalLabel"></p>
+  <div id="feedsModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <p id="feedsModalLabel"></p>
     <div class="row feeds_proceed">
       <div class="small-3 small-offset-3 columns">
         <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
@@ -463,14 +463,13 @@
         $(this).attr('href', "{% url 'activity_feed' group_object.pk %}")
       }
       else{
-        console.log("NOT MOZILLA");
         lbl_msg = "RSS Feeds may not be displayed properly in this browser. Would you still like to continue?"
-        $("#alertModalLabel").text(lbl_msg);
+        $("#feedsModalLabel").text(lbl_msg);
         $(".small_msg").text("You may try Mozilla Firefox")
-        $("#alertModal")
+        $("#feedsModal")
           .removeClass("medium").addClass("small")
           .addClass("warning")
-        $("#alertModal").foundation('reveal', 'open');
+        $("#feedsModal").foundation('reveal', 'open');
       }
     }
   })
@@ -478,14 +477,14 @@
   //Confirm or Cancel Deletion
     $(document).on("click", "#btnConfirmYes", function() {
         set_href = true;
-        $("#alertModal").foundation('reveal', 'close');
+        $("#feedsModal").foundation('reveal', 'close');
         $(".feeds_btn").attr('href', "{% url 'activity_feed' group_object.pk %}")
         $(".feeds_btn")[0].click();
     });
 
     $(document).on("click", "#btnConfirmNo", function() {
         set_href = false;
-        $("#alertModal").foundation('reveal', 'close');
+        $("#feedsModal").foundation('reveal', 'close');
     });
 
 </script>
