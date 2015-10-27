@@ -1,0 +1,18 @@
+* Running schema files (csv) for Course and MIS				:dev:
+
+Schema files will now be located in gstudio/doc/schema_directory/
+
+Put STs.csv, RTs.csv, ATs.csv under management/commands/schema_files/ and the execute following commands:
+
+#+BEGIN_EXAMPLE
+python manage.py create_schema STs_run1.csv
+python manage.py create_schema ATs.csv
+python manage.py create_schema RTs.csv
+python manage.py create_schema STs_run2.csv
+#+END_EXAMPLE
+
+The following command should be executed under project directory:
+
+#+BEGIN_EXAMPLE
+echo "execfile('property_order_reset.py')" | python manage.py shell
+#+END_EXAMPLE

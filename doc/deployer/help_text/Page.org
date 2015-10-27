@@ -1,0 +1,42 @@
+
+* Page
+
+Make a page for creating an online text document. The document can be
+edited collaboratively by members of the group.  Simultaneous editing
+is also supported.  While editing the editor will report if there are
+any other users editing the same page. 
+
+The pages are wikistyle pages using orgmode style markup. For more
+information about text editing please follow the documentation
+provided at http://www.metaStudio.org/help/. More information about
+orgmode markup is available from http://orgmode.org/.
+
+Pages support the following features:
+
+- Changing the typeface, /italics/, *bold*, +strike through+ and
+  _underline_.
+- Bullet items, such as this list. You can nest lists within lists,
+  and also make numbered lists.
+- Headings of different levels as title, heading, sub-heading etc.
+- Mathematical equations and special characters using LaTeX to create
+  MathML code. The exported HTML will use MathJax to render the
+  symbols.
+- Insert pictures with captions and control size of the image, and its
+  position in the text as left, right or center aligned.
+- Embed any HTML code, including JavaScript
+- Insert videos using the above feature.
+- Insert footnotes and references
+
+Pages can be grouped together as a collection in a heirarchically to
+make an online document or a book. 
+
+Each page content can be annotated, discussed and rated.  When the
+page is about a geographical location the latitude and longitude
+information can be set. 
+
+Most common metadata elements can also be set to each page as
+properties of the page informing the age group, intended auidence,
+what topic does the page teach (if it does), what other page you wish
+the reader to read before the current page etc.
+
+  
