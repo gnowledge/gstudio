@@ -1,0 +1,25 @@
+* Using etags for maintaining consistency of names across the project				:dev:
+
+We recommend to use etags to search and replace expressions across the
+project.  This helps to keep the entire project consistent.
+
+Aggregate the files from your project that you normally edit. These
+are my files.
+
+#+BEGIN_EXAMPLE
+find gnowsys-ndf/ -name "*.py" -print >> files
+find gnowsys-ndf/ -name "*.html" -print >> files
+find gnowsys-ndf/ -name "*.css" -print >> files
+find gnowsys-ndf/ -name "*.scss" -print >> files
+find gnowsys-ndf/ -name "*.org" -print >> files
+find doc/ -name "*.org" -print >> files
+#+END_EXAMPLE
+
+generate TAGS file by the following command: 
+
+cat files | etags -
+
+You will see a new file in the project directory called 'TAGS'. 
+
+While editing your project, use "M-x tags-search" or "M-x
+tags-query-replace" to do your work.
