@@ -358,7 +358,7 @@
       {% else %} 
 
         {% get_edit_url node.pk as edit_url %}
-          <a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button radius edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+          <a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny button radius edit"><i class="fi-pencil"></i> {% trans "Edit " %}</a>
       {% endif %} 
     {% endif %} 
 
