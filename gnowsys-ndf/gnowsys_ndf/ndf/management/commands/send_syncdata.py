@@ -64,7 +64,8 @@ class Command(BaseCommand):
 		for i,folder_name in enumerate(list_of_syncdata_folders):
 			send_counter = "%06d" % i
 			path = syncdata_folder_path + '/' + folder_name
-			list_of_syncdata_files = os.listdir(path)
+			#list_of_syncdata_files = os.listdir(syncdata_folder_path)
+			#list_of_syncdata_files = os.listdir(path)
 			if connected_to_internet() is True:
 				mail = EmailMessage()
 				tstamp = folder_name
@@ -72,13 +73,15 @@ class Command(BaseCommand):
 				mail.subject= str(SYNCDATA_KEY_PUB) + "_SYNCDATA_"+ tstamp	
 
 				folder_empty = 1
+				''''
 				for filename in list_of_syncdata_files:
 					file_path = path + '/' + filename
 					#attch Info registry with every mail
+					print file_path,filename
 					mail.attach_file(file_path)
 					folder_empty = 0
-					print file_path
-
+				'''	
+				mail.attach_file(path)
 				mail.from_email = SYNCDATA_FROM_EMAIL_ID
 				mail.to = list(SYNCDATA_SENDING_EMAIL_ID)
 				if folder_empty == 0:
