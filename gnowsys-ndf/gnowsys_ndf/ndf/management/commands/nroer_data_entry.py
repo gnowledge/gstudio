@@ -447,7 +447,7 @@ def parse_data_create_gsystem(json_file_path):
             # --END of for loop ---  
 
             # calling method to create File GSystems
-            nodeid = create_resource_gsystem(parsed_json_document)
+            nodeid = create_resource_gsystem(parsed_json_document, i)
             # print "nodeid : ", nodeid
 
             collection_name = parsed_json_document.get('collection', '')
@@ -468,7 +468,7 @@ def parse_data_create_gsystem(json_file_path):
 
             if thumbnail_url and nodeid:
                 try:
-                    attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document)
+                    attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document, i)
                 except:
                     pass
 
@@ -848,7 +848,7 @@ def create_thread_obj(node_id):
         log_list.append(str(info_message))
 
 
-def create_resource_gsystem(resource_data):
+def create_resource_gsystem(resource_data, row_no=''):
   
     # fetching resource from url
     resource_link = resource_data.get("resource_link")  # actual download file link
@@ -866,14 +866,16 @@ def create_resource_gsystem(resource_data):
 
     try:
         files = urllib2.urlopen(resource_link)
-    except Exception, e:
+    except urllib2.URLError, e:
         error_message = "\n!! File Not Found at: " + resource_link
         log_list.append(error_message)
 
         file_not_found_msg = "\nFile with following details not found: \n"
+        file_not_found_msg += "- Row No   : " + str(row_no) + "\n"
         file_not_found_msg += "- Name     : " + resource_data["name"] + "\n"
         file_not_found_msg += "- File Name: " + resource_data["file_name"] + "\n"
         file_not_found_msg += "- URL      : " + resource_link + "\n\n"
+        file_not_found_msg += "- ERROR    : " + e + "\n\n"
         log_file_not_found.append(file_not_found_msg)
         return None
 
@@ -971,7 +973,7 @@ def create_resource_gsystem(resource_data):
         return fileobj_oid
 
 
-def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
+def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     
     updated_res_data = resource_data.copy()
 
@@ -982,7 +984,7 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
     updated_res_data['tags'] = []
 
     # th_id: thumbnail id
-    th_id = create_resource_gsystem(updated_res_data)
+    th_id = create_resource_gsystem(updated_res_data, row_no)
     # print "th_id: ", th_id
     
     th_obj = node_collection.one({'_id': ObjectId(th_id)})
