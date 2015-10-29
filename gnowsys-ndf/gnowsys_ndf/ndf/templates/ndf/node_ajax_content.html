@@ -4,6 +4,48 @@
 
 {% get_schema node as schema %} 
 {% get_group_name groupid as group_name_tag %}
+<style type="text/css">
+.share_link {
+    color: #FFF;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 20px;
+    text-shadow: 0px -1px 0px #354C8C;
+    white-space: nowrap;
+}
+
+
+</style>
+<script type="text/javascript">
+  $( document ).ready(function() {
+    var x = location.href;
+    x = "https://www.facebook.com/dialog/feed?app_id=1663958913874619&redirect_uri=http://www.metastudio.org/home/&link="+location.href+"&caption=skjfhdj&description=This%20is%20ldfs;gjdfkg;jgsldlkfjkthe%20description"; 
+    $(".share_link").attr("href",x);
+
+    hrefs = "href=https://twitter.com/share"; 
+    b = "large"; 
+    c = location.href;
+    d = location.href+"tweet-button";
+    e = "atMetaStudio";
+    f = "twitterapi,twitter"; 
+    g= "example,demo";
+    h="hello ghello";
+    $(".twitter-share-button").attr("href",a);
+    $(".twitter-share-button").attr("data-size",b);
+    $(".twitter-share-button").attr("data-url",c);
+    $(".twitter-share-button").attr("data-count-url",d);
+    $(".twitter-share-button").attr("data-via",e);
+    $(".twitter-share-button").attr("data-related",f);
+    $(".twitter-share-button").attr("data-hashtags",g);
+    $(".twitter-share-button").attr("data-text",h);
+  
+});
+</script>
+<script type="text/javascript">
+!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+</script>
+
+
 
 
 <div class="row page" itemscope itemtype="{{schema.1.type}}"> 
@@ -536,11 +578,16 @@
               <div class="right">
                       {% if node.mime_type %}
                         <i>{% trans 'Resource Type' %}: {{node.mime_type}}</i><br/>
-                        
-                     {% endif %}
+                   
+
+                    {% endif %}
               </div>
           {% endif %}
-          
+          <a class="share_link" href="#" target="_blank"  style="width=626,height=436" >
+                            Share on Facebook
+                        </a>
+                    <a class="twitter-share-button"href="" data-size=""  data-url="" data-count-url="" data-via="" data-related=""
+                     data-hashtags="" data-text="">TweetNew</a>
           {% block add_fields %} {% endblock %}
 
           <ul class="inline-list">

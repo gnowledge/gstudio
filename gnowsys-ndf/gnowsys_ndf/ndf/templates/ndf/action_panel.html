@@ -57,6 +57,12 @@
 		/*font-weight: bold;*/
 		margin-top: 1rem;
 		font-size: 1rem !important;
+		margin-left:10%;
+	}
+	.location-div{
+		margin-left:10%;
+
+
 	}
 	.label > a{
 		color: white !important;
@@ -216,9 +222,9 @@
 			<!-- Location	-->
 				<div class="row tag-rating-div">
 				{% if node.location %}
-		        	<a data-reveal-id="view-map-widget" class="text-left"><i class="fi-marker"></i> {% trans "Location" %}</a>
+		        	<a data-reveal-id="view-map-widget" class="location-div"><i class="fi-marker"></i> {% trans "Location" %}</a>
 	        	{% else %}
-		        	<a class="text-left disabled text-gray"><i class="fi-marker"></i> {% trans "Location" %}</a>
+		        	<a class="location-div disabled text-gray"><i class="fi-marker"></i> {% trans "Location" %}</a>
 	        	{% endif %}
 
 		    <!-- Graphs For Topics or Concept -->
