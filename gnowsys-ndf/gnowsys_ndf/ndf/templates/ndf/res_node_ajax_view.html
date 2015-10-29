@@ -39,6 +39,20 @@
   li.subsc_users_li {
     list-style: none;
   }
+  .btn-row{
+    /*margin-left: 1rem !important;*/
+    text-align: center;
+    margin-bottom: -1rem !important;
+  }
+
+  .right-btn, .left-btn{
+    /*float: left;*/
+    /*margin-left: 1rem;*/
+    width: 40%;
+    font-size: 0.60em !important;
+    margin-top: 0.1rem !important;
+  }
+
 
   </style>
 
@@ -60,7 +74,7 @@
     {% endfor %}
   </ul>
   {% endif %}
-  <section class="medium-10 columns"> 
+  <section class="medium-9 columns"> 
 
 	<div class="content active commentable-section" id="accordion1" data-section-id="1">
     <!-- Code for showing media details -->
@@ -328,18 +342,23 @@
     {% check_is_gstaff groupid request.user as is_gstaff %}
     {% if is_gstaff %}
       {% if "CourseEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
-          <section class="medium-2 columns"> 
-            <div class="row">
-                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit"><i class="fi-pencil"></i> {% trans "Edit " %}{% if sg_type == "ProgramEventGroup" %}{% trans "Event" %}{% else %}{% trans "eCourse" %}{% endif %}</a>
-              <br/><br/>
+      <section class="medium-3 columns"> 
+          <div class="panel">
+              <div class="row btn-row">
+                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button radius edit left-btn"><i class="fi-pencil"></i> {% trans "Edit " %}{% if sg_type == "ProgramEventGroup" %}{% trans "Event" %}{% else %}{% trans "eCourse" %}{% endif %}</a>
+                <input type="button" class="button tiny radius right-btn" value="Users">        
+              </div>
+              <div class="row btn-row">
                 {% include "ndf/invite_users.html" %}
                 {% include "ndf/invite_admins.html" %}
-            </div>  
-          </section>  
+              </div>
+
+          </div>
+      </section>
       {% else %} 
 
         {% get_edit_url node.pk as edit_url %}
-          <a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+          <a href="{% url edit_url groupid node %}?course_event_id={{groupid}}&res=True" class="tiny button radius edit"><i class="fi-pencil"></i> {% trans "Edit " %}</a>
       {% endif %} 
     {% endif %} 
 
