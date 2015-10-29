@@ -32,7 +32,6 @@ from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.rcslib import RCS
-from django.dispatch import receiver
 from registration.signals import user_registered
 
 
@@ -113,25 +112,6 @@ STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
 
 QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
-
-
-# FRAME CLASS DEFINITIONS
-@receiver(user_registered)
-def user_registered_handler(sender, user, request, **kwargs):
-    tmp_hold = node_collection.collection.node_holder()
-    dict_to_hold = {}
-    dict_to_hold['node_type'] = 'Author'
-    dict_to_hold['userid'] = user.id
-    agency_type = request.POST.get("agency_type", "")
-    if agency_type:
-        dict_to_hold['agency_type'] = agency_type
-    else:
-        # Set default value for agency_type as "Other"
-        dict_to_hold['agency_type'] = "Other"
-    dict_to_hold['group_affiliation'] = request.POST.get("group_affiliation", "")
-    tmp_hold.details_to_hold = dict_to_hold
-    tmp_hold.save()
-    return
 
 
 @connection.register
@@ -1908,3 +1888,4 @@ db = get_database()
 node_collection = db[Node.collection_name].Node
 triple_collection = db[Triple.collection_name].Triple
 gridfs_collection = db["fs.files"]
+import signals
