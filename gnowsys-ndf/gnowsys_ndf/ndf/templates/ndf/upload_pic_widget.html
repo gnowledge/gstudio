@@ -1,5 +1,6 @@
 {% load ndf_tags %}
 {% load i18n %}
+
     <div id="upload_picModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
         <label id="upload_picModalLabel"></label>
         <a class="close-reveal-modal">&#215;</a>
@@ -22,24 +23,24 @@
         {% if "Author" in group_object.member_of_names_list and user_id == request.user.id or "Author" not in group_object.member_of_names_list and gstaff_access %}
                 <div class="row" >
                   <div class="small-12 columns" >
-                    <input type="button" class="button tiny expand margin-p5 btn-font" id="btnUploadProfilePic"  value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
+                    <input type="button" class="button tiny expand margin-p5 btn-font" id="{{widget_for}}_btnUploadProfilePic"  value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
                   </div>
                 </div>
             {% endif %}
-            <div id="prof_pic_prop" class="reveal-modal medium" data-reveal style="height:500px;"> 
-                <a href="#" id="upload_photo">
+            <div id="{{widget_for}}_prof_pic_prop" class="reveal-modal medium" data-reveal style="height:500px;"> 
+                <a href="#" id="{{widget_for}}_upload_photo">
                   <div id="upload-photo-div" class="text-center">
-                    <label id="upload_photo_lbl" class="fi-upload">Upload New Photo</label>
+                    <label class="upload_photo_lbl fi-upload">Upload New Photo</label>
                   </div>
                 </a>
                 {% if old_profile_pics %}
-                <fieldset id="existing-photo-fieldset">
-                    <legend id="choose_photo_lbl">Choose Any Existing Photo</legend>
+                <fieldset id="{{widget_for}}_existing-photo-fieldset">
+                    <legend class="choose_photo_lbl">Choose Any Existing Photo</legend>
                     <div class="existing-photo-div"  style="display:inline-block;overflow-y: auto;height:320px;">
                       {% for each_prof_pic in old_profile_pics %}
                         <div class="old_img">
                           <img src="{% url 'getFileThumbnail' group_id each_prof_pic.pk %}" style="height:150px;width:100px;" />
-                          <div class="prof_pic_select">
+                          <div class="{{widget_for}}_prof_pic_select">
                           <input type="button" value="Use this" class="button tiny use_old_img_btn" onclick="update_img('{{each_prof_pic.pk}}')" />
                           </div>
                         </div>
@@ -47,14 +48,14 @@
                     </div>
                 </fieldset>
                 {% endif %}
-                <div id="pic_div" class="hide row">
-                    <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post"  action="{% url 'upload_prof_pic' group_id %}">
+                <div id="{{widget_for}}_pic_div" class="hide row">
+                    <form class="dropzone" id ="{{widget_for}}_docPost" enctype="multipart/form-data" method="post"  action="{% url 'upload_prof_pic' group_id %}">
                         {% csrf_token %}
-                        <input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
-                        <div class="upload_cancel_div">
-                            <img id="img_preview" src="#" alt="New profile photo" />
-                            <input type="submit" id="submitpostid" value="Save" style="margin-left:2rem;" class="button tiny margin-p5" />
-                            <input type="button" class="button tiny margin-p5" id="btnUploadCancel" value="Cancel">
+                        <input type="file" name="has_profile_pic" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
+                        <div class="{{widget_for}}_upload_cancel_div">
+                            <img id="{{widget_for}}_img_preview" src="#" alt="New profile photo" />
+                            <input type="submit" id="{{widget_for}}_submitpostid" value="Save" style="margin-left:2rem;" class="button tiny margin-p5" />
+                            <input type="button" class="button tiny margin-p5" id="{{widget_for}}_btnUploadCancel" value="Cancel">
                         </div>
                         <input type="hidden" name="type" value="profile_pic">           
                         <input type="hidden" name="user" value="{{usr}}">
@@ -64,7 +65,7 @@
 
                     </form>
                 </div>
-                <p id="message" style="display:none">
+                <p id="{{widget_for}}_message" style="display:none">
                   {% trans "Your profile photo is uploading. Please wait.." %}
                 </p>
 
@@ -86,7 +87,7 @@
       border: 2px solid #0b8a91;
     }
 
-    #choose_photo_lbl{
+    .choose_photo_lbl{
       color: #0b8a91;
     }
 
@@ -104,7 +105,7 @@
     }
 
 
-    #upload_photo_lbl{
+    .upload_photo_lbl{
       color: #0b8a91;
       font-size:30px;
     }
@@ -136,25 +137,25 @@
     })
 
   // Upload/Change Profile photo ----------------------------------------------------------------
-  $("#btnUploadProfilePic").click(function() {
+  $("#{{widget_for}}_btnUploadProfilePic").click(function() {
     console.log("Change btn clicked")
-    $("#prof_pic_prop").foundation('reveal', 'open');
+    $("#{{widget_for}}_prof_pic_prop").foundation('reveal', 'open');
   });
 
   // Cancel/Abort Profile pic Upload-------------------------------------------------------------
-  $("#btnUploadCancel").click(function() {
-    $("#pic_div").addClass("hide");
-    $("#upload_photo").removeClass("hide");
-    $("#existing-photo-fieldset").removeClass("hide");
-    $("#docFile").val("");
+  $("#{{widget_for}}_btnUploadCancel").click(function() {
+    $("#{{widget_for}}_pic_div").addClass("hide");
+    $("#{{widget_for}}_upload_photo").removeClass("hide");
+    $("#{{widget_for}}_existing-photo-fieldset").removeClass("hide");
+    $("#{{widget_for}}_docFile").val("");
   });
 
   // Upload photo btn in overlay ----------------------------------------------------------------
-  $("#upload_photo").click(function() {
+  $("#{{widget_for}}_upload_photo").click(function() {
     console.log("demo")
-    $("#docFile").trigger("click");
+    $("#{{widget_for}}_docFile").trigger("click");
     // $(this).addClass("hide")
-    // $("#existing-photo-fieldset").addClass("hide")
+    // $("#{{widget_for}}_existing-photo-fieldset").addClass("hide")
   })
 
   // Choose from already uploaded(old profile photos) files -------------------------------------
@@ -162,23 +163,23 @@
     $('<input>')
       .attr('type','hidden')
       .attr('name','old_pic_ele')
-      .attr('id','old_pic_ele')
+      .attr('id','{{widget_for}}_old_pic_ele')
       .attr('value',old_img_id)
-      .appendTo('form#docPost');
-    $("#submitpostid").trigger("click");
+      .appendTo('form#{{widget_for}}_docPost');
+    $("#{{widget_for}}_submitpostid").trigger("click");
   }
 
 
   //Upload file action validation ---------------------------------------------------------------
-  $('#docFile').on("change", function() {
-    $("#upload_photo").addClass("hide")
-    $("#existing-photo-fieldset").addClass("hide")
-    console.log("docFile change function")
-    $("#pic_div").removeClass("hide");
+  $('#{{widget_for}}_docFile').on("change", function() {
+    $("#{{widget_for}}_upload_photo").addClass("hide")
+    $("#{{widget_for}}_existing-photo-fieldset").addClass("hide")
+    console.log("{{widget_for}}_docFile change function")
+    $("#{{widget_for}}_pic_div").removeClass("hide");
     file_mime_type = this.files[0].type;
     console.log(file_mime_type)
     if(file_mime_type.indexOf("image/") < 0){
-      $("#btnUploadCancel").click()
+      $("#{{widget_for}}_btnUploadCancel").click()
       var message = "{% trans 'Only image files should be selected for setting your profile picture!' %}"
       $("#upload_picModalLabel").text(message);
       $("#upload_picModal").addClass("alert");
@@ -189,7 +190,7 @@
       console.log("hi")
       var reader = new FileReader();
       reader.onload = function (e) {
-        $('#img_preview')
+        $('#{{widget_for}}_img_preview')
           .attr('src', e.target.result)
           .width(150)
           .height(200)
@@ -200,13 +201,13 @@
   });
 
   // Update profile photo -----------------------------------------------------------------------
-  $("#submitpostid").click(function() {
-    upload_from_existing = $("#old_pic_ele").length
-    if($("#docFile").val() != "" || upload_from_existing > 0) { 
-      $("#prof_pic_prop").foundation('reveal', 'close');
-      $("#message").show();
-      $(".upload_cancel_div").addClass("hide");
-      $("#btnUploadProfilePic").attr("disabled", "disabled");
+  $("#{{widget_for}}_submitpostid").click(function() {
+    upload_from_existing = $("#{{widget_for}}_old_pic_ele").length
+    if($("#{{widget_for}}_docFile").val() != "" || upload_from_existing > 0) { 
+      $("#{{widget_for}}_prof_pic_prop").foundation('reveal', 'close');
+      $("#{{widget_for}}_message").show();
+      $(".{{widget_for}}_upload_cancel_div").addClass("hide");
+      $("#{{widget_for}}_btnUploadProfilePic").attr("disabled", "disabled");
       var message = "{% trans 'Please wait while your profile photo is updating..' %}"
       $("#upload_picModalLabel").text(message);
       $("#upload_picModal").addClass("success");
@@ -217,7 +218,7 @@
       $("#upload_picModalLabel").text(message);
       $("#upload_picModal").addClass("warning");
       $("#upload_picModal").foundation('reveal', 'open');
-      $("#btnUploadCancel").click();
+      $("#{{widget_for}}_btnUploadCancel").click();
       return false;
     }
   });
