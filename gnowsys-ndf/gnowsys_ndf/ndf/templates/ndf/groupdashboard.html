@@ -152,15 +152,7 @@ $(document).ready(function()
   </h4>
 
   <div id="group_picture">
-  
-    {% if prof_pic_obj %}
-      <img alt="profile picture for this group." src="{% url 'get_mid_size_img' group_id prof_pic_obj.pk %}" id="group-image" class="group-images th">
-
-    {% else %}
-      <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." id="group-image" class="group-images th">
-
-    {% endif %}   
-
+  {% include "ndf/upload_pic_widget.html" with url_name='groupchange'  widget_for="Group_about" %}
   </div>
 {% endblock %}
 {% endcache %}
