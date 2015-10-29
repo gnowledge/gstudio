@@ -1171,21 +1171,6 @@ class GSystem(Node):
         # 'origin': [dict]          # e.g: [import: True/False, sync_source: ss41, sync: True, function: save_file]
     }
 
-
-    indexes = [
-        {
-            # 10: Single index
-            'fields': [
-                ('attribute_set', INDEX_ASCENDING)
-            ]
-        }, {
-            # 11: Single index
-            'fields': [
-                ('relation_set', INDEX_ASCENDING)
-            ]
-        }
-    ]
-
     use_dot_notation = True
 
     # TODO: Make default value for license as 'CC-BY-SA 4.0 ...', kedar2a, 12-sep-15
