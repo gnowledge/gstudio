@@ -87,6 +87,7 @@
 					{% else %}
 					{% if blog_type %}
 						{% trans "Create New Blog" %} :
+
 					{% else %}
 						{% trans "Create New " %} {{title}} :
 						{% endif  %}
@@ -103,6 +104,7 @@
 	    </div> 
     </header>
     {% check_group node as is_group %}
+
     <div class="edit-card">
         
 	    <div class="row">
@@ -1428,10 +1430,10 @@
     	{
           $("#message").css("display", "none");
 	    }
-	{% get_site_name_from_settings as site_name %}
 	{% if not blog_type %}
+		{% get_site_name_from_settings as site_name %}
        
-       {%  if site_name == "NROER"  %}
+		{%  if site_name == "NROER"  %}
             if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
                     // $('#tabs').find('a[href="#tab2"]').trigger('click');
                     $('.meta_tab').trigger('click');
@@ -1439,7 +1441,7 @@
                     $("#message").text("{% trans 'Please fill compulsory metadata fields(* marked)' %}");
                     event.preventDefault();
             }
-       {% endif %}
+		{% endif %}
 
 	$("input[name='thread_create']").attr("disabled",false);
 		{% if title == "Page" or "File" in node.member_of_names_list %}

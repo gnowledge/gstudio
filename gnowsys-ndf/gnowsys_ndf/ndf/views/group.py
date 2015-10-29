@@ -1701,6 +1701,7 @@ def group_dashboard(request, group_id=None):
     profile_pic_image = None
     list_of_unit_events = []
     blog_pages = None
+    old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
 
@@ -1749,7 +1750,20 @@ def group_dashboard(request, group_id=None):
     group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=group_obj['_id']
     pass
+  for each in group_obj.relation_set:
+    if "has_profile_pic" in each:
+      if each["has_profile_pic"]:
+        profile_pic_image = node_collection.one(
+            {'_type': "File", '_id': each["has_profile_pic"][0]}
+        )
 
+
+  has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
+  all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+  if all_old_prof_pics:
+    for each_grel in all_old_prof_pics:
+      n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+      old_profile_pics.append(n)
 
   # Call to get_neighbourhood() is required for setting-up property_order_list
   group_obj.get_neighbourhood(group_obj.member_of)
@@ -1773,7 +1787,7 @@ def group_dashboard(request, group_id=None):
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
   # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
-  if "CourseEventGroup" in group_obj.member_of_names_list:
+  if "CourseEventGroup" in group_obj.member_of_names_list or u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
       page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
       blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
       # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"}).sort("last_update",-1)
@@ -1811,6 +1825,7 @@ def group_dashboard(request, group_id=None):
   annotations = json.dumps(group_obj.annotations)
   
   default_template = "ndf/groupdashboard.html"
+  # print "\n\n blog_pages.count------",blog_pages
   return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
                                                        'group_id':group_id, 'user':request.user, 
                                                        'shelf_list': shelf_list,
@@ -1824,7 +1839,8 @@ def group_dashboard(request, group_id=None):
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
                                                        'annotations' : annotations, 'shelves': shelves,
-                                                       'prof_pic_obj': profile_pic_image
+                                                       'prof_pic_obj': profile_pic_image,
+                                                       'old_profile_pics':old_profile_pics
                                                       },context_instance=RequestContext(request)
                           )
 
