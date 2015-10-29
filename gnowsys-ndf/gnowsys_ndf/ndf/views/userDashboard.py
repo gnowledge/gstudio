@@ -72,7 +72,8 @@ def uDashboard(request, group_id):
     group_name = auth.name
     usrname = auth.name
     date_of_join = auth['created_at']
-    current_user = request.user.pk
+    # current_user = request.user.pk
+    current_user = usrid
 
     has_profile_pic = None
     profile_pic_image = None

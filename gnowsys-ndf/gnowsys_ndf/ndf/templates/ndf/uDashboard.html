@@ -19,10 +19,10 @@
   {% endif %}
   {% endcomment %}
       {% include "ndf/upload_pic_widget.html" with url_name='dashboard' %}
-
+      <hr/>
     <div class="action-btn-div">
     <span class="fi-graph-bar">
-      <a href="#" data-reveal-id="activity-statistics" class="user_actions">{% trans "Activity Ratings" %}</a>
+      <a href="#" data-reveal-id="activity-statistics">{% trans "Activity Ratings" %}</a>
     </span>
   </div>
   <div class="small reveal-modal" id="activity-statistics" data-reveal>
@@ -30,10 +30,10 @@
     <a href="#" class="close-reveal-modal">&#215;</a>
   </div>
 
-  {% if user.is_superuser %}
+  {% if user.is_superuser and user_id == request.user.id %}
     <div class="action-btn-div">
       <span class="fi-trash">
-        <a href="/Trash/data-review" class="user_actions">Trash</a>
+        <a href="/Trash/data-review">Trash</a>
       </span>
     </div>
   {% endif %}  
@@ -50,12 +50,11 @@
     font-size: 10em;
     text-shadow: 0 1px 0 #0092b3, 0 2px 0 #0087a6;
   }
-  .user_actions{
-    margin-left:0.5rem;
-  }
 
   .action-btn-div{
     font-size:15px;
+    margin-left:0.5rem;
+    margin-top:1rem;
   }
 
   .style-text {
@@ -88,7 +87,8 @@
               
         <div class="small-12 large-10 columns">
       <h3>
-        {% trans "Welcome "%} {% firstof current_user_obj.first_name current_user_obj.email %} !
+      {{username}}'s  Dashboard 
+        <!-- {% trans "Welcome "%} {% firstof current_user_obj.first_name current_user_obj.email %} ! -->
       </h3>
 
             <dl class="tabs" data-tab >
