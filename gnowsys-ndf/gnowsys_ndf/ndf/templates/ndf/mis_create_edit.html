@@ -93,7 +93,7 @@
   	</li>
 
     {% for each in app_collection_set %}
-    {% get_memberof_objects_count each.pk groupid as count %}
+    {% get_memberof_objects_count request each.pk groupid as count %}
 
     {% if app_set_id == each|safe %}
       {% if '/new/' in request.path %}

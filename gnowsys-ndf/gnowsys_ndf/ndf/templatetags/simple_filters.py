@@ -39,10 +39,14 @@ def get_latest_git_hash():
 	Returns:
 	    str: Returned hash no is 7 digit smaller unique (hash).
 	"""
-	import subprocess
-	gitproc = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'], stdout = subprocess.PIPE)
-	(stdout, _) = gitproc.communicate()
-	return stdout.strip()
+	# import subprocess
+	# gitproc = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'], stdout = subprocess.PIPE)
+	# (stdout, _) = gitproc.communicate()
+	# return stdout.strip()
+
+	import os
+	git_commit_hash = os.popen("git rev-parse --short HEAD").read().strip()
+	return git_commit_hash
 
 
 @get_execution_time

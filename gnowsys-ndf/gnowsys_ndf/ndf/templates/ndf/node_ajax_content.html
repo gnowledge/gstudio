@@ -528,6 +528,10 @@
 
             <!-- End New -->          
               <div class="right">
+                      {% if node.mime_type %}
+                        <!-- <i>{% trans 'Resource Type' %}: {{node.mime_type}}</i><br/> -->
+                        
+                     {% endif %}
                 <p class="large-text-right"><small>
                   <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
                 </small></p>
