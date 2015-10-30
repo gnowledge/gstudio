@@ -209,6 +209,10 @@ def collection_nav(request, group_id):
           else:
             breadcrumbs_list.remove(e)
     # print "breadcrumbs_list: ",breadcrumbs_list,"\n"
+    node_obj.get_neighbourhood(node_obj.member_of)
+    thread_node = None
+    allow_to_comment = None
+    thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     return render_to_response(template, 
                                 { 'node': node_obj,
                                   'original_node':curr_node_obj,
@@ -218,7 +222,8 @@ def collection_nav(request, group_id):
                                   'sg_type': sg_type,
                                   'allow_to_comment': allow_to_comment,
                                   'thread_node': thread_node,
-                                  'app_id': node_id, 'topic':topic, 'nav_list':nav_list
+                                  'app_id': node_id, 'topic':topic, 'nav_list':nav_list,
+                                  'allow_to_comment':allow_to_comment,'thread_node': thread_node
                                 },
                                 context_instance = RequestContext(request)
     )

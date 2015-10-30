@@ -209,7 +209,7 @@ factory_relation_types = [
     }, 
 
     {'has_profile_pic': {
-            'subject_type':['Author','Group'],
+            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup'],
             'object_type':['Image'], 
             'inverse_name':'profile_pic_of', 
             'meta_type':'factory_types'

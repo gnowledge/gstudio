@@ -6,9 +6,9 @@ import subprocess
 def run_syncdata_script():
 
 	data_fetch_script_name = 'fetch_data'
-	command1 = "python manage.py " + data_fetch_script_name
-	subprocess.call([command1],shell=True)
-	print syncdata_sending_script_name + ' executed.'
+	command = "python manage.py " + data_fetch_script_name
+	subprocess.call([command],shell=True)
+	print data_fetch_script_name + ' executed.'
 
 	syncdata_sending_script_name = 'send_syncdata'
 	command1 = "python manage.py " + syncdata_sending_script_name

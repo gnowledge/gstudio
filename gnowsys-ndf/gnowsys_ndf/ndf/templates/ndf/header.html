@@ -4,6 +4,20 @@
 
   {% get_group_object groupid as group_object %}
   <!-- <div class="contain-to-grid sticky"> -->
+
+  <div id="feedsModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <p id="feedsModalLabel"></p>
+    <div class="row feeds_proceed">
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
+      </div>
+    </div>
+    <small class="small_msg"></small>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
   <div id="top-headers">
 
     <!-- top LHS logo -->
@@ -345,7 +359,7 @@
                             <i class="fi-results"></i> {% trans "Updates" %}
                           </a>
                            <li>
-                    <a href="/{{group_id}}/feeds/updates/" class="">
+                    <a class="feeds_btn" data-tooltip title="Feeds">
                       <i class="fi-rss"></i>
                     </a>
                   </li>
@@ -448,3 +462,37 @@
     <!-- end of section appointed for two header's -->
   </div>
   <!-- end of LOGO + top header's -->
+
+<script>
+  var set_href = false;
+  $(document).on('click','.feeds_btn',function(){
+    if(!set_href){
+      if( navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ){
+        $(this).attr('href', "{% url 'activity_feed' group_object.pk %}")
+      }
+      else{
+        lbl_msg = "RSS Feeds may not be displayed properly in this browser. Would you still like to continue?"
+        $("#feedsModalLabel").text(lbl_msg);
+        $(".small_msg").text("You may try Mozilla Firefox")
+        $("#feedsModal")
+          .removeClass("medium").addClass("small")
+          .addClass("warning")
+        $("#feedsModal").foundation('reveal', 'open');
+      }
+    }
+  })
+
+  //Confirm or Cancel Deletion
+    $(document).on("click", "#btnConfirmYes", function() {
+        set_href = true;
+        $("#feedsModal").foundation('reveal', 'close');
+        $(".feeds_btn").attr('href', "{% url 'activity_feed' group_object.pk %}")
+        $(".feeds_btn")[0].click();
+    });
+
+    $(document).on("click", "#btnConfirmNo", function() {
+        set_href = false;
+        $("#feedsModal").foundation('reveal', 'close');
+    });
+
+</script>

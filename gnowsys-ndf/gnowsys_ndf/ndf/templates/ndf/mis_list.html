@@ -65,7 +65,6 @@
       font-size: 1em !important;
     }
 {% endblock%}
-
 {% block meta_content %}
   {% check_is_gstaff groupid request.user as gstaff_access %}
   
@@ -78,7 +77,7 @@
 
   <ul class="side-nav"> 
     {% for each in app_collection_set %}
-    {% get_memberof_objects_count each.pk groupid as count %}
+    {% get_memberof_objects_count request each.pk groupid as count %}
 
     {% if app_set_id == each|safe %}
       {% if '/new/' in request.path %}
@@ -162,7 +161,7 @@
     </div>
 
     <div>
-      <span class="button small">
+      <span class="button radius small">
         <a href="{% url 'mis:get_mis_reports' group_id %}" style="float:right;color:white;">MIS REPORTS</a>
       </span>
     </div>
@@ -215,7 +214,7 @@
   {% else %}
 
   {% check_is_gstaff groupid request.user as gstaff_access %}  
-
+      <h3> List of {{title}}{% if title != "Partners" %}s{% endif %} in MIS</h3>
   {% if nodes %}
     {% autopaginate nodes 25 %}
   

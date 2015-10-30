@@ -32,7 +32,7 @@
 <div>
   <br/>
     {% if allow_to_comment %}
-      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button small" style="margin-bottom:0;">
+      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button small radius" style="margin-bottom:0;">
         {% if thr_int_type %}
           {{thr_int_type}} {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
@@ -100,7 +100,7 @@
   <div id="org" style="" class="reveal-modal small" data-reveal>
     <!-- Reply : -->
     <textarea id="orgitdownreps" name="content_org" placeholder="{% trans 'Enter your reply text here.'%}"></textarea>
-    <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
+    <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand radius reply-button" onclick="addReply($(this))">
     {% if sg_type != "Event" %}
       <input type="file" id="uploaded-files" style="" value="" multiple>
     {% else %}
@@ -266,7 +266,7 @@
     + "<div class='reply-btn small-2 small-text-left columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'Delete' %}</div>"
     + "<div data-org-content='"
     + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-    + data[1] + "' class='reply-btn  small-2 small-text-left columns'>{% trans  'Reply' %} </div></div></div>"
+    + data[1] + "' class='reply-btn small-2 small-text-left columns'>{% trans  'Reply' %} </div></div></div>"
     return htmlReply;
   }
   function addReply(sourceObj)

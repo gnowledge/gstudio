@@ -70,67 +70,67 @@ ins_objectid = ObjectId()
 def get_execution_time(f):
    if BENCHMARK == 'ON': 
 
-	    def wrap(*args,**kwargs):
-	        time1 = time.time()
-	        total_parm_size = 0
-	        for key, value in kwargs.iteritems():
-	           total_parm_size = total_parm_size + getsizeof(value)
-	        total_param = len(kwargs)
-	        ret = f(*args,**kwargs)
-	        t2 = time.clock()
-	        time2 = time.time()
-	        time_diff = time2 - time1
-	        benchmark_node =  col.Benchmark()
-	        benchmark_node.time_taken = unicode(str(time_diff))
-	        benchmark_node.name = unicode(f.func_name)
-	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
-	        try :
-	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
-	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
-	        except : 
-	        	pass
-	        try :
-	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
-	        except : 
-	        	pass
-	        try :
-	        	benchmark_node.user = unicode(args[0].user.username)
-	        except :
-	        	pass
-	        benchmark_node.parameters = unicode(total_param)
-	        benchmark_node.size_of_parameters = unicode(total_parm_size)
-	        benchmark_node.last_update = datetime.today()
-	        try:
-	        	benchmark_node.calling_url = unicode(args[0].path)
-	        	url = benchmark_node.calling_url.split("/")
-	        	
-	        	if url[1] != "" : 
-	        		group = url[1]
-	        		benchmark_node.group = group
-	        		try :
-	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
-	        			if bool(n) :
-	        				benchmark_node.group = group;
-	        		except :
-	        			group_name, group = get_group_name_id(group)
-	        			benchmark_node.group = str(group)
-	        	else :
-	        		pass
+            def wrap(*args,**kwargs):
+                time1 = time.time()
+                total_parm_size = 0
+                for key, value in kwargs.iteritems():
+                   total_parm_size = total_parm_size + getsizeof(value)
+                total_param = len(kwargs)
+                ret = f(*args,**kwargs)
+                t2 = time.clock()
+                time2 = time.time()
+                time_diff = time2 - time1
+                benchmark_node =  col.Benchmark()
+                benchmark_node.time_taken = unicode(str(time_diff))
+                benchmark_node.name = unicode(f.func_name)
+                benchmark_node.has_data = { "POST" : 0, "GET" : 0}
+                try :
+                        benchmark_node.has_data["POST"] = bool(args[0].POST)
+                        benchmark_node.has_data["GET"] = bool(args[0].GET)
+                except : 
+                        pass
+                try :
+                        benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
+                except : 
+                        pass
+                try :
+                        benchmark_node.user = unicode(args[0].user.username)
+                except :
+                        pass
+                benchmark_node.parameters = unicode(total_param)
+                benchmark_node.size_of_parameters = unicode(total_parm_size)
+                benchmark_node.last_update = datetime.today()
+                try:
+                        benchmark_node.calling_url = unicode(args[0].path)
+                        url = benchmark_node.calling_url.split("/")
+                        
+                        if url[1] != "" : 
+                                group = url[1]
+                                benchmark_node.group = group
+                                try :
+                                        n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+                                        if bool(n) :
+                                                benchmark_node.group = group;
+                                except :
+                                        group_name, group = get_group_name_id(group)
+                                        benchmark_node.group = str(group)
+                        else :
+                                pass
 
-	        	if url[2] == "" : 
-	        		benchmark_node.action = None
-	        	else : 
-	        		benchmark_node.action = url[2]
-		        	if url[3] != '' : 
-		        		benchmark_node.action +=  str('/'+url[3])
-		        	else : 
-		        		pass
-	        except : 
-	        	pass
-	        benchmark_node.save()
-	        return ret
+                        if url[2] == "" : 
+                                benchmark_node.action = None
+                        else : 
+                                benchmark_node.action = url[2]
+                                if url[3] != '' : 
+                                        benchmark_node.action +=  str('/'+url[3])
+                                else : 
+                                        pass
+                except : 
+                        pass
+                benchmark_node.save()
+                return ret
    if BENCHMARK == 'ON': 
-    	return wrap
+        return wrap
    if BENCHMARK == 'OFF':
         return f
 
@@ -171,7 +171,7 @@ def server_sync(func):
         ''' Get current date and time to timestamp json and the document being captured by this function.
          This done so that files in syncdata folder will have unique name'''
         #timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.now().microsecond)
-	timestamp = kwargs['time']
+        timestamp = kwargs['time']
 
         ''' To fetch the data about the node '''
         # the actual file
@@ -284,21 +284,21 @@ def server_sync(func):
         
         print 'JSON'
         node_json = bson.json_util.dumps(node)
-	with open(node_data_path,'w') as outfile:
+        with open(node_data_path,'w') as outfile:
             json.dump(node_json, outfile)
         ''' Run command to sign the json file, rename and move to syncdata folder'''
         #add _sig otherwise django_mailbox scrambles file name
-	json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
-        command = 'gpg -u ' + SYNCDATA_KEY_PUB + ' --output ' + json_op_file_name + ' --sign ' + node_data_path
+        print "pasdf"
+        json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
+        command = 'gpg --batch --yes -u ' + SYNCDATA_KEY_PUB + ' --output ' + json_op_file_name + ' --sign ' + node_data_path
         subprocess.call([command],shell=True)
-	src = json_op_file_name
+        src = json_op_file_name
         shutil.move(src,path_for_this_capture)
-	# mail.attach_file(json_op_file_name)
+        # mail.attach_file(json_op_file_name)
         
         # mail.attach_file(node_data_path)
         # mail.subject = subject + str(node._id)
         #mail.send()
-        print "stop work"
         os.remove(node_data_path)
         # os.remove(json_op_file_name)
         if file_data:
@@ -406,7 +406,7 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
    try:
            usr=request.user.id
            task_node = collection.GSystem()
-           GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'}) 	
+           GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})     
            grp=collection.Node.one({'_id':ObjectId(group_id)})
            if not grp:
                    return
@@ -476,7 +476,7 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
                                                    else:
                                                            newattribute.object_value = unicode(task_dict[str(each)])
                                            newattribute.save()
-                   if task_dict['Assignee'] :	
+                   if task_dict['Assignee'] :   
                             activ="task reported"
                             msg="Task -"+task_node.name+"- has been reported by "+"\n     - Status: "+task_dict['Status']+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
                             bx=User.objects.get(id=task_dict['Assignee'])
@@ -1298,7 +1298,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
       if node.prior_node != right_drawer_list:
         i = 0
         node.prior_node=[]
-	node_prior_node_append_temp=node.prior_node.append #a temp. variable which stores the lookup for append method
+        node_prior_node_append_temp=node.prior_node.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
@@ -1324,8 +1324,8 @@ def build_collection(node, check_collection, right_drawer_list, checked):
         i = 0
         node.collection_set = []
         # checking if each _id in collection_list is valid or not
-	nlist_append_temp=nlist.append #a temp. variable which stores the lookup for append method
-	node_collection_set_append_temp=node.collection_set.append #a temp. variable which stores the lookup for append method
+        nlist_append_temp=nlist.append #a temp. variable which stores the lookup for append method
+        node_collection_set_append_temp=node.collection_set.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
@@ -1739,37 +1739,37 @@ def get_page(request,node):
   node2,ver2=get_user_page(request,node)     
   
   if  ver2 != '1.1':                           
-	    if node2 is not None:
+            if node2 is not None:
                 if node2.status == 'PUBLISHED':
                   
-			if float(ver2) > float(ver1):			
-				return (node2,ver2)
-			elif float(ver2) < float(ver1):
-				return (node1,ver1)
-			elif float(ver2) == float(ver1):
-				return(node1,ver1)
-		elif node2.status == 'DRAFT':
+                        if float(ver2) > float(ver1):                   
+                                return (node2,ver2)
+                        elif float(ver2) < float(ver1):
+                                return (node1,ver1)
+                        elif float(ver2) == float(ver1):
+                                return(node1,ver1)
+                elif node2.status == 'DRAFT':
                        #========== conditions for Group===============#
 
                         if   node._type == "Group":
-			    
-			    count=check_page_first_creation(request,node2)
+                            
+                            count=check_page_first_creation(request,node2)
                             if count == 1:
                                 return (node1,ver1)
                             elif count == 2:
-                               	return (node2,ver2)
+                                return (node2,ver2)
                         
                         return (node2,ver2)  
-	    else:
+            else:
                         
-			return(node1,ver1)		
-	    
+                        return(node1,ver1)              
+            
   else: 
         # if node._type == "GSystem" and node1.status == "DRAFT":
         #     if node1.created_by ==request.user.id:
         #           return (node2,ver2)
         #      else:
-	#	   return (node2,ver2)
+        #          return (node2,ver2)
         return (node1,ver1)
 
 @get_execution_time
@@ -4750,7 +4750,7 @@ def repository(request, group_id):
 
 
 def create_thread_for_node(request, group_id, node):
-	"""
+        """
       Accepts:
        * ObjectId of group.
        * node - Page/File GSystem
@@ -4764,95 +4764,95 @@ def create_thread_for_node(request, group_id, node):
       Returns:
         * Success - True/False
 
-	"""
-	if request.method == "POST":
-		from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
-		# release_response_status = False
-		# thread_interaction_type_status = False
-		# thread_start_time_status = False
-		# thread_end_time_status = False
-		has_thread_status = False
-		if get_relation_value(node._id,"has_thread") != ("",""):
-			has_thread_status = True
+        """
+        if request.method == "POST":
+                from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+                # release_response_status = False
+                # thread_interaction_type_status = False
+                # thread_start_time_status = False
+                # thread_end_time_status = False
+                has_thread_status = False
+                if get_relation_value(node._id,"has_thread") != ("",""):
+                        has_thread_status = True
 
-		release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
-		interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
-		start_time = request.POST.get("thread_start_date", '')
-		if start_time:
-			start_time = datetime.strptime(start_time, "%d/%m/%Y")
-		end_time = request.POST.get("thread_close_date", '')
-		if end_time:
-			end_time = datetime.strptime(end_time, "%d/%m/%Y")
-		twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
-		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
-		has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
-		if thread_obj:
-			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
-			thread_obj.reload()
-			# print "\n\n Found old model thread node existing"
-		else:
-			thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
-			# print "\n\n Found updated thread node existing"
-		if thread_obj:
-			if thread_obj.name != u"Thread of "+ unicode(node.name):
-				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
-				thread_obj.reload()
-				# print "\n\n thread_obj found -- name update if needed"
-		else:
-			# print "\n\n Creating new thread node"
-			thread_obj = node_collection.collection.GSystem()
+                release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
+                interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
+                start_time = request.POST.get("thread_start_date", '')
+                if start_time:
+                        start_time = datetime.strptime(start_time, "%d/%m/%Y")
+                end_time = request.POST.get("thread_close_date", '')
+                if end_time:
+                        end_time = datetime.strptime(end_time, "%d/%m/%Y")
+                twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
+                thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
+                has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+                if thread_obj:
+                        node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
+                        thread_obj.reload()
+                        # print "\n\n Found old model thread node existing"
+                else:
+                        thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
+                        # print "\n\n Found updated thread node existing"
+                if thread_obj:
+                        if thread_obj.name != u"Thread of "+ unicode(node.name):
+                                node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
+                                thread_obj.reload()
+                                # print "\n\n thread_obj found -- name update if needed"
+                else:
+                        # print "\n\n Creating new thread node"
+                        thread_obj = node_collection.collection.GSystem()
 
-			thread_obj.name = u"Thread of " + unicode(node.name)
-			thread_obj.status = u"PUBLISHED"
+                        thread_obj.name = u"Thread of " + unicode(node.name)
+                        thread_obj.status = u"PUBLISHED"
 
-			thread_obj.created_by = int(request.user.id)
-			thread_obj.modified_by = int(request.user.id)
-			thread_obj.contributors.append(int(request.user.id))
-			thread_obj.prior_node.append(node._id)
-			thread_obj.member_of.append(ObjectId(twist_gst._id))
-			# thread_obj.prior_node.append(ObjectId(node._id))
-			thread_obj.group_set.append(ObjectId(group_id))
-			thread_obj.save()
-		'''
-		if thread_obj:
-			if get_attribute_value(thread_obj._id,"release_response") != "":
-				release_response_status = True
-			if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
-				thread_interaction_type_status = True
-			if get_attribute_value(thread_obj._id,"start_time") != "":
-				thread_start_time_status = True
-			if get_attribute_value(thread_obj._id,"end_time") != "":
-				thread_end_time_status = True
-		print "\n thread_end_time_status---",thread_end_time_status
-		print "\n thread_start_time_status---",thread_start_time_status
-		print "\n release_response_status---",release_response_status
-		print "\n thread_interaction_type_status---",thread_interaction_type_status
-		print "\n has_thread_status---",has_thread_status
-		'''
-		if not has_thread_status:
-			# creating GRelation
-			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
-			node.reload()
-			thread_obj.reload()
-			# print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
-			# print "\n\n node", node._id, "--", node.relation_set
-		if release_response_val:
-			rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
-			release_response_val = eval(release_response_val)
-			create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
-		if interaction_type_val:
-			thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
-			create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+                        thread_obj.created_by = int(request.user.id)
+                        thread_obj.modified_by = int(request.user.id)
+                        thread_obj.contributors.append(int(request.user.id))
+                        thread_obj.prior_node.append(node._id)
+                        thread_obj.member_of.append(ObjectId(twist_gst._id))
+                        # thread_obj.prior_node.append(ObjectId(node._id))
+                        thread_obj.group_set.append(ObjectId(group_id))
+                        thread_obj.save()
+                '''
+                if thread_obj:
+                        if get_attribute_value(thread_obj._id,"release_response") != "":
+                                release_response_status = True
+                        if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
+                                thread_interaction_type_status = True
+                        if get_attribute_value(thread_obj._id,"start_time") != "":
+                                thread_start_time_status = True
+                        if get_attribute_value(thread_obj._id,"end_time") != "":
+                                thread_end_time_status = True
+                print "\n thread_end_time_status---",thread_end_time_status
+                print "\n thread_start_time_status---",thread_start_time_status
+                print "\n release_response_status---",release_response_status
+                print "\n thread_interaction_type_status---",thread_interaction_type_status
+                print "\n has_thread_status---",has_thread_status
+                '''
+                if not has_thread_status:
+                        # creating GRelation
+                        gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
+                        node.reload()
+                        thread_obj.reload()
+                        # print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
+                        # print "\n\n node", node._id, "--", node.relation_set
+                if release_response_val:
+                        rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
+                        release_response_val = eval(release_response_val)
+                        create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+                if interaction_type_val:
+                        thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
+                        create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
 
-		if start_time and end_time:
-			start_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'start_time'})
-			end_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'end_time'})
-			create_gattribute(thread_obj._id, start_time_at, start_time)
-			create_gattribute(thread_obj._id, end_time_at, end_time)
+                if start_time and end_time:
+                        start_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'start_time'})
+                        end_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'end_time'})
+                        create_gattribute(thread_obj._id, start_time_at, start_time)
+                        create_gattribute(thread_obj._id, end_time_at, end_time)
 
-		thread_obj.reload()
-		# print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
-		return True
+                thread_obj.reload()
+                # print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
+                return True
 
 def node_thread_access(group_id, node):
     """
@@ -4933,6 +4933,11 @@ def get_language_tuple(lang):
     """
 
     all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
+
+    # check if lang argument itself is a complete, valid tuple that exists in all_languages.
+    if lang in all_languages:
+        return lang
+
     all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
 
     # iterating over each document in the cursor:

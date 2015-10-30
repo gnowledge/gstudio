@@ -134,6 +134,13 @@
 
     <script type="text/javascript">
     // Ensure that it is a number and stop the keypress while entering hours for course subsection prop
+
+
+      $(".max_100").keyup(function () {
+        attr_val = parseInt($(this).val())
+        if ( attr_val > 100) { $(this).val('100')};
+      })
+
       $(".input_only_num").keydown(function (e) {
             // Allow ctrl+A
         if ((e.keyCode == 65 && e.ctrlKey === true) || 
