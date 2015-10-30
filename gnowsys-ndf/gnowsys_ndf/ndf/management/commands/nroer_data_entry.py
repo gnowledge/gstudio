@@ -36,7 +36,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, get_language_tuple
 from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import add_to_collection_set
 
 ##############################################################################
@@ -54,6 +54,11 @@ home_group = node_collection.one({"name": "home", "_type": "Group"})
 theme_gst = node_collection.one({'_type': 'GSystemType', "name": "Theme"})
 theme_item_gst = node_collection.one({'_type': 'GSystemType', "name": "theme_item"})
 topic_gst = node_collection.one({'_type': 'GSystemType', "name": "Topic"})
+twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
+rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
+thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
+has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
 nroer_team_id = 1
 
 # setting variable:
@@ -194,9 +199,7 @@ class Command(BaseCommand):
                 with open(log_file_path, 'a') as log_file:
                     log_file.writelines(log_file_not_found)
 
-
-
-  # --- End of handle() ---
+    # --- End of handle() ---
 
 
 def create_user_nroer_team():
@@ -444,7 +447,7 @@ def parse_data_create_gsystem(json_file_path):
             # --END of for loop ---  
 
             # calling method to create File GSystems
-            nodeid = create_resource_gsystem(parsed_json_document)
+            nodeid = create_resource_gsystem(parsed_json_document, i)
             # print "nodeid : ", nodeid
 
             collection_name = parsed_json_document.get('collection', '')
@@ -465,11 +468,15 @@ def parse_data_create_gsystem(json_file_path):
 
             if thumbnail_url and nodeid:
                 try:
-                    attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document)
+                    attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document, i)
                 except:
                     pass
 
             # print type(nodeid), "-------", nodeid, "\n"
+
+            # create thread node 
+            if isinstance(nodeid, ObjectId):
+                thread_result = create_thread_obj(nodeid)
 
             # starting processing for the attributes and relations saving
             if isinstance(nodeid, ObjectId) and attribute_relation_list:
@@ -795,14 +802,53 @@ def parse_data_create_gsystem(json_file_path):
                 log_list.append(str(info_message))
 
                 continue
-
         except Exception as e:
             error_message = "\n While creating ("+str(json_document['name'])+") got following error...\n " + str(e)
             print error_message # Keep it!
             log_list.append(str(error_message))
 
+def create_thread_obj(node_id):
+    '''
+    Creates thread object.
+        RT : has_thread
+        AT : release_response, thread_interaction_type
+    '''
+    try:
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        release_response_val = True
+        interaction_type_val = unicode('Comment')
+        thread_obj = None
+        thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node_obj._id)})
 
-def create_resource_gsystem(resource_data):
+        if thread_obj == None:
+            # print "\n\n Creating new thread node"
+            thread_obj = node_collection.collection.GSystem()
+            thread_obj.name = u"Thread_of_" + unicode(node_obj.name)
+            thread_obj.status = u"PUBLISHED"
+            thread_obj.created_by = int(nroer_team_id)
+            thread_obj.modified_by = int(nroer_team_id)
+            thread_obj.contributors.append(int(nroer_team_id))
+            thread_obj.member_of.append(ObjectId(twist_gst._id))
+            thread_obj.group_set.append(home_group._id)
+            thread_obj.save()
+            # creating GRelation
+            gr = create_grelation(node_obj._id, has_thread_rt, thread_obj._id)
+            create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+            create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+            create_gattribute(node_obj._id, discussion_enable_at, True)
+            thread_obj.reload()
+            node_obj.reload()
+            # print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
+            info_message = "\n- Successfully created thread obj - " + thread_obj._id.__str__() +" for - " + node_obj._id.__str__()
+            print info_message
+            log_list.append(str(info_message))
+    except Exception as e:
+        info_message = "\n- Error occurred while creating thread obj for - " + node_obj._id.__str__() +" - " + str(e)
+        print info_message
+        log_list.append(str(info_message))
+
+
+def create_resource_gsystem(resource_data, row_no=''):
   
     # fetching resource from url
     resource_link = resource_data.get("resource_link")  # actual download file link
@@ -820,14 +866,16 @@ def create_resource_gsystem(resource_data):
 
     try:
         files = urllib2.urlopen(resource_link)
-    except Exception, e:
+    except urllib2.URLError, e:
         error_message = "\n!! File Not Found at: " + resource_link
         log_list.append(error_message)
 
         file_not_found_msg = "\nFile with following details not found: \n"
+        file_not_found_msg += "- Row No   : " + str(row_no) + "\n"
         file_not_found_msg += "- Name     : " + resource_data["name"] + "\n"
         file_not_found_msg += "- File Name: " + resource_data["file_name"] + "\n"
         file_not_found_msg += "- URL      : " + resource_link + "\n\n"
+        file_not_found_msg += "- ERROR    : " + e + "\n\n"
         log_file_not_found.append(file_not_found_msg)
         return None
 
@@ -900,15 +948,22 @@ def create_resource_gsystem(resource_data):
 
     else:  # creating new resource
 
-        files.seek(0)
-        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
-        # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
-        
         info_message = "\n- Creating resource: " + str(resource_data["name"])
         log_list.append(str(info_message))
         print info_message
         
+        files.seek(0)
+        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
+        # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
+        
         # filetype = magic.from_buffer(files.read(100000), mime = 'true')  # Gusing filetype by python-magic
+
+        node_collection.collection.update(
+                                {'_id': ObjectId(fileobj_oid)},
+                                {'$push': {'origin': {'csv-import': 'save_file'} }},
+                                upsert=False,
+                                multi=False
+                            )
 
         info_message = "\n- Created resource/GSystem object of name: '" + unicode(name) + "' having ObjectId: " + unicode(fileobj_oid) + "\n- Saved resource into gridfs. \n"
         log_list.append(info_message)
@@ -918,7 +973,7 @@ def create_resource_gsystem(resource_data):
         return fileobj_oid
 
 
-def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
+def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     
     updated_res_data = resource_data.copy()
 
@@ -929,7 +984,7 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
     updated_res_data['tags'] = []
 
     # th_id: thumbnail id
-    th_id = create_resource_gsystem(updated_res_data)
+    th_id = create_resource_gsystem(updated_res_data, row_no)
     # print "th_id: ", th_id
     
     th_obj = node_collection.one({'_id': ObjectId(th_id)})

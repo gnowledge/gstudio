@@ -1536,7 +1536,7 @@ def getFileThumbnail(request, group_id, _id):
         group_name, group_id = get_group_name_id(group_id)
 
 
-    file_node = node_collection.one({"_id": ObjectId(_id)})
+    file_node = node_collection.one({"_type": u"File", "_id": ObjectId(_id)})
     """
     if file_node is not None:
         if file_node.fs_file_ids:

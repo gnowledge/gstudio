@@ -24,6 +24,18 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     # Keep latest changes in field(s) to be added at top
 
+    # --------------------------------------------------------------------------
+    # Adding <'origin': []> field to all objects and inheritance of GSystem class
+    # fetching all GSystem and it's inheritance class objects
+    # all_gsystem_inherited_nodes = node_collection.find({'_type': {'$in': [u'GSystem', u'File', u'Group']}, 'origin': {'$exists': False} })
+
+    res = node_collection.collection.update({'_type': {'$in': [u'GSystem', u'File', u'Group']}, 'origin': {'$exists': False} }, {'$set': {'origin': [] }}, upsert=False, multi=True)
+
+    if res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'origin' field to " + res['n'].__str__() + " GSystem instances."
+
+    # -----------------------------------------------------------------------------
+
     # Updating language fields data type:
     # - Firstly, replacing None to ('en', 'English')
     node_collection.collection.update({ '_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']}, 'language': {'$in': [None, '', u'']} }, {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
@@ -86,7 +98,7 @@ class Command(BaseCommand):
 
     # --------------------------------------------------------------------------
     # Adding <'moderation_level': -1> field to Group objects
-    node_collection.collection.update({'_type': {'$in': ['Group']}, 'edit_policy': {'$nin': ['EDITABLE_MODERATED']}}, {'$set': {'moderation_level': -1 }}, upsert=False, multi=True)
+    res = node_collection.collection.update({'_type': {'$in': ['Group']}, 'edit_policy': {'$nin': ['EDITABLE_MODERATED']}, 'moderation_level': {'$exists': False}}, {'$set': {'moderation_level': -1 }}, upsert=False, multi=True)
 
     if res['updatedExisting']: # and res['nModified']:
         print "\n Added 'moderation_level' field to " + res['n'].__str__() + " Group instances."
@@ -624,9 +636,11 @@ class Command(BaseCommand):
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     all_count =  page_file_cur.count()
     print "\n Total pages and files found : ", all_count
+    print "\n Processing " + str(all_count) + " will take time. Plase hold on ...\n"
     for idx, each_node in enumerate(page_file_cur):
         try:
-            print "Processing #",idx, " of ",all_count
+            # print "Processing #",idx, " of ",all_count
+            print ".",
             # print "\nPage# ",idx, "\t - ", each_node._id, '\t - ' , each_node.name, each_node.attribute_set
             release_response_val = True
             interaction_type_val = unicode('Comment')
