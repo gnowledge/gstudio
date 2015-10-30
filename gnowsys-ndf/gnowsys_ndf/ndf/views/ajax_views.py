@@ -6008,3 +6008,20 @@ def get_detailed_report(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
+
+def get_resource_by_oid(request, group_id):
+
+    oid = request.GET.get('oid', None)
+    if oid:
+      print oid
+      node_obj = node_collection.one({  '_id': ObjectId(oid)},
+                                      {
+                                        'name': 1,
+                                        'altnames': 1,
+                                        'content': 1,
+                                        '_id': 0
+                                      }
+                                    )
+      return HttpResponse(json.dumps(node_obj))
+
+    return HttpResponse('false')
