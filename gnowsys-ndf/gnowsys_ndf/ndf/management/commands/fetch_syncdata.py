@@ -16,27 +16,27 @@ import traceback
 import filecmp
 
 def connected_to_internet(url='http://www.google.com/', timeout=2):
-	try:
-		urllib2.urlopen(url, timeout=timeout)
-		return True
-	except Exception as error:
-		print 'Internet is not Available'
-		print str(error)
-		return False
+    try:
+        urllib2.urlopen(url, timeout=timeout)
+        return True
+    except Exception as error:
+        print 'Internet is not Available'
+        print str(error)
+        return False
 
 class Command(BaseCommand):
-	help = 'Function to fetch mails from the MailID specified in settings.py '
+    help = 'Function to fetch mails from the MailID specified in settings.py '
 
-	def handle(self, *args, **kwargs):
+    def handle(self, *args, **kwargs):
                 if connected_to_internet() is False:
                         return None
                 received_registries = []
-                received_data = []	
+                received_data = []  
                 email = SYNCDATA_FETCHING_EMAIL_ID.replace('@','%40')
                 metabox = Mailbox()
                 metabox.name = 'Metabox'
                 metabox.uri = 'imap+ssl://' + email + ':' + SYNCDATA_FETCHING_EMAIL_ID_PASSWORD + '@' + SYNCDATA_FETCHING_IMAP_SERVER_ADDRESS + '?archive=METABOX_SYNCDATA'
-		
+        
                 try:
                         metabox.get_connection()
                 except IMAP4.error as error_obj:
@@ -54,16 +54,15 @@ class Command(BaseCommand):
                                 syncdata_mails_list = metabox.get_new_mail()
                                 if syncdata_mails_list:
                                         for mail in syncdata_mails_list:
-                                                text,data,serverdir = process_mails(mail)
+                                                serverdir = process_mails(mail)
                                                 #received_registries += serverdir
                                                 if serverdir not in received_registries:         
                                                         received_registries.append(serverdir)                            
-                                                received_data += data	
                                         result=chain_and_check_registry(received_registries)
                                         print result
                                         if result:
                                                 server_sync(result)
-                                                delete(result)		
+                                                delete(result)      
                                 else:
                                         print 'No new mails received'
                         metabox.delete()
@@ -88,13 +87,53 @@ def process_mails(mail):
     for attachment in all_attachments:
         filename = attachment.document.path
         op_file_name = filename.split('_sig')[0]            
-        print 'output file name of decrypted attachment : \n %s' % op_file_name            
-        command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
-        std_out= subprocess.call([command],shell=True)
-        list_of_decrypted_attachments.append(op_file_name)
-    return fetch_registry(list_of_decrypted_attachments,mail)
+        print filename
+        #print 'output file name of decrypted attachment : \n %s' % op_file_name            
+        #command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
+        #std_out= subprocess.call([command],shell=True)
+        list_of_decrypted_attachments.append(filename)
+    return unpack_dir(list_of_decrypted_attachments,mail)
 
+import tarfile
+def unpack_dir(file_list,mail):
+    # store this registry and data in different folder according to thei server name
+    subject = mail.subject
+    serverid = subject.split('_')[0]
+    if os.path.exists(serverid) == False:
+        os.mkdir(serverid)
+    manage_path = os.path.abspath(os.path.dirname(os.pardir))
+    server_folder = os.path.join(manage_path,serverid+"/")
+    #path_val = os.path.exists(serverdir)
+    #if path_val == False:
+    #    os.makedirs(serverdir)  
+    cp = "cp  -u " + str(file_list[0]) + " " + server_folder + "/"  
+    #subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)    
+    os.popen(cp)
+    #create zip patgh in server folder and dezip them 
+    file_path = file_list[0]
+    file_path = file_path.split('/')[-1:][0]
+    zipfilepath =  os.path.join(server_folder,file_path)
+    print zipfilepath
+    zipfilepath = os.path.abspath(zipfilepath)
+    print os.path.exists(zipfilepath)
+    unzip(server_folder)
+    return server_folder
+    # unpack the file
+
+def unzip(path):
+    #unzip all the compressed files in a given directory 
+    for dir,subdir,files in os.walk(path):
+        for i in files:
+            if '.gz' in i: 
+                gz_path = os.path.join(dir,i)
+                tar = tarfile.open(gz_path)    
+                tar.extractall(path=path)
+                tar.close()
+                os.remove(gz_path)
+    
+'''
 def fetch_registry(file_list,mail):
+    #code written for fetchin packet information and data from the email as attachment
     registryfile = [i for i in file_list if i.find(".txt")!= -1]
     datafile = [ i for i in file_list if i.find(".json") != -1]
     # store this registry and data in different folder according to thei server name
@@ -112,29 +151,42 @@ def fetch_registry(file_list,mail):
     serverdir = os.path.join(server_folder,str(folder_name)+"/")
     path_val = os.path.exists(serverdir)
     if path_val == False:
-		os.makedirs(serverdir)
+        os.makedirs(serverdir)
     cp = "cp  -u " + str(registryfile[0]) + " " + serverdir + "/"  
     subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
     cp = "cp  -u " + str(datafile[0]) + " " + serverdir + "/"  
-    subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)	
+    subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)    
     return  registryfile,datafile,server_folder
+'''
 
 def chain_and_check_registry(file_list):
     #file_list is list of servers from where files are recived
     all_file_path = []
     for i in file_list:
-        print "the list of files",i    
         #Get all the dir in the server folder
         dir_list = get_directories(i)
         #chain and check the sequence of th files
         file_list = chain_registries(dir_list,i)
         all_file_path += file_list
-    return all_file_path    
+    return all_file_path
+
 def get_directories(path):
     scanned_file = []    
     for dir_,_i,files in os.walk(path):
-        scanned_file.append(dir_)
-    return scanned_file    
+        if 'registries' not in dir_:
+                scanned_file.append(dir_)
+        for i in files:
+            if '_sig' in i:
+                path = os.path.join(dir_,i)
+                decrypt_file(path)    
+    return scanned_file 
+
+def decrypt_file(filename):
+    op_file_name = filename.split('_sig')[0]            
+    print 'output file name of decrypted attachment : \n %s' % op_file_name            
+    command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
+    std_out= subprocess.call([command],shell=True)   
+    os.remove(filename)    
 def chain_registries(dir_list,serverdir):
     create_stream = []
     streams = []
@@ -161,12 +213,11 @@ def chain_registries(dir_list,serverdir):
         current_file = open(filepath).readlines()
         if 'Start\n' in current_file or 'Start\r\n' in current_file or create_stream:
             create_stream.append(current_file[1])
-            temp_list.append((os.path.join(i,json)))    
+            temp_list.append((os.path.join(i,json)))
             if readed and create_stream:
                 if readed[2] == current_file[1]:
                     if  'End' in current_file:
                         filepath_list += temp_list
-                        print "coming here"    
                         with open(serverdir + "registries/"+str("%06d" % k)+".txt",'w') as outfile:
                             for i in create_stream:
                                 outfile.write(i)
