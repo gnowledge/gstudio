@@ -22,7 +22,6 @@ processing_list_ids = []
 class Command(BaseCommand):
 
     def handle(self,*args,**options):
-        #temprory time stamp
         collection_list = ['.Triples','.Nodes','.fs.files','.fs.chunks']
         collection = '.Nodes'
         #Read time stamp from the file
@@ -36,8 +35,9 @@ class Command(BaseCommand):
             t = str1.strip("\t\n\r ")
         else:
             ti = datetime.time(0,0,0,0)
-            date1 = datetime.date.today()
+            date1 = datetime.datetime(2014,12,1)
             t = str(datetime.datetime.combine(date1,ti).strftime("%Y-%m-%dT%H:%M:%S"))  
+            print t
         log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'WRITE'|grep '.Nodes\|.Triples\|.fs.files\|.fs.chunks'" % str(t))
         for line in log_output:
             '''raw string processing code'''
@@ -75,8 +75,10 @@ class Command(BaseCommand):
         sync_dir =  str(manage_path) + "/gnowsys_ndf/ndf/MailClient/syncdata" 
         #Zip the files in sync_dir
         zip_directories(sync_dir)    
-        with open("Last_Scan.txt","w") as outfile:
-            outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))
+        if processing_list_ids:
+            #only update the last scan tym if some data is feched 
+            with open("Last_Scan.txt","w") as outfile:
+                outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))
 def process_parent_node(Parent_collection_ids,last_scan):
     root_path =  os.path.abspath(os.path.dirname(os.pardir))
     file_scan =  os.path.join(root_path, 'receivedfile')
@@ -85,8 +87,12 @@ def process_parent_node(Parent_collection_ids,last_scan):
         packet_sequence = "%06d" % k
         id = i[0]
         id = (id[id.find('\''):id[id.find('\''):].find(')') + id.find('\'')]).strip('\'')
+        #time to cross check with database insetion time to avoid resending of data
         time_with_microsec = i[1]
         time = time_with_microsec.split('.')[0]
+        #time stamp to create unique file name
+        timestamp = datetime.datetime.utcnow()
+        timestamp = timestamp.isoformat()
         collection = i[2]
         #After last scan of this machine if that data reside in this system 
         #check its insertion tym
@@ -103,12 +109,11 @@ def process_parent_node(Parent_collection_ids,last_scan):
                         allowed = True
                         break   
                 if  allowed ==  True:
-                        print "id",id,log_output
-                        capture_id_data(id,time_with_microsec,collection)
+                        capture_id_data(id,timestamp,collection)
                         node_skipped_after_capture.append(id)
             else:
                     print "Nodes Generated from this server",id
-                    capture_id_data(id,time_with_microsec,collection)
+                    capture_id_data(id,timestamp,collection)
                     node_skipped_after_capture.append(id)
                         
                 
@@ -147,31 +152,33 @@ def slice_registry(time):
     registry_path =  os.path.join(manage_path, 'Registry.txt') 
     if time == "":
         ti = datetime.time(0,0,0,0)
-        date1 = datetime.date.today()
+        date1 = datetime.datetime(2014,12,1)
         time = str(datetime.datetime.combine(date1,ti).strftime("%Y-%m-%dT%H:%M:%S"))
     log_output =  os.popen("cat  %s|awk '$0 > \"%s\"'" %  (registry_path,str(time))).read()
     with open(manage_path + "/Info_Registry.txt","w") as outfile:
         outfile.write("Start")
         outfile.write("\n")     
         outfile.write(log_output)
-        outfile.write("End")    
-    log_output =  os.popen("cat  %s|awk '$0 > \"%s\"'" %  (registry_path,str(time))).readlines()
-    manage_path =  os.path.abspath(os.path.dirname(os.pardir))
-    #file to copy
-    manage_path =  os.path.abspath(os.path.dirname(os.pardir))
+        outfile.write("End")
+    
     registry_path = os.path.join(manage_path,'Info_Registry.txt')
+    log_output =  os.popen("cat  %s" %  registry_path).readlines()
+    
     #loop around to fill the destination data
     for i,j in enumerate(log_output):
         dst = str(manage_path) + "/gnowsys_ndf/ndf/MailClient/syncdata"
-        file_name = j[0:j.index(',')]
-        dst = dst +"/" +str(file_name)
-        if  file_name not in ['Start','End']:
+        file_name = j.strip()
+        if  (file_name not in ['Start','End']) == True:
+            file_name = j[0:j.index(',')]
+            dst = dst +"/" +str(file_name)
             data=get_neighbours(file_name,registry_path)
+
             file_path = create_file(dst,data)
             '''
             cp = "cp  -u " + str(file_path) + " " + dst + "/"  
             subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
             '''
+        
     #delete the Info_Registry after copying
     #os.remove(registry_path)
 def create_file(file_path,data,mode="w"):
@@ -226,13 +233,13 @@ def zip_directories(sync_dir):
             total_size = 0
             #os.mkdir(dirname)
             #path = os.path.abspath(dirname)
-            syndir_path = os.path.join(sync_dir,dirname)
+            syncdir_path = os.path.join(sync_dir,dirname)
             for i in zip_list:
-                if os.path.exists(syndir_path) == False:
-                    os.makedirs(syndir_path)
-                shutil.move(i,syndir_path+"/")
+                if os.path.exists(syncdir_path) == False:
+                    os.makedirs(syncdir_path)
+                shutil.move(i,syncdir_path+"/")
             total_size = 0  
-            dir_list.append(syndir_path)        
+            dir_list.append(syncdir_path)        
             dirname  = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.datetime.now().microsecond)
             zip_list = []
 
@@ -240,11 +247,11 @@ def zip_directories(sync_dir):
         for i in zip_list:
                 #path = os.path.abspath(dirname)
                 #print sync_dir,"",path
-                syndir_path = os.path.join(sync_dir,dirname)
-                if os.path.exists(syndir_path) == False:
-                    os.makedirs(syndir_path)
-                shutil.move(i,syndir_path+"/")
-    dir_list.append(syndir_path)        
+                syncdir_path = os.path.join(sync_dir,dirname)
+                if os.path.exists(syncdir_path) == False:
+                    os.makedirs(syncdir_path)
+                shutil.move(i,syncdir_path+"/")
+        dir_list.append(syncdir_path)        
     for i in dir_list:
         shutil.make_archive(os.path.abspath(i),'gztar',os.path.abspath(i))
         shutil.rmtree(i)

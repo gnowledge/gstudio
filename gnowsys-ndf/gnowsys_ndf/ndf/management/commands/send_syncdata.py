@@ -72,7 +72,7 @@ class Command(BaseCommand):
 				#mail.subject= str(SYNCDATA_KEY_PUB) + "SYNCDATA_"+tstamp
 				mail.subject= str(SYNCDATA_KEY_PUB) + "_SYNCDATA_"+ tstamp	
 
-				folder_empty = 1
+				folder_empty = 0
 				''''
 				for filename in list_of_syncdata_files:
 					file_path = path + '/' + filename
@@ -81,6 +81,7 @@ class Command(BaseCommand):
 					mail.attach_file(file_path)
 					folder_empty = 0
 				'''	
+				print path
 				mail.attach_file(path)
 				mail.from_email = SYNCDATA_FROM_EMAIL_ID
 				mail.to = list(SYNCDATA_SENDING_EMAIL_ID)
