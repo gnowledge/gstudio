@@ -256,8 +256,8 @@ ul#navigation li a.last {
  }
 
  #ebook-area{
-  height: 40rem;
-  height: 80vh;
+  min-height: 40rem;
+  min-height: 80vh;
  }
 
  .redirection {
@@ -639,8 +639,8 @@ ul#navigation li a.last {
 
     var iframeBodyHt = $("iframe").contents().find("body").height();
     var docHeight = $(window).height();
-    docHeight -= docHeight * 0.10;
-    $("iframe").height(iframeBodyHt + 50);
+    docHeight -= docHeight * 0.20;
+    $("iframe").height(docHeight + 50);
     
     var changedHt;
     

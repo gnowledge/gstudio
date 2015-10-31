@@ -229,9 +229,60 @@ class Node(DjangoDocument):
         'rating':[{'score':int,
                   'user_id':int,
                   'ip_address':basestring}],
-    	'snapshot':dict
+        'snapshot':dict
     }
-    
+
+    indexes = [
+        {
+            # 1: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('name', INDEX_ASCENDING)
+            ]
+        }, {
+            # 2: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('created_by', INDEX_ASCENDING)
+            ]
+        }, {
+            # 3: Single index
+            'fields': [
+                ('group_set', INDEX_ASCENDING)
+            ]
+        }, {
+            # 4: Single index
+            'fields': [
+                ('member_of', INDEX_ASCENDING)
+            ]
+        }, {
+            # 5: Single index
+            'fields': [
+                ('name', INDEX_ASCENDING)
+            ]
+        }, {
+            # 6: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('status', INDEX_ASCENDING), \
+                ('access_policy', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 7: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('status', INDEX_ASCENDING), \
+                ('access_policy', INDEX_ASCENDING), ('created_at' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 8: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 9: Compound index
+            'fields': [
+                ('status', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, 
+    ]
+
     required_fields = ['name', '_type'] # 'group_set' to be included
                                         # here after the default
                                         # 'Administration' group is
@@ -1115,9 +1166,9 @@ class GSystem(Node):
         'author_set': [int],                     # List of Authors
 
         'annotations': [dict],      # List of json files for annotations on the page
-        'license': basestring       # contains license/s in string format
+        'license': basestring,       # contains license/s in string format
         # TODO: Adding one more field 'origin', kedar2a, 12-sep-15
-        # 'origin': [dict]          # e.g: [import: True/False, sync_source: ss41, sync: True, function: save_file]
+        'origin': []          # e.g: [{"csv-import": <fn name>}, {"sync_source": "<system-pub-key>"}]
     }
 
     use_dot_notation = True
@@ -1139,6 +1190,15 @@ class File(GSystem):
             'unit': unicode
         }  # dict used to hold file size in int and unit palace in term of KB,MB,GB
     }
+
+    indexes = [
+        {
+            # 12: Single index
+            'fields': [
+                ('mime_type', INDEX_ASCENDING)
+            ]
+        }
+    ]
 
     gridfs = {
         'containers': ['files']
@@ -1596,8 +1656,6 @@ class Analytics(DjangoDocument):
     return self.__unicode__()
 
 
-
-
 #  TRIPLE CLASS DEFINITIONS
 @connection.register
 class Triple(DjangoDocument):
@@ -1817,13 +1875,23 @@ class Triple(DjangoDocument):
 
 @connection.register
 class GAttribute(Triple):
-
     structure = {
         'attribute_type_scope': basestring,
-        'attribute_type': AttributeType,  # DBRef of AttributeType Class
+        'attribute_type': AttributeType,  # Embedded document of AttributeType Class
         'object_value_scope': basestring,
-        'object_value': None		  # value -- it's data-type, is determined by attribute_type field
+        'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
+
+    indexes = [
+        {
+            # 1: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
+                ('attribute_type.$id', INDEX_ASCENDING), ('status', INDEX_ASCENDING)
+            ],
+            'check': False  # Required because $id is not explicitly specified in the structure
+        }
+    ]
 
     required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
@@ -1840,9 +1908,26 @@ class GRelation(Triple):
         'right_subject': OR(ObjectId, list)
     }
 
+    indexes = [{
+        # 1: Compound index
+        'fields': [
+            ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
+            ('relation_type.$id'), ('status', INDEX_ASCENDING), \
+            ('right_subject', INDEX_ASCENDING)
+        ],
+        'check': False  # Required because $id is not explicitly specified in the structure
+    }, {
+        # 2: Compound index
+        'fields': [
+            ('_type', INDEX_ASCENDING), ('right_subject', INDEX_ASCENDING), \
+            ('relation_type.$id'), ('status', INDEX_ASCENDING)
+        ],
+        'check': False  # Required because $id is not explicitly specified in the structure
+    }]
+
     required_fields = ['relation_type', 'right_subject']
     use_dot_notation = True
-    use_autorefs = True                   # To support Embedding of Documents
+    use_autorefs = True  # To support Embedding of Documents
 
 
 
