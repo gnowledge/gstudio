@@ -163,14 +163,20 @@
         </div>
         {% endif %}
 
+        <!-- T & C -->
         <div class="row">
-          <div class="small-12 large-3 columns end small-text-right">
-            <input type="checkbox" id="tc-check">
+          <div class="small-12 large-9 large-push-3 columns end">
+
+            <input type="checkbox" id="tc-check" class="text-right" title="check to accept T&C" required>
+            <label for="tc-check" class="overlay-description-by-oid-caller" data-reveal-id="overlay-description-by-oid" data-oid="{{oids.tc}}" title="click to read T&C">
+            {% trans "I agree to the terms and conditions" %}.
+            </label>
+            <small class="error">Please accept terms & conditions.</small>
+
           </div>
-          <a class="small-12 large-6 small-text-left columns end overlay-description-by-oid-caller" data-reveal-id="overlay-description-by-oid" data-oid="{{oids.tc}}">
-              {% trans "I agree to the terms and conditions" %}.
-          </a>
         </div>
+        <!-- END of T & C -->
+        
         <br/>
 
         <!-- Send Activation button -->
