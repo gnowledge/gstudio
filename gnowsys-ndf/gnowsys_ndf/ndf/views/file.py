@@ -37,6 +37,7 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id, get_language_tuple  # , get_page
+from gnowsys_ndf.ndf.views.methods import node_thread_access, create_thread_for_node
 
 try:
     from bson import ObjectId
@@ -44,7 +45,6 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls ,create_gattribute, node_thread_access, create_thread_for_node
 from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
 from gnowsys_ndf.ndf.views.tasks import convertVideo
@@ -795,6 +795,7 @@ def submitDoc(request, group_id):
         Audience = request.POST.get("audience", "")
         fileType = request.POST.get("FileType", "")
         Based_url = request.POST.get("based_url", "")
+        co_contributors = request.POST.get("co_contributors", "")
         map_geojson_data = request.POST.get('map-geojson-data')
         subject = request.POST.get("Subject", "")
         level = request.POST.get("Level", "")
@@ -817,11 +818,11 @@ def submitDoc(request, group_id):
                 if index == 0:
                     # f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
 
                 else:
                     title = mtitle + "_" + str(i)  # increament title
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
                     i = i + 1
             else:
                 title = each.name
@@ -831,7 +832,7 @@ def submitDoc(request, group_id):
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
             # if isinstance(f, list):
-                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
+                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
                 try:
                     ObjectId(f)
                 except:
@@ -910,7 +911,7 @@ def submitDoc(request, group_id):
     
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, request=None, map_geojson_data=[], **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, co_contributors="", request=None, map_geojson_data=[], **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
@@ -1063,12 +1064,17 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
               # create gattribute for file with 'educationaluse' value
               educationallevel_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationallevel'})
               edu_level = create_gattribute(fileobj._id, educationallevel_AT, level)                
-
             if Based_url:
               # create gattribute for file with 'educationaluse' value
               basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
               basedUrl = create_gattribute(fileobj._id, basedonurl_AT, Based_url)                
+
+            if co_contributors:
+              # create gattribute for file with 'co_contributors' value
+              co_contributors_AT = node_collection.one({'_type':'AttributeType', 'name': 'co_contributors'})
+              co_contributors = create_gattribute(fileobj._id, co_contributors_AT, co_contributors)                
             files.seek(0)                                                                  #moving files cursor to start
+
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
             node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': objectid}})
 
