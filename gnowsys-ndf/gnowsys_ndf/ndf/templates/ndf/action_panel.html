@@ -65,6 +65,19 @@
 		margin-left: 3rem;
 	}
 </style>
+  <div id="deleteModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <p id="deleteModalLabel"></p>
+    <div class="row feeds_proceed">
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
+      </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
 <section class="medium-3 columns"> 
 	<ul class="side-nav">
 
@@ -85,16 +98,16 @@
 							{% get_edit_url node.pk as edit_url %}
 							{% if is_group %}
 								{% if is_gstaff %}
-									<a href="{% url edit_url group_id %}" class="tiny button radius left-btn edit fi-pencil">{% trans " Edit" %}</a>
+									<a href="{% url edit_url group_id %}" class="tiny button radius left-btn edit ">{% trans " Edit" %}</a>
 								{% endif %}
 							{% else %}
 								{% if user_is_joined == "joined" or user_is_joined == "author" or is_gstaff %}
-									<a href="{% url edit_url group_id node %}" class="tiny button radius edit left-btn fi-pencil">{% trans " Edit" %}</a>
+									<a href="{% url edit_url group_id node %}" class="tiny button radius edit left-btn ">{% trans " Edit" %}</a>
 								{% endif %}
 							{% endif %}
 							{% endif %}
 						{% else %}
-							<input type="button" class="tiny button radius secondary edit left-btn fi-pencil disabled" value="Edit">
+							<input type="button" class="tiny button radius secondary edit left-btn  disabled" value="Edit">
 						{% endif %}
 
 
@@ -121,24 +134,22 @@
 			<!-- Delete and History -->
 				<div class="row btn-row">
 					<br/>
+					<!-- History -->
+					<a href = "{% url 'node_version' groupid node.pk  %}" class="tiny button radius right-btn" >{% trans "History" %}</a> 
+
 					<!-- Delete button				 -->
 					{% if user.is_authenticated and "Group" in group_object.member_of_names_list %} 
-						{% if node.created_by == request.user.id %}
-							{% if "Page" in node.member_of_names_list %}
-								<a class="tiny button radius left-btn fi-trash" href="{% url 'trash_resource' group_id node %}">{% trans " Delete" %}</a>
-							{% elif "Term" in node.member_of_names_list %}
-								<a class="tiny button radius left-btn fi-trash" href="{% url 'term_delete' group_name_tag node %}">{% trans " Delete" %}</a>
+						{% if node.created_by == request.user.id or is_gstaff %}
+							{% if "Page" in node.member_of_names_list or "File" in node.member_of_names_list or "Term" in node.member_of_names_list %}
+								<a class="tiny button radius left-btn delete-btn" >{% trans "Delete" %}</a>
 							{% else %}
-								<a class="tiny button radius left-btn fi-trash disabled secondary" href="#" >{% trans " Delete" %}</a>
+								<a class="tiny button radius left-btn disabled secondary">{% trans " Delete" %}</a>
 							{% endif %}
 						{% else %}
-							<input type="button" class="tiny button radius left-btn fi-trash secondary disabled" value="{% trans 'Delete' %}">
+							<input type="button" class="tiny button radius left-btn secondary disabled" value="{% trans 'Delete' %}">
 						{% endif %}
-						<!-- History -->
-						<a href = "{% url 'node_version' groupid node.pk  %}" class="tiny button radius right-btn" >{% trans "History" %}</a> 
 					{% else %}
-						<input type="button" class="tiny button radius left-btn fi-trash secondary disabled" value="{% trans 'Delete' %}">
-						<input type="button" class="tiny button radius left-btn secondary disabled" value="{% trans 'History' %}">
+						<input type="button" class="tiny button radius left-btn secondary disabled" value="{% trans 'Delete' %}">
 					{% endif %}
 				</div>
 
@@ -392,4 +403,43 @@
 			$(this).text("Less")
 		}
 	})
+
+  var set_href = false;
+  $(document).on('click','.delete-btn',function(){
+    if(!set_href){
+      if( navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ){
+        $(this).attr('href', "{% url 'activity_feed' group_object.pk %}")
+      }
+      else{
+        lbl_msg = "Are you sure you want to delete?"
+        $("#deleteModalLabel").text(lbl_msg);
+        $("#deleteModal")
+          .removeClass("medium").addClass("small")
+          .addClass("alert")
+        $("#deleteModal").foundation('reveal', 'open');
+      }
+    }
+  })
+
+  //Confirm or Cancel Deletion
+    $(document).on("click", "#btnConfirmYes", function() {
+        set_href = true;
+        delete_url = ""
+        $("#deleteModal").foundation('reveal', 'close');
+		{% if "Page" in node.member_of_names_list or "File" in node.member_of_names_list %}
+			// alert("page")
+			delete_url = "{% url 'trash_resource' group_id node %}"
+		{% elif "Term" in node.member_of_names_list %}
+			// alert("term_delete")
+			delete_url = "{% url 'term_delete' group_name_tag node %}"
+		{% endif %}
+        $(".delete-btn").attr('href', delete_url)
+        $(".delete-btn")[0].click();
+    });
+
+    $(document).on("click", "#btnConfirmNo", function() {
+        set_href = false;
+        $("#deleteModal").foundation('reveal', 'close');
+    });
+
 </script>
