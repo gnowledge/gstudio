@@ -2206,7 +2206,7 @@ def get_preferred_lang(request, group_id, nodes, node_type):
       pref_lan={}
       pref_lan[u'primary'] = get_language_tuple(request.LANGUAGE_CODE)
    
-      pref_lan[u'default']=u"en"
+      pref_lan[u'default']= ('en', 'English')
    try:
       for each in nodes:
          get_rel = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':each._id}]})
