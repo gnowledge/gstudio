@@ -688,6 +688,8 @@ CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
 # the no of cards/objects/instances to be render of app (listing view).
 GSTUDIO_NO_OF_OBJS_PP = 24
 
+GSTUDIO_HELP_SIDEBAR = False
+
 # ----------------------------------------------------------------------------
 # following has to be at last
 # just put every thing above it

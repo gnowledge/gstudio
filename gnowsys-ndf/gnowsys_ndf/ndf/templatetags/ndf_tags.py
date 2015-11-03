@@ -3011,3 +3011,9 @@ def get_list_of_fields(oid_list, field_name='name'):
 def convert_list(value):
 	#convert list of list to list
 	return list(itertools.chain(*value))
+
+
+@get_execution_time
+@register.assignment_tag
+def get_gstudio_help_sidebar():
+	return GSTUDIO_HELP_SIDEBAR
