@@ -32,7 +32,6 @@ from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.rcslib import RCS
-from django.dispatch import receiver
 from registration.signals import user_registered
 
 
@@ -113,25 +112,6 @@ STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
 
 QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
-
-
-# FRAME CLASS DEFINITIONS
-@receiver(user_registered)
-def user_registered_handler(sender, user, request, **kwargs):
-    tmp_hold = node_collection.collection.node_holder()
-    dict_to_hold = {}
-    dict_to_hold['node_type'] = 'Author'
-    dict_to_hold['userid'] = user.id
-    agency_type = request.POST.get("agency_type", "")
-    if agency_type:
-        dict_to_hold['agency_type'] = agency_type
-    else:
-        # Set default value for agency_type as "Other"
-        dict_to_hold['agency_type'] = "Other"
-    dict_to_hold['group_affiliation'] = request.POST.get("group_affiliation", "")
-    tmp_hold.details_to_hold = dict_to_hold
-    tmp_hold.save()
-    return
 
 
 @connection.register
@@ -229,8 +209,60 @@ class Node(DjangoDocument):
         'rating':[{'score':int,
                   'user_id':int,
                   'ip_address':basestring}],
-    	'snapshot':dict
+        'snapshot':dict
     }
+
+    indexes = [
+        {
+            # 1: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('name', INDEX_ASCENDING)
+            ]
+        }, {
+            # 2: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('created_by', INDEX_ASCENDING)
+            ]
+        }, {
+            # 3: Single index
+            'fields': [
+                ('group_set', INDEX_ASCENDING)
+            ]
+        }, {
+            # 4: Single index
+            'fields': [
+                ('member_of', INDEX_ASCENDING)
+            ]
+        }, {
+            # 5: Single index
+            'fields': [
+                ('name', INDEX_ASCENDING)
+            ]
+        }, {
+            # 6: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('status', INDEX_ASCENDING), \
+                ('access_policy', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 7: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('status', INDEX_ASCENDING), \
+                ('access_policy', INDEX_ASCENDING), ('created_at' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 8: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 9: Compound index
+            'fields': [
+                ('status', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, 
+    ]
+
     required_fields = ['name', '_type'] # 'group_set' to be included
                                         # here after the default
                                         # 'Administration' group is
@@ -1139,6 +1171,15 @@ class File(GSystem):
         }  # dict used to hold file size in int and unit palace in term of KB,MB,GB
     }
 
+    indexes = [
+        {
+            # 12: Single index
+            'fields': [
+                ('mime_type', INDEX_ASCENDING)
+            ]
+        }
+    ]
+
     gridfs = {
         'containers': ['files']
     }
@@ -1595,8 +1636,6 @@ class Analytics(DjangoDocument):
     return self.__unicode__()
 
 
-
-
 #  TRIPLE CLASS DEFINITIONS
 @connection.register
 class Triple(DjangoDocument):
@@ -1816,13 +1855,23 @@ class Triple(DjangoDocument):
 
 @connection.register
 class GAttribute(Triple):
-
     structure = {
         'attribute_type_scope': basestring,
-        'attribute_type': AttributeType,  # DBRef of AttributeType Class
+        'attribute_type': AttributeType,  # Embedded document of AttributeType Class
         'object_value_scope': basestring,
-        'object_value': None		  # value -- it's data-type, is determined by attribute_type field
+        'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
+
+    indexes = [
+        {
+            # 1: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
+                ('attribute_type.$id', INDEX_ASCENDING), ('status', INDEX_ASCENDING)
+            ],
+            'check': False  # Required because $id is not explicitly specified in the structure
+        }
+    ]
 
     required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
@@ -1839,9 +1888,26 @@ class GRelation(Triple):
         'right_subject': OR(ObjectId, list)
     }
 
+    indexes = [{
+        # 1: Compound index
+        'fields': [
+            ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
+            ('relation_type.$id'), ('status', INDEX_ASCENDING), \
+            ('right_subject', INDEX_ASCENDING)
+        ],
+        'check': False  # Required because $id is not explicitly specified in the structure
+    }, {
+        # 2: Compound index
+        'fields': [
+            ('_type', INDEX_ASCENDING), ('right_subject', INDEX_ASCENDING), \
+            ('relation_type.$id'), ('status', INDEX_ASCENDING)
+        ],
+        'check': False  # Required because $id is not explicitly specified in the structure
+    }]
+
     required_fields = ['relation_type', 'right_subject']
     use_dot_notation = True
-    use_autorefs = True                   # To support Embedding of Documents
+    use_autorefs = True  # To support Embedding of Documents
 
 
 
@@ -1907,4 +1973,8 @@ db = get_database()
 node_collection = db[Node.collection_name].Node
 triple_collection = db[Triple.collection_name].Triple
 gridfs_collection = db["fs.files"]
+<<<<<<< HEAD
 chunk_collection = db["fs.chunks"]
+=======
+import signals
+>>>>>>> 97c0446c897bb394732a2e5290c5dcb2f17342c1
