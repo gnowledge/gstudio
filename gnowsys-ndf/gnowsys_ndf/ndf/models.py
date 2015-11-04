@@ -1973,8 +1973,5 @@ db = get_database()
 node_collection = db[Node.collection_name].Node
 triple_collection = db[Triple.collection_name].Triple
 gridfs_collection = db["fs.files"]
-<<<<<<< HEAD
 chunk_collection = db["fs.chunks"]
-=======
 import signals
->>>>>>> 97c0446c897bb394732a2e5290c5dcb2f17342c1
