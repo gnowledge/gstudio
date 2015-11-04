@@ -5,14 +5,14 @@
 {% get_schema node as schema %} 
 {% get_group_name groupid as group_name_tag %}
 <style type="text/css">
-.share_link {
+/*.share_link {
     color: #FFF;
     cursor: pointer;
     font-weight: bold;
     line-height: 20px;
     text-shadow: 0px -1px 0px #354C8C;
     white-space: nowrap;
-}
+}*/
 
 
 </style>
@@ -574,27 +574,21 @@
             <!-- End New -->          
               <div class="right">
                       {% if node.mime_type %}
-<<<<<<< HEAD
                         <!-- <i>{% trans 'Resource Type' %}: {{node.mime_type}}</i><br/> -->
                         
                      {% endif %}
                 <p class="large-text-right"><small>
                   <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
                 </small></p>
-=======
                         <i>{% trans 'Resource Type' %}: {{node.mime_type}}</i><br/>
                    
 
-                    {% endif %}
->>>>>>> 2043536bb54a8a95047c421a5f0c19b78d9ee96f
+                    
+
               </div>
 
           {% endif %}
-          <a class="share_link" href="#" target="_blank"  style="width=626,height=436" >
-                            Share on Facebook
-                        </a>
-                    <a class="twitter-share-button"href="" data-size=""  data-url="" data-count-url="" data-via="" data-related=""
-                     data-hashtags="" data-text="">TweetNew</a>
+          
           {% block add_fields %} {% endblock %}
 
           <ul class="inline-list">
@@ -637,6 +631,11 @@
             {% endif %}
             {% endwith %}
           </div>
+          <a class="share_link" href="#" target="_blank"  style="width=626,height=436" >
+                            <img src="/static/ndf/images/fb-share-button.png" style="width:75px">
+                        </a>
+                    <a class="twitter-share-button"href="" data-size=""  data-url="" data-count-url="" data-via="" data-related=""
+                     data-hashtags="" data-text=""></a>
           <!-- Discussion -->
                 <div class="content" id="view-discussion">
                   <!-- discussion content area -->
