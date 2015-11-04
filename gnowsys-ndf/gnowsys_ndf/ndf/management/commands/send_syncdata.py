@@ -90,7 +90,8 @@ class Command(BaseCommand):
                 shutil.move(path,sent_folder_path)
                 root_path =  os.path.abspath(os.path.dirname(os.pardir))
                 packet_sequnce_scan =  os.path.join(root_path, 'last_packet_number.txt')
-                with open(packet_sequnce_scan,"w") as outfile:
-                    outfile.write(str(0))
+                
             else:
                 return 'Internet no longer available'
+        with open(packet_sequnce_scan,"w") as outfile:
+                    outfile.write(str(0))        
