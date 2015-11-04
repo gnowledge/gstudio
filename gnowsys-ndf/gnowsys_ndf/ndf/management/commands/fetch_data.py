@@ -35,7 +35,7 @@ class Command(BaseCommand):
             t = str1.strip("\t\n\r ")
         else:
             ti = datetime.time(0,0,0,0)
-            date1 = datetime.datetime(2014,12,1)
+            date1 = datetime.datetime(2015,11,4)
             t = str(datetime.datetime.combine(date1,ti).strftime("%Y-%m-%dT%H:%M:%S"))  
             print t
         log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'WRITE'|grep '.Nodes\|.Triples\|.fs.files\|.fs.chunks'" % str(t))
@@ -109,6 +109,7 @@ def process_parent_node(Parent_collection_ids,last_scan):
                         allowed = True
                         break   
                 if  allowed ==  True:
+                        print "node here",id
                         capture_id_data(id,timestamp,collection)
                         node_skipped_after_capture.append(id)
             else:
@@ -142,6 +143,7 @@ def capture_id_data(id,time_with_microsec,collection):
         #create log file
 
         if node:
+                print "every node passing through it","the id",id
                 with open("Registry.txt", 'a') as outfile:
                     outfile.write(str(time_with_microsec + "_" + str(node["_id"]) + ", " +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{1}" +"\n" ))
                 capture_data(file_object=node, file_data=None, content_type='Genral',time=time_with_microsec)       
@@ -220,7 +222,17 @@ def zip_directories(sync_dir):
     dir_list = []
     total_size = 0
     list_of_tuples = []
+    last_packet_number = 0
     dirname  = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.datetime.now().microsecond)           
+    root_path =  os.path.abspath(os.path.dirname(os.pardir))
+    packet_sequnce_scan =  os.path.join(root_path, 'last_packet_number.txt')
+    if os.path.exists(packet_sequnce_scan):
+        with open(packet_sequnce_scan,"r") as outfile:
+                    last_packet_number = outfile.read()
+        last_packet_number = last_packet_number.strip()            
+    else:
+        last_packet_number = 0
+    print "the scan",last_packet_number    
     for dir,subdir,file in sorted(os.walk(sync_dir)):
         #print dir,"\n",subdir,"\n",file,"\n"
         for f in file:
@@ -252,9 +264,14 @@ def zip_directories(sync_dir):
                     os.makedirs(syncdir_path)
                 shutil.move(i,syncdir_path+"/")
         dir_list.append(syncdir_path)        
-    for i in dir_list:
-        shutil.make_archive(os.path.abspath(i),'gztar',os.path.abspath(i))
+        
+    for v,i in enumerate(dir_list):
+        send_counter = "%06d" % int(last_packet_number)
+        shutil.make_archive(sync_dir+"/"+send_counter,'gztar',os.path.abspath(i))
         shutil.rmtree(i)
-
+        last_packet_number = int(last_packet_number) + 1 
+        with open(packet_sequnce_scan,"w") as outfile:
+                outfile.write(str(last_packet_number))
+    
 
 
