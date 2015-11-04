@@ -15,28 +15,23 @@
 
 	.app-card{
 		width: 17rem;
-		min-height: 12rem;
-		margin: 20px 1rem;
-		background-color: #efefef;
-		border: thin solid lightgray;
+		min-height: 10rem;
+		margin: 10px 1rem;
 		float: left;
-		padding: 1em;
+		padding: 0.4em;
 	}
 
 	.app-card:hover{
-		box-shadow: 0px 0px 15px gray;
-		border: thin solid lightgray;
-		border-radius: 5px;
 		transition: ease 0.6s;
 	}
 
-	.icons{
-		position: absolute;
-		font-size: 7em;
-		z-index: 0;
-		opacity: 0.1;
-		margin-top: -35px;
-		/*padding-top: 2rem;*/
+	.app-card-icon{
+		position: relative;
+		font-size: 6em;
+		left:2%
+	}
+	.app-card-content{
+
 	}
 
 {% endblock %}
@@ -73,11 +68,10 @@
 		<li>
 			<a class="app-card text-center" href="/home/e-library">
 				<h4>Partner Resources</h4>
-				<hr/>
-				<i class="icons fi-results-demographics"></i>
-				<p>
-					<b>Contributions from institutions and individuals</b>
-				</p>
+				<div class="app-card-icon"><i class="icons fi-results-demographics"></i></div>
+				<div class="app-card-content">
+					Contributions from institutions and individuals
+				</div>
 			</a>
 		</li>
 	</ul>
