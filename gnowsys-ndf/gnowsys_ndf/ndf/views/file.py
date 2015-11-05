@@ -818,19 +818,11 @@ def submitDoc(request, group_id):
                 if index == 0:
                     # f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
-<<<<<<< HEAD
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync = False,oid=True)
-
-                else:
-                    title = mtitle + "_" + str(i)  # increament title
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync = False, oid=True)
-=======
                     f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
 
                 else:
                     title = mtitle + "_" + str(i)  # increament title
                     f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
->>>>>>> 97c0446c897bb394732a2e5290c5dcb2f17342c1
                     i = i + 1
             else:
                 title = each.name
