@@ -89,16 +89,6 @@
 
 			<div class="row">
 				<div class="small-3 large-3 columns">
-					<label> <h6> {% trans 'Pages created' %}</h6></label>
-				</div>
-				
-				<div class="small-4 columns large-2 end"> 
-					<label>{% firstof page_count 'Not created yet!'%}</label>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="small-3 large-3 columns">
 					<label> <h6> {% trans 'Files uploaded' %}</h6></label>
 				</div>
 				
@@ -106,23 +96,32 @@
 					<label>{% firstof file_count 'Not uploaded yet!'%}</label>
 				</div>
 			</div>
+			{% if site_name != "NROER" %}
+				<div class="row">
+					<div class="small-3 large-3 columns">
+						<label> <h6> {% trans 'Pages created' %}</h6></label>
+					</div>
+					<div class="small-4 columns large-2 end">
+						<label>{% firstof page_count 'Not created yet!'%}</label>
+					</div>
+				</div>
 
-			<div class="row">
-				<div class="small-3 large-3 columns">
-					<label> <h6> {% trans 'Quiz' %}</h6></label>
+				<div class="row">
+					<div class="small-3 large-3 columns">
+						<label> <h6> {% trans 'Quiz' %}</h6></label>
+					</div>
+					<div class="small-4 columns large-2 end">
+						<label>{% firstof quiz_count 'Not created yet!'%}</label>
+					</div>
 				</div>
-				
-				<div class="small-4 columns large-2 end"> 
-					<label>{% firstof quiz_count 'Not created yet!'%}</label>
-				</div>
-			</div>
+			{% endif %}
 
 			<div class="row">
 				<div class="small-3 large-3 columns">
 					<label> <h6> {% trans 'Forum' %}</h6></label>
 				</div>
 				
-				<div class="small-4 columns large-2 end"> 
+				<div class="small-4 columns large-2 end">
 					<label>{% firstof forum_count 'Not created yet!'%}</label>
 				</div>
 			</div>
