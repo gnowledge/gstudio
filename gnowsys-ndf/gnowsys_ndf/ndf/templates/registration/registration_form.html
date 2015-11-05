@@ -163,6 +163,22 @@
         </div>
         {% endif %}
 
+        <!-- T & C -->
+        <div class="row">
+          <div class="small-12 large-9 large-push-3 columns end">
+
+            <input type="checkbox" id="tc-check" class="text-right" title="check to accept T&C" required>
+            <label for="tc-check" class="overlay-description-by-oid-caller" data-reveal-id="overlay-description-by-oid" data-oid="{{oids.tc}}" title="click to read T&C">
+            {% trans "I agree to the terms and conditions" %}.
+            </label>
+            <small class="error">Please accept terms & conditions.</small>
+
+          </div>
+        </div>
+        <!-- END of T & C -->
+        
+        <br/>
+
         <!-- Send Activation button -->
         <div class="row">
           <div class="small-7 large-3 small-offset-3 large-offset-4 columns end">

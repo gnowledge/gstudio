@@ -116,6 +116,32 @@ def get_site_variables():
 
 @get_execution_time
 @register.assignment_tag
+def get_oid_variables():
+	result = cache.get('oid_var')
+
+	if result:
+		return result
+
+	oid_var = {}
+	oid_var['tc']				 	= GSTUDIO_OID_TC
+	# oid_var['ABOUT'] 				= GSTUDIO_OID_ABOUT
+	# oid_var['COPYRIGHT'] 			= GSTUDIO_OID_COPYRIGHT
+	# oid_var['PRIVACY_POLICY'] 	= GSTUDIO_OID_SITE_PRIVACY_POLICY
+	# oid_var['TERMS_OF_SERVICE'] 	= GSTUDIO_OID_SITE_TERMS_OF_SERVICE
+	# oid_var['PARTNERS'] 			= GSTUDIO_OID_SITE_PARTNERS
+	# oid_var['GROUPS'] 			= GSTUDIO_OID_SITE_GROUPS
+	# oid_var['CONTACT'] 			= GSTUDIO_OID_SITE_CONTACT
+	# oid_var['CONTRIBUTE'] 		= GSTUDIO_OID_SITE_CONTRIBUTE
+	# oid_var['LANDING_PAGE'] 		= GSTUDIO_OID_SITE_LANDING_PAGE
+	# oid_var['HOME_PAGE'] 			= GSTUDIO_OID_SITE_HOME_PAGE
+
+	cache.set('oid_var', oid_var, 60 * 30)
+
+	return  oid_var
+
+
+@get_execution_time
+@register.assignment_tag
 def get_author_agency_types():
    return GSTUDIO_AUTHOR_AGENCY_TYPES
 
