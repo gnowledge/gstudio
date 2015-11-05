@@ -115,7 +115,8 @@
 	$(".orgitdown .orgitdownButton8 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/html.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 	$(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/close.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 	$(document).ready(function(){
-	$("#lan option[value={{node.language}}]").remove();
+    var temp_var = "{{node.language|safe}}";
+	$('#lan option[value="'+ temp_var +'"]').remove();
 	{% if node %}
 	{% get_possible_translations node as translations %}
 	{% for each in translations %}
