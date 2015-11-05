@@ -87,11 +87,15 @@ class Command(BaseCommand):
                 mail.to = list(SYNCDATA_SENDING_EMAIL_ID)
                 if folder_empty == 0:
                     mail.send()
+                print "here",path,sent_folder_path
                 shutil.move(path,sent_folder_path)
-                root_path =  os.path.abspath(os.path.dirname(os.pardir))
-                packet_sequnce_scan =  os.path.join(root_path, 'last_packet_number.txt')
+                
                 
             else:
                 return 'Internet no longer available'
+        '''        
+        root_path =  os.path.abspath(os.path.dirname(os.pardir))
+        packet_sequnce_scan =  os.path.join(root_path, 'last_packet_number.txt')        
         with open(packet_sequnce_scan,"w") as outfile:
                     outfile.write(str(0))        
+        '''            
