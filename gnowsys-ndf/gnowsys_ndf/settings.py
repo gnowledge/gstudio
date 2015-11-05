@@ -630,6 +630,12 @@ GSTUDIO_NROER_MENU_MAPPINGS = {
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
 
+GSTUDIO_FILTERS = {
+            "File": ['educationallevel', 'audience', 'language', 'educationalsubject'],
+            "E-Library": ['educationallevel', 'audience', 'language', 'educationalsubject'],
+            "Topics": ['educationallevel', 'audience', 'language', 'educationalsubject', 'educationaluse']
+            }
+
 GSTUDIO_RESOURCES_CREATION_RATING = 5
 
 GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
