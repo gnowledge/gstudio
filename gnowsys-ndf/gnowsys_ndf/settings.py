@@ -633,6 +633,7 @@ GSTUDIO_NROER_MENU_MAPPINGS = {
 GSTUDIO_FILTERS = {
             "File": ['educationallevel', 'audience', 'language', 'educationalsubject'],
             "E-Library": ['educationallevel', 'audience', 'language', 'educationalsubject'],
+            "E-Book": ['educationallevel', 'audience', 'language', 'educationalsubject'],
             "Topics": ['educationallevel', 'audience', 'language', 'educationalsubject', 'educationaluse']
             }
 
