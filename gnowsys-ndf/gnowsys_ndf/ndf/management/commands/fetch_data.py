@@ -14,6 +14,7 @@ import datetime
 import shutil
 import zipfile
 import os
+import time
 rcs = RCS()
 hr = HistoryManager()
 Parent_collection_ids = []
@@ -78,6 +79,7 @@ class Command(BaseCommand):
         zip_directories(sync_dir)    
         if processing_list_ids:
             #only update the last scan tym if some data is feched 
+            time.sleep(1)
             with open("Last_Scan.txt","w") as outfile:
                 outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))
 def process_parent_node(Parent_collection_ids,last_scan):
