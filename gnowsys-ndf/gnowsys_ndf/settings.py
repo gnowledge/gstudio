@@ -691,7 +691,8 @@ WETUBE_PASSWORD = "gl@b$@)we!ube"
 #Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
-
+#Mail Chunk Size in MB
+TARSIZE = 1000
 # the no of cards/objects/instances to be render of app (listing view).
 GSTUDIO_NO_OF_OBJS_PP = 24
 

@@ -8,6 +8,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.views.methods import capture_data
 from gnowsys_ndf.local_settings import SYNCDATA_KEY_PUB
+from gnowsys_ndf.settings import TARSIZE
 import json
 import datetime
 import shutil
@@ -35,7 +36,7 @@ class Command(BaseCommand):
             t = str1.strip("\t\n\r ")
         else:
             ti = datetime.time(0,0,0,0)
-            date1 = datetime.datetime(2015,11,4)
+            date1 = datetime.datetime(2015,12,1)
             t = str(datetime.datetime.combine(date1,ti).strftime("%Y-%m-%dT%H:%M:%S"))  
             print t
         log_output =  os.popen("cat  /var/log/mongodb/mongod.log|awk '$0 > \"%s\" '|grep 'WRITE'|grep '.Nodes\|.Triples\|.fs.files\|.fs.chunks'" % str(t))
@@ -241,7 +242,7 @@ def zip_directories(sync_dir):
         if dir != sync_dir:
             zip_list.append(dir)        
         #zip_list.remove('/home/glab/Desktop/pythonzipfoldercode')
-        if total_size/1024 > 1000:
+        if total_size/1024 > TARSIZE:
             total_size = 0
             #os.mkdir(dirname)
             #path = os.path.abspath(dirname)
