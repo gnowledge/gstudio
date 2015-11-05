@@ -134,6 +134,8 @@ def get_oid_variables():
 	# oid_var['CONTRIBUTE'] 		= GSTUDIO_OID_SITE_CONTRIBUTE
 	# oid_var['LANDING_PAGE'] 		= GSTUDIO_OID_SITE_LANDING_PAGE
 	# oid_var['HOME_PAGE'] 			= GSTUDIO_OID_SITE_HOME_PAGE
+	
+	oid_var['oer']					= GSTUDIO_OID_OER
 
 	cache.set('oid_var', oid_var, 60 * 30)
 
