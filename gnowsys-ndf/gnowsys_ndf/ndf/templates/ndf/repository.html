@@ -52,7 +52,8 @@
 	}
 
 	.app-card-content{
-		color:black;
+		color:#4c4c4c;
+		text-align:center;
 	}
 
 {% endblock %}
@@ -75,9 +76,8 @@
 				{% endif %}
 				>
 					<h4>{% firstof each_gapp.altnames each_gapp.name %}</h4>
-					<hr/>
-					<i class="icons {{ each_gapp.url }}"></i>
-					<p>{{ each_gapp.content|safe }}</p>
+					<div class="app-card-icon"><i class="icons {{ each_gapp.url }}"></i></div>
+					<div class="app-card-content">{{ each_gapp.content|safe }}</div>
 				</a>
 			</li>
 		{% endfor %}
