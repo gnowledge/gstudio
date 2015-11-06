@@ -5,19 +5,22 @@
   {% get_group_object groupid as group_object %}
   <!-- <div class="contain-to-grid sticky"> -->
 
+  {% if site.SITE_NAME != "NROER" %}
   <div id="feedsModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <p id="feedsModalLabel"></p>
     <div class="row feeds_proceed">
       <div class="small-3 small-offset-3 columns">
-        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+        <input type="button" id="btnConfirmFeedsYes" class="button tiny expand" value="Yes">
       </div>
       <div class="small-3 columns end">
-        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
+        <input type="button" id="btnConfirmFeedsNo" class="button tiny expand " value="No">
       </div>
     </div>
     <small class="small_msg"></small>
     <a class="close-reveal-modal">&#215;</a>
   </div>
+  {% endif %}
+
   <div id="top-headers">
 
     <!-- top LHS logo -->
@@ -347,15 +350,18 @@
                           </a>
 
                         {% else %}
-                          <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
-                            <i class="fi-results"></i> {% trans "Updates" %}
-                          </a>
-                           <li>
-                    <a class="feeds_btn" data-tooltip title="Feeds">
-                      <i class="fi-rss"></i>
-                    </a>
-                  </li>
-                         
+
+                          {% if site.SITE_NAME != "NROER" %}
+                            <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
+                              <i class="fi-results"></i> {% trans "Updates" %}
+                            </a>
+                            <li>
+                              <a class="feeds_btn" data-tooltip title="Feeds">
+                                <i class="fi-rss"></i>
+                              </a>
+                            </li>
+                          {% endif %}
+
                         {% endif %}
                       {% endif %}
 
@@ -455,6 +461,7 @@
   </div>
   <!-- end of LOGO + top header's -->
 
+{% if site.SITE_NAME != "NROER" %}
 <script>
   var set_href = false;
   $(document).on('click','.feeds_btn',function(){
@@ -475,16 +482,17 @@
   })
 
   //Confirm or Cancel Deletion
-    $(document).on("click", "#btnConfirmYes", function() {
+    $(document).on("click", "#btnConfirmFeedsYes", function() {
         set_href = true;
         $("#feedsModal").foundation('reveal', 'close');
         $(".feeds_btn").attr('href', "{% url 'activity_feed' group_object.pk %}")
         $(".feeds_btn")[0].click();
     });
 
-    $(document).on("click", "#btnConfirmNo", function() {
+    $(document).on("click", "#btnConfirmFeedsNo", function() {
         set_href = false;
         $("#feedsModal").foundation('reveal', 'close');
     });
 
 </script>
+{% endif %}
