@@ -22,7 +22,10 @@
 	}
 
 	.app-card:hover{
-		transition: ease 0.6s;
+		box-shadow: 0px 0px 15px #808080;
+		border: thin solid #D3D3D3;
+		border-radius: 5px;
+		transition: all 0.6s ease 0s;
 	}
 
 	.app-card-icon{
@@ -30,42 +33,46 @@
 		position: relative;
 		font-size: 6em;
 		left:2%
+		margin-top:-2em;
+	}
+	.app-card-title{
+
 	}
 
 	.repository-title{	
 	    color:#D7D7D7;
 		font-size: 1.5em;
-		//width:50%;
-		//padding-left:30px;
+		width:auto;
 		background-color: rgba(0, 0, 0, 0.8);
-		text-align:center;
+		text-align:left;
 		display:inline-block;
-		//margin-left:5px;
-		
+		margin-left:5px;
+		position:relative;
+		text-align:center;
 	}
 	.repository-desc{
 	    font-size: 1.5em;
-		//width:50%;
-		//padding-left:30px;
+		width:auto;
 		background-color:#E5E5E5;
-		text-align:center;
+		text-align:left;
 		display:inline-block;
-		margin-left:15px;
 		color:#878787;
+		position:relative;
 	}
 
 	.app-card-content{
 		color:#4c4c4c;
 		text-align:center;
+		margin-top:-0.5cm;
 	}
 
 {% endblock %}
 
 
 {% block body_content %}
-		<div class="large-block-grid-3 repository-title">{% trans "Repository" %}
+		<div class="repository-title large-4 columns">{% trans "Repository" %}
 		</div>
-		<div class="large-7 columns repository-desc">{% trans "Digital" %} {% trans "resources" %} {% trans "grouped in multiple ways" %}</div>
+		<div class="repository-desc large-8 columns">{% trans "Digital" %} {% trans "resources" %} {% trans "grouped in multiple ways" %}</div>
 	
 	<!-- <ul class="inline-list card-holder"> -->
 	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-3">
@@ -86,7 +93,7 @@
 		{% endfor %}
 		<li>
 			<a class="app-card text-center" href="/home/e-library">
-				<h4>Partner Resources</h4>
+				<div class="app-card-title"><h4>Partner Resources</h4></div>
 				<div class="app-card-icon"><i class="icons fi-results-demographics"></i></div>
 				<div class="app-card-content">
 					Contributions from institutions and individuals
