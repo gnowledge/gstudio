@@ -634,6 +634,13 @@ GSTUDIO_NROER_MENU_MAPPINGS = {
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
 
+GSTUDIO_FILTERS = {
+            "File": ['educationallevel', 'audience', 'language', 'educationalsubject'],
+            "E-Library": ['educationallevel', 'audience', 'language', 'educationalsubject'],
+            "E-Book": ['educationallevel', 'audience', 'language', 'educationalsubject'],
+            "Topics": ['educationallevel', 'audience', 'language', 'educationalsubject', 'educationaluse']
+            }
+
 GSTUDIO_RESOURCES_CREATION_RATING = 5
 
 GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
@@ -646,7 +653,7 @@ GSTUDIO_GROUP_MODERATION_LEVEL = 1
 # allowed moderation levels
 GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
 
-GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "OTHERS"]
+GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "NCERT LICENSE", "OTHERS"]
 
 GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
 

@@ -68,3 +68,11 @@ def multiply(value,multiply_factor):
 
 	"""
 	return value*multiply_factor
+
+
+@register.filter
+def get_dict_value_from_key(dict, key):    
+    try:
+        return dict[key]
+    except KeyError:
+        return ''

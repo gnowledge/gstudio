@@ -121,7 +121,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     if request.method=="POST":
         if translate:
             new_instance_type = eval("node_collection.collection"+"."+class_name)()
-            
+        # print new_instance_type    
         for key,value in class_structure.items():
             if value == bool:
                 if request.POST.get(key,""):
@@ -171,6 +171,9 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                             listoflist.append(ObjectId(each))
                         new_instance_type[key] = listoflist
 
+            elif type(value) == tuple:
+                new_instance_type[key] = tuple(eval(request.POST.get(key,"")))
+
             elif value == datetime.datetime:
                 if key == "last_update":
                     new_instance_type[key] = datetime.datetime.now()
@@ -187,11 +190,14 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                     new_instance_type[key] = int(request.POST.get(key,""))
 
             else: 
+                # print key, " === ", value
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"")
+                    # print type(value)
+                    # print new_instance_type
+                    # print new_instance_type[key]
 
         user_id = request.user.id
-
         if not new_instance_type.has_key('_id'):
             new_instance_type.created_by = user_id
 
