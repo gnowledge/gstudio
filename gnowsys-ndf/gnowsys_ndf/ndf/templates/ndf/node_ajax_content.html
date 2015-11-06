@@ -13,6 +13,8 @@
   <ul>
 
       <!--  Fliter now on right hand side of page   -->
+      {% comment %}
+        
        {% if topic %}
         <dl class="tabs" style="float: right; height: 1px;" data-tab> 
 
@@ -73,6 +75,9 @@
                           </ul>
                         </li> -->
                         {% endcomment %}                    
+
+                {% comment %}
+                          
                       {% elif k == "language" %}
                         <li>
                           <a> {% trans "Language" %} &raquo;</a>
@@ -121,6 +126,7 @@
           -->
           </dl>
       {% endif %}
+      {% endcomment %}
       <!--  End of Filter-->
   </ul>
 
