@@ -80,7 +80,7 @@ class Command(BaseCommand):
             sync_dir =  str(manage_path) + "/gnowsys_ndf/ndf/MailClient/syncdata" 
             #Zip the files in sync_dir
             zip_directories(sync_dir)
-            #time.sleep(1)
+            time.sleep(1)
             with open("Last_Scan.txt","w") as outfile:
                 outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))
 def process_parent_node(Parent_collection_ids,last_scan):
