@@ -134,6 +134,8 @@ def get_oid_variables():
 	# oid_var['CONTRIBUTE'] 		= GSTUDIO_OID_SITE_CONTRIBUTE
 	# oid_var['LANDING_PAGE'] 		= GSTUDIO_OID_SITE_LANDING_PAGE
 	# oid_var['HOME_PAGE'] 			= GSTUDIO_OID_SITE_HOME_PAGE
+	
+	oid_var['oer']					= GSTUDIO_OID_OER
 
 	cache.set('oid_var', oid_var, 60 * 30)
 
@@ -1346,6 +1348,7 @@ def get_all_resources(request,node_id):
         if node._id not in obj_set:
                 obj_set.append(node._id)
                 for item in result_set:
+                        # print "\n=====",item.keys()
                         obj_set.extend(item.keys())
         resources={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[], 'eBooks':[]}
         for each in obj_set:
@@ -2802,7 +2805,7 @@ def get_filters_data(gst_name):
 	static_mapping = {
                     "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
                     "language": GSTUDIO_RESOURCES_LANGUAGES,
-                    # "educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
+                    "educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
                     "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
                     # "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
                     "educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
@@ -2816,16 +2819,25 @@ def get_filters_data(gst_name):
 
 	filter_dict = {}
 
-	gst = node_collection.one({'_type':"GSystemType", "name": unicode(gst_name)})
+	# gst = node_collection.one({'_type':"GSystemType", "name": unicode(gst_name)})
+	gst = node_collection.one({'_type':"GSystemType", "name": unicode('File')})
 	poss_attr = gst.get_possible_attributes(gst._id)
+	# print "============", gst.name
 
-	exception_list = ["educationaluse"]
+	filter_parameters = []
+	# filter_parameters = GSTUDIO_FILTERS.get('File', [])
+	filter_parameters = GSTUDIO_FILTERS.get(gst_name, [])
+	# print filter_parameters
+
+	exception_list = ["interactivitytype"]
 
 	for k, v in poss_attr.iteritems():
 
-		if (k in exception_list) or not static_mapping.has_key(k):
+		# if (k in exception_list) or not static_mapping.has_key(k):
+		if (k in exception_list) or (k not in filter_parameters):
 			continue
 
+		# print k
 		filter_dict[k] = {
 	    					"data_type": v["data_type"].__name__,
 	    					"altnames": v['altnames'],

@@ -57,7 +57,7 @@
 
 {% block body_content %}
 
-  {% get_filters_data "File" as filter_dict %}
+  {% get_filters_data "E-Book" as filter_dict %}
   {% include "ndf/filters.html" with filter_dict=filter_dict %}
 
     {% include "ndf/file_list_tab.html" with resource_type=all_ebooks detail_urlname="page_details" filetype="ebook" res_type_name="" page_info=page_info %}

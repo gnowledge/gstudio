@@ -69,12 +69,12 @@
 							<div class="row collapse" data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}">
 									
 								<div class="small-9 columns">
-							    	<input id="tags_id" tabindex="11" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
+							    	<input id="tags_id" tabindex="11" type="text" value="" placeholder="{% trans 'Add one tag at a time' %}">
 							    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
 						        </div>
 						        <div class="small-3 columns">
 						        	<span tabindex="12" id="add-tag-btn" class="tiny button">
-						        		{% trans 'Add Tag' %}
+						        		{% trans 'Add' %}
 						        	</span>
 						        </div>
 
@@ -200,7 +200,7 @@
 							{% endfor %}
 						</div>
 					</div>
-					<small>({% trans "ctr + click to select multiple values" %})</small>
+					<small>({% trans "ctrl + click to select multiple values" %})</small>
 					<br/>
 					<br/>
 
@@ -209,7 +209,7 @@
 							<b>Co-Contributors:</b>
 						</div>
 						<div class="large-9 columns">
-							<input id="co_contributors" name="co_contributors" type="text" placeholder="Add comma seperated co-contributors (e.g: abc, xyz)" tabindex="7"/>
+							<input id="co_contributors" name="co_contributors" type="text" placeholder="Names of co-creators separated by commas" tabindex="7"/>
 						</div>
 					</div>
 					
@@ -238,7 +238,7 @@
 							<b>Source</b>
 						</div>
 						<div class="large-10 columns">
-							<input id="source_id" name="Source" type="text" placeholder="Owner of the file" tabindex="9"/>
+							<input id="source_id" name="Source" type="text" placeholder="Owner of the file (institution or individual)" tabindex="9"/>
 						</div>
 					</div>
 
@@ -247,7 +247,7 @@
 							<b>Based on url</b>
 						</div>
 						<div class="large-9 columns">
-							<input id="based_on_id" name="based_url" type="text" placeholder="Web Address (url) of the file if you sourced it from a website" tabindex="10"/>
+							<input id="based_on_id" name="based_url" type="text" placeholder="Web Address (url) of the file you sourced it from" tabindex="10"/>
 						</div>
 					</div>
 
