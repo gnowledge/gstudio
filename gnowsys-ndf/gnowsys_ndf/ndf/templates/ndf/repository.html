@@ -32,23 +32,26 @@
 		left:2%
 	}
 
-	.repository-title{
-	    font-size: 1.5em;
-	    float: left;
-	    background-color: rgba(0, 0, 0, 0.8);
-	    color:#D7D7D7;width:13%;
-	    display:inline-block;
-	    text-align: center;
+	.repository-title{	
+	    color:#D7D7D7;
+		font-size: 1.5em;
+		//width:50%;
+		//padding-left:30px;
+		background-color: rgba(0, 0, 0, 0.8);
+		text-align:center;
+		display:inline-block;
+		//margin-left:5px;
+		
 	}
 	.repository-desc{
 	    font-size: 1.5em;
-		width:50%;
-		padding-left:30px;
-		background-color:#9B9DA0;
-		text-align:left;
+		//width:50%;
+		//padding-left:30px;
+		background-color:#E5E5E5;
+		text-align:center;
 		display:inline-block;
-		margin-left:5px;
-
+		margin-left:15px;
+		color:#878787;
 	}
 
 	.app-card-content{
@@ -60,9 +63,9 @@
 
 
 {% block body_content %}
-		<div class="repository-title">{% trans "Repository" %}
+		<div class="large-block-grid-3 repository-title">{% trans "Repository" %}
 		</div>
-		<div class="repository-desc">{% trans "Digital" %} {% trans "resources" %} {% trans "grouped in multiple ways" %}</div>
+		<div class="large-7 columns repository-desc">{% trans "Digital" %} {% trans "resources" %} {% trans "grouped in multiple ways" %}</div>
 	
 	<!-- <ul class="inline-list card-holder"> -->
 	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-3">
