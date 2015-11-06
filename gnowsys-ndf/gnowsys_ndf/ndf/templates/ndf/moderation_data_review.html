@@ -64,7 +64,7 @@
 
 {% block script %}
 {{ block.super }}
-
+	<script type="text/javascript">
 	{% get_sg_member_of group_id as list_of_sg_member_of %}
 	{% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of%}
 		$("#group-level-header").addClass("hide");
@@ -177,5 +177,5 @@
         $("#mod_appr_rej_Modal").foundation('reveal', 'close');
         approve_rej_confirm = false;
     });
-
+</script>
 {% endblock script %}
