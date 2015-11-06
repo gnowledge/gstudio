@@ -72,14 +72,15 @@ class Command(BaseCommand):
         process_parent_node(processing_list_ids,t)
         #process_dependent_collection(child_collection_ids)         
         datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-        slice_registry(t)
-        manage_path =  os.path.abspath(os.path.dirname(os.pardir))
-        sync_dir =  str(manage_path) + "/gnowsys_ndf/ndf/MailClient/syncdata" 
-        #Zip the files in sync_dir
-        zip_directories(sync_dir)    
+            
         if processing_list_ids:
             #only update the last scan tym if some data is feched 
-            time.sleep(1)
+            slice_registry(t)
+            manage_path =  os.path.abspath(os.path.dirname(os.pardir))
+            sync_dir =  str(manage_path) + "/gnowsys_ndf/ndf/MailClient/syncdata" 
+            #Zip the files in sync_dir
+            zip_directories(sync_dir)
+            #time.sleep(1)
             with open("Last_Scan.txt","w") as outfile:
                 outfile.write(str("Last Scan time:" + str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))))
 def process_parent_node(Parent_collection_ids,last_scan):
@@ -94,7 +95,7 @@ def process_parent_node(Parent_collection_ids,last_scan):
         time_with_microsec = i[1]
         time = time_with_microsec.split('.')[0]
         #time stamp to create unique file name
-        timestamp = datetime.datetime.utcnow()
+        timestamp = datetime.datetime.now()
         timestamp = timestamp.isoformat()
         collection = i[2]
         #After last scan of this machine if that data reside in this system 
@@ -147,12 +148,14 @@ def capture_id_data(id,time_with_microsec,collection):
 
         if node:
                 print "every node passing through it","the id",id
+                capture_data(file_object=node, file_data=None, content_type='Genral',time=time_with_microsec)
                 with open("Registry.txt", 'a') as outfile:
                     outfile.write(str(time_with_microsec + "_" + str(node["_id"]) + ", " +"Snapshot"+ str(node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{1}" +"\n" ))
-                capture_data(file_object=node, file_data=None, content_type='Genral',time=time_with_microsec)       
+                       
 
 
 def slice_registry(time):
+    print "coming here",time
     manage_path =  os.path.abspath(os.path.dirname(os.pardir))
     registry_path =  os.path.join(manage_path, 'Registry.txt') 
     if time == "":
