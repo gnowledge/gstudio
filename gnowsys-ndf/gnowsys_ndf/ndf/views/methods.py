@@ -284,12 +284,13 @@ def server_sync(func):
         
         print 'JSON'
         node_json = bson.json_util.dumps(node)
+        print "creating the file",node['_id']
         with open(node_data_path,'w') as outfile:
             json.dump(node_json, outfile)
         ''' Run command to sign the json file, rename and move to syncdata folder'''
         #add _sig otherwise django_mailbox scrambles file name
-        print "pasdf"
         json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
+        print os.path.exists(node_data_path)
         command = 'gpg --batch --yes -u ' + SYNCDATA_KEY_PUB + ' --output ' + json_op_file_name + ' --sign ' + node_data_path
         subprocess.call([command],shell=True)
         src = json_op_file_name
@@ -299,7 +300,8 @@ def server_sync(func):
         # mail.attach_file(node_data_path)
         # mail.subject = subject + str(node._id)
         #mail.send()
-        os.remove(node_data_path)
+        if os.path.exists(node_data_path):
+            os.remove(node_data_path)
         # os.remove(json_op_file_name)
         if file_data:
             os.remove(file_path)
