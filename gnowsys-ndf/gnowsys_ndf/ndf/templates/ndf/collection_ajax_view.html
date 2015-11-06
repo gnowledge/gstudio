@@ -277,7 +277,9 @@
                 
                 <!-- Clicked topic should not be included in related nodes list -->
                 {% if node.pk != obj.pk %}
-                <li> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a> </li>
+                  <li> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a> </li>
+                {% else %}
+                  <li> <span class="text-gray">{{obj.name}}</span> </li>
                 {% endif %} 
 
             {% endfor %}
