@@ -4,6 +4,7 @@
 
 {% get_group_name groupid as group_name_tag %}
 {% get_site_variables as site %}
+{% get_oid_variables as oids %}
 
 {% cache 360 static_html_head %}  <!-- cache static dependencies for a hour -->
 <!DOCTYPE html>
@@ -141,6 +142,16 @@
       </div>
     </div>
   </div>
+
+
+  <!-- div to show description on overlay -->
+  <div id="overlay-description-by-oid" class="reveal-modal medium" data-reveal aria-hidden="true" role="dialog" style="height: 75%; overflow: auto;">
+    <div id="overlay-description-by-oid-title"></div>
+    <div id="overlay-description-by-oid-content"></div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+  </div>
+  <!-- END of div to show description on overlay -->
+
   <!-- end of workspace -->
   
   {% cache 360 footer request.LANGUAGE_CODE %} <!-- cache for footer -->
@@ -198,45 +209,30 @@
       }
 
     //Functions to automatically add an <i> element icon inside node spans 
-      $(".user").prepend(function(){
-        /* Attaches user icon with gnow level color for every user link */
-        return "<i class='fi-torso'></i>"
-      });
 
-      $(".card .course").prepend(function(){
-        /* Attaches icon for node type */
-        return "<i class='fi-book'></i>"
-      });
+    /* Attaches user icon with gnow level color for every user link */
+    $(".user").prepend(function(){return "<i class='fi-torso'></i>"});
 
-      $(".card .quiz").prepend(function(){
-        /* Attaches icon for node type */
-        return "<i class='fi-graph-bar'></i>"
-      });
+    /* Attaches icon for node type */
+    $(".card .course").prepend(function(){return "<i class='fi-book'></i>"});
 
-      $(".card .forum").prepend(function(){
-        /* Attaches icon for node type */
-        return "<i class='fi-comments'></i>"
-      });
+    /* Attaches icon for node type */
+    $(".card .quiz").prepend(function(){return "<i class='fi-graph-bar'></i>"});
 
-      $(".card .group").prepend(function(){
-        /* Attaches icon for node type */
-        return "<i class='fi-torsos'></i>"
-      });
+    /* Attaches icon for node type */
+    $(".card .forum").prepend(function(){return "<i class='fi-comments'></i>"});
 
-      $(".card .page").prepend(function(){
-        /* Attaches icon for node type */
-        return "<i class='fi-page'></i>"
-      });
+    /* Attaches icon for node type */
+    $(".card .group").prepend(function(){return "<i class='fi-torsos'></i>"});
 
-      $(".card .ebook").prepend(function(){
-        /* Attaches icon for node type */
-        return "<i class='fi-book'></i>"
-      });
+      /* Attaches icon for node type */
+    $(".card .page").prepend(function(){return "<i class='fi-page'></i>"});
 
-      $("aside.page").prepend(function(){
-        /* Attaches icon for node type */
-        return "<i class='fi-page'></i>"
-      });
+    /* Attaches icon for node type */
+    $(".card .ebook").prepend(function(){return "<i class='fi-book'></i>"});
+
+    /* Attaches icon for node type */
+    $("aside.page").prepend(function(){return "<i class='fi-page'></i>"});
     
     //set language prefernce
       $(document).on('click', "#savepref", function(){
@@ -255,6 +251,40 @@
           }
         }); //ajax closes
       }); //document closes
+
+      // after opening overlay node'sdescription should fetch from oid
+      $('.overlay-description-by-oid-caller').click(function(){
+        // alert(this.getAttribute('data-oid'));
+        var oid = this.getAttribute('data-oid');
+        document.getElementById('overlay-description-by-oid').setAttribute('caught-data-oid', oid);
+
+        // wiping out #overlay-description-by-oid-content and overlay-description-by-oid-title
+        document.getElementById('overlay-description-by-oid-content').textContent = ""
+        document.getElementById('overlay-description-by-oid-title').textContent = ""
+      });
+
+      $(document).on('open', '#overlay-description-by-oid[data-reveal]', function () {
+        var modal = this;
+        // console.log(modal.getAttribute('caught-data-oid'));
+        var oid = modal.getAttribute('caught-data-oid');
+        // var url = "/{{group_id}}/ajax/get_resource_by_oid/" + oid;
+        
+        if (!oid) {return};
+        
+        $.ajax({
+          url: "{% url 'get_resource_by_oid' group_name_tag %}",
+          type: 'GET',
+          data: {'oid': oid},
+          success: function(data){
+            console.log(data);
+            var dataObj = JSON.parse(data),
+              name = dataObj.altnames?dataObj.altnames:dataObj.name;
+            $('#overlay-description-by-oid-title').html('<h3 class="text-center">' + name + '</h3>');
+            $('#overlay-description-by-oid-content').html(dataObj.content);
+          }
+        });
+
+      });
 
     // start of document.ready()
       $(document).ready(function() {

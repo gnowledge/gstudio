@@ -79,8 +79,8 @@
  --><!-- end of mobwrite -->
 {% endcomment %}
 
-{% if node_id %}
 {% trans var_placeholder as content %}
+{% if node_id %}
 <!-- <input type="hidden" value="{#% check_existence_textObj_mobwrite node_id %#}"> -->
 <textarea id="{{node_id|mongo_id}}" class="small-12 columns" name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}">{{var_value}}</textarea>
 
