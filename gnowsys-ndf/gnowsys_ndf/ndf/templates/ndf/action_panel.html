@@ -283,7 +283,10 @@
 										<a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny button radius edit left-btn">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 									{% else %}
 										{% if "Theme" in node.member_of_names_list or "Topic" in node.member_of_names_list %}
-											<a href="{% url create_url group_name_tag app_id %}" class="tiny button radius edit left-btn">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+											{% if is_gstaff %}
+												<a href="{% url create_url group_name_tag app_id %}" class="tiny button radius edit left-btn">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+											{% endif %}
+
 										{% elif "Term" in node.member_of_names_list %}
 											<a href="{% url create_url group_name_tag %}" class="tiny button radius edit left-btn">{% trans "New" %} Topic
 											</a>

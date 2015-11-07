@@ -255,9 +255,8 @@
 	                    </div>
 		     		</div>
 
-		     		{% if title == "Page" %}
-		     		
-		     		<div class = "page type" >
+		     		{% if title == "Page" and "Author" not in group_object.member_of_names_list %}
+		     		<div class = "page_type">
 		     			<div class="row">
 		     			 	<div class = "small-2 columns">	
 			     				<span  style="width: 70px; float: left;" >{% trans 'Page Type' %}:  </span>
@@ -265,7 +264,6 @@
  							<div class="small-8 columns" ends>
 					     			<select name="type_of" id="type_of">
 						  			{% for i in page_instance %}
-
 						  				{% if i.name == "Wiki page" %}	        				
 											<option value = {{i.pk}} selected> {% trans i.name %} </option>
 
