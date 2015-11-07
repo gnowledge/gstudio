@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of  # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.org2any import org2html
 # ######################################################################################################################################
@@ -251,7 +251,6 @@ class CreateGroup(object):
 
         else:
             return False, 'Group with same name exists.'
-
     # --- END --- create_group() ---
 
 
@@ -522,6 +521,9 @@ class CreateModeratedGroup(CreateSubGroup):
             group_obj = self.get_group_fields(group_name, node_id=node_id)
             try:
                 group_obj.save()
+
+                # print "\n\n group_obj.name",group_obj.name, "---\n\n", group_obj
+
             except Exception, e:
                 # if any errors return tuple with False and error
                 # print e
@@ -1071,6 +1073,50 @@ class CreateProgramEventGroup(CreateEventGroup):
         super(CreateProgramEventGroup, self).__init__(request)
         self.request = request
 
+    def set_logo(self, request, group_obj):
+        from gnowsys_ndf.ndf.views.file import save_file
+        # adding thumbnail 
+        logo_img_node = None
+        grel_id = None
+        logo_img_node, grel_id = get_relation_value(group_obj._id,'has_logo')
+
+        f = request.FILES.get("docFile", "")
+        # print "\nf is ",f
+
+        if f:
+
+            # if existing logo image is found
+            if logo_img_node:
+                # print "\nlogo_img_node--",logo_img_node
+                # check whether it appears in any other node's grelation
+                rel_obj = None
+                rel_obj = triple_collection.find({"_type": "GRelation", 'subject': {'$ne': ObjectId(group_obj._id)}, 'right_subject': logo_img_node._id})
+                file_cur = node_collection.find({'_type':"File",'fs_file_ids':logo_img_node.fs_file_ids,'_id': {'$ne': logo_img_node._id}})
+                # print "\nrel_obj--",rel_obj.count()
+                # print "\nfile_cur.count()--",file_cur.count()
+                if rel_obj.count() > 0 or file_cur.count() > 0:
+                    # if found elsewhere too, delete it from current node's grelation ONLY
+                    # print "\n Image exists for others"
+                    if grel_id:
+                        del_status, del_status_msg = delete_grelation(
+                            node_id=ObjectId(grel_id),
+                            deletion_type=1
+                        )
+                        # print del_status, "--", del_status_msg
+                else:
+                    # else delete the logo file
+                    # print "\n delete node"
+                    del_status, del_status_msg = delete_node(
+                        node_id=logo_img_node._id,
+                        deletion_type=1
+                    )
+                    # print del_status, "--", del_status_msg
+
+            fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            if fileobj:
+                rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
+                # print "\n creating GRelation has_logo\n"
+                create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj))
 
 # --- END of class CreateProgramEventGroup ---
 # -----------------------------------------
@@ -1342,12 +1388,18 @@ class EventGroupCreateEditHandler(View):
         group_obj = None
         nodes_list = []
         spl_group_type = sg_type
+        logo_img_node = None    
         # spl_group_type = request.GET.get('sg_type','')
         # print "\n\n spl_group_type", spl_group_type
 
         if action == "edit":  # to edit existing group
 
             group_obj = get_group_name_id(group_id, get_obj=True)
+            grel_id = None
+
+            logo_img_node, grel_id = get_relation_value(group_obj._id,'has_logo')
+
+
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.
 
@@ -1368,7 +1420,9 @@ class EventGroupCreateEditHandler(View):
                                         'nodes_list': nodes_list,
                                         'spl_group_type': spl_group_type,
                                         'course_node_id': course_node_id,
-                                        'groupid': group_id, 'group_id': group_id
+                                        'groupid': group_id, 'group_id': group_id,
+                                        'logo_img_node':logo_img_node
+
                                         # 'appId':app._id, # 'is_auth_node':is_auth_node
                                       }, context_instance=RequestContext(request))
     # --- END of get() ---
@@ -1418,7 +1472,8 @@ class EventGroupCreateEditHandler(View):
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
-
+                elif sg_type == "ProgramEventGroup":
+                    mod_group.set_logo(request,group_obj)
                 group_name = group_obj.name
                 url_name = 'groupchange'
             else:
@@ -1774,12 +1829,14 @@ def group_dashboard(request, group_id=None):
   # print "\n\n list_of_sg_member_of", list_of_sg_member_of
   files_cur = None
   sg_type = None
+
   if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
       sg_type = "ProgramEventGroup"
       # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
       parent_groupid_of_pe = node_collection.find_one({'_type':"Group","post_node": group_obj._id})
       if parent_groupid_of_pe:
         parent_groupid_of_pe = parent_groupid_of_pe._id
+
       alternate_template = "ndf/program_event_group.html"
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
