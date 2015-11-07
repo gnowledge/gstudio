@@ -2053,18 +2053,22 @@ def app_selection(request, group_id):
 
 @get_execution_time
 def switch_group(request,group_id,node_id):
-  ins_objectid = ObjectId()
-  if ins_objectid.is_valid(group_id) is False:
-    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    if group_ins:
-      group_id = str(group_ins._id)
-    else:
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth:
-      	group_id = str(auth._id)
-  else :
-  	pass
+  # ins_objectid = ObjectId()
+  # if ins_objectid.is_valid(group_id) is False:
+  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+  #   if group_ins:
+  #     group_id = str(group_ins._id)
+  #   else:
+  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #     if auth:
+  #     	group_id = str(auth._id)
+  # else :
+  # 	pass
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
 
   try:
     node = node_collection.one({"_id": ObjectId(node_id)})
@@ -2112,8 +2116,16 @@ def switch_group(request,group_id,node_id):
     # for each in get_all_user_groups():
     #   all_user_groups.append(each.name)
     #loop replaced by a list comprehension
-      all_user_groups=[each.name for each in get_all_user_groups()]
-      st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
+      all_user_groups = [each.name for each in get_all_user_groups()]
+      all_user_groups.append('home')
+      all_user_groups.append('Trash')
+      st = node_collection.find({'$and': [{'_type': 'Group'},{'$or':[{'author_set': {'$in':[1]}},{'group_admin': {'$in':[1]}}]},
+                                          {'name':{'$nin':all_user_groups}}, {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}]})
+      # st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},
+      #                                     {'name':{'$nin':all_user_groups}},
+      #                                     {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
+      #                                    ]
+      #                           })
     # for each in node.group_set:
     #   coll_obj_list.append(node_collection.one({'_id': each}))
     #loop replaced by a list comprehension
