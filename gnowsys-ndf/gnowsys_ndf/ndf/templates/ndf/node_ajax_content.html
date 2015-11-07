@@ -585,6 +585,9 @@
             {% endif %}
             {% endwith %}
           </div>
+          {% get_list_of_fields node.type_of "name" as type_of_list %}
+          {% if "Info page" not in type_of_list %}
+
           <!-- Discussion -->
                 <div class="content" id="view-discussion">
                   <!-- discussion content area -->
@@ -603,6 +606,7 @@
                   <!-- END of discussion content area -->     
                 </div>
           <br/>
+          {% endif %}
           
           <div>
             {% get_grid_fs_object each_node as grid_fs_obj %}
