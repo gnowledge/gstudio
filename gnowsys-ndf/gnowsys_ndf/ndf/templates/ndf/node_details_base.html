@@ -47,6 +47,13 @@
 {% endblock %}
 
 
+{% block style %}
+  .topic.accordion dd > a{
+    background: none;
+    {# color: Gray; #}
+  }
+{% endblock style %}
+
 {% block meta_content %}
 {% endblock %}
 
@@ -74,7 +81,7 @@
 
 {% if topic %}
   <br/>
-  <dl class="accordion" data-accordion>
+  <dl class="accordion topic" data-accordion>
     <dd>
       <a href="#add_resources"> <b>{% trans "Add resources in this topic " %}</b> </a>
       <div id="add_resources" class="content">
