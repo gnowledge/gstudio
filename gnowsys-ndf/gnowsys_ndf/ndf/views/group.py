@@ -1765,9 +1765,12 @@ def group_dashboard(request, group_id=None):
     profile_pic_image = None
     list_of_unit_events = []
     blog_pages = None
+    subgroups_cur = None
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
+    if group_obj and group_obj.post_node:
+        subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, 'member_of': group_gst._id})
 
     if not group_obj:
       group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -1904,6 +1907,7 @@ def group_dashboard(request, group_id=None):
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
+                                                       'subgroups_cur':subgroups_cur,
                                                        'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image,
                                                        'old_profile_pics':old_profile_pics
