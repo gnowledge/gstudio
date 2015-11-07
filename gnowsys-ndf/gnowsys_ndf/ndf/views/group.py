@@ -1770,7 +1770,7 @@ def group_dashboard(request, group_id=None):
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
     if group_obj and group_obj.post_node:
-        subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, 'member_of': group_gst._id})
+        subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, 'member_of': group_gst._id, 'edit_policy': {'$ne': "EDITABLE_MODERATED"}})
 
     if not group_obj:
       group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
