@@ -26,7 +26,7 @@ from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROE
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups  # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups,get_relation_value  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.data_review import data_review
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_sg_member_of
@@ -206,50 +206,51 @@ def approve_resource(request, group_id):
 	Method to approve resorce.
 	Means resource will get published by moderator to next moderated or parent group.
 	'''
+	group_obj = get_group_name_id(group_id, get_obj=True)
 	node_id = request.POST.get('node_oid', '')
 	node_obj = node_collection.one({'_id': ObjectId(node_id)})
+	approve_or_reject = request.POST.get('app_rej_state', '')
 	flag = 0  # good to check at JS/front-end level
+	if approve_or_reject == "Approve":
+		if node_obj:
+			node_group_set = node_obj.group_set
+			task_id = get_relation_value(node_obj._id,"has_current_approval_task")
+			# make deep copy of object and not to copy it's reference with [:].
+			group_set_details_dict = get_moderator_group_set(node_group_set[:], group_id, get_details=True)
+			updated_group_set = group_set_details_dict['updated_group_set']
+			# print "==== updated_group_set : ", updated_group_set
+			# print "==== node_group_set : ", node_group_set
+			# print "==== group_set_details_dict : ", group_set_details_dict
 
-	if node_obj:
-		node_group_set = node_obj.group_set
-		# make deep copy of object and not to copy it's reference with [:].
-		group_set_details_dict = get_moderator_group_set(node_group_set[:], group_id, get_details=True)
-		updated_group_set = group_set_details_dict['updated_group_set']
-		# print "==== updated_group_set : ", updated_group_set
-		# print "==== node_group_set : ", node_group_set
-		# print "==== group_set_details_dict : ", group_set_details_dict
-
-		# if set(node_group_set) != set(updated_group_set):
-		if group_set_details_dict['is_group_set_updated']:
-			
-			node_obj.group_set = updated_group_set
-
-			# ---| checking for top group. \
-			# If not top group and it's fond to be sub group create task |---
-			# one way:
-			# group_obj = get_group_name_id(updated_group_set[len(updated_group_set) - 1], get_obj=True)
-			# print "===== group_obj.member_of_names_list : ", group_obj.member_of_names_list
-			# if group_obj.member_of_names_list[0] in ['ProgramEventGroup', 'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']:
-			# second way:
-			if group_set_details_dict['is_new_group_top_group']:
-				# means, resource is passed through curation flow and \
-				# therefore change the status from 'MODERATION' to 'PUBLISHED'
-				node_obj.status = u'PUBLISHED'
-
-				# intimate creator of object/resource and creator of parent group
-				node_creator_username = User.objects.get(id=node_obj.created_by).username
-
-				task_content_org = u"Congratulations " + unicode(node_creator_username) + \
-								u",\n\n Your contribution is moderated and it's published to " + \
-								group_set_details_dict['newly_appended_group_name'] + \
-								u". \n\nWe appreciate your efforts and thank you for your contribution!"
-				create_moderator_task(request, \
-					group_set_details_dict['newly_appended_group_id'],\
-					 node_obj._id, task_type_creation='multiple', \
-					 task_type='Other', task_content_org=task_content_org,\
-					 created_by_name=node_creator_username)
+			# if set(node_group_set) != set(updated_group_set):
+			if group_set_details_dict['is_group_set_updated']:
 				
+				node_obj.group_set = updated_group_set
 
+				# ---| checking for top group. \
+				# If not top group and it's fond to be sub group create task |---
+				# one way:
+				# group_obj = get_group_name_id(updated_group_set[len(updated_group_set) - 1], get_obj=True)
+				# print "===== group_obj.member_of_names_list : ", group_obj.member_of_names_list
+				# if group_obj.member_of_names_list[0] in ['ProgramEventGroup', 'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']:
+				# second way:
+				if group_set_details_dict['is_new_group_top_group']:
+					# means, resource is passed through curation flow and \
+					# therefore change the status from 'MODERATION' to 'PUBLISHED'
+					node_obj.status = u'PUBLISHED'
+
+					# intimate creator of object/resource and creator of parent group
+					node_creator_username = User.objects.get(id=node_obj.created_by).username
+
+					task_content_org = u"Congratulations " + unicode(node_creator_username) + \
+									u",\n\n Your contribution is moderated and it's published to " + \
+									group_set_details_dict['newly_appended_group_name'] + \
+									u". \n\nWe appreciate your efforts and thank you for your contribution!"
+					create_moderator_task(request, \
+						group_set_details_dict['newly_appended_group_id'],\
+						 node_obj._id, task_type_creation='multiple', \
+						 task_type='Other', task_content_org=task_content_org,\
+						 created_by_name=node_creator_username)
 			else:
 				# resource is in curation flow hence, create a task
 				create_moderator_task(request, \
@@ -262,9 +263,52 @@ def approve_resource(request, group_id):
 		else:
 			flag = 0
 		
-	else:
-		flag = 0
+	elif approve_or_reject == "Reject":
+		reject_reason_msg = request.POST.get('reject_reason', '')
+		# print "reject_reason_msg----", reject_reason_msg
+		# raise Exception("bb")
+		task_node,task_rt = get_relation_value(node_obj._id,"has_current_approval_task")
+		auth_grp = node_collection.one({'_type': "Author", 'created_by': int(node_obj.created_by)})
+		node_obj.group_set = [auth_grp._id]
+		node_obj.status = u"DRAFT"
+		node_obj.save()
+		is_top_group, top_group_obj = get_top_group_of_hierarchy(group_obj._id)
 
+		list_of_recipients_ids = []
+		list_of_recipients_ids.extend(group_obj.group_admin)
+		list_of_recipients_ids.extend(top_group_obj.group_admin)
+		list_of_recipients_ids.append(node_obj.created_by)
+		# print list_of_recipients_ids
+
+		if task_node:
+			task_content_org = u"\n\nThis task is CLOSED.\n " \
+						"The resource associated with Moderation Task has been REJECTED. \n"
+			task_dict = {
+				"name": task_node.name,
+				"created_by": node_obj.created_by,
+				"modified_by": request.user.id,
+				"contributors": [request.user.id],
+				"content_org": unicode(task_content_org),
+				"created_by_name": unicode(request.user.username),
+				"Status": u"CLOSED",
+				"Priority": u"Normal",
+				"Assignee": list(group_obj.group_admin[:]),
+				# "has_type": task_type_list
+			}
+			task_obj = create_task(task_dict, 'group')
+
+		# Sending notification to all watchers about the updates of the task
+		try:
+			for each_user_id in list_of_recipients_ids:
+				activ = "Contribution to " + group_obj.name +"."
+				mail_content = u"\n The resource "+ node_obj.name +" is REJECTED by " \
+							 + request.user.username + ". \n" \
+							 + "Reason specified: "+ unicode(reject_reason_msg)
+				user_obj = User.objects.get(id=int(each_user_id))
+				set_notif_val(request, group_obj._id, mail_content, activ, user_obj)
+		except Exception as e:
+			print "\n Unable to send notifications ",e
+		flag = 1
 	return HttpResponse(flag)
 
 
