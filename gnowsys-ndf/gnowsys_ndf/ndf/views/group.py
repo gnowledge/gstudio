@@ -405,7 +405,6 @@ class CreateSubGroup(CreateGroup):
             self.add_subgroup_to_parents_postnode(parent_group_id, group_obj._id, sg_member_of)
 
             return True, group_obj
-        
         else:
             return False, 'Group with same name exists.'
 
@@ -420,6 +419,9 @@ class CreateSubGroup(CreateGroup):
         Otherwise returns False.
         '''
         if sg_member_of == 'Group':
+            # i.e: group is normal-sub-group.
+            return True
+        elif sg_member_of == 'subgroup':
             # i.e: group is normal-sub-group.
             return True
 
@@ -1278,6 +1280,7 @@ class GroupCreateEditHandler(View):
 
         group_obj = None
         nodes_list = []
+        subgroup_flag = request.GET.get('subgroup','')
 
         if action == "edit":  # to edit existing group
 
@@ -1305,7 +1308,8 @@ class GroupCreateEditHandler(View):
                                     {
                                         'node': group_obj, 'title': title,
                                         'nodes_list': nodes_list,
-                                        'groupid': group_id, 'group_id': group_id
+                                        'groupid': group_id, 'group_id': group_id,
+                                        'subgroup_flag':subgroup_flag
                                         # 'appId':app._id, # 'is_auth_node':is_auth_node
                                       }, context_instance=RequestContext(request))
     # --- END of get() ---
@@ -1325,6 +1329,9 @@ class GroupCreateEditHandler(View):
         group_name = request.POST.get('name', '').strip()  # hidden-form-field
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
+        subgroup_flag = request.POST.get('subgroup', '')
+        if subgroup_flag:
+            subgroup_flag = eval(subgroup_flag)
         # check if group's editing policy is already 'EDITABLE_MODERATED' or
         # it was not and now it's changed to 'EDITABLE_MODERATED' or vice-versa.
         if (edit_policy == "EDITABLE_MODERATED") or (group_obj.edit_policy == "EDITABLE_MODERATED"):
@@ -1338,8 +1345,10 @@ class GroupCreateEditHandler(View):
             # calling method to create new group
             result = mod_group.create_edit_moderated_group(group_name, moderation_level, "ModeratingGroup", node_id=node_id)
 
+        elif subgroup_flag:
+            sub_group = CreateSubGroup(request)
+            result = sub_group.create_subgroup(group_id, group_name, "subgroup")
         else:
-
             # instantiate regular group
             group = CreateGroup(request)
 
@@ -1756,9 +1765,12 @@ def group_dashboard(request, group_id=None):
     profile_pic_image = None
     list_of_unit_events = []
     blog_pages = None
+    subgroups_cur = None
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
+    if group_obj and group_obj.post_node:
+        subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, 'member_of': group_gst._id, 'edit_policy': {'$ne': "EDITABLE_MODERATED"}})
 
     if not group_obj:
       group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -1895,6 +1907,7 @@ def group_dashboard(request, group_id=None):
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
+                                                       'subgroups_cur':subgroups_cur,
                                                        'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image,
                                                        'old_profile_pics':old_profile_pics
