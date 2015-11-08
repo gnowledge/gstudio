@@ -323,6 +323,14 @@ if($('.breadcrumbs').length == 0)
   {
   // alert("hhhh");
     breadcrumbElStr = searchStr.substring(7);
+
+    var teachesLHS = $(".teaches-block a");
+    for(i=0; i < teachesLHS.length; i++){
+      // console.log(teachesLHS[i])
+      // console.log(teachesLHS[i].href + location.search)
+      teachesLHS[i].href = teachesLHS[i].href + location.search;
+    }
+
     breadcrumbElList = breadcrumbElStr.split(',');
     node_id = "{{node.pk}}";
 
@@ -339,7 +347,7 @@ if($('.breadcrumbs').length == 0)
         'oid_list': breadcrumbElListJSON
       },
       success: function (data) {
-        console.log(data);
+        // console.log(data);
         if(data != "false")
         {
           dataObj = JSON.parse(data);
