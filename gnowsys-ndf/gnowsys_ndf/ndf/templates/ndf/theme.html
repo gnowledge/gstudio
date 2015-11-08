@@ -86,16 +86,7 @@
 
 
 {% block meta_content %}
-	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
-		<h2 class="subheader">
-			{% if theme_GST.altnames and theme_GST.altnames != "None" %}
-				{{theme_GST.altnames}}
-			{% else %}
-				{{theme_GST.name}}
-			{% endif%}
-		</h2>
-	</a>
-	{{theme_GST.content|default_if_none:""|safe}}
+	
 {% endblock %}
 
 
@@ -210,7 +201,7 @@
 
 	{% if themes_hierarchy and node %}
 
-		<div style="float:left; font-size: 2em; "> {{node.name}}</div> 
+		<div class="large-4 columns repository-title"> {{node.name}}</div> 
 
         <div style="float:right; margin:0 2em;" >
 
@@ -259,16 +250,29 @@
   		Now by changing query at backend, it shows resources related to selected language.
   		Still this needs to be checked. So do not deletethis commented ndf_tag - 'get_preferred_lang' -->
 
-{{ each.name }}
+		{{ each.name }}
         {# {% get_preferred_lang request group_id nodes "Theme" as nodes %} #}
 
 		{% group_type_info groupid request.user as grouptype %}
   		<!-- Existing card list-->
-	  	{% for each in nodes %}
+	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
+			<h2 class="large-4 columns repository-title">
+				{% if theme_GST.altnames and theme_GST.altnames != "None" %}
+					{{theme_GST.altnames}}
+				{% else %}
+					{{theme_GST.name}}
+				{% endif%}
+			</h2>
+		</a>
+		<div class="large-8 columns repository-desc">
+		{{theme_GST.content|default_if_none:""|safe}}
+			
+		</div>
 
 <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
 
      <li class="card-image-wrapper"> 
+	  	{% for each in nodes %}
 
 
 	      <div class="scard">

@@ -229,6 +229,9 @@
 
     {% if topic %}
       {% get_filters_data "Topics" as filter_dict %}
+  <div id="view_collection">
+    <span itemprop="{{schema.1.name}}" class='large-4 columns repository-title'> {% firstof node.altnames node.name %}   
+  </div>
       {% include "ndf/filters.html" with filter_dict=filter_dict %}
     {% endif %}
 
@@ -593,13 +596,9 @@
             {% endif %}
             {% endwith %}
           </div>
-<<<<<<< HEAD
-          
-=======
           {% get_list_of_fields node.type_of "name" as type_of_list %}
           {% if "Info page" not in type_of_list %}
 
->>>>>>> cded3791848f871ae599f512d1076bcfa404ecfb
           <!-- Discussion -->
                 <div class="content" id="view-discussion">
                   <!-- discussion content area -->

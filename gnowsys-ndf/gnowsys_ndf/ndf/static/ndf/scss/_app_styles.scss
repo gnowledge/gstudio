@@ -1597,21 +1597,24 @@ aside#help{
   color: gray;
 }
 
-.repository-title{
-      font-size: 150%;
-      float: left;
-      background-color: rgba(0, 0, 0, 0.8);
-      color:#D7D7D7;width:13%;
-      display:inline-block;
-      text-align: center;
-  }
-  .repository-desc{
-      font-size: 150%;
-    width:39%;
-    padding-left:30px;
-    background-color:#9B9DA0;
+.repository-title{  
+      color:#D7D7D7;
+    font-size: 1.5em;
+    width:auto;
+    background-color: rgba(0, 0, 0, 0.8);
     text-align:left;
     display:inline-block;
     margin-left:5px;
-
+    position:relative;
+    text-align:center;
+  }
+  .repository-desc{
+      font-size: 1.5em;
+    width:auto;
+    background-color:#E5E5E5;
+    text-align:left;
+    display:inline-block;
+    color:#878787;
+    position:relative;
+    margin-left:10px;
   }

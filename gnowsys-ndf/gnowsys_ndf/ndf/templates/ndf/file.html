@@ -56,14 +56,7 @@
 {% block meta_content %}
 
   <!-- {# <a href="{% url app_gst.name|lower group_name_tag %}"> #} -->
-    <h2 class="subheader">
-      {% if app_gst.altnames and app_gst.altnames != "None" %}
-         {% trans app_gst.altnames %}
-      {% else %}
-        {% trans app_gst.name %}
-      {% endif%}
-    </h2>
-    {{app_gst.content|default_if_none:""|safe}}
+    
   <!-- {# </a> #} -->
 
 {% endblock %}
@@ -255,7 +248,15 @@
 
 
 {% block body_content %}
-  
+  <div class="large-4 columns repository-title">
+      {% if app_gst.altnames and app_gst.altnames != "None" %}
+         {% trans app_gst.altnames %}
+      {% else %}
+        {% trans app_gst.name %}
+      {% endif%}
+  </div>
+    
+    <div class="large-8 columns repository-desc">{{app_gst.content_org|default_if_none:""|safe}}</div>
   {% if files.count > 1  and title == "E-Library" %}
     {% get_filters_data "File" as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}

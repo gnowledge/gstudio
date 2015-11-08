@@ -227,6 +227,7 @@
     border: solid thin #ddd;
     margin-bottom: 1em;
     overflow: auto;
+
   }
 
   .collection > ul li:nth-child(odd) { background: #ddd; }
@@ -239,12 +240,26 @@
     text-indent:-32px;
 
 }
+  .topic-title{
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #D7D7D7;
+        font-size: 1em;
+        padding-left:10px;
+        position: relative;
+        margin-top: -1em !important;
 
+
+  }
     
-  #view_collection legend{
+  .custom-fieldset{
+    background-color: #efefef !important;
+  }
+
+  #view_collection{
     text-align: center;
     border-left: solid thin #ddd;
     border-right: solid thin #ddd;
+
   }
   
   .res_name{
@@ -259,9 +274,9 @@
   {% if topic %}
     <!-- For displaying related nodes in topic page -->
     <!-- Related node means all collection elements of its teme item i.e all siblings of topic node -->
-    <fieldset>
+    <fieldset class="custom-fieldset">
       {% if prior_obj %}        
-      <legend><h3><small>Topics in {{prior_obj.name}}</small></h3></legend>
+      <div class="row topic-title">Topics in {{prior_obj.name}}</div>
   
         {% comment %}
           {% for each in prior_obj.collection_set %}
@@ -284,9 +299,7 @@
                 
                 <!-- Clicked topic should not be included in related nodes list -->
                 {% if node.pk != obj.pk %}
-                  <li> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a> </li>
-                {% else %}
-                  <li> <span class="text-gray">{{obj.name}}</span> </li>
+                <li> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a> </li>
                 {% endif %} 
 
             {% endfor %}
