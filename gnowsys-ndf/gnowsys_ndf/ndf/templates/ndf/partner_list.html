@@ -6,30 +6,7 @@
 {% block title %} {{group_obj.name}} {% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader"></h2>
-<!-- 
-  {% comment %}
-  <a href="{% url app_gst.name|lower group_name_tag %}">
-    <h2 class="subheader">
-      {% if app_gst.altnames and app_gst.altnames != "None" %}
-        {{app_gst.altnames}}
-      {% else %}
-        {{app_gst.name}}
-      {% endif%}
-    </h2>
-    {{app_gst.content|safe}}
-  </a>
-  {% endcomment %} -->
-{% endblock %}
-
-
-{% block help_content %}
-
-{% endblock %}
-
-
-{% block search_content %}
-  {% include "ndf/node_search_base.html" %}
+<h2 class="subheader"> {{group_obj.name}}</h2>
 {% endblock %}
 
 
@@ -57,66 +34,15 @@
   {% autopaginate group_nodes 23 %}
 
   {% for node in group_nodes %}
-  {% if node.name != request.user.username %}
-  
-    <li class="card">
-      {% if grouptype == "Moderated" %}
-        {% if node.status == "DRAFT" %}
-          <div class="draft group">
-        {% elif node.status == "PUBLISHED" %}
-          <div class="published group">
-        {% endif %}
-      {% else %}
-        <div class='{% if node.status == "PUBLISHED" %}published{% endif %} group'>
-      {% endif %} 
-
-      <a href="{% url 'groupchange' node.pk %}">
-      <div class="row">
-        <div class="small-10 columns">                             
-            <b>
-              {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-            </b>
-        </div>
-      </div>
-        {% get_relation_value node.pk 'has_profile_pic' as logo_img_and_grel %}
-          {% if logo_img_and_grel.0 %}
-            {% get_node logo_img as logo_img_and_grel.0 %}
-            {% if logo_img_and_grel.0.fs_file_ids.1 %}
-              <img src="{% url 'get_gridfs_resource' logo_img_and_grel.0.fs_file_ids.1 %}" alt="" />
-            {% endif %}
-          {% endif %}
-      <hr/>
-      <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-      
-      <footer>
-          <div class="age">
-            {{ node.agency_type}} {% trans "created" %} {{node.created_at|timesince}} {% trans "ago by" %} <span class="user" href="" data-gnow="">{{node.user_details_dict.created_by}}</span>
-        </div>
-        <span><strong>{{node.author_set|length}}</strong> {% trans "Members" %}</span>
-        {% get_group_resources node as obj_count %}
-        <span class="right"><strong>{{obj_count}}</strong> {% trans "Objects" %}</span>
-      </footer>
-      </a>
-
-      <div class="label-list small-12 columns">
-        {% for tag in node.tags|slice:":3" %}
-          <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
-        {% endfor %}
-      </div>
-
-    </div>
-  </li>
-  {% endif %}
-
+    <li class="card-image-wrapper"> 
+      {% include 'ndf/simple_card.html' with resource=node url_name="groupchange" first_arg=node.pk %}
+    </li>
   {% empty %}
-    {% if not searching %}
-      <div class="row">
-        <div class="small-12 columns">
-         <h5>{% trans "There are no" %} {{group_obj.name}} {% trans "created yet." %} </h5>
-        </div>
+    <div class="row">
+      <div class="small-12 columns">
+       <h5>{% trans "There are no" %} {{group_obj.name}} {% trans "created yet." %} </h5>
       </div>
-    {% endif %}
-
+    </div>
   {% endfor %}
   
 </ul>
