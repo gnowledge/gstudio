@@ -536,7 +536,7 @@
                         <i>{% trans 'Resource Type' %}: {{node.mime_type}}</i><br/>
                      {% endif %}
                   {% endcomment %}
-                <p class="large-text-right"><small>
+                  <p class="large-text-right"><small>
                   <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
                 </small></p>
               </div>
@@ -871,7 +871,6 @@
               <a href="#" class="round small button right">{% trans 'View Statistics' %}</a> <br/>
             </div>
           </div>
-
         </div>
         <div id="cl_house_modal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
           <div class="row">
@@ -899,8 +898,9 @@
 
     <div >
 
+      
+    <h5>Sub-Groups:</h5>
       <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-
         {% for subgroup_node in subgroups_cur %}
           <li class="card">
               <div class="subgroup_node">
@@ -935,5 +935,8 @@
         {% endfor %}
       {% endif %}
       </section>
-      </div>
+    </div>
     </section>
+    </div>
+
+</section>
