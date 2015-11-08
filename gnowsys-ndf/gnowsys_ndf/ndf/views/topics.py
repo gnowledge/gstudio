@@ -115,12 +115,13 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     else:
         # This will show Themes as a card view on landing page of Topics
         themes_cards = True
-        lang = list(get_language_tuple(request.LANGUAGE_CODE))
-        nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}, 'language': lang})
         # if request.user.username:
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
         # else:
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+        
+    lang = list(get_language_tuple(request.LANGUAGE_CODE))
+    nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}, 'language': lang})
 
     return render_to_response("ndf/theme.html",
                                {'theme_GST_id':theme_GST._id, 'theme_GST':theme_GST, 'themes_cards': themes_cards, 'theme_GST':theme_GST,
@@ -744,21 +745,6 @@ def get_coll_set(node):
 
 @get_execution_time
 def topic_detail_view(request, group_id, app_Id=None):
-
-  #####################
-  # ins_objectid  = ObjectId()
-  # if ins_objectid.is_valid(group_id) is False :
-  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #   if group_ins:
-  #       group_id = str(group_ins._id)
-  #   else :
-  #       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #       if auth :
-  #           group_id = str(auth._id)
-  # else :
-  #   pass
-  ###################### 
 
   try:
       group_id = ObjectId(group_id)
