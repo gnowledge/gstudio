@@ -532,7 +532,7 @@ class CreateSubGroup(CreateGroup):
 
     def set_partnergroup(self, request, group_object):
         try:
-            at_list = ['house_street','town_city','pin_code','email_id','alternate_number','mobile_number']
+            at_list = ['house_street','town_city','pin_code','email_id','alternate_number','mobile_number','website']
             partner_at_cur = node_collection.find({'_type':"AttributeType",'name':{'$in': at_list}})
             for each in partner_at_cur:
                 each_name_val = self.request.POST.get(each.name,'')
@@ -1294,6 +1294,7 @@ class GroupCreateEditHandler(View):
 
         group_obj = None
         nodes_list = []
+        logo_img_node = None
         parent_obj_partner = None
         subgroup_flag = request.GET.get('subgroup','')
 
@@ -1330,7 +1331,11 @@ class GroupCreateEditHandler(View):
         if partnergroup_flag:
             template = "ndf/create_partner.html"
             parent_obj_partner = get_group_name_id(group_id, get_obj=True)
+            if group_obj:
+                logo_img_node, grel_id = get_relation_value(group_obj._id,'has_profile_pic')
+                group_obj.get_neighbourhood(group_obj.member_of)
 
+        # print "\n\ngroup_obj",group_obj.name,"----",group_obj.relation_set
         return render_to_response(template,
                                     {
                                         'node': group_obj, 'title': title,
@@ -1338,7 +1343,8 @@ class GroupCreateEditHandler(View):
                                         'groupid': group_id, 'group_id': group_id,
                                         'subgroup_flag':subgroup_flag,
                                         'parent_obj_partner':parent_obj_partner,
-                                        'partnergroup_flag':partnergroup_flag
+                                        'partnergroup_flag':partnergroup_flag,
+                                        'logo_img_node': logo_img_node
                                         # 'appId':app._id, # 'is_auth_node':is_auth_node
                                       }, context_instance=RequestContext(request))
     # --- END of get() ---
@@ -1359,6 +1365,7 @@ class GroupCreateEditHandler(View):
         edit_policy = request.POST.get('edit_policy', '')
         subgroup_flag = request.POST.get('subgroup', '')
         partnergroup_flag = request.POST.get('partnergroup_flag', '')
+        url_name = 'groupchange'
 
         # raise Exception(partnergroup_flag)
         if subgroup_flag:
@@ -1393,7 +1400,7 @@ class GroupCreateEditHandler(View):
             # operation success: redirect to group-detail page
             group_obj = result[1]
             group_name = group_obj.name
-            url_name = 'groupchange'
+            # url_name = 'groupchange'
             if not partnergroup_flag:
                 # print request.POST.get('apps_to_set', '')
                 app_selection(request, group_obj._id)
@@ -1403,10 +1410,13 @@ class GroupCreateEditHandler(View):
                 partner_grp_result = sub_group.set_partnergroup(request, group_obj)
                 sub_group.set_logo(request, group_obj, logo_rt = "has_profile_pic")
         else:
-            # operation fail: redirect to group-listing
-            group_name = 'home'
-            url_name = 'group'
-
+            if not partnergroup_flag:
+                # operation fail: redirect to group-listing
+                group_name = 'home'
+                url_name = 'group'
+            else:
+                partner_grp_result = sub_group.set_partnergroup(request, group_obj)
+                sub_group.set_logo(request, group_obj, logo_rt = "has_profile_pic")
         return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
 # ===END of class EditGroup() ===
 # -----------------------------------------

@@ -30,21 +30,18 @@
     {% csrf_token %}
     {% cache 3600 create_partner request.user.id request.LANGUAGE_CODE %}
     <fieldset>
-    {% csrf_token %}
 
     <div id="people-details-edit-div" class="tabs-content">
         <div class="row">
-          <br>
           <div class="row">
             <div class="small-3 columns"> 
               <label class="right inline">Name
               </label>
             </div>
             <div class="small-5 columns end">
-            <input type="text" name="name" id="name">
+            <input type="text" name="name" id="name_input" value="{% if node %}{{node.name}}{% endif %}" {% if node %}disabled="disabled"{% endif %}>
             </div>
           </div>
-          <br>
           <div class="row">
             <div class="small-3 columns"> 
               <label class="right inline">Description
@@ -54,69 +51,71 @@
               {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}      
             </div>
           </div>
-          <br/>
           <div class="row">
             <div class="small-3 columns"> 
               <label class="right inline">House/Street
               </label>
             </div>
             <div class="small-5 columns end">
-            <input type="text" name="house_street" id="street">
+            <input type="text" name="house_street" value="{{node.house_street}}" >
             </div>
           </div>
-          <br/>          
           <div class="row">
             <div class="small-3 columns"> 
               <label class="right inline">Town/City
               </label>
             </div>
             <div class="small-5 columns end">
-            <input type="text" name="town_city" id="town_city">
+            <input type="text" name="town_city" id="town_city" value="{{node.town_city}}">
             </div>
           </div>
-          <br/> 
           <div class="row">
             <div class="small-3 columns"> 
               <label class="right inline">Pin Code
               </label>
             </div>
             <div class="small-5 columns end">
-              <input type="text" name="pin_code" id="pin_code">
+              <input type="text" name="pin_code" id="pin_code" value="{{node.pin_code}}">
             </div>
           </div>
-          <br/>          
           <div class="row">
             <div class="small-3 columns"> 
               <label class="right inline">E-mail Id
               </label>
             </div>
             <div class="small-5 columns end">
-              <input type="email" name="email_id" id="email_id" required pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$" class="compulsory">
+              <input type="email" name="email_id" id="email_id" required pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$" class="compulsory" value="{{node.email_id}}">
             <small class="error">{% trans "Please fill a valid email" %}! </small>
 
             </div>
           </div>
-          <br/>          
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">Website
+              </label>
+            </div>
+            <div class="small-5 columns end">
+              <input type="text" name="website" id="website" value="{{node.website}}">
+            </div>
+          </div>
           <div class="row">
             <div class="small-3 columns"> 
               <label class="right inline">Mobile No.
               </label>
             </div>
             <div class="small-5 columns end">
-              <input type="text" name="mobile_number" id="mobile_num">
+              <input type="text" name="mobile_number" id="mobile_num" value="{{node.mobile_number}}">
             </div>
           </div>
-          <br/>          
           <div class="row">
             <div class="small-3 columns"> 
               <label class="right inline">Altertnate No.
               </label>
             </div>
             <div class="small-5 columns end">
-            <input type="text" name="alternate_number" id="alternate_num">
+            <input type="text" name="alternate_number" id="alternate_num" value="{{node.alternate_number}}">
             </div>
           </div>
-          <br/>          
         </div>
     <div class="row">
       <div class="small-3 columns">
@@ -351,7 +350,7 @@
       event.preventDefault();
     }
   });
-
-
-
+  $("#grpsubmit").click(function(event) {
+    $("#name_input,#email_id").removeAttr("disabled")
+  });
 {% endblock %}
