@@ -898,7 +898,7 @@
 
     <div >
 
-      
+    {% if subgroups_cur %}
     <h5>Sub-Groups:</h5>
       <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
         {% for subgroup_node in subgroups_cur %}
@@ -935,6 +935,7 @@
         {% endfor %}
       {% endif %}
       </section>
+    {% endif %}
     </div>
     </section>
     </div>
