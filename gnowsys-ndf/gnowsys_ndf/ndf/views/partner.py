@@ -139,7 +139,7 @@ def partner_list(request, group_id):
 
     group_obj = get_group_name_id(group_id, get_obj=True)
     app_gst = node_collection.one({'_type': 'GSystemType', 'name': 'PartnerGroup'})
-
+    group_nodes = None
     collection_set = []
     # groups_category = None
     if group_obj:
