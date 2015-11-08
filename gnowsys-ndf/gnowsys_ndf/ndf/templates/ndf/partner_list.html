@@ -3,11 +3,10 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
-
-{% block title %} {{groups_category}}s {% endblock %}
+{% block title %} {{group_obj.name}} {% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader">{{groups_category}}s</h2>
+<h2 class="subheader"></h2>
 <!-- 
   {% comment %}
   <a href="{% url app_gst.name|lower group_name_tag %}">
@@ -35,29 +34,20 @@
 
 
 {% block related_content %}
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% if is_gstaff %}
   <br/>
-  <div class="create card">
-    <div class="group">
-      <br/>
-      <a class="button medium" 
-        {% if groups_category == "Partner" %}
-          href="{% url 'create_partner' group_name_tag %}">
-        {% else%}
-          href="{% url 'create_group' group_name_tag %}">
-        {% endif %}
-    	<span class="fi-plus">&nbsp;&nbsp;{% trans "New" %} {{groups_category}} </span>
+      <a class="button small" 
+          href="{% url 'create_group' group_obj.pk %}?subgroup=True&partnergroup=True">
+    	<span class="fi-plus">&nbsp;&nbsp;{% trans "New" %} {{group_obj.name}}</span>
       </a>
-    </div>
-  </div>
-  {% endif %}
   {% endif %}
 {% endblock %}
 
 
 {% block body_content %}
+<br/><div>
+  
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
   <!-- Existing card list-->
@@ -88,7 +78,13 @@
             </b>
         </div>
       </div>
-      
+        {% get_relation_value node.pk 'has_profile_pic' as logo_img_and_grel %}
+          {% if logo_img_and_grel.0 %}
+            {% get_node logo_img as logo_img_and_grel.0 %}
+            {% if logo_img_and_grel.0.fs_file_ids.1 %}
+              <img src="{% url 'get_gridfs_resource' logo_img_and_grel.0.fs_file_ids.1 %}" alt="" />
+            {% endif %}
+          {% endif %}
       <hr/>
       <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
       
@@ -116,7 +112,7 @@
     {% if not searching %}
       <div class="row">
         <div class="small-12 columns">
-         <h5>{% trans "There are no" %} {{groups_category}} {% trans "created yet." %} <b>{% trans "Be the first to create a" %} {{groups_category}}!</b></h5>
+         <h5>{% trans "There are no" %} {{group_obj.name}} {% trans "created yet." %} </h5>
         </div>
       </div>
     {% endif %}
@@ -124,6 +120,7 @@
   {% endfor %}
   
 </ul>
+</div>
 
 {% paginate %}
 
