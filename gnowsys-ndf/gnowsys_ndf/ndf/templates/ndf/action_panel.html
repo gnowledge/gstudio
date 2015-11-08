@@ -98,7 +98,11 @@
 							{% get_edit_url node.pk as edit_url %}
 							{% if is_group %}
 								{% if is_gstaff %}
+									{% if "PartnerGroup" in node.member_of_names_list %}
+									<a href="{% url 'edit_group' group_id %}?subgroup=True&partnergroup=True" class="tiny button radius left-btn edit ">{% trans " Edit" %}</a>
+									{% else %}
 									<a href="{% url edit_url group_id %}" class="tiny button radius left-btn edit ">{% trans " Edit" %}</a>
+									{% endif %}
 								{% endif %}
 							{% else %}
 								{% if user_is_joined == "joined" or user_is_joined == "author" or is_gstaff %}
