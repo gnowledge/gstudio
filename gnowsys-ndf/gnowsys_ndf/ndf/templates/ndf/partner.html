@@ -9,11 +9,7 @@
 {% block meta_content %}  
 
   <h2 class="subheader">
-    {% if app_gst.altnames and app_gst.altnames != "None" %}
-      {{app_gst.altnames}}
-    {% else %}
-      {{app_gst.name}}
-    {% endif%}
+  {% trans 'Partners' %}
   </h2>
   {{app_gst.content|default_if_none:''|safe}}
 
@@ -29,16 +25,13 @@
   {% include "ndf/node_search_base.html" %}
 {% endblock %}
 
-
+{% comment %}
 {% block related_content %}
   {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}
   {% if user_access == "allow" %}
   <br/>
-  <div class="create card">
-    <div class="group">
-      <br/>
-      <a class="button medium"
+      <a class="button small"
       {% if groups_category == "Partners" %}
           href="{% url 'create_partner' group_name_tag %}">
         {% else%}
@@ -46,22 +39,19 @@
         {% endif %}
         <span class="fi-plus">&nbsp;&nbsp;{% blocktrans %} New {{groups_category}} {% endblocktrans %}</span>
       </a>
-    </div>
-  </div>
   {% endif %}
   {% endif %}
 {% endblock %}
+{% endcomment %}
 
 
 {% block body_content %}
 {% get_group_name groupid as group_name_tag %}
-<header class="row">
   <dl class="tabs" data-tab data-options="deep_linking:true">
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> {% trans "All" %} {{ groups_category }} {% if group_nodes_count %}({{ group_nodes_count }}){% endif %}</a></dd>
+    <dd class="active"><a href="#panel2-1">{% trans "All" %} {{ groups_category }} {% if group_nodes_count %}({{ group_nodes_count }}){% endif %}</a></dd>
     <!--<dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>-->
   </dl>
-</header>
-
+<br/>
 <div class="content row">
     
 {% if searching and group_nodes_count > 0 %}
