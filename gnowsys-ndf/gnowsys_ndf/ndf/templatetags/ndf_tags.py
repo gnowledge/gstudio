@@ -2877,16 +2877,17 @@ def get_sg_member_of(group_id):
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
 	# print group_obj.name
 	# Fetch post_node of group
-	if "post_node" in group_obj:
-		post_node_id_list = group_obj.post_node
+	if group_obj:
+		if "post_node" in group_obj:
+			post_node_id_list = group_obj.post_node
 
-		if post_node_id_list:
-			# getting parent's sub group's member_of in a list
-			for each_sg in post_node_id_list:
-				each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
-				if each_sg_node:
-					sg_member_of_list.extend(each_sg_node.member_of_names_list)
-	# print "\n\n sg_member_of_list---",sg_member_of_list
+			if post_node_id_list:
+				# getting parent's sub group's member_of in a list
+				for each_sg in post_node_id_list:
+					each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
+					if each_sg_node:
+						sg_member_of_list.extend(each_sg_node.member_of_names_list)
+		# print "\n\n sg_member_of_list---",sg_member_of_list
 	return sg_member_of_list
 
 def get_objectid_name(nodeid):
