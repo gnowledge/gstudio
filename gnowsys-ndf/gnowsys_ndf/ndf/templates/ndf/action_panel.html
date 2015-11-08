@@ -289,7 +289,10 @@
 										<a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny button radius edit left-btn">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 									{% else %}
 										{% if "Theme" in node.member_of_names_list or "Topic" in node.member_of_names_list %}
-											<a href="{% url create_url group_name_tag app_id %}" class="tiny button radius edit left-btn">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+											{% if is_gstaff %}
+												<a href="{% url create_url group_name_tag app_id %}" class="tiny button radius edit left-btn">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+											{% endif %}
+
 										{% elif "Term" in node.member_of_names_list %}
 											<a href="{% url create_url group_name_tag %}" class="tiny button radius edit left-btn">{% trans "New" %} Topic
 											</a>
@@ -312,7 +315,7 @@
 			<div class="row btn-row">
 				<!-- New SubGroup and PE-->
 					{% if user.is_superuser %}
-						<a href="{% url 'create_sub_group' group_id %}" class="tiny button radius left-btn">{% trans "New SubGroup" %}</a>
+						<a href="{% url 'create_group' group_id %}?subgroup=True" class="tiny button radius left-btn">{% trans "New SubGroup" %}</a>
 
 						<a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="tiny button radius right-btn">{% trans "New Programs" %}</a>
 					{% endif %}

@@ -14,6 +14,8 @@
   <ul>
 
       <!--  Fliter now on right hand side of page   -->
+      {% comment %}
+        
        {% if topic %}
         <dl class="tabs" style="float: right; height: 1px;" data-tab> 
 
@@ -74,6 +76,9 @@
                           </ul>
                         </li> -->
                         {% endcomment %}                    
+
+                {% comment %}
+                          
                       {% elif k == "language" %}
                         <li>
                           <a> {% trans "Language" %} &raquo;</a>
@@ -122,6 +127,7 @@
           -->
           </dl>
       {% endif %}
+      {% endcomment %}
       <!--  End of Filter-->
   </ul>
 
@@ -138,15 +144,6 @@
     {% endfor %}
   </ul>
     
-  {% comment %}
-  <ul class="breadcrumbs">
-    <li>
-        {% for each_topic in node.teaches %}
-          <a href="{% url 'topic_details' group_name_tag each_topic.pk %}" style="color:black;">{% trans each_topic.name %},</a>
-        {% endfor %}
-    </li>
-  </ul>
-  {% endcomment %}
   {% endif %}
   
   {% if node.teaches %}
@@ -538,10 +535,11 @@
 
             <!-- End New -->          
               <div class="right">
+                  {% comment %}
                       {% if node.mime_type %}
-                        <!-- <i>{% trans 'Resource Type' %}: {{node.mime_type}}</i><br/> -->
-                        
+                        <i>{% trans 'Resource Type' %}: {{node.mime_type}}</i><br/>
                      {% endif %}
+                  {% endcomment %}
                 <p class="large-text-right"><small>
                   <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
                 </small></p>
@@ -595,7 +593,13 @@
             {% endif %}
             {% endwith %}
           </div>
+<<<<<<< HEAD
           
+=======
+          {% get_list_of_fields node.type_of "name" as type_of_list %}
+          {% if "Info page" not in type_of_list %}
+
+>>>>>>> cded3791848f871ae599f512d1076bcfa404ecfb
           <!-- Discussion -->
                 <div class="content" id="view-discussion">
                   <!-- discussion content area -->
@@ -614,6 +618,7 @@
                   <!-- END of discussion content area -->     
                 </div>
           <br/>
+          {% endif %}
           
           <div>
             {% get_grid_fs_object each_node as grid_fs_obj %}
@@ -900,6 +905,49 @@
 
         
       </div><!-- end of tab's content -->
+      
+      {% check_group node as is_group %}
+      {% if is_group %}
+
+    <div >
+
+      <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+        {% for subgroup_node in subgroups_cur %}
+          <li class="card">
+              <div class="subgroup_node">
+              <a href="{% url 'groupchange' subgroup_node.name %}">
+                <div class="row">
+                  <div class="small-8 column">
+                    <b>{{subgroup_node.name}}</b>
+                  </div>
+                </div>
+                <hr/>
+              </a>
+              <footer>
+                <div class="age">
+                  {{ subgroup_node.member_of_names_list|join:', ' }} created {{subgroup_node.created_at|timesince}} ago 
+                  <br/>
+                  by <a class="user" href="{% url 'dashboard' subgroup_node.created_by %}" data-gnow="">{{subgroup_node.user_details_dict.created_by}}</a> 
+                </div>
+              </footer>
+              <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+            </div>
+          </li>        
+
+        {% empty %}
+            <div class="row">
+              <div class="small-12 columns">
+                <h5> 
+                No Subgroups Found!
+                </h5>
+              </div>
+            </div>
+        
+        {% endfor %}
+      {% endif %}
+      </section>
+      </div>
     </section>
   
   </div>

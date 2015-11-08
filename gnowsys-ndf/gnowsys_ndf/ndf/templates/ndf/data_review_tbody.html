@@ -83,11 +83,12 @@
 
 	<!-- moderation -->
 	{% if title == "moderation" %}
-
+		{% comment %}
 		<td class="view"> <!-- editorial discussion -->
 			0 | Replies
 			<!-- get the count of editorial discussion here -->
 		</td>
+		{% endcomment %}
 		<td class="view"> <!-- approval -->
 			Not Approved
 		</td>
@@ -311,19 +312,21 @@
 	{% if title == "moderation" %}
 
 	<!-- editorial discussion -->
+	{% comment %}
 	<td class="hide-el"> 
 		<input type="button" data-reveal-id="editorial_discussion_overlay" class="button tiny expand"  data-id="editorial-discussion" value="Discuss" data-action="editorial-discussion"/>
 		<!-- get the count of editorial discussion here -->
 	</td>
+	{% endcomment %}
 
 	<!-- approval -->
 	<td class="hide-el"> 
-		<input type="button" class="button tiny expand success" data-approve-id="{{resource.pk}}" data-id="action-btn-approve-{{resource.pk}}" value="Approve" data-action="approve" onclick="approveResource('{{resource.pk}}')">
+		<input type="button" class="button tiny expand success" data-approve-id="{{resource.pk}}" data-id="action-btn-approve-{{resource.pk}}" value="Approve" data-action="approve" onclick="approveResource('{{resource.pk}}','{{resource.name}}')">
 	</td>
 
 	<!-- rejection -->
 	<td class="hide-el"> 
-		<input type="button" class="button tiny expand alert" data-approve-id="{{resource.pk}}" value="Reject"  data-id="action-btn-reject-{{resource.pk}}" data-action="reject" onclick="rejectResource('{{resource.pk}}')">
+		<input type="button" class="button tiny expand alert" data-approve-id="{{resource.pk}}" value="Reject"  data-id="action-btn-reject-{{resource.pk}}" data-action="reject" onclick="rejectResource('{{resource.pk}}','{{resource.name}}')">
 	</td>
 
 	{% endif %}

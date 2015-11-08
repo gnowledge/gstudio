@@ -315,6 +315,67 @@ ul#navigation li a.last {
  -->
 <script type="text/javascript">
 
+if($('.breadcrumbs').length == 0)
+{
+  searchStr = window.location.search.substring(1)
+
+  if(searchStr.search("nav_li=") > -1)
+  {
+  // alert("hhhh");
+    breadcrumbElStr = searchStr.substring(7);
+    breadcrumbElList = breadcrumbElStr.split(',');
+    node_id = "{{node.pk}}";
+
+    breadcrumbElList.push(node_id);
+    breadcrumbElListJSON = JSON.stringify(breadcrumbElList);
+    // console.log(breadcrumbElList);
+
+    $.ajax({
+
+      url: "{% url 'get_resource_by_oid_list' group_id %}",
+      type: 'GET',
+      // datatype: ''
+      data:{
+        'oid_list': breadcrumbElListJSON
+      },
+      success: function (data) {
+        console.log(data);
+        if(data != "false")
+        {
+          dataObj = JSON.parse(data);
+          // console.log(dataObj);
+
+          u = document.createElement("UL");
+          u.classList.add('breadcrumbs');
+
+          for (var i = 0; i < dataObj.length; i++) {
+            var li = document.createElement("li");
+            var a = document.createElement("a");
+            // a.textContent = dataObj[i].name;
+            a.id = dataObj[i]._id;
+            a.style.color = "black";
+            a.classList.add('current');
+            a.appendChild(document.createTextNode(dataObj[i].name));
+
+            li.appendChild(a);
+            u.appendChild(li);
+          };
+
+          var lastEl = u.childNodes[u.childNodes.length - 1];
+          lastEl.children[0].id = "";
+          lastEl.children[0].classList.remove("current");
+          lastEl.children[0].style.color = "inherit";
+
+          $("section.medium-9.columns").prepend(u);
+
+        }
+      }
+
+    });
+
+  }
+}
+
 {% comment %}
   
   // fileResources = document.querySelectorAll('.file-resource');
