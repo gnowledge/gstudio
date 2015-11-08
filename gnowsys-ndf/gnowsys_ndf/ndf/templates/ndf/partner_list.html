@@ -13,10 +13,9 @@
 {% block related_content %}
   {% check_is_gstaff groupid request.user as is_gstaff %}
   {% if is_gstaff %}
-  <br/>
       <a class="button small" 
           href="{% url 'create_group' group_obj.pk %}?subgroup=True&partnergroup=True">
-    	<span class="fi-plus">&nbsp;&nbsp;{% trans "New" %} {{group_obj.name}}</span>
+        	<span class="fi-plus">&nbsp;&nbsp;{% trans "New" %} {{group_obj.name}}</span>
       </a>
   {% endif %}
 {% endblock %}

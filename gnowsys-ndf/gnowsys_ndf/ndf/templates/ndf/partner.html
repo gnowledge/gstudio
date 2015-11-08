@@ -4,11 +4,11 @@
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
 
-{% block title %} {% trans "Partners" %} {% endblock %}
+{% block title %} {{groups_category}} {% endblock %}
 
 {% block meta_content %}  
   <h2 class="subheader">
-  {% trans 'Partners' %}
+    {{groups_category}}
   </h2>
   {{app_gst.content|default_if_none:''|safe}}
 {% endblock %}
@@ -19,7 +19,7 @@
     {% autopaginate group_nodes 23 %}
     {% for node in group_nodes %}
       <li class="card-image-wrapper"> 
-        {% include 'ndf/simple_card.html' with resource=node url_name="partnerlist" first_arg=node.pk %}
+        {% include 'ndf/simple_card.html' with resource=node url_name="groupchange" first_arg=node.pk %}
       </li>
     {% endfor %}
   </ul>

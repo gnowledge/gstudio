@@ -176,7 +176,6 @@ def nroer_groups(request, group_id, groups_category):
         temp_key_name = each_item.keys()[0]
         if temp_key_name == groups_category:
             groups_names_list = each_item.get(groups_category, [])
-            
             # mapping for the text names in list
             groups_names_list = [mapping.get(i) for i in groups_names_list]
             break
@@ -187,8 +186,11 @@ def nroer_groups(request, group_id, groups_category):
                                         'group_type': "PUBLIC"
                                      })#.sort('last_update', -1)
 
+    if groups_category == "Partners":
+        app_gst = node_collection.one({'_type': 'GSystemType', 'name': 'PartnerGroup'})
 
-    app_gst = gst_group
+    elif groups_category == "Groups":
+        app_gst = gst_group
 
     # print "=============", app_gst
     group_nodes_count = group_nodes.count() if group_nodes else 0
