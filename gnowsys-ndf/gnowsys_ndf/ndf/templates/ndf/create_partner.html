@@ -75,7 +75,7 @@
               </label>
             </div>
             <div class="small-5 columns end">
-              <input type="text" name="pin_code" id="pin_code" value="{{node.pin_code}}">
+              <input type="text" name="pin_code" id="pin_code" value="{{node.pin_code}}" pattern="[0-9]{6}" class="input_only_num" maxlength="6">
             </div>
           </div>
           <div class="row">
@@ -104,7 +104,7 @@
               </label>
             </div>
             <div class="small-5 columns end">
-              <input type="text" name="mobile_number" id="mobile_num" value="{{node.mobile_number}}">
+              <input type="tel" name="mobile_number" id="mobile_num" class="input_only_num" value="{{node.mobile_number}}" maxlength='10' pattern="[1-9][0-9]{9}">
             </div>
           </div>
           <div class="row">
@@ -113,7 +113,7 @@
               </label>
             </div>
             <div class="small-5 columns end">
-            <input type="text" name="alternate_number" id="alternate_num" value="{{node.alternate_number}}">
+            <input type="text" name="alternate_number" id="alternate_num" value="{{node.alternate_number}}"  maxlength='10' pattern="[1-9][0-9]{9}" class="input_only_num">
             </div>
           </div>
         </div>
@@ -303,6 +303,21 @@
 {% endblock %}
 
 {% block script %}
+
+  $(".input_only_num").keydown(function (e) {
+        // Allow ctrl+A
+    if ((e.keyCode == 65 && e.ctrlKey === true) || 
+             // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+            (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9) {
+                 // let it happen, don't do anything
+                 return;
+        }
+   // Ensure that it is a number and stop the keypress
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+        e.preventDefault();
+    }        
+  });
+
 
   $("#node_search_form").parent().hide();
 
