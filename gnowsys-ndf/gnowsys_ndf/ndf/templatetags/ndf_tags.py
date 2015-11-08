@@ -36,7 +36,7 @@ except ImportError:
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
@@ -3054,3 +3054,20 @@ def get_list_of_fields(oid_list, field_name='name'):
 def convert_list(value):
 	#convert list of list to list
 	return list(itertools.chain(*value))
+
+
+@get_execution_time
+@register.assignment_tag
+def get_topic_breadcrumb_hierarchy(oid):
+
+	nodes_cur = get_prior_node_hierarchy(oid)
+	nodes_cur_list = [n._id for n in nodes_cur]
+	nodes_cur_list.reverse()
+	
+	comma_sep_str = ""
+	for each_t in nodes_cur_list:
+		comma_sep_str += each_t.__str__() + ","
+
+	# print "comma_sep_str : ", comma_sep_str
+	comma_sep_str = comma_sep_str[:-1]
+	return comma_sep_str
