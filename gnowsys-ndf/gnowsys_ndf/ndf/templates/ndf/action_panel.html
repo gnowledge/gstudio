@@ -309,7 +309,7 @@
 			<div class="row btn-row">
 				<!-- New SubGroup and PE-->
 					{% if user.is_superuser %}
-						<a href="{% url 'create_sub_group' group_id %}" class="tiny button radius left-btn">{% trans "New SubGroup" %}</a>
+						<a href="{% url 'create_group' group_id %}?subgroup=True" class="tiny button radius left-btn">{% trans "New SubGroup" %}</a>
 
 						<a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="tiny button radius right-btn">{% trans "New Programs" %}</a>
 					{% endif %}
