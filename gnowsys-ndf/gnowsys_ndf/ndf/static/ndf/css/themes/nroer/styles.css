@@ -25052,10 +25052,10 @@ p {
   color: gray;
 }
 
-/* line 1600, ../../../scss/_app_styles.scss */
+/* line 1601, ../../../scss/_app_styles.scss */
 .repository-title {
   color: #D7D7D7;
-  font-size: 1.5em;
+  font-size: 1.3em;
   width: auto;
   background-color: rgba(0, 0, 0, 0.8);
   text-align: left;
@@ -25065,14 +25065,14 @@ p {
   text-align: center;
 }
 
-/* line 1611, ../../../scss/_app_styles.scss */
+/* line 1612, ../../../scss/_app_styles.scss */
 .repository-desc {
-  font-size: 1.5em;
+  font-size: 1.3em;
   width: auto;
   background-color: #E5E5E5;
   text-align: left;
   display: inline-block;
   color: #878787;
   position: relative;
-  margin-left: 10px;
+  margin-left: 4px;
 }

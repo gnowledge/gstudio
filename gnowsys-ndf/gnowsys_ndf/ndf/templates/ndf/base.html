@@ -63,7 +63,7 @@
    {% get_gstudio_help_sidebar as gst_help_sidebar %}
    {% if gst_help_sidebar and app or app_description%}
      
-    <div id ="help-canvas-menu" class="">      
+    <!-- <div id ="help-canvas-menu" class="">      
       <a class="help-button btn" href="javascript:void(0);" >
         <div class="help-button-text">
           Help
@@ -73,7 +73,7 @@
       <div class="mainContainer">
              {{ app.content|default_if_none:app.content_org }}
       </div>
-    </div>
+    </div> -->
    {% endif %}
   <div class="workspace">
     <div class="off-canvas-wrap" data-offcanvas>
@@ -100,7 +100,7 @@
 
               <!-- Meta content in the (main aside header)-->
               <section>
-                <div style="padding-top:2.5rem;">
+                <div style="padding-top:2rem;">
                   {% block collection_content %}  {% endblock %}
                 </div>
 
