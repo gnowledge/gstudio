@@ -69,47 +69,9 @@
       {% endif %}
 
         {% for course in ce_coll %}
-          <li class="card">
-              <div class="course">
-              <a href="{% url 'groupchange' course.name %}">
-                <div class="row">
-                  <div class="small-8 column">
-                    <b>{{course.name}}
-                    </b>
-                  </div>
-                  {% get_relation_value course.pk 'has_logo' as logo_img_and_grel %}
-                    {% if logo_img_and_grel.0 %}
-                      {% get_node logo_img as logo_img_and_grel.0 %}
-                      {% if logo_img_and_grel.0.fs_file_ids.1 %}
-                        <img src="{% url 'get_gridfs_resource' logo_img_and_grel.0.fs_file_ids.1 %}" alt="" />
-                      {% endif %}
-                    {% endif %}
-
-                </div>
-                <span data-tooltip title="Course Event"></span>
-                <hr/>
-                <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-              </a>
-
-                <footer>
-                  <div class="age">
-                    {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-                    <br/>
-                    by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-                  </div>
-                  <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
-                </footer>
-
-              <div class="label-list small-12 columns">
-                {% for tag in course.tags|slice:":3" %}
-                <a href="{% url 'tag_info' group_name_tag tag %}">
-                  <span class="label" style="background-color:yellow">{{tag}}</span>
-                </a>{% endfor %}
-              </div>
-                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-            </div>
-          </li>        
-
+          <li class="card-image-wrapper"> 
+            {% include 'ndf/simple_card.html' with resource=course has_logo=True url_name="groupchange" first_arg=course.pk  %}
+          </li>
         {% empty %}
             <div class="row">
               <div class="small-12 columns">
@@ -131,38 +93,9 @@
         <h4>My {{title}}</h4>
       {% endif %}
         {% for course in enr_ce_coll %}
-          <li class="card">
-              <div class="course">
-              <a href="{% url 'groupchange' course.name %}">
-                <div class="row">
-                  <div class="small-8 column">
-                    <b>{{course.name}}
-                    </b>
-                  </div>
-                </div>
-                <span data-tooltip title="Course"></span>
-                <hr/>
-                <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-              </a>
-
-                <footer>
-                  <div class="age">
-                    {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-                    <br/>
-                    by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-                  </div>
-                  <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
-                </footer>
-
-              <div class="label-list small-12 columns">
-                {% for tag in course.tags|slice:":3" %}
-                <a href="{% url 'tag_info' group_name_tag tag %}">
-                  <span class="label" style="background-color:yellow">{{tag}}</span>
-                </a>{% endfor %}
-              </div>
-                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-            </div>
-          </li>        
+          <li class="card-image-wrapper"> 
+            {% include 'ndf/simple_card.html' with resource=course has_logo=True url_name="groupchange" first_arg=course.pk %}
+          </li>
 
         {% empty %}
             <div class="row">
@@ -183,45 +116,9 @@
       <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="courses">
       <h4> All Courses</h4>
         {% for course in course_coll %}
-          <li class="card">
-              <div class="course">
-              <a href="{% url 'course_detail' group_name_tag course %}">
-                <div class="row">
-                  <div class="small-8 column">
-                    <b>{{course.name}}
-                    </b>
-                  </div>
-                  {% get_relation_value course.pk 'has_logo' as logo_img_and_grel%}
-                    {% if logo_img_and_grel.0 %}
-                      {% get_node logo_img as logo_img_and_grel.0 %}
-                      {% if logo_img_and_grel.0.fs_file_ids.1 %}
-                        <img src="{% url 'get_gridfs_resource' logo_img_and_grel.0.fs_file_ids.1 %}" alt="" />
-                      {% endif %}
-                    {% endif %}
-
-                </div>
-                <hr/>
-                <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-              </a>
-
-                <footer>
-                  <div class="age">
-                    {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-                    <br/>
-                    by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-                  </div>
-                  <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
-                </footer>
-
-              <div class="label-list small-12 columns">
-                {% for tag in course.tags|slice:":3" %}
-                <a href="{% url 'tag_info' group_name_tag tag %}">
-                  <span class="label" style="background-color:yellow">{{tag}}</span>
-                </a>{% endfor %}
-              </div>
-                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-            </div>
-          </li>        
+          <li class="card-image-wrapper"> 
+            {% include 'ndf/simple_card.html' with resource=course url_name="groupchange" first_arg=node.pk %}
+          </li>
 
         {% empty %}
             <div class="row">
