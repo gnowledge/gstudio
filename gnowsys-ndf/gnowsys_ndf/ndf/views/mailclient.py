@@ -493,6 +493,7 @@ def server_sync(mail):
                 #updated data
                 if json_data.get('_type',0) != 0:
                                  #Updateable data       
+                        '''         
                         if json_data['_type'] == 'GAttribute' or json_data['_type'] == 'GRelation':
                                 temp_node = triple_collection.one({"_id": ObjectId(json_data["_id"])})
                         else:
@@ -501,7 +502,7 @@ def server_sync(mail):
                                 #if node is not present   
                                 temp_dict = {}
                                 for key, values in temp_node.items():
-                                        if key != u'fs_file_ids':
+                                        if key != u'fs_file_ids' or key != '_type':
                                             if key != 'name':          
                                                 if key in ['attribute_type','relation_type','relation_type_set','attribute_type_set']:
                                                         if key == 'attribute_type':
@@ -518,31 +519,30 @@ def server_sync(mail):
                                                                         node = process_list(values) 
                                                                 
                                                         if node:
-                                                                print "the nodewa",node
                                                                 temp_node[key] = node
                                                 else:
-                                                        temp_node[key] = json_data[key]
-                                print "hello",temp_node
-                                #temp_node.update(temp_dict)
-                                try:
-                                        temp_node.save()
-                                except:  
-                                        print "pass dila"       
-                                        #for i,v in temp_dict.items():  
-                                        #        temp_node[i] = v
-                                        #temp_node.save()
-                                        
+                                                        try:
+                                                            temp_node[key] = json_data[key]
+                                                        except:
+                                                            print (traceback.format_exc())
+                                temp_node.save()
+                                    
                         else:
+                        '''    
                             # if node is present update it
-                                try:
+                        try:
                                         if json_data['_type'] in ['GAttribute','GRelation']:
                                                 if json_data['_type'] == 'GAttribute':
                                                         temp_node = triple_collection.collection.GAttribute()
                                                 elif json_data['_type'] == 'GRelation':
                                                         temp_node = triple_collection.collection.GRelation()
+                                                elif json_data['_type'] == 'RelationType': 
+                                                        temp_node = node_collection.collection.RelationType()
+                                                elif json_data['_type'] == 'AttributeType':
+                                                        temp_node = node_collection.collection.AttributeType()        
                                                 temp_dict = {}
-                                                for key,values in json_data.items():
-                                                        if key != 'name':          
+                                                for key,values in temp_node.items():
+                                                        if key not in ['name','_type']:          
                                                                 if key in ['attribute_type','relation_type','relation_type_set','attribute_type_set']:
                                                                         if key == 'attribute_type':
                                                                                 node = node_collection.one({"_id":ObjectId(json_data['attribute_type']['_id'])})
@@ -559,9 +559,13 @@ def server_sync(mail):
                                                                         if node:
                                                                                 temp_node[key] = node
                                                                 else:
-                                                                        temp_dict[key] = values
+                                                                        try:
+                                                                            temp_dict[key] = temp_node[key]#values
+                                                                        except:
+                                                                            print "error aala"
                                                 temp_node.update(temp_dict)
                                                 try:
+                                                        print temp_node
                                                         temp_node.save()
                                                 except:         
                                                         for i,v in temp_dict.items():  
@@ -583,7 +587,7 @@ def server_sync(mail):
 
                                                 temp_node.update(temp_dict)
                                                 temp_node.save()
-                                except:
+                        except:
                                         print(traceback.format_exc())                        
                                              
                 else:
