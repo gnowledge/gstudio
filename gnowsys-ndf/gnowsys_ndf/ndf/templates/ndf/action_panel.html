@@ -98,7 +98,11 @@
 							{% get_edit_url node.pk as edit_url %}
 							{% if is_group %}
 								{% if is_gstaff %}
+									{% if "PartnerGroup" in node.member_of_names_list %}
+									<a href="{% url 'edit_group' group_id %}?subgroup=True&partnergroup=True" class="tiny button radius left-btn edit ">{% trans " Edit" %}</a>
+									{% else %}
 									<a href="{% url edit_url group_id %}" class="tiny button radius left-btn edit ">{% trans " Edit" %}</a>
+									{% endif %}
 								{% endif %}
 							{% else %}
 								{% if user_is_joined == "joined" or user_is_joined == "author" or is_gstaff %}
@@ -115,12 +119,12 @@
 					{% if node %}
 						{% get_publish_policy request groupid node as group_policy %}
 						{% if group_policy == "allow" %}
-							{% if is_group %}
-								{% if user.is_superuser or node.created_by == user.id %}
-									<a href="{% url 'publish_group' group_id node %}" class="tiny button radius edit right-btn">{% trans "Publish" %}</a>
+							{% if user.is_superuser or node.created_by == user.id %}
+								{% if is_group %}
+										<a href="{% url 'publish_group' group_id node %}" class="tiny button radius edit right-btn">{% trans "Publish" %}</a>
+								{% else %}
+									<a href="{% url 'publish_page' group_id node %}" class="tiny button radius edit right-btn">{% trans "Publish" %}</a>
 								{% endif %}
-							{% else %}
-								<a href="{% url 'publish_page' group_id node %}" class="tiny button radius edit right-btn">{% trans "Publish" %}</a>
 							{% endif %}
 						{% elif group_policy == "MODERATION" %}
 							<a class="tiny button radius edit right-btn secondary disabled">{% trans "Moderation" %}</a>

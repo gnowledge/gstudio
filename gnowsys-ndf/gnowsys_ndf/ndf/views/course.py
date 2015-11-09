@@ -78,6 +78,9 @@ def course(request, group_id, course_id=None):
 
     # Course search view
     title = GST_COURSE.name
+    if GST_COURSE.name == "Course":
+        title = "eCourses"
+    
     query = {'member_of': ce_gst._id,'_id':{'$in': group_obj_post_node_list},'group_type':u"PUBLIC"}
     if request.user.id:
         course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"}).sort('last_update', -1)
