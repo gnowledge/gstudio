@@ -317,19 +317,18 @@ ul#navigation li a.last {
 
 if($('.breadcrumbs').length == 0)
 {
-  searchStr = window.location.search.substring(1)
+  searchStr = window.location.search.substring(1);
 
   if(searchStr.search("nav_li=") > -1)
   {
-  // alert("hhhh");
     breadcrumbElStr = searchStr.substring(7);
 
-    var teachesLHS = $(".teaches-block a");
-    for(i=0; i < teachesLHS.length; i++){
-      // console.log(teachesLHS[i])
-      // console.log(teachesLHS[i].href + location.search)
-      teachesLHS[i].href = teachesLHS[i].href + location.search;
-    }
+    // var teachesLHS = $(".teaches-block a");
+    // for(i=0; i < teachesLHS.length; i++){
+    //   // console.log(teachesLHS[i])
+    //   // console.log(teachesLHS[i].href + location.search)
+    //   teachesLHS[i].href = teachesLHS[i].href + location.search;
+    // }
 
     breadcrumbElList = breadcrumbElStr.split(',');
     node_id = "{{node.pk}}";

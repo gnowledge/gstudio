@@ -6038,7 +6038,7 @@ def get_resource_by_oid_list(request, group_id):
 
     oid_list = eval(oid_list)
     # print oid_list
-    oid_list = [ObjectId(each_oid) for each_oid in oid_list]
+    oid_list = [ObjectId(each_oid) for each_oid in oid_list if each_oid]
 
     if oid_list:
 

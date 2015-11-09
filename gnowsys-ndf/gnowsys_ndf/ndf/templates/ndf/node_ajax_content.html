@@ -151,8 +151,9 @@
       <h5 class="subheader">Teaches:</h5>
       <ul >
         {% for each_topic in node.teaches %}
+            {% get_topic_breadcrumb_hierarchy each_topic.pk as topic_prior_hier %}
           <li>
-            <a href="{% url 'topic_details' group_name_tag each_topic.pk %}" style="color:black;">{% trans each_topic.name %}</a>
+            <a href="{% url 'topic_details' group_name_tag each_topic.pk %}?nav_li={{topic_prior_hier}}" style="color:black;">{% trans each_topic.name %}</a>
           </li>
         {% endfor %}
       </ul>
