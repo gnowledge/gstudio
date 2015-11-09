@@ -106,10 +106,11 @@ def unpack_dir(file_list,mail):
     #path_val = os.path.exists(serverdir)
     #if path_val == False:
     #    os.makedirs(serverdir)  
-    cp = "cp  -u " + str(file_list[0]) + " " + server_folder + "/"  
+    #cp = "cp  -u " + str(file_list[0]) + " " + server_folder + "/"  
     #subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)    
-    os.popen(cp)
+    #os.popen(cp)
     #create zip patgh in server folder and dezip them 
+    shutil.move(str(file_list[0]),server_folder)
     file_path = file_list[0]
     file_path = file_path.split('/')[-1:][0]
     zipfilepath =  os.path.join(server_folder,file_path)
