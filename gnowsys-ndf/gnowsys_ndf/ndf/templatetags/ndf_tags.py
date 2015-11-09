@@ -49,7 +49,7 @@ except ImportError:
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy
 from gnowsys_ndf.mobwrite.models import TextObj
 
 # mailclient
@@ -134,6 +134,39 @@ def get_site_variables():
 	cache.set('site_var', site_var, 60 * 30)
 
 	return  site_var
+
+
+@get_execution_time
+@register.assignment_tag
+def get_oid_variables():
+	result = cache.get('oid_var')
+
+	if result:
+		return result
+
+	oid_var = {}
+
+	try:
+		# oid_var['ABOUT'] 				= GSTUDIO_OID_ABOUT
+		# oid_var['COPYRIGHT'] 			= GSTUDIO_OID_COPYRIGHT
+		# oid_var['PRIVACY_POLICY'] 	= GSTUDIO_OID_SITE_PRIVACY_POLICY
+		# oid_var['TERMS_OF_SERVICE'] 	= GSTUDIO_OID_SITE_TERMS_OF_SERVICE
+		# oid_var['PARTNERS'] 			= GSTUDIO_OID_SITE_PARTNERS
+		# oid_var['GROUPS'] 			= GSTUDIO_OID_SITE_GROUPS
+		# oid_var['CONTACT'] 			= GSTUDIO_OID_SITE_CONTACT
+		# oid_var['CONTRIBUTE'] 		= GSTUDIO_OID_SITE_CONTRIBUTE
+		# oid_var['LANDING_PAGE'] 		= GSTUDIO_OID_SITE_LANDING_PAGE
+		# oid_var['HOME_PAGE'] 			= GSTUDIO_OID_SITE_HOME_PAGE
+
+		oid_var['tc']			 	= GSTUDIO_OID_TC
+		oid_var['oer']				= GSTUDIO_OID_OER
+
+	except Exception, e:
+		pass
+
+	cache.set('oid_var', oid_var, 60 * 30)
+
+	return  oid_var
 
 
 @get_execution_time
@@ -1343,6 +1376,7 @@ def get_all_resources(request,node_id):
         if node._id not in obj_set:
                 obj_set.append(node._id)
                 for item in result_set:
+                        # print "\n=====",item.keys()
                         obj_set.extend(item.keys())
         resources={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[], 'eBooks':[]}
         for each in obj_set:
@@ -2799,7 +2833,7 @@ def get_filters_data(gst_name):
 	static_mapping = {
                     "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
                     "language": GSTUDIO_RESOURCES_LANGUAGES,
-                    # "educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
+                    "educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
                     "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
                     # "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
                     "educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
@@ -2813,16 +2847,25 @@ def get_filters_data(gst_name):
 
 	filter_dict = {}
 
-	gst = node_collection.one({'_type':"GSystemType", "name": unicode(gst_name)})
+	# gst = node_collection.one({'_type':"GSystemType", "name": unicode(gst_name)})
+	gst = node_collection.one({'_type':"GSystemType", "name": unicode('File')})
 	poss_attr = gst.get_possible_attributes(gst._id)
+	# print "============", gst.name
 
-	exception_list = ["educationaluse"]
+	filter_parameters = []
+	# filter_parameters = GSTUDIO_FILTERS.get('File', [])
+	filter_parameters = GSTUDIO_FILTERS.get(gst_name, [])
+	# print filter_parameters
+
+	exception_list = ["interactivitytype"]
 
 	for k, v in poss_attr.iteritems():
 
-		if (k in exception_list) or not static_mapping.has_key(k):
+		# if (k in exception_list) or not static_mapping.has_key(k):
+		if (k in exception_list) or (k not in filter_parameters):
 			continue
 
+		# print k
 		filter_dict[k] = {
 	    					"data_type": v["data_type"].__name__,
 	    					"altnames": v['altnames'],
@@ -2873,16 +2916,17 @@ def get_sg_member_of(group_id):
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
 	# print group_obj.name
 	# Fetch post_node of group
-	if "post_node" in group_obj:
-		post_node_id_list = group_obj.post_node
+	if group_obj:
+		if "post_node" in group_obj:
+			post_node_id_list = group_obj.post_node
 
-		if post_node_id_list:
-			# getting parent's sub group's member_of in a list
-			for each_sg in post_node_id_list:
-				each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
-				if each_sg_node:
-					sg_member_of_list.extend(each_sg_node.member_of_names_list)
-	# print "\n\n sg_member_of_list---",sg_member_of_list
+			if post_node_id_list:
+				# getting parent's sub group's member_of in a list
+				for each_sg in post_node_id_list:
+					each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
+					if each_sg_node:
+						sg_member_of_list.extend(each_sg_node.member_of_names_list)
+		# print "\n\n sg_member_of_list---",sg_member_of_list
 	return sg_member_of_list
 
 def get_objectid_name(nodeid):
@@ -3051,3 +3095,20 @@ def get_list_of_fields(oid_list, field_name='name'):
 def convert_list(value):
 	#convert list of list to list
 	return list(itertools.chain(*value))
+
+
+@get_execution_time
+@register.assignment_tag
+def get_topic_breadcrumb_hierarchy(oid):
+
+	nodes_cur = get_prior_node_hierarchy(oid)
+	nodes_cur_list = [n._id for n in nodes_cur]
+	nodes_cur_list.reverse()
+	
+	comma_sep_str = ""
+	for each_t in nodes_cur_list:
+		comma_sep_str += each_t.__str__() + ","
+
+	# print "comma_sep_str : ", comma_sep_str
+	comma_sep_str = comma_sep_str[:-1]
+	return comma_sep_str

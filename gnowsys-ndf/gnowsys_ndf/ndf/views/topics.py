@@ -23,7 +23,8 @@ from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.models import Node, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata,create_grelation, get_language_tuple
-
+from gnowsys_ndf.ndf.views.methods import get_filter_querydict
+from gnowsys_ndf.ndf.templatetags.simple_filters import get_dict_from_list_of_dicts
 #######################################################################################################################################
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -114,12 +115,13 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     else:
         # This will show Themes as a card view on landing page of Topics
         themes_cards = True
-        lang = list(get_language_tuple(request.LANGUAGE_CODE))
-        nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}, 'language': lang})
         # if request.user.username:
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
         # else:
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+        
+    lang = list(get_language_tuple(request.LANGUAGE_CODE))
+    nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}, 'language': lang})
 
     return render_to_response("ndf/theme.html",
                                {'theme_GST_id':theme_GST._id, 'theme_GST':theme_GST, 'themes_cards': themes_cards, 'theme_GST':theme_GST,
@@ -747,21 +749,6 @@ def get_coll_set(node):
 @get_execution_time
 def topic_detail_view(request, group_id, app_Id=None):
 
-  #####################
-  # ins_objectid  = ObjectId()
-  # if ins_objectid.is_valid(group_id) is False :
-  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #   if group_ins:
-  #       group_id = str(group_ins._id)
-  #   else :
-  #       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #       if auth :
-  #           group_id = str(auth._id)
-  # else :
-  #   pass
-  ###################### 
-
   try:
       group_id = ObjectId(group_id)
   except:
@@ -840,4 +827,75 @@ def topic_detail_view(request, group_id, app_Id=None):
   )
 
 
+def get_filtered_topic_resources(request, group_id, node_id):
 
+    selfilters = request.POST.get('filters', None)
+    query_dict = get_filter_querydict(json.loads(selfilters)) if selfilters else {}
+    # print query_dict
+
+    node_rel_cur = node_collection.one(
+                                    {
+                                        '_id': ObjectId( node_id ),
+                                        'relation_set.taught_by': {'$exists': 'true'}
+                                    },
+                                    {
+                                        'relation_set.taught_by': 1, '_id': 0
+                                    }
+                                )
+    
+    node_rel_list = node_rel_cur.relation_set[0].get('taught_by', [])
+
+    filtered_taught_by_res = node_collection.find({
+                        '_id': {'$in': node_rel_list},
+                        '$and': query_dict
+                    })
+
+    primary_lang_resources = {}
+    other_lang_resources = {}
+    all_educationaluse = []
+    language_selected = list(get_language_tuple(request.LANGUAGE_CODE))
+    # print language_selected,"request.LANGUAGE_CODE: ", request.LANGUAGE_CODE
+
+    # print filtered_taught_by_res.count()
+    for each_res in filtered_taught_by_res:
+        # if each_res.language :
+        #     pass
+        att_set_dict = get_dict_from_list_of_dicts(each_res.attribute_set)
+        educationaluse = att_set_dict['educationaluse']
+
+        all_educationaluse.append(educationaluse)
+
+        if language_selected == each_res.language:
+            temp = primary_lang_resources.get(educationaluse, [])
+            temp.append(each_res)
+            primary_lang_resources[educationaluse] = temp
+            temp = ""
+        else:
+            temp = other_lang_resources.get(educationaluse, [])
+            temp.append(each_res)
+            other_lang_resources[educationaluse] = temp
+            temp = ""
+
+    # print "primary_lang_resources : ", primary_lang_resources
+    # print "other_lang_resources: ", other_lang_resources
+
+    all_educationaluse = list(set(all_educationaluse))
+
+    # data = json.dumps({'primary_lang_resources': primary_lang_resources, 'other_lang_resources': other_lang_resources, 'all_educationaluse': all_educationaluse })
+
+    # return HttpResponse(data)
+
+    # return HttpResponse({'primary_lang_resources': primary_lang_resources, 'other_lang_resources': other_lang_resources, 'all_educationaluse': all_educationaluse })
+
+
+    return render_to_response('ndf/topic_resources_listing.html', 
+                                    { 
+                                    'primary_lang_resources': primary_lang_resources, 'other_lang_resources': other_lang_resources, 'all_educationaluse': all_educationaluse,
+                                    # 'node': obj,'app_id': app_id,"theme_id": theme_id, "prior_obj": prior_obj,
+                                      'group_id': group_id,'groupid':group_id,
+                                      'filtered_topics': 'filtered_topics'
+                                      # 'shelves': shelves,'topic': topic, 'nav_list':nav_li,
+                                      # 'shelf_list': shelf_list,'breadcrumbs_list': breadcrumbs_list
+                                    },
+                                    context_instance = RequestContext(request)
+                            )

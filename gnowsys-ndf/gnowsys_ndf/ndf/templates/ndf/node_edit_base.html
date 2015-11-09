@@ -85,11 +85,10 @@
 					{% if node %}
 						{% trans "Editing " %} {{title}} : {{node.name}}
 					{% else %}
-					{% if blog_type %}
-						{% trans "Create New Blog" %} :
-
-					{% else %}
-						{% trans "Create New " %} {{title}} :
+						{% if blog_type %}
+							{% trans "Create New Blog" %} :
+						{% else %}
+							{% trans "Create New " %} {{title}} :
 						{% endif  %}
 					{% endif %} 
 				</span></h3>
@@ -106,16 +105,13 @@
     {% check_group node as is_group %}
 
     <div class="edit-card">
-        
 	    <div class="row">
-
 	      	<dl class="tabs pill large-12 columns select" id = "tabs">
-
+				{% if not ce_id %}
 				<dd class="active node_tab" title="Click here to add Name, Description, Privacy and Tags">
-		  		<!-- change name of collection tab overide block in your code -->
+		  			<!-- change name of collection tab overide block in your code -->
 		  			<a>{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
 				</dd>
-				{% if not ce_id %}
 				<dd class="prior_node_tab" title="Click here to add/edit Prior Node">
 				  	<a>{% block prior_node_tab %} {% trans "Requires" %} {% endblock %}</a>
 				</dd>
@@ -144,9 +140,7 @@
 				{% else %}
 					<input type="hidden" name="blog_type" value="{{blog_type}}">
 				{% endif %}
-		
 	     	</dl>     
-	            
 	   	</div>
 	</div>
         
@@ -261,9 +255,8 @@
 	                    </div>
 		     		</div>
 
-		     		{% if title == "Page" %}
-		     		
-		     		<div class = "page type" >
+		     		{% if title == "Page" and "Author" not in group_object.member_of_names_list %}
+		     		<div class = "page_type">
 		     			<div class="row">
 		     			 	<div class = "small-2 columns">	
 			     				<span  style="width: 70px; float: left;" >{% trans 'Page Type' %}:  </span>
@@ -271,7 +264,6 @@
  							<div class="small-8 columns" ends>
 					     			<select name="type_of" id="type_of">
 						  			{% for i in page_instance %}
-
 						  				{% if i.name == "Wiki page" %}	        				
 											<option value = {{i.pk}} selected> {% trans i.name %} </option>
 
@@ -504,13 +496,14 @@
 		</div>
 
 	    <div class="row yes_no_disc_div">
-	      <div class="large-2 medium-4 columns"><h5 class="compulsory">{% trans "Interaction : " %}</h5>
+	      <div class="large-2 medium-4 columns"><h5>{% trans "Interaction : " %}</h5>
 	      </div>
 	      <div class="large-pull-4 large-6 medium-8 columns">
 			<input type="radio" name="thread_create" value="Yes">Yes &nbsp;&nbsp;
-			<input type="radio" name="thread_create" value="No">No
+			<input type="radio" name="thread_create" value="No" checked="checked">No
 	      </div>
 	    </div>
+
 	    <div class="thread-settings-div hide">
 		    <div class="row">
 		      <div class="large-2 medium-4 columns "><h5>{% trans "Release Option:" %}</h5>
@@ -1430,30 +1423,33 @@
     	{
           $("#message").css("display", "none");
 	    }
-	{% if not blog_type %}
-		{% get_site_name_from_settings as site_name %}
-       
-		{%  if site_name == "NROER"  %}
-            if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
-                    // $('#tabs').find('a[href="#tab2"]').trigger('click');
-                    $('.meta_tab').trigger('click');
-                    $("#message").css("display", "block");
-                    $("#message").text("{% trans 'Please fill compulsory metadata fields(* marked)' %}");
-                    event.preventDefault();
-            }
-		{% endif %}
 
-	$("input[name='thread_create']").attr("disabled",false);
-		{% if title == "Page" or "File" in node.member_of_names_list %}
-			if (!$("input[name='thread_create']:checked").val()) {
-				$('.thread_prop_tab').trigger('click');
-				$("#message").css("display", "block");
-				$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
-				event.preventDefault();
-			}
+		{% if not blog_type %}
+
+			{% get_site_name_from_settings as site_name %}
+	       
+			{%  if site_name == "NROER" and "File" in node.member_of_names_list %}
+	            if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
+	                    // $('#tabs').find('a[href="#tab2"]').trigger('click');
+	                    $('.meta_tab').trigger('click');
+	                    $("#message").css("display", "block");
+	                    $("#message").text("{% trans 'Please fill compulsory metadata fields(* marked)' %}");
+	                    event.preventDefault();
+	            }
+			{% endif %}
+
+			$("input[name='thread_create']").attr("disabled",false);
+
+			// {% if title == "Page" or "File" in node.member_of_names_list %}
+			// 	if (!$("input[name='thread_create']:checked").val()) {
+			// 		$('.thread_prop_tab').trigger('click');
+			// 		$("#message").css("display", "block");
+			// 		$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+			// 		event.preventDefault();
+			// 	}
+			// {% endif %}
 		{% endif %}
-	{% endif %}
-    updateAllTags();
+	    updateAllTags();
 	});
 
 

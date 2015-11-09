@@ -41,6 +41,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^remove_user_from_author_set/', 'remove_user_from_author_set', name="remove_user_from_author_set"),
     url(r'^get_data_for_user_drawer/', 'get_data_for_user_drawer', name='get_data_for_user_drawer'),
     url(r'^get_data_for_batch_drawer/', 'get_data_for_batch_drawer', name='get_data_for_batch_drawer'),
+    url(r'^get_resource_by_oid_list$', 'get_resource_by_oid_list', name='get_resource_by_oid_list'),
+    url(r'^get_resource_by_oid/?', 'get_resource_by_oid', name='get_resource_by_oid'),
     
 
                        # Ajax-urls required for MIS --------------------------------

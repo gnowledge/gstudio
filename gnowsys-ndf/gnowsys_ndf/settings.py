@@ -546,6 +546,10 @@ GSTUDIO_SITE_VIDEO = "pandora_and_local"  # possible values are 'local','pandora
 GSTUDIO_SITE_LANDING_PAGE = "home"  # possible values are 'home' and 'udashboard'
 GSTUDIO_SITE_HOME_PAGE = None  # it is url rendered on template. e.g: "/welcome". Default is: "/home"
 GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" etc. (Override it in local_settings)
+
+# terms & conditions
+GSTUDIO_OID_TC = None
+
 # GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
 # Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY = True
@@ -637,6 +641,13 @@ GSTUDIO_NROER_MENU_MAPPINGS = {
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
 
+GSTUDIO_FILTERS = {
+            "File": ['educationallevel', 'audience', 'language', 'educationalsubject'],
+            "E-Library": ['educationallevel', 'audience', 'language', 'educationalsubject'],
+            "E-Book": ['educationallevel', 'audience', 'language', 'educationalsubject'],
+            "Topics": ['educationallevel', 'audience', 'language', 'educationalsubject', 'educationaluse']
+            }
+
 GSTUDIO_RESOURCES_CREATION_RATING = 5
 
 GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
@@ -649,7 +660,7 @@ GSTUDIO_GROUP_MODERATION_LEVEL = 1
 # allowed moderation levels
 GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
 
-GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "OTHERS"]
+GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "NCERT LICENSE", "OTHERS"]
 
 GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
 
