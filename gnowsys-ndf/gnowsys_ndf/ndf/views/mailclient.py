@@ -500,7 +500,7 @@ def server_sync(mail):
                         if temp_node is not None:
                                 #if node is not present   
                                 temp_dict = {}
-                                for key, values in json_data.items():
+                                for key, values in temp_node.items():
                                         if key != u'fs_file_ids':
                                             if key != 'name':          
                                                 if key in ['attribute_type','relation_type','relation_type_set','attribute_type_set']:
@@ -521,15 +521,16 @@ def server_sync(mail):
                                                                 print "the nodewa",node
                                                                 temp_node[key] = node
                                                 else:
-                                                        temp_dict[key] = values
+                                                        temp_node[key] = json_data[key]
                                 print "hello",temp_node
-                                temp_node.update(temp_dict)
+                                #temp_node.update(temp_dict)
                                 try:
                                         temp_node.save()
-                                except:         
-                                        for i,v in temp_dict.items():  
-                                                temp_node[i] = v
-                                        temp_node.save()
+                                except:  
+                                        print "pass dila"       
+                                        #for i,v in temp_dict.items():  
+                                        #        temp_node[i] = v
+                                        #temp_node.save()
                                         
                         else:
                             # if node is present update it
