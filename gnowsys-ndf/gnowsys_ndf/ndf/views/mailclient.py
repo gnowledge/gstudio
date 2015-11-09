@@ -524,7 +524,12 @@ def server_sync(mail):
                                                         temp_dict[key] = values
                                 print "hello",temp_node
                                 temp_node.update(temp_dict)
-                                temp_node.save()
+                                try:
+                                        temp_node.save()
+                                except:         
+                                        for i,v in temp_dict.items():  
+                                                temp_node[i] = v
+                                        temp_node.save()
                                         
                         else:
                             # if node is present update it
