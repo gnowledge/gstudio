@@ -531,11 +531,13 @@ def server_sync(mail):
                         '''    
                             # if node is present update it
                         try:
+                                if json_data['_type'] not in ['RelationType','AttributeType']:
                                         if json_data['_type'] in ['GAttribute','GRelation','RelationType','AttributeType']:
                                                 if json_data['_type'] == 'GAttribute':
                                                         temp_node = triple_collection.collection.GAttribute()
                                                 elif json_data['_type'] == 'GRelation':
                                                         temp_node = triple_collection.collection.GRelation()
+
                                                 elif json_data['_type'] == 'RelationType': 
                                                         temp_node = node_collection.collection.RelationType()
                                                 elif json_data['_type'] == 'AttributeType':
@@ -614,7 +616,7 @@ def process_list(val_list):
         for i in val_list:
                 print i
                 #print ObjectId(i['_id']['$oid'])
-                node = node_collection.one({"_id":ObjectId(i['_id'])})
+                node = node_collection.find_one({"_id":ObjectId(i['_id'])})
                 if node:
                         node_list.append(node)
         return node_list
