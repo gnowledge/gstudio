@@ -572,7 +572,7 @@ def server_sync(mail):
                                                         print "after temp node",temp_node
                                                         temp_node.save()
                                                         '''
-                                                        pass
+                                                        print (traceback.format_exc())
                                                    
                                         
                                         else:

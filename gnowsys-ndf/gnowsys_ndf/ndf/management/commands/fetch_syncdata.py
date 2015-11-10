@@ -62,6 +62,7 @@ class Command(BaseCommand):
                                         print result
                                         if result:
                                                 server_sync(result)
+                                                print "Data Inserted. Deleting Json Files"
                                                 delete(result)      
                                 else:
                                         print 'No new mails received'
@@ -99,6 +100,15 @@ def unpack_dir(file_list,mail):
     # store this registry and data in different folder according to thei server name
     subject = mail.subject
     serverid = subject.split('_')[0]
+    #strip anything before space
+    serverid = serverid.split(' ')
+    print "id after",serverid
+    if len(serverid) > 1:
+        serverid = serverid[1]
+    else:
+        print serverid
+        serverid = serverid[0]
+    print "the serverid",serverid    
     if os.path.exists(serverid) == False:
         os.mkdir(serverid)
     manage_path = os.path.abspath(os.path.dirname(os.pardir))
