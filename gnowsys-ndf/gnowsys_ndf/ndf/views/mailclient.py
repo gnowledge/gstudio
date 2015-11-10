@@ -531,18 +531,20 @@ def server_sync(mail):
                         '''    
                             # if node is present update it
                         try:
-                                        if json_data['_type'] in ['GAttribute','GRelation']:
+                                        if json_data['_type'] in ['GAttribute','GRelation','RelationType','AttributeType']:
                                                 if json_data['_type'] == 'GAttribute':
                                                         temp_node = triple_collection.collection.GAttribute()
                                                 elif json_data['_type'] == 'GRelation':
                                                         temp_node = triple_collection.collection.GRelation()
                                                 elif json_data['_type'] == 'RelationType': 
-                                                        temp_node = triple_collection.collection.RelationType()
+                                                        temp_node = node_collection.collection.RelationType()
                                                 elif json_data['_type'] == 'AttributeType':
-                                                        temp_node = triple_collection.collection.AttributeType()        
+                                                        temp_node = node_collection.collection.AttributeType()        
                                                 temp_dict = {}
+                                                if json_data['_type'] in ['GAttribute','GRelation']:
+                                                        json_data.pop('name')           
+                                                
                                                 for key,values in json_data.items():
-                                                        if key != 'name' or  key != '_type':          
                                                                 if key in ['attribute_type','relation_type','relation_type_set','attribute_type_set']:
                                                                         if key == 'attribute_type':
                                                                                 node = node_collection.find_one({"_id":ObjectId(json_data['attribute_type']['_id'])})
@@ -561,14 +563,16 @@ def server_sync(mail):
                                                                 else:
                                                                         temp_dict[key] = values
                                                 temp_node.update(temp_dict)
-                                                print "after temp node",temp_node
                                                 try:
                                                         temp_node.save()
-                                                except:         
+                                                except: 
+                                                        '''        
                                                         for i,v in temp_dict.items():  
                                                                 temp_node[i] = v
                                                         print "after temp node",temp_node
                                                         temp_node.save()
+                                                        '''
+                                                        pass
                                                    
                                         
                                         else:
