@@ -1817,7 +1817,7 @@ def group_dashboard(request, group_id=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
     if group_obj and group_obj.post_node:
         subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, '_type': "Group", 'edit_policy': {'$ne': "EDITABLE_MODERATED"},
-            '$or': [{'created_by': request.user.id},{'group_admin': request.user.id},{'author_set': request.user.id},{'group_type': 'PUBLIC'}]})
+            '$or': [{'created_by': request.user.id},{'group_admin': request.user.id},{'author_set': request.user.id},{'group_type': 'PUBLIC'}]}).sort("last_update",-1)
 
     if not group_obj:
       group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
