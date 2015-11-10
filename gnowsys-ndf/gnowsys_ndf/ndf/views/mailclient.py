@@ -537,17 +537,17 @@ def server_sync(mail):
                                                 elif json_data['_type'] == 'GRelation':
                                                         temp_node = triple_collection.collection.GRelation()
                                                 elif json_data['_type'] == 'RelationType': 
-                                                        temp_node = node_collection.collection.RelationType()
+                                                        temp_node = triple_collection.collection.RelationType()
                                                 elif json_data['_type'] == 'AttributeType':
-                                                        temp_node = node_collection.collection.AttributeType()        
+                                                        temp_node = triple_collection.collection.AttributeType()        
                                                 temp_dict = {}
-                                                for key,values in temp_node.items():
-                                                        if key not in ['name','_type']:          
+                                                for key,values in json_data.items():
+                                                        if key != 'name' or  key != '_type':          
                                                                 if key in ['attribute_type','relation_type','relation_type_set','attribute_type_set']:
                                                                         if key == 'attribute_type':
-                                                                                node = node_collection.one({"_id":ObjectId(json_data['attribute_type']['_id'])})
+                                                                                node = node_collection.find_one({"_id":ObjectId(json_data['attribute_type']['_id'])})
                                                                         elif key == 'relation_type':
-                                                                                node = node_collection.one({"_id":ObjectId(json_data['relation_type']['_id'])})
+                                                                                node = node_collection.find_one({"_id":ObjectId(json_data['relation_type']['_id'])})
                                                                         elif key == 'relation_type_set':
                                                                                 values = json_data['relation_type_set']      
                                                                                 if values is not None:
@@ -559,17 +559,15 @@ def server_sync(mail):
                                                                         if node:
                                                                                 temp_node[key] = node
                                                                 else:
-                                                                        try:
-                                                                            temp_dict[key] = temp_node[key]#values
-                                                                        except:
-                                                                            print "error aala"
+                                                                        temp_dict[key] = values
                                                 temp_node.update(temp_dict)
+                                                print "after temp node",temp_node
                                                 try:
-                                                        print temp_node
                                                         temp_node.save()
                                                 except:         
                                                         for i,v in temp_dict.items():  
                                                                 temp_node[i] = v
+                                                        print "after temp node",temp_node
                                                         temp_node.save()
                                                    
                                         
