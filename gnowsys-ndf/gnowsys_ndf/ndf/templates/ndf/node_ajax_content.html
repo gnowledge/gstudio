@@ -145,10 +145,11 @@
   </ul>
     
   {% endif %}
+  {% if not topic %}
   <div id="view_collection">
-    <span itemprop="{{schema.1.name}}" class='large-4 columns repository-title'> {% firstof node.altnames node.name %}   
+    <div itemprop="{{schema.1.name}}" class="large-8 columns repository-desc"> {% firstof node.altnames node.name %}</div>   
   </div>
-  
+  {% endif %}
   {% if node.teaches %}
     <div class="hide teaches-block">
           
@@ -434,7 +435,7 @@
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
                
-                <div class="row">
+                <div class="row" style="margin-top:-0.1em;">
                   <h4 class="small-4 columns redirection" onclick="Book.prevPage();">
                     <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
                   </h4>

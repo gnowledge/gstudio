@@ -13,16 +13,7 @@
 {% endblock head %}
 
 {% block meta_content %}
-  <a href="{% url 'e-book' group_name_tag %}" title="Click to go to ebooks">
-    <h2 class="subheader">
-      {% if ebook_gst.altnames and ebook_gst.altnames != "None" %}
-        {{ebook_gst.altnames}}
-      {% else %}
-        {{ebook_gst.name}}
-      {% endif%}
-    </h2>
-  </a>
-  {{ebook_gst.content|default_if_none:""|safe}}
+  
 {% endblock %}
 
 {% comment %}
@@ -56,7 +47,16 @@
 {# ===================================== #}
 
 {% block body_content %}
-
+<a href="{% url 'e-book' group_name_tag %}" title="Click to go to ebooks">
+    <div class="large-4 columns repository-title">
+      {% if ebook_gst.altnames and ebook_gst.altnames != "None" %}
+        {{ebook_gst.altnames}}
+      {% else %}
+        {{ebook_gst.name}}
+      {% endif%}
+    </div>
+  </a>
+  {{ebook_gst.content|default_if_none:""|safe}}
   {% get_filters_data "E-Book" as filter_dict %}
   {% include "ndf/filters.html" with filter_dict=filter_dict %}
 

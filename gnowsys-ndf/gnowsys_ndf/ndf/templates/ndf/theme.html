@@ -89,12 +89,20 @@
 	
 {% endblock %}
 
+{% block collection_content %}  
+{% if themes_hierarchy and node %}
+
+	<div class="large-4 columns repository-title"> {{node.name}}</div> 
+{% endif %}
+
+{% endblock %}
+
 
 {% block related_content %}
 	{% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
 
-	<div class="panel" style="background-color:#ddd;">
+	<div class="panel" style="background-color:#ddd;margin-top:5em">
 	<ul class="no-bullet" id="app-set-item"> 
 
 		<!--
@@ -201,8 +209,8 @@
 
 	{% if themes_hierarchy and node %}
 
-		<div class="large-4 columns repository-title"> {{node.name}}</div> 
-
+<!-- 		<div class="large-4 columns repository-title"> {{node.name}}</div> 
+ -->
         <div style="float:right; margin:0 2em;" >
 
 			<a class="collapsible_tree {% if tree == 'collapsible' or not tree %} highlight {% endif %}" style="">
@@ -255,20 +263,16 @@
 
 		{% group_type_info groupid request.user as grouptype %}
   		<!-- Existing card list-->
-	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
-			<h2 class="large-4 columns repository-title">
+	
+<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
+			<div class="large-4 columns repository-title">
 				{% if theme_GST.altnames and theme_GST.altnames != "None" %}
 					{{theme_GST.altnames}}
 				{% else %}
 					{{theme_GST.name}}
 				{% endif%}
-			</h2>
+			</div>
 		</a>
-		<div class="large-8 columns repository-desc">
-		{{theme_GST.content|default_if_none:""|safe}}
-			
-		</div>
-
 <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
 
   	{% for each in nodes %}

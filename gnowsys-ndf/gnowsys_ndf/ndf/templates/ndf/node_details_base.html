@@ -63,6 +63,9 @@
 
 
 {% block collection_content %}
+    <div  itemprop="{{schema.1.name}}" class="large-4 columns repository-title" style="margin-bottom:1.1em;"> {% firstof node.altnames node.name %}</div>
+    <br/>
+
     {% include "ndf/collection_ajax_view.html" %}  
 {% endblock %}
 

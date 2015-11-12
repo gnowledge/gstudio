@@ -72,13 +72,14 @@
 
 {% if resource.content_org %}
     <div class="scard-desc" title="{{resource.content_org}}">
-     {{resource.content_org|truncatechars:50}}
+     {{resource.content_org|truncatechars:75}}
     </div>
     {% endif %}
    
 
   <div class="scard-action">
     
-    at <i>{{resource.created_at|date:"d M Y"}} </i>
+    on <i>{{resource.created_at}} </i>
+     </a> <input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
   </div>
 </a>
