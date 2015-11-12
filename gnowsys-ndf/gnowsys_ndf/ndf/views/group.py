@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of  # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.org2any import org2html
 # ######################################################################################################################################
@@ -41,6 +41,7 @@ app = gst_group
 moderating_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
 programevent_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ProgramEventGroup'})
 courseevent_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
+partner_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'PartnerGroup'})
 
 file_gst = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
 page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
@@ -110,9 +111,9 @@ class CreateGroup(object):
             altnames = self.request.POST.get('altnames', name).strip()
 
         if kwargs.get('group_type', ''):
-            group_type = kwargs.get('group_type', '') 
+            group_type = kwargs.get('group_type', u'PUBLIC') 
         else:
-            group_type = self.request.POST.get('group_type', '')
+            group_type = self.request.POST.get('group_type', u'PUBLIC')
 
         if kwargs.get('access_policy', ''):
             access_policy = kwargs.get('access_policy', group_type) 
@@ -120,34 +121,34 @@ class CreateGroup(object):
             access_policy = self.request.POST.get('access_policy', group_type)
 
         if kwargs.get('edit_policy', ''):
-            edit_policy = kwargs.get('edit_policy', '') 
+            edit_policy = kwargs.get('edit_policy', u'EDITABLE_NON_MODERATED') 
         else:
-            edit_policy = self.request.POST.get('edit_policy', '')
+            edit_policy = self.request.POST.get('edit_policy', u'EDITABLE_NON_MODERATED')
 
         if kwargs.get('subscription_policy', ''):
-            subscription_policy = kwargs.get('subscription_policy', 'OPEN') 
+            subscription_policy = kwargs.get('subscription_policy', u'OPEN') 
         else:
-            subscription_policy = self.request.POST.get('subscription_policy', "OPEN")
+            subscription_policy = self.request.POST.get('subscription_policy', u"OPEN")
 
         if kwargs.get('visibility_policy', ''):
-            visibility_policy = kwargs.get('visibility_policy', 'ANNOUNCED') 
+            visibility_policy = kwargs.get('visibility_policy', u'ANNOUNCED') 
         else:
-            visibility_policy = self.request.POST.get('visibility_policy', 'ANNOUNCED')
+            visibility_policy = self.request.POST.get('visibility_policy', u'ANNOUNCED')
 
         if kwargs.get('disclosure_policy', ''):
-            disclosure_policy = kwargs.get('disclosure_policy', 'DISCLOSED_TO_MEM') 
+            disclosure_policy = kwargs.get('disclosure_policy', u'DISCLOSED_TO_MEM') 
         else:
-            disclosure_policy = self.request.POST.get('disclosure_policy', 'DISCLOSED_TO_MEM')
+            disclosure_policy = self.request.POST.get('disclosure_policy', u'DISCLOSED_TO_MEM')
 
         if kwargs.get('encryption_policy', ''):
-            encryption_policy = kwargs.get('encryption_policy', 'NOT_ENCRYPTED') 
+            encryption_policy = kwargs.get('encryption_policy', u'NOT_ENCRYPTED') 
         else:
-            encryption_policy = self.request.POST.get('encryption_policy', 'NOT_ENCRYPTED')
+            encryption_policy = self.request.POST.get('encryption_policy', u'NOT_ENCRYPTED')
 
         if kwargs.get('agency_type', ''):
-            agency_type = kwargs.get('agency_type', 'Other') 
+            agency_type = kwargs.get('agency_type', u'Other') 
         else:
-            agency_type = self.request.POST.get('agency_type', 'Other')
+            agency_type = self.request.POST.get('agency_type', u'Other')
 
         if kwargs.get('content_org', ''):
             content_org = kwargs.get('content_org', '')
@@ -251,7 +252,6 @@ class CreateGroup(object):
 
         else:
             return False, 'Group with same name exists.'
-
     # --- END --- create_group() ---
 
 
@@ -324,6 +324,51 @@ class CreateGroup(object):
 
         return sg_member_of_list
     # --- END --- get_all_subgroups_member_of_list() ------
+
+    def set_logo(self, request, group_obj, logo_rt = "has_logo"):
+        from gnowsys_ndf.ndf.views.file import save_file
+        # adding thumbnail 
+        logo_img_node = None
+        grel_id = None
+        logo_img_node, grel_id = get_relation_value(group_obj._id,unicode(logo_rt))
+
+        f = request.FILES.get("docFile", "")
+        # print "\nf is ",f
+
+        if f:
+
+            # if existing logo image is found
+            if logo_img_node:
+                # print "\nlogo_img_node--",logo_img_node
+                # check whether it appears in any other node's grelation
+                rel_obj = None
+                rel_obj = triple_collection.find({"_type": "GRelation", 'subject': {'$ne': ObjectId(group_obj._id)}, 'right_subject': logo_img_node._id})
+                file_cur = node_collection.find({'_type':"File",'fs_file_ids':logo_img_node.fs_file_ids,'_id': {'$ne': logo_img_node._id}})
+                # print "\nrel_obj--",rel_obj.count()
+                # print "\nfile_cur.count()--",file_cur.count()
+                if rel_obj.count() > 0 or file_cur.count() > 0:
+                    # if found elsewhere too, delete it from current node's grelation ONLY
+                    # print "\n Image exists for others"
+                    if grel_id:
+                        del_status, del_status_msg = delete_grelation(
+                            node_id=ObjectId(grel_id),
+                            deletion_type=1
+                        )
+                        # print del_status, "--", del_status_msg
+                else:
+                    # else delete the logo file
+                    # print "\n delete node"
+                    del_status, del_status_msg = delete_node(
+                        node_id=logo_img_node._id,
+                        deletion_type=1
+                    )
+                    # print del_status, "--", del_status_msg
+
+            fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            if fileobj:
+                rt_has_logo = node_collection.one({'_type': "RelationType", 'name': unicode(logo_rt)})
+                # print "\n creating GRelation has_logo\n"
+                create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj))
 
 # --- END of class CreateGroup ---
 # --------------------------------
@@ -406,7 +451,6 @@ class CreateSubGroup(CreateGroup):
             self.add_subgroup_to_parents_postnode(parent_group_id, group_obj._id, sg_member_of)
 
             return True, group_obj
-        
         else:
             return False, 'Group with same name exists.'
 
@@ -421,6 +465,9 @@ class CreateSubGroup(CreateGroup):
         Otherwise returns False.
         '''
         if sg_member_of == 'Group':
+            # i.e: group is normal-sub-group.
+            return True
+        elif sg_member_of == 'subgroup':
             # i.e: group is normal-sub-group.
             return True
 
@@ -483,6 +530,19 @@ class CreateSubGroup(CreateGroup):
         else:
             return False
 
+    def set_partnergroup(self, request, group_object):
+        try:
+            at_list = ['house_street','town_city','pin_code','email_id','alternate_number','mobile_number','website']
+            partner_at_cur = node_collection.find({'_type':"AttributeType",'name':{'$in': at_list}})
+            for each in partner_at_cur:
+                each_name_val = self.request.POST.get(each.name,'')
+                create_gattribute(group_object._id, each, each_name_val)
+                group_object.reload()
+            # print "\n\n group_object.attribute_set",group_object.attribute_set
+            return True
+        except Exception as e:
+            return False
+
 # --- END of class CreateSubGroup ---
 # --------------------------------
 
@@ -522,6 +582,9 @@ class CreateModeratedGroup(CreateSubGroup):
             group_obj = self.get_group_fields(group_name, node_id=node_id)
             try:
                 group_obj.save()
+
+                # print "\n\n group_obj.name",group_obj.name, "---\n\n", group_obj
+
             except Exception, e:
                 # if any errors return tuple with False and error
                 # print e
@@ -1071,7 +1134,6 @@ class CreateProgramEventGroup(CreateEventGroup):
         super(CreateProgramEventGroup, self).__init__(request)
         self.request = request
 
-
 # --- END of class CreateProgramEventGroup ---
 # -----------------------------------------
 
@@ -1232,10 +1294,21 @@ class GroupCreateEditHandler(View):
 
         group_obj = None
         nodes_list = []
+        logo_img_node = None
+        parent_obj_partner = None
+        subgroup_flag = request.GET.get('subgroup','')
+
+        partnergroup_flag = request.GET.get('partnergroup','')
+        if partnergroup_flag:
+            partnergroup_flag = eval(partnergroup_flag)
 
         if action == "edit":  # to edit existing group
 
             group_obj = get_group_name_id(group_id, get_obj=True)
+            if partnergroup_flag:
+                parent_id = group_obj.prior_node[0]
+                parent_obj_partner = get_group_name_id(parent_id, get_obj=True)
+                # print "\n\n parent_group_obj", parent_obj_partner
 
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.
@@ -1245,6 +1318,9 @@ class GroupCreateEditHandler(View):
             available_nodes = node_collection.find({'_type': u'Group'}, {'name': 1, '_id': 0})
             # making list of group names (to check uniqueness of the group):
             nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
+            if partnergroup_flag:
+                parent_obj_partner = get_group_name_id(group_id, get_obj=True)
+
             # print nodes_list
         # why following logic exists? Do we need so?
         # if group_obj.status == u"DRAFT":
@@ -1255,11 +1331,25 @@ class GroupCreateEditHandler(View):
 
         # In the case of need, we can simply replace:
         # "ndf/create_group.html" with "ndf/edit_group.html"
-        return render_to_response("ndf/create_group.html",
+        template = "ndf/create_group.html"
+        if subgroup_flag:
+            subgroup_flag = eval(subgroup_flag)
+        if partnergroup_flag:
+            template = "ndf/create_partner.html"
+            if group_obj:
+                logo_img_node, grel_id = get_relation_value(group_obj._id,'has_profile_pic')
+                group_obj.get_neighbourhood(group_obj.member_of)
+
+        # print "\n\ngroup_obj",group_obj.name,"----",group_obj.relation_set
+        return render_to_response(template,
                                     {
                                         'node': group_obj, 'title': title,
                                         'nodes_list': nodes_list,
-                                        'groupid': group_id, 'group_id': group_id
+                                        'groupid': group_id, 'group_id': group_id,
+                                        'subgroup_flag':subgroup_flag,
+                                        'parent_obj_partner':parent_obj_partner,
+                                        'partnergroup_flag':partnergroup_flag,
+                                        'logo_img_node': logo_img_node
                                         # 'appId':app._id, # 'is_auth_node':is_auth_node
                                       }, context_instance=RequestContext(request))
     # --- END of get() ---
@@ -1271,7 +1361,6 @@ class GroupCreateEditHandler(View):
         To handle post request of group form.
         To save edited or newly-created group's data.
         '''
-
         # getting group's object:
         group_obj = get_group_name_id(group_id, get_obj=True)
 
@@ -1279,6 +1368,15 @@ class GroupCreateEditHandler(View):
         group_name = request.POST.get('name', '').strip()  # hidden-form-field
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
+        subgroup_flag = request.POST.get('subgroup', '')
+        partnergroup_flag = request.POST.get('partnergroup_flag', '')
+        url_name = 'groupchange'
+
+        # raise Exception(partnergroup_flag)
+        if subgroup_flag:
+            subgroup_flag = eval(subgroup_flag)
+        if partnergroup_flag:
+            partnergroup_flag = eval(partnergroup_flag)
         # check if group's editing policy is already 'EDITABLE_MODERATED' or
         # it was not and now it's changed to 'EDITABLE_MODERATED' or vice-versa.
         if (edit_policy == "EDITABLE_MODERATED") or (group_obj.edit_policy == "EDITABLE_MODERATED"):
@@ -1292,8 +1390,10 @@ class GroupCreateEditHandler(View):
             # calling method to create new group
             result = mod_group.create_edit_moderated_group(group_name, moderation_level, "ModeratingGroup", node_id=node_id)
 
+        elif subgroup_flag:
+            sub_group = CreateSubGroup(request)
+            result = sub_group.create_subgroup(group_id, group_name, "subgroup")
         else:
-
             # instantiate regular group
             group = CreateGroup(request)
 
@@ -1305,18 +1405,24 @@ class GroupCreateEditHandler(View):
             # operation success: redirect to group-detail page
             group_obj = result[1]
             group_name = group_obj.name
-            url_name = 'groupchange'
-
-            # print request.POST.get('apps_to_set', '')
-            app_selection(request, group_obj._id)
-
+            # url_name = 'groupchange'
+            if not partnergroup_flag:
+                # print request.POST.get('apps_to_set', '')
+                app_selection(request, group_obj._id)
+            else:
+                group_obj.member_of = [partner_group_gst._id]
+                group_obj.save()
+                partner_grp_result = sub_group.set_partnergroup(request, group_obj)
+                sub_group.set_logo(request, group_obj, logo_rt = "has_profile_pic")
         else:
-            # operation fail: redirect to group-listing
-            group_name = 'home'
-            url_name = 'group'
-
+            if not partnergroup_flag:
+                # operation fail: redirect to group-listing
+                group_name = 'home'
+                url_name = 'group'
+            else:
+                partner_grp_result = sub_group.set_partnergroup(request, group_obj)
+                sub_group.set_logo(request, group_obj, logo_rt = "has_profile_pic")
         return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
-
 # ===END of class EditGroup() ===
 # -----------------------------------------
 
@@ -1342,12 +1448,18 @@ class EventGroupCreateEditHandler(View):
         group_obj = None
         nodes_list = []
         spl_group_type = sg_type
+        logo_img_node = None    
         # spl_group_type = request.GET.get('sg_type','')
         # print "\n\n spl_group_type", spl_group_type
 
         if action == "edit":  # to edit existing group
 
             group_obj = get_group_name_id(group_id, get_obj=True)
+            grel_id = None
+
+            logo_img_node, grel_id = get_relation_value(group_obj._id,'has_logo')
+
+
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.
 
@@ -1368,7 +1480,9 @@ class EventGroupCreateEditHandler(View):
                                         'nodes_list': nodes_list,
                                         'spl_group_type': spl_group_type,
                                         'course_node_id': course_node_id,
-                                        'groupid': group_id, 'group_id': group_id
+                                        'groupid': group_id, 'group_id': group_id,
+                                        'logo_img_node':logo_img_node
+
                                         # 'appId':app._id, # 'is_auth_node':is_auth_node
                                       }, context_instance=RequestContext(request))
     # --- END of get() ---
@@ -1418,7 +1532,8 @@ class EventGroupCreateEditHandler(View):
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
-
+                elif sg_type == "ProgramEventGroup":
+                    mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
                 group_name = group_obj.name
                 url_name = 'groupchange'
             else:
@@ -1701,9 +1816,13 @@ def group_dashboard(request, group_id=None):
     profile_pic_image = None
     list_of_unit_events = []
     blog_pages = None
+    subgroups_cur = None
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
+    if group_obj and group_obj.post_node:
+        subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, '_type': "Group", 'edit_policy': {'$ne': "EDITABLE_MODERATED"},
+            '$or': [{'created_by': request.user.id},{'group_admin': request.user.id},{'author_set': request.user.id},{'group_type': 'PUBLIC'}]}).sort("last_update",-1)
 
     if not group_obj:
       group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -1774,12 +1893,14 @@ def group_dashboard(request, group_id=None):
   # print "\n\n list_of_sg_member_of", list_of_sg_member_of
   files_cur = None
   sg_type = None
+
   if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
       sg_type = "ProgramEventGroup"
       # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
       parent_groupid_of_pe = node_collection.find_one({'_type':"Group","post_node": group_obj._id})
       if parent_groupid_of_pe:
         parent_groupid_of_pe = parent_groupid_of_pe._id
+
       alternate_template = "ndf/program_event_group.html"
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
@@ -1802,7 +1923,18 @@ def group_dashboard(request, group_id=None):
   if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
 
-  allow_to_join = True
+  allow_to_join = ""
+  if 'start_enroll' in group_obj:
+      if group_obj.start_enroll:
+          start_enrollment_date = group_obj.start_enroll
+          start_enrollment_date = start_enrollment_date.date()
+          if start_enrollment_date:
+            curr_date_time = datetime.now().date()
+            if start_enrollment_date > curr_date_time:
+                allow_to_join = "Forthcoming"
+            else:
+                allow_to_join = "Open"
+
   if 'end_enroll' in group_obj:
       if group_obj.end_enroll:
           last_enrollment_date = group_obj.end_enroll
@@ -1810,7 +1942,11 @@ def group_dashboard(request, group_id=None):
           if last_enrollment_date:
             curr_date_time = datetime.now().date()
             if last_enrollment_date < curr_date_time:
-                allow_to_join = False
+                allow_to_join = "Closed"
+            else:
+                allow_to_join = "Open"
+
+
   property_order_list = []
   if "group_of" in group_obj:
     if group_obj['group_of']:
@@ -1838,6 +1974,7 @@ def group_dashboard(request, group_id=None):
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
+                                                       'subgroups_cur':subgroups_cur,
                                                        'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image,
                                                        'old_profile_pics':old_profile_pics
@@ -1996,18 +2133,22 @@ def app_selection(request, group_id):
 
 @get_execution_time
 def switch_group(request,group_id,node_id):
-  ins_objectid = ObjectId()
-  if ins_objectid.is_valid(group_id) is False:
-    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    if group_ins:
-      group_id = str(group_ins._id)
-    else:
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth:
-      	group_id = str(auth._id)
-  else :
-  	pass
+  # ins_objectid = ObjectId()
+  # if ins_objectid.is_valid(group_id) is False:
+  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+  #   if group_ins:
+  #     group_id = str(group_ins._id)
+  #   else:
+  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #     if auth:
+  #     	group_id = str(auth._id)
+  # else :
+  # 	pass
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
 
   try:
     node = node_collection.one({"_id": ObjectId(node_id)})
@@ -2055,8 +2196,21 @@ def switch_group(request,group_id,node_id):
     # for each in get_all_user_groups():
     #   all_user_groups.append(each.name)
     #loop replaced by a list comprehension
-      all_user_groups=[each.name for each in get_all_user_groups()]
-      st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
+      top_partners_list = ["State Partners", "Individual Partners", "Institutional Partners"]
+      all_user_groups = [each.name for each in get_all_user_groups()]
+      all_user_groups.append('home')
+      all_user_groups.append('Trash')
+      all_user_groups.extend(top_partners_list)
+
+      st = node_collection.find({'$and': [{'_type': 'Group'},{'$or':[{'author_set': {'$in':[1]}},{'group_admin': {'$in':[1]}}]},
+                                          {'name':{'$nin':all_user_groups}},
+                                          {'member_of': {'$ne': partner_group_gst._id}},
+                                          {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}]})
+      # st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},
+      #                                     {'name':{'$nin':all_user_groups}},
+      #                                     {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
+      #                                    ]
+      #                           })
     # for each in node.group_set:
     #   coll_obj_list.append(node_collection.one({'_id': each}))
     #loop replaced by a list comprehension

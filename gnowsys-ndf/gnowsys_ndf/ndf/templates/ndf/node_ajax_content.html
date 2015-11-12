@@ -143,15 +143,6 @@
     {% endfor %}
   </ul>
     
-  {% comment %}
-  <ul class="breadcrumbs">
-    <li>
-        {% for each_topic in node.teaches %}
-          <a href="{% url 'topic_details' group_name_tag each_topic.pk %}" style="color:black;">{% trans each_topic.name %},</a>
-        {% endfor %}
-    </li>
-  </ul>
-  {% endcomment %}
   {% endif %}
   
   {% if node.teaches %}
@@ -160,8 +151,9 @@
       <h5 class="subheader">Teaches:</h5>
       <ul >
         {% for each_topic in node.teaches %}
+            {% get_topic_breadcrumb_hierarchy each_topic.pk as topic_prior_hier %}
           <li>
-            <a href="{% url 'topic_details' group_name_tag each_topic.pk %}" style="color:black;">{% trans each_topic.name %}</a>
+            <a href="{% url 'topic_details' group_name_tag each_topic.pk %}?nav_li={{topic_prior_hier}}" style="color:black;">{% trans each_topic.name %}</a>
           </li>
         {% endfor %}
       </ul>
@@ -545,7 +537,7 @@
                         <i>{% trans 'Resource Type' %}: {{node.mime_type}}</i><br/>
                      {% endif %}
                   {% endcomment %}
-                <p class="large-text-right"><small>
+                  <p class="large-text-right"><small>
                   <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
                 </small></p>
               </div>
@@ -594,6 +586,9 @@
             {% endif %}
             {% endwith %}
           </div>
+          {% get_list_of_fields node.type_of "name" as type_of_list %}
+          {% if "Info page" not in type_of_list %}
+
           <!-- Discussion -->
                 <div class="content" id="view-discussion">
                   <!-- discussion content area -->
@@ -612,6 +607,7 @@
                   <!-- END of discussion content area -->     
                 </div>
           <br/>
+          {% endif %}
           
           <div>
             {% get_grid_fs_object each_node as grid_fs_obj %}
@@ -756,7 +752,7 @@
               </tr>
               {% endfor %}
               {% endif %}
-              </tdbody>
+              </tbody>
               </table>
               {% endif %}
               {% endfor %}
@@ -788,7 +784,7 @@
               <td align ="right">{{v}}</td>
               </tr>
               {% endfor %}
-              </tdbody>
+              </tbody>
               </table>
               {% endif %}
               {% endif %}
@@ -820,7 +816,7 @@
               <td align ="right">{{v}}</td>
               </tr>
               {% endfor %}
-              </tdbody>
+              </tbody>
               </table>
               {% endif %}
               {% endif %}
@@ -876,7 +872,6 @@
               <a href="#" class="round small button right">{% trans 'View Statistics' %}</a> <br/>
             </div>
           </div>
-
         </div>
         <div id="cl_house_modal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
           <div class="row">
@@ -898,16 +893,30 @@
 
         
       </div><!-- end of tab's content -->
+      
+      {% check_group node as is_group %}
+      {% if is_group %}
+        {% if subgroups_cur %}
+          <div >
+          <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+            {% for subgroup_node in subgroups_cur %}
+              <li class="card-image-wrapper"> 
+                {% include 'ndf/simple_card.html' with resource=subgroup_node url_name="groupchange" first_arg=subgroup_node.pk %}
+              </li>
+            {% empty %}
+                <div class="row">
+                  <div class="small-12 columns">
+                    <h5> 
+                    No Subgroups Found!
+                    </h5>
+                  </div>
+                </div>
+            
+            {% endfor %}
+          </section>
+          </div>
+          {% endif %}
+        {% endif %}
     </section>
-  
-  </div>
-
-  <footer>
-    
-  </footer>
-
-  <!-- schema ends here -->
-  <!-- end new -->
-
+</div>
   </section>
-  

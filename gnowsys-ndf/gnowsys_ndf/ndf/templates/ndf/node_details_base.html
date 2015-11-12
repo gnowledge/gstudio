@@ -47,7 +47,15 @@
 {% endblock %}
 
 
+{% block style %}
+  .topic.accordion dd > a{
+    background: none;
+    {# color: Gray; #}
+  }
+{% endblock style %}
+
 {% block meta_content %}
+<h3><b><span itemprop="{{schema.1.name}}" class=''> {% firstof node.altnames node.name %} </span></b></h3>
 {% endblock %}
 
 
@@ -57,8 +65,6 @@
 
 {% block collection_content %}
   <div id="view_collection">
-    <h3><b><span itemprop="{{schema.1.name}}" class=''> {% firstof node.altnames node.name %} </span></b></h3>
-    <hr>
     {% include "ndf/collection_ajax_view.html" %}  
   </div>
 {% endblock %}
@@ -74,7 +80,7 @@
 
 {% if topic %}
   <br/>
-  <dl class="accordion" data-accordion>
+  <dl class="accordion topic" data-accordion>
     <dd>
       <a href="#add_resources"> <b>{% trans "Add resources in this topic " %}</b> </a>
       <div id="add_resources" class="content">

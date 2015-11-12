@@ -47,7 +47,7 @@ this template is modified. So for the fields in the template it supports -
   {% if node %} action="{% url 'edit_event_group' group_id spl_group_type %}"
   {% else %} action="{% url 'create_event_group' group_id spl_group_type %}"
   {% endif %}
-  data-abide>
+  data-abide enctype="multipart/form-data">
     {% csrf_token %}
 
     <!-- node_id, name -->
@@ -287,22 +287,46 @@ this template is modified. So for the fields in the template it supports -
     <br/>
     {% endcomment %}
 
+    <!-- Upload logo for ProgramEvent -->
+    {% if spl_group_type == "ProgramEventGroup" %}
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+              
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Upload thumbnail" %}</label>
+            <small><i>(.svg images are currently not supported)</i></small>
+          </div>
+          <div class="small-8 columns">
+          {% if logo_img_node %}
+            <a target="_blank" href="{% url 'read_file' group_id logo_img_node.pk %}">{% trans "View existing thumbnail " %}</a>
+            <input type="button" class="button tiny" id="change_logo" value="Edit">
+            <input type="button" class="button tiny hide" id="cancel_change_logo" value="Cancel">
+            <input type="file" name="docFile" id="docFile" class="hide" accept="image/*"/>
+          {% else %}
+          <input type="file" name="docFile" id="docFile" accept="image/*"/>
+          {% endif %}
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- description -->
           
       <!-- <div class="small-12 medium-6 medium-centered columns"> -->
     <dl class="accordion row" title="Click to Add/Edit Description" data-accordion>
       <dd class="accordion-navigation small-12 medium-6 medium-centered columns">
-
         <a href="#content_org">
           <label for="right-label" class="">
             {% if node.content_org %}Edit{% else %}Add{% endif %} {% trans "Description" %}
           </label>
         </a>
-
         <div id="content_org" class="content">
           {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
         </div>
-
       </dd>
     </dl>
     
@@ -368,6 +392,26 @@ this template is modified. So for the fields in the template it supports -
       event.preventDefault();
     }
   });
+  $(document).on('click',"#change_logo",function(){
+    $("#cancel_change_logo").removeClass("hide");
+    $("#docFile").removeClass("hide");
+  })
+
+  $(document).on('click',"#cancel_change_logo",function(){
+    $("#cancel_change_logo").addClass("hide");
+    $("#docFile").addClass("hide");
+    $("#docFile").val("")
+  })
+
+  $("#docFile").change(function(event) {
+    file_mime_type = this.files[0].type;
+    if(file_mime_type.indexOf("svg") >= 0 ){
+      alert(".svg images are currently not supported")
+      $("#docFile").val("");
+      event.preventDefault();
+    }
+  });
+
 
 // </script>
 {% endblock %}

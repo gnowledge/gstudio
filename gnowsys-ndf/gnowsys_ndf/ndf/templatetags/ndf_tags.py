@@ -36,7 +36,7 @@ except ImportError:
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
@@ -1053,11 +1053,25 @@ def check_user_join(request,group_id):
 @get_execution_time
 @register.assignment_tag
 def check_group(group_id):
-	if group_id:
-		fl = check_existing_group(group_id)
-		return fl
-	else:
-		return ""
+	try:
+		result = False
+		if group_id:
+			group_obj = node_collection.one({'_id': ObjectId(group_id)})
+			if "Group" in group_obj.member_of_names_list or "Author" in group_obj.member_of_names_list:
+				result = True
+			if group_obj._type == "Author" or group_obj._type == "Group":
+				result = True
+		else:
+			result = False
+		return result
+	except:
+		return result
+
+	# if group_id:
+	# 	fl = check_existing_group(group_id)
+	# 	return fl
+	# else:
+	# 	return ""
 
 
 @get_execution_time
@@ -1887,6 +1901,9 @@ def user_access_policy(node, user):
         user_access = True
 
       elif user.id in group_node.group_admin:
+        user_access = True
+
+      elif "PartnerGroup" in group_node.member_of_names_list:
         user_access = True
 
       elif group_node.edit_policy == "NON_EDITABLE":
@@ -2877,16 +2894,17 @@ def get_sg_member_of(group_id):
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
 	# print group_obj.name
 	# Fetch post_node of group
-	if "post_node" in group_obj:
-		post_node_id_list = group_obj.post_node
+	if group_obj:
+		if "post_node" in group_obj:
+			post_node_id_list = group_obj.post_node
 
-		if post_node_id_list:
-			# getting parent's sub group's member_of in a list
-			for each_sg in post_node_id_list:
-				each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
-				if each_sg_node:
-					sg_member_of_list.extend(each_sg_node.member_of_names_list)
-	# print "\n\n sg_member_of_list---",sg_member_of_list
+			if post_node_id_list:
+				# getting parent's sub group's member_of in a list
+				for each_sg in post_node_id_list:
+					each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
+					if each_sg_node:
+						sg_member_of_list.extend(each_sg_node.member_of_names_list)
+		# print "\n\n sg_member_of_list---",sg_member_of_list
 	return sg_member_of_list
 
 def get_objectid_name(nodeid):
@@ -3054,3 +3072,32 @@ def get_list_of_fields(oid_list, field_name='name'):
 def convert_list(value):
 	#convert list of list to list
 	return list(itertools.chain(*value))
+
+
+@get_execution_time
+@register.assignment_tag
+def get_topic_breadcrumb_hierarchy(oid):
+
+	nodes_cur = get_prior_node_hierarchy(oid)
+	nodes_cur_list = [n._id for n in nodes_cur]
+	nodes_cur_list.reverse()
+	
+	comma_sep_str = ""
+	for each_t in nodes_cur_list:
+		comma_sep_str += each_t.__str__() + ","
+
+	# print "comma_sep_str : ", comma_sep_str
+	comma_sep_str = comma_sep_str[:-1]
+	return comma_sep_str
+
+@get_execution_time
+@register.assignment_tag
+def is_partner(group_obj):
+	try:
+		result = False
+		partner_spaces = ["State Partners", "Individual Partners", "Institutional Partners"]
+		if group_obj.name in partner_spaces:
+			result = True
+		return result
+	except:
+		return result

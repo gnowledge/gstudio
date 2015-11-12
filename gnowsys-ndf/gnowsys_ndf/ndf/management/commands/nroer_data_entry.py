@@ -875,7 +875,7 @@ def create_resource_gsystem(resource_data, row_no=''):
         file_not_found_msg += "- Name     : " + resource_data["name"] + "\n"
         file_not_found_msg += "- File Name: " + resource_data["file_name"] + "\n"
         file_not_found_msg += "- URL      : " + resource_link + "\n\n"
-        file_not_found_msg += "- ERROR    : " + e + "\n\n"
+        file_not_found_msg += "- ERROR    : " + str(e) + "\n\n"
         log_file_not_found.append(file_not_found_msg)
         return None
 

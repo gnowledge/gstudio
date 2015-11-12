@@ -6018,7 +6018,7 @@ def get_resource_by_oid(request, group_id):
 
     oid = request.GET.get('oid', None)
     if oid:
-      print oid
+      # print "oid : ", oid
       node_obj = node_collection.one({  '_id': ObjectId(oid)},
                                       {
                                         'name': 1,
@@ -6028,5 +6028,35 @@ def get_resource_by_oid(request, group_id):
                                       }
                                     )
       return HttpResponse(json.dumps(node_obj))
+
+    return HttpResponse('false')
+
+
+def get_resource_by_oid_list(request, group_id):
+
+    oid_list = request.GET.get('oid_list', None)
+
+    oid_list = eval(oid_list)
+    # print oid_list
+    oid_list = [ObjectId(each_oid) for each_oid in oid_list if each_oid]
+
+    if oid_list:
+
+      node_obj = node_collection.find({  '_id': {'$in': oid_list}},
+                                      {
+                                        'name': 1,
+                                        'altnames': 1,
+                                        'content': 1,
+                                        '_id': 1
+                                      }
+                                    )
+
+      # print node_obj.count()
+      if node_obj.count() > 0:
+          node_list = [n for n in node_obj]
+          # print node_list
+          return HttpResponse(json.dumps(node_list, cls=NodeJSONEncoder))
+      else:
+          pass
 
     return HttpResponse('false')

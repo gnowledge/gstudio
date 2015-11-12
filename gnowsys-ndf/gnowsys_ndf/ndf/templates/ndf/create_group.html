@@ -28,7 +28,12 @@ this template is modified. So for the fields in the template it supports -
   <h2 class="text-center">
     <small>
       {% if node %} Edit | {{node.name}}
-      {% else %} {% trans "Create New Group" %}
+      {% else %} 
+      {% if subgroup_flag %}
+      {% trans "Create New Sub Group" %}
+      {% else %}
+      {% trans "Create New Group" %}
+      {% endif %}
       {% endif %}
     </small>
   </h2>
@@ -45,6 +50,9 @@ this template is modified. So for the fields in the template it supports -
     {% if node %}
       <input type="hidden" name="node_id" value="{{node.pk}}">
       <input type="hidden" name="name" value="{{node.name}}">
+    {% endif %}
+    {% if subgroup_flag %}
+    <input type="hidden" name="subgroup" value="{{subgroup_flag}}">
     {% endif %}
 
     <!-- name -->
