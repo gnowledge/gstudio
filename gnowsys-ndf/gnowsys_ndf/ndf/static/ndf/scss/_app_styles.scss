@@ -197,30 +197,30 @@ body{
 
   #first-header.top-bar {
 
-    background-color: #dadfe1;
+    background-color: #3e3e3e;
 
     .title-area a{
 
       &:hover{
           // background-color: scale-color($topbar-bg-color, $lightness: 5%);
-          box-shadow: inset 0px 100px 50px #fff;
+          //box-shadow: inset 0px 100px 50px #fff;
           // box-shadow: inset 0px 100px 50px scale-color($theme-color-invert, $lightness: 10%);
           // transition: 0.8s all;
       }
     }
 
-      .top-bar-section li a.active:not(.button){ color: #fff; }
+      .top-bar-section li a.active:not(.button){ color: #ececec; }
 
       .top-bar-section li a:not(.button), .top-bar-section li {
           // background-color: scale-color($topbar-bg-color, $lightness: 10%);
-          background-color: #dadfe1;
-          color: #2b2c2d;
+          background-color: #3e3e3e;
+          color: #ececec;
       }
 
 
       .top-bar-section li a:not(.button):hover, .top-bar-section li:not(.has-form):hover {
           background-color: scale-color($theme-color-invert, $lightness: 10%) !important;
-          color: #fff;
+          color: #ececec;
           // background-color: #E1E1E1;
       }
   }
@@ -422,26 +422,32 @@ body{
 
 body>footer{
   //Site footer
-  padding:20px 0;
+  padding:10px 10px;
   position: relative;
   color:#888;
   min-height: 170px;
   background-color: rgba(0,0,0,0.8);
 
+
   section:first-child{
-     border-bottom: 1px solid #222;
-     margin-bottom: 1rem;
+     //border-bottom: 1px solid #222;
+     margin-bottom: 2rem;
+      
    }
   
    a{
+
     color: #bbbbbb !important;
+    //margin-left:10px;
     &:hover{
-      color:#eee !important;
+      color:#03a9f4 !important;
+    
     }
   }
   
   strong a{
     border-bottom: 1px dotted #555;
+    //margin-bottom:rem;
   }
 }
 
@@ -1055,13 +1061,14 @@ aside#help{
 }
 /* Simple  Card CSS*/
 .scard {
-    /*background: #F2F2F2;*/
+    background:#FFF;
     border:1px solid #AAA;
     border-bottom:3px solid #BBB;
     padding:0px;
     margin:5px;
     overflow:hidden;
-    width:85%;
+    width:80%;
+    height:11rem;
      &:hover{
     box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
     transition: box-shadow 0.5s ease;
@@ -1071,7 +1078,11 @@ aside#help{
 .scard_header {
     text-align:center;
     position:fixed;
-    height:30px;
+    height:20rem;
+    border:1px solid #AAA;
+    border-bottom:3px solid #BBB;
+    padding:0px;
+    margin:5px;
     left:0px;
     right:0px;
     background:#FFF;
@@ -1080,31 +1091,59 @@ aside#help{
     font-size:20px;
     font-weight:bold;
   }
-
+}
 .scard-content {  
+    height: auto;
     padding: 0.5rem;
+    margin:5px;
+    //margin-top: 2cm;
+    padding-top: 0.5cm;
     border-radius: 0 0 2px 2px;
     overflow: hidden;
+    width:80%;
+    margin-top: -0.3em;
     /*height: 8.25rem;*/
-   margin-top: 8px;
+      background-color:#3e3e3e;
   .scard-title{
-      font-family: Open Sans Bold;
-      margin:0px;
-      /*padding:10px;*/
-      color:#6B0000;
-      /*font-size:small;*/
-      text-transform: uppercase;
-      word-wrap: normal;
+      font-size: 1em;
+      margin-top: -1em;
+      float: left;
+      color:#ececec;
+      //width:50%;
+      display:inline-block;
+      text-align: center;
     }
+
 
   }
 
 .scard-action {
-    border-top: 1px solid rgba(160, 160, 160, 0.2);
-    padding: 0.25rem 0.5rem;
-    /*color: gray;*/
-    font-size: small;
-    /*background: #A6D9CB;*/
+    //color:#ececec;
+    height: height;
+    font-size:0.7em;
+    padding: 0.5rem;
+    margin:5px;
+    padding-top: 0.1cm;
+    margin-top:-0.25em;
+    border-radius: 0 0 2px 2px;
+    overflow: hidden;
+    width:80%;
+    background-color:#CCCCCC;
+  
+}
+
+.scard-desc{
+    font-size:0.8em;
+    color:#333333;
+    height: height;
+    padding: 0.5rem;
+    margin:5px;
+    padding-top: 0.1cm;
+    margin-top:-0.25em;
+    border-radius: 0 0 2px 2px;
+    overflow: hidden;
+    width:80%;
+    background-color:#E6E6E6;
 }
 
  p {
@@ -1113,10 +1152,9 @@ aside#help{
   }
 
 .scard-image {
-    width:100%;
-    height:30%;
     padding:0px;
     margin:0px;
+    height:100%;
     background-position:center;
     background-repeat:no-repeat;
     position:relative;
@@ -1128,6 +1166,7 @@ aside#help{
     margin: 0 auto;
     opacity: 0.9;
     width:100%;
+    height:100%;
   }
   
   i {
@@ -1213,10 +1252,92 @@ aside#help{
 
 
 
-}
 
 
 /* End Simple Card CSS*/
+
+/* Customized Off-Canvas */
+#help-canvas-menu {
+    position:fixed;
+    top:52px;
+    left:-250px;
+    z-index:99;
+    -webkit-transition:left 150ms linear 0ms;
+    -moz-transition:left 150ms linear 0ms;
+    -ms-transition:left 150ms linear 0ms;
+    transition:left 150ms linear 0ms;
+    height:100%;
+}
+#help-canvas-menu.expanded {
+    left:0!important;
+    z-index:100000000;
+    left:150px;
+}
+#help-canvas-menu.expanded .help-button {
+    right:80px;
+    z-index:-1;
+}
+
+#help-canvas-menu.animating .help-button {
+    -webkit-animation:shake 400ms;
+    animation:shake 400ms;
+}
+#help-canvas-menu .help-button {
+    position:absolute;
+    -webkit-transform:rotate(-90deg);
+    -moz-transform:rotate(-90deg);
+    -o-transform:rotate(-90deg);
+    transform:rotate(-90deg);
+    filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
+    -ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=0)";
+    left:200px;
+    top:300px;
+    background:$primary-color;
+    color:#fff;
+    text-decoration:none;
+    height:28px;
+    line-height:28px;
+    width:124px;
+    text-transform:none;
+    padding:0;
+    text-align:center;
+    font-size:14px;
+    border-radius:0;
+    overflow:none;
+    border-top-left-radius:5px;
+    border-top-right-radius:5px;
+
+}
+#help-canvas-menu .help-button-text{
+    font-size:18px;
+}
+#help-canvas-menu .help-button .text {
+    color:#f9f9f9;
+    letter-spacing:.1em;
+    float:left;
+    margin-left:5px;
+    text-shadow:0 0 1px rgba(0,0,0,0.35);
+
+}
+
+#help-canvas-menu .mainContainer {
+    background:#fff;
+    /*-webkit-box-shadow:3px 3px 17px -1px #7b7b7b;
+    -moz-box-shadow:3px 3px 17px -1px #7b7b7b;*/
+     box-shadow:1px 1px 10px 1px #7b7b7b;
+    /*overflow-y:scroll;*/
+    text-align:center;
+    height:100%;
+    width:250px;
+    overflow: none;
+
+
+}
+
+
+
+/* End of Customized Off-Canvas */
+
 .rcard {
   overflow: hidden;
   color: #272727;
@@ -1475,3 +1596,26 @@ aside#help{
 .text-gray{
   color: gray;
 }
+
+
+  .repository-title{  
+      color:#D7D7D7;
+    font-size: 1.3em;
+    width:auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    text-align:left;
+    display:inline-block;
+    margin-left:5px;
+    position:relative;
+    text-align:center;
+  }
+  .repository-desc{
+    font-size: 1.3em;
+    width:auto;
+    background-color:#E5E5E5;
+    text-align:left;
+    display:inline-block;
+    color:#878787;
+    position:relative;
+    margin-left:4px;
+  }

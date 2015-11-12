@@ -3072,3 +3072,8 @@ def get_topic_breadcrumb_hierarchy(oid):
 	# print "comma_sep_str : ", comma_sep_str
 	comma_sep_str = comma_sep_str[:-1]
 	return comma_sep_str
+
+@get_execution_time
+@register.assignment_tag
+def get_gstudio_help_sidebar():
+	return GSTUDIO_HELP_SIDEBAR

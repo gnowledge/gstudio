@@ -6,6 +6,7 @@
 {% get_group_name groupid as group_name_tag %}
 
 
+
 <div class="row page" itemscope itemtype="{{schema.1.type}}"> 
   
   <section class="medium-9 columns">
@@ -144,6 +145,9 @@
   </ul>
     
   {% endif %}
+  <div id="view_collection">
+    <span itemprop="{{schema.1.name}}" class='large-4 columns repository-title'> {% firstof node.altnames node.name %}   
+  </div>
   
   {% if node.teaches %}
     <div class="hide teaches-block">
@@ -229,6 +233,7 @@
 
     {% if topic %}
       {% get_filters_data "Topics" as filter_dict %}
+  
       {% include "ndf/filters.html" with filter_dict=filter_dict %}
     {% endif %}
 
@@ -454,8 +459,11 @@
                   <h4 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
                     <small>Next <i class="fi-arrow-right"></i></small>
                   </h4>
+                  
                 </div>
-                
+                  <!-- <p class="large-text-right"><small>
+                  <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
+                </small></p> -->
 
                 <script>
                   // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
@@ -540,6 +548,10 @@
                   <p class="large-text-right"><small>
                   <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
                 </small></p>
+                                    
+
+                    
+
               </div>
 
           {% endif %}
@@ -606,6 +618,7 @@
 
                   <!-- END of discussion content area -->     
                 </div>
+        
           <br/>
           {% endif %}
           
