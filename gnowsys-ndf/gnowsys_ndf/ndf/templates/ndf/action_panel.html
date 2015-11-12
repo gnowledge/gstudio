@@ -284,6 +284,8 @@
 							{% if group_object.edit_policy != "EDITABLE_MODERATED" and is_gstaff %}
 								<a href="{% url create_url group_name_tag %}" class="tiny button radius edit left-btn">{% trans 'New Group' %}</a>
 							{% else %}
+
+
 								<input type="button" class="tiny button secondary radius disabled edit left-btn" value="New {{node.member_of_names_list.0}}" >
 							{% endif %}								
 						{% else %}
@@ -319,8 +321,11 @@
 			<div class="row btn-row">
 				<!-- New SubGroup and PE-->
 					{% if user.is_superuser %}
-						<a href="{% url 'create_group' group_id %}?subgroup=True" class="tiny button radius left-btn">{% trans "New SubGroup" %}</a>
-
+						{% if group_object.name == "Individual Partners" or group_object.name == "State Partners" or group_object.name == "Institutional Partners"%}
+							<a class="button tiny radius left-btn" href="{% url 'create_group' group_object.pk %}?subgroup=True&partnergroup=True">{% trans "New" %} {{group_object.name}}</a>
+						{% else %}
+							<a href="{% url 'create_group' group_id %}?subgroup=True" class="tiny button radius left-btn">{% trans "New SubGroup" %}</a>
+	  					{% endif %}
 						<a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="tiny button radius right-btn">{% trans "New Programs" %}</a>
 					{% endif %}
 			</div>

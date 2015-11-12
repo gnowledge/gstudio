@@ -1305,6 +1305,10 @@ class GroupCreateEditHandler(View):
         if action == "edit":  # to edit existing group
 
             group_obj = get_group_name_id(group_id, get_obj=True)
+            if partnergroup_flag:
+                parent_id = group_obj.prior_node[0]
+                parent_obj_partner = get_group_name_id(parent_id, get_obj=True)
+                # print "\n\n parent_group_obj", parent_obj_partner
 
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.
@@ -1314,6 +1318,8 @@ class GroupCreateEditHandler(View):
             available_nodes = node_collection.find({'_type': u'Group'}, {'name': 1, '_id': 0})
             # making list of group names (to check uniqueness of the group):
             nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
+            if partnergroup_flag:
+                parent_obj_partner = get_group_name_id(group_id, get_obj=True)
 
             # print nodes_list
         # why following logic exists? Do we need so?
@@ -1330,7 +1336,6 @@ class GroupCreateEditHandler(View):
             subgroup_flag = eval(subgroup_flag)
         if partnergroup_flag:
             template = "ndf/create_partner.html"
-            parent_obj_partner = get_group_name_id(group_id, get_obj=True)
             if group_obj:
                 logo_img_node, grel_id = get_relation_value(group_obj._id,'has_profile_pic')
                 group_obj.get_neighbourhood(group_obj.member_of)
@@ -1817,7 +1822,7 @@ def group_dashboard(request, group_id=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
     if group_obj and group_obj.post_node:
         subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, '_type': "Group", 'edit_policy': {'$ne': "EDITABLE_MODERATED"},
-            '$or': [{'created_by': request.user.id},{'group_admin': request.user.id},{'author_set': request.user.id},{'group_type': 'PUBLIC'}]})
+            '$or': [{'created_by': request.user.id},{'group_admin': request.user.id},{'author_set': request.user.id},{'group_type': 'PUBLIC'}]}).sort("last_update",-1)
 
     if not group_obj:
       group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})

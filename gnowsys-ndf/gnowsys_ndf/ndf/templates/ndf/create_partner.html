@@ -3,9 +3,10 @@
 {% load ndf_tags %}
 {% load cache %}
 
-{% block title %} Create New {{parent_obj_partner.name}} {% endblock %}
+{% block title %} {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}} {{node.name}}{% endblock %}
 
-{% block meta_content %}
+{% block meta_content %}  
+<h2 class="subheader"> {{parent_obj_partner.name}}</h2>
 {% endblock %}
 
 {% block related_content %}
@@ -21,9 +22,9 @@
 
 {% block body_content %}
 
-  <h3>Create New {{parent_obj_partner.name}}</h3><br>
+  <h3> {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}} {{node.name}}</h3><br>
   <form id="create_group" class="" method="post"
-  {% if node %} action="{% url 'edit_group' parent_obj_partner.pk %}"
+  {% if node %} action="{% url 'edit_group' node.pk %}"
   {% else %} action="{% url 'create_group' parent_obj_partner.pk %}"
   {% endif %}
   data-abide enctype="multipart/form-data">
@@ -42,6 +43,16 @@
             <input type="text" name="name" id="name_input" value="{% if node %}{{node.name}}{% endif %}" {% if node %}disabled="disabled"{% endif %}>
             </div>
           </div>
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">Altnames
+              </label>
+            </div>
+            <div class="small-5 columns end">
+            <input type="text" name="altnames" id="altname_input" value="{% if node %}{{node.altnames}}{% endif %}" >
+            </div>
+          </div>
+
           <div class="row">
             <div class="small-3 columns"> 
               <label class="right inline">Description
