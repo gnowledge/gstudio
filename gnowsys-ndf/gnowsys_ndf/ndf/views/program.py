@@ -59,9 +59,11 @@ def program_event_list(request, group_id):
                     enr_ce_coll.append(each)     
             else:
                 all_pe.append(each)   
+    else:
+        all_pe = list_of_pe
         # enr_ce_coll = node_collection.find({'$in': list_of_pe,'author_set': int(request.user.id)}).sort('last_update', -1)
 
-    ce_coll = node_collection.find({'member_of': pe_gst._id, 'author_set': {'$ne': int(request.user.id)}})
+    # ce_coll = node_collection.find({'member_of': pe_gst._id, 'author_set': {'$ne': int(request.user.id)}})
 
     return render_to_response("ndf/course.html",
                             {'title': title,

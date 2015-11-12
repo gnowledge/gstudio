@@ -81,8 +81,10 @@ def course(request, group_id, course_id=None):
     # if GST_COURSE.name == "Course":
     title = "eCourses"
     
-    query = {'member_of': ce_gst._id,'_id':{'$in': group_obj_post_node_list},'author_set':{'$ne':int(request.user.id)}}
+    query = {'member_of': ce_gst._id,'_id':{'$in': group_obj_post_node_list}}
+
     if request.user.id:
+        query.update({'author_set':{'$ne':int(request.user.id)}})
         course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"}).sort('last_update', -1)
         enr_ce_coll = node_collection.find({'member_of': ce_gst._id,'author_set': int(request.user.id),'_id':{'$in': group_obj_post_node_list}}).sort('last_update', -1)
 
