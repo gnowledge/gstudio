@@ -9,19 +9,10 @@ def run_syncdata_script():
     #or stuck  
     #manage directory path
 
-    root_path =  os.path.abspath(os.path.dirname(os.pardir))
-    lock =  os.path.join(root_path, 'lock')
-    print lock
-    print "n comoputing",os.path.exists(lock)
-    if  os.path.exists(lock) == False:
-        fl = open("lock", "wb")
-        fl.close()
-        data_fetch_script_name = 'fetch_data'
-        command = "python manage.py " + data_fetch_script_name
-        op = subprocess.call([command],shell=True)
-        if op == 0 :
-            os.remove(lock)
-        print data_fetch_script_name + ' executed.'
+    data_fetch_script_name = 'fetch_data'
+    command = "python manage.py " + data_fetch_script_name
+    subprocess.call([command],shell=True)
+    print data_fetch_script_name + ' executed.'
 
     syncdata_sending_script_name = 'send_syncdata'
     command1 = "python manage.py " + syncdata_sending_script_name
