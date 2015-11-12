@@ -3072,3 +3072,15 @@ def get_topic_breadcrumb_hierarchy(oid):
 	# print "comma_sep_str : ", comma_sep_str
 	comma_sep_str = comma_sep_str[:-1]
 	return comma_sep_str
+
+@get_execution_time
+@register.assignment_tag
+def is_partner(group_obj):
+	try:
+		result = False
+		partner_spaces = ["State Partners", "Individual Partners", "Institutional Partners"]
+		if group_obj.name in partner_spaces:
+			result = True
+		return result
+	except:
+		return result
