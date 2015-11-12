@@ -1924,6 +1924,17 @@ def group_dashboard(request, group_id=None):
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
 
   allow_to_join = ""
+  if 'start_enroll' in group_obj:
+      if group_obj.start_enroll:
+          start_enrollment_date = group_obj.start_enroll
+          start_enrollment_date = start_enrollment_date.date()
+          if start_enrollment_date:
+            curr_date_time = datetime.now().date()
+            if start_enrollment_date > curr_date_time:
+                allow_to_join = "Forthcoming"
+            else:
+                allow_to_join = "Open"
+
   if 'end_enroll' in group_obj:
       if group_obj.end_enroll:
           last_enrollment_date = group_obj.end_enroll
@@ -1932,8 +1943,6 @@ def group_dashboard(request, group_id=None):
             curr_date_time = datetime.now().date()
             if last_enrollment_date < curr_date_time:
                 allow_to_join = "Closed"
-            elif last_enrollment_date > curr_date_time:
-                allow_to_join = "Forthcoming"
             else:
                 allow_to_join = "Open"
 
