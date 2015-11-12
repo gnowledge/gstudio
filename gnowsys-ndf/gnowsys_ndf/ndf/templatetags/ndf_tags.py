@@ -3079,6 +3079,8 @@ def convert_list(value):
 def get_topic_breadcrumb_hierarchy(oid):
 
 	nodes_cur = get_prior_node_hierarchy(oid)
+	# removing top theme id
+	nodes_cur.pop()
 	nodes_cur_list = [n._id for n in nodes_cur]
 	nodes_cur_list.reverse()
 	
