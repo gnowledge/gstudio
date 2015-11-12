@@ -449,10 +449,9 @@ def server_sync(mail):
                 #user_id = 1
                 #query = 'select username from auth_user where id=\''+str(user_id)+'\''
                 #cursor = conn.execute(query)
-                print "the path"
                 user_id = json_data[u'created_by']
             except Exception as error:
-                print "this is error point",error
+                print error
             
             if user_id:
                 try:    
@@ -531,66 +530,67 @@ def server_sync(mail):
                         '''    
                             # if node is present update it
                         try:
-                                if json_data['_type'] not in ['RelationType','AttributeType']:
-                                        if json_data['_type'] in ['GAttribute','GRelation','RelationType','AttributeType']:
-                                                if json_data['_type'] == 'GAttribute':
-                                                        temp_node = triple_collection.collection.GAttribute()
-                                                elif json_data['_type'] == 'GRelation':
-                                                        temp_node = triple_collection.collection.GRelation()
-
-                                                elif json_data['_type'] == 'RelationType': 
-                                                        temp_node = node_collection.collection.RelationType()
-                                                elif json_data['_type'] == 'AttributeType':
-                                                        temp_node = node_collection.collection.AttributeType()        
-                                                temp_dict = {}
-                                                if json_data['_type'] in ['GAttribute','GRelation']:
-                                                        json_data.pop('name')           
-                                                
-                                                for key,values in json_data.items():
-                                                                if key in ['attribute_type','relation_type','relation_type_set','attribute_type_set']:
-                                                                        if key == 'attribute_type':
-                                                                                node = node_collection.find_one({"_id":ObjectId(json_data['attribute_type']['_id'])})
-                                                                        elif key == 'relation_type':
-                                                                                node = node_collection.find_one({"_id":ObjectId(json_data['relation_type']['_id'])})
-                                                                        elif key == 'relation_type_set':
-                                                                                values = json_data['relation_type_set']      
-                                                                                if values is not None:
-                                                                                        node = process_list(values)
-                                                                        elif key == 'attribute_type_set':
-                                                                                values = json_data['attribute_type_set']      
-                                                                                if values is not None:
-                                                                                        node = process_list(values) 
-                                                                        if node:
-                                                                                temp_node[key] = node
-                                                                else:
-                                                                        temp_dict[key] = values
-                                                temp_node.update(temp_dict)
-                                                try:
-                                                        temp_node.save()
-                                                except: 
-                                                        '''        
-                                                        for i,v in temp_dict.items():  
-                                                                temp_node[i] = v
-                                                        print "after temp node",temp_node
-                                                        temp_node.save()
-                                                        '''
-                                                        print (traceback.format_exc())
-                                                   
+                                if json_data['_type'] in ['GAttribute','GRelation','RelationType','AttributeType','GSystemType']:
+                                        if json_data['_type'] == 'GAttribute':
+                                                temp_node = triple_collection.collection.GAttribute()
+                                        elif json_data['_type'] == 'GRelation':
+                                                temp_node = triple_collection.collection.GRelation()
+                                        elif json_data['_type'] == 'RelationType': 
+                                                temp_node = node_collection.collection.RelationType()
+                                        elif json_data['_type'] == 'AttributeType':
+                                                temp_node = node_collection.collection.AttributeType()        
+                                        elif json_data['_type'] == 'GSystemType':
+                                                temp_node = node_collection.collection.GSystemType()
+                                        temp_dict = {}
+                                        if json_data['_type'] in ['GAttribute','GRelation']:
+                                                json_data.pop('name')           
                                         
-                                        else:
-                                                if json_data['_type'] == 'Group':
-                                                        temp_node = node_collection.collection.Group()
-                                                else:                           
-                                                        temp_node = node_collection.collection.GSystem()
-                                                temp_dict = {}
-                                                ''' dictionary creation '''
-                        
-                                                for key, values in json_data.items():
-                                                        print key,values
-                                                        temp_dict[key] = values
-
-                                                temp_node.update(temp_dict)
+                                        for key,values in json_data.items():
+                                                        if key in ['attribute_type','relation_type','relation_type_set','attribute_type_set']:
+                                                                if key == 'attribute_type':
+                                                                        node = node_collection.one({"_id":ObjectId(json_data['attribute_type']['_id'])})
+                                                                elif key == 'relation_type':
+                                                                        node = node_collection.one({"_id":ObjectId(json_data['relation_type']['_id'])})
+                                                                elif key == 'relation_type_set':
+                                                                        values = json_data['relation_type_set']      
+                                                                        if values is not None:
+                                                                                node = process_list(values)
+                                                                elif key == 'attribute_type_set':
+                                                                        values = json_data['attribute_type_set']      
+                                                                        if values is not None:
+                                                                                node = process_list(values) 
+                                                                                print node
+                                                                if node:
+                                                                        print "coming till here",key
+                                                                        temp_node[key] = node
+                                                        else:
+                                                                temp_dict[key] = values
+                                        temp_node.update(temp_dict)
+                                        try:
                                                 temp_node.save()
+                                        except: 
+                                                '''        
+                                                for i,v in temp_dict.items():  
+                                                        temp_node[i] = v
+                                                print "after temp node",temp_node
+                                                temp_node.save()
+                                                '''
+                                                print (traceback.format_exc())
+                                           
+                                
+                                else:
+                                        if json_data['_type'] == 'Group':
+                                                temp_node = node_collection.collection.Group()
+                                        else:                           
+                                                temp_node = node_collection.collection.GSystem()
+                                        temp_dict = {}
+                                        ''' dictionary creation '''
+                
+                                        for key, values in json_data.items():
+                                                temp_dict[key] = values
+
+                                        temp_node.update(temp_dict)
+                                        temp_node.save()
                         except:
                                         print(traceback.format_exc())                        
                                              
@@ -605,7 +605,7 @@ def server_sync(mail):
                                                
                         except:
                                 print(traceback.format_exc())
-                        temp_node = json_data
+                temp_node = json_data
                 with open("receivedfile","a") as outputfile:
                         outputfile.write(str(str(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")) + ", _id:" + str(temp_node["_id"]) + ", " +"Snapshot"+ str(temp_node.get("snapshot",0)) +  ", Public key:" +SYNCDATA_KEY_PUB + ",Synced:{1}" +"\n" ))
 
@@ -616,7 +616,7 @@ def process_list(val_list):
         for i in val_list:
                 print i
                 #print ObjectId(i['_id']['$oid'])
-                node = node_collection.find_one({"_id":ObjectId(i['_id'])})
+                node = node_collection.one({"_id":ObjectId(i['_id'])})
                 if node:
                         node_list.append(node)
         return node_list
