@@ -581,6 +581,8 @@ def server_sync(mail):
                                 else:
                                         if json_data['_type'] == 'Group':
                                                 temp_node = node_collection.collection.Group()
+                                        elif json_data['_type']  == 'Author':
+                                                temp_node = node_collection.collection.Author()
                                         else:                           
                                                 temp_node = node_collection.collection.GSystem()
                                         temp_dict = {}
