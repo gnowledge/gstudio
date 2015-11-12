@@ -205,7 +205,6 @@ def slice_registry(time):
             data.append(previouse_line)
             data.append(current_line)
             data.append(last_line)
-            print data
             file_path = create_file(dst,data)
             '''
             cp = "cp  -u " + str(file_path) + " " + dst + "/"  
