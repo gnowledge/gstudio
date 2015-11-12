@@ -1889,6 +1889,9 @@ def user_access_policy(node, user):
       elif user.id in group_node.group_admin:
         user_access = True
 
+      elif "PartnerGroup" in group_node.member_of_names_list:
+        user_access = True
+
       elif group_node.edit_policy == "NON_EDITABLE":
         user_access = False
 
