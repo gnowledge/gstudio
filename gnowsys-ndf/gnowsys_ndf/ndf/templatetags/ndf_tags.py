@@ -1053,11 +1053,25 @@ def check_user_join(request,group_id):
 @get_execution_time
 @register.assignment_tag
 def check_group(group_id):
-	if group_id:
-		fl = check_existing_group(group_id)
-		return fl
-	else:
-		return ""
+	try:
+		result = False
+		if group_id:
+			group_obj = node_collection.one({'_id': ObjectId(group_id)})
+			if "Group" in group_obj.member_of_names_list or "Author" in group_obj.member_of_names_list:
+				result = True
+			if group_obj._type == "Author" or group_obj._type == "Group":
+				result = True
+		else:
+			result = False
+		return result
+	except:
+		return result
+
+	# if group_id:
+	# 	fl = check_existing_group(group_id)
+	# 	return fl
+	# else:
+	# 	return ""
 
 
 @get_execution_time
