@@ -115,12 +115,16 @@
                 <ul class="right">
                   <li class="enroll-btn-li">
                   {% if user_access == "allow" %}
-                    <input class="enroll-btn button tiny" type="button" value="ENROLLED" disabled="disabled">
+                    <input class="button tiny" type="button" value="ENROLLED" disabled="disabled">
                   {% else %}
-                    {% if allow_to_join %}
-                      <input class="enroll-btn button tiny" type="button" value="ENROLL">
+                    {% if user.is_authenticated %}
+                      {% if allow_to_join == "Open" %}
+                        <input class="enroll-btn button tiny" type="button" value="ENROLL">
+                      {% else %}
+                        <input class="button tiny" type="button" value="Enrollment {{allow_to_join}}" disabled="disabled">
+                      {% endif %}
                     {% else %}
-                      <input class="button tiny" type="button" value="ENROLL" disabled="disabled">
+                        <input class="button tiny" type="button" value="ENROLL" disabled="disabled" title="Please login to Enroll">
                     {% endif %}
                   {% endif %}
                   </li>

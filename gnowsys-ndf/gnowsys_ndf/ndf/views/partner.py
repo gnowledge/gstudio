@@ -154,10 +154,10 @@ def partner_list(request, group_id):
         #         node = node_collection.one({'_id': each})
         #         collection_set.append(node)
 
-        group_nodes = node_collection.find({'_id': {'$in':group_obj.post_node}})
+        group_nodes = node_collection.find({'_id': {'$in':group_obj.post_node}}).sort("last_update",-1)
     # print GSTUDIO_NROER_MENU_MAPPINGS.get(group_name, None)
     # print GSTUDIO_NROER_MENU
-    return render_to_response("ndf/partner_list.html", 
+    return render_to_response("ndf/partner_list.html",
                           {'group_nodes': group_nodes,
                            # "groups_category": groups_category,
                            'group_obj':group_obj,
