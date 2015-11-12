@@ -344,10 +344,12 @@
       {% if "CourseEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
       <section class="medium-3 columns"> 
           <div class="panel">
+
               <div class="row btn-row">
-                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button radius edit left-btn"><i class="fi-pencil"></i> {% trans "Edit " %}{% if sg_type == "ProgramEventGroup" %}{% trans "Event" %}{% else %}{% trans "eCourse" %}{% endif %}</a>
-                <input type="button" class="button tiny radius right-btn" value="Users">        
+                <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button radius edit mod-btn"><i class="fi-pencil"></i> {% trans "Edit " %}{% if sg_type == "ProgramEventGroup" %}{% trans "Event" %}{% else %}{% trans "eCourse" %}{% endif %}</a>
+                <!-- <input type="button" class="button tiny radius right-btn" value="List Users">         -->
               </div>
+              <br/>
               <div class="row btn-row">
                 {% include "ndf/invite_users.html" %}
                 {% include "ndf/invite_admins.html" %}

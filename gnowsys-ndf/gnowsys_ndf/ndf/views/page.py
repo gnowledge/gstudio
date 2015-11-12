@@ -305,7 +305,7 @@ def create_edit_page(request, group_id, node_id=None):
                           'program_res':program_res,
                           'blog_type': blog_type
                       }
-
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
@@ -361,7 +361,7 @@ def create_edit_page(request, group_id, node_id=None):
         if blog_type:
             blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
             page_node.type_of = [blogpage_gst._id]
-        elif GSTUDIO_SITE_NAME == "NROER":
+        elif GSTUDIO_SITE_NAME == "NROER" and "Author" in group_obj.member_of_names_list:
             infopage_gst = node_collection.one({'_type': "GSystemType", 'name': "Info page"})
             page_node.type_of = [infopage_gst._id]
         # if the page created is as a resource in course or program event,

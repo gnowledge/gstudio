@@ -38,7 +38,7 @@ def program_event_list(request, group_id):
     course_coll = None
     enr_ce_coll = []
     list_of_pe = []
-
+    all_pe = []
     pe_gst = node_collection.one({'_type': "GSystemType", 'name': "ProgramEventGroup"})
 
     # program events
@@ -56,17 +56,21 @@ def program_event_list(request, group_id):
         for each in list_of_pe:
             if userid in each.author_set:
                 if each not in enr_ce_coll:
-                    enr_ce_coll.append(each)        
+                    enr_ce_coll.append(each)     
+            else:
+                all_pe.append(each)   
+    else:
+        all_pe = list_of_pe
         # enr_ce_coll = node_collection.find({'$in': list_of_pe,'author_set': int(request.user.id)}).sort('last_update', -1)
 
-    ce_coll = node_collection.find({'member_of': pe_gst._id})
+    # ce_coll = node_collection.find({'member_of': pe_gst._id, 'author_set': {'$ne': int(request.user.id)}})
 
     return render_to_response("ndf/course.html",
                             {'title': title,
                              'course_gst': pe_gst,
                              'course_coll': list_of_pe,
                              'groupid': group_id, 'group_id': group_id,
-                             'ce_coll':list_of_pe,
+                             'ce_coll':all_pe,
                              'enr_ce_coll':enr_ce_coll,
                             },
                             context_instance=RequestContext(request)
