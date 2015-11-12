@@ -168,6 +168,10 @@ def capture_id_data(id,time_with_microsec,collection):
 
 def slice_registry(time):
     print "coming here",time
+    data = []
+    current_line = ""
+    previouse_line = ""
+    last_line = ""
     manage_path =  os.path.abspath(os.path.dirname(os.pardir))
     registry_path =  os.path.join(manage_path, 'Registry.txt') 
     if time == "":
@@ -191,14 +195,25 @@ def slice_registry(time):
         if  (file_name not in ['Start','End']) == True:
             file_name = j[0:j.index(',')]
             dst = dst +"/" +str(file_name)
-            data=get_neighbours(file_name,registry_path)
+            current_line = j
+            try:
+                last_line = log_output[i+1]
+            except:
+                last_line = ""
 
+            #data=get_neighbours(file_name,registry_path)
+            data.append(previouse_line)
+            data.append(current_line)
+            data.append(last_line)
+            print data
             file_path = create_file(dst,data)
             '''
             cp = "cp  -u " + str(file_path) + " " + dst + "/"  
             subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
             '''
-        
+        previouse_line = j
+        data = []
+            
     #delete the Info_Registry after copying
     #os.remove(registry_path)
 def create_file(file_path,data,mode="w"):
