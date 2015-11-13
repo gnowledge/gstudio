@@ -1053,11 +1053,25 @@ def check_user_join(request,group_id):
 @get_execution_time
 @register.assignment_tag
 def check_group(group_id):
-	if group_id:
-		fl = check_existing_group(group_id)
-		return fl
-	else:
-		return ""
+	try:
+		result = False
+		if group_id:
+			group_obj = node_collection.one({'_id': ObjectId(group_id)})
+			if "Group" in group_obj.member_of_names_list or "Author" in group_obj.member_of_names_list:
+				result = True
+			if group_obj._type == "Author" or group_obj._type == "Group":
+				result = True
+		else:
+			result = False
+		return result
+	except:
+		return result
+
+	# if group_id:
+	# 	fl = check_existing_group(group_id)
+	# 	return fl
+	# else:
+	# 	return ""
 
 
 @get_execution_time
@@ -1887,6 +1901,9 @@ def user_access_policy(node, user):
         user_access = True
 
       elif user.id in group_node.group_admin:
+        user_access = True
+
+      elif "PartnerGroup" in group_node.member_of_names_list:
         user_access = True
 
       elif group_node.edit_policy == "NON_EDITABLE":
@@ -3077,3 +3094,15 @@ def get_topic_breadcrumb_hierarchy(oid):
 @register.assignment_tag
 def get_gstudio_help_sidebar():
 	return GSTUDIO_HELP_SIDEBAR
+
+@get_execution_time
+@register.assignment_tag
+def is_partner(group_obj):
+	try:
+		result = False
+		partner_spaces = ["State Partners", "Individual Partners", "Institutional Partners"]
+		if group_obj.name in partner_spaces:
+			result = True
+		return result
+	except:
+		return result

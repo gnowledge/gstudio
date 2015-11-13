@@ -1923,7 +1923,18 @@ def group_dashboard(request, group_id=None):
   if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
 
-  allow_to_join = True
+  allow_to_join = ""
+  if 'start_enroll' in group_obj:
+      if group_obj.start_enroll:
+          start_enrollment_date = group_obj.start_enroll
+          start_enrollment_date = start_enrollment_date.date()
+          if start_enrollment_date:
+            curr_date_time = datetime.now().date()
+            if start_enrollment_date > curr_date_time:
+                allow_to_join = "Forthcoming"
+            else:
+                allow_to_join = "Open"
+
   if 'end_enroll' in group_obj:
       if group_obj.end_enroll:
           last_enrollment_date = group_obj.end_enroll
@@ -1931,7 +1942,11 @@ def group_dashboard(request, group_id=None):
           if last_enrollment_date:
             curr_date_time = datetime.now().date()
             if last_enrollment_date < curr_date_time:
-                allow_to_join = False
+                allow_to_join = "Closed"
+            else:
+                allow_to_join = "Open"
+
+
   property_order_list = []
   if "group_of" in group_obj:
     if group_obj['group_of']:
@@ -2181,11 +2196,16 @@ def switch_group(request,group_id,node_id):
     # for each in get_all_user_groups():
     #   all_user_groups.append(each.name)
     #loop replaced by a list comprehension
+      top_partners_list = ["State Partners", "Individual Partners", "Institutional Partners"]
       all_user_groups = [each.name for each in get_all_user_groups()]
       all_user_groups.append('home')
       all_user_groups.append('Trash')
+      all_user_groups.extend(top_partners_list)
+
       st = node_collection.find({'$and': [{'_type': 'Group'},{'$or':[{'author_set': {'$in':[1]}},{'group_admin': {'$in':[1]}}]},
-                                          {'name':{'$nin':all_user_groups}}, {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}]})
+                                          {'name':{'$nin':all_user_groups}},
+                                          {'member_of': {'$ne': partner_group_gst._id}},
+                                          {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}]})
       # st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},
       #                                     {'name':{'$nin':all_user_groups}},
       #                                     {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}

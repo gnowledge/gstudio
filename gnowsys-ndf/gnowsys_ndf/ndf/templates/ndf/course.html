@@ -120,7 +120,7 @@
       <div class="repository-title"> All Courses</div>
         {% for course in course_coll %}
           <li class="card-image-wrapper"> 
-            {% include 'ndf/simple_card.html' with resource=course url_name="groupchange" first_arg=node.pk %}
+            {% include 'ndf/simple_card.html' with resource=course url_name="course_detail" first_arg=group_id second_arg=course.pk %}
           </li>
 
         {% empty %}
