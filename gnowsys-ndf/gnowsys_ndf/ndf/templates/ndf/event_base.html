@@ -124,7 +124,7 @@
                         <input class="button tiny" type="button" value="Enrollment {{allow_to_join}}" disabled="disabled">
                       {% endif %}
                     {% else %}
-                        <input class="button tiny" type="button" value="ENROLL" disabled="disabled" title="Please login to Enroll">
+                        <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
                     {% endif %}
                   {% endif %}
                   </li>
