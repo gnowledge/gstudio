@@ -1,4 +1,5 @@
 import re
+import urllib
 
 ''' -- imports from installed packages -- ''' 
 from django.shortcuts import render_to_response
@@ -18,7 +19,7 @@ from gnowsys_ndf.ndf.models import Node, GRelation,GSystemType,File,Triple
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, get_execution_time
-# from gnowsys_ndf.ndf.views.methods import get_filter_querydict
+from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 # from gnowsys_ndf.ndf.org2any import org2html
 
 #######################################################################################################################################
@@ -38,7 +39,6 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 
 	is_video = request.GET.get('is_video', "")
 	
-	# group_name, group_id = get_group_name_id(group_id)
 	try:
 		group_id = ObjectId(group_id)
 	except:
@@ -84,13 +84,44 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	datavisual = []
 	no_of_objs_pp = 24
 
-	
-	files = node_collection.find({
-									'member_of': ObjectId(GST_FILE._id), 
-									'_type': 'File',
-									'fs_file_ids': {'$ne': []}, 
-									'group_set': ObjectId(group_id), 
-									# '$and': query_dict,
+	# filters = request.POST.get("filters", "")
+	# filters = json.loads(filters)
+	# filters = get_filter_querydict(filters)
+
+	# print "filters in E-Library : ", filters
+
+	# declaring empty (deliberately to avoid errors), query dict to be pass-on in query
+	query_dict = [{}]
+	# query_dict = filters
+
+	selfilters = urllib.unquote(request.GET.get('selfilters', ''))
+	if selfilters:
+		selfilters = json.loads(selfilters)
+		query_dict = get_filter_querydict(selfilters)
+
+	# files = node_collection.find({
+	# 								'member_of': ObjectId(GST_FILE._id), 
+	# 								'_type': 'File',
+	# 								'fs_file_ids': {'$ne': []}, 
+	# 								'group_set': ObjectId(group_id), 
+	# 								'$and': query_dict,
+	# 								'$or': [
+	# 										{ 'access_policy': u"PUBLIC" },
+	# 										{ '$and': [
+	# 													{'access_policy': u"PRIVATE"}, 
+	# 													{'created_by': request.user.id}
+	# 												]
+	# 										}
+	# 									]
+											 
+	# 								}).sort("last_update", -1)
+
+	files = node_collection.find({												
+									'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+									# '_type': 'File',
+									# 'fs_file_ids': {'$ne': []}, 
+									'group_set': {'$all': [ObjectId(group_id)]},
+									'$and': query_dict,
 									'$or': [
 											{ 'access_policy': u"PUBLIC" },
 											{ '$and': [
@@ -99,7 +130,6 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 													]
 											}
 										]
-											 
 									}).sort("last_update", -1)
 
 	# print "files.count : ", files.count()
@@ -142,6 +172,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	collection_pages_cur = node_collection.find({
 									'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
                                     'group_set': {'$all': [ObjectId(group_id)]},
+                                    '$and': query_dict,
                                     '$or': [
                                         {'access_policy': u"PUBLIC"},
                                         {'$and': [
@@ -194,10 +225,19 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 
 		filters = request.POST.get("filters", "")
 		filters = json.loads(filters)
+		filters = get_filter_querydict(filters)
+
 		# print "filters in E-Library : ", filters
 
 		# declaring empty (deliberately to avoid errors), query dict to be pass-on in query
-		query_dict = [{}]
+		# query_dict = [{}]
+		query_dict = filters
+
+		selfilters = urllib.unquote(request.GET.get('selfilters', ''))
+		if selfilters:
+			selfilters = json.loads(selfilters)
+			query_dict = get_filter_querydict(selfilters)
+
 		detail_urlname = "file_detail"
 		if filetype != "all":
 			# if filetype == "Pages":
@@ -246,30 +286,30 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 				query_dict.append({"attribute_set.educationaluse": filetype})
 
 		# print filters
-		if filters:
-			temp_list = []
-			for each in filters:
-				filter_grp = each["or"]
-				for each_filter in filter_grp:
-					temp_dict = {}
-					each_filter["selFieldText"] = cast_to_data_type(each_filter["selFieldText"], each_filter["selFieldPrimaryType"])
+		# if filters:
+		# 	temp_list = []
+		# 	for each in filters:
+		# 		filter_grp = each["or"]
+		# 		for each_filter in filter_grp:
+		# 			temp_dict = {}
+		# 			each_filter["selFieldText"] = cast_to_data_type(each_filter["selFieldText"], each_filter["selFieldPrimaryType"])
 
-					if each_filter["selFieldPrimaryType"] == unicode("list"):
-						each_filter["selFieldText"] = {"$in": each_filter["selFieldText"]}
+		# 			if each_filter["selFieldPrimaryType"] == unicode("list"):
+		# 				each_filter["selFieldText"] = {"$in": each_filter["selFieldText"]}
 
-					if each_filter["selFieldGstudioType"] == "attribute":
+		# 			if each_filter["selFieldGstudioType"] == "attribute":
 
-						temp_dict["attribute_set." + each_filter["selFieldValue"]] = each_filter["selFieldText"]
-						temp_list.append(temp_dict)
-						# print "temp_list : ", temp_list
-					elif each_filter["selFieldGstudioType"] == "field":
-						temp_dict[each_filter["selFieldValue"]] = each_filter["selFieldText"]
-						temp_list.append(temp_dict)
+		# 				temp_dict["attribute_set." + each_filter["selFieldValue"]] = each_filter["selFieldText"]
+		# 				temp_list.append(temp_dict)
+		# 				# print "temp_list : ", temp_list
+		# 			elif each_filter["selFieldGstudioType"] == "field":
+		# 				temp_dict[each_filter["selFieldValue"]] = each_filter["selFieldText"]
+		# 				temp_list.append(temp_dict)
 				
-				if temp_list:			        	
-					query_dict.append({ "$or": temp_list})
+		# 		if temp_list:			        	
+		# 			query_dict.append({ "$or": temp_list})
 
-		# print "query_dict : ", query_dict
+		print "query_dict : ", query_dict
 
 		files = node_collection.find({												
 										'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
@@ -289,6 +329,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 
 	  
 		educationaluse_stats = {}
+		# print "files_count: ", files.count()
 
 		# if filetype == "Pages":
 		# 	filter_result = "True" if (result_cur.count() > 0) else "False"

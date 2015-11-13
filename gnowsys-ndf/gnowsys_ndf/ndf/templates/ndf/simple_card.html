@@ -11,11 +11,11 @@
  <div class="scard">
 
 {% if first_arg and second_arg and third_arg %}
-  <a href="{% url url_name first_arg second_arg third_arg %}">
+  <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
 {% elif first_arg and second_arg %}
-  <a href="{% url url_name first_arg second_arg %}">
+  <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
 {% elif first_arg %}
-  <a href="{% url url_name first_arg %}">
+  <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
 {% endif %}
 <div class="scard-image">
     
