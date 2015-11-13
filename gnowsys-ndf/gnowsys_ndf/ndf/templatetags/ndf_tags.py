@@ -1179,23 +1179,33 @@ def get_user_group(user, selected_group_name):
 @get_execution_time
 @register.assignment_tag
 def get_profile_pic(user_pk):
-    """
-    This returns file document if exists, otherwise None value.
-    """
-    profile_pic_image = None
-    ID = int(user_pk)
-    auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'_id': 1, 'relation_set': 1})
+	"""
+	This returns file document if exists, otherwise None value.
+	"""
+	try:
+		profile_pic_image = None
+		ID = int(user_pk)
+		auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'_id': 1, 'relation_set': 1})
 
-    if auth:
-        for each in auth.relation_set:
-            if "has_profile_pic" in each:
-                profile_pic_image = node_collection.one(
-                    {'_type': "File", '_id': each["has_profile_pic"][0]}
-                )
+		# if auth:
+		#     for each in auth.relation_set:
+		#         if "has_profile_pic" in each:
+		#             profile_pic_image = node_collection.one(
+		#                 {'_type': "File", '_id': each["has_profile_pic"][0]}
+		#             )
 
-                break
-
-    return profile_pic_image
+		#             break
+		grel_val_node = ""
+		if auth:
+			grel = node_collection.one({'_type': 'RelationType', 'name': unicode("has_profile_pic") })
+			if auth and grel:
+				node_grel = triple_collection.one({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': grel._id,'status':"PUBLISHED"})
+		if node_grel:
+			grel_val = node_grel.right_subject
+			grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+		return grel_val_node
+	except Exception as e:
+		return grel_val_node
 
 
 @get_execution_time
