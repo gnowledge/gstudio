@@ -2813,7 +2813,7 @@ def get_features_with_special_rights(group_id_or_name, user):
 
 @get_execution_time
 @register.assignment_tag
-def get_filters_data(gst_name):
+def get_filters_data(gst_name, group_name_or_id='home'):
 	'''
 	Returns the static data needed by filters. The data to be return will in following format:
 	{ 
@@ -2823,6 +2823,8 @@ def get_filters_data(gst_name):
 		"key_name": { "data_type": "<int>/<string>/<...>", "type": "attribute/field", "value": ["val1", "val2"]} 
 	}
 	'''
+
+	group_id, group_name = get_group_name_id(group_name_or_id)
 
 	static_mapping = {
                     "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
@@ -2844,11 +2846,12 @@ def get_filters_data(gst_name):
 	# gst = node_collection.one({'_type':"GSystemType", "name": unicode(gst_name)})
 	gst = node_collection.one({'_type':"GSystemType", "name": unicode('File')})
 	poss_attr = gst.get_possible_attributes(gst._id)
-	# print "============", gst.name
+	# print gst_name, "============", gst.name
 
 	filter_parameters = []
 	# filter_parameters = GSTUDIO_FILTERS.get('File', [])
-	filter_parameters = GSTUDIO_FILTERS.get(gst_name, [])
+	filter_parameters = GSTUDIO_FILTERS.get(gst_name, [])[:]
+	# print GSTUDIO_FILTERS
 	# print filter_parameters
 
 	exception_list = ["interactivitytype"]
@@ -2860,12 +2863,29 @@ def get_filters_data(gst_name):
 			continue
 
 		# print k
+		if static_mapping.has_key(k):
+			fvalue = static_mapping.get(k, [])
+		else:
+			# print "================----"
+			at_set_key = 'attribute_set.' + k
+
+			all_at_list = node_collection.find({at_set_key: {'$exists': True, '$nin': ['', 'None', []], } }).distinct(at_set_key)
+
+			fvalue = all_at_list
+
 		filter_dict[k] = {
 	    					"data_type": v["data_type"].__name__,
 	    					"altnames": v['altnames'],
 	    					"type" : "attribute",
-	    					"value": json.dumps(static_mapping.get(k, []))
+	    					"value": json.dumps(fvalue)
 	    				}
+
+		try:
+			filter_parameters.pop(filter_parameters.index(k))
+		except Exception, e:
+			pass
+
+		# print filter_parameters
 
 	# additional filters:
 
@@ -2874,6 +2894,28 @@ def get_filters_data(gst_name):
 								"value": json.dumps(static_mapping["language"]) 
 							}
 
+	
+	try:
+		filter_parameters.pop(filter_parameters.index('language'))
+	except Exception, e:
+		pass
+
+	if filter_parameters:
+		gst_structure = gst.structure
+		gst_structure_keys = gst.structure.keys()
+
+		for each_fpara in filter_parameters:
+			if each_fpara in gst_structure_keys:
+				fvalue = node_collection.find({'group_set': {'$in': [ObjectId(group_id)]}, 'member_of': {'$in': [gst._id]} }).distinct(each_fpara)
+
+				if fvalue:
+					filter_dict[each_fpara] = {
+											'data_type': gst_structure[each_fpara],
+											'type': 'field',
+											'value': json.dumps(value)
+										}
+
+	# print "@@@ ", filter_dict
 	return filter_dict
 
 @get_execution_time
@@ -3079,6 +3121,8 @@ def convert_list(value):
 def get_topic_breadcrumb_hierarchy(oid):
 
 	nodes_cur = get_prior_node_hierarchy(oid)
+	# removing top theme id
+	nodes_cur.pop()
 	nodes_cur_list = [n._id for n in nodes_cur]
 	nodes_cur_list.reverse()
 	
