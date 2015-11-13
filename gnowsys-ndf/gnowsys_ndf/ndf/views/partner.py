@@ -171,6 +171,7 @@ def nroer_groups(request, group_id, groups_category):
 
     mapping = GSTUDIO_NROER_MENU_MAPPINGS
 
+    groups_names_list = []
     # loop over nroer menu except "Repository" 
     for each_item in GSTUDIO_NROER_MENU[1:]:
         temp_key_name = each_item.keys()[0]
