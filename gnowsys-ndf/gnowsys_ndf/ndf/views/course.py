@@ -82,9 +82,13 @@ def course(request, group_id, course_id=None):
     title = "eCourses"
     
     query = {'member_of': ce_gst._id,'_id':{'$in': group_obj_post_node_list}}
-
+    gstaff_access = False
     if request.user.id:
-        query.update({'author_set':{'$ne':int(request.user.id)}})
+        # if user is admin then show all ce
+        gstaff_access = check_is_gstaff(group_id,request.user)
+        if not gstaff_access:
+            query.update({'author_set':{'$ne':int(request.user.id)}})
+
         course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"}).sort('last_update', -1)
         enr_ce_coll = node_collection.find({'member_of': ce_gst._id,'author_set': int(request.user.id),'_id':{'$in': group_obj_post_node_list}}).sort('last_update', -1)
 
@@ -93,7 +97,8 @@ def course(request, group_id, course_id=None):
             # show PRIVATE CourseEvent
             query.update({'group_type': {'$in':[u"PRIVATE",u"PUBLIC"]}})
 
-    ce_coll = node_collection.find(query)
+    ce_coll = node_collection.find(query).sort('last_update', -1)
+    # print "\n\n ce_coll",ce_coll.count()
     return render_to_response("ndf/course.html",
                             {'title': title,
                              'app_id': app_id, 'course_gst': GST_COURSE,

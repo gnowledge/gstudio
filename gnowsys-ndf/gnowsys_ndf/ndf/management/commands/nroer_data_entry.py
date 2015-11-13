@@ -71,7 +71,7 @@ update_file_exists_in_gridfs = True
 # http://192.168.1.102/sites/default/files/nroer_resources/ (for whole ncert campus)
 # http://125.23.112.5/sites/default/files/nroer_resources/ (for public i.e outside campus)
 
-resource_link_common = "http://192.168.1.102/sites/default/files/nroer_resources/"
+resource_link_common = "http://125.23.112.5/sites/default/files/nroer_resources/"
 
 class Command(BaseCommand):
     help = "\n\tFor saving data in gstudio DB from NROER schema files. This will create 'File' type GSystem instances.\n\tCSV file condition: The first row should contain DB names.\n"
