@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block meta_content %}
-
+  <h3 class="subheader">{{node.name}}</h3>
   <a href="{% url 'program' parent_groupid_of_pe %}" class="tiny button radius"> {% trans "All Events" %}</a>
 
   {% check_is_gstaff groupid request.user as is_gstaff %}
