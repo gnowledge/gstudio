@@ -3,7 +3,7 @@
 {% load cache %}
 {% user_access_policy groupid request.user as user_access %}
 {% get_group_object groupid as group_object %}
-{% is_partner group_object.pk as is_partner_val %}
+{% is_partner group_object as is_partner_val %}
 {% with user.is_authenticated as is_user_authenticated %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 {% check_group node.pk as is_group %}
@@ -341,7 +341,7 @@
 			<!-- New SubGroup and PE-->
 			<div class="row btn-row">
 						{% if is_partner_val %}
-							<a class="button tiny radius left-btn" href="{% url 'create_group' group_object.pk %}?subgroup=True&partnergroup=True">{% trans "New" %} {{group_object.name}}</a>
+							<a class="button tiny radius left-btn" href="{% url 'create_group' group_object.pk %}?subgroup=True&partnergroup=True">{% trans "New Sub Partner" %} </a>
 						{% else %}
 							<a href="{% url 'create_group' group_id %}?subgroup=True" class="tiny button radius left-btn">{% trans "New SubGroup" %}</a>
 	  					{% endif %}
