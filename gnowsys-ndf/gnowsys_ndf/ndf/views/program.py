@@ -52,7 +52,9 @@ def program_event_list(request, group_id):
         if pe_obj not in list_of_pe and pe_obj._id in group_obj.post_node:
             list_of_pe.append(pe_obj)
     # print "\n\n list_of_pe",list_of_pe
+    gstaff_access = False
     if request.user.id:
+        gstaff_access = check_is_gstaff(group_id,request.user)
         userid = int(request.user.id)
         for each in list_of_pe:
             if userid in each.author_set:
@@ -62,7 +64,6 @@ def program_event_list(request, group_id):
                 all_pe.append(each)   
     else:
         all_pe = list_of_pe
-    gstaff_access = check_is_gstaff(group_id,request.user)
     if gstaff_access:
         all_pe = enr_ce_coll
     # If request.user is admin, enr_ce_coll is all_pe. 
