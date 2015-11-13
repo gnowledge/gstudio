@@ -647,14 +647,20 @@
           -->
 
           <!-- Content for Concept Graph -->
+          {% comment %}
+            
           <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
             <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
             {% include "ndf/graph_concept.html" %}
           </div>
 
+          {% endcomment %}
+
           <div id="view-levels" style="display:none;">
           </div>
           
+          {% comment %}
+            
           <!-- Content for Collection Graph -->
           {% if node.collection_set %}
             <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
@@ -670,6 +676,7 @@
              {% include "ndf/graph_dependency.html" %}
             </div>
           {% endif %}
+          {% endcomment %}
          
           <!-- Tab View Map Widget -->
         {% elif node.location %}
