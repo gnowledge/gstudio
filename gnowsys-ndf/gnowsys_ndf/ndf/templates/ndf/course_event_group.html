@@ -64,6 +64,7 @@
 
 
 {% block script %}
+{{block.super}}
   $(document).on("change", ".date_month_day_year", function(){
     $(".save_date").attr("disabled",false);
   })
