@@ -13,7 +13,7 @@
 		/*float: left;*/
 		/*margin-left: 1rem;*/
 		width: 40%;
-		font-size: 0.60em !important;
+		font-size: 0.70em !important;
 		margin-top: 0.1rem !important;
 		text-align: center;
 	}
@@ -31,7 +31,7 @@
 	*/
 	.rating-lbl{
 		display: inline-block;
-		font-size: 0.60rem !important;
+		font-size: 1rem !important;
 		/*font-style: italic;*/
 		/*margin-left: 3rem;*/
 
@@ -50,8 +50,7 @@
 	}
 	.lbl_tag{
 		display: inline-block;
-		font-size: 0.60rem !important;
-		margin-left: 1% !important;
+		font-size: 0.80rem !important;
 	}
 	.lbl_field{
 		width: 20%;
@@ -59,12 +58,6 @@
 		/*font-weight: bold;*/
 		margin-top: 1rem;
 		font-size: 1rem !important;
-		margin-left:1%;
-	}
-	.location-div{
-		margin-left:5%;
-
-
 	}
 	.label > a{
 		color: white !important;
@@ -262,9 +255,7 @@
 			<!-- Location	-->
 				
 				{% if node.location %}
-		        	<a data-reveal-id="view-map-widget" class="location-div"><i class="fi-marker"></i> {% trans "Location" %}</a>
-	        	{% else %}
-		        	<a class="location-div disabled text-gray"><i class="fi-marker"></i> {% trans "Location" %}</a>
+		        	<a data-reveal-id="view-map-widget" class="lbl_field tag-rating-div" title="Click to view the location"><i class="fi-marker"></i> {% trans "Location" %}</a>
 	        	{% endif %}
 
 		    <!-- Graphs For Topics or Concept -->
