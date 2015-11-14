@@ -247,6 +247,7 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
     margin-top: 20px;
   }
   
+
   .res_name{
     margin-left: 20px;
     font-size: 18px;
@@ -256,10 +257,11 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
 
 {% endblock %}
   
+
   {% if topic %}
     <!-- For displaying related nodes in topic page -->
     <!-- Related node means all collection elements of its teme item i.e all siblings of topic node -->
-    <fieldset style="margin-top:50px;">
+    <fieldset >
       {% if prior_obj %}        
       <legend><h3><small>Topics in {{prior_obj.name}}</small></h3></legend>
   

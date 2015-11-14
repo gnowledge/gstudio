@@ -33,16 +33,15 @@
 
 	div#filter-area {
 		//border: solid thin thistle;
- 		//border-radius: 5px;
+ 		border-radius: 5px;
 		padding: 0 5px 5px 5px;
 		margin-left: -10px;
-		padding-top: 30px;
  	}
 
 	/*div#filter-area:hover { border: dashed thistle; }*/
 
 	div#add-filters/*, div#close-select-filters*/ { cursor: pointer; height: 100%; }
-	div#add-filters:hover, div#close-select-filters:hover { background-color: lightgray; }
+	div#add-filters:hover/*, div#close-select-filters:hover*/ { background-color: lightgray; }
 	/*
 	div#close-select-filters {
 		margin-left: 8px;
@@ -52,12 +51,11 @@
 	*/
 	div#create-filter { padding-top:0.75em; }
 
-	span#applied-filters { 
+	div#applied-filters { 
 		/*margin-top: -15px;*/
 		/*padding-left: 2em;*/
 		padding-bottom: 5px;
 		padding-top: 5px;
-		margin-left: 10px;
 	}
 	
 	#add-filters {
@@ -67,8 +65,6 @@
 		padding-bottom: 5px;
 		/*padding-left: 5px;*/
 		cursor: pointer;
-		margin-left: 15px;
-		margin-top: 10px;
 	}
 
 	#filters-label{
@@ -109,13 +105,9 @@
 <div id="filter-area">
 	
 	<!-- top-filter row -->
-
 	<div class="row" >
-		<div id="add-filters" title="Filters applied">
-		<span id="filters-count"></span> <span id="filters-label"></span>		
-
-		</div>
-		<span id="applied-filters" ></span>
+		
+		<div id="applied-filters" class="small-10 columns"></div>
 	</div>
 
 	<!-- second filter row -->

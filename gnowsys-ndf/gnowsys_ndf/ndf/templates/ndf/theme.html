@@ -90,10 +90,14 @@
 {% endblock %}
 
 {% block collection_content %}  
-{% if themes_hierarchy and node %}
+			<h3><div class="large-4 columns repository-title">
+				{% if theme_GST.altnames and theme_GST.altnames != "None" %}
+					{{theme_GST.altnames}}
+				{% else %}
+					{{theme_GST.name}}
+				{% endif%}
+			</div></h3>
 
-	<div class="large-4 columns repository-title"> {{node.name}}</div> 
-{% endif %}
 
 {% endblock %}
 
@@ -204,6 +208,7 @@
 
 
 {% block body_content %}
+	<div class="large-4 columns repository-title" style="margin-left:7%;"> {{node.name}}</div> 
 
 	{% user_access_policy groupid request.user as user_access %}
 
@@ -250,6 +255,7 @@
 	{% endif %}
 
 	<!-- For displaying themes items -->
+
 	{% if themes_cards  %}
 
 		{% cache 300 theme_card_listing request.LANGUAGE_CODE %}
@@ -264,15 +270,9 @@
 		{% group_type_info groupid request.user as grouptype %}
   		<!-- Existing card list-->
 	
-<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
-			<div class="large-4 columns repository-title">
-				{% if theme_GST.altnames and theme_GST.altnames != "None" %}
-					{{theme_GST.altnames}}
-				{% else %}
-					{{theme_GST.name}}
-				{% endif%}
-			</div>
-		</a>
+
+
+
 <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
 
   	{% for each in nodes %}
@@ -295,8 +295,8 @@
       		  </a>
 		      
 	          <div class="scard-action">
-		            {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
-		            <br/>
+		          <i> {{each.created_at|date:"d-m-Y"}}</i>  
+		         
 		        </div>
 
 	  

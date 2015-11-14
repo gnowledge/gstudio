@@ -18,7 +18,8 @@
 		min-height: 10rem;
 		margin: 40px 1rem;
 		float: left;
-		padding: 0.4em;
+		padding: 0.4em;		
+		height:15em;
 	}
 
 	.app-card:hover{
@@ -39,7 +40,7 @@
 
 	}
 
-	.repository-title{	
+	<!-- .repository-title{	
 	    color:#D7D7D7;
 		font-size: 1.5em;
 		width:auto;
@@ -58,7 +59,7 @@
 		display:inline-block;
 		color:#878787;
 		position:relative;
-	}
+	} -->
 
 	.app-card-content{
 		color:#4c4c4c;
@@ -86,7 +87,7 @@
 				{% endif %}
 				>
 					<h4>{% firstof each_gapp.altnames each_gapp.name %}</h4>
-					<div class="app-card-icon"><i class="icons {{ each_gapp.url }}"></i></div>
+					<div class="app-card-icon"><i class="{{ each_gapp.url }}"></i></div>
 					<div class="app-card-content">{{ each_gapp.content|safe }}</div>
 				</a>
 			</li>
@@ -94,11 +95,10 @@
 		<li>
 			<a class="app-card text-center" href="{% url 'partner_showcase' group_id %}">
 				<h4>Partner Showcase</h4>
-				<hr/>
-				<i class="icons fi-results-demographics"></i>
-				<p>
-					<b>Contributions from institutions and individuals</b>
-				</p>
+				<div class="app-card-icon"><i class="fa fa-graduation-cap fa-fw"></i></div>
+				
+					<div class="app-card-content">Contributions from institutions and individuals</div>
+				
 			</a>
 		</li>
 	</ul>

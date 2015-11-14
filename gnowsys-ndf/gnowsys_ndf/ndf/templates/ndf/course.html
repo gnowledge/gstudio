@@ -21,7 +21,9 @@
 {% block meta_content %}
 
   {% check_is_gstaff groupid request.user as is_gstaff %}
-    
+    <h2 class="subheader">
+        {{title}}
+    </h2>
   {% if is_gstaff %}
     {% if req_from_course %}
         <a class="button btn-width" href="{% url 'create_edit' group_name_tag %}">
@@ -60,17 +62,12 @@
     <div class="tabs-content ">
 
       <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="all_events">
-      <div class="row" style="margin-left:1px;">
-      <div class="large-4 columns repository-title">
-        {{title}}
-      </div>
       {% if title == "Course" %}
-        <div class="large-8 columns repository-desc">All eCourses</h4>
+        <h4>All eCourses</h4>
       {% else %}
-        <div class="large-8 columns repository-desc">All {{title}}</div>
+        <h4>All {{title}}</h4>
       {% endif %}
-      </div>
-      
+
         {% for course in ce_coll %}
           <li class="card-image-wrapper"> 
             {% include 'ndf/simple_card.html' with resource=course has_logo=True url_name="groupchange" first_arg=course.pk  %}
@@ -117,7 +114,7 @@
 
 
       <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="courses">
-      <div class="repository-title"> All Courses</div>
+      <h4> All Courses</h4>
         {% for course in course_coll %}
           <li class="card-image-wrapper"> 
             {% include 'ndf/simple_card.html' with resource=course url_name="course_detail" first_arg=group_id second_arg=course.pk %}
