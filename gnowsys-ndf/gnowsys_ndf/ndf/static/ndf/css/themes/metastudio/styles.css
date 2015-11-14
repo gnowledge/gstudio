@@ -24435,7 +24435,7 @@ aside#help p, aside#help h5, aside#help h6 {
 
 /* line 1095, ../../../scss/_app_styles.scss */
 .scard-content {
-  height: auto;
+  height: 2em;
   padding: 0.5rem;
   margin: 5px;
   padding-top: 0.5cm;

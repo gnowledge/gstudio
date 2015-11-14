@@ -48,7 +48,7 @@
 
 {% block body_content %}
 <a href="{% url 'e-book' group_name_tag %}" title="Click to go to ebooks">
-    <div class="large-4 columns repository-title">
+    <div class="large-4 columns repository-title" style="margin-bottom:0.5em;">
       {% if ebook_gst.altnames and ebook_gst.altnames != "None" %}
         {{ebook_gst.altnames}}
       {% else %}
@@ -56,7 +56,8 @@
       {% endif%}
     </div>
   </a>
-  {{ebook_gst.content|default_if_none:""|safe}}
+  <div class="large-8 columns repository-desc">{{ebook_gst.content_org|default_if_none:""|safe}}</div>
+
   {% get_filters_data "E-Book" as filter_dict %}
   {% include "ndf/filters.html" with filter_dict=filter_dict %}
 

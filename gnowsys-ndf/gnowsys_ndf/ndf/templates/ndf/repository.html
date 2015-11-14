@@ -14,7 +14,7 @@
 	}
 
 	.app-card{
-		width: 17rem;
+		width: 19rem;
 		min-height: 10rem;
 		margin: 40px 1rem;
 		float: left;
@@ -88,7 +88,7 @@
 				>
 					<h4>{% firstof each_gapp.altnames each_gapp.name %}</h4>
 					<div class="app-card-icon"><i class="{{ each_gapp.url }}"></i></div>
-					<div class="app-card-content">{{ each_gapp.content|safe }}</div>
+					<div class="app-card-content">{{each_gapp.content_org|truncatechars:45 }}</div>
 				</a>
 			</li>
 		{% endfor %}
