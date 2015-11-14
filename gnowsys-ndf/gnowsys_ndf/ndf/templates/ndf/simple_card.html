@@ -18,7 +18,7 @@
 {% elif first_arg %}
   <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
 {% endif %}
-<div class="scard-image">
+<div class="scard-image" title="{% firstof resource.altnames resource.name %}">
     
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
     {% if resource.fs_file_ids.1 %}
@@ -62,7 +62,7 @@
 
   <div class="scard-content">
    <span class="scard-title">{% firstof resource.altnames resource.name|truncatechars:25 %}</span>
-    {% get_node_ratings request resource.pk as ratings %}
+    <!-- {% get_node_ratings request resource.pk as ratings %} -->
             <!-- <div class="rating-stars center" style="width:{{ratings.avg|multiply:16}}px;"> <!-- 16px = 1 star -->
               <!-- <div></div>
             </div> --> 

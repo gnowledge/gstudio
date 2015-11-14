@@ -310,7 +310,7 @@
                   <li class="active small-12 large-columns">
                     <center>                   
                     {% if 'image' in node.mime_type %}
-                    <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                    <a class="th">
                       <img style="min-height:200px;" src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
                       </a>
                     {% elif 'video' in node.mime_type %}
@@ -338,7 +338,7 @@
                     <li>
                       <center>
                         {% if 'image' in obj.mime_type %}
-                        <a class="th" href="{% url 'read_file' group_name_tag k grid_fs_obj.filename %}">
+                        <a class="th">
                           <img src="{% url 'get_mid_size_img' group_name_tag k %}" style="min-height:200px;"/> 
                         </a>
                         {% elif 'Pandora_video' in obj.member_of_names_list %}
@@ -390,7 +390,7 @@
             {% else %}
               <!-- not a collection -->
               {% if 'image' in node.mime_type %}
-                <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                <a class="th" >
                   <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;"/> 
                 </a>
               {% elif 'Pandora_video' in node.member_of_names_list %}
