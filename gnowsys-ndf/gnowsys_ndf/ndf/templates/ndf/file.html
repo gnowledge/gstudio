@@ -11,7 +11,8 @@
 
   .first-load { display: none; }
 
-  .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; }
+  .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; color: black; }
+  .tabs dd > a, .tabs .tab-title > a {color: #4c4c4c;}
 
   .tabs dd { width: 100%; }
 
@@ -22,6 +23,9 @@
   .panel > .side-nav > .tabs i {margin-right: 0.5rem;}
 
 {% endblock %}
+
+
+
 
 <!--
 {% comment %}
@@ -52,14 +56,7 @@
 {% block meta_content %}
 
   <!-- {# <a href="{% url app_gst.name|lower group_name_tag %}"> #} -->
-    <h2 class="subheader">
-      {% if app_gst.altnames and app_gst.altnames != "None" %}
-         {% trans app_gst.altnames %}
-      {% else %}
-        {% trans app_gst.name %}
-      {% endif%}
-    </h2>
-    {{app_gst.content|default_if_none:""|safe}}
+    
   <!-- {# </a> #} -->
 
 {% endblock %}
@@ -251,8 +248,16 @@
 
 
 {% block body_content %}
-  
-  {% if title == "E-Library" %}
+  <div class="large-4 columns repository-title">
+      {% if app_gst.altnames and app_gst.altnames != "None" %}
+         {% trans app_gst.altnames %}
+      {% else %}
+        {% trans app_gst.name %}
+      {% endif%}
+  </div>
+    
+    <div class="large-8 columns repository-desc">{{app_gst.content_org|default_if_none:""|safe}}</div>
+  {% if files.count > 1  and title == "E-Library" %}
     {% get_filters_data "File" as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
   {% endif %}

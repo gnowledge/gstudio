@@ -13,9 +13,8 @@
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-
+  <meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; width=device-width" />
 
   <link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> 
 
@@ -60,7 +59,21 @@
 
   {% include "ndf/header.html" %}
   {% block extended_header %}{% endblock %}
-
+   {% get_gstudio_help_sidebar as gst_help_sidebar %}
+   {% if gst_help_sidebar and app or app_description%}
+     
+    <!-- <div id ="help-canvas-menu" class="">      
+      <a class="help-button btn" href="javascript:void(0);" >
+        <div class="help-button-text">
+          Help
+        </div>
+                
+      </a>
+      <div class="mainContainer">
+             {{ app.content|default_if_none:app.content_org }}
+      </div>
+    </div> -->
+   {% endif %}
   <div class="workspace">
     <div class="off-canvas-wrap" data-offcanvas>
       <div class="inner-wrap">
@@ -86,7 +99,7 @@
 
               <!-- Meta content in the (main aside header)-->
               <section>
-                <div>
+                <div style="padding-top:1.3rem;">
                   {% block collection_content %}  {% endblock %}
                 </div>
 
@@ -278,6 +291,10 @@
     // start of document.ready()
       $(document).ready(function() {
         try{
+            $("#help-canvas-menu").click(function(){
+                $("#help-canvas-menu").toggleClass("expanded");
+                // $("div").addClass("expanded");
+            });
 
           // $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
                 

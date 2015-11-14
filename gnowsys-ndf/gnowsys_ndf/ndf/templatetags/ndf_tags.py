@@ -3146,6 +3146,11 @@ def get_topic_breadcrumb_hierarchy(oid):
 
 @get_execution_time
 @register.assignment_tag
+def get_gstudio_help_sidebar():
+	return GSTUDIO_HELP_SIDEBAR
+
+@get_execution_time
+@register.assignment_tag
 def is_partner(group_obj):
 	try:
 		result = False
