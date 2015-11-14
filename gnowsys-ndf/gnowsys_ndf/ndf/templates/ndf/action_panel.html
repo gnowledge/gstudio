@@ -40,7 +40,7 @@
 		display: inline-table;
 	}
 	.mod-btn{
-		width: 12.30rem !important;
+		width: 80% !important;
 		font-size: 0.75rem !important;
 	}
 	.btn-row{
@@ -54,7 +54,7 @@
 		margin-left: 1% !important;
 	}
 	.lbl_field{
-		width: 3rem;
+		width: 20%;
 		color: #194d6f;
 		/*font-weight: bold;*/
 		margin-top: 1rem;
@@ -236,7 +236,7 @@
 								{% endif %}
 								<a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
 							{% endfor %}
-							{% if node.tags|length > 3 %}
+							{% if node.tags|length > 2 %}
 								<small><label class="view-more-tags" style="display:inline-block;">More</label></small>
 							{% endif %}	
 						{% else %}

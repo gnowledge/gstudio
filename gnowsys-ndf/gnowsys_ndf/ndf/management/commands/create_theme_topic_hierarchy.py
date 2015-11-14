@@ -171,9 +171,9 @@ def create_theme_topic_hierarchy(row):
     language = row[0]   # language field will get populated in this case.
     curricular = row[1] # CR or XCR
     featured = int(row[2])   # 0 or 1
-    alignment = row[4]  # like NCF
-    content_org = row[5]
-    theme_name = row[6] # theme-name like National Curriculum
+    alignment = row[3]  # like NCF
+    content_org = row[4]
+    theme_name = row[5] # theme-name like National Curriculum
     # topic_name = row[-1:]
 
     # --- Theme processing ---
