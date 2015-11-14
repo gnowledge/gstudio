@@ -205,16 +205,17 @@ def nroer_groups(request, group_id, groups_category):
 
 def partner_showcase(request, group_id):
 
+    group_name, group_id = get_group_name_id(group_id)
+    
     all_source = node_collection.find({'attribute_set.source': {'$exists': True, '$ne': ''} }).distinct('attribute_set.source')
 
     partner_group = node_collection.one({'_type': 'GSystemType', 'name': 'PartnerGroup'})
 
     source_partners = node_collection.find({'_type': 'Group', 'member_of': {'$in': [partner_group._id]}, 'name': {'$in': all_source} })
-
+    
     return render_to_response('ndf/partner_showcase.html',
                             {
                               'group_id': group_id, 'groupid': group_id,
                               'source_partners': source_partners
                             }, context_instance=RequestContext(request)
                           )
-
