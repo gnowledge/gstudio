@@ -17,8 +17,11 @@
     display: none;
   
   }
-  
-}{% endblock %}
+	.themes {
+  	margin: 0;
+  }  
+}
+{% endblock %}
 
 {% block head %}  
 
@@ -83,16 +86,19 @@
 
 
 {% block meta_content %}
-	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
-		<h2 class="subheader">
-			{% if theme_GST.altnames and theme_GST.altnames != "None" %}
-				{{theme_GST.altnames}}
-			{% else %}
-				{{theme_GST.name}}
-			{% endif%}
-		</h2>
-	</a>
-	{{theme_GST.content|default_if_none:""|safe}}
+	
+{% endblock %}
+
+{% block collection_content %}  
+			<h3><div class="large-4 columns repository-title">
+				{% if theme_GST.altnames and theme_GST.altnames != "None" %}
+					{{theme_GST.altnames}}
+				{% else %}
+					{{theme_GST.name}}
+				{% endif%}
+			</div></h3>
+
+
 {% endblock %}
 
 
@@ -100,7 +106,7 @@
 	{% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
 
-	<div class="panel" style="background-color:#ddd;">
+	<div class="panel" style="background-color:#ddd;margin-top:5em">
 	<ul class="no-bullet" id="app-set-item"> 
 
 		<!--
@@ -202,13 +208,14 @@
 
 
 {% block body_content %}
+	<div class="large-4 columns repository-title" style="margin-left:7%;"> {{node.name}}</div> 
 
 	{% user_access_policy groupid request.user as user_access %}
 
 	{% if themes_hierarchy and node %}
 
-		<div style="float:left; font-size: 2em; "> {{node.name}}</div> 
-
+<!-- 		<div class="large-4 columns repository-title"> {{node.name}}</div> 
+ -->
         <div style="float:right; margin:0 2em;" >
 
 			<a class="collapsible_tree {% if tree == 'collapsible' or not tree %} highlight {% endif %}" style="">
@@ -248,74 +255,55 @@
 	{% endif %}
 
 	<!-- For displaying themes items -->
+
 	{% if themes_cards  %}
 
 		{% cache 300 theme_card_listing request.LANGUAGE_CODE %}
 			
-		<div class="content row" id="panel2-4">
-
-		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-
   		<!-- following ndf_tag is commented for time being. which is fetching the themes from relation and current selected language.
   		Now by changing query at backend, it shows resources related to selected language.
   		Still this needs to be checked. So do not deletethis commented ndf_tag - 'get_preferred_lang' -->
 
+		{{ each.name }}
         {# {% get_preferred_lang request group_id nodes "Theme" as nodes %} #}
 
 		{% group_type_info groupid request.user as grouptype %}
-
   		<!-- Existing card list-->
-	  	{% for each in nodes %}
+	
 
-	      <li class="card">
-	        {% if grouptype == "Moderated" %}
-	          {% if each.status == "DRAFT" %}
-	            <div class="draft page">
-	          {% elif each.status == "PUBLISHED" %}
-	            <div class="published page">
-	          {% endif %}
-	        {% else %}
-	          <div class='{% if each.status == "PUBLISHED" %}published{% endif %} page'>
-	        {% endif %} 
 
+
+<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+
+  	{% for each in nodes %}
+     <li class="card-image-wrapper"> 
+
+
+	      <div class="scard">
 		      <a href="{% url 'theme_page' group_name_tag each.pk %}">
-		      <div class="row">
-            	<div class="small-10 columns">                             
-	                <b>
-	                  {{ each.name }}{% if each.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-	                </b>
-            	</div>
+		      <div class="scard-image">
+	                <i class="fi-book"></i>
           	  </div>
-		      <span style="font-size:12px;">{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+      	  </div>
+          	  <div class="scard-content">
+          	  	<div class="scard-title">
+          	  		{{ each.name }}
+          	  	</div>
+          	  </div>
 		      
-		      <footer>
-		          <div class="age">
-		            {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
-		            <br/>
-		            by <span class="user" href="{% url 'dashboard' each.created_by %}" data-gnow="">{{each.user_details_dict.created_by}}</span> 
-		          </div>
-		        <span><strong>{{each.contributors|length}}</strong> Contributor{{each.contributors|pluralize}}</span>
-		        <span class="right"><strong>{{each.version_dict|length}}</strong> Edit{{each.version_dict|pluralize}}</span>
-          
-      		  </footer>
+		      <div class="scard-desc">{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</div>
       		  </a>
+		      
+	          <div class="scard-action">
+		          <i> {{each.created_at|date:"d-m-Y"}}</i>  
+		         
+		        </div>
 
-      		  <div class="label-list small-12 columns">
-	            {% for tag in each.tags|slice:":3" %}
-	              <a href="{% url 'tag_info' group_name_tag tag %}">
-	                <span class="label" style="background-color:yellow">{{tag}}</span>
-	              </a>
-	            {% endfor %}
-	          </div>
-
-		      </div>
-		    </li>  
 	  
 	  	{% endfor %}
 
-		</ul>
-
-		</div>
+</li>
+</ul>
 		
 	{% endcache %}
 	

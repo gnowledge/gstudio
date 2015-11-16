@@ -642,8 +642,8 @@ GSTUDIO_NROER_MENU_MAPPINGS = {
             }
 
 GSTUDIO_FILTERS = {
-            "File": ['educationallevel', 'audience', 'language', 'educationalsubject'],
-            "E-Library": ['educationallevel', 'audience', 'language', 'educationalsubject'],
+            "File": ['educationallevel', 'audience', 'language', 'educationalsubject', 'source'],
+            "E-Library": ['educationallevel', 'audience', 'language', 'educationalsubject', 'source'],
             "E-Book": ['educationallevel', 'audience', 'language', 'educationalsubject'],
             "Topics": ['educationallevel', 'audience', 'language', 'educationalsubject', 'educationaluse']
             }
@@ -706,6 +706,8 @@ CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
 TARSIZE = 1000
 # the no of cards/objects/instances to be render of app (listing view).
 GSTUDIO_NO_OF_OBJS_PP = 24
+
+GSTUDIO_HELP_SIDEBAR = False
 
 # ----------------------------------------------------------------------------
 # following has to be at last

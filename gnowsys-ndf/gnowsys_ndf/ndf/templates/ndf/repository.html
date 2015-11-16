@@ -14,43 +14,66 @@
 	}
 
 	.app-card{
-		width: 17rem;
-		min-height: 12rem;
-		margin: 20px 1rem;
-		background-color: #efefef;
-		border: thin solid lightgray;
+		width: 19rem;
+		min-height: 10rem;
+		margin: 40px 1rem;
 		float: left;
-		padding: 1em;
+		padding: 0.4em;		
+		height:15em;
 	}
 
 	.app-card:hover{
-		box-shadow: 0px 0px 15px gray;
-		border: thin solid lightgray;
+		box-shadow: 0px 0px 15px #808080;
+		border: thin solid #D3D3D3;
 		border-radius: 5px;
-		transition: ease 0.6s;
+		transition: all 0.6s ease 0s;
 	}
 
-	.icons{
-		position: absolute;
-		font-size: 7em;
-		z-index: 0;
-		opacity: 0.1;
-		margin-top: -35px;
-		/*padding-top: 2rem;*/
+	.app-card-icon{
+		color:#4c4c4c;
+		position: relative;
+		font-size: 6em;
+		left:2%
+		margin-top:-2em;
+	}
+	.app-card-title{
+
+	}
+
+	<!-- .repository-title{	
+	    color:#D7D7D7;
+		font-size: 1.5em;
+		width:auto;
+		background-color: rgba(0, 0, 0, 0.8);
+		text-align:left;
+		display:inline-block;
+		margin-left:5px;
+		position:relative;
+		text-align:center;
+	}
+	.repository-desc{
+	    font-size: 1.5em;
+		width:auto;
+		background-color:#E5E5E5;
+		text-align:left;
+		display:inline-block;
+		color:#878787;
+		position:relative;
+	} -->
+
+	.app-card-content{
+		color:#4c4c4c;
+		text-align:center;
+		margin-top:-0.5cm;
 	}
 
 {% endblock %}
 
-
-{% block meta_content %}
-	<h2 class="subheader">{% trans "Repository" %}</h2>
-{% endblock %}
-
-{% block related_content%}
-	{% trans "Digital" %} {% trans "resources" %} {% trans "grouped in multiple ways" %}
-{% endblock %}
 
 {% block body_content %}
+		<div class="repository-title large-4 columns">{% trans "Repository" %}
+		</div>
+		<div class="repository-desc large-8 columns">{% trans "Digital" %} {% trans "resources" %} {% trans "grouped in multiple ways" %}</div>
 	
 	<!-- <ul class="inline-list card-holder"> -->
 	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-3">
@@ -64,20 +87,18 @@
 				{% endif %}
 				>
 					<h4>{% firstof each_gapp.altnames each_gapp.name %}</h4>
-					<hr/>
-					<i class="icons {{ each_gapp.url }}"></i>
-					<p>{{ each_gapp.content|safe }}</p>
+					<div class="app-card-icon"><i class="{{ each_gapp.url }}"></i></div>
+					<div class="app-card-content">{{each_gapp.content_org|truncatechars:45 }}</div>
 				</a>
 			</li>
 		{% endfor %}
 		<li>
-			<a class="app-card text-center" href="/home/e-library">
+			<a class="app-card text-center" href="{% url 'partner_showcase' group_id %}">
 				<h4>Partner Showcase</h4>
-				<hr/>
-				<i class="icons fi-results-demographics"></i>
-				<p>
-					<b>Contributions from institutions and individuals</b>
-				</p>
+				<div class="app-card-icon"><i class="fa fa-graduation-cap fa-fw"></i></div>
+				
+					<div class="app-card-content">Contributions from institutions and individuals</div>
+				
 			</a>
 		</li>
 	</ul>

@@ -20,7 +20,7 @@
 {% endblock %}
 
 {% block meta_content %}
-  <h4>Course Outline</h4>
+  <h3 class="subheader">{{node.name}}</h3>
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
         <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
@@ -64,6 +64,7 @@
 
 
 {% block script %}
+{{block.super}}
   $(document).on("change", ".date_month_day_year", function(){
     $(".save_date").attr("disabled",false);
   })

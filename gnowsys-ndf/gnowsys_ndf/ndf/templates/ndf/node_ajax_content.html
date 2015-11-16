@@ -6,6 +6,7 @@
 {% get_group_name groupid as group_name_tag %}
 
 
+
 <div class="row page" itemscope itemtype="{{schema.1.type}}"> 
   
   <section class="medium-9 columns">
@@ -144,7 +145,12 @@
   </ul>
     
   {% endif %}
+  {% if not topic %}
+  <!-- <div id="view_collection">
+    <div itemprop="{{schema.1.name}}" class="large-8 columns repository-desc"> {% firstof node.altnames node.name %}</div>   
+  </div> -->
   
+  {% endif %}
   {% if node.teaches %}
     <div class="hide teaches-block">
           
@@ -229,6 +235,7 @@
 
     {% if topic %}
       {% get_filters_data "Topics" as filter_dict %}
+  
       {% include "ndf/filters.html" with filter_dict=filter_dict %}
     {% endif %}
 
@@ -303,7 +310,7 @@
                   <li class="active small-12 large-columns">
                     <center>                   
                     {% if 'image' in node.mime_type %}
-                    <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                    <a class="th">
                       <img style="min-height:200px;" src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
                       </a>
                     {% elif 'video' in node.mime_type %}
@@ -331,7 +338,7 @@
                     <li>
                       <center>
                         {% if 'image' in obj.mime_type %}
-                        <a class="th" href="{% url 'read_file' group_name_tag k grid_fs_obj.filename %}">
+                        <a class="th">
                           <img src="{% url 'get_mid_size_img' group_name_tag k %}" style="min-height:200px;"/> 
                         </a>
                         {% elif 'Pandora_video' in obj.member_of_names_list %}
@@ -383,7 +390,7 @@
             {% else %}
               <!-- not a collection -->
               {% if 'image' in node.mime_type %}
-                <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                <a class="th" >
                   <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;"/> 
                 </a>
               {% elif 'Pandora_video' in node.member_of_names_list %}
@@ -429,7 +436,7 @@
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
                
-                <div class="row">
+                <div class="row" style="margin-top:-0.1em;">
                   <h4 class="small-4 columns redirection" onclick="Book.prevPage();">
                     <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
                   </h4>
@@ -454,8 +461,11 @@
                   <h4 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
                     <small>Next <i class="fi-arrow-right"></i></small>
                   </h4>
+                  
                 </div>
-                
+                  <!-- <p class="large-text-right"><small>
+                  <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
+                </small></p> -->
 
                 <script>
                   // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
@@ -540,6 +550,10 @@
                   <p class="large-text-right"><small>
                   <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
                 </small></p>
+                                    
+
+                    
+
               </div>
 
           {% endif %}
@@ -606,6 +620,7 @@
 
                   <!-- END of discussion content area -->     
                 </div>
+        
           <br/>
           {% endif %}
           
@@ -647,14 +662,20 @@
           -->
 
           <!-- Content for Concept Graph -->
+          {% comment %}
+            
           <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
             <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
             {% include "ndf/graph_concept.html" %}
           </div>
 
+          {% endcomment %}
+
           <div id="view-levels" style="display:none;">
           </div>
           
+          {% comment %}
+            
           <!-- Content for Collection Graph -->
           {% if node.collection_set %}
             <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
@@ -670,6 +691,7 @@
              {% include "ndf/graph_dependency.html" %}
             </div>
           {% endif %}
+          {% endcomment %}
          
           <!-- Tab View Map Widget -->
         {% elif node.location %}

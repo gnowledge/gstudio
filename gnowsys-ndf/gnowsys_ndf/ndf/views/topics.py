@@ -776,6 +776,7 @@ def topic_detail_view(request, group_id, app_Id=None):
         # Theme object needs to be added in breadcrumbs for full navigation path from theme to topic
         # "nav_l" doesnt includes theme object since its not in tree hierarchy level, 
         # hence Match the first element and get its prior node which is theme object, to include it in breadcrumbs list
+        # print "!!!!!!!!! ", each_obj.name
         if each == nav_l[0]:
             if each_obj.prior_node:
                 theme_obj = node_collection.one({'_id': ObjectId(each_obj.prior_node[0] ) })
@@ -818,6 +819,7 @@ def topic_detail_view(request, group_id, app_Id=None):
 	  else:
 	    shelves = []
   
+  # print "theme_id: ", theme_id
   return render_to_response('ndf/topic_details.html', 
 	                                { 'node': obj,'app_id': app_id,"theme_id": theme_id, "prior_obj": prior_obj,
 	                                  'group_id': group_id,'shelves': shelves,'topic': topic, 'nav_list':nav_li,

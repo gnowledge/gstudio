@@ -23,7 +23,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, get_prior_node_hierarchy
-
+from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
 
 def program_event_list(request, group_id):
     """
@@ -51,7 +51,10 @@ def program_event_list(request, group_id):
             pe_obj = list_of_hierarchy[len(list_of_hierarchy)-1]
         if pe_obj not in list_of_pe and pe_obj._id in group_obj.post_node:
             list_of_pe.append(pe_obj)
+    # print "\n\n list_of_pe",list_of_pe
+    gstaff_access = False
     if request.user.id:
+        gstaff_access = check_is_gstaff(group_id,request.user)
         userid = int(request.user.id)
         for each in list_of_pe:
             if userid in each.author_set:
@@ -61,6 +64,10 @@ def program_event_list(request, group_id):
                 all_pe.append(each)   
     else:
         all_pe = list_of_pe
+    if gstaff_access:
+        all_pe = enr_ce_coll
+    # If request.user is admin, enr_ce_coll is all_pe. 
+    # As admin is added in author set of all pe
         # enr_ce_coll = node_collection.find({'$in': list_of_pe,'author_set': int(request.user.id)}).sort('last_update', -1)
 
     # ce_coll = node_collection.find({'member_of': pe_gst._id, 'author_set': {'$ne': int(request.user.id)}})

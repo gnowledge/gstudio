@@ -3,7 +3,7 @@
 {% load cache %}
 {% user_access_policy groupid request.user as user_access %}
 {% get_group_object groupid as group_object %}
-{% is_partner group_object.pk as is_partner_val %}
+{% is_partner group_object as is_partner_val %}
 {% with user.is_authenticated as is_user_authenticated %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 {% check_group node.pk as is_group %}
@@ -40,7 +40,7 @@
 		display: inline-table;
 	}
 	.mod-btn{
-		width: 12.30rem !important;
+		width: 80% !important;
 		font-size: 0.75rem !important;
 	}
 	.btn-row{
@@ -53,7 +53,7 @@
 		font-size: 0.80rem !important;
 	}
 	.lbl_field{
-		width: 3rem;
+		width: 20%;
 		color: #194d6f;
 		/*font-weight: bold;*/
 		margin-top: 1rem;
@@ -229,7 +229,7 @@
 								{% endif %}
 								<a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
 							{% endfor %}
-							{% if node.tags|length > 3 %}
+							{% if node.tags|length > 2 %}
 								<small><label class="view-more-tags" style="display:inline-block;">More</label></small>
 							{% endif %}	
 						{% else %}
@@ -264,6 +264,8 @@
 		             which are Topic or Concept
 		        -->
 
+		        {% comment %}
+		        <!-- commented for time being, for TB. -->
 		        <a href="#" class="lbl_field tag-rating-div" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
 		        
 		        <ul id="graph-list" class="f-dropdown" data-dropdown-content>
@@ -277,6 +279,7 @@
 		          <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
 		          {% endif %}               
 		        </ul>
+		        {% endcomment %}
 		      {% endif %}
 	
 		        
@@ -338,7 +341,7 @@
 			<!-- New SubGroup and PE-->
 			<div class="row btn-row">
 						{% if is_partner_val %}
-							<a class="button tiny radius left-btn" href="{% url 'create_group' group_object.pk %}?subgroup=True&partnergroup=True">{% trans "New" %} {{group_object.name}}</a>
+							<a class="button tiny radius left-btn" href="{% url 'create_group' group_object.pk %}?subgroup=True&partnergroup=True">{% trans "New Sub Partner" %} </a>
 						{% else %}
 							<a href="{% url 'create_group' group_id %}?subgroup=True" class="tiny button radius left-btn">{% trans "New SubGroup" %}</a>
 	  					{% endif %}
