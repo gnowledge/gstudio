@@ -285,9 +285,9 @@ def zip_directories(sync_dir):
             dir_list.append(syncdir_path)        
             dirname  = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.datetime.now().microsecond)
             zip_list = []
-        else:
-            if dir != sync_dir:
-                zip_list.append(dir)    
+        
+        if dir != sync_dir:
+            zip_list.append(dir)    
 
     if zip_list:
         for i in zip_list:

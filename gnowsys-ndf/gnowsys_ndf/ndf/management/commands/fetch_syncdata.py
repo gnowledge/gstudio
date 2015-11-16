@@ -54,7 +54,8 @@ class Command(BaseCommand):
                                 syncdata_mails_list = metabox.get_new_mail()
                                 if syncdata_mails_list:
                                         for mail in syncdata_mails_list:
-                                                serverdir = process_mails(mail)
+                                                if mail.subject.find('SYNC') != '-1': 
+                                                    serverdir = process_mails(mail)
                                                 #received_registries += serverdir
                                                 if serverdir not in received_registries:         
                                                         received_registries.append(serverdir)                            
