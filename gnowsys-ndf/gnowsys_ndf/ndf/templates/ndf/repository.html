@@ -10,7 +10,7 @@
 {% block style %}
 
 	.card-holder{
-		padding-left: 5%;
+		padding-left: 2%;
 	}
 
 	.app-card{
@@ -18,8 +18,9 @@
 		min-height: 10rem;
 		margin: 40px 1rem;
 		float: left;
-		padding: 0.4em;		
-		height:15em;
+		padding: 1em;	
+		margin-left:1%;	
+		height:18em;
 	}
 
 	.app-card:hover{
@@ -37,7 +38,7 @@
 		margin-top:-2em;
 	}
 	.app-card-title{
-
+padding-bottom:-1em;
 	}
 
 	<!-- .repository-title{	
@@ -64,7 +65,7 @@
 	.app-card-content{
 		color:#4c4c4c;
 		text-align:center;
-		margin-top:-0.5cm;
+		margin-top:0.5cm;
 	}
 
 {% endblock %}
@@ -86,16 +87,16 @@
 					href="{% url each_gapp.name|lower group_id %}"
 				{% endif %}
 				>
-					<h4>{% firstof each_gapp.altnames each_gapp.name %}</h4>
-					<div class="app-card-icon"><i class="{{ each_gapp.url }}"></i></div>
+					<div class="app-card-title"><h4>{% firstof each_gapp.altnames each_gapp.name %}</h4></div>
+					<div class="app-card-icon"><img src="{{ each_gapp.url }}" width="35%"></div>
 					<div class="app-card-content">{{each_gapp.content_org|truncatechars:45 }}</div>
 				</a>
 			</li>
 		{% endfor %}
 		<li>
 			<a class="app-card text-center" href="{% url 'partner_showcase' group_id %}">
-				<h4>Partner Showcase</h4>
-				<div class="app-card-icon"><i class="fa fa-graduation-cap fa-fw"></i></div>
+				<div class="app-card-title"><h4>Partner Showcase</h4></div>
+				<div class="app-card-icon"><img src="/static/ndf/images/partner-01.svg" width="35%" style="padding-top:-2em"></div>
 				
 					<div class="app-card-content">Contributions from institutions and individuals</div>
 				
