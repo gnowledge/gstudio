@@ -324,15 +324,13 @@
 
 
     <!-- Tab View 3 - Interactives -->
-    {% if interactive_pages %}
-      <div class="content" id="view-interactive" data-filetype="Interactives">
-        {% if title == "E-Library" %}
-          <a href='{% url "elib_paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
-        {% else %}
-          <a href='{% url "paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
-        {% endif %}
-      </div>
-    {% endif %}
+    <div class="content" id="view-interactive" data-filetype="Interactives">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
 
 
     <!-- Tab View 4 - e-book -->
@@ -349,15 +347,13 @@
     {% endcomment %}
 
     <!-- Tab View 5 - Audios -->
-    {% if audio_pages %}
-      <div class="content" id="view-audio" data-filetype="Audios">
-        {% if title == "E-Library" %}
-          <a href='{% url "elib_paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
-        {% else %}
-          <a href='{% url "paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
-        {% endif %}
-      </div>
-    {% endif %}
+    <div class="content" id="view-audio" data-filetype="Audios">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
 
     <!-- Tab View 6 - Images -->
     <div class="content" id="view-image" data-filetype="Images">
@@ -472,12 +468,14 @@
 
     $("dl.tabs dd").click(function(e){
 
+
       var tabDivId = $(this).children("a").attr("href");
 
       // if((tabDivId != "#view-collection") && (tabDivId != "view-pandora-video"))
       if(tabDivId != "view-pandora-video")
       {
         var pageAnchor = $(tabDivId).children("a.first-load")[0];
+        // console.log(pageAnchor);
         if(! pageAnchor)
         {
           var pageAnchor = $(tabDivId).find("ul.pagination > li > a:first")[0];
