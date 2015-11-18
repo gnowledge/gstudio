@@ -122,7 +122,7 @@
             {% if res_type_name == "collection" %}
               <h5> {% trans "This group doesn't have any collections." %}</h5>
             {% elif filter_result == "False" %}
-              <h5> {% trans "Sorry, No resources found with selected filters" %} :( </h5>
+              <h5> {% trans "Sorry, No resources found" %}.</h5>
             {% else %}
               {% if not dont_show_error %}
               {% if "CourseEventGroup" in node.member_of_names_list %}
