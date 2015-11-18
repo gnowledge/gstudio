@@ -4,6 +4,9 @@ INSTALLING PostgreSQL:
 
 	# instaling db with dependencies
 	$ sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
+	
+	# installing psycopg2 (postgresql dependency)
+	$ pip installpython-psycopg2
 
 	# getting into db commandline:
 	$ sudo su - postgres
