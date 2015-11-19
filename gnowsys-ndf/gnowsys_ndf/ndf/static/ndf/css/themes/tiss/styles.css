@@ -10622,7 +10622,7 @@ p {
   background-color: rgba(0, 0, 0, 0.8);
   text-align: left;
   display: inline-block;
-  margin-left: 5px;
+  margin-left: 2px;
   position: relative;
   text-align: center;
 }
@@ -10637,4 +10637,47 @@ p {
   color: #878787;
   position: relative;
   margin-left: 4px;
+}
+
+/* line 1625, ../../../scss/_app_styles.scss */
+.card-holder {
+  padding-left: 2%;
+}
+
+/* line 1629, ../../../scss/_app_styles.scss */
+.app-card {
+  width: 19rem;
+  min-height: 10rem;
+  margin: 15px 20px;
+  float: left;
+  padding: 1em;
+  margin-left: -20%;
+  height: 18em;
+}
+
+/* line 1639, ../../../scss/_app_styles.scss */
+.app-card:hover {
+  box-shadow: 0px 0px 15px #808080;
+  border: thin solid #D3D3D3;
+  border-radius: 5px;
+  transition: all 0.6s ease 0s;
+}
+
+/* line 1646, ../../../scss/_app_styles.scss */
+.app-card-icon {
+  color: #4c4c4c;
+  position: relative;
+  font-size: 6em;
+}
+
+/* line 1651, ../../../scss/_app_styles.scss */
+.app-card-title {
+  padding-bottom: -1em;
+}
+
+/* line 1655, ../../../scss/_app_styles.scss */
+.app-card-content {
+  color: #4c4c4c;
+  text-align: center;
+  margin-top: 0.5cm;
 }

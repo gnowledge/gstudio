@@ -90,14 +90,6 @@
 {% endblock %}
 
 {% block collection_content %}  
-			<h3><div class="large-4 columns repository-title">
-				{% if theme_GST.altnames and theme_GST.altnames != "None" %}
-					{{theme_GST.altnames}}
-				{% else %}
-					{{theme_GST.name}}
-				{% endif%}
-			</div></h3>
-
 
 {% endblock %}
 
@@ -106,7 +98,7 @@
 	{% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
 
-	<div class="panel" style="background-color:#ddd;margin-top:5em">
+	<div class="panel" style="background-color:#ddd;margin-top:1em">
 	<ul class="no-bullet" id="app-set-item"> 
 
 		<!--
@@ -208,7 +200,20 @@
 
 
 {% block body_content %}
-	<div class="large-4 columns repository-title" style="margin-left:7%;"> {{node.name}}</div> 
+		<div class="large-4 columns repository-title">
+				{% if theme_GST.altnames and theme_GST.altnames != "None" %}
+					{{theme_GST.altnames}}
+				{% elif node.name %}
+					{{node.name}}
+					{% else %}
+					{{theme_GST.name}}
+				{% endif%}
+	</div>
+
+
+	<div class="large-8 columns repository-desc">{{theme_GST.content_org|default_if_none:""|safe}}</div>
+
+
 
 	{% user_access_policy groupid request.user as user_access %}
 
@@ -254,6 +259,9 @@
 		
 	{% endif %}
 
+	
+
+
 	<!-- For displaying themes items -->
 
 	{% if themes_cards  %}
@@ -273,7 +281,7 @@
 
 
 
-<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-5" style="margin-top:40px" >
 
   	{% for each in nodes %}
      <li class="card-image-wrapper"> 

@@ -1602,13 +1602,13 @@ aside#help{
 
 
   .repository-title{  
-      color:#D7D7D7;
+    color:#D7D7D7;
     font-size: 1.3em;
     width:auto;
     background-color: rgba(0, 0, 0, 0.8);
     text-align:left;
     display:inline-block;
-    margin-left:5px;
+    margin-left:2px;
     position:relative;
     text-align:center;
   }
@@ -1621,4 +1621,39 @@ aside#help{
     color:#878787;
     position:relative;
     margin-left:4px;
+  }
+.card-holder{
+    padding-left: 2%;
+  }
+
+  .app-card{
+    width: 19rem;
+    min-height: 10rem;
+    margin: 15px 20px;
+    float: left;
+    padding: 1em; 
+    margin-left:-20%; 
+    height:18em;
+  }
+
+  .app-card:hover{
+    box-shadow: 0px 0px 15px #808080;
+    border: thin solid #D3D3D3;
+    border-radius: 5px;
+    transition: all 0.6s ease 0s;
+  }
+
+  .app-card-icon{
+    color:#4c4c4c;
+    position: relative;
+    font-size: 6em;
+  }
+  .app-card-title{
+    padding-bottom:-1em;
+  }
+  
+  .app-card-content{
+    color:#4c4c4c;
+    text-align:center;
+    margin-top:0.5cm;
   }
