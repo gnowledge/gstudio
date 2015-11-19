@@ -412,7 +412,7 @@
           {% if node %}
             
             {% get_publish_policy request groupid node as group_policy %}
-            {% check_group node as is_group %}
+            {% check_group node.pk as is_group %}
 
           	{% if group_policy == "allow" %}
           	  {% if is_group %} 
@@ -436,7 +436,7 @@
 
         	  {% get_edit_url node.pk as edit_url %}
         	  {% switch_group_conditions request.user group_id as switch_conditions %}
-        	  {% check_group node as is_group %}
+        	  {% check_group node.pk as is_group %}
         	  {% get_user_object node.created_by as created_user %}
 
         	  {% if is_group %}
