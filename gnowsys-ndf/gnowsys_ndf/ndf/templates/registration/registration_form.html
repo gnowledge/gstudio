@@ -192,10 +192,14 @@
 
 {% block document_ready %}
   {{block.super}}
-
+  
   $("input[id='id_email'], input[id='id_username'], input[id='id_password1'], input[id='id_password2'], select[id='id_agency_type']").each(function(){
     if (this.id == "id_email") {
       $(this).prop("type", "email");
+    }
+    if(this.id == "id_username")
+    {
+      $(this).attr("pattern", "^[a-zA-Z](([\._\-][a-zA-Z0-9])|[a-zA-Z0-9])*[a-z0-9]$");
     }
 
     $(this).css("width", "95%");
