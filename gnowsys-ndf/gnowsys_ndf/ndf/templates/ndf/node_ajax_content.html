@@ -198,7 +198,7 @@
     </div>
   {% endif %}
 
-  {% check_group node as is_group %}
+  {% check_group node.pk as is_group %}
   {% if is_group %}
     {% if node.edit_policy == "EDITABLE_MODERATED" and "Group" not in node.member_of_names_list %}
       <div class="row">
@@ -953,7 +953,7 @@
         
       </div><!-- end of tab's content -->
       
-      {% check_group node as is_group %}
+      {% check_group node.pk as is_group %}
       {% if is_group %}
         {% if subgroups_cur %}
           <div >

@@ -33,7 +33,7 @@
       {% else  %}
         <i class="{{resource.member_of_names_list.0|lower }}"></i>
       {% endif %}
-    {% elif "PartnerGroup" in resource.member_of_names_list or "Course" in resource.member_of_names_list or has_logo == True %}
+    {% elif "PartnerGroup" in resource.member_of_names_list or "Group" in resource.member_of_names_list or "Course" in resource.member_of_names_list or has_logo == True %}
       {% if "Course" in resource.member_of_names_list or has_logo == True %}
         {% get_relation_value resource.pk 'has_logo' as logo_img_and_grel_hl %}
         {% if logo_img_and_grel_hl.0 %}
@@ -41,6 +41,9 @@
           {% if logo_img_and_grel_hl.0.fs_file_ids.1 %}
             <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.1 %}" alt="" />
           {% endif %}
+        {% else %}
+          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
+
         {% endif %}
 
       {% else %}
@@ -50,6 +53,8 @@
           {% if logo_img_and_grel_pp.0.fs_file_ids.1 %}
             <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.1 %}" alt="" />
           {% endif %}
+        {% else %}
+          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
         {% endif %}
 
       {% endif %}
