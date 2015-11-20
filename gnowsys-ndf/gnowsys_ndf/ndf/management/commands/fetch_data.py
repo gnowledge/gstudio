@@ -222,6 +222,9 @@ def create_file(file_path,data,mode="w"):
     
 
 def zip_directories(sync_dir):
+    #code to walk through the /ndf/Mailclient/sync_data/ directory
+    #scan all the folder, pick then and create zip files of size 1Mb
+
     zip_list = []
     dir_list = []
     total_size = 0
@@ -284,7 +287,10 @@ def zip_directories(sync_dir):
 def mongorotate():
     #rotate the mongolog 
     #check if the file size if greater than 20MB Rotate
-    #
-    conn = Connection()
-    database = conn['admin']
-    database.command({"logRotate":1})
+    #if yes Rotate
+    #20480 is 20MB in bytes if file size is greater than that rotate
+    if os.path.getsize('/var/log/mongodb/mongod.log')/1000 >= 20480:
+        conn = Connection()
+        database = conn['admin']
+        #logRotate command can be executed on mongo shell with admin database
+        database.command({"logRotate":1})
