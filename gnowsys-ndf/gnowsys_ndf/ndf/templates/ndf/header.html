@@ -72,7 +72,7 @@
 	      
               <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
               	 href="{% url 'nroer_groups' 'home' menuk %}" 
-              > {{menuk}} </a>
+              > {% trans menuk %} </a>
               <ul class="dropdown">
 	
                 {% for each_sub_menu in menuv %}
@@ -96,7 +96,7 @@
                       {% endif %}
                     {% endif %}
                   {% endfor %}
-                  >{{each_sub_menu}}
+                  >{% trans each_sub_menu %}
                   </a>
                 </li>
                 {% endfor %}
@@ -415,7 +415,7 @@
                 <ul class="left" id="group-apps">
                   <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
                   <li class="" onclick="history.back();">
-                    <a href="javascript:window.history.back();"><i class="fa fa-angle-left back-btn"></i> BACK</a>
+                    <a href="javascript:window.history.back();"><i class="fa fa-angle-left back-btn"></i> {% trans "BACK" %}</a>
                   </li>
                   {% if site.SITE_NAME == "NROER" %} 
                     {% if group_name_tag == "home" or "CourseEventGroup" in group_object.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
@@ -470,7 +470,7 @@
         $(this).attr('href', "{% url 'activity_feed' group_object.pk %}")
       }
       else{
-        lbl_msg = "RSS Feeds may not be displayed properly in this browser. Would you still like to continue?"
+        lbl_msg = {% trans "RSS Feeds may not be displayed properly in this browser. Would you still like to continue?" %}
         $("#feedsModalLabel").text(lbl_msg);
         $(".small_msg").text("You may try Mozilla Firefox")
         $("#feedsModal")

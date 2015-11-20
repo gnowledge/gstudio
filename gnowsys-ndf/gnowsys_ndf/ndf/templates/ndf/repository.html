@@ -86,7 +86,14 @@
 					href="{% url each_gapp.name|lower group_id %}"
 				{% endif %}
 				>
-					<h4>{% firstof each_gapp.altnames each_gapp.name %}</h4>
+				<h4>  
+				{% if each_gapp.altnames %}
+					{% trans each_gapp.altnames %}
+				{% elif each_gapp.name %}
+					{% trans each_gapp.name %}
+				{% endif %}
+				</h4>
+					<!-- <h4>{% firstof each_gapp.altnames each_gapp.name %}</h4> -->
 					<div class="app-card-icon"><i class="{{ each_gapp.url }}"></i></div>
 					<div class="app-card-content">{{each_gapp.content_org|truncatechars:45 }}</div>
 				</a>
@@ -94,10 +101,10 @@
 		{% endfor %}
 		<li>
 			<a class="app-card text-center" href="{% url 'partner_showcase' group_id %}">
-				<h4>Partner Showcase</h4>
+				<h4>{% trans "Partner Showcase" %}</h4>
 				<div class="app-card-icon"><i class="fa fa-graduation-cap fa-fw"></i></div>
 				
-					<div class="app-card-content">Contributions from institutions and individuals</div>
+					<div class="app-card-content">{% trans "Contributions from institutions and individuals" %}</div>
 				
 			</a>
 		</li>

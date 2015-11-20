@@ -68,7 +68,7 @@ this template is modified. So for the fields in the template it supports -
           <div class="small-8 columns">
             <input type="text" name="name" id="group_name" required placeholder="{% trans 'Enter the unique group name' %}" {% if node %}disabled=disabled title="Group name can not be changed" {% endif %} value="{{node.name}}">
             <label id="message" style="display:none; color:red"></label>
-            <small class="error">Group Name is required and it must be a string.</small>
+            <small class="error">{% trans "Group Name is required and it must be a string. " %}</small>
           </div>
 
         </div>
@@ -113,7 +113,7 @@ this template is modified. So for the fields in the template it supports -
                 </option>
               {% endfor %}
             </select> 
-            <small class="error">Please select group type.</small>
+            <small class="error">{% trans "Please select group type." %}</small>
           </div>
 
         </div>
@@ -132,7 +132,7 @@ this template is modified. So for the fields in the template it supports -
 
             <div class="small-8 columns">
             <input type="text" id="event_start_date" name="event_start_date" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="width:15rem">      
-              <small class="error">Please select start date.</small>
+              <small class="error">{% trans "Please select start date." %}</small>
             </div>
 
           </div>
@@ -151,7 +151,7 @@ this template is modified. So for the fields in the template it supports -
             <div class="small-8 columns">
             <input type="text" id="event_end_date" name="event_end_date" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="width:15rem">      
 
-              <small class="error">Please select end date.</small>
+              <small class="error">{% trans "Please select end date." %}</small>
             </div>
 
           </div>
@@ -170,7 +170,7 @@ this template is modified. So for the fields in the template it supports -
 
             <div class="small-8 columns">
             <input type="text" id="event_start_enroll_date" name="event_start_enroll_date" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="width:15rem">      
-              <small class="error">Please select enrollment start date.</small>
+              <small class="error">{% trans "Please select enrollment start date." %}</small>
             </div>
 
           </div>
@@ -382,13 +382,13 @@ this template is modified. So for the fields in the template it supports -
       }
       else if (val_chk != -1){
           $("#message").css("display", "block");
-          $("#message").text("Group name cannot include 'Mod' or 'mod' text at end.");
+          $("#message").text("{% trans 'Group name cannot include 'Mod' or 'mod' text at end.' %}");
           event.preventDefault();
       }
     }
     else if (name == ""){
       $("#message").css("display", "block");
-      $("#message").text("Group name cannot be empty.");
+      $("#message").text("{% trans 'Group name cannot be empty.' %}");
       event.preventDefault();
     }
   });
@@ -406,7 +406,7 @@ this template is modified. So for the fields in the template it supports -
   $("#docFile").change(function(event) {
     file_mime_type = this.files[0].type;
     if(file_mime_type.indexOf("svg") >= 0 ){
-      alert(".svg images are currently not supported")
+      alert("{% trans '.svg images are currently not supported' %}")
       $("#docFile").val("");
       event.preventDefault();
     }
