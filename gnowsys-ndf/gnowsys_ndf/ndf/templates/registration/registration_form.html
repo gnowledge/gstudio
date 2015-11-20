@@ -205,7 +205,15 @@
     $(this).css("width", "95%");
     $(this).attr("required", "");
     $(this).css("float", "left");
-    $(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+
+    if(this.name == 'username')
+    {
+      $(this).after("<small class='error'>Username should start with letters and can have digits and - / . / _ only</small>");
+    }
+    else{
+      $(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+    }
+
     $(this).after("<i style='color:red; float:left display:inline'>*</i>");
   });
 
