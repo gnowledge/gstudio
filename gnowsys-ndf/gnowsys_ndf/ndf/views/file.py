@@ -946,15 +946,17 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
                 # Fetch file node by docid
                 file_node = node_collection.one({'_id': ObjectId(cur_oid['docid'])})
-                # Check if already existing file is uploaded in same group as earlier
-                if ObjectId(group_id) not in file_node.group_set:
-                    # if not, add current request group_id in group_set of file_node
-                    file_node.group_set.append(ObjectId(group_id))
-                    file_node.last_update = datetime.datetime.now()
-                    file_node.modified_by = int(userid)
-                    file_node.save()
-                    # This change is made in order to fetch file nodes 
-                    # from a group 
+                # print "\n\n file_node\n\n",file_node
+                if file_node:
+                    # Check if already existing file is uploaded in same group as earlier
+                    if ObjectId(group_id) not in file_node.group_set:
+                        # if not, add current request group_id in group_set of file_node
+                        file_node.group_set.append(ObjectId(group_id))
+                        file_node.last_update = datetime.datetime.now()
+                        file_node.modified_by = int(userid)
+                        file_node.save()
+                        # This change is made in order to fetch file nodes 
+                        # from a group 
 
                 # returning only ObjectId (of GSystem containing file info) in dict format.
                 # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
