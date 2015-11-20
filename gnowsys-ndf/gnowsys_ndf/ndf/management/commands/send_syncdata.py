@@ -47,7 +47,6 @@ class Command(BaseCommand):
         if  os.path.exists(lock) == False:
             if connected_to_internet() is False:
                 return None
-            print "herer"
             syncdata_folder_path = os.path.dirname(__file__).split('/management')[0] + '/MailClient/syncdata'
             list_of_syncdata_folders = []
             sent_folder_path = os.path.dirname(__file__).split('/management')[0] + '/MailClient/sent_syncdata_files'
@@ -91,7 +90,6 @@ class Command(BaseCommand):
                     mail.to = list(SYNCDATA_SENDING_EMAIL_ID)
                     if folder_empty == 0:
                         mail.send()
-                    print "here",path,sent_folder_path  
                     shutil.move(path,sent_folder_path)
                     
                     

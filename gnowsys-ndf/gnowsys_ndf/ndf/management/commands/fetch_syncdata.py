@@ -119,14 +119,11 @@ def unpack_dir(file_list,mail):
     #subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)    
     #os.popen(cp)
     #create zip patgh in server folder and dezip them 
-    print "one point"
     shutil.move(str(file_list[0]),server_folder)
     file_path = file_list[0]
     file_path = file_path.split('/')[-1:][0]
     zipfilepath =  os.path.join(server_folder,file_path)
-    print "something",zipfilepath
     zipfilepath = os.path.abspath(zipfilepath)
-    print os.path.exists(zipfilepath)
     unzip(server_folder)
     return server_folder
     # unpack the file
