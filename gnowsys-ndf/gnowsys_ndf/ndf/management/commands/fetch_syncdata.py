@@ -119,11 +119,12 @@ def unpack_dir(file_list,mail):
     #subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)    
     #os.popen(cp)
     #create zip patgh in server folder and dezip them 
+    print "one point"
     shutil.move(str(file_list[0]),server_folder)
     file_path = file_list[0]
     file_path = file_path.split('/')[-1:][0]
     zipfilepath =  os.path.join(server_folder,file_path)
-    print zipfilepath
+    print "something",zipfilepath
     zipfilepath = os.path.abspath(zipfilepath)
     print os.path.exists(zipfilepath)
     unzip(server_folder)
@@ -195,7 +196,8 @@ def decrypt_file(filename):
     op_file_name = filename.split('_sig')[0]            
     print 'output file name of decrypted attachment : \n %s' % op_file_name            
     command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
-    std_out= subprocess.call([command],shell=True)   
+    if not os.path.exists(op_file_name):
+        std_out= subprocess.call([command],shell=True)   
     os.remove(filename)    
 def chain_registries(dir_list,serverdir):
     create_stream = []
