@@ -491,44 +491,8 @@ def server_sync(mail):
                 # We need to check from the _type what we have that needs to be saved
                 #updated data
                 if json_data.get('_type',0) != 0:
-                                 #Updateable data       
-                        '''         
-                        if json_data['_type'] == 'GAttribute' or json_data['_type'] == 'GRelation':
-                                temp_node = triple_collection.one({"_id": ObjectId(json_data["_id"])})
-                        else:
-                                temp_node = node_collection.one({"_id" : ObjectId(json_data["_id"])})
-                        if temp_node is not None:
-                                #if node is not present   
-                                temp_dict = {}
-                                for key, values in temp_node.items():
-                                        if key != u'fs_file_ids' or key != '_type':
-                                            if key != 'name':          
-                                                if key in ['attribute_type','relation_type','relation_type_set','attribute_type_set']:
-                                                        if key == 'attribute_type':
-                                                                node = node_collection.one({"_id":ObjectId(json_data['attribute_type']['_id'])})
-                                                        elif key == 'relation_type':
-                                                                node = node_collection.one({"_id":ObjectId(json_data['relation_type']['_id'])})
-                                                        elif key == 'relation_type_set':
-                                                                values = json_data['relation_type_set']      
-                                                                if values is not None:
-                                                                        node = process_list(values)
-                                                        elif key == 'attribute_type_set':
-                                                                values = json_data['attribute_type_set']      
-                                                                if values is not None:
-                                                                        node = process_list(values) 
-                                                                
-                                                        if node:
-                                                                temp_node[key] = node
-                                                else:
-                                                        try:
-                                                            temp_node[key] = json_data[key]
-                                                        except:
-                                                            print (traceback.format_exc())
-                                temp_node.save()
-                                    
-                        else:
-                        '''    
-                            # if node is present update it
+                        #Updateable data       
+                        # if node is present update it
                         try:
                                 if json_data['_type'] in ['GAttribute','GRelation','RelationType','AttributeType','GSystemType']:
                                         if json_data['_type'] == 'GAttribute':
@@ -559,9 +523,7 @@ def server_sync(mail):
                                                                         values = json_data['attribute_type_set']      
                                                                         if values is not None:
                                                                                 node = process_list(values) 
-                                                                                print node
                                                                 if node:
-                                                                        print "coming till here",key
                                                                         temp_node[key] = node
                                                         else:
                                                                 temp_dict[key] = values

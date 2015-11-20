@@ -14,6 +14,7 @@ from gnowsys_ndf.ndf.views.mailclient import server_sync
 import os
 import traceback
 import filecmp
+import tarfile
 
 def connected_to_internet(url='http://www.google.com/', timeout=2):
     try:
@@ -96,20 +97,17 @@ def process_mails(mail):
         list_of_decrypted_attachments.append(filename)
     return unpack_dir(list_of_decrypted_attachments,mail)
 
-import tarfile
 def unpack_dir(file_list,mail):
     # store this registry and data in different folder according to thei server name
     subject = mail.subject
     serverid = subject.split('_')[0]
     #strip anything before space
     serverid = serverid.split(' ')
-    print "id after",serverid
     if len(serverid) > 1:
         serverid = serverid[1]
     else:
         print serverid
         serverid = serverid[0]
-    print "the serverid",serverid    
     if os.path.exists(serverid) == False:
         os.mkdir(serverid)
     manage_path = os.path.abspath(os.path.dirname(os.pardir))
@@ -270,7 +268,7 @@ def request_for_packet(packet_name):
     # check the from address from which mail is coming 
     # and send a request to that mail servers to request the 
     # missing packet
-    mail.to = ['mukesh_5501@yahoo.com','mrunal.upload@gmail.com']
+    mail.to = ['example@example.com','example.upload@example.com']
     mail.subject = "Request" +"_" +str(packet_name)
     mail.send()     
 

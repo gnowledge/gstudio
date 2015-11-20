@@ -1,6 +1,5 @@
 import subprocess
 from django.core.management.base import BaseCommand, CommandError
-from gnowsys_ndf.factory_type import *
 from gnowsys_ndf.ndf.models import *
 from bson.json_util import dumps,loads
 from bson import json_util
@@ -9,14 +8,13 @@ from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.views.methods import capture_data
 from gnowsys_ndf.local_settings import SYNCDATA_KEY_PUB
 from gnowsys_ndf.settings import TARSIZE
+from pymongo import Connection
 import json
 import datetime
 import shutil
 import zipfile
 import os
 import time
-rcs = RCS()
-hr = HistoryManager()
 Parent_collection_ids = []
 child_collection_ids = []
 processing_list_ids = []    
@@ -222,32 +220,6 @@ def create_file(file_path,data,mode="w"):
             outfile.write(i)
     return file_path + "/Info.txt"
     
-def get_neighbours(file_name,registry_path):
-    #get previouse and next line of the match 
-    # from the defined file path
-    file_output = open(registry_path)
-    current_line = ""
-    previouse_line = ""
-    last_line = ""
-    a = True
-    data = []
-    #Old code to create previouse and post node information
-    #with every sending node
-    while a:
-            previouse_line = current_line
-            current_line = file_output.readline()
-            c = current_line.find(str(file_name))      
-            if c != -1:
-                a = False
-            if current_line == "":  
-                break
-    last_line = file_output.readline()
-    file_output.close()
-    #written file path to copy
-    data.append(previouse_line)
-    data.append(current_line)
-    data.append(last_line)  
-    return data 
 
 def zip_directories(sync_dir):
     zip_list = []
@@ -309,3 +281,10 @@ def zip_directories(sync_dir):
     
 
 
+def mongorotate():
+    #rotate the mongolog 
+    #check if the file size if greater than 20MB Rotate
+    #
+    conn = Connection()
+    database = conn['admin']
+    database.command({"logRotate":1})
