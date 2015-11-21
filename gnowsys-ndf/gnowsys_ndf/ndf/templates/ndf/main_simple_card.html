@@ -38,10 +38,10 @@
         {% if logo_img_and_grel_hl.0 %}
           {% get_node logo_img as logo_img_and_grel_hl.0 %}
           {% if logo_img_and_grel_hl.0.fs_file_ids.1 %}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.1 %}" alt="" />
+            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.1 %}" style="width:50%" alt="" />
           {% endif %}
         {% else %}
-          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
+          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." style="width:50%" class="img-height">
 
         {% endif %}
 
@@ -50,10 +50,10 @@
         {% if logo_img_and_grel_pp.0 %}
           {% get_node logo_img as logo_img_and_grel_pp.0 %}
           {% if logo_img_and_grel_pp.0.fs_file_ids.1 %}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.1 %}" alt="" style="width:35%" />
+            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.1 %}" alt="" style="width:50%" />
           {% endif %}
         {% else %}
-          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
+          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." style="width:50%"  class="img-height">
         {% endif %}
 
       {% endif %}

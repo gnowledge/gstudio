@@ -13,7 +13,7 @@
 
 {% block body_content %}
   <div class="repository-title large-4 columns">{{groups_category}}</div> 
-  <div class="repository-desc large-8 columns">{{app_gst.content|default_if_none:''|safe}}</div>
+  <div class="repository-desc large-8 columns">{{app_gst.content_org|default_if_none:''|safe}}</div>
 <div class="content row">
   <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-3">
     {% autopaginate group_nodes 23 %}

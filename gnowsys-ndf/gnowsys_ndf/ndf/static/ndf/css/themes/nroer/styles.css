@@ -10743,10 +10743,12 @@ p {
   float: left;
   padding: 1em;
   margin-left: -20%;
-  height: 18em;
+  height: 18rem;
+  background-color: #f2f2f2;
+  border: thin solid #D3D3D3;
 }
 
-/* line 1640, ../../../scss/_app_styles.scss */
+/* line 1642, ../../../scss/_app_styles.scss */
 .app-card:hover {
   box-shadow: 0px 0px 15px #808080;
   border: thin solid #D3D3D3;
@@ -10754,26 +10756,26 @@ p {
   transition: all 0.6s ease 0s;
 }
 
-/* line 1647, ../../../scss/_app_styles.scss */
+/* line 1649, ../../../scss/_app_styles.scss */
 .app-card-icon {
   color: #4c4c4c;
   position: relative;
   font-size: 6em;
 }
 
-/* line 1652, ../../../scss/_app_styles.scss */
+/* line 1656, ../../../scss/_app_styles.scss */
 .app-card-title {
   padding-bottom: -1em;
 }
 
-/* line 1656, ../../../scss/_app_styles.scss */
+/* line 1660, ../../../scss/_app_styles.scss */
 .app-card-content {
   color: #4c4c4c;
   text-align: center;
   margin-top: 0.5cm;
 }
 
-/* line 1662, ../../../scss/_app_styles.scss */
+/* line 1666, ../../../scss/_app_styles.scss */
 .discussion-title-username {
   background-color: #3e3e3e;
   color: #ececec !important;
@@ -10788,7 +10790,7 @@ p {
   padding-left: 10px;
 }
 
-/* line 1676, ../../../scss/_app_styles.scss */
+/* line 1680, ../../../scss/_app_styles.scss */
 .discussion-footer {
   background-color: #CCCCCC;
   color: gray !important;

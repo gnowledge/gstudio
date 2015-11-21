@@ -52,7 +52,7 @@
 				{% endif %}
 				>
 					<div class="app-card-title"><h4>{% firstof each_gapp.altnames each_gapp.name %}</h4></div>
-					<div class="app-card-icon"><img src="{{ each_gapp.url }}" width="35%"></div>
+					<div class="app-card-icon"><img src="{{ each_gapp.url }}" width="50%"></div>
 					<div class="app-card-content">{{each_gapp.content_org|truncatechars:45 }}</div>
 				</a>
 			</li>
@@ -60,7 +60,7 @@
 		<li>
 			<a class="app-card text-center" href="{% url 'partner_showcase' group_id %}">
 				<div class="app-card-title"><h4>Partner Showcase</h4></div>
-				<div class="app-card-icon"><img src="/static/ndf/images/partner-01.svg" width="35%" style="padding-top:-2em"></div>
+				<div class="app-card-icon"><img src="/static/ndf/images/partner-01.svg" width="50%" style="padding-top:-2em"></div>
 				
 					<div class="app-card-content">Contributions from institutions and individuals</div>
 				
