@@ -59,7 +59,8 @@
 
   {% include "ndf/header.html" %}
   {% block extended_header %}{% endblock %}
-   <!--{% get_gstudio_help_sidebar as gst_help_sidebar %}
+   {% comment %}
+   {% get_gstudio_help_sidebar as gst_help_sidebar %}
    {% if gst_help_sidebar and app or app_description%}
      
      <div id ="help-canvas-menu" class="">      
@@ -73,7 +74,8 @@
              {{ app.content_org }}
       </div>
     </div> 
-   {% endif %} -->
+   {% endif %}
+   {% endcomment %} 
   <div class="workspace">
     <div class="off-canvas-wrap" data-offcanvas>
       <div class="inner-wrap">
