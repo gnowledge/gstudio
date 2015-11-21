@@ -73,7 +73,7 @@
 {% block body_content %}
 		<div class="repository-title large-4 columns">{% trans "Repository" %}
 		</div>
-		<div class="repository-desc large-8 columns">{% trans "Digital" %} {% trans "resources" %} {% trans "grouped in multiple ways" %}</div>
+		<div class="repository-desc large-8 columns">{% trans "Digital resource grouped in multiple ways" %}</div>
 	
 	<!-- <ul class="inline-list card-holder"> -->
 	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-3">
@@ -95,7 +95,7 @@
 				</h4>
 					<!-- <h4>{% firstof each_gapp.altnames each_gapp.name %}</h4> -->
 					<div class="app-card-icon"><i class="{{ each_gapp.url }}"></i></div>
-					<div class="app-card-content">{{each_gapp.content_org|truncatechars:45 }}</div>
+					<div class="app-card-content"> {% trans each_gapp.content_org %} </div>
 				</a>
 			</li>
 		{% endfor %}

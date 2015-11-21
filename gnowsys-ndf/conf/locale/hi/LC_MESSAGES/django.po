@@ -300,12 +300,6 @@ msgstr "क्रियाकलाप"
 msgid "No Recent Activities"
 msgstr "हाल ही में कोई क्रियाकलाप नहीं है"
 
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:104
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:106
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:111
-msgid "Edit"
-msgstr "संपादित करें"
-
 #: gnowsys_ndf/ndf/templates/ndf/action_panel.html:128
 #: gnowsys_ndf/ndf/templates/ndf/action_panel.html:130
 #: gnowsys_ndf/ndf/templates/ndf/mis_details.html:420
@@ -851,6 +845,9 @@ msgstr "पाठ्यक्रम का नाम"
 msgid " - - - Select course - - - "
 msgstr "पाठ्यक्रम चुनें"
 
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:104
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:106
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:111
 #: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:19
 #: gnowsys_ndf/ndf/templates/ndf/course_detail.html:149
 #: gnowsys_ndf/ndf/templates/ndf/course_details.html:50
@@ -3795,7 +3792,7 @@ msgstr "प्रसंग"
 
 #: gnowsys_ndf/ndf/templates/ndf/theme.html:226
 msgid "Tree"
-msgstr ""
+msgstr "ट्री"
 
 #: gnowsys_ndf/ndf/templates/ndf/theme.html:230
 msgid "Open"
@@ -4781,9 +4778,6 @@ msgstr "देखने के लिए क्ल्कि करें"
 msgid "Click here to view  My Analytics"
 msgstr "देखने के लिए क्ल्कि करें"
 
-msgid "Message id"
-msgstr "Translations"
-
 msgid "Announced Courses"
 msgstr "घोषित पाठ्यक्रम"
 
@@ -4901,13 +4895,16 @@ msgstr "अभिरूचि समूह"
 msgid "Schools"
 msgstr "विद्यालय"
 
-msgid "Digital resources grouped in multiple ways"
+msgid "Digital resource grouped in multiple ways"
 msgstr "डिजि़टल संसाधन बहु-माध्यम समूहों में उपलब्ध हैं"
 
-msgid "Open Educational Resources mapped to School curricula"
+msgid "Open Educational Resources mapped to school curricular"
 msgstr "विद्यालय पाठ्यचर्या से संबद्ध मुक्त शैक्षिक संसाधन"
 
-msgid "elibrary"
+msgid "Open Educational Resources mapped to schoo..."
+msgstr "विद्यालय पाठ्यचर्या से संबद्ध मुक्त शैक्षिक संसाधन"
+
+msgid "eLibrary"
 msgstr "ई-पुस्तकालय"
 
 msgid "Homogeneous collections of resources"
@@ -4922,10 +4919,10 @@ msgstr "स्वतंत्र डिजि़टल पुस्तकों 
 msgid "eCourses"
 msgstr "ई-पाठ्यक्रम"
 
-msgid "Online and Blended courses"
+msgid "Online and blended courses"
 msgstr "आॅनलाइन और मिश्रित पाठ्यक्रम"
 
-msgid "Community showcase and celebrations"
+msgid "Community showcases and celebrations"
 msgstr "समुदाय प्रदर्शन तथा महोत्सव"
 
 msgid "Partner Showcase"
@@ -4937,8 +4934,5 @@ msgstr "व्यक्तिगत तथा संस्थाओं से �
 msgid "BACK"
 msgstr "पीछे"
 
-msgid "tree"
-msgstr "ट्री"
-
-msgid "BACK"
-msgstr "पीछे"
+msgid "New password"
+msgstr "नया शब्दकूट"
