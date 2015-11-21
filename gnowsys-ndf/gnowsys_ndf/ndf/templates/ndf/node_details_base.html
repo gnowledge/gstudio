@@ -55,6 +55,7 @@
 {% endblock style %}
 
 {% block meta_content %}
+{{block.super }}
 <div class="repository-title" itemprop="{{schema.1.name}}" style="width:100%;margin-top:20px"> 
       {% firstof node.altnames node.name %} 
   </div>

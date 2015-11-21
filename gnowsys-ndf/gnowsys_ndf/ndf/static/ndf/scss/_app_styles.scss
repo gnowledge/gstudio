@@ -564,7 +564,7 @@ body>footer{
                 }
             }
             header{
-             padding: 0 10px;
+             //padding: 0 0px;
          }
          footer{
             background-color: #222;
@@ -1045,18 +1045,19 @@ aside#help{
 #replies-area .disc-replies {
 
     padding:10px;
-    background-color: lighten($primary-color, 40%);
+    background-color:#ddd;
     width:27em;
     max-width: 40em;
     margin-left: 48px; 
     margin-top: 10px;
-
+    padding-bottom:0em;
     .reply-btn{
         cursor: pointer;
+        color:black !important;
     }
 
     .reply-btn:hover {
-        font-weight: bold;
+        color:#ececec !important;
     }
 }
 /* Simple  Card CSS*/
@@ -1183,7 +1184,7 @@ aside#help{
   text-decoration: inherit;
   }
   
-  i.common-icon{
+  i.common-icon:before{
   content: "\f1fb";
   }
   i.file:before {
@@ -1657,3 +1658,33 @@ aside#help{
     text-align:center;
     margin-top:0.5cm;
   }
+  
+  .discussion-title-username{
+      background-color:#3e3e3e;
+      color:#ececec !important;
+      //width:auto;
+      margin-top:-0.6em;
+      margin-left:-0.7em; 
+      height:2em;
+      top: 0px;
+      left: 0px;
+      width: 105%;
+      right:0;
+      padding-right:10px;
+      padding-left:10px;
+  }
+.discussion-footer{
+      background-color:#CCCCCC;
+      color:gray !important;
+      //width:auto;
+      //margin-top:-1em;
+      margin-left:-0.7em; 
+      height:2em;
+      top: 0px;
+      left: 0px;
+      width: 105%;
+      right:0;
+      padding-right:10px;
+      padding-left:10px;
+      //margin-top:0.2em;
+}

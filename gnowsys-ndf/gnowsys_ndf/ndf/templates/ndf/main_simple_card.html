@@ -16,7 +16,7 @@
    <div class="app-card-title"><h4>{% firstof resource.altnames resource.name %}</h4></div>
 
 
-    <div class="app-card-icon" title="{% firstof resource.altnames resource.name %}">
+    <div class="app-card-icon" title="{% firstof resource.altnames resource.name %}" >
 <!--{{resource.member_of_names_list}} --> 
     
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
@@ -32,7 +32,7 @@
       {% else  %}
         <i class="{{resource.member_of_names_list.0|lower }}"></i>
       {% endif %}
-    {% elif "PartnerGroup" in resource.member_of_names_list or "Course" in resource.member_of_names_list or has_logo == True %}
+    {% elif "PartnerGroup" in resource.member_of_names_list or "Group" in resource.member_of_names_list or "Course" in resource.member_of_names_list or has_logo == True %}
       {% if "Course" in resource.member_of_names_list or has_logo == True %}
         {% get_relation_value resource.pk 'has_logo' as logo_img_and_grel_hl %}
         {% if logo_img_and_grel_hl.0 %}
@@ -40,16 +40,20 @@
           {% if logo_img_and_grel_hl.0.fs_file_ids.1 %}
             <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.1 %}" alt="" />
           {% endif %}
+        {% else %}
+          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
+
         {% endif %}
 
       {% else %}
         {% get_relation_value resource.pk 'has_profile_pic' as logo_img_and_grel_pp %}
-        dasdsa
         {% if logo_img_and_grel_pp.0 %}
           {% get_node logo_img as logo_img_and_grel_pp.0 %}
           {% if logo_img_and_grel_pp.0.fs_file_ids.1 %}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.1 %}" alt="" />
+            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.1 %}" alt="" style="width:35%" />
           {% endif %}
+        {% else %}
+          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
         {% endif %}
 
       {% endif %}
@@ -64,7 +68,7 @@
    
 
     <div class="app-card-content" title="{{resource.content_org}}">
-     {{resource.content_org|default_if_none:"Add some description."|truncatechars:60}}
+     {{resource.content_org|default_if_none:"Add some description."|truncatechars:45}}
     </div>   
 </a>
 

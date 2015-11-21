@@ -18,7 +18,6 @@
   <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
 {% endif %}
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
-<!--{{resource.member_of_names_list}} --> 
     
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
     {% if resource.fs_file_ids.1 %}
