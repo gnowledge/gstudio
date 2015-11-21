@@ -9,36 +9,6 @@
 
 {% block style %}
 
-	.card-holder{
-		padding-left: 5%;
-	}
-
-	.app-card{
-		width: 19rem;
-		min-height: 10rem;
-		margin: 40px 1rem;
-		float: left;
-		padding: 0.4em;		
-		height:15em;
-	}
-
-	.app-card:hover{
-		box-shadow: 0px 0px 15px #808080;
-		border: thin solid #D3D3D3;
-		border-radius: 5px;
-		transition: all 0.6s ease 0s;
-	}
-
-	.app-card-icon{
-		color:#4c4c4c;
-		position: relative;
-		font-size: 6em;
-		left:2%
-		margin-top:-2em;
-	}
-	.app-card-title{
-
-	}
 
 	<!-- .repository-title{	
 	    color:#D7D7D7;
@@ -61,11 +31,6 @@
 		position:relative;
 	} -->
 
-	.app-card-content{
-		color:#4c4c4c;
-		text-align:center;
-		margin-top:-0.5cm;
-	}
 
 {% endblock %}
 
@@ -86,23 +51,23 @@
 					href="{% url each_gapp.name|lower group_id %}"
 				{% endif %}
 				>
-				<h4>  
+				<div class="app-card-title"><h4>  
 				{% if each_gapp.altnames %}
 					{% trans each_gapp.altnames %}
 				{% elif each_gapp.name %}
 					{% trans each_gapp.name %}
 				{% endif %}
-				</h4>
-					<!-- <h4>{% firstof each_gapp.altnames each_gapp.name %}</h4> -->
-					<div class="app-card-icon"><i class="{{ each_gapp.url }}"></i></div>
-					<div class="app-card-content"> {% trans each_gapp.content_org %} </div>
+				</h4></div>
+					<!-- <div class="app-card-title"><h4>{% firstof each_gapp.altnames each_gapp.name %}</h4></div> -->
+					<div class="app-card-icon"><img src="{{ each_gapp.url }}" width="50%"></div>
+					<div class="app-card-content">{{each_gapp.content_org|truncatechars:45 }}</div>
 				</a>
 			</li>
 		{% endfor %}
 		<li>
 			<a class="app-card text-center" href="{% url 'partner_showcase' group_id %}">
-				<h4>{% trans "Partner Showcase" %}</h4>
-				<div class="app-card-icon"><i class="fa fa-graduation-cap fa-fw"></i></div>
+				<div class="app-card-title"><h4>{% trans "Partner Showcase" %}</h4></div>
+				<div class="app-card-icon"><img src="/static/ndf/images/partner-01.svg" width="50%" style="padding-top:-2em"></div>
 				
 					<div class="app-card-content">{% trans "Contributions from institutions and individuals" %}</div>
 				

@@ -48,19 +48,20 @@
     {% for each_reply in all_replies %}
       {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
       <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
-        <div class="row"> 
-          <div class="small-3 columns">
-            <a class="text-center" href="{% url 'dashboard' each_reply.userid %}">
-              <span class="align-center"><i class="fi-torso"></i></span>
-              <label>{{ each_reply.username }}</label>
-            </a>
-          </div>
-          <div class="small-9 columns">
-            {% spaceless %}
-            {{each_reply.HTMLcontent | safe }}
-            {% endspaceless %}
-          </div>
 
+          <div clas="discussion-title row " >
+             <div class="discussion-title-username"> 
+              <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ececec !important" title=" {{ each_reply.username }}">
+                {{ each_reply.username|truncatechars:12 }}
+              </a>
+                <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
+            </div>
+        
+            </div>
+          <div class="discussion-content">
+            {% spaceless %}
+            <i>{{each_reply.HTMLcontent | safe }}</i>
+            {% endspaceless %}
           {% for node in each_reply.collection_set  %}
             <div style="margin: 1em;">
               <br/>
@@ -69,7 +70,7 @@
               {% elif node.status == "DRAFT" %}
                     <p>This File is Rejected by the Moderator.</p>
               {% elif node.status != "MODERATION" %}
-                  {{node.mime_type}}
+                  {# {{node.mime_type}} #}
                   <a class="th" href="{% url 'read_file' group_id node node.name %}">
                     {% if 'image' in node.mime_type  %}
                         <img style="height:100px;" src="{% url 'getFileThumbnail' group_id node.pk %}" />
@@ -80,22 +81,23 @@
               {% endif %}
             </div>
           {% endfor %}
-        </div>
-
-        <div class="row">
-        {% if request.user.id == each_reply.userid or is_gstaff %}
-          <div class="reply-btn small-2  small-text-left large-2 columns" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))">{% trans "Delete" %}</div>
-        {% endif %}
-          <div class='reply-btn  small-2 small-text-left large-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
-          {% trans "Reply" %}
+          
           </div>
-          <div class="small-12 large-6  columns"> <small>{{ each_reply.last_update }}</small> </div>
+          <div class="discussion-footer">
+              {% if request.user.id == each_reply.userid or is_gstaff %}
+                <a class="reply-btn" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" >{% trans "Delete" %} </a>
+              {% endif %}
+                <a class="reply-btn"  data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'style="float:right">
+                {% trans "Reply" %}
+                </a>
+              </div>
+          
       </div>
 
-      </div>
       {% endif %}
 
     {% endfor %}
+
     <!-- END of populating replies -->
   </div>
 

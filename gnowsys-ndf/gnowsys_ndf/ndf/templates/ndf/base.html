@@ -59,10 +59,11 @@
 
   {% include "ndf/header.html" %}
   {% block extended_header %}{% endblock %}
+   {% comment %}
    {% get_gstudio_help_sidebar as gst_help_sidebar %}
    {% if gst_help_sidebar and app or app_description%}
      
-    <!-- <div id ="help-canvas-menu" class="">      
+     <div id ="help-canvas-menu" class="">      
       <a class="help-button btn" href="javascript:void(0);" >
         <div class="help-button-text">
           Help
@@ -70,10 +71,11 @@
                 
       </a>
       <div class="mainContainer">
-             {{ app.content|default_if_none:app.content_org }}
+             {{ app.content_org }}
       </div>
-    </div> -->
+    </div> 
    {% endif %}
+   {% endcomment %} 
   <div class="workspace">
     <div class="off-canvas-wrap" data-offcanvas>
       <div class="inner-wrap">

@@ -564,7 +564,7 @@ body>footer{
                 }
             }
             header{
-             padding: 0 10px;
+             //padding: 0 0px;
          }
          footer{
             background-color: #222;
@@ -1045,18 +1045,19 @@ aside#help{
 #replies-area .disc-replies {
 
     padding:10px;
-    background-color: lighten($primary-color, 40%);
+    background-color:#ddd;
     width:27em;
     max-width: 40em;
     margin-left: 48px; 
     margin-top: 10px;
-
+    padding-bottom:0em;
     .reply-btn{
         cursor: pointer;
+        color:black !important;
     }
 
     .reply-btn:hover {
-        font-weight: bold;
+        color:#ececec !important;
     }
 }
 /* Simple  Card CSS*/
@@ -1183,6 +1184,9 @@ aside#help{
   text-decoration: inherit;
   }
   
+  i.common-icon:before{
+  content: "\f1fb";
+  }
   i.file:before {
   content: "\f18e";
   }
@@ -1599,13 +1603,13 @@ aside#help{
 
 
   .repository-title{  
-      color:#D7D7D7;
+    color:#D7D7D7;
     font-size: 1.3em;
     width:auto;
     background-color: rgba(0, 0, 0, 0.8);
     text-align:left;
     display:inline-block;
-    margin-left:5px;
+    margin-left:2px;
     position:relative;
     text-align:center;
   }
@@ -1619,3 +1623,73 @@ aside#help{
     position:relative;
     margin-left:4px;
   }
+.card-holder{
+    padding-left: 2%;
+  }
+
+  .app-card{
+    width: 19rem;
+    min-height: 10rem;
+    margin: 15px 20px;
+    float: left;
+    padding: 1em; 
+    margin-left:-20%; 
+    height:18rem;
+    background-color:#fafafa;
+   //border: thin solid #D3D3D3;
+  }
+
+  .app-card:hover{
+    box-shadow: 0px 0px 15px #808080;
+    border: thin solid #D3D3D3;
+    border-radius: 5px;
+    transition: all 0.6s ease 0s;
+  }
+
+  .app-card-icon{
+    color:#4c4c4c;
+    position: relative;
+    font-size: 6em;
+
+
+  }
+  .app-card-title{
+    padding-bottom:-1em;
+  }
+  
+  .app-card-content{
+    color:#4c4c4c;
+    text-align:center;
+    margin-top:0.5cm;
+  }
+  
+  .discussion-title-username{
+      background-color:#3e3e3e;
+      color:#ececec !important;
+      //width:auto;
+      margin-top:-0.6em;
+      margin-left:-0.7em; 
+      height:2em;
+      top: 0px;
+      left: 0px;
+      width: 105%;
+      right:0;
+      padding-right:10px;
+      padding-left:10px;
+  }
+.discussion-footer{
+      background-color:#CCCCCC;
+      color:gray !important;
+      //width:auto;
+      //margin-top:-1em;
+      margin-left:-0.7em; 
+      height:2em;
+      top: 0px;
+      left: 0px;
+      width: 105%;
+      right:0;
+      padding-right:10px;
+      padding-left:10px;
+      //margin-top:0.2em;
+}
+

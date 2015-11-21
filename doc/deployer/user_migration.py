@@ -126,10 +126,6 @@ class Command(BaseCommand):
 
 
 		def create_author_node(user_obj):
-			global log_msg
-			global new_users_created
-			global success_log_var
-			global success_log_txt_var
 			auth = node_collection.collection.Author()
 			auth.name = unicode(user_obj.username)
 			# print auth.name
@@ -147,21 +143,7 @@ class Command(BaseCommand):
 			# auth._id = auth_id
 			# auth.save(groupid=auth._id)
 			auth.save()
-			log_msg = "ID updated (" + str(each.id) + " to "+ str(new_user.id) + ")"
-			log_msg += " Successfully created User object and Author group : " + str(auth._id)
-			print "\n\n log_msg",log_msg
-			# print "\n\n new author grp creation completed--", auth._id
-			# adding user's id into author_set of "home" group.
-			if user_obj.id not in home_group_obj.author_set:
-				node_collection.collection.update({'_id': home_group_obj._id}, {'$push': {'author_set': user_obj.id }}, upsert=False, multi=False)
-				home_group_obj.reload()
-			new_users_created =  new_users_created + 1
-
-			success_log_var += '\n"'+str(user_obj.email) +'",'+str(user_obj.id)+',"'+str(user_obj.username)+'","'+str(user_obj.first_name)+'","'+str(user_obj.last_name)+'",'+str(user_obj.is_active)+','+log_msg
-			success_log_txt_var += "\n\nEmail - " + str(user_obj.email) + "\n\t ID : "+ str(user_obj.id)+ "\n\t Username : "+ str(user_obj.username) + \
-			"\n\t First Name : "+ str(user_obj.first_name)+"\n\t Last Name : "+str(user_obj.last_name) + \
-			"\n\t Active : " + str(user_obj.is_active) + "\n\t Remark : " + log_msg
-			# logging.info('New author group created : name- %s and _id- %s ',str(auth.name),str(auth._id))
+			return auth
 
 
 		# print "\nBefore user migration home group author_set -- ",home_group_obj.author_set
@@ -180,6 +162,7 @@ class Command(BaseCommand):
 							if each.is_active:
 								print "\n Processing user_obj ",index + 1, " of ", len(line)
 								total_active_users = total_active_users + 1
+								old_id = each.id
 								if len(userids) == 0:
 									each.id = 1
 								else:
@@ -188,7 +171,23 @@ class Command(BaseCommand):
 								if auth_node is None:
 									print "New auth_node"
 									new_user = create_user(each)
-									create_author_node(new_user)
+									auth = create_author_node(new_user)
+									log_msg = "ID updated (" + str(old_id) + " to "+ str(new_user.id) + ")"
+									log_msg += " Successfully created User object and Author group : " + str(auth._id)
+									print "\n\n log_msg",log_msg
+									# print "\n\n new author grp creation completed--", auth._id
+									# adding user's id into author_set of "home" group.
+									if new_user.id not in home_group_obj.author_set:
+										node_collection.collection.update({'_id': home_group_obj._id}, {'$push': {'author_set': new_user.id }}, upsert=False, multi=False)
+										home_group_obj.reload()
+									new_users_created =  new_users_created + 1
+
+									success_log_var += '\n"'+str(new_user.email) +'",'+str(new_user.id)+',"'+str(new_user.username)+'","'+str(new_user.first_name)+'","'+str(new_user.last_name)+'",'+str(new_user.is_active)+','+log_msg
+									success_log_txt_var += "\n\nEmail - " + str(new_user.email) + "\n\t ID : "+ str(new_user.id)+ "\n\t Username : "+ str(new_user.username) + \
+									"\n\t First Name : "+ str(new_user.first_name)+"\n\t Last Name : "+str(new_user.last_name) + \
+									"\n\t Active : " + str(new_user.is_active) + "\n\t Remark : " + log_msg
+									# logging.info('New author group created : name- %s and _id- %s ',str(auth.name),str(auth._id))
+
 								else:
 									print "Author exists for -- ", new_user.id, "------", auth_node._id, "--", auth_node.name
 									failed_users = failed_users + 1
