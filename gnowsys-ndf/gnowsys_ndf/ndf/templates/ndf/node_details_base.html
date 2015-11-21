@@ -55,7 +55,11 @@
 {% endblock style %}
 
 {% block meta_content %}
-<h3><b><span itemprop="{{schema.1.name}}" class=''> {% firstof node.altnames node.name %} </span></b></h3>
+{{block.super }}
+<div class="repository-title" itemprop="{{schema.1.name}}" style="width:100%;margin-top:20px"> 
+      {% firstof node.altnames node.name %} 
+  </div>
+  <br>
 {% endblock %}
 
 
@@ -64,7 +68,9 @@
 
 
 {% block collection_content %}
+  
   <div id="view_collection">
+  
     {% include "ndf/collection_ajax_view.html" %}  
   </div>
 {% endblock %}
