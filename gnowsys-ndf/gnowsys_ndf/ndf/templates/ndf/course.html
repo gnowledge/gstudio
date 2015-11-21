@@ -13,63 +13,59 @@
     list-style:none;
   }
   .btn-width{
-    width:100% !important;
-    max-width:100% !important;
+    //width:100% !important;
+    //max-width:100% !important;
   }
 {% endblock %}
 
-{% block meta_content %}
+{% block collection_content %}
 
   {% check_is_gstaff groupid request.user as is_gstaff %}
-    <h2 class="subheader">
-        {{title}}
-    </h2>
-  {% if is_gstaff %}
-    {% if req_from_course %}
-        <a class="button btn-width" href="{% url 'create_edit' group_name_tag %}">
-          <i class="fi-plus"></i>{% trans " New Course" %} 
-        </a>
-    {% else %}
-        <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="button btn-width">
-          <i class="fi-plus"></i>{% trans " New Event" %}
-        </a>
-    {% endif %}
-  {% endif %}
-  
   {% user_access_policy groupid request.user as user_access %}
     <!-- 
       Tab 1 - All CourseEvents  (Displayed to all : Anonymous, Authenticated, Group member/admin/owner, SuperUser)
       Tab 2 - User enrolled CourseEvents
       Tab 3 - Courses
     -->
-    <header class="row" data-tab data-options="deep_linking:true">
-      <ul class="vertical tabs" data-tab role="tablist">
-        <li class="active"><a href="#all_events" class="button">{% if req_from_course %}{% trans "All eCourses" %}{% else %}{% trans "All Events" %}{% endif %}</a></li>
+    <div class="panel" style="background-color:#ddd;margin-top:1.8em;padding: 1rem;">
+      <ul class="" data-tab role="tablist" >
+        {% if is_gstaff %}
+          {% if req_from_course %}
+              <a class="tiny expand button radius btn-width" href="{% url 'create_edit' group_name_tag %}">
+                <i class="fi-plus"></i>{% trans " New Course" %} 
+              </a>
+          {% else %}
+              <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="tiny expand button radius btn-width">
+                <i class="fi-plus"></i>{% trans " New Event" %}
+              </a>
+          {% endif %}
+        {% endif %}
+
+        <li class="active"><a href="#all_events" class="tiny expand button radius  btn-width">{% if req_from_course %}{% trans "All eCourses" %}{% else %}{% trans "All Events" %}{% endif %}</a></li>
         {% if request.user.is_authenticated  and not is_gstaff %}
-          <li><a href="#my_events" class="button">{% if req_from_course %}{% trans "My eCourses" %}{% else %}{% trans "My Events" %}{% endif %}</a></li>
+          <li><a href="#my_events" class="button btn-width">{% if req_from_course %}{% trans "My eCourses" %}{% else %}{% trans "My Events" %}{% endif %}</a></li>
         {% endif %}    
         {% if req_from_course and is_gstaff %}
-            <li><a href="#courses" class="button">{% trans "Courses" %}</a></li>
+            <li><a href="#courses" class="tiny expand button radius btn-width">{% trans "Courses" %}</a></li>
         {% endif %}
       </ul>
-    </header>
-
+    </div>
 
 {% endblock %}
 
 {% block body_content %}
 
-    <div class="tabs-content ">
+    <div class="tabs-content"  style="margin-left:18px;margin-top:-1em;">
 
-      <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="all_events">
+      <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-5" id="all_events" style="background-color:#fafafa;border-style:none">
       {% if title == "Course" %}
-        <h4>All eCourses</h4>
+        <div class="repository-title large-4 columns">All eCourses</div>
       {% else %}
-        <h4>All {{title}}</h4>
+        <div class="repository-title large-4 columns">All {{title}}</div>
       {% endif %}
 
         {% for course in ce_coll %}
-          <li class="card-image-wrapper"> 
+          <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
             {% include 'ndf/simple_card.html' with resource=course has_logo=True url_name="groupchange" first_arg=course.pk  %}
           </li>
         {% empty %}
@@ -86,14 +82,14 @@
         {% endfor %}
       </section>
 
-      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="my_events">
+      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-5" id="my_events">
       {% if title == "Course" %}
         <h4>My eCourses</h4>
       {% else %}
         <h4>My {{title}}</h4>
       {% endif %}
         {% for course in enr_ce_coll %}
-          <li class="card-image-wrapper"> 
+          <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
             {% include 'ndf/simple_card.html' with resource=course has_logo=True url_name="groupchange" first_arg=course.pk %}
           </li>
 
@@ -113,10 +109,10 @@
 
 
 
-      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="courses">
-      <h4> All Courses</h4>
+      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-5" id="courses" style="background-color:#fafafa;border-style:none">
+       <div class="repository-title large-4 columns">All Courses</div>
         {% for course in course_coll %}
-          <li class="card-image-wrapper"> 
+          <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
             {% include 'ndf/simple_card.html' with resource=course url_name="course_detail" first_arg=group_id second_arg=course.pk %}
           </li>
 

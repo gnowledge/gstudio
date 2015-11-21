@@ -6,25 +6,28 @@
 {% block title %} {{group_obj.name}} {% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader"> {{group_obj.name}}</h2>
 {% endblock %}
 
 
 {% block related_content %}
   {% check_is_gstaff groupid request.user as is_gstaff %}
+   <div class="panel" style="background-color:#ddd;margin-top:1.8em;padding: 1rem;">
   {% if is_gstaff %}
-      <a class="button small" 
+      <a class="tiny expand button radius " 
           href="{% url 'create_group' group_obj.pk %}?subgroup=True&partnergroup=True">
         	<span class="fi-plus">&nbsp;&nbsp;{% trans "New" %} {{group_obj.name}}</span>
       </a>
   {% endif %}
+  </div>
 {% endblock %}
 
 
 {% block body_content %}
-<br/><div>
+<div class="repository-title large-4 columns"> {{group_obj.name}}</div>
+
+<div>
   
-<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5">
   
   <!-- Existing card list-->
   <!-- #{#% get_group_type request.path request.user as group_type %} -->
@@ -37,11 +40,11 @@
       {% include 'ndf/simple_card.html' with resource=node url_name="groupchange" first_arg=node.pk %}
     </li>
   {% empty %}
-    <div class="row">
-      <div class="small-12 columns">
-       <h5>{% trans "There are no" %} {{group_obj.name}} {% trans "created yet." %} </h5>
+    
+      <div class="repository-desc large-8 columns">
+       {% trans "There are no" %} {{group_obj.name}} {% trans "created yet." %} 
       </div>
-    </div>
+  
   {% endfor %}
   
 </ul>
