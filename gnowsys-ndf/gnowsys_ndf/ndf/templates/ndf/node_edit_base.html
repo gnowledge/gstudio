@@ -1433,7 +1433,7 @@
 	                    // $('#tabs').find('a[href="#tab2"]').trigger('click');
 	                    $('.meta_tab').trigger('click');
 	                    $("#message").css("display", "block");
-	                    $("#message").text("{% trans 'Please fill compulsory metadata fields(* marked)' %}");
+	                    $("#message").text("{% trans 'Please fill compulsory metadata fields(marked with a *)' %}");
 	                    event.preventDefault();
 	            }
 			{% endif %}
@@ -1444,7 +1444,7 @@
 			// 	if (!$("input[name='thread_create']:checked").val()) {
 			// 		$('.thread_prop_tab').trigger('click');
 			// 		$("#message").css("display", "block");
-			// 		$("#message").text("{% trans 'Please fill compulsory fields(* marked)' %}");
+			// 		$("#message").text("{% trans 'Please fill compulsory fields(marked with a *)' %}");
 			// 		event.preventDefault();
 			// 	}
 			// {% endif %}
