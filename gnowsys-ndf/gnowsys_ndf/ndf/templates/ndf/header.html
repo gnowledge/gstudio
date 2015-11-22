@@ -178,7 +178,7 @@
 
       <!-- Right Nav Section -->
       <ul class="right">
-{#}{% comment %}
+{% comment %}
       <!-- Language selector--> 
       <li class="has-form"> 
         <a href="#" class="rounded language button"  data-reveal-id="languageModal">{{request.LANGUAGE_CODE}}</a>  
@@ -210,7 +210,7 @@
           </div> 
         </li>
         <!-- end of language selector -->
-{#}{% endcomment %}
+{% endcomment %}
 
         <!-- If logged in show user options -->
         {% if user.is_authenticated %}
