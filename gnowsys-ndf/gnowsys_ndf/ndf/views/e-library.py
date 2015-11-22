@@ -309,7 +309,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		# 		if temp_list:			        	
 		# 			query_dict.append({ "$or": temp_list})
 
-		print "query_dict : ", query_dict
+		# print "query_dict : ", query_dict
 
 		files = node_collection.find({												
 										'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
