@@ -9,7 +9,6 @@
     }
   </style>
  <div class="scard">
-
 {% check_is_gstaff groupid request.user as gstaff_access %}
 {% if first_arg and second_arg and third_arg %}
   <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
@@ -25,13 +24,15 @@
     <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.collection_set %}
         <i class="collection"></i>
-    {% elif "File" in resource.member_of_names_list %}
+    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
       {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
         <i class="{{attr_set_dict.educationaluse|lower}}"></i>
-      {% else %}
+      {% elif resource.mime_type %}
         <i class="{{resource.mime_type|lower|split:'/'|join:' '}}"></i>
+      {% else  %}
+        <i class="{{resource.member_of_names_list.0|lower }}"></i>
       {% endif %}
-    {% elif "PartnerGroup" in resource.member_of_names_list or "Course" in resource.member_of_names_list or has_logo == True %}
+    {% elif "PartnerGroup" in resource.member_of_names_list or "Group" in resource.member_of_names_list or "Course" in resource.member_of_names_list or has_logo == True %}
       {% if "Course" in resource.member_of_names_list or has_logo == True %}
         {% get_relation_value resource.pk 'has_logo' as logo_img_and_grel_hl %}
         {% if logo_img_and_grel_hl.0 %}
@@ -39,6 +40,9 @@
           {% if logo_img_and_grel_hl.0.fs_file_ids.1 %}
             <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.1 %}" alt="" />
           {% endif %}
+        {% else %}
+          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
+
         {% endif %}
 
       {% else %}
@@ -48,6 +52,8 @@
           {% if logo_img_and_grel_pp.0.fs_file_ids.1 %}
             <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.1 %}" alt="" />
           {% endif %}
+        {% else %}
+          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
         {% endif %}
 
       {% endif %}
@@ -55,13 +61,13 @@
     {% elif resource.collection_set %}
         <i class="collection"></i>
     {% else %}
-      <i class="{{resource.member_of_names_list.0|lower}}"></i>
+        <i class="common-icon"></i>
     {% endif %}
   </div>
 </div>
 
-  <div class="scard-content">
-   <span class="scard-title">{% firstof resource.altnames resource.name|truncatechars:25 %}</span>
+  <div class="scard-content" title="{% firstof resource.altnames resource.name %}">
+   <span class="scard-title">{% firstof resource.altnames resource.name %}</span>
     <!-- {% get_node_ratings request resource.pk as ratings %} -->
             <!-- <div class="rating-stars center" style="width:{{ratings.avg|multiply:16}}px;"> <!-- 16px = 1 star -->
               <!-- <div></div>
@@ -73,12 +79,16 @@
     <div class="scard-desc" title="{{resource.content_org}}">
      {{resource.content_org|default_if_none:"Add some description."|truncatechars:60}}
     </div>   
-
+</a>
 
   <div class="scard-action">
-    <i>{{resource.created_at|date:"d-m-Y"}}</i>
-     {% if gstaff_access %}
+    {% if has_contributor == True %}
+     By <a href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}">
+      {{resource.created_by|get_username|truncatechars:"10"}}</a>
+     {% endif %}
+         at<i>{{resource.created_at|date:"d-m-Y"}}</i>
+     {% if gstaff_access  %}
      </a> <input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
     {% endif %}
   </div>
-</a>
+

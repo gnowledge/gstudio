@@ -6,7 +6,7 @@
 {% block title %} Repository {% endblock %}
 
 {% block head %}
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
 <link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
 <script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
 
@@ -61,7 +61,7 @@
   {% get_filters_data "E-Book" as filter_dict %}
   {% include "ndf/filters.html" with filter_dict=filter_dict %}
 
-    {% include "ndf/file_list_tab.html" with resource_type=all_ebooks detail_urlname="page_details" filetype="ebook" res_type_name="" page_info=page_info %}
+    <div style="margin-top:13px">{% include "ndf/file_list_tab.html" with resource_type=all_ebooks detail_urlname="page_details" filetype="ebook" res_type_name="" page_info=page_info %}</div>
 
 {% endblock body_content %}
 
