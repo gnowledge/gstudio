@@ -99,7 +99,7 @@
   <!-- <h3>{% trans "About" %}</h3> -->
 
   {% blocktrans %}
-    <b> Group Dashboard </b> Shows the tasks and activities in the site.
+    <b> Group Dashboard </b> Shows the tasks and activities on the site.
   {% endblocktrans %}
   <br><br>
 
@@ -148,7 +148,7 @@
             <input type="hidden" name="type" value="banner_pic">           
             <input type="hidden" name="user" value="{{usr}}">         
             <p id="message" style="display:none">
-              {% trans "Please wait while profile picture is uploading .." %}
+              {% trans "Please wait while profile picture is uploaded .." %}
             </p>
           </div> 
         </div>
@@ -604,7 +604,7 @@
           $("#GroupUpdatesModalLabel").text("{% trans 'Do you want to continue approving the selected students?' %}");
         }
         else if(approval_state == "Reject"){
-          $("#GroupUpdatesModalLabel").text("{% trans 'Do you want to continue rejecting the selected stuffdents?' %}");
+          $("#GroupUpdatesModalLabel").text("{% trans 'Do you want to continue rejecting the selected students?' %}");
         }
         $("#GroupUpdatesModal")
           .removeClass("medium").addClass("small")

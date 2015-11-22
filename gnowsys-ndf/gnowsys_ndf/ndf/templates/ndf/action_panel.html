@@ -71,10 +71,10 @@
     <p id="deleteModalLabel"></p>
     <div class="row feeds_proceed">
       <div class="small-3 small-offset-3 columns">
-        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value={% trans "Yes" %}>
       </div>
       <div class="small-3 columns end">
-        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value={% trans "No" %}>
       </div>
     </div>
     <a class="close-reveal-modal">&#215;</a>
@@ -101,21 +101,21 @@
 							{% if is_group %}
 								{% if is_gstaff %}
 									{% if "PartnerGroup" in node.member_of_names_list %}
-									<a href="{% url 'edit_group' group_id %}?subgroup=True&partnergroup=True" class="tiny button radius left-btn ">{% trans " Edit" %}</a>
+									<a href="{% url 'edit_group' group_id %}?subgroup=True&partnergroup=True" class="tiny button radius left-btn ">{% trans "Edit" %}</a>
 									{% else %}
-									<a href="{% url edit_url group_id %}" class="tiny button radius left-btn">{% trans " Edit" %}</a>
+									<a href="{% url edit_url group_id %}" class="tiny button radius left-btn">{% trans "Edit" %}</a>
 									{% endif %}
 								{% endif %}
 							{% else %}
 								{% if is_gstaff or node.created_by == user.id %}
-									<a href="{% url edit_url group_id node %}" class="tiny button radius left-btn ">{% trans " Edit" %}</a>
+									<a href="{% url edit_url group_id node %}" class="tiny button radius left-btn ">{% trans "Edit" %}</a>
 								{% else %}
-									<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title="You are not authorized for this action">
+									<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title={% trans "You are not authorized for this action" %}>
 								{% endif %}
 							{% endif %}
 							{% endif %}
 						{% else %}
-							<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title="You are not authorized for this action">
+							<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title={% trans "You are not authorized for this action" %}>
 						{% endif %}
 
 
@@ -153,7 +153,7 @@
 
 							<!-- {% switch_group_conditions request.user group_id as switch_conditions %} -->
 							<!-- If resource is already under moderation, don't show cross-publish button -->
-								<input type="button" id="switch_group" class="tiny button radius left-btn" data-reveal-id="publish_resource" value="{% trans 'Cross Publish' %}" title="Publish this resource in other group/s" class="has-tip tip-bottom">
+								<input type="button" id="switch_group" class="tiny button radius left-btn" data-reveal-id="publish_resource" value="{% trans 'Cross Publish' %}" title={% trans "Publish this resource in other group/s" %} class="has-tip tip-bottom">
 
 								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 									<div id="switchgrp" class="content">
@@ -166,7 +166,7 @@
 									<a class="close-reveal-modal">&#215;</a>
 								</div>
 							{% else %}
-								<input type="button" class="tiny button radius left-btn secondary disabled" title="You are not authorized for this action" value="{% trans 'Cross Publish' %}">
+								<input type="button" class="tiny button radius left-btn secondary disabled" title={% trans "You are not authorized for this action" %} value="{% trans 'Cross Publish' %}">
 							{% endif %}
 						{% endif %}
 						<!-- Delete button				 -->
@@ -177,7 +177,7 @@
 								<input type="button" class="tiny button radius right-btn disabled secondary" value="{% trans 'Delete'  %} {{node.member_of_names_list.0}}">
 							{% endif %}
 						{% else %}
-							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete ' %}{{node.member_of_names_list.0}}" title="You are not authorized for this action">
+							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete ' %}{{node.member_of_names_list.0}}" title={% trans "You are not authorized for this action" %}>
 						{% endif %}
 
 
@@ -197,7 +197,7 @@
 						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
 							<!-- {% switch_group_conditions request.user group_id as switch_conditions %} -->
 							<!-- If resource is already under moderation, don't show cross-publish button -->
-								<span data-tooltip title="Publish this resource in other group/s" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius right-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
+								<span data-tooltip title={% trans "Publish this resource in other group/s" %} class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius right-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
 								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 									<div id="switchgrp" class="content">
 									<h4>{% trans "Select Groups" %}</h4>
@@ -213,13 +213,13 @@
 
 					{% else %}
 						<input type="button" class="tiny disabled secondary button radius left-btn" value="{% trans "Translate" %}" >
-						<span data-tooltip title="Publish this resource in other group/s" class="has-tip tip-bottom"><input type="button"class="secondary disabled tiny button radius right-btn" value="{% trans 'Cross Publish' %}"></span>
+						<span data-tooltip title={% trans "Publish this resource in other group/s" %} class="has-tip tip-bottom"><input type="button"class="secondary disabled tiny button radius right-btn" value="{% trans 'Cross Publish' %}"></span>
 					{% endif %}
 				</div>
 			{% endcomment %}
 			<!-- Tags row -->
 				<div class="row tag-rating-div">
-					<span data-tooltip title="'keyword' or 'label' to categorize"><label class="lbl_tag lbl_field">{% trans "Tags" %}</label></span>
+					<span data-tooltip title={% trans "'keyword' or 'label' to categorize" %}><label class="lbl_tag lbl_field">{% trans "Tags" %}</label></span>
 						{% if node.tags %}
 							{% for tag in node.tags %}
 								{% if forloop.counter < 3 %}
@@ -243,7 +243,7 @@
 					{% get_list_of_fields node.type_of "name" as type_of_list %}
 					{% if "Info page" not in type_of_list %}
 						<div class="row tag-rating-div">
-							<span data-tooltip title="Rating defines popularity">
+							<span data-tooltip title={% trans "Rating defines popularity" %}>
 								<label class="lbl_tag lbl_field">{% trans "Rating" %}</label>
 							</span>
 							<div class="rating_template"> {% include "ndf/rating.html" %} </div>
@@ -255,7 +255,7 @@
 			<!-- Location	-->
 				
 				{% if node.location %}
-		        	<a data-reveal-id="view-map-widget" class="lbl_field tag-rating-div" title="Click to view the location"><i class="fi-marker"></i> {% trans "Location" %}</a>
+		        	<a data-reveal-id="view-map-widget" class="lbl_field tag-rating-div" title={% trans "Click to view the location" %}><i class="fi-marker"></i> {% trans "Location" %}</a>
 	        	{% endif %}
 
 		    <!-- Graphs For Topics or Concept -->
@@ -384,17 +384,17 @@
 									{% if allow_to_join %}
 									<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Join' %}">
 									{% else %}
-									<input class="tiny button radius secondary disabled right-btn" type="button" id="notify" value="{% trans 'Closed' %}" title="You are not authorized for this action">
+									<input class="tiny button radius secondary disabled right-btn" type="button" id="notify" value="{% trans 'Closed' %}" title={% trans "You are not authorized for this action" %}>
 									{% endif %}
 									{% comment %}
 										<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Follow' %}">
 									{% endcomment %}
 								{% endif %}
 							{% else %}
-								<input class="tiny button radius secondary disabled right-btn" type="button" value="{% trans 'Joined' %}" title="You are already a member of this group">
+								<input class="tiny button radius secondary disabled right-btn" type="button" value="{% trans 'Joined' %}" title={% trans "You are already a member of this group" %}>
 							{% endif %}
 						{% else %}
-							<input class="tiny button radius disabled secondary right-btn" type="button" value="{% trans 'Join' %}" title="You are not authorized for this action" >
+							<input class="tiny button radius disabled secondary right-btn" type="button" value="{% trans 'Join' %}" title={% trans "You are not authorized for this action" %} >
 						{% endif %}
 				</div>
 			{% endif %}
