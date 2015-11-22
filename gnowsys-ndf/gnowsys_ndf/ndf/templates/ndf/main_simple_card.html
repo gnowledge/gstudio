@@ -49,11 +49,11 @@
         {% get_relation_value resource.pk 'has_profile_pic' as logo_img_and_grel_pp %}
         {% if logo_img_and_grel_pp.0 %}
           {% get_node logo_img as logo_img_and_grel_pp.0 %}
-          {% if logo_img_and_grel_pp.0.fs_file_ids.0 %}
+          {% if logo_img_and_grel_pp.0.fs_file_ids.1 %}
+            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.1 %}" alt="" style="width:50%" />
+        {% elif logo_img_and_grel_pp.0.fs_file_ids.0%}
             <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.0 %}" alt="" style="width:50%" />
           {% endif %}
-        {% elif logo_img_and_grel_pp.0.fs_file_ids.1%}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.1 %}" alt="" style="width:50%" />
 
         {% else %}
           <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." style="width:50%"  class="img-height">
