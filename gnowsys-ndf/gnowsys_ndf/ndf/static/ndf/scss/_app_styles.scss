@@ -1633,10 +1633,10 @@ aside#help{
     margin: 15px 20px;
     float: left;
     padding: 1em; 
-    margin-left:-20%; 
+    margin-left:-10%; 
     height:18rem;
     background-color:#fafafa;
-   //border: thin solid #D3D3D3;
+    border: thin solid #D3D3D3;
   }
 
   .app-card:hover{
@@ -1693,3 +1693,6 @@ aside#help{
       //margin-top:0.2em;
 }
 
+.discussion-content{
+      color:#8c8c8c;  
+}

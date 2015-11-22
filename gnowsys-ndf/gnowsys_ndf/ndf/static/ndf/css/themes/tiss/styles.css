@@ -10649,9 +10649,10 @@ p {
   margin: 15px 20px;
   float: left;
   padding: 1em;
-  margin-left: -20%;
+  margin-left: -10%;
   height: 18rem;
   background-color: #fafafa;
+  border: thin solid #D3D3D3;
 }
 
 /* line 1642, ../../../scss/_app_styles.scss */
@@ -10708,4 +10709,9 @@ p {
   right: 0;
   padding-right: 10px;
   padding-left: 10px;
+}
+
+/* line 1696, ../../../scss/_app_styles.scss */
+.discussion-content {
+  color: #8c8c8c;
 }
