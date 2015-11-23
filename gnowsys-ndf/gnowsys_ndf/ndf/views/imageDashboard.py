@@ -78,9 +78,9 @@ def getImageThumbnail(request, group_id, _id):
 
     img_obj = node_collection.one({"_type": u"File", "_id": ObjectId(_id)})
 
-    if img_obj is not None:
+    if (img_obj is not None) and (len(img_obj.fs_file_ids) >= 2):
         # getting latest uploaded pic's _id
-        img_fs = img_obj.fs_file_ids[2]
+        img_fs = img_obj.fs_file_ids[1]
 
         if (img_obj.fs.files.exists(img_fs)):
             f = img_obj.fs.files.get(ObjectId(img_fs))
