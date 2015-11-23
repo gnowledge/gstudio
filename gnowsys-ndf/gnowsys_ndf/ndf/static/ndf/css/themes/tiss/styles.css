@@ -10123,7 +10123,7 @@ aside#help p, aside#help h5, aside#help h6 {
 .scard-desc {
   font-size: 0.8em;
   color: #333333;
-  height: 4em;
+  height: 40px;
   padding: 0.5rem;
   margin: 5px;
   padding-top: 0.1cm;
@@ -10132,15 +10132,16 @@ aside#help p, aside#help h5, aside#help h6 {
   overflow: hidden;
   width: 80%;
   background-color: #E6E6E6;
+  display-inline: block;
 }
 
-/* line 1150, ../../../scss/_app_styles.scss */
+/* line 1151, ../../../scss/_app_styles.scss */
 p {
   margin: 0px;
   padding: 10px;
 }
 
-/* line 1155, ../../../scss/_app_styles.scss */
+/* line 1156, ../../../scss/_app_styles.scss */
 .scard-image {
   padding: 0px;
   margin: 0px;
@@ -10150,7 +10151,7 @@ p {
   position: relative;
   overflow: hidden;
 }
-/* line 1164, ../../../scss/_app_styles.scss */
+/* line 1165, ../../../scss/_app_styles.scss */
 .scard-image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -10159,7 +10160,7 @@ p {
   width: 100%;
   height: 100%;
 }
-/* line 1173, ../../../scss/_app_styles.scss */
+/* line 1174, ../../../scss/_app_styles.scss */
 .scard-image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -10173,83 +10174,83 @@ p {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1187, ../../../scss/_app_styles.scss */
+/* line 1188, ../../../scss/_app_styles.scss */
 .scard-image i.common-icon:before {
   content: "\f1fb";
 }
-/* line 1190, ../../../scss/_app_styles.scss */
+/* line 1191, ../../../scss/_app_styles.scss */
 .scard-image i.file:before {
   content: "\f18e";
 }
-/* line 1193, ../../../scss/_app_styles.scss */
+/* line 1194, ../../../scss/_app_styles.scss */
 .scard-image i.page:before {
   content: "\f18e";
 }
-/* line 1196, ../../../scss/_app_styles.scss */
+/* line 1197, ../../../scss/_app_styles.scss */
 .scard-image i.collection:before {
   content: "\f18a";
 }
-/* line 1199, ../../../scss/_app_styles.scss */
+/* line 1200, ../../../scss/_app_styles.scss */
 .scard-image i.documents:before {
   content: "\f18b";
 }
-/* line 1202, ../../../scss/_app_styles.scss */
+/* line 1203, ../../../scss/_app_styles.scss */
 .scard-image i.pdf:before {
   content: "\f18b";
 }
-/* line 1205, ../../../scss/_app_styles.scss */
+/* line 1206, ../../../scss/_app_styles.scss */
 .scard-image i.text:before {
   content: "\f18e";
 }
-/* line 1208, ../../../scss/_app_styles.scss */
+/* line 1209, ../../../scss/_app_styles.scss */
 .scard-image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1211, ../../../scss/_app_styles.scss */
+/* line 1212, ../../../scss/_app_styles.scss */
 .scard-image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1214, ../../../scss/_app_styles.scss */
+/* line 1215, ../../../scss/_app_styles.scss */
 .scard-image i.images:before {
   content: "\f125";
 }
-/* line 1217, ../../../scss/_app_styles.scss */
+/* line 1218, ../../../scss/_app_styles.scss */
 .scard-image i.audios:before, .scard-image i.audio:before {
   content: "\f17b";
 }
-/* line 1220, ../../../scss/_app_styles.scss */
+/* line 1221, ../../../scss/_app_styles.scss */
 .scard-image i.videos:before, .scard-image i.video:before {
   content: "\f20e";
 }
 
-/* line 1226, ../../../scss/_app_styles.scss */
+/* line 1227, ../../../scss/_app_styles.scss */
 .published.scard-action {
   background: #A6D9CB;
 }
 
-/* line 1230, ../../../scss/_app_styles.scss */
+/* line 1231, ../../../scss/_app_styles.scss */
 .draft.scard-action {
   content: "Draft";
   background: #DCDCDC;
 }
 
-/* line 1236, ../../../scss/_app_styles.scss */
+/* line 1237, ../../../scss/_app_styles.scss */
 .deleted.scard-action {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
 
-/* line 1241, ../../../scss/_app_styles.scss */
+/* line 1242, ../../../scss/_app_styles.scss */
 .moderation.scard-action {
   border-color: transparent #0eacb5 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #0eacb5 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1245, ../../../scss/_app_styles.scss */
+/* line 1246, ../../../scss/_app_styles.scss */
 .moderation.scard-action .label-text:before {
   content: "Mod";
 }
 
-/* line 1249, ../../../scss/_app_styles.scss */
+/* line 1250, ../../../scss/_app_styles.scss */
 .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -10260,7 +10261,7 @@ p {
 
 /* End Simple Card CSS*/
 /* Customized Off-Canvas */
-/* line 1264, ../../../scss/_app_styles.scss */
+/* line 1265, ../../../scss/_app_styles.scss */
 #help-canvas-menu {
   position: fixed;
   top: 52px;
@@ -10273,26 +10274,26 @@ p {
   height: 100%;
 }
 
-/* line 1275, ../../../scss/_app_styles.scss */
+/* line 1276, ../../../scss/_app_styles.scss */
 #help-canvas-menu.expanded {
   left: 0 !important;
   z-index: 100000000;
   left: 150px;
 }
 
-/* line 1280, ../../../scss/_app_styles.scss */
+/* line 1281, ../../../scss/_app_styles.scss */
 #help-canvas-menu.expanded .help-button {
   right: 80px;
   z-index: -1;
 }
 
-/* line 1285, ../../../scss/_app_styles.scss */
+/* line 1286, ../../../scss/_app_styles.scss */
 #help-canvas-menu.animating .help-button {
   -webkit-animation: shake 400ms;
   animation: shake 400ms;
 }
 
-/* line 1289, ../../../scss/_app_styles.scss */
+/* line 1290, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button {
   position: absolute;
   -webkit-transform: rotate(-90deg);
@@ -10319,12 +10320,12 @@ p {
   border-top-right-radius: 5px;
 }
 
-/* line 1315, ../../../scss/_app_styles.scss */
+/* line 1316, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button-text {
   font-size: 18px;
 }
 
-/* line 1318, ../../../scss/_app_styles.scss */
+/* line 1319, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button .text {
   color: #f9f9f9;
   letter-spacing: .1em;
@@ -10333,7 +10334,7 @@ p {
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
-/* line 1327, ../../../scss/_app_styles.scss */
+/* line 1328, ../../../scss/_app_styles.scss */
 #help-canvas-menu .mainContainer {
   background: #fff;
   /*-webkit-box-shadow:3px 3px 17px -1px #7b7b7b;
@@ -10347,7 +10348,7 @@ p {
 }
 
 /* End of Customized Off-Canvas */
-/* line 1345, ../../../scss/_app_styles.scss */
+/* line 1346, ../../../scss/_app_styles.scss */
 .rcard {
   overflow: hidden;
   color: #272727;
@@ -10355,56 +10356,56 @@ p {
   background-color: #f5f5f5;
   margin: 5px;
 }
-/* line 1356, ../../../scss/_app_styles.scss */
+/* line 1357, ../../../scss/_app_styles.scss */
 .rcard:hover {
   box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.5s ease;
 }
-/* line 1361, ../../../scss/_app_styles.scss */
+/* line 1362, ../../../scss/_app_styles.scss */
 .rcard .title {
   font-size: 1.1rem;
   font-weight: bold;
 }
-/* line 1367, ../../../scss/_app_styles.scss */
+/* line 1368, ../../../scss/_app_styles.scss */
 .rcard .content {
   padding: 0.5rem 2rem;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
   height: 7.25rem;
 }
-/* line 1374, ../../../scss/_app_styles.scss */
+/* line 1375, ../../../scss/_app_styles.scss */
 .rcard .content .slick-slider {
   margin-bottom: 0;
 }
-/* line 1378, ../../../scss/_app_styles.scss */
+/* line 1379, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev {
   left: 0.25rem;
 }
-/* line 1381, ../../../scss/_app_styles.scss */
+/* line 1382, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev:before {
   color: #ccc;
 }
-/* line 1387, ../../../scss/_app_styles.scss */
+/* line 1388, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next {
   right: 0.25rem;
 }
-/* line 1390, ../../../scss/_app_styles.scss */
+/* line 1391, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next:before {
   color: #ccc;
 }
-/* line 1396, ../../../scss/_app_styles.scss */
+/* line 1397, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title {
   width: 100%;
   border-bottom: 1px solid #808080;
   line-height: 0.25em;
   margin: 10px 0 20px;
 }
-/* line 1402, ../../../scss/_app_styles.scss */
+/* line 1403, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title small {
   padding: 0 10px;
   background-color: whitesmoke;
 }
-/* line 1409, ../../../scss/_app_styles.scss */
+/* line 1410, ../../../scss/_app_styles.scss */
 .rcard .action {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -10412,15 +10413,15 @@ p {
   font-size: small;
   height: 2rem;
 }
-/* line 1416, ../../../scss/_app_styles.scss */
+/* line 1417, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection {
   opacity: 0.5;
 }
-/* line 1419, ../../../scss/_app_styles.scss */
+/* line 1420, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection:hover {
   opacity: 1;
 }
-/* line 1433, ../../../scss/_app_styles.scss */
+/* line 1434, ../../../scss/_app_styles.scss */
 .rcard .image {
   position: relative;
   background-color: #ccc;
@@ -10428,7 +10429,7 @@ p {
   height: 8em;
   overflow: hidden;
 }
-/* line 1443, ../../../scss/_app_styles.scss */
+/* line 1444, ../../../scss/_app_styles.scss */
 .rcard .image .title {
   position: absolute;
   bottom: 0;
@@ -10441,7 +10442,7 @@ p {
   text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
   font-family: Open Sans Bold;
 }
-/* line 1456, ../../../scss/_app_styles.scss */
+/* line 1457, ../../../scss/_app_styles.scss */
 .rcard .image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -10451,14 +10452,14 @@ p {
   filter: brightness(0.75);
   -webkit-filter: brightness(0.75);
 }
-/* line 1468, ../../../scss/_app_styles.scss */
+/* line 1469, ../../../scss/_app_styles.scss */
 .rcard .image img:hover {
   filter: brightness(1);
   -webkit-filter: brightness(1);
   transform: translate3d(0, 0, 0);
   transition: all 1.5s ease;
 }
-/* line 1477, ../../../scss/_app_styles.scss */
+/* line 1478, ../../../scss/_app_styles.scss */
 .rcard .image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -10472,51 +10473,51 @@ p {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1494, ../../../scss/_app_styles.scss */
+/* line 1495, ../../../scss/_app_styles.scss */
 .rcard .image i.file:before {
   content: "\f18e";
 }
-/* line 1495, ../../../scss/_app_styles.scss */
+/* line 1496, ../../../scss/_app_styles.scss */
 .rcard .image i.page:before {
   content: "\f18e";
 }
-/* line 1496, ../../../scss/_app_styles.scss */
+/* line 1497, ../../../scss/_app_styles.scss */
 .rcard .image i.collection:before {
   content: "\f18a";
 }
-/* line 1498, ../../../scss/_app_styles.scss */
+/* line 1499, ../../../scss/_app_styles.scss */
 .rcard .image i.documents:before {
   content: "\f18b";
 }
-/* line 1499, ../../../scss/_app_styles.scss */
+/* line 1500, ../../../scss/_app_styles.scss */
 .rcard .image i.pdf:before {
   content: "\f18b";
 }
-/* line 1500, ../../../scss/_app_styles.scss */
+/* line 1501, ../../../scss/_app_styles.scss */
 .rcard .image i.text:before {
   content: "\f18e";
 }
-/* line 1501, ../../../scss/_app_styles.scss */
+/* line 1502, ../../../scss/_app_styles.scss */
 .rcard .image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1502, ../../../scss/_app_styles.scss */
+/* line 1503, ../../../scss/_app_styles.scss */
 .rcard .image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1503, ../../../scss/_app_styles.scss */
+/* line 1504, ../../../scss/_app_styles.scss */
 .rcard .image i.images:before {
   content: "\f125";
 }
-/* line 1504, ../../../scss/_app_styles.scss */
+/* line 1505, ../../../scss/_app_styles.scss */
 .rcard .image i.audios:before, .rcard .image i.audio:before {
   content: "\f17b";
 }
-/* line 1505, ../../../scss/_app_styles.scss */
+/* line 1506, ../../../scss/_app_styles.scss */
 .rcard .image i.videos:before, .rcard .image i.video:before {
   content: "\f20e";
 }
-/* line 1508, ../../../scss/_app_styles.scss */
+/* line 1509, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-style: solid;
   border-width: 0 70px 40px 0;
@@ -10529,59 +10530,59 @@ p {
   z-index: 1;
   opacity: 0.75;
 }
-/* line 1521, ../../../scss/_app_styles.scss */
+/* line 1522, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-color: transparent #333 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #333333 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1526, ../../../scss/_app_styles.scss */
+/* line 1527, ../../../scss/_app_styles.scss */
 .rcard .published.card-label {
   border-color: transparent #43ac6a transparent transparent;
   border-color: rgba(255, 255, 255, 0) #43ac6a rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1530, ../../../scss/_app_styles.scss */
+/* line 1531, ../../../scss/_app_styles.scss */
 .rcard .published.card-label .label-text:before {
   content: "\221A";
   margin-left: 5px;
   font-size: larger;
 }
-/* line 1538, ../../../scss/_app_styles.scss */
+/* line 1539, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label {
   border-color: transparent #a9b2b3 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #a9b2b3 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1542, ../../../scss/_app_styles.scss */
+/* line 1543, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label .label-text:before {
   content: "Draft";
 }
-/* line 1547, ../../../scss/_app_styles.scss */
+/* line 1548, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1551, ../../../scss/_app_styles.scss */
+/* line 1552, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label .label-text:before {
   content: "Deleted";
 }
-/* line 1556, ../../../scss/_app_styles.scss */
+/* line 1557, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label {
   border-color: transparent #0eacb5 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #0eacb5 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1560, ../../../scss/_app_styles.scss */
+/* line 1561, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label .label-text:before {
   content: "Mod";
 }
-/* line 1563, ../../../scss/_app_styles.scss */
+/* line 1564, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label {
   border-color: transparent #000 transparent transparent;
   border-color: rgba(255, 255, 255, 0) black rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1567, ../../../scss/_app_styles.scss */
+/* line 1568, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label .label-text:before {
   content: "hidden";
 }
-/* line 1570, ../../../scss/_app_styles.scss */
+/* line 1571, ../../../scss/_app_styles.scss */
 .rcard .label-text {
   color: #fff;
   font-size: 0.75rem;
@@ -10592,7 +10593,7 @@ p {
   transform: rotate(30deg);
 }
 
-/* line 1584, ../../../scss/_app_styles.scss */
+/* line 1585, ../../../scss/_app_styles.scss */
 .compulsory:after {
   content: '*';
   color: red;
@@ -10600,19 +10601,19 @@ p {
 }
 
 /* Watermark background for node_ajax_content  */
-/* line 1592, ../../../scss/_app_styles.scss */
+/* line 1593, ../../../scss/_app_styles.scss */
 .allow.draft {
   background-size: 10%;
   background-repeat: repeat;
   background-image: url("/static/ndf/images/draft-watermark.png");
 }
 
-/* line 1600, ../../../scss/_app_styles.scss */
+/* line 1601, ../../../scss/_app_styles.scss */
 .text-gray {
   color: gray;
 }
 
-/* line 1605, ../../../scss/_app_styles.scss */
+/* line 1606, ../../../scss/_app_styles.scss */
 .repository-title {
   color: #D7D7D7;
   font-size: 1.3em;
@@ -10625,7 +10626,7 @@ p {
   text-align: center;
 }
 
-/* line 1616, ../../../scss/_app_styles.scss */
+/* line 1617, ../../../scss/_app_styles.scss */
 .repository-desc {
   font-size: 1.3em;
   width: auto;
@@ -10637,12 +10638,12 @@ p {
   margin-left: 4px;
 }
 
-/* line 1626, ../../../scss/_app_styles.scss */
+/* line 1627, ../../../scss/_app_styles.scss */
 .card-holder {
   padding-left: 2%;
 }
 
-/* line 1630, ../../../scss/_app_styles.scss */
+/* line 1631, ../../../scss/_app_styles.scss */
 .app-card {
   width: 19rem;
   min-height: 10rem;
@@ -10655,7 +10656,7 @@ p {
   border: thin solid #D3D3D3;
 }
 
-/* line 1642, ../../../scss/_app_styles.scss */
+/* line 1643, ../../../scss/_app_styles.scss */
 .app-card:hover {
   box-shadow: 0px 0px 15px #808080;
   border: thin solid #D3D3D3;
@@ -10663,26 +10664,26 @@ p {
   transition: all 0.6s ease 0s;
 }
 
-/* line 1649, ../../../scss/_app_styles.scss */
+/* line 1650, ../../../scss/_app_styles.scss */
 .app-card-icon {
   color: #4c4c4c;
   position: relative;
   font-size: 6em;
 }
 
-/* line 1656, ../../../scss/_app_styles.scss */
+/* line 1657, ../../../scss/_app_styles.scss */
 .app-card-title {
   padding-bottom: -1em;
 }
 
-/* line 1660, ../../../scss/_app_styles.scss */
+/* line 1661, ../../../scss/_app_styles.scss */
 .app-card-content {
   color: #4c4c4c;
   text-align: center;
   margin-top: 0.5cm;
 }
 
-/* line 1666, ../../../scss/_app_styles.scss */
+/* line 1667, ../../../scss/_app_styles.scss */
 .discussion-title-username {
   background-color: #3e3e3e;
   color: #ececec !important;
@@ -10697,7 +10698,7 @@ p {
   padding-left: 10px;
 }
 
-/* line 1680, ../../../scss/_app_styles.scss */
+/* line 1681, ../../../scss/_app_styles.scss */
 .discussion-footer {
   background-color: #CCCCCC;
   color: gray !important;
@@ -10711,7 +10712,7 @@ p {
   padding-left: 10px;
 }
 
-/* line 1696, ../../../scss/_app_styles.scss */
+/* line 1697, ../../../scss/_app_styles.scss */
 .discussion-content {
   color: #8c8c8c;
 }

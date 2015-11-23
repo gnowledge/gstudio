@@ -1136,7 +1136,7 @@ aside#help{
 .scard-desc{
     font-size:0.8em;
     color:#333333;
-    height: 4em;
+    height: 40px;
     padding: 0.5rem;
     margin:5px;
     padding-top: 0.1cm;
@@ -1145,6 +1145,7 @@ aside#help{
     overflow: hidden;
     width:80%;
     background-color:#E6E6E6;
+    display-inline:block;
 }
 
  p {
