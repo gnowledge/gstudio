@@ -20,8 +20,10 @@
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
     
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
-    {% if resource.fs_file_ids.1 %}
+    {% if resource.fs_file_ids.2 and 'image' in resource.mime_type %}
     <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
+    {% elif resource.fs_file_ids.1 %}
+    <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
     {% elif resource.collection_set %}
         <i class="collection"></i>
     {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
