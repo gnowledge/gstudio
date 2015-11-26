@@ -333,12 +333,9 @@
 
               {% if 'image' in node.mime_type or 'video' in node.mime_type %}
                 <!-- Orbit image slider only for image and video collections--> 
-                
-                <ul data-orbit data-options="variable_height: true;timer:false;">
-                  <li class="active small-12 large-columns">
-                    <center>                   
+                  
                     {% if 'image' in node.mime_type %}
-                    <a class="th">
+                    <a class="th" target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                       <img style="min-height:200px;" src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
                       </a>
                     {% elif 'video' in node.mime_type %}
@@ -356,42 +353,7 @@
                         {% trans "Your browser does not support the video tag." %}
                       </video>  
                     {% endif %}
-                    <div class="orbit-caption"> {{node.name}} </div>             
-                  </li>                
-
-                  {% for k in node.collection_set %}
-                    {% get_node k as obj %}
-                    {% get_grid_fs_object obj as grid_fs_obj %}
-                    {% if 'image' in obj.mime_type or 'video' in obj.mime_type %}
-                    <li>
-                      <center>
-                        {% if 'image' in obj.mime_type %}
-                        
-                          <img src="{% url 'get_mid_size_img' group_name_tag k %}" style="min-height:200px;"/> 
-                        
-                        {% elif 'Pandora_video' in obj.member_of_names_list %}
-                          {% get_source_id k as source_id %}
-                          <!-- <video width="480px" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls> -->
-                          <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                            <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
-                            {% trans "Your browser does not support the video tag." %}
-                          </video>  
-                        {% elif 'video' in obj.mime_type %}
-                          <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
-
-                            <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/webm">
-                            <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/ogg">    
-                            <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/mp4">    
-                            {% trans "Your browser does not support the video tag." %}
-                          </video>                    
-                        {% endif %}    
-                        <div class="orbit-caption"> {{obj.name}} </div> 
-                      </center>
-                    </li>
-                    {% endif %} 
-
-                  {% endfor %}
-                </ul>           
+                             
 
                 <!-- End of slider --> 
               {% else %}
@@ -418,7 +380,7 @@
             {% else %}
               <!-- not a collection -->
               {% if 'image' in node.mime_type %}
-                <a class="th" style="cursor:default">
+                <a class="th" target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;"/> 
                 </a>
               {% elif 'Pandora_video' in node.member_of_names_list %}
@@ -558,14 +520,7 @@
               {% elif 'video' in node.mime_type %}
               {% endcomment %}
 
-              {% if 'video' in node.mime_type %}
-                <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
-              {% else %}
-                <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-              {% endif %}
-                  <span class="fi-download large"> {% trans "Download " %} </span>
-                  
-                </a>
+            
             {% endif %}
                   
                
@@ -577,19 +532,6 @@
           </a> -->
  <!-- <a href="http://www.facebook.com/sharer.php?s=100&p[title]=title&p[url]=http://www.google.com&p[summary]=sdfds&p[images][0]=http://i.forbesimg.com/media/lists/companies/google_416x416.jpg">click here</a> -->
             <!-- End New -->          
-              <div class="right">
-                  {% comment %}
-                      {% if node.mime_type %}
-                        <i>{% trans 'Resource Type' %}: {{node.mime_type}}</i><br/>
-                     {% endif %}
-                  {% endcomment %}
-                  <p class="large-text-right"><small>
-                  <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
-                </small></p>
-                                    
-            
-              </div>
-
           {% endif %}
           
           {% block add_fields %} {% endblock %}
@@ -635,6 +577,24 @@
             {% endwith %}
           </div>
         
+
+           {% if not topic %} 
+             <div>  
+               <small class="text-gray">
+                  [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
+                </small> 
+            
+            {% if user.is_authenticated %}  
+              {% if 'video' in node.mime_type  %}
+                <a class="" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
+              {% else %}
+                <a class="" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+              {% endif %}
+                  <span class="fa fa-download fa-1g" title="Download">  </span> 
+                </a>
+            {% endif %}   
+              </div>
+         {% endif %}
          {% get_list_of_fields node.type_of "name" as type_of_list %}
           {% if "Info page" not in type_of_list %}
           
