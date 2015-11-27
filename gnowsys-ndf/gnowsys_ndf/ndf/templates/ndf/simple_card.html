@@ -85,10 +85,10 @@
 
   <div class="scard-action">
     {% if has_contributor == True %}
-     By <a href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}">
-      {{resource.created_by|get_username|truncatechars:"10"}}</a>
+     <a href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}" target="_blank">
+      {{resource.created_by|get_username|truncatechars:"10"}}</a>| 
      {% endif %}
-         at<i>{{resource.created_at|date:"d-m-Y"}}</i>
+         <i style="float">{{resource.created_at|date:"d-m-Y"}}</i>
      {% if gstaff_access  %}
      </a> <input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
     {% endif %}
