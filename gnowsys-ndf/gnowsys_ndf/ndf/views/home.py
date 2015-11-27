@@ -97,7 +97,10 @@ def landing_page(request):
     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
         return render_to_response(
                                 "ndf/landing_page_nroer.html",
-                                {"group_id": "home", 'groupid':"home"},
+                                {
+                                    "group_id": "home", 'groupid':"home",
+                                    'landing_page': 'landing_page'
+                                },
                                 context_instance=RequestContext(request)
                             )
     else:
