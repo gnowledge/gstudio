@@ -37,7 +37,7 @@
 
   {% for node in group_nodes %}
     <li class="card-image-wrapper"> 
-      {% include 'ndf/simple_card.html' with resource=node url_name="groupchange" first_arg=node.pk %}
+      {% include 'ndf/simple_card.html' with resource=node has_prof_pic=True url_name="groupchange" first_arg=node.pk %}
     </li>
   {% empty %}
     

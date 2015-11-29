@@ -7,8 +7,23 @@
       background-image:url("/static/ndf/images/stars.png");
       height: 17px;
     }
+    .event-status{
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+
   </style>
+
  <div class="scard">
+ {% if is_event %}
+  {% get_event_status resource as event_status_msg %}
+  {% if event_status_msg %}
+    <div class="event-status-div" >
+    <label class="event-status" style="color:{{event_status_msg.1}}">{{event_status_msg.0}}</label>
+    </div>
+  {% endif%}
+{% endif%}
+
 {% check_is_gstaff groupid request.user as gstaff_access %}
 {% if first_arg and second_arg and third_arg %}
   <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
@@ -24,8 +39,6 @@
     <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
     <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
-    {% elif resource.collection_set %}
-        <i class="collection"></i>
     {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
       {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
         <i class="{{attr_set_dict.educationaluse|lower}}"></i>
@@ -34,13 +47,14 @@
       {% else  %}
         <i class="{{resource.member_of_names_list.0|lower }}"></i>
       {% endif %}
-    {% elif "PartnerGroup" in resource.member_of_names_list or "Group" in resource.member_of_names_list or "Course" in resource.member_of_names_list or has_logo == True %}
+
+    {% elif "Group" in resource.member_of_names_list or has_logo == True or has_prof_pic == True %}
       {% if "Course" in resource.member_of_names_list or has_logo == True %}
         {% get_relation_value resource.pk 'has_logo' as logo_img_and_grel_hl %}
         {% if logo_img_and_grel_hl.0 %}
           {% get_node logo_img as logo_img_and_grel_hl.0 %}
           {% if logo_img_and_grel_hl.0.fs_file_ids.1 %}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.1 %}" alt="" />
+            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.2 %}" alt="" />
           {% endif %}
         {% else %}
           <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
@@ -52,7 +66,7 @@
         {% if logo_img_and_grel_pp.0 %}
           {% get_node logo_img as logo_img_and_grel_pp.0 %}
           {% if logo_img_and_grel_pp.0.fs_file_ids.1 %}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.1 %}" alt="" />
+            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.2 %}" alt="" />
           {% endif %}
         {% else %}
           <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
@@ -62,6 +76,7 @@
 
     {% elif resource.collection_set %}
         <i class="collection"></i>
+
     {% else %}
         <i class="common-icon"></i>
     {% endif %}
@@ -93,4 +108,5 @@
      </a> <input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
     {% endif %}
   </div>
+
 
