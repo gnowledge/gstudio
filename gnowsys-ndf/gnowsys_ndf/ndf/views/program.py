@@ -44,7 +44,7 @@ def program_event_list(request, group_id):
     # program events
     title = "Events"
 
-    pe_coll = node_collection.find({'member_of': pe_gst._id})
+    pe_coll = node_collection.find({'member_of': pe_gst._id}).sort('last_update', -1)
     for each_pe in pe_coll:
         list_of_hierarchy = get_prior_node_hierarchy(each_pe._id)
         if list_of_hierarchy:
