@@ -11,24 +11,7 @@
     var hostname = location.host;
     x = "https://www.facebook.com/dialog/feed?app_id=1663958913874619&redirect_uri=http://www.metastudio.org/home/&link="+location.href+"&caption=  {{node.name}}&description={{node.content_org}}&picture=" + hostname + "{% url 'read_file' group_name_tag node grid_fs_obj.filename %}";
     $(".share_link").attr("href",x);
-
-    hrefs = "https://twitter.com/share";
-    b = "large";
-    c = location.href;
-    d = location.href+"tweet-button";
-    e = "atMetaStudio";
-    f = "twitterapi,twitter";
-    g= "example,demo";
-    h="hello ghello";
-    $(".twitter-share-button").attr("href",hrefs);
-    $(".twitter-share-button").attr("data-size",b);
-    $(".twitter-share-button").attr("data-url",c);
-    $(".twitter-share-button").attr("data-count-url",d);
-    $(".twitter-share-button").attr("data-via",e);
-    $(".twitter-share-button").attr("data-related",f);
-    $(".twitter-share-button").attr("data-hashtags",g);
-    $(".twitter-share-button").attr("data-text",h);
- 
+   
 });
 </script>
 
@@ -523,9 +506,7 @@
             
             {% endif %}
                   
-          
- <!-- <a href="http://www.facebook.com/sharer.php?s=100&p[title]=title&p[url]=http://www.google.com&p[summary]=sdfds&p[images][0]=http://i.forbesimg.com/media/lists/companies/google_416x416.jpg">click here</a> -->
-            <!-- End New -->          
+                         
           {% endif %}
           
           {% block add_fields %} {% endblock %}
@@ -578,27 +559,25 @@
                   [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
                 </small> 
             
-            {% if user.is_authenticated %}  
-              {% if node.mime_type %}
+          {% if user.is_authenticated %}  
+            {% if node.mime_type %}    
               {% if 'video' in node.mime_type  %}
                 <a class="" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
               {% else %}
                 <a class="" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
               {% endif %}
                   <span class="fa fa-download fa-1g" title="Download">  </span> 
-                    </a>
-                  <span>
-                    <a class="share_link" href="#" target="_blank"   >
+                </a>
+
+                 <span>
+                    <a class="share_link" href="#" target="_blank" title="share this resource on facebook">
                     <i class="fa fa-facebook-square fa-1g"></i>
                     </a>
-                    </span>
-
-  <a class="twitter-share-button"href="" data-size=""  data-url="" data-count-url="" data-via="" data-related=""
-                     data-hashtags="" data-text="">TweetNew</a>
-
-            {% endif %}   
+                    </span>  
+            {% endif %}
+          {% endif %} 
+             
               </div>
-         {% endif %}
          {% endif %}
          {% get_list_of_fields node.type_of "name" as type_of_list %}
           {% if "Info page" not in type_of_list %}

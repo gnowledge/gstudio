@@ -286,29 +286,9 @@
   	{% for each in nodes %}
      <li class="card-image-wrapper"> 
 
-
-	      <div class="scard">
-		      <a href="{% url 'theme_page' group_name_tag each.pk %}">
-		      <div class="scard-image">
-	                <i class="fi-book"></i>
-          	  </div>
-      	  </div>
-          	  <div class="scard-content">
-          	  	<div class="scard-title">
-          	  		{{ each.name }}
-          	  	</div>
-          	  </div>
-		      
-		      <div class="scard-desc">{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</div>
-      		  </a>
-		      
-	          <div class="scard-action">
-		          <i> {{each.created_at|date:"d-m-Y"}}</i>  
-		         
-		        </div>
-
-	  
-	  	{% endfor %}
+ 		{% include 'ndf/simple_card.html' with  resource=each url_name="theme_page" first_arg=group_id second_arg=each.pk %}
+	     
+	{% endfor %}
 
 </li>
 </ul>
