@@ -3160,3 +3160,31 @@ def is_partner(group_obj):
 		return result
 	except:
 		return result
+
+@get_execution_time
+@register.assignment_tag
+def get_event_status(node):
+	status_msg = ""
+	text_color = "white"
+	"""
+	Returns FORTHCOMING/OPEN/CLOSED
+	"""
+	if node:
+		start_time_val = get_attribute_value(node._id,"start_time")
+		end_time_val = get_attribute_value(node._id,"end_time")
+		start_enroll_val = get_attribute_value(node._id,"start_enroll")
+		end_enroll_val = get_attribute_value(node._id,"end_enroll")
+		from datetime import datetime
+        curr_date_time = datetime.now()
+
+        if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
+        or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
+            status_msg = "OPEN"
+            text_color = "green"
+        elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
+            status_msg = "FORTHCOMING"
+            text_color = "#03a9f4"
+        elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
+            status_msg = "CLOSED"
+            text_color = "red"
+	return status_msg,text_color

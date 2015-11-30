@@ -1457,7 +1457,7 @@ class EventGroupCreateEditHandler(View):
             group_obj = get_group_name_id(group_id, get_obj=True)
             grel_id = None
 
-            logo_img_node, grel_id = get_relation_value(group_obj._id,'has_logo')
+            logo_img_node, grel_id = get_relation_value(group_obj._id,'has_profile_pic')
 
 
             # as group edit will not have provision to change name field.
@@ -1532,8 +1532,9 @@ class EventGroupCreateEditHandler(View):
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
-                elif sg_type == "ProgramEventGroup":
-                    mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
+                # elif sg_type == "ProgramEventGroup":
+                    # mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
+                mod_group.set_logo(request,group_obj,logo_rt = "has_profile_pic")
                 group_name = group_obj.name
                 url_name = 'groupchange'
             else:
@@ -1832,12 +1833,14 @@ def group_dashboard(request, group_id=None):
       group_id = group_obj._id
 
       # getting the profile pic File object
-      for each in group_obj.relation_set:
-          if "has_profile_pic" in each:
-              profile_pic_image = node_collection.one(
-                  {'_type': "File", '_id': each["has_profile_pic"][0]}
-              )
-              break
+      profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
+
+      # for each in group_obj.relation_set:
+      #     if "has_profile_pic" in each:
+      #         profile_pic_image = node_collection.one(
+      #             {'_type': "File", '_id': each["has_profile_pic"][0]}
+      #         )
+      #         break
 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
@@ -1869,12 +1872,14 @@ def group_dashboard(request, group_id=None):
     group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=group_obj['_id']
     pass
-  for each in group_obj.relation_set:
-    if "has_profile_pic" in each:
-      if each["has_profile_pic"]:
-        profile_pic_image = node_collection.one(
-            {'_type': "File", '_id': each["has_profile_pic"][0]}
-        )
+  profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
+
+  # for each in group_obj.relation_set:
+  #   if "has_profile_pic" in each:
+  #     if each["has_profile_pic"]:
+  #       profile_pic_image = node_collection.one(
+  #           {'_type': "File", '_id': each["has_profile_pic"][0]}
+  #       )
 
 
   has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
