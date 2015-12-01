@@ -475,9 +475,11 @@ def translate_node(request,group_id,node_id=None):
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
                           'groupid': group_id
-                      }
+                        }
+
     if request.method == "POST":
-        get_type=get_resource_type(request, node_id)
+        get_type = get_resource_type(request, node_id)
+        # get_type can be GSystem/File/Author/Group
         page_node = eval("node_collection.collection"+"."+ get_type)()
         get_translate_common_fields(request, get_type,page_node, group_id, gst_page,node_id)
         page_node.save(groupid=group_id)
