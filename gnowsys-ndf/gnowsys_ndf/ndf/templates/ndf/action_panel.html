@@ -66,6 +66,12 @@
 	.graph_btn{
 		margin-left: 3rem;
 	}
+
+	#group_drawer{
+		height: 400px;
+		overflow-y: auto;
+		margin-left: 2em;
+	}
 </style>
   <div id="deleteModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <p id="deleteModalLabel"></p>
@@ -155,11 +161,10 @@
 
 								<span data-tooltip title={% trans "Publish this resource in other group/s" %} class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius right-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
 								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
-									<div id="switchgrp" class="content">
 									<h4>{% trans "Select Groups" %}</h4>
-									<div id="group_drawer">
-									{% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
-									</div><br/>
+									<div id="switchgrp" class="content">
+									<ul id="group_drawer" class="large-block-grid-2">
+									</ul><br/>
 									<input type="button" id="save_switch_group" class="round button push-4" value="{% trans 'Save selected group' %}">
 									</div>
 									<a class="close-reveal-modal">&#215;</a>
