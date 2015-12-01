@@ -1897,6 +1897,7 @@ def group_dashboard(request, group_id=None):
   list_of_sg_member_of = get_sg_member_of(group_obj._id)
   # print "\n\n list_of_sg_member_of", list_of_sg_member_of
   files_cur = None
+  allow_to_join = ""
   sg_type = None
 
   if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
@@ -1925,31 +1926,32 @@ def group_dashboard(request, group_id=None):
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
             }).sort('last_update', -1)
+      if 'start_enroll' in group_obj:
+          if group_obj.start_enroll:
+              start_enrollment_date = group_obj.start_enroll
+              print "\n\nstart_enrollment_date", start_enrollment_date
+              if start_enrollment_date:
+                  start_enrollment_date = start_enrollment_date.date()
+                  if start_enrollment_date:
+                    curr_date_time = datetime.now().date()
+                    if start_enrollment_date > curr_date_time:
+                        allow_to_join = "Forthcoming"
+                    else:
+                        allow_to_join = "Open"
+
+      if 'end_enroll' in group_obj:
+          if group_obj.end_enroll:
+              last_enrollment_date = group_obj.end_enroll
+              last_enrollment_date = last_enrollment_date.date()
+              if last_enrollment_date:
+                curr_date_time = datetime.now().date()
+                if last_enrollment_date < curr_date_time:
+                    allow_to_join = "Closed"
+                else:
+                    allow_to_join = "Open"
   if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
 
-  allow_to_join = ""
-  if 'start_enroll' in group_obj:
-      if group_obj.start_enroll:
-          start_enrollment_date = group_obj.start_enroll
-          start_enrollment_date = start_enrollment_date.date()
-          if start_enrollment_date:
-            curr_date_time = datetime.now().date()
-            if start_enrollment_date > curr_date_time:
-                allow_to_join = "Forthcoming"
-            else:
-                allow_to_join = "Open"
-
-  if 'end_enroll' in group_obj:
-      if group_obj.end_enroll:
-          last_enrollment_date = group_obj.end_enroll
-          last_enrollment_date = last_enrollment_date.date()
-          if last_enrollment_date:
-            curr_date_time = datetime.now().date()
-            if last_enrollment_date < curr_date_time:
-                allow_to_join = "Closed"
-            else:
-                allow_to_join = "Open"
 
 
   property_order_list = []
@@ -2164,7 +2166,7 @@ def switch_group(request,group_id,node_id):
       resource_exists_in_grps = []
       response_dict = {'success': False, 'message': ""}
       #a temp. variable which stores the lookup for append method
-      resource_exists_in_grps_append_temp=resource_exists_in_grps.append
+      resource_exists_in_grps_append_temp = resource_exists_in_grps.append
       new_grps_list_distinct = [ObjectId(item) for item in new_grps_list if ObjectId(item) not in existing_grps]
       if new_grps_list_distinct:
         for each_new_grp in new_grps_list_distinct:
@@ -2178,8 +2180,10 @@ def switch_group(request,group_id,node_id):
 
       if not resource_exists:
         new_grps_list_all = [ObjectId(item) for item in new_grps_list]
-        node_collection.collection.update({'_id': node._id}, {'$set': {'group_set': new_grps_list_all}}, upsert=False, multi=False)
-        node.reload()
+        node.group_set = new_grps_list_all
+        node.save()
+        # node_collection.collection.update({'_id': node._id}, {'$set': {'group_set': new_grps_list_all}}, upsert=False, multi=False)
+        # node.reload()
         response_dict["success"] = True
         response_dict["message"] = "Published to selected groups"
       else:
@@ -2221,6 +2225,7 @@ def switch_group(request,group_id,node_id):
     #loop replaced by a list comprehension
       coll_obj_list=[node_collection.one({'_id': each}) for each in node.group_set ]
       data_list = set_drawer_widget(st, coll_obj_list)
+      # print "\n\n data_list",data_list
       return HttpResponse(json.dumps(data_list))
    
   except Exception as e:
