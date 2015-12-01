@@ -1183,6 +1183,7 @@ def get_profile_pic(user_pk):
 	This returns file document if exists, otherwise None value.
 	"""
 	try:
+		grel_val_node = ""
 		profile_pic_image = None
 		ID = int(user_pk)
 		auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'_id': 1, 'relation_set': 1})
@@ -1195,7 +1196,6 @@ def get_profile_pic(user_pk):
 		#             )
 
 		#             break
-		grel_val_node = ""
 		if auth:
 			grel = node_collection.one({'_type': 'RelationType', 'name': unicode("has_profile_pic") })
 			if auth and grel:

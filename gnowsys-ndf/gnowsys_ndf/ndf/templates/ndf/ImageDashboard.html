@@ -4,7 +4,11 @@
 {% block title %} Image Gallery {% endblock %}
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
+
+{% comment %}
 <script type="text/javascript" src="http://jqueryrotate.googlecode.com/svn/trunk/jQueryRotate.js"></script> <!-- required ? -->
+{% endcomment %}
+
 {% if already_uploaded %} 
 <div id="message">
   <span style="color:red">Listed below files are already uploaded please choose different files</span>
