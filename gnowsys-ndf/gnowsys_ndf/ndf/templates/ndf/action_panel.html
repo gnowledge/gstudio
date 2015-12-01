@@ -448,17 +448,12 @@
   var set_href = false;
   $(document).on('click','.delete-btn',function(){
     if(!set_href){
-      if( navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ){
-        $(this).attr('href', "{% url 'activity_feed' group_object.pk %}")
-      }
-      else{
         lbl_msg = "Are you sure you want to delete?"
         $("#deleteModalLabel").text(lbl_msg);
         $("#deleteModal")
           .removeClass("medium").addClass("small")
           .addClass("alert")
         $("#deleteModal").foundation('reveal', 'open');
-      }
     }
   })
 
