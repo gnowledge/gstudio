@@ -16,131 +16,10 @@
 </script>
 
 
-
-
 <div class="row page" itemscope itemtype="{{schema.1.type}}"> 
   
   <section class="medium-9 columns">
   {% block breadcrumb %} {% get_breadcrumb request.path %} {% endblock breadcrumb %}
-  <ul>
-
-      <!--  Fliter now on right hand side of page   -->
-      {% comment %}
-        
-       {% if topic %}
-        <dl class="tabs" style="float: right; height: 1px;" data-tab> 
-
-          <!-- Basic Description -->
-          <!-- Filter view for Topics -->
-          <dd class="filters-view">
-            <nav id="nav">
-              <ul id="navigation">
-                <li><a href="#" class="view-filters"><i class ="fi-filter"></i> {% trans "Filter based on" %} </a>
-                  <ul id="view-elements">
-                    {% get_metadata_values as metadata %}
-                    {% for k,v in metadata.items %}
-                      {% if k == "educationallevel" %}            
-                        <li>
-                          <a> {% trans "Level" %} &raquo;</a>
-                          <ul>
-                            {% for opts in v %}
-                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                            {% endfor %}
-                          </ul>
-                        </li> 
-                      {% elif k == "educationalsubject" %}
-                        <li>
-                          <a> {% trans "Subject" %} &raquo;</a>
-                          <ul>
-                            {% for opts in v %}
-                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                            {% endfor %}
-                          </ul>
-                        </li>
-                      {% elif k == "educationaluse" %}
-                        <li>
-                          <a> {% trans "Resource Type" %} &raquo;</a>
-                          <ul>
-                            {% for opts in v %}
-                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                            {% endfor %}
-                          </ul>
-                        </li>
-                        <!-- Commented bellow filters for time being will be using this filter at different place "So dont remove this code" -->
-                        {% comment %}                    
-                      <!-- {% elif k == "textcomplexity" %}
-                        <li>
-                          <a> {% trans "Text Complexity" %} &raquo;</a>
-                          <ul>
-                            {% for opts in v %}
-                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                            {% endfor %}
-                          </ul>
-                        </li> 
-                      {% elif k == "educationalalignment" %}
-                        <li>
-                          <a> {% trans "Educational Alignment" %} &raquo;</a>
-                          <ul>
-                            {% for opts in v %}
-                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                            {% endfor %}
-                          </ul>
-                        </li> -->
-                        {% endcomment %}                    
-
-                {% comment %}
-                          
-                      {% elif k == "language" %}
-                        <li>
-                          <a> {% trans "Language" %} &raquo;</a>
-                          <ul>
-                            {% for opts in v %}
-                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                            {% endfor %}
-                          </ul>
-                        </li>
-                      {% elif k == "interactivitytype" %}
-                        <li>
-                          <a> {% trans "Learning Type" %} &raquo;</a>
-                          <ul>
-                            {% for opts in v %}
-                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                            {% endfor %}
-                          </ul>
-                        </li>
-                      {% elif k == "audience" %}
-                        <li>
-                          <a> {% trans "Target Group" %} &raquo;</a>
-                          <ul>
-                            {% for opts in v %}
-                              <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                            {% endfor %}
-                          </ul>
-                        </li>
-                      {% endif %}
-
-                    {% endfor %}
-                  </ul>
-                </li>
-              </ul>
-            </nav>
-          </dd>
-
-          <!--
-          <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
-          <ul id="hover1" class="f-dropdown" data-dropdown-content>
-            <li class="view_list" id="Images"><a><i class="fi-photo"></i> {#% trans "Images" %#} </a></li> 
-            <li class="view_list" id="Videos"><a><i class="fi-play-circle"></i> {#% trans "Videos" %#} </a></li>  
-            <li class="view_list" id="Audios"><a><i class="fi-music"></i> {#% trans "Audios" %#} </a></li>  
-            <li class="view_list" id="Documents"><a><i class="fi-page-filled"></i> {#% trans "Documents" %#} </a></li>  
-            <li class="view_list" id="Interactives"><a><i class="fi-arrows-compress"></i> {#% trans "Interactives" %#} </a></li>  
-          </ul>
-          -->
-          </dl>
-      {% endif %}
-      {% endcomment %}
-      <!--  End of Filter-->
-  </ul>
 
   {% if breadcrumbs_list %}
   <ul class="breadcrumbs"> 
@@ -156,12 +35,7 @@
   </ul>
     
   {% endif %}
-  {% if not topic %}
-  <!-- <div id="view_collection">
-    <div itemprop="{{schema.1.name}}" class="large-8 columns repository-desc"> {% firstof node.altnames node.name %}</div>   
-  </div> -->
-  
-  {% endif %}
+
   {% if node.teaches %}
     <div class="hide teaches-block">
           
@@ -255,10 +129,15 @@
       {% endif %}
     <section class="medium-12 columns content">
       <div class="tabs-content">
-        <!--  {{ group_policy }} {{ node.status|lower }} passed for watermark background to .allow.draft class --> 
+        
         <div class="{{ group_policy }} {{ node.status|lower }} content active commentable-section" id="view-page" data-section-id="1">
+          
+          <div class="{{node.pk}}-collection-set" data-cs="{{node.collection_set|safe}}"></div>
+        {% comment %}
           <div class="row">  
-          {% comment %}
+        {% endcomment %}
+
+            {% comment %}
               <!--
               <div class="small-4 columns">
                 {% if node.prior_node|length > 0 %}
@@ -281,6 +160,8 @@
               -->
             {% endcomment %}
 
+              
+            {% comment %}
             <div class="small-4 columns"> </div>
 
             <div class="small-4 small-pull-4 columns">
@@ -301,17 +182,16 @@
               {% endif %}
             </div>
           </div>
+          {% endcomment %}
     
           <!-- Code for showing media details -->
           {% if node.mime_type %}
 
             {% get_grid_fs_object node as grid_fs_obj %}
 
-            <!-- New Implementation -->
+            <!-- commenting following block which shows slider if resource is collection of all images/videos/audios -->
             {% comment %}
-              {% trans 'Resource Type' %}: {{node.mime_type}}<br/>          
-            {% endcomment %}
-            
+              
             {% if node.collection_set and node.pk|is_media_collection %} 
 
               {% if 'image' in node.mime_type or 'video' in node.mime_type %}
@@ -361,10 +241,16 @@
               <!-- end of if 'image' in node.mime_type ... -->
 
             {% else %}
+            {% endcomment %}
+
+            <!-- END of commenting following block which shows slider if resource is collection of all images/videos/audios -->
+
+
               <!-- not a collection -->
               {% if 'image' in node.mime_type %}
-                <a class="th" target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                  <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;"/> 
+                {# <a class="th" target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}"> #}
+                <a class="th {% if node.collection_set %}collection-exists{% endif %}" href="#"  data-oid="{{node.pk|safe}}">
+                  <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;"/>
                 </a>
               {% elif 'Pandora_video' in node.member_of_names_list %}
                 {% get_source_id node.pk as source_id %}
@@ -406,6 +292,8 @@
 
 
               {% elif 'epub' in node.mime_type %}
+                {% comment %}
+                  
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
                
@@ -486,27 +374,29 @@
                   //     console.log(locationCfi)
                   // });
                 </script>
+                {% endcomment %}
+                
               {% else %}
                 <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   {{ grid_fs_obj.filename }}
                 </a>
               {% endif %}
 
-            {% endif %}
+            {% comment %}
+              <!-- commenting following block which shows slider if resource is collection of all images/videos/audios -->
+
+              {% endif %}
+            {% endcomment %}
+                
 
             {% if user.is_authenticated %}
-              <br/>
-              <br/>
               {% comment %}
               {% if 'Pandora_video' in node.member_of_names_list %}
                 <a class="button small secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
               {% elif 'video' in node.mime_type %}
               {% endcomment %}
-
             
             {% endif %}
-                  
-                         
           {% endif %}
           
           {% block add_fields %} {% endblock %}
