@@ -436,17 +436,23 @@ if($('.breadcrumbs').length == 0)
 
   function get_new_groups(){
     data_list = []
-    $("#switchgrp #collection_set_drawer2").children("li").each(
+    $("#group_drawer").find("input:checkbox:checked").each(
       function(c,v){
-        data_list.push($(v).attr("id"))
-      });
-    return data_list;
+        data_list.push(v.value)
+        // console.log(v.value)
+      }
+    )
+    return data_list
+
+  //   $("#group_drawer").children("li").each(
+  //     function(c,v){
+  //       data_list.push($(v).attr("id"))
+  //     });
+  //   return data_list;
   }
 
   $(document).on('click',"#switch_group",function(){
-    $('#switchgrp #collection_set_drawer1').html("");
-     $('#switchgrp #collection_set_drawer2').html("");
-     $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans "Type here to search in the resources" %}" id="collection_set_search" class="margin-0"></li>');
+    $("#group_drawer").html("")
       var url='/{{groupid}}/group/switch_group/'+'{{node}}';
       $.getJSON( url, function( data ) {
         $.each(data ,function(index , drawer_elements){
@@ -454,19 +460,50 @@ if($('.breadcrumbs').length == 0)
          if(index == 0)
           {
            $.each(drawer_elements.drawer1, function(index, element) {
-              $('#switchgrp #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+
+              $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'"> '+element.name+'</li>')
             });
           }
           if(index == 1)
           {
             $.each(drawer_elements.drawer2, function(index, element) {
-              $('#switchgrp #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+              if(element.name == "home"){
+                $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked disabled> '+element.name+'</li>')
+              }
+              else{
+                $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked> '+element.name+'</li>')
+              }
             });
           }
 
         });
       });
   });
+
+  // $(document).on('click',"#switch_group",function(){
+  //   $('#switchgrp #collection_set_drawer1').html("");
+  //    $('#switchgrp #collection_set_drawer2').html("");
+  //    $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans "Type here to search in the resources" %}" id="collection_set_search" class="margin-0"></li>');
+  //     var url='/{{groupid}}/group/switch_group/'+'{{node}}';
+  //     $.getJSON( url, function( data ) {
+  //       $.each(data ,function(index , drawer_elements){
+        
+  //        if(index == 0)
+  //         {
+  //          $.each(drawer_elements.drawer1, function(index, element) {
+  //             $('#switchgrp #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+  //           });
+  //         }
+  //         if(index == 1)
+  //         {
+  //           $.each(drawer_elements.drawer2, function(index, element) {
+  //             $('#switchgrp #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+  //           });
+  //         }
+
+  //       });
+  //     });
+  // });
 
   $(".current").click(function() {
 
@@ -551,19 +588,19 @@ if($('.breadcrumbs').length == 0)
   }); //end of document click
 
   function apply_color_to_li(element_id){
-    $("#switchgrp #collection_set_drawer2").children("li").each(
+    $("#group_drawer").find("input:checkbox").each(
       function(c,v){
-        if (element_id == $(v).attr("id")){
-          $(v).addClass("resource_exists");
+        if (element_id == v.value){
+          $(v).parent("li").addClass("resource_exists");
         }
       });
   }
 
   //Overriding from drawer_widget.html
   // To select the single as well as multiple items from list
-  $(document).on('click','#switchgrp #collection_set_drawer2 li.bullet-item',function(e){
-    if($(this).hasClass("resource_exists")){
-      $(this).removeClass("resource_exists")
+  $(document).on('click','input:checkbox',function(e){
+    if($(this).parent("li").hasClass("resource_exists")){
+      $(this).parent("li").removeClass("resource_exists")
     }
   });
 
