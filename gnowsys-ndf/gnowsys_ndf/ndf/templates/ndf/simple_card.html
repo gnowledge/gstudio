@@ -11,6 +11,15 @@
       font-size: 0.8em;
       font-weight: bold;
     }
+    .closed{
+      color: red;
+    }
+    .forthcoming{
+      color: #03a9f4;
+    }
+    .open{
+      color: green;
+    }
 
   </style>
 
@@ -18,8 +27,8 @@
  {% if is_event %}
   {% get_event_status resource as event_status_msg %}
   {% if event_status_msg %}
-    <div class="event-status-div" >
-    <label class="event-status" style="color:{{event_status_msg.1}}">{{event_status_msg.0}}</label>
+    <div class="event-status-div text-center" >
+    <label class="event-status {{event_status_msg|lower}}">{{event_status_msg}}</label>
     </div>
   {% endif%}
 {% endif%}
