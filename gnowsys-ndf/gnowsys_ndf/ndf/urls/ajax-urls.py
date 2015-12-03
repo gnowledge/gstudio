@@ -87,4 +87,5 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^page_scroll/(?P<page>[^/]+)$', 'page_scroll', name='page_scroll'),
     url(r'^check_date/(?P<node>[\w-]+)$', 'check_date', name='check_date'),
     url(r'^save_time/(?P<node>[\w-]+)$', 'save_time', name='save_time'),
+    url(r'^show_coll_cards/$', 'show_coll_cards', name='show_coll_cards'),
 )

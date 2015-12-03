@@ -6060,3 +6060,19 @@ def get_resource_by_oid_list(request, group_id):
           pass
 
     return HttpResponse('false')
+
+
+def show_coll_cards(request, group_id):
+
+    node_id = request.GET.get('node_id')
+    node = node_collection.one({'_id': ObjectId(node_id)})
+
+    node_collection_set = list(node.collection_set)
+    coll_objs = node_collection.find({'_id': {'$in': node_collection_set} })
+
+    return render_to_response('ndf/collection_set_cards.html',
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'coll_objs': coll_objs, 'node': node
+            },
+            context_instance=RequestContext(request))
