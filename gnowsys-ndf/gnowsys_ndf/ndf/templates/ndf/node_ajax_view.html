@@ -756,5 +756,23 @@ if($('.breadcrumbs').length == 0)
 
     // map.setView([lat, lng], zoom);
   });
+
+  $('.collection-exists').click(function (e) {
+    e.preventDefault();
+    var oid = this.getAttribute('data-oid');
+    var url = "{% url 'show_coll_cards' group_id %}" + "?node_id=" + oid
+
+    $.ajax({
+      url: url,
+      type: 'get',
+      datatype: 'html',
+      // data:,
+      success:function (data) {
+        $('#view-page').html(data);
+        
+      }
+    })
+
+  })
   
 </script>
