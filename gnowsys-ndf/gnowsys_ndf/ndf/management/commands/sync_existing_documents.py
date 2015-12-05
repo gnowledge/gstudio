@@ -624,6 +624,9 @@ class Command(BaseCommand):
     # Add attributes to discussion thread for every page node.
     # If thread does not exist, create it.
     # pages_files_not_updated = []
+    '''
+    Commented on Dec 5 2015 katkam.rachana@gmail.com to avoid unnecessary processing. This is a one-time script
+
     pages_files_not_updated = {}
     page_gst = node_collection.one( { '_type': "GSystemType", 'name': "Page" })
     file_gst = node_collection.one( { '_type': "GSystemType", 'name': "File" })
@@ -696,6 +699,9 @@ class Command(BaseCommand):
             print "\n\nError occurred for page ", each_node._id, "--", each_node.name,"--",e
             # print e, each_node._id
             pass
+    print "\n------- Discussion thread for Page and File GST successfully completed-------\n"
+    print "\n\n Pages/Files that were not able to updated\t", pages_files_not_updated
+    '''
     # Correct Eventype and CollegeEventtype Node  by setting their modified by field
     glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
     node = node_collection.find({'member_of':ObjectId(glist._id),"name":{'$in':['Eventtype','CollegeEvents']}}) 
@@ -705,5 +711,3 @@ class Command(BaseCommand):
             i.save()
             print "Updated",i.name,"'s modified by feild from null to 1"
 
-    print "\n------- Discussion thread for Page and File GST successfully completed-------\n"
-    print "\n\n Pages/Files that were not able to updated\t", pages_files_not_updated
