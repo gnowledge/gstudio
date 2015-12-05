@@ -211,7 +211,7 @@ def partner_showcase(request, group_id):
 
     partner_group = node_collection.one({'_type': 'GSystemType', 'name': 'PartnerGroup'})
 
-    source_partners = node_collection.find({'_type': 'Group', 'member_of': {'$in': [partner_group._id]}, 'name': {'$in': all_source} })
+    source_partners = node_collection.find({'_type': 'Group', 'member_of': {'$in': [partner_group._id]}, 'name': {'$in': all_source} }).sort('name',1)
     
     return render_to_response('ndf/partner_showcase.html',
                             {
