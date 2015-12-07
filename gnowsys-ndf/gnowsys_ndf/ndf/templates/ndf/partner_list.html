@@ -11,14 +11,14 @@
 
 {% block related_content %}
   {% check_is_gstaff groupid request.user as is_gstaff %}
-   <div class="panel" style="background-color:#ddd;margin-top:1.8em;padding: 1rem;">
   {% if is_gstaff %}
+   <div class="panel" style="background-color:#ddd;margin-top:1.8em;padding: 1rem;">
       <a class="tiny expand button radius " 
           href="{% url 'create_group' group_obj.pk %}?subgroup=True&partnergroup=True">
         	<span class="fi-plus">&nbsp;&nbsp;{% trans "New" %} {{group_obj.name}}</span>
       </a>
-  {% endif %}
   </div>
+  {% endif %}
 {% endblock %}
 
 
