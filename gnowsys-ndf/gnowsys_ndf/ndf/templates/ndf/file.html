@@ -215,9 +215,11 @@
       {% if user_is_joined == "joined" or user_is_joined == "author" %}
       <!-- <b>{% trans "Actions" %}</b><br/><br/> -->
       
+        {% if site.SITE_NAME == "NROER" and not group_name_tag == "home" %}
           <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny expand button radius">
             {% trans "Upload File" %}
           </a><br/>
+        {% endif %}
 
         {% comment %}
         {% user_access_policy groupid request.user as user_access %}
