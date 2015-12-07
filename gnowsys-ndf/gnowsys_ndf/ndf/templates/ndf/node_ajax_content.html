@@ -249,10 +249,20 @@
 
               <!-- not a collection -->
               {% if 'image' in node.mime_type %}
-                {# <a class="th" target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}"> #}
-                <a class="th {% if node.collection_set %}collection-exists{% endif %}" href="#"  data-oid="{{node.pk|safe}}">
-                  <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;"/>
-                </a>
+               
+                <div class="show-image">
+                  
+                  <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
+                    <img  src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;" />
+        
+
+                  </a>
+                  <div class="fullscreen-icon" >
+                        <a  target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">  
+                          <i class="fa fa-arrows-alt" style="color:black !important" title="Full Screen Image"></i>
+                        </a>
+                      </div>
+                </div>
               {% elif 'Pandora_video' in node.member_of_names_list %}
                 {% get_source_id node.pk as source_id %}
                 <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>

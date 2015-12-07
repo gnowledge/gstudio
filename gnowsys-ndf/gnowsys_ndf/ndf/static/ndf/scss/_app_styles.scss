@@ -1604,7 +1604,7 @@ aside#help{
 
   .repository-title{  
     color:#D7D7D7;
-    font-size: 1.5em;
+    font-size: 1.4em;
     width:auto;
     background-color: rgba(0, 0, 0, 0.8);
     text-align:left;
@@ -1614,7 +1614,7 @@ aside#help{
     text-align:center;
   }
   .repository-desc{
-    font-size: 1.5em;
+    font-size: 1.4em;
     width:auto;
     background-color:#E5E5E5;
     text-align:left;
@@ -1697,3 +1697,18 @@ aside#help{
       color:#8c8c8c;  
 }
 
+.fullscreen-icon{
+  
+  display:none;
+}
+
+div.show-image:hover div.fullscreen-icon{
+    display: block;
+    left:15px;
+    position:absolute;
+    top:3px;
+    
+        
+    font-size:2em;
+    
+}
