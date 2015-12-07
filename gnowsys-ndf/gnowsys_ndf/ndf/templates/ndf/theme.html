@@ -201,17 +201,22 @@
 
 {% block body_content %}
 		<div class="large-4 columns repository-title">
-				{% if theme_GST.altnames and theme_GST.altnames != "None" %}
-					{{theme_GST.altnames}}
-				{% elif node.name %}
+				{% if node.name %}
 					{{node.name}}
+				{% elif theme_GST.altnames and theme_GST.altnames != "None" %}
+					{{theme_GST.altnames}}
 					{% else %}
 					{{theme_GST.name}}
 				{% endif%}
 	</div>
 
-
-	<div class="large-8 columns repository-desc">{{theme_GST.content_org|default_if_none:""|safe}}</div>
+	<div class="large-8 columns repository-desc">
+				{% if node.content_org %}
+					{{node.content_org}}
+				{% elif theme_GST.content_org and theme_GST.content_org != "None" %}
+					{{theme_GST.content_org}}
+				{% endif%}
+	</div>
 
 
 

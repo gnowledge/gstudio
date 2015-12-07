@@ -38,7 +38,7 @@
 				</h4></div>
 					<!-- <div class="app-card-title"><h4>{% firstof each_gapp.altnames each_gapp.name %}</h4></div> -->
 					<div class="app-card-icon"><img src="{{ each_gapp.url }}" width="50%"></div>
-					<div class="app-card-content">{{each_gapp.content_org|truncatechars:45 }}</div>
+					<div class="app-card-content">{{each_gapp.content_org|truncatechars:60 }}</div>
 				</a>
 			</li>
 		{% endfor %}
