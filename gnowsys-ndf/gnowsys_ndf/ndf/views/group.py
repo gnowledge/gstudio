@@ -1929,7 +1929,7 @@ def group_dashboard(request, group_id=None):
       if 'start_enroll' in group_obj:
           if group_obj.start_enroll:
               start_enrollment_date = group_obj.start_enroll
-              print "\n\nstart_enrollment_date", start_enrollment_date
+              # print "\n\nstart_enrollment_date", start_enrollment_dates
               if start_enrollment_date:
                   start_enrollment_date = start_enrollment_date.date()
                   if start_enrollment_date:

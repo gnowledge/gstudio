@@ -1,10 +1,24 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
-{% block title %} Tag Browser {% endblock %}
+
+
+{% block title %} Tags Browser {% endblock %}
+
 
 {% block meta_content %}
-    <p class="subheader">{% blocktrans %}<b>Tag</b> is like a keyword or category label. <br/><br/>Tags helps you to find photos, videos, files and pages which have something in common.</p>{% endblocktrans%}
+
+    <h4>Tags</h4>
+      
+    <ul>
+      <small>
+        <li>Tags are like a keyword or category label. </li>
+        <br/>
+        <li>Tags helps you to find photos, videos, files and pages which have something in common.</li>
+        <br/>
+      </small>
+    </ul>
+
 {% endblock %}
 
 {% block style %}
@@ -65,42 +79,12 @@
     {% endif %}
   {% endif %}
   <br/>
-
-  <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-
-    {%  for each in search_result %}
-
-      <li class="card">
-        <div class ="published_page">
-          <a href="{% url 'page_details' group_id each.pk %}">
-            <header>
-              <div class="th">
-                <img src="/static/ndf/scss/metastudio/logo.svg"/>
-              </div>
-              <h3>{{ each.name|truncatechars:10 }}</h3>
-              <p>
-                {{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}
-              </p>
-              <div>
-                <small class="subheader">
-                  {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
-                  <br/>
-                  {% get_user_object each.created_by as user %}
-                  by <span href="#" class="user" data-gnow="">{{ user }}</span> 
-                </small>
-              </div>
-            </header>
-          </a>
-            <div class="label-list">
-              {% for tag in each.tags %}
-                 <a href="{% url 'tag_info' groupid tag %}"><span class="label"><mark>{{tag}}</mark></span></a>
-              {% endfor %}
-            </div>
-        </div> 
-      </li>
-
-    {% endfor %}
-
+  <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
+      {%  for each in search_result %}
+        <li class="card-image-wrapper" > 
+          {% include 'ndf/simple_card.html' with resource=each url_name="file_detail" first_arg=group_id second_arg=each.pk  %}
+        </li>
+      {% endfor %}
   </ul>
 
 {% endblock %}

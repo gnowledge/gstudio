@@ -140,8 +140,8 @@
   function createDiscussion()
   {
     if( is_user_authenticated){
-      if( user_access == "allow" )
-      {  
+      // if( user_access == "allow" )
+      // {  
         // ajax to create thread for first time.
         $.ajax({
           url: "{% url 'create_discussion' group_id node.pk %}",
@@ -172,20 +172,20 @@
           // }
         });
         // --- END ajax and create thread for first time.
-      }
-      else
-      {
-        // alert("To start discussion you need to login and be the member of this group.");
-        // alert("Only group members can comment.");
-        $("#alertModalLabel").text("Only group members can comment.");
-        $("#alertModal").addClass("warning");
-        $("#alertModal").foundation('reveal', 'open');
+      // }
+      // else
+      // {
+      //   // alert("To start discussion you need to login and be the member of this group.");
+      //   // alert("Only group members can comment.");
+      //   $("#alertModalLabel").text("Only group members can comment.");
+      //   // $("#alertModal").addClass("warning");
+      //   $("#alertModal").foundation('reveal', 'open');
 
-      }
+      // }
     }
   else{
         $("#alertModalLabel").text("Please login to start discussion.");
-        $("#alertModal").addClass("alert");
+        // $("#alertModal").addClass("alert");
         $("#alertModal").foundation('reveal', 'open');
         // alert("{% trans 'Login to start discussion' %}");
   }
@@ -194,9 +194,9 @@
   // function called by "Add Reply" and "Reply" buttons to open editor
   function openOrgEditor(sourceObj)
   {
-    if( user_access == "allow"){
-    if( is_user_authenticated )
-    {
+    if( is_user_authenticated){
+    // if(  user_access == "allow")
+    // {
       var sourceObjDataId = $(sourceObj).attr("data-id"); // prior-node _id
       $("#prior-node").val(sourceObjDataId);
       
@@ -222,15 +222,15 @@
       // {
         $('#org').foundation('reveal', 'open');
       // }
-    }
-    else
-    {
-      // alert("To start discussion you need to login and be the member of this group.");
-      alert(" {% trans 'Login to start discussion.' %} ");
-    }
+    // }
+    // else
+    // {
+    //   alert("Only group members can reply to comment.");
+    //   // alert("To start discussion you need to login and be the member of this group.");
+    // }
   }
   else{
-      alert("Only group members can reply to comment.");
+      alert(" {% trans 'Login to start discussion.' %} ");
   }
   }
   function updateDiscussionTabText()
