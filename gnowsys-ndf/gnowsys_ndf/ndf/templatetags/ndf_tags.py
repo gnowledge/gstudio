@@ -3165,7 +3165,6 @@ def is_partner(group_obj):
 @register.assignment_tag
 def get_event_status(node):
 	status_msg = ""
-	text_color = "white"
 	"""
 	Returns FORTHCOMING/OPEN/CLOSED
 	"""
@@ -3180,11 +3179,8 @@ def get_event_status(node):
         if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
         or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
             status_msg = "OPEN"
-            text_color = "green"
         elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
             status_msg = "FORTHCOMING"
-            text_color = "#03a9f4"
         elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
             status_msg = "CLOSED"
-            text_color = "red"
-	return status_msg,text_color
+	return status_msg

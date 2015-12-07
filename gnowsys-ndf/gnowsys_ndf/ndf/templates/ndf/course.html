@@ -66,7 +66,7 @@
 
         {% for course in ce_coll %}
           <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
-            {% include 'ndf/simple_card.html' with resource=course is_event=True has_prof_pic=True url_name="groupchange" first_arg=course.pk  %}
+            {% include 'ndf/simple_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk  %}
           </li>
         {% empty %}
             <div class="row">
@@ -90,7 +90,7 @@
       {% endif %}
         {% for course in enr_ce_coll %}
           <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
-            {% include 'ndf/simple_card.html' with resource=course is_event=True has_prof_pic=True url_name="groupchange" first_arg=course.pk %}
+            {% include 'ndf/simple_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk %}
           </li>
 
         {% empty %}

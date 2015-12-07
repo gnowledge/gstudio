@@ -11,6 +11,15 @@
       font-size: 0.8em;
       font-weight: bold;
     }
+    .closed{
+      color: red;
+    }
+    .forthcoming{
+      color: #03a9f4;
+    }
+    .open{
+      color: green;
+    }
 
   </style>
 
@@ -18,8 +27,8 @@
  {% if is_event %}
   {% get_event_status resource as event_status_msg %}
   {% if event_status_msg %}
-    <div class="event-status-div" >
-    <label class="event-status" style="color:{{event_status_msg.1}}">{{event_status_msg.0}}</label>
+    <div class="event-status-div text-center" >
+    <label class="event-status {{event_status_msg|lower}}">{{event_status_msg}}</label>
     </div>
   {% endif%}
 {% endif%}
@@ -36,7 +45,7 @@
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
     
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
-    {% if resource.fs_file_ids.2 and 'image' in resource.mime_type %}
+    {% if resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
     <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
     <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">

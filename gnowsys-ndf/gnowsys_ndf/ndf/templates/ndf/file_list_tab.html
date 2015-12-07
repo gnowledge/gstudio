@@ -122,19 +122,16 @@
             {% if res_type_name == "collection" %}
               <h5> {% trans "This group doesn't have any collections." %}</h5>
             {% elif filter_result == "False" %}
-              <h5> {% trans "Sorry, No resources found" %}.</h5>
+              <h5> {% trans "Sorry, No such files found." %}.</h5>
             {% else %}
               {% if not dont_show_error %}
-              {% if "CourseEventGroup" in node.member_of_names_list %}
-              <h5> 
-                {% blocktrans %}No files have been uploaded yet.{% endblocktrans %}
-              </h5>
-              {% else %}
-              <h5> 
-                {% blocktrans %}This group doesn't have any files. <b>Be the first to upload a file!</b>{% endblocktrans %}
-              </h5>
-              {% endif %}
-              
+                {% if "CourseEventGroup" in node.member_of_names_list %}
+                <h5> 
+                  {% blocktrans %}No files have been uploaded yet.{% endblocktrans %}
+                </h5>
+                {% else %}
+                  <h5> {% trans "Sorry, No such files found." %}.</h5>
+                {% endif %}
               {% endif %}
             {% endif %}
 
