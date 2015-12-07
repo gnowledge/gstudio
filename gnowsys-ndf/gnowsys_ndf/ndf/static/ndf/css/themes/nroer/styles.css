@@ -25167,7 +25167,7 @@ p {
 /* line 1705, ../../../scss/_app_styles.scss */
 div.show-image:hover div.fullscreen-icon {
   display: block;
-  left: 15px;
+  left: 27%;
   position: absolute;
   top: 3px;
   font-size: 2em;

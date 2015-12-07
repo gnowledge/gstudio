@@ -249,7 +249,7 @@
 
               <!-- not a collection -->
               {% if 'image' in node.mime_type %}
-               
+               <center>
                 <div class="show-image">
                   
                   <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
@@ -263,6 +263,7 @@
                         </a>
                       </div>
                 </div>
+                </center>
               {% elif 'Pandora_video' in node.member_of_names_list %}
                 {% get_source_id node.pk as source_id %}
                 <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
