@@ -25058,7 +25058,7 @@ p {
 /* line 1605, ../../../scss/_app_styles.scss */
 .repository-title {
   color: #D7D7D7;
-  font-size: 1.5em;
+  font-size: 1.4em;
   width: auto;
   background-color: rgba(0, 0, 0, 0.8);
   text-align: left;
@@ -25070,7 +25070,7 @@ p {
 
 /* line 1616, ../../../scss/_app_styles.scss */
 .repository-desc {
-  font-size: 1.5em;
+  font-size: 1.4em;
   width: auto;
   background-color: #E5E5E5;
   text-align: left;
@@ -25157,4 +25157,18 @@ p {
 /* line 1696, ../../../scss/_app_styles.scss */
 .discussion-content {
   color: #8c8c8c;
+}
+
+/* line 1700, ../../../scss/_app_styles.scss */
+.fullscreen-icon {
+  display: none;
+}
+
+/* line 1705, ../../../scss/_app_styles.scss */
+div.show-image:hover div.fullscreen-icon {
+  display: block;
+  left: 15px;
+  position: absolute;
+  top: 3px;
+  font-size: 2em;
 }
