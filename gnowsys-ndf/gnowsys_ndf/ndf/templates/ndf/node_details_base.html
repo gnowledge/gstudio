@@ -78,12 +78,14 @@
 
 {% block add_resource_content %}  
 
+{% comment %}
 {% user_access_policy groupid request.user as user_access %}
 
 {% if user.is_authenticated %}
 {% if user_access == "allow" %}
 
 
+  
 {% if topic %}
   <br/>
   <dl class="accordion topic" data-accordion>
@@ -131,7 +133,7 @@
           <div id="view_add_file" class="reveal-modal" data-reveal style="height:300px;">
             <h3>{% trans "Add New File: " %}</h3><br/>
             <!-- Upload file -->
-            <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_file' group_name_tag %}?context_node={{node.pk}}">
+            <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_file' 'desk' %}?context_node={{node.pk}}">
             {% csrf_token %}
 
             <div>
@@ -212,7 +214,9 @@ $("#add_page").click(function() {
 <!--  <b>Please login to see the add resource options</b>-->
 {% endif %}
 
+{% endcomment %}
 {% endblock %}
+
 
 {% comment %}
     
