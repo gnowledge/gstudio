@@ -128,12 +128,13 @@ class Command(BaseCommand):
             gs_node.contributors.append(user_id)
 
           gs_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
-          gs_node.disclosure_policy=u'DISCLOSED_TO_MEM'
-          gs_node.subscription_policy=u'OPEN'
-          gs_node.visibility_policy=u'ANNOUNCED'
-          gs_node.encryption_policy=u'NOT_ENCRYPTED'
-          gs_node.group_type= u'PUBLIC'
-          gs_node.edit_policy =u'NON_EDITABLE'
+          gs_node.disclosure_policy = u'DISCLOSED_TO_MEM'
+          gs_node.subscription_policy = u'OPEN'
+          gs_node.visibility_policy = u'ANNOUNCED'
+          gs_node.encryption_policy = u'NOT_ENCRYPTED'
+          gs_node.group_type = u'PUBLIC'
+          gs_node.edit_policy  = u'NON_EDITABLE'
+          gs_node.status = u'PUBLISHED'
           gs_node.save()
         
                    
@@ -149,14 +150,15 @@ class Command(BaseCommand):
             gs_node.contributors.append(user_id)
 
           gs_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
-          gs_node.disclosure_policy=u'DISCLOSED_TO_MEM'
+          gs_node.disclosure_policy =u'DISCLOSED_TO_MEM'
           gs_node.subscription_policy=u'OPEN'
           gs_node.visibility_policy=u'ANNOUNCED'
           gs_node.encryption_policy=u'NOT_ENCRYPTED'
           gs_node.group_type= u'PUBLIC'
           # edit policy needs to be decided.
-          # should it be with moderated with 2 level of moderation ?
+          # should it be moderated with 2 level of moderation ?
           gs_node.edit_policy =u'EDITABLE_NON_MODERATED'
+          gs_node.status = u'PUBLISHED'
           gs_node.save()
         
         # Creating factory GSystemType's 
