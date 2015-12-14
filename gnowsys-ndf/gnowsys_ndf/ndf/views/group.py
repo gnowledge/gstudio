@@ -2168,18 +2168,7 @@ def app_selection(request, group_id):
 
 @get_execution_time
 def switch_group(request,group_id,node_id):
-  # ins_objectid = ObjectId()
-  # if ins_objectid.is_valid(group_id) is False:
-  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
-  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-  #   if group_ins:
-  #     group_id = str(group_ins._id)
-  #   else:
-  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #     if auth:
-  #     	group_id = str(auth._id)
-  # else :
-  # 	pass
+  
   try:
       group_id = ObjectId(group_id)
   except:
@@ -2192,7 +2181,7 @@ def switch_group(request,group_id,node_id):
       new_grps_list = request.POST.getlist("new_groups_list[]", "")
       resource_exists = False
       resource_exists_in_grps = []
-      response_dict = {'success': False, 'message': ""}
+      response_dict = {'success': False, 'message': ''}
       #a temp. variable which stores the lookup for append method
       resource_exists_in_grps_append_temp = resource_exists_in_grps.append
       new_grps_list_distinct = [ObjectId(item) for item in new_grps_list if ObjectId(item) not in existing_grps]
@@ -2239,10 +2228,20 @@ def switch_group(request,group_id,node_id):
       all_user_groups.append('Trash')
       all_user_groups.extend(top_partners_list)
 
-      st = node_collection.find({'$and': [{'_type': 'Group'},{'$or':[{'author_set': {'$in':[user_id]}},{'group_admin': {'$in':[user_id]}}]},
-                                          {'name':{'$nin':all_user_groups}},
-                                          {'member_of': {'$ne': partner_group_gst._id}},
-                                          {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}]})
+      st = node_collection.find({
+            '$and': [
+                        {'_type': 'Group'},
+                        {'$or':[
+                                {'author_set': {'$in':[user_id]}},
+                                {'group_admin': {'$in':[user_id]}}
+                            ]
+                        },
+                        {'name':{'$nin':all_user_groups}},
+                        {'member_of': {'$in': [group_gst._id]}},
+                        {'status': u'PUBLISHED'}
+                      # ,{'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
+                    ]
+                })
       # st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},
       #                                     {'name':{'$nin':all_user_groups}},
       #                                     {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
