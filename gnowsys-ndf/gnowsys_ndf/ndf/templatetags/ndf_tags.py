@@ -3152,6 +3152,11 @@ def get_gstudio_help_sidebar():
 
 @get_execution_time
 @register.assignment_tag
+def social_share_resource():
+	return SOCIAL_SHARE_RESOURCE
+
+@get_execution_time
+@register.assignment_tag
 def is_partner(group_obj):
 	try:
 		result = False

@@ -701,6 +701,7 @@ CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
 GSTUDIO_NO_OF_OBJS_PP = 24
 
 GSTUDIO_HELP_SIDEBAR = False
+SOCIAL_SHARE_RESOURCE = False
 
 # ----------------------------------------------------------------------------
 # following has to be at last

@@ -467,13 +467,16 @@
               {% endif %}
                   <span class="fa fa-download fa-1g" title="Download">  </span> 
                 </a>
-
-                 <span>
-                    <a class="share_link" href="#" target="_blank" title="share this resource on facebook">
-                    <i class="fa fa-facebook-square fa-1g"></i>
-                    </a>
-                    </span>  
-            {% endif %}
+               
+               {% social_share_resource as social_share %}
+                  {% if social_share %}
+                    <span>
+                        <a class="share_link" href="#" target="_blank" title="share this resource on facebook">
+                        <i class="fa fa-facebook-square fa-1g"></i>
+                        </a>
+                        </span>  
+                  {% endif %}
+                {% endif %}
           {% endif %} 
              
               </div>
