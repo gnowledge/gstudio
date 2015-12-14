@@ -5,6 +5,7 @@ import json
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from django.http import request
 from django.http import Http404
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
@@ -164,9 +165,11 @@ def all_under_moderation(request, group_id):
 
 	group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(group_obj._id,sg_member_of)
 	group_hierarchy_obj_list = []
+
 	if group_hierarchy_result[0]:
 		group_hierarchy_obj_list = group_hierarchy_result[1]
 		group_hierarchy_id_list = [g._id for g in group_hierarchy_obj_list]
+
 		file_gst = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
 		page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
 
@@ -272,7 +275,10 @@ def approve_resource(request, group_id):
 		node_obj.group_set = [auth_grp._id]
 		node_obj.status = u"DRAFT"
 		node_obj.save()
-		is_top_group, top_group_obj = get_top_group_of_hierarchy(group_obj._id)
+
+		# is_top_group, top_group_obj = get_top_group_of_hierarchy(group_obj._id)
+		mod_group_instance = CreateModeratedGroup(request)
+		is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(curr_group_id)
 
 		list_of_recipients_ids = []
 		list_of_recipients_ids.extend(group_obj.group_admin)
@@ -570,7 +576,10 @@ def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
 
 	# if no sub-group found or it's last sub-group of hierarchy
 	else:
-		is_top_group, top_group_obj = get_top_group_of_hierarchy(curr_group_id)
+		mod_group_instance = CreateModeratedGroup(request.HttpRequest())
+		is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(curr_group_id)
+		# print "==== ", is_top_group
+		# print "==== ", top_group_obj
 		
 		if ObjectId(curr_group_id) in group_set:
 			# remove current group's _id
@@ -599,18 +608,18 @@ def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
 	return group_set
 
 
-def get_top_group_of_hierarchy(group_id):
-	'''
-	getting top group object of hierarchy.
-	Returns mongokit object of top group.
-	'''
-	curr_group_obj = node_collection.one({'_id': ObjectId(group_id)})
+# def get_top_group_of_hierarchy(group_id):
+# 	'''
+# 	getting top group object of hierarchy.
+# 	Returns mongokit object of top group.
+# 	'''
+# 	curr_group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
-	# loop till there is no end of prior_node or till reaching at top group.
-	while curr_group_obj and curr_group_obj.prior_node:
-		curr_group_obj = node_collection.one({'_id': curr_group_obj.prior_node[0]})
-		if curr_group_obj.edit_policy != 'EDITABLE_MODERATED':
-			return False, "One of the group: " + str(curr_group_obj._id) \
-			 + " is not with edit_policy: EDITABLE_MODERATED."
-	# send overwritten/first curr_group_obj's "_id"
-	return True, curr_group_obj
+# 	# loop till there is no end of prior_node or till reaching at top group.
+# 	while curr_group_obj and curr_group_obj.prior_node:
+# 		curr_group_obj = node_collection.one({'_id': curr_group_obj.prior_node[0]})
+# 		if curr_group_obj.edit_policy != 'EDITABLE_MODERATED':
+# 			return False, "One of the group: " + str(curr_group_obj._id) \
+# 			 + " is not with edit_policy: EDITABLE_MODERATED."
+# 	# send overwritten/first curr_group_obj's "_id"
+# 	return True, curr_group_obj
