@@ -24497,8 +24497,8 @@ aside#help p, aside#help h5, aside#help h6 {
   padding: 0px;
   margin: 5px;
   overflow: hidden;
-  width: 80%;
-  height: 11rem;
+  width: 11rem;
+  height: 9rem;
   /*float:left;*/
 }
 /* line 1073, ../../../scss/_app_styles.scss */
@@ -24532,7 +24532,7 @@ aside#help p, aside#help h5, aside#help h6 {
   padding-top: 0.5cm;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
-  width: 80%;
+  width: 11rem;
   margin-top: -0.3em;
   /*height: 8.25rem;*/
   background-color: #3e3e3e;
@@ -24557,7 +24557,7 @@ aside#help p, aside#help h5, aside#help h6 {
   margin-top: -0.25em;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
-  width: 80%;
+  width: 11rem;
   background-color: #CCCCCC;
 }
 
@@ -24572,7 +24572,7 @@ aside#help p, aside#help h5, aside#help h6 {
   margin-top: -0.25em;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
-  width: 80%;
+  width: 11rem;
   background-color: #E6E6E6;
   display-inline: block;
 }

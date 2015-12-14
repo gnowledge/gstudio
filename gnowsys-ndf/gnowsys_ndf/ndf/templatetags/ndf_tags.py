@@ -108,6 +108,7 @@ def get_site_variables():
 	site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
 	site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
 	site_var['SITE_NAME']=GSTUDIO_SITE_NAME
+	site_var['ISSUES_PAGE']=GSTUDIO_SITE_ISSUES_PAGE
 
 	cache.set('site_var', site_var, 60 * 30)
 

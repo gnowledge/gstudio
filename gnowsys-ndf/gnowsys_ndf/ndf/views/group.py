@@ -388,7 +388,7 @@ class CreateSubGroup(CreateGroup):
     def get_subgroup_fields(self, parent_group_id, sub_group_name, sg_member_of, **kwargs):
         '''
         Get empty group object filled with values supplied in arguments.
-        "parent_group_id" and "sub_group_id" and "sg_member_of" are compulsory args.
+        "parent_group_id" and "sub_group_name" and "sg_member_of" are compulsory args.
         '''
 
         # get basic fields filled group object
@@ -1929,7 +1929,7 @@ def group_dashboard(request, group_id=None):
       if 'start_enroll' in group_obj:
           if group_obj.start_enroll:
               start_enrollment_date = group_obj.start_enroll
-              print "\n\nstart_enrollment_date", start_enrollment_date
+              # print "\n\nstart_enrollment_date", start_enrollment_dates
               if start_enrollment_date:
                   start_enrollment_date = start_enrollment_date.date()
                   if start_enrollment_date:

@@ -31,6 +31,7 @@ GST_VIDEO = node_collection.one({'_type':'GSystemType', 'name': GAPPS[4]})
 e_library_GST = node_collection.one({'_type':'GSystemType', 'name': 'E-Library'})
 pandora_video_st = node_collection.one({'_type':'GSystemType', 'name': 'Pandora_video'})
 app = node_collection.one({'_type':'GSystemType', 'name': 'E-Library'})
+wiki_page = node_collection.one({'_type': 'GSystemType', 'name': 'Wiki page'})
 
 #######################################################################################################################################
 
@@ -117,7 +118,8 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	# 								}).sort("last_update", -1)
 
 	files = node_collection.find({												
-									'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+									# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+									'member_of': {'$in': [GST_FILE._id]},
 									# '_type': 'File',
 									# 'fs_file_ids': {'$ne': []}, 
 									'group_set': {'$all': [ObjectId(group_id)]},
@@ -142,8 +144,8 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 															{'created_by': request.user.id}
 														]
 												}
-											]
-											 
+											],
+										'type_of': {'$in': [wiki_page._id]}
 										}).sort("last_update", -1) 
 
 
@@ -170,7 +172,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 		result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
 	collection_pages_cur = node_collection.find({
-									'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+									'member_of': {'$in': [GST_FILE._id]},
                                     'group_set': {'$all': [ObjectId(group_id)]},
                                     '$and': query_dict,
                                     '$or': [
@@ -312,7 +314,8 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		# print "query_dict : ", query_dict
 
 		files = node_collection.find({												
-										'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+										'member_of': {'$in': [GST_FILE._id]},
+										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 										# '_type': 'File',
 										# 'fs_file_ids': {'$ne': []}, 
 										'group_set': {'$all': [ObjectId(group_id)]},
@@ -361,7 +364,8 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		if filetype == "Collections":
 				detail_urlname = "page_details"
 				result_cur = node_collection.find({
-									'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+									# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+									'member_of': {'$in': [GST_FILE._id]},
                                     'group_set': {'$all': [ObjectId(group_id)]},
 									'$and': query_dict,
                                     '$or': [
