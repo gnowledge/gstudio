@@ -467,11 +467,12 @@ if($('.breadcrumbs').length == 0)
           if(index == 1)
           {
             $.each(drawer_elements.drawer2, function(index, element) {
-              if(element.name == "home"){
-                $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked disabled> '+element.name+'</li>')
+              if((element.name == "home") || (element.moderation_level > -1))
+              {
+                $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked disabled> '+element.name+ element.moderation_level+'</li>')
               }
               else{
-                $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked> '+element.name+'</li>')
+                $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked> '+element.name + element['moderation_level']+'</li>')
               }
             });
           }
