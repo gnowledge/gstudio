@@ -253,12 +253,14 @@
                 <div class="show-image">
                   <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
                     <img  src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;" />
+                    
                   </a>
-                  <div class="fullscreen-icon" >
-                    <a  target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">  
-                      <i class="fa fa-arrows-alt" style="color:black !important" title="Full Screen Image"></i>
-                    </a>
-                  </div>
+                  <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
+                      <a  target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">  
+                         View in Full Screen
+                         <i class="fi-projection-screen"> </i>
+                      </a>
+                    </figcaption>
                 </div>
                 </center>
               {% elif 'Pandora_video' in node.member_of_names_list %}
@@ -457,22 +459,22 @@
                <small class="text-gray">
                   [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
                 </small> 
-            
+                </br>
           {% if user.is_authenticated %}  
             {% if node.mime_type %}    
               {% if 'video' in node.mime_type  %}
-                <a class="" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
+                <a class="button tiny" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
               {% else %}
-                <a class="" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                <a class="button tiny" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
               {% endif %}
-                  <span class="fa fa-download fa-1g" title="Download">  </span> 
+                  Download 
                 </a>
                
                {% social_share_resource as social_share %}
                   {% if social_share %}
                     <span>
-                        <a class="share_link" href="#" target="_blank" title="share this resource on facebook">
-                        <i class="fa fa-facebook-square fa-1g"></i>
+                        <a class="share_link button tiny" href="#" target="_blank" title="share this resource on facebook">
+                        <i class="fa fa-facebook-square "></i>
                         </a>
                         </span>  
                   {% endif %}
@@ -808,15 +810,16 @@
               <li class="card-image-wrapper"> 
                 {% include 'ndf/simple_card.html' with resource=subgroup_node has_prof_pic=True url_name="groupchange" first_arg=subgroup_node.pk %}
               </li>
-            {% empty %}
-                <div class="row">
-                  <div class="small-12 columns">
-                    <h5> 
-                    No Subgroups Found!
-                    </h5>
+            {% comment %}
+              {% empty %}
+                  <div class="row">
+                    <div class="small-12 columns">
+                      <h5> 
+                      No Subgroups Found!
+                      </h5>
+                    </div>
                   </div>
-                </div>
-            
+              {% endcomment %}
             {% endfor %}
           </section>
           </div>
