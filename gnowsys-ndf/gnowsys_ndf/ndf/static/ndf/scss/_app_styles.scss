@@ -1166,7 +1166,7 @@ aside#help{
     display: block;
     margin: 0 auto;
     opacity: 0.9;
-    width:100%;
+    //width:100%;
     height:100%;
   }
   
@@ -1694,21 +1694,22 @@ aside#help{
 }
 
 .discussion-content{
-      color:#8c8c8c;  
+      color: #262626;  
+      word-wrap: break-word;
 }
 
 .fullscreen-icon{
   
   display:none;
 }
-
+/*
 div.show-image:hover div.fullscreen-icon{
     display: block;
-    left:27%;
     position:absolute;
     top:3px;
+    left:7em;
     
         
     font-size:2em;
     
-}
+}*/

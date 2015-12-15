@@ -59,9 +59,9 @@
         
             </div>
           <div class="discussion-content">
-            {% spaceless %}
-            <i>{{each_reply.HTMLcontent | safe }}</i>
-            {% endspaceless %}
+          
+            {{each_reply.HTMLcontent|safe }}
+            
           {% for node in each_reply.collection_set  %}
             <div style="margin: 1em;">
               <br/>
@@ -85,10 +85,10 @@
           </div>
           <div class="discussion-footer">
               {% if request.user.id == each_reply.userid or is_gstaff %}
-                <a class="reply-btn" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" >{% trans "Delete" %} </a>
+                <a class="" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" ><input type="button" name="delete" value="Delete"> </a>
               {% endif %}
-                <a class="reply-btn"  data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'style="float:right">
-                {% trans "Reply" %}
+                <a class=""  data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'style="float:right">
+                 <input type="button" name="reply" value="Reply">
                 </a>
               </div>
           
