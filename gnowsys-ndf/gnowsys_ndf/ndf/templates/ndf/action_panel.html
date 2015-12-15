@@ -368,7 +368,9 @@
 				<!-- List Members and Join buttons -->
 				<div class="row btn-row">
 					<!-- List Members -->
-						<input type="button" id ="btn_list_member" class="tiny button radius left-btn" data-reveal-id="firstModal" value="{% trans 'List Members' %}" title="List Members of this group">
+					{% if  is_gstaff %}	
+						<input type="button" id ="btn_list_member" class="tiny button radius  left-btn" data-reveal-id="firstModal" value="{% trans 'List Members' %}" title="List Members of this group">
+					{% endif %}
 						<!-- Reveal Modals begin -->
 						<div id="firstModal" class="reveal-modal" data-reveal></div>
 					
