@@ -36,7 +36,7 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val
 
 
 @login_required
-def moderation_status(request, group_id, node_id):
+def moderation_status(request, group_id, node_id, get_only_response_dict=False):
 
 	try:
 		group_id = ObjectId(group_id)
@@ -136,13 +136,18 @@ def moderation_status(request, group_id, node_id):
 	# print "\n\n cleared_group_objs",cleared_group_objs
 	# print "\n\n next_mod_group_objs",next_mod_group_objs
 
-	return render_to_response('ndf/under_moderation.html', {
+	response_dict = {
 		'group_id': group_id, 'groupid': group_id, 'node': node, 'title': 'Under Moderation Status',
 		'is_under_moderation': is_under_moderation, 'current_mod_group_obj': current_mod_group_obj,
 		'group_hierarchy_obj_list': json.dumps(group_hierarchy_obj_list,cls=NodeJSONEncoder), 'top_group_obj': top_group_obj,
 		'group_obj': group_obj, 'next_mod_group_objs':next_mod_group_objs,
 		'cleared_group_objs':cleared_group_objs
-	}, RequestContext(request))
+	}
+
+	if get_only_response_dict:
+		return response_dict
+
+	return render_to_response('ndf/under_moderation.html', response_dict, RequestContext(request))
 
 def all_under_moderation(request, group_id):
 
