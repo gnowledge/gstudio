@@ -31,6 +31,7 @@ from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
+
 from gnowsys_ndf.ndf.org2any import org2html
 # ######################################################################################################################################
 
@@ -2177,7 +2178,9 @@ def switch_group(request,group_id,node_id):
   try:
     node = node_collection.one({"_id": ObjectId(node_id)})
     existing_grps = node.group_set
+    from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, CreateModeratedGroup
     if request.method == "POST":
+
       new_grps_list = request.POST.getlist("new_groups_list[]", "")
       resource_exists = False
       resource_exists_in_grps = []
@@ -2196,8 +2199,31 @@ def switch_group(request,group_id,node_id):
         response_dict["resource_exists_in_grps"] = resource_exists_in_grps
 
       if not resource_exists:
-        new_grps_list_all = [ObjectId(item) for item in new_grps_list]
-        node.group_set = new_grps_list_all
+        # new_grps_list_all = [ObjectId(item) for item in new_grps_list]
+
+        new_grps_list_all = []
+
+        for each_group_id in new_grps_list:
+            each_group_obj = node_collection.one({'_id': ObjectId(each_group_id)})
+
+            if each_group_obj.moderation_level > -1:
+                # means group is moderated one.
+                each_result_dict = moderation_status(request, each_group_obj._id, node._id, get_only_response_dict=True)
+                if each_result_dict['is_under_moderation']:
+                    # means, this node already exists in one of -
+                    # - the underlying mod group of this (each_group_obj).
+                    pass
+                else:
+                    each_group_set = get_moderator_group_set(existing_grps, each_group_id, get_details=False)
+                    merge_group_set = set(each_group_set + new_grps_list_all)
+                    new_grps_list_all = list(merge_group_set)
+
+            else:
+                if each_group_id not in new_grps_list_all:
+                    new_grps_list_all.append(ObjectId(each_group_id))
+
+
+        node.group_set = list(set(new_grps_list_all))
         node.save()
         # node_collection.collection.update({'_id': node._id}, {'$set': {'group_set': new_grps_list_all}}, upsert=False, multi=False)
         # node.reload()
@@ -2250,13 +2276,26 @@ def switch_group(request,group_id,node_id):
     # for each in node.group_set:
     #   coll_obj_list.append(node_collection.one({'_id': each}))
     #loop replaced by a list comprehension
-      coll_obj_list=[node_collection.one({'_id': each}) for each in node.group_set ]
-      data_list = set_drawer_widget(st, coll_obj_list)
+
+      # coll_obj_list=[node_collection.one({'_id': each}) for each in node.group_set ]
+
+      for each_coll_obj_id in node.group_set:
+        each_coll_obj = node_collection.one({'_id': ObjectId(each_coll_obj_id)})
+
+        if each_coll_obj and moderating_group_gst._id not in each_coll_obj.member_of:
+            coll_obj_list.append(each_coll_obj)
+        else:
+            mod_group_instance = CreateModeratedGroup(request)
+            is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(each_coll_obj_id)
+            coll_obj_list.append(top_group_obj)
+
+
+      data_list = set_drawer_widget(st, coll_obj_list, 'moderation_level')
       # print "\n\n data_list",data_list
       return HttpResponse(json.dumps(data_list))
    
   except Exception as e:
-    print "Exception in switch_group"+str(e)
+    print "Exception in switch_group: "+str(e)
     return HttpResponse("Failure")
 
 
