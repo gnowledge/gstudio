@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 
+{% load i18n %}
 {% load ndf_tags %}
 {% load simple_filters %}
 
@@ -13,9 +14,13 @@
 {% endblock head %}
 
 {% block meta_content %}
-  <p class="text-justify subheader">each eBook is Collection of Chapter files.
-  Download an ePub Reader or install a browser extension to view ePub files
-</p>
+  {% blocktrans %} 
+    <p class="text-justify subheader">Each eBook is a collection of chapter files.
+    </p> 
+  {% endblocktrans %}
+  <p>
+    <a href="http://nroer.gov.in/55ab34ff81fccb4f1d806025/page/56701a8581fccb0343bf438b" target="_blank">How to read eBooks</a>  
+  </p>
 
 {% endblock %}
 
