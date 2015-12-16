@@ -53,12 +53,13 @@ def moderation_status(request, group_id, node_id, get_only_response_dict=False):
 	node_status = node.status
 	node_group_set = node.group_set
 	current_mod_group_obj = None
+	group_hierarchy_obj_list = []
 	is_under_moderation = True
 	top_group_obj = None
 	cleared_group_objs = []
 	next_mod_group_objs = []
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
-	# mod_group_instance = CreateGroup(request)
+	mod_group_instance = CreateModeratedGroup(request)
 	# list_of_sg_mn = mod_group_instance.get_all_subgroups_member_of_list(group_obj._id)
 	# list_of_sg_member_of = get_sg_member_of(group_obj._id)
 	# print "\n\nlist_of_sg_mn-----",list_of_sg_member_of
@@ -81,20 +82,21 @@ def moderation_status(request, group_id, node_id, get_only_response_dict=False):
 
 	# Based on the resource's current group's member_of 
 	# or if resource is in top_level_group, based on its sg_member_of
-	if "ProgramEventGroup" in selected_group_obj.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of:
+	if "ModeratingGroup" in selected_group_obj.member_of_names_list or "ModeratingGroup" in list_of_sg_member_of or selected_group_obj.name == "home":
+		sg_member_of = "ModeratingGroup"
+		mod_group_instance = CreateModeratedGroup(request)
+	elif "ProgramEventGroup" in selected_group_obj.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of:
 		sg_member_of = "ProgramEventGroup"
 		mod_group_instance = CreateEventGroup(request)
 	elif "CourseEventGroup" in selected_group_obj.member_of_names_list or "CourseEventGroup" in list_of_sg_member_of:
 		sg_member_of = "CourseEventGroup"
 		mod_group_instance = CreateEventGroup(request)
-	elif "ModeratingGroup" in selected_group_obj.member_of_names_list or "ModeratingGroup" in list_of_sg_member_of:
-		sg_member_of = "ModeratingGroup"
-		mod_group_instance = CreateModeratedGroup(request)
 
 	# group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(selected_group,sg_member_of)
+	# print "\n sg_member_of",sg_member_of
 	group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(selected_group_obj._id,sg_member_of)
 	# returns result in <True, all_sub_group_list> format
-
+	# print "\n\n group_hierarchy_result",group_hierarchy_result
 	if group_hierarchy_result[0]:
 		group_hierarchy_obj_list = group_hierarchy_result[1]
 		group_hierarchy_id_list = [g._id for g in group_hierarchy_obj_list]
@@ -259,13 +261,13 @@ def approve_resource(request, group_id):
 						 node_obj._id, task_type_creation='multiple', \
 						 task_type='Other', task_content_org=task_content_org,\
 						 created_by_name=node_creator_username)
-			else:
-				# resource is in curation flow hence, create a task
-				create_moderator_task(request, \
-					group_set_details_dict['newly_appended_group_id'],\
-					 node_obj._id)
-			# node_obj.modified_by = int(request.user.id)
-			node_obj.save(groupid=group_id)
+				else:
+					# resource is in curation flow hence, create a task
+					create_moderator_task(request, \
+						group_set_details_dict['newly_appended_group_id'],\
+						 node_obj._id)
+				# node_obj.modified_by = int(request.user.id)
+				node_obj.save(groupid=group_id)
 
 			flag = 1
 		else:
@@ -330,19 +332,23 @@ def create_moderator_task(request, group_id, node_id, \
 	'''
 	Method to create task to group admins or moderators of the moderated groups.
 	'''
+	from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 	# def create_task(task_dict, task_type_creation="single"):
 	# task_dict
 	# - Required keys: _id[optional], name, group_set, created_by, modified_by, contributors, content_org,
 		# created_by_name, Status, Priority, start_time, end_time, Assignee, has_type
-
 	try:
 		task_dict = {}
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
-		if node_obj.relation_set:
-			for rel in node_obj.relation_set:
-				if rel and 'has_current_approval_task' in rel:
-					task_id = rel['has_current_approval_task'][0]
-					task_dict["_id"] = ObjectId(task_id)
+		
+		task_id_val = get_relation_value(node_obj._id,"has_current_approval_task")
+		if task_id_val != ('',''):
+			task_dict['_id'] = get_relation_value(node_obj._id,"has_current_approval_task")
+		# if node_obj.relation_set:
+		# 	for rel in node_obj.relation_set:
+		# 		if rel and 'has_current_approval_task' in rel:
+		# 			task_id = rel['has_current_approval_task'][0]
+		# 			task_dict["_id"] = ObjectId(task_id)
 
 		# last group is next appended group
 		group_obj = get_group_name_id(group_id, get_obj=True)
@@ -353,7 +359,6 @@ def create_moderator_task(request, group_id, node_id, \
 		site = Site.objects.get(pk=1)
 		site = unicode(site.name.__str__())
 		auth_grp = node_collection.one({'_type': "Author", 'created_by': int(node_obj.created_by)})
-
 		if task_type == "Moderation":
 			task_title = u"Moderate Resource: " + node_obj.name
 			if task_content_org:
@@ -385,20 +390,24 @@ def create_moderator_task(request, group_id, node_id, \
 			task_obj = create_task(task_dict, task_type_creation)
 			if task_obj:
 				create_grelation(node_obj._id, at_curr_app_task, task_obj._id)
-				if not on_upload:
-					try:
-						url = u"http://" + site + "/" + unicode(auth_grp._id) \
-							+ u"/moderation/status/" + unicode(node_obj._id.__str__())
+				try:
+					url = u"http://" + site + "/" + unicode(auth_grp._id) \
+						+ u"/moderation/status/" + unicode(node_obj._id.__str__())
+					activ = "Contribution to " + group_obj.name + "."
 
-						activ = "Contribution to " + group_obj.name + "."
+					if not on_upload:
 						mail_content = "Moderation status of your contributed file has been updated.\n" \
 							+ "You may visit this link to check the status of Moderation :\t" \
 							+ url
-						user_obj = User.objects.get(id=node_obj.created_by)
-						set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
-					except:
-						msg = "Unable to send Notification"
-
+					elif on_upload:
+						mail_content = "Your contributed file has been sent for Moderation.\n" \
+							+ "You may visit this link to check the status of Moderation :\t" \
+							+ url
+					user_obj = User.objects.get(id=node_obj.created_by)
+					set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
+				except Exception as notif_err:
+					# print notif_err
+					msg = "Unable to send Notification"
 		else:
 			# on final publish to top group
 
@@ -421,6 +430,23 @@ def create_moderator_task(request, group_id, node_id, \
 
 			try:
 				# delete the task associated with the resource
+				list_of_recipients_ids = []
+				list_of_recipients_ids.extend(group_obj.group_admin)
+				list_of_recipients_ids.append(node_obj.created_by)
+
+				# Sending notification to all watchers about the updates of the task
+				for each_user_id in list_of_recipients_ids:
+					url = u"http://" + site + "/"+ unicode(group_obj._id) \
+						+ u"/file/" + unicode(node_obj._id.__str__())
+
+					activ = "Contribution to " + group_obj.name +"."
+					mail_content = u"\n\n Contribution file "+ node_obj.name +" is moderated " \
+								 + "and successfully published to " + \
+								group_obj.name + \
+								u". \n\nVisit this link to view the resource : " \
+								+ url
+					user_obj = User.objects.get(id=int(each_user_id))
+					set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
 				if task_id:
 					task_node = node_collection.one({'_id': ObjectId(task_id)})
 					# del_status, del_status_msg = delete_node(
@@ -446,40 +472,9 @@ def create_moderator_task(request, group_id, node_id, \
 					}
 					task_obj = create_task(task_dict, task_type_creation)
 
-				list_of_recipients_ids = []
-				list_of_recipients_ids.extend(group_obj.group_admin)
-				list_of_recipients_ids.append(node_obj.created_by)
-
-				# Sending notification to all watchers about the updates of the task
-				for each_user_id in list_of_recipients_ids:
-					url = u"http://" + site + "/"+ unicode(group_obj._id) \
-						+ u"/file/" + unicode(node_obj._id.__str__())
-
-					activ = "Contribution to " + group_obj.name +"."
-					mail_content = u"\n\n Contribution file "+ node_obj.name +" is moderated " \
-								 + "and successfully published to " + \
-								group_obj.name + \
-								u". \n\nVisit this link to view the resource : " \
-								+ url
-					user_obj = User.objects.get(id=int(each_user_id))
-					set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
 
 			except Exception as e:
 				msg = "Unable to send Notification", str(e)
-		if on_upload:
-			try:
-				url = u"http://" + site + "/"+ unicode(auth_grp._id) \
-					+ u"/moderation/status/" + unicode(node_obj._id.__str__())
-
-				activ = "Contribution to " + group_obj.name +"."
-				mail_content = "Your contributed file has been sent for Moderation.\n" \
-					+ "You may visit this link to check the status of Moderation :\t" \
-					+ url
-				user_obj = User.objects.get(id=node_obj.created_by)
-				set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
-			except:
-				msg = "Unable to send Notification"
-			return True
 	except Exception as e:
 		print "Error in task create moderation --- " + str(e)
 
