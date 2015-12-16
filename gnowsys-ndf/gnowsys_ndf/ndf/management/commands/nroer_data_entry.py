@@ -51,6 +51,7 @@ log_list.append("######### Script ran on : " + time.strftime("%c") + " #########
 
 file_gst = node_collection.one({'_type': 'GSystemType', "name": "File"})
 home_group = node_collection.one({"name": "home", "_type": "Group"})
+warehouse_group = node_collection.one({"name": 'warehouse', "_type": "Group"})
 theme_gst = node_collection.one({'_type': 'GSystemType', "name": "Theme"})
 theme_item_gst = node_collection.one({'_type': 'GSystemType', "name": "theme_item"})
 topic_gst = node_collection.one({'_type': 'GSystemType', "name": "Topic"})
@@ -848,7 +849,7 @@ def create_thread_obj(node_id):
         log_list.append(str(info_message))
 
 
-def create_resource_gsystem(resource_data, row_no=''):
+def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
   
     # fetching resource from url
     resource_link = resource_data.get("resource_link")  # actual download file link
@@ -887,6 +888,7 @@ def create_resource_gsystem(resource_data, row_no=''):
     content_org = resource_data["content_org"]
     tags = resource_data["tags"]
     language = resource_data["language"]
+    group_set_id = ObjectId(group_set_id) if group_set_id else home_group._id
 
     img_type = None
     access_policy = None
@@ -953,7 +955,8 @@ def create_resource_gsystem(resource_data, row_no=''):
         print info_message
         
         files.seek(0)
-        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
+
+        fileobj_oid, video = save_file(files, name, userid, group_set_id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
         # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
         
         # filetype = magic.from_buffer(files.read(100000), mime = 'true')  # Gusing filetype by python-magic
@@ -984,11 +987,16 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     updated_res_data['tags'] = []
 
     # th_id: thumbnail id
-    th_id = create_resource_gsystem(updated_res_data, row_no)
+    th_id = create_resource_gsystem(updated_res_data, row_no, group_set_id=warehouse_group._id)
     # print "th_id: ", th_id
     
     th_obj = node_collection.one({'_id': ObjectId(th_id)})
-    th_gridfs_id = th_obj.fs_file_ids[1]
+
+    # tring to keep mid-size image otherwise thumbnail
+    try:
+        th_gridfs_id = th_obj.fs_file_ids[2]
+    except:
+        th_gridfs_id = th_obj.fs_file_ids[1]
     # print "th_gridfs_id: ", th_gridfs_id
 
     node_obj = node_collection.one({'_id': ObjectId(node_id)})

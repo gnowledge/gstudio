@@ -136,6 +136,7 @@ class Command(BaseCommand):
           gs_node.edit_policy  = u'NON_EDITABLE'
           gs_node.status = u'PUBLISHED'
           gs_node.save()
+          print "Group: 'home' created."
         
                    
         # Create default group 'warehouse' wherein intermediate uploads like:
@@ -159,6 +160,7 @@ class Command(BaseCommand):
           gs_node.edit_policy =u'EDITABLE_NON_MODERATED'
           gs_node.status = u'PUBLISHED'
           gs_node.save()
+          print "Group: 'warehouse' created."
 
 
         # Create default group 'desk' wherein all initial uploads will happen
@@ -183,6 +185,7 @@ class Command(BaseCommand):
           gs_node.edit_policy =u'EDITABLE_NON_MODERATED'
           gs_node.status = u'PUBLISHED'
           gs_node.save()
+          print "Group: 'desk' created."
 
         
         # Creating factory GSystemType's 
