@@ -215,10 +215,14 @@
       {% if user_is_joined == "joined" or user_is_joined == "author" %}
       <!-- <b>{% trans "Actions" %}</b><br/><br/> -->
       
-        {% if site.SITE_NAME == "NROER" and not group_name_tag == "home" %}
-          <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny expand button radius">
+        {% if group_name_tag == "home" %}
+          <a href="{% url 'uploadDoc' 'desk' %}" class="tiny expand button radius" title="To have file in this group, upload in desk group">
+            {% trans "Upload File in desk" %}
+          </a> <br/>
+        {% else %}
+          <a href="{% url 'uploadDoc' group_name_tag %}" class="tiny expand button radius">
             {% trans "Upload File" %}
-          </a><br/>
+          </a> <br/>
         {% endif %}
 
         {% comment %}

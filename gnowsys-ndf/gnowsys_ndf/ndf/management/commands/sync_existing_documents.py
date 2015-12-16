@@ -59,21 +59,22 @@ class Command(BaseCommand):
     # --- END of Language processing ---
 
 
-    # adding all activated and logged-in user's id into author_set of "home" group ---
+    # adding all activated and logged-in user's id into author_set of "home" and "desk" group ---
     all_authors = node_collection.find({"_type": "Author"})
     authors_list = [auth.created_by for auth in all_authors]
 
-    home_group = node_collection.one({"_type":"Group", "name": "home"}) 
+    # updating author_set of desk and home group w.ref. to home group's author_set
+    home_group = node_collection.one({"_type":"Group", "name": "home"})
     prev_home_author_set = home_group.author_set
     total_author_set = list(set(authors_list + home_group.author_set))
 
-    result = node_collection.collection.update({"_type": "Group", "name": u"home", "author_set": {"$ne": total_author_set} }, {"$set": {"author_set": total_author_set}}, upsert=False, multi=False )
+    result = node_collection.collection.update({"_type": "Group", "name": {"$in": [u"home", u"desk"]}, "author_set": {"$ne": total_author_set} }, {"$set": {"author_set": total_author_set}}, upsert=False, multi=True )
 
     if result['updatedExisting']: # and result['nModified']:
         home_group.reload()
-        print "\n Updated author_set of 'home' group:" + \
-            "\n\t - Previously it was   : " + str(prev_home_author_set) + \
-            "\n\t - Now it's updated to : " + str(home_group.author_set)
+        print "\n Updated author_set of 'home' and 'desk' group:" + \
+            "\n\t - Previously it was   : " + str(len(prev_home_author_set)) + " users."\
+            "\n\t - Now it's updated to : " + str(len(home_group.author_set)) + " users."
 
     
     # --------------------------------------------------------------------------

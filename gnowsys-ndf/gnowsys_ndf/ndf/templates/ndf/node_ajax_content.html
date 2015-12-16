@@ -810,8 +810,18 @@
               <li class="card-image-wrapper"> 
                 {% include 'ndf/simple_card.html' with resource=subgroup_node has_prof_pic=True url_name="groupchange" first_arg=subgroup_node.pk %}
               </li>
-
-            {% endfor %}
+            {% comment %}
+                
+            {% empty %}
+              <div class="row">
+                <div class="small-12 columns">
+                  <h5> 
+                  No Subgroups Found!
+                  </h5>
+                </div>
+              </div>
+            {% endcomment %}
+          {% endfor %}
           </section>
           </div>
           {% endif %}

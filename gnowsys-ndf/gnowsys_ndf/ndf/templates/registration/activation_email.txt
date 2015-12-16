@@ -9,4 +9,4 @@
 http://{{ site.domain }}{{ activation_key_url }}
 
 {% trans "Sincerely"%},
-{{ site.name }} {% trans "Management" %}
+{{ site.name }} {% trans "Team" %}
