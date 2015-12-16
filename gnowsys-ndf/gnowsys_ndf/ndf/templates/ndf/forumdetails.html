@@ -262,7 +262,7 @@ function forum_del() {
 var th_count={{thread_count}};
 if (th_count <= 0)
 {
-if (!window.confirm("Are you sure you want to delete this ?"))
+if (!window.confirm("{% trans 'Are you sure you want to delete this' %} ?"))
 {
   $("edit-options").class="f-dropdown";		
   return false;

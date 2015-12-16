@@ -60,7 +60,7 @@ table {
 
 {% block body_content %} 
 <div id="myGroup" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
-     <p>Hold down "Control", to select more than one.</p>
+     <p>{% trans 'Hold down "Control", to select more than one.' %}</p>
      <h2>{% trans "Select Groups" %}</h2>
      <select id="id_groups" name="groups" multiple="multiple" style="max-width:500px;height:180px;">
        {% for group in Groups%}
@@ -81,7 +81,7 @@ table {
 </div>
 
 <div id="myAttributetype" class="reveal-modal" data-reveal >
-     <h2>Select Attributetype set</h2>
+     <h2>{% trans 'Select Attributetype set' %}</h2>
       <div id="module_drawer" >
         {% include "ndf/drawer_widget.html" with widget_for="attributetype_set"  %}
       </div>
@@ -89,7 +89,7 @@ table {
 </div>
 
 <div id="myRelationtype" class="reveal-modal" data-reveal >
-     <h2>Select Relationtype set</h2>
+     <h2>{% trans 'Select Relationtype set' %}</h2>
       <div id="module_drawer" >
         {% include "ndf/drawer_widget.html" with widget_for="relationtype_set"  %}
       </div>
@@ -97,8 +97,8 @@ table {
 </div>
 
 <div id="my_meta_type" class="reveal-modal" data-reveal style="width:30%; overflow: auto; text-overflow: ellipsis;">
-     <p>Hold down "Control", to select more than one.</p>
-     <h2>Select MetaType</h2>
+     <p>{% trans 'Hold down "Control", to select more than one.' %}</p>
+     <h2>{% trans 'Select MetaType' %}</h2>
      <select id="id_meta_type" name="meta_types" multiple="multiple" style="max-width:500px;height:180px;">
        {% for meta_type in meta_types %}
        <option value="{{meta_type.id}}" name="{{meta_type.title}} - {{meta_type.id}}">{{meta_type.title}} - {{meta_type.id}}</option>
@@ -109,12 +109,12 @@ table {
 </div>
 {% endif %}
 
- <input class="button deleteObjects" type="button" value="Delete">
+ <input class="button deleteObjects" type="button" value="{% trans 'Delete' %}">
 <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
 {% csrf_token %}
 <input name="search" type="textbox" value="" style="width:300px;">
 <input type="hidden" name="class" value="{{class_name}}">
-<input type="submit" value="search" style="width:100px;">
+<input type="submit" value="{% trans 'search' %}" style="width:100px;">
 </form>
 {% autopaginate nodes 25 %}
 <div style="display: block; width: 101%; overflow: auto;">
@@ -122,8 +122,8 @@ table {
   <thead>
     <tr>
       <th width="20"> <input class="checkedAll" type="checkbox"></th>
-      <th width="140" style="display:none">Id</th>
-      <th width="140">Title</th>
+      <th width="140" style="display:none">{% trans 'Id' %}</th>
+      <th width="140">{% trans 'Title' %}</th>
     {% if class_name == "File" or class_name ==  "GSystem"  %}
       <th width="140">{% trans "Group(s)" %}</th>
     {% endif %}
@@ -180,8 +180,8 @@ table {
           </td>
 	  {% endif %}
 	  <td style="font-size:11px;"> 
-	    <input class="button editobject" id="{{each.Id}}" type="button" value="Edit"> 
-	    <input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none">
+	    <input class="button editobject" id="{{each.Id}}" type="button" value="{% trans 'Edit' %}"> 
+	    <input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="{% trans 'Save' %}" style="display:none">
 	  </td>
 	  {% if class_name == "GSystemType" or class_name = "AttributeType" or class_name = "RelationType" %}
 	  <td> 
@@ -211,7 +211,7 @@ function set_drawer_value(node_id)
 {
  $('#mySystemtype #collection_set_drawer1').html("");
  $('#mySystemtype #collection_set_drawer2').html("");
- $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+ $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans 'Type here to search in the resources' %}" id="collection_set_search" class="margin-0"></li>');
   var url = '/{{groupid}}/ajax/get_data_for_drawer/?id='+node_id ;
   $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
@@ -235,7 +235,7 @@ function attributetype_set_drawer_value(node_id)
 {
  $('#myAttributetype #attributetype_set_drawer1').html("");
  $('#myAttributetype #attributetype_set_drawer2').html("");
- $('#myAttributetype #attributetype_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="attributetype_set_search" class="margin-0"></li>');
+ $('#myAttributetype #attributetype_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans 'Type here to search in the resources' %}" id="attributetype_set_search" class="margin-0"></li>');
   var url = '/{{groupid}}/ajax/get_data_for_drawer_of_attributetype_set/?id='+node_id ;
   $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
@@ -259,7 +259,7 @@ function relationtype_set_drawer_value(node_id)
 {
  $('#myRelationtype #relationtype_set_drawer1').html("");
  $('#myRelationtype #relationtype_set_drawer2').html("");
- $('#myRelationtype #relationtype_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="relationtype_set_search" class="margin-0"></li>');
+ $('#myRelationtype #relationtype_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans 'Type here to search in the resources' %}" id="relationtype_set_search" class="margin-0"></li>');
   var url = '/{{groupid}}/ajax/get_data_for_drawer_of_relationtype_set/?id='+node_id ;
   $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
@@ -305,7 +305,7 @@ $(document).on('click',".button.editobject",function(){
 $(document).on('click',".button.deleteObjects",function(){
         var selectedobject = $(".objectsCheckbox input:checked")
         if(selectedobject.length > 0){
-             var confirmed = confirm("Deleting "+selectedobject.length+" objects");
+             var confirmed = confirm("{% trans 'Deleting objects' %} :"+selectedobject.length);
              if(confirmed == true){
              var i = 0;
              var str = "";  

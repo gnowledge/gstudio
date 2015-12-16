@@ -66,9 +66,9 @@
             <div style="margin: 1em;">
               <br/>
               {% if node.status == "MODERATION" %}
-                  <p>File is under moderation.<br><a href="/{{group_id}}/moderation/status/{{node.pk}}" target="_blank">Click here to check status</a></p>
+                  <p>{% trans 'File is under moderation.' %}<br><a href="/{{group_id}}/moderation/status/{{node.pk}}" target="_blank"> {% trans 'Click here to check status' %}</a></p>
               {% elif node.status == "DRAFT" %}
-                    <p>This File is Rejected by the Moderator.</p>
+                    <p>{% trans 'This File is Rejected by the Moderator.' %}</p>
               {% elif node.status != "MODERATION" %}
                   {# {{node.mime_type}} #}
                   <a class="th" href="{% url 'read_file' group_id node node.name %}">
@@ -175,8 +175,8 @@
       // }
       // else
       // {
-      //   // alert("To start discussion you need to login and be the member of this group.");
-      //   // alert("Only group members can comment.");
+      //   // alert("{% trans 'To start discussion you need to login and be the member of this group.' %}");
+      //   // alert("{% trans 'Only group members can comment.' %}");
       //   $("#alertModalLabel").text("Only group members can comment.");
       //   // $("#alertModal").addClass("warning");
       //   $("#alertModal").foundation('reveal', 'open');
@@ -225,8 +225,8 @@
     // }
     // else
     // {
-    //   alert("Only group members can reply to comment.");
-    //   // alert("To start discussion you need to login and be the member of this group.");
+    //   alert("{% trans 'Only group members can reply to comment.' %}");
+    //   // alert("{% trans 'To start discussion you need to login and be the member of this group.' %}");
     // }
   }
   else{

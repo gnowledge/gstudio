@@ -59,9 +59,9 @@
 
       <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-5" id="all_events" style="background-color:#fafafa;border-style:none">
       {% if title == "Course" %}
-        <div class="repository-title large-4 columns">All eCourses</div>
+        <div class="repository-title large-4 columns">{% trans 'All eCourses' %}</div>
       {% else %}
-        <div class="repository-title large-4 columns">All {{title}}</div>
+        <div class="repository-title large-4 columns">{% trans 'All' %} {{title}}</div>
       {% endif %}
 
         {% for course in ce_coll %}
@@ -72,8 +72,8 @@
             <div class="row">
               <div class="small-12 columns">
                 <h5> 
-                {% if req_from_course %}No Course Available!
-                {% else %}No Program Available!
+                {% if req_from_course %}{% trans 'No Course Available!' %}
+                {% else %}{% trans 'No Program Available!' %}
                 {% endif %}
                 </h5>
               </div>
@@ -84,9 +84,9 @@
 
       <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-5" id="my_events">
       {% if title == "Course" %}
-        <h4>My eCourses</h4>
+        <h4>{% trans 'My eCourses' %}</h4>
       {% else %}
-        <h4>My {{title}}</h4>
+        <h4>{% trans 'My' %} {{title}}</h4>
       {% endif %}
         {% for course in enr_ce_coll %}
           <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
@@ -97,8 +97,8 @@
             <div class="row">
               <div class="small-12 columns">
                 <h5>
-                {% if req_from_course %}Not Enrolled to Any Courses!
-                {% else %}Not Enrolled to Any Programs!
+                {% if req_from_course %}{% trans 'Not Enrolled to Any Courses!' %}
+                {% else %}{% trans 'Not Enrolled to Any Programs!' %}
                 {% endif %}
                 </h5>
               </div>
@@ -110,7 +110,7 @@
 
 
       <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-5" id="courses" style="background-color:#fafafa;border-style:none">
-       <div class="repository-title large-4 columns">All Courses</div>
+       <div class="repository-title large-4 columns">{% trans 'All Courses' %}</div>
         {% for course in course_coll %}
           <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
             {% include 'ndf/simple_card.html' with resource=course has_logo=True url_name="course_detail" first_arg=group_id second_arg=course.pk %}
@@ -119,7 +119,7 @@
         {% empty %}
             <div class="row">
               <div class="small-12 columns">
-                <h5> No Course Created!
+                <h5> {% trans 'No Course Created!' %}
                 </h5>
               </div>
             </div>

@@ -32,9 +32,9 @@
 {% block body_content %}
 
 	{% if files.count > 0 %}
-		<h4>Following ({{files.count}}) resource/s are under moderation:</h4>
+		<h4>({{files.count}}) {% trans 'resource/s are under moderation' %}:</h4>
 	{% else %}
-		<h4>Currently, no resources are under moderation in this group</h4>
+		<h4>{% trans 'Currently, no resources are under moderation in this group' %}</h4>
 	{% endif %}
   
   <div class="tabs-content gallery">

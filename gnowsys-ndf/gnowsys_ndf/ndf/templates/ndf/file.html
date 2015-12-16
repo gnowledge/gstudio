@@ -50,7 +50,7 @@
     {% if user.is_authenticated %}
       {% include "ndf/shelf.html" %}
     {% else %}
-      <h4>Please Login to create your shelf</h4>
+      <h4>{% trans "Please Login to create your shelf" %}</h4>
     {% endif %}  
   {% endblock %}
 {% endcomment %}
@@ -216,7 +216,7 @@
       <!-- <b>{% trans "Actions" %}</b><br/><br/> -->
       
         {% if group_name_tag == "home" %}
-          <a href="{% url 'uploadDoc' 'desk' %}" class="tiny expand button radius" title="To have file in this group, upload in desk group">
+          <a href="{% url 'uploadDoc' 'desk' %}" class="tiny expand button radius" title="{% trans 'To have file in this group, upload in desk group' %}">
             {% trans "Upload File in desk" %}
           </a> <br/>
         {% else %}
@@ -248,8 +248,8 @@
       </div>
 
       <div class="coll_label row" style="display:none;">
-        <span class="small-12 columns">Create Collection</span>
-        <div class="small-11 columns"><input type="text" class="coll_value" placeholder="Enter collection name" name="coll_name"/></div><a class="create_coll"><span class="fi-check" style="color:green;"></span></a>
+        <span class="small-12 columns">{% trans 'Create Collection' %}</span>
+        <div class="small-11 columns"><input type="text" class="coll_value" placeholder="{% trans 'Enter collection name' %}" name="coll_name"/></div><a class="create_coll"><span class="fi-check" style="color:green;"></span></a>
       </div>
     </ul>
   </div>
@@ -736,7 +736,7 @@
 
 
   {% if is_video %}
-    alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
+    alert("{% trans 'Your video file uploaded succesfully, But still in process, play video about 1 hour after' %}");
   {% endif %}
 
 // </script>

@@ -84,7 +84,7 @@
       <div class="active content row" id="panel_{{property_order_list.0.0}}">
         <!-- fieldset for search criteria //////////////////////////////////////////////////////////////////// -->
         <fieldset id="sc">
-          <legend><label><h5>Course</h5></label></legend>
+          <legend><label><h5>{% trans 'Course' %}</h5></label></legend>
 
           <div class="row">
             <div class="small-2 columns">
@@ -121,7 +121,7 @@
           {% else %}
             <fieldset id="unset-ac" class="hide">
               <legend>
-                <label><h5>Select Course : </h5></label>
+                <label><h5>{% trans 'Select Course' %} : </h5></label>
               </legend>
               
               <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
@@ -155,7 +155,7 @@
         </fieldset>
         {% if tiss_site %}
         <fieldset id="fsCollege" class="hide">
-            <legend><label><h5>Select College</h5></label></legend>
+            <legend><label><h5>{% trans 'Select College' %}</h5></label></legend>
 
           <div class="row">
             <div class="small-2 columns">
@@ -186,7 +186,7 @@
 
           <div class="row hide" id="already_announced_in_colg_list_div">
             <div class="small-12 columns">
-              <label><h6><b>Following are the college(s) in which Course(s) are announced for given duration:</b></h6></label>
+              <label><h6><b>{% trans 'Following are the college(s) in which Course(s) are announced for given duration' %}:</b></h6></label>
             </div>
             <div class="small-12 columns">
               <ol id="already_announced_in_colg_list_ol">
@@ -197,7 +197,7 @@
 
           <div class="row hide" id="unassigned_PO_college_div">
             <div class="small-12 columns">
-              <label><h6><b>Following are the college(s) for which Program Officer(s) is/are either not registered or not subscribed to their respective college group(s):</b></h6></label>
+              <label><h6><b>{% trans 'Following are the college(s) for which Program Officer(s) is/are either not registered or not subscribed to their respective college group(s)' %}:</b></h6></label>
             </div>
             <div class="small-12 columns">
               <ol id="unassigned_PO_college_ol">
@@ -258,7 +258,7 @@
     if (!(is_all_courses_not_selected) || $("#start_time").val() == "" || $("#end_time").val() == "") {
       $("#univ_cur").prop("selectedIndex", 0);
 
-      $("#alertModalLabel").text("Either course is not selected or course period duration is not set properly!!!");
+      $("#alertModalLabel").text("{% trans 'Either course is not selected or course period duration is not set properly' %}!!!");
       $("#alertModal").removeClass("success").removeClass("warning");
       $("#alertModal").addClass("alert");
       $("#alertModal").foundation('reveal', 'open');
@@ -574,7 +574,7 @@
         $("#announce_to_colg_list").val(announce_to_colg_list);
 
         $('article').block({ 
-          message: '<h4>Processing... Please wait!</h4>',
+          message: '<h4>{% trans 'Processing... Please wait!' %}</h4>',
           css: { 
             border: 'none', 
             padding: '15px', 
@@ -608,7 +608,7 @@
             }        
 
             $('article').block({ 
-              message: '<h4>Processing... Please wait!</h4>',
+              message: '<h4>{% trans 'Processing... Please wait!' %}</h4>',
               css: { 
                 border: 'none', 
                 padding: '15px', 
@@ -622,7 +622,7 @@
           }
 
           else{
-            $("#alertModalLabel").text("Please select College!!!");
+            $("#alertModalLabel").text("{% trans 'Please select College' %} !!!");
             $("#alertModal").addClass("alert");
             $("#alertModal").foundation('reveal', 'open');
             
@@ -652,7 +652,7 @@
           $("#end_time").attr("disabled", false);
 
           $('article').block({ 
-            message: '<h4>Processing... Please wait!</h4>',
+            message: '<h4>{% trans 'Processing... Please wait!' %}</h4>',
             css: { 
               border: 'none', 
               padding: '15px', 
@@ -696,7 +696,7 @@
       $("#fsCollege").removeClass("hide")
     }
 
-    $(".tab-nav").children(".for-next").append("<input type='submit' id='announce-course' class='small button ' value='Update' style='float:right;'>")
+    $(".tab-nav").children(".for-next").append("<input type='submit' id='announce-course' class='small button ' value='{% trans "Update" %}' style='float:right;'>")
 
     if($("#announce-course").hasClass("hide")) {
       $("#announce-course").removeClass("hide")

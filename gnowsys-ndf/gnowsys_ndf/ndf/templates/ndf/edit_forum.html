@@ -70,8 +70,8 @@ function cancel(){
 
 
 {% block meta_content %}
-  {% blocktrans %}  <h3 class="subheader">Existing Discussion</h3>
-    <p class="text-justify subheader">Use a relevant topic for the <b>Forum</b> so that people interested can join the discussion.</p> {% endblocktrans %}
+    <h3 class="subheader">{% trans 'Existing Discussion' %}</h3>
+    <p class="text-justify subheader">{% blocktrans %}Use a relevant topic for the <b>Forum</b> so that people interested can join the discussion.</p> {% endblocktrans %}
 {% endblock %}
 
 {% block body_content %} 
@@ -94,16 +94,16 @@ function cancel(){
     <br/><br/>
 
     <!-- Date time -->
-    <!-- <h5><b>Select Date and Time:</b></h5>
+    <!-- <h5><b>{% trans 'Select Date and Time' %}:</b></h5>
     <br/>        
     <div class="row">
-        <div class="large-1 columns text-align-middle" >Start at:</div>
-        <div class="large-2 large-pull-9 columns"><input type="text" placeholder="Click to select datetime" id="startDtInput" name="startDtInput" /></div>
+        <div class="large-1 columns text-align-middle" >{% trans 'Start at' %}:</div>
+        <div class="large-2 large-pull-9 columns"><input type="text" placeholder="{% trans 'Click to select datetime' %}" id="startDtInput" name="startDtInput" /></div>
     </div>
         
     <div class="row">
-        <div class="large-1 columns text-align-middle">End at: </div>
-        <div class="large-2 large-pull-9 columns"><input type="text" placeholder="Click to select datetime" id="endDtInput" name="startDtInput"/></div>
+        <div class="large-1 columns text-align-middle">{% trans 'End at' %}: </div>
+        <div class="large-2 large-pull-9 columns"><input type="text" placeholder="{% trans 'Click to select datetime' %}" id="endDtInput" name="startDtInput"/></div>
     </div>
     <br/><br/>
  -->
@@ -116,13 +116,13 @@ function cancel(){
 
 {% include "ndf/add_editor.html" with var_name="content_org" var_value=forum.content_org|default_if_none:"" node_id=forum.pk %}
         <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">                   -->
-        <!-- <input type="button" id="save_edit_cont" class="button" value="Save"> -->
+        <!-- <input type="button" id="save_edit_cont" class="button" value="{% trans 'Save' %}"> -->
       </div>
       <br/><br/>
 
       <!-- Final Create forum button -->
       <div class="large-8 columns">
-        <!-- <input type="submit" id="forum" value="Edit Forum" style="display:none"> -->
+        <!-- <input type="submit" id="forum" value="{% trans 'Edit Forum' %}" style="display:none"> -->
         <input type="submit" id="forum" class="button tiny" value="{% trans 'Save' %} {% trans 'Forum' %}">
 	<input type="button" id="cancel_edit" class="button tiny" value="{% trans 'Cancel' %}" onclick="cancel()">
       </div>
@@ -139,13 +139,13 @@ function cancel(){
 
 
             <div class="large-4 columns">
-               <label>Name of the Forum</label>
+               <label>{% trans 'Name of the Forum' %}</label>
                <input type="text" id="forum_name" name="forum_name">
                <div id="message" style="display:none; color:red"></div>
            </div>
      -->
     <!--        <div class="large-4 small-2 columns">
-              <label>Description</label>
+              <label>{% trans 'Description' %}</label>
      -->          <!-- #{#% include "ndf/loadeditor.html" %} -->
 
               <!-- <textarea id="forum_edit_cont" type="hidden" value="" name="content_org" style="display:none"></textarea> -->
@@ -154,28 +154,28 @@ function cancel(){
 
         <div class="row">
           <div class="large-4 columns">
-            <label>Start time:</label>
+            <label>{% trans 'Start time' %}:</label>
             <div class="small-2 columns">
-             <label>Date:</label></div>
+             <label>{% trans 'Date' %}:</label></div>
              <div class="small-9 columns">
                  <input type="text" class="span2" value="" id="startdate" data-date-format="mm/dd/yyyy" name="sdate">
              </div>
          </div>
 
          <div class="large-4 columns">
-          <label>Hours:</label>
+          <label>{% trans 'Hours' %}:</label>
           <input id="starthrs" type="text" name="shrs">
       </div>
       <div class="large-4 columns">
-          <label>Minutes:</label>
+          <label>{% trans 'Minutes' %}:</label>
           <input id = "startmts" type = "text" name = "smts">
       </div>
       </div>
       <div class="row">
           <div class="large-4 columns">
-           <label> End time:  </label>
+           <label> {% trans 'End time' %}:  </label>
            <div class="small-2 columns"> 
-              <label>Date: </label>
+              <label>{% trans 'Date' %}: </label>
           </div>
           <div class="small-9 columns"> 
 
@@ -185,18 +185,18 @@ function cancel(){
       </div>
 
       <div class="large-4 columns">
-          <label>Hours:</label>
+          <label>{% trans 'Hours' %}:</label>
           <input id = "endhrs"  type = "text" name = "ehrs">
       </div>
       <div class="large-4 columns">
-       <label>Minutes:</label>
+       <label>{% trans 'Minutes' %}:</label>
        <input id = "endmts"  type = "text" name = "emts">
       </div>
       </div>
 
-      <input type="button" id="save_forum" class="btn btn-primary btn-large btn-block" value="Create Forum" onclick="saveforum()">
+      <input type="button" id="save_forum" class="btn btn-primary btn-large btn-block" value="{% trans 'Create Forum' %}" onclick="saveforum()">
 
-      <input type="submit" id="forum" value="Create Forum" class="btn btn-primary btn-large btn-block" style="display:none">
+      <input type="submit" id="forum" value="{% trans 'Create Forum' %}" class="btn btn-primary btn-large btn-block" style="display:none">
 
       <input type="hidden" id="nodes_list" value="{{nodes_list}}">            
 
@@ -338,7 +338,7 @@ function cancel(){
       if (nodes.indexOf(name) > 0)  
       {
         $("#message").css("display", "block");
-        $("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+        $("#message").html("'"+ name +"' {% trans ' name already exist .. Please choose another name' %}");
         $("#forum_name").val("");
       }
       else

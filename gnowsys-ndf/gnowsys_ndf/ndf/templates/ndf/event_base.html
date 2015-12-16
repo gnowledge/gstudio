@@ -115,16 +115,16 @@
                 <ul class="right">
                   <li class="enroll-btn-li">
                   {% if user_access == "allow" %}
-                    <input class="button tiny" type="button" value="ENROLLED" disabled="disabled">
+                    <input class="button tiny" type="button" value="{% trans 'ENROLLED' %}" disabled="disabled">
                   {% else %}
                     {% if user.is_authenticated %}
                       {% if allow_to_join == "Open" %}
-                        <input class="enroll-btn button tiny" type="button" value="ENROLL">
+                        <input class="enroll-btn button tiny" type="button" value="{% trans 'ENROLL' %}">
                       {% else %}
-                        <input class="button tiny" type="button" value="Enrollment {{allow_to_join}}" disabled="disabled">
+                        <input class="button tiny" type="button" value="{% trans 'Enrollment' %} {{allow_to_join}}" disabled="disabled">
                       {% endif %}
                     {% else %}
-                        <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
+                        <a href="{% url 'auth_login' %}" class="button tiny" title="{% trans 'Please login to Enroll' %}">{% trans 'ENROLL' %}</a>
                     {% endif %}
                   {% endif %}
                   </li>
@@ -149,7 +149,7 @@
 
 			        <div class="content" id="journal-tab">
 			            <div class="text-right">
-			                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button small radius"> Add Blog </a>
+			                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button small radius"> {% trans 'Add Blog' %} </a>
 			            </div>
 			            <div class="row all_blogs">
 			            	{% for each_blog in blog_pages %}
@@ -172,7 +172,7 @@
 			              {% empty %}
 			                <div class="blogpage"  style="margin-left:10px;">
 			                  <h4><u>
-			                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True">Start writing Pages </a>
+			                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True">{% trans 'Start writing Pages' %} </a>
 			                  </u></h4>
 			                </div>
 			              {% endfor %}
@@ -186,8 +186,8 @@
 				                    {% csrf_token %}
 				                    <input type="file" name="doc" id="docFile"/>
 				                    <div class="save_cancel hide">
-				                      <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
-				                      <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
+				                      <input type="submit" id="submitpostid" class="tiny button radius" value="{% trans 'Save' %}"/>
+				                      <input type="button" id="btnUploadCancel" class="tiny button radius" value="{% trans 'Cancel' %}"/>
 				                    </div>
 				                </form>
 

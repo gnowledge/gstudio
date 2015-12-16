@@ -41,7 +41,7 @@
         <div>
           
           <a href="{% url "GAPPS_set_new_instance" group_name_tag app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
-            +&nbsp;Add
+            +&nbsp;{% trans 'Add' %}
           </a>
           
           <a href="{% url "GAPPS_set" group_name_tag app_name app_id each.id %}" >
@@ -58,7 +58,7 @@
         <div>
         
           <a href="{% url "GAPPS_set_new_instance" group_name_tag app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
-            +&nbsp;Add
+            +&nbsp;{% trans 'Add' %}
           </a>
           <a href="{% url "GAPPS_set" group_name_tag app_name app_id each.id %}" >
             {{each.name}} ({{count}})
@@ -87,15 +87,15 @@
         
         <h3>{% trans "Are you sure you want to delete? All of the following related items also will be deleted:" %}</h3> 
         
-        <input class="button confirmDeleteObjects" type="button" value="Confirm">
-        <input class="button cancelDeleteObjects" type="button" value="Cancel">
+        <input class="button confirmDeleteObjects" type="button" value="{% trans 'Confirm' %}">
+        <input class="button cancelDeleteObjects" type="button" value="{% trans 'Cancel' %}">
         <div id="deletion_results"></div>
         <a class="close-reveal-modal">&#215;</a>
 
       </div>
 
       {% if user.is_authenticated %}
-        <input class="button deleteObjects" type="button" value="Delete">
+        <input class="button deleteObjects" type="button" value="{% trans 'Delete' %}">
       {% endif %}
       
       <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
@@ -103,7 +103,7 @@
         {% csrf_token %}
         <input name="search" type="textbox" value="" style="width:300px;">
         <input type="hidden" name="class" value="{{class_name}}">
-        <input type="submit" value="search" style="width:100px;">
+        <input type="submit" value="{% trans 'search' %}" style="width:100px;">
 
       </form>
     {% endif %}
@@ -157,7 +157,7 @@
     
     <a href="{% url "GAPPS_set_instance_edit" group_name_tag app_name app_id app_set_id app_set_instance_id %}" class="button medium">
 
-      Edit
+      {% trans 'Edit' %}
     </a>
     <br/>
 
@@ -166,7 +166,7 @@
       <div style="display:table-row;">
         
         <div style="display:table-cell;">
-   <font size="3"> {{app_set_name}}'s Title</font>
+   <font size="3"> {{app_set_name}}{% trans "'s Title" %}</font>
         </div>
         
         <div style="display:table-cell;">
@@ -297,7 +297,7 @@
 {% if create_new %}
 	{% if already_uploaded_file %}
 	<div>
-		<font size ="5" color="red">This file: {{already_uploaded_file}} Already uploaded please choose another file</font>
+		<font size ="5" color="red">{% trans 'File' %}: {{already_uploaded_file}} - {% trans 'Already uploaded, please choose another file' %} </font>
 	</div>
 	{% endif %}
 
@@ -387,7 +387,7 @@
 				</div>
 
 				<div style="display:table-cell;">
-					<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+					<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="{% trans 'Click to add location markers' %}">
 						<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 					</a>
 				</div>      
@@ -407,7 +407,7 @@
 					<font size="3"> {% trans "Tags" %}</font> 
 				</div>
 				<div style="display:table-cell;">
-					<input id="tags_id" name="tags" type="textbox" value="{{tags}}" placeholder="Separate tags with commas...">
+					<input id="tags_id" name="tags" type="textbox" value="{{tags}}" placeholder="{% trans 'Separate tags with commas' %}...">
 				</div>
 			</div>
        
@@ -437,7 +437,7 @@
 
     	</div>
    
-		<input type="submit" name="submit" class="button" id="save-system" value="submit">
+		<input type="submit" name="submit" class="button" id="save-system" value="{% trans 'Submit' %}">
    
 	</form>
 {% endif %}

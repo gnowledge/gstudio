@@ -169,11 +169,11 @@
 		<div class="small-3 columns">
 			<div class="row collapse">
 				<div class="small-10 columns">
-					<input type="text" id="dr-search" name="search_text" placeholder="Search in the {{group_object.altnames|default_if_none:group_object.name}}" value="{{search_text}}" title="Search in the '{{group_object.altnames|default_if_none:group_object.name}}'">
+					<input type="text" id="dr-search" name="search_text" placeholder="{% trans 'Search in the' %} {{group_object.altnames|default_if_none:group_object.name}}" value="{{search_text}}" title="{% trans 'Search in the' %} '{{group_object.altnames|default_if_none:group_object.name}}'">
 				</div>
 				<div class="small-2 columns">
 					<!-- <div id="dr-search-btn" class="button postfix">Search</div> -->
-					<button type="submit" class="button postfix">Search</button>
+					<button type="submit" class="button postfix">{% trans 'Search' %}</button>
 				</div>
 			</div>
 		</div>
@@ -213,7 +213,7 @@
 {% block data_review_pagination %}
 	
 	{% include 'ndf/pagination.html' with urlname=urlname first_arg=group_name_tag second_arg=second_arg third_arg="" %}
-	<div id="kbd-tips" onclick="$('#kbd-tips-alert').toggle()"><i class="fi-layout"></i>Keyboard Shortcuts</div>
+	<div id="kbd-tips" onclick="$('#kbd-tips-alert').toggle()"><i class="fi-layout"></i>{% trans 'Keyboard Shortcuts' %}</div>
 	
 	<div id="kbd-tips-alert">
 
@@ -221,16 +221,16 @@
 			<i class="fi-x-circle"></i>
 		</div>
 
-		<h4 class="text-center"><small>Data Review: Keyboard shortcuts</small></h4>
-		When the row is open to edit:
+		<h4 class="text-center"><small>{% trans 'Data Review: Keyboard shortcuts' %}</small></h4>
+		{% trans 'When the row is open to edit' %}:
 		<ul>
-			<li>"<b>save</b>" : Press <span class="radius secondary label"> s </span> of keyboard</li>
-			<li>"<b>cancel</b>" : Press <span class="radius secondary label"> c </span> of keyboard</li>
+			<li>"<b>{% trans 'save' %}</b>" : <% blocktrans %> Press <span class="radius secondary label"> s </span> of keyboard<% endblocktrans %></li>
+			<li>"<b>{% trans 'cancel' %}</b>" : <% blocktrans %> Press <span class="radius secondary label"> c </span> of keyboard<% endblocktrans %></li>
 		</ul>
 		<hr/>
 		<ul>
-			<li>"Scroll right till end" : <span class="radius secondary label"> Ctrl </span> + <span class="radius secondary label"><i class="fi-arrow-right"></i></span></li>
-			<li>"Scroll left till end" : <span class="radius secondary label"> Ctrl </span> + <span class="radius secondary label"><i class="fi-arrow-left"></i></span></li>
+			<li>"<% blocktrans %>Scroll right till end" : <span class="radius secondary label"> Ctrl <% endblocktrans %></span> + <span class="radius secondary label"><i class="fi-arrow-right"></i></span></li>
+			<li>"<% blocktrans %>Scroll left till end" : <span class="radius secondary label"> Ctrl <% endblocktrans %></span> + <span class="radius secondary label"><i class="fi-arrow-left"></i></span></li>
 		</ul>
 	 	 
 	</div>
@@ -312,7 +312,7 @@
 
 		if(editedRowName.length > 0 || editedRowId.length > 0)
 		{
-			alert("At a time you could edit only one row. \n\nNow you are editing: '" + editedRowName + "'\n\nPlease 'SAVE' or 'CANCEL' the changes to edit any other row!");
+			alert("{% trans 'At a time you could edit only one row. \n\nNow you are editing: ' %} '" + editedRowName + "'\n\n{% trans 'Please SAVE or CANCEL the changes to edit any other row!' %}");
 
 			return true; // Row editing is going on.
 		}
@@ -515,7 +515,7 @@
 						{
 							++fieldEditCntr;
 
-							tempEditedFields += "\n-------| FIELD "+String(fieldEditCntr)+": " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n Element's in right drawer are changed.\n\n";
+							tempEditedFields += "\n-------| FIELD "+String(fieldEditCntr)+": " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n {% trans 'Element's in right drawer are changed.' %}\n\n";
 						}
 
 						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempCurrDrawerFields;
@@ -532,7 +532,7 @@
 		{
 			var saveCancelConfirm = "false"
 			
-			saveCancelConfirm = window.confirm("Please Note that following [ " + String(fieldEditCntr) + " ] fields are changed:\n\n" + tempEditedFields + msg);
+			saveCancelConfirm = window.confirm("{% trans 'Please Note that following' %} [ " + String(fieldEditCntr) + " ] {% trans 'fields are changed' %}:\n\n" + tempEditedFields + msg);
 			
 			if(saveCancelConfirm)
 			{
@@ -551,7 +551,7 @@
 		{
 			if(action == "save")
 			{
-				alert("No field is edited or changed to save !")
+				alert("{% trans 'No field is edited or changed to save' %} !")
 				return [false, nodeObj];
 			}
 
@@ -685,7 +685,7 @@
 					csrfmiddlewaretoken: '{{ csrf_token }}'
 				},
 				success: function(data){
-					alert("Resource is successfully saved.");
+					alert("{% trans 'Resource is successfully saved.' %}");
 					setViewByEditData(oid, data);
 					changeSaveCancelToEdit(oid, resEditRowArr)
 				}
@@ -879,7 +879,7 @@
 			 		
 			 		//updateContent();
 			 		if (Boolean(data)) { removeRow(oid); }
-			 		else { alert("Oops some error occured! Resource could not get restored!"); };
+			 		else { alert("{% trans 'Oops some error occured! Resource could not get restored' %}!"); };
 			 		
 			 	}		
 			});	

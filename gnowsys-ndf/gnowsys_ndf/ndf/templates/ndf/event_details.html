@@ -94,14 +94,14 @@ table, th, td {
 
                           <div class="row">
                               <div class="small-3 columns">
-                                <label>Start time:</label> 
+                                <label>{% trans 'Start time' %}:</label> 
                               </div>
                               
                               <div class="small-5 end columns">
                                 <label>{{node.start_time}}</label> 
                               </div>
                               <div id = 'Edit_start_time'> 
-	                                  <a  onclick="checkDate()" class="tiny button">  Edit 
+	                                  <a  onclick="checkDate()" class="tiny button">  {% trans 'Edit' %} 
 	                                  </a>
 	                          </div>
                               
@@ -115,7 +115,7 @@ table, th, td {
                               
                           <div class="row">
                               <div class="small-3 columns">
-                                <label>End time:</label>
+                                <label>{% trans 'End time' %}:</label>
                               </div>
                               <div class="small-5 end columns">
                                 <label>{{node.end_time}}</label>
@@ -127,7 +127,7 @@ table, th, td {
                                 <br>
                                 <div class="row">
                                   <div class="small-3 columns">
-                                    <label>Event organised by:</label>
+                                    <label>{% trans 'Event organised by' %}:</label>
                                   </div>
                                   <div class="small-5 end columns">
                                     {% for details in node.event_organised_by %}
@@ -149,7 +149,7 @@ table, th, td {
                           <br>
                           <div class="row">
                             <div class="small-3 columns">
-                              <label>Event Co-ordinator:</label>
+                              <label>{% trans 'Event Co-ordinator' %}:</label>
                             </div>
                             <div class="small-5 end columns">
                               {% for details in node.event_coordinator %}
@@ -168,7 +168,7 @@ table, th, td {
                             <br>
                             <div class="row">
                               <div class="small-3 columns">
-                                <label>Batch:</label>
+                                <label>{% trans 'Batch' %}:</label>
                               </div>
                               <div class="small-5 end columns">
                                 <label>{{batch}}</label>
@@ -178,7 +178,7 @@ table, th, td {
                           
                           <div class="row">
                               <div class="small-3 columns">
-                                <label>Course:</label>
+                                <label>{% trans 'Course' %}</label>
                               </div>
                               <div class="small-5 end columns">
                                 <label>{{course.name}}</label>
@@ -188,7 +188,7 @@ table, th, td {
                           <br>
                           <div class="row">
                               <div class="small-3 columns">
-                                <label>Min marks:</label>
+                                <label>{% trans 'Min marks' %}:</label>
                               </div>
                               <div class="small-3 end columns">
                                 <label>{{session_min_marks}}</label>
@@ -196,7 +196,7 @@ table, th, td {
                               </div>
                                 
                               <div class="small-3 columns">
-                                <label>Max Marks:</label>
+                                <label>{% trans 'Max Marks' %}:</label>
                               </div>
                               <div class="small-2 end columns">
                                   <label>{{session_max_marks}}</label>  
@@ -208,7 +208,7 @@ table, th, td {
                           <br>
                           {% with node.html_content|safe as description %}
                           {% if description != "None" %}
-                          <label>Brief description about event:</label>
+                          <label>{% trans 'Brief description about event' %}:</label>
                           {{ description }}
                           {% endif %}
                           {% endwith %}
@@ -220,10 +220,10 @@ table, th, td {
                       <div class="panel">
                         <p>
                         {{ node.member_of_names_list.0 }} 
-                        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
+                        {% trans 'Edited' %} {{ node.last_update|timesince }} {% trans 'ago by' %} <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
                         <br>
                         <small>
-                          <a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+                          <a href="#view-changes"><i class="fi-clock"></i> {% trans 'Versions' %} </a>
                           {% for seq_no, version_no in node.version_dict.items|slice:"-6:" reversed %}
                           <abbr title="Version #{{version_no}}">
                             {% if forloop.last and forloop.counter > 5 %}
@@ -246,14 +246,14 @@ table, th, td {
                       {% if user.is_authenticated and status == "allow" and gstaff_access %}
                         <div id = 'Edit' hidden> 
                               <a href="{% url 'event_app_instance_edit' groupid  app_set_id node %}" class="small button split edit">
-                               <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
+                               <i class="fi-pencil"></i> {% trans 'Edit' %} <span data-dropdown="edit-options"></span>
                               </a>
                         </div>
                         
                         <ul id="edit-options" class="f-dropdown">
                           <li>
                             <a class="button small expand" href="{% url 'event_app_instance_create' groupid app_set_id %}">
-                            <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                            <span class="fi-plus">&nbsp;&nbsp; {% trans 'New' %} {{node.member_of_names_list.0}}</span>
                             </a>
                           </li>
 
@@ -268,7 +268,7 @@ table, th, td {
                    <fieldset> 
                           <div class = "row">
                             <div class="small-6 columns">
-                                <h6> <b> Reschedule Session Dates </b> </h6>
+                                <h6> <b> {% trans 'Reschedule Session Dates' %} </b> </h6>
                             </div>
                             <div id="total_session_time" align ="right"> 
                                 
@@ -278,13 +278,13 @@ table, th, td {
                           <br>
                           <div class = "row"> 
                              <div class = "large-2  medium-4  columns">
-                               <label> Start time </label>
+                               <label> {% trans 'Start time' %} </label>
                              </div>  
                              <div class = "large-4   columns"> 
                                <input id="start_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time">
                              </div>  
                              <div class = "large-2   columns">
-                               <label> End time </label>
+                               <label> {% trans 'End time' %} </label>
                              </div>
                              	
                              <div class = "large-4  columns">  
@@ -292,11 +292,11 @@ table, th, td {
                              </div>  
                           </div>     
                           <div class="save" align="center">
-                             <input type="button" class="tiny button" onclick="saveTime()" value ="Save"> 
+                             <input type="button" class="tiny button" onclick="saveTime()" value ="{% trans 'Save' %}"> 
                           </div>
                           <div class = "row"> 
                             <div id='note'>
-                               <label style = "color:red;"> Note:- Please schedule session same as total time </label>
+                               <label style = "color:red;"> {% trans 'Note:- Please schedule session same as total time' %} </label>
                             </div>
                           </div> 
                       <a class="close-reveal-modal">&#215;</a>      
@@ -308,7 +308,7 @@ table, th, td {
                             
                           <div class = "row">
                                <div class = "small-4  medium -4 large-4 columns">
-                              	 <label><b>Reschedule Session till : </b></label>
+                              	 <label><b>{% trans 'Reschedule Session till' %} : </b></label>
                                </div>  
                               <div class = "small-4  medium -4 large-5 columns">  
                                <input id="start_time_1" class="date_month_day_year" type="text" style="float:left;" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time_1">
@@ -326,16 +326,16 @@ table, th, td {
                           
                           
                           <div class = "row" align="center">
-                                <label> <h5> Please select what you want to reschedule </h5> </label>
+                                <label> <h5> {% trans 'Please select what you want to reschedule' %} </h5> </label>
                                 <br>
 
                                 <form>
                                     <div class = "small-5 columns ">  
-                                      Attendance:
+                                      {% trans 'Attendance' %}:
                                       <input type="radio" class = "sessiontype" name = "sessiontype" id="a1" value = "Attendance">
                                     </div>
                                     <div class = "small-5 columns ">  
-                                      Assessment:
+                                      {% trans 'Assessment' %}:
                                       <input type="radio" class = "sessiontype" name = "sessiontype" id="a2" value = "Assessment">
                                     </div>  
                                 </form>    
@@ -384,7 +384,7 @@ pass = ""
 session_time  = 0
 session_time  = get_time_diff("{{node.start_time|date:'c'}}","{{node.end_time|date:'c'}}")
 
-$('#total_session_time').append("<label>  <h6> <b> Total Session time :" + session_time + "minutes<b> </b> </h6></label>")  
+$('#total_session_time').append("<label>  <h6> <b> {% trans 'Total Session time' %} :" + session_time + "{% trans 'minutes' %}<b> </b> </h6></label>")  
 
 function get_time_diff(start_time , end_time)
  {
@@ -448,7 +448,7 @@ function add_reschedule(){
 
          if ('{{Add}}' == 'Allow'){
                   $('#reschedule').append("<div class='small-2 columns'>"
-                  + "<input class='tiny button' onclick=reschedule_time('event_reschedule') value='Reschedule'>"
+                  + "<input class='tiny button' onclick=reschedule_time('event_reschedule') value='{% trans "Reschedule" %}'>"
                   +"</div>")
                   }
          if ('{{task_date}}' != 'False')
@@ -458,7 +458,7 @@ function add_reschedule(){
                   {     
                         $('#br-div br:first').remove()
                         $('#reschedule').append("<div class='small-2 columns'>"
-                  		+ "<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>"	
+                  		+ "<input class='tiny button' onclick=reschedule_event('event_reschedule') value='{% trans "Reschedule" %}'>"	
                   		+"</div>")
                   }
                   
@@ -467,7 +467,7 @@ function add_reschedule(){
             
  if ('{{task_date}}' == 'False' && '{{Add}}' == 'Stop'){  
       $('#message').empty()
-      $('#message').append("<label id = 'lbl_displ' > Your request to reschedule the event has been sent to Admin </label>")
+      $('#message').append("<label id = 'lbl_displ' > {% trans 'Your request to reschedule the event has been sent to Admin' %} </label>")
    }
 }
  
@@ -505,7 +505,7 @@ function checkDate()
                    }
                 if (data == 'event closed')
                   {
-                    alert("Time to reschdule event has passed please request to central office")
+                    alert("{% trans 'Time to reschdule event has passed please request to central office' %}")
                     add_reschedule()
                   }   
              }
@@ -543,7 +543,7 @@ function controler()
 	                     else
 	                      {
 	                         $('#attendance_message').empty()
-	                         $('#attendance_message').append("<label id = 'lbl_displ' > Attendance would be available after start time of event </label>")
+	                         $('#attendance_message').append("<label id = 'lbl_displ' > {% trans 'Attendance would be available after start time of event' %} </label>")
 	                      } 
                      }   
                 });
@@ -597,7 +597,7 @@ function saveTime()
         }
      else
          {
-            alert("session time should be exactly same as previouse alloted time")
+            alert("{% trans 'Session time should be exactly same as previouse alloted time' %}")
          }     
     
 
@@ -629,15 +629,15 @@ column2="<th> Presence </th>"
 checkbox1="<input type=checkbox class='selall' onClick=mark_all_present() id='selall'>"
 if ( pass[0] == 'Edit')
 {
-  column2="<th> Presence " + checkbox1 +"</th>" 
+  column2="<th> {% trans 'Presence' %} " + checkbox1 +"</th>" 
 }
 else
 {
 
-  column2="<th> Presence </th>"
+  column2="<th> {% trans 'Presence' %} </th>"
 }  
-column3="<th> Assignment Marks </th>"
-column4="<th> Assessment Marks </th>"
+column3="<th> {% trans 'Assignment Marks' %} </th>"
+column4="<th> {% trans 'Assessment Marks' %} </th>"
      if(pass[1] == 1)
       {
         column3= " " 
@@ -738,9 +738,9 @@ if ( pass[0] == 'Edit'){
         $('#attendance').append("<div class='row'>" 
          + "<div class='small-8 columns'> "
          + " <fieldset>"
-         + "<div id='assessmentdiv'> <input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> Assessment Done </div>"
-         + "<div id='attendancediv'> <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> Attendance Done </div>"
-         + " <br> <span style='color:red;'> Note:- Edit option will be closed after asessment is done. </span> "
+         + "<div id='assessmentdiv'> <input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> {% trans 'Assessment Done' %} </div>"
+         + "<div id='attendancediv'> <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> {% trans 'Attendance Done' %} </div>"
+         + " <br> <span style='color:red;'> Note:- Edit option will be closed after asessment is done.' %} </span> "
          + " </fieldset> </div></div>")
       }
       else
@@ -749,45 +749,45 @@ if ( pass[0] == 'Edit'){
         $('#attendance').append("<div class='row'>" 
          + "<div class='small-8 columns'> "
          + " <fieldset>   "
-         + " <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> Attendance Done"
-         + " <br> <span style='color:red;'> Note:- Edit option will be closed after Attendance is done. </span> "
+         + " <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> {% trans 'Attendance Done' %}"
+         + " <br> <span style='color:red;'> {% trans 'Note:- Edit option will be closed after Attendance is done.' %} </span> "
          + " </fieldset> </div></div>")
 
       }
 
         $('#attendance').append("<br>")
-        $('#attendance').append("<input class='tiny button' onclick='saveattendees("+pass[1]+")' value='Save' >")
-        $('#attendance').append("<input class='tiny button' onclick='TakePrint()' value='Print'>")
+        $('#attendance').append("<input class='tiny button' onclick='saveattendees("+pass[1]+")' value='{% trans "Save" %}' >")
+        $('#attendance').append("<input class='tiny button' onclick='TakePrint()' value='{% trans "Print" %}'>")
                    
 
 }
 else
 {     
         
-      $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='Download'>")
+      $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='{% trans "Download" %}'>")
       
       if(reschedule == true || marks_enter  == false)
            {
-              $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='Edit'>" )
+              $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='{% trans "Edit" %}'>" )
            }
       if(reschedule == false)
       {
         <!-- reschedule == false meaning event edit functionality if closed and reschedule is not allow -->
         if ('{{Add}}' == 'Allow'){
           <!-- if admin show the reschedule till panel  --> 
-          $('#attendance').append("<input class='tiny button'  onclick=reschedule_time('attendance_reschedule',pass) value='Re-Schedule'>" )
+          $('#attendance').append("<input class='tiny button'  onclick=reschedule_time('attendance_reschedule',pass) value='{% trans "Re-Schedule" %}'>" )
           }
         if ('{{task_attendance}}' != 'False')
              {  
                 if('{{Add}}' == 'Stop')
                   {
-                  		$('#attendance').append("<input class='tiny button'  onclick = reschedule_event('attendance_reschedule') value='Re-Schedule'>" )
+                  		$('#attendance').append("<input class='tiny button'  onclick = reschedule_event('attendance_reschedule') value='{% trans "Re-Schedule" %}'>" )
                   }
              }  
         if ('{{task_attendance}}' == 'False' && '{{Add}}' == 'Stop' )
           {
               $('#attendance_message').empty()
-              $('#attendance_message').append("<label id = 'lbl_displ'   >  Your request to reschedule the event has been sent to Admin  </label>")
+              $('#attendance_message').append("<label id = 'lbl_displ'   >  {% trans "Your request to reschedule the event has been sent to Admin" %}  </label>")
 
           } 
      
@@ -810,18 +810,18 @@ function reschedule_time(type,value)
        if(value[1] != '1'){
         $('#rescheduleoption').foundation('reveal', 'open');
         $('#reschedule_check').empty()
-        $('#reschedule_check').append( "<input type='button' class='tiny button' onclick = reschedule_till_overlay('" + event_type + "') value='ok'>")}
+        $('#reschedule_check').append( "<input type='button' class='tiny button' onclick = reschedule_till_overlay('" + event_type + "') value='{% trans "ok" %}'>")}
         else
         {
              $('#reschedule_save').empty()
-             $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+             $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='{% trans "Save" %}'>")
              $('#reschedulemodal').foundation('reveal', 'open');
         }
     }
     else
     {
            $('#reschedule_save').empty()
-           $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+           $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='{% trans "Save" %}'>")
            $('#reschedulemodal').foundation('reveal', 'open');
      }
 }
@@ -834,7 +834,7 @@ function reschedule_till_overlay(type)
            var event_type = ""
            event_type  = String(type) 
            $('#reschedule_save').empty()
-           $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+           $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='{% trans "Save" %}'>")
            $('#reschedulemodal').foundation('reveal', 'open');
       }
       if ( $('.sessiontype:checked').val() == 'Assessment' )
@@ -1077,7 +1077,7 @@ if (!(Status_attended))
      }
      else
      {
-     alert("No Attendance Taken.")
+     alert("{% trans 'No attendance taken.' %}")
      }
      }
     
@@ -1096,7 +1096,7 @@ function validate_txtbx(input)
   else
   {
     document.getElementById(input.id).value = "0" 
-     alert("Please Enter valid marks Between Min and Max Marks!")
+     alert("{% trans 'Please Enter valid marks Between Min and Max Marks' %}!")
   }
 }
    

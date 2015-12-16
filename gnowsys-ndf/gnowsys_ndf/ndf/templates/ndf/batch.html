@@ -55,7 +55,7 @@ background-repeat:no-repeat; background-size: 48px 48px
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
       <a id ="btn_create" class="button expand" href="{% url 'new_batch' groupid %}">
-        Create {{title}}
+        {% trans 'Create' %} {{title}}
       </a>
       {% endif %}
       {% endif %}
@@ -92,7 +92,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     </div>
     <input type="hidden" name="nussd_course_name" id="nussd_course_name">
     <input type="hidden" name="announced_course_name" id="announced_course_name">
-    <input type="submit" value="VIEW" id="submit" class="small button  tiny">
+    <input type="submit" value="VIEW" id="{% trans 'submit' %}" class="small button  tiny">
   </div>
 
   <fieldset id="batches_of_acourse">
@@ -119,7 +119,7 @@ background-repeat:no-repeat; background-size: 48px 48px
                 </small>
               </div>
             </header>
-            <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+            <p>{{ node.html_content|default_if_none:"{% trans 'Add some description.' %}"|safe|striptags|truncatechars:75 }}</p>
            </a> 
           </div>
         </span>

@@ -80,7 +80,7 @@
           </div>
         </div>
         <hr/>
-        <span style="font-size:12px;">{{ each_res.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span></br>
+        <span style="font-size:12px;">{{ each_res.html_content|default_if_none:"{% trans 'Add some description.' %} "|safe|striptags|truncatechars:75 }}</span></br>
         
         <footer>
           <div class="small-6 columns">{{each_res.mime_type|truncatechars:15}}</div>
@@ -91,7 +91,7 @@
               {{ each_res.member_of_names_list|join:', ' }}{% trans 'created' %} {{each_res.created_at|timesince}} {% trans 'ago' %} 
               <br/>
             <span><strong>{{each_res.contributors|length}}</strong> {% trans 'Contributor' %}{{each_res.contributors|pluralize}} | </span>
-              by <span class="user" href="{% url 'dashboard' each_res.created_by %}" data-gnow="">{{each_res.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
+              {% trans 'by' %} <span class="user" href="{% url 'dashboard' each_res.created_by %}" data-gnow="">{{each_res.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
             </div>
           </footer>
           </a>

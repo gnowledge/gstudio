@@ -256,14 +256,14 @@ $(".orgitdownButton.orgitdownButton10 a").click(function(){
 <a class="close-reveal-modal">&#215;</a>
 <h3>{% trans 'Add External Image' %}:</h3> 
 <div>
-    <label>{% trans 'Image' %} {% trans 'Description' %}</label> 
+    <label>{% trans 'Image Description' %}</label> 
     <input type="text" id="image_des" placeholder="{% trans 'Some description' %} ...">
-    <label>Width</label>
+    <label>{% trans 'Width' %}</label>
     <input type="text" id="image_width" placeholder="{% trans 'Enter width in pixel eg.600' %}...">
-    <label>URL</label>
+    <label>{% trans 'URL' %}</label>
     <input type="text" id="image_url" placeholder="{% trans 'Enter Image path' %} {% trans 'eg' %}. http:filename.jpg...">
     <!-- <button type="submit" id="insertimage" onclick="insertImg()"> Add Image</button> -->
-    <input type="button" id="insertimage" onclick="insertImg()" value="Add Image" class="button">
+    <input type="button" id="insertimage" onclick="insertImg()" value="{% trans 'Add Image' %}" class="button">
 
 </div></div>
 

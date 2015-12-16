@@ -63,7 +63,7 @@
     <div>
         <header>
             <a href="/{{group_id}}/analytics/group/list_activities/">
-                <h2 class="subheader">User Analytics</h2>
+                <h2 class="subheader">{% trans 'User Analytics' %}</h2>
             </a>
         </header>
 
@@ -76,7 +76,7 @@
         <!-- summary -->
         	<div class="tabs">
             <a href="/{{group_id}}/analytics/summary/">
-                 Summary
+                 {% trans 'Summary' %}
             </a>
             </div>
         
@@ -87,7 +87,7 @@
         	<div class="tabs">
             <a href="/{{group_id}}/analytics/list_activities/">
                
-                Activities
+                {% trans 'Activities' %}
           	</a>
           	</div>
 
@@ -112,9 +112,9 @@
 <div class="table_wrapper">
 	<div class="cate">
     {% if specific == False %}
-        Detailed Activities for user : {{user_name}}
+        {% trans 'Detailed Activities for user' %} : {{user_name}}
     {% else %}
-        {{app}} Activities for user : {{user_name}}
+        {{app}} {% trans 'Activities for user' %} : {{user_name}}
     {% endif %}
     </div>
 	
@@ -140,7 +140,7 @@
 								</div>
 							</td>
 							<td class="b2">
-								<div class="timestamp"><b>{{activity.timestamp|timesince}} ago</b></div>
+								<div class="timestamp"><b>{{activity.timestamp|timesince}} {% trans 'ago' %}</b></div>
 							</td>
 						</tr>
 					{% endfor %}

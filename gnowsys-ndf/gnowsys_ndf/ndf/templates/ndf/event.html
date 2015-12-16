@@ -30,8 +30,8 @@
 <ul class="side-nav">
 <li >
   <div class="row">
-      <a class="small-6 columns" href="{% url 'event' group_name_tag %}" title="View all">
-              View all
+      <a class="small-6 columns" href="{% url 'event' group_name_tag %}" title="{% trans 'View all' %}">
+              {% trans 'View all' %}
         </a>
   </div>        
 </li>
@@ -47,18 +47,18 @@
     <li>
     {% endif %}    
       <div class="row">
-          <a class="small-6 columns" href="{% url 'event_list' groupid each.pk %}" title="View all {{each.name}}">
+          <a class="small-6 columns" href="{% url 'event_list' groupid each.pk %}" title="{% trans 'View all' %} {{each.name}}">
             {{each.name}}
           </a>
           {% if each.name == "Exam" %}
             {% if Add == "Allow" %}
-            <a class="small-6 columns" href="{% url 'event_app_instance_create' groupid each.pk %}" title="Add {{each.name}}">
+            <a class="small-6 columns" href="{% url 'event_app_instance_create' groupid each.pk %}" title="{% trans 'Add' %} {{each.name}}">
             +&nbsp; {% trans "Add" %}
             {% endif %}
           </a>
           {% else %}
           
-             <a class="small-6 columns" href="{% url 'event_app_instance_create' groupid each.pk %}" title="Add {{each.name}}">
+             <a class="small-6 columns" href="{% url 'event_app_instance_create' groupid each.pk %}" title="{% trans 'Add' %} {{each.name}}">
             +&nbsp; {% trans "Add" %}
           </a>
           
@@ -71,10 +71,10 @@
 </ul>
 <table>
 	<tbody>
-		<tr> <td> Scheduled </td>  <td bgcolor="#00CED1" style="width:50%;">      </td>  </tr>
-		<tr> <td> ReScheduled </td>  <td bgcolor="#ffff66" style="width:50%;">   </td> </tr>
-		<tr> <td> InComplete </td> <td bgcolor="#ff3232" style="width:50%;">    </td> </tr>
-		<tr> <td> Completed </td> <td bgcolor="#00%6600" style="width:50%;">    </td> </tr>
+		<tr> <td> {% trans 'Scheduled' %} </td>  <td bgcolor="#00CED1" style="width:50%;">      </td>  </tr>
+		<tr> <td> {% trans 'Rescheduled' %} </td>  <td bgcolor="#ffff66" style="width:50%;">   </td> </tr>
+		<tr> <td> {% trans 'Incomplete' %} </td> <td bgcolor="#ff3232" style="width:50%;">    </td> </tr>
+		<tr> <td> {% trans 'Completed' %} </td> <td bgcolor="#00%6600" style="width:50%;">    </td> </tr>
 	</tbody>
 </table>	
 {% endblock %}

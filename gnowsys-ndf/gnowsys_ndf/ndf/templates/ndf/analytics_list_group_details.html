@@ -63,7 +63,7 @@
     <div>
         <header>
             <a href="/{{group_id}}/analytics/group/list_activities/">
-                <h2 class="subheader">Group Analytics</h2>
+                <h2 class="subheader">{% trans 'Group Analytics' %}</h2>
             </a>
         </header>
 
@@ -76,7 +76,7 @@
         <!-- summary -->
         	<div class="tabs">
             <a href="/{{group_id}}/analytics/group/summary/">
-                 Summary
+                 {% trans 'Summary' %}
             </a>
             </div>
         
@@ -87,7 +87,7 @@
         	<div class="tabs">
             <a href="/{{group_id}}/analytics/group/list_activities/">
                
-                Activities
+                {% trans 'Activities' %}
           	</a>
           	</div>
 
@@ -96,7 +96,7 @@
         <!-- members -->
         	<div class="tabs">
             <a href="/{{group_id}}/analytics/group/members/">
-                Members
+                {% trans 'Members' %}
                 
             </a>
             </div>
@@ -119,7 +119,7 @@
 
 
 <div class="table_wrapper">
-	<div class="cate">Detailed Activities in the group : {{group_name}}</div>
+	<div class="cate">{% trans 'Detailed Activities in the group' %} : {{group_name}}</div>
 	
 	{% for day in data %}
 		{% for date, activity_lst in day.items %}
@@ -143,7 +143,7 @@
 								</div>
 							</td>
 							<td class="b2">
-								<div class="timestamp"><b>{{activity.timestamp|timesince}} ago</b></div>
+								<div class="timestamp"><b>{{activity.timestamp|timesince}} {% trans 'ago' %}</b></div>
 							</td>
 						</tr>
 					{% endfor %}

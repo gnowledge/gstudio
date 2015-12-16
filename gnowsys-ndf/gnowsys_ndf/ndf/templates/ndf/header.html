@@ -10,10 +10,10 @@
     <p id="feedsModalLabel"></p>
     <div class="row feeds_proceed">
       <div class="small-3 small-offset-3 columns">
-        <input type="button" id="btnConfirmFeedsYes" class="button tiny expand" value="Yes">
+        <input type="button" id="btnConfirmFeedsYes" class="button tiny expand" value="{% trans 'Yes' %}">
       </div>
       <div class="small-3 columns end">
-        <input type="button" id="btnConfirmFeedsNo" class="button tiny expand " value="No">
+        <input type="button" id="btnConfirmFeedsNo" class="button tiny expand " value="{% trans 'No' %}">
       </div>
     </div>
     <small class="small_msg"></small>
@@ -439,7 +439,7 @@
       else{
         lbl_msg = {% trans "RSS Feeds may not be displayed properly in this browser. Would you still like to continue?" %}
         $("#feedsModalLabel").text(lbl_msg);
-        $(".small_msg").text("You may try Mozilla Firefox")
+        $(".small_msg").text("{% trans 'You may try Mozilla Firefox' %}")
         $("#feedsModal")
           .removeClass("medium").addClass("small")
           .addClass("warning")

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-16 12:48+0530\n"
+"POT-Creation-Date: 2015-12-16 20:15+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -178,6 +178,7 @@ msgid "View"
 msgstr "देखें"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/ImageDashboard.html:10
+#: gnowsys_ndf/ndf/templates/ndf/ImageDashboard.html:14
 #, fuzzy
 msgid "Listed below files are already uploaded please choose different files"
 msgstr "यह फाइल अपलोड की गई है कृपया अन्य फाइल चुने"
@@ -602,6 +603,7 @@ msgstr "हाल ही में कोई क्रियाकलाप न�
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:335
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:337
 #: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:118
+#: gnowsys_ndf/ndf/templates/ndf/header.html:13
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:182
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:184
 #: gnowsys_ndf/ndf/templates/ndf/moderation_data_review.html:47
@@ -622,6 +624,7 @@ msgstr "हाँ"
 #: gnowsys_ndf/ndf/templates/ndf/course_detail.html:45
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:341
 #: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:121
+#: gnowsys_ndf/ndf/templates/ndf/header.html:16
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:188
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:190
 #: gnowsys_ndf/ndf/templates/ndf/moderation_data_review.html:48
@@ -680,6 +683,7 @@ msgstr "नहीं"
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:249
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:771
 #: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:115
+#: gnowsys_ndf/ndf/templates/ndf/list_themes.html:54
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:111
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:115
 #: gnowsys_ndf/ndf/templates/ndf/mis_details.html:446
@@ -701,8 +705,8 @@ msgstr "संपादित करें"
 #: gnowsys_ndf/ndf/templates/ndf/action_panel.html:124
 #: gnowsys_ndf/ndf/templates/ndf/action_panel.html:174
 #: gnowsys_ndf/ndf/templates/ndf/action_panel.html:185
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:397
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:408
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:399
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:410
 msgid "You are not authorized for this action"
 msgstr ""
 
@@ -772,6 +776,9 @@ msgstr "समूह चुनें"
 #: gnowsys_ndf/ndf/templates-old/ndf/thread_details.html:101
 #: gnowsys_ndf/ndf/templates-old/ndf/trainer_create_edit.html:526
 #: gnowsys_ndf/ndf/templates-old/ndf/videoDashboard.html:51
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:180
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:182
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:185
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:112
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:79
 #: gnowsys_ndf/ndf/templates/ndf/course_detail.html:149
@@ -808,6 +815,7 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/action_panel.html:228
 #: gnowsys_ndf/ndf/templates/ndf/card.html:51
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:407
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:236
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:295
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:98
 msgid "Tags"
@@ -897,52 +905,54 @@ msgstr "नया कार्य"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/action_panel.html:370
 #: gnowsys_ndf/ndf/templates-old/ndf/groupdashboard.html:178
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:375
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:376
 #: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:178
 msgid "List Members"
 msgstr "सदस्यों की सूची"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/action_panel.html:378
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:383
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:385
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:199
 msgid "Unsubscribe"
 msgstr "विवरण दें"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/action_panel.html:390
 #: gnowsys_ndf/ndf/templates-old/ndf/action_panel.html:403
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:395
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:408
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:397
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:410
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:207
 msgid "Join"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/action_panel.html:392
 #: gnowsys_ndf/ndf/templates-old/ndf/task.html:66
 #: gnowsys_ndf/ndf/templates-old/ndf/task_create_edit.html:191
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:397
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:399
 #: gnowsys_ndf/ndf/templates/ndf/task.html:66
 #: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:191
 msgid "Closed"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/action_panel.html:400
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:405
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:407
 msgid "Joined"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/action_panel.html:400
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:405
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:407
 msgid "You are already a member of this group"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/action_panel.html:420
 #: gnowsys_ndf/ndf/templates-old/ndf/under_moderation.html:23
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:425
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:427
 #: gnowsys_ndf/ndf/templates/ndf/under_moderation.html:23
 msgid "Moderate Resources"
 msgstr "संसाधन"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/action_panel.html:426
 #: gnowsys_ndf/ndf/templates-old/ndf/program_event_group.html:18
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:431
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:433
 #: gnowsys_ndf/ndf/templates/ndf/program_event_group.html:18
 msgid "Moderation Status"
 msgstr "सृजित तिथि"
@@ -1167,6 +1177,7 @@ msgstr "रिलेशन टाइप सेट"
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:817
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:824
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:837
+#: gnowsys_ndf/ndf/templates/ndf/loadeditor.html:54
 #: gnowsys_ndf/ndf/templates/ndf/replyforum.html:103
 #: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:321
 #: gnowsys_ndf/ndf/templates/ndf/task_details.html:268
@@ -1224,6 +1235,7 @@ msgstr "विकल्प"
 #: gnowsys_ndf/ndf/templates-old/registration/password_change_form.html:26
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboardCreate.html:161
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:440
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:247
 #: gnowsys_ndf/ndf/templates/registration/password_change_form.html:26
 msgid "Submit"
 msgstr ""
@@ -1787,6 +1799,7 @@ msgstr "Sr. #"
 #: gnowsys_ndf/ndf/templates/ndf/approval_data_review.html:62
 #: gnowsys_ndf/ndf/templates/ndf/data_review_table.html:79
 #: gnowsys_ndf/ndf/templates/ndf/data_review_tbody.html:327
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:257
 #, fuzzy
 msgid "Approve"
 msgstr "अनुमोदन"
@@ -1797,6 +1810,7 @@ msgstr "अनुमोदन"
 #: gnowsys_ndf/ndf/templates/ndf/approval_data_review.html:65
 #: gnowsys_ndf/ndf/templates/ndf/data_review_table.html:80
 #: gnowsys_ndf/ndf/templates/ndf/data_review_tbody.html:332
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:260
 msgid "Reject"
 msgstr ""
 
@@ -1813,6 +1827,7 @@ msgid "All"
 msgstr "सभी"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/approval_data_review.html:85
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:586
 #, fuzzy
 msgid "rows are selected"
 msgstr "समूह चुनें"
@@ -2057,7 +2072,7 @@ msgid "contains no files yet"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/collection_ajax_view.html:266
-#: gnowsys_ndf/ndf/templates/ndf/collection_ajax_view.html:267
+#: gnowsys_ndf/ndf/templates/ndf/collection_ajax_view.html:268
 #, fuzzy
 msgid "Topics in"
 msgstr "प्रकरण"
@@ -2982,6 +2997,7 @@ msgstr "यह फाइल अपलोड की गई है कृपया
 
 #: gnowsys_ndf/ndf/templates-old/ndf/custom_template_for_app.html:390
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:390
+#: gnowsys_ndf/ndf/templates/ndf/location_widget.html:3
 msgid "Click to add location markers"
 msgstr ""
 
@@ -2993,12 +3009,14 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates-old/ndf/custom_template_for_app.html:427
 #: gnowsys_ndf/ndf/templates-old/ndf/mis_create_edit.html:326
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:427
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:237
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:326
 msgid "Content"
 msgstr "विषय-वस्तु"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/custom_template_for_app.html:440
 #: gnowsys_ndf/ndf/templates/ndf/batch.html:95
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:166
 msgid "submit"
 msgstr ""
 
@@ -3010,6 +3028,9 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates-old/ndf/custom_template_for_app.html:541
 #: gnowsys_ndf/ndf/templates-old/ndf/event_list.html:164
 #: gnowsys_ndf/ndf/templates-old/ndf/event_list.html:233
+#: gnowsys_ndf/ndf/templates/ndf/hierarchy_tree.html:362
+#: gnowsys_ndf/ndf/templates/ndf/hierarchy_tree.html:408
+#: gnowsys_ndf/ndf/templates/ndf/hierarchy_tree.html:547
 msgid "Select object to delete"
 msgstr ""
 
@@ -3181,6 +3202,7 @@ msgstr "द्वारा संपादित पूर्व"
 #: gnowsys_ndf/ndf/templates-old/ndf/topic_create_edit.html:163
 #: gnowsys_ndf/ndf/templates/ndf/create_partner.html:39
 #: gnowsys_ndf/ndf/templates/ndf/data_review_table.html:33
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:235
 #: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:166
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:88
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:163
@@ -3220,7 +3242,7 @@ msgstr "भाषा"
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:499
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:593
 #: gnowsys_ndf/ndf/templates/ndf/data_review_table.html:41
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:463
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:490
 msgid "Contributed by"
 msgstr "योगदानकर्ता द्वारा"
 
@@ -4364,7 +4386,6 @@ msgstr "संपर्क करें"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/footer.html:16
 #: gnowsys_ndf/ndf/templates/ndf/footer.html:18
-#: gnowsys_ndf/ndf/templates/ndf/footer.html:20
 msgid "Issues"
 msgstr ""
 
@@ -4524,6 +4545,7 @@ msgstr ""
 "हो सकते हैं</b>"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/forumdetails.html:266
+#: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:266
 msgid "Are you sure you want to delete this"
 msgstr ""
 
@@ -4554,12 +4576,18 @@ msgstr "प्रकरण"
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_collection.html:143
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_concept.html:137
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_dependency.html:137
+#: gnowsys_ndf/ndf/templates/ndf/graph_collection.html:143
+#: gnowsys_ndf/ndf/templates/ndf/graph_concept.html:137
+#: gnowsys_ndf/ndf/templates/ndf/graph_dependency.html:137
 msgid "1. Use Shift+Click to Stick the Node."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_collection.html:144
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_concept.html:138
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_dependency.html:138
+#: gnowsys_ndf/ndf/templates/ndf/graph_collection.html:144
+#: gnowsys_ndf/ndf/templates/ndf/graph_concept.html:138
+#: gnowsys_ndf/ndf/templates/ndf/graph_dependency.html:138
 #, fuzzy
 msgid "Double Click to remove Sticky Node."
 msgstr "देखने के लिए क्ल्कि करें"
@@ -4567,11 +4595,15 @@ msgstr "देखने के लिए क्ल्कि करें"
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_collection.html:147
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_concept.html:141
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_dependency.html:141
+#: gnowsys_ndf/ndf/templates/ndf/graph_collection.html:147
+#: gnowsys_ndf/ndf/templates/ndf/graph_concept.html:141
+#: gnowsys_ndf/ndf/templates/ndf/graph_dependency.html:141
 msgid "2. Use Ctrl+Click to Expand/Collaps the Node."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_collection.html:150
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_dependency.html:144
+#: gnowsys_ndf/ndf/templates/ndf/graph_collection.html:150
 #, fuzzy
 msgid "3. Filter"
 msgstr "फिल्टर्स"
@@ -4579,11 +4611,15 @@ msgstr "फिल्टर्स"
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_collection.html:156
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_concept.html:150
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_dependency.html:150
+#: gnowsys_ndf/ndf/templates/ndf/graph_collection.html:156
+#: gnowsys_ndf/ndf/templates/ndf/graph_concept.html:150
+#: gnowsys_ndf/ndf/templates/ndf/graph_dependency.html:150
 #, fuzzy
 msgid "Save as SVG"
 msgstr "पृष्ठ"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/graph_concept.html:144
+#: gnowsys_ndf/ndf/templates/ndf/graph_concept.html:144
 msgid "3. Filter the Graph."
 msgstr ""
 
@@ -5321,22 +5357,22 @@ msgid "Accept invite  "
 msgstr "निमंत्रण स्वीकार करें"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:208
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:64
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:74
 msgid " awaiting for moderation: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:211
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:67
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:77
 msgid "Currently, there are no Resources for moderation "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:219
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:75
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:85
 msgid "Note: Following Resource is Under Moderation -"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:220
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:76
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:86
 msgid "Check the current status of Moderation"
 msgstr ""
 
@@ -5353,9 +5389,9 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates-old/ndf/res_node_ajax_view.html:141
 #: gnowsys_ndf/ndf/templates-old/ndf/res_node_ajax_view.html:184
 #: gnowsys_ndf/ndf/templates-old/ndf/res_node_ajax_view.html:193
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:270
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:279
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:289
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:290
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:299
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:309
 #: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:106
 #: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:112
 #: gnowsys_ndf/ndf/templates/ndf/res_node_ajax_view.html:133
@@ -5369,56 +5405,55 @@ msgstr "आपका ब्राउज़र वीडियो टैग क�
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:408
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:455
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:459
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:293
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:297
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:313
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:317
 msgid "Your browser does not support the audio element"
 msgstr "आपका ब्राउज़र वीडियो टैग को सहयोग नहीं कर रहा है"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:413
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:464
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:302
 msgid "Full screen view"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:762
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:604
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:634
 msgid "Overview"
 msgstr "अवलोकन"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:804
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:646
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:676
 msgid "Collection Set"
 msgstr "संग्रह"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:828
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:670
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:700
 #, python-format
 msgid " No Collections associted with %(node.name)s resource"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:837
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:679
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:709
 msgid "Attribute Set"
 msgstr "विशेषताएँ:"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:861
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:703
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:733
 #, python-format
 msgid " No Attributes associted with %(node.name)s resource "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:870
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:712
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:742
 msgid "Relation Set"
 msgstr "संबंध:"
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:893
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:735
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:765
 msgid "No Relations associted with"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/node_ajax_content.html:893
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:735
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:765
 msgid "resource."
 msgstr "संसाधन"
 
@@ -6523,6 +6558,7 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates-old/ndf/task.html:65
 #: gnowsys_ndf/ndf/templates-old/ndf/task_create_edit.html:190
+#: gnowsys_ndf/ndf/templates/ndf/footer.html:20
 #: gnowsys_ndf/ndf/templates/ndf/task.html:65
 #: gnowsys_ndf/ndf/templates/ndf/task_create_edit.html:190
 msgid "Feedback"
@@ -7899,18 +7935,6 @@ msgstr "अंडरलाईन मोडरेशन ग्रुप"
 msgid "is Published."
 msgstr "प्रकाशित"
 
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:180
-#, fuzzy
-msgid "Delete this"
-msgstr "मिटाएं"
-
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:180
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:182
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:185
-#, fuzzy
-msgid "Delete this "
-msgstr "मिटाएं"
-
 #: gnowsys_ndf/ndf/templates/ndf/action_panel.html:228
 msgid "keyword or label to categorize"
 msgstr ""
@@ -7930,26 +7954,26 @@ msgstr "पार्टर्नस"
 msgid "Create New Program"
 msgstr "नया बनायें"
 
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:375
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:376
 #, fuzzy
 msgid "List Members of this group"
 msgstr "सदस्यों की सूची"
 
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:383
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:385
 msgid "Unsubscribe from this group"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:395
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:397
 #, fuzzy
 msgid "Join this Group"
 msgstr "समूह का नाम"
 
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:424
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:426
 #, fuzzy
 msgid "Moderate Resources of this group"
 msgstr "संसाधन"
 
-#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:430
+#: gnowsys_ndf/ndf/templates/ndf/action_panel.html:432
 msgid "Check Moderation Status of resources of this group"
 msgstr ""
 
@@ -8277,6 +8301,15 @@ msgstr ""
 msgid "Are you sure to delete this reply ?\\nClick "
 msgstr ""
 
+#: gnowsys_ndf/ndf/templates/ndf/ebook.html:17
+msgid ""
+" \n"
+"    <p class=\"text-justify subheader\">Each eBook is a collection of "
+"chapter files.\n"
+"    </p> \n"
+"  "
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/ndf/edit_forum.html:74
 #, fuzzy
 msgid ""
@@ -8340,10 +8373,30 @@ msgstr "ई-पुस्तकें"
 msgid "Please Enter valid marks Between Min and Max Marks"
 msgstr ""
 
+#: gnowsys_ndf/ndf/templates/ndf/file.html:222
+msgid "To have file in this group, upload in desk group"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/ndf/file.html:223
 #, fuzzy
 msgid "Upload File in desk"
 msgstr "फ़ाइल अपलोड करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:255
+#, fuzzy
+msgid "Create Collection"
+msgstr "संग्रह चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:256
+#, fuzzy
+msgid "Enter collection name"
+msgstr "संग्रह"
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:746
+msgid ""
+"Your video file uploaded succesfully, But still in process, play video about "
+"1 hour after"
+msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/file_list_tab.html:126
 #: gnowsys_ndf/ndf/templates/ndf/file_list_tab.html:134
@@ -8389,6 +8442,93 @@ msgstr ""
 "संक्षिप्त विवरण अथवा रूप् रेखा पढ सकते हैं परंतु विषय वस्तु को पूर्णतः देख नहीं सकते) अथवा "
 "पूर्णतः निजि। प्रत्येक समूह एक विकी, संसाधन समूह तथा वार्ता हेतु परिचर्चा बोर्ड रखता है।</"
 "p>"
+
+#: gnowsys_ndf/ndf/templates/ndf/group_dashboard.html:242
+#, fuzzy
+msgid "Nothing there to be approved!!"
+msgstr "कुछ भी नहीं मिला"
+
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:192
+#, fuzzy
+msgid "Create subgroup"
+msgstr "नया समूह बनाएं"
+
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:196
+#, fuzzy
+msgid "Stop following"
+msgstr "निम्नलिखित से मिलान करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:204
+msgid "Follow"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:239
+msgid "Search particular user"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:241
+#, fuzzy
+msgid "All users"
+msgstr "सभी पाठ्यक्रम"
+
+#: gnowsys_ndf/ndf/templates/ndf/header.html:442
+msgid "You may try Mozilla Firefox"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/hierarchy_tree.html:150
+msgid "Do you want to delete this topic"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/hierarchy_tree.html:161
+msgid " topic deleted successfully"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/hierarchy_tree.html:284
+#, fuzzy
+msgid " theme item already available, Please choose different name"
+msgstr "यह फाइल अपलोड की गई है कृपया अन्य फाइल चुने"
+
+#: gnowsys_ndf/ndf/templates/ndf/hierarchy_tree.html:399
+#: gnowsys_ndf/ndf/templates/ndf/hierarchy_tree.html:538
+msgid "Themes deleted successfully"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:219
+#, fuzzy
+msgid "Choose"
+msgstr "फ़ाइल चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_admins.html:150
+msgid "View/Subscribe Admins"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:153
+msgid "View/Subscribe Users"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/landing_page_nroer.html:160
+#, fuzzy
+msgid "Click here to visit the old site"
+msgstr "देखने के लिए क्ल्कि करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/list_themes.html:8
+#, fuzzy
+msgid "Click to go to themes card view"
+msgstr "देखने के लिए क्ल्कि करें"
+
+#: gnowsys_ndf/ndf/templates/ndf/loadeditor.html:46
+#, fuzzy
+msgid "Please click to add content"
+msgstr "विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/loadeditor.html:52
+#, fuzzy
+msgid "Please enter description..."
+msgstr "विवरण"
+
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_content.html:325
+msgid "View in full screen"
+msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email.html:16
 #, fuzzy
@@ -8619,6 +8759,14 @@ msgid ""
 "        </p>\n"
 "        "
 msgstr ""
+
+#, fuzzy
+#~ msgid "Delete this"
+#~ msgstr "मिटाएं"
+
+#, fuzzy
+#~ msgid "Delete this "
+#~ msgstr "मिटाएं"
 
 #~ msgid ""
 #~ "  <h3 class=\"subheader\">Starting Discussions</h3>\n"

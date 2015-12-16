@@ -61,7 +61,7 @@
 
 <dl class="accordion" data-accordion>
   <dd class="accordion-navigation">
-    <a href="#definitionlist">Definition</a>
+    <a href="#definitionlist">{% trans 'Definition' %}</a>
     <div id="definitionlist" class="content active">
       {% for list in definitionlist %}
       {% if translate and list != "language" %}
@@ -73,7 +73,7 @@
 	{% if list in  required_fields %}
 	<div style="display:table-cell;">
           <font size="3" color="red"> * </font>
-          <font id="{{list}}_required" style="display:none" color="red">This field required</font>
+          <font id="{{list}}_required" style="display:none" color="red">{% trans 'This field required' %}</font>
         </div>
         {% endif %}
       </div>
@@ -88,7 +88,7 @@
         {% if list in  required_fields %}
         <div style="display:table-cell;">
           <font size="3" color="red"> * </font>
-          <font id="{{list}}_required" style="display:none" color="red">This field required</font>
+          <font id="{{list}}_required" style="display:none" color="red">{% trans 'This field required' %}</font>
         </div>
         {% endif %}
       </div>
@@ -130,7 +130,7 @@
     </div>
   </dd>
   <dd class="accordion-navigation">
-    <a href="#dependencylist">Dependency</a>
+    <a href="#dependencylist">{% trans 'Dependency' %}</a>
     <div id="dependencylist" class="content">
       {% for list in dependencylist %}
       <div style="display:table-row;">
@@ -143,7 +143,7 @@
     </div>
   </dd>
   <dd class="accordion-navigation">
-    <a href="#options">Options</a>
+    <a href="#options">{% trans 'Options' %}</a>
     <div id="options" class="content">
       {% for list in options %}
       <div style="display:table-row;">
@@ -158,7 +158,7 @@
 </dl>
 </div>
 
-<input type="submit" name="submit" class="button" id="save-node-type" value="Submit">
+<input type="submit" name="submit" class="button" id="save-node-type" value="{% trans 'Submit' %}">
 </form>
 <!-- {% if translate %}    -->
 <!-- <div class="text-right small-9"> -->
@@ -207,7 +207,7 @@
   
     <!-- if(flag == 1) -->
     <!-- { -->
-    <!--   alert("* mandatory fields requiredss"); -->
+    <!--   alert("* {% trans 'mandatory fields required' %}"); -->
     <!--   event.preventDefault(); -->
     <!-- } -->
   });
