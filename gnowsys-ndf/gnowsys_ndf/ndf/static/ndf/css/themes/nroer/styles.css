@@ -24497,8 +24497,8 @@ aside#help p, aside#help h5, aside#help h6 {
   padding: 0px;
   margin: 5px;
   overflow: hidden;
-  width: 80%;
-  height: 11rem;
+  width: 11rem;
+  height: 9rem;
   /*float:left;*/
 }
 /* line 1073, ../../../scss/_app_styles.scss */
@@ -24532,7 +24532,7 @@ aside#help p, aside#help h5, aside#help h6 {
   padding-top: 0.5cm;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
-  width: 80%;
+  width: 11rem;
   margin-top: -0.3em;
   /*height: 8.25rem;*/
   background-color: #3e3e3e;
@@ -24557,7 +24557,7 @@ aside#help p, aside#help h5, aside#help h6 {
   margin-top: -0.25em;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
-  width: 80%;
+  width: 11rem;
   background-color: #CCCCCC;
 }
 
@@ -24572,7 +24572,7 @@ aside#help p, aside#help h5, aside#help h6 {
   margin-top: -0.25em;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
-  width: 80%;
+  width: 11rem;
   background-color: #E6E6E6;
   display-inline: block;
 }
@@ -24599,7 +24599,6 @@ p {
   display: block;
   margin: 0 auto;
   opacity: 0.9;
-  width: 100%;
   height: 100%;
 }
 /* line 1173, ../../../scss/_app_styles.scss */
@@ -25156,19 +25155,23 @@ p {
 
 /* line 1696, ../../../scss/_app_styles.scss */
 .discussion-content {
-  color: #8c8c8c;
+  color: #262626;
+  word-wrap: break-word;
 }
 
-/* line 1700, ../../../scss/_app_styles.scss */
+/* line 1701, ../../../scss/_app_styles.scss */
 .fullscreen-icon {
   display: none;
 }
 
-/* line 1705, ../../../scss/_app_styles.scss */
-div.show-image:hover div.fullscreen-icon {
-  display: block;
-  left: 15px;
-  position: absolute;
-  top: 3px;
-  font-size: 2em;
-}
+/*
+div.show-image:hover div.fullscreen-icon{
+    display: block;
+    position:absolute;
+    top:3px;
+    left:7em;
+    
+        
+    font-size:2em;
+    
+}*/

@@ -5,6 +5,16 @@
 {% get_schema node as schema %} 
 {% get_group_name groupid as group_name_tag %}
 
+<style type="text/css">
+  legend{
+      text-align: center;
+      //border-left: solid thin #ddd;
+      //border-right: solid thin #ddd;
+      margin-top: 20px;
+      color:black !important;
+    }
+</style>
+
 <script type="text/javascript">
   $( document ).ready(function() {
     var x = location.href;
@@ -40,12 +50,12 @@
   {% if node.teaches %}
     <div class="hide teaches-block">
           
-      <h5 class="subheader">Teaches:</h5>
-      <ul >
+      <legend><h3>Teaches</h3></legend>
+      <ul style="list-style: none; border-bottom: solid thin #ddd;">
         {% for each_topic in node.teaches %}
             {% get_topic_breadcrumb_hierarchy each_topic.pk as topic_prior_hier %}
-          <li>
-            <a href="{% url 'topic_details' group_name_tag each_topic.pk %}?nav_li={{topic_prior_hier}}" style="color:black;">{% trans each_topic.name %}</a>
+          <li style="border-bottom: solid thin #ddd;">
+            <a href="{% url 'topic_details' group_name_tag each_topic.pk %}?nav_li={{topic_prior_hier}}" >{% trans each_topic.name %}</a>
           </li>
         {% endfor %}
       </ul>
@@ -232,7 +242,13 @@
                     {% elif 'pdf' in node.mime_type %}
                         <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                         <br/>
-                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">{% trans 'Full screen view' %}</a>
+                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">  
+                          <center>
+                            <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">{% trans 'View in full screen' %}
+                             <i class="fi-projection-screen"> </i>   
+                            </figcaption>
+                          </center>                
+                        </a>
                   {% else %}
                     <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                       {{ grid_fs_obj.filename }}
@@ -249,16 +265,20 @@
 
               <!-- not a collection -->
               {% if 'image' in node.mime_type %}
-                <div class="show-image ">
+               <center>
+                <div class="show-image">
                   <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
                     <img  src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;" />
+                    
                   </a>
-                  <div class="fullscreen-icon" >
-                    <a  target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">  
-                      <i class="fa fa-arrows-alt" style="color:black !important" title="Full Screen Image"></i>
-                    </a>
-                  </div>
+                  <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
+                      <a  target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">  
+                         View in Full Screen
+                         <i class="fi-projection-screen"> </i>
+                    </figcaption>
+                      </a>
                 </div>
+                </center>
               {% elif 'Pandora_video' in node.member_of_names_list %}
                 {% get_source_id node.pk as source_id %}
                 <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
@@ -295,7 +315,14 @@
               {% elif 'pdf' in node.mime_type %}
                 <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                 <br/>
-                <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">{% trans 'Full screen view' %}</a>
+                <center>
+                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
+                       <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                      {% trans 'View in full screen' %} <i class="fi-projection-screen"> </i><a>
+                   </figcaption>
+                </center> 
+                  
+                </a>
 
 
               {% elif 'epub' in node.mime_type %}
@@ -450,28 +477,31 @@
           </div>
         
 
-           {% if not topic %} 
+           {% if not topic and not is_group %} 
              <div>  
                <small class="text-gray">
                   [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
                 </small> 
-            
+                </br>
           {% if user.is_authenticated %}  
             {% if node.mime_type %}    
               {% if 'video' in node.mime_type  %}
-                <a class="" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
+                <a class="button tiny" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
               {% else %}
-                <a class="" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                <a class="button tiny" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
               {% endif %}
-                  <span class="fa fa-download fa-1g" title="Download">  </span> 
+                  Download 
                 </a>
-
-                 <span>
-                    <a class="share_link" href="#" target="_blank" title="share this resource on facebook">
-                    <i class="fa fa-facebook-square fa-1g"></i>
-                    </a>
-                    </span>  
-            {% endif %}
+               
+               {% social_share_resource as social_share %}
+                  {% if social_share %}
+                    <span>
+                        <a class="share_link " href="#" target="_blank" title="share this resource on facebook">
+                        <i class="fa fa-facebook-square fa-2x"></i>
+                        </a>
+                        </span>  
+                  {% endif %}
+                {% endif %}
           {% endif %} 
              
               </div>
@@ -814,8 +844,7 @@
                 </div>
               </div>
             {% endcomment %}
-            
-            {% endfor %}
+          {% endfor %}
           </section>
           </div>
           {% endif %}
