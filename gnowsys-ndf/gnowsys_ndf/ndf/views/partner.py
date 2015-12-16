@@ -180,12 +180,22 @@ def nroer_groups(request, group_id, groups_category):
             # mapping for the text names in list
             groups_names_list = [mapping.get(i) for i in groups_names_list]
             break
+    # print "\n\ngroups_names_list",groups_names_list
+    group_nodes = []
+    '''
+    For displaying Partners and Groups in same order
+     as defined in settings GSTUDIO_NROER_MENU_MAPPINGS
+    '''
+    for eachgroup in groups_names_list:
+        grp_node = node_collection.one({'_type': "Group", 'name': unicode(eachgroup)})
+        group_nodes.append(grp_node)
 
-    group_nodes = node_collection.find({ '_type': "Group", 
-                                        '_id': {'$nin': [ObjectId(group_id)]},
-                                        'name': {'$nin': ["home"], '$in': groups_names_list},
-                                        'group_type': "PUBLIC"
-                                     })#.sort('last_update', -1)
+    # group_nodes = node_collection.find({ '_type': "Group", 
+    #                                     '_id': {'$nin': [ObjectId(group_id)]},
+
+    #                                     'name': {'$nin': ["home"], '$in': groups_names_list},
+    #                                     'group_type': "PUBLIC"
+    #                                  }).sort('created_at', -1)
 
     if groups_category == "Partners":
         app_gst = node_collection.one({'_type': 'GSystemType', 'name': 'PartnerGroup'})
@@ -194,10 +204,11 @@ def nroer_groups(request, group_id, groups_category):
         app_gst = gst_group
 
     # print "=============", app_gst
-    group_nodes_count = group_nodes.count() if group_nodes else 0
+    # group_nodes_count = group_nodes.count() if group_nodes else 0
     return render_to_response("ndf/partner.html", 
                           {'group_nodes': group_nodes, "groups_category": groups_category,
-                           'group_nodes_count': group_nodes_count, 'app_gst': app_gst,
+                           #'group_nodes_count': group_nodes_count,
+                          'app_gst': app_gst,
                            'groupid': group_id, 'group_id': group_id,
                            
                           }, context_instance=RequestContext(request))

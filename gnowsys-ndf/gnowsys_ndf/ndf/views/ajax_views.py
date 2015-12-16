@@ -1739,7 +1739,7 @@ def get_data_for_batch_drawer(request, group_id):
     return HttpResponse(json.dumps(data_list))
 
 @get_execution_time        
-def set_drawer_widget(st, coll_obj_list):
+def set_drawer_widget(st, coll_obj_list, extra_key=None):
     '''
     this method will set data for drawer widget
     '''
@@ -1767,6 +1767,10 @@ def set_drawer_widget(st, coll_obj_list):
        dic = {}
        dic['id'] = str(each['_id'])
        dic['name'] = each['name']
+       try:
+         dic[extra_key] = each[extra_key]
+       except:
+         pass
        d1.append(dic)
     draw1['drawer1'] = d1
     data_list.append(draw1)
@@ -1774,6 +1778,10 @@ def set_drawer_widget(st, coll_obj_list):
        dic = {}
        dic['id'] = str(each['_id'])
        dic['name'] = each['name']
+       try:
+         dic[extra_key] = each[extra_key]
+       except:
+         pass
        d2.append(dic)
     draw2['drawer2'] = d2
     data_list.append(draw2)
