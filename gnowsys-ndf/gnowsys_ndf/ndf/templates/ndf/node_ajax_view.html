@@ -456,7 +456,6 @@ if($('.breadcrumbs').length == 0)
       var url='/{{groupid}}/group/switch_group/'+'{{node}}';
       $.getJSON( url, function( data ) {
         $.each(data ,function(index , drawer_elements){
-        
          if(index == 0)
           {
            $.each(drawer_elements.drawer1, function(index, element) {
@@ -469,7 +468,7 @@ if($('.breadcrumbs').length == 0)
             $.each(drawer_elements.drawer2, function(index, element) {
               if((element.name == "home") || (element.moderation_level > -1))
               {
-                $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked disabled> '+element.name+ element.moderation_level+'</li>')
+                $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked disabled> '+element.name+'</li>')
               }
               else{
                 $('#group_drawer').append('<li><input type="checkbox" name="switch_group_ele" value="'+element.id+'" checked> '+element.name + element['moderation_level']+'</li>')
