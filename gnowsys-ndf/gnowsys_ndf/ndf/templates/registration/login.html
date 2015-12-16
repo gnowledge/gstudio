@@ -97,7 +97,7 @@
 							{% if site.SITE_NAME == "NROER" %}
 							<br/>
 							<a href="mailto:nroer.support@gnowledge.org">
-								Can't register? Contact us for help.
+								{% trans "Can't register? Contact us for help." %}
 							</a>  
 							{% endif %}
 							</center>
@@ -122,7 +122,7 @@
 
 	$("input[id='id_username'], input[id='id_password']").each(function(){
 		$(this).attr("required", "");
-		$(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+		$(this).after("<small class='error'>{% trans 'Please fill valid' %} "+this.name+"</small>");
 	});
     
 	//Code to refresh the Captcha

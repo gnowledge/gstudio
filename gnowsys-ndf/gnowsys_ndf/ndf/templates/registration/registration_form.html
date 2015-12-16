@@ -28,15 +28,15 @@
 {% block meta_content %}
 <h2 class="subheader text-center">{% trans "Register" %}</h2>
 
-  <b>As a registered user you can:</b>
+  <b>{% trans 'As a registered user you can' %}:</b>
   <ul>
     
-  <li> critique resources</li>
-  <li> share feedback</li>
-  <li> contribute creations</li>
-  <li> Participate and create events</li>
-  <li> Participate and create courses</li>
-  <li> And many more...</li>
+  <li> {% trans 'Critique resources' %}</li>
+  <li> {% trans 'Share feedback' %}</li>
+  <li> {% trans 'Contribute creations' %}</li>
+  <li> {% trans 'Participate and create events' %}</li>
+  <li> {% trans 'Participate and create courses' %}</li>
+  <li> {% trans 'and many more' %}...</li>
   </ul>
 {% endblock meta_content %}
 
@@ -110,7 +110,7 @@
             <small style="color: green; font-weight: bold;">{% trans "NOTE: " %}</small>
             <ul style="color: green; font-weight: normal;">
                 <li>{% trans "Password must contain atleast 8 characters," %}</li>
-                <li>{% trans "One uppercase letter, and" %}</li>
+                <li>{% trans "One uppercase letter and" %}</li>
                 <li>{% trans "One numeral" %}</li>
             </ul>
           </div>
@@ -171,7 +171,7 @@
             <label for="tc-check" class="overlay-description-by-oid-caller" data-reveal-id="overlay-description-by-oid" data-oid="{{oids.tc}}" title="click to read T&C">
             {% trans "I agree to the terms and conditions" %}.
             </label>
-            <small class="error">Please accept terms & conditions.</small>
+            <small class="error">{% trans 'Please accept terms & conditions.' %}</small>
 
           </div>
         </div>
@@ -208,10 +208,10 @@
 
     if(this.name == 'username')
     {
-      $(this).after("<small class='error'>Username should start with letters and can have digits and - / . / _ only</small>");
+      $(this).after("<small class='error'>{% trans 'Username should start with letters and can have digits and - / . / _ only' %}</small>");
     }
     else{
-      $(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+      $(this).after("<small class='error'>{% trans 'Please fill valid' %}: "+this.name+"</small>");
     }
 
     $(this).after("<i style='color:red; float:left display:inline'>*</i>");
