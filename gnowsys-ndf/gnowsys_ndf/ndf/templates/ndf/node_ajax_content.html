@@ -242,7 +242,13 @@
                     {% elif 'pdf' in node.mime_type %}
                         <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                         <br/>
-                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">{% trans 'Full screen view' %}</a>
+                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">  
+                          <center>
+                            <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">{% trans 'View in full screen' %}
+                             <i class="fi-projection-screen"> </i>   
+                            </figcaption>
+                          </center>                
+                        </a>
                   {% else %}
                     <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                       {{ grid_fs_obj.filename }}
@@ -269,8 +275,8 @@
                       <a  target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">  
                          View in Full Screen
                          <i class="fi-projection-screen"> </i>
-                      </a>
                     </figcaption>
+                      </a>
                 </div>
                 </center>
               {% elif 'Pandora_video' in node.member_of_names_list %}
@@ -309,7 +315,14 @@
               {% elif 'pdf' in node.mime_type %}
                 <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                 <br/>
-                <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">{% trans 'Full screen view' %}</a>
+                <center>
+                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
+                       <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                      {% trans 'View in full screen' %} <i class="fi-projection-screen"> </i><a>
+                   </figcaption>
+                </center> 
+                  
+                </a>
 
 
               {% elif 'epub' in node.mime_type %}
