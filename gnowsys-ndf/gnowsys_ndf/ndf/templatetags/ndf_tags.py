@@ -3157,6 +3157,11 @@ def social_share_resource():
 
 @get_execution_time
 @register.assignment_tag
+def get_ebook_help_text():
+	return GSTUDIO_EBOOKS_HELP_TEXT
+
+@get_execution_time
+@register.assignment_tag
 def is_partner(group_obj):
 	try:
 		result = False

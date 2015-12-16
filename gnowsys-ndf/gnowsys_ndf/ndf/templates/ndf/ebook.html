@@ -12,14 +12,14 @@
 <script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
 
 {% endblock head %}
-
 {% block meta_content %}
+  {% get_ebook_help_text as ebook_help_text_url %}
   {% blocktrans %} 
     <p class="text-justify subheader">Each eBook is a collection of chapter files.
     </p> 
   {% endblocktrans %}
   <p>
-    <a href="http://nroer.gov.in/55ab34ff81fccb4f1d806025/page/56701a8581fccb0343bf438b" target="_blank">How to read eBooks</a>  
+    <a href="{{ebook_help_text_url}}" target="_blank">How to read eBooks</a>  
   </p>
 
 {% endblock %}
