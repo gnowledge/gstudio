@@ -85,10 +85,10 @@
           </div>
           <div class="discussion-footer">
               {% if request.user.id == each_reply.userid or is_gstaff %}
-                <a class="" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" ><input type="button" name="delete" value="Delete"> </a>
+                <a class="reply-btn" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" >{% trans "Delete" %} </a>
               {% endif %}
-                <a class=""  data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'style="float:right">
-                 <input type="button" name="reply" value="Reply">
+                <a class="reply-btn"  data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'style="float:right">
+                {% trans "Reply" %}
                 </a>
               </div>
           
