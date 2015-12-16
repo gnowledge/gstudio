@@ -59,9 +59,9 @@
         
             </div>
           <div class="discussion-content">
-            {% spaceless %}
-            <i>{{each_reply.HTMLcontent | safe }}</i>
-            {% endspaceless %}
+          
+            {{each_reply.HTMLcontent|safe }}
+            
           {% for node in each_reply.collection_set  %}
             <div style="margin: 1em;">
               <br/>

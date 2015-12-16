@@ -540,6 +540,7 @@ GSTUDIO_SITE_LANDING_PAGE = "home"  # possible values are 'home' and 'udashboard
 GSTUDIO_SITE_HOME_PAGE = None  # it is url rendered on template. e.g: "/welcome". Default is: "/home"
 GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" etc. (Override it in local_settings)
 GSTUDIO_SITE_ISSUES_PAGE = ""
+GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebooks") 
 
 # terms & conditions
 GSTUDIO_OID_TC = None
@@ -701,6 +702,7 @@ CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
 GSTUDIO_NO_OF_OBJS_PP = 24
 
 GSTUDIO_HELP_SIDEBAR = False
+SOCIAL_SHARE_RESOURCE = False
 
 # ----------------------------------------------------------------------------
 # following has to be at last
