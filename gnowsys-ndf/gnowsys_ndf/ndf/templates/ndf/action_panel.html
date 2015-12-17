@@ -314,11 +314,11 @@
 							{% endif %}								
 						{% else %}
 							{% if user_is_joined == "joined" or  user_is_joined == "author" %}
-								{% if node.status != 'MODERATION' %}
-									{% if "File" in node.member_of_names_list %}
+								{% if node.status != 'MODERATION' %} 
+									{% if "File" in node.member_of_names_list and group_name_tag != "home" %}
 										<a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 									{% else %}
-										{% if "Theme" in node.member_of_names_list or "Topic" in node.member_of_names_list %}
+										{% if "Theme" in node.member_of_names_list or "Topic" in node.member_of_names_list  %}
 											{% if is_gstaff %}
 												<a href="{% url create_url group_name_tag app_id %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 											{% endif %}
@@ -326,8 +326,8 @@
 										{% elif "Term" in node.member_of_names_list %}
 											<a href="{% url create_url group_name_tag %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} Topic
 											</a>
-										{% elif "Group" not in node.member_of_names_list and "ProgramEventGroup" not in node.member_of_names_list and "CourseEventGroup" not in node.member_of_names_list and "ModeratingGroup" not in node.member_of_names_list %}
-											<a href="{% url create_url group_name_tag %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+										{% elif "Group" not in node.member_of_names_list and "ProgramEventGroup" not in node.member_of_names_list and "CourseEventGroup" not in node.member_of_names_list and "ModeratingGroup" not in node.member_of_names_list  and group_name_tag != "home"%}
+											<a href="{% url create_url group_name_tag %}" class="tiny button radius expand mod-btn" title="Create New  {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 										{% endif %}
 									{% endif %}
 								{% endif %}
