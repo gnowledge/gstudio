@@ -982,7 +982,7 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     updated_res_data = resource_data.copy()
 
     updated_res_data['resource_link'] = thumbnail_url
-    updated_res_data['name'] = u'thumbnail'
+    updated_res_data['name'] = u'Thumbnail: ' + a.split('/')[-1:][0]
     
     updated_res_data['content_org'] = ''
     updated_res_data['tags'] = []
