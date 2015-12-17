@@ -1154,13 +1154,13 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
                 thumbnailimg = convert_image_thumbnail(files)
                 if thumbnailimg:
-                    tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
+                    tobjectid = fileobj.fs.files.put(thumbnailimg, filename="thumbnail-of-"+filename, content_type=filetype)
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': tobjectid}})
 
                 files.seek(0)
                 mid_size_img = convert_mid_size_image(files)
                 if mid_size_img:
-                    mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
+                    mid_img_id = fileobj.fs.files.put(mid_size_img, filename="mid_size_img-of-"+filename, content_type=filetype)
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
             return fileobj._id, is_video

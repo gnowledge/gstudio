@@ -333,7 +333,8 @@ def add_to_collection_set(node_object, id_to_be_added):
     Returns:
         updates an object but returns nothing
     """
-    if not ObjectId(id_to_be_added) in node_object.collection_set:
+    if not ObjectId(id_to_be_added) in node_object.collection_set and \
+    node_object._id != id_to_be_added:
 
         node_collection.collection.update({
                 '_id': node_object._id},
