@@ -178,10 +178,10 @@
 							{% if "Page" in node.member_of_names_list or "File" in node.member_of_names_list or "Term" in node.member_of_names_list %}
 								<a class="tiny button radius right-btn delete-btn" title="Delete  {{node.member_of_names_list.0}}">{% trans 'Delete' %} {{node.member_of_names_list.0}}</a>
 							{% else %}
-								<input type="button" class="tiny button radius right-btn disabled secondary" value="{% trans 'Delete'  %} {{node.member_of_names_list.0}}">
+								<input type="button" class="tiny button radius right-btn disabled secondary" value="{% trans 'Delete'  %} {{node.member_of_names_list.0}}" title='{% trans "You are not authorized for this action" %}'>
 							{% endif %}
 						{% else %}
-							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete' %}{{node.member_of_names_list.0}}" title={% trans "You are not authorized for this action" %}>
+							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete' %}{{node.member_of_names_list.0}}" title='{% trans "You are not authorized for this action" %}'>
 						{% endif %}
 
 
