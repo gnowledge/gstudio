@@ -51,32 +51,34 @@
 </head>
 <body>
 
-    <nav class="top-bar drop-shadow row" data-topbar role="navigation">
+	<div id="top-headers">
+	    <nav class="top-bar" id="first-header" data-topbar role="navigation">
 
-		<ul class="title-area ">
+			<ul class="title-area ">
 
-		<li class="name">
-		    <h1>
-		      <a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
-		    </h1>
-		</li>
+			<li class="name">
+			    <h1>
+			      <a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
+			    </h1>
+			</li>
 
-		<li class="toggle-topbar menu-icon">
-		  <a href="#">{% trans "Menu" %}</a>
-		</li>
+			<li class="toggle-topbar">
+			  <a href="#">{% trans "Menu" %}</a>
+			</li>
 
-		</ul>
-    </nav>
+			</ul>
+	    </nav>
 
-    <div class="bk-image">
-    	<i class="fi-paw"></i>
-    </div>
+	    <div class="bk-image">
+	    	<i class="fi-paw"></i>
+	    </div>
 
-    <br/>
-    <br/>
+	    <br/>
+	    <br/>
 
-	<div class="text-center">
-		{% block error_body_text %}	{% endblock %}
+		<div class="text-center">
+			{% block error_body_text %}	{% endblock %}
+		</div>
 	</div>
 
 	{% include "ndf/footer.html" with site=site %} 
