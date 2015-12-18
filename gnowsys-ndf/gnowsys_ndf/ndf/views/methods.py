@@ -3194,6 +3194,14 @@ def parse_data(doc):
                               for each in doc[i]:
                                       for k1, v1 in each.items():
                                               for rel in v1:
+                                                      if isinstance(rel, ObjectId):
+                                                              rel = node_collection.one({'_id':ObjectId(rel)})
+                                                              att_dic[k1] = rel.name
+                                                      elif '$oid' in rel:
+                                                              rel = rel['$oid']
+                                                              rel = node_collection.one({'_id':ObjectId(rel)})
+                                                              att_dic[k1] = rel.name
+                                                      # print "\n\n\nrel", rel
                                                       rel = node_collection.one({'_id':ObjectId(rel)})
                                                       att_dic[k1] = rel.name
                               for att,value in att_dic.items():
