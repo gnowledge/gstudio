@@ -8,7 +8,7 @@
           <li><strong>Keyword search </strong>
               <ul>
                     <li>It searches all the public resources for the keywords provided.</li>
-                    <li>Search by name, tags, contents and on specific users. </li>
+                    {% comment %}<li>Search by name, tags, contents and on specific users. </li>{% endcomment %}
               </ul><br>
                 </ul>
 
@@ -27,37 +27,39 @@
   
 </div>
 <hr>
-<dl class="accordion" data-accordion>
-    <dd class="accordion-navigation" data-options="deep_linking:true">
-          <a href="#panel1" style="background-color: #2980B9; color:#FFF">Search</a>
-          <div id="panel1" class="content active small-12 large-4 columns">
-            
-                       <!-- <h1>Search</h1> -->
+   {% comment %} 
+    <dl class="accordion" data-accordion>
+        <dd class="accordion-navigation" data-options="deep_linking:true">
+              <a href="#panel1" style="background-color: #2980B9; color:#FFF">Search</a>
+              <div id="panel1" class="content active small-12 large-4 columns">
+                
+                           <!-- <h1>Search</h1> -->
 
-                      <form name="search_form" method="GET" action="{% url 'results' groupid %}">
-                        {% csrf_token %}
-                        Enter the value to be searched:
-                        <input type="text" class="small-2 columns" name="search_text" id="search_text" required>
-                        <h5> Search by: </h5>
-                        <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />Name
-                        <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />Tags 
-                        <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />Content <br>
-                        Search particular user: 
-                        <select name="users" required>
-                          <option value="all">All users</option>
-                          {% for mem in authors %}    
-                            <option value="hello">{{ mem }} </option>
-                            {% endfor %}
-                        </select>
+                          <form name="search_form" method="GET" action="{% url 'results' groupid %}">
+                            {% csrf_token %}
+                            Enter the value to be searched:
+                            <input type="text" class="small-2 columns" name="search_text" id="search_text" required>
+                            <h5> Search by: </h5>
+                            <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />Name
+                            <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />Tags 
+                            <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />Content <br>
+                            Search particular user: 
+                            <select name="users" required>
+                              <option value="all">All users</option>
+                              {% for mem in authors %}    
+                                <option value="hello">{{ mem }} </option>
+                                {% endfor %}
+                            </select>
 
-                        <input type="submit" class="button" name="subButton2" id="subButton2" value="Submit" />
-                      </form>
-    
-            
-          </div>
-    
-    </dd>
-</dl>
+                            <input type="submit" class="button" name="subButton2" id="subButton2" value="Submit" />
+                          </form>
+        
+                
+              </div>
+        
+        </dd>
+    </dl>
+    {% endcomment %}
 <script>
   /********************************************************************************
   THIS SCRIPT EXTRACTS THE GET VARIABLES FROM THE URL AND CONVERTS IT INTO A DICTIONARY - "VARS"  

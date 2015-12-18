@@ -85,9 +85,7 @@
  -->
 
 
-{% block meta_content %}
-	
-{% endblock %}
+
 
 {% block collection_content %}  
 
@@ -197,16 +195,20 @@
 	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;border: 1px solid #1a1a1a;"> </div>
 
 {% endblock %}
-
+{% block meta_content %}
+	<div class="large-4 columns repository-title">
+		{% if theme_GST.altnames and theme_GST.altnames != "None" %}
+			{{theme_GST.altnames}}
+		{% else %}
+			{{theme_GST.name}}
+		{% endif %}
+	</div>
+{% endblock %}
 
 {% block body_content %}
 		<div class="large-4 columns repository-title">
 				{% if node.name %}
 					{{node.name}}
-				{% elif theme_GST.altnames and theme_GST.altnames != "None" %}
-					{{theme_GST.altnames}}
-					{% else %}
-					{{theme_GST.name}}
 				{% endif%}
 	</div>
 
