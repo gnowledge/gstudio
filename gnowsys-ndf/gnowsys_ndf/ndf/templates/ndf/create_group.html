@@ -12,14 +12,12 @@ this template is modified. So for the fields in the template it supports -
  -->
 
 {% block meta_content %}
-  {% blocktrans %}
-    <h3>Types of Groups</h3>
+    <h3>{% trans 'Types of Groups' %}</h3>
     <hr/>
-    <h5>Open Groups</h5>
-    <p class="subheader">Open groups are ideal for projects that require a high level of collaboration and participation. Any metastudio user can join this group without prior approval</p>
-    <h5>Closed Groups</h5>
-    <p class="subheader">Closed groups are ideal for projects that require restricted access to content and documents. Users can only join after their membership request is approved or have been invited.</p>
-  {% endblocktrans %}
+    <h5>{% trans 'Open Groups' %}</h5>
+    <p class="subheader">{% trans 'Open groups are ideal for projects that require a high level of collaboration and participation. Any metastudio user can join this group without prior approval' %}</p>
+    <h5>{% trans 'Closed Groups' %}</h5>
+    <p class="subheader">{% trans 'Closed groups are ideal for projects that require restricted access to content and documents. Users can only join after their membership request is approved or have been invited.' %}</p>
 {% endblock %}
 
 
@@ -27,7 +25,7 @@ this template is modified. So for the fields in the template it supports -
 
   <h2 class="text-center">
     <small>
-      {% if node %} Edit | {{node.name}}
+      {% if node %} {% trans 'Edit' %} | {{node.name}}
       {% else %} 
       {% if subgroup_flag %}
       {% trans "Create New Sub Group" %}
@@ -112,7 +110,7 @@ this template is modified. So for the fields in the template it supports -
                 </option>
               {% endfor %}
             </select> 
-            <small class="error">Please select group type.</small>
+            <small class="error">{% trans 'Please select group type.' %}</small>
           </div>
 
         </div>
@@ -138,7 +136,7 @@ this template is modified. So for the fields in the template it supports -
                 </option>
               {% endfor %}
             </select> 
-            <small class="error">Please select group editing policy.</small>
+            <small class="error">{% trans 'Please select group editing policy.' %}</small>
           </div>
         </div>
       </div>
@@ -191,7 +189,7 @@ this template is modified. So for the fields in the template it supports -
               <option id="BY_REQUEST">{% trans "BY_REQUEST" %}</option>
               <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
             </select>
-            <small class="error">Please select subscription policy.</small>
+            <small class="error">{% trans 'Please select subscription policy.' %}</small>
           </div>
 
         </div>
@@ -212,7 +210,7 @@ this template is modified. So for the fields in the template it supports -
               <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED_TO_MEM" %}</option>
               <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT_DISCLOSED_TO_MEM" %}</option>
             </select>
-            <small class="error">Please select group member visibility.</small>
+            <small class="error">{% trans 'Please select group member visibility.' %}</small>
           </div>
 
         </div>
@@ -233,7 +231,7 @@ this template is modified. So for the fields in the template it supports -
               <option id="NOT_ENCRYPTED">{% trans "NOT_ENCRYPTED" %}</option>
               <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
             </select>
-            <small class="error">Please select group encryption policy.</small>
+            <small class="error">{% trans 'Please select group encryption policy.' %}</small>
           </div>
 
         </div>
@@ -254,7 +252,7 @@ this template is modified. So for the fields in the template it supports -
               <option id="ANNOUNCED">{% trans "ANNOUNCED" %}</option>
               <option id="NOT_ANNOUNCED">{% trans "NOT_ANNOUNCED" %}</option>
             </select>
-            <small class="error">Please select group visibility policy.</small>
+            <small class="error">{% trans 'Please select group visibility policy.' %}</small>
           </div>
 
         </div>
@@ -281,7 +279,7 @@ this template is modified. So for the fields in the template it supports -
                 </option>
               {% endfor %}
             </select>
-            <small class="error">Please select group agency type.</small>
+            <small class="error">{% trans 'Please select group agency type.' %}</small>
           </div>
 
         </div>
@@ -296,7 +294,7 @@ this template is modified. So for the fields in the template it supports -
 
         <a href="#content_org">
           <label for="right-label" class="">
-            {% if node.content_org %}Edit{% else %}Add{% endif %} {% trans "Description" %}
+            {% if node.content_org %}{% trans 'Edit' %}{% else %}{% trans 'Add' %}{% endif %} {% trans "Description" %}
           </label>
         </a>
 
@@ -324,9 +322,9 @@ this template is modified. So for the fields in the template it supports -
     <div class="row">
       <div class="small-12 medium-6 medium-centered columns">
         {% if node %}
-          <input type="submit" value="Save Changes" id="group-submit" class="button expand">
+          <input type="submit" value="{% trans 'Save Changes' %}" id="group-submit" class="button expand">
         {% else %}
-          <input type="submit" value="Create Group" id="group-submit" class="button expand">
+          <input type="submit" value="{% trans 'Create Group' %}" id="group-submit" class="button expand">
         {% endif %}
       </div>
     </div>
@@ -370,7 +368,7 @@ this template is modified. So for the fields in the template it supports -
         if (nodes.indexOf(name) >= 0)  
           { 
             $("#message").css("display", "block");
-            $("#message").text("Group '"+ name +"' {% trans ' already exist. Please choose another name' %}");
+            $("#message").text("'"+ name +"' {% trans ' group already exist. Please choose another name' %}");
             event.preventDefault();
           }
       }

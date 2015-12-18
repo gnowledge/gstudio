@@ -39,10 +39,10 @@
     <p id="alertModalLabel"></p>
     <div class="row deletion">
       <div class="small-3 small-offset-3 columns">
-        <input type="button" id="btnConfirmYes" class="button tiny expand radius" value="Yes">
+        <input type="button" id="btnConfirmYes" class="button tiny expand radius" value="{% trans 'Yes' %}">
       </div>
       <div class="small-3 columns end">
-        <input type="button" id="btnConfirmNo" class="button tiny expand radius" value="No">
+        <input type="button" id="btnConfirmNo" class="button tiny expand radius" value="{% trans 'No' %}">
       </div>
     </div>
     <a class="close-reveal-modal">&#215;</a>
@@ -54,13 +54,13 @@
       <span class='node'>{{node.name}}</span>
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff or request.user.id == node.created_by %}
-        <span data-tooltip title="Edit this Course"><a class="fi-pencil" href="{% url 'create_edit' group_id node.pk %}">Edit</a></span>
+        <span data-tooltip title="{% trans 'Edit this Course' %}"><a class="fi-pencil" href="{% url 'create_edit' group_id node.pk %}">{% trans 'Edit' %}</a></span>
       {% endif %}
     </h3>
 
       <small>
           <div class="age">
-            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+            {{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
             by <a class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
           <!-- <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span> -->
           <!-- <a href=""><i class="fi-clock"></i> {% trans "View history" %}</a> -->
@@ -97,7 +97,7 @@
 
   // Click on delete button
     $(document).on('click','.fi-trash',function(){
-      lbl_msg = "Are you sure you want to delete '{{node.name}}' course?"
+      lbl_msg = "{% trans 'Are you sure you want to delete course' %} :'{{node.name}}' ?"
       $("#alertModalLabel").text(lbl_msg);
       $("#alertModal")
         .removeClass("medium").addClass("small")

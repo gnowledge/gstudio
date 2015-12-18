@@ -147,7 +147,7 @@
 		        var node = event.node;
 		        {% user_access_policy groupid request.user as user_access %}
         		{% if user_access == "allow" %}
-			        var msg = confirm("Do you want to delete this topic ?");
+			        var msg = confirm("{% trans 'Do you want to delete this topic' %} ?");
 			        if (msg == true) {
 
 			        	$.ajax({
@@ -158,7 +158,7 @@
 			             		csrfmiddlewaretoken: '{{ csrf_token }}'
 			             	},
 			             	success: function(result){
-			             		alert("Topic "+node.name+" deleted successfully");
+			             		alert(node.name+" {% trans ' topic deleted successfully' %}");
 			             		location.reload(true);
 			             	},
 			            });
@@ -281,7 +281,7 @@
 		          var item = $(".name_id").val();
 
 		          if ($.trim(data) === "failure") {
-		            alert("Theme item "+ item +" already available, Please choose different name");
+		            alert( item +" {% trans ' theme item already available, Please choose different name' %}");
 		          }
 
 		          if ($.trim(data) === "success") {
@@ -359,7 +359,7 @@
            	}
            	else
            	{
-        		alert("select object to delete")
+        		alert("{% trans 'Select object to delete' %}")
         	}
 
 	    });
@@ -396,7 +396,7 @@
 	             		csrfmiddlewaretoken: '{{ csrf_token }}'
 	             	},
 	             	success: function(result){
-	             		alert("Themes deleted successfully");
+	             		alert("{% trans 'Themes deleted successfully' %}");
 	             		$('#myModal').foundation('reveal', 'close');
 	             		location.reload(true);
 	             	},
@@ -405,7 +405,7 @@
 	             
 	        }
 	        else{
-	        alert("select object to delete")
+	        alert("{% trans 'Select object to delete' %}")
 	        }
 
 		});
@@ -535,7 +535,7 @@
 	             		csrfmiddlewaretoken: '{{ csrf_token }}'
 	             	},
 	             	success: function(result){
-	             		alert("Themes deleted successfully");
+	             		alert("{% trans 'Themes deleted successfully' %}");
 	             		$('#myModal').foundation('reveal', 'close');
 	             		location.reload(true);
 	             	},
@@ -544,7 +544,7 @@
 	             
 	        }
 	        else{
-	        alert("select object to delete")
+	        alert("{% trans 'Select object to delete' %}")
 	        }
 
 		});

@@ -189,22 +189,22 @@ $(document).ready(function()
   <input type="hidden" id="groupname" value="{{node}}">
   {% if user.is_authenticated %}
      {% if user.is_superuser or node.created_by == user.id %}
-         <li><a href="{% url 'create_sub_group' group_id %}" >create subgroup</li>
+         <li><a href="{% url 'create_sub_group' group_id %}" >{% trans 'Create subgroup' %}</li>
      {% endif %}
   {% if user_is_joined == "joined" %}
     {% if is_user_group and node.created_by != request.user %}
-    <li><input class="button" type="submit" id="notify" value="Stop following"></li>
+    <li><input class="button" type="submit" id="notify" value="{% trans 'Stop following' %}"></li>
 
     {% else %}
-    <li><input class="button" type="submit" id="notify" value="Unsubscribe"></li>
+    <li><input class="button" type="submit" id="notify" value="{% trans 'Unsubscribe' %}"></li>
     {% endif %} 
 
   {% elif user_is_joined == "not" or not user.is_authenticated %}
     {% if is_user_group and node.created_by != request.user %}
-    <li><input class="button" type="submit" id="notify" value="Follow"></li>
+    <li><input class="button" type="submit" id="notify" value="{% trans 'Follow' %}"></li>
 
     {% else %}
-    <li><input class="button" type="submit" id="notify" value="Join"></li>
+    <li><input class="button" type="submit" id="notify" value="{% trans 'Join' %}"></li>
     {% endif %}
 
   {% endif %}
@@ -232,19 +232,19 @@ $(document).ready(function()
     <input type="text" name="search_text" id="search_text" required>
 
     <font style="font-size:0.8em">Search by:<br>
-    <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />Name &nbsp
-    <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />Tags &nbsp
-    <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />Content <br>
+    <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />{% trans 'Name' %} &nbsp
+    <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />{% trans 'Tags' %} &nbsp
+    <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />{% trans 'Content' %} <br>
   </font>
-    Search particular user: 
+    {% trans 'Search particular user' %}: 
     <select name="users">
-      <option value="all">All users</option>
+      <option value="all">{% trans 'All users' %}</option>
       {% for mem in authors %}    
         <option value="hello">{{ mem }} </option>
         {% endfor %}
     </select>
 
-    <input type="submit" name="subButton2" id="subButton2" value="Submit" />
+    <input type="submit" name="subButton2" id="subButton2" value="{% trans 'Submit' %}" />
   </form>
   <div id="results">
 

@@ -175,7 +175,7 @@
       $(document)
         .ajaxStart(function() {
           $('article').block({ 
-            message: '<h4>Processing... Please wait!</h4>',
+            message: '<h4>{% trans "Processing... Please wait!" %}</h4>',
             centerX: false,
             centerY: false,
             css: { 
@@ -250,7 +250,7 @@
           data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
 
           success:function(data){
-            alert("Successfully set the preferences");
+            alert("{% trans 'Successfully set the preferences' %}");
             location.reload();
           }
         }); //ajax closes

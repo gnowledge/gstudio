@@ -134,20 +134,20 @@
 			<!-- CheckBox Container -->
 				<div class="sidebar">
 					<div class="item-group">
-						<label class="item-label">1. Use Shift+Click to Stick the Node.</label><br>
-						<label class="item-label">   Double Click to remove Sticky Node.</label>
+						<label class="item-label">{% trans '1. Use Shift+Click to Stick the Node.' %}</label><br>
+						<label class="item-label">   {% trans 'Double Click to remove Sticky Node.' %}</label>
 					</div>
 					<div class="item-group">
-						<label class="item-label">2. Use Ctrl+Click to Expand/Collaps the Node.</label>
+						<label class="item-label">{% trans '2. Use Ctrl+Click to Expand/Collaps the Node.' %}</label>
 					</div>
 					<div class="item-group">
-						<label class="item-label">3. Filter the Graph.</label>
+						<label class="item-label">{% trans '3. Filter the Graph.' %}</label>
     	            	<div id="filterContainer" class="filterContainer checkbox-interaction-group"></div>
     	            </div>
                 </div>
 			</div>
 		<!-- Download Button -->
-			<input type="button" class="button expand" value="Save as SVG" onclick='conceptg_download("{{node.name}}");' />
+			<input type="button" class="button expand" value="{% trans 'Save as SVG' %}" onclick='conceptg_download("{{node.name}}");' />
 		</div>
 
 	<!-- Div containing svg area -->

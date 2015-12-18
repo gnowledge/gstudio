@@ -237,7 +237,7 @@
               </tbody>  
             </table>
             {% else %}
-            <h4>Nothing there to be approved!!</h4>
+            <h4>{% trans 'Nothing there to be approved!!' %}</h4>
             {% endif %}
           </div>
         </dd>
@@ -252,10 +252,10 @@
           </div>
             <div class="row hide" id="approval_buttons">
                 <div class="medium-2 columns">
-                    <input type="button" class="button small radius expand btnApproval" id="btnApp_id" value="Approve" disabled="disabled">
+                    <input type="button" class="button small radius expand btnApproval" id="btnApp_id" value="{% trans 'Approve' %}" disabled="disabled">
                 </div>
                 <div class="medium-2 columns end">
-                    <input type="button" class="button small radius expand btnApproval"  id="btnRej_id" value="Reject" disabled="disabled">
+                    <input type="button" class="button small radius expand btnApproval"  id="btnRej_id" value="{% trans 'Reject' %}" disabled="disabled">
                 </div>
             </div>
           </div>
@@ -524,8 +524,8 @@
 
               // Define table
               student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_app_data_table">' +
-              '<input type="button" class="button tiny select_all_rows" value="Select All" >' +
-              '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >' +
+              '<input type="button" class="button tiny select_all_rows" value="{% trans Select All %}" >' +
+              '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="{% trans De-Select All %}" >' +
               '<label id="lbl_displ"></label>' +
               '</table>';
               $("#approval_table").html(student_data_table); 
@@ -581,7 +581,7 @@
   //On click of select All, highlight all rows
     $(document).on('click','.select_all_rows',function(){
       $(sce_dt_var.fnGetNodes()).addClass('selected');
-      $("#lbl_displ").text("All " + $(sce_dt_var.fnGetNodes()).length + " rows are selected")
+      $("#lbl_displ").text( $(sce_dt_var.fnGetNodes()).length + " {% trans 'rows are selected' %}")
       $(".btnApproval").removeAttr("disabled")
     });
 

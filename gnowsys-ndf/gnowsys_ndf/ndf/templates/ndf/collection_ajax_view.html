@@ -138,7 +138,7 @@
               var lbl_name = document.createElement('label');
               lbl_name.style.fontSize = "20px"
               if(node.hasChildren()){
-                lbl_name.innerHTML = node.name + " contains following : ";
+                lbl_name.innerHTML = node.name + " {% trans 'contains following' %} : ";
                 $("#view_page").append(lbl_name);
                 var ol_elem = document.createElement('OL');
                 ol_elem.id = "res_container";
@@ -152,7 +152,7 @@
                 }
               }
               else{
-                lbl_name.innerHTML = node.name + " contains no files yet!";
+                lbl_name.innerHTML = node.name + " {% trans 'contains no files yet!' %}";
                 $("#view_page").append(lbl_name);
               }
               $("#view_page").append(ol_elem)
@@ -265,7 +265,7 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
     <!-- Related node means all collection elements of its teme item i.e all siblings of topic node -->
     
       {% if prior_obj %}        
-      <legend><h3>Topics in {{prior_obj.name}}</h3></legend>
+      <legend><h3>{% trans 'Topics in' %} {{prior_obj.name}}</h3></legend>
         {% comment %}
           {% for each in prior_obj.collection_set %}
               <!-- To get the node object -->

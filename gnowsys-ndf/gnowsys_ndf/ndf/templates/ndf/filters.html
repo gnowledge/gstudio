@@ -124,7 +124,7 @@
 				<div class="small-12 large-3 columns small-text-left  large-text-center"><h5> {% trans 'Filter Resources' %}</h5></div>
 				<div class="small-12 large-3 columns">
 					<select name="filter-field-name">
-						<option value="initial-select"> -- {% trans 'Select' %} -- </option>
+						<option value="initial-select"> --- {% trans 'Select' %} --- </option>
 						{% for key, val in filter_dict.items %}
 							<option value='{{val.value}}'
 							data-primary-type='{{val.data_type}}'
@@ -146,7 +146,7 @@
 					<select name="filter-field-value"  
 					onblur="$(this).css('height', '')"
 					onfocus="$(this).css('height', '6em')" multiple disabled>
-						<option value=""> -- {% trans 'Select' %} -- </option>
+						<option value=""> --- {% trans 'Select' %} --- </option>
 						
 					</select>				
 				</div>

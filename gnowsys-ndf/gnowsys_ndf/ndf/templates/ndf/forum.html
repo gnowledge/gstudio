@@ -109,7 +109,7 @@
 
     {% comment %}
     {% if node.created_by == request.user.id %}
-    <a class="button alert tiny" href="{% url '' group_name_tag each.id %}">Delete</a>
+    <a class="button alert tiny" href="{% url '' group_name_tag each.id %}">{% trans 'Delete' %}</a>
     {% endif %}
     {% endcomment %}
 

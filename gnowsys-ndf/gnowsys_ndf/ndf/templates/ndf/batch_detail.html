@@ -29,7 +29,7 @@
     </section>
   </header>
   <div class="row">
-    <h4> This batch has following {{student_coll|length}} Members: </h4>
+    <h4> {% trans 'This batch has following' %} {{student_coll|length}} {% trans 'Members' %}: </h4>
     {% for each in student_coll %}
       <div>
         &nbsp;&nbsp;&nbsp;&nbsp; <b>{{ forloop.counter }}. {{each.name}}<b><br>

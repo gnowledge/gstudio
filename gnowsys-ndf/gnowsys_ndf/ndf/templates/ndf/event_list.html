@@ -1,7 +1,6 @@
 {% extends "ndf/event.html" %}
 {% load i18n %}
 
-{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 
@@ -17,8 +16,8 @@
       
       <h3>{% trans "Are you sure you want to delete? All of the following related items also will be deleted!" %}</h3>
       
-      <input class="button confirmDeleteObjects" type="button" value="Confirm">
-      <input class="button cancelDeleteObjects" type="button" value="Cancel">
+      <input class="button confirmDeleteObjects" type="button" value="{% trans 'Confirm' %}">
+      <input class="button cancelDeleteObjects" type="button" value="{% trans 'Cancel' %}">
       <div id="deletion_results"></div>
       <a class="close-reveal-modal"> &#215;</a>
     </div>
@@ -35,7 +34,7 @@
       {% csrf_token %}
       <input name="search" type="textbox" value="" style="width:300px;">
       <input type="hidden" name="class" value="{{class_name}}">
-      <input type="submit" value="search" style="width:100px;">
+      <input type="submit" value="{% trans 'search' %}" style="width:100px;">
 
     </form>
   {% endif %}
@@ -45,8 +44,8 @@
     <thead>
       <tr>
           <th width="20"> <input class="checkedAll" type="checkbox" ></th>
-          <th>Title</th>
-          <th>Status</th>
+          <th>{% trans 'Title' %}</th>
+          <th>{% trans 'Status' %}</th>
           <th></th>
 
       </tr>
@@ -229,7 +228,7 @@
     }
     
     else {
-      alert("select object to delete");
+      alert("{% trans 'select object to delete' %}");
     }
   });
 

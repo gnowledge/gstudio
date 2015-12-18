@@ -40,7 +40,7 @@
     <!-- description -->
     {% if resource.content_org %}
       <div title="{{resource.content_org}}">
-        <h4 class="text-center card-content-title"><small>Description</small></h4>
+        <h4 class="text-center card-content-title"><small>{% trans 'Description' %}</small></h4>
         {{resource.content_org|truncatechars:75}}
       </div>
     {% endif %}
@@ -48,7 +48,7 @@
     <!-- tags -->
     {% if resource.tags %}
       <div>
-        <h4 class="text-center card-content-title"><small>Tags</small></h4>
+        <h4 class="text-center card-content-title"><small>{% trans 'Tags' %}</small></h4>
         <div>
         
           {% for each_tag in resource.tags %}
@@ -58,7 +58,7 @@
             {% endif %}
           {% endfor %}
           {% if resource.tags|length > 6 %}
-            <small>+{{ resource.tags|length|add:"-6"}} more...</small>
+            <small>+{{ resource.tags|length|add:"-6"}} {% trans 'more...' %}</small>
           {% endif %}
         
         </div>
@@ -70,7 +70,7 @@
     {% comment %}
     {% if resource.attribute_set %}
       <div>
-        <h4 class="text-center card-content-title"><small>Properties</small></h4>
+        <h4 class="text-center card-content-title"><small>{% trans 'Properties' %}</small></h4>
         
           <small>
             {% for each_attr_key, each_attr_val in attr_set_dict.items %}
@@ -79,7 +79,7 @@
               {% endif %}
             {% endfor %}
             {% if resource.attribute_set|length > 2 %}
-              +{{ resource.attribute_set|length|add:"-2"}} more...
+              +{{ resource.attribute_set|length|add:"-2"}} {% trans 'more...' %}
             {% endif %}
           </small>
         
@@ -91,9 +91,9 @@
     {% comment %}
       {% if "File" in resource.member_of_names_list %}
         <div>
-          <h4 class="text-center card-content-title"><small>Resource Metadata</small></h4>
-            <div><b>Type</b>: {{resource.mime_type}}</div>
-            <div><b>Size</b>: {{resource.file_size.size}} {{resource.file_size.unit}}</div>
+          <h4 class="text-center card-content-title"><small>{% trans 'Resource Metadata' %}</small></h4>
+            <div><b>{% trans 'Type' %}</b>: {{resource.mime_type}}</div>
+            <div><b>{% trans 'Size' %}</b>: {{resource.file_size.size}} {{resource.file_size.unit}}</div>
         </div>
       {% endif %}
     {% endcomment %}
@@ -105,7 +105,7 @@
     By <a href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}">
       {{resource.created_by|get_username|truncatechars:"10"}}
     </a> at {{resource.created_at|date:"d M Y"}}
-    <span class="add-to-collection right" title="Add to collection">
+    <span class="add-to-collection right" title="{% trans 'Add to collection' %}">
       <input type="checkbox" style="margin:0;" class="filenode" name="filenode" value="{{resource.pk}}">
     </span>
   </div>

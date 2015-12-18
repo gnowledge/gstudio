@@ -90,7 +90,7 @@
          </div>
         <div style='display:table-row;'>
           <div style='display:table-cell;' colspan='2' align="middle"> 
-            <input type="button" id="changeButton" value="Change"  class="button">
+            <input type="button" id="changeButton" value="{% trans 'Change' %}"  class="button">
             <img id="ajax_search" width="50" style="display: none;" src="/static/ndf/images/ajax-wait.gif">
             <font id="status"></font>
           </div>
@@ -194,7 +194,7 @@
    </select>
  </div>
   <div style='display:table-cell;'> 
-    <input type="button" id="changeButton" value="Change"  class="button">
+    <input type="button" id="changeButton" value="{% trans 'Change' %}"  class="button">
    </div>
 </div> <!-- row ending -->
 </div>   <!-- table ending -->
@@ -217,7 +217,7 @@
         {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
       </div>
 
-      <input type="button" id="save_gapps" class="button small-10 small-push-1 column" value="Save">
+      <input type="button" id="save_gapps" class="button small-10 small-push-1 column" value="{% trans 'Save' %}">
 
     </div>
 
@@ -288,7 +288,7 @@
       },
 
       success: function(data){
-        alert("Apps set for this group successfully.");
+        alert("{% trans 'Apps set for this group successfully.' %}");
         location.reload();
       },
 

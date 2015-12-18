@@ -90,10 +90,10 @@
 		</td>
 		{% endcomment %}
 		<td class="view"> <!-- approval -->
-			Not Approved
+			{% trans 'Not Approved' %}
 		</td>
 		<td class="view right-border"> <!-- approval -->
-			Not Rejected
+			{% trans 'Not Rejected' %}
 		</td>
 
 	{% endif %}
@@ -125,16 +125,16 @@
 	<td class="hide-el" data-field="name"><input type="text" value="{{ resource.name }}" /></td>
 	<td class="hide-el" data-field="altnames"><input type="text" value="{{ resource.altnames }}" /></td>
 	<td class="hide-el" data-field="content_org">
-		<input type="button" data-reveal-id="content_org_overlay" class="button tiny expand" value="Edit content in editor" data-content-org="{{ resource.content_org }}" data-content-org-row-id="{{resource.pk}}" />
+		<input type="button" data-reveal-id="content_org_overlay" class="button tiny expand" value="{% trans 'Edit content in editor' %}" data-content-org="{{ resource.content_org }}" data-content-org-row-id="{{resource.pk}}" />
 	</td>
 	<td class="hide-el" data-field="language">
 		<select name="language">
-			<option value="{{resource.language.1}}">-- Select --</option>
+			<option value="{{resource.language.1}}">{% trans '--- Select ---' %}</option>
 			{% for each_lang in static_language %}
 			<option {%if each_lang|lower == resource.language.1|lower %}selected="selected"{%endif%} value="{{ each_lang }}">{{ each_lang }}</option>
 			{% endfor %}
-				<!-- <option {%if not resource.language %}selected="selected"{%endif%} value="None">
-					None
+				<!-- <option {%if not resource.language %}selected="selected"{%endif%} value="{% trans 'None' %}">
+					{% trans 'None' %}
 				</option> -->
 				
 				{% comment %}
@@ -169,25 +169,25 @@
 	<!-- LRMI -->
 	<td class="hide-el" data-field="educationaluse">
 		<select name="educationaluse">
-			<option value="{{resource.educationaluse}}"> -- Select -- </option>
+			<option value="{{resource.educationaluse}}"> {% trans '--- Select ---' %}' </option>
 			{% for each_edu_use in static_educationaluse %}
 			<option {%if each_edu_use == resource.educationaluse %}selected="selected"{%endif%} value="{{ each_edu_use }}">
 				{{ each_edu_use }}
 			</option>
 			{% endfor %}
-			<!-- <option {%if not resource.educationaluse %}selected="selected"{%endif%} value="None">
-				None
+			<!-- <option {%if not resource.educationaluse %}selected="selected"{%endif%} value="{% trans 'None' %}">
+				{% trans 'None' %}
 			</option> -->
 		</select>
 	</td>
 	<td class="hide-el right-border" data-field="interactivitytype">
 		<select name="interactivitytype">
-			<option value="{{resource.interactivitytype}}"> -- Select -- </option>
+			<option value="{{resource.interactivitytype}}"> {% trans '--- Select ---' %} </option>
 			{% for each_intertype in static_interactivitytype %}
 			<option {%if each_intertype == resource.interactivitytype %}selected="selected"{%endif%} value="{{ each_intertype }}">{{ each_intertype }}</option>
 			{% endfor %}
 			<!-- <option {%if not resource.interactivitytype %}selected="selected"{%endif%} value="None">
-				None
+				{% trans 'None' %}
 			</option> -->
 		</select>
 	</td>
@@ -195,7 +195,7 @@
 	<!-- Alignment and Level -->
 	<td class="hide-el" data-field="educationalalignment">
 		<select name="educationalalignment">
-			<option value="{{resource.educationalalignment}}"> -- Select -- </option>
+			<option value="{{resource.educationalalignment}}"> {% trans '--- Select ---' %} </option>
 			{% for each_edu_align in static_educationalalignment %}
 			<option {%if each_edu_align == resource.educationalalignment %}selected="selected"{%endif%} value="{{ each_edu_align }}">{{ each_edu_align }}</option>
 			{% endfor %}
@@ -204,23 +204,23 @@
 	</td>
 	<td class="hide-el" data-field="educationallevel">
 		<select name="educationallevel" multiple>
-			<option value="{{resource.educationallevel}}"> -- Select -- </option>
+			<option value="{{resource.educationallevel}}"> {% trans '--- Select ---' %} </option>
 			{% for each_edulevel in static_educationallevel %}
 			<option {%if each_edulevel in resource.educationallevel %}selected="selected"{%endif%} value="{{ each_edulevel }}">{{ each_edulevel }}</option>
 			{% endfor %}
-			<!-- <option {%if not resource.educationallevel %}selected="selected"{%endif%} value="None">
-				None
+			<!-- <option {%if not resource.educationallevel %}selected="selected"{%endif%} value="{% trans 'None' %}">
+				{% trans 'None' %}
 			</option> -->
 		</select>
 	</td>
 	<td class="hide-el right-border" data-field="educationalsubject">
 		<select name="educationalsubject">
-			<option value="{{resource.educationalsubject}}"> -- Select -- </option>
+			<option value="{{resource.educationalsubject}}"> {% trans '--- Select ---' %} </option>
 			{% for each_sub in static_educationalsubject %}
 			<option {%if each_sub == resource.educationalsubject %}selected="selected"{%endif%} value="{{each_sub}}">{{ each_sub }}</option>
 			{% endfor %}
-			<!-- <option {%if not resource.educationalsubject %}selected="selected"{%endif%} value="None">
-				None
+			<!-- <option {%if not resource.educationalsubject %}selected="selected"{%endif%} value="{% trans 'None' %}">
+				{% trans 'None' %}
 			</option> -->
 		</select>
 	</td>
@@ -228,7 +228,7 @@
 	<!-- Curate -->
 	<td class="hide-el" data-field="curricular">
 		<select name="curricular">
-			<option value="{{resource.curricular}}"> -- Select -- </option>
+			<option value="{{resource.curricular}}"> {% trans '--- Select ---' %} </option>
 			{% for each_curr in static_curricular %}		
 			<option {%if each_curr == resource.curricular %}selected="selected"{%endif%} value="{{ each_curr }}">{{ each_curr }}</option>
 			{% endfor %}
@@ -237,35 +237,35 @@
 	</td>
 	<td class="hide-el" data-field="audience">
 		<select name="audience" multiple>
-			<option value="{{resource.audience}}"> -- Select -- </option>
+			<option value="{{resource.audience}}"> {% trans '--- Select ---' %} </option>
 			{% for each_aud in static_audience %}		
 			<option {%if each_aud in resource.audience %}selected="selected"{%endif%} value="{{ each_aud }}">{{ each_aud }}</option>
 			{% endfor %}
-		<!-- 	<option {%if not resource.audience %}selected="selected"{%endif%} value="None">
-				None
+		<!-- 	<option {%if not resource.audience %}selected="selected"{%endif%} value="{% trans 'None' %}">
+				{% trans 'None' %}
 			</option> -->
 		</select>
 	</td>
 	<td class="hide-el" data-field="teaches">
-		<input type="button" data-reveal-id="teaches-overlay" class="button tiny expand" value="Edit in drawer"/>
+		<input type="button" data-reveal-id="teaches-overlay" class="button tiny expand" value="{% trans 'Edit in drawer' %}"/>
 	</td>
 	<td class="hide-el" data-field="prior_node">
-		<input type="button" data-reveal-id="prior_node-overlay" class="button tiny expand" value="Edit in drawer"/>
+		<input type="button" data-reveal-id="prior_node-overlay" class="button tiny expand" value="{% trans 'Edit in drawer' %}"/>
 	</td>
 	<td class="hide-el" data-field="featured">
 		<select name="featured">
-			<option value="{{resource.featured}}"> -- Select -- </option>
-			<option {% if resource.featured == False %}selected="selected"{%endif%} value="False">False</option>
-			<option {% if resource.featured == True %}selected="selected"{%endif%} value="True">True</option>
-			<!-- <option {%if not resource.featured %}selected="selected"{%endif%} value="None">
-				None
+			<option value="{{resource.featured}}"> {% trans '--- Select ---' %} </option>
+			<option {% if resource.featured == False %}selected="selected"{%endif%} value="False">{% trans 'False' %}</option>
+			<option {% if resource.featured == True %}selected="selected"{%endif%} value="True">{% trans 'True' %}</option>
+			<!-- <option {%if not resource.featured %}selected="selected"{%endif%} value="{% trans 'None' %}">
+				{% trans 'None' %}
 			</option> -->
 		</select>
 	</td>
 	<td class="hide-el" data-field="status">
 		<!-- <select name="status" {% if not user_is_joined == "author" or not user.is_superuser %}disabled{%endif%}> -->
 		<select name="status" {% if not user.is_superuser %}disabled{%endif%}>
-			<option value="{{resource.status}}"> -- Select -- </option>
+			<option value="{{resource.status}}"> {% trans '--- Select ---' %} </option>
 			{% for each_status in static_status %}		
 			<option {%if each_status == resource.status %}selected="selected"{%endif%} value="{{ each_status }}">{{ each_status }}</option>
 			{% endfor %}	
@@ -273,11 +273,11 @@
 	</td>
 	<td class="hide-el right-border" data-field="access_policy">
 		<select name="access_policy">
-			<option value="{{resource.access_policy}}"> -- Select -- </option>
-			<option {%if resource.access_policy == "PUBLIC"%}selected="selected"{%endif%} value="PUBLIC">PUBLIC</option>
-			<option {%if resource.access_policy == "PRIVATE"%}selected="selected"{%endif%} value="PRIVATE">PRIVATE</option>
-			<!-- <option {%if not resource.access_policy %}selected="selected"{%endif%} value="None">
-				None
+			<option value="{{resource.access_policy}}"> {% trans '--- Select ---' %} </option>
+			<option {%if resource.access_policy == "PUBLIC"%}selected="selected"{%endif%} value="PUBLIC">{% trans 'PUBLIC' %}</option>
+			<option {%if resource.access_policy == "PRIVATE"%}selected="selected"{%endif%} value="PRIVATE">{% trans 'PRIVATE' %}</option>
+			<!-- <option {%if not resource.access_policy %}selected="selected"{%endif%} value="{% trans 'None' %}">
+				{% trans 'None' %}
 			</option> -->
 		</select>
 	</td>
@@ -289,22 +289,22 @@
 	</td>
 	<td class="hide-el right-border" data-field="textcomplexity" class="right-border">
 		<select name="textcomplexity">
-			<option value="{{resource.textcomplexity}}"> -- Select -- </option>
+			<option value="{{resource.textcomplexity}}"> {% trans '--- Select ---' %} </option>
 			{% for each_tc in static_textcomplexity %}		
 			<option {%if each_tc == resource.textcomplexity %}selected="selected"{%endif%} value="{{ each_tc }}">{{ each_tc }}</option>
 			{% endfor %}	
-			<!-- <option {%if not resource.textcomplexity %}selected="selected"{%endif%} value="None">
-				None
+			<!-- <option {%if not resource.textcomplexity %}selected="selected"{%endif%} value="{% trans 'None' %}">
+				{% trans 'None' %}
 			</option> -->
 		</select>				
 	</td>
 	{% if user.is_superuser %}
 		<td class="deletedata">
 		   	 
-			<div class="button tiny exapnd" id ="{{resource.pk}}" onclick = "deleteNode('{{resource.pk}}')"> Delete </div> 
+			<div class="button tiny exapnd" id ="{{resource.pk}}" onclick = "deleteNode('{{resource.pk}}')"> {% trans 'Delete' %} </div> 
 		</td>
 		<td class="right-border">
-			<div class="button tiny exapnd" id ="{{resource.pk}}" onclick = "restoreNode('{{resource.pk}}')"> restore </div>
+			<div class="button tiny exapnd" id ="{{resource.pk}}" onclick = "restoreNode('{{resource.pk}}')"> {% trans 'Restore' %} </div>
 		</td>
 	{% endif %}
 
@@ -314,19 +314,19 @@
 	<!-- editorial discussion -->
 	{% comment %}
 	<td class="hide-el"> 
-		<input type="button" data-reveal-id="editorial_discussion_overlay" class="button tiny expand"  data-id="editorial-discussion" value="Discuss" data-action="editorial-discussion"/>
+		<input type="button" data-reveal-id="editorial_discussion_overlay" class="button tiny expand"  data-id="editorial-discussion" value="{% trans 'Discuss' %}" data-action="editorial-discussion"/>
 		<!-- get the count of editorial discussion here -->
 	</td>
 	{% endcomment %}
 
 	<!-- approval -->
 	<td class="hide-el"> 
-		<input type="button" class="button tiny expand success" data-approve-id="{{resource.pk}}" data-id="action-btn-approve-{{resource.pk}}" value="Approve" data-action="approve" onclick="approveResource('{{resource.pk}}','{{resource.name}}')">
+		<input type="button" class="button tiny expand success" data-approve-id="{{resource.pk}}" data-id="action-btn-approve-{{resource.pk}}" value="{% trans 'Approve' %}" data-action="approve" onclick="approveResource('{{resource.pk}}','{{resource.name}}')">
 	</td>
 
 	<!-- rejection -->
 	<td class="hide-el"> 
-		<input type="button" class="button tiny expand alert" data-approve-id="{{resource.pk}}" value="Reject"  data-id="action-btn-reject-{{resource.pk}}" data-action="reject" onclick="rejectResource('{{resource.pk}}','{{resource.name}}')">
+		<input type="button" class="button tiny expand alert" data-approve-id="{{resource.pk}}" value="{% trans 'Reject' %}"  data-id="action-btn-reject-{{resource.pk}}" data-action="reject" onclick="rejectResource('{{resource.pk}}','{{resource.name}}')">
 	</td>
 
 	{% endif %}

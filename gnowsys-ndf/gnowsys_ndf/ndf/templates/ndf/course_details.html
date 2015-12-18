@@ -52,12 +52,12 @@
       </h3>
         <small>
               <div class="age">
-                {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                {{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
                 by <a class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
 
                 {% check_is_gstaff groupid request.user as is_gstaff %}
                 {% if is_gstaff %}
-                  <span data-tooltip title="Edit this Course"><a class="fi-pencil" href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id node.pk %}">Edit</a></span>
+                  <span data-tooltip title="{% trans 'Edit this Course' %}"><a class="fi-pencil" href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id node.pk %}">{% trans 'Edit' %}</a></span>
                 {% endif %}
 
 

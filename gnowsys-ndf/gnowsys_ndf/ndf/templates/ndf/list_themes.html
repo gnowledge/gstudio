@@ -5,7 +5,7 @@
 
 
 {% block meta_content %}
-	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
+	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="{% trans 'Click to go to themes card view' %}">
 		<h2 class="subheader">
 			{% if theme_GST.altnames and theme_GST.altnames != "None" %}
 				{{theme_GST.altnames}}
@@ -51,7 +51,7 @@
 				{% if user_access == "allow" %}
 					<td  class="name">
 						<a href="{% url "theme_topic_create" groupid each.pk %}" class="button tiny fi-pencil"> &nbsp;
-							Edit
+							{% trans 'Edit' %}
 						</a>
 						<a href="{% url "theme_topic_create" groupid each.pk %}?translate=true" class="button tiny fi-refresh"> &nbsp;
 							{% trans "Translate" %}
