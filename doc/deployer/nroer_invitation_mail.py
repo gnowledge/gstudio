@@ -3,17 +3,34 @@ from django.contrib.auth.models import User
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.models import *
 
-
 def send_notifications():
 	'''
-	Fetch all django user objects
-	order_by is applied in order to ensure user_objs seq remain same always
+	Send an email notification to users of the platform
 	'''
 	try:
-		# Update the following comment whenever this script is run
-		# Notifications sent to -- '0' No. of Users -- 17-12-2015
-		user_objs = User.objects.order_by('id')
-		target_users = user_objs[:2]
+		list_of_users_ids = []
+		# list_of_users_ids will hold django ids of all old site nroer imported users
+
+		user_objs = []
+		# user_objs will hold django user objects of list_of_users_ids
+		# sorted in ascending order on id
+
+		target_users = []
+		# target_users will hold specific number of django user objects of user_objs
+
+		# target_users and user_objs is kept separate with 
+		# a purpose to select a range of users(target_users) from all user_objs 
+
+		with open('success_log.csv') as f:
+			for indexval,eachrow in enumerate(f):
+				if indexval>9 : # and not len(list_of_users_ids) > 100:
+					list_of_items = eachrow.split(",")
+					list_of_users_ids.append(str(list_of_items[1]))
+
+		user_objs = User.objects.filter(id__in=list_of_users_ids).order_by('id')
+		# order_by ensures user objects to be fetched in same sequence always
+		target_users = user_objs[:100] # 21-12-2015  -- Mail Sending to Top '5' Users
+		print "\n Preparing to send Mail to Top 100 users"
 		site_var = "nroer.gov.in"
 		render_label = render_to_string("notification/label.html",{"sender": site_var,"activity": "NROER WC","conjunction": "-",'site':site_var,'link':site_var})
 
@@ -31,12 +48,10 @@ def send_notifications():
 			+ "\n\nWe look forward to hearing from you. You can add your feedback at " \
 			+ "http://nroer.gov.in/home/page/5665aa9681fccb03424ffcda"
 
-		for each_user in target_users:
-			if each_user:
-				notification.create_notice_type(render_label,"\nDear "+str(each_user.username)+",\n\t " + notification_msg + "\n\nWith best regards,\nNROER Team", "notification")
-				notification.send([each_user], render_label, {"from_user": "NROER Team"})
-	except ValueError as ve:
-		return "Please enter proper values"
+		for eachuser_obj in target_users:
+			notification.create_notice_type(render_label,"\nDear "+str(eachuser_obj.username)+",\n\t " + notification_msg + "\n\nWith best regards,\nNROER Team", "notification")
+			notification.send([eachuser_obj], render_label, {"from_user": "NROER Team"})
+		print "\n Successfully sent Mail to Top 100 users"
 	except Exception as e:
 		return "Error occurred while sending NROER Welcome notification  " + str(e)
 
