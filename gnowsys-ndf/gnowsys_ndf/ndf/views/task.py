@@ -34,7 +34,8 @@ sitename=Site.objects.all()
 app = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
 
 if sitename :
-	sitename = sitename[0]
+  sitename = sitename[0]
+  site_domain = sitename.domain
 else : 
 	sitename = ""
 
@@ -493,7 +494,7 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
           "\n     - Changes: " + str(change_list).strip('[]') + \
           "\n     - Status: " + request.POST.get('Status','') + \
           "\n     - Assignee: " + ", ".join(assignee_list) + \
-          "\n     - Url: http://" + sitename.domain + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
+          "\n     - Url: http://" + site_domain + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
         bx=User.objects.get(username=eachuser)
         set_notif_val(request,group_id,msg,activ,bx)
 
@@ -653,7 +654,7 @@ def create_task_at_rt(request,rt_list,at_list,task_node,assign,group_name,group_
             "' has been reported by " + request.user.username + \
             "\n     - Status: " + request.POST.get('Status', '') + \
             "\n     - Assignee: " + ", ".join(assignee_list) + \
-            "\n     - Url: http://" + sitename.name + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
+            "\n     - Url: http://" + site_domain + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
 
           set_notif_val(request, group_id, msg, activ, eachuser)
 
