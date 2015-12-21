@@ -1,1 +1,7 @@
-{% load i18n %}{% blocktrans %}[{{ current_site }}] {{ message }}{% endblocktrans %}
+{% load i18n %}
+{% comment %}
+{% blocktrans %}
+	{{ message }}
+{% endblocktrans %}
+{% endcomment %}
+Announcing a new interface for NROER

@@ -26,8 +26,7 @@ from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls
-
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls, get_group_name_id
 
 #######################################################################################################################################
 
