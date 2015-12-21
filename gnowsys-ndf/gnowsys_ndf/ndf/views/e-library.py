@@ -4,7 +4,6 @@ import urllib
 ''' -- imports from installed packages -- ''' 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-# from django.core.urlresolvers import reverse
 from mongokit import paginator
 
 
@@ -22,7 +21,7 @@ from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, 
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
 # from gnowsys_ndf.ndf.org2any import org2html
 
-#######################################################################################################################################
+##############################################################################
 
 GST_FILE = node_collection.one({'_type':'GSystemType', 'name': "File"})
 GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': 'Page'})
@@ -33,10 +32,13 @@ pandora_video_st = node_collection.one({'_type':'GSystemType', 'name': 'Pandora_
 app = node_collection.one({'_type':'GSystemType', 'name': 'E-Library'})
 wiki_page = node_collection.one({'_type': 'GSystemType', 'name': 'Wiki page'})
 
-#######################################################################################################################################
+##############################################################################
 
 @get_execution_time
 def resource_list(request, group_id, app_id=None, page_no=1):
+	"""
+	* Renders a list of all 'Resources' available within the database (except eBooks).
+	"""
 
 	is_video = request.GET.get('is_video', "")
 	
@@ -73,14 +75,10 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	# 	shelves = []
 	# # End of user shelf
 
-	pandoravideoCollection=node_collection.find({'member_of':pandora_video_st._id, 'group_set': ObjectId(group_id) })
+	# pandoravideoCollection = node_collection.find({'member_of':pandora_video_st._id, 'group_set': ObjectId(group_id) })
 
 	# if e_library_GST._id == ObjectId(app_id):
-	"""
-	* Renders a list of all 'Resources(XCR)' available within the database.
-	"""
 	title = e_library_GST.name
-
 	file_id = GST_FILE._id
 	datavisual = []
 	no_of_objs_pp = 24
@@ -92,13 +90,15 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	# print "filters in E-Library : ", filters
 
 	# declaring empty (deliberately to avoid errors), query dict to be pass-on in query
-	query_dict = [{}]
+	query_dict = []
 	# query_dict = filters
 
 	selfilters = urllib.unquote(request.GET.get('selfilters', ''))
 	if selfilters:
 		selfilters = json.loads(selfilters)
 		query_dict = get_filter_querydict(selfilters)
+
+	query_dict.append({'attribute_set.educationaluse': {'$ne': 'eBooks'}})
 
 	# files = node_collection.find({
 	# 								'member_of': ObjectId(GST_FILE._id), 
@@ -136,17 +136,17 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 
 	# print "files.count : ", files.count()
 
-  	pageCollection=node_collection.find({'member_of':GST_PAGE._id, 'group_set': ObjectId(group_id),
-  										'$or': [
-												{ 'access_policy': u"PUBLIC" },
-												{ '$and': [
-															{'access_policy': u"PRIVATE"}, 
-															{'created_by': request.user.id}
-														]
-												}
-											],
-										'type_of': {'$in': [wiki_page._id]}
-										}).sort("last_update", -1) 
+  	# pageCollection=node_collection.find({'member_of':GST_PAGE._id, 'group_set': ObjectId(group_id),
+  	# 									'$or': [
+			# 									{ 'access_policy': u"PUBLIC" },
+			# 									{ '$and': [
+			# 												{'access_policy': u"PRIVATE"}, 
+			# 												{'created_by': request.user.id}
+			# 											]
+			# 									}
+			# 								],
+			# 							'type_of': {'$in': [wiki_page._id]}
+			# 							}).sort("last_update", -1) 
 
 
 	educationaluse_stats = {}
@@ -205,11 +205,21 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 								 'appId':app._id, "app_gst": app,
 								 # 'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
 								 'files': files,
-								 "detail_urlname": "file_detail", 'ebook_pages': educationaluse_stats.get("eBooks", 0),'page_count': pageCollection.count(),
-								 'file_pages': result_pages, 'image_pages': educationaluse_stats.get("Images", 0), 'interactive_pages': educationaluse_stats.get("Interactives", 0), 'educationaluse_stats': json.dumps(educationaluse_stats),
-								 'doc_pages': educationaluse_stats.get("Documents", 0), 'video_pages': educationaluse_stats.get("Videos", 0), 'audio_pages': educationaluse_stats.get("Audios", 0),
-								 'collection_pages': collection_pages, 'collection': collection_pages_cur,
-								 'groupid': group_id, 'group_id':group_id,"datavisual":datavisual,'page_nodes':pageCollection
+								 "detail_urlname": "file_detail",
+								 'ebook_pages': educationaluse_stats.get("eBooks", 0),
+								 # 'page_count': pageCollection.count(),
+								 # 'page_nodes':pageCollection
+								 'file_pages': result_pages,
+								 'image_pages': educationaluse_stats.get("Images", 0),
+								 'interactive_pages': educationaluse_stats.get("Interactives", 0),
+								 'educationaluse_stats': json.dumps(educationaluse_stats),
+								 'doc_pages': educationaluse_stats.get("Documents", 0),
+								 'video_pages': educationaluse_stats.get("Videos", 0),
+								 'audio_pages': educationaluse_stats.get("Audios", 0),
+								 'collection_pages': collection_pages,
+								 'collection': collection_pages_cur,
+								 'groupid': group_id, 'group_id':group_id,
+								 "datavisual":datavisual,
 								}, 
 								context_instance = RequestContext(request))
 
@@ -218,7 +228,6 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 	'''
 	Method to implement pagination in File and E-Library app.
 	'''
-	# print "\n\n\nfiletype : ", filetype
 	if request.is_ajax() and request.method == "POST":
 		group_name, group_id = get_group_name_id(group_id)
 
@@ -239,6 +248,8 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		if selfilters:
 			selfilters = json.loads(selfilters)
 			query_dict = get_filter_querydict(selfilters)
+
+		query_dict.append({'attribute_set.educationaluse': {'$ne': u'eBooks'}})
 
 		detail_urlname = "file_detail"
 		if filetype != "all":
