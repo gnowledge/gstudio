@@ -2799,7 +2799,8 @@ def create_task(task_dict, task_type_creation="single"):
         # i.e. either single or multiple
         if not task_dict.has_key("_id"):
           site = Site.objects.get(pk=1)
-          site = site.name.__str__()
+          # site = site.name.__str__()
+          site = site.domain.__str__()
 
           from_user = task_node.user_details_dict["created_by"]  # creator of task
 

@@ -40,6 +40,8 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
+    theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
+
     if app_id is None:
         # app_ins = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
         app_ins = app
@@ -708,7 +710,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                        },context_instance = RequestContext(request)
                               
         )
-        
+
     return render_to_response("ndf/theme.html",
                        {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards, 'theme_GST':theme_GST, 'theme_GST':theme_GST,
                             'shelf_list': shelf_list,'shelves': shelves,

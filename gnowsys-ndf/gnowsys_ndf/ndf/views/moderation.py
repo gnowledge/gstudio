@@ -356,8 +356,12 @@ def create_moderator_task(request, group_id, node_id, \
 		glist_gst = node_collection.one({'_type': "GSystemType", 'name': "GList"})
 		task_type_list = []
 		task_type_list.append(node_collection.one({'member_of': glist_gst._id, 'name':unicode(task_type)})._id)
+
 		site = Site.objects.get(pk=1)
+		site_domain = site.domain
+		# print "=== site_domain: ", site_domain
 		site = unicode(site.name.__str__())
+
 		auth_grp = node_collection.one({'_type': "Author", 'created_by': int(node_obj.created_by)})
 		if task_type == "Moderation":
 			task_title = u"Moderate Resource: " + node_obj.name
@@ -365,7 +369,7 @@ def create_moderator_task(request, group_id, node_id, \
 				pass
 
 			else:
-				url = u"http://" + site + "/"+ unicode(group_obj._id) \
+				url = u"http://" + site_domain + "/"+ unicode(group_obj._id) \
 						+ u"/moderation#" + unicode(node_obj._id.__str__())
 
 				task_content_org = u'\n\nModerate resource: "' + unicode(node_obj.name) \
@@ -391,7 +395,7 @@ def create_moderator_task(request, group_id, node_id, \
 			if task_obj:
 				create_grelation(node_obj._id, at_curr_app_task, task_obj._id)
 				try:
-					url = u"http://" + site + "/" + unicode(auth_grp._id) \
+					url = u"http://" + site_domain + "/" + unicode(auth_grp._id) \
 						+ u"/moderation/status/" + unicode(node_obj._id.__str__())
 					activ = "Contribution to " + group_obj.name + "."
 
@@ -436,7 +440,7 @@ def create_moderator_task(request, group_id, node_id, \
 
 				# Sending notification to all watchers about the updates of the task
 				for each_user_id in list_of_recipients_ids:
-					url = u"http://" + site + "/"+ unicode(group_obj._id) \
+					url = u"http://" + site_domain + "/"+ unicode(group_obj._id) \
 						+ u"/file/" + unicode(node_obj._id.__str__())
 
 					activ = "Contribution to " + group_obj.name +"."
@@ -451,7 +455,7 @@ def create_moderator_task(request, group_id, node_id, \
 					task_node = node_collection.one({'_id': ObjectId(task_id)})
 					# del_status, del_status_msg = delete_node(
 					# node_id=task_node._id, deletion_type=0)
-					url = u"http://" + site + "/"+ unicode(group_obj._id) \
+					url = u"http://" + site_domain + "/"+ unicode(group_obj._id) \
 						+ u"/file/" + unicode(node_obj._id.__str__())
 
 					task_content_org = u"\n\nThis task is CLOSED.\n " \
