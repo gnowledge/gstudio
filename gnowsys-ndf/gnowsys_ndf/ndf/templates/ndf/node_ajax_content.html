@@ -50,7 +50,7 @@
   {% if node.teaches %}
     <div class="hide teaches-block">
           
-      <legend><h3>Teaches</h3></legend>
+      <div class="repository-title large-4 columns" style="width:100%">Teaches</div><br><br>
       <ul style="list-style: none; border-bottom: solid thin #ddd;">
         {% for each_topic in node.teaches %}
             {% get_topic_breadcrumb_hierarchy each_topic.pk as topic_prior_hier %}
