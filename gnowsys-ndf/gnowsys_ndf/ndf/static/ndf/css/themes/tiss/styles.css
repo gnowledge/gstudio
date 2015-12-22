@@ -24964,7 +24964,7 @@ p {
 /* line 1605, ../../../scss/_app_styles.scss */
 .repository-title {
   color: #D7D7D7;
-  font-size: 1.4em;
+  font-size: 1.1em;
   width: auto;
   background-color: rgba(0, 0, 0, 0.8);
   text-align: left;
@@ -24976,7 +24976,7 @@ p {
 
 /* line 1616, ../../../scss/_app_styles.scss */
 .repository-desc {
-  font-size: 1.4em;
+  font-size: 1.1em;
   width: auto;
   background-color: #E5E5E5;
   text-align: left;
