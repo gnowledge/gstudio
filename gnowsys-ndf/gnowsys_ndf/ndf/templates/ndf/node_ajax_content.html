@@ -567,7 +567,7 @@
         <!-- /////////////////// -->
 
         <!-- Display Maps only for Topic or Concept node -->
-        {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
+        {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list or "Page" in node.member_of_names_list %}
           <!-- Below code/widgets will only be shown for all resource instances/documents
                which are neither Topic nor Concept
           -->
@@ -585,8 +585,6 @@
           <div id="view-levels" style="display:none;">
           </div>
           
-          {% comment %}
-            
           <!-- Content for Collection Graph -->
           {% if node.collection_set %}
             <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
@@ -602,7 +600,7 @@
              {% include "ndf/graph_dependency.html" %}
             </div>
           {% endif %}
-          {% endcomment %}
+          
          
           <!-- Tab View Map Widget -->
         {% elif node.location %}

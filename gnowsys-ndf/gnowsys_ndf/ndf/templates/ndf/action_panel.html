@@ -263,18 +263,22 @@
 	        	{% endif %}
 
 		    <!-- Graphs For Topics or Concept -->
-	      	{% comment %}
-		      {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
+	      	
+		      {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list or "Page" in node.member_of_names_list %}
 		        <!-- Below code/widgets will only be shown for all resource instances/documents
 		             which are Topic or Concept
 		        -->
 
-		        
+		        {% if node.collection_set or node.prior_node %}
+		        	
 		        <!-- commented for time being, for TB. -->
 		        <a href="#" class="lbl_field tag-rating-div" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
 		        
 		        <ul id="graph-list" class="f-dropdown" data-dropdown-content>
+		        	
+		        {% comment %}
 		          <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% trans "Concept Graph" %}</a></li>
+		        {% endcomment %}
 
 		          {% if node.collection_set %}
 		          	<li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
@@ -284,8 +288,9 @@
 		          	<li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
 		          {% endif %}               
 		        </ul>
+		        {% endif %}
 		      {% endif %}
-	        {% endcomment %}
+	        
 	
 		        
 			{% endif %}
