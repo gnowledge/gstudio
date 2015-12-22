@@ -2,54 +2,62 @@
 {% load simple_filters %}
 {% load i18n %}
 
-{% if filtered_topics %}
   
-  {% for each_educationaluse in all_educationaluse %}
-    <fieldset id="{{each_educationaluse}}">
-      <legend>{{each_educationaluse}}</legend>
+{% if filtered_topics %}
+  {% if primary_lang_resources or other_lang_resources %}
+    <!-- after applying filters following block gets-->
+    {% for each_educationaluse in all_educationaluse %}
+      <fieldset id="{{each_educationaluse}}">
+        <legend>{{each_educationaluse}}</legend>
 
-      {% for each_primary_lang_resource in primary_lang_resources|get_dict_value_from_key:each_educationaluse %}
-        {# {{each_primary_lang_resource.name}} #}
-        {% if each_educationaluse == "Images" or each_educationaluse == "Videos" %}
-          {% if each_educationaluse == "Images" %}
-            <a href ="{% url 'image_detail' group_id each_primary_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-          {% elif each_educationaluse == "Videos" %}
-            <a href ="{% url 'video_detail' group_id each_primary_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-          {% endif %}
-            <img src="{% url 'getFileThumbnail' group_id each_primary_lang_resource.pk %}" />
-            <br/><div>{{each_primary_lang_resource.name}}</div>
-            </a>&nbsp;&nbsp;&nbsp;&nbsp;
-        {% else %}
-        <a href ="{% url 'file_detail' group_id each_primary_lang_resource.pk %}?nav_li={{nav_list}}"> {{each_primary_lang_resource.name}} </a>&nbsp;
-                        &nbsp;&nbsp;
-        {% endif %}
-      {% endfor %}
-
-      {% if other_lang_resources|get_dict_value_from_key:each_educationaluse %}
-        
-        <fieldset>
-          <legend>{% trans "In other languages" %}</legend>
-          {% for each_other_lang_resource in other_lang_resources|get_dict_value_from_key:each_educationaluse %}
-            {# {{each_other_lang_resource.name}} #}
-        {% if each_educationaluse == "Images" or each_educationaluse == "Videos" %}
-          {% if each_educationaluse == "Images" %}
-            <a href ="{% url 'image_detail' group_id each_other_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-          {% elif each_educationaluse == "Videos" %}
-            <a href ="{% url 'video_detail' group_id each_other_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-          {% endif %}
-                        <img src="{% url 'getFileThumbnail' group_id each_other_lang_resource.pk %}" />
-                        <br/><div>{{each_other_lang_resource.name}}</div>
-                        </a>&nbsp;&nbsp;&nbsp;&nbsp;
-        {% else %}
-          <a href ="{% url 'file_detail' group_id each_other_lang_resource.pk %}?nav_li={{nav_list}}"> {{each_other_lang_resource.name}} </a>&nbsp;
+        {% for each_primary_lang_resource in primary_lang_resources|get_dict_value_from_key:each_educationaluse %}
+          {# {{each_primary_lang_resource.name}} #}
+          {% if each_educationaluse == "Images" or each_educationaluse == "Videos" %}
+            {% if each_educationaluse == "Images" %}
+              <a href ="{% url 'image_detail' group_id each_primary_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+            {% elif each_educationaluse == "Videos" %}
+              <a href ="{% url 'video_detail' group_id each_primary_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+            {% endif %}
+              <img src="{% url 'getFileThumbnail' group_id each_primary_lang_resource.pk %}" />
+              <br/><div>{{each_primary_lang_resource.name}}</div>
+              </a>&nbsp;&nbsp;&nbsp;&nbsp;
+          {% else %}
+          <a href ="{% url 'file_detail' group_id each_primary_lang_resource.pk %}?nav_li={{nav_list}}"> {{each_primary_lang_resource.name}} </a>&nbsp;
                           &nbsp;&nbsp;
-        {% endif %}
-          {% endfor %}        
-        </fieldset>
-      {% endif %}
+          {% endif %}
+        {% endfor %}
 
-    </fieldset>
-  {% endfor %}
+        {% if other_lang_resources|get_dict_value_from_key:each_educationaluse %}
+          
+          <fieldset>
+            <legend>{% trans "In other languages" %}</legend>
+            {% for each_other_lang_resource in other_lang_resources|get_dict_value_from_key:each_educationaluse %}
+              {# {{each_other_lang_resource.name}} #}
+          {% if each_educationaluse == "Images" or each_educationaluse == "Videos" %}
+            {% if each_educationaluse == "Images" %}
+              <a href ="{% url 'image_detail' group_id each_other_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+            {% elif each_educationaluse == "Videos" %}
+              <a href ="{% url 'video_detail' group_id each_other_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+            {% endif %}
+                          <img src="{% url 'getFileThumbnail' group_id each_other_lang_resource.pk %}" />
+                          <br/><div>{{each_other_lang_resource.name}}</div>
+                          </a>&nbsp;&nbsp;&nbsp;&nbsp;
+          {% else %}
+            <a href ="{% url 'file_detail' group_id each_other_lang_resource.pk %}?nav_li={{nav_list}}"> {{each_other_lang_resource.name}} </a>&nbsp;
+                            &nbsp;&nbsp;
+          {% endif %}
+            {% endfor %}        
+          </fieldset>
+        {% endif %}
+
+      </fieldset>
+    {% endfor %}
+
+  {% else %}
+
+    {% trans "No resources found with the selected filter" %}
+    
+  {% endif %}
 
 {% else %}  
         <!-- Resource contents of topic -->
