@@ -480,18 +480,19 @@
           </div>
         
 
-           {% if not topic and not is_group %} 
+     {% if not topic and not is_group %} 
              <div>  
                <small class="text-gray">
                   [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
                 </small> 
                 </br>
           {% if user.is_authenticated %}  
+           
             {% if node.mime_type %}    
               {% if 'video' in node.mime_type  %}
-                <a class="button tiny" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
+                <a class="button tiny" title="Click here to Download the resource" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
               {% else %}
-                <a class="button tiny" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                <a class="button tiny" title="Click here to Download the resource" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
               {% endif %}
                   Download 
                 </a>
@@ -499,16 +500,37 @@
                {% social_share_resource as social_share %}
                   {% if social_share %}
                     <span>
-                        <a class="share_link " href="#" target="_blank" title="share this resource on facebook">
-                        <i class="fa fa-facebook-square fa-2x"></i>
+                        <a class = "share_link" href="#" accesskey="l" target="_blank"  title="share this resource on facebook">
+                        <img src="/static/ndf/images/facebook-share.png"  width="30px">
                         </a>
-                        </span>  
+                      </span>  
                   {% endif %}
-                {% endif %}
-          {% endif %} 
-             
+              {% endif %}
+         
+          {%  else %}
+            {% if node.mime_type %}    
+              {% if 'video' in node.mime_type  %}
+                <a class="button tiny disabled secondary" title="Click here to login,so that you can download the resource" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+              {% else %}
+                <a class="button tiny disabled secondary" title="Click here to login,so that you can download the resource" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+              {% endif %}
+                  Download 
+                </a>
+               
+               {% social_share_resource as social_share %}
+                  {% if social_share %}
+                    <span>
+                        <a title="Click here to login,so that you can share the resource on Facebook" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l" target="_blank"  title="share this resource on facebook">
+                        <img src="/static/ndf/images/facebook-share.png"  width="30px">
+                        </a>
+                      </span>  
+                  {% endif %}
+              {% endif %}
+          
+          {% endif %}           
               </div>
-         {% endif %}
+       {% endif %}
+         
          {% get_list_of_fields node.type_of "name" as type_of_list %}
           {% if "Info page" not in type_of_list %}
           
