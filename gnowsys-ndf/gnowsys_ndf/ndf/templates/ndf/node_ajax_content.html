@@ -481,7 +481,7 @@
                   {% if social_share %}
                     <span>
                         <a class = "share_link" href="#" accesskey="l" target="_blank"  title="share this resource on facebook">
-                        <img src="/static/ndf/images/facebook-share.png"  width="30px">
+                        <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
                         </a>
                       </span>  
                   {% endif %}
@@ -499,9 +499,9 @@
                
                {% social_share_resource as social_share %}
                   {% if social_share %}
-                    <span>
+                    &nbsp;<span>
                         <a title="Click here to login,so that you can share the resource on Facebook" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l" target="_blank"  title="share this resource on facebook">
-                        <img src="/static/ndf/images/facebook-share.png"  width="30px">
+                        <img src="/static/ndf/images/Facebook_logo.png"  width="35px">
                         </a>
                       </span>  
                   {% endif %}
