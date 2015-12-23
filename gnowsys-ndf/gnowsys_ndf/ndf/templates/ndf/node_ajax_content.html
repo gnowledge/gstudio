@@ -470,9 +470,9 @@
            
             {% if node.mime_type %}    
               {% if 'video' in node.mime_type  %}
-                <a class="button tiny" title="Click here to Download the resource" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
+                <a class="button tiny" title="Click here to Download" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
               {% else %}
-                <a class="button tiny" title="Click here to Download the resource" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                <a class="button tiny" title="Click here to Download" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
               {% endif %}
                   Download 
                 </a>
@@ -480,7 +480,7 @@
                {% social_share_resource as social_share %}
                   {% if social_share %}
                     <span>
-                        <a class = "share_link" href="#" accesskey="l" target="_blank"  title="share this resource on facebook">
+                        <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
                         <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
                         </a>
                       </span>  
@@ -490,9 +490,9 @@
           {%  else %}
             {% if node.mime_type %}    
               {% if 'video' in node.mime_type  %}
-                <a class="button tiny disabled secondary" title="Click here to login,so that you can download the resource" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+                <a class="button tiny disabled secondary" title="Please login to download" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
               {% else %}
-                <a class="button tiny disabled secondary" title="Click here to login,so that you can download the resource" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+                <a class="button tiny disabled secondary" title="Please login to download" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
               {% endif %}
                   Download 
                 </a>
@@ -500,7 +500,7 @@
                {% social_share_resource as social_share %}
                   {% if social_share %}
                     &nbsp;<span>
-                        <a title="Click here to login,so that you can share the resource on Facebook" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l" target="_blank"  title="share this resource on facebook">
+                        <a title="Please login to share on Facebook" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l" target="_blank">
                         <img src="/static/ndf/images/Facebook_logo.png"  width="35px">
                         </a>
                       </span>  
