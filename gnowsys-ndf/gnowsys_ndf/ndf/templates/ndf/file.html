@@ -120,17 +120,15 @@
         {% endcomment %}
         
         <!-- Interactives -->
-        {% if interactive_pages %}
-          <dd data-filetype="Interactives">
-            <a href="#view-interactive">
-              <i class="fi-shuffle"></i>
-              {% trans "Interactives" %}
-              <span class="count">
-                {{ interactive_pages }}
-              </span>
-            </a>
-          </dd><br/>
-        {% endif %}
+        <dd data-filetype="Interactives">
+          <a href="#view-interactive">
+            <i class="fi-shuffle"></i>
+            {% trans "Interactives" %}
+            <span class="count">
+              {{ interactive_pages }}
+            </span>
+          </a>
+        </dd><br/>
 
           
         {% comment %}

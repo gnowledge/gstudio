@@ -14,7 +14,6 @@
       color:black !important;
     }
 </style>
-
 <script type="text/javascript">
   $( document ).ready(function() {
     var x = location.href;
@@ -45,25 +44,6 @@
     {% endfor %}
   </ul>
     
-  {% endif %}
-
-  {% if node.teaches %}
-    <div class="hide teaches-block">
-          
-      <div class="repository-title large-4 columns" style="width:100%;font-size:1.2em">Teaches</div><br><br>
-      <ul style="list-style: none; border-bottom: solid thin #ddd;">
-        {% for each_topic in node.teaches %}
-            {% get_topic_breadcrumb_hierarchy each_topic.pk as topic_prior_hier %}
-          <li style="border-bottom: solid thin #ddd;">
-            <a href="{% url 'topic_details' group_name_tag each_topic.pk %}?nav_li={{topic_prior_hier}}" >{% trans each_topic.name %}</a>
-          </li>
-        {% endfor %}
-      </ul>
-      <script type="text/javascript">
-      document.querySelector('main.row > aside section').appendChild(document.querySelector('div.hide.teaches-block'));
-      document.querySelector('div.hide.teaches-block').classList.remove('hide');
-      </script>
-    </div>
   {% endif %}
 
   {% check_group node.pk as is_group %}
@@ -589,7 +569,7 @@
         <!-- /////////////////// -->
 
         <!-- Display Maps only for Topic or Concept node -->
-        {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
+        {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list or "Page" in node.member_of_names_list %}
           <!-- Below code/widgets will only be shown for all resource instances/documents
                which are neither Topic nor Concept
           -->
@@ -607,8 +587,6 @@
           <div id="view-levels" style="display:none;">
           </div>
           
-          {% comment %}
-            
           <!-- Content for Collection Graph -->
           {% if node.collection_set %}
             <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
@@ -624,7 +602,7 @@
              {% include "ndf/graph_dependency.html" %}
             </div>
           {% endif %}
-          {% endcomment %}
+          
          
           <!-- Tab View Map Widget -->
         {% elif node.location %}
