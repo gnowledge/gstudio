@@ -234,6 +234,11 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
     text-indent:-32px !important;
 
 }
+.hanging-indent-topics-name{
+    position: relative !important;
+    padding-left: 16px !important;
+    text-indent:-18px !important;
+}
 
   /*.collection > ul li:nth-child(odd) { background: #ddd; }*/
   .collection > ul li { border-bottom: solid thin #ddd; }
@@ -265,7 +270,7 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
     <!-- Related node means all collection elements of its teme item i.e all siblings of topic node -->
     
       {% if prior_obj %}        
-      <legend><h3>Topics in {{prior_obj.name}}</h3></legend>
+      <div class="repository-desc large-12 columns" style="width:100%">Topics in {{prior_obj.name}}</div>
         {% comment %}
           {% for each in prior_obj.collection_set %}
               <!-- To get the node object -->
@@ -287,9 +292,9 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
                 
                 <!-- Clicked topic should not be included in related nodes list -->
                 {% if node.pk != obj.pk %}
-                  <li style="border-bottom: solid thin #ddd;"> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a> </li>
+                  <li class="hanging-indent-topics-name" style="border-bottom: solid thin #ddd; "> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a> </li>
                 {% else %}
-                  <li style="border-bottom: solid thin #ddd;"> <span class="text-gray">{{obj.name}}</span> </li>
+                  <li class="hanging-indent-topics-name" style="border-bottom: solid thin #ddd;"> <span class="text-gray">{{obj.name}}</span> </li>
                 {% endif %} 
             {% endfor %}
           </ul>
