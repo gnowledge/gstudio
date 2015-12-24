@@ -43,7 +43,6 @@ app = gst_quiz
 def quiz(request, group_id):
     """Renders a list of all 'Quiz-type-GSystems' available within the database.
     """
-    print "\n\n coming to quiz"
     try:
         group_id = ObjectId(group_id)
     except:
@@ -119,7 +118,7 @@ def create_edit_quiz_item(request, group_id, quiz_node_id, node_id=None):
         if quiz_type != QUIZ_TYPE_CHOICES[0]:
             no_of_options = int(request.POST.get('no_of_options',''))
             quiz_item_node['options'] = []
-            # print "\n\nno_of_options",no_of_options
+            # print "\n\n no_of_options",no_of_options
             i = 1
             while i <= no_of_options:
                 options.append(request.POST.get("option" if i == 1 else "option_"+str(i)))
