@@ -1930,10 +1930,10 @@ def group_dashboard(request, group_id=None):
       if parent_groupid_of_pe:
         parent_groupid_of_pe = parent_groupid_of_pe._id
 
-      alternate_template = "ndf/program_event_group.html"
+      alternate_template = "ndf/gprogram_event_group.html"
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
-      alternate_template = "ndf/course_event_group.html"
+      alternate_template = "ndf/gcourse_event_group.html"
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
   # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
