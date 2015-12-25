@@ -294,7 +294,7 @@ def course_detail(request, group_id, _id):
                 if str_course_id in course_enrollment_status:
                     enrolled_status = True
             context_variables['enrolled_status'] = enrolled_status
-    return render_to_response("ndf/course_detail.html",
+    return render_to_response("ndf/gcourse_detail.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
         )
