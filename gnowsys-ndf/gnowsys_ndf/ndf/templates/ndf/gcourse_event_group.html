@@ -28,35 +28,7 @@
       {% endif %}
   
   <div id="view_collection">
-    {% for section in course_collection_data %}
-      {% if section.node_type == 'CourseSectionEvent' %}
-        <dl class="accordion" data-accordion>
-          <!-- sections -->
-          <dd class="accordion-navigation">
-            <a href="#s{{section.id}}">{{section.name}}</a>
-            <div id="s{{section.id}}" class="content active">
-              <!-- sub sections  -->
-              {% for sub_section in section.children %}
-                {% if sub_section.node_type == 'CourseSubSectionEvent' %}
-                <strong>{{sub_section.name}}</strong>
-                  <ul>
-                  <!-- units -->
-                    {% for unit in sub_section.children %}
-                      {% if unit.node_type == 'CourseUnitEvent' %}
-                        <li>{{unit.name}}</li>
-                      {% endif %}
-                    {% endfor %}
-                    <!-- units end -->
-                  </ul>
-                {% endif %}
-              {% endfor %}
-              <!-- sub sections end -->
-            </div>
-          </dd>
-        </dl>
-      {% endif %}
-    {% endfor %}
-    <!-- sections end -->
+    {% include "ndf/gcollection_ajax_view.html" %}
   </div>
 {% endblock %}
 
