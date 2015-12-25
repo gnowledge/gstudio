@@ -27,7 +27,7 @@ from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROG
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget, get_collection
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 
@@ -1922,7 +1922,7 @@ def group_dashboard(request, group_id=None):
   files_cur = None
   allow_to_join = ""
   sg_type = None
-
+  course_collection_data = []
   if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
       sg_type = "ProgramEventGroup"
       # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
@@ -1934,6 +1934,9 @@ def group_dashboard(request, group_id=None):
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
       alternate_template = "ndf/gcourse_event_group.html"
+      course_collection_data = get_collection(request,group_obj._id,group_obj._id)
+      # print "\n\n\n\n\ncollection_data",collection_data
+
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
   # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
@@ -2000,6 +2003,7 @@ def group_dashboard(request, group_id=None):
                                                        'selected': selected,
                                                        'files_cur': files_cur,
                                                        'sg_type': sg_type,
+                                                       'course_collection_data':course_collection_data,
                                                        'parent_groupid_of_pe':parent_groupid_of_pe,
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
