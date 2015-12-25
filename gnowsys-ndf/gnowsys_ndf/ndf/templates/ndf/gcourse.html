@@ -57,7 +57,7 @@
 
     <div class="tabs-content"  style="margin-left:18px;margin-top:-1em;">
 
-      <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-2" id="all_events" style="background-color:#fafafa;border-style:none">
+      <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" id="all_events" style="background-color:#fafafa;border-style:none">
       {% if title == "Course" %}
         <div class="repository-title large-4 columns">All eCourses</div>
       {% else %}
@@ -66,7 +66,7 @@
 
         {% for course in ce_coll %}
           <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
-            {% include 'ndf/horizontal_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk  %}
+            {% include 'ndf/event_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk  %}
           </li>
         {% empty %}
             <div class="row">
@@ -90,7 +90,7 @@
       {% endif %}
         {% for course in enr_ce_coll %}
           <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
-            {% include 'ndf/horizontal_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk %}
+            {% include 'ndf/event_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk %}
           </li>
 
         {% empty %}
