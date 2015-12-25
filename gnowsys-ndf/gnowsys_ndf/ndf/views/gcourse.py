@@ -1706,7 +1706,7 @@ def add_course_file(request, group_id):
         app_set_id = request.POST.get("app_set_id", "")
 
         # i.e  if context_name is "Course"
-        url_name = "/" + group_id + "/course/add_units/?css_node_id=" + \
+        url_name = "/" + group_id + "/gcourse/add_units/?css_node_id=" + \
             css_node_id + "&unit_node_id=" + context_node_id + "&course_node="+ course_node
         if app_id and app_set_id:
             url_name += "&app_id=" + app_id + "&app_set_id=" + app_set_id + ""
