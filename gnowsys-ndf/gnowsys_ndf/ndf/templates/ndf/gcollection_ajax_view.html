@@ -4,27 +4,46 @@
 {% block head %}
 {% get_node_type node as node_type %}  
 
+<style type="text/css">
+  .accordion-resources {
+    font-size: x-small;
+  }
+
+  .accordion-unit-name {
+    font-size: normal;
+    padding-top: 10px;
+  }
+
+  .accordion-sub-section {
+    list-style: none;
+  }
+
+  .accordion-section-name {
+    font-size: xx-large;
+    font-weight: thin;
+  }
+</style>
 
 {% for section in course_collection_data %}
   {% if section.node_type == 'CourseSectionEvent' %}
     <dl class="accordion" data-accordion>
       <!-- sections -->
       <dd class="accordion-navigation">
-        <a href="#s{{section.id}}">{{section.name}}</a>
+        <a href="#s{{section.id}}" class="accordion-section-name">{{section.name}} <span class="right">{{section.children|length}}</span></a>
         <div id="s{{section.id}}" class="content active">
           <!-- sub sections  -->
           {% for sub_section in section.children %}
             {% if sub_section.node_type == 'CourseSubSectionEvent' %}
-            <strong>{{sub_section.name}}</strong>
-              <ul>
+            <strong class="accordion-sub-section-name">{{sub_section.name}} <span class="right">{{sub_section.children|length}}</span></strong>
+              <ul class="accordion-sub-section">
               <!-- units -->
                 {% for unit in sub_section.children %}
                   {% if unit.node_type == 'CourseUnitEvent' %}
-                    <li>
-                    <div>{{unit.name}}</div>
+                    <li class="accordion-unit">
+                    <div class="accordion-unit-name">{{unit.name}} <span class="right">{{unit.children|length}}</span></div>
                     <!-- resources -->
                     {% for resource in unit.children %}
-                      <label class="resource">
+                      <label class="accordion-resource">
                         <a href="#" class="load-on-click" id="{{resource.id}}">{{resource.name}}</a>
                       </label>
                     {% endfor %}
