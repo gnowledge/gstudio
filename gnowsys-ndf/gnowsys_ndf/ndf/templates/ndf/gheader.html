@@ -473,7 +473,7 @@
         $(this).attr('href', "{% url 'activity_feed' group_object.pk %}")
       }
       else{
-        lbl_msg = {% trans "RSS Feeds may not be displayed properly in this browser. Would you still like to continue?" %}
+        lbl_msg = '{% trans "RSS Feeds may not be displayed properly in this browser. Would you still like to continue?" %}'
         $("#feedsModalLabel").text(lbl_msg);
         $(".small_msg").text("You may try Mozilla Firefox")
         $("#feedsModal")
