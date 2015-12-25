@@ -6,7 +6,6 @@
 {% get_site_variables as site %}
 {% get_oid_variables as oids %}
 
-{% cache 360 static_html_head %}  <!-- cache static dependencies for a hour -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,6 +17,7 @@
 
   <link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> 
 
+  <!-- External library stylesheets-->
   <!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
   <link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> 
   <link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/styles.css"> 
@@ -38,8 +38,7 @@
   <!-- Enable HTML5 on old browsers -->
   <!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
-  <!-- External library stylesheets-->
-{% endcache %}
+
   <title>{{ site.SITE_NAME }} - {% block title %} {% endblock %} </title> 
 
   {% block head %}{% endblock %}
@@ -59,7 +58,8 @@
 
   {% include "ndf/gheader.html" %}
   {% block extended_header %}{% endblock %}
-   {% comment %}
+
+  {% comment %}
    {% get_gstudio_help_sidebar as gst_help_sidebar %}
    {% if gst_help_sidebar and app or app_description%}
      
@@ -68,14 +68,14 @@
         <div class="help-button-text">
           Help
         </div>
-                
       </a>
       <div class="mainContainer">
              {{ app.content_org }}
       </div>
     </div> 
    {% endif %}
-   {% endcomment %} 
+  {% endcomment %} 
+
   <div class="workspace">
     <div class="off-canvas-wrap" data-offcanvas>
       <div class="inner-wrap">
@@ -92,7 +92,7 @@
 
         <main class="row">
           <!-- Start of sidebar section (main aside) -->
-          <aside class="medium-2 columns">
+          <aside class='medium-{% firstof first_body_column 2 %} columns'>
             <div>
               <header>
                 {% block meta_content %}  {% endblock %} 
@@ -118,7 +118,7 @@
           <!-- End of related content -->
 
           <!-- Start of content section -->
-          <article class="medium-10 columns">
+          <article class="medium{% firstof first_body_column|default_if_none:'2'|safe|add:'-12' %} columns">
             <!-- The actual body content -->
             <!-- Url redirection -->
   
