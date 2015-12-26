@@ -1,0 +1,9 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+{% get_user_groups request.user.id as user_concern_groups %}
+
+{% for each_gr in user_concern_groups %}
+	{{each_gr.name}}
+	<hr/>
+{% endfor %}
