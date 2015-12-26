@@ -115,7 +115,7 @@
         <!-- Current group selector -->
         <li class="group">
           <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
-            {{group_object.name|truncatechars:20}}
+           <i class="fi-compass icon_header"></i> {% trans "Explore"%}
           </a>
           </li>
           </ul>
@@ -126,7 +126,7 @@
         <!-- Current group selector -->
         <li class="has-dropdown group">
           <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
-            {{group_object.name|truncatechars:20}}
+            <i class="fi-compass icon_header"></i> {% trans "Explore"%}
           </a>
           <!-- If logged in show user groups -->
           {% if user.is_authenticated %}
@@ -264,10 +264,37 @@
                   </form>
                 </li>
               {% endfor %}
-
             </ul>
           </li>
         </ul>
+
+         <!-- Right Nav Section -->
+         <ul class="right">
+            <li><a href="/">
+           <i class="fi-info icon_header"></i> {% trans 'Help'%} 
+            </a>
+            </li>
+         </ul>
+         <!-- Closes Right Nav section -->
+
+
+          <!-- Right Nav Section -->
+       {% comment %}
+            <!--DropDown Help -->
+          <ul class="right">
+            <li class="has-dropdown">
+               <a> <i class="fi-info icon_header"></i> {% trans 'Help'%} 
+            </a>
+              <ul class="dropdown text-center">
+                <li class="text-center">
+                  <a> Hello 1</a>
+                </li>
+              </ul>
+            </li>
+         </ul>
+         {% endcomment %}
+         <!-- Closes Right Nav section -->
+
         </section>
 
       </nav>
