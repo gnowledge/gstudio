@@ -3195,3 +3195,24 @@ def get_event_status(node):
 	        elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
 	            status_msg = "CLOSED"
 	return status_msg
+
+
+
+@get_execution_time
+@register.assignment_tag
+def get_user_groups(user_id):
+	user_id = int(user_id)
+
+	gst_modg = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
+
+	all_user_groups = node_collection.find({
+				'_type': 'Group',
+				'$or':[
+						{'author_set': {'$in': [user_id]}},
+						{'group_admin': {'$in': [user_id]}},
+						{'created_by': user_id} 
+					],
+				'member_of': {'$nin': [gst_modg._id]} 
+				})
+
+	return all_user_groups
