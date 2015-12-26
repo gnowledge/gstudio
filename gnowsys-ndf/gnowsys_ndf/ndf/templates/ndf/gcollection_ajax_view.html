@@ -5,23 +5,32 @@
 {% get_node_type node as node_type %}  
 
 <style type="text/css">
-  .accordion-resources {
-    font-size: x-small;
-  }
+	.accordion-navigation > a:before {
+		content: "◂";
+		padding-left: 5px;
+		float: right;
+		font-size: 20px;
+	}
+	.accordion-navigation.active a:before {
+		content: "▾";
+	}
+	.accordion-resources {
+		font-size: x-small;
+	}
 
-  .accordion-unit-name {
-    font-size: normal;
-    padding-top: 10px;
-  }
+	.accordion-unit-name {
+		font-size: normal;
+		padding-top: 10px;
+	}
 
-  .accordion-sub-section {
-    list-style: none;
-  }
+	.accordion-sub-section {
+		list-style: none;
+	}
 
-  .accordion-section-name {
-    font-size: xx-large;
-    font-weight: thin;
-  }
+	.accordion-section-name {
+		font-size: xx-large;
+		font-weight: thin;
+	}
 </style>
 
 <dl class="accordion" data-accordion>
