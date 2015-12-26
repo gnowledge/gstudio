@@ -49,16 +49,12 @@ def quiz(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
     title = gst_quiz.name
     quiz_nodes = node_collection.find({'member_of': gst_quiz._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
-    quiz_nodes_count = quiz_nodes.count()
-    # gst_quiz_item_id = node_collection.one({'_type': 'GSystemType', 'name': u'QuizItem'})._id
-    # quiz_item_nodes = node_collection.find({'member_of': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-    # quiz_item_nodes.sort('last_update', -1)
-    # quiz_item_nodes_count = quiz_item_nodes.count()
-    # quiz_node.get_neighbourhood(quiz_node.member_of)
+    gst_quiz_item_id = node_collection.one({'_type': 'GSystemType', 'name': u'QuizItem'})._id
+    quiz_item_nodes = node_collection.find({'member_of': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
     return render_to_response("ndf/quiz.html",
                               {'title': title, 
-                               'quiz_nodes': quiz_nodes, 'quiz_nodes_count': quiz_nodes_count,
-                               # 'quiz_item_nodes': quiz_item_nodes, 'quiz_item_nodes_count': quiz_item_nodes_count,
+                               'quiz_nodes': quiz_nodes,
+                               'quiz_item_nodes': quiz_item_nodes,
                                'groupid':group_id,
                                'group_id':group_id
                               }, 
@@ -67,7 +63,7 @@ def quiz(request, group_id):
 
 @login_required
 @get_execution_time
-def create_edit_quiz_item(request, group_id, quiz_node_id, node_id=None):
+def create_edit_quiz_item(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
     try:
@@ -78,41 +74,77 @@ def create_edit_quiz_item(request, group_id, quiz_node_id, node_id=None):
 
     node = None
     quiz_node = None
+    quiz_node_id = None
     quiz_item_node = None
 
     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
-    quiz_node = node_collection.one({'_id': ObjectId(quiz_node_id)})
-    if node_id:
-        quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
-
+    # if node_id:
+    #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
+    quiz_node_id = request.GET.get('quiznode','')
     context_variables = { 'title': gst_quiz_item.name,
                           'quiz_type_choices': QUIZ_TYPE_CHOICES,
                           'group_id': group_id,
-                          'groupid': group_id
+                          'groupid': group_id,
+
                         }
+    if quiz_node_id:
+        quiz_node = node_collection.one({'_id': ObjectId(quiz_node_id)})
+        context_variables['quiz_node_id'] = quiz_node._id
+    if node_id:
+        node = node_collection.one({'_id': ObjectId(node_id)})
+        if gst_quiz._id in node.member_of:
+            # Add question from a given Quiz category's context
+            quiz_node = node
+        else:
+            # Edit a question
+            quiz_item_node = node
+
 
     if request.method == "POST":
         usrid = int(request.user.id)
         usrname = unicode(request.user.username)
 
+        # if node_id:
+        #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
+        # else:
+        #     # Add miscellaneous question
+        #     quiz_item_node = node_collection.collection.GSystem()
+
         if node_id:
-            quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
+            node = node_collection.one({'_id': ObjectId(node_id)})
+
+            if gst_quiz._id in node.member_of:
+                # Add question from a given Quiz category's context
+                quiz_node = node
+                quiz_item_node = node_collection.collection.GSystem()
+
+            else:
+                # Edit a question
+                quiz_item_node = node
         else:
             # Add miscellaneous question
             quiz_item_node = node_collection.collection.GSystem()
+            # quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
+
         quiz_item_node.save(is_changed=get_node_common_fields(request, quiz_item_node, group_id, gst_quiz_item),groupid=group_id)
 
+        quiz_node_id = request.POST.get('quiz_node_id','')
+        if quiz_node_id:
+            quiz_node = node_collection.one({'_id': ObjectId(quiz_node_id)})
         quiz_type = request.POST.get('quiz_type_val','')
         quiz_item_node['quiz_type'] = unicode(quiz_type)
 
         # question = request.POST.get('question','')
         # quiz_item_node.content_org = unicode(question)
-        # name = "quiz-item-" + (question.split()[3] if len(question.split()) > 4 else question.split()[0])   # Extracting the third word of the question if present, otherwise first word 
         # Required to link temporary files with the current user who is modifying this document
-        # usrname = request.user.username
-        # filename = slugify(name) + "-" + usrname + "-"
-        # quiz_item_node.content = org2html(question, file_prefix=filename)
 
+        # Required to link temporary files with the current user who is
+        # modifying this document
+        # filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+        # quiz_item_node.content = unicode(org2html(content_org, file_prefix=filename))
+
+        # print "\n\n content from html---", question
+        # print "\n\n content---\n", quiz_item_node.content
         # If "quiz_type" is either 'Single-Choice' or 'Multiple-Choice', then only extract options
         options = []
         if quiz_type != QUIZ_TYPE_CHOICES[0]:
@@ -135,9 +167,9 @@ def create_edit_quiz_item(request, group_id, quiz_node_id, node_id=None):
             correct_answer = request.POST.get('correct_answer_' + qt_initial)
             quiz_item_node['correct_answer'].append(correct_answer)
 
-        tags = request.POST.get('tags','')
-        if tags:
-            quiz_item_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+        # tags = request.POST.get('tags','')
+        # if tags:
+        #     quiz_item_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
         
         quiz_item_node.save(groupid=group_id)
 
@@ -149,14 +181,15 @@ def create_edit_quiz_item(request, group_id, quiz_node_id, node_id=None):
         # if assesses_list !='':
         #     assesses_list=assesses_list.split(",")
         # create_grelation_list(quiz_item_node._id,"assesses",assesses_list)
-        return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id, 'node_id':quiz_node_id}))
+        return HttpResponseRedirect(reverse('quiz', kwargs={'group_id': group_id}))
         
     else:
         if node_id:
-            context_variables['node'] = quiz_item_node
+            if quiz_item_node:
+                context_variables['node'] = quiz_item_node
             context_variables['groupid'] = group_id
             context_variables['group_id'] = group_id
-        context_variables['quiz_node']=quiz_node
+            # context_variables['quiz_node']=quiz_node
         return render_to_response("ndf/quiz_item_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -223,7 +256,7 @@ def quiz_details(request, group_id, node_id):
 
     quiz_node = node_collection.one({'_id': ObjectId(node_id)})
     quiz_item_nodes = node_collection.find({'_id': {'$in': quiz_node.collection_set}, 'member_of': gst_quiz_item._id }).sort('last_update', -1)
-    quiz_node.get_neighbourhood(quiz_node.member_of)
+    # quiz_node.get_neighbourhood(quiz_node.member_of)
 
     context_variables = {'groupid': group_id,
                         'group_id': group_id,
