@@ -14,6 +14,11 @@
 	.accordion-navigation.active > a:before {
 		content: "▾";
 	}
+
+	.content-wide {
+		padding: 0 !important;
+	}
+
 	.accordion-resources {
 		font-size: x-small;
 	}
@@ -21,6 +26,11 @@
 	.accordion-unit-name {
 		font-size: normal;
 		padding-top: 10px;
+	}
+
+	.accordion-sub-section-name {
+		background-color: transparent !important;
+		font-weight: 100;
 	}
 
 	.accordion-sub-section {
@@ -39,12 +49,12 @@
       <!-- sections -->
       <dd class="accordion-navigation">
         <a href="#s{{section.id}}" class="accordion-section-name">{{section.name}} <span class="right">{{section.children|length}}</span></a>
-        <dl id="s{{section.id}}" class="content" data-accordion>
+        <dl id="s{{section.id}}" class="content content-wide" data-accordion>
           <!-- sub sections  -->
           {% for sub_section in section.children %}
             {% if sub_section.node_type == 'CourseSubSectionEvent' %}
-            <dd class="accordion-sub-section-name accordion-navigation">
-            	<a href="#ss{{sub_section.id}}">
+            <dd class="accordion-navigation">
+            	<a href="#ss{{sub_section.id}}" class="accordion-sub-section-name">
 	            	<i class="fa fa-check-circle-o fa-lg"></i> {{sub_section.name}} 
 	            	<span class="right">{{sub_section.children|length}}</span>
             	</a>
