@@ -24,13 +24,13 @@
   }
 </style>
 
-{% for section in course_collection_data %}
-  {% if section.node_type == 'CourseSectionEvent' %}
-    <dl class="accordion" data-accordion>
+<dl class="accordion" data-accordion>
+	{% for section in course_collection_data %}
+	  {% if section.node_type == 'CourseSectionEvent' %}
       <!-- sections -->
       <dd class="accordion-navigation">
         <a href="#s{{section.id}}" class="accordion-section-name">{{section.name}} <span class="right">{{section.children|length}}</span></a>
-        <div id="s{{section.id}}" class="content active">
+        <div id="s{{section.id}}" class="content">
           <!-- sub sections  -->
           {% for sub_section in section.children %}
             {% if sub_section.node_type == 'CourseSubSectionEvent' %}
@@ -61,9 +61,9 @@
           <!-- sub sections end -->
         </div>
       </dd>
-    </dl>
-  {% endif %}
-{% endfor %}
+	  {% endif %}
+	{% endfor %}
+</dl>
 <!-- sections end -->
 
 <!-- script to handle ajax of .accordion & #view_page -->
