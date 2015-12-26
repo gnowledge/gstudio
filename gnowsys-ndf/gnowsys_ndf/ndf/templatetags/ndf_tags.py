@@ -3198,21 +3198,45 @@ def get_event_status(node):
 
 
 
+# @get_execution_time
+# @register.assignment_tag
+# def get_all_user_groups(user_id):
+
+# 	user_id = int(user_id)
+
+# 	gst_modg = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
+
+# 	all_user_groups = node_collection.find({
+# 				'_type': 'Group',
+# 				'$or':[
+# 						{'author_set': {'$in': [user_id]}},
+# 						{'group_admin': {'$in': [user_id]}},
+# 						{'created_by': user_id} #,
+# 						# {'group_type': u'PUBLIC'}
+# 					],
+# 				'member_of': {'$nin': [gst_modg._id]} 
+# 				})
+
+# 	return all_user_groups
+
+
 @get_execution_time
 @register.assignment_tag
-def get_user_groups(user_id):
+def get_user_course_groups(user_id):
+
 	user_id = int(user_id)
 
-	gst_modg = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
+	gst_course = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
 
 	all_user_groups = node_collection.find({
 				'_type': 'Group',
 				'$or':[
 						{'author_set': {'$in': [user_id]}},
 						{'group_admin': {'$in': [user_id]}},
-						{'created_by': user_id} 
+						{'created_by': user_id} #,
+						# {'group_type': u'PUBLIC'}
 					],
-				'member_of': {'$nin': [gst_modg._id]} 
+				'member_of': {'$in': [gst_course._id]} 
 				})
 
 	return all_user_groups
