@@ -69,12 +69,12 @@
             {% for menuk, menuv in each_menu.items %}
 
             <li class="has-dropdown">
-	      
+        
               <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
-              	 href="{% url 'nroer_groups' 'home' menuk %}" 
+                 href="{% url 'nroer_groups' 'home' menuk %}" 
               > {% trans menuk %} </a>
               <ul class="dropdown">
-	
+  
                 {% for each_sub_menu in menuv %}
                 <li>
                   <a 
@@ -87,7 +87,7 @@
                           class="active" 
                         {% endif %}
                       {% endif %}
-          		      {% endif %}
+                    {% endif %}
 
                     {% if each_sub_menu == mapk %}
                       href="{% url 'partnerlist' mapv %}"
@@ -115,7 +115,7 @@
         <!-- Current group selector -->
         <li class="group">
           <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
-           <i class="fi-compass icon_header"></i> {% trans "Explore"%}
+            {{group_object.name|truncatechars:20}}
           </a>
           </li>
           </ul>
@@ -126,7 +126,7 @@
         <!-- Current group selector -->
         <li class="has-dropdown group">
           <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
-            <i class="fi-compass icon_header"></i> {% trans "Explore"%}
+            {{group_object.name|truncatechars:20}}
           </a>
           <!-- If logged in show user groups -->
           {% if user.is_authenticated %}
@@ -249,14 +249,6 @@
         </ul>
         <!-- Closes Right Nav section -->
 
-        <!-- Right Nav Section -->
-          <ul class="right">
-            <li>
-              <a href=""><i class="fa fa-bell icon_header"></i> Notice Board</a>
-            </li>
-          </ul>
-        <!-- Closes Right Nav section -->
-
         <ul class="right">
           <li class="has-dropdown">
             <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
@@ -272,37 +264,10 @@
                   </form>
                 </li>
               {% endfor %}
+
             </ul>
           </li>
         </ul>
-
-         <!-- Right Nav Section -->
-         <ul class="right">
-            <li><a href="/">
-           <i class="fi-info icon_header"></i> {% trans 'Help'%} 
-            </a>
-            </li>
-         </ul>
-         <!-- Closes Right Nav section -->
-
-
-          <!-- Right Nav Section -->
-       {% comment %}
-            <!--DropDown Help -->
-          <ul class="right">
-            <li class="has-dropdown">
-               <a> <i class="fi-info icon_header"></i> {% trans 'Help'%} 
-            </a>
-              <ul class="dropdown text-center">
-                <li class="text-center">
-                  <a> Hello 1</a>
-                </li>
-              </ul>
-            </li>
-         </ul>
-         {% endcomment %}
-         <!-- Closes Right Nav section -->
-
         </section>
 
       </nav>
