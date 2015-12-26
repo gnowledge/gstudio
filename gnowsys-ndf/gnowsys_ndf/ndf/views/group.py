@@ -2002,7 +2002,7 @@ def group_dashboard(request, group_id=None):
                                                        'selected': selected,
                                                        'files_cur': files_cur,
                                                        'sg_type': sg_type,
-                                                       'course_collection_data':json.loads(course_collection_data.content),
+                                                       'course_collection_data':json.loads(course_collection_data.content) if course_collection_data != [] else [],
                                                        'parent_groupid_of_pe':parent_groupid_of_pe,
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
