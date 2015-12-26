@@ -9,19 +9,6 @@
 {% get_group_name groupid as group_name_tag %}
 {% block title %} {{title}} -- khaal version  {% endblock %}
 
-{% block help_content %}
-{% endblock %}
-{% block style %}
-  {{block.super}}
-  li{
-    list-style:none;
-  }
-  .btn-width{
-    //width:100% !important;
-    //max-width:100% !important;
-  }
-{% endblock %}
-
 {% block collection_content %}
 
   {% check_is_gstaff groupid request.user as is_gstaff %}
@@ -32,7 +19,7 @@
       Tab 3 - Courses
     -->
     <div class="panel" style="background-color:#ddd;margin-top:1.8em;padding: 1rem;">
-      <ul class="" data-tab role="tablist" >
+      <ul class="no-bullet" data-tab role="tablist" >
         {% if is_gstaff %}
           {% if req_from_course %}
               <a class="tiny expand button radius btn-width" href="{% url 'create_edit' group_name_tag %}">
@@ -56,6 +43,10 @@
     </div>
 
 {% endblock %}
+
+{% block meta_content %}
+  {% include "ndf/side_group_panel.html" %}
+{% endblock meta_content %}
 
 {% block body_content %}
 
