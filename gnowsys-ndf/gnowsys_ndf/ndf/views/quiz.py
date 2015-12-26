@@ -125,7 +125,11 @@ def create_edit_quiz_item(request, group_id, node_id=None):
             # Add miscellaneous question
             quiz_item_node = node_collection.collection.GSystem()
             # quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
-
+        question_content = request.POST.get('content_org','')
+        question_content = question_content.split(' ')
+        question_content = question_content[:4]
+        question_content = ' '.join(question_content)
+        quiz_item_node.name = unicode(question_content)
         quiz_item_node.save(is_changed=get_node_common_fields(request, quiz_item_node, group_id, gst_quiz_item),groupid=group_id)
 
         quiz_node_id = request.POST.get('quiz_node_id','')
