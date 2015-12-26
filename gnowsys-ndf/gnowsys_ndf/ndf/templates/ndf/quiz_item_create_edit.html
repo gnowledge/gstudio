@@ -12,17 +12,14 @@
 
 {% endblock %}
 
-{% block related_content %}
-    <span>    <a href="{% url 'quiz_details' group_name_tag quiz_node.pk %}" class="tiny button">{{quiz_node.name}}</a></span>
-    <span>    <a href="{% url 'quiz_item_create' group_name_tag quiz_node.pk %}" class="tiny button"> {% trans "Add Question" %}</a>
-	</span>
-{% endblock %}
 
 {% block body_content %}
 {% get_group_name groupid as group_name_tag %}
 <form id="quiz_item_create_form" method="POST" action="">
 {% csrf_token %}
-
+	{% if quiz_node_id %}
+	<input type="hidden" name="quiz_node_id" value="{{quiz_node_id}}">
+	{% endif %}
 	<div id="node-details-edit-div" class="tabs-content" >
 		<div class="active content row" id="panel-name-description"> 
 			<div class="row text-center">
@@ -42,24 +39,22 @@
 
 			<div class="row">
 				<div class="small-4 large-2 columns">
-					<label for="quiz_type" class="right inline">{% trans "Enter Question" %}</label>
+					<label for="quiz_type" class="right inline">{% trans "Name your Question" %}</label>
 				</div>
 
 				<div class="small-8 large-8 columns left">
 				<input type="text" name="name" value="{% if node %}{{node.name}}{% endif %}">
 				</div>
 			</div>
-			{% comment %}
-			<div class="row" id="question">
+			<div class="row">
 				<div class="small-4 large-2 columns">
-					<label for="quiz_type" class="right inline">{% trans "Enter Question" %}</label>
+					<label class="right inline">{% trans "Enter Full Question" %}</label>
 				</div>
 
 				<div class="small-8 large-8 columns left">
-					{% include "ndf/add_editor.html" with var_name="question" var_placeholder="Enter Question here.." var_value=node.content_org %}
+					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter Question here.." var_value=node.content_org %}
 				</div>
 			</div>
-			{% endcomment %}
 
 			<div class="row" id="options" style="display:none;">
 				<div class="small-4 large-2 columns">
