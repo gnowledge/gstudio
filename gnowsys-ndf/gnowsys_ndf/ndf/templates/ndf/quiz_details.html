@@ -9,7 +9,12 @@
   <!-- <script src="/static/ndf/js/tree.jquery.js"></script> -->
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
 {% endblock %}
-
+{% block style %}
+{{ block.super }}
+	.questions_table{
+		width: 150%;
+	}
+{% endblock %}
 <!-- overiding block from node_detail_base.html -->
 
 {% block collection_content %}
@@ -17,7 +22,7 @@
       {% if is_gstaff or request.user.id == node.created_by %}
         <span data-tooltip title="Edit this Course"><a class="fi-pencil tiny button" href="{% url 'quiz_edit' group_id node.pk %}">Edit this Quiz</a></span>
 
-	    <span>  <a href="{% url 'quiz_item_create' group_name_tag node.pk %}" class="tiny button">Add Question</a>
+	    <span>  <a href="{% url 'quiz_item_create' group_name_tag %}?quiznode={{node.pk}}" class="tiny button">Add Question</a>
 
 		</span>
       {% endif %}
@@ -75,44 +80,55 @@
 
 			<div class="content" id="questions">
 					<div class="row">
-					<div class="small-12 columns">
-					<table>
-						<thead>
-							<tr>
-								<td>{% trans "Sr. No " %}</td>
-								<td>{% trans "Question" %}</td>
-								<td>{% trans "Type" %}</td>
-								<td>{% trans "Options" %}</td>
-								<td>{% trans "Add to 'Question Library' " %}</td>
-			                	{% if request.user.id == node.created_by or gstaff_access %}
-									<td>{% trans "Edit " %}</td>
-								{% endif %}
+					<div class="small-12 columns text-center">
+					{% if quiz_item_nodes %}
+						<table class="questions_table">
+							<thead>
+								<tr>
+									<td>{% trans "Sr. No " %}</td>
+									<!-- <td>{% trans "Name" %}</td> -->
+									<td>{% trans "Question" %}</td>
+									<td>{% trans "Type" %}</td>
+									<td>{% trans "Options" %}</td>
+									{% comment %}
+									<td>{% trans "Add to 'Question Library' " %}</td>
+									{% endcomment %}
+				                	{% if request.user.id == node.created_by or gstaff_access %}
+										<td>{% trans "Edit " %}</td>
+									{% endif %}
 
-							</tr>
-						</thead>
-						<tbody>
-						{% for each_question in quiz_item_nodes %}
-							<tr>
-								<td>{{forloop.counter}}</td>
-								<td>{{each_question.name}}</td>
-								<td>{{each_question.quiz_type}}</td>
-								{% if each_question.quiz_type == "Short-Response" %}
-									<td><i>{% trans "Not Applicable" %}</i></td>
-								{% else %}
-								<td>
-								{% for each_opt in each_question.options %}
-									{{each_opt}}{% if not forloop.last %},{% endif %}
-								{% endfor %}
-								</td>
-								{% endif %}
-								<td><input type="button" value="Yes" class="button tiny add_qtn_lib"></td>
-		                		{% if request.user.id == node.created_by or gstaff_access %}
-									<td><a  title="Edit this Question" class="button tiny" href="{% url 'quiz_item_edit' group_id node.pk each_question.pk %}">{% trans "Edit" %}</a></td>
-		                		{% endif %}
-							</tr>
-						{% endfor %}
-						</tbody>
-					</table>
+								</tr>
+							</thead>
+							<tbody>
+							{% for each_question in quiz_item_nodes %}
+								<tr>
+									<td>{{forloop.counter}}</td>
+									<!-- <td>{{each_question.name}}</td> -->
+									<td>{{each_question.content_org}}</td>
+									<td>{{each_question.quiz_type}}</td>
+									{% if each_question.quiz_type == "Short-Response" %}
+										<td><i>{% trans "Not Applicable" %}</i></td>
+									{% else %}
+									<td>
+									{% for each_opt in each_question.options %}
+										{{each_opt}}{% if not forloop.last %},{% endif %}
+									{% endfor %}
+									</td>
+									{% endif %}
+									{% comment %}
+									<td><input type="button" value="Yes" class="button tiny add_qtn_lib"></td>
+									{% endcomment %}
+			                		{% if request.user.id == node.created_by or gstaff_access %}
+										<td><a  title="Edit this Question" class="button tiny" href="{% url 'quiz_item_edit' group_id each_question.pk %}">{% trans "Edit" %}</a></td>
+			                		{% endif %}
+								</tr>
+							{% endfor %}
+							</tbody>
+						</table>
+					{% else %}
+						<i>{% trans "No Questions have been added yet!" %}</i>
+
+					{% endif %}
 					</div>
 					</div>
 
@@ -120,6 +136,7 @@
 		</div>
 	</div>
 </section>
+
 </div>
 
 {% endblock %}
