@@ -138,7 +138,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
       - "res_group_name" will contain name of the group.
       - "res_group_id" will contain _id/ObjectId of the group.
 
-      Example 2: res_group_obj = get_group_name_id(group_name_or_id, True)
+      Example 2: res_group_obj = get_group_name_id(group_name_or_id, get_obj=True)
       - "res_group_obj" will contain entire object.
 
       Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
