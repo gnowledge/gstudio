@@ -34,7 +34,10 @@
           <!-- sub sections  -->
           {% for sub_section in section.children %}
             {% if sub_section.node_type == 'CourseSubSectionEvent' %}
-            <strong class="accordion-sub-section-name">{{sub_section.name}} <span class="right">{{sub_section.children|length}}</span></strong>
+            <strong class="accordion-sub-section-name">
+            	<i class="fa fa-check-circle-o fa-lg"></i> {{sub_section.name}} 
+            	<span class="right">{{sub_section.children|length}}</span>
+            </strong>
               <ul class="accordion-sub-section">
               <!-- units -->
                 {% for unit in sub_section.children %}
