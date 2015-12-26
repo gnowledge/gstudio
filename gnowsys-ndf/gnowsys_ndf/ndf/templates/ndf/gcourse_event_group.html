@@ -28,13 +28,7 @@
       {% endif %}
   
   <div id="view_collection">
-  {% comment %}
-    {% for eachc in course_collection_data %}
-      <label>
-      {{eachc}}
-      </label>
-    {% endfor %}
-  {% endcomment %}
+    {% include "ndf/gcollection_ajax_view.html" %}
   </div>
 {% endblock %}
 
