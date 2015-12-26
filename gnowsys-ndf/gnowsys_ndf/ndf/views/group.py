@@ -1935,7 +1935,6 @@ def group_dashboard(request, group_id=None):
       sg_type = "CourseEventGroup"
       alternate_template = "ndf/gcourse_event_group.html"
       course_collection_data = get_collection(request,group_obj._id,group_obj._id)
-      # print "\n\n\n\n\ncollection_data",collection_data
 
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
@@ -2003,7 +2002,7 @@ def group_dashboard(request, group_id=None):
                                                        'selected': selected,
                                                        'files_cur': files_cur,
                                                        'sg_type': sg_type,
-                                                       'course_collection_data':course_collection_data,
+                                                       'course_collection_data':json.loads(course_collection_data.content),
                                                        'parent_groupid_of_pe':parent_groupid_of_pe,
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
