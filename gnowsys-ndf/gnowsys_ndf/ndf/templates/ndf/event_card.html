@@ -87,9 +87,10 @@
       
   </div>
   <!-- End Card  Image -->
-<div class="event-card-status">
+  {% get_event_status resource as event_status_msg %}
+     
+<div class="event-card-status {{event_status_msg|lower}}">   
         {% if is_event %}
-          {% get_event_status resource as event_status_msg %}
           {% if event_status_msg %}
               {{event_status_msg}} 
           {% endif%}
@@ -116,6 +117,10 @@
       </div>
     {% endif %}
     <!-- End Card Description  -->
+    <!-- Card Next Session -->
+      
+    <!-- End Next Session -->
+
 </div>
     
     

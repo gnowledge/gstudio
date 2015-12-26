@@ -1433,19 +1433,47 @@ aside#help{
     transition: box-shadow 0.5s ease;
     }
     
-  .event-card-status{
+   .event-card-status.closed{
     z-index: 99;
     width: auto;
     //margin-right: 200px;
     top: 30px;
+    margin-left:-5px;
     //right: 0;
     //vertical-align: middle;
     position: absolute;
+    display: inline-block;
     background-color: #00b300;
     color:white;
-
     }
 
+    .event-card-status.upcoming{
+    z-index: 99;
+    width: auto;
+    //margin-right: 200px;
+    top: 30px;
+    margin-left:-5px;
+    //right: 0;
+    //vertical-align: middle;
+    position: absolute;
+    display: inline-block;
+    background-color: #F2910D;
+    color:white;
+    }
+
+    .event-card-status.completed{
+    z-index: 99;
+    width: auto;
+    //margin-right: 200px;
+    top: 30px;
+    margin-left:-5px;
+    //right: 0;
+    //vertical-align: middle;
+    position: absolute;
+    display: inline-block;
+    background-color: #4d4d4d;
+    color:white;
+    }
   .event-card-title{
     padding-top: 1em;
     //font-size:0.7em;
