@@ -104,7 +104,7 @@
   <!-- orgitdown container -->
   <div id="org" style="" class="reveal-modal small" data-reveal>
     <!-- Reply : -->
-    <textarea id="orgitdownreps" name="content_org" placeholder="{% trans 'Enter your reply text here.'%}"></textarea>
+    <textarea id="orgitdownreps" name="content_org" placeholder="{% trans 'Enter text here.'%}"></textarea>
     <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand radius reply-button" onclick="addReply($(this))">
     {% if sg_type != "Event" %}
       <input type="file" id="uploaded-files" style="" value="" multiple>
