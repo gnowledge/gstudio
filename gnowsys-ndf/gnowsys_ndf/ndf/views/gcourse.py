@@ -1772,3 +1772,12 @@ def set_release_date_css(request, group_id):
 		response_dict["message"] = "Something went wrong! Please try after some time"
 	return HttpResponse(json.dumps(response_dict))
 
+
+
+def course_summary(request, group_id):
+    variable = RequestContext(request, {
+        'group_id': group_id, 'groupid': group_id,
+    })
+
+    template = "ndf/course_summary.html"
+    return render_to_response(template, variable)
