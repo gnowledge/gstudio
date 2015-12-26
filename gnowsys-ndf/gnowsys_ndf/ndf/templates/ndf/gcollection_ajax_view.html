@@ -11,7 +11,7 @@
 		float: right;
 		font-size: 20px;
 	}
-	.accordion-navigation.active a:before {
+	.accordion-navigation.active > a:before {
 		content: "▾";
 	}
 	.accordion-resources {
@@ -39,15 +39,17 @@
       <!-- sections -->
       <dd class="accordion-navigation">
         <a href="#s{{section.id}}" class="accordion-section-name">{{section.name}} <span class="right">{{section.children|length}}</span></a>
-        <div id="s{{section.id}}" class="content">
+        <dl id="s{{section.id}}" class="content" data-accordion>
           <!-- sub sections  -->
           {% for sub_section in section.children %}
             {% if sub_section.node_type == 'CourseSubSectionEvent' %}
-            <strong class="accordion-sub-section-name">
-            	<i class="fa fa-check-circle-o fa-lg"></i> {{sub_section.name}} 
-            	<span class="right">{{sub_section.children|length}}</span>
-            </strong>
-              <ul class="accordion-sub-section">
+            <dd class="accordion-sub-section-name accordion-navigation">
+            	<a href="#ss{{sub_section.id}}">
+	            	<i class="fa fa-check-circle-o fa-lg"></i> {{sub_section.name}} 
+	            	<span class="right">{{sub_section.children|length}}</span>
+            	</a>
+            
+              <ul id="ss{{sub_section.id}}" class="accordion-sub-section content">
               <!-- units -->
                 {% for unit in sub_section.children %}
                   {% if unit.node_type == 'CourseUnitEvent' %}
@@ -65,10 +67,11 @@
                 {% endfor %}
                 <!-- units end -->
               </ul>
+            </dd>
             {% endif %}
           {% endfor %}
           <!-- sub sections end -->
-        </div>
+        </dl>
       </dd>
 	  {% endif %}
 	{% endfor %}
