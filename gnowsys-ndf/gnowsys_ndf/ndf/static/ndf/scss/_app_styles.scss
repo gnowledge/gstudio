@@ -1713,3 +1713,40 @@ div.show-image:hover div.fullscreen-icon{
     font-size:2em;
     
 }*/
+#envelop-cover{
+  height: 350px;
+  border: 1px solid black;
+}
+#left-tab{
+  position:absolute;
+  left:0px;
+  bottom:0px;
+}
+#right-tab{
+  position:absolute;
+  right:0px;
+  bottom:0px;
+  padding-bottom:6px;
+}
+#enrolled-btn{
+  margin-bottom:0px;
+}
+div.absol-descrip{
+  position:absolute;
+  top:190px;
+  left:0;
+  width:70%;
+  height:160px;
+  background-color:#d3d3d3;
+}
+div.absol-enroll{
+  position:absolute;
+  top:190px;
+  right:0;
+  width:30%;
+  height:160px;
+  background-color:#d3d3d3;
+}
+.vertical-indent-enroll{
+  height:60px;
+}

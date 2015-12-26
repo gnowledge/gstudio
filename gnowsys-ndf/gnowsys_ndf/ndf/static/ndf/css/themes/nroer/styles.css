@@ -25175,3 +25175,53 @@ div.show-image:hover div.fullscreen-icon{
     font-size:2em;
     
 }*/
+/* line 1716, ../../../scss/_app_styles.scss */
+#envelop-cover {
+  height: 350px;
+  border: 1px solid black;
+}
+
+/* line 1720, ../../../scss/_app_styles.scss */
+#left-tab {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+}
+
+/* line 1725, ../../../scss/_app_styles.scss */
+#right-tab {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  padding-bottom: 6px;
+}
+
+/* line 1731, ../../../scss/_app_styles.scss */
+#enrolled-btn {
+  margin-bottom: 0px;
+}
+
+/* line 1734, ../../../scss/_app_styles.scss */
+div.absol-descrip {
+  position: absolute;
+  top: 190px;
+  left: 0;
+  width: 70%;
+  height: 160px;
+  background-color: #d3d3d3;
+}
+
+/* line 1742, ../../../scss/_app_styles.scss */
+div.absol-enroll {
+  position: absolute;
+  top: 190px;
+  right: 0;
+  width: 30%;
+  height: 160px;
+  background-color: #d3d3d3;
+}
+
+/* line 1750, ../../../scss/_app_styles.scss */
+.vertical-indent-enroll {
+  height: 60px;
+}
