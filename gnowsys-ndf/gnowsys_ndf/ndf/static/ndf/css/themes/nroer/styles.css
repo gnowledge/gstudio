@@ -25211,17 +25211,58 @@ div.absol-descrip {
   background-color: #d3d3d3;
 }
 
-/* line 1742, ../../../scss/_app_styles.scss */
-div.absol-enroll {
-  position: absolute;
-  top: 190px;
-  right: 0;
-  width: 30%;
-  height: 160px;
-  background-color: #d3d3d3;
+/*overview-summary styling*/
+/* line 1743, ../../../scss/_app_styles.scss */
+div.course {
+  position: relative;
+  height: 300px;
+  border: 1px solid black;
+  background-color: #999999;
 }
 
-/* line 1750, ../../../scss/_app_styles.scss */
-.vertical-indent-enroll {
-  height: 60px;
+/* line 1749, ../../../scss/_app_styles.scss */
+div.course-contents {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+/* line 1754, ../../../scss/_app_styles.scss */
+.course-title, .course-date {
+  color: white;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+/* line 1759, ../../../scss/_app_styles.scss */
+.course-description {
+  color: #cccccc;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+/* line 1766, ../../../scss/_app_styles.scss */
+.course-para {
+  padding: 0;
+}
+
+/* line 1770, ../../../scss/_app_styles.scss */
+course-title {
+  padding-left: 10px;
+}
+
+/* line 1774, ../../../scss/_app_styles.scss */
+.tab-title a {
+  color: white !important;
+}
+
+/* line 1782, ../../../scss/_app_styles.scss */
+.enroll-status-margin {
+  margin-bottom: 0;
+}
+
+/* line 1786, ../../../scss/_app_styles.scss */
+.progress-summery {
+  color: white;
+  margin-top: 20px;
 }
