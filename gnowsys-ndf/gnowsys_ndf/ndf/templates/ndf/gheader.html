@@ -114,8 +114,8 @@
 
         <!-- Current group selector -->
         <li class="group">
-          <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
-            {{group_object.name|truncatechars:20}}
+          <a title="{{group_object.name|default:' -- '}}" class="active" href="/home/group">
+            <i class="fa fa-compass fa-2x"></i> {% trans 'Explore' %}
           </a>
           </li>
           </ul>
@@ -125,8 +125,8 @@
 
         <!-- Current group selector -->
         <li class="has-dropdown group">
-          <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
-            {{group_object.name|truncatechars:20}}
+          <a title="{{group_object.name|default:' -- '}}" class="active" href="/home/group">
+            <i class="fa fa-compass fa-2x"></i>{% trans 'Explore' %}
           </a>
           <!-- If logged in show user groups -->
           {% if user.is_authenticated %}
