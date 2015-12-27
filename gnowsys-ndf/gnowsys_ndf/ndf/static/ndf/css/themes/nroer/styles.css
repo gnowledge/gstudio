@@ -24701,8 +24701,394 @@ p {
 }
 
 /* End Simple Card CSS*/
+/* Horizontal Card */
+/* line 1263, ../../../scss/_app_styles.scss */
+.hr-card {
+  /*background: #F2F2F2;*/
+  border: 1px solid #AAA;
+  border-bottom: 3px solid #BBB;
+  padding: 0px;
+  margin: 5px;
+  overflow: hidden;
+  width: 100%;
+}
+/* line 1272, ../../../scss/_app_styles.scss */
+.hr-card:hover {
+  box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.5s ease;
+}
+/* line 1277, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-status {
+  z-index: 99;
+  width: auto;
+  top: 30px;
+  position: absolute;
+  background-color: #00b300;
+  color: white;
+}
+/* line 1290, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-title {
+  padding-top: 1em;
+  color: #0d0d0d;
+  font-weight: bold;
+  padding-left: 4px;
+}
+/* line 1299, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-desc {
+  word-wrap: break-word;
+  font-size: 0.7em;
+  color: #333333;
+  padding-left: 4px;
+}
+/* line 1305, ../../../scss/_app_styles.scss */
+.hr-card p {
+  margin: 0px;
+  padding: 10px;
+}
+/* line 1310, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image {
+  max-height: 12rem;
+  padding: 0px;
+  margin: 0px;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+  height: 10rem;
+}
+/* line 1321, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image img {
+  border-radius: 2px 2px 0 0;
+  display: block;
+  margin: 0 auto;
+  opacity: 0.9;
+  height: 100%;
+}
+/* line 1330, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i {
+  font-size: 7rem;
+  opacity: 0.75;
+  display: block;
+  margin: -15px auto;
+  text-align: center;
+  color: gray;
+  font-family: "foundation-icons";
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  text-decoration: inherit;
+}
+/* line 1344, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.file:before {
+  content: "\f18e";
+}
+/* line 1347, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.page:before {
+  content: "\f18e";
+}
+/* line 1350, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.collection:before {
+  content: "\f18a";
+}
+/* line 1353, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.documents:before {
+  content: "\f18b";
+}
+/* line 1356, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.pdf:before {
+  content: "\f18b";
+}
+/* line 1359, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.text:before {
+  content: "\f18e";
+}
+/* line 1362, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.interactives:before {
+  content: "\f1b2";
+}
+/* line 1365, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.ebooks:before {
+  content: "\f11e";
+}
+/* line 1368, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.images:before {
+  content: "\f125";
+}
+/* line 1371, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.audios:before, .hr-card .hr-card-image i.audio:before {
+  content: "\f17b";
+}
+/* line 1374, ../../../scss/_app_styles.scss */
+.hr-card .hr-card-image i.videos:before, .hr-card .hr-card-image i.video:before {
+  content: "\f20e";
+}
+/* line 1380, ../../../scss/_app_styles.scss */
+.hr-card .published.scard-action {
+  background: #A6D9CB;
+}
+/* line 1384, ../../../scss/_app_styles.scss */
+.hr-card .draft.scard-action {
+  content: "Draft";
+  background: #DCDCDC;
+}
+/* line 1390, ../../../scss/_app_styles.scss */
+.hr-card .deleted.scard-action {
+  border-color: transparent #f04124 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1395, ../../../scss/_app_styles.scss */
+.hr-card .moderation.scard-action {
+  border-color: transparent #03a9f4 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #03a9f4 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1399, ../../../scss/_app_styles.scss */
+.hr-card .moderation.scard-action .label-text:before {
+  content: "Mod";
+}
+/* line 1403, ../../../scss/_app_styles.scss */
+.hr-card .scard_footer {
+  border-top: 1px solid rgba(160, 160, 160, 0.2);
+  padding: 0.25rem 0.5rem;
+  color: gray;
+  font-size: small;
+  height: 2rem;
+}
+
+/* End Horizontal Card */
+/* Course/ Event Card CSS*/
+/* line 1422, ../../../scss/_app_styles.scss */
+.event-card {
+  border: 1px solid #AAA;
+  border-bottom: 3px solid #BBB;
+  padding: 0px;
+  margin: 5px;
+  overflow: hidden;
+  width: 100%;
+  height: 16rem;
+}
+/* line 1430, ../../../scss/_app_styles.scss */
+.event-card:hover {
+  box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.5s ease;
+}
+/* line 1435, ../../../scss/_app_styles.scss */
+.event-card .event-card-status.open {
+  z-index: 99;
+  width: auto;
+  top: 30px;
+  margin-left: -5px;
+  position: absolute;
+  display: inline-block;
+  background-color: #00b300;
+  color: white;
+}
+/* line 1449, ../../../scss/_app_styles.scss */
+.event-card .event-card-status.closed {
+  z-index: 99;
+  width: auto;
+  top: 30px;
+  margin-left: -5px;
+  position: absolute;
+  display: inline-block;
+  background-color: red;
+  color: white;
+}
+/* line 1460, ../../../scss/_app_styles.scss */
+.event-card .event-card-status.in-progress {
+  z-index: 99;
+  width: auto;
+  top: 30px;
+  margin-left: -5px;
+  position: absolute;
+  display: inline-block;
+  background-color: #00b300;
+  color: white;
+}
+/* line 1470, ../../../scss/_app_styles.scss */
+.event-card .event-card-status.forthcoming {
+  z-index: 99;
+  width: auto;
+  top: 30px;
+  margin-left: -5px;
+  position: absolute;
+  display: inline-block;
+  background-color: #F2910D;
+  color: white;
+}
+/* line 1481, ../../../scss/_app_styles.scss */
+.event-card .event-card-status.completed {
+  z-index: 99;
+  width: auto;
+  top: 30px;
+  margin-left: -5px;
+  position: absolute;
+  display: inline-block;
+  background-color: #4d4d4d;
+  color: white;
+}
+/* line 1491, ../../../scss/_app_styles.scss */
+.event-card .event-card-session-status.open {
+  color: #00b300;
+  padding-left: 4px;
+  font-size: 0.6em;
+}
+/* line 1497, ../../../scss/_app_styles.scss */
+.event-card .event-card-session-status.closed {
+  color: red;
+  padding-left: 4px;
+  font-size: 0.6em;
+}
+/* line 1503, ../../../scss/_app_styles.scss */
+.event-card .event-card-session-status.in-progress {
+  color: #00b300;
+  padding-left: 4px;
+  font-size: 0.6em;
+}
+/* line 1508, ../../../scss/_app_styles.scss */
+.event-card .event-card-session-status.forthcoming {
+  color: #F2910D;
+  padding-left: 4px;
+  font-size: 0.6em;
+}
+/* line 1514, ../../../scss/_app_styles.scss */
+.event-card .event-card-session-status.completed {
+  color: #4d4d4d;
+  padding-left: 4px;
+  font-size: 0.6em;
+}
+/* line 1519, ../../../scss/_app_styles.scss */
+.event-card .event-card-title {
+  padding-top: 1em;
+  color: #0d0d0d;
+  font-weight: bold;
+  font-size: 0.8em;
+  padding-left: 4px;
+}
+/* line 1528, ../../../scss/_app_styles.scss */
+.event-card .event-card-desc {
+  word-wrap: break-word;
+  font-size: 0.6em;
+  color: #333333;
+  padding-left: 4px;
+}
+/* line 1534, ../../../scss/_app_styles.scss */
+.event-card p {
+  margin: 0px;
+  padding: 10px;
+}
+/* line 1540, ../../../scss/_app_styles.scss */
+.event-card .event-card-image {
+  max-height: 12rem;
+  padding: 0px;
+  margin: 0px;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+  height: 10rem;
+  background-color: gray;
+}
+/* line 1550, ../../../scss/_app_styles.scss */
+.event-card .event-card-image img {
+  border-radius: 2px 2px 0 0;
+  display: block;
+  margin: 0 auto;
+  opacity: 0.9;
+  height: 100%;
+}
+/* line 1559, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i {
+  font-size: 7rem;
+  opacity: 0.75;
+  display: block;
+  margin: -15px auto;
+  text-align: center;
+  color: gray;
+  font-family: "foundation-icons";
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  text-decoration: inherit;
+}
+/* line 1573, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.file:before {
+  content: "\f18e";
+}
+/* line 1576, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.page:before {
+  content: "\f18e";
+}
+/* line 1579, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.collection:before {
+  content: "\f18a";
+}
+/* line 1582, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.documents:before {
+  content: "\f18b";
+}
+/* line 1585, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.pdf:before {
+  content: "\f18b";
+}
+/* line 1588, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.text:before {
+  content: "\f18e";
+}
+/* line 1591, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.interactives:before {
+  content: "\f1b2";
+}
+/* line 1594, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.ebooks:before {
+  content: "\f11e";
+}
+/* line 1597, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.images:before {
+  content: "\f125";
+}
+/* line 1600, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.audios:before, .event-card .event-card-image i.audio:before {
+  content: "\f17b";
+}
+/* line 1603, ../../../scss/_app_styles.scss */
+.event-card .event-card-image i.videos:before, .event-card .event-card-image i.video:before {
+  content: "\f20e";
+}
+/* line 1609, ../../../scss/_app_styles.scss */
+.event-card .published.scard-action {
+  background: #A6D9CB;
+}
+/* line 1613, ../../../scss/_app_styles.scss */
+.event-card .draft.scard-action {
+  content: "Draft";
+  background: #DCDCDC;
+}
+/* line 1619, ../../../scss/_app_styles.scss */
+.event-card .deleted.scard-action {
+  border-color: transparent #f04124 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1624, ../../../scss/_app_styles.scss */
+.event-card .moderation.scard-action {
+  border-color: transparent #03a9f4 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #03a9f4 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1628, ../../../scss/_app_styles.scss */
+.event-card .moderation.scard-action .label-text:before {
+  content: "Mod";
+}
+/* line 1632, ../../../scss/_app_styles.scss */
+.event-card .scard_footer {
+  border-top: 1px solid rgba(160, 160, 160, 0.2);
+  padding: 0.25rem 0.5rem;
+  color: gray;
+  font-size: small;
+  height: 2rem;
+}
+
+/* End Course/events Card CSS*/
 /* Customized Off-Canvas */
-/* line 1264, ../../../scss/_app_styles.scss */
+/* line 1652, ../../../scss/_app_styles.scss */
 #help-canvas-menu {
   position: fixed;
   top: 52px;
@@ -24715,26 +25101,26 @@ p {
   height: 100%;
 }
 
-/* line 1275, ../../../scss/_app_styles.scss */
+/* line 1663, ../../../scss/_app_styles.scss */
 #help-canvas-menu.expanded {
   left: 0 !important;
   z-index: 100000000;
   left: 150px;
 }
 
-/* line 1280, ../../../scss/_app_styles.scss */
+/* line 1668, ../../../scss/_app_styles.scss */
 #help-canvas-menu.expanded .help-button {
   right: 80px;
   z-index: -1;
 }
 
-/* line 1285, ../../../scss/_app_styles.scss */
+/* line 1673, ../../../scss/_app_styles.scss */
 #help-canvas-menu.animating .help-button {
   -webkit-animation: shake 400ms;
   animation: shake 400ms;
 }
 
-/* line 1289, ../../../scss/_app_styles.scss */
+/* line 1677, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button {
   position: absolute;
   -webkit-transform: rotate(-90deg);
@@ -24761,12 +25147,12 @@ p {
   border-top-right-radius: 5px;
 }
 
-/* line 1315, ../../../scss/_app_styles.scss */
+/* line 1703, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button-text {
   font-size: 18px;
 }
 
-/* line 1318, ../../../scss/_app_styles.scss */
+/* line 1706, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button .text {
   color: #f9f9f9;
   letter-spacing: .1em;
@@ -24775,7 +25161,7 @@ p {
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
-/* line 1327, ../../../scss/_app_styles.scss */
+/* line 1715, ../../../scss/_app_styles.scss */
 #help-canvas-menu .mainContainer {
   background: #fff;
   /*-webkit-box-shadow:3px 3px 17px -1px #7b7b7b;
@@ -24789,7 +25175,7 @@ p {
 }
 
 /* End of Customized Off-Canvas */
-/* line 1345, ../../../scss/_app_styles.scss */
+/* line 1733, ../../../scss/_app_styles.scss */
 .rcard {
   overflow: hidden;
   color: #272727;
@@ -24797,56 +25183,56 @@ p {
   background-color: #f5f5f5;
   margin: 5px;
 }
-/* line 1356, ../../../scss/_app_styles.scss */
+/* line 1744, ../../../scss/_app_styles.scss */
 .rcard:hover {
   box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.5s ease;
 }
-/* line 1361, ../../../scss/_app_styles.scss */
+/* line 1749, ../../../scss/_app_styles.scss */
 .rcard .title {
   font-size: 1.1rem;
   font-weight: bold;
 }
-/* line 1367, ../../../scss/_app_styles.scss */
+/* line 1755, ../../../scss/_app_styles.scss */
 .rcard .content {
   padding: 0.5rem 2rem;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
   height: 7.25rem;
 }
-/* line 1374, ../../../scss/_app_styles.scss */
+/* line 1762, ../../../scss/_app_styles.scss */
 .rcard .content .slick-slider {
   margin-bottom: 0;
 }
-/* line 1378, ../../../scss/_app_styles.scss */
+/* line 1766, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev {
   left: 0.25rem;
 }
-/* line 1381, ../../../scss/_app_styles.scss */
+/* line 1769, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev:before {
   color: #ccc;
 }
-/* line 1387, ../../../scss/_app_styles.scss */
+/* line 1775, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next {
   right: 0.25rem;
 }
-/* line 1390, ../../../scss/_app_styles.scss */
+/* line 1778, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next:before {
   color: #ccc;
 }
-/* line 1396, ../../../scss/_app_styles.scss */
+/* line 1784, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title {
   width: 100%;
   border-bottom: 1px solid #808080;
   line-height: 0.25em;
   margin: 10px 0 20px;
 }
-/* line 1402, ../../../scss/_app_styles.scss */
+/* line 1790, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title small {
   padding: 0 10px;
   background-color: #f5f5f5;
 }
-/* line 1409, ../../../scss/_app_styles.scss */
+/* line 1797, ../../../scss/_app_styles.scss */
 .rcard .action {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -24854,15 +25240,15 @@ p {
   font-size: small;
   height: 2rem;
 }
-/* line 1416, ../../../scss/_app_styles.scss */
+/* line 1804, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection {
   opacity: 0.5;
 }
-/* line 1419, ../../../scss/_app_styles.scss */
+/* line 1807, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection:hover {
   opacity: 1;
 }
-/* line 1433, ../../../scss/_app_styles.scss */
+/* line 1821, ../../../scss/_app_styles.scss */
 .rcard .image {
   position: relative;
   background-color: #ccc;
@@ -24870,7 +25256,7 @@ p {
   height: 8em;
   overflow: hidden;
 }
-/* line 1443, ../../../scss/_app_styles.scss */
+/* line 1831, ../../../scss/_app_styles.scss */
 .rcard .image .title {
   position: absolute;
   bottom: 0;
@@ -24883,7 +25269,7 @@ p {
   text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
   font-family: Open Sans Bold;
 }
-/* line 1456, ../../../scss/_app_styles.scss */
+/* line 1844, ../../../scss/_app_styles.scss */
 .rcard .image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -24893,14 +25279,14 @@ p {
   filter: brightness(0.75);
   -webkit-filter: brightness(0.75);
 }
-/* line 1468, ../../../scss/_app_styles.scss */
+/* line 1856, ../../../scss/_app_styles.scss */
 .rcard .image img:hover {
   filter: brightness(1);
   -webkit-filter: brightness(1);
   transform: translate3d(0, 0, 0);
   transition: all 1.5s ease;
 }
-/* line 1477, ../../../scss/_app_styles.scss */
+/* line 1865, ../../../scss/_app_styles.scss */
 .rcard .image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -24914,51 +25300,51 @@ p {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1494, ../../../scss/_app_styles.scss */
+/* line 1882, ../../../scss/_app_styles.scss */
 .rcard .image i.file:before {
   content: "\f18e";
 }
-/* line 1495, ../../../scss/_app_styles.scss */
+/* line 1883, ../../../scss/_app_styles.scss */
 .rcard .image i.page:before {
   content: "\f18e";
 }
-/* line 1496, ../../../scss/_app_styles.scss */
+/* line 1884, ../../../scss/_app_styles.scss */
 .rcard .image i.collection:before {
   content: "\f18a";
 }
-/* line 1498, ../../../scss/_app_styles.scss */
+/* line 1886, ../../../scss/_app_styles.scss */
 .rcard .image i.documents:before {
   content: "\f18b";
 }
-/* line 1499, ../../../scss/_app_styles.scss */
+/* line 1887, ../../../scss/_app_styles.scss */
 .rcard .image i.pdf:before {
   content: "\f18b";
 }
-/* line 1500, ../../../scss/_app_styles.scss */
+/* line 1888, ../../../scss/_app_styles.scss */
 .rcard .image i.text:before {
   content: "\f18e";
 }
-/* line 1501, ../../../scss/_app_styles.scss */
+/* line 1889, ../../../scss/_app_styles.scss */
 .rcard .image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1502, ../../../scss/_app_styles.scss */
+/* line 1890, ../../../scss/_app_styles.scss */
 .rcard .image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1503, ../../../scss/_app_styles.scss */
+/* line 1891, ../../../scss/_app_styles.scss */
 .rcard .image i.images:before {
   content: "\f125";
 }
-/* line 1504, ../../../scss/_app_styles.scss */
+/* line 1892, ../../../scss/_app_styles.scss */
 .rcard .image i.audios:before, .rcard .image i.audio:before {
   content: "\f17b";
 }
-/* line 1505, ../../../scss/_app_styles.scss */
+/* line 1893, ../../../scss/_app_styles.scss */
 .rcard .image i.videos:before, .rcard .image i.video:before {
   content: "\f20e";
 }
-/* line 1508, ../../../scss/_app_styles.scss */
+/* line 1896, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-style: solid;
   border-width: 0 70px 40px 0;
@@ -24971,59 +25357,59 @@ p {
   z-index: 1;
   opacity: 0.75;
 }
-/* line 1521, ../../../scss/_app_styles.scss */
+/* line 1909, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-color: transparent #333 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #333 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1526, ../../../scss/_app_styles.scss */
+/* line 1914, ../../../scss/_app_styles.scss */
 .rcard .published.card-label {
   border-color: transparent #43AC6A transparent transparent;
   border-color: rgba(255, 255, 255, 0) #43AC6A rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1530, ../../../scss/_app_styles.scss */
+/* line 1918, ../../../scss/_app_styles.scss */
 .rcard .published.card-label .label-text:before {
   content: "\221A";
   margin-left: 5px;
   font-size: larger;
 }
-/* line 1538, ../../../scss/_app_styles.scss */
+/* line 1926, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label {
   border-color: transparent #beccd2 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #beccd2 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1542, ../../../scss/_app_styles.scss */
+/* line 1930, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label .label-text:before {
   content: "Draft";
 }
-/* line 1547, ../../../scss/_app_styles.scss */
+/* line 1935, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1551, ../../../scss/_app_styles.scss */
+/* line 1939, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label .label-text:before {
   content: "Deleted";
 }
-/* line 1556, ../../../scss/_app_styles.scss */
+/* line 1944, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label {
   border-color: transparent #03a9f4 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #03a9f4 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1560, ../../../scss/_app_styles.scss */
+/* line 1948, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label .label-text:before {
   content: "Mod";
 }
-/* line 1563, ../../../scss/_app_styles.scss */
+/* line 1951, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label {
   border-color: transparent #000 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #000 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1567, ../../../scss/_app_styles.scss */
+/* line 1955, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label .label-text:before {
   content: "hidden";
 }
-/* line 1570, ../../../scss/_app_styles.scss */
+/* line 1958, ../../../scss/_app_styles.scss */
 .rcard .label-text {
   color: #fff;
   font-size: 0.75rem;
@@ -25034,7 +25420,7 @@ p {
   transform: rotate(30deg);
 }
 
-/* line 1584, ../../../scss/_app_styles.scss */
+/* line 1972, ../../../scss/_app_styles.scss */
 .compulsory:after {
   content: '*';
   color: red;
@@ -25042,19 +25428,19 @@ p {
 }
 
 /* Watermark background for node_ajax_content  */
-/* line 1592, ../../../scss/_app_styles.scss */
+/* line 1980, ../../../scss/_app_styles.scss */
 .allow.draft {
   background-size: 10%;
   background-repeat: repeat;
   background-image: url("/static/ndf/images/draft-watermark.png");
 }
 
-/* line 1600, ../../../scss/_app_styles.scss */
+/* line 1988, ../../../scss/_app_styles.scss */
 .text-gray {
   color: gray;
 }
 
-/* line 1605, ../../../scss/_app_styles.scss */
+/* line 1993, ../../../scss/_app_styles.scss */
 .repository-title {
   color: #D7D7D7;
   font-size: 1.1em;
@@ -25067,7 +25453,7 @@ p {
   text-align: center;
 }
 
-/* line 1616, ../../../scss/_app_styles.scss */
+/* line 2004, ../../../scss/_app_styles.scss */
 .repository-desc {
   font-size: 1.1em;
   width: auto;
@@ -25079,12 +25465,12 @@ p {
   margin-left: 4px;
 }
 
-/* line 1626, ../../../scss/_app_styles.scss */
+/* line 2014, ../../../scss/_app_styles.scss */
 .card-holder {
   padding-left: 2%;
 }
 
-/* line 1630, ../../../scss/_app_styles.scss */
+/* line 2018, ../../../scss/_app_styles.scss */
 .app-card {
   width: 19rem;
   min-height: 10rem;
@@ -25097,7 +25483,7 @@ p {
   border: thin solid #D3D3D3;
 }
 
-/* line 1642, ../../../scss/_app_styles.scss */
+/* line 2030, ../../../scss/_app_styles.scss */
 .app-card:hover {
   box-shadow: 0px 0px 15px #808080;
   border: thin solid #D3D3D3;
@@ -25105,26 +25491,26 @@ p {
   transition: all 0.6s ease 0s;
 }
 
-/* line 1649, ../../../scss/_app_styles.scss */
+/* line 2037, ../../../scss/_app_styles.scss */
 .app-card-icon {
   color: #4c4c4c;
   position: relative;
   font-size: 6em;
 }
 
-/* line 1656, ../../../scss/_app_styles.scss */
+/* line 2044, ../../../scss/_app_styles.scss */
 .app-card-title {
   padding-bottom: -1em;
 }
 
-/* line 1660, ../../../scss/_app_styles.scss */
+/* line 2048, ../../../scss/_app_styles.scss */
 .app-card-content {
   color: #4c4c4c;
   text-align: center;
   margin-top: 0.5cm;
 }
 
-/* line 1666, ../../../scss/_app_styles.scss */
+/* line 2054, ../../../scss/_app_styles.scss */
 .discussion-title-username {
   background-color: #3e3e3e;
   color: #ececec !important;
@@ -25139,7 +25525,7 @@ p {
   padding-left: 10px;
 }
 
-/* line 1680, ../../../scss/_app_styles.scss */
+/* line 2068, ../../../scss/_app_styles.scss */
 .discussion-footer {
   background-color: #CCCCCC;
   color: gray !important;
@@ -25153,13 +25539,13 @@ p {
   padding-left: 10px;
 }
 
-/* line 1696, ../../../scss/_app_styles.scss */
+/* line 2084, ../../../scss/_app_styles.scss */
 .discussion-content {
   color: #262626;
   word-wrap: break-word;
 }
 
-/* line 1701, ../../../scss/_app_styles.scss */
+/* line 2089, ../../../scss/_app_styles.scss */
 .fullscreen-icon {
   display: none;
 }
