@@ -5,47 +5,48 @@
 {% get_node_type node as node_type %}  
 
 <style type="text/css">
-	.accordion-navigation > a:before {
-		content: "◂";
-		padding-left: 5px;
-		float: right;
-		font-size: 20px;
-	}
-	.accordion-navigation.active > a:before {
-		content: "▾";
-	}
+  .accordion-navigation > a:before {
+    content: "◂";
+    padding-left: 5px;
+    float: right;
+    font-size: 20px;
+  }
+  .accordion-navigation.active > a:before {
+    content: "▾";
+  }
 
-	.content-wide {
-		padding: 0 !important;
-	}
+  .content-wide {
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+  }
 
-	.accordion-resources {
-		font-size: x-small;
-	}
+  .accordion-resources {
+    font-size: x-small;
+  }
 
-	.accordion-unit-name {
-		font-size: normal;
-		padding-top: 10px;
-	}
+  .accordion-unit-name {
+    font-size: normal;
+    padding-top: 10px;
+  }
 
-	.accordion-sub-section-name {
-		background-color: transparent !important;
-		font-weight: 100;
-	}
+  .accordion-sub-section-name {
+    background-color: transparent !important;
+    font-weight: 100;
+  }
 
-	.accordion-sub-section {
-		list-style: none;
-	}
+  .accordion-sub-section {
+    list-style: none;
+  }
 
-	.accordion-section-name {
-		font-size: xx-large;
-		font-weight: thin;
-	}
+  .accordion-section-name {
+    font-size: xx-large;
+    font-weight: thin;
+  }
 </style>
 
 <dl class="accordion" data-accordion>
-	{% for section in course_collection_data %}
-	  {% if section.node_type == 'CourseSectionEvent' %}
+  {% for section in course_collection_data %}
+    {% if section.node_type == 'CourseSectionEvent' %}
       <!-- sections -->
       <dd class="accordion-navigation">
         <a href="#s{{section.id}}" class="accordion-section-name">{{section.name}} <span class="right">{{section.children|length}}</span></a>
@@ -54,10 +55,10 @@
           {% for sub_section in section.children %}
             {% if sub_section.node_type == 'CourseSubSectionEvent' %}
             <dd class="accordion-navigation">
-            	<a href="#ss{{sub_section.id}}" class="accordion-sub-section-name">
-	            	<i class="fa fa-check-circle-o fa-lg"></i> {{sub_section.name}} 
-	            	<span class="right">{{sub_section.children|length}}</span>
-            	</a>
+              <a href="#ss{{sub_section.id}}" class="accordion-sub-section-name">
+                <i class="fa fa-check-circle-o fa-lg"></i> {{sub_section.name}} 
+                <span class="right">{{sub_section.children|length}}</span>
+              </a>
             
               <ul id="ss{{sub_section.id}}" class="accordion-sub-section content">
               <!-- units -->
@@ -83,8 +84,8 @@
           <!-- sub sections end -->
         </dl>
       </dd>
-	  {% endif %}
-	{% endfor %}
+    {% endif %}
+  {% endfor %}
 </dl>
 <!-- sections end -->
 
