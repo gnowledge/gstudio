@@ -110,7 +110,9 @@ $(document).ready(function() {
   var selected = window.location.search.match(/selected=\w+/);
   if (selected) {
     var unit_id = selected[0].replace(/selected=/, '');
-    triggerOnChildOfParent($('a[id="' + unit_id + '"]'), 'click', 'a:first-child', '.accordion-navigation');
+    var unit = $('a[id="' + unit_id + '"]');
+    unit.trigger('click');
+    triggerOnChildOfParent(unit, 'click', 'a:first-child', '.accordion-navigation');
   }
 });
 
