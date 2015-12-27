@@ -130,66 +130,72 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         question_content = question_content[:4]
         question_content = ' '.join(question_content)
         quiz_item_node.name = unicode(question_content)
-        quiz_item_node.save(is_changed=get_node_common_fields(request, quiz_item_node, group_id, gst_quiz_item),groupid=group_id)
+        quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
+        options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
+        correct_answer_AT = node_collection.one({'_type': "AttributeType", 'name': "correct_answer"})
+
+        quizitem_show_correct_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_show_correct_ans"})
+        quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
+        quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
+        
 
         quiz_node_id = request.POST.get('quiz_node_id','')
+        maximum_attempts_val = request.POST.get('maximum_attempts','1')
+        problem_weight_val = request.POST.get('problem_weight','1')
+        show_correct_ans_val = request.POST.get('show_correct_ans','False')
+        # print "\n\n maximum_attempts",maximum_attempts_val
+        # print "\n problem_weight",problem_weight_val
+        # print "\n show_correct_ans",show_correct_ans_val
+
+        quiz_item_node.save(is_changed=get_node_common_fields(request, quiz_item_node, group_id, gst_quiz_item),groupid=group_id)
         if quiz_node_id:
             quiz_node = node_collection.one({'_id': ObjectId(quiz_node_id)})
         quiz_type = request.POST.get('quiz_type_val','')
-        quiz_item_node['quiz_type'] = unicode(quiz_type)
 
-        # question = request.POST.get('question','')
-        # quiz_item_node.content_org = unicode(question)
-        # Required to link temporary files with the current user who is modifying this document
+        # create gattribute quiz_type,options, correct_answer
+        # quiz_item_node['quiz_type'] = unicode(quiz_type)
+        create_gattribute(quiz_item_node._id, quizitem_max_attempts_AT, int(maximum_attempts_val))
+        create_gattribute(quiz_item_node._id, quizitem_problem_weight_AT, float(problem_weight_val))
+        create_gattribute(quiz_item_node._id, quizitem_show_correct_ans_AT, eval(show_correct_ans_val))
+        create_gattribute(quiz_item_node._id, quiz_type_AT, unicode(quiz_type))
 
-        # Required to link temporary files with the current user who is
-        # modifying this document
-        # filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-        # quiz_item_node.content = unicode(org2html(content_org, file_prefix=filename))
 
-        # print "\n\n content from html---", question
-        # print "\n\n content---\n", quiz_item_node.content
         # If "quiz_type" is either 'Single-Choice' or 'Multiple-Choice', then only extract options
         options = []
         if quiz_type != QUIZ_TYPE_CHOICES[0]:
             no_of_options = int(request.POST.get('no_of_options',''))
-            quiz_item_node['options'] = []
+            # quiz_item_node['options'] = []
             # print "\n\n no_of_options",no_of_options
             i = 1
             while i <= no_of_options:
                 options.append(request.POST.get("option" if i == 1 else "option_"+str(i)))
                 i = i + 1
-            quiz_item_node['options'] = options
+
+            # quiz_item_node['options'] = options
+            create_gattribute(quiz_item_node._id, options_AT, options)
 
         # Extracting correct-answer, depending upon 'Multiple-Choice' / 'Single-Choice' 
         qt_initial = quiz_type[:quiz_type.find("-")].lower()
-        quiz_item_node['correct_answer'] = []
+        # quiz_item_node['correct_answer'] = []
         if quiz_type == QUIZ_TYPE_CHOICES[2]:
             correct_answer = request.POST.getlist('correct_answer_' + qt_initial)
-            quiz_item_node['correct_answer'] = correct_answer
+            # quiz_item_node['correct_answer'] = correct_answer
         else:
             correct_answer = request.POST.get('correct_answer_' + qt_initial)
-            quiz_item_node['correct_answer'].append(correct_answer)
+            # quiz_item_node['correct_answer'].append(correct_answer)
+        create_gattribute(quiz_item_node._id, options_AT, correct_answer)
+        quiz_item_node.reload()
+        quiz_item_node.status = u"PUBLISHED"
 
-        # tags = request.POST.get('tags','')
-        # if tags:
-        #     quiz_item_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
-        
         quiz_item_node.save(groupid=group_id)
-
         if quiz_node:
             quiz_node.collection_set.append(quiz_item_node._id)
             quiz_node.save(groupid=group_id)
-	
-        # assesses_list = request.POST.get('assesses_list','') 	
-        # if assesses_list !='':
-        #     assesses_list=assesses_list.split(",")
-        # create_grelation_list(quiz_item_node._id,"assesses",assesses_list)
         return HttpResponseRedirect(reverse('quiz', kwargs={'group_id': group_id}))
-        
     else:
         if node_id:
             if quiz_item_node:
+                quiz_item_node.get_neighbourhood(quiz_item_node.member_of)
                 context_variables['node'] = quiz_item_node
             context_variables['groupid'] = group_id
             context_variables['group_id'] = group_id
