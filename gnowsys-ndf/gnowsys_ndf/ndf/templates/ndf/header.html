@@ -69,12 +69,12 @@
             {% for menuk, menuv in each_menu.items %}
 
             <li class="has-dropdown">
-	      
+        
               <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
-              	 href="{% url 'nroer_groups' 'home' menuk %}" 
+                 href="{% url 'nroer_groups' 'home' menuk %}" 
               > {% trans menuk %} </a>
               <ul class="dropdown">
-	
+  
                 {% for each_sub_menu in menuv %}
                 <li>
                   <a 
@@ -87,7 +87,7 @@
                           class="active" 
                         {% endif %}
                       {% endif %}
-          		      {% endif %}
+                    {% endif %}
 
                     {% if each_sub_menu == mapk %}
                       href="{% url 'partnerlist' mapv %}"
