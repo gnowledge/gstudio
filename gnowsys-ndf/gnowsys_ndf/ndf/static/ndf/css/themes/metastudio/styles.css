@@ -24669,7 +24669,6 @@ p {
   display: block;
   margin: 0 auto;
   opacity: 0.9;
-  width: 100%;
   height: 100%;
 }
 /* line 1330, ../../../scss/_app_styles.scss */
@@ -24781,7 +24780,7 @@ p {
   transition: box-shadow 0.5s ease;
 }
 /* line 1436, ../../../scss/_app_styles.scss */
-.event-card .event-card-status.closed {
+.event-card .event-card-status.open {
   z-index: 99;
   width: auto;
   top: 30px;
@@ -24792,6 +24791,28 @@ p {
   color: white;
 }
 /* line 1450, ../../../scss/_app_styles.scss */
+.event-card .event-card-status.closed {
+  z-index: 99;
+  width: auto;
+  top: 30px;
+  margin-left: -5px;
+  position: absolute;
+  display: inline-block;
+  background-color: red;
+  color: white;
+}
+/* line 1464, ../../../scss/_app_styles.scss */
+.event-card .event-card-status.in-progress {
+  z-index: 99;
+  width: auto;
+  top: 30px;
+  margin-left: -5px;
+  position: absolute;
+  display: inline-block;
+  background-color: #00b300;
+  color: white;
+}
+/* line 1477, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.upcoming {
   z-index: 99;
   width: auto;
@@ -24802,7 +24823,7 @@ p {
   background-color: #F2910D;
   color: white;
 }
-/* line 1464, ../../../scss/_app_styles.scss */
+/* line 1491, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.completed {
   z-index: 99;
   width: auto;
@@ -24813,26 +24834,26 @@ p {
   background-color: #4d4d4d;
   color: white;
 }
-/* line 1477, ../../../scss/_app_styles.scss */
+/* line 1504, ../../../scss/_app_styles.scss */
 .event-card .event-card-title {
   padding-top: 1em;
   color: #0d0d0d;
   font-weight: bold;
   padding-left: 4px;
 }
-/* line 1486, ../../../scss/_app_styles.scss */
+/* line 1513, ../../../scss/_app_styles.scss */
 .event-card .event-card-desc {
   word-wrap: break-word;
   font-size: 0.7em;
   color: #333333;
   padding-left: 4px;
 }
-/* line 1492, ../../../scss/_app_styles.scss */
+/* line 1519, ../../../scss/_app_styles.scss */
 .event-card p {
   margin: 0px;
   padding: 10px;
 }
-/* line 1497, ../../../scss/_app_styles.scss */
+/* line 1524, ../../../scss/_app_styles.scss */
 .event-card .event-card-image {
   max-height: 12rem;
   padding: 0px;
@@ -24843,7 +24864,7 @@ p {
   overflow: hidden;
   height: 10rem;
 }
-/* line 1508, ../../../scss/_app_styles.scss */
+/* line 1535, ../../../scss/_app_styles.scss */
 .event-card .event-card-image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -24852,7 +24873,7 @@ p {
   width: 100%;
   height: 100%;
 }
-/* line 1517, ../../../scss/_app_styles.scss */
+/* line 1544, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -24866,74 +24887,74 @@ p {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1531, ../../../scss/_app_styles.scss */
+/* line 1558, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.file:before {
   content: "\f18e";
 }
-/* line 1534, ../../../scss/_app_styles.scss */
+/* line 1561, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.page:before {
   content: "\f18e";
 }
-/* line 1537, ../../../scss/_app_styles.scss */
+/* line 1564, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.collection:before {
   content: "\f18a";
 }
-/* line 1540, ../../../scss/_app_styles.scss */
+/* line 1567, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.documents:before {
   content: "\f18b";
 }
-/* line 1543, ../../../scss/_app_styles.scss */
+/* line 1570, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.pdf:before {
   content: "\f18b";
 }
-/* line 1546, ../../../scss/_app_styles.scss */
+/* line 1573, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.text:before {
   content: "\f18e";
 }
-/* line 1549, ../../../scss/_app_styles.scss */
+/* line 1576, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1552, ../../../scss/_app_styles.scss */
+/* line 1579, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1555, ../../../scss/_app_styles.scss */
+/* line 1582, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.images:before {
   content: "\f125";
 }
-/* line 1558, ../../../scss/_app_styles.scss */
+/* line 1585, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.audios:before, .event-card .event-card-image i.audio:before {
   content: "\f17b";
 }
-/* line 1561, ../../../scss/_app_styles.scss */
+/* line 1588, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.videos:before, .event-card .event-card-image i.video:before {
   content: "\f20e";
 }
-/* line 1567, ../../../scss/_app_styles.scss */
+/* line 1594, ../../../scss/_app_styles.scss */
 .event-card .published.scard-action {
   background: #A6D9CB;
 }
-/* line 1571, ../../../scss/_app_styles.scss */
+/* line 1598, ../../../scss/_app_styles.scss */
 .event-card .draft.scard-action {
   content: "Draft";
   background: #DCDCDC;
 }
-/* line 1577, ../../../scss/_app_styles.scss */
+/* line 1604, ../../../scss/_app_styles.scss */
 .event-card .deleted.scard-action {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1582, ../../../scss/_app_styles.scss */
+/* line 1609, ../../../scss/_app_styles.scss */
 .event-card .moderation.scard-action {
   border-color: transparent #0eacb5 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #0eacb5 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1586, ../../../scss/_app_styles.scss */
+/* line 1613, ../../../scss/_app_styles.scss */
 .event-card .moderation.scard-action .label-text:before {
   content: "Mod";
 }
-/* line 1590, ../../../scss/_app_styles.scss */
+/* line 1617, ../../../scss/_app_styles.scss */
 .event-card .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -24944,7 +24965,7 @@ p {
 
 /* End Course/events Card CSS*/
 /* Customized Off-Canvas */
-/* line 1610, ../../../scss/_app_styles.scss */
+/* line 1637, ../../../scss/_app_styles.scss */
 #help-canvas-menu {
   position: fixed;
   top: 52px;
@@ -24957,26 +24978,26 @@ p {
   height: 100%;
 }
 
-/* line 1621, ../../../scss/_app_styles.scss */
+/* line 1648, ../../../scss/_app_styles.scss */
 #help-canvas-menu.expanded {
   left: 0 !important;
   z-index: 100000000;
   left: 150px;
 }
 
-/* line 1626, ../../../scss/_app_styles.scss */
+/* line 1653, ../../../scss/_app_styles.scss */
 #help-canvas-menu.expanded .help-button {
   right: 80px;
   z-index: -1;
 }
 
-/* line 1631, ../../../scss/_app_styles.scss */
+/* line 1658, ../../../scss/_app_styles.scss */
 #help-canvas-menu.animating .help-button {
   -webkit-animation: shake 400ms;
   animation: shake 400ms;
 }
 
-/* line 1635, ../../../scss/_app_styles.scss */
+/* line 1662, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button {
   position: absolute;
   -webkit-transform: rotate(-90deg);
@@ -25003,12 +25024,12 @@ p {
   border-top-right-radius: 5px;
 }
 
-/* line 1661, ../../../scss/_app_styles.scss */
+/* line 1688, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button-text {
   font-size: 18px;
 }
 
-/* line 1664, ../../../scss/_app_styles.scss */
+/* line 1691, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button .text {
   color: #f9f9f9;
   letter-spacing: .1em;
@@ -25017,7 +25038,7 @@ p {
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
-/* line 1673, ../../../scss/_app_styles.scss */
+/* line 1700, ../../../scss/_app_styles.scss */
 #help-canvas-menu .mainContainer {
   background: #fff;
   /*-webkit-box-shadow:3px 3px 17px -1px #7b7b7b;
@@ -25031,7 +25052,7 @@ p {
 }
 
 /* End of Customized Off-Canvas */
-/* line 1691, ../../../scss/_app_styles.scss */
+/* line 1718, ../../../scss/_app_styles.scss */
 .rcard {
   overflow: hidden;
   color: #272727;
@@ -25039,56 +25060,56 @@ p {
   background-color: #f5f5f5;
   margin: 5px;
 }
-/* line 1702, ../../../scss/_app_styles.scss */
+/* line 1729, ../../../scss/_app_styles.scss */
 .rcard:hover {
   box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.5s ease;
 }
-/* line 1707, ../../../scss/_app_styles.scss */
+/* line 1734, ../../../scss/_app_styles.scss */
 .rcard .title {
   font-size: 1.1rem;
   font-weight: bold;
 }
-/* line 1713, ../../../scss/_app_styles.scss */
+/* line 1740, ../../../scss/_app_styles.scss */
 .rcard .content {
   padding: 0.5rem 2rem;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
   height: 7.25rem;
 }
-/* line 1720, ../../../scss/_app_styles.scss */
+/* line 1747, ../../../scss/_app_styles.scss */
 .rcard .content .slick-slider {
   margin-bottom: 0;
 }
-/* line 1724, ../../../scss/_app_styles.scss */
+/* line 1751, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev {
   left: 0.25rem;
 }
-/* line 1727, ../../../scss/_app_styles.scss */
+/* line 1754, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev:before {
   color: #ccc;
 }
-/* line 1733, ../../../scss/_app_styles.scss */
+/* line 1760, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next {
   right: 0.25rem;
 }
-/* line 1736, ../../../scss/_app_styles.scss */
+/* line 1763, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next:before {
   color: #ccc;
 }
-/* line 1742, ../../../scss/_app_styles.scss */
+/* line 1769, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title {
   width: 100%;
   border-bottom: 1px solid #808080;
   line-height: 0.25em;
   margin: 10px 0 20px;
 }
-/* line 1748, ../../../scss/_app_styles.scss */
+/* line 1775, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title small {
   padding: 0 10px;
   background-color: #f5f5f5;
 }
-/* line 1755, ../../../scss/_app_styles.scss */
+/* line 1782, ../../../scss/_app_styles.scss */
 .rcard .action {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -25096,15 +25117,15 @@ p {
   font-size: small;
   height: 2rem;
 }
-/* line 1762, ../../../scss/_app_styles.scss */
+/* line 1789, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection {
   opacity: 0.5;
 }
-/* line 1765, ../../../scss/_app_styles.scss */
+/* line 1792, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection:hover {
   opacity: 1;
 }
-/* line 1779, ../../../scss/_app_styles.scss */
+/* line 1806, ../../../scss/_app_styles.scss */
 .rcard .image {
   position: relative;
   background-color: #ccc;
@@ -25112,7 +25133,7 @@ p {
   height: 8em;
   overflow: hidden;
 }
-/* line 1789, ../../../scss/_app_styles.scss */
+/* line 1816, ../../../scss/_app_styles.scss */
 .rcard .image .title {
   position: absolute;
   bottom: 0;
@@ -25125,7 +25146,7 @@ p {
   text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
   font-family: Open Sans Bold;
 }
-/* line 1802, ../../../scss/_app_styles.scss */
+/* line 1829, ../../../scss/_app_styles.scss */
 .rcard .image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -25135,14 +25156,14 @@ p {
   filter: brightness(0.75);
   -webkit-filter: brightness(0.75);
 }
-/* line 1814, ../../../scss/_app_styles.scss */
+/* line 1841, ../../../scss/_app_styles.scss */
 .rcard .image img:hover {
   filter: brightness(1);
   -webkit-filter: brightness(1);
   transform: translate3d(0, 0, 0);
   transition: all 1.5s ease;
 }
-/* line 1823, ../../../scss/_app_styles.scss */
+/* line 1850, ../../../scss/_app_styles.scss */
 .rcard .image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -25156,51 +25177,51 @@ p {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1840, ../../../scss/_app_styles.scss */
+/* line 1867, ../../../scss/_app_styles.scss */
 .rcard .image i.file:before {
   content: "\f18e";
 }
-/* line 1841, ../../../scss/_app_styles.scss */
+/* line 1868, ../../../scss/_app_styles.scss */
 .rcard .image i.page:before {
   content: "\f18e";
 }
-/* line 1842, ../../../scss/_app_styles.scss */
+/* line 1869, ../../../scss/_app_styles.scss */
 .rcard .image i.collection:before {
   content: "\f18a";
 }
-/* line 1844, ../../../scss/_app_styles.scss */
+/* line 1871, ../../../scss/_app_styles.scss */
 .rcard .image i.documents:before {
   content: "\f18b";
 }
-/* line 1845, ../../../scss/_app_styles.scss */
+/* line 1872, ../../../scss/_app_styles.scss */
 .rcard .image i.pdf:before {
   content: "\f18b";
 }
-/* line 1846, ../../../scss/_app_styles.scss */
+/* line 1873, ../../../scss/_app_styles.scss */
 .rcard .image i.text:before {
   content: "\f18e";
 }
-/* line 1847, ../../../scss/_app_styles.scss */
+/* line 1874, ../../../scss/_app_styles.scss */
 .rcard .image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1848, ../../../scss/_app_styles.scss */
+/* line 1875, ../../../scss/_app_styles.scss */
 .rcard .image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1849, ../../../scss/_app_styles.scss */
+/* line 1876, ../../../scss/_app_styles.scss */
 .rcard .image i.images:before {
   content: "\f125";
 }
-/* line 1850, ../../../scss/_app_styles.scss */
+/* line 1877, ../../../scss/_app_styles.scss */
 .rcard .image i.audios:before, .rcard .image i.audio:before {
   content: "\f17b";
 }
-/* line 1851, ../../../scss/_app_styles.scss */
+/* line 1878, ../../../scss/_app_styles.scss */
 .rcard .image i.videos:before, .rcard .image i.video:before {
   content: "\f20e";
 }
-/* line 1854, ../../../scss/_app_styles.scss */
+/* line 1881, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-style: solid;
   border-width: 0 70px 40px 0;
@@ -25213,59 +25234,59 @@ p {
   z-index: 1;
   opacity: 0.75;
 }
-/* line 1867, ../../../scss/_app_styles.scss */
+/* line 1894, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-color: transparent #333 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #333 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1872, ../../../scss/_app_styles.scss */
+/* line 1899, ../../../scss/_app_styles.scss */
 .rcard .published.card-label {
   border-color: transparent #43AC6A transparent transparent;
   border-color: rgba(255, 255, 255, 0) #43AC6A rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1876, ../../../scss/_app_styles.scss */
+/* line 1903, ../../../scss/_app_styles.scss */
 .rcard .published.card-label .label-text:before {
   content: "\221A";
   margin-left: 5px;
   font-size: larger;
 }
-/* line 1884, ../../../scss/_app_styles.scss */
+/* line 1911, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label {
   border-color: transparent #a9b2b3 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #a9b2b3 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1888, ../../../scss/_app_styles.scss */
+/* line 1915, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label .label-text:before {
   content: "Draft";
 }
-/* line 1893, ../../../scss/_app_styles.scss */
+/* line 1920, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1897, ../../../scss/_app_styles.scss */
+/* line 1924, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label .label-text:before {
   content: "Deleted";
 }
-/* line 1902, ../../../scss/_app_styles.scss */
+/* line 1929, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label {
   border-color: transparent #0eacb5 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #0eacb5 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1906, ../../../scss/_app_styles.scss */
+/* line 1933, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label .label-text:before {
   content: "Mod";
 }
-/* line 1909, ../../../scss/_app_styles.scss */
+/* line 1936, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label {
   border-color: transparent #000 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #000 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1913, ../../../scss/_app_styles.scss */
+/* line 1940, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label .label-text:before {
   content: "hidden";
 }
-/* line 1916, ../../../scss/_app_styles.scss */
+/* line 1943, ../../../scss/_app_styles.scss */
 .rcard .label-text {
   color: #fff;
   font-size: 0.75rem;
@@ -25276,7 +25297,7 @@ p {
   transform: rotate(30deg);
 }
 
-/* line 1930, ../../../scss/_app_styles.scss */
+/* line 1957, ../../../scss/_app_styles.scss */
 .compulsory:after {
   content: '*';
   color: red;
@@ -25284,19 +25305,19 @@ p {
 }
 
 /* Watermark background for node_ajax_content  */
-/* line 1938, ../../../scss/_app_styles.scss */
+/* line 1965, ../../../scss/_app_styles.scss */
 .allow.draft {
   background-size: 10%;
   background-repeat: repeat;
   background-image: url("/static/ndf/images/draft-watermark.png");
 }
 
-/* line 1946, ../../../scss/_app_styles.scss */
+/* line 1973, ../../../scss/_app_styles.scss */
 .text-gray {
   color: gray;
 }
 
-/* line 1951, ../../../scss/_app_styles.scss */
+/* line 1978, ../../../scss/_app_styles.scss */
 .repository-title {
   color: #D7D7D7;
   font-size: 1.1em;
@@ -25309,7 +25330,7 @@ p {
   text-align: center;
 }
 
-/* line 1962, ../../../scss/_app_styles.scss */
+/* line 1989, ../../../scss/_app_styles.scss */
 .repository-desc {
   font-size: 1.1em;
   width: auto;
@@ -25321,12 +25342,12 @@ p {
   margin-left: 4px;
 }
 
-/* line 1972, ../../../scss/_app_styles.scss */
+/* line 1999, ../../../scss/_app_styles.scss */
 .card-holder {
   padding-left: 2%;
 }
 
-/* line 1976, ../../../scss/_app_styles.scss */
+/* line 2003, ../../../scss/_app_styles.scss */
 .app-card {
   width: 19rem;
   min-height: 10rem;
@@ -25339,7 +25360,7 @@ p {
   border: thin solid #D3D3D3;
 }
 
-/* line 1988, ../../../scss/_app_styles.scss */
+/* line 2015, ../../../scss/_app_styles.scss */
 .app-card:hover {
   box-shadow: 0px 0px 15px #808080;
   border: thin solid #D3D3D3;
@@ -25347,26 +25368,26 @@ p {
   transition: all 0.6s ease 0s;
 }
 
-/* line 1995, ../../../scss/_app_styles.scss */
+/* line 2022, ../../../scss/_app_styles.scss */
 .app-card-icon {
   color: #4c4c4c;
   position: relative;
   font-size: 6em;
 }
 
-/* line 2002, ../../../scss/_app_styles.scss */
+/* line 2029, ../../../scss/_app_styles.scss */
 .app-card-title {
   padding-bottom: -1em;
 }
 
-/* line 2006, ../../../scss/_app_styles.scss */
+/* line 2033, ../../../scss/_app_styles.scss */
 .app-card-content {
   color: #4c4c4c;
   text-align: center;
   margin-top: 0.5cm;
 }
 
-/* line 2012, ../../../scss/_app_styles.scss */
+/* line 2039, ../../../scss/_app_styles.scss */
 .discussion-title-username {
   background-color: #3e3e3e;
   color: #ececec !important;
@@ -25381,7 +25402,7 @@ p {
   padding-left: 10px;
 }
 
-/* line 2026, ../../../scss/_app_styles.scss */
+/* line 2053, ../../../scss/_app_styles.scss */
 .discussion-footer {
   background-color: #CCCCCC;
   color: gray !important;
@@ -25395,13 +25416,13 @@ p {
   padding-left: 10px;
 }
 
-/* line 2042, ../../../scss/_app_styles.scss */
+/* line 2069, ../../../scss/_app_styles.scss */
 .discussion-content {
   color: #262626;
   word-wrap: break-word;
 }
 
-/* line 2047, ../../../scss/_app_styles.scss */
+/* line 2074, ../../../scss/_app_styles.scss */
 .fullscreen-icon {
   display: none;
 }
