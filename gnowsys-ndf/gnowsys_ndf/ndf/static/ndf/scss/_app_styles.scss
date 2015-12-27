@@ -1740,17 +1740,7 @@ div.absol-descrip{
   background-color:#d3d3d3;
 }
 /*overview-summary styling*/
-div.course{
-  position:relative;
-  height:300px;
-  border:1px solid black;
-  background-color:#999999;
-}
-div.course-contents{
-  position:absolute;
-  bottom:0;
-  width:100%;
-}
+
 .course-title,.course-date,{
   color:white;
   padding-top:0px;
@@ -1770,15 +1760,6 @@ div.course-contents{
 course-title{
   padding-left:10px;
 }
-
-.tab-title a{
-  color:white!important;
-}
-
-.enroll-top-height{
-
-}
-
 .enroll-status-margin{
   margin-bottom:0;
 }
@@ -1786,3 +1767,55 @@ course-title{
 .progress-summery{
   color:white; margin-top:20px;
 }
+
+.course-description-thumbnails{
+  margin:0;
+  padding:0;
+}
+
+.left-shift{
+  padding:0;
+  color:white!important;
+}
+
+//Small screens
+.course{
+  /*position:relative;*/
+   border:1px solid black;
+  background-color:#999999;
+
+  }
+.course-contents{
+  /*position:absolute;*/
+
+  width:100%;
+}
+//Medium screens
+@media only screen and (min-width: 40.063em) {
+  .course{
+  position:relative;
+  height:300px;
+  border:1px solid black;
+  background-color:#999999;
+}
+.course-contents{
+  position:absolute;
+  bottom:0;
+  width:100%;
+}
+ } /* min-width 641px, medium screens */
+
+
+// Large screens
+@media only screen and (min-width: 64.063em) { 
+.course{
+  position:relative;
+  height:300px;
+  border:1px solid black;
+  background-color:#999999;
+}
+.course-contents{
+  position:absolute;
+  bottom:0;
+  width:100%;
+}} /* min-width 1025px, large screens */
