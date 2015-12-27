@@ -65,7 +65,7 @@
       <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-5" style="background-color:#fafafa;border-style:none">
         {% for node in quiz_item_nodes %}
           <li class="card-image-wrapper no-bullet"     style="margin-top:13px;margin-left:-10px"> 
-            {% include 'ndf/simple_card.html' with resource=node no_footer=True no_description=True  url_name="quiz_details" first_arg=group_name_tag second_arg=node.pk %}
+            {% include 'ndf/simple_card.html' with resource=node no_footer=True no_description=True  %}
           </li>
         {% empty %}
           <div class="row">
@@ -76,7 +76,8 @@
           </div>
         {% endfor %}
     </section>
-    </div>
+
+  </div>
 
 </div>
   {% comment %}
