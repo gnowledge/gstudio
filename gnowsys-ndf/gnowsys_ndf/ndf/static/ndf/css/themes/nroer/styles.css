@@ -24986,6 +24986,7 @@ p {
   position: relative;
   overflow: hidden;
   height: 10rem;
+  background-color: gray;
 }
 /* line 1550, ../../../scss/_app_styles.scss */
 .event-card .event-card-image img {

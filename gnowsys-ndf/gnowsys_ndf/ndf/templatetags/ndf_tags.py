@@ -3243,6 +3243,10 @@ def get_user_course_groups(user_id):
 @get_execution_time
 @register.assignment_tag
 def get_course_session_status(node):
+	
+	"""
+	Returns Session Start_time in Courses 
+	"""
 	status = ""
 	upcoming_course = False
 	if node:
