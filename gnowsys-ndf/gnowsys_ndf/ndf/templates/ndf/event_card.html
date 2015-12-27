@@ -118,7 +118,22 @@
     {% endif %}
     <!-- End Card Description  -->
     <!-- Card Next Session -->
-      
+    {% get_course_session_status resource as event_session_status %}
+    <div class="event-card-session-status {{event_status_msg|lower}}">
+    {% if event_status_msg == "CLOSED"%}
+      No Sessions
+
+    {% elif next_session %}
+      {% get_course_session_status resource as event_session_status %}
+       {% if event_session_status.1 == True %} 
+        First 
+       {% else %} 
+        Next 
+       {% endif %} 
+       Session:
+      <b>{{event_session_status.0|date:"d-m-Y"}}</b>
+    {% endif %}
+    </div>
     <!-- End Next Session -->
 
 </div>
