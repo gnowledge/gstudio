@@ -42,7 +42,7 @@
 					<label class="right inline">{% trans "Enter Question" %}</label>
 				</div>
 
-				<div class="small-8 large-8 columns left">
+				<div class="small-8 large-8 columns left ">
 					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter Question here.." var_value=node.content_org %}
 				</div>
 			</div>
@@ -120,6 +120,42 @@
 					</select>
 				</div>
 			</div>
+
+			<div class="row">
+				<div class="small-4 large-2 columns">
+					<label class="right inline">{% trans "Show Correct Answer " %}<br/>
+					<small>(To allow a user to see Correct Answer)</small></label>
+				</div>
+
+				<div class="small-8 large-8 columns left">
+					<select name="show_correct_ans" class="sel_show_correct_ans">
+						<option value="True" >True</option>
+						<option value="False">False</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="small-4 large-2 columns">
+					<label class="right inline">{% trans "Problem Weight " %}
+					</label>
+				</div>
+
+				<div class="small-8 large-8 columns left">
+					<input type="text" name="problem_weight" value="{% if node %}{{node.quizitem_problem_weight}}{% else %}1{% endif %}">
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="small-4 large-2 columns">
+					<label class="right inline">{% trans "Maximum Attempts " %}
+					</label>
+				</div>
+
+				<div class="small-8 large-8 columns left">
+					<input type="text" name="maximum_attempts" value="{% if node %}{{node.quizitem_max_attempts}}{% else %}1{% endif %}">
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -140,6 +176,12 @@
  * Description : 
    (1) Based on which type of quiz is selected, it's corresponding answer-div is displayed (along with options, wherever required). 
  */
+ $(document).ready(function(){
+	{% if node %}
+		$(".sel_show_correct_ans").val("{{node.quizitem_show_correct_ans}}")
+	{% endif %}
+ })
+
 $('#quiz_type').change(function (){
     $("#quiz_type_val").val($(this).val())
 
