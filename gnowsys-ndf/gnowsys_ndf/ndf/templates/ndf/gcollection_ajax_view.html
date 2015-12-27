@@ -88,8 +88,27 @@
 </dl>
 <!-- sections end -->
 
+{% endblock %}
+
+{% block script %}
+
 <!-- script to handle ajax of .accordion & #view_page -->
 <script>
+var triggerOnChildOfParent = function(startElement, triggerAction, childSelector, parentSelector) {
+  var parent = startElement.parent().closest(parentSelector);
+  while (parent.length) {
+    parent.children(childSelector).trigger(triggerAction);
+    parent = parent.parent().closest(parentSelector);
+  }
+}
+
+$(document).ready(function() {
+  var selected = window.location.search.match(/selected=\w+/);
+  if (selected) {
+    var unit_id = selected[0].replace(/selected=/, '');
+    triggerOnChildOfParent($('a[id="' + unit_id + '"]'), 'click', 'a:first-child', '.accordion-navigation');
+  }
+});
 
 $('.load-on-click').on('click', function(e) {
   var node = { id: e.target.id };
