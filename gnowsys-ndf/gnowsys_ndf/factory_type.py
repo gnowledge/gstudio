@@ -174,7 +174,7 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem','QuizI
                            {'quizitem_max_attempts':{'gsystem_names_list':['QuizItem','QuizItemEvent'], 
                                               'data_type':'int',
                                               'meta_type':'factory_types'}},
-                           {'quizitempost_user_given_ans':{'gsystem_names_list':['QuizItem','QuizItemEvent'], 
+                           {'quizitempost_user_given_ans':{'gsystem_names_list':['QuizItemPost'], 
                                               'data_type':'bool',
                                               'meta_type':'factory_types'}}]
 
