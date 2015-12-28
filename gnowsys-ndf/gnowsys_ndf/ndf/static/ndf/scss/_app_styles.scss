@@ -1750,8 +1750,11 @@ div.absol-descrip{
   color:#cccccc;
   padding-top:0px;
   padding-bottom:0px;
-
-
+  /*height: 50px;*/
+  /*width: 100%;*/
+ /* white-space: nowrap;*/
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .course-para{
   padding:0;
@@ -1778,7 +1781,7 @@ course-title{
   color:white!important;
 }
 
-//Small screens
+/*course overview for Small screens*/
 .course{
   /*position:relative;*/
    border:1px solid black;
@@ -1790,7 +1793,7 @@ course-title{
 
   width:100%;
 }
-//Medium screens
+/*Medium screens*/
 @media only screen and (min-width: 40.063em) {
   .course{
   position:relative;
@@ -1806,7 +1809,7 @@ course-title{
  } /* min-width 641px, medium screens */
 
 
-// Large screens
+/* Large screens*/
 @media only screen and (min-width: 64.063em) { 
 .course{
   position:relative;

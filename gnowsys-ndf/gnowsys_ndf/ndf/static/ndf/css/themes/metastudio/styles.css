@@ -25131,56 +25131,63 @@ div.absol-descrip {
   color: #cccccc;
   padding-top: 0px;
   padding-bottom: 0px;
+  /*height: 50px;*/
+  /*width: 100%;*/
+  /* white-space: nowrap;*/
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
-/* line 1756, ../../../scss/_app_styles.scss */
+/* line 1759, ../../../scss/_app_styles.scss */
 .course-para {
   padding: 0;
 }
 
-/* line 1760, ../../../scss/_app_styles.scss */
+/* line 1763, ../../../scss/_app_styles.scss */
 course-title {
   padding-left: 10px;
 }
 
-/* line 1763, ../../../scss/_app_styles.scss */
+/* line 1766, ../../../scss/_app_styles.scss */
 .enroll-status-margin {
   margin-bottom: 0;
 }
 
-/* line 1767, ../../../scss/_app_styles.scss */
+/* line 1770, ../../../scss/_app_styles.scss */
 .progress-summery {
   color: white;
   margin-top: 20px;
 }
 
-/* line 1771, ../../../scss/_app_styles.scss */
+/* line 1774, ../../../scss/_app_styles.scss */
 .course-description-thumbnails {
   margin: 0;
   padding: 0;
 }
 
-/* line 1776, ../../../scss/_app_styles.scss */
+/* line 1779, ../../../scss/_app_styles.scss */
 .left-shift {
   padding: 0;
   color: white !important;
 }
 
-/* line 1782, ../../../scss/_app_styles.scss */
+/*course overview for Small screens*/
+/* line 1785, ../../../scss/_app_styles.scss */
 .course {
   /*position:relative;*/
   border: 1px solid black;
   background-color: #999999;
 }
 
-/* line 1788, ../../../scss/_app_styles.scss */
+/* line 1791, ../../../scss/_app_styles.scss */
 .course-contents {
   /*position:absolute;*/
   width: 100%;
 }
 
+/*Medium screens*/
 @media only screen and (min-width: 40.063em) {
-  /* line 1795, ../../../scss/_app_styles.scss */
+  /* line 1798, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -25188,7 +25195,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 1801, ../../../scss/_app_styles.scss */
+  /* line 1804, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -25196,8 +25203,9 @@ course-title {
   }
 }
 /* min-width 641px, medium screens */
+/* Large screens*/
 @media only screen and (min-width: 64.063em) {
-  /* line 1811, ../../../scss/_app_styles.scss */
+  /* line 1814, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -25205,7 +25213,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 1817, ../../../scss/_app_styles.scss */
+  /* line 1820, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
