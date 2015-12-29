@@ -150,7 +150,7 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem','QuizI
                            {'Citation':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
                                         'data_type':'basestring',
                                         'meta_type':'factory_types'}},
-                           {'discussion_enable':{'gsystem_names_list':['Page','File', 'E-Book'],
+                           {'discussion_enable':{'gsystem_names_list':['Page','File', 'E-Book','QuizItemEvent'],
                                         'data_type':'bool',
                                         'meta_type':'factory_types'}},
                            {'release_response':{'gsystem_names_list':['Twist'],
