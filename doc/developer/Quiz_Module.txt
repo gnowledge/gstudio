@@ -9,7 +9,7 @@ Quiz Module
 		- quizitem_problem_weight. Type: float (0 to 100)
 		- quizitem_max_attempts. Type: int (0 to 5)
 		- quizitempost_user_given_ans. basestring
-	3. New RelationTypes (PostQuiz)
+	3. New RelationTypes
 		- clone_of
 
 2. Quiz Authoring
