@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, replicate_resource
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation
@@ -1423,20 +1423,31 @@ def get_resources(request, group_id):
             resource_type = resource_type.strip()
             list_resources = []
             css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+            units_res = []
             try:
                 unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
+                units_res = [ObjectId(each_res_of_unit) for each_res_of_unit in unit_node.collection_set]
+                units_res_nodes = node_collection.find({'_id': {'$in': units_res}})
+                for each_res_node in units_res_nodes:
+                    print "\n\n each_res_node.relation_set----",each_res_node.relation_set
+                    clone_of_obj,grel_node = get_relation_value(each_res_node._id,"clone_of")
+                    if clone_of_obj:
+                        units_res.append(clone_of_obj._id)
             except:
                 unit_node = None
+
             if resource_type:
                 if resource_type == "Pandora":
                     resource_type = "Pandora_video"
-
+                if resource_type == "Quiz":
+                    resource_type = "QuizItem"
                 resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
                 res = node_collection.find(
                     {
                         'member_of': resource_gst._id,
-                        'group_set': ObjectId(group_id),
-                        'status': u"PUBLISHED"
+                        'status': u"PUBLISHED",
+                        '$or':[{'created_by': request.user.id},{'group_set': ObjectId(group_id)}],
+                        '_id':{ '$nin': units_res }
                     }
                 )
                 for each in res:
@@ -1475,6 +1486,11 @@ def save_resources(request, group_id):
     '''
     response_dict = {"success": False,"create_new_unit": True}
     if request.is_ajax() and request.method == "POST":
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
+
         list_of_res = json.loads(request.POST.get('list_of_res', ""))
         css_node_id = request.POST.get('css_node', "")
         unit_name = request.POST.get('unit_name', "")
@@ -1505,6 +1521,19 @@ def save_resources(request, group_id):
 
         if cu_new._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
+        # print "\n\n member_of_names_list----", cu_new.member_of_names_list, "list_of_res_ids", list_of_res_ids
+
+        if "CourseUnitEvent" in cu_new.member_of_names_list:
+            list_of_res_nodes = node_collection.find({'_id': {'$in': list_of_res_ids}})
+
+            for each_res_node in list_of_res_nodes:
+
+                if "QuizItem" in each_res_node.member_of_names_list:
+
+                    index_of_qi = list_of_res_ids.index(each_res_node._id)
+
+                    new_gs = replicate_resource(request, each_res_node, group_id)
+                    list_of_res_ids[index_of_qi] = new_gs._id
 
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
         cu_new.reload()

@@ -4403,3 +4403,66 @@ def get_course_units_tree(data,list_ele):
                     # print "\n each_dict---",each_dict
                     if "children" in each_dict:
                         get_course_units_tree(each_dict['children'],list_ele)
+
+
+
+def replicate_resource(request, node, group_id):
+    try:
+        if "Page" in node.member_of_names_list or "QuizItem" in node.member_of_names_list:
+            new_gsystem = node_collection.collection.GSystem()
+        else:
+            new_gsystem = node_collection.collection.File()
+            new_gsystem.fs_file_ids = node.fs_file_ids
+            new_gsystem.file_size = node.file_size
+            new_gsystem.mime_type = node.mime_type
+
+        new_gsystem.group_set.append(group_id)
+        new_gsystem.name = unicode(node.name)
+        new_gsystem.status = u"PUBLISHED"
+        if "QuizItem" in node.member_of_names_list:
+            quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
+            new_gsystem.member_of.append(quiz_item_event_gst._id)
+        else:
+            new_gsystem.member_of = node.member_of
+        new_gsystem.modified_by = int(request.user.id)
+        new_gsystem.created_by = int(request.user.id)
+        new_gsystem.contributors.append(int(request.user.id))
+        new_gsystem.tags = node.tags
+        new_gsystem.content_org = node.content_org
+        new_gsystem.content = node.content
+        new_gsystem.save()
+        discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+        create_gattribute(new_gsystem._id, discussion_enable_at, False)
+        clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
+        create_grelation(new_gsystem._id, clone_of_RT, node._id)
+        if "QuizItem" in node.member_of_names_list:
+            # Setup all relevant Attributes for QuizItemEvent
+            node.get_neighbourhood(node.member_of)
+    
+            quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
+            options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
+            correct_answer_AT = node_collection.one({'_type': "AttributeType", 'name': "correct_answer"})
+            quizitem_show_correct_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_show_correct_ans"})
+            quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
+            quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
+
+            if node.quiz_type:
+                create_gattribute(new_gsystem._id,quiz_type_AT, node.quiz_type)
+            if node.options:
+                create_gattribute(new_gsystem._id,options_AT, node.options)
+            if node.correct_answer:
+                create_gattribute(new_gsystem._id,correct_answer_AT, node.correct_answer)
+            if "quizitem_show_correct_ans" in node:
+                create_gattribute(new_gsystem._id,quizitem_show_correct_ans_AT, node.quizitem_show_correct_ans)
+            if node.quizitem_problem_weight:
+                create_gattribute(new_gsystem._id,quizitem_problem_weight_AT, node.quizitem_problem_weight)
+            if node.quizitem_max_attempts:
+                create_gattribute(new_gsystem._id,quizitem_max_attempts_AT, node.quizitem_max_attempts)
+
+
+        new_gsystem.reload()
+        return new_gsystem
+    except Exception as replicate_resource_err:
+        print replicate_resource_err
+        print "Failed replicating resource"
+        return None
