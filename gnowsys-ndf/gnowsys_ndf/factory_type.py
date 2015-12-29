@@ -290,6 +290,16 @@ factory_relation_types = [
             'meta_type': 'factory_types',
             'object_cardinality': 1
         }
+    }, 
+
+    {'has_thumbnail': {
+            'subject_type': ['Page', 'File'],
+            'object_type': ['File'], 
+            'inverse_name': 'thumbnail_of', 
+            'meta_type': 'factory_types',
+            'member_of': 'Binary',
+            'object_cardinality': 1
+        }
     }
 ]
 
