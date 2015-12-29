@@ -133,7 +133,6 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
         options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
         correct_answer_AT = node_collection.one({'_type': "AttributeType", 'name': "correct_answer"})
-
         quizitem_show_correct_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_show_correct_ans"})
         quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
         quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
@@ -183,7 +182,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         else:
             correct_answer = request.POST.get('correct_answer_' + qt_initial)
             # quiz_item_node['correct_answer'].append(correct_answer)
-        create_gattribute(quiz_item_node._id, options_AT, correct_answer)
+        create_gattribute(quiz_item_node._id, correct_answer_AT, correct_answer)
         quiz_item_node.reload()
         quiz_item_node.status = u"PUBLISHED"
 
