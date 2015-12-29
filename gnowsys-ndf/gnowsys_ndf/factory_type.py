@@ -285,6 +285,7 @@ factory_relation_types = [
             'object_type': ['File'], 
             'inverse_name': 'thumbnail_of', 
             'meta_type': 'factory_types',
+            'member_of': 'Binary',
             'object_cardinality': 1
         }
     }
