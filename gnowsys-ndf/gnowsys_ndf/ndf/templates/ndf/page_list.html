@@ -149,7 +149,7 @@
   {% for node in page_nodes %}
 
        <li class="card-image-wrapper" > 
-             {% include 'ndf/simple_card.html' with  has_contributor=True resource=node url_name="page" first_arg=groupid  %}
+             {% include 'ndf/simple_card.html' with  has_contributor=True resource=node url_name="page_details" first_arg=group_name_tag second_arg=node %}
         
         </li>
 
