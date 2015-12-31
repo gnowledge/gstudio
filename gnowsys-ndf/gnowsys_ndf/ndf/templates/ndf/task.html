@@ -19,9 +19,11 @@
 {% endblock %}
 
 {% block related_content %}
+{% check_is_user_group groupid as is_author %}
+
   {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
+  {% if is_author == False %}
   <br/>
      <div class="task">
       <br/>

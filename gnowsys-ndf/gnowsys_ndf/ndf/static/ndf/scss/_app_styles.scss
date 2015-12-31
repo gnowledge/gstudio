@@ -248,7 +248,17 @@ body{
       background-color: #fafafa;
       border-top: solid thin gray;
       height: 52px;
+      span{
+        font-size: 1em!important;
+      }
 
+
+      img{
+        
+        height:45px;
+        width:50px;
+        //margin-left: -20px!important;
+      }
       // &:hover{
       //     box-shadow: inset 0px 101px 50px #E1E1E1;
       //     transition: 0.8s all;

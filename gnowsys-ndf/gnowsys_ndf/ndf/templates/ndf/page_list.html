@@ -16,7 +16,7 @@
 
 {% block meta_content %}
 
-<h2 class="subheader">{% trans "Pages" %}</h2>
+
 
 {% endblock %}
 
@@ -136,75 +136,30 @@
 </div>  
 
 {% endif %}
-
-<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+<div class="repository-title large-4 columns">{% trans "Pages" %}</div><br>
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5">
 
 <!-- {#% get_preferred_lang request page_nodes "Page" as page_nodes %#} -->
 
-{% autopaginate page_nodes 23 %}
+
 
   {% group_type_info groupid request.user as grouptype %}
 
   <!-- Existing card list-->
   {% for node in page_nodes %}
 
-      <li class="card">
-        {% if grouptype == "Moderated" %}
-          {% if node.status == "DRAFT" %}
-            <div class="draft page">
-          {% elif node.status == "PUBLISHED" %}
-            <div class="published page">
-          {% endif %}
-        {% else %}
-          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} page'>
-        {% endif %} 
-
-          <a href="{% url 'page_details' group_name_tag node %}">
-          <div class="row">
-            <div class="small-10 columns">                             
-                <b>
-                  {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-                </b>
-            </div>
-          </div>
-          {% if node.status == "PUBLISHED" or node.created_by == request.user.id %}
-          <hr/>
-          <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-          {% endif %}
-          <footer>
-            <div class="age">
-              {{ node.member_of_names_list|join:', ' }}{% trans  'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
-              <br/>
-              by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-            </div>
-            <span><strong>{{node.contributors|length}}</strong> {% trans 'Contributor' %}{{node.contributors|pluralize}}</span>
-          </footer>
-          </a>
-
-          <div class="label-list small-12 columns">
-          {% for tag in node.tags|slice:":3" %}
-            <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
-          {% endfor %}
-          </div>
-
+       <li class="card-image-wrapper" > 
+             {% include 'ndf/simple_card.html' with  has_contributor=True resource=node url_name="page_details" first_arg=group_name_tag second_arg=node %}
         
-        </div>
-      </li>
-      
-  {% empty %}
-    {% if not searching %}
-      <div class="row">
-        <div class="small-12 columns">
-        <h5>  {% blocktrans %} This group doesn't have any pages. <b>Be the first to create a Page!</b>{% endblocktrans %} </h5>
-        </div>
-      </div>
-    {% endif %}
+        </li>
+
 
   {% endfor %}
 
 </ul>
 
-{% paginate %}
+  
+
 
 </div>
 
