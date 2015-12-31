@@ -20,7 +20,6 @@
 {% endblock %}
 
 {% block meta_content %}
-  <h2>{% trans "Task" %}</h2>
 {% endblock %}
 
 {% block search_content %}
@@ -44,10 +43,11 @@
 {% endblock %}
   
 {% block body_content %}
+  <div class="repository-title large-4 columns">{% trans "Task" %}</div>
+      <div class="repository-desc large-8 columns">{{node.name}}</div> 
 <div class="row margin-top-1">
   <section class="medium-9 columns">
     <h2>
-      <span class='node'><font id="nodeTitleId">{{node.name}}</font> 
         {% get_user_object node.created_by as user_obj %}
       
         {% if user_obj.username == request.user.username or request.user.is_superuser %}
