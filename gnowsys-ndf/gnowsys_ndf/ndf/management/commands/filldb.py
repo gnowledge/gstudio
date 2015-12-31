@@ -43,6 +43,7 @@ log_list = []  # To hold intermediate error and information messages
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
 ###############################################################################
+bin_member_of_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':"Binary"}]})
 
 class Command(BaseCommand):
   help = "This performs activities required for setting up default structure or updating it." 
@@ -60,6 +61,7 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     if options["setup_structure"]:
       try:
+
         info_message = "\n Performing structure create/update...\n"
         print info_message
         log_list.append(info_message)
@@ -511,7 +513,7 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
     else:
       print 'AttributeType',at_name,'already created'
 
-def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id=None, object_cardinality=None):
+def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id=None, object_cardinality=None,member_of_type_id=bin_member_of_type._id):
   '''
   creating factory RelationType's
   '''
@@ -531,8 +533,10 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
       
       rt_node.created_by = user_id
       rt_node.modified_by = user_id
-      if meta_type_id:
-        rt_node.member_of.append(meta_type_id)
+      # if meta_type_id:
+      #   rt_node.member_of.append(meta_type_id)
+      if member_of_type_id:
+        rt_node.member_of.append(member_of_type_id)
 
       if user_id not in rt_node.contributors:
         rt_node.contributors.append(user_id)
@@ -597,6 +601,7 @@ def create_ats(factory_attribute_types,user_id):
 
 def create_rts(factory_relation_types,user_id):
   meta_type_id = ""
+  member_of_type_id = ""
   for each in factory_relation_types:
     subject_type_id_list = []
     object_type_id_list = []
@@ -611,6 +616,12 @@ def create_rts(factory_relation_types,user_id):
         meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
         if meta_type:
           meta_type_id = meta_type._id
+
+      if "member_of" in value:
+        member_of_name = value['member_of']
+        member_of_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':member_of_name}]})
+        if member_of_type:
+          member_of_type_id = member_of_type._id
 
       for s in value['subject_type']:
         node_s = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name': s}]})
@@ -629,7 +640,7 @@ def create_rts(factory_relation_types,user_id):
       if "object_cardinality" in value:
         object_cardinality = value["object_cardinality"]
 
-    create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id, object_cardinality)
+    create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id, object_cardinality, member_of_type_id)
 
 def create_sts(factory_gsystem_types,user_id):
   meta_type_id = ""

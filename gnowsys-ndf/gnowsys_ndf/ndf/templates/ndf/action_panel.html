@@ -101,8 +101,6 @@
 					<!-- Edit button -->
 						{% edit_policy groupid node request.user as status %}
 						{% if is_user_authenticated %}
-							{% get_sg_member_of groupid as list_of_sg_member_of %}
-							{% if "ProgramEventGroup" not in list_of_sg_member_of %}
 							{% get_edit_url node.pk as edit_url %}
 							{% if is_group %}
 								{% if is_gstaff %}
@@ -118,7 +116,6 @@
 								{% else %}
 									<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title="{% trans 'You are not authorized for this action' %}">
 								{% endif %}
-							{% endif %}
 							{% endif %}
 						{% else %}
 							<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title="{% trans 'You are not authorized for this action' %}">
