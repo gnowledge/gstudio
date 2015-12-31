@@ -470,7 +470,7 @@ def get_all_replies(parent):
 	 if parent:
 		 ex_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}],'status':{'$nin':['HIDDEN']}})
 		 ex_reply.sort('created_at',-1)
-	 return ex_replysimp
+	 return ex_reply
 
 
 @get_execution_time
