@@ -285,7 +285,8 @@ def approve_resource(request, group_id):
 
 		# is_top_group, top_group_obj = get_top_group_of_hierarchy(group_obj._id)
 		mod_group_instance = CreateModeratedGroup(request)
-		is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(curr_group_id)
+		# is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(curr_group_id)
+		is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(group_obj._id)
 
 		list_of_recipients_ids = []
 		list_of_recipients_ids.extend(group_obj.group_admin)
@@ -298,6 +299,7 @@ def approve_resource(request, group_id):
 						"The resource associated with Moderation Task has been REJECTED. \n"
 			task_dict = {
 				"name": task_node.name,
+				"_id" : ObjectId(task_node._id),
 				"created_by": node_obj.created_by,
 				"modified_by": request.user.id,
 				"contributors": [request.user.id],
@@ -384,14 +386,20 @@ def create_moderator_task(request, group_id, node_id, \
 				"contributors": [request.user.id],
 				"content_org": unicode(task_content_org),
 				"created_by_name": unicode(request.user.username),
-				"Status": u"New",
+				# "Status": u"New",
 				"Priority": u"Normal",
 				# "start_time": "",
 				# "end_time": "",
 				"Assignee": list(group_obj.group_admin[:]),
 				"has_type": task_type_list
 			}
+			if on_upload:
+				task_dict['Status'] = u"New"
+			else:
+				task_dict['Status'] = u"In Progress"
+
 			task_obj = create_task(task_dict, task_type_creation)
+
 			if task_obj:
 				create_grelation(node_obj._id, at_curr_app_task, task_obj._id)
 				try:
