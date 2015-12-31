@@ -245,7 +245,8 @@
     <div class="panel">
       <h3 class="subheader"></h3>
   
-      {% trans 'Edited' %} {{ node.last_update|timesince }} {% trans 'ago' %} {% trans 'by' %} <a class="user">{{node.user_details_dict.modified_by}}</a>
+      {% trans 'Edited' %} {{ node.last_update|timesince }} {% trans 'ago' %} {% trans 'by' %} <a class="user">{{node.user_details_dict.modified_by}}</a><br>
+      {% comment %}
       <small>
         <div><a href="#view-changes"><i class="fi-clock"></i>{% trans 'Versions' %} </a>
         {% for seq_no, version_no in node.version_dict.items reversed %}
@@ -253,6 +254,7 @@
         {% endfor %}
         </div>
       </small>
+      {% endcomment %}
     
       {% if collection != 'True' %}
       <a href="{% url 'task_edit' group_name node %}" class="small button split edit">
