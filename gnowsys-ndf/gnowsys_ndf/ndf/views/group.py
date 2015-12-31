@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value  # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 
 from gnowsys_ndf.ndf.org2any import org2html
@@ -2246,7 +2246,9 @@ def switch_group(request,group_id,node_id):
     #loop replaced by a list comprehension
       top_partners_list = ["State Partners", "Individual Partners", "Institutional Partners"]
       all_user_groups = [each.name for each in get_all_user_groups()]
-      all_user_groups.append('home')
+      if not request.user.is_superuser:
+          all_user_groups.append('home')
+          # exclude home group in listing if not SU
       all_user_groups.append('Trash')
       all_user_groups.extend(top_partners_list)
 
@@ -2269,9 +2271,9 @@ def switch_group(request,group_id,node_id):
       #                                     {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
       #                                    ]
       #                           })
-    # for each in node.group_set:
-    #   coll_obj_list.append(node_collection.one({'_id': each}))
-    #loop replaced by a list comprehension
+      # for each in node.group_set:
+      #   coll_obj_list.append(node_collection.one({'_id': each}))
+      #loop replaced by a list comprehension
 
       # coll_obj_list=[node_collection.one({'_id': each}) for each in node.group_set ]
 
