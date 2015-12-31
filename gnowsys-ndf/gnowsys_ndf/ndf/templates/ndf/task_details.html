@@ -28,14 +28,15 @@
 {% endblock %}
 
 {% block related_content %}
+  {% check_is_user_group groupid as is_author_group %}
   {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
+  {% if is_author_group == False %}
   <br/>
      <div class="task">
       <br/>
       <a class="button medium" href="{% url 'task_create_edit' group_name %}">
-      	<span class="fi-plus">&nbsp;&nbsp;{% trans "New Task" %}</span>
+        <span class="fi-plus">&nbsp;&nbsp;{% trans "New Task" %}</span>
       </a>
     </div>
   {% endif %}
@@ -144,27 +145,27 @@
       </div>
     </div>
 
-  	{% if subtask %}
+    {% if subtask %}
       <hr>
 
-    	<div class="row">
-    	  <div class="medium-3 columns">
+      <div class="row">
+        <div class="medium-3 columns">
           <label><b>{% trans "Sub Task:" %}</b></label>
-    	  </div>
+        </div>
 
-    	  <div class="medium-3 columns">
-      		{% for each_subtask in subtask %}
-    	    <a class="" href="{% url 'task_details' group_name each_subtask.id %}">{{each_subtask.name}}</a>
-      		{% if not forloop.last %},{% endif %}
-      		{% endfor %}
-    	  </div>
-    	
+        <div class="medium-3 columns">
+          {% for each_subtask in subtask %}
+          <a class="" href="{% url 'task_details' group_name each_subtask.id %}">{{each_subtask.name}}</a>
+          {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        </div>
+      
         <div class="medium-6 columns">
-    	  </div>
-    	</div>
-  	{% endif %}
+        </div>
+      </div>
+    {% endif %}
 
-  	<hr>
+    <hr>
 
     <!-- Description -->
     <div class="row">
@@ -211,7 +212,7 @@
     </div>
 
     <hr>
-	
+  
     <div class="row">
       <div class="medium-12 columns">
         <label><b>{% trans "History:" %}</b></label>
@@ -224,7 +225,7 @@
                 {{ history_description }}
               {% endwith %}
               {% endif %}
-              {% for each_altnames in each_history.altnames %}		
+              {% for each_altnames in each_history.altnames %}    
                 <p style="color:#999999">{{each_altnames}}</p>
               {% endfor %}
               <div align="right">
@@ -233,7 +234,7 @@
             </div>
           {% empty %}
             --
-          {% endfor %}	
+          {% endfor %}  
         </div>
       </div>
     </div>
@@ -303,7 +304,7 @@ else {
              data: {taskid:"{{node}}",csrfmiddlewaretoken: '{{ csrf_token }}',title:editedTitle},
              beforeSend: function() {     },
              success: function(result){
-		  $('#nodeTitleId').html(result);
+      $('#nodeTitleId').html(result);
 
              },
              complete: function(){ 
@@ -322,7 +323,7 @@ var editedContent = $('#orgitdown_content_org').val();
              data: {taskid:"{{node}}",csrfmiddlewaretoken: '{{ csrf_token }}',content_org:editedContent},
              beforeSend: function() {     },
              success: function(result){
-		  $('#nodeContentId').html(result);
+      $('#nodeContentId').html(result);
 
              },
              complete: function(){ 
