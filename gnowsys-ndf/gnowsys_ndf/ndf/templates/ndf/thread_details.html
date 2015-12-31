@@ -77,16 +77,17 @@ color: #7a7a7a;
 {% block body_content %}
 {% get_group_name groupid as group_name_tag %}
 
-	<h3>
-		<a href="/{{groupid}}/forum/{{forum}}" title="Forum Name">
+	  <div class="repository-title large-4 columns" >
+		<a href="/{{groupid}}/forum/{{forum}}" title="Forum Name" style="color:#D7D7D7!important;">
 			{{forum.name}}
 		</a>
+		</div>
 {% if thread %}
   {% get_group_name groupid as group_name_tag %}
 
-		&nbsp; <i class="fi-shuffle"></i> &nbsp;
-		<span title="Thread Name">{{thread.name}}</span>
-	</h3>
+		
+		<div title="Thread Name" class="repository-desc large-8 columns">{{thread.name}}</div><br>
+	
         {% get_edit_url thread.pk as edit_url %}
    
 	 {% if user.is_superuser or thread.created_by == user.id %}
