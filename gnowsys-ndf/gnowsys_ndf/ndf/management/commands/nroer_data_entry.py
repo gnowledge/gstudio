@@ -379,7 +379,7 @@ def parse_data_create_gsystem(json_file_path):
 
     for i, json_document in enumerate(json_documents_list):
       
-        info_message = "\n\n\n********** Processing row number : ["+ str(i) + "] **********"
+        info_message = "\n\n\n********** Processing row number : ["+ str(i + 2) + "] **********"
         print info_message
         log_list.append(str(info_message))
         
