@@ -46,7 +46,7 @@
               <li>Currently in '{% firstof current_mod_group_obj.altnames current_mod_group_obj.name %}' </li>
           {% endif %}
           {% if next_mod_group_objs %}
-              <li>Next include(s) {{next_mod_group_objs|join:", "}}</li>
+              <li>Next in ' {{next_mod_group_objs|join:", "}}'</li>
           {% endif %}
         </div>
         <br/>
