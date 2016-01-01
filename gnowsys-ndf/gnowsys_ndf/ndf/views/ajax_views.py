@@ -164,7 +164,11 @@ def collection_nav(request, group_id):
         sg_type = "ProgramEventGroup"
       elif "CourseEventGroup" in list_of_sg_member_of:
         sg_type = "CourseEventGroup"
+      if "QuizItemEvent" in node_obj.member_of_names_list:
+        template = "ndf/quiz_player.html"
+
       thread_node, allow_to_comment = node_thread_access(group_obj._id, node_obj)
+
 
     nav_list = request.POST.getlist("nav[]", '')
     n_list = request.POST.get("nav", '')
