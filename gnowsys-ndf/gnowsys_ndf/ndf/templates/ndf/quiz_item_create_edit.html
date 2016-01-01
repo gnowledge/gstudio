@@ -18,7 +18,7 @@
 <form id="quiz_item_create_form" method="POST" action="">
 {% csrf_token %}
 	{% if quiz_node_id %}
-	<input type="hidden" name="quiz_node_id" value="{{quiz_node_id}}">
+		<input type="hidden" name="quiz_node_id" value="{{quiz_node_id}}">
 	{% endif %}
 	<div id="node-details-edit-div" class="tabs-content" >
 		<div class="active content row" id="panel-name-description"> 

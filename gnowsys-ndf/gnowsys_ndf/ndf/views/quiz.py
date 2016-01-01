@@ -36,9 +36,9 @@ history_manager = HistoryManager()
 rcs = RCS()
 app = gst_quiz
 
-#######################################################################################################################################
-#                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
-#######################################################################################################################################
+##############################################################################
+#       V I E W S   D E F I N E D   F O R   G A P P -- ' Q U I Z '
+##############################################################################
 @get_execution_time
 def quiz(request, group_id):
     """Renders a list of all 'Quiz-type-GSystems' available within the database.
@@ -60,6 +60,7 @@ def quiz(request, group_id):
                               }, 
                               context_instance=RequestContext(request)
     )
+
 
 @login_required
 @get_execution_time
