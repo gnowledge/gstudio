@@ -3197,7 +3197,6 @@ def get_event_status(node):
 	return status_msg
 
 
-
 # @get_execution_time
 # @register.assignment_tag
 # def get_all_user_groups(user_id):
@@ -3240,3 +3239,35 @@ def get_user_course_groups(user_id):
 				})
 
 	return all_user_groups
+
+@get_execution_time
+@register.assignment_tag
+def get_course_session_status(node):
+	
+	"""
+	Returns Session Start_time in Courses 
+	"""
+	status = ""
+	upcoming_course = False
+	if node:
+		from datetime import datetime
+		curr_date_time = datetime.now()
+		start_time_val = get_attribute_value(node._id,"start_time")
+		end_time_val = get_attribute_value(node._id,"end_time")
+		#print "\n node.name",node.name
+		if curr_date_time.date() < start_time_val.date():
+			upcoming_course = True
+		for each_course_section in node.collection_set:
+			each_course_section_node = node_collection.one({"_id":ObjectId(each_course_section)})
+			for each_course_subsection in each_course_section_node.collection_set:
+				each_course_subsection_node = node_collection.one({"_id":ObjectId(each_course_subsection)})
+				each_sub_section_start_time = get_attribute_value(each_course_subsection_node._id,"start_time")
+				# print "each_sub_section_start_time",each_sub_section_start_time
+				if each_sub_section_start_time:
+					if curr_date_time.date() <= each_sub_section_start_time.date():
+						status =  each_sub_section_start_time
+						# print "\n******************"
+						# print upcoming_course,node.name 
+						return status, upcoming_course 
+		# print upcoming_course,node.name 
+		return status, upcoming_course 

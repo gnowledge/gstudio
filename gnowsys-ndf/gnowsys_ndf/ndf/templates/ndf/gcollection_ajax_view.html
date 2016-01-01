@@ -5,13 +5,36 @@
 {% get_node_type node as node_type %}  
 
 <style type="text/css">
+  .accordion-navigation > a:before {
+    content: "◂";
+    padding-left: 5px;
+    float: right;
+    font-size: 20px;
+  }
+  .accordion-navigation.active > a:before {
+    content: "▾";
+  }
+
+  .content-wide {
+    padding: 0 !important;
+  }
+
+  .content-wide, .content-wide ul {
+    margin-bottom: 0 !important;
+  }
+
   .accordion-resources {
     font-size: x-small;
   }
 
   .accordion-unit-name {
     font-size: normal;
-    padding-top: 10px;
+    /*padding-top: 10px;*/
+  }
+
+  .accordion-sub-section-name {
+    background-color: transparent !important;
+    font-weight: 100;
   }
 
   .accordion-sub-section {
@@ -24,21 +47,23 @@
   }
 </style>
 
-{% for section in course_collection_data %}
-  {% if section.node_type == 'CourseSectionEvent' %}
-    <dl class="accordion" data-accordion>
+<dl class="accordion" data-accordion>
+  {% for section in course_collection_data %}
+    {% if section.node_type == 'CourseSectionEvent' %}
       <!-- sections -->
       <dd class="accordion-navigation">
         <a href="#s{{section.id}}" class="accordion-section-name">{{section.name}} <span class="right">{{section.children|length}}</span></a>
-        <div id="s{{section.id}}" class="content active">
+        <dl id="s{{section.id}}" class="content content-wide" data-accordion>
           <!-- sub sections  -->
           {% for sub_section in section.children %}
             {% if sub_section.node_type == 'CourseSubSectionEvent' %}
-            <strong class="accordion-sub-section-name">
-            	<i class="fa fa-check-circle-o fa-lg"></i> {{sub_section.name}} 
-            	<span class="right">{{sub_section.children|length}}</span>
-            </strong>
-              <ul class="accordion-sub-section">
+            <dd class="accordion-navigation">
+              <a href="#ss{{sub_section.id}}" class="accordion-sub-section-name">
+                <i class="fa fa-check-circle-o fa-lg"></i> {{sub_section.name}} 
+                <span class="right">{{sub_section.children|length}}</span>
+              </a>
+            
+              <ul id="ss{{sub_section.id}}" class="accordion-sub-section content">
               <!-- units -->
                 {% for unit in sub_section.children %}
                   {% if unit.node_type == 'CourseUnitEvent' %}
@@ -56,18 +81,40 @@
                 {% endfor %}
                 <!-- units end -->
               </ul>
+            </dd>
             {% endif %}
           {% endfor %}
           <!-- sub sections end -->
-        </div>
+        </dl>
       </dd>
-    </dl>
-  {% endif %}
-{% endfor %}
+    {% endif %}
+  {% endfor %}
+</dl>
 <!-- sections end -->
+
+{% endblock %}
+
+{% block script %}
 
 <!-- script to handle ajax of .accordion & #view_page -->
 <script>
+var triggerOnChildOfParent = function(startElement, triggerAction, childSelector, parentSelector) {
+  var parent = startElement.parent().closest(parentSelector);
+  while (parent.length) {
+    parent.children(childSelector).trigger(triggerAction);
+    parent = parent.parent().closest(parentSelector);
+  }
+}
+
+$(document).ready(function() {
+  var selected = window.location.search.match(/selected=\w+/);
+  if (selected) {
+    var unit_id = selected[0].replace(/selected=/, '');
+    var unit = $('a[id="' + unit_id + '"]');
+    unit.trigger('click');
+    triggerOnChildOfParent(unit, 'click', 'a:first-child', '.accordion-navigation');
+  }
+});
 
 $('.load-on-click').on('click', function(e) {
   var node = { id: e.target.id };
