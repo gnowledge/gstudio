@@ -119,7 +119,7 @@ this template is modified. So for the fields in the template it supports -
         </div>
       </div>
     </div>
-    
+    {% if spl_group_type == "ProgramEventGroup" %}
     <!-- moderation level -->
     <div class="row" id="moderation-level">
       <div class="small-12 medium-6 medium-centered columns">
@@ -147,6 +147,7 @@ this template is modified. So for the fields in the template it supports -
         </div>
       </div>
     </div>
+    {% endif %}
 
 
       <!-- start date -->
