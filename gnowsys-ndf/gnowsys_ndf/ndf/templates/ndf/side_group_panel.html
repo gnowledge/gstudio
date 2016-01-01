@@ -1,0 +1,10 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+{% get_user_course_groups request.user.id as user_concern_groups %}
+
+{% for each_gr in user_concern_groups %}
+	<a href="{% url 'course_summary' each_gr.pk %}">{{each_gr.name}}</a>
+	<br/>
+	<br/>
+{% endfor %}

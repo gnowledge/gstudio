@@ -3186,12 +3186,57 @@ def get_event_status(node):
 		end_enroll_val = get_attribute_value(node._id,"end_enroll")
 		from datetime import datetime
         curr_date_time = datetime.now()
-
-        if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
-        or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
-            status_msg = "OPEN"
-        elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
-            status_msg = "FORTHCOMING"
-        elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
-            status_msg = "CLOSED"
+        if start_time_val and end_time_val and start_enroll_val and end_enroll_val:
+	        if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
+	        or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
+	            status_msg = "OPEN"
+	        elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
+	            status_msg = "FORTHCOMING"
+	        elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
+	            status_msg = "CLOSED"
 	return status_msg
+
+
+
+# @get_execution_time
+# @register.assignment_tag
+# def get_all_user_groups(user_id):
+
+# 	user_id = int(user_id)
+
+# 	gst_modg = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
+
+# 	all_user_groups = node_collection.find({
+# 				'_type': 'Group',
+# 				'$or':[
+# 						{'author_set': {'$in': [user_id]}},
+# 						{'group_admin': {'$in': [user_id]}},
+# 						{'created_by': user_id} #,
+# 						# {'group_type': u'PUBLIC'}
+# 					],
+# 				'member_of': {'$nin': [gst_modg._id]} 
+# 				})
+
+# 	return all_user_groups
+
+
+@get_execution_time
+@register.assignment_tag
+def get_user_course_groups(user_id):
+
+	user_id = int(user_id)
+
+	gst_course = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
+
+	all_user_groups = node_collection.find({
+				'_type': 'Group',
+				'$or':[
+						{'author_set': {'$in': [user_id]}},
+						{'group_admin': {'$in': [user_id]}},
+						{'created_by': user_id} #,
+						# {'group_type': u'PUBLIC'}
+					],
+				'member_of': {'$in': [gst_course._id]} 
+				})
+
+	return all_user_groups
