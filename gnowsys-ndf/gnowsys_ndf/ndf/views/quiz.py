@@ -79,8 +79,8 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     quiz_item_node = None
 
     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
-    if "CourseEventGroup" in group_object.member_of_names_list:
-        gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
+    # if "CourseEventGroup" in group_object.member_of_names_list:
+    #     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
 
     # if node_id:
     #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
@@ -180,13 +180,19 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         # Extracting correct-answer, depending upon 'Multiple-Choice' / 'Single-Choice' 
         qt_initial = quiz_type[:quiz_type.find("-")].lower()
         # quiz_item_node['correct_answer'] = []
-        if quiz_type == QUIZ_TYPE_CHOICES[2]:
-            correct_answer = request.POST.getlist('correct_answer_' + qt_initial)
-            # quiz_item_node['correct_answer'] = correct_answer
-        else:
-            correct_answer = request.POST.get('correct_answer_' + qt_initial)
+
+        correct_ans_val = None
+        if quiz_type == QUIZ_TYPE_CHOICES[1]: # Single Choice
+            correct_ans_val = request.POST.getlist('correct_answer_' + qt_initial)
             # quiz_item_node['correct_answer'].append(correct_answer)
-        create_gattribute(quiz_item_node._id, correct_answer_AT, correct_answer)
+        elif quiz_type == QUIZ_TYPE_CHOICES[2]: # Multiple Choice
+            correct_ans_val = request.POST.getlist('correct_answer_' + qt_initial)
+            # quiz_item_node['correct_answer'] = correct_answer
+
+        if correct_ans_val: # To handle if Quiz-type is Short-Response
+            correct_answer = map(int,correct_ans_val) # Convert list of unicode ele to list of int ele
+            create_gattribute(quiz_item_node._id, correct_answer_AT, correct_answer)
+
         quiz_item_node.reload()
         quiz_item_node.status = u"PUBLISHED"
 
