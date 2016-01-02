@@ -1,0 +1,156 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% get_group_name groupid as group_name_tag %}
+
+<style type="text/css">
+	.quiz_qtn{
+		margin-left:20px !important;
+		font-size: 20px;
+	}
+
+	input[type=checkbox], input[type=radio]{
+	    margin-right: 10px;
+	    width: 15px;
+		height: 15px;
+	}
+
+	.chk_ans_lbl, .rad_ans_lbl{
+		font-size: 22px;
+		margin-left: 5px;
+	}
+
+	.fi-check{
+		color: green;
+	}
+
+	.fi-x{
+		color: red;
+	}
+</style>
+
+<div class="row">
+	<fieldset>
+		<legend>
+			<label>Question</label>
+		</legend>
+
+		<div class="row">
+			<div class="quiz_qtn">
+				<b>{{node.content_org}}</b>
+				<div class="quiz_qtn">
+					{% if node.quiz_type == "Single-Choice" %}
+
+						{% for each_opt in node.options %}
+							<input type="radio" name="single_quiz_ans"  value="{{each_opt}}"
+							{% if forloop.counter in node.correct_answer %}
+								class="single-choice">{{each_opt}}<span class='fi-check hide rad_ans_lbl'></span>
+							{% else %}
+								class="single-choice">{{each_opt}}<span class='fi-x hide rad_ans_lbl'></span>
+							{% endif %}
+							<br/>
+						{% endfor %}
+						<div class="row">
+							<input type="button" value="Check" class="button tiny check-ans radius single-choice-chk">
+							{% if node.quizitem_show_correct_ans %}
+								<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
+							{% endif%}
+						</div>
+					{% elif node.quiz_type == "Multiple-Choice" %}
+						{% for each_opt in node.options %}
+							<input type="checkbox" name="multi_quiz_ans" value="{{each_opt}}"
+							{% if forloop.counter in node.correct_answer %}
+								class="multi-choice">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
+							{% else %}
+								class="multi-choice">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
+							{% endif %}
+							<br/>
+						{% endfor %}
+						<div class="row">
+							<input type="button" value="Check" class="button tiny check-ans radius multi-choice-chk">
+							{% if node.quizitem_show_correct_ans %}
+								<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
+							{% endif%}
+						</div>
+					{% elif node.quiz_type == "Short-Response" %}
+						<textarea rows="4" cols="50" name="single_choice_{{node.pk}}" placeholder="Enter answer here"></textarea>
+						<input type="button" value="Submit" class="button tiny radius">
+						<br/>
+
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</fieldset>
+</div>
+
+<script type="text/javascript">
+	$(".multi-choice-chk").click(function(){
+		if($(this).val() == "Check"){
+			if($('input:checkbox:checked').length > 0){
+				$.each($('.multi-choice:checked'), function(a,b){
+					n = b.nextSibling.nextSibling
+					n.classList.remove("hide")
+				})
+				$(".multi-choice-chk").val("Clear")
+				$(".show-ans-btn").removeClass("hide")
+			}
+			else{
+				alert("Please select an answer")
+			}
+		}
+		else if ($(this).val() == "Clear"){
+			hide_post_chk_act();
+		}
+	})
+
+	$('input:checkbox').change(function() {
+		if($(".multi-choice-chk").val() == "Clear"){
+			hide_post_chk_act();
+			$(this).prop("checked", true)
+		}
+	})
+
+	function hide_post_chk_act(){
+		$('input:checkbox').removeAttr('checked')
+		$(".chk_ans_lbl").addClass("hide")
+		$(".multi-choice-chk").val("Check")
+		$(".show-ans-btn").addClass("hide")
+	}
+
+	$(".single-choice-chk").click(function(){
+		if($(this).val() == "Check"){
+			if($('input:radio:checked').length > 0){
+				$.each($('.single-choice:checked'), function(a,b){
+					n = b.nextSibling.nextSibling
+					n.classList.remove("hide")
+				})
+				$(".single-choice-chk").val("Clear")
+				$(".show-ans-btn").removeClass("hide")
+			}
+			else{
+				alert("Please select an answer")
+			}
+		}
+		else if ($(this).val() == "Clear"){
+			hide_post_rad_act();
+		}
+	})
+
+	$('input:radio').change(function() {
+		if($(".single-choice-chk").val() == "Clear"){
+			hide_post_rad_act();
+			$(this).prop("checked", true)
+		}
+	})
+
+	function hide_post_rad_act(){
+		$('input:radio').removeAttr('checked')
+		$(".rad_ans_lbl").addClass("hide")
+		$(".single-choice-chk").val("Check")
+		$(".show-ans-btn").addClass("hide")
+	}
+
+	$(".show-ans-btn").click(function(){
+		$(".fi-check").removeClass("hide")
+	})
+</script>
