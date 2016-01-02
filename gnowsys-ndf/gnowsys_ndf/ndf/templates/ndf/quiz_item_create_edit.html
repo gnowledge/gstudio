@@ -29,6 +29,7 @@
 
 				<div class="small-5 large-5 columns left">
 					<select id="quiz_type" name="quiz_type" autofocus {% if node.quiz_type %}disabled{% endif %}>
+					<option value=""> --- Select Quiz Type --- </option>
 					{% for choice in quiz_type_choices %}
 					<option value="{{choice}}" {% ifequal node.quiz_type choice %}selected{% endifequal %}>{{choice}}</option>
 					{% endfor %}
@@ -89,14 +90,18 @@
 				</div>
 			</div>
 
-			<div class="row">
+			<div class="row hide quiz_type_based_correct_ans_div">
+
 				<div class="small-4 large-2 columns">
 					<label for="quiz_type" class="right inline">{% trans "Correct Answer" %}</label>
 				</div>
+				{% comment %}
 
 				<div class="quiz-type-based-div small-8 large-8 columns left" id="Short-Response">
 					<textarea id="correct_answer_short" name="correct_answer_short" rows="2" placeholder="Enter correct answer...">{{node.correct_answer.0|default_if_none:""}}</textarea>
+
 				</div>
+				{% endcomment %}
 
 				<div class="quiz-type-based-div small-8 large-8 columns left" id="Single-Choice">
 					<select id="correct_answer_single" name="correct_answer_single">
@@ -184,17 +189,24 @@
 
 $('#quiz_type').change(function (){
     $("#quiz_type_val").val($(this).val())
-
-    if ($(this).val() != $('#' + $(this).attr('id') + ' option:nth-child(1)').val()) {
-	$('#options').css('display', 'block');
-    }
-    else {
-	$('#options').css('display', 'none');
-    }
-
-    $('.quiz-type-based-div').hide('fast');
     var targetDivId = $(this).val();
-    $('div#' + targetDivId).show('fast');
+    console.log(targetDivId)
+    if(targetDivId == "Single-Choice" || targetDivId == "Multiple-Choice"){
+    	$(".quiz_type_based_correct_ans_div").removeClass("hide");
+	    if ($(this).val() != $('#' + $(this).attr('id') + ' option:nth-child(1)').val()) {
+			$('#options').css('display', 'block');
+	    }
+	    else {
+			$('#options').css('display', 'none');
+	    }
+	    $('.quiz-type-based-div').hide('fast');
+	    $('div#' + targetDivId).show('fast');
+    }
+    else if(targetDivId == "Short-Response"){
+    	$(".quiz_type_based_correct_ans_div").addClass("hide");
+		$('#options').css('display', 'none');
+	    $('div#' + targetDivId).hide('fast');
+    }
 
 }).change();
 
