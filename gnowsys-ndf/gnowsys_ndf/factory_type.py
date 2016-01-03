@@ -242,7 +242,7 @@ factory_relation_types = [
         }
     }, 
     {'has_thread': {
-            'subject_type':['Page', 'File'],
+            'subject_type':['Page', 'File', 'QuizItem', 'QuizItemEvent'],
             'object_type':['Twist'], 
             'inverse_name':'thread_of', 
             'meta_type':'factory_types'
