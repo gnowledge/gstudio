@@ -5,11 +5,22 @@
 {% block title %} {{title}} - {% if node %}{% trans 'Edit' %}{% else %}{% trans 'Create' %}{% endif %}  {% endblock %}
 
 {% block style %}
+	.quiz-type-based-div{
+	    display: none;
+	}
 
-.quiz-type-based-div{
-    display: none;
-}
+	.orgitdown textarea{
+		min-height: 100px !important;	
+	}
+{% endblock %}
 
+{% block head %}
+	{{block.super}}
+	  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> 
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> 
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script>
+	  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css">
+	  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> 
 {% endblock %}
 
 
@@ -161,9 +172,56 @@
 					<input type="text" name="maximum_attempts" value="{% if node %}{{node.quizitem_max_attempts}}{% else %}1{% endif %}">
 				</div>
 			</div>
+
+
 		</div>
 	</div>
 
+          
+      	<div class="row">
+		  	<label>{% trans "Add properties to the discussion feature " %} </label>
+		</div>
+
+
+		<div class="row">
+			<div class="small-4 large-2 columns">
+				<label class="right inline">{% trans "Release Option " %}
+				</label>
+			</div>
+
+			<div class="small-8 large-8 columns left">
+		        <select id="release_resp_sel" name="release_resp_sel">
+		          <option value="True">Show Replies to All</option>
+		          <option value="False">Hide Replies from All</option>
+		        </select>
+			</div>
+		</div>
+
+
+
+		<div class="row">
+			<div class="small-4 large-2 columns">
+				<label class="right inline">{% trans "Interaction start date " %}
+				</label>
+			</div>
+
+			<div class="small-8 large-8 columns left">
+		      	<input type="text" id="thread_start_date" name="thread_start_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+			</div>
+		</div>
+
+
+		<div class="row">
+			<div class="small-4 large-2 columns">
+				<label class="right inline">{% trans "Interaction close date " %}
+				</label>
+			</div>
+
+			<div class="small-8 large-8 columns left">
+		      	<input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+			</div>
+		</div>
+	<input type="hidden" value="Answer" name="interaction_type_sel">
 	<div class="row">
 		<div class="small-1 columns">
 			<input id="save_quiz_item" name="save_quiz_item" type="submit" class="button small" value="Save"/>
@@ -256,6 +314,107 @@ $('#add_option').click(function (){
     // Updating number of options value to hidden element
     $("#no_of_options").val(no_of_options);
 });
+
+		var startEnrollDt = $("#thread_start_date");
+		var endEnrollDt = $("#thread_close_date");
+
+		currentDate = new Date();
+		var currentDay = currentDate.getDate();
+		var currentMonth = currentDate.getMonth();
+		var currentYear = currentDate.getFullYear();
+		lowerYearLimit = currentYear;
+		upperYearLimit = currentYear + 20;
+
+
+		$(".date_month_day_year").datepicker({ 
+			changeMonth: true,
+			changeYear: true,
+			dateFormat: 'dd/mm/yy',
+			yearRange: lowerYearLimit + ":" + upperYearLimit,
+			defaultDate: '0',
+
+			onClose: function(dateText, inst) {
+			  $(this).val(dateText);
+			  
+			  var month_year = $(this).val();
+			  day = currentDay;
+			  month = currentMonth;
+			  year = currentYear;
+			  
+			  if ($(this).attr('id') == "thread_start_date") {
+			    if (month_year) {
+			      month_year = month_year.split("/");
+			      day = parseInt(month_year[0]);
+			      month = parseInt(month_year[1]);
+			      year = parseInt(month_year[2]);
+			    }
+
+			    if (endEnrollDt.val() != '') {
+			      var testStartDate = startEnrollDt.datepicker('getDate');
+			      var testEndDate = endEnrollDt.datepicker('getDate');
+
+			      if (testStartDate > testEndDate) {
+			        endEnrollDt.datepicker('setDate', testStartDate);
+			      }
+
+			      else {
+			        $(this).val(day+"/"+month+"/"+year);
+			        $(this).datepicker('setDate', new Date(year, (month-1), day));
+			      }
+			    }
+
+			    else {
+			      endEnrollDt.val(day+"/"+month+"/"+year);
+			      $(this).datepicker('setDate', new Date(year, (month-1), day));
+			    }
+			    $("#thread_close_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
+			  }
+
+			  else if ($(this).attr('id') == "thread_close_date") {
+			    if (month_year) {
+			      month_year = month_year.split("/");
+			      day = parseInt(month_year[0]);
+			      month = parseInt(month_year[1]);
+			      year = parseInt(month_year[2]);
+			    }
+
+			    if (startEnrollDt.val() != '') {
+			      var testStartDate = startEnrollDt.datepicker('getDate');
+			      var testEndDate = endEnrollDt.datepicker('getDate');
+
+			      if (testStartDate > testEndDate) {
+			        startEnrollDt.datepicker('setDate', testEndDate);
+			      }
+			      else {
+			        $(this).val(day+"/"+month+"/"+year);
+			        $(this).datepicker('setDate', new Date(year, (month-1), day));
+			      }
+			    }
+
+			    else {
+			      startEnrollDt.val(day+"/"+month+"/"+year);
+			      $(this).datepicker('setDate', new Date(year, (month-1), day));
+			    }
+			  }
+			},
+
+			beforeShow: function() {
+			  var month_year = $(this).val();
+			  day = currentDay;
+			  month = currentMonth;
+			  year = currentYear;
+
+			  if (month_year) {
+			    month_year = month_year.split("/");
+			    day = parseInt(month_year[0]);
+			    month = parseInt(month_year[1]);
+			    year = parseInt(month_year[2]);
+			  }
+			  $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+			  $(this).datepicker('setDate', new Date(year, (month-1), day));
+			},
+		});
+
 
 </script>
 
