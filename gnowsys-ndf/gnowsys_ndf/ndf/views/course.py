@@ -1429,7 +1429,7 @@ def get_resources(request, group_id):
                 units_res = [ObjectId(each_res_of_unit) for each_res_of_unit in unit_node.collection_set]
                 units_res_nodes = node_collection.find({'_id': {'$in': units_res}})
                 for each_res_node in units_res_nodes:
-                    print "\n\n each_res_node.relation_set----",each_res_node.relation_set
+                    # print "\n\n each_res_node.relation_set----",each_res_node.relation_set
                     clone_of_obj,grel_node = get_relation_value(each_res_node._id,"clone_of")
                     if clone_of_obj:
                         units_res.append(clone_of_obj._id)
