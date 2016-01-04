@@ -1826,7 +1826,10 @@ def group_dashboard(request, group_id=None):
       group_id = group_obj._id
 
       # getting the profile pic File object
-      profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
+      # profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
+      profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")      
+      if profile_pic_image:
+        profile_pic_image =  profile_pic_image[0]
 
       # for each in group_obj.relation_set:
       #     if "has_profile_pic" in each:
@@ -1865,8 +1868,11 @@ def group_dashboard(request, group_id=None):
     group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=group_obj['_id']
     pass
-  profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
 
+  # profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
+  profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")      
+  if profile_pic_image:
+    profile_pic_image = profile_pic_image[0]
   # for each in group_obj.relation_set:
   #   if "has_profile_pic" in each:
   #     if each["has_profile_pic"]:
