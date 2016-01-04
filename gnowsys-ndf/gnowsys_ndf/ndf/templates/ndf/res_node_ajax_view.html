@@ -352,8 +352,7 @@
 
 
     {% get_node node.prior_node.0 as unit_node %}
-
-    {% if node.pk|stringformat:"s" == unit_node.collection_set|last|stringformat:"s" %}
+    {% if node.pk|stringformat:"s" == unit_node.collection_set|last|stringformat:"s" and unit_node.post_node %}
       <input type="button" value="Take Quiz" class="button tiny radius take_quiz">
     {% endif %}
 
