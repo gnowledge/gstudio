@@ -4161,7 +4161,7 @@ def create_thread_for_node(request, group_id, node):
 		# thread_start_time_status = False
 		# thread_end_time_status = False
 		has_thread_status = False
-		if get_relation_value(node._id,"has_thread") != ("",""):
+		if get_relation_value(node._id,"has_thread") != None:
 			has_thread_status = True
 
 		release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
@@ -4441,7 +4441,7 @@ def replicate_resource(request, node, group_id):
             thread_obj = None
             from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
             thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
-            if thread_obj != ("",""):
+            if thread_obj != None:
                 has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
                 gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
 

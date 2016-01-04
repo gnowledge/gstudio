@@ -224,7 +224,7 @@ def approve_resource(request, group_id):
 	if approve_or_reject == "Approve":
 		if node_obj:
 			node_group_set = node_obj.group_set
-			task_id = get_relation_value(node_obj._id,"has_current_approval_task")
+			# task_id = get_relation_value(node_obj._id,"has_current_approval_task")
 			# make deep copy of object and not to copy it's reference with [:].
 			group_set_details_dict = get_moderator_group_set(node_group_set[:], group_id, get_details=True)
 			updated_group_set = group_set_details_dict['updated_group_set']
@@ -344,7 +344,7 @@ def create_moderator_task(request, group_id, node_id, \
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		
 		task_id_val = get_relation_value(node_obj._id,"has_current_approval_task")
-		if task_id_val != ('',''):
+		if task_id_val != None:
 			task_dict['_id'] = get_relation_value(node_obj._id,"has_current_approval_task")
 		# if node_obj.relation_set:
 		# 	for rel in node_obj.relation_set:
