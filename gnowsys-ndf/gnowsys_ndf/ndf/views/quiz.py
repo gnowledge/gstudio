@@ -303,8 +303,12 @@ def save_quizitem_answer(request, group_id):
 
         all_ans = request.POST.getlist("all_ans[]", '')
         node_id = request.POST.get("node", '')
+        short_ans = request.POST.get("short_ans", '')
+        if short_ans:
+            short_ans = [short_ans]
+        # print "\n\n short_ans",short_ans
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
-        thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
+        thread_obj,thread_grel = get_relation_value(node_obj._id,"has_thread")
 
         user_id = int(request.user.id)
         user_name = unicode(request.user.username)
