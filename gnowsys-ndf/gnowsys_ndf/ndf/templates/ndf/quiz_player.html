@@ -71,7 +71,7 @@
 							{% endif%}
 						</div>
 					{% elif node.quiz_type == "Short-Response" %}
-						<textarea rows="4" cols="50" name="single_choice_{{node.pk}}" placeholder="Enter answer here"></textarea>
+						<textarea rows="4" cols="50" name="single_choice_{{node.pk}}" placeholder="Enter answer here" class="short_ans_txt"></textarea>
 						<input type="button" value="Submit" class="button tiny radius short-ans_chk">
 						<br/>
 
@@ -110,6 +110,8 @@
 
 		          success: function(data){
 	            	console.log("success")
+              		window.location.replace("{{group_id}}")
+              		// window.history.pushState("", "", "/{{group_id}}"+"?selected={{node.prior_node.0}}");
 		          },
 
 		        });//end of ajax
@@ -167,6 +169,8 @@
 
 		          success: function(data){
 	            	console.log("success")
+              		window.location.replace("{{group_id}}")
+              		// window.history.pushState("", "", "/{{group_id}}"+"?selected={{node.prior_node.0}}");
 		          },
 
 		        });//end of ajax
@@ -202,13 +206,13 @@
 	})
 	$(".short-ans_chk").click(function(){
 
-		all_ans = $(".single_choice_{{node.pk}}")
+		short_ans = $(".short_ans_txt").val();
         $.ajax({
           url: "{% url 'save_quizitem_answer' group_id %}",
 
           data: {
             node: "{{node.pk}}",
-            all_ans: all_ans,
+            short_ans: short_ans,
             'csrfmiddlewaretoken': "{{csrf_token}}"
           },
 
@@ -218,11 +222,11 @@
 
           success: function(data){
         	console.log("success")
+      		window.location.replace("{{group_id}}")
+      		// window.history.pushState("", "", "/{{group_id}}"+"?selected={{node.prior_node.0}}");
           },
 
         });//end of ajax
-
-
 	})
 
 
