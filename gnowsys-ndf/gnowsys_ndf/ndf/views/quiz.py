@@ -327,6 +327,7 @@ def save_quizitem_answer(request, group_id):
             node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
             node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
         create_gattribute(user_ans._id, qip_user_given_ans_AT, all_ans)
+        response_dict['success'] = True
         return HttpResponse(json.dumps(response_dict))
 
 
