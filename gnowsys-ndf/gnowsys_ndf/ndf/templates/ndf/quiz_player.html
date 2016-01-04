@@ -72,7 +72,7 @@
 						</div>
 					{% elif node.quiz_type == "Short-Response" %}
 						<textarea rows="4" cols="50" name="single_choice_{{node.pk}}" placeholder="Enter answer here"></textarea>
-						<input type="button" value="Submit" class="button tiny radius">
+						<input type="button" value="Submit" class="button tiny radius short-ans_chk">
 						<br/>
 
 					{% endif %}
@@ -152,6 +152,25 @@
 					n.classList.remove("hide")
 				})
 				console.log(all_ans)
+		        $.ajax({
+		          url: "{% url 'save_quizitem_answer' group_id %}",
+
+		          data: {
+		            node: "{{node.pk}}",
+		            all_ans: all_ans,
+		            'csrfmiddlewaretoken': "{{csrf_token}}"
+		          },
+
+		          type: "POST",
+
+		          dataType: "json",
+
+		          success: function(data){
+	            	console.log("success")
+		          },
+
+		        });//end of ajax
+
 				$(".single-choice-chk").val("Clear")
 				$(".show-ans-btn").removeClass("hide")
 			}
@@ -181,4 +200,30 @@
 	$(".show-ans-btn").click(function(){
 		$(".fi-check").removeClass("hide")
 	})
+	$(".short-ans_chk").click(function(){
+
+		all_ans = $(".single_choice_{{node.pk}}")
+        $.ajax({
+          url: "{% url 'save_quizitem_answer' group_id %}",
+
+          data: {
+            node: "{{node.pk}}",
+            all_ans: all_ans,
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+
+          type: "POST",
+
+          dataType: "json",
+
+          success: function(data){
+        	console.log("success")
+          },
+
+        });//end of ajax
+
+
+	})
+
+
 </script>
