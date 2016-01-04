@@ -305,7 +305,7 @@ def save_quizitem_answer(request, group_id):
         node_id = request.POST.get("node", '')
         short_ans = request.POST.get("short_ans", '')
         if short_ans:
-            short_ans = [short_ans]
+            all_ans = [short_ans]
         # print "\n\n short_ans",short_ans
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
         thread_obj,thread_grel = get_relation_value(node_obj._id,"has_thread")
@@ -330,7 +330,8 @@ def save_quizitem_answer(request, group_id):
         if thread_obj != None:
             node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
             node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
-        create_gattribute(user_ans._id, qip_user_given_ans_AT, all_ans)
+        if all_ans:
+            create_gattribute(user_ans._id, qip_user_given_ans_AT, all_ans)
         response_dict['success'] = True
         return HttpResponse(json.dumps(response_dict))
 
