@@ -175,7 +175,7 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem','QuizI
                                               'data_type':'int',
                                               'meta_type':'factory_types'}},
                            {'quizitempost_user_given_ans':{'gsystem_names_list':['QuizItemPost'], 
-                                              'data_type':'bool',
+                                              'data_type':'list',
                                               'meta_type':'factory_types'}}]
 
 # the following types are useful when BibApp's second phase
