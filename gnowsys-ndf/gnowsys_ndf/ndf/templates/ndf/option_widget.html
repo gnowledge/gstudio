@@ -1,6 +1,11 @@
 <select id="widget_for" name="{{widget_for}}">
 <option value="">select</option>
+
 {% for key, value in drawer1.items %}
-<option value="{{key}}" {% if key in selected_value %}selected{% endif %}>{{value}}</option>
+
+<option value="{% firstof value.id key %}" {% if key in selected_value %}selected{% endif %}>{% firstof value.name value %}</option>
+
+
 {% endfor %}
 </select>
+
