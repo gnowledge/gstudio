@@ -335,8 +335,10 @@ class CreateGroup(object):
         # adding thumbnail 
         logo_img_node = None
         grel_id = None
-        logo_img_node, grel_id = get_relation_value(group_obj._id,unicode(logo_rt))
-
+        logo_img_node_grel_id = get_relation_value(group_obj._id,unicode(logo_rt))
+        if logo_img_node_grel_id:
+            logo_img_node = logo_img_node_grel_id[0]
+            grel_id = logo_img_node_grel_id[1]
         f = request.FILES.get("docFile", "")
         # print "\nf is ",f
 
@@ -1235,6 +1237,8 @@ class CreateCourseEventGroup(CreateEventGroup):
                     new_res = replicate_resource(request, each_res_node, group_obj._id)
                     # new_res = self.replicate_resource(request, each_res_node, group_obj)
                     prior_node_obj.collection_set.append(new_res._id)
+                    new_res.prior_node.append(prior_node_obj._id)
+                    new_res.save()
                     # below code changes the group_set of resources
                     # i.e cross-publication
                     # each_res_node.group_set.append(group_obj._id)
