@@ -470,7 +470,7 @@ def get_all_replies(parent):
 	 if parent:
 		 ex_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}],'status':{'$nin':['HIDDEN']}})
 		 ex_reply.sort('created_at',-1)
-	 return ex_replysimp
+	 return ex_reply
 
 
 @get_execution_time
@@ -3149,6 +3149,16 @@ def get_topic_breadcrumb_hierarchy(oid):
 @register.assignment_tag
 def get_gstudio_help_sidebar():
 	return GSTUDIO_HELP_SIDEBAR
+
+@get_execution_time
+@register.assignment_tag
+def social_share_resource():
+	return SOCIAL_SHARE_RESOURCE
+
+@get_execution_time
+@register.assignment_tag
+def get_ebook_help_text():
+	return GSTUDIO_EBOOKS_HELP_TEXT
 
 @get_execution_time
 @register.assignment_tag

@@ -8,11 +8,14 @@
 {
 	width:1900px; 
 }
+hr{
+	width:40%;
+}
 </style>
 
 	{% get_metadata_values as values%}
 	{% get_all_possible_languages as languages %}
-	<div class = "information-div" style="position:relative; ">
+	<div class = "information-div panel" style="position:relative">
 
 		<!-- <div style=" position:relative; float:left; width:45%; border-radius: 1px; box-shadow:1px 0.3px 0.6px 1.2px rgba(9,9,9,0.2);" style="position:relative;"> -->
 		<!-- <div class="small-12 large-5 columns"> -->
@@ -31,6 +34,7 @@
 						<a class="fi-pencil edit_profile-btn"> Edit Profile</a>
 					{% endif %}
 				</div>
+				<hr>
 			</div>
 
 			<div class="row">
@@ -41,7 +45,9 @@
 				<div class="small-4 columns large-2 end"> 
 					<label class="lname">{{usr_lname}}</label>
 				</div>
+		
 			</div>
+			<hr>
 
 			<div class="row">
 				<div class="small-3 large-3 columns">
@@ -55,7 +61,9 @@
                     </div>
                     
 				</div>
+				
 			</div>
+			<hr>
 
 			<div class="row">
 				<div class="small-3 large-3 columns">
@@ -65,7 +73,9 @@
 				<div class="small-4 columns large-2 end" > 
 					<label id="subject_proficiency_info">{{author.subject_proficiency|default:""|join:","}}</label>
 				</div>
+				
 			</div>
+			<hr>
 
 			<div class="row">
 				<div class="small-3 large-3 columns">
@@ -75,7 +85,9 @@
 				<div class="small-4 columns large-2 end"> 
 					<label>{{DOJ|date:"d M Y"}}</label>
 				</div>
+				
 			</div>
+			<hr>
 
 			<div class="row">
 				<div class="small-3 large-3 columns">
@@ -85,7 +97,9 @@
 				<div class="small-4 columns large-2 end"> 
 					<label>{{group_count}} {% trans " Groups" %}</label>
 				</div>
+				
 			</div>
+			<hr>
 
 			<div class="row">
 				<div class="small-3 large-3 columns">
@@ -96,6 +110,7 @@
 					<label>{% firstof file_count 'Not uploaded yet!'%}</label>
 				</div>
 			</div>
+			<hr>
 			{% if site_name != "NROER" %}
 				<div class="row">
 					<div class="small-3 large-3 columns">

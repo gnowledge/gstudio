@@ -1,7 +1,7 @@
 {% include "ndf/node_details_base.html" %}  
 
 {% block script %}
-// <script type="text/javascript">
+<script type="text/javascript">
 	
 	
   {% if topic %}
@@ -23,7 +23,7 @@
         choice: choice,
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
-      success: function(data) { 
+      success: function(data) {
 
         data_obj = JSON.parse(data);
 
@@ -116,9 +116,6 @@
 			        csrfmiddlewaretoken: '{{ csrf_token }}'
 		      },
 		      success: function(data){
-		      	console.log(data)
-		      	aaa = data;
-
 		      	$('#topic-resources').html(data)
 		 		}
 	 		});      

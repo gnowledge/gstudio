@@ -4,6 +4,7 @@ import datetime
 
 ''' -- imports from django -- '''
 from django.shortcuts import render_to_response, render
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from django.template import RequestContext
 from django.template import Context
 from django.template.defaultfilters import slugify
@@ -53,7 +54,7 @@ def forum(request, group_id, node_id=None):
     '''
     Method to list all the available forums and to return forum-search-query result.
     '''
-
+    print "\n\n\n inside forum"
     # getting group id and group name
     group_name, group_id = get_group_name_id(group_id)
 
@@ -89,12 +90,13 @@ def forum(request, group_id, node_id=None):
                                             'status':{'$nin':['HIDDEN']} 
                                             }).sort('last_update', -1)
         forum_detail_list = []
-
+        '''
         for each in existing_forums:
 
             temp_forum = {}
             temp_forum['name'] = each.name
             temp_forum['created_at'] = each.created_at
+            temp_forum['created_by'] = each.created_by
             temp_forum['tags'] = each.tags
             temp_forum['member_of_names_list'] = each.member_of_names_list
             temp_forum['user_details_dict'] = each.user_details_dict
@@ -110,8 +112,8 @@ def forum(request, group_id, node_id=None):
                                                         }).count()
             
             forum_detail_list.append(temp_forum)
-
-        variables = RequestContext(request, {'existing_forums': forum_detail_list,'groupid': group_id, 'group_id': group_id})
+        print "\n\n\n forum detail list",forum_detail_list'''
+        variables = RequestContext(request, {'existing_forums':existing_forums ,'groupid': group_id, 'group_id': group_id})
 
         return render_to_response("ndf/forum.html",variables)
 

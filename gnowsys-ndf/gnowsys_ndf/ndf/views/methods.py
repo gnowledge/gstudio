@@ -2799,7 +2799,8 @@ def create_task(task_dict, task_type_creation="single"):
         # i.e. either single or multiple
         if not task_dict.has_key("_id"):
           site = Site.objects.get(pk=1)
-          site = site.name.__str__()
+          # site = site.name.__str__()
+          site = site.domain.__str__()
 
           from_user = task_node.user_details_dict["created_by"]  # creator of task
 
@@ -3182,7 +3183,7 @@ def parse_data(doc):
                                                     for each in v1:
                                                         str1 += str(each["name"]) + ", "
                                                 else:
-                                                    str1 = ",".join(v1)
+                                                    str1 = ",".join(str(v1))
                                                 att_dic[k1] = str1
                                         else:
                                                 att_dic[k1] = str(v1)
@@ -3194,7 +3195,15 @@ def parse_data(doc):
                               for each in doc[i]:
                                       for k1, v1 in each.items():
                                               for rel in v1:
-                                                      rel = node_collection.one({'_id':ObjectId(rel)})
+                                                      if isinstance(rel, ObjectId):
+                                                              rel = node_collection.one({'_id':ObjectId(rel)})
+                                                              att_dic[k1] = rel.name
+                                                      elif '$oid' in rel:
+                                                              rel = rel['$oid']
+                                                              rel = node_collection.one({'_id':ObjectId(rel)})
+                                                              att_dic[k1] = rel.name
+                                                      #print "\n\n\nrel", rel
+                                                      rel = node_collection.one({'_id':ObjectId(rel._id)})
                                                       att_dic[k1] = rel.name
                               for att,value in att_dic.items():
                                   str1 =  str1 + att + " : " + value + "  "+"\n"

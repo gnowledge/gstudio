@@ -85,9 +85,7 @@
  -->
 
 
-{% block meta_content %}
-	
-{% endblock %}
+
 
 {% block collection_content %}  
 
@@ -197,18 +195,20 @@
 	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;border: 1px solid #1a1a1a;"> </div>
 
 {% endblock %}
-
+{% block meta_content %}
+	<div class="large-4 columns repository-title" style="width:100%">
+		{% if theme_GST.altnames and theme_GST.altnames != "None" and not node.name %}
+			{{theme_GST.altnames}}		
+		{% endif %}
+	</div>
+{% endblock %}
 
 {% block body_content %}
 		<div class="large-4 columns repository-title">
 				{% if node.name %}
 					{{node.name}}
-				{% elif theme_GST.altnames and theme_GST.altnames != "None" %}
-					{{theme_GST.altnames}}
-					{% else %}
-					{{theme_GST.name}}
 				{% endif%}
-	</div>
+		</div>
 
 	<div class="large-8 columns repository-desc">
 				{% if node.content_org %}
@@ -226,7 +226,7 @@
 
 <!-- 		<div class="large-4 columns repository-title"> {{node.name}}</div> 
  -->
-        <div style="float:right; margin:0 2em;" >
+        <div style="float:right; margin:0 4em; font-size:0.8em" >
 
 			<a class="collapsible_tree {% if tree == 'collapsible' or not tree %} highlight {% endif %}" style="">
 				{% trans "Theme" %} {% trans "Graph" %}

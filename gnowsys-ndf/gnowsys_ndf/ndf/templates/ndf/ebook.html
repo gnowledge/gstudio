@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 
+{% load i18n %}
 {% load ndf_tags %}
 {% load simple_filters %}
 
@@ -9,14 +10,24 @@
 <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
 <link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
 <script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
-
 {% endblock head %}
 
 {% block meta_content %}
-  
+
+  {% get_ebook_help_text as ebook_help_text_url %}
+  {% blocktrans %} 
+    <p class="text-justify subheader">Each eBook is a collection of chapter files.
+    </p> 
+  {% endblocktrans %}
+  <p>
+    <a href="{{ebook_help_text_url}}" target="_blank">How to read eBooks</a>  
+  </p>
+
 {% endblock %}
 
+
 {% comment %}
+
 {% block body_content %}
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">

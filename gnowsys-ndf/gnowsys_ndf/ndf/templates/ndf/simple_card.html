@@ -45,7 +45,13 @@
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
     
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
-    {% if resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
+    {% get_relation_value resource.pk 'has_thumbnail' as thumbnail_img_and_grel_hl %}
+    {% if thumbnail_img_and_grel_hl.0 %}
+      {% get_node logo_img as thumbnail_img_and_grel_hl.0 %}
+      {% if thumbnail_img_and_grel_hl.0.fs_file_ids.1 %}
+        <img src="{% url 'get_gridfs_resource' thumbnail_img_and_grel_hl.0.fs_file_ids.2 %}" alt="" />
+      {% endif %}
+    {% elif resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
     <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
     <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
@@ -95,11 +101,13 @@
 
   <div class="scard-content" title="{% firstof resource.altnames resource.name %}">
    <span class="scard-title">{% firstof resource.altnames resource.name %}</span>
+    
+    {% comment %}
     <!-- {% get_node_ratings request resource.pk as ratings %} -->
             <!-- <div class="rating-stars center" style="width:{{ratings.avg|multiply:16}}px;"> <!-- 16px = 1 star -->
               <!-- <div></div>
             </div> --> 
-    
+    {% endcomment %}
    
     </div>
 

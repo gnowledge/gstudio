@@ -9,7 +9,7 @@
 {% block style %}
 {{ block.super }}
   #mod_appr_rej_Modal, #mod_appr_rej_ModalLabel{
-    color: white;
+    color: black;
     font-size: 1rem;
   }
   #mod_appr_rej_ModalLabel > li{
@@ -29,7 +29,7 @@
 
 {% block body_content %}
 {{ block.super }}
-  <div id="mod_appr_rej_Modal" class="reveal-modal warning small alert-box radius" data-reveal data-alert>
+  <div id="mod_appr_rej_Modal" class="reveal-modal small alert-box radius" data-reveal data-alert>
     <div class="row mod_msg">
       	<label id="mod_appr_rej_ModalLabel"></label>
 	</div>

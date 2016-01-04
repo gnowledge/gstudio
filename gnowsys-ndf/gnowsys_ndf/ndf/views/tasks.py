@@ -27,7 +27,11 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 
-sitename = Site.objects.all()[0]
+# sitename = Site.objects.all()[0]
+site = Site.objects.get(pk=1)
+site_domain = site.domain
+# print "=== site_domain: ", site_domain
+sitename = unicode(site.name.__str__())
 
 @task
 def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
@@ -38,7 +42,7 @@ def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
     to_send_user = User.objects.get(id=to_user)
     try:
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        site = sitename.name.__str__()
+        # site = sitename.name.__str__()
         objurl = "http://test"
         render = render_to_string(
             "notification/label.html",
@@ -47,7 +51,7 @@ def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
                 'activity': activ,
                 'conjunction': '-',
                 'object': group_obj,
-                'site': site,
+                'site': sitename,
                 'link': objurl
             }
         )

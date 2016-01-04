@@ -94,8 +94,8 @@
   {% if user.is_authenticated %}
     {% include "ndf/replyforum.html" %}
   {% endif %} 
-  {% endcomment %} -->
   <h4>{% trans "Top Contributors" %}</h4>
+  {% endcomment %} -->
   {% endblock %}
 
   {% block body_content %}
@@ -103,11 +103,12 @@
   <!-- <div class="row"> -->
     <!-- <div class="small-12 large-12 columns"> -->
 
-    <h2>{% trans "Forum:" %} 
-    <a title="{{forum.name}}" href="#">
-     <a href="{% url 'show' groupid forum.pk %}">
-        {{forum.name}}</a></h2>
-    </a>
+    <div class="repository-title large-4 columns">{% trans "Forum" %}</div> 
+    
+     <a href="{% url 'show' groupid forum.pk %}" style="color:#878787!important;">
+        <div class="repository-desc large-8 columns">{{forum.name}}</a></div>
+        <br>
+    
     {% get_edit_url forum.pk as edit_url %}
    
     {% if user.is_superuser or forum.created_by == user.id %}

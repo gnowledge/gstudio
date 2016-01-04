@@ -83,4 +83,10 @@ def create_auth_grp(sender, user, request, **kwargs):
             node_collection.collection.update({'_id': home_group_obj._id}, {'$push': {'author_set': user_id }}, upsert=False, multi=False)
             home_group_obj.reload()
 
+        desk_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("desk")})
+        if desk_group_obj and user_id not in desk_group_obj.author_set:
+            # print "\n\n adding in desk_group_obj"
+            node_collection.collection.update({'_id': desk_group_obj._id}, {'$push': {'author_set': user_id }}, upsert=False, multi=False)
+            desk_group_obj.reload()
+
 

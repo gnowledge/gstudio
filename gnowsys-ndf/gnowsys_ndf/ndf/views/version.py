@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string,get_published_version_list
+from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from gnowsys_ndf.ndf.views.methods import parse_data
 try:
   from bson import ObjectId

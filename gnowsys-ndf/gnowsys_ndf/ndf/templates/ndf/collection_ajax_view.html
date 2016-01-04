@@ -234,6 +234,11 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
     text-indent:-32px !important;
 
 }
+.hanging-indent-topics-name{
+    position: relative !important;
+    padding-left: 16px !important;
+    text-indent:-18px !important;
+}
 
   /*.collection > ul li:nth-child(odd) { background: #ddd; }*/
   .collection > ul li { border-bottom: solid thin #ddd; }
@@ -243,9 +248,10 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
     
   #view_collection legend{
     text-align: center;
-    border-left: solid thin #ddd;
-    border-right: solid thin #ddd;
+    //border-left: solid thin #ddd;
+    //border-right: solid thin #ddd;
     margin-top: 20px;
+    color:black !important;
   }
   
 
@@ -262,10 +268,9 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
   {% if topic %}
     <!-- For displaying related nodes in topic page -->
     <!-- Related node means all collection elements of its teme item i.e all siblings of topic node -->
-    <fieldset>
+    
       {% if prior_obj %}        
-      <legend><h3><small>Topics in {{prior_obj.name}}</small></h3></legend>
-  
+      <div class="repository-desc large-12 columns" style="width:100%">Topics in {{prior_obj.name}}</div>
         {% comment %}
           {% for each in prior_obj.collection_set %}
               <!-- To get the node object -->
@@ -279,7 +284,7 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
           {% endfor %}
         {% endcomment %}
 
-          <ul>
+          <ul style="list-style: none; border-bottom: solid thin #ddd;">
             {% for each in prior_obj.collection_set %}
 
                 <!-- To get the node object -->
@@ -287,18 +292,15 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
                 
                 <!-- Clicked topic should not be included in related nodes list -->
                 {% if node.pk != obj.pk %}
-                  <li> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a> </li>
+                  <li class="hanging-indent-topics-name" style="border-bottom: solid thin #ddd; "> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a> </li>
                 {% else %}
-                  <li> <span class="text-gray">{{obj.name}}</span> </li>
+                  <li class="hanging-indent-topics-name" style="border-bottom: solid thin #ddd;"> <span class="text-gray">{{obj.name}}</span> </li>
                 {% endif %} 
-
             {% endfor %}
           </ul>
 
       {% endif %}
         
-    </fieldset>
-
   {% endif %}
   <!-- <b class="current">{{node.name}}</b> -->
   {% if node.collection_set %}

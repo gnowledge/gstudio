@@ -43,14 +43,16 @@ from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import add
 
 SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files")
 
+script_start_str = "######### Script ran on : " + time.strftime("%c") + " #########\n------------------------------------------------------------\n"
 log_file_not_found = []
-log_file_not_found.append("######### Script ran on : " + time.strftime("%c") + " #########\n------------------------------------------------------------\n")
+log_file_not_found.append(script_start_str)
 
 log_list = []  # To hold intermediate errors
-log_list.append("######### Script ran on : " + time.strftime("%c") + " #########\n############################################################\n")
+log_list.append(script_start_str)
 
 file_gst = node_collection.one({'_type': 'GSystemType', "name": "File"})
 home_group = node_collection.one({"name": "home", "_type": "Group"})
+warehouse_group = node_collection.one({"name": 'warehouse', "_type": "Group"})
 theme_gst = node_collection.one({'_type': 'GSystemType', "name": "Theme"})
 theme_item_gst = node_collection.one({'_type': 'GSystemType', "name": "theme_item"})
 topic_gst = node_collection.one({'_type': 'GSystemType', "name": "Topic"})
@@ -58,6 +60,7 @@ twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
 rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
 thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
 has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+has_thumbnail_rt = node_collection.one({'_type': "RelationType", 'name': u"has_thumbnail"})
 discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
 nroer_team_id = 1
 
@@ -188,9 +191,9 @@ class Command(BaseCommand):
                 with open(log_file_path, 'a') as log_file:
                     log_file.writelines(log_list)
 
-            if log_file_not_found:
+            if log_file_not_found != [script_start_str]:
 
-                log_file_not_found.append("============================== End of Iteration =====================================\n\n\n")
+                log_file_not_found.append("============================== End of Iteration =====================================\n")
                 log_file_not_found.append("-------------------------------------------------------------------------------------\n")
 
                 log_file_name = args[0].replace('.', '_FILES_NOT_FOUND.').rstrip("csv") + "log"
@@ -454,7 +457,7 @@ def parse_data_create_gsystem(json_file_path):
 
             if collection_name and nodeid:
 
-                collection_node = node_collection.one({
+                collection_node = node_collection.find_one({
                         '_type': 'File',
                         'group_set': {'$in': [home_group._id]},
                         'name': unicode(collection_name)
@@ -468,9 +471,10 @@ def parse_data_create_gsystem(json_file_path):
 
             if thumbnail_url and nodeid:
                 try:
+                    print "\n\n- Attaching thumbnail to resource\n"
                     attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document, i)
-                except:
-                    pass
+                except Exception, e:
+                    print e
 
             # print type(nodeid), "-------", nodeid, "\n"
 
@@ -595,106 +599,6 @@ def parse_data_create_gsystem(json_file_path):
 
                         if json_document[key]:
 
-                            # # -----------------------------
-                            # hierarchy_output = None
-                            # def _get_id_from_hierarchy(hier_list, oid=None):
-                            #     '''
-                            #     Returns the last hierarchical element's ObjectId.
-                            #     Arguments to be passes is list of unicode names.
-                            #     e.g.
-                            #     hier_list = [u'NCF', u'Science', u'Physical world', u'Materials', u'States of matter', u'Liquids']
-                            #     '''
-                            #     # print oid
-                            #     if len(hier_list) >= 2:
-                            #         # print hier_list, "len(hier_list) : ", len(hier_list)
-                            #         # object_exist = ""
-                            #         try:
-                            #             if oid:
-                            #                 curr_oid = node_collection.one({ "_id": oid })
-                            #                 # print "curr_oid._id", curr_oid._id
-
-                            #             else:
-                            #                 row_list = []
-
-                            #                 for e in hier_list:
-                            #                     row_list.append(e)
-
-                            #                 curr_oid = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-
-                            #             if curr_oid:
-                            #                 # object_exist = True
-                            #                 next_oid = node_collection.one({ 
-                            #                                           "name": hier_list[1],
-                            #                                           'group_set': {'$all': [ObjectId(home_group._id)]},
-                            #                                           'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
-                            #                                           '_id': {'$in': curr_oid.collection_set }
-                            #                                           })
-
-                                        
-                            #                 # print "||||||", next_oid.name
-                            #                 hier_list.remove(hier_list[0])
-                            #                 # print "calling _get_id_from_hierarchy(", hier_list,", ", next_oid._id,")" 
-
-                            #                 _get_id_from_hierarchy(hier_list, next_oid._id)
-      
-                            #             else:
-                            #                 error_message = "!! ObjectId of curr_oid does not found."
-                            #                 print error_message
-                            #                 log_list.append(error_message)
-
-                            #         except Exception as e:
-                            #             error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
-                            #             # print error_message
-                            #             log_list.append(error_message)
-
-                            #     else:
-                            #         print "==== return oid: ", oid
-                            #         global hierarchy_output
-                            #         hierarchy_output = oid
-
-                            #     print "==== hierarchy_output"
-                            #     return hierarchy_output
-                            #     print "==== hierarchy_output"
-
-                            #     # -----------------------------                  
-                          
-                            #     # if len(hier_list) == 1:
-                            #     #     if oid:
-                            #     #       print "oid: ", oid
-                            #     #       return oid
-                            #     #     else:
-                            #     #       # print "else - hier_list : ", hier_list
-                            #     #       temp_obj = node_collection.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                            #     #       # temp_obj = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                            #     #       # print temp_obj
-                            #     #       if temp_obj.count() > 0:
-                            #     #           for e in temp_obj:
-                            #     #               if e.prior_node:
-                            #     #                   for k in e.prior_node:
-                            #     #                       obj = node_collection.one({'_id':ObjectId(k) })
-                            #     #                       # print "\nitem: ",row_list[len(row_list)-2],"\n"
-                            #     #                       if obj.name == row_list[len(row_list)-2]:
-                            #     #                           # print e._id
-                            #     #                           return e._id
-
-                            #     #           return None
-                            #     #       else:
-                            #     #           return None
-                            #     #       # if temp_obj:
-                            #     #       #   return temp_obj._id
-                            #     #       # else:
-                            #     #       #   return None
-
-                            #     #   # if any one of the item of hierarchy does not exist in database then:
-                            #     # elif not object_exist:
-                            #     #     temp_obj = node_collection.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                            #     #     if temp_obj:
-                            #     #       return temp_obj._id
-                            #     #     else:
-                            #     #       return None
-
-                            #   # -------------- END of _get_id_from_hierarchy() ---------------                  
-
                             # most often the data is hierarchy sep by ":"
                             if ":" in json_document[key]:
                                 formatted_list = []
@@ -807,6 +711,7 @@ def parse_data_create_gsystem(json_file_path):
             print error_message # Keep it!
             log_list.append(str(error_message))
 
+
 def create_thread_obj(node_id):
     '''
     Creates thread object.
@@ -848,10 +753,11 @@ def create_thread_obj(node_id):
         log_list.append(str(info_message))
 
 
-def create_resource_gsystem(resource_data, row_no=''):
+def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
   
     # fetching resource from url
     resource_link = resource_data.get("resource_link")  # actual download file link
+    resource_link = resource_link.replace(' ', '%20')
 
     if not resource_link:
         resource_link = resource_link_common + resource_data.get("file_name")
@@ -866,6 +772,8 @@ def create_resource_gsystem(resource_data, row_no=''):
 
     try:
         files = urllib2.urlopen(resource_link)
+        print "  Fetched the resource successfully!\n"
+
     except urllib2.URLError, e:
         error_message = "\n!! File Not Found at: " + resource_link
         log_list.append(error_message)
@@ -887,6 +795,7 @@ def create_resource_gsystem(resource_data, row_no=''):
     content_org = resource_data["content_org"]
     tags = resource_data["tags"]
     language = resource_data["language"]
+    group_set_id = ObjectId(group_set_id) if group_set_id else home_group._id
 
     img_type = None
     access_policy = None
@@ -953,9 +862,9 @@ def create_resource_gsystem(resource_data, row_no=''):
         print info_message
         
         files.seek(0)
-        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
+
+        fileobj_oid, video = save_file(files, name, userid, group_set_id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
         # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
-        
         # filetype = magic.from_buffer(files.read(100000), mime = 'true')  # Gusing filetype by python-magic
 
         node_collection.collection.update(
@@ -978,31 +887,48 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     updated_res_data = resource_data.copy()
 
     updated_res_data['resource_link'] = thumbnail_url
-    updated_res_data['name'] = u'thumbnail'
+    updated_res_data['name'] = u'Thumbnail: ' + thumbnail_url.split('/')[-1]
     
     updated_res_data['content_org'] = ''
     updated_res_data['tags'] = []
 
     # th_id: thumbnail id
-    th_id = create_resource_gsystem(updated_res_data, row_no)
-    # print "th_id: ", th_id
+    th_id = create_resource_gsystem(updated_res_data, row_no, group_set_id=warehouse_group._id)
+
+    # th_obj = node_collection.one({'_id': ObjectId(th_id)})
+
+    # # tring to keep mid-size image otherwise thumbnail
+    # try:
+    #     th_gridfs_id = th_obj.fs_file_ids[2]
+    # except:
+    #     th_gridfs_id = th_obj.fs_file_ids[1]
+    # # print "th_gridfs_id: ", th_gridfs_id
+
+    # node_obj = node_collection.one({'_id': ObjectId(node_id)})
     
-    th_obj = node_collection.one({'_id': ObjectId(th_id)})
-    th_gridfs_id = th_obj.fs_file_ids[1]
-    # print "th_gridfs_id: ", th_gridfs_id
+    # print "~~~~~~~~~~", ObjectId(node_id), " : ", has_thumbnail_rt, " : ", ObjectId(th_id)
+    
+    info_message = "\n- Creating GRelation ("+ str(node_id)+ " -- has_thumbnail -- "+ str(th_id)+") ..."
+    print info_message
+    log_list.append(str(info_message))
 
-    node_obj = node_collection.one({'_id': ObjectId(node_id)})
-    # print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
-    node_fs_file_ids = node_obj.fs_file_ids
+    create_grelation(ObjectId(node_id), has_thumbnail_rt, ObjectId(th_id))
 
-    if len(node_fs_file_ids) == 1:
-        node_fs_file_ids.append(ObjectId(th_gridfs_id))
-    elif len(node_fs_file_ids) > 1:
-        node_fs_file_ids[1] = ObjectId(th_gridfs_id)
+    info_message = "\n- Grelation processing done for has_thumbnail.\n"
+    print info_message
+    log_list.append(str(info_message))
 
-    # print "node_fs_file_ids: ", node_fs_file_ids
+    # # print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
+    # node_fs_file_ids = node_obj.fs_file_ids
 
-    node_collection.collection.update(
-                                        {'_id': ObjectId(node_id)},
-                                        {'$set': {'fs_file_ids': node_fs_file_ids}}
-                                    )
+    # if len(node_fs_file_ids) == 1:
+    #     node_fs_file_ids.append(ObjectId(th_gridfs_id))
+    # elif len(node_fs_file_ids) > 1:
+    #     node_fs_file_ids[1] = ObjectId(th_gridfs_id)
+
+    # # print "node_fs_file_ids: ", node_fs_file_ids
+
+    # node_collection.collection.update(
+    #                                     {'_id': ObjectId(node_id)},
+    #                                     {'$set': {'fs_file_ids': node_fs_file_ids}}
+    #                                 )

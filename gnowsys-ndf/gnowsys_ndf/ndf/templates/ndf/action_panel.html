@@ -101,8 +101,6 @@
 					<!-- Edit button -->
 						{% edit_policy groupid node request.user as status %}
 						{% if is_user_authenticated %}
-							{% get_sg_member_of groupid as list_of_sg_member_of %}
-							{% if "ProgramEventGroup" not in list_of_sg_member_of %}
 							{% get_edit_url node.pk as edit_url %}
 							{% if is_group %}
 								{% if is_gstaff %}
@@ -116,12 +114,11 @@
 								{% if is_gstaff or node.created_by == user.id %}
 									<a href="{% url edit_url group_id node %}" class="tiny button radius left-btn" title="Edit this {{node.member_of_names_list.0}}">{% trans " Edit" %}</a>
 								{% else %}
-									<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title={% trans "You are not authorized for this action" %}>
+									<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title="{% trans 'You are not authorized for this action' %}">
 								{% endif %}
 							{% endif %}
-							{% endif %}
 						{% else %}
-							<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title={% trans "You are not authorized for this action" %}>
+							<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title="{% trans 'You are not authorized for this action' %}">
 						{% endif %}
 
 
@@ -159,7 +156,7 @@
 							<!-- {% switch_group_conditions request.user group_id as switch_conditions %} -->
 							<!-- If resource is already under moderation, don't show cross-publish button -->
 
-								<span data-tooltip title={% trans "Publish this resource in other group/s" %} class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius right-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
+								<span  title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius right-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
 								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 									<h4>{% trans "Select Groups" %}</h4>
 									<div id="switchgrp" class="content">
@@ -170,18 +167,18 @@
 									<a class="close-reveal-modal">&#215;</a>
 								</div>
 							{% else %}
-								<input type="button" class="tiny button radius left-btn secondary disabled" title={% trans "You are not authorized for this action" %} value="{% trans 'Cross Publish' %}">
+								<input type="button" class="tiny button radius left-btn secondary disabled" title="{% trans 'You are not authorized for this action' %}" value="{% trans 'Cross Publish' %}">
 							{% endif %}
 						{% endif %}
 						<!-- Delete button				 -->
 						{% if node.created_by == request.user.id or is_gstaff %}
 							{% if "Page" in node.member_of_names_list or "File" in node.member_of_names_list or "Term" in node.member_of_names_list %}
-								<a class="tiny button radius right-btn delete-btn" title="Delete this {{node.member_of_names_list.0}}">{% trans 'Delete this ' %} {{node.member_of_names_list.0}}</a>
+								<a class="tiny button radius right-btn delete-btn" title="Delete  {{node.member_of_names_list.0}}">{% trans 'Delete' %} {{node.member_of_names_list.0}}</a>
 							{% else %}
-								<input type="button" class="tiny button radius right-btn disabled secondary" value="{% trans 'Delete this '  %} {{node.member_of_names_list.0}}">
+								<input type="button" class="tiny button radius right-btn disabled secondary" value="{% trans 'Delete'  %} {{node.member_of_names_list.0}}">
 							{% endif %}
 						{% else %}
-							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete this ' %}{{node.member_of_names_list.0}}" title={% trans "You are not authorized for this action" %}>
+							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete' %} {{node.member_of_names_list.0}}" title="{% trans 'You are not authorized for this action' %}">
 						{% endif %}
 
 
@@ -201,7 +198,7 @@
 						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
 							<!-- {% switch_group_conditions request.user group_id as switch_conditions %} -->
 							<!-- If resource is already under moderation, don't show cross-publish button -->
-								<span data-tooltip title={% trans "Publish this resource in other group/s" %} class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius right-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
+								<span  title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius right-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
 								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 									<div id="switchgrp" class="content">
 									<h4>{% trans "Select Groups" %}</h4>
@@ -217,13 +214,13 @@
 
 					{% else %}
 						<input type="button" class="tiny disabled secondary button radius left-btn" value="{% trans "Translate" %}" >
-						<span data-tooltip title={% trans "Publish this resource in other group/s" %} class="has-tip tip-bottom"><input type="button"class="secondary disabled tiny button radius right-btn" value="{% trans 'Cross Publish' %}"></span>
+						<span title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><input type="button" class="secondary disabled tiny button radius right-btn" value="{% trans 'Cross Publish' %}"></span>
 					{% endif %}
 				</div>
 			{% endcomment %}
 			<!-- Tags row -->
 				<div class="row tag-rating-div">
-					<span data-tooltip title='{% trans "keyword or label to categorize" %}'><label class="lbl_tag lbl_field">{% trans "Tags" %}</label></span>
+					<span title="{% trans 'keyword or label to categorize' %}"><label class="lbl_tag lbl_field">{% trans "Tags" %}</label></span>
 						{% if node.tags %}
 							{% for tag in node.tags %}
 								{% if forloop.counter < 3 %}
@@ -247,7 +244,7 @@
 					{% get_list_of_fields node.type_of "name" as type_of_list %}
 					{% if "Info page" not in type_of_list %}
 						<div class="row tag-rating-div">
-							<span data-tooltip title='{% trans "Rating defines popularity" %}'>
+							<span title="{% trans 'Rating defines popularity' %}">
 								<label class="lbl_tag lbl_field">{% trans "Rating" %}</label>
 							</span>
 							<div class="rating_template"> {% include "ndf/rating.html" %} </div>
@@ -263,18 +260,22 @@
 	        	{% endif %}
 
 		    <!-- Graphs For Topics or Concept -->
-	      	{% comment %}
-		      {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
+	      	
+		      {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list or "Page" in node.member_of_names_list %}
 		        <!-- Below code/widgets will only be shown for all resource instances/documents
 		             which are Topic or Concept
 		        -->
 
-		        
+		        {% if node.collection_set or node.prior_node %}
+		        	
 		        <!-- commented for time being, for TB. -->
 		        <a href="#" class="lbl_field tag-rating-div" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
 		        
 		        <ul id="graph-list" class="f-dropdown" data-dropdown-content>
+		        	
+		        {% comment %}
 		          <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% trans "Concept Graph" %}</a></li>
+		        {% endcomment %}
 
 		          {% if node.collection_set %}
 		          	<li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
@@ -284,8 +285,9 @@
 		          	<li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
 		          {% endif %}               
 		        </ul>
+		        {% endif %}
 		      {% endif %}
-	        {% endcomment %}
+	        
 	
 		        
 			{% endif %}
@@ -314,11 +316,11 @@
 							{% endif %}								
 						{% else %}
 							{% if user_is_joined == "joined" or  user_is_joined == "author" %}
-								{% if node.status != 'MODERATION' %}
-									{% if "File" in node.member_of_names_list %}
+								{% if node.status != 'MODERATION' %} 
+									{% if "File" in node.member_of_names_list and group_name_tag != "home" %}
 										<a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 									{% else %}
-										{% if "Theme" in node.member_of_names_list or "Topic" in node.member_of_names_list %}
+										{% if "Theme" in node.member_of_names_list or "Topic" in node.member_of_names_list  %}
 											{% if is_gstaff %}
 												<a href="{% url create_url group_name_tag app_id %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 											{% endif %}
@@ -326,8 +328,8 @@
 										{% elif "Term" in node.member_of_names_list %}
 											<a href="{% url create_url group_name_tag %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} Topic
 											</a>
-										{% elif "Group" not in node.member_of_names_list and "ProgramEventGroup" not in node.member_of_names_list and "CourseEventGroup" not in node.member_of_names_list and "ModeratingGroup" not in node.member_of_names_list %}
-											<a href="{% url create_url group_name_tag %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+										{% elif "Group" not in node.member_of_names_list and "ProgramEventGroup" not in node.member_of_names_list and "CourseEventGroup" not in node.member_of_names_list and "ModeratingGroup" not in node.member_of_names_list  and group_name_tag != "home"%}
+											<a href="{% url create_url group_name_tag %}" class="tiny button radius expand mod-btn" title="Create New  {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 										{% endif %}
 									{% endif %}
 								{% endif %}
@@ -368,7 +370,9 @@
 				<!-- List Members and Join buttons -->
 				<div class="row btn-row">
 					<!-- List Members -->
-						<input type="button" id ="btn_list_member" class="tiny button radius left-btn" data-reveal-id="firstModal" value="{% trans 'List Members' %}" title="List Members of this group">
+					{% if  is_gstaff %}	
+						<input type="button" id ="btn_list_member" class="tiny button radius  left-btn" data-reveal-id="firstModal" value="{% trans 'List Members' %}" title="List Members of this group">
+					{% endif %}
 						<!-- Reveal Modals begin -->
 						<div id="firstModal" class="reveal-modal" data-reveal></div>
 					
@@ -389,17 +393,17 @@
 									{% if allow_to_join %}
 									<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Join' %}" title="Join this Group">
 									{% else %}
-									<input class="tiny button radius secondary disabled right-btn" type="button" id="notify" value="{% trans 'Closed' %}" title={% trans "You are not authorized for this action" %}>
+									<input class="tiny button radius secondary disabled right-btn" type="button" id="notify" value="{% trans 'Closed' %}" title="{% trans 'You are not authorized for this action' %}">
 									{% endif %}
 									{% comment %}
 										<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Follow' %}">
 									{% endcomment %}
 								{% endif %}
 							{% else %}
-								<input class="tiny button radius secondary disabled right-btn" type="button" value="{% trans 'Joined' %}" title={% trans "You are already a member of this group" %}>
+								<input class="tiny button radius secondary disabled right-btn" type="button" value="{% trans 'Joined' %}" title="{% trans 'You are already a member of this group' %}">
 							{% endif %}
 						{% else %}
-							<input class="tiny button radius disabled secondary right-btn" type="button" value="{% trans 'Join' %}" title={% trans "You are not authorized for this action" %} >
+							<input class="tiny button radius disabled secondary right-btn" type="button" value="{% trans 'Join' %}" title="{% trans 'You are not authorized for this action' %}" >
 						{% endif %}
 				</div>
 			{% endif %}

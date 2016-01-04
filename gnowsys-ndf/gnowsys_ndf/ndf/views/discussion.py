@@ -229,38 +229,38 @@ def discussion_reply(request, group_id, node_id):
             # print "===========", reply
 
             # ---------- mail/notification sending -------
-            '''
-            node = node_collection.one({"_id": ObjectId(node_id)})
-            node_creator_user_obj = User.objects.get(id=node.created_by)
-            node_creator_user_name = node_creator_user_obj.username
+            try:
+                node = node_collection.one({"_id": ObjectId(node_id)})
+                node_creator_user_obj = User.objects.get(id=node.created_by)
+                node_creator_user_name = node_creator_user_obj.username
 
-            site = Site.objects.get(pk=1)
-            site = site.name.__str__()
-            
-            from_user = user_name
+                site = Site.objects.get(pk=1)
+                site = site.name.__str__()
+                
+                from_user = user_name
 
-            to_user_list = [node_creator_user_obj]
+                to_user_list = [node_creator_user_obj]
 
-            msg = "\n\nDear " + node_creator_user_name + ",\n\n" + \
-                  "A reply has been added in discussion under the " + \
-                  node.member_of_names_list[0] + " named: '" + \
-                  node.name + "' by '" + user_name + "'."
+                msg = "\n\nDear " + node_creator_user_name + ",\n\n" + \
+                      "A reply has been added in discussion under the " + \
+                      node.member_of_names_list[0] + " named: '" + \
+                      node.name + "' by '" + user_name + "'."
 
-            activity = "Discussion Reply"
-            render_label = render_to_string(
-                "notification/label.html",
-                {
-                    # "sender": from_user,
-                    "activity": activity,
-                    "conjunction": "-",
-                    "link": "url_link"
-                }
-            )
-            notification.create_notice_type(render_label, msg, "notification")
-            notification.send(to_user_list, render_label, {"from_user": from_user})
-
+                activity = "Discussion Reply"
+                render_label = render_to_string(
+                    "notification/label.html",
+                    {
+                        # "sender": from_user,
+                        "activity": activity,
+                        "conjunction": "-",
+                        "link": "url_link"
+                    }
+                )
+                notification.create_notice_type(render_label, msg, "notification")
+                notification.send(to_user_list, render_label, {"from_user": from_user})
+            except Exception as notification_err:
+                print "\n Unable to send notification", notification_err
             # ---------- END of mail/notification sending ---------
-            '''
             return HttpResponse( reply )
 
         else: # no reply content
