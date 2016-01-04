@@ -4172,6 +4172,8 @@ def create_thread_for_node(request, group_id, node):
 		end_time = request.POST.get("thread_close_date", '')
 		if end_time:
 			end_time = datetime.strptime(end_time, "%d/%m/%Y")
+
+
 		twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
 		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
 		has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
@@ -4241,7 +4243,7 @@ def create_thread_for_node(request, group_id, node):
 
 		thread_obj.reload()
 		# print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
-		return True
+		return thread_obj
 
 def node_thread_access(group_id, node):
     """
@@ -4436,6 +4438,13 @@ def replicate_resource(request, node, group_id):
         clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
         create_grelation(new_gsystem._id, clone_of_RT, node._id)
         if "QuizItem" in node.member_of_names_list:
+            thread_obj = None
+            from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
+            thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
+            if thread_obj != ("",""):
+                has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+                gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
+
             # Setup all relevant Attributes for QuizItemEvent
             node.get_neighbourhood(node.member_of)
     
@@ -4452,7 +4461,7 @@ def replicate_resource(request, node, group_id):
                 create_gattribute(new_gsystem._id,options_AT, node.options)
             if node.correct_answer:
                 create_gattribute(new_gsystem._id,correct_answer_AT, node.correct_answer)
-            if "quizitem_show_correct_ans" in node:
+            if "quizitem_show_correct_ans" in node and node.quizitem_show_correct_ans != None:
                 create_gattribute(new_gsystem._id,quizitem_show_correct_ans_AT, node.quizitem_show_correct_ans)
             if node.quizitem_problem_weight:
                 create_gattribute(new_gsystem._id,quizitem_problem_weight_AT, node.quizitem_problem_weight)

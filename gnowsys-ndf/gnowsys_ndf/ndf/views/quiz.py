@@ -26,7 +26,7 @@ from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls, get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls, get_group_name_id, create_thread_for_node
 
 
 #######################################################################################################################################
@@ -193,6 +193,8 @@ def create_edit_quiz_item(request, group_id, node_id=None):
             correct_answer = map(int,correct_ans_val) # Convert list of unicode ele to list of int ele
             create_gattribute(quiz_item_node._id, correct_answer_AT, correct_answer)
 
+        thread_obj = create_thread_for_node(request,group_id, quiz_item_node)
+
         quiz_item_node.reload()
         quiz_item_node.status = u"PUBLISHED"
 
@@ -287,4 +289,15 @@ def quiz_details(request, group_id, node_id):
                                   context_variables,
                                   context_instance=RequestContext(request)
         )
+
+# @login_required
+# def save_quizitem_answer(request, group_id):
+#     response_dict = {"success": False}
+#     if request.is_ajax() and request.method == "POST":
+#         try:
+#             group_id = ObjectId(group_id)
+#         except:
+#             group_name, group_id = get_group_name_id(group_id)
+#         group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
 
