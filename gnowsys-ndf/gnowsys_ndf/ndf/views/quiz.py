@@ -5,12 +5,12 @@
 from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
-# from django.http import HttpResponse
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-
+import json
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -27,6 +27,7 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls, get_group_name_id, create_thread_for_node
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 
 
 #######################################################################################################################################
@@ -290,14 +291,41 @@ def quiz_details(request, group_id, node_id):
                                   context_instance=RequestContext(request)
         )
 
-# @login_required
-# def save_quizitem_answer(request, group_id):
-#     response_dict = {"success": False}
-#     if request.is_ajax() and request.method == "POST":
-#         try:
-#             group_id = ObjectId(group_id)
-#         except:
-#             group_name, group_id = get_group_name_id(group_id)
-#         group_obj = node_collection.one({'_id': ObjectId(group_id)})
+@login_required
+def save_quizitem_answer(request, group_id):
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
+        # group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+        all_ans = request.POST.getlist("all_ans[]", '')
+        node_id = request.POST.get("node", '')
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
+        if thread_obj != ("",""):
+
+        user_id = int(request.user.id)
+        user_name = unicode(request.user.username)
+
+        qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
+        qip_user_given_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_given_ans"})
+
+        user_ans = node_collection.collection.GSystem()
+        user_ans.name = unicode("Answer_of:" + str(node_obj.name) + "-Answer_by:"+ str(user_name))
+        user_ans.status = u"PUBLISHED"
+
+        user_ans.created_by = user_id
+        user_ans.modified_by = user_id
+        user_ans.contributors.append(user_id)
+
+        user_ans.member_of.append(qip_gst._id)
+        user_ans.group_set.append(group_id)
+        user_ans.save()
+        create_gattribute(user_ans._id, qip_user_given_ans_AT, all_ans)
+        return HttpResponse(json.dumps(response_dict))
+
 
 
