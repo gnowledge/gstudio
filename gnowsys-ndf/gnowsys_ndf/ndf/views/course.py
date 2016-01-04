@@ -1534,10 +1534,10 @@ def save_resources(request, group_id):
                     else:
                         new_res_set.append(new_gs._id)
                     node_collection.collection.update({'_id': new_gs._id}, {'$push': {'prior_node':cu_new._id}},upsert=False,multi=False)
-                else:
-                    new_res_set.append(each_res_node._id)
-        node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':new_res_set}},upsert=False,multi=False)
-        cu_new.reload()
+        for each_res_in_unit in new_res_set:
+            if each_res_in_unit not in cu_new.collection_set:
+                cu_new.collection_set.append(each_res_in_unit)
+                cu_new.save()
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
         return HttpResponse(json.dumps(response_dict))
@@ -1753,6 +1753,7 @@ def add_course_file(request, group_id):
             file_node.status = u"PUBLISHED"
             file_node.save()
             context_node.collection_set.append(file_node._id)
+            file_node.prior_node.append(context_node._id)
             file_node.save()
         context_node.save()
     return HttpResponseRedirect(url_name)
