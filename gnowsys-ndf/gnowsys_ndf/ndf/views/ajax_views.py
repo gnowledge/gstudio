@@ -134,6 +134,7 @@ def collection_nav(request, group_id):
   This ajax function retunrs the node on main template, when clicked on collection hierarchy
   '''
   if request.is_ajax() and request.method == "POST":
+    curr_node_obj = None
     node_id = request.POST.get("node_id", '')
     curr_node_id = request.POST.get("curr_node", '')
     node_type = request.POST.get("nod_type", '')
