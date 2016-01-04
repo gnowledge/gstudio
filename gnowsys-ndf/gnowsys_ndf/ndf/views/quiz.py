@@ -305,7 +305,6 @@ def save_quizitem_answer(request, group_id):
         node_id = request.POST.get("node", '')
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
         thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
-        if thread_obj != ("",""):
 
         user_id = int(request.user.id)
         user_name = unicode(request.user.username)
@@ -324,6 +323,9 @@ def save_quizitem_answer(request, group_id):
         user_ans.member_of.append(qip_gst._id)
         user_ans.group_set.append(group_id)
         user_ans.save()
+        if thread_obj != None:
+            node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
+            node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
         create_gattribute(user_ans._id, qip_user_given_ans_AT, all_ans)
         return HttpResponse(json.dumps(response_dict))
 
