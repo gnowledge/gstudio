@@ -1522,24 +1522,24 @@ def save_resources(request, group_id):
         if cu_new._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
         # print "\n\n member_of_names_list----", cu_new.member_of_names_list, "list_of_res_ids", list_of_res_ids
-
         if "CourseUnitEvent" in cu_new.member_of_names_list:
             list_of_res_nodes = node_collection.find({'_id': {'$in': list_of_res_ids}})
 
+            new_res_set = []
             for each_res_node in list_of_res_nodes:
-
-                if "QuizItem" in each_res_node.member_of_names_list:
-
-                    index_of_qi = list_of_res_ids.index(each_res_node._id)
-
+                if each_res_node._id not in cu_new.collection_set:
                     new_gs = replicate_resource(request, each_res_node, group_id)
-                    list_of_res_ids[index_of_qi] = new_gs._id
-
-        node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
+                    if "QuizItem" in each_res_node.member_of_names_list:
+                        node_collection.collection.update({'_id': cu_new._id}, {'$push': {'post_node':new_gs._id}},upsert=False,multi=False)
+                    else:
+                        new_res_set.append(new_gs._id)
+                    node_collection.collection.update({'_id': new_gs._id}, {'$push': {'prior_node':cu_new._id}},upsert=False,multi=False)
+                else:
+                    new_res_set.append(each_res_node._id)
+        node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':new_res_set}},upsert=False,multi=False)
         cu_new.reload()
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
-
         return HttpResponse(json.dumps(response_dict))
 
 
