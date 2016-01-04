@@ -373,7 +373,7 @@
               csrfmiddlewaretoken: '{{ csrf_token }}'
             },
             success: function(data) {
-              window.history.pushState("", "", "/{{group_id}}/course/course_detail/{{node.pk}}"+"?selected={{unit_node.post_node.0}}");
+              window.history.pushState("", "", "/{{group_id}}"+"?selected={{unit_node.post_node.0}}");
               $("#view_page").html(data);
             }
         });
