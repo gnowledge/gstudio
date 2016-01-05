@@ -27,7 +27,7 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls, get_group_name_id, create_thread_for_node
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
 
 #######################################################################################################################################
@@ -330,8 +330,15 @@ def save_quizitem_answer(request, group_id):
         if thread_obj != None:
             node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
             node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
-        if user_give_ans:
-            create_gattribute(user_ans._id, qip_user_given_ans_AT, user_give_ans)
+        quiz_type_val = get_attribute_value(node_obj._id,"quiz_type")
+        # print "\n get_attribute_value--", get_attribute_value
+        if user_given_ans:
+            if quiz_type_val == "Short-Response":
+                create_gattribute(user_ans._id, qip_user_given_ans_AT, user_given_ans)
+            else:
+                list_of_ans = [int(each.split('_')[1]) for each in user_given_ans]
+                if list_of_ans:
+                    create_gattribute(user_ans._id, qip_user_given_ans_AT, list_of_ans)
         response_dict['success'] = True
         return HttpResponse(json.dumps(response_dict))
 
