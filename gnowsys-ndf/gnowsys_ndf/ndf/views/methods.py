@@ -3183,7 +3183,7 @@ def parse_data(doc):
                                                     for each in v1:
                                                         str1 += str(each["name"]) + ", "
                                                 else:
-                                                    str1 = ",".join(v1)
+                                                    str1 = ",".join(str(v1))
                                                 att_dic[k1] = str1
                                         else:
                                                 att_dic[k1] = str(v1)
@@ -3202,8 +3202,8 @@ def parse_data(doc):
                                                               rel = rel['$oid']
                                                               rel = node_collection.one({'_id':ObjectId(rel)})
                                                               att_dic[k1] = rel.name
-                                                      # print "\n\n\nrel", rel
-                                                      rel = node_collection.one({'_id':ObjectId(rel)})
+                                                      #print "\n\n\nrel", rel
+                                                      rel = node_collection.one({'_id':ObjectId(rel._id)})
                                                       att_dic[k1] = rel.name
                               for att,value in att_dic.items():
                                   str1 =  str1 + att + " : " + value + "  "+"\n"
