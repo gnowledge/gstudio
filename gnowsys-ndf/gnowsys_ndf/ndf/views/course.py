@@ -1522,18 +1522,24 @@ def save_resources(request, group_id):
         if cu_new._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
         # print "\n\n member_of_names_list----", cu_new.member_of_names_list, "list_of_res_ids", list_of_res_ids
+        new_res_set = []
         if "CourseUnitEvent" in cu_new.member_of_names_list:
             list_of_res_nodes = node_collection.find({'_id': {'$in': list_of_res_ids}})
 
-            new_res_set = []
             for each_res_node in list_of_res_nodes:
                 if each_res_node._id not in cu_new.collection_set:
                     new_gs = replicate_resource(request, each_res_node, group_id)
-                    if "QuizItem" in each_res_node.member_of_names_list:
-                        node_collection.collection.update({'_id': cu_new._id}, {'$push': {'post_node':new_gs._id}},upsert=False,multi=False)
-                    else:
+                    # if "QuizItem" in each_res_node.member_of_names_list:
+                    #     node_collection.collection.update({'_id': cu_new._id}, {'$push': {'post_node':new_gs._id}},upsert=False,multi=False)
+                    # else:
+                    if new_gs:
                         new_res_set.append(new_gs._id)
-                    node_collection.collection.update({'_id': new_gs._id}, {'$push': {'prior_node':cu_new._id}},upsert=False,multi=False)
+                        node_collection.collection.update({'_id': new_gs._id}, {'$push': {'prior_node':cu_new._id}},upsert=False,multi=False)
+        else:
+            for each_res_node_course in list_of_res_ids:
+                if each_res_node_course not in cu_new.collection_set:
+                    new_res_set.append(each_res_node_course)
+
         for each_res_in_unit in new_res_set:
             if each_res_in_unit not in cu_new.collection_set:
                 cu_new.collection_set.append(each_res_in_unit)

@@ -350,32 +350,3 @@
       {% endif %} 
     {% endif %}
 
-
-    {% get_node node.prior_node.0 as unit_node %}
-    {% if node.pk|stringformat:"s" == unit_node.collection_set|last|stringformat:"s" and unit_node.post_node %}
-      <input type="button" value="Take Quiz" class="button tiny radius take_quiz">
-    {% endif %}
-
-{% if not is_gstaff and user_access == "allow" %}
-    <input type="button" value="Take Quiz" class="button tiny radius">
-{% endif %}
-
-<script type="text/javascript">
-
-      $(".take_quiz").click(function(){
-        $.ajax({
-            type: "POST",
-            url: "{% url 'collection_nav' group_id %}",
-            datatype: "html",
-            data:{
-              node_id: "{{unit_node.post_node.0}}",
-              curr_node:"{{node.pk}}",
-              csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function(data) {
-              window.history.pushState("", "", "/{{group_id}}"+"?selected={{unit_node.post_node.0}}");
-              $("#view_page").html(data);
-            }
-        });
-      });  
-</script>
