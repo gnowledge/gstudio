@@ -4454,6 +4454,7 @@ def replicate_resource(request, node, group_id):
             quizitem_show_correct_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_show_correct_ans"})
             quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
             quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
+            quizitem_check_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_check_answer"})
 
             if node.quiz_type:
                 create_gattribute(new_gsystem._id,quiz_type_AT, node.quiz_type)
@@ -4463,6 +4464,8 @@ def replicate_resource(request, node, group_id):
                 create_gattribute(new_gsystem._id,correct_answer_AT, node.correct_answer)
             if "quizitem_show_correct_ans" in node and node.quizitem_show_correct_ans != None:
                 create_gattribute(new_gsystem._id,quizitem_show_correct_ans_AT, node.quizitem_show_correct_ans)
+            if "quizitem_check_answer" in node and node.quizitem_show_correct_ans != None:
+                create_gattribute(new_gsystem._id,quizitem_check_ans_AT, node.quizitem_check_answer)
             if node.quizitem_problem_weight:
                 create_gattribute(new_gsystem._id,quizitem_problem_weight_AT, node.quizitem_problem_weight)
             if node.quizitem_max_attempts:

@@ -153,6 +153,20 @@
 
 			<div class="row">
 				<div class="small-4 large-2 columns">
+					<label class="right inline">{% trans "Check Answer " %}<br/>
+					<small>(To allow a user to see Check Answer)</small></label>
+				</div>
+
+				<div class="small-8 large-8 columns left">
+					<select name="check_ans" class="sel_check_ans">
+						<option value="True" >True</option>
+						<option value="False">False</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="small-4 large-2 columns">
 					<label class="right inline">{% trans "Problem Weight " %}
 					</label>
 				</div>

@@ -141,13 +141,16 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         quizitem_show_correct_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_show_correct_ans"})
         quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
         quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
+        quizitem_check_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_check_answer"})
         
 
         quiz_node_id = request.POST.get('quiz_node_id','')
         maximum_attempts_val = request.POST.get('maximum_attempts','1')
         problem_weight_val = request.POST.get('problem_weight','1')
         show_correct_ans_val = request.POST.get('show_correct_ans','False')
+        check_ans_val = request.POST.get('check_ans','False')
         # print "\n\n maximum_attempts",maximum_attempts_val
+
         # print "\n problem_weight",problem_weight_val
         # print "\n show_correct_ans",show_correct_ans_val
 
@@ -162,7 +165,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         create_gattribute(quiz_item_node._id, quizitem_problem_weight_AT, float(problem_weight_val))
         create_gattribute(quiz_item_node._id, quizitem_show_correct_ans_AT, eval(show_correct_ans_val))
         create_gattribute(quiz_item_node._id, quiz_type_AT, unicode(quiz_type))
-
+        create_gattribute(quiz_item_node._id, quizitem_check_ans_AT, eval(check_ans_val))
 
         # If "quiz_type" is either 'Single-Choice' or 'Multiple-Choice', then only extract options
         options = []
