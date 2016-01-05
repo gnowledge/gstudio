@@ -42,40 +42,43 @@
 						{% for each_opt in node.options %}
 							<input type="radio" name="single_quiz_ans"  value="{{each_opt}}"
 							{% if forloop.counter in node.correct_answer %}
-								class="single-choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-check hide rad_ans_lbl'></span>
+								class="choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
-								class="single-choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-x hide rad_ans_lbl'></span>
+								class="choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
 							{% endif %}
 							<br/>
 						{% endfor %}
 						<div class="row">
-							<input type="button" value="Check" class="button tiny check-ans radius single-choice-chk">
+							{% if node.quizitem_check_answer %}
+								<input type="button" value="Check" class="button tiny check-ans radius check-btn">
+							{% endif %}
 							{% if node.quizitem_show_correct_ans %}
 								<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
-							{% endif%}
+							{% endif %}
 						</div>
 					{% elif node.quiz_type == "Multiple-Choice" %}
 						{% for each_opt in node.options %}
 							<input type="checkbox" name="multi_quiz_ans" value="{{each_opt}}"
 							{% if forloop.counter in node.correct_answer %}
-								class="multi-choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
+								class="choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
-								class="multi-choice"  id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
+								class="choice"  id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
 							{% endif %}
 							<br/>
 						{% endfor %}
 						<div class="row">
-							<input type="button" value="Check" class="button tiny check-ans radius multi-choice-chk">
+							{% if node.quizitem_check_answer %}
+								<input type="button" value="Check" class="button tiny check-ans radius check-btn">
+							{% endif %}
 							{% if node.quizitem_show_correct_ans %}
 								<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
-							{% endif%}
+							{% endif %}
 						</div>
 					{% elif node.quiz_type == "Short-Response" %}
 						<textarea rows="4" cols="50" name="single_choice_{{node.pk}}" placeholder="Enter answer here" class="short_ans_txt"></textarea>
-						<input type="button" value="Submit" class="button tiny radius short-ans_chk">
-						<br/>
-
+						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
 					{% endif %}
+					<input type="button" value="Submit" class="small button radius right">
 				</div>
 			</div>
 		</div>
@@ -84,39 +87,23 @@
 
 <script type="text/javascript">
 
-	$(".multi-choice-chk").click(function(){
-		if($(this).val() == "Check"){
+	$(".check-btn").click(function(){
+		{% if node.quiz_type == "Multiple-Choice" %}
 			var selected_ans = $('input:checkbox:checked')
+		{% elif node.quiz_type == "Single-Choice" %}
+			var selected_ans = $('input:radio:checked')
+		{% endif %}
+
+		if($(this).val() == "Check"){
 			all_ans = []
 			if( selected_ans.length > 0){
-				$.each($('.multi-choice:checked'), function(a,b){
+				$.each($('.choice:checked'), function(a,b){
 					all_ans.push(b.id)
 					n = b.nextSibling.nextSibling
 					n.classList.remove("hide")
 				})
 				console.log(all_ans)
-		        $.ajax({
-		          url: "{% url 'save_quizitem_answer' group_id %}",
-
-		          data: {
-		            node: "{{node.pk}}",
-		            all_ans: all_ans,
-		            'csrfmiddlewaretoken': "{{csrf_token}}"
-		          },
-
-		          type: "POST",
-
-		          dataType: "json",
-
-		          success: function(data){
-	            	console.log("success")
-              		window.location.replace("{{group_id}}")
-              		// window.history.pushState("", "", "/{{group_id}}"+"?selected={{node.prior_node.0}}");
-		          },
-
-		        });//end of ajax
-
-				$(".multi-choice-chk").val("Clear")
+				$(".check-btn").val("Clear")
 				$(".show-ans-btn").removeClass("hide")
 			}
 			else{
@@ -129,104 +116,37 @@
 	})
 
 	$('input:checkbox').change(function() {
-		if($(".multi-choice-chk").val() == "Clear"){
+		if($(".check-btn").val() == "Clear"){
 			hide_post_chk_act();
 			$(this).prop("checked", true)
 		}
 	})
 
 	function hide_post_chk_act(){
-		$('input:checkbox').removeAttr('checked')
+		{% if node.quiz_type == "Multiple-Choice" %}
+			$('input:checkbox').removeAttr('checked')
+			var selected_ans = $('input:checkbox:checked')
+		{% elif node.quiz_type == "Single-Choice" %}
+			$('input:radio').removeAttr('checked')
+			var selected_ans = $('input:radio:checked')
+		{% endif %}
 		$(".chk_ans_lbl").addClass("hide")
-		$(".multi-choice-chk").val("Check")
+		$(".check-btn").val("Check")
 		$(".show-ans-btn").addClass("hide")
 	}
 
-	$(".single-choice-chk").click(function(){
-		if($(this).val() == "Check"){
-			var selected_ans = $('input:radio:checked')
-			console.log(selected_ans.val())
-			all_ans = []
-			if(selected_ans.length > 0){
-				$.each($('.single-choice:checked'), function(a,b){
-					all_ans.push(b.id)
-					n = b.nextSibling.nextSibling
-					n.classList.remove("hide")
-				})
-				console.log(all_ans)
-		        $.ajax({
-		          url: "{% url 'save_quizitem_answer' group_id %}",
-
-		          data: {
-		            node: "{{node.pk}}",
-		            all_ans: all_ans,
-		            'csrfmiddlewaretoken': "{{csrf_token}}"
-		          },
-
-		          type: "POST",
-
-		          dataType: "json",
-
-		          success: function(data){
-	            	console.log("success")
-              		window.location.replace("{{group_id}}")
-              		// window.history.pushState("", "", "/{{group_id}}"+"?selected={{node.prior_node.0}}");
-		          },
-
-		        });//end of ajax
-
-				$(".single-choice-chk").val("Clear")
-				$(".show-ans-btn").removeClass("hide")
-			}
-			else{
-				alert("Please select an answer")
-			}
-		}
-		else if ($(this).val() == "Clear"){
-			hide_post_rad_act();
-		}
-	})
-
 	$('input:radio').change(function() {
-		if($(".single-choice-chk").val() == "Clear"){
-			hide_post_rad_act();
+		if($(".check-btn").val() == "Clear"){
+			hide_post_chk_act();
 			$(this).prop("checked", true)
 		}
 	})
-
-	function hide_post_rad_act(){
-		$('input:radio').removeAttr('checked')
-		$(".rad_ans_lbl").addClass("hide")
-		$(".single-choice-chk").val("Check")
-		$(".show-ans-btn").addClass("hide")
-	}
 
 	$(".show-ans-btn").click(function(){
 		$(".fi-check").removeClass("hide")
 	})
 	$(".short-ans_chk").click(function(){
-
 		short_ans = $(".short_ans_txt").val();
-        $.ajax({
-          url: "{% url 'save_quizitem_answer' group_id %}",
-
-          data: {
-            node: "{{node.pk}}",
-            short_ans: short_ans,
-            'csrfmiddlewaretoken': "{{csrf_token}}"
-          },
-
-          type: "POST",
-
-          dataType: "json",
-
-          success: function(data){
-        	console.log("success")
-      		window.location.replace("{{group_id}}")
-      		// window.history.pushState("", "", "/{{group_id}}"+"?selected={{node.prior_node.0}}");
-          },
-
-        });//end of ajax
 	})
 
 
