@@ -40,7 +40,7 @@
 				<div class="quiz_qtn">
 					{% if node.quiz_type == "Single-Choice" %}
 						{% for each_opt in node.options %}
-							<input type="radio" name="single_quiz_ans"  value="{{each_opt}}"
+							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
 							{% if forloop.counter in node.correct_answer %}
 								class="choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
@@ -58,7 +58,7 @@
 						</div>
 					{% elif node.quiz_type == "Multiple-Choice" %}
 						{% for each_opt in node.options %}
-							<input type="checkbox" name="multi_quiz_ans" value="{{each_opt}}"
+							<input type="checkbox" name="quiz_ans" value="{{each_opt}}"
 							{% if forloop.counter in node.correct_answer %}
 								class="choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
@@ -75,10 +75,10 @@
 							{% endif %}
 						</div>
 					{% elif node.quiz_type == "Short-Response" %}
-						<textarea rows="4" cols="50" name="single_choice_{{node.pk}}" placeholder="Enter answer here" class="short_ans_txt"></textarea>
+						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt"></textarea>
 						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
 					{% endif %}
-					<input type="button" value="Submit" class="small button radius right">
+					<input type="button" value="Submit" class="small button radius right submit-btn">
 				</div>
 			</div>
 		</div>
@@ -95,14 +95,8 @@
 		{% endif %}
 
 		if($(this).val() == "Check"){
-			all_ans = []
 			if( selected_ans.length > 0){
-				$.each($('.choice:checked'), function(a,b){
-					all_ans.push(b.id)
-					n = b.nextSibling.nextSibling
-					n.classList.remove("hide")
-				})
-				console.log(all_ans)
+				all_ans = user_ans()
 				$(".check-btn").val("Clear")
 				$(".show-ans-btn").removeClass("hide")
 			}
@@ -111,18 +105,21 @@
 			}
 		}
 		else if ($(this).val() == "Clear"){
-			hide_post_chk_act();
+			hide_options();
 		}
 	})
+	function user_ans(){
+		list_name = []
+		$.each($('.choice:checked'), function(a,b){
+			list_name.push(b.id)
+			n = b.nextSibling.nextSibling
+			n.classList.remove("hide")
+		})
+		return list_name;
 
-	$('input:checkbox').change(function() {
-		if($(".check-btn").val() == "Clear"){
-			hide_post_chk_act();
-			$(this).prop("checked", true)
-		}
-	})
+	}
 
-	function hide_post_chk_act(){
+	function hide_options(){
 		{% if node.quiz_type == "Multiple-Choice" %}
 			$('input:checkbox').removeAttr('checked')
 			var selected_ans = $('input:checkbox:checked')
@@ -137,7 +134,14 @@
 
 	$('input:radio').change(function() {
 		if($(".check-btn").val() == "Clear"){
-			hide_post_chk_act();
+			hide_options();
+			$(this).prop("checked", true)
+		}
+	})
+
+	$('input:checkbox').change(function() {
+		if($(".check-btn").val() == "Clear"){
+			hide_options();
 			$(this).prop("checked", true)
 		}
 	})
@@ -145,8 +149,32 @@
 	$(".show-ans-btn").click(function(){
 		$(".fi-check").removeClass("hide")
 	})
-	$(".short-ans_chk").click(function(){
-		short_ans = $(".short_ans_txt").val();
+
+	$(".submit-btn").click(function(){
+		{% if node.quiz_type == "Short-Response" %}
+			var user_given_ans = $(".choice").val()
+			user_given_ans = [user_given_ans]
+		{% else %}
+			var user_given_ans = user_ans()
+		{% endif %}
+        $.ajax({
+          url: "{% url 'save_quizitem_answer' group_id %}",
+
+          data: {
+            node: "{{node.pk}}",
+            user_given_ans: user_given_ans,
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+
+          type: "POST",
+
+          dataType: "json",
+
+          success: function(data){
+      		window.location.replace("{{group_id}}")
+      		// window.history.pushState("", "", "/{{group_id}}"+"?selected={{node.prior_node.0}}");
+          },
+        });//end of ajax
 	})
 
 
