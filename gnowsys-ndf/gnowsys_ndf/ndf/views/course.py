@@ -242,9 +242,9 @@ def course_detail(request, group_id, _id):
     title = GST_COURSE.name
 
     course_node = node_collection.one({"_id": ObjectId(_id)})
-
-    if course_node.collection_set:
-        course_structure_exists = True
+    if course_node:
+        if course_node.collection_set:
+            course_structure_exists = True
 
     gs_name = course_node.member_of_names_list[0]
     context_variables = {'groupid': group_id,
