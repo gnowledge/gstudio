@@ -134,6 +134,7 @@ def collection_nav(request, group_id):
   This ajax function retunrs the node on main template, when clicked on collection hierarchy
   '''
   if request.is_ajax() and request.method == "POST":
+    curr_node_obj = None
     node_id = request.POST.get("node_id", '')
     curr_node_id = request.POST.get("curr_node", '')
     node_type = request.POST.get("nod_type", '')
@@ -164,7 +165,11 @@ def collection_nav(request, group_id):
         sg_type = "ProgramEventGroup"
       elif "CourseEventGroup" in list_of_sg_member_of:
         sg_type = "CourseEventGroup"
+      if "QuizItemEvent" in node_obj.member_of_names_list:
+        template = "ndf/quiz_player.html"
+
       thread_node, allow_to_comment = node_thread_access(group_obj._id, node_obj)
+
 
     nav_list = request.POST.getlist("nav[]", '')
     n_list = request.POST.get("nav", '')
@@ -982,9 +987,10 @@ def add_page(request, group_id):
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page),groupid=group_id)
         page_node.status = u"PUBLISHED"
         page_node.save()
-
         context_node.collection_set.append(page_node._id)
         context_node.save(groupid=group_id)
+        page_node.prior_node.append(context_node._id)
+        page_node.save()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
