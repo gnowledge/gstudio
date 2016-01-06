@@ -29,23 +29,23 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'unpublished_entry','meta_type':'factory_types'},
                          {'name':'booklet','meta_type':'factory_types'},
                          {'name':'GList','meta_type':'factory_types'},
-			 {'name':'GListItem','meta_type':'factory_types'},
-			 {'name':'Group','meta_type':'factory_types'},	
-			 {'name':'ProgramEventGroup','meta_type':'factory_types'},
+                         {'name':'GListItem','meta_type':'factory_types'},
+                         {'name':'Group','meta_type':'factory_types'},	
+                         {'name':'ProgramEventGroup','meta_type':'factory_types'},
                          {'name':'CourseEventGroup','meta_type':'factory_types'},
                          {'name':'PartnerGroup','meta_type':'factory_types'},
                          {'name':'ModeratingGroup','meta_type':'factory_types'},
                          {'name':'Info page','meta_type':'factory_types'},
-			 {'name':'Blog page','meta_type':'factory_types'},
-			 {'name':'Wiki page','meta_type':'factory_types'}
+                         {'name':'Blog page','meta_type':'factory_types'},
+                         {'name':'Wiki page','meta_type':'factory_types'}
                         ]
 
 
 #fill attribute name,data_type,gsystem_type name in bellow dict to create factory Attribute Type
-factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'], 
+factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem','QuizItemEvent'], 
                                          'data_type':'str(QUIZ_TYPE_CHOICES_TU)', 
                                          'meta_type':'factory_types'}},
-                           {'options':{'gsystem_names_list':['QuizItem'], 
+                           {'options':{'gsystem_names_list':['QuizItem','QuizItemEvent'], 
                                        'data_type':'"[" + DATA_TYPE_CHOICES[6] + "]"', 
                                        'meta_type':'factory_types'}}, 
                            {'correct_answer':{'gsystem_names_list':['QuizItem'], 
@@ -150,7 +150,7 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                            {'Citation':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
                                         'data_type':'basestring',
                                         'meta_type':'factory_types'}},
-                           {'discussion_enable':{'gsystem_names_list':['Page','File', 'E-Book'],
+                           {'discussion_enable':{'gsystem_names_list':['Page','File', 'E-Book','QuizItemEvent'],
                                         'data_type':'bool',
                                         'meta_type':'factory_types'}},
                            {'release_response':{'gsystem_names_list':['Twist'],
@@ -164,7 +164,25 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                                         'meta_type':'factory_types'}},
                            {'entry_list':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
                                           'data_type':'basestring',
-                                          'meta_type':'factory_types'}}]
+                                          'meta_type':'factory_types'}},
+                           {'quizitem_show_correct_ans':{'gsystem_names_list':['QuizItem','QuizItemEvent'], 
+                                              'data_type':'bool',
+                                              'meta_type':'factory_types'}},
+                           {'quizitem_problem_weight':{'gsystem_names_list':['QuizItem','QuizItemEvent'], 
+                                              'data_type':'float',
+                                              'meta_type':'factory_types'}},
+                           {'quizitem_max_attempts':{'gsystem_names_list':['QuizItem','QuizItemEvent'], 
+                                              'data_type':'int',
+                                              'meta_type':'factory_types'}},
+                           {'quizitem_check_answer':{'gsystem_names_list':['QuizItem','QuizItemEvent'], 
+                                              'data_type':'bool',
+                                              'meta_type':'factory_types'}},
+                           {'quizitempost_user_submitted_ans':{'gsystem_names_list':['QuizItemPost'], 
+                                              'data_type':'list',
+                                              'meta_type':'factory_types'}},
+                           {'quizitempost_user_checked_ans':{'gsystem_names_list':['QuizItemPost'], 
+                                              'data_type':'list',
+                                              'meta_type':'factory_types'}}]
 
 # the following types are useful when BibApp's second phase
 # development begins. Currently this data is not set as attributes
@@ -230,7 +248,7 @@ factory_relation_types = [
         }
     }, 
     {'has_thread': {
-            'subject_type':['Page', 'File'],
+            'subject_type':['Page', 'File', 'QuizItem', 'QuizItemEvent'],
             'object_type':['Twist'], 
             'inverse_name':'thread_of', 
             'meta_type':'factory_types'

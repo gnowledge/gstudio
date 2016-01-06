@@ -507,7 +507,7 @@ GAPPS = [
 # please make use of local_settings file
 GSTUDIO_WORKING_GAPPS = [
     u"Page", u"File", u"E-Library", u"Forum", u"Task", u"Topics",
-    u"Course", u"Observation", u"Event"
+    u"Course", u"Observation", u"Event", u"Quiz"
 ]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
