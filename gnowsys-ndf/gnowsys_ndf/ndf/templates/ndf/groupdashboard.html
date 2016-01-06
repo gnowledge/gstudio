@@ -98,7 +98,8 @@ function notify(node,activity)
 
 $(document).ready(function()
 {
-  var groupn = $("#groupname").val();
+  // var groupn = $("#groupname").val();
+  var groupn = '{{group_id}}'
   var label = $("#notify").val();
   $("#notify").click(function(){
    if (label == "Follow")
