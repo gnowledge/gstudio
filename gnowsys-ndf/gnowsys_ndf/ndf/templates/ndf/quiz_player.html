@@ -50,9 +50,9 @@
 						{% for each_opt in node.options %}
 							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
 							{% if forloop.counter in node.correct_answer %}
-								class="choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
+								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
-								class="choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
+								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
 							{% endif %}
 							<br/>
 						{% endfor %}
@@ -68,9 +68,9 @@
 						{% for each_opt in node.options %}
 							<input type="checkbox" name="quiz_ans" value="{{each_opt}}"
 							{% if forloop.counter in node.correct_answer %}
-								class="choice" id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
+								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
-								class="choice"  id="opt_{{forloop.counter}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
+								class="choice"  id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
 							{% endif %}
 							<br/>
 						{% endfor %}
@@ -105,6 +105,7 @@
 		if($(this).val() == "Check"){
 			if( selected_ans.length > 0){
 				all_ans = user_ans()
+				save_user_action("check",all_ans)
 				$(".check-btn").val("Clear")
 				$(".show-ans-btn").removeClass("hide")
 			}
@@ -165,11 +166,16 @@
 		{% else %}
 			var user_given_ans = user_ans()
 		{% endif %}
+		save_user_action("submit",user_given_ans)
+	})
+
+	function save_user_action(user_action, user_given_ans){
         $.ajax({
           url: "{% url 'save_quizitem_answer' group_id %}",
 
           data: {
             node: "{{node.pk}}",
+            user_action: user_action,
             user_given_ans: user_given_ans,
             'csrfmiddlewaretoken': "{{csrf_token}}"
           },
@@ -183,7 +189,7 @@
       		// window.history.pushState("", "", "/{{group_id}}"+"?selected={{node.prior_node.0}}");
           },
         });//end of ajax
-	})
 
+	}
 
 </script>
