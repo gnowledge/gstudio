@@ -12,15 +12,4 @@
       </ol>    </p>
 {% endblocktrans %}
 
-    <!-- Add button -->
-    {% if user.is_authenticated %}
-<p>
-    <a href="{% url 'quiz_create' groupid %}" class="button small">{% trans "+ Add" %} {{title}}</a>
-    <a href="{% url 'quiz_item_create' groupid %}" class="button small right">   
- {{title}} {% trans "Item" %}    
-</a>
-    </p>
- {% endif %}
-    
-
 {% endblock %}

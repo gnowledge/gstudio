@@ -90,3 +90,9 @@ TRANSFERRING DATA FROM OLD/sqlite TO PostgreSQL
 # 	from django.db import connections
 # 	connection = connections['default']
 # 	connection.introspection.table_names()
+
+Updating size of notification columns.
+
+alter table notification_noticetype alter COLUMN display TYPE varchar(1024);
+alter table notification_noticetype alter COLUMN label TYPE varchar(1024);
+alter table notification_noticetype alter COLUMN description TYPE varchar(1024);

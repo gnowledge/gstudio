@@ -44,6 +44,8 @@ log_list.append("\n######### Script run on : " + time.strftime("%c") + " #######
 
 ###############################################################################
 bin_member_of_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':"Binary"}]})
+if not bin_member_of_type:
+  create_meta_type(1,"Binary")
 
 class Command(BaseCommand):
   help = "This performs activities required for setting up default structure or updating it." 
