@@ -198,7 +198,8 @@ def create_edit_quiz_item(request, group_id, node_id=None):
 
         if correct_ans_val: # To handle if Quiz-type is Short-Response
             correct_answer = map(int,correct_ans_val) # Convert list of unicode ele to list of int ele
-            create_gattribute(quiz_item_node._id, correct_answer_AT, correct_answer)
+            correct_ans_val_list = [options[each_val-1] for each_val in correct_answer]
+            create_gattribute(quiz_item_node._id, correct_answer_AT, correct_ans_val_list)
 
         thread_obj = create_thread_for_node(request,group_id, quiz_item_node)
 
@@ -310,6 +311,7 @@ def save_quizitem_answer(request, group_id):
             group_id = ObjectId(group_id)
         except:
             group_name, group_id = get_group_name_id(group_id)
+        import datetime
         # group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
         user_given_ans = request.POST.getlist("user_given_ans[]", '')
@@ -318,11 +320,14 @@ def save_quizitem_answer(request, group_id):
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
         thread_obj,thread_grel = get_relation_value(node_obj._id,"has_thread")
 
+        user_action = request.POST.get("user_action", '')
+
         user_id = int(request.user.id)
         user_name = unicode(request.user.username)
 
         qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
-        qip_user_given_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_given_ans"})
+        qip_user_submitted_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_submitted_ans"})
+        qip_user_checked_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_checked_ans"})
         already_ans_obj = None
         if thread_obj != None:
             already_ans_obj = node_collection.find_one({'member_of': qip_gst._id,'created_by': user_id, 'prior_node': thread_obj._id})
@@ -336,23 +341,47 @@ def save_quizitem_answer(request, group_id):
 
         user_ans.created_by = user_id
         user_ans.modified_by = user_id
-        user_ans.contributors.append(user_id)
+        if user_id not in user_ans.contributors:
+            user_ans.contributors.append(user_id)
 
         user_ans.member_of.append(qip_gst._id)
         user_ans.group_set.append(group_id)
         user_ans.save()
+
         if thread_obj != None:
             node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
             node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
         quiz_type_val = get_attribute_value(node_obj._id,"quiz_type")
+
         # print "\n get_attribute_value--", get_attribute_value
         if user_given_ans:
             if quiz_type_val == "Short-Response":
-                create_gattribute(user_ans._id, qip_user_given_ans_AT, user_given_ans)
+                create_gattribute(user_ans._id, qip_user_submitted_ans_AT, user_given_ans)
             else:
-                list_of_ans = [int(each.split('_')[1]) for each in user_given_ans]
-                if list_of_ans:
-                    create_gattribute(user_ans._id, qip_user_given_ans_AT, list_of_ans)
+                # list_of_ans = [int(each.split('_')[1]) for each in user_given_ans]
+
+                curr_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                if user_given_ans:
+                    if user_action == "check":
+                        new_list = []
+                        if already_ans_obj:
+                            old_checked_ans = get_attribute_value(user_ans._id,"quizitempost_user_checked_ans")
+                            if old_checked_ans != "None" and old_checked_ans != "":
+                                new_list = old_checked_ans
+                        new_list.append({str(curr_datetime):user_given_ans})
+                        if new_list:
+                            create_gattribute(user_ans._id, qip_user_checked_ans_AT, new_list)
+                    elif user_action == "submit":
+                        new_list = []
+                        if already_ans_obj:
+                            old_submitted_ans = get_attribute_value(user_ans._id,"quizitempost_user_submitted_ans")
+                            if old_submitted_ans != "None" and old_submitted_ans != "":
+                                new_list = old_submitted_ans
+                        new_list.append({str(curr_datetime):user_given_ans})
+                        if new_list:
+                            create_gattribute(user_ans._id, qip_user_submitted_ans_AT, new_list)
+                    user_ans.reload()
+        # print "\n user_ans.attribute_set",user_ans.attribute_set
         response_dict['success'] = True
         return HttpResponse(json.dumps(response_dict))
 
