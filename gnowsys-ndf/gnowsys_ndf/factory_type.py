@@ -177,7 +177,10 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem','QuizI
                            {'quizitem_check_answer':{'gsystem_names_list':['QuizItem','QuizItemEvent'], 
                                               'data_type':'bool',
                                               'meta_type':'factory_types'}},
-                           {'quizitempost_user_given_ans':{'gsystem_names_list':['QuizItemPost'], 
+                           {'quizitempost_user_submitted_ans':{'gsystem_names_list':['QuizItemPost'], 
+                                              'data_type':'list',
+                                              'meta_type':'factory_types'}},
+                           {'quizitempost_user_checked_ans':{'gsystem_names_list':['QuizItemPost'], 
                                               'data_type':'list',
                                               'meta_type':'factory_types'}}]
 
