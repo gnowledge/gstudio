@@ -43,16 +43,20 @@
 {% endblock %}
   
 {% block body_content %}
-  <div class="repository-title large-4 columns">{% trans "Task" %}</div>
-      <div class="repository-desc large-8 columns">{{node.name}}</div> 
+  
 <div class="row margin-top-1">
   <section class="medium-9 columns">
+  <div class="repository-title large-4 columns">{% trans "Task" %}</div>
+  <div class="repository-desc large-8 columns">{{node.name}}</div></br> 
     <h2>
         {% get_user_object node.created_by as user_obj %}
-      
+        {% get_relation_value node.pk 'has_type' as task_type_name %}
+
+       {% if task_type_name.0.name != "Moderation" %} 
         {% if user_obj.username == request.user.username or request.user.is_superuser %}
         <a href="#" class="button tiny" style="float:right" data-reveal-id="titleModal"> {% trans 'Edit' %}</a>
         {% endif %}
+       {% endif %}
       </span> 
     </h2>
 
@@ -172,10 +176,11 @@
       <div class="medium-12 columns">
         <label>
           <b>{% trans "Description:" %}</b>
-          
+        {% if task_type_name.0.name != "Moderation" %}
           {% if user_obj.username == request.user.username or request.user.is_superuser %}
           <a href="#" class="button tiny" style="float:right" data-reveal-id="contentModal"> {% trans 'Edit' %}</a>
           {% endif %}
+        {% endif %}
         </label>
       
         <div id="contentlist" class="content" style="padding-left:20px;">
@@ -193,7 +198,7 @@
     </div>
     
     <hr>
-
+    {% comment %}
     <!-- Attachments -->
     <div class="row">
       <div class="medium-12 columns">
@@ -238,9 +243,9 @@
         </div>
       </div>
     </div>
+ {% endcomment %}
 
   </section>
-
   <section class="medium-3 columns">
     <div class="panel">
       <h3 class="subheader"></h3>
@@ -255,12 +260,13 @@
         </div>
       </small>
       
-    
+    {% if task_type_name.0.name != "Moderation" %}
       {% if collection != 'True' %}
       <a href="{% url 'task_edit' group_name node %}" class="small button split edit">
         <i class="fi-pencil"></i> Update <span data-dropdown="edit-options"></span>
       </a> 
       {% endif %}
+    {% endif %}
     </div>
   </section>
 
@@ -287,6 +293,7 @@
     <a class="close-reveal-modal">{% trans "&#215;" %}</a>
   </div>
 </div>
+
 {% endblock %}
 
 {% block script %}
