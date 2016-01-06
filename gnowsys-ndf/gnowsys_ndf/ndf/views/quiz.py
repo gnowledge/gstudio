@@ -323,8 +323,14 @@ def save_quizitem_answer(request, group_id):
 
         qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
         qip_user_given_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_given_ans"})
-
-        user_ans = node_collection.collection.GSystem()
+        already_ans_obj = None
+        if thread_obj != None:
+            already_ans_obj = node_collection.find_one({'member_of': qip_gst._id,'created_by': user_id, 'prior_node': thread_obj._id})
+    
+        if already_ans_obj:
+            user_ans = already_ans_obj
+        else:
+            user_ans = node_collection.collection.GSystem()
         user_ans.name = unicode("Answer_of:" + str(node_obj.name) + "-Answer_by:"+ str(user_name))
         user_ans.status = u"PUBLISHED"
 
