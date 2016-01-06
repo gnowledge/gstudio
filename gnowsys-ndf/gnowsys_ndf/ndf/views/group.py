@@ -1839,7 +1839,7 @@ def group_dashboard(request, group_id=None):
         subgroups_cur = node_collection.find({
                 '_type': u'Group',
                 '_id': {'$in': group_obj.post_node},
-                'member_of': {'$in': [group_gst._id]},
+                # 'member_of': {'$in': [group_gst._id]}, #Listing all types of sub groups
                 '$or': [
                             {'created_by': request.user.id},
                             {'group_admin': request.user.id},
@@ -1847,6 +1847,8 @@ def group_dashboard(request, group_id=None):
                             {'group_type': 'PUBLIC'}
                         ]
                 }).sort("last_update",-1)
+
+
 
     if not group_obj:
       group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
