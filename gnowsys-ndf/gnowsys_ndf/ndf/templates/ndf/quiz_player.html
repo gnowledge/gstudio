@@ -7,6 +7,9 @@
 		margin-left:20px !important;
 		font-size: 20px;
 	}
+	.question_edit{
+		margin-left: 20px !important;
+	}
 
 	input[type=checkbox], input[type=radio]{
 	    margin-right: 10px;
@@ -29,10 +32,15 @@
 </style>
 
 <div class="row">
+
 	<fieldset>
-		<legend>
-			<label>Question</label>
-		</legend>
+	    <legend >
+	    	<span>Question</span>
+			{% check_is_gstaff groupid request.user as is_gstaff %}
+			{% if is_gstaff %}
+		    	<a href="{% url 'quiz_item_edit' group_id node.pk %}?return_url={{ request.META.HTTP_REFERER }}" class="right question_edit" target="_blank" >Edit</a>
+		    {% endif %}
+	    </legend>
 
 		<div class="row">
 			<div class="quiz_qtn">

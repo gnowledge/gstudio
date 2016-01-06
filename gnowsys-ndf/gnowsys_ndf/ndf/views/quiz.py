@@ -86,12 +86,15 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     # if node_id:
     #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
     quiz_node_id = request.GET.get('quiznode','')
+    return_url = request.GET.get('return_url','')
     context_variables = { 'title': gst_quiz_item.name,
                           'quiz_type_choices': QUIZ_TYPE_CHOICES,
                           'group_id': group_id,
                           'groupid': group_id,
 
                         }
+    if return_url:
+        context_variables['return_url'] = return_url
     if quiz_node_id:
         quiz_node = node_collection.one({'_id': ObjectId(quiz_node_id)})
         context_variables['quiz_node_id'] = quiz_node._id
@@ -203,6 +206,11 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         quiz_item_node.status = u"PUBLISHED"
 
         quiz_item_node.save(groupid=group_id)
+        if "QuizItemEvent" in quiz_item_node.member_of_names_list:
+            return_url = request.POST.get("return_url")
+            # print "\n\n return_url", return_url, type(return_url)
+            if return_url:
+                return HttpResponseRedirect(return_url)
         if quiz_node:
             quiz_node.collection_set.append(quiz_item_node._id)
             quiz_node.save(groupid=group_id)

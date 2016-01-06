@@ -241,7 +241,9 @@
 			<input id="save_quiz_item" name="save_quiz_item" type="submit" class="button small" value="Save"/>
 		</div>
 	</div>
-
+	{% if return_url %}
+		<input type="hidden" value="{{return_url}}" name="return_url">
+	{% endif %}
 </form>
 
 <script type="text/javascript">
@@ -256,6 +258,8 @@
  $(document).ready(function(){
 	{% if node %}
 		$(".sel_show_correct_ans").val("{{node.quizitem_show_correct_ans}}")
+		$(".sel_check_ans").val("{{node.quizitem_check_answer}}")
+
 	{% endif %}
  })
 
