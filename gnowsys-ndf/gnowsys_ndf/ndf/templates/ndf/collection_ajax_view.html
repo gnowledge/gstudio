@@ -22,14 +22,13 @@
     function TreeTillNode () {
       // This gives the last hierarchy node id from browser url.
       // var url = window.location.search.replace("?selected=", "")
-      var url = "{{selected}}";
+      url = "{{selected}}";
 
       // Condition to check whether the tree has been loaded on the page completely or not before attempting any function on tree(such as 'getNodeById')
       if (url && $(".collection").not(".jqtree-loading").length > 0){
-
         var tree_build = $(".collection").not(".jqtree-loading");
-        var node = tree_build.tree('getNodeById', url);
-        tree_build.tree('selectNode', node);
+        selected_node = tree_build.tree('getNodeById', url);
+        tree_build.tree('selectNode', selected_node);
         return;
       }
       
@@ -61,6 +60,9 @@
             var node_id = node.id;
             if (arr.indexOf(node_id) < 0){
               arr.push(node_id);  
+            }
+            if(selected_node){
+              node = selected_node
             }
             $tree.tree('selectNode', node);
         }
