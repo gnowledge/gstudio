@@ -44,8 +44,6 @@ log_list.append("\n######### Script run on : " + time.strftime("%c") + " #######
 
 ###############################################################################
 bin_member_of_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':"Binary"}]})
-if not bin_member_of_type:
-  create_meta_type(1,"Binary")
 
 class Command(BaseCommand):
   help = "This performs activities required for setting up default structure or updating it." 
@@ -440,6 +438,10 @@ def create_meta_type(user_id,meta_type):
   meta.status = u"PUBLISHED"
   meta.save()
   print "succesfully created META_TYPE:",meta_type
+
+if not bin_member_of_type:
+  create_meta_type(1,u"Binary")
+  bin_member_of_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':"Binary"}]})
 
 def create_gsystem_type(st_name, user_id, meta_type_id = None):
   '''
