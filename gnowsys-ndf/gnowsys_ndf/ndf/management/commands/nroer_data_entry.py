@@ -379,7 +379,7 @@ def parse_data_create_gsystem(json_file_path):
 
     for i, json_document in enumerate(json_documents_list):
       
-        info_message = "\n\n\n********** Processing row number : ["+ str(i) + "] **********"
+        info_message = "\n\n\n********** Processing row number : ["+ str(i + 2) + "] **********"
         print info_message
         log_list.append(str(info_message))
         
@@ -452,6 +452,35 @@ def parse_data_create_gsystem(json_file_path):
             # calling method to create File GSystems
             nodeid = create_resource_gsystem(parsed_json_document, i)
             # print "nodeid : ", nodeid
+
+            # ----- for updating language -----
+            node_lang = get_language_tuple(eval(parsed_json_document['language']))
+            # print "============= 1 :", type(eval(parsed_json_document['language']))
+            # print "============= 2 :", node_lang
+
+            temp_node = node_collection.one({'_id': ObjectId(nodeid) })
+            # print "============= lang :", temp_node.language
+
+            update_res = node_collection.collection.update(
+                                {'_id': ObjectId(nodeid), 'language': {'$ne': node_lang}},
+                                {'$set': {'language': node_lang}},
+                                upsert=False,
+                                multi=False
+                            )
+
+            if update_res['updatedExisting']:
+                temp_node.reload()
+
+                info_message = "\n\n- Update to language of resource: " + str(update_res)
+                print info_message
+                log_list.append(info_message)
+
+                info_message = "\n\n- Now language of resource updates to: " + str(temp_node.language)
+                print info_message
+                log_list.append(info_message)
+            # print "============= lang :", temp_node.language
+
+            # ----- END of updating language -----
 
             collection_name = parsed_json_document.get('collection', '')
 
@@ -794,7 +823,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
     userid = resource_data["created_by"]
     content_org = resource_data["content_org"]
     tags = resource_data["tags"]
-    language = resource_data["language"]
+    language = get_language_tuple(eval(parsed_json_document['language']))
     group_set_id = ObjectId(group_set_id) if group_set_id else home_group._id
 
     img_type = None
@@ -873,6 +902,9 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
                                 upsert=False,
                                 multi=False
                             )
+
+        print "\n\n Printing newly created object:\n", node_collection.one({'_id': ObjectId(fileobj_oid)})
+        print "\n ===================================\n\n"
 
         info_message = "\n- Created resource/GSystem object of name: '" + unicode(name) + "' having ObjectId: " + unicode(fileobj_oid) + "\n- Saved resource into gridfs. \n"
         log_list.append(info_message)
