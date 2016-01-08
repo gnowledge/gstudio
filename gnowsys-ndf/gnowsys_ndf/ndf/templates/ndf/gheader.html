@@ -109,70 +109,32 @@
         </ul>
         <!-- -END of NROER level one menu -->
       {% else %}
-      {% if "CourseEventGroup" in group_object.member_of_names_list %}
-      <ul class="left">
-
-        <!-- Current group selector -->
-        <li class="group">
-          <a title="{{group_object.name|default:' -- '}}" class="active" href="/home/group">
-            <i class="fi-compass"> </i> {% trans ' Explore' %}
-          </a>
-          </li>
-          </ul>
-      {% else %}
-
 
       <ul class="left">
 
         <!-- Current group selector -->
-        <li class="group">
-          <a title="{{group_object.name|default:' -- '}}" class="active" href="/home/group">
-            <i class="fi-compass"></i>{% trans ' Explore' %}
-          </a>
-          <!-- If logged in show user groups -->
           {% if user.is_authenticated %}
-          {% get_user_group request.user group_object.name as groups %}
-
-          {% else %}  
-          {% get_existing_groups_excluded group_object.name as groups %}
-
-          {% endif %} 
-
-          <!-- dropdown for group's -->
-          <ul>
-            {% comment %}
-            {% if groups == "None" %}
-              <li id="{{gp_id}}">
-                <a class="group" href="{% url 'groupchange' 'None' %}">{{gp_id}}</a>
-              </li>
-
-            {% else %}
-              {% for group_node in groups|slice:":10" %}
-                <li id="{{group_node}}">
-                {% if "Author" in group_node.member_of_names_list %}
-                <a data-tooltip aria-haspopup="true" class="has-tip tip-right" title="{{group_node.name|default:' -- '}}" class="group" href="{% url 'dashboard' request.user.pk %}">
-                  {{group_node.name|truncatechars:20}} (User group)
-                </a>
-                {% else %}
-                <a data-tooltip aria-haspopup="true" class="has-tip tip-right" title="{{group_node.name|default:' -- '}}" class="group" href="{% url 'groupchange' group_node.name %}">
-                  {{group_node.name|truncatechars:20}}
-                </a>
-                {% endif %}
-                </li>
-              {% endfor %}  
-            {% endif %} 
-
-            <li id="more_groups">
-              <a class="group" href="{% url 'group' 'home' %}">{% trans "See more groups..." %}</a>
-            </li>
-            {% endcomment %}
-          </ul>
-          <!-- END of dropdown for group's -->
-
+        <li class="">
+            
+          <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'my_courses' request.user.username %}">
+            {% trans 'My Courses' %}
+          </a>
         </li>
 
+        <li class="">
+          <a title="" class="{%if title == 'My Groups'%}active{%endif%}" href="/home/group">
+            {% trans 'My Groups' %}
+          </a>
+        </li>
+          {% endif %}
+
+        <li class="group">
+          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="/home/group">
+            {% trans 'Explore' %}
+          </a>
+        </li>
       </ul>
-      {% endif %}
+
       {% endif %}
       <!-- {#% endcache %} -->
 
@@ -298,7 +260,8 @@
 
       <!-- =========| divider between two nav's/header's |=========== -->
 
-
+      {% comment %}
+        
       <!-- start of second nav  or group level header-->
       {% get_sg_member_of group_object.pk as list_of_sg_member_of %}
       {% if "CourseEventGroup" not in group_object.member_of_names_list and "ProgramEventGroup" not in list_of_sg_member_of or site.SITE_NAME == "NROER" %}
@@ -444,6 +407,7 @@
 
       {% endif %}
       <!-- end of second nav -->
+      {% endcomment %}
 
     {# </div> #}
     <!-- end of section appointed for two header's -->
