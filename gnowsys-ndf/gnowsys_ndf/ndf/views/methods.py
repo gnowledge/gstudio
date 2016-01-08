@@ -4324,7 +4324,7 @@ def get_language_tuple(lang):
     all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
 
     # check if lang argument itself is a complete, valid tuple that exists in all_languages.
-    if lang in all_languages:
+    if (lang in all_languages) or (tuple(lang) in all_languages):
         return lang
 
     all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
