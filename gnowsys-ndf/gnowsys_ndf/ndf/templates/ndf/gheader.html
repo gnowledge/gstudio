@@ -122,14 +122,15 @@
         </li>
 
         <li class="">
-          <a title="" class="{%if title == 'My Groups'%}active{%endif%}" href="/home/group">
+          <a title="" class="{%if title == 'My Groups'%}active{%endif%}" href="{% url 'my_groups' request.user.username %}">
             {% trans 'My Groups' %}
           </a>
         </li>
           {% endif %}
 
         <li class="group">
-          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="/home/group">
+          {# <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}"> #}
+          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="/home/group/">
             {% trans 'Explore' %}
           </a>
         </li>
