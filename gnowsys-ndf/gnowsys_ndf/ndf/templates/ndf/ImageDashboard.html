@@ -4,10 +4,10 @@
 {% block title %} Image Gallery {% endblock %}
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
-
+   <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 {% comment %}
 <script type="text/javascript" src="http://jqueryrotate.googlecode.com/svn/trunk/jQueryRotate.js"></script> <!-- required ? -->
-{% endcomment %}
+
 
 {% if already_uploaded %} 
 <div id="message">
@@ -20,6 +20,7 @@
 </div>
 {% endif %}
 
+{% endcomment %}
 
 <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name_tag %}">
   <div class="row"  style="padding-top:20px">
@@ -33,15 +34,30 @@
 	      <i class="fi-magnifying-glass large">{% trans "Search" %}</i>
 	    </a>
 	  </div>
-	  <div class="small-2 columns">
+	  {% comment %}
+    <div class="small-2 columns">
             <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="button postfix secondary">
 	      <i class="fi-paperclip">{% trans "Upload" %}</i>
 	    </a>
 	  </div>
+      {% endcomment %}
       </div>
     </div>
   </div>
 </form>
+
+  <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-8" >
+    {% for each in imageCollection %}
+    
+    <li class="card-image-wrapper">
+    <a id="image" href = "{% url 'read_file' group_name_tag each grid_fs_obj.filename %}">
+        <img  src="{% url 'getImageThumbnail' group_name_tag each%}">
+        <figcaption>{{each.name}}</figcaption>
+    </a>
+    </li>
+    {% endfor %}
+  </ul>     
+  
 
 <ul class="clearing-thumbs" data-clearing>
   {% for image in imageCollection %}

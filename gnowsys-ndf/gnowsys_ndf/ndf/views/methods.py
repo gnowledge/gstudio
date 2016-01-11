@@ -850,6 +850,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     else:
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
+        # print "\n\n\n content_org",content_org
         tags = request.POST.get('tags','')
     language = request.POST.get('lan')
     license = request.POST.get('license')
@@ -1002,7 +1003,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         # modifying this document
         usrname = request.user.username
         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-        node.content = unicode(org2html(content_org, file_prefix=filename))
+        # node.content = unicode(org2html(content_org, file_prefix=filename))
+        node.content = unicode(content_org)
         is_changed = True
 
     # visited_location in author class

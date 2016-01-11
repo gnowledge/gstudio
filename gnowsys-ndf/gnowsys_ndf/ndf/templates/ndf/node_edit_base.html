@@ -158,7 +158,7 @@
     	<div class="active content row contents" id="panel-name-description">
 
       		<div class="medium-8 columns">
-		  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
+		  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
 			</div>
 		
 			<!--  -->
@@ -1345,6 +1345,7 @@
 	addTagBtn.onkeypress = addTag;
 
 	$("#save-node").click(function(event) {
+	
 		pn_arr = []
 		cn_arr = []
 		md_arr = [] //for adding module
