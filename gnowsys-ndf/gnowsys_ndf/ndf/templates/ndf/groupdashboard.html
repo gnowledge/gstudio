@@ -18,7 +18,12 @@
 <!-- Ajax for getting user List  -->
 <script type="text/javascript">
   jQuery(document).ready(function($) {
-
+  {% get_sg_member_of groupid as list_of_sg_member_of %}
+  {% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
+    $("#group-level-header").addClass("hide");
+  {% endif %}
+  });
+  /*
   $('#btn_list_member').on("click",function() {
   var ajurl ="{% url 'get_author_set_users' groupid %}?_id={{node.pk}}";
   $.ajax({
@@ -37,11 +42,7 @@
   success: function(data){
   $('#firstModal').html(data); },
   });}); 
-  {% get_sg_member_of groupid as list_of_sg_member_of %}
-  {% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
-    $("#group-level-header").addClass("hide");
-  {% endif %}
-  });
+  */
 
 
 </script> 
