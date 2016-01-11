@@ -78,35 +78,34 @@
   <ul class="side-nav"> 
     {% for each in app_collection_set %}
     {% get_memberof_objects_count request each.pk groupid as count %}
-
-    {% if app_set_id == each|safe %}
-      {% if '/new/' in request.path %}
-      <li class="active-app-set-edit">
-      {% else %}
-      <li class="active-app-set-view">
-      {% endif %}
-    {% else %}
-    <li>
-    {% endif %}
-    
-      <div class="row">
-        {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
-          <a class="large-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
-            {{each.name}} ({{count}})
-          </a>
-
-          {% if gstaff_access and each.name not in features_list %}
-          <a class="large-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
-            +&nbsp;Add
-          </a>
-          {% endif %}
-
+    {% if each.name != "Student" %}
+      {% if app_set_id == each|safe %}
+        {% if '/new/' in request.path %}
+        <li class="active-app-set-edit">
         {% else %}
-          {{each.name}}
+        <li class="active-app-set-view">
         {% endif %}
-      </div>
-    </li>
+      {% else %}
+      <li>
+      {% endif %}
+        <div class="row">
+          {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
+            <a class="large-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+              {{each.name}} ({{count}})
+            </a>
 
+            {% if gstaff_access and each.name not in features_list %}
+            <a class="large-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+              +&nbsp;Add
+            </a>
+            {% endif %}
+
+          {% else %}
+            {{each.name}}
+          {% endif %}
+        </div>
+      </li>
+      {% endif %}
     {% endfor %}
   </ul>
 {% endblock %}

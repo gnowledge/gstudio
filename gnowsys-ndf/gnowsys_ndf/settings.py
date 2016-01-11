@@ -507,7 +507,7 @@ GAPPS = [
 # please make use of local_settings file
 GSTUDIO_WORKING_GAPPS = [
     u"Page", u"File", u"E-Library", u"Forum", u"Task", u"Topics",
-    u"Course", u"Observation", u"Event"
+    u"Course", u"Observation", u"Event", u"Quiz"
 ]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
@@ -655,7 +655,7 @@ GSTUDIO_GROUP_MODERATION_LEVEL = 1
 # allowed moderation levels
 GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
 
-GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "NCERT LICENSE", "OTHERS"]
+GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "NCERT License", "OTHERS"]
 
 GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
 

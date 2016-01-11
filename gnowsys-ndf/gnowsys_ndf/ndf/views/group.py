@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value  # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 
 from gnowsys_ndf.ndf.org2any import org2html
@@ -335,8 +335,10 @@ class CreateGroup(object):
         # adding thumbnail 
         logo_img_node = None
         grel_id = None
-        logo_img_node, grel_id = get_relation_value(group_obj._id,unicode(logo_rt))
-
+        logo_img_node_grel_id = get_relation_value(group_obj._id,unicode(logo_rt))
+        if logo_img_node_grel_id:
+            logo_img_node = logo_img_node_grel_id[0]
+            grel_id = logo_img_node_grel_id[1]
         f = request.FILES.get("docFile", "")
         # print "\nf is ",f
 
@@ -1232,8 +1234,11 @@ class CreateCourseEventGroup(CreateEventGroup):
             if "CourseUnit" in node.member_of_names_list:
                 for each_res in node.collection_set:
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
-                    new_res = self.replicate_resource(request, each_res_node, group_obj)
+                    new_res = replicate_resource(request, each_res_node, group_obj._id)
+                    # new_res = self.replicate_resource(request, each_res_node, group_obj)
                     prior_node_obj.collection_set.append(new_res._id)
+                    new_res.prior_node.append(prior_node_obj._id)
+                    new_res.save()
                     # below code changes the group_set of resources
                     # i.e cross-publication
                     # each_res_node.group_set.append(group_obj._id)
@@ -1247,37 +1252,6 @@ class CreateCourseEventGroup(CreateEventGroup):
                     member_of_name_str = each_node.member_of_names_list[0]
                     new_node = self.create_corresponding_gsystem(name_arg,member_of_name_str, prior_node_obj, group_obj)
                     self.call_setup(request, each_node, new_node, group_obj)
-
-    def replicate_resource(self, request, node, group_obj):
-        try:
-            if "Page" in node.member_of_names_list:
-                new_gsystem = node_collection.collection.GSystem()
-            else:
-                new_gsystem = node_collection.collection.File()
-                new_gsystem.fs_file_ids = node.fs_file_ids
-                new_gsystem.file_size = node.file_size
-                new_gsystem.mime_type = node.mime_type
-
-            new_gsystem.group_set.append(group_obj._id)
-            new_gsystem.name = unicode(node.name)
-            new_gsystem.status = u"PUBLISHED"
-            new_gsystem.member_of = node.member_of
-            new_gsystem.modified_by = int(self.user_id)
-            new_gsystem.created_by = int(self.user_id)
-            new_gsystem.contributors.append(int(self.user_id))
-            new_gsystem.tags = node.tags
-            new_gsystem.content_org = node.content_org
-            new_gsystem.content = node.content
-            new_gsystem.save()
-            discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-            create_gattribute(new_gsystem._id, discussion_enable_at, False)
-            new_gsystem.reload()
-            # return_status = create_thread_for_node(request, group_obj._id, new_gsystem)
-            return new_gsystem
-
-        except Exception as e:
-            # print e
-            return False
 
 
 
@@ -1839,7 +1813,7 @@ def group_dashboard(request, group_id=None):
         subgroups_cur = node_collection.find({
                 '_type': u'Group',
                 '_id': {'$in': group_obj.post_node},
-                'member_of': {'$in': [group_gst._id]},
+                # 'member_of': {'$in': [group_gst._id]}, #Listing all types of sub groups
                 '$or': [
                             {'created_by': request.user.id},
                             {'group_admin': request.user.id},
@@ -1847,6 +1821,8 @@ def group_dashboard(request, group_id=None):
                             {'group_type': 'PUBLIC'}
                         ]
                 }).sort("last_update",-1)
+
+
 
     if not group_obj:
       group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -1856,7 +1832,10 @@ def group_dashboard(request, group_id=None):
       group_id = group_obj._id
 
       # getting the profile pic File object
-      profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
+      # profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
+      profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")      
+      if profile_pic_image:
+        profile_pic_image =  profile_pic_image[0]
 
       # for each in group_obj.relation_set:
       #     if "has_profile_pic" in each:
@@ -1895,8 +1874,11 @@ def group_dashboard(request, group_id=None):
     group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=group_obj['_id']
     pass
-  profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
 
+  # profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
+  profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")      
+  if profile_pic_image:
+    profile_pic_image = profile_pic_image[0]
   # for each in group_obj.relation_set:
   #   if "has_profile_pic" in each:
   #     if each["has_profile_pic"]:
@@ -2246,7 +2228,9 @@ def switch_group(request,group_id,node_id):
     #loop replaced by a list comprehension
       top_partners_list = ["State Partners", "Individual Partners", "Institutional Partners"]
       all_user_groups = [each.name for each in get_all_user_groups()]
-      all_user_groups.append('home')
+      if not request.user.is_superuser:
+          all_user_groups.append('home')
+          # exclude home group in listing if not SU
       all_user_groups.append('Trash')
       all_user_groups.extend(top_partners_list)
 
@@ -2269,9 +2253,9 @@ def switch_group(request,group_id,node_id):
       #                                     {'edit_policy': {'$ne': "EDITABLE_MODERATED"}}
       #                                    ]
       #                           })
-    # for each in node.group_set:
-    #   coll_obj_list.append(node_collection.one({'_id': each}))
-    #loop replaced by a list comprehension
+      # for each in node.group_set:
+      #   coll_obj_list.append(node_collection.one({'_id': each}))
+      #loop replaced by a list comprehension
 
       # coll_obj_list=[node_collection.one({'_id': each}) for each in node.group_set ]
 

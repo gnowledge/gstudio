@@ -224,7 +224,7 @@ def approve_resource(request, group_id):
 	if approve_or_reject == "Approve":
 		if node_obj:
 			node_group_set = node_obj.group_set
-			task_id = get_relation_value(node_obj._id,"has_current_approval_task")
+			# task_id = get_relation_value(node_obj._id,"has_current_approval_task")
 			# make deep copy of object and not to copy it's reference with [:].
 			group_set_details_dict = get_moderator_group_set(node_group_set[:], group_id, get_details=True)
 			updated_group_set = group_set_details_dict['updated_group_set']
@@ -285,7 +285,8 @@ def approve_resource(request, group_id):
 
 		# is_top_group, top_group_obj = get_top_group_of_hierarchy(group_obj._id)
 		mod_group_instance = CreateModeratedGroup(request)
-		is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(curr_group_id)
+		# is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(curr_group_id)
+		is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(group_obj._id)
 
 		list_of_recipients_ids = []
 		list_of_recipients_ids.extend(group_obj.group_admin)
@@ -298,6 +299,7 @@ def approve_resource(request, group_id):
 						"The resource associated with Moderation Task has been REJECTED. \n"
 			task_dict = {
 				"name": task_node.name,
+				"_id" : ObjectId(task_node._id),
 				"created_by": node_obj.created_by,
 				"modified_by": request.user.id,
 				"contributors": [request.user.id],
@@ -342,7 +344,7 @@ def create_moderator_task(request, group_id, node_id, \
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		
 		task_id_val = get_relation_value(node_obj._id,"has_current_approval_task")
-		if task_id_val != ('',''):
+		if task_id_val != None:
 			task_dict['_id'] = get_relation_value(node_obj._id,"has_current_approval_task")
 		# if node_obj.relation_set:
 		# 	for rel in node_obj.relation_set:
@@ -364,7 +366,7 @@ def create_moderator_task(request, group_id, node_id, \
 
 		auth_grp = node_collection.one({'_type': "Author", 'created_by': int(node_obj.created_by)})
 		if task_type == "Moderation":
-			task_title = u"Moderate Resource: " + node_obj.name
+			task_title = u"Resource under moderation: " + node_obj.name
 			if task_content_org:
 				pass
 
@@ -372,10 +374,9 @@ def create_moderator_task(request, group_id, node_id, \
 				url = u"http://" + site_domain + "/"+ unicode(group_obj._id) \
 						+ u"/moderation#" + unicode(node_obj._id.__str__())
 
-				task_content_org = u'\n\nModerate resource: "' + unicode(node_obj.name) \
+				task_content_org = u'\n\nResource under moderation: "' + unicode(node_obj.name) \
 								+ u'" having id: "' + unicode(node_obj._id.__str__()) + '"' \
-								+ u'\n\nPlease moderate resource accesible at following link: \n'\
-								+ unicode(url)
+								
 			task_dict = {
 				"name": task_title,
 				"group_set": [group_obj._id],
@@ -384,14 +385,20 @@ def create_moderator_task(request, group_id, node_id, \
 				"contributors": [request.user.id],
 				"content_org": unicode(task_content_org),
 				"created_by_name": unicode(request.user.username),
-				"Status": u"New",
+				# "Status": u"New",
 				"Priority": u"Normal",
 				# "start_time": "",
 				# "end_time": "",
 				"Assignee": list(group_obj.group_admin[:]),
 				"has_type": task_type_list
 			}
+			if on_upload:
+				task_dict['Status'] = u"New"
+			else:
+				task_dict['Status'] = u"In Progress"
+
 			task_obj = create_task(task_dict, task_type_creation)
+
 			if task_obj:
 				create_grelation(node_obj._id, at_curr_app_task, task_obj._id)
 				try:

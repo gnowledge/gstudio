@@ -248,7 +248,17 @@ body{
       background-color: #fafafa;
       border-top: solid thin gray;
       height: 52px;
+      span{
+        font-size: 1em!important;
+      }
 
+
+      img{
+        
+        height:45px;
+        width:50px;
+        //margin-left: -20px!important;
+      }
       // &:hover{
       //     box-shadow: inset 0px 101px 50px #E1E1E1;
       //     transition: 0.8s all;
@@ -330,9 +340,9 @@ body{
 
         &:hover{
         // background-color: scale-color($topbar-bg-color, $lightness: 5%);
-        box-shadow: inset 0px 75px 50px #2b2c2d;
-        color: #fafafa;
-        transition: 0.8s all;
+        //box-shadow: inset 0px 75px 50px #cccccc;
+        //color: #black;
+        //transition: 0.8s all;
     }
 
   }
@@ -1160,7 +1170,7 @@ aside#help{
     background-repeat:no-repeat;
     position:relative;
     overflow:hidden;
-    
+    background-color:#f2f2f2;    
     img  {
     border-radius: 2px 2px 0 0;
     display: block;

@@ -218,7 +218,7 @@ class Command(BaseCommand):
 
           else:
             print 'file name should be ATs.json,STs.json or RTs.json to load Ats,STs or RTs of json'
-        
+        '''
         # Retrieve 'Quiz' GSystemType's id -- in order to append it to 'meta_type_set' for 'QuizItem' GSystemType
         quiz_type = node_collection.one({'_type': u'GSystemType', 'name': u'Quiz'})
         quiz_item_type = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
@@ -235,7 +235,7 @@ class Command(BaseCommand):
           quiz_type.attribute_type_set.append(node_collection.one({'_type': u'AttributeType', 'name': u'start_time'}))
           quiz_type.attribute_type_set.append(node_collection.one({'_type': u'AttributeType', 'name': u'end_time'}))
           quiz_type.save()
-
+        '''
         #Creation Gsystem Eventtype as a container to hold the Event types
         glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
         GlistItem=node_collection.one({'_type': "GSystemType","name":"GListItem"})
@@ -438,6 +438,10 @@ def create_meta_type(user_id,meta_type):
   meta.status = u"PUBLISHED"
   meta.save()
   print "succesfully created META_TYPE:",meta_type
+
+if not bin_member_of_type:
+  create_meta_type(1,u"Binary")
+  bin_member_of_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':"Binary"}]})
 
 def create_gsystem_type(st_name, user_id, meta_type_id = None):
   '''

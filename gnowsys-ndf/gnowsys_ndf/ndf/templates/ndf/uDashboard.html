@@ -231,6 +231,7 @@
                     <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
                         {% for node in user_task %}
                             {% get_version_of_module node.pk as version %}
+                            {#{% get_attribute_value node.pk "Status" as task_status %}#}
                             <li class="card">
                                 <div id="assignedTask">
                                     <header>
