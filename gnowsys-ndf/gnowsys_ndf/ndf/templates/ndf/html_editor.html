@@ -1,0 +1,39 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+{% get_group_name groupid as group_name_tag %}
+
+{% cache 3600 editor_static_files %}
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+
+{% endcache %}
+
+<style type="text/css">
+
+</style>
+{% trans var_placeholder as content %}
+{% if node_id %}
+    
+            <textarea id="textarea-{{node_id}}"  name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}" rows="10" cols="80">
+                {{var_value}}
+            </textarea>
+            <div id="myID" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
+             
+            </div>
+            <script>
+                // Replace the <textarea id="editor1"> with a CKEditor
+                // instance, using default configuration.
+                CKEDITOR.replace( 'textarea-{{node_id}}',{
+                                    enterMode : Number(2), //override default behaviour that adds <p></p> in ck editor
+                                    toolbar:'basic',
+                                    uiColor:'#f2f2f2',
+                                    groupID: {group_id:'{{group_id}}'},
+                                    nodeID: {node_id:'{{node_id}}'},
+                                    customConfig : '/static/ndf/js/ckeditor-config.js',                                     
+                                 });
+                // CKEDITOR.plugins.addExternal('addImage', '/static/ndf/js/ckPlugins/add');
+
+            </script>
+  {% endif %}
