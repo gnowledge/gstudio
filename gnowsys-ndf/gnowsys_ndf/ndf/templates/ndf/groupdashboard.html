@@ -50,6 +50,8 @@
 
 <script type="text/javascript">
 //function to toggle the lable Join and Unsubscribe
+
+/* 
 function change_label(label)
 {   
 	if(chk_login=="AnonymousUser")
@@ -69,7 +71,7 @@ function change_label(label)
         }
 
 }
-
+*/
 //function for sending notifications for Join and Unsubscribe
 function notify(node,activity)
 {
@@ -94,7 +96,7 @@ function notify(node,activity)
 
 
 }
-
+/*
 
 $(document).ready(function()
 {
@@ -130,6 +132,7 @@ $(document).ready(function()
   }); //end notify_click()
 }); //end document_ready()
 
+*/
 </script>
 {% endblock %}
 <!-- end of head block -->
@@ -148,10 +151,11 @@ $(document).ready(function()
 {% cache 300 groupdashboard_meta_content %}
 {% block meta_content %}
 {{block.super}}
-
+  {% comment %}
   <h4>
   <i class="fi-torsos"></i> {{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}
   </h4>
+  {% endcomment %}
 
   <div id="group_picture">
   {% include "ndf/upload_pic_widget.html" with url_name='groupchange'  widget_for="Group_about" %}
@@ -161,7 +165,7 @@ $(document).ready(function()
 <!-- end of meta_content block -->
 
 {% block app_action_list %}
-
+{% comment %}
   {% check_is_user_group group_id as is_user_group %}
   {% get_policy node request.user as policy  %}
 
@@ -217,6 +221,7 @@ $(document).ready(function()
     {% include "ndf/invite_users.html" %}
     {% include "ndf/invite_admins.html" %}
   {% endif %} 
+{% endcomment %}
 
 
 {% endblock %}
