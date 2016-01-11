@@ -911,7 +911,7 @@ def submitDoc(request, group_id):
     
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, co_contributors="", request=None, map_geojson_data=[], **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type=None, language=None, usrname=None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, co_contributors="", request=None, map_geojson_data=[], **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
