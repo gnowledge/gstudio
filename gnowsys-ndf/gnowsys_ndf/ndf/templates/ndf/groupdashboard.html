@@ -152,11 +152,9 @@ $(document).ready(function()
 {% cache 300 groupdashboard_meta_content %}
 {% block meta_content %}
 {{block.super}}
-  {% comment %}
   <h4>
   <i class="fi-torsos"></i> {{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}
   </h4>
-  {% endcomment %}
 
   <div id="group_picture">
   {% include "ndf/upload_pic_widget.html" with url_name='groupchange'  widget_for="Group_about" %}
