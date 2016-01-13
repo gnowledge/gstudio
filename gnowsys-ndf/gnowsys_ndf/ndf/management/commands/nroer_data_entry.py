@@ -583,7 +583,7 @@ def parse_data_create_gsystem(json_file_path):
                                 ga_node = None
 
                                 info_message = "\n- Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
-                                print info_message
+                                # print info_message
                                 log_list.append(str(info_message))
 
                                 ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
@@ -823,7 +823,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
     userid = resource_data["created_by"]
     content_org = resource_data["content_org"]
     tags = resource_data["tags"]
-    language = get_language_tuple(eval(parsed_json_document['language']))
+    language = get_language_tuple(eval(resource_data['language']))
     group_set_id = ObjectId(group_set_id) if group_set_id else home_group._id
 
     img_type = None
