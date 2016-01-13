@@ -14,11 +14,17 @@
 
 </style>
 {% trans var_placeholder as content %}
-{% if node_id %}
+        {% if node_id %}
     
             <textarea id="textarea-{{node_id}}"  name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}" rows="10" cols="80">
                 {{var_value}}
             </textarea>
+        {% else %}
+        <textarea id="textarea-{{var_name}}"  name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}" rows="10" cols="80">
+                {{var_value}}
+            </textarea>
+
+        {% endif %}
             <div id="myID" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
              
             </div>
@@ -31,9 +37,7 @@
                                     uiColor:'#f2f2f2',
                                     groupID: {group_id:'{{group_id}}'},
                                     nodeID: {node_id:'{{node_id}}'},
-                                    customConfig : '/static/ndf/js/ckeditor-config.js',                                     
+                                    customConfig : '/static/ndf/js/ckeditor-config.js',
+                                     
                                  });
-                // CKEDITOR.plugins.addExternal('addImage', '/static/ndf/js/ckPlugins/add');
-
             </script>
-  {% endif %}
