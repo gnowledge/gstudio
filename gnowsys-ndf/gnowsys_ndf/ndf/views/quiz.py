@@ -304,6 +304,7 @@ def quiz_details(request, group_id, node_id):
         )
 
 @login_required
+@get_execution_time
 def save_quizitem_answer(request, group_id):
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
@@ -331,26 +332,27 @@ def save_quizitem_answer(request, group_id):
         already_ans_obj = None
         if thread_obj != None:
             already_ans_obj = node_collection.find_one({'member_of': qip_gst._id,'created_by': user_id, 'prior_node': thread_obj._id})
-    
         if already_ans_obj:
             user_ans = already_ans_obj
         else:
             user_ans = node_collection.collection.GSystem()
+            user_ans.created_by = user_id
+            user_ans.modified_by = user_id
+            if user_id not in user_ans.contributors:
+                user_ans.contributors.append(user_id)
+
+            user_ans.member_of.append(qip_gst._id)
+            user_ans.group_set.append(group_id)
+            user_ans.status = u"PUBLISHED"
+
         user_ans.name = unicode("Answer_of:" + str(node_obj.name) + "-Answer_by:"+ str(user_name))
-        user_ans.status = u"PUBLISHED"
-
-        user_ans.created_by = user_id
-        user_ans.modified_by = user_id
-        if user_id not in user_ans.contributors:
-            user_ans.contributors.append(user_id)
-
-        user_ans.member_of.append(qip_gst._id)
-        user_ans.group_set.append(group_id)
         user_ans.save()
 
         if thread_obj != None:
-            node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
-            node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
+            if thread_obj._id not in user_ans.prior_node:
+                node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
+            if user_ans._id not in thread_obj.post_node:
+                node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
         quiz_type_val = get_attribute_value(node_obj._id,"quiz_type")
 
         # print "\n get_attribute_value--", get_attribute_value
@@ -384,6 +386,4 @@ def save_quizitem_answer(request, group_id):
         # print "\n user_ans.attribute_set",user_ans.attribute_set
         response_dict['success'] = True
         return HttpResponse(json.dumps(response_dict))
-
-
 
