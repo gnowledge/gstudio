@@ -1,7 +1,6 @@
-{% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
-{% block title %} Image Gallery {% endblock %}
+
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
@@ -21,20 +20,24 @@
 {% endif %}
 
 {% endcomment %}
-
+<div class = "repository-title" style="width:100%">
+Image Gallery
+</div>
+<br>
+<br>
+{% comment %}
 <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name_tag %}">
   <div class="row"  style="padding-top:20px">
     <div class="large-7 columns">
       <div class="row collapse">
-	  <div class="small-8 columns">
+    <div class="small-8 columns">
             <input type="text" placeholder="search images" name="search">
-	  </div>
-	  <div class="small-2 columns">
+    </div>
+    <div class="small-2 columns">
             <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
-	      <i class="fi-magnifying-glass large">{% trans "Search" %}</i>
-	    </a>
-	  </div>
-	  {% comment %}
+        <i class="fi-magnifying-glass large">{% trans "Search" %}</i>
+      </a>
+    </div>
     <div class="small-2 columns">
             <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="button postfix secondary">
 	      <i class="fi-paperclip">{% trans "Upload" %}</i>
@@ -50,7 +53,7 @@
     {% for each in imageCollection %}
     
     <li class="card-image-wrapper">
-            <img  data-image-id="{{each.pk}}" src="{% url 'getImageThumbnail' group_name_tag each%}">
+            <img  data-image-id="{{each.pk}}" src="{% url 'getImageThumbnail' group_name_tag each %}" data-image-src="{% url 'getFullImage' group_id each each.name%}">
             <figcaption>{{each.name}}</figcaption>
     
     </li>
