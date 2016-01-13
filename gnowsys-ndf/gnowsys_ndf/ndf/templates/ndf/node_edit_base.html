@@ -832,14 +832,7 @@
 		$(".prior_node_tab").hide();
 		$("#metadata_info").empty();
 		
-    $("#type_of").children('option').click(function(){
-        var option_val = $( "#type_of option:selected" ).text();
-        if(option_val){
-    			alert(option_val);	
-    		     $("#info-blog-page-editor").hide();
-    		     $("#wiki-page-editor").css("display", "block");
-        }
-    });
+    
 
 		if (nt == "Page" || nt == "File" || nt == "Pandora_video" || nt == "Concept")
 		{
