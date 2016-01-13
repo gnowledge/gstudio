@@ -1003,8 +1003,26 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         # modifying this document
         usrname = request.user.username
         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-        # node.content = unicode(org2html(content_org, file_prefix=filename))
-        node.content = unicode(content_org)
+        
+        node_page_type_list = []
+        if node.get("_id",None):  
+            get_node = node_collection.one({'_id': ObjectId(node._id)})
+            node_type_of = get_node.type_of 
+            if node_type_of:
+              for each_node_type_of in node_type_of:
+                node_type_of_name = node_collection.one({'_id': each_node_type_of})
+                node_page_type_list.append(node_type_of_name.name)
+
+        # org editor for wiki page and ckeditor for blog and info pages
+        if node_page_type_list:
+          if "Wiki page" in node_page_type_list:
+            node.content = unicode(org2html(content_org, file_prefix=filename))
+          else:
+            node.content = unicode(content_org)
+        else:
+          node.content = unicode(org2html(content_org, file_prefix=filename))
+
+          
         is_changed = True
 
     # visited_location in author class
