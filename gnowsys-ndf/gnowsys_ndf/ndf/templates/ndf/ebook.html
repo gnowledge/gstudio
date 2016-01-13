@@ -13,10 +13,7 @@
 {% endblock head %}
 
 {% block meta_content %}
-  {% if group_name_tag == "desk" %}
-    <div class="large-4 columns repository-title" style="width:100%">{{group_name_tag}}
-    </div><br>
-  {% endif %}
+
   {% get_ebook_help_text as ebook_help_text_url %}
   {% blocktrans %} 
     <p class="text-justify subheader">Each eBook is a collection of chapter files.

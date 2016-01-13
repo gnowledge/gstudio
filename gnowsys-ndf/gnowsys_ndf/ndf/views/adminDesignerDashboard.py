@@ -17,7 +17,7 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     '''
     fetching class's objects
     '''
-    if request.method=="POST":
+    if request.method == "POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
         nodes = node_collection.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype}).sort('last_update', -1)
@@ -70,6 +70,7 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     if group_obj:
 	groupid = str(group_obj[0]._id)
 
+
     template = "ndf/adminDashboard.html"
     variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"designer","groupid":groupid,'meta_types':meta_types,'group_id':groupid})
     return render_to_response(template, variable)
@@ -90,6 +91,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     translate=request.GET.get('translate','')
     if class_name == "AttributeType":
         definitionlist = ['name','altnames','language','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        # definitionlist = ['name','altnames','language','subject_type','data_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
@@ -100,6 +102,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
     elif class_name == "RelationType":
         definitionlist = ['name','inverse_name','altnames','language','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','is_symmetric','is_reflexive','is_transitive','status','member_of']
+        # definitionlist = ['name','inverse_name','altnames','language','subject_type','object_type','subject_cardinality','object_cardinality','is_symmetric','is_reflexive','is_transitive','status','member_of']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
@@ -111,6 +114,8 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
     class_structure = eval(class_name).structure
     required_fields = eval(class_name).required_fields
+
+
     newdict = {}
     if node_id:
         new_instance_type = node_collection.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
@@ -167,7 +172,9 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                         new_instance_type[key] = listoflist
                     else :
                         listoflist = []
+                        print "key __ " , key
                         for each in request.POST.get(key,"").split(","):
+                            print "each ", each
                             listoflist.append(ObjectId(each))
                         new_instance_type[key] = listoflist
 
@@ -283,5 +290,5 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     else:
         variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid})
 
+    #print variable
     return render_to_response(template, variable)
-

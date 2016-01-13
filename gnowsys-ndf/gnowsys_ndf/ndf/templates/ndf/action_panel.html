@@ -366,15 +366,18 @@
 		{% if not is_user_group %}
 
 		<div class="panel">
-			{% if is_gstaff or 'ModeratingGroup' not in group_object.member_of_names_list and 'ProgramEventGroup' not in group_object.member_of_names_list and "PartnerGroup" not in group_object.member_of_names_list and is_partner_val %}
+			{% if is_gstaff or 'ModeratingGroup' not in group_object.member_of_names_list and 'ProgramEventGroup' not in group_object.member_of_names_list and "PartnerGroup" not in group_object.member_of_names_list %}
 				<!-- List Members and Join buttons -->
 				<div class="row btn-row">
+					{% comment %}
 					<!-- List Members -->
-					{% if  is_gstaff %}	
-						<input type="button" id ="btn_list_member" class="tiny button radius  left-btn" data-reveal-id="firstModal" value="{% trans 'List Members' %}" title="List Members of this group">
-					{% endif %}
-						<!-- Reveal Modals begin -->
-						<div id="firstModal" class="reveal-modal" data-reveal></div>
+		            {% if  is_gstaff %}     
+		                    <input type="button" id ="btn_list_member" class="tiny button radius left-btn" data-reveal-id="firstModal" value="{% trans 'List Members' %}" title="List Members of this group">
+		            {% endif %}
+		                    <!-- Reveal Modals begin -->
+		                    <div id="firstModal" class="reveal-modal" data-reveal></div>
+					{% endcomment %}
+							<a href="{% url 'program' groupid %}" class="tiny button radius left-btn"><span>{% trans 'List Programs' %}</span></a>
 					
 					<!-- Join/ Unsubscribe -->
 						{% if user.is_authenticated %}
@@ -390,11 +393,7 @@
 									{% endcomment %}
 
 								{% elif user_is_joined == "not" %}
-									{% if allow_to_join %}
 									<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Join' %}" title="Join this Group">
-									{% else %}
-									<input class="tiny button radius secondary disabled right-btn" type="button" id="notify" value="{% trans 'Closed' %}" title="{% trans 'You are not authorized for this action' %}">
-									{% endif %}
 									{% comment %}
 										<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Follow' %}">
 									{% endcomment %}

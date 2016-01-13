@@ -71,7 +71,7 @@
                     <p>This File is Rejected by the Moderator.</p>
               {% elif node.status != "MODERATION" %}
                   {# {{node.mime_type}} #}
-                  <a class="th" href="{% url 'read_file' group_id node node.name %}">
+                  <a class="th" target="_blank" href="{% url 'file_detail' group_id node %}">
                     {% if 'image' in node.mime_type  %}
                         <img style="height:100px;" src="{% url 'getFileThumbnail' group_id node.pk %}" />
                     {% endif %}
@@ -256,7 +256,7 @@
         // console.log(f)
         var mime_type = f[1];
         filesContent += "<div style='margin: 1em;'>"+ f[1] +"<br/>"+
-        "<a class='th' href='/{{group_id}}/file/readDoc/"+f[0]+"/"+f[2]+"'>";
+        "<a class='th' href='/{{group_id}}/file/"+f[2]+"'>";
         if(mime_type.indexOf("image") >= 0){
           filesContent += "<img style='height: 100px;' src='/{{group_id}}/file/thumbnail/"+ f[0] +"'/>";}
         filesContent += "<p>" + f[2] + "</p></a></div>";

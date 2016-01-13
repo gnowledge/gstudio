@@ -224,7 +224,7 @@ def approve_resource(request, group_id):
 	if approve_or_reject == "Approve":
 		if node_obj:
 			node_group_set = node_obj.group_set
-			task_id = get_relation_value(node_obj._id,"has_current_approval_task")
+			# task_id = get_relation_value(node_obj._id,"has_current_approval_task")
 			# make deep copy of object and not to copy it's reference with [:].
 			group_set_details_dict = get_moderator_group_set(node_group_set[:], group_id, get_details=True)
 			updated_group_set = group_set_details_dict['updated_group_set']
@@ -344,7 +344,7 @@ def create_moderator_task(request, group_id, node_id, \
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		
 		task_id_val = get_relation_value(node_obj._id,"has_current_approval_task")
-		if task_id_val != ('',''):
+		if task_id_val != None:
 			task_dict['_id'] = get_relation_value(node_obj._id,"has_current_approval_task")
 		# if node_obj.relation_set:
 		# 	for rel in node_obj.relation_set:
@@ -366,7 +366,7 @@ def create_moderator_task(request, group_id, node_id, \
 
 		auth_grp = node_collection.one({'_type': "Author", 'created_by': int(node_obj.created_by)})
 		if task_type == "Moderation":
-			task_title = u"Moderate Resource: " + node_obj.name
+			task_title = u"Resource under moderation: " + node_obj.name
 			if task_content_org:
 				pass
 
@@ -374,10 +374,9 @@ def create_moderator_task(request, group_id, node_id, \
 				url = u"http://" + site_domain + "/"+ unicode(group_obj._id) \
 						+ u"/moderation#" + unicode(node_obj._id.__str__())
 
-				task_content_org = u'\n\nModerate resource: "' + unicode(node_obj.name) \
+				task_content_org = u'\n\nResource under moderation: "' + unicode(node_obj.name) \
 								+ u'" having id: "' + unicode(node_obj._id.__str__()) + '"' \
-								+ u'\n\nPlease moderate resource accesible at following link: \n'\
-								+ unicode(url)
+								
 			task_dict = {
 				"name": task_title,
 				"group_set": [group_obj._id],

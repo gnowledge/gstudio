@@ -911,7 +911,7 @@ def submitDoc(request, group_id):
     
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, co_contributors="", request=None, map_geojson_data=[], **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type=None, language=None, usrname=None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, co_contributors="", request=None, map_geojson_data=[], **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
@@ -921,7 +921,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
-
+    group_object = node_collection.one({'_id': ObjectId(group_id)})
     
     # overwritting count and first object by sending arguments kwargs (count=0, first_object="") 
     # this is to prevent from forming collection of first object containing subsequent objects.
@@ -992,8 +992,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             if access_policy:
                 fileobj.access_policy = unicode(access_policy)  # For giving privacy to file objects
             fileobj.file_size = size
-
-            group_object = node_collection.one({'_id': ObjectId(group_id)})
 
             if group_object._id not in fileobj.group_set:
                 # group id stored in group_set field

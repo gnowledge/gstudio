@@ -623,7 +623,7 @@ def my_courses(request, group_id):
     auth_id = auth_obj._id
     title = 'My Courses'
     my_course_objs = get_user_course_groups(user_id)
-    print my_course_objs
+    # print my_course_objs
 
     return render_to_response('ndf/my-courses.html',
                 {
