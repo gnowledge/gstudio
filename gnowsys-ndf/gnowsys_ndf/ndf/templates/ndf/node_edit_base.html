@@ -157,11 +157,18 @@
 
     	<div class="active content row contents" id="panel-name-description">
 
-      		<div class="medium-8 columns">
+	 {% get_node_page_type node.pk as node_type %}
+	  
+	   {% if "Wiki page" in node_type or not node.pk %}
+			<div class="medium-8 columns" >
+		  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
+			</div>
+		{% else  %}
+			<div class="medium-8 columns" >
 		  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
 			</div>
-		
-			<!--  -->
+		{% endif %}
+
 			{% if ce_id %}
 				<input type="hidden" name="ce_id" value="{{ce_id}}">
 				<input type="hidden" name="res" value="{{res}}">
@@ -268,7 +275,7 @@
 											<option value = {{i.pk}} selected> {% trans i.name %} </option>
 
 										{% else %}
-											<option value = {{i.pk}} > {% trans i.name %} </option>
+											<option value = {{i.pk}} > {% trans i.name  %} </option>
 										{% endif %}
 			  						{% endfor %}
 								</select>
@@ -824,6 +831,15 @@
 		$(".teaches_tab").hide();
 		$(".prior_node_tab").hide();
 		$("#metadata_info").empty();
+		
+    $("#type_of").children('option').click(function(){
+        var option_val = $( "#type_of option:selected" ).text();
+        if(option_val){
+    			alert(option_val);	
+    		     $("#info-blog-page-editor").hide();
+    		     $("#wiki-page-editor").css("display", "block");
+        }
+    });
 
 		if (nt == "Page" || nt == "File" || nt == "Pandora_video" || nt == "Concept")
 		{
