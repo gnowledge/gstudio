@@ -45,7 +45,7 @@
 			<font size="3"> {{list}} </font> 
 			</div>
 
-{% get_input_fields class_structure|get_dict_item:list list translate class_name is_ds_RT%}
+{% get_input_fields class_structure|get_dict_item:list list translate class_name %}
 
 </div>
 {% endif %}
@@ -70,7 +70,7 @@
 	<div style="display:table-cell;"> 
 		<font size="3"> {{list}}</font> 
 	</div>
-	{% get_input_fields class_structure|get_dict_item:list list translate class_name is_ds_RT%}
+	{% get_input_fields class_structure|get_dict_item:list list translate class_name %}
 	{% if list in  required_fields %}
 	<div style="display:table-cell;">
 					<font size="3" color="red"> * </font>
@@ -84,9 +84,8 @@
 			<div style="display:table-row;">
 				<div style="display:table-cell;"> 
 		<font size="3"> {{list}} </font> 
-				{# {{"is_ds_RT=True"}} #}
 				</div>
-				{% get_input_fields class_structure|get_dict_item:list list translate class_name is_ds_RT%}
+				{% get_input_fields class_structure|get_dict_item:list list translate class_name %}
 				{% if list in  required_fields %}
 				<div style="display:table-cell;">
 					<font size="3" color="red"> * </font>

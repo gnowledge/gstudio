@@ -625,18 +625,16 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 
 @get_execution_time
 @register.inclusion_tag('tags/dummy.html')
-def list_widget( fields_name, fields_type, fields_value, class_name=None, is_ds_RT = True , template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
+def list_widget( fields_name, fields_type, fields_value, class_name=None, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
 	
 	drawer1 = {}
 	drawer2 = None
 	# groupid = ""
-	is_ds_RT = True
 	group_obj = node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+	admin_related_drawer = True
 
 	if group_obj:
 		groupid = str(group_obj[0]._id)
-
-	print "bcz frm group_object groupid" , groupid
 
 	alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
 
@@ -709,7 +707,7 @@ def list_widget( fields_name, fields_type, fields_value, class_name=None, is_ds_
 					drawer2.append(each_node)
 
 	
-		return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid,'groupid': groupid, 'is_RT':class_name , 'is_ds_RT':True }
+		return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid,'groupid': groupid, 'is_RT':class_name , 'admin_related_drawer': admin_related_drawer }
 
 
 @get_execution_time
@@ -1850,12 +1848,12 @@ def get_policy(group, user):
 
 @get_execution_time
 @register.inclusion_tag('ndf/admin_fields.html')
-def get_input_fields(fields_type, fields_name, translate=None, class_name=None, is_ds_RT = True ):
+def get_input_fields(fields_type, fields_name, translate=None, class_name=None ):
 	"""Get html tags 
 	"""
 	field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
 	return {"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
-					"field_type_list":field_type_list,"translate":translate,"class_name":class_name, 'is_ds_RT':is_ds_RT }
+					"field_type_list":field_type_list,"translate":translate,"class_name":class_name }
 	# return {'template': 'ndf/admin_fields.html', 
 	# 				"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
 	# 				"field_type_list":field_type_list,"translate":translate}

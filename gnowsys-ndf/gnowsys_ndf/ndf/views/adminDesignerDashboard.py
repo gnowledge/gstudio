@@ -273,7 +273,6 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
     template = "ndf/adminDashboardCreate.html"
 
-    is_ds_RT = True 
     variable =  None
     class_structure_with_values = {}
     if node_id:
@@ -286,13 +285,11 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                                             'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
                                             'options': options, 'required_fields': required_fields,"translate":translate,"lan":LANGUAGES,
-                                            'groupid': groupid,'group_id':groupid, 'is_ds_RT':is_ds_RT 
+                                            'groupid': groupid,'group_id':groupid 
                                         })
 
     else:
 
-        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid,'is_ds_RT':is_ds_RT  })
-   
-
-   
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid })
+      
     return render_to_response(template, variable)

@@ -332,7 +332,7 @@
 <script type="text/javascript">
   
   var is_RT = "{{is_RT}}";
-  var is_ds_RT = "{{is_ds_RT}}"
+  var admin_related_drawer = "{{admin_related_drawer}}"
 
   $(document).ready(function(){
     if ("{{search_name}}"){
@@ -516,7 +516,7 @@
   $('#{{widget_for}}_search').bind('keydown change', function(e) {
 
     // if (is_RT == "RelationType" ) {
-    if (is_RT == "RelationType" || is_ds_RT == "True" ) {
+    if (is_RT == "RelationType" || admin_related_drawer == "True" ) {
     // if (is_RT == "RelationType" || is_RT == "GSystemType" || is_RT == "AttributeType" ) {
       var search_text = (this.value).toLowerCase();
 
