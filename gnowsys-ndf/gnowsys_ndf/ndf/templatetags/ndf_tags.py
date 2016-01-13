@@ -106,6 +106,7 @@ def get_site_variables():
 	site_var['CONTRIBUTE']=GSTUDIO_SITE_CONTRIBUTE
 	site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
 	site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
+	site_var['LANDING_TEMPLATE']=GSTUDIO_SITE_LANDING_TEMPLATE
 	site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
 	site_var['SITE_NAME']=GSTUDIO_SITE_NAME
 	site_var['ISSUES_PAGE']=GSTUDIO_SITE_ISSUES_PAGE
@@ -3175,7 +3176,7 @@ def is_partner(group_obj):
 @get_execution_time
 @register.assignment_tag
 def get_event_status(node):
-	status_msg = ""
+	status_msg = None
 	"""
 	Returns FORTHCOMING/OPEN/CLOSED
 	"""
@@ -3189,11 +3190,11 @@ def get_event_status(node):
         if start_time_val and end_time_val and start_enroll_val and end_enroll_val:
 	        if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
 	        or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
-	            status_msg = "OPEN"
+	            status_msg = "in-progress"
 	        elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
-	            status_msg = "FORTHCOMING"
+	            status_msg = "upcoming"
 	        elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
-	            status_msg = "CLOSED"
+	            status_msg = "completed"
 	return status_msg
 
 
@@ -3223,7 +3224,7 @@ def get_event_status(node):
 @register.assignment_tag
 def get_user_course_groups(user_id):
 
-	user_id = int(user_id)
+	user_id = int(user_id) if user_id else user_id
 
 	gst_course = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
 
@@ -3238,7 +3239,36 @@ def get_user_course_groups(user_id):
 				'member_of': {'$in': [gst_course._id]} 
 				})
 
-	return all_user_groups
+	# all_courses = []
+
+	all_courses_obj_grouped = {
+							# 'all': [],
+							'in-progress': [],
+							'upcoming': [],
+							'completed': []
+						}
+
+	courses_status_count_dict = {
+							'all': all_user_groups.count(),
+							'in-progress': 0,
+							'upcoming': 0,
+							'completed': 0
+						}
+
+	for each_course in all_user_groups:
+		each_course.course_status_field = get_event_status(each_course)
+
+		all_courses_obj_grouped[each_course.course_status_field].append(each_course)
+		# all_courses_obj_grouped['all'].append(each_course)
+
+		courses_status_count_dict[each_course.course_status_field] += 1
+
+		# all_courses.append(each_course)
+
+	# print "::: ", courses_status_count_dict
+	# print "::: ", all_courses_obj_grouped
+	return all_courses_obj_grouped
+
 
 @get_execution_time
 @register.assignment_tag

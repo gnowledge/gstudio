@@ -16,7 +16,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE, GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE, GSTUDIO_SITE_NAME, GSTUDIO_SITE_LANDING_TEMPLATE
 from gnowsys_ndf.ndf.models import GSystemType, Node
 from gnowsys_ndf.ndf.models import node_collection
 
@@ -100,6 +100,16 @@ def landing_page(request):
                                 {
                                     "group_id": "home", 'groupid':"home",
                                     'landing_page': 'landing_page'
+                                },
+                                context_instance=RequestContext(request)
+                            )
+
+    elif GSTUDIO_SITE_LANDING_TEMPLATE:
+        return render_to_response(
+                                GSTUDIO_SITE_LANDING_TEMPLATE,
+                                {
+                                    "group_id": "home", 'groupid':"home",
+                                    'title': 'CLIx'
                                 },
                                 context_instance=RequestContext(request)
                             )

@@ -128,3 +128,17 @@ def get_dict_value_from_key(dict, key):
         return dict[key]
     except KeyError:
         return ''
+
+
+@register.assignment_tag
+def datetime_now():
+	import datetime
+	return datetime.datetime.now()
+
+
+@get_execution_time
+@register.filter
+# filter added to remove underscore from string
+def replace(str_to_process, to_be_replace, replace_by):
+   replaced_str = str_to_process.replace(to_be_replace, replace_by)   
+   return replaced_str
