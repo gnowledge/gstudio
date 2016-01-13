@@ -583,7 +583,7 @@ def parse_data_create_gsystem(json_file_path):
                                 ga_node = None
 
                                 info_message = "\n- Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
-                                print info_message
+                                # print info_message
                                 log_list.append(str(info_message))
 
                                 ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
