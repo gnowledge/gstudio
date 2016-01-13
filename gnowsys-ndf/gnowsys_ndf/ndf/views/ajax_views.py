@@ -2186,19 +2186,23 @@ def get_author_set_users(request, group_id):
     if request.is_ajax():
         _id = request.GET.get('_id',"")
         node = node_collection.one({'_id':ObjectId(_id)})
-        course_name = ""
-        rt_has_course = node_collection.one({'_type':'RelationType', 'name':'has_course'})
-        if rt_has_course and node._id:
-            course = triple_collection.one({"_type": "GRelation", 'right_subject':node._id, 'relation_type.$id':rt_has_course._id})
-            if course:
-                course_name = node_collection.one({'_id':ObjectId(course.subject)}).name
+        # course_name = ""
+        # rt_has_course = node_collection.one({'_type':'RelationType', 'name':'has_course'})
+        # if rt_has_course and node._id:
+        #     course = triple_collection.one({"_type": "GRelation", 'right_subject':node._id, 'relation_type.$id':rt_has_course._id})
+        #     if course:
+        #         course_name = node_collection.one({'_id':ObjectId(course.subject)}).name
         if node.created_by == request.user.id:
             can_remove = True
         if node.author_set:
-            for each in node.author_set:
-                user_list.append(User.objects.get(id = each))
+            user_list = User.objects.filter(id__in=node.author_set).order_by('id')
+            # for each in node.author_set:
+            #     user_list.append(User.objects.get(id = each))
             return render_to_response("ndf/refresh_subscribed_users.html",
-                                       {"user_list":user_list,'can_remove':can_remove,'node_id':node._id,'course_name':course_name}, 
+                                       {
+                                       "user_list":user_list,'can_remove':can_remove,'node_id':node._id,
+                                       # 'course_name':course_name
+                                       }, 
                                        context_instance=RequestContext(request)
             )
         else:

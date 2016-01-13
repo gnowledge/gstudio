@@ -2121,7 +2121,11 @@ def get_publish_policy(request, groupid, res_node):
 		node = node_collection.one({"_id": ObjectId(group_id)})
 		group_type = group_type_info(groupid)
 		group = user_access_policy(groupid,request.user)
-		ver = resnode.current_version
+		ver = ''
+		try:
+			ver = resnode.current_version
+		except:
+			pass
 
 		if request.user.id:
 			if group_type == "Moderated":
@@ -2135,7 +2139,7 @@ def get_publish_policy(request, groupid, res_node):
 
 			elif node.edit_policy == "NON_EDITABLE":
 				if resnode._type == "Group":
-					if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+					if (ver and (ver == "1.1")) or (resnode.created_by != request.user.id and not request.user.is_superuser):
 						return "stop"
 		        if group == "allow":          
 		        	if resnode.status == "DRAFT": 
@@ -2144,7 +2148,7 @@ def get_publish_policy(request, groupid, res_node):
 			elif node.edit_policy == "EDITABLE_NON_MODERATED":
 		        #condition for groups
 				if resnode._type == "Group":
-					if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+					if (ver and (ver == "1.1")) or (resnode.created_by != request.user.id and not request.user.is_superuser):
 		            	# print "\n version = 1.1\n"
 						return "stop"
 
