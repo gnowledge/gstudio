@@ -3200,3 +3200,14 @@ def get_event_status(node):
         elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
             status_msg = "CLOSED"
 	return status_msg
+
+
+@get_execution_time
+@register.assignment_tag
+def get_user_quiz_resp(node_obj, user_obj):
+	if node_obj and user_obj:
+		thread_obj = get_relation_value(node_obj._id,'has_thread')
+		qip = node_collection.find_one({'_id': {'$in':thread_obj[0].post_node}, 'created_by': user_obj.id})
+		qip_sub = get_attribute_value(qip._id,'quizitempost_user_submitted_ans')
+		recent_ans = qip_sub[-1]
+		return recent_ans.values()[0]
