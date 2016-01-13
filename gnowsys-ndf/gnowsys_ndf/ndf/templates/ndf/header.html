@@ -79,7 +79,7 @@
                   <a 
                   {% for mapk, mapv in nroer_menu.mapping.items %}
 
-                    {% if mapv in "Teachers, Schools, Interest Groups" %}
+                    {% if mapv %}
                       {% if each_sub_menu == mapk %}
                         href="/{{mapv}}"
                         {% if nroer_menu.sub_menu_selected == mapk %}
@@ -294,18 +294,14 @@
                 <li class="name" title="{{group_object.altnames}}">
                   <h1>
                     <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
-                     {% if group_object.name == "home" %} 
-                        <i class="fa fa-home  fa-fw fa-2x"></i> 
-
-                      {% else %}
+    
                           {% get_relation_value group_object.pk 'has_profile_pic' as prof_pic_grel %}
                             {% if prof_pic_grel.0 %}
                                     <img src="{% url 'getFileThumbnail' group_id prof_pic_grel.0.pk %}" />
                             {% else %}
                                     <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >    
                             {% endif %}
-                            <span>{{group_object.altnames|truncatechars:8}}</span>
-                      {% endif %}
+                            <span>{{group_object.altnames|truncatechars:7}}</span>
                     </a>
                   </h1>
                 </li>

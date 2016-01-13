@@ -723,9 +723,9 @@ def delete_task(request, group_name, _id):
     #     pass
 
     try:
-        group_id = ObjectId(group_id)
+        group_id = ObjectId(group_name)
     except:
-        group_name, group_id = get_group_name_id(group_id)
+        group_name, group_id = get_group_name_id(group_name)
 
     pageurl = request.GET.get("next", "")
     try:

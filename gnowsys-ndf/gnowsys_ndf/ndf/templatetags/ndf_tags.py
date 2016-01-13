@@ -518,24 +518,29 @@ def get_attribute_value(node_id, attr):
 @register.assignment_tag
 def get_relation_value(node_id, grel):
 	try:
-		grel_val_node = ""
-		grel_id = ""
+		grel_val_node = Node
+		grel_id = None
 		node_grel = None
 		if node_id:
 			node = node_collection.one({'_id': ObjectId(node_id) })
 			grel = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
 			if node and grel:
 				node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id,'status':"PUBLISHED"})
-		# print "\n\n node_grel",node_grel
-		if node_grel:
-			grel_val = node_grel.right_subject
-			grel_id = node_grel._id
-			grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
-		# print "grel_val_node: ",grel_val_node,"\n"
-		# returns right_subject of grelation and GRelation _id 
-		return grel_val_node, grel_id
+				if node_grel:
+					grel_val = node_grel.right_subject
+					grel_id = node_grel._id
+					grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+					# returns right_subject of grelation and GRelation _id 
+					return grel_val_node, grel_id
+				else:
+					return None
+			else:
+				return None
+		else:
+			return None
+
 	except Exception as e:
-		return grel_val_node, grel_id
+		return None
 
 @get_execution_time
 @register.inclusion_tag('ndf/drawer_widget.html')
@@ -2125,7 +2130,11 @@ def get_publish_policy(request, groupid, res_node):
 		node = node_collection.one({"_id": ObjectId(group_id)})
 		group_type = group_type_info(groupid)
 		group = user_access_policy(groupid,request.user)
-		ver = resnode.current_version
+		ver = ''
+		try:
+			ver = resnode.current_version
+		except:
+			pass
 
 		if request.user.id:
 			if group_type == "Moderated":
@@ -2139,7 +2148,7 @@ def get_publish_policy(request, groupid, res_node):
 
 			elif node.edit_policy == "NON_EDITABLE":
 				if resnode._type == "Group":
-					if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+					if (ver and (ver == "1.1")) or (resnode.created_by != request.user.id and not request.user.is_superuser):
 						return "stop"
 		        if group == "allow":          
 		        	if resnode.status == "DRAFT": 
@@ -2148,7 +2157,7 @@ def get_publish_policy(request, groupid, res_node):
 			elif node.edit_policy == "EDITABLE_NON_MODERATED":
 		        #condition for groups
 				if resnode._type == "Group":
-					if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+					if (ver and (ver == "1.1")) or (resnode.created_by != request.user.id and not request.user.is_superuser):
 		            	# print "\n version = 1.1\n"
 						return "stop"
 
