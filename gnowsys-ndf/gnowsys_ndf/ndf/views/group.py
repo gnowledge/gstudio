@@ -1797,8 +1797,8 @@ def group_dashboard(request, group_id=None):
 
   try:
     group_obj = "" 
-    shelf_list = {}
-    shelves = []
+    # shelf_list = {}
+    # shelves = []
     alternate_template = ""
     profile_pic_image = None
     list_of_unit_events = []
@@ -1843,7 +1843,7 @@ def group_dashboard(request, group_id=None):
       #             {'_type': "File", '_id': each["has_profile_pic"][0]}
       #         )
       #         break
-
+    '''
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
     if auth:
@@ -1869,7 +1869,7 @@ def group_dashboard(request, group_id=None):
               
       else:
           shelves = []
-
+    '''
   except Exception as e:
     group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=group_obj['_id']
@@ -1879,13 +1879,6 @@ def group_dashboard(request, group_id=None):
   profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")      
   if profile_pic_image:
     profile_pic_image = profile_pic_image[0]
-  # for each in group_obj.relation_set:
-  #   if "has_profile_pic" in each:
-  #     if each["has_profile_pic"]:
-  #       profile_pic_image = node_collection.one(
-  #           {'_type': "File", '_id': each["has_profile_pic"][0]}
-  #       )
-
 
   has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
   all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
@@ -1895,7 +1888,7 @@ def group_dashboard(request, group_id=None):
       old_profile_pics.append(n)
 
   # Call to get_neighbourhood() is required for setting-up property_order_list
-  group_obj.get_neighbourhood(group_obj.member_of)
+  # group_obj.get_neighbourhood(group_obj.member_of)
   course_structure_exists = False
   files_cur = None
   parent_groupid_of_pe = None
@@ -1931,34 +1924,34 @@ def group_dashboard(request, group_id=None):
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
             }).sort('last_update', -1)
-      if 'start_enroll' in group_obj:
-          if group_obj.start_enroll:
-              start_enrollment_date = group_obj.start_enroll
-              # print "\n\nstart_enrollment_date", start_enrollment_dates
-              if start_enrollment_date:
-                  start_enrollment_date = start_enrollment_date.date()
-                  if start_enrollment_date:
-                    curr_date_time = datetime.now().date()
-                    if start_enrollment_date > curr_date_time:
-                        allow_to_join = "Forthcoming"
-                    else:
-                        allow_to_join = "Open"
 
-      if 'end_enroll' in group_obj:
-          if group_obj.end_enroll:
-              last_enrollment_date = group_obj.end_enroll
-              last_enrollment_date = last_enrollment_date.date()
-              if last_enrollment_date:
-                curr_date_time = datetime.now().date()
-                if last_enrollment_date < curr_date_time:
-                    allow_to_join = "Closed"
-                else:
-                    allow_to_join = "Open"
+      start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
+      # if 'start_enroll' in group_obj:
+      #     if group_obj.start_enroll:
+      #         start_enrollment_date = group_obj.start_enroll
+      #         # print "\n\nstart_enrollment_date", start_enrollment_dates
+      if start_enrollment_date:
+        start_enrollment_date = start_enrollment_date.date()
+        curr_date_time = datetime.now().date()
+        if start_enrollment_date > curr_date_time:
+            allow_to_join = "Forthcoming"
+        else:
+            allow_to_join = "Open"
+
+      last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
+      # if 'end_enroll' in group_obj:
+      #     if group_obj.end_enroll:
+      #         last_enrollment_date = group_obj.end_enroll
+      if last_enrollment_date:
+        last_enrollment_date = last_enrollment_date.date()
+        curr_date_time = datetime.now().date()
+        if last_enrollment_date < curr_date_time:
+            allow_to_join = "Closed"
+        else:
+            allow_to_join = "Open"
   if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
-
-
-
+  '''
   property_order_list = []
   if "group_of" in group_obj:
     if group_obj['group_of']:
@@ -1971,12 +1964,12 @@ def group_dashboard(request, group_id=None):
       property_order_list = get_property_order_with_value(group_obj['group_of'][0])
 
   annotations = json.dumps(group_obj.annotations)
-  
+  '''
   default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
   return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
                                                        'group_id':group_id, 'user':request.user, 
-                                                       'shelf_list': shelf_list,
+                                                       # 'shelf_list': shelf_list,
                                                        'list_of_unit_events': list_of_unit_events,
                                                        'blog_pages':blog_pages,
                                                        'selected': selected,
@@ -1987,7 +1980,7 @@ def group_dashboard(request, group_id=None):
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
                                                        'subgroups_cur':subgroups_cur,
-                                                       'annotations' : annotations, 'shelves': shelves,
+                                                       # 'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image,
                                                        'old_profile_pics':old_profile_pics
                                                       },context_instance=RequestContext(request)

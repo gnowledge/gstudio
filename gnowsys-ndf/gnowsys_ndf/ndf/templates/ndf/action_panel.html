@@ -369,12 +369,15 @@
 			{% if is_gstaff or 'ModeratingGroup' not in group_object.member_of_names_list and 'ProgramEventGroup' not in group_object.member_of_names_list and "PartnerGroup" not in group_object.member_of_names_list %}
 				<!-- List Members and Join buttons -->
 				<div class="row btn-row">
+					{% comment %}
 					<!-- List Members -->
-					{% if  is_gstaff %}	
-						<input type="button" id ="btn_list_member" class="tiny button radius  left-btn" data-reveal-id="firstModal" value="{% trans 'List Members' %}" title="List Members of this group">
-					{% endif %}
-						<!-- Reveal Modals begin -->
-						<div id="firstModal" class="reveal-modal" data-reveal></div>
+		            {% if  is_gstaff %}     
+		                    <input type="button" id ="btn_list_member" class="tiny button radius left-btn" data-reveal-id="firstModal" value="{% trans 'List Members' %}" title="List Members of this group">
+		            {% endif %}
+		                    <!-- Reveal Modals begin -->
+		                    <div id="firstModal" class="reveal-modal" data-reveal></div>
+					{% endcomment %}
+							<a href="{% url 'program' groupid %}" class="tiny button radius left-btn"><span>{% trans 'List Programs' %}</span></a>
 					
 					<!-- Join/ Unsubscribe -->
 						{% if user.is_authenticated %}
