@@ -293,8 +293,10 @@
               <ul class="title-area text-center">
                 <li class="name" title="{{group_object.altnames}}">
                   <h1>
-                    <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
-    
+                    
+                      <a href="{% url 'groupchange' group_object.pk %}">
+                    
+
                           {% get_relation_value group_object.pk 'has_profile_pic' as prof_pic_grel %}
                             {% if prof_pic_grel.0 %}
                                     <img src="{% url 'getFileThumbnail' group_id prof_pic_grel.0.pk %}" />

@@ -100,7 +100,7 @@
 </div>
 
   <div class="scard-content" title="{% firstof resource.altnames resource.name %}">
-   <span class="scard-title">{% firstof resource.altnames resource.name %}</span>
+   <span class="scard-title">{% firstof  resource.name resource.altnames %}</span>
     
     {% comment %}
     <!-- {% get_node_ratings request resource.pk as ratings %} -->
@@ -114,7 +114,7 @@
     <!-- suppy no_description=True for not having description -->
     {% if not no_description %}
       <div class="scard-desc" title="{{resource.content_org}}">
-       {{resource.content_org|default_if_none:"Add some description."|truncatechars:75}}
+       {{resource.content_org|safe|default_if_none:"Add some description."|truncatechars:75}}
       </div>
     {% endif %}
 </a>

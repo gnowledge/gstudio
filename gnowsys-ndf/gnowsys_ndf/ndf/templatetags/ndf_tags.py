@@ -3204,3 +3204,20 @@ def get_event_status(node):
         elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
             status_msg = "CLOSED"
 	return status_msg
+
+@get_execution_time
+@register.assignment_tag
+def get_node_page_type(node_id=None):
+	print "\n\n\n\n+++++++++++++++arg",node_id
+	node_page_type_list = []
+	if node_id:
+		node = node_collection.one({'_id': ObjectId(node_id)})
+		node_type_of = node.type_of 
+		if node_type_of:
+			for each_node_type_of in node_type_of:
+				node_type_of_name = node_collection.one({'_id': each_node_type_of})
+				node_page_type_list.append(node_type_of_name.name)
+	return node_page_type_list
+
+
+
