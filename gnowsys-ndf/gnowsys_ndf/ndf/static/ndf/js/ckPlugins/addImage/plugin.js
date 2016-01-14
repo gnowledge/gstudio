@@ -7,7 +7,8 @@ CKEDITOR.plugins.add('addImage',
         var groupId = editor.config.groupID.group_id;
         var nodeId = editor.config.nodeID.node_id;
         var url = "/" + groupId + "/image";
-        var textAreaId = "textarea-"+nodeId;
+        // var textAreaId = "textarea-"+nodeId;
+        var textAreaId = editor.config.textarea_id;
         CKEDITOR.dialog.add(pluginName, this.path + 'plugin.js');
         editor.addCommand(pluginName, new CKEDITOR.dialogCommand(pluginName));
 
@@ -22,16 +23,17 @@ CKEDITOR.plugins.add('addImage',
 
                         },
                         success: function(data) {
-                          $("#myID").html(data);
-                          $('#myID').foundation('reveal', 'open');
+                          $("#group_imgs_on_modal").html(data);
+                          $('#group_imgs_on_modal').foundation('reveal', 'open');
 
                           $(".card-image-wrapper").click(function(event){
                             var imageURL = $(this).children('img').attr("data-image-src");
-                            var locationURL = 'http://' + location.host;
+                            // var locationURL = 'http://' + location.host;
+                            var locationURL = window.location.origin
                             var completeURL = locationURL + imageURL
-                            var width = prompt("width for image");
+                            var width = prompt("Please enter width",'100');
                             CKEDITOR.instances[textAreaId].insertHtml('<img width="'+  width + '"src=' + completeURL +  '>' + '</img>');
-                            $('#myID').foundation('reveal', 'close');
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
                             return false;
 
                           });
@@ -44,7 +46,7 @@ CKEDITOR.plugins.add('addImage',
 
         editor.ui.addButton('addImage',
             {
-                label: 'add Image',
+                label: 'Add Image from this Group',
                 command: pluginName,
                 icon: this.path + 'images/addImage.png'
             });
