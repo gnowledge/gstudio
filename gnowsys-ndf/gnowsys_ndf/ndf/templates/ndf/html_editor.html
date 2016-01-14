@@ -9,6 +9,13 @@
     <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 {% endcache %}
 
+<style type="text/css">
+    #group_imgs_on_modal{
+        overflow-y: auto;
+        height:600px;        
+    }
+</style>
+
 {% trans var_placeholder as content %}
 
 <textarea id="textarea-{{var_name}}"  name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}" rows="10" cols="80"> {{var_value}} </textarea>
