@@ -452,9 +452,9 @@
         
           <!-- <div id="commentable-area"> -->
           <div>
-            {% with node.content_org|safe as description %}
+            {% with node.content|safe as description %}
             {% if description != "None" %}
-            <span itemprop="{{schema.1.description}}">{{ description }}</span>
+              <span itemprop="{{schema.1.description}}">{{ description }}</span>
             {% endif %}
             {% endwith %}
           </div>
