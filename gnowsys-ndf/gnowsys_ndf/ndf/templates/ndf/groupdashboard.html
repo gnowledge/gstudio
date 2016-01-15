@@ -159,6 +159,23 @@ $(document).ready(function()
   <div id="group_picture">
   {% include "ndf/upload_pic_widget.html" with url_name='groupchange'  widget_for="Group_about" %}
   </div>
+
+</br>
+{% if group_object.prior_node %}
+<div class="repository-title large-4 columns" style="width:100%">Parent Group(s)</div></br>
+ {% for each in group_object.prior_node  %}
+    {% get_group_name each as prior_node_name %}
+      
+     <ul style="list-style: none; border-bottom: solid thin #ddd;">
+      <li style="border-bottom: solid thin #ddd;">
+        <a href="{% url 'groupchange' each %}">
+          {{prior_node_name}}
+        </a>
+      </li>
+    </ul>
+ {% endfor %}
+{% endif %}
+
 {% endblock %}
 {% endcache %}
 <!-- end of meta_content block -->

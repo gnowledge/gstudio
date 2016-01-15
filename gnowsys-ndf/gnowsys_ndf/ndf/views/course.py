@@ -1606,7 +1606,7 @@ def create_edit_unit(request, group_id):
 
 @login_required
 def delete_course(request, group_id, node_id):
-    del_stat = delete_item(node_id)
+    del_stat = delete_item(node_id, "CourseUnit")
     if del_stat:
         return HttpResponseRedirect(reverse('course', kwargs={'group_id': ObjectId(group_id)}))
 
