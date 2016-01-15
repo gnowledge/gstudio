@@ -20,6 +20,44 @@
     <a class="close-reveal-modal">&#215;</a>
   </div>
   {% endif %}
+  <div id="loginModal" class="reveal-modal" data-reveal aria-labelledby="loginModal" aria-hidden="true" role="dialog">
+    <h2 >{% trans "Login" %}</h2>
+    <form method="post" action="{% url 'auth_login' %}" id="loginSubmit" data-abide>
+      {% csrf_token %}
+      <div class="row">
+        <div class="large-12 columns">
+          <label>Username
+            <input type="text" placeholder="User Name" tabindex="1" name="username"/>
+          </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="large-12 columns">
+          <label>Password
+            <input type="password" placeholder="Password" tabindex="2" name="password"/>
+          </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class = "columns captcha-feild">
+          {% include "ndf/Captcha.html" %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="columns">
+          <label>
+            <a title={% trans "Recover your password" %} href="{{ auth_pwd_reset_url }}">{% trans "Forgot your password?" %}</a>
+          </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-12 columns">
+          <input type="submit" class="button small expand" tabindex= "4" value="{% trans "Login" %}" style="font-size:15px" />
+        </div>
+      </div>
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+  </div>
 
   <div id="top-headers">
 
@@ -32,14 +70,15 @@
 
     <!-- two menus headers -->
     {# <div class="large-12 small-7 medium-7 columns two-nav-container"> #}
-    
+
       <!-- first menu header  -->
       <nav class="top-bar" id="first-header" data-topbar role="navigation">
 
         <ul class="title-area">
-          <li class="name"> 
+          <li class="name">
             <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
-              <img src="{{site.LOGO}}">
+              <!--img title="Website" src="{{site.LOGO}}"-->
+              <h3 class="user-heading">{{request.user.username|capfirst}}</h3>
             </a></h1>
           </li>
           <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
@@ -51,12 +90,12 @@
 
       <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
       <!-- {#% cache 3600 top_header request.LANGUAGE_CODE request.path request.user.username %} -->
-      {% if site.SITE_NAME == "NROER" %} 
-      
+      {% if site.SITE_NAME == "NROER" %}
+
         <!-- NROER level one menu -->
         {% get_nroer_menu request group_name_tag as nroer_menu %}
 
-        
+
         <ul class="left">
           <li>
             <!-- <a href="{#% url 'GAPPS' 'home' 'topics' %#}" {#% if nroer_menu.top_menu_selected == "Repository" %#}class="active"{#% endif %#}> -->
@@ -69,22 +108,22 @@
             {% for menuk, menuv in each_menu.items %}
 
             <li class="has-dropdown">
-	      
+
               <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
-              	 href="{% url 'nroer_groups' 'home' menuk %}" 
+              	 href="{% url 'nroer_groups' 'home' menuk %}"
               > {% trans menuk %} </a>
               <ul class="dropdown">
-	
+
                 {% for each_sub_menu in menuv %}
                 <li>
-                  <a 
+                  <a
                   {% for mapk, mapv in nroer_menu.mapping.items %}
 
                     {% if mapv in "Teachers, Schools, Interest Groups" %}
                       {% if each_sub_menu == mapk %}
                         href="/{{mapv}}"
                         {% if nroer_menu.sub_menu_selected == mapk %}
-                          class="active" 
+                          class="active"
                         {% endif %}
                       {% endif %}
           		      {% endif %}
@@ -92,7 +131,7 @@
                     {% if each_sub_menu == mapk %}
                       href="{% url 'partnerlist' mapv %}"
                       {% if nroer_menu.sub_menu_selected == mapk %}
-                        class="active" 
+                        class="active"
                       {% endif %}
                     {% endif %}
                   {% endfor %}
@@ -115,8 +154,8 @@
         <!-- Current group selector -->
           {% if user.is_authenticated %}
         <li class="">
-            
-          <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'my_courses' request.user.username %}">
+
+          <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'course' request.user.username %}">
             {% trans 'My Courses' %}
           </a>
         </li>
@@ -156,16 +195,16 @@
             <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
             {{ user.username }}
           </a>
-          
+
           {% else %}
           <a class="user" href="{% url 'dashboard' request.user.pk %}">
             {{ user.username }}
           </a>
           {% endif %}
           {% endcache %}
-          
+
           <ul class="dropdown text-center">
-                
+
             <li class="text-center">
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
             </li>
@@ -179,7 +218,7 @@
               <li class="text-center">
                 <a href="/admin/designer">{% trans "Admin Designer" %}</a>
               </li>
-              {% if site.SITE_NAME == "NROER" %} 
+              {% if site.SITE_NAME == "NROER" %}
                 <li class="text-center">
                   <a href="/home/">{% trans "Home Dashboard" %}</a>
                 </li>
@@ -195,7 +234,7 @@
 
         <!-- Else show login link -->
         {% else %}
-        <!-- 
+        <!--
         check_accounts_url:
           If accounts related url exists in path, then returns True; otherwise False
 
@@ -204,11 +243,13 @@
           Otherwise it will get into unending loop i.e. as soon as logs-in it gets logged-out
           as redirection-url was of logout; similar case with password-reset!
         -->
-        
+
         <li>
-          <a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+          <a href="#" data-reveal-id="loginModal" id="login-button-medium">{% trans "Login to your clix account" %}</a>
+          <a href="#" data-reveal-id="loginModal" id="login-button-small">{% trans "Login" %}</a>
+          <!--<a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
             <i class="fi-key"></i>&nbsp; {% trans "Login" %}
-          </a>
+          </a>-->
         </li>
         {% endif %}
         </ul>
@@ -222,11 +263,11 @@
         </ul>
 
         <!-- Closes Right Nav section -->
- 
+
 
         <ul class="right">
           <li class="has-dropdown">
-            <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
+            <a>{{request.LANGUAGE_CODE}}</a>
             <ul class="dropdown">
 
               {% for lang in LANGUAGES %}
@@ -262,12 +303,12 @@
       <!-- =========| divider between two nav's/header's |=========== -->
 
       {% comment %}
-        
+
       <!-- start of second nav  or group level header-->
       {% get_sg_member_of group_object.pk as list_of_sg_member_of %}
       {% if "CourseEventGroup" not in group_object.member_of_names_list and "ProgramEventGroup" not in list_of_sg_member_of or site.SITE_NAME == "NROER" %}
       {% if not landing_page %}
-        
+
 
       <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %}" id="group-level-header">
 
@@ -281,7 +322,7 @@
                 <li class="name">
                   <h1>
                     <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
-                      <i class="fa fa-home  fa-fw fa-2x"></i> 
+                      <i class="fa fa-home  fa-fw fa-2x"></i>
                     </a>
                   </h1>
                 </li>
@@ -296,7 +337,7 @@
                   <!-- update/about of group -->
                   <li>
                     {% if group_name_tag %}
-                    
+
                       {% if not "/partner/" in request.path %}
                       <!-- while listing the partners and/or groups cards dont show any text -->
                         {% if "/dashboard/group" in request.path %}
@@ -341,7 +382,7 @@
                   <li class="has-form">
                     <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                       name="search_form" method="GET" >
-                  
+
                       <div class="row collapse">
                         <div class="large-11 small-10 columns">
                           <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name|truncatechars:15}}' autocomplete="off" required/>
@@ -355,17 +396,14 @@
 
                     </form>
                   </li>
-                  
+
                   <!-- END of search in the app bar -->
 
                 </ul>
 
                 <ul class="left" id="group-apps">
                   <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
-                  <li class="" onclick="history.back();">
-                    <a href="javascript:window.history.back();"><i class="fa fa-angle-left back-btn"></i> {% trans "BACK" %}</a>
-                  </li>
-                  {% if site.SITE_NAME == "NROER" %} 
+                  {% if site.SITE_NAME == "NROER" %}
                     {% if group_name_tag == "home" or "CourseEventGroup" in group_object.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
                     <!-- NROER level-two menu -->
                       {% if "repository" not in request.path %}

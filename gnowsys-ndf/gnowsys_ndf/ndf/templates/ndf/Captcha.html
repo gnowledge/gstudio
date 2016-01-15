@@ -3,37 +3,38 @@
 
 
 <div class = "row">
-  <div class = "small-9  medium-5 large-3 columns"   id = "captcha-content" >
-     <!-- Area to append captcha -->
+  <div class = "small-9  medium-12 columns"   id = "captcha-content" >
+    <label class='fi-refresh js-captcha-refresh'>  </label>
+    <!-- Area to append captcha -->
   </div>
-  
+
   <br>
 
   <div class="small-3 medium-3 large-3 columns" ends>
-  	<label class='fi-refresh js-captcha-refresh'>  </button>
+  	<label class='fi-refresh js-captcha-refresh'>  </label>
   </div>
-  		
+
 </div>
 <div class = "invalid-captcha">
-  	
+
 </div>
 <script type="text/javascript">
-   
+
    var formData = [];
    $('form').submit(function(event){
 		event.preventDefault();
-		
+
 		$('form').find("input[name]").each(function (index, node) {
 	    formData.push(String(node.name) + ":"+ String(node.value));
-	    });	
-		
+	    });
+
 		$.ajax({
 				url: "{% url 'captcha_validate' %}",
 				type:"POST",
 				data:{
 						formData,
-						csrfmiddlewaretoken: '{{ csrf_token }}'},	
-				
+						csrfmiddlewaretoken: '{{ csrf_token }}'},
+
 				success:function(data)
 					{   if (data == 'True')
 						{   //Diconnect the on Submit action from form
@@ -49,11 +50,11 @@
 					}
 			   });
 	});
-  
+
   $(document).ready(function(){
-			get_new_captcha(); 	
-	});	
-  
+			get_new_captcha();
+	});
+
 
   function get_new_captcha(){
   	$.ajax({
@@ -63,19 +64,19 @@
 					{
 						$('#captcha-content').empty()
 						$('#captcha-content').append(data)
-						$('.invalid-captcha').empty();	
+						$('.invalid-captcha').empty();
 					},
 				complete:function()
 					{
 						$("#id_captcha_1").attr("tabindex", "3");
-					}	
+					}
   		});
   }
-  
+
   $('.js-captcha-refresh').click(function(){
     		get_new_captcha();
 
   });
 
 
-</script>    
+</script>
