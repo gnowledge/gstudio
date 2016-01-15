@@ -31,7 +31,11 @@ CKEDITOR.plugins.add('addImage',
                             // var locationURL = 'http://' + location.host;
                             var locationURL = window.location.origin
                             var completeURL = locationURL + imageURL
-                            var width = prompt("Please enter width",'100');
+                            var width = prompt("Please enter width in px",'100');
+                            if(width == null)
+                            {
+                                return false;
+                            }
                             CKEDITOR.instances[textAreaId].insertHtml('<img width="'+  width + '"src=' + completeURL +  '>' + '</img>');
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                             return false;
