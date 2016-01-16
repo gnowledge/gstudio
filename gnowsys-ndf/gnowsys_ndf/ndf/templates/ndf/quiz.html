@@ -4,7 +4,7 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block help_content %}
-
+{% comment %}
 <h3>{% trans "About Quiz/QuizItem" %}</h3>
 <p class="text-justify">By <b>Quiz Item</b>, you can create a miscellaneous quiz-question. This quiz-question can be of, basically three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>.</p>
 
@@ -15,6 +15,14 @@
  </ol>
 </p>
 
+{% endcomment %}
+{% endblock %}
+
+{% block style %}
+{{ block.super }}
+  .quizitem_act{
+    margin-left:1.5em;
+  }
 {% endblock %}
 
 
@@ -28,7 +36,11 @@
 
 {% endblock %}
 
+{% block breadcrumb %} 
+{% endblock breadcrumb %}
+
 {% block body_content %} 
+{% check_is_gstaff groupid request.user as is_gstaff %}
 {% get_group_name groupid as group_name_tag %}
 <ul class="tabs" data-tab>
   <li class="tab-title active">
@@ -64,9 +76,18 @@
     <div class="repository-title large-4 columns" >All Questions </div><hr>
       <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-5" style="background-color:#fafafa;border-style:none">
         {% for node in quiz_item_nodes %}
-          <li class="card-image-wrapper no-bullet" style="margin-top:13px;margin-left:-10px"> 
-            {% include 'ndf/simple_card.html' with resource=node no_footer=True no_description=True  %}
-          </li>
+            <div>
+              {{forloop.counter}}.{{node.name}} 
+              <br/>
+              <div>
+                {% if is_gstaff or node.created_by == request.user.id %}
+                  <a href="{% url 'quiz_item_edit' group_id node.pk %}" class="quizitem_act">{% trans 'Edit' %}</a>
+                {% endif %}
+                <small class="quizitem_act"><i>{% trans 'Created by: ' %}
+                  <a href="{% url 'dashboard' node.created_by %}" title="{{node.created_by|get_username}}" target="_blank" >{{node.created_by|get_username}}</a></i>
+                </small>
+              </div>
+            </div>
         {% empty %}
           <div class="row">
             <div class="small-12 columns">
@@ -112,4 +133,3 @@
       </div>
   {% endcomment %}
 {% endblock %}
-

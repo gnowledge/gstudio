@@ -50,13 +50,13 @@
 
 {% block body_content %}
 
-    <div class="tabs-content"  style="margin-left:18px;margin-top:-1em;">
+    <div class="tabs-content all-courses"  style="margin-left:18px;margin-top:-1em;">
 
       <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" id="all_events" style="background-color:#fafafa;border-style:none">
       {% if title == "Course" %}
-        <div class="repository-title large-4 columns">All eCourses</div>
+        <div class="repository-title large-4 columns">All Courses</div>
       {% else %}
-        <div class="repository-title large-4 columns">All {{title}}</div>
+        <div class="repository-title large-4 columns">All {{title}}1</div>
       {% endif %}
 
         {% for course in ce_coll %}
@@ -78,7 +78,7 @@
 
       <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-3 large-block-grid-4" id="my_events">
       {% if title == "Course" %}
-        <div class="repository-title large-4 columns">My eCourses</div>
+        <div class="repository-title large-4 columns">My Courses</div>
       {% else %}
         <div class="repository-title large-4 columns">My {{title}}</div>
       {% endif %}

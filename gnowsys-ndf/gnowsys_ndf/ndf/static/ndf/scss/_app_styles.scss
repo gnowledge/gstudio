@@ -1402,9 +1402,10 @@ aside#help{
     background-repeat:no-repeat;
     position:relative;
     overflow:hidden;
-    height: 16em;
+    height: 16rem;
     width: 100%;
     font-size: 25px;
+    background-color: #E5E5E5;
 
     img  {
     border-radius: 2px 2px 0 0;
@@ -2189,10 +2190,107 @@ div.show-image:hover div.fullscreen-icon{
     font-size:2em;
 
 }*/
-#envelop-cover{
-  height: 350px;
-  border: 1px solid black;
+#envelop-cover {
+  .course-page-title {
+    font-size: 35px;
+    font-weight: 600;
+  }
+  .meta {
+    .key {
+      color: #A7A4A4;
+      font-weight: bold;
+      font-size: 20px;
+      text-transform: uppercase;
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 10px;
+    }
+
+    .value {
+      line-height: 1.8em;
+      display: inline-block;
+
+      .name {
+        color: #000;
+      }
+
+      .time {
+        font-size: 16px;
+        font-weight: bold;
+        color: #999999;
+      }
+    }
+  }
 }
+#envelop-content{
+  margin-top: 20px;
+
+  .tabs {
+    border: 0 solid silver;
+    border-width: 1px 1px 0px 0px;
+
+    .tab-title {
+      border: 0 solid silver;
+      border-width: 0 0 1px 1px;
+
+      &.active {
+        border-width: 0px 0px 0px 1px;
+      }
+
+      &.dummy-tab {
+
+      }
+    }
+  }
+
+  .course-book {
+
+    #course-about {
+
+      .about-course-heading {
+        display: block;
+        height: 300px;
+        width: 100%;
+        border: 1px solid black;
+        background: #999999;
+        position: relative;
+        color: #fff;
+        text-align: center;
+
+        .heading-text {
+          display: inline-block;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+
+          div:not(:first-child) {
+            font-size: 20px;
+          }
+
+          h2 {
+            color: inherit;
+          }
+        }
+      }
+
+      .about-course-details {
+        display: block;
+        min-height: 100px;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.notebook {
+  .notebook-header {
+    border-color: black;
+    border-style: solid;
+    border-width: 1px 0px;
+  }
+}
+
 #left-tab{
   position:absolute;
   left:0px;

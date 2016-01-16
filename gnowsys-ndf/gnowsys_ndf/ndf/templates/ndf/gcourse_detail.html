@@ -27,7 +27,7 @@
 
 {% block collection_content %}
   <div id="view_collection">
-    {% include "ndf/collection_ajax_view.html" %}  
+    {% include "ndf/collection_ajax_view.html" %}
   </div>
 {% endblock %}
 
@@ -60,8 +60,8 @@
 
       <small>
           <div class="age">
-            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-            by <a class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
+            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago
+            by <a class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a>
           <!-- <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span> -->
           <!-- <a href=""><i class="fi-clock"></i> {% trans "View history" %}</a> -->
           </div>
@@ -109,7 +109,7 @@
   //Confirm or Cancel Deletion
     $(document).on("click", "#btnConfirmYes", function() {
         $("#alertModal").foundation('reveal', 'close');
-        turl = "{% url 'del_course' group_id node.pk %}" 
+        turl = "{% url 'del_course' group_id node.pk %}"
         $(".fi-trash").attr("href",turl)
         location.href = $(".fi-trash").attr('href');
     });

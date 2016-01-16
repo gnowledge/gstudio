@@ -24733,11 +24733,12 @@ p {
   background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
-  height: 16em;
+  height: 16rem;
   width: 100%;
   font-size: 25px;
+  background-color: #E5E5E5;
 }
-/* line 1409, ../../../scss/_app_styles.scss */
+/* line 1410, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -24745,7 +24746,7 @@ p {
   opacity: 0.5;
   height: 100%;
 }
-/* line 1418, ../../../scss/_app_styles.scss */
+/* line 1419, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -24759,74 +24760,74 @@ p {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1432, ../../../scss/_app_styles.scss */
+/* line 1433, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.file:before {
   content: "\f18e";
 }
-/* line 1435, ../../../scss/_app_styles.scss */
+/* line 1436, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.page:before {
   content: "\f18e";
 }
-/* line 1438, ../../../scss/_app_styles.scss */
+/* line 1439, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.collection:before {
   content: "\f18a";
 }
-/* line 1441, ../../../scss/_app_styles.scss */
+/* line 1442, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.documents:before {
   content: "\f18b";
 }
-/* line 1444, ../../../scss/_app_styles.scss */
+/* line 1445, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.pdf:before {
   content: "\f18b";
 }
-/* line 1447, ../../../scss/_app_styles.scss */
+/* line 1448, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.text:before {
   content: "\f18e";
 }
-/* line 1450, ../../../scss/_app_styles.scss */
+/* line 1451, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1453, ../../../scss/_app_styles.scss */
+/* line 1454, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1456, ../../../scss/_app_styles.scss */
+/* line 1457, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.images:before {
   content: "\f125";
 }
-/* line 1459, ../../../scss/_app_styles.scss */
+/* line 1460, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.audios:before, .hr-card .hr-card-image i.audio:before {
   content: "\f17b";
 }
-/* line 1462, ../../../scss/_app_styles.scss */
+/* line 1463, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.videos:before, .hr-card .hr-card-image i.video:before {
   content: "\f20e";
 }
-/* line 1468, ../../../scss/_app_styles.scss */
+/* line 1469, ../../../scss/_app_styles.scss */
 .hr-card .published.scard-action {
   background: #A6D9CB;
 }
-/* line 1472, ../../../scss/_app_styles.scss */
+/* line 1473, ../../../scss/_app_styles.scss */
 .hr-card .draft.scard-action {
   content: "Draft";
   background: #DCDCDC;
 }
-/* line 1478, ../../../scss/_app_styles.scss */
+/* line 1479, ../../../scss/_app_styles.scss */
 .hr-card .deleted.scard-action {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1483, ../../../scss/_app_styles.scss */
+/* line 1484, ../../../scss/_app_styles.scss */
 .hr-card .moderation.scard-action {
   border-color: transparent #0eacb5 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #0eacb5 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1487, ../../../scss/_app_styles.scss */
+/* line 1488, ../../../scss/_app_styles.scss */
 .hr-card .moderation.scard-action .label-text:before {
   content: "Mod";
 }
-/* line 1491, ../../../scss/_app_styles.scss */
+/* line 1492, ../../../scss/_app_styles.scss */
 .hr-card .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -24837,7 +24838,7 @@ p {
 
 /* End Horizontal Card */
 /* Course/ Event Card CSS*/
-/* line 1510, ../../../scss/_app_styles.scss */
+/* line 1511, ../../../scss/_app_styles.scss */
 .event-card {
   border: 1px solid #AAA;
   border-bottom: 3px solid #BBB;
@@ -24847,12 +24848,12 @@ p {
   width: 100%;
   height: 16rem;
 }
-/* line 1518, ../../../scss/_app_styles.scss */
+/* line 1519, ../../../scss/_app_styles.scss */
 .event-card:hover {
   box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.5s ease;
 }
-/* line 1523, ../../../scss/_app_styles.scss */
+/* line 1524, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.open {
   z-index: 99;
   width: auto;
@@ -24863,7 +24864,7 @@ p {
   background-color: #00b300;
   color: white;
 }
-/* line 1537, ../../../scss/_app_styles.scss */
+/* line 1538, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.closed {
   z-index: 99;
   width: auto;
@@ -24874,7 +24875,7 @@ p {
   background-color: red;
   color: white;
 }
-/* line 1548, ../../../scss/_app_styles.scss */
+/* line 1549, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.in-progress {
   z-index: 99;
   width: auto;
@@ -24885,7 +24886,7 @@ p {
   background-color: #00b300;
   color: white;
 }
-/* line 1558, ../../../scss/_app_styles.scss */
+/* line 1559, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.forthcoming {
   z-index: 99;
   width: auto;
@@ -24896,7 +24897,7 @@ p {
   background-color: #F2910D;
   color: white;
 }
-/* line 1569, ../../../scss/_app_styles.scss */
+/* line 1570, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.completed {
   z-index: 99;
   width: auto;
@@ -24907,37 +24908,37 @@ p {
   background-color: #4d4d4d;
   color: white;
 }
-/* line 1579, ../../../scss/_app_styles.scss */
+/* line 1580, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.open {
   color: #00b300;
   padding-left: 4px;
   font-size: 0.6em;
 }
-/* line 1585, ../../../scss/_app_styles.scss */
+/* line 1586, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.closed {
   color: red;
   padding-left: 4px;
   font-size: 0.6em;
 }
-/* line 1591, ../../../scss/_app_styles.scss */
+/* line 1592, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.in-progress {
   color: #00b300;
   padding-left: 4px;
   font-size: 0.6em;
 }
-/* line 1596, ../../../scss/_app_styles.scss */
+/* line 1597, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.forthcoming {
   color: #F2910D;
   padding-left: 4px;
   font-size: 0.6em;
 }
-/* line 1602, ../../../scss/_app_styles.scss */
+/* line 1603, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.completed {
   color: #4d4d4d;
   padding-left: 4px;
   font-size: 0.6em;
 }
-/* line 1607, ../../../scss/_app_styles.scss */
+/* line 1608, ../../../scss/_app_styles.scss */
 .event-card .event-card-title {
   padding-top: 1em;
   color: #0d0d0d;
@@ -24945,19 +24946,19 @@ p {
   font-size: 0.8em;
   padding-left: 4px;
 }
-/* line 1616, ../../../scss/_app_styles.scss */
+/* line 1617, ../../../scss/_app_styles.scss */
 .event-card .event-card-desc {
   word-wrap: break-word;
   font-size: 0.6em;
   color: #333333;
   padding-left: 4px;
 }
-/* line 1622, ../../../scss/_app_styles.scss */
+/* line 1623, ../../../scss/_app_styles.scss */
 .event-card p {
   margin: 0px;
   padding: 10px;
 }
-/* line 1628, ../../../scss/_app_styles.scss */
+/* line 1629, ../../../scss/_app_styles.scss */
 .event-card .event-card-image {
   max-height: 12rem;
   padding: 0px;
@@ -24969,7 +24970,7 @@ p {
   height: 10rem;
   background-color: gray;
 }
-/* line 1638, ../../../scss/_app_styles.scss */
+/* line 1639, ../../../scss/_app_styles.scss */
 .event-card .event-card-image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -24977,7 +24978,7 @@ p {
   opacity: 0.9;
   height: 100%;
 }
-/* line 1647, ../../../scss/_app_styles.scss */
+/* line 1648, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -24991,74 +24992,74 @@ p {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1661, ../../../scss/_app_styles.scss */
+/* line 1662, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.file:before {
   content: "\f18e";
 }
-/* line 1664, ../../../scss/_app_styles.scss */
+/* line 1665, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.page:before {
   content: "\f18e";
 }
-/* line 1667, ../../../scss/_app_styles.scss */
+/* line 1668, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.collection:before {
   content: "\f18a";
 }
-/* line 1670, ../../../scss/_app_styles.scss */
+/* line 1671, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.documents:before {
   content: "\f18b";
 }
-/* line 1673, ../../../scss/_app_styles.scss */
+/* line 1674, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.pdf:before {
   content: "\f18b";
 }
-/* line 1676, ../../../scss/_app_styles.scss */
+/* line 1677, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.text:before {
   content: "\f18e";
 }
-/* line 1679, ../../../scss/_app_styles.scss */
+/* line 1680, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1682, ../../../scss/_app_styles.scss */
+/* line 1683, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1685, ../../../scss/_app_styles.scss */
+/* line 1686, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.images:before {
   content: "\f125";
 }
-/* line 1688, ../../../scss/_app_styles.scss */
+/* line 1689, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.audios:before, .event-card .event-card-image i.audio:before {
   content: "\f17b";
 }
-/* line 1691, ../../../scss/_app_styles.scss */
+/* line 1692, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.videos:before, .event-card .event-card-image i.video:before {
   content: "\f20e";
 }
-/* line 1697, ../../../scss/_app_styles.scss */
+/* line 1698, ../../../scss/_app_styles.scss */
 .event-card .published.scard-action {
   background: #A6D9CB;
 }
-/* line 1701, ../../../scss/_app_styles.scss */
+/* line 1702, ../../../scss/_app_styles.scss */
 .event-card .draft.scard-action {
   content: "Draft";
   background: #DCDCDC;
 }
-/* line 1707, ../../../scss/_app_styles.scss */
+/* line 1708, ../../../scss/_app_styles.scss */
 .event-card .deleted.scard-action {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1712, ../../../scss/_app_styles.scss */
+/* line 1713, ../../../scss/_app_styles.scss */
 .event-card .moderation.scard-action {
   border-color: transparent #0eacb5 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #0eacb5 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1716, ../../../scss/_app_styles.scss */
+/* line 1717, ../../../scss/_app_styles.scss */
 .event-card .moderation.scard-action .label-text:before {
   content: "Mod";
 }
-/* line 1720, ../../../scss/_app_styles.scss */
+/* line 1721, ../../../scss/_app_styles.scss */
 .event-card .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -25069,7 +25070,7 @@ p {
 
 /* End Course/events Card CSS*/
 /* Customized Off-Canvas */
-/* line 1740, ../../../scss/_app_styles.scss */
+/* line 1741, ../../../scss/_app_styles.scss */
 #help-canvas-menu {
   position: fixed;
   top: 52px;
@@ -25082,26 +25083,26 @@ p {
   height: 100%;
 }
 
-/* line 1751, ../../../scss/_app_styles.scss */
+/* line 1752, ../../../scss/_app_styles.scss */
 #help-canvas-menu.expanded {
   left: 0 !important;
   z-index: 100000000;
   left: 150px;
 }
 
-/* line 1756, ../../../scss/_app_styles.scss */
+/* line 1757, ../../../scss/_app_styles.scss */
 #help-canvas-menu.expanded .help-button {
   right: 80px;
   z-index: -1;
 }
 
-/* line 1761, ../../../scss/_app_styles.scss */
+/* line 1762, ../../../scss/_app_styles.scss */
 #help-canvas-menu.animating .help-button {
   -webkit-animation: shake 400ms;
   animation: shake 400ms;
 }
 
-/* line 1765, ../../../scss/_app_styles.scss */
+/* line 1766, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button {
   position: absolute;
   -webkit-transform: rotate(-90deg);
@@ -25128,12 +25129,12 @@ p {
   border-top-right-radius: 5px;
 }
 
-/* line 1791, ../../../scss/_app_styles.scss */
+/* line 1792, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button-text {
   font-size: 18px;
 }
 
-/* line 1794, ../../../scss/_app_styles.scss */
+/* line 1795, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button .text {
   color: #f9f9f9;
   letter-spacing: .1em;
@@ -25142,7 +25143,7 @@ p {
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
-/* line 1803, ../../../scss/_app_styles.scss */
+/* line 1804, ../../../scss/_app_styles.scss */
 #help-canvas-menu .mainContainer {
   background: #fff;
   /*-webkit-box-shadow:3px 3px 17px -1px #7b7b7b;
@@ -25156,7 +25157,7 @@ p {
 }
 
 /* End of Customized Off-Canvas */
-/* line 1821, ../../../scss/_app_styles.scss */
+/* line 1822, ../../../scss/_app_styles.scss */
 .rcard {
   overflow: hidden;
   color: #272727;
@@ -25164,56 +25165,56 @@ p {
   background-color: #f5f5f5;
   margin: 5px;
 }
-/* line 1832, ../../../scss/_app_styles.scss */
+/* line 1833, ../../../scss/_app_styles.scss */
 .rcard:hover {
   box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.5s ease;
 }
-/* line 1837, ../../../scss/_app_styles.scss */
+/* line 1838, ../../../scss/_app_styles.scss */
 .rcard .title {
   font-size: 1.1rem;
   font-weight: bold;
 }
-/* line 1843, ../../../scss/_app_styles.scss */
+/* line 1844, ../../../scss/_app_styles.scss */
 .rcard .content {
   padding: 0.5rem 2rem;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
   height: 7.25rem;
 }
-/* line 1850, ../../../scss/_app_styles.scss */
+/* line 1851, ../../../scss/_app_styles.scss */
 .rcard .content .slick-slider {
   margin-bottom: 0;
 }
-/* line 1854, ../../../scss/_app_styles.scss */
+/* line 1855, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev {
   left: 0.25rem;
 }
-/* line 1857, ../../../scss/_app_styles.scss */
+/* line 1858, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev:before {
   color: #ccc;
 }
-/* line 1863, ../../../scss/_app_styles.scss */
+/* line 1864, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next {
   right: 0.25rem;
 }
-/* line 1866, ../../../scss/_app_styles.scss */
+/* line 1867, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next:before {
   color: #ccc;
 }
-/* line 1872, ../../../scss/_app_styles.scss */
+/* line 1873, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title {
   width: 100%;
   border-bottom: 1px solid #808080;
   line-height: 0.25em;
   margin: 10px 0 20px;
 }
-/* line 1878, ../../../scss/_app_styles.scss */
+/* line 1879, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title small {
   padding: 0 10px;
   background-color: #f5f5f5;
 }
-/* line 1885, ../../../scss/_app_styles.scss */
+/* line 1886, ../../../scss/_app_styles.scss */
 .rcard .action {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -25221,15 +25222,15 @@ p {
   font-size: small;
   height: 2rem;
 }
-/* line 1892, ../../../scss/_app_styles.scss */
+/* line 1893, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection {
   opacity: 0.5;
 }
-/* line 1895, ../../../scss/_app_styles.scss */
+/* line 1896, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection:hover {
   opacity: 1;
 }
-/* line 1909, ../../../scss/_app_styles.scss */
+/* line 1910, ../../../scss/_app_styles.scss */
 .rcard .image {
   position: relative;
   background-color: #ccc;
@@ -25237,7 +25238,7 @@ p {
   height: 8em;
   overflow: hidden;
 }
-/* line 1919, ../../../scss/_app_styles.scss */
+/* line 1920, ../../../scss/_app_styles.scss */
 .rcard .image .title {
   position: absolute;
   bottom: 0;
@@ -25250,7 +25251,7 @@ p {
   text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
   font-family: Open Sans Bold;
 }
-/* line 1932, ../../../scss/_app_styles.scss */
+/* line 1933, ../../../scss/_app_styles.scss */
 .rcard .image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -25260,14 +25261,14 @@ p {
   filter: brightness(0.75);
   -webkit-filter: brightness(0.75);
 }
-/* line 1944, ../../../scss/_app_styles.scss */
+/* line 1945, ../../../scss/_app_styles.scss */
 .rcard .image img:hover {
   filter: brightness(1);
   -webkit-filter: brightness(1);
   transform: translate3d(0, 0, 0);
   transition: all 1.5s ease;
 }
-/* line 1953, ../../../scss/_app_styles.scss */
+/* line 1954, ../../../scss/_app_styles.scss */
 .rcard .image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -25281,51 +25282,51 @@ p {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1970, ../../../scss/_app_styles.scss */
+/* line 1971, ../../../scss/_app_styles.scss */
 .rcard .image i.file:before {
   content: "\f18e";
 }
-/* line 1971, ../../../scss/_app_styles.scss */
+/* line 1972, ../../../scss/_app_styles.scss */
 .rcard .image i.page:before {
   content: "\f18e";
 }
-/* line 1972, ../../../scss/_app_styles.scss */
+/* line 1973, ../../../scss/_app_styles.scss */
 .rcard .image i.collection:before {
   content: "\f18a";
 }
-/* line 1974, ../../../scss/_app_styles.scss */
+/* line 1975, ../../../scss/_app_styles.scss */
 .rcard .image i.documents:before {
   content: "\f18b";
 }
-/* line 1975, ../../../scss/_app_styles.scss */
+/* line 1976, ../../../scss/_app_styles.scss */
 .rcard .image i.pdf:before {
   content: "\f18b";
 }
-/* line 1976, ../../../scss/_app_styles.scss */
+/* line 1977, ../../../scss/_app_styles.scss */
 .rcard .image i.text:before {
   content: "\f18e";
 }
-/* line 1977, ../../../scss/_app_styles.scss */
+/* line 1978, ../../../scss/_app_styles.scss */
 .rcard .image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1978, ../../../scss/_app_styles.scss */
+/* line 1979, ../../../scss/_app_styles.scss */
 .rcard .image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1979, ../../../scss/_app_styles.scss */
+/* line 1980, ../../../scss/_app_styles.scss */
 .rcard .image i.images:before {
   content: "\f125";
 }
-/* line 1980, ../../../scss/_app_styles.scss */
+/* line 1981, ../../../scss/_app_styles.scss */
 .rcard .image i.audios:before, .rcard .image i.audio:before {
   content: "\f17b";
 }
-/* line 1981, ../../../scss/_app_styles.scss */
+/* line 1982, ../../../scss/_app_styles.scss */
 .rcard .image i.videos:before, .rcard .image i.video:before {
   content: "\f20e";
 }
-/* line 1984, ../../../scss/_app_styles.scss */
+/* line 1985, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-style: solid;
   border-width: 0 70px 40px 0;
@@ -25338,59 +25339,59 @@ p {
   z-index: 1;
   opacity: 0.75;
 }
-/* line 1997, ../../../scss/_app_styles.scss */
+/* line 1998, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-color: transparent #333 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #333 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2002, ../../../scss/_app_styles.scss */
+/* line 2003, ../../../scss/_app_styles.scss */
 .rcard .published.card-label {
   border-color: transparent #43AC6A transparent transparent;
   border-color: rgba(255, 255, 255, 0) #43AC6A rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2006, ../../../scss/_app_styles.scss */
+/* line 2007, ../../../scss/_app_styles.scss */
 .rcard .published.card-label .label-text:before {
   content: "\221A";
   margin-left: 5px;
   font-size: larger;
 }
-/* line 2014, ../../../scss/_app_styles.scss */
+/* line 2015, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label {
   border-color: transparent #a9b2b3 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #a9b2b3 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2018, ../../../scss/_app_styles.scss */
+/* line 2019, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label .label-text:before {
   content: "Draft";
 }
-/* line 2023, ../../../scss/_app_styles.scss */
+/* line 2024, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2027, ../../../scss/_app_styles.scss */
+/* line 2028, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label .label-text:before {
   content: "Deleted";
 }
-/* line 2032, ../../../scss/_app_styles.scss */
+/* line 2033, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label {
   border-color: transparent #0eacb5 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #0eacb5 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2036, ../../../scss/_app_styles.scss */
+/* line 2037, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label .label-text:before {
   content: "Mod";
 }
-/* line 2039, ../../../scss/_app_styles.scss */
+/* line 2040, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label {
   border-color: transparent #000 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #000 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2043, ../../../scss/_app_styles.scss */
+/* line 2044, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label .label-text:before {
   content: "hidden";
 }
-/* line 2046, ../../../scss/_app_styles.scss */
+/* line 2047, ../../../scss/_app_styles.scss */
 .rcard .label-text {
   color: #fff;
   font-size: 0.75rem;
@@ -25401,7 +25402,7 @@ p {
   transform: rotate(30deg);
 }
 
-/* line 2060, ../../../scss/_app_styles.scss */
+/* line 2061, ../../../scss/_app_styles.scss */
 .compulsory:after {
   content: '*';
   color: red;
@@ -25409,19 +25410,19 @@ p {
 }
 
 /* Watermark background for node_ajax_content  */
-/* line 2068, ../../../scss/_app_styles.scss */
+/* line 2069, ../../../scss/_app_styles.scss */
 .allow.draft {
   background-size: 10%;
   background-repeat: repeat;
   background-image: url("/static/ndf/images/draft-watermark.png");
 }
 
-/* line 2076, ../../../scss/_app_styles.scss */
+/* line 2077, ../../../scss/_app_styles.scss */
 .text-gray {
   color: gray;
 }
 
-/* line 2081, ../../../scss/_app_styles.scss */
+/* line 2082, ../../../scss/_app_styles.scss */
 .repository-title {
   color: #D7D7D7;
   font-size: 1.1em;
@@ -25434,7 +25435,7 @@ p {
   text-align: center;
 }
 
-/* line 2092, ../../../scss/_app_styles.scss */
+/* line 2093, ../../../scss/_app_styles.scss */
 .repository-desc {
   font-size: 1.1em;
   width: auto;
@@ -25446,12 +25447,12 @@ p {
   margin-left: 4px;
 }
 
-/* line 2102, ../../../scss/_app_styles.scss */
+/* line 2103, ../../../scss/_app_styles.scss */
 .card-holder {
   padding-left: 2%;
 }
 
-/* line 2106, ../../../scss/_app_styles.scss */
+/* line 2107, ../../../scss/_app_styles.scss */
 .app-card {
   width: 19rem;
   min-height: 10rem;
@@ -25464,7 +25465,7 @@ p {
   border: thin solid #D3D3D3;
 }
 
-/* line 2118, ../../../scss/_app_styles.scss */
+/* line 2119, ../../../scss/_app_styles.scss */
 .app-card:hover {
   box-shadow: 0px 0px 15px #808080;
   border: thin solid #D3D3D3;
@@ -25472,26 +25473,26 @@ p {
   transition: all 0.6s ease 0s;
 }
 
-/* line 2125, ../../../scss/_app_styles.scss */
+/* line 2126, ../../../scss/_app_styles.scss */
 .app-card-icon {
   color: #4c4c4c;
   position: relative;
   font-size: 6em;
 }
 
-/* line 2132, ../../../scss/_app_styles.scss */
+/* line 2133, ../../../scss/_app_styles.scss */
 .app-card-title {
   padding-bottom: -1em;
 }
 
-/* line 2136, ../../../scss/_app_styles.scss */
+/* line 2137, ../../../scss/_app_styles.scss */
 .app-card-content {
   color: #4c4c4c;
   text-align: center;
   margin-top: 0.5cm;
 }
 
-/* line 2142, ../../../scss/_app_styles.scss */
+/* line 2143, ../../../scss/_app_styles.scss */
 .discussion-title-username {
   background-color: #3e3e3e;
   color: #ececec !important;
@@ -25506,7 +25507,7 @@ p {
   padding-left: 10px;
 }
 
-/* line 2156, ../../../scss/_app_styles.scss */
+/* line 2157, ../../../scss/_app_styles.scss */
 .discussion-footer {
   background-color: #CCCCCC;
   color: gray !important;
@@ -25520,13 +25521,13 @@ p {
   padding-left: 10px;
 }
 
-/* line 2172, ../../../scss/_app_styles.scss */
+/* line 2173, ../../../scss/_app_styles.scss */
 .discussion-content {
   color: #262626;
   word-wrap: break-word;
 }
 
-/* line 2177, ../../../scss/_app_styles.scss */
+/* line 2178, ../../../scss/_app_styles.scss */
 .fullscreen-icon {
   display: none;
 }
@@ -25542,20 +25543,104 @@ div.show-image:hover div.fullscreen-icon{
     font-size:2em;
 
 }*/
-/* line 2192, ../../../scss/_app_styles.scss */
-#envelop-cover {
-  height: 350px;
-  border: 1px solid black;
+/* line 2194, ../../../scss/_app_styles.scss */
+#envelop-cover .course-page-title {
+  font-size: 35px;
+  font-weight: 600;
+}
+/* line 2199, ../../../scss/_app_styles.scss */
+#envelop-cover .meta .key {
+  color: #A7A4A4;
+  font-weight: bold;
+  font-size: 20px;
+  text-transform: uppercase;
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 10px;
+}
+/* line 2209, ../../../scss/_app_styles.scss */
+#envelop-cover .meta .value {
+  line-height: 1.8em;
+  display: inline-block;
+}
+/* line 2213, ../../../scss/_app_styles.scss */
+#envelop-cover .meta .value .name {
+  color: #000;
+}
+/* line 2217, ../../../scss/_app_styles.scss */
+#envelop-cover .meta .value .time {
+  font-size: 16px;
+  font-weight: bold;
+  color: #999999;
 }
 
-/* line 2196, ../../../scss/_app_styles.scss */
+/* line 2225, ../../../scss/_app_styles.scss */
+#envelop-content {
+  margin-top: 20px;
+}
+/* line 2228, ../../../scss/_app_styles.scss */
+#envelop-content .tabs {
+  border: 0 solid silver;
+  border-width: 1px 1px 0px 0px;
+}
+/* line 2232, ../../../scss/_app_styles.scss */
+#envelop-content .tabs .tab-title {
+  border: 0 solid silver;
+  border-width: 0 0 1px 1px;
+}
+/* line 2236, ../../../scss/_app_styles.scss */
+#envelop-content .tabs .tab-title.active {
+  border-width: 0px 0px 0px 1px;
+}
+/* line 2250, ../../../scss/_app_styles.scss */
+#envelop-content .course-book #course-about .about-course-heading {
+  display: block;
+  height: 300px;
+  width: 100%;
+  border: 1px solid black;
+  background: #999999;
+  position: relative;
+  color: #fff;
+  text-align: center;
+}
+/* line 2260, ../../../scss/_app_styles.scss */
+#envelop-content .course-book #course-about .about-course-heading .heading-text {
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+/* line 2267, ../../../scss/_app_styles.scss */
+#envelop-content .course-book #course-about .about-course-heading .heading-text div:not(:first-child) {
+  font-size: 20px;
+}
+/* line 2271, ../../../scss/_app_styles.scss */
+#envelop-content .course-book #course-about .about-course-heading .heading-text h2 {
+  color: inherit;
+}
+/* line 2277, ../../../scss/_app_styles.scss */
+#envelop-content .course-book #course-about .about-course-details {
+  display: block;
+  min-height: 100px;
+  width: 100%;
+}
+
+/* line 2287, ../../../scss/_app_styles.scss */
+.notebook .notebook-header {
+  border-color: black;
+  border-style: solid;
+  border-width: 1px 0px;
+}
+
+/* line 2294, ../../../scss/_app_styles.scss */
 #left-tab {
   position: absolute;
   left: 0px;
   bottom: 0px;
 }
 
-/* line 2201, ../../../scss/_app_styles.scss */
+/* line 2299, ../../../scss/_app_styles.scss */
 #right-tab {
   position: absolute;
   right: 0px;
@@ -25563,12 +25648,12 @@ div.show-image:hover div.fullscreen-icon{
   padding-bottom: 6px;
 }
 
-/* line 2207, ../../../scss/_app_styles.scss */
+/* line 2305, ../../../scss/_app_styles.scss */
 #enrolled-btn {
   margin-bottom: 0px;
 }
 
-/* line 2210, ../../../scss/_app_styles.scss */
+/* line 2308, ../../../scss/_app_styles.scss */
 div.absol-descrip {
   position: absolute;
   top: 190px;
@@ -25579,14 +25664,14 @@ div.absol-descrip {
 }
 
 /*overview-summary styling*/
-/* line 2220, ../../../scss/_app_styles.scss */
+/* line 2318, ../../../scss/_app_styles.scss */
 .course-title, .course-date {
   color: white;
   padding-top: 0px;
   padding-bottom: 0px;
 }
 
-/* line 2225, ../../../scss/_app_styles.scss */
+/* line 2323, ../../../scss/_app_styles.scss */
 .course-description {
   color: #cccccc;
   padding-top: 0px;
@@ -25598,48 +25683,48 @@ div.absol-descrip {
   overflow: hidden;
 }
 
-/* line 2235, ../../../scss/_app_styles.scss */
+/* line 2333, ../../../scss/_app_styles.scss */
 .course-para {
   padding: 0;
 }
 
-/* line 2239, ../../../scss/_app_styles.scss */
+/* line 2337, ../../../scss/_app_styles.scss */
 course-title {
   padding-left: 10px;
 }
 
-/* line 2242, ../../../scss/_app_styles.scss */
+/* line 2340, ../../../scss/_app_styles.scss */
 .enroll-status-margin {
   margin-bottom: 0;
 }
 
-/* line 2246, ../../../scss/_app_styles.scss */
+/* line 2344, ../../../scss/_app_styles.scss */
 .progress-summery {
   color: white;
   margin-top: 20px;
 }
 
-/* line 2250, ../../../scss/_app_styles.scss */
+/* line 2348, ../../../scss/_app_styles.scss */
 .course-description-thumbnails {
   margin: 0;
   padding: 0;
 }
 
-/* line 2255, ../../../scss/_app_styles.scss */
+/* line 2353, ../../../scss/_app_styles.scss */
 .left-shift {
   padding: 0;
   color: white !important;
 }
 
 /*course overview for Small screens*/
-/* line 2261, ../../../scss/_app_styles.scss */
+/* line 2359, ../../../scss/_app_styles.scss */
 .course {
   /*position:relative;*/
   border: 1px solid black;
   background-color: #999999;
 }
 
-/* line 2267, ../../../scss/_app_styles.scss */
+/* line 2365, ../../../scss/_app_styles.scss */
 .course-contents {
   /*position:absolute;*/
   width: 100%;
@@ -25647,7 +25732,7 @@ course-title {
 
 /*Medium screens*/
 @media only screen and (min-width: 40.063em) {
-  /* line 2274, ../../../scss/_app_styles.scss */
+  /* line 2372, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -25655,7 +25740,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 2280, ../../../scss/_app_styles.scss */
+  /* line 2378, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -25665,7 +25750,7 @@ course-title {
 /* min-width 641px, medium screens */
 /* Large screens*/
 @media only screen and (min-width: 64.063em) {
-  /* line 2290, ../../../scss/_app_styles.scss */
+  /* line 2388, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -25673,7 +25758,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 2296, ../../../scss/_app_styles.scss */
+  /* line 2394, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
