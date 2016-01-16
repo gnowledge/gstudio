@@ -1,17 +1,102 @@
 <div class="row notebook">
     <div class="row notebook-header">
-        <div class="medium-3">
-            <div class="row collapse prefix-round">
-                <div class="small-3 columns">
-                  <span class="prefix">
-                      <i class="fi-magnifying-glass"></i>
-                  </span>
+        <div class="medium-6 columns filters">
+            <div class="row">
+                <div class="medium-2 columns"> View By</div>
+                <div class="medium-4 columns">
+                    <select>
+                        <option value="husker">User</option>
+                        <option value="husker">School</option>
+                        <option value="husker">Tags</option>
+                    </select>
                 </div>
-                <div class="small-9 columns">
-                    <input type="text" placeholder="Search">
+                <div class="medium-4 columns end">
+                    <select>
+                        <option value="husker">Pinky Bunny</option>
+                        <option value="husker">Fluffy Apple</option>
+                    </select>
                 </div>
             </div>
         </div>
-        <div class="medium-3"></div>
+        <div class="medium-6 columns">
+            <div class="row">
+                <div class="medium-6 medium-offset-3 columns">
+                    <div class="row collapse prefix-round">
+                        <div class="small-3 columns">
+                          <span class="prefix">
+                              <i class="fi-magnifying-glass"></i>
+                          </span>
+                        </div>
+                        <div class="small-9 columns">
+                            <input type="text" placeholder="Search">
+                        </div>
+                    </div>
+                </div>
+                <div class="medium-3 columns">
+                    <a href="#" class="button tiny radius"><i class="fi-plus"></i>  New Note</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row notebook-body">
+        <div class="small-12 medium-3 notebook-index">
+            <ul class="tabs" data-tab>
+                <li class="tab-title active"><a href="#all-notes">All Notes</a></li>
+                <li class="tab-title"><a href="#my-notes">My Notes</a></li>
+                <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
+            </ul>
+            <div class="small-12 tabs-content">
+                <div class="content active notes" id="all-notes">
+                    <div class="date">
+                        December 2015
+                        <span class="notes-count right">1</span>
+                    </div>
+                    <div class="note active">
+                        <div class="note-heading"> Note Heading </div>
+                        <div class="note-meta">
+                            <span>Fluffy Apple</span>
+                            &#8226;
+                            <span>25th Dec 2015</span>
+                            &#8226;
+                            <span>3pm</span>
+                        </div>
+                        <div class="note-footer">
+                            <i class="fi-eye"></i>
+                            <span class="viewed-count">214</span>
+                            <i class="fi-like"></i>
+                            <span class="likes-count">10</span>
+                            <i class="fi-comments"></i>
+                            <span class="comment-count">22</span>
+                            <i class="fi-trash"></i>
+                        </div>
+                    </div>
+                    <div class="note">
+                        <div class="note-heading"> Note Heading </div>
+                        <div class="note-meta">
+                            <span>Fluffy Apple</span>
+                            &#8226;
+                            <span>25th Dec 2015</span>
+                            &#8226;
+                            <span>3pm</span>
+                        </div>
+                        <div class="note-footer">
+                            <i class="fi-eye"></i>
+                            <span class="viewed-count">214</span>
+                            <i class="fi-like"></i>
+                            <span class="likes-count">10</span>
+                            <i class="fi-comments"></i>
+                            <span class="comment-count">22</span>
+                            <i class="fi-trash"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="content notes" id="my-notes">
+                    <p>This is the second panel of the basic tab example. This is the second panel of the basic tab example.</p>
+                </div>
+                <div class="content notes" id="my-drafts">
+                    <p>This is the third panel of the basic tab example. This is the third panel of the basic tab example.</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

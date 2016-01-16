@@ -25724,16 +25724,88 @@ div.show-image:hover div.fullscreen-icon{
   border-color: black;
   border-style: solid;
   border-width: 1px 0px;
+  padding-top: 1em;
+}
+/* line 2293, ../../../scss/_app_styles.scss */
+.notebook .notebook-header a, .notebook .notebook-header input {
+  margin: 0px;
+}
+/* line 2298, ../../../scss/_app_styles.scss */
+.notebook .notebook-index {
+  border-right: 1px solid #AFAEAE;
+}
+/* line 2301, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .tabs {
+  width: 100%;
+}
+/* line 2304, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .tabs .tab-title {
+  width: 33.33%;
+}
+/* line 2310, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes .date {
+  font-size: 12px;
+  font-weight: bold;
+  background: #EFEFEF;
+  padding: 7px 10px;
+}
+/* line 2316, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes .date .note-count {
+  font-size: 11px;
+  line-height: 2em;
+}
+/* line 2321, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes > div {
+  border-bottom: 1px solid #AFAEAE;
+}
+/* line 2324, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes .note {
+  padding: 5px 15px;
+  background: #EEEEEE;
+  cursor: pointer;
+}
+/* line 2329, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes .note .note-heading {
+  font-weight: 400;
+  font-size: 17px;
+}
+/* line 2334, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes .note .note-meta {
+  font-size: 13px;
+}
+/* line 2337, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes .note .note-meta > span:not(:first-child) {
+  font-size: 11px;
+  font-weight: 600;
+  color: #717171;
+}
+/* line 2344, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes .note .note-footer {
+  color: #888888;
+}
+/* line 2347, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes .note .note-footer span {
+  margin-right: 10px;
+}
+/* line 2352, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes .note.active {
+  border-left: 5px solid blue;
+  background: #FFF;
+}
+/* line 2356, ../../../scss/_app_styles.scss */
+.notebook .notebook-index .notes .note.active .note-heading {
+  font-weight: 800;
+  font-size: 17px;
 }
 
-/* line 2294, ../../../scss/_app_styles.scss */
+/* line 2366, ../../../scss/_app_styles.scss */
 #left-tab {
   position: absolute;
   left: 0px;
   bottom: 0px;
 }
 
-/* line 2299, ../../../scss/_app_styles.scss */
+/* line 2371, ../../../scss/_app_styles.scss */
 #right-tab {
   position: absolute;
   right: 0px;
@@ -25741,12 +25813,12 @@ div.show-image:hover div.fullscreen-icon{
   padding-bottom: 6px;
 }
 
-/* line 2305, ../../../scss/_app_styles.scss */
+/* line 2377, ../../../scss/_app_styles.scss */
 #enrolled-btn {
   margin-bottom: 0px;
 }
 
-/* line 2308, ../../../scss/_app_styles.scss */
+/* line 2380, ../../../scss/_app_styles.scss */
 div.absol-descrip {
   position: absolute;
   top: 190px;
@@ -25757,14 +25829,14 @@ div.absol-descrip {
 }
 
 /*overview-summary styling*/
-/* line 2318, ../../../scss/_app_styles.scss */
+/* line 2390, ../../../scss/_app_styles.scss */
 .course-title, .course-date {
   color: white;
   padding-top: 0px;
   padding-bottom: 0px;
 }
 
-/* line 2323, ../../../scss/_app_styles.scss */
+/* line 2395, ../../../scss/_app_styles.scss */
 .course-description {
   color: #cccccc;
   padding-top: 0px;
@@ -25776,48 +25848,48 @@ div.absol-descrip {
   overflow: hidden;
 }
 
-/* line 2333, ../../../scss/_app_styles.scss */
+/* line 2405, ../../../scss/_app_styles.scss */
 .course-para {
   padding: 0;
 }
 
-/* line 2337, ../../../scss/_app_styles.scss */
+/* line 2409, ../../../scss/_app_styles.scss */
 course-title {
   padding-left: 10px;
 }
 
-/* line 2340, ../../../scss/_app_styles.scss */
+/* line 2412, ../../../scss/_app_styles.scss */
 .enroll-status-margin {
   margin-bottom: 0;
 }
 
-/* line 2344, ../../../scss/_app_styles.scss */
+/* line 2416, ../../../scss/_app_styles.scss */
 .progress-summery {
   color: white;
   margin-top: 20px;
 }
 
-/* line 2348, ../../../scss/_app_styles.scss */
+/* line 2420, ../../../scss/_app_styles.scss */
 .course-description-thumbnails {
   margin: 0;
   padding: 0;
 }
 
-/* line 2353, ../../../scss/_app_styles.scss */
+/* line 2425, ../../../scss/_app_styles.scss */
 .left-shift {
   padding: 0;
   color: white !important;
 }
 
 /*course overview for Small screens*/
-/* line 2359, ../../../scss/_app_styles.scss */
+/* line 2431, ../../../scss/_app_styles.scss */
 .course {
   /*position:relative;*/
   border: 1px solid black;
   background-color: #999999;
 }
 
-/* line 2365, ../../../scss/_app_styles.scss */
+/* line 2437, ../../../scss/_app_styles.scss */
 .course-contents {
   /*position:absolute;*/
   width: 100%;
@@ -25825,7 +25897,7 @@ course-title {
 
 /*Medium screens*/
 @media only screen and (min-width: 40.063em) {
-  /* line 2372, ../../../scss/_app_styles.scss */
+  /* line 2444, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -25833,7 +25905,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 2378, ../../../scss/_app_styles.scss */
+  /* line 2450, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -25843,7 +25915,7 @@ course-title {
 /* min-width 641px, medium screens */
 /* Large screens*/
 @media only screen and (min-width: 64.063em) {
-  /* line 2388, ../../../scss/_app_styles.scss */
+  /* line 2460, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -25851,7 +25923,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 2394, ../../../scss/_app_styles.scss */
+  /* line 2466, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
