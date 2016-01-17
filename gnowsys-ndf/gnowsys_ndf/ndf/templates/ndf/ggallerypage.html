@@ -1,0 +1,116 @@
+<div class="gallery-page row">
+    <div class="row gallery-header">
+        <div class="medium-6 columns filters">
+            <div class="row">
+                <div class="medium-2 columns"> View By</div>
+                <div class="medium-3 columns">
+                    <select placeholder="Select File Types">
+                        <option value="all">All File Types</option>
+                        <option value="pdf">Pdf</option>
+                        <option value="image">Image</option>
+                        <option value="compressed">Compressed</option>
+                    </select>
+                </div>
+                <div class="medium-3 columns">
+                    <select placeholder="Select School">
+                        <option value="all">All Schools</option>
+                        <option value="school1">School 1</option>
+                        <option value="school2">School 2</option>
+                    </select>
+                </div>
+                <div class="medium-3 columns end">
+                    <select placeholder="Sort">
+                        <option value="all">Top Rated</option>
+                        <option value="school1">Recent</option>
+                        <option value="school2">Most Commented</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="medium-6 columns">
+            <div class="row">
+                <div class="medium-6 search columns">
+                    <div class="row collapse prefix-round">
+                        <div class="small-3 columns">
+                          <span class="prefix">
+                              <i class="fi-magnifying-glass"></i>
+                          </span>
+                        </div>
+                        <div class="small-9 columns">
+                            <input type="text" placeholder="Search gallery">
+                        </div>
+                    </div>
+                </div>
+                <div class="medium-5 side-heading columns">
+                    <div class = "parent-folder">
+                        <i class="fi-folder"></i>
+                        <span>Collection</span>
+                    </div>
+                    <div>
+                        <i class="fi-list-bullet"></i>
+                    </div>
+                    <div>
+                        <i class="fi-info"></i>
+                        <span>Info</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row gallery-panel">
+        <div class="medium-9 columns gallery-content" >
+            <div class="gallery-subheader small-12">
+                <div class="row">
+                    <div class="small-12 medium-6 columns upload-file" >
+                        <a href="#" class="button tiny">
+                            <i class="fi-upload"></i>
+                            Upload
+                        </a>
+                    </div>
+                    <div class="small-12 medium-6 columns gallery-actions" >
+                        <div class="download-file">
+                            <i class="fi-download"></i>
+                            <span> Download</span>
+                        </div>
+                        <div class="create-note">
+                            <i class="fi-page-edit"></i>
+                            <span> Create note</span>
+                        </div>
+                        <div class="create-collection">
+                            <i class="fi-folder"></i>
+                            <span> Create new collection</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gallery-body small-12">
+            <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+                {% include "ndf/ggallerycard.html" %}
+                {% include "ndf/ggallerycard.html" %}
+                {% include "ndf/ggallerycard.html" %}
+                {% include "ndf/ggallerycard.html" %}
+                {% include "ndf/ggallerycard.html" %}
+            </ul>
+            </div>
+        </div>
+        <div class="medium-3 columns file-info-panel">
+            <div class="file-name"> File Name </div>
+            <div class="row">
+                <div class="small-6 columns"> Type </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Size </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Uploaded By </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Created Date </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+        </div>
+    </div>
+</div>

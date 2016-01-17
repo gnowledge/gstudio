@@ -218,7 +218,7 @@ list-style: none;
       </div>
       <div class="content" id="course-gallery">
         {% if "CourseEventGroup" in group_object.member_of_names_list %}
-        <div id="upload_form_div" class="text-right">
+        <!--div id="upload_form_div" class="text-right">
           <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
             {% csrf_token %}
             <input type="file" name="doc" id="docFile"/>
@@ -227,11 +227,14 @@ list-style: none;
               <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
             </div>
           </form>
-        </div>
+        </div-->
         {% endif %}
 
+        <!--div class="row">
+         {# include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" #}
+        </div-->
         <div class="row">
-         {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
+         {% include "ndf/ggallerypage.html" %}
         </div>
       </div>
       <div class="content" id="course-about">

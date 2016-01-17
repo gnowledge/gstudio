@@ -25637,82 +25637,279 @@ div.show-image:hover div.fullscreen-icon{
 .notebook .notebook-header a, .notebook .notebook-header input {
   margin: 0px;
 }
-/* line 2298, ../../../scss/_app_styles.scss */
-.notebook .notebook-index {
+/* line 2299, ../../../scss/_app_styles.scss */
+.notebook .notebook-body > div {
+  padding-top: 15px;
+  height: 50em;
+  overflow: scroll;
+}
+/* line 2305, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index {
   border-right: 1px solid #AFAEAE;
 }
-/* line 2301, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .tabs {
+/* line 2308, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .tabs {
   width: 100%;
 }
-/* line 2304, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .tabs .tab-title {
+/* line 2311, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .tabs .tab-title {
   width: 33.33%;
 }
-/* line 2310, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes .date {
+/* line 2317, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes .date {
   font-size: 12px;
   font-weight: bold;
   background: #EFEFEF;
   padding: 7px 10px;
 }
-/* line 2316, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes .date .note-count {
+/* line 2323, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes .date .note-count {
   font-size: 11px;
   line-height: 2em;
 }
-/* line 2321, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes > div {
+/* line 2328, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes > div {
   border-bottom: 1px solid #AFAEAE;
 }
-/* line 2324, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes .note {
+/* line 2331, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note {
   padding: 5px 15px;
   background: #EEEEEE;
   cursor: pointer;
 }
-/* line 2329, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes .note .note-heading {
+/* line 2336, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-heading {
   font-weight: 400;
   font-size: 17px;
 }
-/* line 2334, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes .note .note-meta {
+/* line 2341, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-meta {
   font-size: 13px;
 }
-/* line 2337, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes .note .note-meta > span:not(:first-child) {
+/* line 2344, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-meta > span:not(:first-child) {
   font-size: 11px;
   font-weight: 600;
   color: #717171;
 }
-/* line 2344, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes .note .note-footer {
+/* line 2351, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-footer {
   color: #888888;
 }
-/* line 2347, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes .note .note-footer span {
+/* line 2354, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-footer span {
   margin-right: 10px;
 }
-/* line 2352, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes .note.active {
+/* line 2359, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note.active {
   border-left: 5px solid blue;
   background: #FFF;
 }
-/* line 2356, ../../../scss/_app_styles.scss */
-.notebook .notebook-index .notes .note.active .note-heading {
+/* line 2363, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .notebook-index .notes .note.active .note-heading {
   font-weight: 800;
   font-size: 17px;
 }
+/* line 2378, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .note-toolbar .creator-rating > div {
+  display: inline-block;
+}
+/* line 2383, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .note-content {
+  padding: 1em 3em 0em;
+}
+/* line 2388, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .note-content .note-header > div {
+  display: inline-block;
+}
+/* line 2391, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .note-content .note-header .note-title {
+  font-size: 1.5em;
+  font-weight: 800;
+  margin-right: 1em;
+}
+/* line 2397, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .note-content .note-header .note-tags span {
+  background: #ffebb2;
+  padding: 0.2em 0.7em;
+  display: inline-block;
+}
+/* line 2406, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .comment-sections {
+  padding: 1em 3.5em 0em;
+}
+/* line 2410, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .comment-sections .comments-header span {
+  font-weight: bold;
+}
+/* line 2413, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .comment-sections .comments-header i:not(:first-child) {
+  margin-left: 15px;
+}
+/* line 2418, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .comment-sections .new-comment {
+  border-top: 1px solid grey;
+  padding: 15px 10px;
+  margin-top: 5px;
+}
+/* line 2423, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-box,
+.notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-editor {
+  min-height: 200px;
+  margin-top: 0px;
+}
+/* line 2429, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .comment-sections .new-comment .user-prof-image {
+  font-size: 90px;
+  line-height: 0em;
+}
 
-/* line 2366, ../../../scss/_app_styles.scss */
+/* line 2441, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-header {
+  line-height: 3.5em;
+  background: #f0f0f0;
+  border-top: 1px solid #797979;
+  border-bottom: 1px solid #ababab;
+}
+/* line 2451, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-header .search {
+  padding-top: 0.6em;
+}
+/* line 2455, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-header .side-heading {
+  font-size: 19px;
+}
+/* line 2458, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-header .side-heading > div {
+  display: inline-block;
+  margin-right: 10px;
+}
+/* line 2464, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-panel {
+  background: #F7F7F7;
+}
+/* line 2467, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-panel .gallery-content {
+  border-right: 1px solid grey;
+}
+/* line 2470, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-panel .gallery-content .gallery-subheader {
+  line-height: 3em;
+  padding: 10px 0px;
+}
+/* line 2474, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-panel .gallery-content .gallery-subheader a.upload-file {
+  margin: 0px;
+  font-size: 1em;
+}
+/* line 2479, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-panel .gallery-content .gallery-subheader .gallery-actions {
+  font-size: 1.3em;
+  color: #999999;
+}
+/* line 2483, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-panel .gallery-content .gallery-subheader .gallery-actions > div {
+  display: inline-block;
+  margin-right: 10px;
+}
+/* line 2490, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-panel .file-info-panel {
+  background: #fff;
+}
+/* line 2493, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-panel .file-info-panel .row {
+  margin: 10px 0px;
+}
+/* line 2497, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-panel .file-info-panel .file-name {
+  font-size: 20px;
+  font-weight: bold;
+  color: #666666;
+  margin: 10px 0px 20px;
+}
+
+/* line 2510, ../../../scss/_app_styles.scss */
+.gallery-card .select-file {
+  vertical-align: top;
+}
+/* line 2515, ../../../scss/_app_styles.scss */
+.gallery-card .file-item {
+  width: 80%;
+  color: #fff;
+  height: 12em;
+  text-align: center;
+  position: relative;
+  background: #fff;
+  border: 1px solid black;
+}
+/* line 2524, ../../../scss/_app_styles.scss */
+.gallery-card .file-item .file-details {
+  margin-top: 10%;
+  display: none;
+}
+/* line 2529, ../../../scss/_app_styles.scss */
+.gallery-card .file-item .file-actions {
+  display: none;
+  position: absolute;
+  bottom: 10%;
+  margin-bottom: 10%;
+  width: 100%;
+  font-size: 25px;
+}
+/* line 2537, ../../../scss/_app_styles.scss */
+.gallery-card .file-item .file-actions i {
+  margin: 0px 10px;
+}
+/* line 2542, ../../../scss/_app_styles.scss */
+.gallery-card .file-item .filename-footer {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  height: 20%;
+  vertical-align: middle;
+  font-size: 1.4em;
+  font-weight: 600;
+  background: #999999;
+}
+/* line 2553, ../../../scss/_app_styles.scss */
+.gallery-card .file-item:hover {
+  background: #999999;
+}
+/* line 2556, ../../../scss/_app_styles.scss */
+.gallery-card .file-item:hover .file-details, .gallery-card .file-item:hover .file-actions {
+  display: block;
+}
+/* line 2559, ../../../scss/_app_styles.scss */
+.gallery-card .file-item:hover .filename-footer {
+  display: none;
+}
+
+/* line 2570, ../../../scss/_app_styles.scss */
+.user-comment .comment-heading {
+  color: #9C9C9C;
+  border-bottom: 1px solid grey;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+/* line 2577, ../../../scss/_app_styles.scss */
+.user-comment .comment-heading > div {
+  display: inline-block;
+}
+/* line 2581, ../../../scss/_app_styles.scss */
+.user-comment .comment-heading .commentor-name span {
+  font-weight: bold;
+  color: #333333;
+}
+
+/* line 2588, ../../../scss/_app_styles.scss */
 #left-tab {
   position: absolute;
   left: 0px;
   bottom: 0px;
 }
 
-/* line 2371, ../../../scss/_app_styles.scss */
+/* line 2593, ../../../scss/_app_styles.scss */
 #right-tab {
   position: absolute;
   right: 0px;
@@ -25720,12 +25917,12 @@ div.show-image:hover div.fullscreen-icon{
   padding-bottom: 6px;
 }
 
-/* line 2377, ../../../scss/_app_styles.scss */
+/* line 2599, ../../../scss/_app_styles.scss */
 #enrolled-btn {
   margin-bottom: 0px;
 }
 
-/* line 2380, ../../../scss/_app_styles.scss */
+/* line 2602, ../../../scss/_app_styles.scss */
 div.absol-descrip {
   position: absolute;
   top: 190px;
@@ -25736,14 +25933,14 @@ div.absol-descrip {
 }
 
 /*overview-summary styling*/
-/* line 2390, ../../../scss/_app_styles.scss */
+/* line 2612, ../../../scss/_app_styles.scss */
 .course-title, .course-date {
   color: white;
   padding-top: 0px;
   padding-bottom: 0px;
 }
 
-/* line 2395, ../../../scss/_app_styles.scss */
+/* line 2617, ../../../scss/_app_styles.scss */
 .course-description {
   color: #cccccc;
   padding-top: 0px;
@@ -25755,48 +25952,48 @@ div.absol-descrip {
   overflow: hidden;
 }
 
-/* line 2405, ../../../scss/_app_styles.scss */
+/* line 2627, ../../../scss/_app_styles.scss */
 .course-para {
   padding: 0;
 }
 
-/* line 2409, ../../../scss/_app_styles.scss */
+/* line 2631, ../../../scss/_app_styles.scss */
 course-title {
   padding-left: 10px;
 }
 
-/* line 2412, ../../../scss/_app_styles.scss */
+/* line 2634, ../../../scss/_app_styles.scss */
 .enroll-status-margin {
   margin-bottom: 0;
 }
 
-/* line 2416, ../../../scss/_app_styles.scss */
+/* line 2638, ../../../scss/_app_styles.scss */
 .progress-summery {
   color: white;
   margin-top: 20px;
 }
 
-/* line 2420, ../../../scss/_app_styles.scss */
+/* line 2642, ../../../scss/_app_styles.scss */
 .course-description-thumbnails {
   margin: 0;
   padding: 0;
 }
 
-/* line 2425, ../../../scss/_app_styles.scss */
+/* line 2647, ../../../scss/_app_styles.scss */
 .left-shift {
   padding: 0;
   color: white !important;
 }
 
 /*course overview for Small screens*/
-/* line 2431, ../../../scss/_app_styles.scss */
+/* line 2653, ../../../scss/_app_styles.scss */
 .course {
   /*position:relative;*/
   border: 1px solid black;
   background-color: #999999;
 }
 
-/* line 2437, ../../../scss/_app_styles.scss */
+/* line 2659, ../../../scss/_app_styles.scss */
 .course-contents {
   /*position:absolute;*/
   width: 100%;
@@ -25804,7 +26001,7 @@ course-title {
 
 /*Medium screens*/
 @media only screen and (min-width: 40.063em) {
-  /* line 2444, ../../../scss/_app_styles.scss */
+  /* line 2666, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -25812,7 +26009,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 2450, ../../../scss/_app_styles.scss */
+  /* line 2672, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -25822,7 +26019,7 @@ course-title {
 /* min-width 641px, medium screens */
 /* Large screens*/
 @media only screen and (min-width: 64.063em) {
-  /* line 2460, ../../../scss/_app_styles.scss */
+  /* line 2682, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -25830,7 +26027,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 2466, ../../../scss/_app_styles.scss */
+  /* line 2688, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;

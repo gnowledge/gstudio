@@ -39,17 +39,17 @@
         </div>
     </div>
     <div class="row notebook-body">
-        <div class="small-12 medium-3 notebook-index">
+        <div class="small-12 medium-3 columns notebook-index">
             <ul class="tabs" data-tab>
                 <li class="tab-title active"><a href="#all-notes">All Notes</a></li>
                 <li class="tab-title"><a href="#my-notes">My Notes</a></li>
                 <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
             </ul>
-            <div class="small-12 tabs-content">
+            <div class="small-12 columns tabs-content">
                 <div class="content active notes" id="all-notes">
                     <div class="date">
                         December 2015
-                        <span class="notes-count right">1</span>
+                        <span class="notes-count right">2</span>
                     </div>
                     <div class="note active">
                         <div class="note-heading"> Note Heading </div>
@@ -91,12 +91,114 @@
                     </div>
                 </div>
                 <div class="content notes" id="my-notes">
-                    <p>This is the second panel of the basic tab example. This is the second panel of the basic tab example.</p>
+                    <div class="content notes" id="all-notes">
+                        <div class="date">
+                            November 2015
+                            <span class="notes-count right">1</span>
+                        </div>
+                        <div class="note active">
+                            <div class="note-heading"> My Notes </div>
+                            <div class="note-meta">
+                                <span>Orange</span>
+                                &#8226;
+                                <span>28th Nov 2015</span>
+                                &#8226;
+                                <span>2am</span>
+                            </div>
+                            <div class="note-footer">
+                                <i class="fi-eye"></i>
+                                <span class="viewed-count">174</span>
+                                <i class="fi-like"></i>
+                                <span class="likes-count">160</span>
+                                <i class="fi-comments"></i>
+                                <span class="comment-count">242</span>
+                                <i class="fi-trash"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="content notes" id="my-drafts">
-                    <p>This is the third panel of the basic tab example. This is the third panel of the basic tab example.</p>
+
+                </div>
+            </div>
+        </div>
+        <div class="small-12 medium-9 columns note-page">
+            <div class="row note-toolbar">
+                <div class="small-9 columns">
+                    <i class="fi-torso"></i>
+                    <span class="note-creator">Madam X</span>
+                    &#8226;
+                    <span>25th Dec 2015</span>
+                </div>
+                <div class="small-3 columns creator-rating">
+                    <div>Your rating</div>
+                    <div>
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row note-content">
+                <div class="note-header">
+                    <span class="note-title">Note Heading</span>
+                    <div class="note-tags">
+                        <span>Tag1</span>
+                        <span>Tag2</span>
+                        <span>Tag3</span>
+                    </div>
+                </div>
+                <div class="note-text">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In at mattis tellus. Integer ac consectetur felis, et laoreet diam. Donec orci ex, fringilla non nibh eu, ornare dictum mi. In orci augue, mattis non arcu at, feugiat tincidunt mi. Nulla gravida leo non elementum fermentum. Nullam luctus sodales est in varius. Nulla et bibendum arcu, in tincidunt odio. Sed rhoncus placerat nunc, eget sollicitudin augue tempor a. Suspendisse ornare dignissim laoreet. Sed a cursus arcu. Etiam vitae semper quam. Maecenas pretium placerat enim non condimentum. Quisque dapibus turpis hendrerit tristique rutrum. Vestibulum maximus augue metus, nec gravida lorem dapibus id. Nulla tristique pharetra ipsum, quis vulputate magna tincidunt at. Duis elementum quam blandit lacus ultrices maximus. Morbi in sem at felis faucibus cursus. Donec arcu justo, fringilla nec scelerisque a, luctus ut nisl. Curabitur dictum felis sed nulla feugiat mattis. Fusce ac tortor eget arcu efficitur aliquam. Sed rutrum felis lacus, id congue mi sodales in. Mauris euismod massa elit.
+                </div>
+            </div>
+            <div class="comment-sections">
+                <div class="comments-header">
+                    <i class="fi-eye"></i>
+                    <span class="viewed-count"><b>214</b></span>
+                    views
+                    <i class="fi-like"></i>
+                    <span class="likes-count">10</span>
+                    likes
+                    <i class="fi-comments"></i>
+                    <span class="comment-count">22</span>
+                    comments
+                </div>
+                <div class="new-comment row">
+                    <div class="small-1 columns user-prof-image">
+                        <i class="fi-torso"></i>
+                    </div>
+                    <div class="small-9 columns">
+                        <textarea class="add-comment" ></textarea>
+                    </div>
+                    <div class="small-2 columns">
+                        <a href="#" id="postCommentBtn" class="button small">Post</a>
+                    </div>
+                </div>
+                <div class="row comments">
+                {% include "ndf/gcomment.html" %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    $(function() {
+        $(".add-comment").trumbowyg({
+            btns: ['viewHTML',
+              '|', 'formatting',
+              '|', 'btnGrp-design',
+              '|', 'link',
+              '|', 'insertImage',
+              '|', 'btnGrp-justify',
+              '|', 'btnGrp-lists'],
+            resetCss: true,
+            fullscreenable: false,
+            mobile: true,
+            tablet: true,
+            autoAjustHeight: true
+        });
+    })
+</script>

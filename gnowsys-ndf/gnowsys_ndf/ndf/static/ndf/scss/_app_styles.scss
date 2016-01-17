@@ -2295,70 +2295,292 @@ div.show-image:hover div.fullscreen-icon{
     }
 
   }
-  .notebook-index {
-    border-right: 1px solid #AFAEAE;
+  .notebook-body {
+    >div {
+      padding-top: 15px;
+      height: 50em;
+      overflow: scroll;
+    }
 
-    .tabs {
-      width: 100%;
+    .notebook-index {
+      border-right: 1px solid #AFAEAE;
 
-      .tab-title {
-        width: 33.33%;
+      .tabs {
+        width: 100%;
+
+        .tab-title {
+          width: 33.33%;
+        }
+      }
+
+      .notes {
+        .date {
+          font-size: 12px;
+          font-weight: bold;
+          background: #EFEFEF;
+          padding: 7px 10px;
+
+          .note-count {
+            font-size: 11px;
+            line-height: 2em;
+          }
+        }
+        >div {
+          border-bottom: 1px solid #AFAEAE;
+        }
+        .note {
+          padding: 5px 15px;
+          background: #EEEEEE;
+          cursor: pointer;
+
+          .note-heading {
+            font-weight: 400;
+            font-size: 17px;
+          }
+
+          .note-meta {
+            font-size: 13px;
+
+            >span:not(:first-child) {
+              font-size: 11px;
+              font-weight: 600;
+              color: #717171;
+            }
+          }
+
+          .note-footer {
+            color: #888888;
+
+            span {
+              margin-right:10px;
+            }
+          }
+
+          &.active {
+            border-left: 5px solid blue;
+            background: #FFF;
+
+            .note-heading {
+              font-weight: 800;
+              font-size: 17px;
+            }
+          }
+        }
       }
     }
 
-    .notes {
-      .date {
-        font-size: 12px;
-        font-weight: bold;
-        background: #EFEFEF;
-        padding: 7px 10px;
+    .note-page {
+      .note-toolbar {
+        .note-creator {
 
-        .note-count {
-          font-size: 11px;
-          line-height: 2em;
         }
-      }
-      >div {
-        border-bottom: 1px solid #AFAEAE;
-      }
-      .note {
-        padding: 5px 15px;
-        background: #EEEEEE;
-        cursor: pointer;
-
-        .note-heading {
-          font-weight: 400;
-          font-size: 17px;
-        }
-
-        .note-meta {
-          font-size: 13px;
-
-          >span:not(:first-child) {
-            font-size: 11px;
-            font-weight: 600;
-            color: #717171;
+        .creator-rating {
+          >div {
+            display: inline-block;
           }
         }
+      }
+      .note-content {
+        padding: 1em 3em 0em;
 
-        .note-footer {
-          color: #888888;
+        .note-header {
 
-          span {
-            margin-right:10px;
+          >div {
+            display: inline-block;
           }
-        }
-
-        &.active {
-          border-left: 5px solid blue;
-          background: #FFF;
-
-          .note-heading {
+          .note-title {
+            font-size: 1.5em;
             font-weight: 800;
-            font-size: 17px;
+            margin-right: 1em;
+          }
+          .note-tags {
+            span {
+              background: #ffebb2;
+              padding: 0.2em 0.7em;
+              display: inline-block;
+            }
           }
         }
       }
+
+      .comment-sections {
+        padding: 1em 3.5em 0em;
+
+        .comments-header {
+          span {
+            font-weight: bold;
+          }
+          i:not(:first-child) {
+            margin-left: 15px;
+          }
+        }
+
+        .new-comment {
+          border-top: 1px solid grey;
+          padding: 15px 10px;
+          margin-top: 5px;
+
+          .trumbowyg-box,
+          .trumbowyg-editor {
+            min-height: 200px;
+            margin-top: 0px;
+          }
+
+          .user-prof-image {
+            font-size: 90px;
+            line-height: 0em;
+          }
+        }
+      }
+    }
+  }
+
+}
+
+.gallery-page {
+  .gallery-header {
+    line-height: 3.5em;
+    background: #f0f0f0;
+    border-top: 1px solid #797979;
+    border-bottom: 1px solid #ababab;
+
+    .filters {
+
+    }
+
+    .search {
+      padding-top: 0.6em;
+    }
+
+    .side-heading {
+      font-size: 19px;
+
+      >div {
+        display: inline-block;
+        margin-right: 10px;
+      }
+    }
+  }
+  .gallery-panel {
+    background: #F7F7F7;
+
+    .gallery-content {
+      border-right: 1px solid grey;
+
+      .gallery-subheader {
+        line-height: 3em;
+        padding: 10px 0px;
+
+        a.upload-file {
+          margin: 0px;
+          font-size: 1em;
+        }
+
+        .gallery-actions {
+          font-size: 1.3em;
+          color: #999999;
+
+          >div {
+            display: inline-block;
+            margin-right: 10px;
+          }
+        }
+      }
+    }
+    .file-info-panel {
+      background: #fff;
+
+      .row {
+        margin: 10px 0px;
+      }
+
+      .file-name {
+        font-size: 20px;
+        font-weight: bold;
+        color: #666666;
+        margin: 10px 0px 20px;
+      }
+    }
+  }
+
+
+}
+
+.gallery-card {
+  .select-file {
+    vertical-align: top;
+  }
+
+
+  .file-item {
+    width: 80%;
+    color: #fff;
+    height: 12em;
+    text-align: center;
+    position: relative;
+    background: #fff;
+    border: 1px solid black;
+
+    .file-details {
+      margin-top: 10%;
+      display: none;
+    }
+
+    .file-actions {
+      display: none;
+      position: absolute;
+      bottom: 10%;
+      margin-bottom: 10%;
+      width: 100%;
+      font-size: 25px;
+
+      i {
+        margin: 0px 10px;
+      }
+    }
+
+    .filename-footer {
+      position: absolute;
+      bottom: 0px;
+      width: 100%;
+      height: 20%;
+      vertical-align: middle;
+      font-size: 1.4em;
+      font-weight: 600;
+      background: #999999;
+    }
+
+    &:hover {
+      background: #999999;
+
+      .file-details, .file-actions {
+        display: block;
+      }
+      .filename-footer {
+        display: none;
+      }
+    }
+  }
+
+}
+
+.user-comment {
+
+
+  .comment-heading {
+    color: #9C9C9C;
+    border-bottom: 1px solid grey;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+
+    >div {
+      display: inline-block;
+    }
+
+    .commentor-name span {
+      font-weight: bold;
+      color: #333333;
     }
   }
 }
