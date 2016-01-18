@@ -983,7 +983,6 @@ def add_page(request, group_id):
 
     if name not in collection_list:
         page_node = node_collection.collection.GSystem()
-
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page),groupid=group_id)
         page_node.status = u"PUBLISHED"
         page_node.save()

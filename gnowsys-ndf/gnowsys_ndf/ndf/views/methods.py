@@ -994,9 +994,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         changed = build_collection(node, check_collection, right_drawer_list, checked)
         if changed:
             is_changed = True
-
     #  org-content
-    type_of_val = request.POST.get('type_of','')
+    # type_of_val = request.POST.get('type_of','')
+    type_of_val = request.POST.getlist("type_of",'')
+
     wiki_page_gst = node_collection.one({'_type':'GSystemType', 'name': "Wiki page"},{'_id':1})
 
     '''
@@ -1004,6 +1005,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     As org-editor is used ONLY for Wiki pages 
     and rest everywhere ckeditor is used
     '''
+    if type_of_val:
+        node.type_of = [ObjectId(type_of_val[0])]
+        is_changed = True
+
     if type_of_val == str(wiki_page_gst._id):
         if node.content_org != content_org:
             node.content_org = unicode(content_org)
