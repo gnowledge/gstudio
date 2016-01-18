@@ -60,6 +60,9 @@
 		cursor: pointer;
 	}
 
+	#type_of{
+		height:36px;	
+	}
 {% endblock %}
 {% endcache %}
 
@@ -157,11 +160,29 @@
 
     	<div class="active content row contents" id="panel-name-description">
 
-      		<div class="medium-8 columns">
-		  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
-			</div>
-		
-			<!--  -->
+    	{% if node.pk %}
+	    	{% get_list_of_fields node.type_of "name" as type_of_list %}
+		   	{% if "Wiki page" in type_of_list  %}
+				<div class="medium-8 columns editor-div">
+			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
+				</div>
+			{% else %}
+				<div class="medium-8 columns editor-div">
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk %}		  
+				</div>
+			{% endif %}
+		{% else  %}
+			{% if title == "Page" %}
+				<div class="medium-8 columns editor-div org-editor">
+			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}		  
+				</div>
+			{% endif %}
+				<div class="medium-8 columns editor-div ck-editor hide">
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}		  
+				</div>
+				
+		{% endif %}
+
 			{% if ce_id %}
 				<input type="hidden" name="ce_id" value="{{ce_id}}">
 				<input type="hidden" name="res" value="{{res}}">
@@ -256,24 +277,22 @@
 		     		</div>
 
 		     		{% if title == "Page" and "Author" not in group_object.member_of_names_list %}
-		     		<div class = "page_type">
-		     			<div class="row">
-		     			 	<div class = "small-2 columns">	
-			     				<span  style="width: 70px; float: left;" >{% trans 'Page Type' %}:  </span>
- 							</div>
- 							<div class="small-8 columns" ends>
+	                <div class="row">
+	                	<div class="large-4 columns">
+	                		<label class="inline">{% trans "Page Type:" %}</label>
+	                    </div>
+	                	<div class="large-8 columns">
 					     			<select name="type_of" id="type_of">
 						  			{% for i in page_instance %}
 						  				{% if i.name == "Wiki page" %}	        				
-											<option value = {{i.pk}} selected> {% trans i.name %} </option>
+											<option value = {{i.pk}} selected>{{ i.name }}</option>
 
 										{% else %}
-											<option value = {{i.pk}} > {% trans i.name %} </option>
+											<option value = {{i.pk}}>{{ i.name }}</option>
 										{% endif %}
 			  						{% endfor %}
 								</select>
-							</div>
-						</div>	
+	                    </div>
 		     		</div>
 		     		{% endif %}
                     	                
@@ -653,6 +672,7 @@
 			}
 		})
 
+
 		$("select#release_resp_sel").change(function() {
 			$("select#interaction_type_sel").removeAttr("disabled");
 		})
@@ -824,6 +844,8 @@
 		$(".teaches_tab").hide();
 		$(".prior_node_tab").hide();
 		$("#metadata_info").empty();
+		
+    
 
 		if (nt == "Page" || nt == "File" || nt == "Pandora_video" || nt == "Concept")
 		{
@@ -843,7 +865,8 @@
 		{% if node %}
 			old_name = "{{node.name}}"
 		    old_name = old_name.toLowerCase();
-		    $("select[name='type_of'] option[value='{{node.type_of.0}}']").prop("selected", true);
+		    $("select#type_of option[value='{{node.type_of.0}}']").prop("selected", true);
+		    $("select#type_of").prop("disabled", true)
 			{% if is_auth_node %}
 				$("#name_id").attr("disabled",true)
 			{% endif %}
@@ -874,7 +897,9 @@
 			{% endif %}
 
 		{% endif %}
-
+		{% if title != "Page" %}
+			$(".ck-editor").removeClass("hide")
+		{% endif %}
 	});
 
 	$("input[type='radio'][name='col']").click(function() {
@@ -1345,6 +1370,7 @@
 	addTagBtn.onkeypress = addTag;
 
 	$("#save-node").click(function(event) {
+	
 		pn_arr = []
 		cn_arr = []
 		md_arr = [] //for adding module
@@ -1423,7 +1449,13 @@
     	{
           $("#message").css("display", "none");
 	    }
-
+		$("select#type_of").prop("disabled", false)
+	    if($("#type_of option:selected").text() == "Wiki page"){
+	    	$(".ck-editor").remove();
+	    }
+	    else{
+	    	$(".org-editor").remove();
+	    }
 		{% if not blog_type %}
 
 			{% get_site_name_from_settings as site_name %}
@@ -1450,6 +1482,8 @@
 			// {% endif %}
 		{% endif %}
 	    updateAllTags();
+
+
 	});
 
 
@@ -1540,12 +1574,24 @@
 	// 	lastVisitedLocationVal.push(mapZoom)
 	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
 	// });
-	function update()
-	{
-		$('#page_type').empty();
-		$('#page_type').append($('#type_of :selected').text());	
-		$('#select_page_type').foundation('reveal', 'close');
-	} 
+	// function update()
+	// {
+	// 	$('#page_type').empty();
+	// 	$('#page_type').append($('#type_of :selected').text());	
+	// 	$('#select_page_type').foundation('reveal', 'close');
+	// } 
+
+	$("select#type_of").change(function() {
+		sel_val_type_of = $("option:selected", this).text();
+		if(sel_val_type_of == "Wiki page"){
+			$(".ck-editor").addClass("hide");
+			$(".org-editor").removeClass("hide");
+		}
+		else{
+			$(".ck-editor").removeClass("hide");
+			$(".org-editor").addClass("hide");
+		}
+	})
 
 
 </script>

@@ -205,6 +205,17 @@ class Command(BaseCommand):
     # --- End of handle() ---
 
 
+def log_print(log_string):
+    try:
+        log_list.append(log_string)
+        print log_string
+
+    except:
+        error_message = '\n !! Error while doing log and print.\n\n'
+        print error_message
+        log_list.append(error_message)
+
+
 def create_user_nroer_team():
     '''
     Check for the user: "nroer_team". If it doesn't exists, create one.
@@ -222,8 +233,8 @@ def create_user_nroer_team():
     
         info_message += "\n- Created super user with following creadentials: "
         info_message += "\n\n\tusername = 'nroer_team', \n\tpassword = 'nroer_team', \n\temail = 'nroer_team@example.com', \n\tid = '" + str(nroer_team_id) + "'"
-        print info_message
-        log_list.append(info_message)
+
+        log_print(info_message)
 
 
 def get_user_id(user_name):
@@ -236,10 +247,10 @@ def get_user_id(user_name):
     try:
         user_obj = User.objects.get(username=user_name)
         return int(user_obj.id)
+
     except Exception as e:
         error_message = e + "\n!! for username: " + user_name
-        print error_message
-        log_list.append(str(error_message))
+        log_print(error_message)
         return False
 
 
@@ -374,14 +385,13 @@ def parse_data_create_gsystem(json_file_path):
 
     except Exception as e:
         error_message = "\n!! While parsing the file ("+json_file_path+") got following error...\n " + str(e)
-        log_list.append(str(error_message))
+        log_print(error_message)
         raise error_message
 
     for i, json_document in enumerate(json_documents_list):
       
         info_message = "\n\n\n********** Processing row number : ["+ str(i + 2) + "] **********"
-        print info_message
-        log_list.append(str(info_message))
+        log_print(info_message)
         
         try:
 
@@ -472,12 +482,10 @@ def parse_data_create_gsystem(json_file_path):
                 temp_node.reload()
 
                 info_message = "\n\n- Update to language of resource: " + str(update_res)
-                print info_message
-                log_list.append(info_message)
+                log_print(info_message)
 
                 info_message = "\n\n- Now language of resource updates to: " + str(temp_node.language)
-                print info_message
-                log_list.append(info_message)
+                log_print(info_message)
             # print "============= lang :", temp_node.language
 
             # ----- END of updating language -----
@@ -500,8 +508,10 @@ def parse_data_create_gsystem(json_file_path):
 
             if thumbnail_url and nodeid:
                 try:
-                    print "\n\n- Attaching thumbnail to resource\n"
+                    info_message = "\n\n- Attaching thumbnail to resource\n"
+                    log_print(info_message)
                     attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document, i)
+
                 except Exception, e:
                     print e
 
@@ -543,8 +553,7 @@ def parse_data_create_gsystem(json_file_path):
                                 # print "key : ", key, "\nvalue : ",json_document[key]
 
                                 info_message = "\n- For GAttribute parsing content | key: '" + attr_key + "' having value: '" + json_document[key]  + "'"
-                                print info_message
-                                log_list.append(str(info_message))
+                                log_print(info_message)
 
                                 cast_to_data_type(json_document[key], attr_value['data_type'])
 
@@ -583,22 +592,19 @@ def parse_data_create_gsystem(json_file_path):
                                 ga_node = None
 
                                 info_message = "\n- Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
-                                # print info_message
-                                log_list.append(str(info_message))
+                                log_print(info_message)
 
                                 ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
                                 
                                 info_message = "- Created ga_node : "+ str(ga_node.name) + "\n"
-                                print info_message
-                                log_list.append(str(info_message))
+                                log_print(info_message)
                                 
                                 # To break outer for loop as key found
                                 break
 
                             else:
                                 error_message = "\n!! DataNotFound: No data found for field ("+str(attr_key)+") while creating GSystem ( -- "+str(node.name)+")\n"
-                                print error_message
-                                log_list.append(str(error_message))
+                                log_print(error_message)
 
                         # ---END of if (key == attr_key)
 
@@ -608,8 +614,7 @@ def parse_data_create_gsystem(json_file_path):
                 if not relation_list:
                     # No possible relations defined for this node
                     info_message = "\n!! ("+str(node.name)+"): No possible relations defined for this node.\n"
-                    print info_message
-                    log_list.append(str(info_message))
+                    log_print(info_message)
                     return
 
                 gst_possible_relations_dict = node.get_possible_relations(file_gst._id)
@@ -652,8 +657,7 @@ def parse_data_create_gsystem(json_file_path):
 
                                 else:
                                     error_message = "\n!! While creating teaches rel: Any one of the item in hierarchy"+ str(json_document[key]) +"does not exist in Db. \n!! So relation: " + str(key) + " cannot be created.\n"
-                                    print error_message
-                                    log_list.append(error_message)
+                                    log_print(error_message)
                                     break
                               
                             # sometimes direct leaf-node may be present without hierarchy and ":"
@@ -665,8 +669,7 @@ def parse_data_create_gsystem(json_file_path):
 
                             # print "\n----------", json_document[key]
                             info_message = "\n- For GRelation parsing content | key: " + str(rel_key) + " -- " + str(json_document[key])
-                            print info_message
-                            log_list.append(str(info_message))
+                            log_print(info_message)
                             # print list(json_document[key])
 
                             # perform_eval_type(key, json_document, "GSystem", "GSystem")
@@ -709,36 +712,32 @@ def parse_data_create_gsystem(json_file_path):
                                         right_subject_id_or_list.append(n.right_subject)
 
                                 info_message = "\n- Creating GRelation ("+ str(node.name)+ " -- "+ str(rel_key)+ " -- "+ str(right_subject_id_or_list)+") ..."
-                                print info_message
-                                log_list.append(str(info_message))
+                                log_print(info_message)
                                 
                                 gr_node = create_grelation(subject_id, relation_type_node, right_subject_id_or_list)
                                                           
                                 info_message = "\n- Grelation processing done.\n"
-                                print info_message
-                                log_list.append(str(info_message))
+                                log_print(info_message)
 
                             # To break outer for loop if key found
                             break
 
                         else:
                             error_message = "\n!! DataNotFound: No data found for relation ("+ str(rel_key)+ ") while creating GSystem (" + str(file_gst.name) + " -- " + str(node.name) + ")\n"
-                            print error_message
-                            log_list.append(str(error_message))
+                            log_print(error_message)
 
                             break
 
               # print relation_list
             else:
                 info_message = "\n!! Either resource is already created or file is already saved into gridfs/DB or file not found"
-                print info_message
-                log_list.append(str(info_message))
+                log_print(info_message)
 
                 continue
+
         except Exception as e:
             error_message = "\n While creating ("+str(json_document['name'])+") got following error...\n " + str(e)
-            print error_message # Keep it!
-            log_list.append(str(error_message))
+            log_print(error_message)
 
 
 def create_thread_obj(node_id):
@@ -774,12 +773,11 @@ def create_thread_obj(node_id):
             node_obj.reload()
             # print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
             info_message = "\n- Successfully created thread obj - " + thread_obj._id.__str__() +" for - " + node_obj._id.__str__()
-            print info_message
-            log_list.append(str(info_message))
+            log_print(info_message)
+
     except Exception as e:
         info_message = "\n- Error occurred while creating thread obj for - " + node_obj._id.__str__() +" - " + str(e)
-        print info_message
-        log_list.append(str(info_message))
+        log_print(info_message)
 
 
 def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
@@ -795,17 +793,18 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
     filename = resource_link.split("/")[-1]  # actual download file name with extension. e.g: neuron.jpg 
 
     info_message = "\n- Fetching resource from : '" + resource_link + "'"
-    print info_message
-    log_list.append(info_message)
+    log_print(info_message)
+
     print "  (Might take some time. please hold on ...)\n"
 
     try:
         files = urllib2.urlopen(resource_link)
-        print "  Fetched the resource successfully!\n"
+        info_message = "  Fetched the resource successfully!\n"
+        log_print(info_message)
 
     except urllib2.URLError, e:
         error_message = "\n!! File Not Found at: " + resource_link
-        log_list.append(error_message)
+        log_print(error_message)
 
         file_not_found_msg = "\nFile with following details not found: \n"
         file_not_found_msg += "- Row No   : " + str(row_no) + "\n"
@@ -831,19 +830,6 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
     usrname = "nroer_team"
 
     filemd5 = hashlib.md5(files.read()).hexdigest()
-    # size, unit = getFileSize(files)
-    # size = {'size':round(size, 2), 'unit':unicode(unit)}
-    
-    # fcol = get_database()[File.collection_name]
-    # fileobj = fcol.File()
-
-    # fileobj = node_collection.collection.File()
-
-    # there can be two different files with same name.
-    # e.g: "The Living World" exists with epub, document, audio etc.
-    # hence not to check by name.
-    # check_obj_by_name = node_collection.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
-    # print "\n====", check_obj_by_name, "==== ", fileobj.fs.files.exists({"md5":filemd5})
 
     check_file_in_gridfs = gridfs_collection.find_one({"md5": filemd5})
     # even though file resource exists as a GSystem or in gridfs return None
@@ -863,16 +849,14 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
         # elif cur_oid:
         info_message = "\n- Resource file exists in gridfs having id: '" + \
         str(check_file_in_gridfs["_id"]) + "'"
-        print info_message
-        log_list.append(str(info_message))
+        log_print(info_message)
 
         if update_file_exists_in_gridfs:
             file_obj = node_collection.one({'_type': 'File', 'fs_file_ids': {'$in': [ObjectId(check_file_in_gridfs['_id'])]} })
 
             if file_obj:
                 info_message = "\n- Returning file _id despite of having in gridfs"
-                print info_message
-                log_list.append(str(info_message))
+                log_print(info_message)
 
                 return file_obj._id
 
@@ -894,8 +878,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
 
         fileobj_oid, video = save_file(files, name, userid, group_set_id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
         # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
-        # filetype = magic.from_buffer(files.read(100000), mime = 'true')  # Gusing filetype by python-magic
-
+        
         node_collection.collection.update(
                                 {'_id': ObjectId(fileobj_oid)},
                                 {'$push': {'origin': {'csv-import': 'save_file'} }},
@@ -907,8 +890,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
         print "\n ===================================\n\n"
 
         info_message = "\n- Created resource/GSystem object of name: '" + unicode(name) + "' having ObjectId: " + unicode(fileobj_oid) + "\n- Saved resource into gridfs. \n"
-        log_list.append(info_message)
-        print info_message
+        log_print(info_message)
 
         # print "\n----------", fileobj
         return fileobj_oid
@@ -941,14 +923,14 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     # print "~~~~~~~~~~", ObjectId(node_id), " : ", has_thumbnail_rt, " : ", ObjectId(th_id)
     
     info_message = "\n- Creating GRelation ("+ str(node_id)+ " -- has_thumbnail -- "+ str(th_id)+") ..."
-    print info_message
-    log_list.append(str(info_message))
+    log_print(info_message)
 
-    create_grelation(ObjectId(node_id), has_thumbnail_rt, ObjectId(th_id))
+    print '\n Created/Updated GRelation Object:\n'
+    print create_grelation(ObjectId(node_id), has_thumbnail_rt, ObjectId(th_id))
+    print '\n\n'
 
     info_message = "\n- Grelation processing done for has_thumbnail.\n"
-    print info_message
-    log_list.append(str(info_message))
+    log_print(info_message)
 
     # # print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
     # node_fs_file_ids = node_obj.fs_file_ids
