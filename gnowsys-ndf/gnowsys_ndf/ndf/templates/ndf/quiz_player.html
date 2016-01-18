@@ -1,6 +1,7 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
+{% get_user_quiz_resp node request.user as user_sub_ans %}
 
 <style type="text/css">
 	.quiz_qtn{
@@ -34,6 +35,7 @@
 <div class="row">
 
 	<fieldset>
+
 	    <legend >
 	    	<span>Question</span>
 			{% check_is_gstaff groupid request.user as is_gstaff %}
@@ -49,13 +51,14 @@
 					{% if node.quiz_type == "Single-Choice" %}
 						{% for each_opt in node.options %}
 							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
-							{% if forloop.counter in node.correct_answer %}
+							{% if each_opt in node.correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
 							{% endif %}
 							<br/>
 						{% endfor %}
+						{% comment %}
 						<div class="row">
 							{% if node.quizitem_check_answer %}
 								<input type="button" value="Check" class="button tiny check-ans radius check-btn">
@@ -64,29 +67,31 @@
 								<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
 							{% endif %}
 						</div>
+						{% endcomment %}
 					{% elif node.quiz_type == "Multiple-Choice" %}
 						{% for each_opt in node.options %}
 							<input type="checkbox" name="quiz_ans" value="{{each_opt}}"
-							{% if forloop.counter in node.correct_answer %}
+							{% if each_opt in node.correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice"  id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
 							{% endif %}
 							<br/>
 						{% endfor %}
-						<div class="row">
-							{% if node.quizitem_check_answer %}
-								<input type="button" value="Check" class="button tiny check-ans radius check-btn">
-							{% endif %}
-							{% if node.quizitem_show_correct_ans %}
-								<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
-							{% endif %}
-						</div>
 					{% elif node.quiz_type == "Short-Response" %}
 						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt"></textarea>
 						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
 					{% endif %}
-					<input type="button" value="Submit" class="small button radius right submit-btn">
+					<div class="row">
+						{% if node.quizitem_check_answer %}
+							<input type="button" value="Check" class="button tiny check-ans radius check-btn">
+						{% endif %}
+						{% if node.quizitem_show_correct_ans %}
+							<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
+						{% endif %}
+						<input type="button" value="Submit" class="tiny button radius submit-btn">
+					</div>
+
 				</div>
 			</div>
 		</div>
@@ -94,6 +99,11 @@
 </div>
 
 <script type="text/javascript">
+	user_sub_ans_list = {{user_sub_ans|jsonify|safe}}
+
+	$(document).ready(function() {
+		display_sub_ans()
+	})
 
 	$(".check-btn").click(function(){
 		{% if node.quiz_type == "Multiple-Choice" %}
@@ -105,9 +115,9 @@
 		if($(this).val() == "Check"){
 			if( selected_ans.length > 0){
 				all_ans = user_ans()
-				save_user_action("check",all_ans)
 				$(".check-btn").val("Clear")
 				$(".show-ans-btn").removeClass("hide")
+				save_user_action("check",all_ans)
 			}
 			else{
 				alert("Please select an answer")
@@ -115,8 +125,17 @@
 		}
 		else if ($(this).val() == "Clear"){
 			hide_options();
+			display_sub_ans()
 		}
 	})
+
+	function display_sub_ans(){
+		user_ans_list = user_sub_ans_list
+		$.each(user_ans_list,function(ind,each_opt_val){
+			$("#"+each_opt_val).prop("checked", true)
+		})
+	}
+
 	function user_ans(){
 		list_name = []
 		$.each($('.choice:checked'), function(a,b){
@@ -185,8 +204,7 @@
           dataType: "json",
 
           success: function(data){
-      		window.location.replace("{{group_id}}")
-      		// window.history.pushState("", "", "/{{group_id}}"+"?selected={{node.prior_node.0}}");
+          	user_sub_ans_list = user_given_ans
           },
         });//end of ajax
 

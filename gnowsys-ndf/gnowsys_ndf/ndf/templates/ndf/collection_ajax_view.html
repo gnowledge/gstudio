@@ -58,6 +58,10 @@
         function(e) {
             var node = e.node;
             var node_id = node.id;
+
+            var tree_build = $(".collection").not(".jqtree-loading");
+            selected_node = tree_build.tree('getNodeById', url);
+            
             if (arr.indexOf(node_id) < 0){
               arr.push(node_id);  
             }

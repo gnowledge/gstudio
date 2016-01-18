@@ -3205,19 +3205,13 @@ def get_event_status(node):
             status_msg = "CLOSED"
 	return status_msg
 
+
 @get_execution_time
 @register.assignment_tag
-def get_node_page_type(node_id=None):
-	print "\n\n\n\n+++++++++++++++arg",node_id
-	node_page_type_list = []
-	if node_id:
-		node = node_collection.one({'_id': ObjectId(node_id)})
-		node_type_of = node.type_of 
-		if node_type_of:
-			for each_node_type_of in node_type_of:
-				node_type_of_name = node_collection.one({'_id': each_node_type_of})
-				node_page_type_list.append(node_type_of_name.name)
-	return node_page_type_list
-
-
-
+def get_user_quiz_resp(node_obj, user_obj):
+	if node_obj and user_obj:
+		thread_obj = get_relation_value(node_obj._id,'has_thread')
+		qip = node_collection.find_one({'_id': {'$in':thread_obj[0].post_node}, 'created_by': user_obj.id})
+		qip_sub = get_attribute_value(qip._id,'quizitempost_user_submitted_ans')
+		recent_ans = qip_sub[-1]
+		return recent_ans.values()[0]
