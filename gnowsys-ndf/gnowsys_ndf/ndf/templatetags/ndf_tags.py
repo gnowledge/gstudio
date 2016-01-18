@@ -675,7 +675,6 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 
 		if fields_value:
 			for each in fields_value:
-				
 				if type(each) == ObjectId:
 					fields_value_id_list.append(each)
 				else:
@@ -683,7 +682,6 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 
 		if types in alltypes:
 			for each in node_collection.find({"_type": types}):
-
 				if fields_value_id_list:
 					if each._id not in fields_value_id_list:
 						drawer1[each._id] = each
