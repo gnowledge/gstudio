@@ -155,6 +155,24 @@
           <!-- To enter name of the page -->
           <div class="small-12 columns">
             <input class="name_id" name="name" type="text" placeholder="Enter name ...">
+            <div class="row">
+                  <div class="large-4 columns">
+                    <label class="inline">{% trans "Page Type:" %}</label>
+                    </div>
+                  <div class="large-8 columns">
+                  <select name="type_of" id="type_of">
+                  {% for i in page_instance %}
+                    {% if i.name == "Wiki page" %}                  
+                    <option value = {{i.pk}} selected>{{ i.name }}</option>
+
+                  {% else %}
+                    <option value = {{i.pk}}>{{ i.name }}</option>
+                  {% endif %}
+                  {% endfor %}
+              </select>
+                    </div>
+            </div>
+
           </div>              
           <div class="small-12 columns">
             <input type="submit" id="add_page" value="Save Page" class="tiny  button"/>
@@ -394,6 +412,7 @@
             css_node: "{{css_node.pk}}",
             unit_name: unit_name,
             context_name: "Course",
+            type_of: $("#type_of option:selected").val(),
             csrfmiddlewaretoken: '{{ csrf_token }}'
           },
           success: function(data) {
