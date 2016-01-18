@@ -63,7 +63,7 @@
 <div id="list_drawer" style="border-spacing:0px;">
   {#% edit_drawer_widget fields_name groupid node %#}
 
-  {% list_widget fields_name fields_type fields_value %}
+  {% list_widget fields_name fields_type fields_value  %}
   {% if fields_name in field_type_list %}
   <input id="{{fields_name}}_type" type="hidden" name="{{fields_name}}" value="" />
   <script type="text/javascript">
@@ -82,6 +82,7 @@
   {% endif %}
 </div>
 
+
 {% elif fields_type == "int" %}
 <div style="display:table-cell;">
   <font size="3"> <input type="number" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
@@ -90,7 +91,7 @@
 {% elif fields_name == "subject_applicable_nodetype" or fields_name == "object_applicable_nodetype" or fields_name == "data_type" %}
 <div id="list_drawer" >
   {#% edit_drawer_widget fields_name groupid node %#}
-  {% list_widget fields_name fields_type fields_value %}
+  {% list_widget fields_name fields_type fields_value  %}
 </div>
 
 {% else %}
@@ -99,4 +100,3 @@
 </div>
 
 {% endif %}
-

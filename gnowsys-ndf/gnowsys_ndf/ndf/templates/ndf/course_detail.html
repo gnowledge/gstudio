@@ -13,12 +13,12 @@
 {% block style %}
   {{block.super}}
 
-  .fi-trash:hover{
-    color:red;
-  }
-
   .name-section{
     height:80px;
+  }
+
+  #alertModalLabel{
+    color:black;
   }
 {% endblock %}
 
@@ -74,13 +74,15 @@
       {% if is_gstaff %}
         <span><a class="tiny publish-btn radius button" href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{node.pk}}">{% trans "Announce" %}</a></span>
         <span><a class="tiny radius button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+        <span><a class="tiny fi-trash radius button">{% trans "Delete" %}</a></span>
+
       {% endif %}
     {% endif %}
   </section>
 </header>
 
 <div class="row">
-  {% with node.html_content|safe as description %}
+  {% with node.content|safe as description %}
   {% if description != "None" %}
   {{ description }}
   {% endif %}
@@ -101,7 +103,6 @@
       $("#alertModalLabel").text(lbl_msg);
       $("#alertModal")
         .removeClass("medium").addClass("small")
-        .addClass("alert")
       $("#alertModal").foundation('reveal', 'open');
     });
 
@@ -138,16 +139,12 @@
       alert(node.id);
     }
     );
-    {% user_access_policy groupid request.user as user_access %}
-    {% if user_access == "allow" %}
-        {% if node_type == "Course" %}
-
-          {% if not course_structure_exists %}
-            $("#view_page").append("<label>{% trans 'You have not added any content to this course yet' %}</label>")
-          {% endif %}
-        {% endif %}
-        $("#view_collection").find("b.current").after('&nbsp;&nbsp;<span><a class="fi-pencil" href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span>&nbsp;&nbsp;<span><a class="fi-trash">{% trans "Delete" %}</a></span>')
+    {% if node_type == "Course" %}
+      {% if not course_structure_exists %}
+        $("#view_page").append("<label>{% trans '* Note: You have not added any resources to this course yet' %}</label>")
+      {% endif %}
     {% endif %}
+
 {% endblock %}
 
 

@@ -113,6 +113,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         options = []
 
     class_structure = eval(class_name).structure
+
     required_fields = eval(class_name).required_fields
 
 
@@ -172,9 +173,9 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                         new_instance_type[key] = listoflist
                     else :
                         listoflist = []
-                        print "key __ " , key
+                        
                         for each in request.POST.get(key,"").split(","):
-                            print "each ", each
+                            
                             listoflist.append(ObjectId(each))
                         new_instance_type[key] = listoflist
 
@@ -197,12 +198,9 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                     new_instance_type[key] = int(request.POST.get(key,""))
 
             else: 
-                # print key, " === ", value
+
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"")
-                    # print type(value)
-                    # print new_instance_type
-                    # print new_instance_type[key]
 
         user_id = request.user.id
         if not new_instance_type.has_key('_id'):
@@ -267,6 +265,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
             newdict[key] = [value, new_instance_type[key]]
 
     class_structure = newdict
+
     groupid = ""
     group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
@@ -281,14 +280,16 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         for key, value in class_structure.items():
             class_structure_with_values[key] = [class_structure[key][0], new_instance_type[key]]
 
+
         variable = RequestContext(request, {'node': new_instance_type,
                                             'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
                                             'options': options, 'required_fields': required_fields,"translate":translate,"lan":LANGUAGES,
-                                            'groupid': groupid,'group_id':groupid
+                                            'groupid': groupid,'group_id':groupid 
                                         })
-    else:
-        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid})
 
-    #print variable
+    else:
+
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid })
+      
     return render_to_response(template, variable)

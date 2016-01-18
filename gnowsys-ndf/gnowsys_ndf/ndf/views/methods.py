@@ -850,6 +850,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     else:
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
+        # print "\n\n\n content_org",content_org
         tags = request.POST.get('tags','')
     language = request.POST.get('lan')
     license = request.POST.get('license')
@@ -995,6 +996,30 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
             is_changed = True
 
     #  org-content
+    type_of_val = request.POST.get('type_of','')
+    wiki_page_gst = node_collection.one({'_type':'GSystemType', 'name': "Wiki page"},{'_id':1})
+
+    '''
+    Exceptional case for "Wiki pages".
+    As org-editor is used ONLY for Wiki pages 
+    and rest everywhere ckeditor is used
+    '''
+    if type_of_val == str(wiki_page_gst._id):
+        if node.content_org != content_org:
+            node.content_org = unicode(content_org)
+
+            # Required to link temporary files with the current user who is
+            # modifying this document
+            usrname = request.user.username
+            filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+            node.content = unicode(org2html(content_org, file_prefix=filename))
+            is_changed = True
+    else:
+        if node.content != content_org:
+            node.content = unicode(content_org)
+            is_changed = True
+
+    '''
     if node.content_org != content_org:
         node.content_org = unicode(content_org)
 
@@ -1002,8 +1027,27 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         # modifying this document
         usrname = request.user.username
         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-        node.content = unicode(org2html(content_org, file_prefix=filename))
+        
+        node_page_type_list = []
+        if node.get("_id",None):  
+            get_node = node_collection.one({'_id': ObjectId(node._id)})
+            node_type_of = get_node.type_of 
+            if node_type_of:
+              for each_node_type_of in node_type_of:
+                node_type_of_name = node_collection.one({'_id': each_node_type_of})
+                node_page_type_list.append(node_type_of_name.name)
+
+        # org editor for wiki page and ckeditor for blog and info pages
+        if node_page_type_list:
+          if "Wiki page" in node_page_type_list:
+            node.content = unicode(org2html(content_org, file_prefix=filename))
+          else:
+            node.content = unicode(content_org)
+        else:
+          node.content = unicode(org2html(content_org, file_prefix=filename))
         is_changed = True
+    '''
+          
 
     # visited_location in author class
     if node.location != map_geojson_data:

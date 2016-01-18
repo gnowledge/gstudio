@@ -242,7 +242,8 @@ def uDashboard(request, group_id):
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
-            old_profile_pics.append(n)
+            if n not in old_profile_pics:
+                old_profile_pics.append(n)
 
     forum_create_rate = forum_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
     file_create_rate = file_cur.count() * GSTUDIO_RESOURCES_CREATION_RATING
@@ -588,6 +589,7 @@ def upload_prof_pic(request, group_id):
         file_uploaded = request.FILES.get("has_profile_pic", "")
         choose_from_existing_pic = request.POST.get("old_pic_ele","")
         has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
+        warehouse_grp_obj = node_collection.one({'_type': "Group", 'name': "warehouse"})
         if file_uploaded:
             fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
             if fileobj:
@@ -595,13 +597,19 @@ def upload_prof_pic(request, group_id):
                 # The 'if' below is required in case file node is deleted but exists in grid_fs
                 if profile_pic_image:
                     gr_node = create_grelation(group_obj._id, has_profile_pic_rt, profile_pic_image._id)
+                    # Move fileobj to "Warehouse" group 
+                    node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
                 else:
                     success_state = False
         elif choose_from_existing_pic:
             # update status of old GRelation
             profile_pic_image = node_collection.one({'_id': ObjectId(choose_from_existing_pic)})
             gr_node = create_grelation(group_obj._id, has_profile_pic_rt, profile_pic_image._id)
+            # Move fileobj to "Warehouse" group 
+            if warehouse_grp_obj._id not in profile_pic_image.group_set:
+                node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
             group_obj.reload()
+
         if user:
             group_id = user
         return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
