@@ -45,7 +45,7 @@
 			<font size="3"> {{list}} </font> 
 			</div>
 
-{% get_input_fields class_structure|get_dict_item:list list translate class_name %}
+{% get_input_fields class_structure|get_dict_item:list list translate  %}
 
 </div>
 {% endif %}
@@ -64,13 +64,13 @@
 	<dd class="accordion-navigation">
 		<a href="#definitionlist">Definition</a>
 		<div id="definitionlist" class="content active">
-			{% for list in definitionlist %}
+		{% for list in definitionlist %}
 			{% if translate and list != "language" %}
 			<div style="display:table-row;">
-	<div style="display:table-cell;"> 
-		<font size="3"> {{list}}</font> 
-	</div>
-	{% get_input_fields class_structure|get_dict_item:list list translate class_name %}
+				<div style="display:table-cell;"> 
+					<font size="3"> {{list}}</font> 
+				</div>
+	{% get_input_fields class_structure|get_dict_item:list list translate  %}
 	{% if list in  required_fields %}
 	<div style="display:table-cell;">
 					<font size="3" color="red"> * </font>
@@ -83,9 +83,9 @@
 			{% if not translate %}
 			<div style="display:table-row;">
 				<div style="display:table-cell;"> 
-		<font size="3"> {{list}} </font> 
+					<font size="3"> {{list}} </font> 
 				</div>
-				{% get_input_fields class_structure|get_dict_item:list list translate class_name %}
+				{% get_input_fields class_structure|get_dict_item:list list translate  %}
 				{% if list in  required_fields %}
 				<div style="display:table-cell;">
 					<font size="3" color="red"> * </font>
@@ -138,7 +138,7 @@
 	<div style="display:table-cell;"> 
 		<font size="3"> {{list}}</font> 
 	</div>
-	{% get_input_fields class_structure|get_dict_item:list list translate class_name %}
+	{% get_input_fields class_structure|get_dict_item:list list translate  %}
 			</div>
 			{% endfor %}
 		</div>
@@ -151,7 +151,7 @@
 				<div style="display:table-cell;"> 
 					<font size="3"> {{list}}</font> 
 				</div>
-				{% get_input_fields class_structure|get_dict_item:list list translate class_name %}
+				{% get_input_fields class_structure|get_dict_item:list list translate  %}
 			</div>
 			{% endfor %}
 		</div>
