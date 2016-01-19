@@ -6093,3 +6093,22 @@ def show_coll_cards(request, group_id):
                 'coll_objs': coll_objs, 'node': node
             },
             context_instance=RequestContext(request))
+
+
+
+def get_views_count(request, group_id):
+    response_dict = {}
+    response_dict['success'] = False
+    try:
+      curr_url = request.GET.get('curr_url')
+      benchmark_collection = db[Benchmark.collection_name]
+      total_views = benchmark_collection.find({'calling_url': unicode(curr_url)},{'name':1})
+      response_dict['total_views'] = total_views.count()
+      if request.user.is_authenticated():
+        username = request.user.username
+        user_views = total_views.where("this.user =='"+str(username)+"'")
+        response_dict['user_views'] = user_views.count()
+      response_dict['success'] = True
+      return HttpResponse(json.dumps(response_dict))
+    except:
+      return HttpResponse(json.dumps(response_dict))
