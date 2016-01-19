@@ -3220,11 +3220,3 @@ def get_user_quiz_resp(node_obj, user_obj):
 		recent_ans = qip_sub[-1]
 		return recent_ans.values()[0]
 
-@get_execution_time
-@register.assignment_tag
-def get_node_views(request, node_obj):
-	# print "\n\n request", request.META.PATH_INFO
-	benchmark_collection = db[Benchmark.collection_name]
-	cursor = benchmark_collection.find({'name':node_obj.url,'calling_url':{'$regex':str(node_obj.url) + "/"+str(node_obj._id)}})
-	print "\n\n cursor.count() --- ",cursor.count()
-	return cursor.count()
