@@ -1009,17 +1009,17 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         node.type_of = [ObjectId(type_of_val[0])]
         is_changed = True
 
-    if type_of_val == str(wiki_page_gst._id):
-        if node.content_org != content_org:
-            node.content_org = unicode(content_org)
+    # if type_of_val == str(wiki_page_gst._id):
+    #     if node.content_org != content_org:
+    #         node.content_org = unicode(content_org)
 
-            # Required to link temporary files with the current user who is
-            # modifying this document
-            usrname = request.user.username
-            filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-            node.content = unicode(org2html(content_org, file_prefix=filename))
-            is_changed = True
-    else:
+    #         # Required to link temporary files with the current user who is
+    #         # modifying this document
+    #         usrname = request.user.username
+    #         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+    #         node.content = unicode(org2html(content_org, file_prefix=filename))
+    #         is_changed = True
+    if content_org:
         if node.content != content_org:
             node.content = unicode(content_org)
             is_changed = True

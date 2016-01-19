@@ -159,34 +159,15 @@
   	<div id="node-details-edit-div" class="tabs-content" > 
 
     	<div class="active content row contents" id="panel-name-description">
-
-    	{% if node.pk %}
-	    	{% get_list_of_fields node.type_of "name" as type_of_list %}
-		   	{% if "Wiki page" in type_of_list  %}
-				<div class="medium-8 columns editor-div">
-			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
-				</div>
-			{% else %}
-				<div class="medium-8 columns editor-div">
-			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk %}		  
-				</div>
-			{% endif %}
-		{% else  %}
-			{% if title == "Page" %}
-				<div class="medium-8 columns editor-div org-editor">
-			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}		  
-				</div>
-			{% endif %}
-				<div class="medium-8 columns editor-div ck-editor hide">
-			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}		  
-				</div>
-				
-		{% endif %}
+		<div class="medium-8 columns editor-div">
+	  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk %}		  
+		</div>
 
 			{% if ce_id %}
 				<input type="hidden" name="ce_id" value="{{ce_id}}">
 				<input type="hidden" name="res" value="{{res}}">
 			{% endif %}
+
 			{% if program_res %}
 				<input type="hidden" name="program_res" value="{{program_res}}">
 			{% endif %}
@@ -866,7 +847,7 @@
 			old_name = "{{node.name}}"
 		    old_name = old_name.toLowerCase();
 		    $("select#type_of option[value='{{node.type_of.0}}']").prop("selected", true);
-		    $("select#type_of").prop("disabled", true)
+		    // $("select#type_of").prop("disabled", true)
 			{% if is_auth_node %}
 				$("#name_id").attr("disabled",true)
 			{% endif %}
@@ -1384,7 +1365,7 @@
 		// 	event.preventDefault();
 
 		// }
-		$("#type_of").removeAttr("disabled")
+		// $("#type_of").removeAttr("disabled")
  		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
 				pn_arr.push($(this).val());
@@ -1580,7 +1561,7 @@
 	// 	$('#page_type').append($('#type_of :selected').text());	
 	// 	$('#select_page_type').foundation('reveal', 'close');
 	// } 
-
+	/*
 	$("select#type_of").change(function() {
 		sel_val_type_of = $("option:selected", this).text();
 		if(sel_val_type_of == "Wiki page"){
@@ -1592,6 +1573,7 @@
 			$(".org-editor").addClass("hide");
 		}
 	})
+	*/
 
 
 </script>
