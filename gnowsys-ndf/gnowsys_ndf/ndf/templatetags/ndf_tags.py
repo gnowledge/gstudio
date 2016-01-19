@@ -625,11 +625,13 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 
 @get_execution_time
 @register.inclusion_tag('tags/dummy.html')
-def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
+def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
+	
 	drawer1 = {}
 	drawer2 = None
-	groupid = ""
+	# groupid = ""
 	group_obj = node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+	admin_related_drawer = True
 
 	if group_obj:
 		groupid = str(group_obj[0]._id)
@@ -702,7 +704,8 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 				if each_node:
 					drawer2.append(each_node)
 
-		return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid, 'groupid': groupid}
+	
+		return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid,'groupid': groupid, 'admin_related_drawer': admin_related_drawer }
 
 
 @get_execution_time
@@ -1842,13 +1845,15 @@ def get_policy(group, user):
 
 @get_execution_time
 @register.inclusion_tag('ndf/admin_fields.html')
-def get_input_fields(fields_type,fields_name,translate=None):
+def get_input_fields(fields_type, fields_name, translate=None ):
 	"""Get html tags 
 	"""
 	field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
-	return {'template': 'ndf/admin_fields.html', 
-					"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
-					"field_type_list":field_type_list,"translate":translate}
+	return {"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
+					"field_type_list":field_type_list,"translate":translate }
+	# return {'template': 'ndf/admin_fields.html', 
+	# 				"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
+	# 				"field_type_list":field_type_list,"translate":translate}
 	
 
 @get_execution_time
