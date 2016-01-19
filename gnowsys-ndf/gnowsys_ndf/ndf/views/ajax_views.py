@@ -6097,18 +6097,25 @@ def show_coll_cards(request, group_id):
 
 
 def get_views_count(request, group_id):
-    response_dict = {}
-    response_dict['success'] = False
-    try:
-      curr_url = request.GET.get('curr_url')
-      benchmark_collection = db[Benchmark.collection_name]
-      total_views = benchmark_collection.find({'calling_url': unicode(curr_url)},{'name':1})
-      response_dict['total_views'] = total_views.count()
-      if request.user.is_authenticated():
-        username = request.user.username
-        user_views = total_views.where("this.user =='"+str(username)+"'")
-        response_dict['user_views'] = user_views.count()
-      response_dict['success'] = True
-      return HttpResponse(json.dumps(response_dict))
-    except:
-      return HttpResponse(json.dumps(response_dict))
+	benchmark_collection = db[Benchmark.collection_name]
+	response_dict = {}
+	response_dict['success'] = False
+	try:
+		curr_url = request.GET.get('curr_url','')
+		group_name = request.GET.get('group_name','')
+		group_id_str = str(group_id)
+		if curr_url and group_name:
+			if group_id_str in curr_url:
+				curr_url_other = curr_url.replace(group_id_str,group_name)
+			elif group_name in curr_url:
+				curr_url_other = curr_url.replace(group_name,group_id_str)
+			total_views = benchmark_collection.find({'calling_url': {'$in': [curr_url,curr_url_other]}},{'name':1})
+			response_dict['total_views'] = total_views.count()
+			if request.user.is_authenticated():
+				username = request.user.username
+				user_views = total_views.where("this.user =='"+str(username)+"'")
+				response_dict['user_views'] = user_views.count()
+		response_dict['success'] = True
+		return HttpResponse(json.dumps(response_dict))
+	except:
+		return HttpResponse(json.dumps(response_dict))

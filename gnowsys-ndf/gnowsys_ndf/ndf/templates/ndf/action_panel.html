@@ -500,10 +500,10 @@
     $(document).on("click", ".views_count", function() {
 		current_url = window.location.pathname
 		$.ajax({
-			url: "{% url 'get_views_count' group_id %}",
-
+			url: "{% url 'get_views_count' group_object.pk %}",
 			data: {
 				curr_url: current_url,
+				group_name: "{{group_object.name}}"
 			},
 
 			type: "GET",
