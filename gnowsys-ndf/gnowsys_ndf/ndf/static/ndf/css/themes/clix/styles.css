@@ -25770,57 +25770,82 @@ div.show-image:hover div.fullscreen-icon{
   background: #f0f0f0;
   border-top: 1px solid #797979;
   border-bottom: 1px solid #ababab;
+  font-size: 14px;
+  text-align: right;
 }
 /* line 2451, ../../../scss/_app_styles.scss */
-.gallery-page .gallery-header .search {
-  padding-top: 0.6em;
+.gallery-page .gallery-header .filters .columns {
+  padding-left: 5px;
 }
-/* line 2455, ../../../scss/_app_styles.scss */
+/* line 2457, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-header .search .columns {
+  padding-left: 5px;
+}
+/* line 2461, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-header .search .filter-tags {
+  text-align: left;
+}
+/* line 2464, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-header .search .filter-tags .filter-tag {
+  padding: 0px 10px;
+  background: #cccccc;
+  line-height: 2.2em;
+  margin-left: 10px;
+}
+/* line 2470, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-header .search .filter-tags .filter-tag span {
+  margin: 0px 2px 0px 6px;
+  cursor: pointer;
+}
+/* line 2475, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-header .search .filter-tags > div {
+  display: inline-block;
+}
+/* line 2482, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .side-heading {
   font-size: 19px;
 }
-/* line 2458, ../../../scss/_app_styles.scss */
-.gallery-page .gallery-header .side-heading > div {
-  display: inline-block;
-  margin-right: 10px;
+/* line 2485, ../../../scss/_app_styles.scss */
+.gallery-page .gallery-header .side-heading input {
+  display: inline;
 }
-/* line 2464, ../../../scss/_app_styles.scss */
+/* line 2490, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel {
   background: #F7F7F7;
 }
-/* line 2467, ../../../scss/_app_styles.scss */
+/* line 2493, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content {
   border-right: 1px solid grey;
 }
-/* line 2470, ../../../scss/_app_styles.scss */
+/* line 2496, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader {
   line-height: 3em;
   padding: 10px 0px;
 }
-/* line 2474, ../../../scss/_app_styles.scss */
+/* line 2500, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader a.upload-file {
   margin: 0px;
   font-size: 1em;
 }
-/* line 2479, ../../../scss/_app_styles.scss */
+/* line 2505, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader .gallery-actions {
-  font-size: 1.3em;
-  color: #999999;
+  font-size: 1.2em;
+  color: #2a79e4;
 }
-/* line 2483, ../../../scss/_app_styles.scss */
+/* line 2509, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader .gallery-actions > div {
   display: inline-block;
   margin-right: 10px;
 }
-/* line 2490, ../../../scss/_app_styles.scss */
+/* line 2516, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel {
   background: #fff;
 }
-/* line 2493, ../../../scss/_app_styles.scss */
+/* line 2519, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel .row {
   margin: 10px 0px;
 }
-/* line 2497, ../../../scss/_app_styles.scss */
+/* line 2523, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel .file-name {
   font-size: 20px;
   font-weight: bold;
@@ -25828,11 +25853,11 @@ div.show-image:hover div.fullscreen-icon{
   margin: 10px 0px 20px;
 }
 
-/* line 2510, ../../../scss/_app_styles.scss */
+/* line 2534, ../../../scss/_app_styles.scss */
 .gallery-card .select-file {
   vertical-align: top;
 }
-/* line 2515, ../../../scss/_app_styles.scss */
+/* line 2539, ../../../scss/_app_styles.scss */
 .gallery-card .file-item {
   width: 80%;
   color: #fff;
@@ -25842,12 +25867,12 @@ div.show-image:hover div.fullscreen-icon{
   background: #fff;
   border: 1px solid black;
 }
-/* line 2524, ../../../scss/_app_styles.scss */
+/* line 2548, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .file-details {
   margin-top: 10%;
   display: none;
 }
-/* line 2529, ../../../scss/_app_styles.scss */
+/* line 2553, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .file-actions {
   display: none;
   position: absolute;
@@ -25856,11 +25881,11 @@ div.show-image:hover div.fullscreen-icon{
   width: 100%;
   font-size: 25px;
 }
-/* line 2537, ../../../scss/_app_styles.scss */
+/* line 2561, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .file-actions i {
   margin: 0px 10px;
 }
-/* line 2542, ../../../scss/_app_styles.scss */
+/* line 2566, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .filename-footer {
   position: absolute;
   bottom: 0px;
@@ -25871,20 +25896,20 @@ div.show-image:hover div.fullscreen-icon{
   font-weight: 600;
   background: #999999;
 }
-/* line 2553, ../../../scss/_app_styles.scss */
+/* line 2577, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover {
   background: #999999;
 }
-/* line 2556, ../../../scss/_app_styles.scss */
+/* line 2580, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover .file-details, .gallery-card .file-item:hover .file-actions {
   display: block;
 }
-/* line 2559, ../../../scss/_app_styles.scss */
+/* line 2583, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover .filename-footer {
   display: none;
 }
 
-/* line 2570, ../../../scss/_app_styles.scss */
+/* line 2592, ../../../scss/_app_styles.scss */
 .user-comment .comment-heading {
   color: #9C9C9C;
   border-bottom: 1px solid grey;
@@ -25892,24 +25917,97 @@ div.show-image:hover div.fullscreen-icon{
   margin-bottom: 10px;
   margin-top: 10px;
 }
-/* line 2577, ../../../scss/_app_styles.scss */
+/* line 2599, ../../../scss/_app_styles.scss */
 .user-comment .comment-heading > div {
   display: inline-block;
 }
-/* line 2581, ../../../scss/_app_styles.scss */
+/* line 2603, ../../../scss/_app_styles.scss */
 .user-comment .comment-heading .commentor-name span {
   font-weight: bold;
   color: #333333;
 }
 
-/* line 2588, ../../../scss/_app_styles.scss */
+/* line 2610, ../../../scss/_app_styles.scss */
+.course-content {
+  border-top: 1px solid #000;
+}
+/* line 2612, ../../../scss/_app_styles.scss */
+.course-content .alert-box {
+  padding: 5px;
+  font-size: 1em;
+}
+/* line 2616, ../../../scss/_app_styles.scss */
+.course-content .alert-box > div {
+  display: inline-block;
+  vertical-align: top;
+}
+/* line 2620, ../../../scss/_app_styles.scss */
+.course-content .alert-box .warning-note {
+  width: 96%;
+}
+/* line 2623, ../../../scss/_app_styles.scss */
+.course-content .alert-box .warning-note > div:nth-child(2) {
+  color: #000;
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid #000;
+}
+/* line 2630, ../../../scss/_app_styles.scss */
+.course-content .alert-box .warning-icon {
+  margin: 0px 5px;
+}
+/* line 2633, ../../../scss/_app_styles.scss */
+.course-content .alert-box .close {
+  position: relative;
+  top: 0px;
+  right: 0px;
+  margin: 0px;
+  font-size: inherit;
+  text-decoration: underline;
+  color: #085394 !important;
+}
+/* line 2644, ../../../scss/_app_styles.scss */
+.course-content .collection {
+  overflow: visible;
+}
+/* line 2647, ../../../scss/_app_styles.scss */
+.course-content .collection .course-module {
+  position: relative;
+  padding-left: 1em;
+  border-left: 1px dotted black;
+}
+/* line 2654, ../../../scss/_app_styles.scss */
+.course-content .collection .course-module .module-header .fa {
+  position: absolute;
+  left: -1.1em;
+  top: 0em;
+  z-index: 1000;
+  background: #fff;
+  font-size: 1.4em;
+}
+/* line 2672, ../../../scss/_app_styles.scss */
+.course-content .collection .course-module .module-page:hover span {
+  text-decoration: underline;
+  color: #9900ff !important;
+}
+/* line 2677, ../../../scss/_app_styles.scss */
+.course-content .collection .course-module .jqtree-tree .jqtree-title {
+  cursor: pointer;
+}
+/* line 2682, ../../../scss/_app_styles.scss */
+.course-content .collection .course-module .module-part .fa {
+  display: inline;
+  margin-right: 5px;
+}
+
+/* line 2691, ../../../scss/_app_styles.scss */
 #left-tab {
   position: absolute;
   left: 0px;
   bottom: 0px;
 }
 
-/* line 2593, ../../../scss/_app_styles.scss */
+/* line 2696, ../../../scss/_app_styles.scss */
 #right-tab {
   position: absolute;
   right: 0px;
@@ -25917,12 +26015,12 @@ div.show-image:hover div.fullscreen-icon{
   padding-bottom: 6px;
 }
 
-/* line 2599, ../../../scss/_app_styles.scss */
+/* line 2702, ../../../scss/_app_styles.scss */
 #enrolled-btn {
   margin-bottom: 0px;
 }
 
-/* line 2602, ../../../scss/_app_styles.scss */
+/* line 2705, ../../../scss/_app_styles.scss */
 div.absol-descrip {
   position: absolute;
   top: 190px;
@@ -25933,14 +26031,14 @@ div.absol-descrip {
 }
 
 /*overview-summary styling*/
-/* line 2612, ../../../scss/_app_styles.scss */
+/* line 2715, ../../../scss/_app_styles.scss */
 .course-title, .course-date {
   color: white;
   padding-top: 0px;
   padding-bottom: 0px;
 }
 
-/* line 2617, ../../../scss/_app_styles.scss */
+/* line 2720, ../../../scss/_app_styles.scss */
 .course-description {
   color: #cccccc;
   padding-top: 0px;
@@ -25952,48 +26050,48 @@ div.absol-descrip {
   overflow: hidden;
 }
 
-/* line 2627, ../../../scss/_app_styles.scss */
+/* line 2730, ../../../scss/_app_styles.scss */
 .course-para {
   padding: 0;
 }
 
-/* line 2631, ../../../scss/_app_styles.scss */
+/* line 2734, ../../../scss/_app_styles.scss */
 course-title {
   padding-left: 10px;
 }
 
-/* line 2634, ../../../scss/_app_styles.scss */
+/* line 2737, ../../../scss/_app_styles.scss */
 .enroll-status-margin {
   margin-bottom: 0;
 }
 
-/* line 2638, ../../../scss/_app_styles.scss */
+/* line 2741, ../../../scss/_app_styles.scss */
 .progress-summery {
   color: white;
   margin-top: 20px;
 }
 
-/* line 2642, ../../../scss/_app_styles.scss */
+/* line 2745, ../../../scss/_app_styles.scss */
 .course-description-thumbnails {
   margin: 0;
   padding: 0;
 }
 
-/* line 2647, ../../../scss/_app_styles.scss */
+/* line 2750, ../../../scss/_app_styles.scss */
 .left-shift {
   padding: 0;
   color: white !important;
 }
 
 /*course overview for Small screens*/
-/* line 2653, ../../../scss/_app_styles.scss */
+/* line 2756, ../../../scss/_app_styles.scss */
 .course {
   /*position:relative;*/
   border: 1px solid black;
   background-color: #999999;
 }
 
-/* line 2659, ../../../scss/_app_styles.scss */
+/* line 2762, ../../../scss/_app_styles.scss */
 .course-contents {
   /*position:absolute;*/
   width: 100%;
@@ -26001,7 +26099,7 @@ course-title {
 
 /*Medium screens*/
 @media only screen and (min-width: 40.063em) {
-  /* line 2666, ../../../scss/_app_styles.scss */
+  /* line 2769, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -26009,7 +26107,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 2672, ../../../scss/_app_styles.scss */
+  /* line 2775, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -26019,7 +26117,7 @@ course-title {
 /* min-width 641px, medium screens */
 /* Large screens*/
 @media only screen and (min-width: 64.063em) {
-  /* line 2682, ../../../scss/_app_styles.scss */
+  /* line 2785, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -26027,7 +26125,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 2688, ../../../scss/_app_styles.scss */
+  /* line 2791, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -26035,3 +26133,67 @@ course-title {
   }
 }
 /* min-width 1025px, large screens */
+/*General config css*/
+/* line 2798, ../../../scss/_app_styles.scss */
+.alert-box.warning {
+  background: #ffe7c0;
+  border-color: #bf9000;
+  color: #966000;
+}
+
+/* line 2805, ../../../scss/_app_styles.scss */
+.badge {
+  display: inline-block;
+  line-height: 22px;
+  height: 22px;
+  font-weight: bolder;
+  padding: 0px 7px;
+  font-family: Arial, sans-serif;
+  color: white;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+  border: 1px solid;
+  border-radius: 18px;
+  -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
+  font-size: 1.8em;
+}
+
+/* line 2821, ../../../scss/_app_styles.scss */
+.badge {
+  background: #67c1ef;
+  border-color: #30aae9;
+  background-image: -webkit-linear-gradient(top, #acddf6, #67c1ef);
+  background-image: -moz-linear-gradient(top, #acddf6, #67c1ef);
+  background-image: -o-linear-gradient(top, #acddf6, #67c1ef);
+  background-image: linear-gradient(to bottom, #acddf6, #67c1ef);
+}
+
+/* line 2830, ../../../scss/_app_styles.scss */
+.badge.green {
+  background: #77cc51;
+  border-color: #59ad33;
+  background-image: -webkit-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: -moz-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: -o-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
+}
+
+/* line 2839, ../../../scss/_app_styles.scss */
+.badge.yellow {
+  background: #faba3e;
+  border-color: #f4a306;
+  background-image: -webkit-linear-gradient(top, #fcd589, #faba3e);
+  background-image: -moz-linear-gradient(top, #fcd589, #faba3e);
+  background-image: -o-linear-gradient(top, #fcd589, #faba3e);
+  background-image: linear-gradient(to bottom, #fcd589, #faba3e);
+}
+
+/* line 2849, ../../../scss/_app_styles.scss */
+.badge.red {
+  background: #fa623f;
+  border-color: #fa5a35;
+  background-image: -webkit-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: -moz-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: -o-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: linear-gradient(to bottom, #fc9f8a, #fa623f);
+}

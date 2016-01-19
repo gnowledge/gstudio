@@ -47,12 +47,6 @@ color: black !important;
 /*Change the color here to change font color of tree*/
 }
 
-.jqtree-tree {
-border-color:#0b8a91;
-border-width:1px;
-border-style: solid;
-}
-
 li.remove-dot{
 list-style: none;
 }
@@ -80,7 +74,7 @@ list-style: none;
 </div>
 
 <div id="view-page" class="small-12 large-12 columns"></div>
-<div id="envelop-cover" class="small-12 large-12 columns">
+<div id="envelop-cover">
   <div class="row course-page-title">
     <div class="small-12 medium-8 columns">Introduction to CLIx</div>
     <div class="small-12 medium-4 columns">
@@ -106,7 +100,7 @@ list-style: none;
 </div>
 
 <!-- Tabs -->
-<div class="small-12 columns" id="envelop-content" >
+<div class="row" id="envelop-content" >
   <!-- Envelop box-->
   <div class="small-12 large-12 columns">
      <div>
@@ -173,7 +167,7 @@ list-style: none;
     <div class="tabs-content course-book">
       <div class="content active" id="course-content">
         <!--@anotation("import gcourse_event_group.html for the list of the modules in the course.")-->
-        <p>Import gcourse_event_group.html here</p>
+        {% include "ndf/gcollection_ajax_view.html" %}
       </div>
       <div class="content" id="course-notebook">
 
@@ -233,12 +227,10 @@ list-style: none;
         <!--div class="row">
          {# include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" #}
         </div-->
-        <div class="row">
-         {% include "ndf/ggallerypage.html" %}
-        </div>
+       {% include "ndf/ggallerypage.html" %}
       </div>
       <div class="content" id="course-about">
-        <div class="row">
+        <div class="row collapse">
           <div class="about-course-heading">
             <div class="heading-text">
               <div>
@@ -255,7 +247,7 @@ list-style: none;
             </div>
           </div>
         </div>
-        <div class="row">
+        <div class="row collapse">
           <div class="about-course-details">
             <!--@anotation('replace this with the about course details')-->
             <p>
