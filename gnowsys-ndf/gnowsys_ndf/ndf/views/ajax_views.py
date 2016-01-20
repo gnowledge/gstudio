@@ -6097,7 +6097,6 @@ def show_coll_cards(request, group_id):
 
 
 def get_views_count(request, group_id):
-	benchmark_collection = db[Benchmark.collection_name]
 	response_dict = {}
 	response_dict['success'] = False
 	try:
