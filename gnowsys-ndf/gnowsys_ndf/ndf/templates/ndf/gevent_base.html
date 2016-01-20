@@ -105,67 +105,20 @@ list-style: none;
   <div class="small-12 large-12 columns">
      <div>
       <ul class="tabs" data-tab>
-        <li class="tab-title active"><a href="#course-content"><i class="fi-clipboard-notes"></i>{% trans "Course Content" %}</a></li>
+        <li class="tab-title active"><a href="#course-dashboard"><i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}</a></li>
+        <li class="tab-title"><a href="#course-content"><i class="fi-clipboard-notes"></i>{% trans "Course Content" %}</a></li>
         <li class="tab-title"><a href="#course-notebook"><i class="fi-book "></i>{% trans "Notebook" %}</a></li>
         <li class="tab-title"><a href="#course-raw-material"><i class="fi-clip "></i>{% trans "Raw Material" %}</a></li>
         <li class="tab-title"><a href="#course-gallery"><i class="fi-photo "></i> {% trans "Gallery" %}</a></li>
         <li class="tab-title"><a href="#course-about"><i class="fi-page-edit "></i>{% trans "About the course" %}</a></li>
       </ul>
-      <!--dl class="tabs" data-tab data-options="deep_linking:true"  >
-
-        <dd class="tab-title active ">
-          <a href="#about-tab"><i class="fi-info "></i> {% trans "About" %}</a>
-        </dd>
-
-        {% if user_access == "allow" %}
-        {% if node.collection_set %}
-        <dd class="tab-title">
-          <a href="#view_page" class="view_page_link"><i class="fi-list-thumbnails"></i> {% trans "Start" %}</a>
-        </dd>
-        {% endif %}
-
-        <dd class="tab-title ">
-          <a href="#journal-tab"><i class="fi-page-edit "></i> {% trans "Journal" %}</a>
-        </dd>
-
-        <dd class="tab-title">
-          <a href="#gallery-tab"><i class="fi-photo "></i> {% trans "Gallery" %}</a>
-        </dd>
-        {% comment %}
-        <dd class="tab-title ">
-          <a href="#analytics-tab"><i class="fi-graph-trend "></i> {% trans "Analytics" %}</a>
-        </dd>
-        {% endcomment %}
-        {% endif %}
-      </dl-->
     </div>
-
-    <!-- <div> -->
-    <!-- Right Nav Section for enrollment -->
-      <!-- {% if not gstaff_access %}
-      <ul class="right">
-        <li class="enroll-btn-li">
-          {% if user_access == "allow" %}
-          <input class="button tiny" type="button" value="ENROLLED" disabled="disabled">
-          {% else %}
-          {% if user.is_authenticated %}
-          {% if allow_to_join == "Open" %}
-          <input class="enroll-btn button tiny" type="button" value="ENROLL">
-          {% else %}
-          <input class="button tiny" type="button" value="Enrollment {{allow_to_join}}" disabled="disabled">
-          {% endif %}
-          {% else %}
-          <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
-          {% endif %}
-          {% endif %}
-        </li>
-      </ul>
-
-      {% endif %}
-    </div> -->
     <!-- Each tab pages -->
     <div class="tabs-content course-book">
-      <div class="content active" id="course-content">
+      <div class="content active" id="course-dashboard">
+        {% include "ndf/gcourseDashboard.html" %}
+      </div>
+      <div class="content" id="course-content">
         <!--@anotation("import gcourse_event_group.html for the list of the modules in the course.")-->
         {% include "ndf/gcollection_ajax_view.html" %}
       </div>
