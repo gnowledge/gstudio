@@ -26,10 +26,7 @@
         <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
         <span><input type="button" class="tiny button radius settings" value="Settings"></span>
       {% endif %}
-  
-  <div id="view_collection">
-    {% include "ndf/gcollection_ajax_view.html" %}
-  </div>
+
 {% endblock %}
 
 {% block body_content %}
@@ -122,7 +119,7 @@
         .addClass("medium")
     });
 
-  $(".date_month_day_year").datepicker({ 
+  $(".date_month_day_year").datepicker({
     changeMonth: true,
     changeYear: true,
     dateFormat: 'dd/mm/yy',
@@ -136,7 +133,7 @@
     $("#docFile").val("");
   });
 
-  
+
   //Upload file action validation ---------------------------------------------------------------
   $(document).on('change','#docFile',function(){
     $(".save_cancel").removeClass("hide");
@@ -154,7 +151,7 @@
 
   // Update profile photo -----------------------------------------------------------------------
   $("#submitpostid").click(function() {
-    if($("#docFile").val() != "") { 
+    if($("#docFile").val() != "") {
       $("#message").show();
       $(".save_cancel").addClass("hide");
       var message = "{% trans 'Please wait while file is Uploading...' %}"

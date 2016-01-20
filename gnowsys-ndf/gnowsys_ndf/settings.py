@@ -411,7 +411,7 @@ INSTALLED_APPS = (
     'djangoratings',
     'notification',
     'pagination',
-    'captcha',	
+    'captcha',
     # 'gnowsys_ndf.mobwrite',       #textb
     # 'south',                      #textb
     # 'django_extensions',          #textb
@@ -521,8 +521,8 @@ GSTUDIO_USER_GAPPS_LIST = ['Page', 'File']
 GSTUDIO_ORG_NAME = '''<p>
 A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education (HBCSE)</a>, <a href="http://www.tifr.res.in" target="_blank">Tata Institute of Fundamental Research (TIFR), India</a>.
 </p>'''
-GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
 GSTUDIO_SITE_FAVICON = "/static/ndf/images/favicon/logo.png"
+GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/CLIX_PANTONE.svg"
 GSTUDIO_COPYRIGHT = ""
 GSTUDIO_GIT_REPO = "https://github.com/gnowledge/gstudio"
 GSTUDIO_SITE_PRIVACY_POLICY = ""
@@ -542,7 +542,7 @@ GSTUDIO_SITE_LANDING_TEMPLATE = ""  # possible value is template name.
 GSTUDIO_SITE_HOME_PAGE = None  # it is url rendered on template. e.g: "/welcome". Default is: "/home"
 GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" etc. (Override it in local_settings)
 GSTUDIO_SITE_ISSUES_PAGE = ""
-GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebooks") 
+GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebooks")
 
 # terms & conditions
 GSTUDIO_OID_TC = None

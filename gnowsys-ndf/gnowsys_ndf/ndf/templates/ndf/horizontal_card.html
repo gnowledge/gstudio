@@ -2,7 +2,7 @@
 {% load ndf_tags %}
 {% load simple_filters %}
 <style type="text/css">
-          
+
   .rating-stars > div {
       background-image:url("/static/ndf/images/stars.png");
       height: 17px;
@@ -23,7 +23,7 @@
 
   </style>
 
- 
+
 
  <div class="hr-card large-12 ">
 
@@ -83,23 +83,19 @@
     {% else %}
         <img src="/static/ndf/images/metaStudio-profile.svg"  class="img-height">
     {% endif %}
-      
-      
-  </div>
-  <!-- End Card  Image -->
-    <!-- Card Title -->
-   <div class="large-6 columns">
-    <div class="hr-card-title large-12 columns" title="{% firstof resource.altnames resource.name %}">
-    {% firstof resource.altnames resource.name %}
+
+    <div class="hr-card-title" title="{% firstof resource.altnames resource.name %}">
+    {% firstof resource.name|capfirst %}
     <!-- {% get_node_ratings request resource.pk as ratings %} -->
             <!-- <div class="rating-stars center" style="width:{{ratings.avg|multiply:16}}px;"> <!-- 16px = 1 star -->
               <!-- <div></div>
-            </div> --> 
-    
-   
+            </div> -->
     </div>
-    <!-- End Card Title -->
-    
+
+  </div>
+  <!-- End Card  Image -->
+   <div class="large-6 columns">
+
     <!-- Card Description -->
 
     <!-- suppy no_description=True for not having description -->
@@ -112,7 +108,7 @@
     <!-- End Card Description  -->
   </div>
 </div>
-    
-    
+
+
 </a>
 

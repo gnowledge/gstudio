@@ -48,7 +48,8 @@
     "epub.js": "0.2.5",
     "font-awesome": "~4.4.0",
     "ckeditor": "~4.5.6",
-    "modernizr": "2.8.3"
+    "modernizr": "2.8.3",
+    "trumbowyg": "~1.1.7"
   },
   "resolutions": {
     "jquery": "2.1.1"

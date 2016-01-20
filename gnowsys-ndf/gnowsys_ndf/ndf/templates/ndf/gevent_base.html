@@ -47,12 +47,6 @@ color: black !important;
 /*Change the color here to change font color of tree*/
 }
 
-.jqtree-tree {
-border-color:#0b8a91;
-border-width:1px;
-border-style: solid;
-}
-
 li.remove-dot{
 list-style: none;
 }
@@ -80,17 +74,49 @@ list-style: none;
 </div>
 
 <div id="view-page" class="small-12 large-12 columns"></div>
+<div id="envelop-cover">
+  <div class="row course-page-title">
+    <div class="small-12 medium-8 columns">Introduction to CLIx</div>
+    <div class="small-12 medium-4 columns">
+      <label>2 out of 6 modules completed</label>
+      <div class="progress success round">
+      <div class="meter" style="width: 20%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row collapse meta">
+    <div class="key">Starts on</div>
+    <div class="value">
+      <div class="time"> Jan 5 2016 &#8226; 3:00pm </div>
+    </div>
+  </div>
+  <div class="row collapse meta">
+    <div class="key">Next Session</div>
+    <div class="value">
+      <div class="name">Taking Screenshots of the work</div>
+      <div class="time"> Jan 5 2016 &#8226; 3:00pm </div>
+    </div>
+  </div>
+</div>
 
 <!-- Tabs -->
-<div class="small-12 columns">
+<div class="row" id="envelop-content" >
   <!-- Envelop box-->
-  <div id="envelop-cover" class="small-12 large-12 columns">
+  <div class="small-12 large-12 columns">
      <div>
-      <dl class="tabs" data-tab data-options="deep_linking:true"  > 
+      <ul class="tabs" data-tab>
+        <li class="tab-title active"><a href="#course-content"><i class="fi-clipboard-notes"></i>{% trans "Course Content" %}</a></li>
+        <li class="tab-title"><a href="#course-notebook"><i class="fi-book "></i>{% trans "Notebook" %}</a></li>
+        <li class="tab-title"><a href="#course-raw-material"><i class="fi-clip "></i>{% trans "Raw Material" %}</a></li>
+        <li class="tab-title"><a href="#course-gallery"><i class="fi-photo "></i> {% trans "Gallery" %}</a></li>
+        <li class="tab-title"><a href="#course-about"><i class="fi-page-edit "></i>{% trans "About the course" %}</a></li>
+      </ul>
+      <!--dl class="tabs" data-tab data-options="deep_linking:true"  >
 
         <dd class="tab-title active ">
           <a href="#about-tab"><i class="fi-info "></i> {% trans "About" %}</a>
         </dd>
+
         {% if user_access == "allow" %}
         {% if node.collection_set %}
         <dd class="tab-title">
@@ -111,8 +137,9 @@ list-style: none;
         </dd>
         {% endcomment %}
         {% endif %}
-      </dl>
+      </dl-->
     </div>
+
     <!-- <div> -->
     <!-- Right Nav Section for enrollment -->
       <!-- {% if not gstaff_access %}
@@ -132,106 +159,60 @@ list-style: none;
           {% endif %}
           {% endif %}
         </li>
-      </ul> 
+      </ul>
 
       {% endif %}
     </div> -->
-    <div class="absol-descrip">
-     <div class="vertical-indent-descrip"></div>
-      <h3>{{node.name}}</h3>
-      {% get_attribute_value node.pk 'start_time' as start_time %}
-      <b>START DATE</b> {{start_time|date:"d-M-Y H:m a"}}
-      {% with node.html_content|safe as description %}
-      {% if description != "None" %}
-      <span itemprop="{{schema.1.description}}">{{ description }}</span>
-      {% endif %}
-      {% endwith %}
-      <div><ul class="tabs" data-tab role="tablist">
-  <li class="tab-title active" role="presentation"><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1"><i class="fa fa-file-text-o"></i> Tab 1</a></li>
-  <li class="tab-title" role="presentation"><a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2"><i class="fa fa-clock-o"></i>1</a></li>
-  <li class="tab-title" role="presentation"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-3"><i class="fa fa-user"></i>25</a></li>
-  <li class="tab-title" role="presentation"><a href="#panel2-4" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-4"><i class="fa fa-globe"></i>English</a></li>
-</ul></div>
-    </div>
-    <div class="absol-enroll">
-      <div class="vertical-indent-enroll"></div>
-      <label>Progress</label>
-      <div class="progress success round">
-      <div class="meter" style="width: 20%"></div>
+    <!-- Each tab pages -->
+    <div class="tabs-content course-book">
+      <div class="content active" id="course-content">
+        <!--@anotation("import gcourse_event_group.html for the list of the modules in the course.")-->
+        {% include "ndf/gcollection_ajax_view.html" %}
       </div>
-      <!-- Right Nav Section for enrollment -->
-      {% if not gstaff_access %}
-      <ul class="">
-        <li class="remove-dot">
-          {% if user_access == "allow" %}
-          <input class="button tiny" type="button" value="ENROLLED" disabled="disabled">
-          {% else %}
-          {% if user.is_authenticated %}
-          {% if allow_to_join == "Open" %}
-          <input class="enroll-btn button tiny" type="button" value="ENROLL">
-          {% else %}
-          <input class="button tiny" type="button" value="Enrollment {{allow_to_join}}" disabled="disabled">
-          {% endif %}
-          {% else %}
-          <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
-          {% endif %}
-          {% endif %}
-        </li>
-      </ul> 
+      <div class="content" id="course-notebook">
 
-      {% endif %}</div>
-    </div>
-    <!-- Tab content -->
-    <div class="row">
-     <section class="small-12 medium-12 columns content">
-       <div class="tabs-content">
+        <!--div class="text-right">
+          <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button small radius"> Add Blog </a>
+        </div>
+        <div class="row all_blogs">
+          {% for each_blog in blog_pages %}
+          <div class="blogpage"  style="margin-left:10px;">
+            <h4>
+              <a href="{% url 'page_details' group_id each_blog.pk %}">{{each_blog.name}}</a>
+            </h4>
+            {% if request.user.id == each_blog.created_by or gstaff_access %}
+            <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}&blog_type=True"> Edit </a>
+            {% endif %}
+            <span>
+              Created by {{each_blog.created_by|get_username}} at {{each_blog.created_at}}
+            </span>
+            <div>
+              {{each_blog.html_content|safe}}
+            </div>
+          </div>
+          <hr/>
+          {% empty %}
+          <div class="blogpage"  style="margin-left:10px;">
+            <h4>
+              <u>
+                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True">Start writing Pages </a>
+              </u>
+            </h4>
+          </div>
+          {% endfor %}
+        </div-->
 
-         <div class="content active" id="about-tab">
-           <div class="row">
-             {% include "ndf/res_node_ajax_view.html" %} 
-           </div>
-         </div>
+        <!--Including the nodebook component-->
+          {% include "ndf/gnotebook.html" %}
+        <!---->
 
-         <div class="content" id="view_page">
-         </div>
-
-         {% if user_access == "allow" %}
-
-         <div class="content" id="journal-tab">
-           <div class="text-right">
-             <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button small radius"> Add Blog </a>
-           </div>
-           <div class="row all_blogs">
-            {% for each_blog in blog_pages %}
-            <div class="blogpage"  style="margin-left:10px;">
-             <h4>
-               <a href="{% url 'page_details' group_id each_blog.pk %}">{{each_blog.name}}</a>
-             </h4>
-             {% if request.user.id == each_blog.created_by or gstaff_access %}
-
-             <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}&blog_type=True"> Edit </a>
-             {% endif %}
-             <span>
-               Created by {{each_blog.created_by|get_username}} at {{each_blog.created_at}}
-             </span>
-             <div>
-               {{each_blog.html_content|safe}}
-             </div>
-           </div>
-           <hr/>
-           {% empty %}
-           <div class="blogpage"  style="margin-left:10px;">
-             <h4><u>
-               <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True">Start writing Pages </a>
-             </u></h4>
-           </div>
-           {% endfor %}
-         </div>
-       </div>
-       <div class="content" id="gallery-tab">
+      </div>
+      <div class="content" id="course-raw-material">
+        <p></p>
+      </div>
+      <div class="content" id="course-gallery">
         {% if "CourseEventGroup" in group_object.member_of_names_list %}
-        <div id="upload_form_div" class="text-right">
-
+        <!--div id="upload_form_div" class="text-right">
           <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
             {% csrf_token %}
             <input type="file" name="doc" id="docFile"/>
@@ -240,30 +221,48 @@ list-style: none;
               <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
             </div>
           </form>
-
-        </div>
+        </div-->
         {% endif %}
-        <div class="row">
-         {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
-       </div>
-     </div>
 
-     {% comment %}
-     <div class="content" id="analytics-tab">
-       <div class="row">
-         {% if gstaff_access %}
-         <a href='{% url "group_summary" node.pk %}' target="_blank">{%  trans "Click here to view Group Analytics" %}</a>
-         {% else %}
-         <a href='{% url "user_summary" node.pk %}' target="_blank">{%  trans "Click here to view  My Analytics" %}</a>
-         {% endif %}
-       </div>
-     </div>
-     {% endcomment %}
+        <!--div class="row">
+         {# include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" #}
+        </div-->
+       {% include "ndf/ggallerypage.html" %}
+      </div>
+      <div class="content" id="course-about">
+        <div class="row collapse">
+          <div class="about-course-heading">
+            <div class="heading-text">
+              <div>
+                <h2>Introduction to CLIx</h2>
+              </div>
+              <div>Next Session Jan 5 2016 &#8226; 3:00pm</div>
+              <div>
+                <span><i class="fi-list-thumbnails"></i>&nbsp;10</span>
+                &#8226;&nbsp;&nbsp;
+                <span><i class="fi-torso"></i>&nbsp;54</span>
+                &#8226;&nbsp;&nbsp;
+                <span><i class="fi-clock"></i>&nbsp;6 weeks</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row collapse">
+          <div class="about-course-details">
+            <!--@anotation('replace this with the about course details')-->
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. In at mattis tellus. Integer ac consectetur felis, et laoreet diam. Donec orci ex, fringilla non nibh eu, ornare dictum mi. In orci augue, mattis non arcu at, feugiat tincidunt mi. Nulla gravida leo non elementum fermentum. Nullam luctus sodales est in varius. Nulla et bibendum arcu, in tincidunt odio. Sed rhoncus placerat nunc, eget sollicitudin augue tempor a. Suspendisse ornare dignissim laoreet. Sed a cursus arcu. Etiam vitae semper quam. Maecenas pretium placerat enim non condimentum. Quisque dapibus turpis hendrerit tristique rutrum.
+              Vestibulum maximus augue metus, nec gravida lorem dapibus id. Nulla tristique pharetra ipsum, quis vulputate magna tincidunt at. Duis elementum quam blandit lacus ultrices maximus. Morbi in sem at felis faucibus cursus. Donec arcu justo, fringilla nec scelerisque a, luctus ut nisl. Curabitur dictum felis sed nulla feugiat mattis. Fusce ac tortor eget arcu efficitur aliquam. Sed rutrum felis lacus, id congue mi sodales in. Mauris euismod massa elit.
+            </p>
 
-     {% endif %}
-   </div>
- </section>
-</div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Each tab pages ends here -->
+  </div>
 </div>
 
 {% endblock %}

@@ -3284,7 +3284,6 @@ def get_user_course_groups(user_id):
 	# print "::: ", all_courses_obj_grouped
 	return all_courses_obj_grouped
 
-
 @get_execution_time
 @register.assignment_tag
 def get_course_session_status(node):
@@ -3316,7 +3315,6 @@ def get_course_session_status(node):
 						return status, upcoming_course 
 		# print upcoming_course,node.name 
 		return status, upcoming_course 
-
 
 def get_user_quiz_resp(node_obj, user_obj):
 	if node_obj and user_obj:
