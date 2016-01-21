@@ -20,6 +20,7 @@
     <a class="close-reveal-modal">&#215;</a>
   </div>
   {% endif %}
+  {% comment %}
   <div id="loginModal" class="reveal-modal" data-reveal aria-labelledby="loginModal" aria-hidden="true" role="dialog">
     <h2 >{% trans "Login" %}</h2>
     <form method="post" action="{% url 'auth_login' %}" id="loginSubmit" data-abide>
@@ -58,6 +59,7 @@
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
   </div>
+  {% endcomment %}
 
   <div id="top-headers">
 
@@ -172,7 +174,7 @@
 
         <li class="group">
           {# <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}"> #}
-          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="/home/group/">
+          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}">
             {% trans 'Explore' %}
           </a>
         </li>
@@ -248,11 +250,11 @@
         -->
 
         <li>
-          <a href="#" data-reveal-id="loginModal" id="login-button-medium">{% trans "Login to your clix account" %}</a>
-          <a href="#" data-reveal-id="loginModal" id="login-button-small">{% trans "Login" %}</a>
-          <!--<a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+          {# <a href="#" data-reveal-id="loginModal" id="login-button-medium">{% trans "Login to your clix account" %}</a> #}
+          {# <a href="#" data-reveal-id="loginModal" id="login-button-small">{% trans "Login" %}</a> #}
+          <a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
             <i class="fi-key"></i>&nbsp; {% trans "Login" %}
-          </a>-->
+          </a>
         </li>
         {% endif %}
         </ul>
