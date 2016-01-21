@@ -22,23 +22,22 @@
 
 <div id="group_imgs_on_modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
 </div>
-
 <script>
     // Replace the <textarea id="editor1"> with a CKEditor
     // instance, using default configuration.
     CKEDITOR.replace( 'textarea-{{var_name}}',{
         enterMode : Number(2), //override default behaviour that adds <p></p> in ck editor
-        toolbar:'basic',
-        uiColor:'#f2f2f2',
+        toolbar:'{{ckeditor_toolbar}}',
+        uiColor:'{{ckeditor_color}}',
         groupID: {group_id:'{{group_id}}'},
         nodeID: {node_id:'{{node_id}}'},
         textarea_id: 'textarea-{{var_name}}',
         customConfig : '/static/ndf/js/ckeditor-config.js',
-         // toolbar :
-                                    //         [
-                                    //             { name: 'basicstyles', items : [ 'Bold','Italic' ] },
-                                    //             { name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
-                                    //             { name: 'tools', items : [ 'Maximize','-','About' ,'addImage'] }
-                                    //         ]
+        // toolbar :
+        //                                     [
+        //                                         { name: 'basicstyles', items : [ 'Bold','Italic' ] },
+        //                                         { name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
+        //                                         { name: 'tools', items : [ 'Maximize','-','About' ,'addImage'] }
+        //                                     ]
     });
 </script>

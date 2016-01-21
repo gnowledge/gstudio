@@ -38,7 +38,7 @@ CKEDITOR.plugins.add('addImage',
                             }
                             CKEDITOR.instances[textAreaId].insertHtml('<img width="'+  width + '"src=' + completeURL +  '>' + '</img>');
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
-                            return false;
+                        
 
                           });
 

@@ -131,6 +131,8 @@ def discussion_reply(request, group_id, node_id):
         prior_node = request.POST.get("prior_node_id", "")
         content_org = request.POST.get("reply_text_content", "") # reply content
 
+        print content_org
+
         # process and save node if it reply has content  
         if content_org:
       
@@ -156,7 +158,8 @@ def discussion_reply(request, group_id, node_id):
         
             reply_obj.content_org = unicode(content_org)
             filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
-            reply_obj.content = org2html(content_org, file_prefix=filename)
+            # reply_obj.content = org2html(content_org, file_prefix=filename)
+            reply_obj.content = content_org
 
             # ==============================
             # try:

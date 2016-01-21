@@ -4,6 +4,8 @@
 
 {% get_schema node as schema %} 
 {% get_group_name groupid as group_name_tag %}
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 
 <style type="text/css">
   legend{
@@ -510,24 +512,24 @@
           {% endif %}           
               </div>
        {% endif %}
-         
+          
          {% get_list_of_fields node.type_of "name" as type_of_list %}
           {% if "Info page" not in type_of_list %}
           
 
     
           <!-- Discussion -->
-                <div class="content" id="view-discussion">
+                <div class="content large-6 columns " id="view-discussion" >
                   <!-- discussion content area -->
                   {% if node.discussion_enable %}
                     {% get_thread_node node.pk as thread_node %}
                     {% if thread_node %}
                         {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
                         {% get_node thread_node as thread_node_obj %}
-                        {% include 'ndf/discussion.html' with node=thread_node_obj %}
+                        {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj ckeditor_toolbar="DiscussionToolbar" %}
                     {% else %}            
                         {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                        {% include 'ndf/discussion.html' %}
+                        {% include 'ndf/in-line-texteditor.html' with ckeditor_toolbar="DiscussionToolbar" %}
                     {% endif %}
                   {% endif %}
 

@@ -6095,7 +6095,6 @@ def show_coll_cards(request, group_id):
             context_instance=RequestContext(request))
 
 
-
 def get_views_count(request, group_id):
 	response_dict = {}
 	response_dict['success'] = False
@@ -6118,3 +6117,14 @@ def get_views_count(request, group_id):
 		return HttpResponse(json.dumps(response_dict))
 	except:
 		return HttpResponse(json.dumps(response_dict))
+
+@get_execution_time
+def get_ckeditor(request,group_id):
+    ckeditor_toolbar_val = request.GET.get('ckeditor_toolbar')
+    return render_to_response('ndf/html_editor.html',            
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'ckeditor_toolbar': ckeditor_toolbar_val
+            },
+            context_instance=RequestContext(request))
+
