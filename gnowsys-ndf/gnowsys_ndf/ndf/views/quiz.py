@@ -211,6 +211,8 @@ def create_edit_quiz_item(request, group_id, node_id=None):
             return_url = request.POST.get("return_url")
             # print "\n\n return_url", return_url, type(return_url)
             if return_url:
+                if return_url == "groupchange":
+                    return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))
                 return HttpResponseRedirect(return_url)
         if quiz_node:
             quiz_node.collection_set.append(quiz_item_node._id)
@@ -307,6 +309,7 @@ def quiz_details(request, group_id, node_id):
 @get_execution_time
 def save_quizitem_answer(request, group_id):
     response_dict = {"success": False}
+
     if request.is_ajax() and request.method == "POST":
         try:
             group_id = ObjectId(group_id)
@@ -314,7 +317,7 @@ def save_quizitem_answer(request, group_id):
             group_name, group_id = get_group_name_id(group_id)
         import datetime
         # group_obj = node_collection.one({'_id': ObjectId(group_id)})
-
+        new_list = []
         user_given_ans = request.POST.getlist("user_given_ans[]", '')
         node_id = request.POST.get("node", '')
         # print "\n\n user_give_ans",user_given_ans
@@ -333,14 +336,13 @@ def save_quizitem_answer(request, group_id):
         if thread_obj != None:
             already_ans_obj = node_collection.find_one({'member_of': qip_gst._id,'created_by': user_id, 'prior_node': thread_obj._id})
         if already_ans_obj:
+            # check whether user has already checked or submitted ans
             user_ans = already_ans_obj
         else:
             user_ans = node_collection.collection.GSystem()
             user_ans.created_by = user_id
             user_ans.modified_by = user_id
-            if user_id not in user_ans.contributors:
-                user_ans.contributors.append(user_id)
-
+            user_ans.contributors.append(user_id)
             user_ans.member_of.append(qip_gst._id)
             user_ans.group_set.append(group_id)
             user_ans.status = u"PUBLISHED"
@@ -350,8 +352,10 @@ def save_quizitem_answer(request, group_id):
 
         if thread_obj != None:
             if thread_obj._id not in user_ans.prior_node:
+                # add user's post/reply obj to thread obj's post_node
                 node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
             if user_ans._id not in thread_obj.post_node:
+                # add thread obj to user's post/reply prior_node
                 node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
         quiz_type_val = get_attribute_value(node_obj._id,"quiz_type")
 
@@ -360,12 +364,9 @@ def save_quizitem_answer(request, group_id):
             if quiz_type_val == "Short-Response":
                 create_gattribute(user_ans._id, qip_user_submitted_ans_AT, user_given_ans)
             else:
-                # list_of_ans = [int(each.split('_')[1]) for each in user_given_ans]
-
                 curr_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 if user_given_ans:
                     if user_action == "check":
-                        new_list = []
                         if already_ans_obj:
                             old_checked_ans = get_attribute_value(user_ans._id,"quizitempost_user_checked_ans")
                             if old_checked_ans != "None" and old_checked_ans != "":
@@ -374,7 +375,6 @@ def save_quizitem_answer(request, group_id):
                         if new_list:
                             create_gattribute(user_ans._id, qip_user_checked_ans_AT, new_list)
                     elif user_action == "submit":
-                        new_list = []
                         if already_ans_obj:
                             old_submitted_ans = get_attribute_value(user_ans._id,"quizitempost_user_submitted_ans")
                             if old_submitted_ans != "None" and old_submitted_ans != "":
