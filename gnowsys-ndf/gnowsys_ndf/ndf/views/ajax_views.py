@@ -133,11 +133,11 @@ def collection_nav(request, group_id):
   '''
   This ajax function retunrs the node on main template, when clicked on collection hierarchy
   '''
-  if request.is_ajax() and request.method == "POST":
+  if request.is_ajax() and request.method == "GET":
     curr_node_obj = None
-    node_id = request.POST.get("node_id", '')
-    curr_node_id = request.POST.get("curr_node", '')
-    node_type = request.POST.get("nod_type", '')
+    node_id = request.GET.get("node_id", '')
+    curr_node_id = request.GET.get("curr_node", '')
+    node_type = request.GET.get("nod_type", '')
     template = "ndf/node_ajax_view.html"
     breadcrumbs_list = []
     curr_node_obj = node_collection.one({'_id': ObjectId(curr_node_id)})
@@ -171,8 +171,8 @@ def collection_nav(request, group_id):
       thread_node, allow_to_comment = node_thread_access(group_obj._id, node_obj)
 
 
-    nav_list = request.POST.getlist("nav[]", '')
-    n_list = request.POST.get("nav", '')
+    nav_list = request.GET.getlist("nav[]", '')
+    n_list = request.GET.get("nav", '')
 
     # This "n_list" is for manipulating breadcrumbs events and its navigation
     if n_list:
@@ -6096,19 +6096,45 @@ def show_coll_cards(request, group_id):
 
 
 
-def get_views_count(request, group_id):
-	response_dict = {}
-	response_dict['success'] = False
+def get_visits_count(request, group_id):
+	'''
+	Accepts:
+	* group_id
+	* current-url
+		pathname used to search in benchmark_collection 'calling_url'
+	* group_name
+		To avoid fetching group_obj and then name
+	* get_params
+		get_params is used for get-parameters
+		This param is passed only in case of collections
+		Currently, Course and Event player are only considered.
+
+	Actions:
+	* Fetches from benchmark_collection,
+		the total instances matching the query
+	* From the total, fetches user related instances
+
+	Returns:
+	* success (i.e True/False)
+	* Count of total visits
+	* Count of user visits
+	'''
+	response_dict = {'success': False, 'total_views': 0}
 	try:
 		curr_url = request.GET.get('curr_url','')
+		get_params =  request.GET.get('get_params','')
 		group_name = request.GET.get('group_name','')
 		group_id_str = str(group_id)
+		query = {}
 		if curr_url and group_name:
 			if group_id_str in curr_url:
 				curr_url_other = curr_url.replace(group_id_str,group_name)
 			elif group_name in curr_url:
 				curr_url_other = curr_url.replace(group_name,group_id_str)
-			total_views = benchmark_collection.find({'calling_url': {'$in': [curr_url,curr_url_other]}},{'name':1})
+			query = {'calling_url': {'$in': [curr_url,curr_url_other]}}
+			if get_params:
+				query = {'calling_url': {'$regex': u"/"+ unicode(get_params)},'name': "collection_nav"}
+			total_views = benchmark_collection.find(query,{'name':1})
 			response_dict['total_views'] = total_views.count()
 			if request.user.is_authenticated():
 				username = request.user.username
@@ -6116,5 +6142,6 @@ def get_views_count(request, group_id):
 				response_dict['user_views'] = user_views.count()
 		response_dict['success'] = True
 		return HttpResponse(json.dumps(response_dict))
-	except:
+	except Exception as e:
+		print e
 		return HttpResponse(json.dumps(response_dict))
