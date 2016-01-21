@@ -9,8 +9,12 @@
 	    display: none;
 	}
 
-	.orgitdown textarea{
-		min-height: 100px !important;	
+	.ck-editor-div{
+		height: 250px !important;
+	}
+
+	#cke_1_contents{
+		height: 100px !important;
 	}
 {% endblock %}
 
@@ -54,8 +58,8 @@
 					<label class="right inline">{% trans "Enter Question" %}</label>
 				</div>
 
-				<div class="small-8 large-8 columns left ">
-					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter Question here.." var_value=node.content_org %}
+				<div class="small-8 large-8 columns left ck-editor-div">
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk %}		  
 				</div>
 			</div>
 
@@ -126,6 +130,7 @@
 				</div>
 
 				<div class="quiz-type-based-div small-8 large-8 columns left" id="Multiple-Choice">
+					<small>(Press Ctrl to select multiple answers)</small></label>
 					<select id="correct_answer_multiple" name="correct_answer_multiple" multiple style="height:75px;">
 					{% for option in node.options %}
 						<option value="{{forloop.counter}}" {% if forloop.counter|slugify in node.correct_answer %}selected{% endif %} >{{forloop.counter}}</option>
