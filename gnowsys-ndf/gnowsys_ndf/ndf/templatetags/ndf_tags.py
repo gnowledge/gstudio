@@ -1298,37 +1298,36 @@ def get_event_type(node):
 @get_execution_time
 @register.assignment_tag
 def get_url(groupid):
-     
-    node = node_collection.one({'_id': ObjectId(groupid) }) 
-    
-    if node._type == 'GSystem':
+	node = node_collection.one({'_id': ObjectId(groupid) }) 
+
+	if node._type == 'GSystem':
 
 		type_name = node_collection.one({'_id': node.member_of[0]})
-                if type_name.name == 'Exam' or type_name.name == "Classroom Session":
-                   return ('event_app_instance_detail')
-                if type_name.name == 'Quiz':
-                   return 'quiz_details'
-                elif type_name.name == 'Page':
-                   return 'page_details' 
-                elif type_name.name == 'Theme' or type_name == 'theme_item':
-                   return 'theme_page'
-                elif type_name.name == 'Forum':
-	                 return 'show'
-                elif type_name.name == 'Task' or type_name.name == 'task_update_history':
-	                 return 'task_details'
-                else:
-	                  return 'None'    
-    elif node._type == 'Group' :
-                    return 'group'
-    elif node._type == 'File':
+		if type_name.name == 'Exam' or type_name.name == "Classroom Session":
+			return ('event_app_instance_detail')
+		if type_name.name == 'Quiz':
+			return 'quiz_details'
+		elif type_name.name == 'Page':
+			return 'page_details' 
+		elif type_name.name == 'Theme' or type_name == 'theme_item':
+			return 'theme_page'
+		elif type_name.name == 'Forum':
+			return 'show'
+		elif type_name.name == 'Task' or type_name.name == 'task_update_history':
+			return 'task_details'
+		else:
+			return 'None'    
+	elif node._type == 'Group':
+		return 'group'
+	elif node._type == 'File':
 		if (node.mime_type) == ("application/octet-stream"): 
 			return 'video_detail'       
 		elif 'image' in node.mime_type:
 			return 'file_detail'
 		else:
 			return 'file_detail'
-    else:
-			return 'group'
+	else:
+		return 'group'
 
 @get_execution_time
 @register.assignment_tag
@@ -3323,3 +3322,4 @@ def get_user_quiz_resp(node_obj, user_obj):
 		qip_sub = get_attribute_value(qip._id,'quizitempost_user_submitted_ans')
 		recent_ans = qip_sub[-1]
 		return recent_ans.values()[0]
+
