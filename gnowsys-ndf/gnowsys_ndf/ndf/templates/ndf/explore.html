@@ -1,0 +1,34 @@
+{% load simple_filters %}
+{% xextends "ndf/gbase.html" with first_body_column=0 %}
+
+{% load i18n %}
+
+
+{% block title %} {{title|capfirst}} {% endblock title %}
+
+
+{% block body_content %}
+	
+	<div class="row">
+		<div class="small-6 columns"><h2><a href="{% url 'explore_courses' %}">Explore</a></h2></div>
+
+		<div class="small-3 columns">
+			<a href="{% url 'explore_courses' %}">Courses</a>
+		</div>
+
+		<div class="small-3 columns">
+			<a href="{% url 'explore_groups' %}">Groups</a>
+		</div>
+	</div>
+
+	{% if title == 'explore' %}
+		Some static text or trending or upcoming groups, courses, events listing.
+	{% else %}
+
+		
+
+	{% endif %}
+
+
+
+{% endblock body_content %}
