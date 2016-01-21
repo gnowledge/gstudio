@@ -130,6 +130,7 @@
 				</div>
 
 				<div class="quiz-type-based-div small-8 large-8 columns left" id="Multiple-Choice">
+					<small>(Press Ctrl to select multiple answers)</small></label>
 					<select id="correct_answer_multiple" name="correct_answer_multiple" multiple style="height:75px;">
 					{% for option in node.options %}
 						<option value="{{forloop.counter}}" {% if forloop.counter|slugify in node.correct_answer %}selected{% endif %} >{{forloop.counter}}</option>
