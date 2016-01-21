@@ -1518,7 +1518,7 @@ def save_resources(request, group_id):
             cu_new.status = u"PUBLISHED"
             cu_new.created_by = int(request.user.id)
             cu_new.contributors.append(int(request.user.id))
-
+            cu_new.group_set.append(group_id)
             cu_new.prior_node.append(css_node._id)
             cu_new.save(groupid=group_id)
             response_dict["create_new_unit"] = True
