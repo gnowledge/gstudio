@@ -6,7 +6,7 @@ new_auth_instances = 0
 for each_user in all_users:
 	auth = node_collection.one({'_type': u"Author", 'created_by': int(each_user.id)})
 	# This will create user document in Author collection to behave user as a group.
-	if auth is None:
+	if auth is None and each_user.is_active:
 		print "\n Creating new Author obj for ",each_user.username
 		auth = node_collection.collection.Author()
 		auth.name = unicode(each_user.username)
