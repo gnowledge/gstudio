@@ -110,7 +110,7 @@
     <div class="edit-card">
 	    <div class="row">
 	      	<dl class="tabs pill large-12 columns select" id = "tabs">
-				{% if not ce_id %}
+				{% if not blog_type %}
 				<dd class="active node_tab" title="Click here to add Name, Description, Privacy and Tags">
 		  			<!-- change name of collection tab overide block in your code -->
 		  			<a>{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
@@ -133,8 +133,6 @@
 				<dd class="assesses_tab" title="Click here to add/edit teaches">
 				 	<a>{% trans "Assesses" %} </a> 
 				</dd>	
-				{% endif %}
-				{% if not blog_type %}
 					{% if title == "Page" or "File" in node.member_of_names_list %}
 						<dd class="thread_prop_tab" title="Click here to add/edit properties of Thread">
 						  	<a>{% trans "Interaction Settings" %} </a> 
@@ -159,9 +157,38 @@
   	<div id="node-details-edit-div" class="tabs-content" > 
 
     	<div class="active content row contents" id="panel-name-description">
+		
 		<div class="medium-8 columns editor-div">
-	  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk %}		  
+
+	  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}		  
 		</div>
+	
+	{% comment %}
+			
+
+    	{% if node.pk %}
+	    	{% get_list_of_fields node.type_of "name" as type_of_list %}
+		   	{% if "Wiki page" in type_of_list  %}
+				<div class="medium-8 columns editor-div">
+			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
+				</div>
+			{% else %}
+				<div class="medium-8 columns editor-div">
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_color="#f2f2f2" ckeditor_toolbar="GeneralToolbar" %}		  
+				</div>
+			{% endif %}
+		{% else  %}
+			{% if title == "Page" %}
+				<div class="medium-8 columns editor-div org-editor">
+			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}		  
+				</div>
+			{% endif %}
+				<div class="medium-8 columns editor-div ck-editor hide">
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}		  
+				</div>
+				
+		{% endif %}
+		{% endcomment %}
 
 			{% if ce_id %}
 				<input type="hidden" name="ce_id" value="{{ce_id}}">
