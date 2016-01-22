@@ -384,6 +384,7 @@ def save_quizitem_answer(request, group_id):
                             create_gattribute(user_ans._id, qip_user_submitted_ans_AT, new_list)
                     user_ans.reload()
         # print "\n user_ans.attribute_set",user_ans.attribute_set
+        response_dict['count'] = len(new_list)
         response_dict['success'] = True
         return HttpResponse(json.dumps(response_dict))
 
