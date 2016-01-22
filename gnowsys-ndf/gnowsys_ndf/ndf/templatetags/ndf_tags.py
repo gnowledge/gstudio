@@ -2070,15 +2070,20 @@ def check_is_gstaff(groupid, user):
   False -- If above criteria is not met (doesn't belongs to any of the category, mentioned above)!
   """
 
+  groupid = groupid if groupid else 'home'
+
   try:
-    group_node = node_collection.one({'_id': ObjectId(groupid)})
+  	try:
+	    group_node = node_collection.one({'_id': ObjectId(groupid)})
+  	except:
+  		group_node = get_group_name_id(groupid, get_obj=True)
 
-    if group_node:
-      return group_node.is_gstaff(user)
+	if group_node:
+		return group_node.is_gstaff(user)
 
-    else:
-      error_message = "No group exists with this id ("+str(groupid)+") !!!"
-      raise Exception(error_message)
+	else:
+		error_message = "No group exists with this id ("+str(groupid)+") !!!"
+		raise Exception(error_message)
 
   except Exception as e:
     error_message = "\n IsGStaffCheckError: " + str(e) + " \n"
@@ -3297,9 +3302,10 @@ def get_course_session_status(node):
 		curr_date_time = datetime.now()
 		start_time_val = get_attribute_value(node._id,"start_time")
 		end_time_val = get_attribute_value(node._id,"end_time")
-		#print "\n node.name",node.name
+
 		if curr_date_time.date() < start_time_val.date():
 			upcoming_course = True
+			
 		for each_course_section in node.collection_set:
 			each_course_section_node = node_collection.one({"_id":ObjectId(each_course_section)})
 			for each_course_subsection in each_course_section_node.collection_set:
