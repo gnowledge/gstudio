@@ -115,6 +115,9 @@ def get_execution_time(f):
 		        		benchmark_node.action +=  str('/'+url[3])
 		        	else : 
 		        		pass
+	        	if "node_id" in args[0].GET and "collection_nav" in f.func_name:
+	        		benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
+	        		# modify calling_url if collection_nav is called i.e collection-player
 	        except : 
 	        	pass
 	        benchmark_node.save()

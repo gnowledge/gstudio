@@ -242,12 +242,8 @@
 			<!-- Views row -->
 				<div class="row tag-rating-div">
 					<span title="{% trans 'Click to see no. of view ' %}"><label class="lbl_tag lbl_field">{% trans "Views" %}</label></span>
-					<small><label class="lbl_tag tag_ele">
-					<a class="views_count" title="Click to see no. of views">Click to see No. of Views</a></label></small>
+					{% include "ndf/analytics_views.html" %}
 				</div>
-
-
-
 
 			<!-- Ratings -->
 				{% if group_object.edit_policy != "EDITABLE_MODERATED" or "CourseEventGroup" in group_object.member_of_names_list %}
@@ -497,40 +493,6 @@
         $("#deleteModal").foundation('reveal', 'close');
     });
 
-    $(document).on("click", ".views_count", function() {
-		// current_url = window.location.href.replace(window.location.origin,'');
-		current_url = window.location.pathname;
-		$.ajax({
-			url: "{% url 'get_views_count' group_object.pk %}",
-			data: {
-				curr_url: current_url,
-				group_name: "{{group_object.name}}"
-			},
-
-			type: "GET",
-
-			dataType: "json",
-
-			success: function(data){
-				if(data['success']){
-					display_views = ""
-					tooltip = "Total views"
-					if(data['user_views']){
-						tooltip = "Your views/Total views"
-						display_views = data['user_views'] + "/"
-					}
-					display_views += data['total_views'] + " views"
-					$(".views_count").text(display_views)
-									 .attr("title", tooltip)
-									 .css('font-size','15px')
-									 .css('color','black')
-									 // .append("<i class='fi-eye'></i>")
-									 .removeClass("views_count")
-									 //removing class to prevent consecutive ajax call
-				}
-			},
-		});//end of ajax
-    });
 
 
 </script>

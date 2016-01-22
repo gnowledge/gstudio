@@ -565,8 +565,11 @@
               else{
                 dict_res[mem_of_name] = dict_res[mem_of_name] + 1
               }
-              {% if res_node.member_of_names_list.0|lower == "page" or res_node.member_of_names_list.0|lower == "quiz" %}
+              {% if res_node.member_of_names_list.0|lower == "page" %}
                 k = "{% url res_node.member_of_names_list.0|lower|concat:"_details" groupid res_node.pk %}"
+              {% elif res_node.member_of_names_list.0|lower == "quizitemevent" or res_node.member_of_names_list.0|lower == "quizitem" %}
+                k = "{% url 'quiz_item_edit' groupid res_node.pk %}?return_url=groupchange"
+
               {% else %}
                 k = "{% url res_node.member_of_names_list.0|lower|concat:"_detail" groupid res_node.pk %}"
               {% endif %}

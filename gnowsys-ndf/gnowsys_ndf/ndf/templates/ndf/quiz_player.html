@@ -1,8 +1,7 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
-{% get_user_quiz_resp node request.user as user_sub_ans %}
-
+{% get_user_quiz_resp node request.user as user_submitted_ans %}
 <style type="text/css">
 	.quiz_qtn{
 		margin-left:20px !important;
@@ -79,11 +78,12 @@
 							<br/>
 						{% endfor %}
 					{% elif node.quiz_type == "Short-Response" %}
-						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt"></textarea>
+
+						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt" >{{user_submitted_ans|default_if_none:""}}</textarea>
 						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
 					{% endif %}
 					<div class="row">
-						{% if node.quizitem_check_answer %}
+						{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
 							<input type="button" value="Check" class="button tiny check-ans radius check-btn">
 						{% endif %}
 						{% if node.quizitem_show_correct_ans %}
@@ -99,7 +99,7 @@
 </div>
 
 <script type="text/javascript">
-	user_sub_ans_list = {{user_sub_ans|jsonify|safe}}
+	user_submitted_ans_list = {{user_submitted_ans|jsonify|safe}}
 
 	$(document).ready(function() {
 		display_sub_ans()
@@ -130,10 +130,12 @@
 	})
 
 	function display_sub_ans(){
-		user_ans_list = user_sub_ans_list
-		$.each(user_ans_list,function(ind,each_opt_val){
-			$("#"+each_opt_val).prop("checked", true)
-		})
+		user_ans_list = user_submitted_ans_list
+		if(user_ans_list){
+			$.each(user_ans_list,function(ind,each_opt_val){
+				$("#"+each_opt_val).prop("checked", true)
+			})
+		}
 	}
 
 	function user_ans(){
@@ -161,6 +163,7 @@
 	}
 
 	$('input:radio').change(function() {
+		$(".chk_ans_lbl").addClass("hide")
 		if($(".check-btn").val() == "Clear"){
 			hide_options();
 			$(this).prop("checked", true)
@@ -168,6 +171,7 @@
 	})
 
 	$('input:checkbox').change(function() {
+		$(".chk_ans_lbl").addClass("hide")
 		if($(".check-btn").val() == "Clear"){
 			hide_options();
 			$(this).prop("checked", true)
@@ -189,25 +193,31 @@
 	})
 
 	function save_user_action(user_action, user_given_ans){
-        $.ajax({
-          url: "{% url 'save_quizitem_answer' group_id %}",
+		if(JSON.stringify(user_submitted_ans_list) != JSON.stringify(user_given_ans)){
+	        $.ajax({
+	          url: "{% url 'save_quizitem_answer' group_id %}",
 
-          data: {
-            node: "{{node.pk}}",
-            user_action: user_action,
-            user_given_ans: user_given_ans,
-            'csrfmiddlewaretoken': "{{csrf_token}}"
-          },
+	          data: {
+	            node: "{{node.pk}}",
+	            user_action: user_action,
+	            user_given_ans: user_given_ans,
+	            'csrfmiddlewaretoken': "{{csrf_token}}"
+	          },
 
-          type: "POST",
+	          type: "POST",
 
-          dataType: "json",
+	          dataType: "json",
 
-          success: function(data){
-          	user_sub_ans_list = user_given_ans
-          },
-        });//end of ajax
-
+	          success: function(data){
+	          	if(user_action == "submit"){
+	          		user_submitted_ans_list = user_given_ans
+	          	}
+	          },
+	        });//end of ajax
+		}
+		else{
+			alert("This answer is already submitted.")
+		}
 	}
 
 </script>
