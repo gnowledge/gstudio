@@ -34,9 +34,10 @@ from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, c
 from gnowsys_ndf.notification import models as notification
 
 
-GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
-GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
-
+gst_course = node_collection.one({'_type': "GSystemType", 'name': "Course"})
+ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
+gst_acourse = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
 
 def explore(request):
 
@@ -54,7 +55,9 @@ def explore_courses(request):
 
     title = 'courses'
 
-    context_variable = {'title': title}
+    ce_cur = node_collection.find({'member_of': ce_gst._id})
+
+    context_variable = {'title': title, 'doc_cur': ce_cur, 'card': 'ndf/event_card.html'}
 
     return render_to_response(
         "ndf/explore.html",
@@ -66,7 +69,9 @@ def explore_groups(request):
 
     title = 'groups'
 
-    context_variable = {'title': title}
+    group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id})
+
+    context_variable = {'title': title, 'doc_cur': group_cur, 'card': 'ndf/simple_card.html'}
 
     return render_to_response(
         "ndf/explore.html",
