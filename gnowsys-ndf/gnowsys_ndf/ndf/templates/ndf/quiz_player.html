@@ -147,6 +147,7 @@
 
 	// Select user's recent submitted answer ---------------------------------
 		function display_sub_ans(){
+			{% if node.quiz_type != "Short-Response" %}
 			user_ans_list = user_submitted_ans_list
 			if(user_ans_list){
 				$.each(user_ans_list,function(ind,each_opt_val){
@@ -161,6 +162,7 @@
 				})
 				submit_btn_status("hide")
 			}
+			{% endif %}
 		}
 
 	// Fecth user's selected answer ------------------------------------------
