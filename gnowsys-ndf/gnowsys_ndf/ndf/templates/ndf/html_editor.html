@@ -18,20 +18,20 @@
 
 {% trans var_placeholder as content %}
 
-<textarea id="textarea-{{var_name}}"  name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}" rows="10" cols="80"> {{var_value}} </textarea>
+<textarea id="ckeditor_textarea"  name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}" rows="10" cols="80"> {{var_value}} </textarea>
 
 <div id="group_imgs_on_modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
 </div>
 <script>
     // Replace the <textarea id="editor1"> with a CKEditor
     // instance, using default configuration.
-    CKEDITOR.replace( 'textarea-{{var_name}}',{
-        enterMode : Number(2), //override default behaviour that adds <p></p> in ck editor
+    CKEDITOR.replace( 'ckeditor_textarea',{
+        // enterMode : Number(2), //override default behaviour that adds <p></p> in ck editor
         toolbar:'{{ckeditor_toolbar}}',
         uiColor:'{{ckeditor_color}}',
         groupID: {group_id:'{{group_id}}'},
         nodeID: {node_id:'{{node_id}}'},
-        textarea_id: 'textarea-{{var_name}}',
+        textarea_id: 'ckeditor_textarea',
         customConfig : '/static/ndf/js/ckeditor-config.js',
         // toolbar :
         //                                     [

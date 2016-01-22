@@ -34,7 +34,7 @@
 <div>
   <br/>
     {% if allow_to_comment %}
-      <div  onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button small radius" style="margin-bottom:0;">
+      <div  onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="ckeditor-comment button small radius" style="margin-bottom:0;">
         {% if thr_int_type %}
           {{thr_int_type}} {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
@@ -43,20 +43,19 @@
       </div>
     {% endif %}
     
-    <input data-id="{{ node.pk }}" type="button" value="Post"  class="button small radius reply-button" onclick="addReply($(this))">
+    {% comment %}
     {% if sg_type != "Event" %}
       <input type="file" id="uploaded-files" style="" value="" multiple>
     {% else %}
       <input type="file" id="uploaded-files" style="" value="" multiple class="hide">
     {% endif %}
+    {% endcomment %}
     <input type="hidden" id="prior-node" style="visibility:hidden" value="">
-    <div class="ckeditor-area" style="display:none">
-      
-    </div>
+   
     <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
     <input type="hidden" id="last-edited-row" data-edited-row-id="">
 
-  <div id="replies-area" style="overflow-x:auto;">
+  <div id="replies-area">
 
     <!-- populating replies -->
 
@@ -143,7 +142,9 @@
   function createDiscussion()
   {
     if( is_user_authenticated){
-     
+       if(checkCurrEdit()){
+           return false; 
+         } 
         $.ajax({
           url: "{% url 'create_discussion' group_id node.pk %}",
           success: function(data){
@@ -159,8 +160,15 @@
                                 'ckeditor_toolbar' : "BasicToolbar"
                           },
                       success: function(data) {                         
-                            $(".ckeditor-area").html(data);
-                            $(".ckeditor-area").css("display","block");
+                            
+                            p = $('.ckeditor-comment');
+
+                            p.after('<div class="ckeditor-content-comment row"><div class="ckeditor-reply-area"></div> <div class="post-btn-div"></div> </div>');
+                                  // '<img width="'+  width + '"src=' + completeURL +  '>' + '</img>'
+                                  $('.ckeditor-reply-area').html(data);
+                                  $('.post-btn-div').html('<input data-id="{{ node.pk }}"  type="button" value="Post"  class="button small right radius reply-button" onclick="addReply(this)">');
+
+                            setCurrNodeEdit(1);
 
                       }
 
@@ -197,7 +205,7 @@
   // function called by "Add Reply" and "Reply" buttons to open editor
   function openCKEditor(sourceObj,each_oid)
   {
-          if(checkCurrEditRow()){
+          if(checkCurrEdit()){
            return false; 
          }
 
@@ -219,10 +227,14 @@
                                   p = r.closest('.disc-replies')
                                   parent_marginleft = p.css("margin-left");
                                   parent_marginleft = (parseFloat(parent_marginleft, 10) + 48) + "px";
-                                  p.after('<div class="ckeditor-reply-area" style="margin-left:'+ parent_marginleft +'"></div>');
+                                  post_marginleft = (parseFloat(parent_marginleft, 10) + 100 ) + "px";
+                                  p.after('<div class="ckeditor-content-reply row" style="margin-left:'+ parent_marginleft +'"><div class="ckeditor-reply-area"></div> <div class="post-btn-div"></div></div>');
                                   // '<img width="'+  width + '"src=' + completeURL +  '>' + '</img>'
                                   $('.ckeditor-reply-area').html(data);
-                                  setCurrNoneToEditRow(each_oid);
+
+                                  $('.post-btn-div').html('<input data-id="{{ node.pk }}"  type="button" value="Post"  class="button small right radius reply-button" onclick="addReply($(this))">');
+                                    
+                                  setCurrNodeEdit(each_oid);
                                   
                             }
 
@@ -274,7 +286,7 @@
   function addReply(sourceObj)
   {
 
-    var value = CKEDITOR.instances['textarea-'].getData();
+    var value = CKEDITOR.instances['ckeditor_textarea'].getData();
     var priorNodeId = $("#prior-node").val(),
         replyContent = value.trim();
         
@@ -282,14 +294,14 @@
     if( (replyContent.length > 0) && (priorNodeId.length == 24) )
     {
       docs_list = new FormData();
-      var all_files = document.getElementById("uploaded-files");
-      var docs_count = all_files.files.length;
-      for(var i = 0; i < docs_count; i++)
-        {
-          docs_list.append("upload"+i, all_files.files[i]);
-          // console.log(all_files.files[i]);
-        }
-        docs_list.append('upload_cnt', docs_count)
+      // var all_files = document.getElementById("uploaded-files");
+      // var docs_count = all_files.files.length;
+      // for(var i = 0; i < docs_count; i++)
+      //   {
+      //     docs_list.append("upload"+i, all_files.files[i]);
+      //     // console.log(all_files.files[i]);
+      //   }
+      //   docs_list.append('upload_cnt', docs_count)
         docs_list.append('csrfmiddlewaretoken','{{csrf_token}}');
         docs_list.append('reply_text_content', replyContent)
         docs_list.append('prior_node_id', priorNodeId)
@@ -408,14 +420,14 @@
    
 <script type="text/javascript">
    
-  function setCurrNoneToEditRow(oid)
+  function setCurrNodeEdit(oid)
   {
 
     document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", oid);
 
   }
 
-   function checkCurrEditRow()
+   function checkCurrEdit()
   {
     var editedRowName = document.getElementById("currently-edited-row").getAttribute("data-edited-row-name").trim(),
       editedRowId = document.getElementById("currently-edited-row").getAttribute("data-edited-row-id").trim();
@@ -431,6 +443,11 @@
       return false; // NO row is being editing now.
     }
   }
+
+
+
+
+
 
 </script>
 

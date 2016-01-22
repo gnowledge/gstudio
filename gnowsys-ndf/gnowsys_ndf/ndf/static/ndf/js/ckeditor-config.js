@@ -6,8 +6,8 @@
 	basePath = basePath.substr(0, basePath.indexOf("ndf/"));   
  	//function to add External plugins  
 	 (function() {
-	   CKEDITOR.plugins.addExternal('addImage',basePath+'ndf/js/ckPlugins/addImage/', 'plugin.js');
-	   CKEDITOR.plugins.addExternal('video',basePath+'ndf/js/ckPlugins/video/', 'plugin.js');
+	   CKEDITOR.plugins.addExternal('addImage',basePath+'ndf/js/ckPlugins/addImage/','plugin.js');
+	   CKEDITOR.plugins.addExternal('closebtn',basePath+'ndf/js/ckPlugins/closebtn/','plugin.js');
 
 	})();
 
@@ -19,14 +19,14 @@ CKEDITOR.editorConfig = function( config ) {
 	// The toolbar groups arrangement, optimized for two toolbar rows.
 	config.toolbar_GeneralToolbar =
 	[
-		{ name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-' ] },
-		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
-		{ name: 'insert', items : [ 'Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe' ] },
-		{ name: 'styles', items : [ 'Styles','Format' ] },
+		
 		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
+		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
+		{ name: 'insert', items : [ 'Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe','video' ] },
+		{ name: 'styles', items : [ 'Styles','Format' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] },
 		{ name: 'links', items : [ 'Link','Unlink' ] },
-		{ name: 'tools', items : [ 'Maximize','addImage','video'] },
+		{ name: 'tools', items : [ 'addImage','Maximize','-'] },
 	];
 
 	config.toolbar_BasicToolbar =
@@ -35,7 +35,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'insert', items : [ 'Image','Flash','Iframe' ] },
-		{ name: 'tools', items : [ 'addImage','Maximize','-','video'] },
+		{ name: 'tools', items : [ 'addImage','Maximize','-','closebtn'] },
 	];
 	
 		 
@@ -70,6 +70,6 @@ CKEDITOR.editorConfig = function( config ) {
 	
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
-	config.extraPlugins = 'addImage,video';
+	config.extraPlugins = 'addImage,closebtn';
 	config.allowedContent = true;
 };
