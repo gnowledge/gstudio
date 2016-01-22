@@ -26,7 +26,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'styles', items : [ 'Styles','Format' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] },
 		{ name: 'links', items : [ 'Link','Unlink' ] },
-		{ name: 'tools', items : [ 'addImage','Maximize','-'] },
+		{ name: 'tools', items : [ 'addImage', 'Source','Maximize','-'] },
 	];
 
 	config.toolbar_BasicToolbar =
@@ -35,7 +35,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'insert', items : [ 'Image','Flash','Iframe' ] },
-		{ name: 'tools', items : [ 'addImage','Maximize','-','closebtn'] },
+		{ name: 'tools', items : [ 'addImage','Source', 'Maximize','-','closebtn'] },
 	];
 	
 		 
