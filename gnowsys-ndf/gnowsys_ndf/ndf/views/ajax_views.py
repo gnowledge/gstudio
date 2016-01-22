@@ -6096,6 +6096,7 @@ def show_coll_cards(request, group_id):
 
 
 
+
 def get_visits_count(request, group_id):
 	'''
 	Accepts:
@@ -6145,3 +6146,14 @@ def get_visits_count(request, group_id):
 	except Exception as e:
 		print e
 		return HttpResponse(json.dumps(response_dict))
+
+@get_execution_time
+def get_ckeditor(request,group_id):
+    ckeditor_toolbar_val = request.GET.get('ckeditor_toolbar')
+    return render_to_response('ndf/html_editor.html',            
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'ckeditor_toolbar': ckeditor_toolbar_val
+            },
+            context_instance=RequestContext(request))
+

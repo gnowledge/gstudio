@@ -61,7 +61,7 @@ Image Gallery
   </ul>     
   
 
-<ul class="clearing-thumbs" data-clearing>
+<ul class="clearing-thumbs" data-clearing   style="height:100px;width:100px;z-index:-1">
   {% for image in imageCollection %}
   <li  class="clearing-featured-img">
     <a href="{% url 'get_mid_size_img' group_name_tag image %}">

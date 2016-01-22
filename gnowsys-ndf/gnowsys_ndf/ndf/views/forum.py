@@ -143,7 +143,7 @@ def create_forum(request, group_id):
             colf.content_org = unicode(content_org)
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
-            colf.content = org2html(content_org, file_prefix=filename)
+            colf.content = content_org
         
         usrid = int(request.user.id)
         usrname = unicode(request.user.username)
@@ -274,7 +274,7 @@ def edit_forum(request,group_id,forum_id):
             colf.content_org = unicode(content_org)
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
-            colf.content = org2html(content_org, file_prefix=filename)
+            colf.content = content_org
         
         usrid = int(request.user.id)
         usrname = unicode(request.user.username)
@@ -518,7 +518,7 @@ def create_thread(request, group_id, forum_id):
             # Required to link temporary files with the current user who is modifying this document
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
-            colrep.content = org2html(content_org, file_prefix=filename)
+            colrep.content = content_org
 
         usrid = int(request.user.id)
         colrep.created_by = usrid
