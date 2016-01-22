@@ -2,7 +2,7 @@
 {% load ndf_tags %}
 {% load simple_filters %}
 <style type="text/css">
-          
+
   .rating-stars > div {
       background-image:url("/static/ndf/images/stars.png");
       height: 17px;
@@ -23,7 +23,7 @@
 
   </style>
 
- 
+
 
  <div class="event-card">
 
@@ -83,38 +83,37 @@
     {% else %}
         <img src="/static/ndf/images/metaStudio-profile.svg"  class="img-height">
     {% endif %}
-      
-      
+
+    <!-- Card Title -->
+    <div class="event-card-title" title="{% firstof resource.altnames resource.name %}">
+      {% firstof resource.altnames resource.name %}
+    </div>
+    <!-- End Card Title -->
+
   </div>
   <!-- End Card  Image -->
   {% get_event_status resource as event_status_msg %}
-     
-<div class="event-card-status {{event_status_msg|lower}}">   
-        {% if is_event %}
-          {% if event_status_msg %}
-              {{event_status_msg}} 
-          {% endif%}
-        {% endif%}
-      </div>
-    <!-- Card Title -->
-    <div class="event-card-title" title="{% firstof resource.altnames resource.name %}">
-    {% firstof resource.altnames resource.name %}
-    <!-- {% get_node_ratings request resource.pk as ratings %} -->
-            <!-- <div class="rating-stars center" style="width:{{ratings.avg|multiply:16}}px;"> <!-- 16px = 1 star -->
-              <!-- <div></div>
-            </div> --> 
-    
-   
+
+  <div class="event-card-status {{event_status_msg|lower}}">
+    {% if is_event %}
+      {% if event_status_msg %}
+          {{event_status_msg}}
+      {% endif%}
+    {% endif%}
+  </div>
+  <!-- Card Notification -->
+    <div class="event-card-notifications">
+      <span> 2 New Notifications</span>
     </div>
-    <!-- End Card Title -->
-    
+  <!-- End Card Notification -->
+
     <!-- Card Description -->
 
     <!-- suppy no_description=True for not having description -->
     {% if not no_description %}
-      <div class="event-card-desc" title="{{resource.content_org}}">
-       {{resource.content_org|default_if_none:"Add some description."|truncatechars:75}}
-      </div>
+      <!--div class="event-card-desc" title="{{resource.content_org}}">
+       {#resource.content_org|default_if_none:"Add some description."|truncatechars:75#}
+      </div-->
     {% endif %}
     <!-- End Card Description  -->
     <!-- Card Next Session -->
@@ -125,20 +124,39 @@
 
     {% elif next_session %}
       {% get_course_session_status resource as event_session_status %}
-       {% if event_session_status.1 == True %} 
-        First 
-       {% else %} 
-        Next 
-       {% endif %} 
-       Session:
-      <b>{{event_session_status.0|date:"d-m-Y"}}</b>
+       {% if event_session_status.1 == True %}
+        First
+       {% else %}
+        Next
+       {% endif %}
+       Session
+      <b class="event-time">{{event_session_status.0|date:"d-m-Y"}}</b>
     {% endif %}
     </div>
     <!-- {{resource.author_set|length}}<i class="fa fa-users"></i> -->
+    <!--Event card footer-->
+    <div class="event-card-session-footer">
+      <div><i class="fa fa-calendar-o"></i> Jan 5th,2016 - Mar 4, 2016</div>
+      <div class="row collapse">
+        <div class="small-12 columns">Course Duration</div>
+        <div class="small-12 columns date">
+          <i class="fa fa-calendar-o"></i> Jan 5th,2016 - Mar 4, 2016
+          <i class="fa fa-pencil-square-o edit-course-date"></i>
+        </div>
+      </div>
+      <div class="row collapse">
+        <div class="small-12 columns ">Enrolment Dates</div>
+        <div class="small-12 columns date">
+          <i class="fa fa-calendar-o "></i> Jan 5th,2016 - Mar 4, 2016
+          <i class="fa fa-pencil-square-o"></i>
+        </div>
+      </div>
+    </div>
+    <!--End event card footer-->
 
     <!-- End Next Session -->
 
 </div>
-    
-    
+
+
 </a>

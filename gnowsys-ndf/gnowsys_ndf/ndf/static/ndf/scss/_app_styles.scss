@@ -1507,112 +1507,101 @@ aside#help{
 
 /* Course/ Event Card CSS*/
 
+.card-image-wrapper {
+  position: relative;
+}
 
 .event-card {
-    border:1px solid #AAA;
-    border-bottom:3px solid #BBB;
-    padding:0px;
-    margin:5px;
-    overflow:hidden;
-    width:100%;
-    height:16rem;
-     &:hover{
+  border: 1px solid #AAA;
+  border-bottom: 3px solid #BBB;
+  padding: 0px;
+  min-height: 22rem;
+  position: relative;
+  &:hover{
     box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
     transition: box-shadow 0.5s ease;
-    }
-
-   .event-card-status.open{
-    z-index: 99;
-    width: auto;
-    //margin-right: 200px;
-    top: 30px;
-    margin-left:-5px;
-    //right: 0;
-    //vertical-align: middle;
-    position: absolute;
-    display: inline-block;
-    background-color: #00b300;
-    color:white;
-    }
-
-    .event-card-status.closed{
-    z-index: 99;
-    width: auto;
-    top: 30px;
-    margin-left:-5px;
-    position: absolute;
-    display: inline-block;
-    background-color: red;
-    color:white;
-    }
-
-    .event-card-status.in-progress{
-    z-index: 99;
-    width: auto;
-    top: 30px;
-    margin-left:-5px;
-    position: absolute;
-    display: inline-block;
-    background-color: #00b300;
-    color:white;
-    }
-    .event-card-status.forthcoming{
-    z-index: 99;
-    width: auto;
-    top: 30px;
-    margin-left:-5px;
-    position: absolute;
-    display: inline-block;
-    background-color: #F2910D;
-    color:white;
-    }
-
-    .event-card-status.completed{
-    z-index: 99;
-    width: auto;
-    top: 30px;
-    margin-left:-5px;
-    position: absolute;
-    display: inline-block;
-    background-color: #4d4d4d;
-    color:white;
-    }
-  .event-card-session-status.open{
-    color: #00b300;
-    padding-left: 4px;
-    font-size: 0.6em;
-    }
-
-  .event-card-session-status.closed{
-    color: red;
-    padding-left: 4px;
-    font-size: 0.6em;
-    }
-
-  .event-card-session-status.in-progress{
-    color: #00b300;
-    padding-left: 4px;
-    font-size: 0.6em;
-    }
-  .event-card-session-status.forthcoming{
-    color: #F2910D;
-    padding-left: 4px;
-    font-size: 0.6em;
   }
 
-  .event-card-session-status.completed{
-    color: #4d4d4d;
-    padding-left: 4px;
-    font-size: 0.6em;
+  .event-card-status {
+    z-index: 99;
+    width: auto;
+    top: -1em;
+    position: absolute;
+    display: inline-block;
+    color: white;
+    right: -0.4em;
+    padding: 0.3em 1em;
+    text-transform: uppercase;
+
+    &.open{
+      background-color: #00b300;
     }
-  .event-card-title{
+    &.closed{
+      background-color: red;
+    }
+    &.in-progress{
+      background-color: #00b300;
+    }
+    &.forthcoming{
+      background-color: #F2910D;
+    }
+
+    &.completed{
+      background-color: #4d4d4d;
+    }
+  }
+
+  .event-card-notifications {
+    position: absolute;
+    top: 2px;
+    left: 7px;
+    font-size: 0.9em;
+    color: #F04124;
+    font-weight: 600;
+  }
+
+  .event-card-session-status {
     padding-top: 1em;
-    color: #0d0d0d;
     font-weight: bold;
-    font-size: 0.8em;
+    font-size: 1.2em;
     padding-left: 4px;
 
+    &.open{
+      color: #00b300;
+      }
+
+    &.closed{
+      color: red;
+      }
+
+    &.in-progress{
+      color: #000;
     }
+    &.forthcoming{
+      color: #F2910D;
+    }
+
+    &.completed{
+      color: #4d4d4d;
+      }
+
+    .event-time {
+      font-size: 0.7em;
+      display: block;
+      font-weight: 800;
+    }
+  }
+
+  .event-card-title{
+    color: #0d0d0d;
+    display: inline-block;
+    top: 50%;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5em;
+    font-weight: 800;
+  }
 
   .event-card-desc{
     word-wrap: break-word;
@@ -1620,114 +1609,128 @@ aside#help{
     color:#333333;
     padding-left: 4px;
   }
- p {
+  p {
     margin:0px;
     padding:10px;
   }
 
 
- .event-card-image {
-    max-height:12rem;
-    padding:0px;
-    margin:0px;
-    background-position:center;
-    background-repeat:no-repeat;
-    position:relative;
-    overflow:hidden;
-    height: 10rem;
-    background-color: gray;
+  .event-card-image {
+    padding: 0px;
+    margin: 0px;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+    height: 60%;
+    background-color: #e5e5e5;
+
     img  {
-    border-radius: 2px 2px 0 0;
+      border-radius: 2px 2px 0 0;
+      display: block;
+      visibility: hidden;
+      margin: 0 auto;
+      opacity: 0.9;
+      height:100%;
+    }
+
+    i {
+    font-size: 7rem;
+    opacity: 0.75;
     display: block;
-    margin: 0 auto;
-    opacity: 0.9;
-    //width:100%;
-    height:100%;
-  }
-
-  i {
-  font-size: 7rem;
-  opacity: 0.75;
-  display: block;
-  margin: -15px auto;
-  text-align: center;
-  color: gray;
-  font-family: "foundation-icons";
-  font-style: normal;
-  font-variant: normal;
-  text-transform: none;
-  text-decoration: inherit;
-  }
-
-  i.file:before {
-  content: "\f18e";
-  }
-  i.page:before {
-  content: "\f18e";
-  }
-  i.collection:before {
-  content: "\f18a";
-  }
-  i.documents:before {
-  content: "\f18b";
-  }
-  i.pdf:before {
-  content: "\f18b";
-  }
-  i.text:before {
-  content: "\f18e";
-  }
-  i.interactives:before {
-  content: "\f1b2";
-  }
-  i.ebooks:before {
-  content: "\f11e";
-  }
-  i.images:before {
-  content: "\f125";
-  }
-  i.audios:before, i.audio:before {
-  content: "\f17b";
-  }
-  i.videos:before, i.video:before {
-  content: "\f20e";
-  }
-
-
-}
- .published.scard-action {
-      background: #A6D9CB;
+    margin: -15px auto;
+    text-align: center;
+    color: gray;
+    font-family: "foundation-icons";
+    font-style: normal;
+    font-variant: normal;
+    text-transform: none;
+    text-decoration: inherit;
     }
 
- .draft.scard-action {
-      content: "Draft";
-      background: #DCDCDC;
-
+    i.file:before {
+    content: "\f18e";
     }
+    i.page:before {
+    content: "\f18e";
+    }
+    i.collection:before {
+    content: "\f18a";
+    }
+    i.documents:before {
+    content: "\f18b";
+    }
+    i.pdf:before {
+    content: "\f18b";
+    }
+    i.text:before {
+    content: "\f18e";
+    }
+    i.interactives:before {
+    content: "\f1b2";
+    }
+    i.ebooks:before {
+    content: "\f11e";
+    }
+    i.images:before {
+    content: "\f125";
+    }
+    i.audios:before, i.audio:before {
+    content: "\f17b";
+    }
+    i.videos:before, i.video:before {
+    content: "\f20e";
+    }
+  }
+  .event-card-session-footer{
+    padding: 0.5em 1em;
+    border-top: 1px solid black;
+    font-size: 0.8em;
+    color: #000;
+    font-size: 0.9em;
+    font-weight: bold;
+
+    .date {
+      color: #CCCCCC;
+      font-size: 0.8em;
+    }
+    .row {
+      margin: 10px 0px;
+    }
+  }
+  .edit-course-date {
+    float: right;
+    font-size: 1.5em;
+  }
+  .published.scard-action {
+    background: #A6D9CB;
+  }
+
+  .draft.scard-action {
+    content: "Draft";
+    background: #DCDCDC;
+  }
 
   .deleted.scard-action {
-      border-color: transparent $alert-color transparent transparent;
-      border-color: rgba(255,255,255,0) $alert-color rgba(255,255,255,0) rgba(255,255,255,0);
-    }
+    border-color: transparent $alert-color transparent transparent;
+    border-color: rgba(255,255,255,0) $alert-color rgba(255,255,255,0) rgba(255,255,255,0);
+  }
 
   .moderation.scard-action {
-      border-color: transparent $primary-color transparent transparent;
-      border-color: rgba(255,255,255,0) $primary-color rgba(255,255,255,0) rgba(255,255,255,0);
+    border-color: transparent $primary-color transparent transparent;
+    border-color: rgba(255,255,255,0) $primary-color rgba(255,255,255,0) rgba(255,255,255,0);
 
-      .label-text:before{ content: "Mod"; }
-    }
-
-
-.scard_footer {
-  border-top: 1px solid rgba(160, 160, 160, 0.2);
-  padding: 0.25rem 0.5rem;
-  color: gray;
-  font-size: small;
-  height: 2rem;
+    .label-text:before{ content: "Mod"; }
   }
 
 
-
+  .scard_footer {
+    border-top: 1px solid rgba(160, 160, 160, 0.2);
+    padding: 0.25rem 0.5rem;
+    color: gray;
+    font-size: small;
+    height: 2rem;
+  }
 }
 
 
