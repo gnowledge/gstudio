@@ -1924,7 +1924,7 @@ def group_dashboard(request, group_id=None):
                 'member_of':page_gst._id,
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
-            }).sort('last_update', -1)
+            }).sort('created_at', -1)
 
       start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
       # if 'start_enroll' in group_obj:
