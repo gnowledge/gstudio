@@ -130,7 +130,7 @@
 		}
 	})
 
-	function submit_action_status(show_hide){
+	function submit_btn_status(show_hide){
 		if(show_hide == "show"){
 			$(".submit-btn")
 				.removeAttr("disabled")
@@ -156,7 +156,7 @@
 					$("#"+each_opt_val).prop("checked", true)
 				}
 			})
-			submit_action_status("hide")
+			submit_btn_status("hide")
 		}
 	}
 
@@ -191,10 +191,10 @@
 			$(this).prop("checked", true)
 		}
 		if(user_submitted_ans_list == $(this).attr('id') ){
-			submit_action_status("hide")
+			submit_btn_status("hide")
 		}
 		else{
-			submit_action_status("show")
+			submit_btn_status("show")
 		}
 
 	})
@@ -239,7 +239,7 @@
 
 	          success: function(data){
 	          	if(user_action == "submit"){
-					submit_action_status("hide")
+					submit_btn_status("hide")
 	          		user_submitted_ans_list = user_given_ans
 	          	}
 	          },
