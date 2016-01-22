@@ -3241,5 +3241,6 @@ def get_user_quiz_resp(node_obj, user_obj):
 				recent_ans = qip_sub[-1]
 				if node_obj.quiz_type == "Short-Response":
 					result['recent_ans'] = recent_ans
-				result['recent_ans'] = recent_ans.values()[0]
+				else:
+					result['recent_ans'] = recent_ans.values()[0]
 		return result
