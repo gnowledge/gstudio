@@ -131,8 +131,6 @@ def discussion_reply(request, group_id, node_id):
         prior_node = request.POST.get("prior_node_id", "")
         content_org = request.POST.get("reply_text_content", "") # reply content
 
-        print content_org
-
         # process and save node if it reply has content  
         if content_org:
       
