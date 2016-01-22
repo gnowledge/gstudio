@@ -526,10 +526,10 @@
                     {% if thread_node %}
                         {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
                         {% get_node thread_node as thread_node_obj %}
-                        {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj ckeditor_toolbar="DiscussionToolbar" %}
+                        {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj  %}
                     {% else %}            
                         {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                        {% include 'ndf/in-line-texteditor.html' with ckeditor_toolbar="DiscussionToolbar" %}
+                        {% include 'ndf/in-line-texteditor.html'  %}
                     {% endif %}
                   {% endif %}
 
