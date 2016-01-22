@@ -102,15 +102,15 @@
             // alert(nav_list);
             // alert("node_type");
             $.ajax({
-                type: "POST",
+                type: "GET",
                 url: "{% url 'collection_nav' group_id %}",
                 datatype: "html",
                 data:{
                   node_id: node.id,
                   curr_node:"{{node.pk}}",
                   nav: nav_list,
-                  nod_type: node_type,
-                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                  nod_type: node_type
+                  // csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function(data) {
                   if (node_type == "Page"){

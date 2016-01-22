@@ -1454,8 +1454,10 @@ class EventGroupCreateEditHandler(View):
             group_obj = get_group_name_id(group_id, get_obj=True)
             grel_id = None
 
-            logo_img_node, grel_id = get_relation_value(group_obj._id,'has_profile_pic')
-
+            logo_img_node_grel_id = get_relation_value(group_obj._id,'has_profile_pic')
+            if logo_img_node_grel_id:
+                logo_img_node = logo_img_node_grel_id[0]
+                grel_id = logo_img_node_grel_id[1]
 
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.

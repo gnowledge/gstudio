@@ -128,7 +128,9 @@
      {% endif %}
          <i style="float">{{resource.created_at|date:"d-m-Y"}}</i>
      {% if gstaff_access  %}
-     </a> <input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
+      {% if not no_checkbox %}
+        </a> <input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
+      {% endif %}
     {% endif %}
   </div>
 {% endif %}
