@@ -148,27 +148,36 @@
 			        {% if user_access == "allow" %}
 
 			        <div class="content" id="journal-tab">
-			            <div class="text-right">
+                  <h4>
+                    {% trans 'Following are the added Blogs: ' %}
+                  </h4>
+                  <div class="text-right">
 			                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button small radius"> Add Blog </a>
 			            </div>
-			            <div class="row all_blogs">
+			            <div class="row all_blogs small-block-grid-1 medium-block-grid-2 large-block-grid-5">
 			            	{% for each_blog in blog_pages %}
-			                <div class="blogpage"  style="margin-left:10px;">
-			                  <h4>
-			                    <a href="{% url 'page_details' group_id each_blog.pk %}">{{each_blog.name}}</a>
-			                  </h4>
-			                  {% if request.user.id == each_blog.created_by or gstaff_access %}
+                      <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
+                        {% include 'ndf/simple_card.html' with resource=each_blog has_contributor=True no_description=True no_checkbox=True url_name="page_details" first_arg=group_id second_arg=each_blog.pk %}
+                      </li>
 
-			                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}&blog_type=True"> Edit </a>
-			                  {% endif %}
-			                  <span>
-			                  Created by {{each_blog.created_by|get_username}} at {{each_blog.created_at}}
-			                  </span>
-			                  <div>
-			                    {{each_blog.html_content|safe}}
-			                  </div>
-			                </div>
-			                <hr/>
+                      {% comment %}
+                      <div class="blogpage"  style="margin-left:10px;">
+                        <h4>
+                          <a href="{% url 'page_details' group_id each_blog.pk %}">{{each_blog.name}}</a>
+                        </h4>
+                        {% if request.user.id == each_blog.created_by or gstaff_access %}
+
+                          <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}&blog_type=True"> Edit </a>
+                        {% endif %}
+                        <span>
+                        Created by {{each_blog.created_by|get_username}} at {{each_blog.created_at}}
+                        </span>
+                        <div>
+                          {{each_blog.html_content|safe}}
+                        </div>
+                      </div>
+                      <hr/>
+                      {% endcomment %}
 			              {% empty %}
 			                <div class="blogpage"  style="margin-left:10px;">
 			                  <h4><u>
