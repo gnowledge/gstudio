@@ -78,7 +78,6 @@
 							<br/>
 						{% endfor %}
 					{% elif node.quiz_type == "Short-Response" %}
-
 						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt" >{{user_submitted_ans|default_if_none:""}}</textarea>
 						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
 					{% endif %}
@@ -89,7 +88,9 @@
 						{% if node.quizitem_show_correct_ans %}
 							<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
 						{% endif %}
+						{% if not node.quizitem_show_correct_ans %}
 						<input type="button" value="Submit" class="tiny button radius submit-btn">
+						{% endif %}
 					</div>
 
 				</div>
@@ -129,12 +130,33 @@
 		}
 	})
 
+	function submit_action_status(show_hide){
+		if(show_hide == "show"){
+			$(".submit-btn")
+				.removeAttr("disabled")
+				.removeClass("secondary")
+		}
+		else{
+			$(".submit-btn")
+				.attr("disabled","disabled")
+				.addClass("secondary")
+		}
+	}
+
 	function display_sub_ans(){
 		user_ans_list = user_submitted_ans_list
 		if(user_ans_list){
 			$.each(user_ans_list,function(ind,each_opt_val){
-				$("#"+each_opt_val).prop("checked", true)
+				var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
+				if(re.test(each_opt_val)){
+					each_opt_val = each_opt_val.replace(re,"\\$&")
+					$(":radio[value='"+each_opt_val+"']").prop("checked", true)
+				}
+				else{
+					$("#"+each_opt_val).prop("checked", true)
+				}
 			})
+			submit_action_status("hide")
 		}
 	}
 
@@ -168,6 +190,13 @@
 			hide_options();
 			$(this).prop("checked", true)
 		}
+		if(user_submitted_ans_list == $(this).attr('id') ){
+			submit_action_status("hide")
+		}
+		else{
+			submit_action_status("show")
+		}
+
 	})
 
 	$('input:checkbox').change(function() {
@@ -210,6 +239,7 @@
 
 	          success: function(data){
 	          	if(user_action == "submit"){
+					submit_action_status("hide")
 	          		user_submitted_ans_list = user_given_ans
 	          	}
 	          },
