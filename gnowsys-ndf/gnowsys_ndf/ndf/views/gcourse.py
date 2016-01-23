@@ -1792,11 +1792,19 @@ def course_summary(request, group_id):
     return render_to_response(template, variable)
 
 
-def course_resource_detail(request, group_id, course_section, course_sub_section, course_unit, resource):
+def course_resource_detail(request, group_id):
+    if request.method == "GET":
+        # course_section = request.GET.get("course_section", "")
+        # course_sub_section = request.GET.get("course_sub_section", "")
+        # course_unit = request.GET.get("course_unit", "")
+        node_id = request.GET.get("node", "")
+        # print "\n\n node_id",node_id
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        variable = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id,
+            'node': node_obj
+        })
 
-    variable = RequestContext(request, {
-        'group_id': group_id, 'groupid': group_id,
-    })
 
-    template = "ndf/unit_player.html"
-    return render_to_response(template, variable)
+        template = "ndf/unit_player.html"
+        return render_to_response(template, variable)

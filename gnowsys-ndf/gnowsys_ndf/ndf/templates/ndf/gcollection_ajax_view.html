@@ -85,12 +85,18 @@
             {
               data: moduleData[pos].children,
               onCreateLi: function(node, $li) {
-                if (node.node_type === "Page") {
+                if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
                   $li.find('.jqtree-title').addClass('module-page');
+                  url = "{% url 'course_resource_detail' group_name_tag  %}"
+                  url += "?node=" + node.id
+                  $li.find('.jqtree-title')
+                    .html('<i class="fa ' + iconMapping[node.status] + '"></i><a href="'+url+'" id='+node.id+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
+                }
+                else{
+                  $li.find('.jqtree-title')
+                    .html('<i class="fa ' + iconMapping[node.status] + '"></i><span>' + $li.find('.jqtree-title').html() + ' </span>');
                 }
                 // Add 'icon' span before title
-                $li.find('.jqtree-title')
-                  .html('<i class="fa ' + iconMapping[node.status] + '"></i><span>' + $li.find('.jqtree-title').html() + ' </span>');
               }
             });
           $(".course-content .collection").append(mod);
@@ -137,47 +143,50 @@
             }
             collapse_tree(node);
             var nav_list = parent_arr.reverse();
-            if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
-            // alert(nav_list);
-            // alert("node_type");
-            $.ajax({
-                type: "GET",
-                url: "{% url 'collection_nav' group_id %}",
-                datatype: "html",
-                data:{
-                  node_id: node.id,
-                  curr_node:"{{node.pk}}",
-                  nav: nav_list,
-                  nod_type: node_type,
-                  csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function(data) {
-                  if (node_type == "Page"){
-                   window.history.pushState("", "", "/{{group_name_tag}}/page/{{node.pk}}"+"?selected="+node.id+"");
-                  }
-                  else if(node_type == "File"){
-                    window.history.pushState("", "", "/{{group_name_tag}}/file/{{node.pk}}"+"?selected="+node.id+"");
-                  }
-                  else if (node_type == "Term"){
-                    window.history.pushState("", "", "/{{group_name_tag}}/term/{{node.pk}}"+"?selected="+node.id+"");
-                  }
-                  else if (node_type == "Course"){
-                    window.history.pushState("", "", "/{{group_id}}/course/course_detail/{{node.pk}}"+"?selected="+node.id+"");
-                  }
-                  if (node_type == "CourseEventGroup" || node_type == "ProgramEventGroup"){
-                    window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");
-                    $(".view_page_link").trigger('click')
-                  }
-                  else if (node_type == "Topic"){
-                    window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
-                  }
+            // if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
 
-                  $("#view-page").html(data);
-                }
-            });
-            $('article').unblock()
-            }
-            else if(node['node_type']=="CourseUnitEvent"){
+
+              // alert(nav_list);
+              // alert("node_type");
+              // $.ajax({
+              //     type: "GET",
+              //     url: "{% url 'collection_nav' group_id %}",
+              //     datatype: "html",
+              //     data:{
+              //       node_id: node.id,
+              //       curr_node:"{{node.pk}}",
+              //       nav: nav_list,
+              //       nod_type: node_type,
+              //       csrfmiddlewaretoken: '{{ csrf_token }}'
+              //     },
+              //     success: function(data) {
+              //       if (node_type == "Page"){
+              //        window.history.pushState("", "", "/{{group_name_tag}}/page/{{node.pk}}"+"?selected="+node.id+"");
+              //       }
+              //       else if(node_type == "File"){
+              //         window.history.pushState("", "", "/{{group_name_tag}}/file/{{node.pk}}"+"?selected="+node.id+"");
+              //       }
+              //       else if (node_type == "Term"){
+              //         window.history.pushState("", "", "/{{group_name_tag}}/term/{{node.pk}}"+"?selected="+node.id+"");
+              //       }
+              //       else if (node_type == "Course"){
+              //         window.history.pushState("", "", "/{{group_id}}/course/course_detail/{{node.pk}}"+"?selected="+node.id+"");
+              //       }
+              //       if (node_type == "CourseEventGroup" || node_type == "ProgramEventGroup"){
+              //         window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");
+              //         $(".view_page_link").trigger('click')
+              //       }
+              //       else if (node_type == "Topic"){
+              //         window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
+              //       }
+
+              //       $("#view-page").html(data);
+              //     }
+              // });
+            // $('article').unblock()
+            // }
+            // else if(node['node_type']=="CourseUnitEvent"){
+            if(node['node_type']=="CourseUnitEvent"){
               $(".view_page_link").trigger('click')
               $("#view_page").html("")
               var lbl_name = document.createElement('label');

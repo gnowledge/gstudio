@@ -30,5 +30,5 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.gcourse',
                         url(r'^/enroll_to_course/$', 'enroll_to_course', name='enroll_to_course'),
                         url(r'^/set_release_date_css/$', 'set_release_date_css', name='set_release_date_css'),
                         url(r'^/summary/$', 'course_summary', name='course_summary'),
-                        url(r'^/(?P<course_section>)/(?P<course_sub_section>)/(?P<course_unit>)/(?P<resource>)/$', 'course_resource_detail', name='course_resource_detail'),
+                        url(r'^/units/$', 'course_resource_detail', name='course_resource_detail'),
                        )
