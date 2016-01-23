@@ -203,6 +203,9 @@ body{
   }
 }
 
+.reveal-modal-bg {
+  background:rgba(0, 0, 0, 0.85);
+}
 #top-headers {
 
   padding-bottom: 0em;
@@ -2594,7 +2597,6 @@ div.show-image:hover div.fullscreen-icon{
     vertical-align: top;
   }
 
-
   .file-item {
     width: 80%;
     color: #fff;
@@ -2603,6 +2605,12 @@ div.show-image:hover div.fullscreen-icon{
     position: relative;
     background: #fff;
     border: 1px solid black;
+    overflow: hidden;
+
+    .item-thumbnail-image {
+      height: 100%;
+      padding: 1em;
+    }
 
     .file-details {
       margin-top: 10%;
@@ -2636,6 +2644,10 @@ div.show-image:hover div.fullscreen-icon{
     &:hover {
       background: #999999;
 
+      .item-thumbnail-image{
+        opacity: 0.2;
+      }
+
       .file-details, .file-actions {
         display: block;
       }
@@ -2647,13 +2659,119 @@ div.show-image:hover div.fullscreen-icon{
 
 }
 
+#userGallery {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0px !important;
+  left: 0px;
+  padding-top: 1em;
+  background: transparent;
+
+  .gmodal-toolbar {
+    height: 7vh;
+    font-size: 1.5em;
+    border-bottom: 1px solid black;
+    color: #fff;
+
+    .gmodal-actions {
+
+      >div {
+        display: inline-block;
+        padding: 0.2em 0.3em;
+        cursor: pointer;
+
+        &:hover {
+          background: #CCCCCC;
+        }
+      }
+      .close-reveal-modal {
+        top: 0px;
+      }
+    }
+  }
+
+  .gmodal-body {
+    .gmodal-item-panel {
+      height: 80vh;
+
+      .gmodal-item-holder {
+        height: 100%;
+        padding: 1em;
+
+        .gmodal-item {
+          height: 100%;
+          width: 100%;
+          background: #fff;
+          padding: 0px;
+
+          .gmodel-item-image {
+            width: 65vh;
+            margin: 0px auto;
+            display: block;
+            padding: 1em 0em;
+          }
+        }
+      }
+      .gmodal-footer {
+        height: 8vh;
+        line-height: 2em;
+        font-size: 1.6em;
+        color: #fff;
+
+        >div:not(.gmodal-item-details) {
+          cursor: pointer;
+        }
+
+        .gmodal-item-details {
+          text-align: center;
+
+          i {
+            margin-left: 1em;
+          }
+        }
+      }
+    }
+    .gmodal-comments-panel {
+      height: 86vh;
+
+      .gmodal-comments {
+        background: #fff;
+        height: 100%;
+        padding: 0.1em 1em;
+
+        .comment-heading {
+          font-size: 0.9em;
+          line-height: 1em;
+
+          .commented-date,
+          .comment-rating {
+            font-size: 0.7em;
+          }
+        }
+        .comment-text {
+          font-size: 0.9em;
+        }
+      }
+    }
+  }
+
+}
+
 .user-comment {
+  display: inline-flex;
+
+  >div {
+    display: inline-block;
+  }
+
   .comment-heading {
     color: #9C9C9C;
     border-bottom: 1px solid grey;
     padding-bottom: 10px;
     margin-bottom: 10px;
     margin-top: 10px;
+
 
     >div {
       display: inline-block;
@@ -2663,6 +2781,11 @@ div.show-image:hover div.fullscreen-icon{
       font-weight: bold;
       color: #333333;
     }
+  }
+  .user-avatar {
+    font-size: 10em;
+    font-size: 5em;
+    line-height: 1em;
   }
 }
 

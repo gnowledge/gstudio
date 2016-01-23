@@ -98,11 +98,7 @@
             </div>
             <div class="gallery-body small-12">
                 <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
-                    {% include "ndf/ggallerycard.html" %}
-                    {% include "ndf/ggallerycard.html" %}
-                    {% include "ndf/ggallerycard.html" %}
-                    {% include "ndf/ggallerycard.html" %}
-                    {% include "ndf/ggallerycard.html" %}
+
                 </ul>
             </div>
         </div>
@@ -127,8 +123,77 @@
         </div>
     </div>
 </div>
+{% include "ndf/ggallerycard.html" %}
+{% include "ndf/ggallerymodal.html" with id="userGallery" %}
 <script type="text/javascript">
+    var galleryData = [{
+        'id': 0,
+        'name': 'User File 1',
+        'views': 23,
+        'rating': 12,
+        'comments': 996,
+        'type': 'image',
+        'size': 5, //in KB
+        'download-link': 'www.google.com',
+        'collection': 'rranjan-collection',
+        'uploadedBy': 'rranjan',
+        'item-image': 'http://www.clker.com/cliparts/c/W/h/n/P/W/generic-image-file-icon-hi.png',
+        'createdOn': '26/02/2016'
+    },
+    {
+        'id': 1,
+        'name': 'User File 2',
+        'views': 33,
+        'rating': 112,
+        'comments': 236,
+        'type': 'image',
+        'size': 5, //in KB
+        'download-link': 'www.google.com',
+        'collection': 'rranjan-collection',
+        'uploadedBy': 'rranjan',
+        'item-image': 'http://f.tqn.com/y/pcsupport/1/0/C/Q/-/-/zip-file.png',
+        'createdOn': '26/02/2016'
+    },{
+        'id': 2,
+        'name': 'User File 3',
+        'views': 233,
+        'rating': 2,
+        'comments': 6,
+        'type': 'image',
+        'size': 5, //in KB
+        'download-link': 'www.google.com',
+        'collection': 'rranjan-collection',
+        'uploadedBy': 'rranjan',
+        'item-image': 'http://1.bp.blogspot.com/-f4CFhdpj5G8/TnTx8U5tedI/AAAAAAAACjw/G6cU4wFRQjU/s1600/music_file_alt.png',
+        'createdOn': '26/02/2016'
+    },{
+        'id': 3,
+        'name': 'User File 4',
+        'views': 233,
+        'rating': 2,
+        'comments': 6,
+        'type': 'image',
+        'size': 5, //in KB
+        'download-link': 'www.google.com',
+        'collection': 'rranjan-collection',
+        'uploadedBy': 'rranjan',
+        'item-image': 'http://southpolesoftware.com/iVI/images/icon-video.gif',
+        'createdOn': '26/02/2016'
+    }];
     $(function() {
+        var galleryId = "userGallery";
+
+        //Restricting the user scroll in the modal
+        $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
+          $('body').css('overflow', 'hidden');
+        });
+        $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+          var modal = $(this);
+          $('body').css('overflow', 'auto');
+
+        });
+
+        //Capturing the selection of the images in the gallery
         $(".gallery-body").on('change', 'input[type=checkbox]', function() {
             var marked = false;
             $(".gallery-body").find('input[type=checkbox]').each(function(pos, item) {
@@ -139,6 +204,43 @@
             } else {
                 $(".gallery-actions").addClass('hide');
             }
+        });
+
+        //Creating the handlebar template for the individual gallery card
+        var source   = $("#gallery-card-template").html();
+        var template = Handlebars.compile(source);
+
+        function renderGallery() {
+            $.each(galleryData, function(key, item) {
+                var context = Object.assign({'gallery': 'userGallery'}, item);
+                var html    = template(context);
+                $(".gallery-panel .gallery-body ul").append(html);
+            });
+        }
+        renderGallery();
+
+        //Initializing the gallery with the new images.
+        var userGallery = $('.gallery-panel .gallery-body ul').userGalleryModal({
+            'items': galleryData,
+            'galleryId': galleryId
+        });
+        $(document).on('click', '[data-reveal-id='+ galleryId +']', function() {
+            if($(".reveal-modal-bg").is(":visible")) {
+                userGallery.openItem($(this).attr('data-item-id'));
+                $("#" + galleryId).find('img').each(function(pos, image) {
+                    $(image).removeClass('hide');
+                });
+
+            }
         })
+
+        /*$.ajax({
+          method: "POST",
+          url: "some.php",
+          data: { name: "John", location: "Boston" }
+        })
+        .done(function( msg ) {
+          alert( "Data Saved: " + msg );
+        });*/
     })
 </script>
