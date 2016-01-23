@@ -19,7 +19,7 @@
       //TreeTillNode();
       initCourseModule();
     });
-
+    /*
     var moduleData = [
       {
         "node_type": "CourseSectionEvent",
@@ -65,7 +65,7 @@
         "name": "Module1"
       }
     ];
-
+    */
     iconMapping = {
       'WARNING': 'fa-exclamation-circle',
       'COMPLETED': 'fa-check',
@@ -76,12 +76,10 @@
     function initCourseModule() {
       var url = "{% url 'get_collection' group_id node.pk %}";
       var moduleTrees = [];
-      var jqxhr = $.getJSON( url, function(data) {
-        //console.log(JSON.stringify(data));
-
-        $.each(moduleData, function(pos, module) {
+      $.getJSON( url, function(data) {
+        var moduleData = data
+        $.each(data, function(pos, module) {
           var mod = getModuleHtml(pos, module);
-
           //Assosiating js tree
           var moduleTree = mod.find('.module-part').tree(
             {
@@ -246,7 +244,7 @@
       var moduleHeader = $('<div></div>').addClass('row collapse module-header');
       var moduleSubHeader = $("<div></div>").addClass('small-12 columns');
       $("<i></i>").addClass('fa ' + iconMapping[module.status]).appendTo(moduleSubHeader);
-      $("<span></span>").addClass('module-number').html('Module ' + pos).appendTo(moduleSubHeader);
+      // $("<span></span>").addClass('module-number').html('Module ' + pos).appendTo(moduleSubHeader);
       $("<span></span>").addClass('module-name').html(module.name).appendTo(moduleSubHeader);
       $("<span></span>").addClass('module-start-date').html(module.startDate).appendTo(moduleSubHeader);
       moduleHeader.append(moduleSubHeader);
