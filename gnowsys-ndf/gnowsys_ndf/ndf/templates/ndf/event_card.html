@@ -103,7 +103,7 @@
   </div>
   <!-- Card Notification -->
     <div class="event-card-notifications">
-      <span> 2 New Notifications</span>
+      <span class="badge red" > 2 </span>
     </div>
   <!-- End Card Notification -->
 
@@ -131,23 +131,24 @@
        {% endif %}
        Session
       <b class="event-time">{{event_session_status.0|date:"d-m-Y"}}</b>
+      <div class="event-time">25th Jan 2016 &#8226; 12:00 pm</div>
     {% endif %}
     </div>
     <!-- {{resource.author_set|length}}<i class="fa fa-users"></i> -->
     <!--Event card footer-->
     <div class="event-card-session-footer">
-      <div><i class="fa fa-calendar-o"></i> Jan 5th,2016 - Mar 4, 2016</div>
+      <div class="date"><i class="fa fa-calendar-o"></i> Jan 5th,2016 - Mar 4, 2016</div>
       <div class="row collapse">
-        <div class="small-12 columns">Course Duration</div>
+        <div class="small-12 columns footer-label">Course Duration</div>
         <div class="small-12 columns date">
-          <i class="fa fa-calendar-o"></i> Jan 5th,2016 - Mar 4, 2016
+          <i class="fa fa-calendar-o"></i> Jan 5th, 2016 - Mar 4, 2016
           <i class="fa fa-pencil-square-o edit-course-date"></i>
         </div>
       </div>
       <div class="row collapse">
-        <div class="small-12 columns ">Enrolment Dates</div>
+        <div class="small-12 columns footer-label">Enrolment Dates</div>
         <div class="small-12 columns date">
-          <i class="fa fa-calendar-o "></i> Jan 5th,2016 - Mar 4, 2016
+          <i class="fa fa-calendar-o "></i> Jan 5th, 2016 - Mar 4, 2016
           <i class="fa fa-pencil-square-o"></i>
         </div>
       </div>

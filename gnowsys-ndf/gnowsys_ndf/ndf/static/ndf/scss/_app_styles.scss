@@ -188,7 +188,8 @@ pre{
 // ------| following style lines were there in _metastudio_styles.scss |------
 
 body{
-    background-color: #fafafa;
+    background-color: #EAEAEA;
+    font-family: 'Rubik', sans-serif;
 }
 //Modals design
 
@@ -757,7 +758,7 @@ article{
     z-index: 200;
 
     b{
-      font-family:  Georgia, Serif;
+      /*font-family:  Georgia, Serif;*/
     }
   }
 
@@ -896,7 +897,6 @@ article{
   }
 
   section.content{
-    background-color:white;
     border: 1px solid #eee;
 }
 
@@ -1263,7 +1263,7 @@ aside#help{
   margin: -15px auto;
   text-align: center;
   color: gray;
-  font-family: "foundation-icons";
+  /*font-family: "foundation-icons";*/
   font-style: normal;
   font-variant: normal;
   text-transform: none;
@@ -1426,7 +1426,7 @@ aside#help{
   margin: -15px auto;
   text-align: center;
   color: gray;
-  font-family: "foundation-icons";
+  /*font-family: "foundation-icons";*/
   font-style: normal;
   font-variant: normal;
   text-transform: none;
@@ -1515,11 +1515,13 @@ aside#help{
 }
 
 .event-card {
-  border: 1px solid #AAA;
-  border-bottom: 3px solid #BBB;
-  padding: 0px;
-  min-height: 22rem;
-  position: relative;
+    padding: 0px;
+    min-height: 22rem;
+    position: relative;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    background-color: #fff;
+
   &:hover{
     box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
     transition: box-shadow 0.5s ease;
@@ -1532,9 +1534,12 @@ aside#help{
     position: absolute;
     display: inline-block;
     color: white;
-    right: -0.4em;
-    padding: 0.3em 1em;
+    right: 1em;
+    padding: 0.3em 0.5em;
     text-transform: uppercase;
+    font-size: 12px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
 
     &.open{
       background-color: #00b300;
@@ -1561,13 +1566,16 @@ aside#help{
     font-size: 0.9em;
     color: #F04124;
     font-weight: 600;
+
+    .badge {
+      padding: 0px 5px;
+    }
   }
 
   .event-card-session-status {
-    padding-top: 1em;
     font-weight: bold;
     font-size: 1.2em;
-    padding-left: 4px;
+    padding: 0.5em 0.8em 0.6em;
 
     &.open{
       color: #00b300;
@@ -1627,6 +1635,7 @@ aside#help{
     overflow: hidden;
     height: 60%;
     background-color: #e5e5e5;
+    border-radius: 10px 10px 0px 0px;
 
     img  {
       border-radius: 2px 2px 0 0;
@@ -1644,7 +1653,7 @@ aside#help{
     margin: -15px auto;
     text-align: center;
     color: gray;
-    font-family: "foundation-icons";
+    /*font-family: "foundation-icons";*/
     font-style: normal;
     font-variant: normal;
     text-transform: none;
@@ -1686,24 +1695,43 @@ aside#help{
     }
   }
   .event-card-session-footer{
-    padding: 0.5em 1em;
-    border-top: 1px solid black;
+    padding: 0.7em 1em;
+    border-top: 1px solid #DCDCDC;
     font-size: 0.8em;
     color: #000;
     font-size: 0.9em;
     font-weight: bold;
+    background-color: #F3F3F3;
+    border-radius: 0px 0px 10px 10px;
+
+    .footer-label {
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 0.6px;
+      margin-bottom: 2px;
+      color: #ADADAD;
+    }
 
     .date {
-      color: #CCCCCC;
-      font-size: 0.8em;
+      color: #929292;
+      font-size: 0.85em;
+      letter-spacing: 0.5px;
+
+      i:not(.edit-course-date) {
+        margin-right: 0.3em;
+      }
     }
     .row {
-      margin: 10px 0px;
+      margin: 10px 0px 0px;
     }
   }
   .edit-course-date {
     float: right;
     font-size: 1.5em;
+    color: #DADADA;
+    &:hover {
+      color: #565656;
+    }
   }
   .published.scard-action {
     background: #A6D9CB;
@@ -1933,7 +1961,7 @@ aside#help{
       box-shadow: 0px -25px 25px -20px rgb(128, 128, 128) inset;
       text-transform: uppercase;
       text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
-      font-family: Open Sans Bold;
+      /*font-family: Open Sans Bold;*/
     }
 
     img {
@@ -1964,7 +1992,7 @@ aside#help{
       margin: -15px auto;
       text-align: center;
       color: gray;
-      font-family: "foundation-icons";
+      /*font-family: "foundation-icons";*/
       font-style: normal;
       font-variant: normal;
       text-transform: none;
@@ -2199,13 +2227,20 @@ div.show-image:hover div.fullscreen-icon{
 #envelop-cover {
   .course-page-title {
     font-size: 35px;
-    font-weight: 600;
+    font-weight: 500;
   }
+
+  .heading {
+    letter-spacing: -1.2px;
+    font-weight: 400;
+  }
+
   .meta {
+    line-height: 2.1em;
     .key {
       color: #A7A4A4;
-      font-weight: bold;
-      font-size: 20px;
+      font-weight: 500;
+      font-size: 13px;
       text-transform: uppercase;
       display: inline-block;
       vertical-align: top;
@@ -2213,7 +2248,6 @@ div.show-image:hover div.fullscreen-icon{
     }
 
     .value {
-      line-height: 1.8em;
       display: inline-block;
 
       .name {
@@ -2221,9 +2255,9 @@ div.show-image:hover div.fullscreen-icon{
       }
 
       .time {
-        font-size: 16px;
-        font-weight: bold;
-        color: #999999;
+        font-size: 13px;
+        font-weight: 300;
+        color: #000;
       }
     }
   }
@@ -2233,19 +2267,42 @@ div.show-image:hover div.fullscreen-icon{
 
   .tabs {
     border: 0 solid silver;
-    border-width: 1px 1px 0px 0px;
+    border-width: 0px 0px 0px 0px;
+    margin-left: 1em;
 
     .tab-title {
       border: 0 solid silver;
-      border-width: 0 0 1px 1px;
+      border-width: 0 0 0px 0px;
+      background: #DEDEDE;
+      border-radius: 10px 10px 0px 0px;
+      margin-right: 0.4em;
+
+      a {
+        color: #2B91EA;
+        border-radius: inherit;
+        margin: 0px 4px;
+        font-size: 18px;
+        letter-spacing: -0.3px;
+      }
 
       &.active {
-        border-width: 0px 0px 0px 1px;
+        border-width: 0px 0px 0px 0px;
+        background: #FFFFFF;
+        a {
+          color: #000;
+        }
       }
 
       &.dummy-tab {
 
       }
+    }
+  }
+
+  .tabs-content {
+    .content {
+      background: #FFFFFF;
+      padding: 1em;
     }
   }
 
@@ -2293,27 +2350,41 @@ div.show-image:hover div.fullscreen-icon{
 
   .course-status, .course-notifications,
   .course-performance {
+
+
     >.row {
+      padding: 0px;
+      min-height: 22rem;
+      position: relative;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+      background-color: #F9F9F9;
       min-height: 20em;
       margin: 0em 0em;
-      border: 1px solid grey;
+      border-radius: 10px;
     }
   }
 
   .dash-tile-heading {
-    padding: 0.5em 1em;
-    border-bottom: 1px solid #000;
-    font-weight: 800;
+    padding: 0.2em 0.7em;
+    border-bottom: 1px solid #DADADA;
+    font-weight: 500;
+    font-size: 1.3em;
   }
   .dash-tile-row {
     padding: 1em;
   }
   .dash-tile-row:nth-child(n+3) {
-    border-top: 1px solid #000;
+    border-top: 1px solid #DCDCDC;
   }
 
   .course-status {
     .course-update {
+      .course-current-state {
+        color: #000;
+        font-weight: bold;
+        font-size: 1.2em;
+        padding: 0.5em 0.8em 0.6em;
+      }
     }
     .course-progress {
     }
@@ -2324,7 +2395,9 @@ div.show-image:hover div.fullscreen-icon{
     .notification-row {
 
       .notification-text{
-        font-size: 0.8em;
+        font-size: 0.85em;
+        letter-spacing: 0em;
+        word-spacing: 0.2em;
       }
       .time-elapsed {
         font-size: 0.6em;
@@ -2838,7 +2911,7 @@ div.show-image:hover div.fullscreen-icon{
           left: -1.1em;
           top: 0em;
           z-index: 1000;
-          background: #fff;
+          background: #EAEAEA;
           font-size: 1.4em;
         }
         .module-number {
@@ -2990,7 +3063,7 @@ course-title{
   height: 22px;
   font-weight: bolder;
   padding: 0px 7px;
-  font-family: Arial, sans-serif;
+  /*font-family: Arial, sans-serif;*/
   color: white;
   text-shadow: 0 1px rgba(0, 0, 0, 0.25);
   border: 1px solid;
