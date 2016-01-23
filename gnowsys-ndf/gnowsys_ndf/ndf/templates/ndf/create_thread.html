@@ -104,8 +104,8 @@
       <div class="large-8 large-pull-4 large-offset-4 columns" 
            style="padding:0 1.65em 0 1.4em;">
 
-        <textarea id="orgitdown" name="content_org" 
-        placeholder="Some description about the thread ..."></textarea>
+                {% include "ndf/html_editor.html" with var_name="content_org"  node_id=forum.pk %}
+
         <!-- <input type="button" id="save_edit_cont" class="button" value="Save"> -->
       </div>
       <br/>
