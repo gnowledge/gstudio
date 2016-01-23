@@ -1790,3 +1790,13 @@ def course_summary(request, group_id):
 
     template = "ndf/course_summary.html"
     return render_to_response(template, variable)
+
+
+def course_resource_detail(request, group_id, course_section, course_sub_section, course_unit, resource):
+
+    variable = RequestContext(request, {
+        'group_id': group_id, 'groupid': group_id,
+    })
+
+    template = "ndf/unit_player.html"
+    return render_to_response(template, variable)

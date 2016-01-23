@@ -32,7 +32,6 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_me
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
-
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # ######################################################################################################################################
@@ -1930,7 +1929,7 @@ def group_dashboard(request, group_id=None):
                 'member_of':page_gst._id,
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
-            }).sort('last_update', -1)
+            }).sort('created_at', -1)
 
       start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
       # if 'start_enroll' in group_obj:

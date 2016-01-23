@@ -10,13 +10,13 @@
 {% block body_content %}
 	
 	<div class="row">
-		<div class="small-6 columns"><h2><a href="{% url 'explore_courses' %}">Explore</a></h2></div>
+		<div class="small-6 columns"><h2><a href="{% url 'explore' %}">Explore</a></h2></div>
 
-		<div class="small-3 columns">
+		<div class="small-3 columns {%if title == 'courses'%}label info{% endif %}">
 			<a href="{% url 'explore_courses' %}">Courses</a>
 		</div>
 
-		<div class="small-3 columns">
+		<div class="small-3 columns {% if title == 'groups' %}label info{% endif %}">
 			<a href="{% url 'explore_groups' %}">Groups</a>
 		</div>
 	</div>
@@ -25,7 +25,14 @@
 		Some static text or trending or upcoming groups, courses, events listing.
 	{% else %}
 
-		
+	<section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="background-color:#fafafa;border-style:none">
+		{% for each_obj in doc_cur %}
+			<li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
+            {% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk  next_session=True %}
+          </li>
+		{% endfor %}
+
+		</section>
 
 	{% endif %}
 

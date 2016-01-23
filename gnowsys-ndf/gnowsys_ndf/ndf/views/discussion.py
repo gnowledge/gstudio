@@ -156,7 +156,8 @@ def discussion_reply(request, group_id, node_id):
         
             reply_obj.content_org = unicode(content_org)
             filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
-            reply_obj.content = org2html(content_org, file_prefix=filename)
+            # reply_obj.content = org2html(content_org, file_prefix=filename)
+            reply_obj.content = content_org
 
             # ==============================
             # try:

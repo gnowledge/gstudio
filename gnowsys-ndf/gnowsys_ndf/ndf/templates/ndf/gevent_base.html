@@ -1,4 +1,6 @@
-{% extends "ndf/gbase.html" %}
+{% load simple_filters %}
+{% xextends "ndf/gbase.html" with first_body_column=0 %}
+{# {% extends "ndf/gbase.html" %} #}
 {% load i18n %}
 {% load cache %}
 {% load ndf_tags %}
@@ -76,7 +78,13 @@ list-style: none;
 <div id="view-page" class="small-12 large-12 columns"></div>
 <div id="envelop-cover">
   <div class="row course-page-title">
-    <div class="small-12 medium-8 columns heading">Introduction to CLIx</div>
+    <div class="small-12 medium-8 columns heading">{{node.name}}</div>
+
+      {% check_is_gstaff groupid request.user as is_gstaff %}
+      {% if is_gstaff %}
+        <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+        <span><input type="button" class="tiny button radius settings" value="Settings"></span>
+      {% endif %}
     <div class="small-12 medium-4 columns">
       <label>2 out of 6 modules completed</label>
       <div class="progress success round">
@@ -123,8 +131,8 @@ list-style: none;
         {% include "ndf/gcollection_ajax_view.html" %}
       </div>
       <div class="content" id="course-notebook">
-
-        <!--div class="text-right">
+      {% comment %}
+        <div class="text-right">
           <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button small radius"> Add Blog </a>
         </div>
         <div class="row all_blogs">
@@ -153,7 +161,8 @@ list-style: none;
             </h4>
           </div>
           {% endfor %}
-        </div-->
+        </div>
+      {% endcomment %}
 
         <!--Including the nodebook component-->
           {% include "ndf/gnotebook.html" %}
@@ -187,7 +196,7 @@ list-style: none;
           <div class="about-course-heading">
             <div class="heading-text">
               <div>
-                <h2>Introduction to CLIx</h2>
+                <h2>{{node.name}}</h2>
               </div>
               <div>Next Session Jan 5 2016 &#8226; 3:00pm</div>
               <div>
@@ -247,16 +256,4 @@ location.reload();
 },
 });//end of ajax
 })
-
-$("main.row > aside.columns")
-.removeClass("medium-2")
-.addClass('medium-3').addClass("large-3");
-
-$("main.row > article.columns")
-.removeClass("medium-10")
-.addClass("medium-9")
-.addClass("large-9")
-.css('float','left');
-$(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder')
-
 {% endblock %}
