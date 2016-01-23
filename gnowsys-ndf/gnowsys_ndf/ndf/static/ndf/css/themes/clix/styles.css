@@ -24912,7 +24912,7 @@ p {
 }
 /* line 1575, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status {
-  font-weight: bold;
+  font-weight: 500;
   font-size: 1.2em;
   padding: 0.5em 0.8em 0.6em;
 }
@@ -24940,7 +24940,7 @@ p {
 .event-card .event-card-session-status .event-time {
   font-size: 0.7em;
   display: block;
-  font-weight: 800;
+  font-weight: 400;
 }
 /* line 1606, ../../../scss/_app_styles.scss */
 .event-card .event-card-title {
@@ -24951,7 +24951,7 @@ p {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 1.5em;
-  font-weight: 800;
+  font-weight: 400;
 }
 /* line 1617, ../../../scss/_app_styles.scss */
 .event-card .event-card-desc {
@@ -25051,7 +25051,7 @@ p {
   font-size: 0.8em;
   color: #000;
   font-size: 0.9em;
-  font-weight: bold;
+  font-weight: 500;
   background-color: #F3F3F3;
   border-radius: 0px 0px 10px 10px;
 }
@@ -25070,7 +25070,7 @@ p {
   letter-spacing: 0.5px;
 }
 /* line 1720, ../../../scss/_app_styles.scss */
-.event-card .event-card-session-footer .date i:not(.edit-course-date) {
+.event-card .event-card-session-footer .date i:not(.edit-course-duration, .edit-course-enrollment) {
   margin-right: 0.3em;
 }
 /* line 1724, ../../../scss/_app_styles.scss */
@@ -25078,13 +25078,13 @@ p {
   margin: 10px 0px 0px;
 }
 /* line 1728, ../../../scss/_app_styles.scss */
-.event-card .edit-course-date {
+.event-card .edit-course-duration, .event-card .edit-course-enrollment {
   float: right;
   font-size: 1.5em;
   color: #DADADA;
 }
 /* line 1732, ../../../scss/_app_styles.scss */
-.event-card .edit-course-date:hover {
+.event-card .edit-course-duration:hover, .event-card .edit-course-enrollment:hover {
   color: #565656;
 }
 /* line 1736, ../../../scss/_app_styles.scss */

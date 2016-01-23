@@ -1573,7 +1573,7 @@ aside#help{
   }
 
   .event-card-session-status {
-    font-weight: bold;
+    font-weight: 500;
     font-size: 1.2em;
     padding: 0.5em 0.8em 0.6em;
 
@@ -1599,7 +1599,7 @@ aside#help{
     .event-time {
       font-size: 0.7em;
       display: block;
-      font-weight: 800;
+      font-weight: 400;
     }
   }
 
@@ -1611,7 +1611,7 @@ aside#help{
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 1.5em;
-    font-weight: 800;
+    font-weight: 400;
   }
 
   .event-card-desc{
@@ -1700,7 +1700,7 @@ aside#help{
     font-size: 0.8em;
     color: #000;
     font-size: 0.9em;
-    font-weight: bold;
+    font-weight: 500;
     background-color: #F3F3F3;
     border-radius: 0px 0px 10px 10px;
 
@@ -1717,7 +1717,7 @@ aside#help{
       font-size: 0.85em;
       letter-spacing: 0.5px;
 
-      i:not(.edit-course-date) {
+      i:not(.edit-course-duration, .edit-course-enrollment) {
         margin-right: 0.3em;
       }
     }
@@ -1725,7 +1725,7 @@ aside#help{
       margin: 10px 0px 0px;
     }
   }
-  .edit-course-date {
+  .edit-course-duration, .edit-course-enrollment {
     float: right;
     font-size: 1.5em;
     color: #DADADA;
