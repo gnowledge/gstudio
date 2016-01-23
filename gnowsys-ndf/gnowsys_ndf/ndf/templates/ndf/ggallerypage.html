@@ -1,3 +1,4 @@
+{% load ndf_tags %}
 <div class="gallery-page">
     <div class="row gallery-header collapse">
         <div class="medium-4 columns filters">
@@ -126,6 +127,7 @@
 {% include "ndf/ggallerycard.html" %}
 {% include "ndf/ggallerymodal.html" with id="userGallery" %}
 <script type="text/javascript">
+/*
     var galleryData = [{
         'id': 0,
         'name': 'User File 1',
@@ -180,6 +182,8 @@
         'item-image': 'http://southpolesoftware.com/iVI/images/icon-video.gif',
         'createdOn': '26/02/2016'
     }];
+
+    */
     $(function() {
         var galleryId = "userGallery";
 
@@ -209,13 +213,27 @@
         //Creating the handlebar template for the individual gallery card
         var source   = $("#gallery-card-template").html();
         var template = Handlebars.compile(source);
-
+        var file_details_dict = {}
+        var galleryData = []
         function renderGallery() {
-            $.each(galleryData, function(key, item) {
-                var context = Object.assign({'gallery': 'userGallery'}, item);
-                var html    = template(context);
-                $(".gallery-panel .gallery-body ul").append(html);
-            });
+            {% for each in files_cur %}
+                // $.each(galleryData, function(key, item) {
+                    {% get_grid_fs_object each as grid_fs_obj %}
+                    file_details_dict = {
+                        'id' : "{{each.pk}}",
+                        'item-image': "{% url 'get_gridfs_resource' each.fs_file_ids.2 %}",
+                        'name': "{{each.name}}",
+                        'createdOn': "{{each.created_at|date:'d-m-Y'}}",
+                        'size': "{{each.file_size.size}}",
+                        'download-link': "{% url 'read_file' group_id each grid_fs_obj.filename %}",
+                        'grid_fs_obj_name': "{{grid_fs_obj.filename}}"
+                    }
+                    galleryData.push(file_details_dict)
+                    var context = Object.assign({'gallery': 'userGallery'}, file_details_dict);
+                    var html    = template(context);
+                    $(".gallery-panel .gallery-body ul").append(html);
+                // });
+            {% endfor %}
         }
         renderGallery();
 
