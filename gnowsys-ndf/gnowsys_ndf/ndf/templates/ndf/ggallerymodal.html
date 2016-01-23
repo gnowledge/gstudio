@@ -6,7 +6,8 @@
         <div class="small-7 columns gmodal-actions">
             <div class="download-file">
                 <i class="fi-download"></i>
-                <span> Download</span>
+                <a class="download-link">Download</a>
+                <!-- <span> Download</span> -->
             </div>
             <div class="create-note">
                 <i class="fi-page-edit"></i>
@@ -109,6 +110,10 @@
             $('#' + _galleryId).find('.file-name').html(_currentItem.name);
             $('#' + _galleryId).find('.gmodel-item-image').attr('src', _currentItem['item-image']);
             $('#' + _galleryId).find('.viewed-count').html(_currentItem.views);
+            $('#' + _galleryId).find('.download-link')
+                        .attr('href',_currentItem['download-link'])
+                        .attr('download',_currentItem.grid_fs_obj_name)
+
             $('#' + _galleryId).find('.likes-count').html(_currentItem.rating);
             $('#' + _galleryId).find('.comment-count').html(_currentItem.comments);
         }
