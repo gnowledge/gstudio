@@ -2531,7 +2531,7 @@ div.show-image:hover div.fullscreen-icon{
             margin-right: 1em;
           }
           .note-tags {
-            span {
+            a {
               background: #ffebb2;
               padding: 0.2em 0.7em;
               display: inline-block;
@@ -2835,9 +2835,14 @@ div.show-image:hover div.fullscreen-icon{
 
 .user-comment {
   display: inline-flex;
+  width: 100%;
 
   >div {
     display: inline-block;
+
+    &:last-child {
+      width: 100%;
+    }
   }
 
   .comment-heading {
@@ -2855,6 +2860,25 @@ div.show-image:hover div.fullscreen-icon{
     .commentor-name span {
       font-weight: bold;
       color: #333333;
+    }
+  }
+  .comment-footer {
+    font-size: 0.9em;
+    font-weight: 400;
+    border: 1px solid #9E9E9E;
+    background: #CCCCCC;
+
+    >div {
+      cursor: pointer;
+    }
+    i {
+      margin-right: 1em;
+    }
+
+  }
+  .comment-container {
+    .comment-add {
+      margin-top: 0.4em;
     }
   }
   .user-avatar {
@@ -2941,6 +2965,62 @@ div.show-image:hover div.fullscreen-icon{
           margin-right: 5px;
         }
       }
+    }
+  }
+}
+
+.activity-page {
+  .activity-page-header {
+    font-weight: 400;
+    font-size: 1.3em;
+
+    .activity-page-previous {
+      cursor: pointer;
+    }
+
+    .unit-title {
+      text-align: center;
+    }
+    .activity-create-note {
+      color: #2a78e3;
+      cursor: pointer;
+
+      >div {
+        float: right;
+      }
+    }
+  }
+  .activity-header {
+    >div:last-child >div {
+      float: right;
+    }
+
+    .activity-title-section {
+      text-align: center;
+
+      >div {
+        display: inline-block;
+      }
+
+      .activity-title {
+
+      }
+
+    }
+  }
+  .activity-slides {
+    border: 1px solid black;
+    height: 600px;
+    background: #CCCCCC;
+  }
+  .activity-comment-section {
+    .user-prof-image {
+      font-size: 7em;
+      text-align: center;
+    }
+
+    #postCommentBtn {
+      padding: 2em 3em;
     }
   }
 }

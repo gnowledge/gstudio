@@ -115,7 +115,7 @@
                     <i class="fi-torso"></i>
                     <span class="note-creator">Madam X</span>
                     &#8226;
-                    <span>25th Dec 2015</span>
+                    <span class="note-creation-date">25th Dec 2015</span>
                 </div>
                 <div class="small-3 columns creator-rating">
                     <div>Your rating</div>
@@ -132,9 +132,9 @@
                 <div class="note-header">
                     <span class="note-title">Note Heading</span>
                     <div class="note-tags">
-                        <span>Tag1</span>
-                        <span>Tag2</span>
-                        <span>Tag3</span>
+                        <a>Tag1</a>
+                        <a>Tag2</a>
+                        <a>Tag3</a>
                     </div>
                 </div>
                 <div class="note-text">
@@ -144,7 +144,7 @@
             <div class="comment-sections">
                 <div class="comments-header">
                     <i class="fi-eye"></i>
-                    <span class="viewed-count"><b>214</b></span>
+                    <span class="viewed-count">214</span>
                     views
                     <i class="fi-like"></i>
                     <span class="likes-count">10</span>
@@ -158,29 +158,173 @@
                         <i class="fi-torso"></i>
                     </div>
                     <div class="small-9 columns">
-                        <textarea class="add-comment" id="textarea-add-comment"></textarea>
+                        <textarea class="add-comment textarea-add-comment" name="textarea-add-comment"></textarea>
                     </div>
                     <div class="small-2 columns">
                         <a href="#" id="postCommentBtn" class="button small">Post</a>
                     </div>
                 </div>
                 <div class="row comments">
-                {% include "ndf/gcomment.html" %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+{% include "ndf/gcomment.html" %}
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 <script type="text/javascript">
     $(function() {
-        CKEDITOR.replace( 'textarea-add-comment',{
-            enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
-            toolbar:'basic',
-            uiColor:'#f2f2f2',
-            textarea_id: 'textarea-add-comment'
+        //Note section
+        var noteDetails = {
+            'id': 1,
+            'creator': 'Ranjan',
+            'createdOn': '22-01-2016',
+            'rating': 3,
+            'heading': 'Note Heading',
+            'tags': [
+                {
+                    'name': 'Tag 1',
+                    'link': 'some_url'
+                }
+            ],
+            'content': 'This is the note content',
+            'views': 3,
+            'comments': 18
+        }
+
+        $('.notebook-index .notes').on('click', '.note', function() {
+            $(".note-page .note-creator").html(noteDetails.creator);
+            $(".note-page .note-creation-date").html(noteDetails.createdOn);
+            $(".note-page .note-title").html(noteDetails.heading);
+            $(".note-page .note-tags").empty();
+            $.each(noteDetails.tags, function(pos, tag) {
+                $(".note-page .note-tags").append('<a href=' + tag.link + '>' + tag.name +'</a>');
+            });
+            $(".note-page .note-text").html(noteDetails.content);
+            $(".note-page .viewed-count").html(noteDetails.views);
+            $(".note-page .likes-count").html(noteDetails.rating);
+            $(".note-page .comment-count").html(noteDetails.comments);
+
+            //Fetching the comments for this note
+            $(".comment-sections .comments").empty();
+            $(".comment-sections .comments").html(renderComments(userComments));
+
+            CKEDITOR.replaceAll( 'textarea-add-comment',{
+                enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
+                toolbar:'basic',
+                uiColor:'#f2f2f2',
+                textarea_id: 'textarea-add-comment'
+            });
+            $(".comment-sections .comments .comment-add").hide();
+            //Handling all reply actions
+            $(".comment-sections>.comments").on('click', '.comment-reply', function() {
+                console.log('Reachded');
+                $(this).closest('.comment-container').children('.comment-add').toggle();
+            })
         });
-    })
+
+
+        //Comment Section
+        var source   = $("#user-comment-template").html();
+        var template = Handlebars.compile(source);
+        var userComments = [
+            {
+                'commentId': 1,
+                'commentOwnerId': 2,
+                'userName': 'Ranjan',
+                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                'commentedOn': '26-01-2016',
+                'commentRating': 3,
+                'commentContent': 'Lorium Ipsum',
+                'childComments': [
+                    {
+                        'commentId': 1,
+                        'commentOwnerId': 2,
+                        'userName': 'Aditya',
+                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                        'commentedOn': '26-01-2016',
+                        'commentRating': 3,
+                        'commentContent': 'Lorium Ipsum',
+                        'childComments': [
+
+                        ]
+                    },
+                    {
+                        'commentId': 1,
+                        'commentOwnerId': 2,
+                        'userName': 'Kedar',
+                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                        'commentedOn': '26-01-2016',
+                        'commentRating': 3,
+                        'commentContent': 'Lorium Ipsum',
+                        'childComments': [
+                            {
+                                'commentId': 1,
+                                'commentOwnerId': 2,
+                                'userName': 'Rachana',
+                                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                                'commentedOn': '26-01-2016',
+                                'commentRating': 3,
+                                'commentContent': 'Lorium Ipsum',
+                                'childComments': [
+
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                'commentId': 1,
+                'commentOwnerId': 2,
+                'userName': 'VK',
+                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                'commentedOn': '26-01-2016',
+                'commentRating': 3,
+                'commentContent': 'Lorium Ipsum',
+                'childComments': [
+                    {
+                        'commentId': 1,
+                        'commentOwnerId': 2,
+                        'userName': 'GN',
+                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                        'commentedOn': '26-01-2016',
+                        'commentRating': 3,
+                        'commentContent': 'Lorium Ipsum',
+                        'childComments': [
+
+                        ]
+                    }
+                ]
+            }
+        ];
+        $.each(userComments, function(pos, comment) {
+            if (comment.childComments.length === 0) {
+                var context = Object.assign({'gallery': 'userGallery'}, comment);
+                return template(context);
+            }
+        });
+        var commentHTML = '';
+        function renderComments (comments) {
+            var commentsHTML ='';
+            for(var i = 0; i < comments.length; i++) {
+                var comment = comments[i];
+                if (comment.childComments.length != 0) {
+                    var tempHTML = renderComments(comment.childComments);
+                    commentsHTML += renderComment(comment, tempHTML);
+                    // return tempHTML;
+                } else {
+                    commentsHTML += renderComment(comment);
+                }
+                //console.log(commentHTML);
+            };
+            return commentsHTML;
+        }
+
+        function renderComment(comment, childComment) {
+            var context = Object.assign({'gallery': 'userGallery', 'childComment': childComment}, {comment});
+            return template(context);
+        }
+    });
 </script>
