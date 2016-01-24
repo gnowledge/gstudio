@@ -26419,29 +26419,44 @@ div.show-image:hover div.fullscreen-icon{
   display: inline-block;
 }
 /* line 3011, ../../../scss/_app_styles.scss */
-.activity-page .activity-slides {
+.activity-page .activity-slides-container {
   border: 1px solid black;
   height: 600px;
   background: #CCCCCC;
+  margin-bottom: 2em;
+  padding: 1em;
 }
-/* line 3017, ../../../scss/_app_styles.scss */
-.activity-page .activity-comment-section .user-prof-image {
+/* line 3018, ../../../scss/_app_styles.scss */
+.activity-page .activity-slides-container .activity-slides {
+  height: 100%;
+}
+/* line 3020, ../../../scss/_app_styles.scss */
+.activity-page .activity-slides-container .activity-slides .activity-slide {
+  display: none;
+  padding: 1em;
+  height: inherit;
+  background: #fff;
+  position: relative;
+  left: 100%;
+}
+/* line 3031, ../../../scss/_app_styles.scss */
+.activity-page .activity-comments-section .user-prof-image {
   font-size: 7em;
   text-align: center;
 }
-/* line 3022, ../../../scss/_app_styles.scss */
-.activity-page .activity-comment-section #postCommentBtn {
+/* line 3036, ../../../scss/_app_styles.scss */
+.activity-page .activity-comments-section #postCommentBtn {
   padding: 2em 3em;
 }
 
-/* line 3028, ../../../scss/_app_styles.scss */
+/* line 3042, ../../../scss/_app_styles.scss */
 #left-tab {
   position: absolute;
   left: 0px;
   bottom: 0px;
 }
 
-/* line 3033, ../../../scss/_app_styles.scss */
+/* line 3047, ../../../scss/_app_styles.scss */
 #right-tab {
   position: absolute;
   right: 0px;
@@ -26449,12 +26464,12 @@ div.show-image:hover div.fullscreen-icon{
   padding-bottom: 6px;
 }
 
-/* line 3039, ../../../scss/_app_styles.scss */
+/* line 3053, ../../../scss/_app_styles.scss */
 #enrolled-btn {
   margin-bottom: 0px;
 }
 
-/* line 3042, ../../../scss/_app_styles.scss */
+/* line 3056, ../../../scss/_app_styles.scss */
 div.absol-descrip {
   position: absolute;
   top: 190px;
@@ -26465,14 +26480,14 @@ div.absol-descrip {
 }
 
 /*overview-summary styling*/
-/* line 3052, ../../../scss/_app_styles.scss */
+/* line 3066, ../../../scss/_app_styles.scss */
 .course-title, .course-date {
   color: white;
   padding-top: 0px;
   padding-bottom: 0px;
 }
 
-/* line 3057, ../../../scss/_app_styles.scss */
+/* line 3071, ../../../scss/_app_styles.scss */
 .course-description {
   color: #cccccc;
   padding-top: 0px;
@@ -26484,48 +26499,48 @@ div.absol-descrip {
   overflow: hidden;
 }
 
-/* line 3067, ../../../scss/_app_styles.scss */
+/* line 3081, ../../../scss/_app_styles.scss */
 .course-para {
   padding: 0;
 }
 
-/* line 3071, ../../../scss/_app_styles.scss */
+/* line 3085, ../../../scss/_app_styles.scss */
 course-title {
   padding-left: 10px;
 }
 
-/* line 3074, ../../../scss/_app_styles.scss */
+/* line 3088, ../../../scss/_app_styles.scss */
 .enroll-status-margin {
   margin-bottom: 0;
 }
 
-/* line 3078, ../../../scss/_app_styles.scss */
+/* line 3092, ../../../scss/_app_styles.scss */
 .progress-summery {
   color: white;
   margin-top: 20px;
 }
 
-/* line 3082, ../../../scss/_app_styles.scss */
+/* line 3096, ../../../scss/_app_styles.scss */
 .course-description-thumbnails {
   margin: 0;
   padding: 0;
 }
 
-/* line 3087, ../../../scss/_app_styles.scss */
+/* line 3101, ../../../scss/_app_styles.scss */
 .left-shift {
   padding: 0;
   color: white !important;
 }
 
 /*course overview for Small screens*/
-/* line 3093, ../../../scss/_app_styles.scss */
+/* line 3107, ../../../scss/_app_styles.scss */
 .course {
   /*position:relative;*/
   border: 1px solid black;
   background-color: #999999;
 }
 
-/* line 3099, ../../../scss/_app_styles.scss */
+/* line 3113, ../../../scss/_app_styles.scss */
 .course-contents {
   /*position:absolute;*/
   width: 100%;
@@ -26533,7 +26548,7 @@ course-title {
 
 /*Medium screens*/
 @media only screen and (min-width: 40.063em) {
-  /* line 3106, ../../../scss/_app_styles.scss */
+  /* line 3120, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -26541,7 +26556,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 3112, ../../../scss/_app_styles.scss */
+  /* line 3126, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -26551,7 +26566,7 @@ course-title {
 /* min-width 641px, medium screens */
 /* Large screens*/
 @media only screen and (min-width: 64.063em) {
-  /* line 3122, ../../../scss/_app_styles.scss */
+  /* line 3136, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -26559,7 +26574,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 3128, ../../../scss/_app_styles.scss */
+  /* line 3142, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -26568,14 +26583,14 @@ course-title {
 }
 /* min-width 1025px, large screens */
 /*General config css*/
-/* line 3135, ../../../scss/_app_styles.scss */
+/* line 3149, ../../../scss/_app_styles.scss */
 .alert-box.warning {
   background: #ffe7c0;
   border-color: #bf9000;
   color: #966000;
 }
 
-/* line 3142, ../../../scss/_app_styles.scss */
+/* line 3156, ../../../scss/_app_styles.scss */
 .badge {
   display: inline-block;
   line-height: 22px;
@@ -26592,7 +26607,7 @@ course-title {
   font-size: 1.8em;
 }
 
-/* line 3158, ../../../scss/_app_styles.scss */
+/* line 3172, ../../../scss/_app_styles.scss */
 .badge {
   background: #67c1ef;
   border-color: #30aae9;
@@ -26602,7 +26617,7 @@ course-title {
   background-image: linear-gradient(to bottom, #acddf6, #67c1ef);
 }
 
-/* line 3167, ../../../scss/_app_styles.scss */
+/* line 3181, ../../../scss/_app_styles.scss */
 .badge.green {
   background: #77cc51;
   border-color: #59ad33;
@@ -26612,7 +26627,7 @@ course-title {
   background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
 }
 
-/* line 3176, ../../../scss/_app_styles.scss */
+/* line 3190, ../../../scss/_app_styles.scss */
 .badge.yellow {
   background: #faba3e;
   border-color: #f4a306;
@@ -26622,7 +26637,7 @@ course-title {
   background-image: linear-gradient(to bottom, #fcd589, #faba3e);
 }
 
-/* line 3186, ../../../scss/_app_styles.scss */
+/* line 3200, ../../../scss/_app_styles.scss */
 .badge.red {
   background: #fa623f;
   border-color: #fa5a35;

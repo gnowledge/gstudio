@@ -3008,12 +3008,26 @@ div.show-image:hover div.fullscreen-icon{
 
     }
   }
-  .activity-slides {
+  .activity-slides-container {
     border: 1px solid black;
     height: 600px;
     background: #CCCCCC;
+    margin-bottom: 2em;
+    padding: 1em;
+
+    .activity-slides {
+      height: 100%;
+      .activity-slide {
+        display: none;
+        padding: 1em;
+        height: inherit;
+        background: #fff;
+        position: relative;
+        left: 100%;
+      }
+    }
   }
-  .activity-comment-section {
+  .activity-comments-section {
     .user-prof-image {
       font-size: 7em;
       text-align: center;
