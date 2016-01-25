@@ -1,6 +1,6 @@
 django==1.6.5
 django-mongokit
-django-registration
+django-registration==1.0
 django-ratings
 django-pagination
 django-notification
