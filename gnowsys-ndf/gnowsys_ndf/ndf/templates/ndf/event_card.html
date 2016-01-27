@@ -42,6 +42,8 @@
     <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
     <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
+    {% elif resource.fs_file_ids.0 %}
+    <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
     {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
       {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
         <i class="{{attr_set_dict.educationaluse|lower}}"></i>
