@@ -109,15 +109,21 @@ list-style: none;
   </div>
 </div>
 
+
+
 <!-- Tabs -->
 <div class="row" id="envelop-content" >
   <!-- Envelop box-->
   <div class="small-12 large-12 columns">
      <div style="line-height: 0.7em;">
-      <ul class="tabs" data-tab>
-        <li class="tab-title active"><a href="#course-dashboard"><i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}</a></li>
-        <li class="tab-title"><a href="#course-content"><i class="fi-clipboard-notes"></i>{% trans "Course Content" %}</a></li>
-        <li class="tab-title"><a href="#course-notebook"><i class="fi-book "></i>{% trans "Notebook" %}</a></li>
+      <ul class="tabs">
+
+        <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}"><a href="{% url 'course_dashboard' group_id %}"><i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}</a></li>
+
+        <li class="tab-title {% ifequal title 'course content' %}active{% endifequal %}"><a href="{% url 'course_content' group_id %}"><i class="fi-clipboard-notes"></i>{% trans "Course Content" %}</a></li>
+
+        <li class="tab-title  {% ifequal title 'notebook' %}active{% endifequal %}"><a href="{% url 'course_notebook' group_id %}"><i class="fi-book "></i>{% trans "Notebook" %}</a></li>
+
         <li class="tab-title"><a href="#course-raw-material"><i class="fi-clip "></i>{% trans "Raw Material" %}</a></li>
         <li class="tab-title"><a href="#course-gallery"><i class="fi-photo "></i> {% trans "Gallery" %}</a></li>
         <li class="tab-title"><a href="#course-about"><i class="fi-page-edit "></i>{% trans "About the course" %}</a></li>

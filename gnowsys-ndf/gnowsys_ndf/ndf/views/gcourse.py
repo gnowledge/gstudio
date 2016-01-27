@@ -1821,3 +1821,56 @@ def course_resource_detail(request, group_id):
 
         template = "ndf/unit_player.html"
         return render_to_response(template, variable)
+
+
+# def course_resource_detail(request, group_id, course_section, course_sub_section, course_unit, resource_id):
+#     pass
+
+
+def course_dashboard(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+
+    template = 'ndf/gcourse_event_group.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'dashboard'        
+        })
+    return render_to_response(template, context_variables)
+
+
+
+def course_content(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+
+    template = 'ndf/gcourse_event_group.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'course content'        
+        })
+    return render_to_response(template, context_variables)
+
+
+def course_notebook(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+
+    template = 'ndf/gcourse_event_group.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'notebook'        
+        })
+    return render_to_response(template, context_variables)

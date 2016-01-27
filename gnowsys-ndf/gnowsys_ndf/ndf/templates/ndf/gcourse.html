@@ -61,7 +61,7 @@
         <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
         {% for course in ce_coll %}
           <li class="card-image-wrapper" style="margin-top:13px;">
-            {% include 'ndf/event_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk  next_session=True %}
+            {% include 'ndf/event_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="course_dashboard" first_arg=course.pk  next_session=True %}
           </li>
         {% empty %}
             <div class="row">
