@@ -49,12 +49,12 @@
     {% if thumbnail_img_and_grel_hl.0 %}
       {% get_node logo_img as thumbnail_img_and_grel_hl.0 %}
       {% if thumbnail_img_and_grel_hl.0.fs_file_ids.1 %}
-        <img src="{% url 'get_gridfs_resource' thumbnail_img_and_grel_hl.0.fs_file_ids.2 %}" alt="1" />
+        <img src="{% url 'get_gridfs_resource' thumbnail_img_and_grel_hl.0.fs_file_ids.2 %}" alt="" />
       {% endif %}
     {% elif resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
-    <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="2">
+    <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
-    <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="3">
+    <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
   
     {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
       {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
@@ -62,7 +62,7 @@
 
     
       {% elif resource.fs_file_ids.0 and 'image' in resource.mime_type %}
-        <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="4">
+        <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
 
       {% elif resource.mime_type %}
         <i class="{{resource.mime_type|lower|split:'/'|join:' '}}"></i>
@@ -76,7 +76,7 @@
         {% if logo_img_and_grel_hl.0 %}
           {% get_node logo_img as logo_img_and_grel_hl.0 %}
           {% if logo_img_and_grel_hl.0.fs_file_ids.1 %}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.2 %}" alt="5" />
+            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.2 %}" alt="" />
           {% endif %}
         {% else %}
           <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
