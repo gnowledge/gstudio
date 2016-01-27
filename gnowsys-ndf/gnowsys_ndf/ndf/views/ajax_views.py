@@ -789,28 +789,29 @@ def get_inner_collection(collection_list, node, gstaff_access):
             inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
             inner_sub_list = [inner_sub_dict]
             inner_sub_list = get_inner_collection(inner_sub_list, col_obj, gstaff_access)
-            if "CourseSubSectionEvent" == node_type:
-              start_date_val = get_attribute_value(col_obj._id, "start_time")
-              if start_date_val:
-                curr_date_val = datetime.datetime.now().date()
-                start_date_val = start_date_val.date()
-                if curr_date_val >= start_date_val or gstaff_access:
-                    inner_sub_dict.update({'start_time_val':start_date_val.strftime("%d/%m/%Y")})
-                else:
-                    # do not send this CSS
-                    inner_sub_list.remove(inner_sub_dict)
-                    # pass
+            # if "CourseSubSectionEvent" == node_type:
+            #   start_date_val = get_attribute_value(col_obj._id, "start_time")
+            #   if start_date_val:
+            #     curr_date_val = datetime.datetime.now().date()
+            #     start_date_val = start_date_val.date()
+            #     if curr_date_val >= start_date_val or gstaff_access:
+            #         inner_sub_dict.update({'start_time_val':start_date_val.strftime("%d/%m/%Y")})
+            #     else:
+            #         # do not send this CSS
+            #         inner_sub_list.remove(inner_sub_dict)
+            #         # pass
             if inner_sub_list:
               inner_list_append_temp(inner_sub_list[0])
-            elif "CourseSubSectionEvent" != node_type:
+            else:
               inner_list_append_temp(inner_sub_dict)
+            # elif "CourseSubSectionEvent" != node_type:
+            #   inner_list_append_temp(inner_sub_dict)
 
             cl.update({'children': inner_list })
       else:
         error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
         print "\n " + error_message
     return collection_list
-
   else:
     return collection_list
 
@@ -862,9 +863,9 @@ def get_collection(request, group_id, node_id):
   data = collection_list
   updated_data = []
   # print "\n node.member_of_names_list",node.member_of_names_list
-  if "CourseEventGroup" in node.member_of_names_list:
-    get_course_units_tree(data,updated_data)
-    data = updated_data
+  # if "CourseEventGroup" in node.member_of_names_list:
+  #   get_course_units_tree(data,updated_data)
+  #   data = updated_data
   # print data
   return HttpResponse(json.dumps(data))
 

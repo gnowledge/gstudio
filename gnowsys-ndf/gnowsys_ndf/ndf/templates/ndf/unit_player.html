@@ -1,0 +1,243 @@
+{% load simple_filters %}
+{% xextends "ndf/gbase.html" with first_body_column=0 %}
+{# {% extends "ndf/gbase.html" %} #}
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+{% block body_content %}
+<div class="activity-page">
+    <div class="row activity-page-header">
+        <div class="small-2 columns activity-page-previous">
+            &lt; <i class="fa fa-home"></i> Course page
+        </div>
+        <div class="small-8 columns unit-title">
+            Unit 1 Title of the Unit
+        </div>
+        <div class="small-2 columns activity-create-note">
+            <div style="float: right;">
+                <i class="fa fa-pencil-square-o"></i> Create note &gt;
+            </div>
+        </div>
+    </div>
+    <div class="activity-header row">
+        <div class="small-2 columns">
+            <a href="#" class="button radius tiny prev-activity">
+                <i class="fa fa-hand-o-left"></i>
+                Previous Activity
+            </a>
+        </div>
+        <div class="small-8 columns activity-title-section">
+            <div class="activity-pagination">
+                <i class="fa fa-align-justify"></i>
+                2 of 4
+            </div>
+            <div class="activity-title">
+                Activity Name
+            </div>
+        </div>
+        <div class="small-2 columns">
+            <div>
+                <a href="#" class="button radius tiny next-activity">
+                    <i class="fa fa-hand-o-right"></i>
+                    Next Activity
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="activity-slides-container row">
+        <div class="columns small-12 activity-slides">
+            <div class="row activity-slide">
+                Activity 1 Content
+            </div>
+            <div class="row activity-slide">
+                Activity 2 Content
+            </div>
+        </div>
+    </div>
+    <div class="row activity-comments-section">
+        <div class="columns small-12 ">
+            <div class="row new-comment">
+                <div class="small-1 columns user-prof-image">
+                    <i class="fi-torso"></i>
+                </div>
+                <div class="small-9 columns">
+                    <textarea class="add-comment textarea-add-comment" name="textarea-add-comment" ></textarea>
+                </div>
+                <div class="small-2 columns">
+                    <a href="#" id="postCommentBtn" class="button small radius">Post</a>
+                </div>
+            </div>
+            <div class="activity-comments">
+
+            </div>
+        </div>
+    </div>
+</div>
+{% include "ndf/gcomment.html" %}
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+<script type="text/javascript">
+     $(function() {
+        //Activity slider initialization
+        var slides = [];
+        var currentSlide = 0;
+        $(".activity-slides").children().each(function(pos, activity){
+            slides.push(activity);
+        });
+        $(".activity-slides .activity-slide").hide();
+        $(".activity-slides .activity-slide:nth-child(1)").show();
+
+        $(slides[currentSlide]).animate({
+            left: '0%',
+        });
+
+        $(".prev-activity").on('click', function() {
+            if(currentSlide != 0) {
+                $(slides[currentSlide]).animate({
+                    left: '100%',
+                } ,600 , function() {
+                    $(this).hide();
+                    $(slides[currentSlide - 1]).show().animate({
+                        left: '0',
+                        opacity: '1'
+                    }, 600);
+                    currentSlide--;
+                });
+            }
+        });
+        $(".next-activity").on('click', function() {
+            if(currentSlide != slides.length-1) {
+                $(slides[currentSlide]).animate({
+                    left: '-100%',
+                }, 600, function() {
+                    $(this).hide();
+                    $(slides[currentSlide + 1]).show().animate({
+                        left: '0',
+                        opacity: '1'
+                    }, 600);
+                    currentSlide++;
+                });
+            }
+        });
+
+
+        //Comment Section
+        var source   = $("#user-comment-template").html();
+        var template = Handlebars.compile(source);
+        var userComments = [
+            {
+                'commentId': 1,
+                'commentOwnerId': 2,
+                'userName': 'Ranjan',
+                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                'commentedOn': '26-01-2016',
+                'commentRating': 3,
+                'commentContent': 'Lorium Ipsum',
+                'childComments': [
+                    {
+                        'commentId': 1,
+                        'commentOwnerId': 2,
+                        'userName': 'Aditya',
+                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                        'commentedOn': '26-01-2016',
+                        'commentRating': 3,
+                        'commentContent': 'Lorium Ipsum',
+                        'childComments': [
+
+                        ]
+                    },
+                    {
+                        'commentId': 1,
+                        'commentOwnerId': 2,
+                        'userName': 'Kedar',
+                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                        'commentedOn': '26-01-2016',
+                        'commentRating': 3,
+                        'commentContent': 'Lorium Ipsum',
+                        'childComments': [
+                            {
+                                'commentId': 1,
+                                'commentOwnerId': 2,
+                                'userName': 'Rachana',
+                                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                                'commentedOn': '26-01-2016',
+                                'commentRating': 3,
+                                'commentContent': 'Lorium Ipsum',
+                                'childComments': [
+
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                'commentId': 1,
+                'commentOwnerId': 2,
+                'userName': 'VK',
+                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                'commentedOn': '26-01-2016',
+                'commentRating': 3,
+                'commentContent': 'Lorium Ipsum',
+                'childComments': [
+                    {
+                        'commentId': 1,
+                        'commentOwnerId': 2,
+                        'userName': 'GN',
+                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
+                        'commentedOn': '26-01-2016',
+                        'commentRating': 3,
+                        'commentContent': 'Lorium Ipsum',
+                        'childComments': [
+
+                        ]
+                    }
+                ]
+            }
+        ];
+        $.each(userComments, function(pos, comment) {
+            if (comment.childComments.length === 0) {
+                var context = Object.assign({'gallery': 'userGallery'}, comment);
+                return template(context);
+            }
+        });
+        var commentHTML = '';
+        function renderComments (comments) {
+            var commentsHTML ='';
+            for(var i = 0; i < comments.length; i++) {
+                var comment = comments[i];
+                if (comment.childComments.length != 0) {
+                    var tempHTML = renderComments(comment.childComments);
+                    commentsHTML += renderComment(comment, tempHTML);
+                    // return tempHTML;
+                } else {
+                    commentsHTML += renderComment(comment);
+                }
+            };
+            return commentsHTML;
+        }
+
+        function renderComment(comment, childComment) {
+            var context = Object.assign({'gallery': 'userGallery', 'childComment': childComment}, {comment});
+            return template(context);
+        }
+
+
+        $(".activity-comments-section .activity-comments").empty();
+        $(".activity-comments-section .activity-comments").html(renderComments(userComments));
+
+        CKEDITOR.replaceAll( 'textarea-add-comment',{
+            enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
+            toolbar:'basic',
+            uiColor:'#f2f2f2',
+            textarea_id: 'textarea-add-comment'
+        });
+
+        $(".activity-comments-section .activity-comments .comment-add").hide();
+        //Handling all reply actions
+        $(".activity-comments-section .activity-comments").on('click', '.comment-reply', function() {
+            $(this).closest('.comment-container').children('.comment-add').toggle();
+        });
+    })
+</script>
+{% endblock body_content %}

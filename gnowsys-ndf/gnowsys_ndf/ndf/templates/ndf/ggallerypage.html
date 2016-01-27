@@ -1,0 +1,264 @@
+{% load ndf_tags %}
+<div class="gallery-page">
+    <div class="row gallery-header collapse">
+        <div class="medium-4 columns filters">
+            <div class="row collapse">
+                <div class="medium-2 columns"> View By</div>
+                <div class="medium-3 columns">
+                    <select placeholder="Select File Types">
+                        <option value="all">All File Types</option>
+                        <option value="pdf">Pdf</option>
+                        <option value="image">Image</option>
+                        <option value="compressed">Compressed</option>
+                    </select>
+                </div>
+                <div class="medium-1 columns">
+                <i class="fi-list-thumbnails"></i>
+                </div>
+                <div class="medium-2 columns">
+                    Sort By
+                </div>
+                <div class="medium-3 columns end">
+                    <select placeholder="Sort">
+                        <option value="all">Top Rated</option>
+                        <option value="school1">Recent</option>
+                        <option value="school2">Most Commented</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="medium-8 columns">
+            <div class="row">
+                <div class="medium-9 search columns">
+                    <div class="row collapse prefix-round">
+                        <div class="small-2 columns">
+                            <i class="fi-filter"></i>
+                            Add Filter
+                        </div>
+                        <div class="small-2 columns">
+                            <select placeholder="User">
+                                <option value="all">User</option>
+                                <option value="school1">Size</option>
+                            </select>
+                        </div>
+                        <div class="small-2 columns">
+                            <select placeholder="Sort">
+                                <option value="all">Select User</option>
+                                <option value="school1">Bunny</option>
+                                <option value="school2">Apple</option>
+                            </select>
+                        </div>
+                        <div class="small-6 columns filter-tags">
+                            <div class="filter-tag">Filter 1 <span>&times;</span></div>
+                            <div class="filter-tag">Filter 1 <span>&times;</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="medium-3 side-heading columns">
+                    <input type="text" placeholder="Search gallery"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row gallery-panel collapse">
+        <div class="medium-9 columns gallery-content" >
+            <div class="gallery-subheader small-12">
+                <div class="row">
+                    <div class="small-12 medium-2 columns upload-file" >
+                        <a href="#" class="button tiny">
+                            <i class="fi-upload"></i>
+                            Upload
+                        </a>
+                    </div>
+                    <div class="small-12 medium-10 columns gallery-actions hide" >
+                        <div class="download-file">
+                            <i class="fi-download"></i>
+                            <span> Download</span>
+                        </div>
+                        <div class="create-note">
+                            <i class="fi-page-edit"></i>
+                            <span> Create note</span>
+                        </div>
+                        <div class="create-collection">
+                            <i class="fi-folder"></i>
+                            <span> Create new collection</span>
+                        </div>
+                        <div class = "parent-folder">
+                            <i class="fi-folder"></i>
+                            <span>Collection</span>
+                        </div>
+                        <div>
+                            <i class="fi-list-bullet"></i>
+                        </div>
+                        <div>
+                            <i class="fi-info"></i>
+                            <span>Info</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gallery-body small-12">
+                <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+
+                </ul>
+            </div>
+        </div>
+        <div class="medium-3 columns file-info-panel">
+            <div class="file-name"> File Name </div>
+            <div class="row">
+                <div class="small-6 columns"> Type </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Size </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Uploaded By </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Created Date </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include "ndf/ggallerycard.html" %}
+{% include "ndf/ggallerymodal.html" with id="userGallery" %}
+<script type="text/javascript">
+/*
+    var galleryData = [{
+        'id': 0,
+        'name': 'User File 1',
+        'views': 23,
+        'rating': 12,
+        'comments': 996,
+        'type': 'image',
+        'size': 5, //in KB
+        'download-link': 'www.google.com',
+        'collection': 'rranjan-collection',
+        'uploadedBy': 'rranjan',
+        'item-image': 'http://www.clker.com/cliparts/c/W/h/n/P/W/generic-image-file-icon-hi.png',
+        'createdOn': '26/02/2016'
+    },
+    {
+        'id': 1,
+        'name': 'User File 2',
+        'views': 33,
+        'rating': 112,
+        'comments': 236,
+        'type': 'image',
+        'size': 5, //in KB
+        'download-link': 'www.google.com',
+        'collection': 'rranjan-collection',
+        'uploadedBy': 'rranjan',
+        'item-image': 'http://f.tqn.com/y/pcsupport/1/0/C/Q/-/-/zip-file.png',
+        'createdOn': '26/02/2016'
+    },{
+        'id': 2,
+        'name': 'User File 3',
+        'views': 233,
+        'rating': 2,
+        'comments': 6,
+        'type': 'image',
+        'size': 5, //in KB
+        'download-link': 'www.google.com',
+        'collection': 'rranjan-collection',
+        'uploadedBy': 'rranjan',
+        'item-image': 'http://1.bp.blogspot.com/-f4CFhdpj5G8/TnTx8U5tedI/AAAAAAAACjw/G6cU4wFRQjU/s1600/music_file_alt.png',
+        'createdOn': '26/02/2016'
+    },{
+        'id': 3,
+        'name': 'User File 4',
+        'views': 233,
+        'rating': 2,
+        'comments': 6,
+        'type': 'image',
+        'size': 5, //in KB
+        'download-link': 'www.google.com',
+        'collection': 'rranjan-collection',
+        'uploadedBy': 'rranjan',
+        'item-image': 'http://southpolesoftware.com/iVI/images/icon-video.gif',
+        'createdOn': '26/02/2016'
+    }];
+
+    */
+    $(function() {
+        var galleryId = "userGallery";
+
+        //Restricting the user scroll in the modal
+        $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
+          $('body').css('overflow', 'hidden');
+        });
+        $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+          var modal = $(this);
+          $('body').css('overflow', 'auto');
+
+        });
+
+        //Capturing the selection of the images in the gallery
+        $(".gallery-body").on('change', 'input[type=checkbox]', function() {
+            var marked = false;
+            $(".gallery-body").find('input[type=checkbox]').each(function(pos, item) {
+                marked = marked || $(item).is(":checked");
+            })
+            if (marked) {
+                $(".gallery-actions").removeClass('hide');
+            } else {
+                $(".gallery-actions").addClass('hide');
+            }
+        });
+
+        //Creating the handlebar template for the individual gallery card
+        var source   = $("#gallery-card-template").html();
+        var template = Handlebars.compile(source);
+        var file_details_dict = {}
+        var galleryData = []
+        function renderGallery() {
+            {% for each in files_cur %}
+                // $.each(galleryData, function(key, item) {
+                    {% get_grid_fs_object each as grid_fs_obj %}
+                    file_details_dict = {
+                        'id' : "{{each.pk}}",
+                        'item-image': "{% url 'get_gridfs_resource' each.fs_file_ids.2 %}",
+                        'name': "{{each.name}}",
+                        'createdOn': "{{each.created_at|date:'d-m-Y'}}",
+                        'size': "{{each.file_size.size}}",
+                        'download-link': "{% url 'read_file' group_id each grid_fs_obj.filename %}",
+                        'grid_fs_obj_name': "{{grid_fs_obj.filename}}"
+                    }
+                    galleryData.push(file_details_dict)
+                    var context = Object.assign({'gallery': 'userGallery'}, file_details_dict);
+                    var html    = template(context);
+                    $(".gallery-panel .gallery-body ul").append(html);
+                // });
+            {% endfor %}
+        }
+        renderGallery();
+
+        //Initializing the gallery with the new images.
+        var userGallery = $('.gallery-panel .gallery-body ul').userGalleryModal({
+            'items': galleryData,
+            'galleryId': galleryId
+        });
+        $(document).on('click', '[data-reveal-id='+ galleryId +']', function() {
+            if($(".reveal-modal-bg").is(":visible")) {
+                userGallery.openItem($(this).attr('data-item-id'));
+                $("#" + galleryId).find('img').each(function(pos, image) {
+                    $(image).removeClass('hide');
+                });
+
+            }
+        })
+
+        /*$.ajax({
+          method: "POST",
+          url: "some.php",
+          data: { name: "John", location: "Boston" }
+        })
+        .done(function( msg ) {
+          alert( "Data Saved: " + msg );
+        });*/
+    })
+</script>
