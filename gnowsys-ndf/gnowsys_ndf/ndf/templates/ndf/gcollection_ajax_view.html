@@ -88,7 +88,7 @@
                 if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
                   $li.find('.jqtree-title').addClass('module-page');
                   url = "{% url 'course_resource_detail' group_name_tag  %}"
-                  url += "?node=" + node.id
+                  url += "?unit_id=" + node.parent.id +"&node_id="+node.id
                   $li.find('.jqtree-title')
                     .html('<i class="fa ' + iconMapping[node.status] + '"></i><a href="'+url+'" id='+node.id+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
                 }
