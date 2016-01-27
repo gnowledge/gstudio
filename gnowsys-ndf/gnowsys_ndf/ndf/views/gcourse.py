@@ -1827,6 +1827,8 @@ def course_resource_detail(request, group_id):
 #     pass
 
 
+
+
 def course_dashboard(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -1874,3 +1876,52 @@ def course_notebook(request, group_id):
             'node': group_obj, 'title': 'notebook'        
         })
     return render_to_response(template, context_variables)
+
+
+def course_raw_material(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+
+    template = 'ndf/gcourse_event_group.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'raw material'        
+        })
+    return render_to_response(template, context_variables)
+
+
+def course_gallery(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+
+    template = 'ndf/gcourse_event_group.html'
+    
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'gallery'        
+        })
+    return render_to_response(template, context_variables)
+
+
+def course_about(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+    
+    template = 'ndf/gcourse_event_group.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'about'        
+        })
+    return render_to_response(template, context_variables)
+
