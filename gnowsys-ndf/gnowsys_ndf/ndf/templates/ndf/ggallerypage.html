@@ -60,15 +60,21 @@
             </div>
         </div>
     </div>
+
     <div class="row gallery-panel collapse">
         <div class="medium-9 columns gallery-content" >
             <div class="gallery-subheader small-12">
                 <div class="row">
-                    <div class="small-12 medium-2 columns upload-file" >
-                        <a href="#" class="button tiny">
-                            <i class="fi-upload"></i>
-                            Upload
-                        </a>
+                    <div class="small-12 medium-2 columns upload-file" id="upload_form_div">
+                        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
+                            {% csrf_token %}
+                            <input type="file" name="doc" id="docFile"/>
+                            <div class="save_cancel hide">
+                              <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
+                              <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
+                            </div>
+                        </form>
+
                     </div>
                     <div class="small-12 medium-10 columns gallery-actions hide" >
                         <div class="download-file">
