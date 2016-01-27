@@ -81,7 +81,7 @@
                 </div>
 
                 <div class="content notes" id="my-notes">
-                {% for each_blog in user_blogs %}
+                {% for each_user_blog in user_blogs %}
                     {% comment %}
                         <div class="date">
                             December 2015
@@ -89,13 +89,13 @@
                         </div>
                     {% endcomment %}
                     <div class="note {% if forloop.counter == 1%} active {% endif %}">
-                        <div class="note-heading"> {{each_blog.name}} </div>
+                        <div class="note-heading"> {{each_user_blog.name}} </div>
                         <div class="note-meta">
                             <span>
-                                {{each_blog.created_by|get_username|truncatechars:"10"}}
+                                {{each_user_blog.created_by|get_username|truncatechars:"10"}}
                             </span>
                             &#8226;
-                            <span>{{each_blog.created_at|date:"d M Y h:i A"}}</span>
+                            <span>{{each_user_blog.created_at|date:"d M Y h:i A"}}</span>
                         </div>
                         <div class="note-footer">
                             <i class="fi-eye"></i>
@@ -179,7 +179,7 @@
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 <script type="text/javascript">
     $(function() {
-        //Note section
+        //Note Section
         var noteDetails = {
             'id': 1,
             'creator': 'Ranjan',
