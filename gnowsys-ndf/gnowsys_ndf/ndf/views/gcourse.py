@@ -1386,6 +1386,10 @@ def add_units(request, group_id):
         unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
     except:
         unit_node = None
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    page_instances = node_collection.find({"type_of": page_gst._id})
+    page_ins_list = [i for i in page_instances]
+
     variable = RequestContext(request, {
         'group_id': group_id, 'groupid': group_id,
         'css_node': css_node,
@@ -1394,9 +1398,10 @@ def add_units(request, group_id):
         'app_id': app_id,
         'unit_node': unit_node,
         'course_node': course_node,
+        'page_instance': page_ins_list
     })
 
-    template = "ndf/course_units.html"
+    template = "ndf/gcourse_units.html"
     return render_to_response(template, variable)
 
 
