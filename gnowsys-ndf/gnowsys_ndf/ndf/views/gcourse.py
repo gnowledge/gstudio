@@ -1799,15 +1799,23 @@ def course_summary(request, group_id):
 
 def course_resource_detail(request, group_id):
     if request.method == "GET":
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
         # course_section = request.GET.get("course_section", "")
         # course_sub_section = request.GET.get("course_sub_section", "")
         # course_unit = request.GET.get("course_unit", "")
-        node_id = request.GET.get("node", "")
+        node_id = request.GET.get("node_id", "")
+        unit_id = request.GET.get("unit_id", "")
         # print "\n\n node_id",node_id
+        unit_node = node_collection.one({'_id': ObjectId(unit_id)})
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
         variable = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id,
-            'node': node_obj
+            'group_name':group_name,
+            'node': node_obj,
+            'unit_node': unit_node
         })
 
 
