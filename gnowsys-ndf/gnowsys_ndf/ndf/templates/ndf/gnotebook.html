@@ -58,7 +58,7 @@
                             <span class="notes-count right">2</span>
                         </div>
                     {% endcomment %}
-                    <div class="note {% if forloop.counter == 1%} active {% endif %}">
+                    <div class="note {% if forloop.counter == 1%} active {% endif %}" id="{{each_blog.pk}}">
                         <div class="note-heading"> {{each_blog.name}} </div>
                         <div class="note-meta">
                             <span>
@@ -88,7 +88,7 @@
                             <span class="notes-count right">2</span>
                         </div>
                     {% endcomment %}
-                    <div class="note {% if forloop.counter == 1%} active {% endif %}">
+                    <div class="note {% if forloop.counter == 1%} active {% endif %}" id="{{each_user_blog.pk}}">
                         <div class="note-heading"> {{each_user_blog.name}} </div>
                         <div class="note-meta">
                             <span>
@@ -114,221 +114,31 @@
             </div>
         </div>
         <div class="small-12 medium-9 columns note-page">
-            <div class="row note-toolbar">
-                <div class="small-9 columns">
-                    <i class="fi-torso"></i>
-                    <span class="note-creator">Madam X</span>
-                    &#8226;
-                    <span class="note-creation-date">25th Dec 2015</span>
-                </div>
-                <div class="small-3 columns creator-rating">
-                    <div>Your rating</div>
-                    <div>
-                        <i class="fi-like"></i>
-                        <i class="fi-like"></i>
-                        <i class="fi-like"></i>
-                        <i class="fi-like"></i>
-                        <i class="fi-like"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="row note-content">
-                <div class="note-header">
-                    <span class="note-title">Note Heading</span>
-                    <div class="note-tags">
-                        <a>Tag1</a>
-                        <a>Tag2</a>
-                        <a>Tag3</a>
-                    </div>
-                </div>
-                <div class="note-text">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In at mattis tellus. Integer ac consectetur felis, et laoreet diam. Donec orci ex, fringilla non nibh eu, ornare dictum mi. In orci augue, mattis non arcu at, feugiat tincidunt mi. Nulla gravida leo non elementum fermentum. Nullam luctus sodales est in varius. Nulla et bibendum arcu, in tincidunt odio. Sed rhoncus placerat nunc, eget sollicitudin augue tempor a. Suspendisse ornare dignissim laoreet. Sed a cursus arcu. Etiam vitae semper quam. Maecenas pretium placerat enim non condimentum. Quisque dapibus turpis hendrerit tristique rutrum. Vestibulum maximus augue metus, nec gravida lorem dapibus id. Nulla tristique pharetra ipsum, quis vulputate magna tincidunt at. Duis elementum quam blandit lacus ultrices maximus. Morbi in sem at felis faucibus cursus. Donec arcu justo, fringilla nec scelerisque a, luctus ut nisl. Curabitur dictum felis sed nulla feugiat mattis. Fusce ac tortor eget arcu efficitur aliquam. Sed rutrum felis lacus, id congue mi sodales in. Mauris euismod massa elit.
-                </div>
-            </div>
-            <div class="comment-sections">
-                <div class="comments-header">
-                    <i class="fi-eye"></i>
-                    <span class="viewed-count">214</span>
-                    views
-                    <i class="fi-like"></i>
-                    <span class="likes-count">10</span>
-                    likes
-                    <i class="fi-comments"></i>
-                    <span class="comment-count">22</span>
-                    comments
-                </div>
-                <div class="new-comment row">
-                    <div class="small-1 columns user-prof-image">
-                        <i class="fi-torso"></i>
-                    </div>
-                    <div class="small-9 columns">
-                        <textarea class="add-comment textarea-add-comment" name="textarea-add-comment"></textarea>
-                    </div>
-                    <div class="small-2 columns">
-                        <a href="#" id="postCommentBtn" class="button small">Post</a>
-                    </div>
-                </div>
-                <div class="row comments">
-                </div>
-            </div>
         </div>
     </div>
 </div>
-{% include "ndf/gcomment.html" %}
-<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+
 <script type="text/javascript">
-    $(function() {
-        //Note Section
-        var noteDetails = {
-            'id': 1,
-            'creator': 'Ranjan',
-            'createdOn': '22-01-2016',
-            'rating': 3,
-            'heading': 'Note Heading',
-            'tags': [
-                {
-                    'name': 'Tag 1',
-                    'link': 'some_url'
-                }
-            ],
-            'content': 'This is the note content',
-            'views': 3,
-            'comments': 18
-        }
+    $('.notebook-index .notes').on('click', '.note', function() {
 
-        $('.notebook-index .notes').on('click', '.note', function() {
-            $(".note-page .note-creator").html(noteDetails.creator);
-            $(".note-page .note-creation-date").html(noteDetails.createdOn);
-            $(".note-page .note-title").html(noteDetails.heading);
-            $(".note-page .note-tags").empty();
-            $.each(noteDetails.tags, function(pos, tag) {
-                $(".note-page .note-tags").append('<a href=' + tag.link + '>' + tag.name +'</a>');
-            });
-            $(".note-page .note-text").html(noteDetails.content);
-            $(".note-page .viewed-count").html(noteDetails.views);
-            $(".note-page .likes-count").html(noteDetails.rating);
-            $(".note-page .comment-count").html(noteDetails.comments);
+        node_id = $(this).attr('id')
+        $.ajax({
+          url: "{% url 'course_note_page' group_id %}",
 
-            //Fetching the comments for this note
-            $(".comment-sections .comments").empty();
-            $(".comment-sections .comments").html(renderComments(userComments));
+          data: {
+            node_id: node_id
+          },
 
-            CKEDITOR.replaceAll( 'textarea-add-comment',{
-                enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
-                toolbar:'basic',
-                uiColor:'#f2f2f2',
-                textarea_id: 'textarea-add-comment'
-            });
-            $(".comment-sections .comments .comment-add").hide();
-            //Handling all reply actions
-            $(".comment-sections>.comments").on('click', '.comment-reply', function() {
-                console.log('Reachded');
-                $(this).closest('.comment-container').children('.comment-add').toggle();
-            })
-        });
+          type: "GET",
+
+          dataType: "html",
+
+          success: function(data){
+            $(".note-page").html(data)
+          },
+        });//end of ajax
 
 
-        //Comment Section
-        var source   = $("#user-comment-template").html();
-        var template = Handlebars.compile(source);
-        var userComments = [
-            {
-                'commentId': 1,
-                'commentOwnerId': 2,
-                'userName': 'Ranjan',
-                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                'commentedOn': '26-01-2016',
-                'commentRating': 3,
-                'commentContent': 'Lorium Ipsum',
-                'childComments': [
-                    {
-                        'commentId': 1,
-                        'commentOwnerId': 2,
-                        'userName': 'Aditya',
-                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                        'commentedOn': '26-01-2016',
-                        'commentRating': 3,
-                        'commentContent': 'Lorium Ipsum',
-                        'childComments': [
-
-                        ]
-                    },
-                    {
-                        'commentId': 1,
-                        'commentOwnerId': 2,
-                        'userName': 'Kedar',
-                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                        'commentedOn': '26-01-2016',
-                        'commentRating': 3,
-                        'commentContent': 'Lorium Ipsum',
-                        'childComments': [
-                            {
-                                'commentId': 1,
-                                'commentOwnerId': 2,
-                                'userName': 'Rachana',
-                                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                                'commentedOn': '26-01-2016',
-                                'commentRating': 3,
-                                'commentContent': 'Lorium Ipsum',
-                                'childComments': [
-
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                'commentId': 1,
-                'commentOwnerId': 2,
-                'userName': 'VK',
-                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                'commentedOn': '26-01-2016',
-                'commentRating': 3,
-                'commentContent': 'Lorium Ipsum',
-                'childComments': [
-                    {
-                        'commentId': 1,
-                        'commentOwnerId': 2,
-                        'userName': 'GN',
-                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                        'commentedOn': '26-01-2016',
-                        'commentRating': 3,
-                        'commentContent': 'Lorium Ipsum',
-                        'childComments': [
-
-                        ]
-                    }
-                ]
-            }
-        ];
-        $.each(userComments, function(pos, comment) {
-            if (comment.childComments.length === 0) {
-                var context = Object.assign({'gallery': 'userGallery'}, comment);
-                return template(context);
-            }
-        });
-        var commentHTML = '';
-        function renderComments (comments) {
-            var commentsHTML ='';
-            for(var i = 0; i < comments.length; i++) {
-                var comment = comments[i];
-                if (comment.childComments.length != 0) {
-                    var tempHTML = renderComments(comment.childComments);
-                    commentsHTML += renderComment(comment, tempHTML);
-                    // return tempHTML;
-                } else {
-                    commentsHTML += renderComment(comment);
-                }
-                //console.log(commentHTML);
-            };
-            return commentsHTML;
-        }
-
-        function renderComment(comment, childComment) {
-            var context = Object.assign({'gallery': 'userGallery', 'childComment': childComment}, {comment});
-            return template(context);
-        }
-    });
+    })
+    
 </script>
