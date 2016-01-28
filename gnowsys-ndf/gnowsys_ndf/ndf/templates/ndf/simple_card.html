@@ -34,6 +34,7 @@
 {% endif%}
 
 {% check_is_gstaff groupid request.user as gstaff_access %}
+{% if not no_url %}
 {% if first_arg and second_arg and third_arg %}
   <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
 {% elif first_arg and second_arg %}
@@ -41,7 +42,7 @@
 {% elif first_arg %}
   <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
 {% endif %}
-
+{% endif %}
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
       
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
