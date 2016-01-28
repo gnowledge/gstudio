@@ -2443,12 +2443,13 @@ def upload_using_save_file(request,group_id):
 
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     usrid = request.user.id
-    url_name = "/"+str(group_id)
+    # url_name = "/"+str(group_id)
     for key,value in request.FILES.items():
         fname=unicode(value.__dict__['_name'])
         # print "key=",key,"value=",value,"fname=",fname
-        fileobj,fs=save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
-        file_obj=node_collection.find_one({'_id': ObjectId(fileobj)})
-        if file_obj:
-            url_name = "/"+str(group_id)+"/#gallery-tab"
-        return HttpResponseRedirect(url_name)
+        fileobj,fs = save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
+        file_obj = node_collection.find_one({'_id': ObjectId(fileobj)})
+        # if file_obj:
+        #     url_name = "/"+str(group_id)+"/#gallery-tab"
+        return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
+        # return HttpResponseRedirect(url_name)

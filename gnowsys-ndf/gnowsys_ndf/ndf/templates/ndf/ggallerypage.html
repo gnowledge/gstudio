@@ -64,8 +64,8 @@
     <div class="row gallery-panel collapse">
         <div class="medium-9 columns gallery-content" >
             <div class="gallery-subheader small-12">
-                <div class="row">
-                    <div class="small-12 medium-2 columns upload-file" id="upload_form_div">
+                <div class="row right">
+                    <div class="upload-file" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
                             {% csrf_token %}
                             <input type="file" name="doc" id="docFile"/>
@@ -103,12 +103,18 @@
                     </div>
                 </div>
             </div>
+            <!-- Files listing div -->
             <div class="gallery-body small-12">
-                <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
-
+                <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5">
+                {% for each_img in files_cur %}
+                    <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
+                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True no_url=True first_arg=group_id second_arg=each_img.pk %}
+                    </li>
+                {% endfor %}
                 </ul>
             </div>
         </div>
+        <!-- File info panel div -->
         <div class="medium-3 columns file-info-panel">
             <div class="file-name"> File Name </div>
             <div class="row">
@@ -128,143 +134,27 @@
                 <div class="small-6 columns"> info </div>
             </div>
         </div>
+
     </div>
+
 </div>
-{% include "ndf/ggallerycard.html" %}
-{% include "ndf/ggallerymodal.html" with id="userGallery" %}
+<div class="reveal-container"></div>
+
 <script type="text/javascript">
-/*
-    var galleryData = [{
-        'id': 0,
-        'name': 'User File 1',
-        'views': 23,
-        'rating': 12,
-        'comments': 996,
-        'type': 'image',
-        'size': 5, //in KB
-        'download-link': 'www.google.com',
-        'collection': 'rranjan-collection',
-        'uploadedBy': 'rranjan',
-        'item-image': 'http://www.clker.com/cliparts/c/W/h/n/P/W/generic-image-file-icon-hi.png',
-        'createdOn': '26/02/2016'
-    },
-    {
-        'id': 1,
-        'name': 'User File 2',
-        'views': 33,
-        'rating': 112,
-        'comments': 236,
-        'type': 'image',
-        'size': 5, //in KB
-        'download-link': 'www.google.com',
-        'collection': 'rranjan-collection',
-        'uploadedBy': 'rranjan',
-        'item-image': 'http://f.tqn.com/y/pcsupport/1/0/C/Q/-/-/zip-file.png',
-        'createdOn': '26/02/2016'
-    },{
-        'id': 2,
-        'name': 'User File 3',
-        'views': 233,
-        'rating': 2,
-        'comments': 6,
-        'type': 'image',
-        'size': 5, //in KB
-        'download-link': 'www.google.com',
-        'collection': 'rranjan-collection',
-        'uploadedBy': 'rranjan',
-        'item-image': 'http://1.bp.blogspot.com/-f4CFhdpj5G8/TnTx8U5tedI/AAAAAAAACjw/G6cU4wFRQjU/s1600/music_file_alt.png',
-        'createdOn': '26/02/2016'
-    },{
-        'id': 3,
-        'name': 'User File 4',
-        'views': 233,
-        'rating': 2,
-        'comments': 6,
-        'type': 'image',
-        'size': 5, //in KB
-        'download-link': 'www.google.com',
-        'collection': 'rranjan-collection',
-        'uploadedBy': 'rranjan',
-        'item-image': 'http://southpolesoftware.com/iVI/images/icon-video.gif',
-        'createdOn': '26/02/2016'
-    }];
-
-    */
-    $(function() {
-        var galleryId = "userGallery";
-
-        //Restricting the user scroll in the modal
-        $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
-          //$('body').css('overflow', 'hidden');
-        });
-        $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
-          var modal = $(this);
-          //$('body').css('overflow', 'auto');
-
-        });
-
-        //Capturing the selection of the images in the gallery
-        $(".gallery-body").on('change', 'input[type=checkbox]', function() {
-            var marked = false;
-            $(".gallery-body").find('input[type=checkbox]').each(function(pos, item) {
-                marked = marked || $(item).is(":checked");
-            })
-            if (marked) {
-                $(".gallery-actions").removeClass('hide');
-            } else {
-                $(".gallery-actions").addClass('hide');
-            }
-        });
-
-        //Creating the handlebar template for the individual gallery card
-        var source   = $("#gallery-card-template").html();
-        var template = Handlebars.compile(source);
-        var file_details_dict = {};
-        var galleryData = [];
-        function renderGallery() {
-            {% for each in files_cur %}
-                // $.each(galleryData, function(key, item) {
-                    {% get_grid_fs_object each as grid_fs_obj %}
-                    file_details_dict = {
-                        'id' : "{{each.pk}}",
-                        'item-image': "{% url 'get_gridfs_resource' each.fs_file_ids.2 %}",
-                        'name': "{{each.name}}",
-                        'createdOn': "{{each.created_at|date:'d-m-Y'}}",
-                        'size': "{{each.file_size.size}}",
-                        'download-link': "{% url 'read_file' group_id each grid_fs_obj.filename %}",
-                        'grid_fs_obj_name': "{{grid_fs_obj.filename}}"
-                    }
-                    galleryData.push(file_details_dict)
-                    var context = Object.assign({'gallery': 'userGallery'}, file_details_dict);
-                    var html    = template(context);
-                    $(".gallery-panel .gallery-body ul").append(html);
-                // });
-            {% endfor %}
-        }
-        renderGallery();
-
-        //Initializing the gallery with the new images.
-        var userGallery = $('.gallery-panel .gallery-body ul').userGalleryModal({
-            'items': galleryData,
-            'galleryId': galleryId
-        });
-        $(document).on('click', '[data-reveal-id='+ galleryId +']', function() {
-            if($(".reveal-modal-bg").is(":visible")) {
-                userGallery.openItem($(this).attr('data-item-id'));
-                $("#" + galleryId).find('img').each(function(pos, image) {
-                    $(image).removeClass('hide');
-                });
-
-            }
-        });
-
-        /*$.ajax({
-          method: "POST",
-          url: "some.php",
-          data: { name: "John", location: "Boston" }
-        })
-        .done(function( msg ) {
-          alert( "Data Saved: " + msg );
-        });*/
+    $('.gallery-img').click(function (){
+        node_id = $(this).attr('id')
+        $.ajax({
+          url: "{% url 'course_gallerymodal' group_id %}",
+          data: {
+            node_id: node_id
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            $(".reveal-container").html(data)
+            $("#reveal-"+ node_id).foundation('reveal','open')
+          },
+        });//end of ajax
     })
+
 </script>

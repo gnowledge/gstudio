@@ -82,10 +82,11 @@ list-style: none;
 <div id="envelop-cover">
   <div class="row course-page-title">
     <div class="small-12 medium-8 columns heading">{{node.name}}</div>
-
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
-      <span><a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button radius"><i class="fi-pencil"></i> {% trans "Edit " %}{% if sg_type == "ProgramEventGroup" %}{% trans "Event" %}{% else %}{% trans "eCourse" %}{% endif %}</a></span>
+        {% with node.member_of_names_list.0 as sg_type %}
+          <span><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny button radius"><i class="fi- pencil"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></span>
+        {% endwith %}
 
         <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
         <span><input type="button" class="tiny button radius settings" value="Settings"></span>
@@ -131,118 +132,99 @@ list-style: none;
   </div>
 </div>
 
+
+
 <!-- Tabs -->
 <div class="row" id="envelop-content" >
   <!-- Envelop box-->
   <div class="small-12 large-12 columns">
-     <div style="line-height: 0.7em;">
-      <ul class="tabs" data-tab>
-        <li class="tab-title active"><a href="#course-dashboard"><i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}</a></li>
-        <li class="tab-title"><a href="#course-content"><i class="fi-clipboard-notes"></i>{% trans "Course Content" %}</a></li>
-        <li class="tab-title"><a href="#course-notebook"><i class="fi-book "></i>{% trans "Notebook" %}</a></li>
-        <li class="tab-title"><a href="#course-raw-material"><i class="fi-clip "></i>{% trans "Raw Material" %}</a></li>
-        <li class="tab-title"><a href="#course-gallery"><i class="fi-photo "></i> {% trans "Gallery" %}</a></li>
-        <li class="tab-title"><a href="#course-about"><i class="fi-page-edit "></i>{% trans "About the course" %}</a></li>
+    <div style="line-height: 0.7em;">
+      <ul class="tabs">
+
+        <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
+          <a href="{% url 'course_dashboard' group_id %}">
+            <i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'course content' %}active{% endifequal %}">
+          <a href="{% url 'course_content' group_id %}">
+            <i class="fi-clipboard-notes"></i>{% trans "Course Content" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
+          <a href="{% url 'course_notebook' group_id %}">
+            <i class="fi-book "></i>{% trans "Notebook" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'raw material' %}active{% endifequal %}">
+          <a href="{% url 'course_raw_material' group_id %}">
+            <i class="fi-clip "></i>{% trans "Raw Material" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'gallery' %}active{% endifequal %}">
+          <a href="{% url 'course_gallery' group_id %}">
+            <i class="fi-photo "></i> {% trans "Gallery" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
+          <a href="{% url 'course_about' group_id %}">
+            <i class="fi-page-edit "></i>{% trans "About the course" %}
+          </a>
+        </li>
+
       </ul>
     </div>
-    <!-- Each tab pages -->
+
+
+
+    <!-- Load tab contents dynamically -->
     <div class="tabs-content course-book">
       <div class="content active" id="course-dashboard">
-        {% include "ndf/gcourseDashboard.html" %}
-      </div>
-      <div class="content" id="course-content">
-        <!--@anotation("import gcourse_event_group.html for the list of the modules in the course.")-->
-        {% include "ndf/gcollection_ajax_view.html" %}
-      </div>
-      <div class="content" id="course-notebook">
-      {% comment %}
-        <div class="text-right">
-          <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button small radius"> Add Blog </a>
-        </div>
-        <div class="row all_blogs">
-          {% for each_blog in blog_pages %}
-          <div class="blogpage"  style="margin-left:10px;">
-            <h4>
-              <a href="{% url 'page_details' group_id each_blog.pk %}">{{each_blog.name}}</a>
-            </h4>
-            {% if request.user.id == each_blog.created_by or gstaff_access %}
-            <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}&blog_type=True"> Edit </a>
-            {% endif %}
-            <span>
-              Created by {{each_blog.created_by|get_username}} at {{each_blog.created_at}}
-            </span>
-            <div>
-              {{each_blog.html_content|safe}}
-            </div>
-          </div>
-          <hr/>
-          {% empty %}
-          <div class="blogpage"  style="margin-left:10px;">
-            <h4>
-              <u>
-                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True">Start writing Pages </a>
-              </u>
-            </h4>
-          </div>
-          {% endfor %}
-        </div>
-      {% endcomment %}
-
-        <!--Including the nodebook component-->
+        {% if title == 'dashboard' %}
+          {% include "ndf/gcourseDashboard.html" %}
+        {% elif title == 'course content' %}
+          {% include "ndf/gcollection_ajax_view.html" %}
+          <!--@anotation("import gcourse_event_group.html for the list of the modules in the course.")-->
+        {% elif title == 'notebook' %}
           {% include "ndf/gnotebook.html" %}
-        <!---->
-
-      </div>
-      <div class="content" id="course-raw-material">
-        <p></p>
-      </div>
-      <div class="content" id="course-gallery">
-        {% if "CourseEventGroup" in group_object.member_of_names_list %}
-        <!--div id="upload_form_div" class="text-right">
-          <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
-            {% csrf_token %}
-            <input type="file" name="doc" id="docFile"/>
-            <div class="save_cancel hide">
-              <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
-              <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
-            </div>
-          </form>
-        </div-->
-        {% endif %}
-
-        <!--div class="row">
-         {# include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" #}
-        </div-->
-       {% include "ndf/ggallerypage.html" %}
-      </div>
-      <div class="content" id="course-about">
-        <div class="row collapse">
-          <div class="about-course-heading">
-            <div class="heading-text">
-              <div>
-                <h2>{{node.name}}</h2>
+        {% elif title == 'gallery' %}
+          {% include "ndf/ggallerypage.html" %}
+        {% elif title == 'about' %}
+          <div id="course-about">
+            <div class="row collapse">
+              <div class="about-course-heading">
+                <div class="heading-text">
+                  <div>
+                    <h2>{{node.name}}</h2>
+                  </div>
+                  <div>Next Session Jan 5 2016 &#8226; 3:00pm</div>
+                  <div>
+                    <span><i class="fi-list-thumbnails"></i>&nbsp;10</span>
+                    &#8226;&nbsp;&nbsp;
+                    <span><i class="fi-torso"></i>&nbsp;{{group_object.author_set|length}}</span>
+                    &#8226;&nbsp;&nbsp;
+                    <span><i class="fi-clock"></i>&nbsp;6 weeks</span>
+                  </div>
+                </div>
               </div>
-              <div>Next Session Jan 5 2016 &#8226; 3:00pm</div>
-              <div>
-                <span><i class="fi-list-thumbnails"></i>&nbsp;10</span>
-                &#8226;&nbsp;&nbsp;
-                <span><i class="fi-torso"></i>&nbsp;{{group_object.author_set|length}}</span>
-                &#8226;&nbsp;&nbsp;
-                <span><i class="fi-clock"></i>&nbsp;6 weeks</span>
+            </div>
+            <div class="row collapse">
+              <div class="about-course-details">
+                <!--@anotation('replace this with the about course details')-->
+                <p>{{group_object.content_org}}
+                </p>
               </div>
             </div>
           </div>
-        </div>
-        <div class="row collapse">
-          <div class="about-course-details">
-            <!--@anotation('replace this with the about course details')-->
-            <p>{{group_object.content_org}}
-            </p>
-          </div>
-        </div>
+        {% endif %}        
       </div>
     </div>
-    <!-- Each tab pages ends here -->
+    <!-- tab-content ends here -->
   </div>
 </div>
 
