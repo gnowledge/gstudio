@@ -1835,12 +1835,11 @@ def course_dashboard(request, group_id):
     group_id    = group_obj._id
     group_name  = group_obj.name
 
-
     template = 'ndf/gcourse_event_group.html'
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'dashboard'        
+            'node': group_obj, 'title': 'dashboard'
         })
     return render_to_response(template, context_variables)
 
@@ -1867,13 +1866,27 @@ def course_notebook(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
+    all_blogs = None
+    blog_pages = None
+    user_blogs = None
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+
+    all_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+                        'group_set': group_obj._id}).sort('created_at', -1)
+    if all_blogs:
+        blog_pages = all_blogs.clone()
+        if request.user.id:
+            blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
+            user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
 
 
     template = 'ndf/gcourse_event_group.html'
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'notebook'        
+            'node': group_obj, 'title': 'notebook', 'blog_pages': blog_pages,
+            'user_blogs': user_blogs
         })
     return render_to_response(template, context_variables)
 
