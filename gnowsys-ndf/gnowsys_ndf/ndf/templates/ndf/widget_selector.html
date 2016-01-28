@@ -21,7 +21,7 @@
   }
 
   #selected-items > .selection{
-    float: left;
+    float: absolute;
     margin: 0.25rem 0.5rem;
   }
 
@@ -140,7 +140,6 @@
 <script type="text/javascript">
 
   selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
-  // console.log(selected_options)
 
   // querySelector, jQuery style
   var $s = function (selector) {
@@ -184,8 +183,9 @@
   function detachEvent() { return false; }
 
   function addToSelection () {
-    // console.log(this.textContent);
+
     selDiv = document.createElement('div');
+    linebreak = document.createElement("br");
     selDiv.classList.add('label', 'secondary', 'selection');
     
     this.onclick = detachEvent;
@@ -202,7 +202,8 @@
     selDiv.appendChild(closeBtn);
 
     selectedItems.appendChild(selDiv);
-    selDiv.onclick = function(){selectedItems.insertBefore(this, this.previousSibling );}
+    selectedItems.appendChild(linebreak);
+    // selDiv.onclick = function(){selectedItems.insertBefore(this, this.previousSibling );}
   }
 
   for (var i = sItems.length - 1; i >= 0; i--) {
