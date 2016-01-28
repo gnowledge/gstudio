@@ -1834,15 +1834,12 @@ def course_dashboard(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-    sg_type = "CourseEventGroup"
-    if "CourseEventGroup" not in group_obj.member_of_names_list:
-        sg_type = "ProgramEventGroup"
 
     template = 'ndf/gcourse_event_group.html'
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'dashboard', 'sg_type': sg_type
+            'node': group_obj, 'title': 'dashboard'
         })
     return render_to_response(template, context_variables)
 
