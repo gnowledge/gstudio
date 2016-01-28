@@ -1912,9 +1912,8 @@ def course_gallery(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-    files_cur = node_collection.find({'group_set': group_id, '_type': "File"})
+    files_cur = node_collection.find({'group_set': group_id, '_type': "File"},{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1})
     template = 'ndf/gcourse_event_group.html'
-    
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'gallery', 'files_cur': files_cur
@@ -1937,3 +1936,17 @@ def course_about(request, group_id):
         })
     return render_to_response(template, context_variables)
 
+def course_gallerymodal(request, group_id):
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    node_id = request.GET.get("node_id", "")
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+
+    template = 'ndf/ggallerymodal.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': node_obj, 'title': 'course_gallerymodall'
+        })
+    return render_to_response(template, context_variables)
