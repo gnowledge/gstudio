@@ -2264,6 +2264,49 @@ div.show-image:hover div.fullscreen-icon{
     }
   }
 }
+
+.note-tags {
+  a {
+    background: #ffebb2;
+    padding: 0.2em 0.7em;
+    display: inline-block;
+  }
+}
+.toggleButtons {
+  a{
+    padding: 0.5em 1em;
+    margin: 0px;
+    background: #dddddd;
+    color: #000;
+    border: 1px solid #000;
+
+    &:first-child{
+      margin-right: -3px;
+      border-right: 0px solid #000;
+    }
+  }
+}
+
+.explore-header {
+  line-height: 3em;
+
+  >div {
+    vertical-align: middle;
+    display: inline-block;
+  }
+  .heading {
+    font-size: 2em;
+  }
+
+  .expore-type {
+
+  }
+
+  .explore-search {
+
+  }
+}
+
 #envelop-content{
   margin-top: 20px;
 
@@ -2446,7 +2489,7 @@ div.show-image:hover div.fullscreen-icon{
         width: 100%;
 
         .tab-title {
-          width: 33.33%;
+          width: 30%;
         }
       }
 
@@ -2507,6 +2550,7 @@ div.show-image:hover div.fullscreen-icon{
     }
 
     .note-page {
+      display: none;
       .note-toolbar {
         .note-creator {
 
@@ -2529,13 +2573,6 @@ div.show-image:hover div.fullscreen-icon{
             font-size: 1.5em;
             font-weight: 800;
             margin-right: 1em;
-          }
-          .note-tags {
-            a {
-              background: #ffebb2;
-              padding: 0.2em 0.7em;
-              display: inline-block;
-            }
           }
         }
       }
@@ -2571,7 +2608,38 @@ div.show-image:hover div.fullscreen-icon{
       }
     }
   }
+}
 
+#newNoteModal {
+  width: 40%;
+
+  >div {
+    margin-bottom: 1em;
+  }
+
+  input {
+    width: 100%;
+  }
+  .heading {
+    margin-right: 1em;
+  }
+
+  .note-tags {
+    padding: 1em;
+    border: 1px solid black;
+  }
+
+  .new-note-actions {
+    .button{
+      float: left;
+      margin-left: 1em;
+      margin-bottom: 0px;
+
+      &:last-child {
+        float: right;
+      }
+    }
+  }
 }
 
 .gallery-page {
@@ -2749,6 +2817,12 @@ div.show-image:hover div.fullscreen-icon{
     border-bottom: 1px solid black;
     color: #fff;
 
+    .file-name {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
     .gmodal-actions {
 
       >div {
@@ -2781,10 +2855,11 @@ div.show-image:hover div.fullscreen-icon{
           padding: 0px;
 
           .gmodel-item-image {
-            width: 65vh;
+            width: auto;
             margin: 0px auto;
             display: block;
             padding: 1em 0em;
+            height: 100%;
           }
         }
       }
@@ -3028,6 +3103,9 @@ div.show-image:hover div.fullscreen-icon{
     }
   }
   .activity-comments-section {
+    width: 75%;
+    margin: 0px auto;
+
     .user-prof-image {
       font-size: 7em;
       text-align: center;

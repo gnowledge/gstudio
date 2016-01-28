@@ -195,11 +195,11 @@
 
         //Restricting the user scroll in the modal
         $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
-          $('body').css('overflow', 'hidden');
+          //$('body').css('overflow', 'hidden');
         });
         $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
           var modal = $(this);
-          $('body').css('overflow', 'auto');
+          //$('body').css('overflow', 'auto');
 
         });
 
@@ -219,8 +219,8 @@
         //Creating the handlebar template for the individual gallery card
         var source   = $("#gallery-card-template").html();
         var template = Handlebars.compile(source);
-        var file_details_dict = {}
-        var galleryData = []
+        var file_details_dict = {};
+        var galleryData = [];
         function renderGallery() {
             {% for each in files_cur %}
                 // $.each(galleryData, function(key, item) {
@@ -256,7 +256,7 @@
                 });
 
             }
-        })
+        });
 
         /*$.ajax({
           method: "POST",

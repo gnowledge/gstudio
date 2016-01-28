@@ -2,16 +2,16 @@
 <div class="notebook">
     <div class="row notebook-header collapse">
         <div class="medium-6 columns filters">
-            <div class="row">
-                <div class="medium-2 columns"> View By</div>
-                <div class="medium-4 columns">
+            <div class="row" data-equalizer>
+                <div class="medium-2 columns" data-equalizer-watch> View By</div>
+                <div class="medium-4 columns" data-equalizer-watch>
                     <select>
                         <option value="husker">User</option>
                         <option value="husker">School</option>
                         <option value="husker">Tags</option>
                     </select>
                 </div>
-                <div class="medium-4 columns end">
+                <div class="medium-4 columns end" data-equalizer-watch>
                     <select>
                         <option value="husker">Pinky Bunny</option>
                         <option value="husker">Fluffy Apple</option>
@@ -34,7 +34,8 @@
                     </div>
                 </div>
                 <div class="medium-3 columns">
-                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button tiny radius"><i class="fi-plus"></i>  New Note</a>
+                    <!--a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button tiny radius"><i class="fi-plus"></i>  New Note</a-->
+                    <a href="#" data-reveal-id="newNoteModal" class="button tiny radius"><i class="fi-plus"></i>  New Note</a>
                 </div>
             </div>
         </div>
@@ -42,7 +43,13 @@
     </div>
     <div class="row notebook-body">
         <div class="small-12 medium-3 columns notebook-index">
-            <ul class="tabs" data-tab>
+            <div class="row" style="border-bottom: 1px solid #000;">
+                <div class="small-2 columns">Notes</div>
+                <div class="small-4 columns">
+                    <a href="#" data-reveal-id="newNoteModal" class="button tiny radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
+                </div>
+            </div>
+            <ul class="tabs" data-tab style="margin-top:1em">
                 <li class="tab-title active"><a href="#all-notes">All Notes</a></li>
                 <li class="tab-title"><a href="#my-notes">My Notes</a></li>
                 {% comment %}
@@ -174,11 +181,23 @@
         </div>
     </div>
 </div>
+{% include "ndf/add_new_note.html" %}
 {% include "ndf/gcomment.html" %}
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 <script type="text/javascript">
     $(function() {
+        //New Note section
+        $("#newNoteModal").on('click', 'save-note', function() {
+            //Necessary ajax call
+        });
+        $("#newNoteModal").on('click', 'delete-note', function() {
+            //Necessary ajax call
+        });
+        $("#newNoteModal").on('click', 'publish-note', function() {
+            //Necessary ajax call
+        });
+
         //Note Section
         var noteDetails = {
             'id': 1,
@@ -198,6 +217,7 @@
         }
 
         $('.notebook-index .notes').on('click', '.note', function() {
+            $('.note-page').show();
             $(".note-page .note-creator").html(noteDetails.creator);
             $(".note-page .note-creation-date").html(noteDetails.createdOn);
             $(".note-page .note-title").html(noteDetails.heading);
@@ -210,24 +230,29 @@
             $(".note-page .likes-count").html(noteDetails.rating);
             $(".note-page .comment-count").html(noteDetails.comments);
 
+            if(CKEDITOR.instances['textarea-reply-comment']) {
+                CKEDITOR.instances['textarea-reply-comment'].destroy(true);
+            }
             //Fetching the comments for this note
             $(".comment-sections .comments").empty();
             $(".comment-sections .comments").html(renderComments(userComments));
 
-            CKEDITOR.replaceAll( 'textarea-add-comment',{
-                enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
-                toolbar:'basic',
-                uiColor:'#f2f2f2',
-                textarea_id: 'textarea-add-comment'
-            });
+            if (!CKEDITOR.instances['textarea-reply-comment']) {
+                //CKEDITOR.instances['textarea-reply-comment'].destroy(true);
+                CKEDITOR.replaceAll( 'textarea-reply-comment',{
+                    enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
+                    toolbar:'basic',
+                    uiColor:'#f2f2f2',
+                    textarea_id: 'textarea-add-comment'
+                });
+            }
             $(".comment-sections .comments .comment-add").hide();
             //Handling all reply actions
-            $(".comment-sections>.comments").on('click', '.comment-reply', function() {
-                console.log('Reachded');
+            $(".comment-sections").off('click', '.comments .comment-reply');
+            $(".comment-sections").on('click', '.comments .comment-reply', function() {
                 $(this).closest('.comment-container').children('.comment-add').toggle();
             })
         });
-
 
         //Comment Section
         var source   = $("#user-comment-template").html();
@@ -330,5 +355,23 @@
             var context = Object.assign({'gallery': 'userGallery', 'childComment': childComment}, {comment});
             return template(context);
         }
+
+        $(document).on('opened.fndtn.reveal', '#newNoteModal[data-reveal]', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            if(!CKEDITOR.instances['textarea-add-note']){
+                CKEDITOR.replaceAll('textarea-add-note',{
+                    enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
+                    toolbar:'basic',
+                    uiColor:'#f2f2f2',
+                    textarea_id: 'textarea-add-note'
+                });
+            }
+        });
+        $(document).on('close.fndtn.reveal', '#newNoteModal[data-reveal]', function () {
+            if (CKEDITOR.instances['textarea-add-note']) {
+                CKEDITOR.instances['textarea-add-note'].destroy(true);
+            }
+        });
     });
 </script>
