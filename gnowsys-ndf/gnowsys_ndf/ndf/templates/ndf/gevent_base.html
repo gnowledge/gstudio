@@ -82,10 +82,11 @@ list-style: none;
 <div id="envelop-cover">
   <div class="row course-page-title">
     <div class="small-12 medium-8 columns heading">{{node.name}}</div>
-
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
-      <span><a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button radius"><i class="fi-pencil"></i> {% trans "Edit " %}{% if sg_type == "ProgramEventGroup" %}{% trans "Event" %}{% else %}{% trans "eCourse" %}{% endif %}</a></span>
+        {% with node.member_of_names_list.0 as sg_type %}
+          <span><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny button radius"><i class="fi- pencil"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></span>
+        {% endwith %}
 
         <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
         <span><input type="button" class="tiny button radius settings" value="Settings"></span>
