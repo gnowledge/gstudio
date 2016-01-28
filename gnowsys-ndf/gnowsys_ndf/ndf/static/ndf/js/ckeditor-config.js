@@ -66,7 +66,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Set the most common block elements.
 	config.format_tags = 'p;h1;h2;h3;pre';
-	config.entities = false; //set false to work with  ASCII such as  "" & '' in source code
+	config.entities = false; //set false to work with  entities such as   "" & '' in source code
 	config.tabSpaces = 4; // for tab spacing
 
 	
