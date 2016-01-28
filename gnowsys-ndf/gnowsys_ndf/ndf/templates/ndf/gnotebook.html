@@ -130,7 +130,7 @@
                 </div>
                 <div class="small-3 columns creator-rating">
                     <div>Your rating</div>
-                    <div>
+                    <div class="rate-scale">
                         <i class="fi-like"></i>
                         <i class="fi-like"></i>
                         <i class="fi-like"></i>
@@ -372,6 +372,19 @@
             if (CKEDITOR.instances['textarea-add-note']) {
                 CKEDITOR.instances['textarea-add-note'].destroy(true);
             }
+        });
+
+        //Rating system
+        $("body").on('mouseenter', '.rate-scale i', function() {
+            $(this).nextAll().add($(this)).addClass('hover-rating');
+        });
+        $("body").on('mouseleave', '.rate-scale i', function() {
+            $(this).nextAll().add($(this)).removeClass('hover-rating');
+        });
+
+        $("body").on('click', '.rate-scale i' ,function() {
+            $(this).siblings().removeClass('rated');
+            $(this).nextAll().add($(this)).addClass('rated');
         });
     });
 </script>

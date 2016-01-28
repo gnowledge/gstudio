@@ -18,7 +18,6 @@
         <div class="small-2 columns activity-create-note">
             <div style="float: right;">
                 <i class="fa fa-pencil-square-o"></i><a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True">Create note &gt;</a>
-                
             </div>
         </div>
     </div>
@@ -32,7 +31,9 @@
         <div class="small-8 columns activity-title-section">
             <div class="activity-pagination">
                 <i class="fa fa-align-justify"></i>
-                2 of 4
+                <span class="current-slide">2</span>
+                of
+                <span class="slide-count"></span>
             </div>
             <div class="activity-title">
                 {{node.name}}
@@ -41,8 +42,8 @@
         <div class="small-2 columns">
             <div>
                 <a href="#" class="button radius tiny next-activity">
-                    <i class="fa fa-hand-o-right"></i>
                     Next Activity
+                    <i class="fa fa-hand-o-right"></i>
                 </a>
             </div>
         </div>
@@ -52,11 +53,9 @@
             <div class="row activity-slide">
                 Activity 1 Content
             </div>
-            {% comment %}
             <div class="row activity-slide">
                 Activity 2 Content
             </div>
-            {% endcomment %}
         </div>
     </div>
     <div class="row activity-comments-section">
@@ -91,6 +90,8 @@
         });
         $(".activity-slides .activity-slide").hide();
         $(".activity-slides .activity-slide:nth-child(1)").show();
+        $(".activity-pagination .current-slide").html(currentSlide + 1);
+        $(".activity-pagination .slide-count").html(slides.length);
 
         $(slides[currentSlide]).animate({
             left: '0%',
@@ -107,6 +108,7 @@
                         opacity: '1'
                     }, 600);
                     currentSlide--;
+                    $(".activity-pagination .current-slide").html(currentSlide + 1);
                 });
             }
         });
@@ -121,6 +123,7 @@
                         opacity: '1'
                     }, 600);
                     currentSlide++;
+                    $(".activity-pagination .current-slide").html(currentSlide + 1);
                 });
             }
         });
@@ -231,6 +234,12 @@
         $(".activity-comments-section .activity-comments").empty();
         $(".activity-comments-section .activity-comments").html(renderComments(userComments));
 
+        CKEDITOR.replaceAll( 'textarea-reply-comment',{
+            enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
+            toolbar:'basic',
+            uiColor:'#f2f2f2',
+            textarea_id: 'textarea-add-comment'
+        });
         CKEDITOR.replaceAll( 'textarea-add-comment',{
             enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
             toolbar:'basic',
@@ -242,6 +251,18 @@
         //Handling all reply actions
         $(".activity-comments-section .activity-comments").on('click', '.comment-reply', function() {
             $(this).closest('.comment-container').children('.comment-add').toggle();
+        });
+
+        //Rating system
+        $("body .rate-scale i").hover(function(){
+            $(this).nextAll().add($(this)).addClass('hover-rating');
+        },
+        function() {
+            $(this).nextAll().add($(this)).removeClass('hover-rating');
+        });
+        $("body .rate-scale i").on('click', function() {
+            $(this).siblings().removeClass('rated');
+            $(this).nextAll().add($(this)).addClass('rated');
         });
     })
 </script>
