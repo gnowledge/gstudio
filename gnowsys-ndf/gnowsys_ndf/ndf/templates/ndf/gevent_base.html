@@ -51,6 +51,7 @@ color: black !important;
 
 li.remove-dot{
 list-style: none;
+
 }
 
 
@@ -84,9 +85,30 @@ list-style: none;
 
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
+      <span><a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button radius"><i class="fi-pencil"></i> {% trans "Edit " %}{% if sg_type == "ProgramEventGroup" %}{% trans "Event" %}{% else %}{% trans "eCourse" %}{% endif %}</a></span>
+
         <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
         <span><input type="button" class="tiny button radius settings" value="Settings"></span>
+      {% else %}
+        <ul class="right">
+          <li class="enroll-btn-li remove-dot">
+          {% if user_access == "allow" %}
+            <input class="button tiny" type="button" value="ENROLLED" disabled="disabled">
+          {% else %}
+            {% if user.is_authenticated %}
+              {% if allow_to_join == "Open" %}
+                <input class="enroll-btn button tiny" type="button" value="ENROLL">
+              {% else %}
+                <input class="button tiny" type="button" value="Enrollment {{allow_to_join}}" disabled="disabled">
+              {% endif %}
+            {% else %}
+                <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
+            {% endif %}
+          {% endif %}
+          </li>
+        </ul>
       {% endif %}
+
     <div class="small-12 medium-4 columns">
       <label>2 out of 6 modules completed</label>
       <div class="progress success round">

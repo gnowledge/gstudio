@@ -4,18 +4,21 @@
 {% load i18n %}
 {% load cache %}
 {% load ndf_tags %}
+{% block title %} {{group_name}}  {% endblock %}
+
 {% block body_content %}
 <div class="activity-page">
     <div class="row activity-page-header">
         <div class="small-2 columns activity-page-previous">
-            &lt; <i class="fa fa-home"></i> Course page
+            &lt; <i class="fa fa-home"></i><a href="{% url 'groupchange' group_name %}">Course page</a>
         </div>
         <div class="small-8 columns unit-title">
-            Unit 1 Title of the Unit
+            {{unit_node.name}}
         </div>
         <div class="small-2 columns activity-create-note">
             <div style="float: right;">
-                <i class="fa fa-pencil-square-o"></i> Create note &gt;
+                <i class="fa fa-pencil-square-o"></i><a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True">Create note &gt;</a>
+                
             </div>
         </div>
     </div>
@@ -32,7 +35,7 @@
                 2 of 4
             </div>
             <div class="activity-title">
-                Activity Name
+                {{node.name}}
             </div>
         </div>
         <div class="small-2 columns">
@@ -49,9 +52,11 @@
             <div class="row activity-slide">
                 Activity 1 Content
             </div>
+            {% comment %}
             <div class="row activity-slide">
                 Activity 2 Content
             </div>
+            {% endcomment %}
         </div>
     </div>
     <div class="row activity-comments-section">
