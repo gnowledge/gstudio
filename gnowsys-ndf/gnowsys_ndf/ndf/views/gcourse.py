@@ -1912,13 +1912,12 @@ def course_gallery(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-
-
+    files_cur = node_collection.find({'group_set': group_id, '_type': "File"})
     template = 'ndf/gcourse_event_group.html'
     
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'gallery'        
+            'node': group_obj, 'title': 'gallery', 'files_cur': files_cur
         })
     return render_to_response(template, context_variables)
 

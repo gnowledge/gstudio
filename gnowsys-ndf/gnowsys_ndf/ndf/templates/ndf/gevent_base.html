@@ -186,14 +186,15 @@ list-style: none;
     <div class="tabs-content course-book">
       <div class="content active" id="course-dashboard">
         {% if title == 'dashboard' %}
-            {% include "ndf/gcourseDashboard.html" %}
+          {% include "ndf/gcourseDashboard.html" %}
         {% elif title == 'course content' %}
           <!--@anotation("import gcourse_event_group.html for the list of the modules in the course.")-->
           {% include "ndf/gcollection_ajax_view.html" %}
         {% elif title == 'notebook' %}
           {% include "ndf/gnotebook.html" %}
+        {% elif title == 'gallery' %}
+          {% include "ndf/ggallerypage.html" %}
         {% endif %}
-
       </div>
     </div>
     <!-- Each tab pages ends here -->
