@@ -138,7 +138,7 @@ list-style: none;
 <div class="row" id="envelop-content" >
   <!-- Envelop box-->
   <div class="small-12 large-12 columns">
-     <div style="line-height: 0.7em;">
+    <div style="line-height: 0.7em;">
       <ul class="tabs">
 
         <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
@@ -182,21 +182,49 @@ list-style: none;
 
 
 
-    <!-- Each tab pages -->
+    <!-- Load tab contents dynamically -->
     <div class="tabs-content course-book">
       <div class="content active" id="course-dashboard">
         {% if title == 'dashboard' %}
-            {% include "ndf/gcourseDashboard.html" %}
+          {% include "ndf/gcourseDashboard.html" %}
         {% elif title == 'course content' %}
-          <!--@anotation("import gcourse_event_group.html for the list of the modules in the course.")-->
           {% include "ndf/gcollection_ajax_view.html" %}
+          <!--@anotation("import gcourse_event_group.html for the list of the modules in the course.")-->
         {% elif title == 'notebook' %}
           {% include "ndf/gnotebook.html" %}
-        {% endif %}
-
+        {% elif title == 'gallery' %}
+          {% include "ndf/ggallerypage.html" %}
+        {% else %}
+          <div id="course-about">
+            <div class="row collapse">
+              <div class="about-course-heading">
+                <div class="heading-text">
+                  <div>
+                    <h2>{{node.name}}</h2>
+                  </div>
+                  <div>Next Session Jan 5 2016 &#8226; 3:00pm</div>
+                  <div>
+                    <span><i class="fi-list-thumbnails"></i>&nbsp;10</span>
+                    &#8226;&nbsp;&nbsp;
+                    <span><i class="fi-torso"></i>&nbsp;{{group_object.author_set|length}}</span>
+                    &#8226;&nbsp;&nbsp;
+                    <span><i class="fi-clock"></i>&nbsp;6 weeks</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row collapse">
+              <div class="about-course-details">
+                <!--@anotation('replace this with the about course details')-->
+                <p>{{group_object.content_org}}
+                </p>
+              </div>
+            </div>
+          </div>
+        {% endif %}        
       </div>
     </div>
-    <!-- Each tab pages ends here -->
+    <!-- tab-content ends here -->
   </div>
 </div>
 

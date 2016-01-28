@@ -39,4 +39,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.gcourse',
                         url(r'^/raw-material/$', 'course_raw_material', name='course_raw_material'),
                         url(r'^/gallery/$', 'course_gallery', name='course_gallery'),
                         url(r'^/about/$', 'course_about', name='course_about'),
+                        url(r'^/course_gallerymodal/$', 'course_gallerymodal', name='course_gallerymodal'),
+
                        )
