@@ -107,9 +107,9 @@
             <div class="gallery-body small-12">
                 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5">
                 {% for each_img in files_cur %}
-                      <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
-                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True  url_name="file_detail" first_arg=group_id second_arg=each_img.pk %}
-                      </li>
+                    <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
+                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True no_url=True first_arg=group_id second_arg=each_img.pk %}
+                    </li>
                 {% endfor %}
                 </ul>
             </div>
@@ -138,3 +138,30 @@
     </div>
 
 </div>
+<div class="reveal-container"></div>
+
+<script type="text/javascript">
+    $('.gallery-img').click(function (){
+        node_id = $(this).attr('id')
+        $.ajax({
+          url: "{% url 'course_gallerymodal' group_id %}",
+
+          data: {
+            node_id: node_id
+          },
+
+          type: "GET",
+
+          dataType: "html",
+
+          success: function(data){
+            $(".reveal-container").html(data)
+            $("#reveal-"+ node_id).foundation('reveal','open')
+          },
+        });//end of ajax
+
+
+
+    })
+
+</script>
