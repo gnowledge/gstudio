@@ -1873,14 +1873,19 @@ def course_notebook(request, group_id):
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
 
     all_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
-                        'group_set': group_obj._id}).sort('created_at', -1)
+                        'group_set': group_obj._id},{'_id': 1, 'created_at': 1,
+                        'created_by': 1, 'name': 1}).sort('created_at', -1)
     if all_blogs:
         blog_pages = all_blogs.clone()
         if request.user.id:
             blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
             user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
-
-
+    # print "\n\n type of blog_pages---", type(blog_pages)
+    # print "\n\n type of user_blogs---", type(user_blogs)
+    # for each in blog_pages:
+    #     print each
+    # for each in user_blogs:
+    #     print each
     template = 'ndf/gcourse_event_group.html'
 
     context_variables = RequestContext(request, {
@@ -1950,3 +1955,19 @@ def course_gallerymodal(request, group_id):
             'node': node_obj, 'title': 'course_gallerymodall'
         })
     return render_to_response(template, context_variables)
+
+def course_note_page(request, group_id):
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    node_id = request.GET.get("node_id", "")
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+
+    template = 'ndf/note_page.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': node_obj, 'title': 'course_gallerymodall'
+        })
+    return render_to_response(template, context_variables)
+
