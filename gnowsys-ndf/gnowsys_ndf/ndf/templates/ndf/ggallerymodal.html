@@ -1,37 +1,45 @@
 {% load get_grid_fs_object from ndf_tags %}
-<div id="reveal-{{node.pk}}" class="reveal-modal " >
+<div id="reveal-{{node.pk}}" class="reveal-modal" data-reveal>
     <div class="row gmodal-toolbar">
         <div class="small-2 columns file-name">
             {{node.name}}
         </div>
-        <div class="small-7 columns gmodal-actions">
-            <div class="download-file">
-                <i class="fi-download"></i>
-                {% get_grid_fs_object node as grid_fs_obj %}
-
-                <a class="download-link" title="Click here to Download" href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">Download</a>
-                <!-- <span> Download</span> -->
-            </div>
+        <div class="small-6 columns gmodal-actions">
+            {% comment %}
             <div class="create-note">
-                <i class="fi-page-edit"></i>
-                <span> Create note</span>
+                <a>
+                    <i class="fi-page-edit"></i>
+                    Create note
+                </a>
             </div>
             <div class="create-collection">
-                <i class="fi-folder"></i>
-                <span> Create new collection</span>
+                <a>
+                    <i class="fi-folder"></i>
+                    Create new collection
+                </a>
             </div>
             <div class = "parent-folder">
-                <i class="fi-folder"></i>
-                <span>Collection</span>
+                <a>
+                    <i class="fa fa-plus"></i>
+                    Add to collection
+                </a>
             </div>
-            <div>
-                <i class="fi-list-bullet"></i>
+            <div class="view-info">
+                <a>
+                    <i class="fi-info"></i>
+                    View Info
+                </a>
             </div>
-            <div>
-                <i class="fi-info"></i>
-                <span>Info</span>
+            {% endcomment %}
+            <div class="download-file">
+                {% get_grid_fs_object node as grid_fs_obj %}
+                <a class="download-link" title="Click here to Download" href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                    <i class="fi-download"></i>Download
+                </a>
+                <!-- <span> Download</span> -->
             </div>
-            <a class="close-reveal-modal">&#215;</a>
+
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
     </div>
     <div class="row gmodal-body">
@@ -62,7 +70,7 @@
         <div class="small-3 columns gmodal-comments-panel">
             <div class="gmodal-comments">
                 <div class="row">
-                    <div class="columns small-12"><h3>Comments</h3></div>
+                    <div class="columns small-12"><h4>Comments</h4></div>
                 </div>
                 <div class="row">
                     <div class="small-12 columns">

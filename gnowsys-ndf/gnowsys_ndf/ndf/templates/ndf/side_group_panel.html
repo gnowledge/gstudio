@@ -11,7 +11,7 @@
 		<h3><small>{{k}}</small></h3>
 		{% if v %}
 			{% for vk in v %}
-		<a href="{% url 'course_summary' vk %}">{{vk.name}}</a>
+		<a href="{% url 'course_dashboard' vk %}">{{vk.name}}</a>
 				
 			{% endfor %}
 		{% endif %}
