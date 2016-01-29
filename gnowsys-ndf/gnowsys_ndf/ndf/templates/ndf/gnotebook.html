@@ -51,7 +51,9 @@
             </div>
             <ul class="tabs" data-tab style="margin-top:1em">
                 <li class="tab-title active"><a href="#all-notes">All Notes</a></li>
-                <li class="tab-title"><a href="#my-notes">My Notes</a></li>
+                {% if user.is_authenticated %}
+                    <li class="tab-title"><a href="#my-notes">My Notes</a></li>
+                {% endif %}
                 {% comment %}
                     <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
                 {% endcomment %}
