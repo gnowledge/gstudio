@@ -1125,28 +1125,20 @@ aside#help{
     // width: 40px;
 }
 
+/* Simple  Card CSS*/
 
-// discussion
+.scard-container {
+    display: inline-block;
+    margin-left: 50%;
+    position: relative;
+    transform: translate(-50%);
+    border-radius: 5px;
 
-#replies-area .disc-replies {
-
-    padding:10px;
-    background-color:#ddd;
-    width:27em;
-    max-width: 40em;
-    margin-left: 48px;
-    margin-top: 10px;
-    padding-bottom:0em;
-    .reply-btn{
-        cursor: pointer;
-        color:black !important;
-    }
-
-    .reply-btn:hover {
-        color:#ececec !important;
+    &:hover{
+        box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
+        transition: box-shadow 0.5s ease;
     }
 }
-/* Simple  Card CSS*/
 .scard {
     background:#FFF;
     border:1px solid #AAA;
@@ -1159,10 +1151,10 @@ aside#help{
     margin: 0px auto;
     cursor: pointer;
 
-     &:hover{
+     /*&:hover{
         box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
         transition: box-shadow 0.5s ease;
-    }
+    }*/
     .scard-image {
           width: 11rem;
           height: 9rem;
@@ -1227,7 +1219,11 @@ aside#help{
         }
     }
 }
-    /*float:left;*/
+/*float:left;*/
+.scard-footer {
+  border-radius: 0px 0px 5px 5px;
+}
+
 .scard-content {
     height: 3em;
     padding: 0.4em 1em;
@@ -1238,18 +1234,35 @@ aside#help{
     border-radius: 0px 0px 5px 5px;
     margin: 0px auto;
     cursor: pointer;
+    text-align: center;
 
-  &:hover{
+  /*&:hover{
       box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
       transition: box-shadow 0.5s ease;
-  }
+  }*/
   .scard-title{
       font-size: 0.8em;
       color: #ececec;
       text-align: center;
       vertical-align: sub;
+      text-transform: uppercase;
   }
 }
+.scard-desc{
+    font-size: 0.7em;
+    color: #333333;
+    height: 40px;
+    padding: 0.5rem;
+    margin: 0px auto;
+    padding-top: 0.1cm;
+    margin-top: -0.25em;
+    border-radius: 0 0 5px 5px;
+    overflow: hidden;
+    width: 11rem;
+    background-color: #E6E6E6;
+    display: block;
+}
+
 .scard_header {
     text-align:center;
     position:fixed;
@@ -1282,20 +1295,6 @@ aside#help{
 
 }
 
-.scard-desc{
-    font-size:0.7em;
-    color:#333333;
-    height: 40px;
-    padding: 0.5rem;
-    margin:5px;
-    padding-top: 0.1cm;
-    margin-top:-0.25em;
-    border-radius: 0 0 2px 2px;
-    overflow: hidden;
-    width:11rem;
-    background-color:#E6E6E6;
-    display-inline:block;
-}
 
  p {
     margin:0px;
@@ -2131,9 +2130,9 @@ aside#help{
   }
 .card-holder{
     padding-left: 2%;
-  }
+}
 
-  .app-card{
+.app-card{
     width: 19rem;
     min-height: 10rem;
     margin: 15px 20px;
@@ -2143,70 +2142,33 @@ aside#help{
     height:18rem;
     background-color:#fafafa;
     border: thin solid #D3D3D3;
-  }
+}
 
-  .app-card:hover{
+.app-card:hover{
     box-shadow: 0px 0px 15px #808080;
     border: thin solid #D3D3D3;
     border-radius: 5px;
     transition: all 0.6s ease 0s;
-  }
+}
 
-  .app-card-icon{
+.app-card-icon{
     color:#4c4c4c;
     position: relative;
     font-size: 6em;
+}
 
-
-  }
-  .app-card-title{
+.app-card-title{
     padding-bottom:-1em;
-  }
+}
 
-  .app-card-content{
+.app-card-content{
     color:#4c4c4c;
     text-align:center;
     margin-top:0.5cm;
-  }
-
-  .discussion-title-username{
-      background-color:#3e3e3e;
-      color:#ececec !important;
-      //width:auto;
-      margin-top:-0.6em;
-      margin-left:-0.7em;
-      height:2em;
-      top: 0px;
-      left: 0px;
-      width: 105%;
-      right:0;
-      padding-right:10px;
-      padding-left:10px;
-  }
-.discussion-footer{
-      background-color:#CCCCCC;
-      color:gray !important;
-      //width:auto;
-      //margin-top:-1em;
-      margin-left:-0.7em;
-      height:2em;
-      top: 0px;
-      left: 0px;
-      width: 105%;
-      right:0;
-      padding-right:10px;
-      padding-left:10px;
-      //margin-top:0.2em;
-}
-
-.discussion-content{
-      color: #262626;
-      word-wrap: break-word;
 }
 
 .fullscreen-icon{
-
-  display:none;
+    display:none;
 }
 /*
 div.show-image:hover div.fullscreen-icon{
@@ -2219,6 +2181,99 @@ div.show-image:hover div.fullscreen-icon{
     font-size:2em;
 
 }*/
+.cke {
+    .cke_toolbox{
+        .cke_toolbar:last-child {
+          float: right;
+        }
+    }
+}
+
+#view-discussion {
+    .create-discussion {
+        position: relative;
+
+        >div {
+          display: inline-block;
+          vertical-align: top;
+        }
+        .ckeditor-content-comment {
+            width: 85%;
+            margin-left: 1em;
+
+            >div{
+              display: inline-block;
+              vertical-align: top;
+            }
+
+            .ckeditor-reply-area {
+              width: 90%;
+            }
+        }
+    }
+
+    #replies-area {
+        .ckeditor-content-reply {
+            margin-top: 1em;
+            width: 97%;
+
+            .ckeditor-reply-area {
+                display: inline-block;
+                width: 90%;
+                margin-left: 1em;
+            }
+            .post-btn-div {
+                display: inline-block;
+                vertical-align: top;
+            }
+        }
+
+        .disc-replies {
+
+            background-color:#ddd;
+            margin-left: 48px;
+            margin-top: 10px;
+            padding-bottom:0em;
+
+            .reply-btn{
+                cursor: pointer;
+                color:black !important;
+            }
+
+            .reply-btn:hover {
+                color:#ececec !important;
+            }
+            .discussion-title-username{
+                background-color: #3e3e3e;
+                color: #ececec !important;
+                height: 2em;
+                padding-right: 10px;
+                padding-left: 10px;
+                line-height: 2em;
+                border-radius: 5px 5px 0px 0px;
+            }
+
+            .discussion-footer{
+                background-color:#CCCCCC;
+                color:gray !important;
+                height:2em;
+                padding-right:10px;
+                padding-left:10px;
+                border-radius: 0px 0px 5px 5px;
+
+                >a {
+                    vertical-align: middle;
+                    line-height: 2em;
+                }
+            }
+
+            .discussion-content{
+                color: #262626;
+                word-wrap: break-word;
+            }
+        }
+    }
+}
 #envelop-cover {
   .course-page-title {
     font-size: 35px;
@@ -2303,7 +2358,7 @@ div.show-image:hover div.fullscreen-icon{
 #envelop-content{
   margin-top: 20px;
 
-  .tabs {
+  .course-tabs {
     border: 0 solid silver;
     border-width: 0px 0px 0px 0px;
     margin-left: 1em;
@@ -2337,8 +2392,8 @@ div.show-image:hover div.fullscreen-icon{
     }
   }
 
-  .tabs-content {
-    .content {
+  >div >.tabs-content {
+    >.content {
       background: #FFFFFF;
       padding: 1em;
     }
@@ -2480,10 +2535,27 @@ div.show-image:hover div.fullscreen-icon{
 
       .tabs {
         width: 100%;
+        margin:1em 0em 0.5em;
+        border-top: 1px solid #000;
+        padding-top: 1em;
 
         .tab-title {
           width: 30%;
+          background-color: #DEDEDE;
+          border-radius: 5px 5px 0px 0px ;
+
+          a {
+            border-radius: inherit;
+          }
+
+          &.active {
+            background-color: #fff;
+          }
         }
+      }
+
+      .tab-content {
+        padding: 0px;
       }
 
       .notes {
@@ -2544,7 +2616,12 @@ div.show-image:hover div.fullscreen-icon{
 
     .note-page {
       display: none;
+      background-color: #f7f7f7;
+
       .note-toolbar {
+        padding: 1em 1em 0.5em;
+        margin: 0em 1em;
+
         .note-creator {
 
         }
@@ -2555,7 +2632,9 @@ div.show-image:hover div.fullscreen-icon{
         }
       }
       .note-content {
-        padding: 1em 3em 0em;
+        padding: 1em 1em 1em;
+        background: #fff;
+        margin: 0em 1em;
 
         .note-header {
 
@@ -3107,7 +3186,7 @@ div.show-image:hover div.fullscreen-icon{
     }
 
     i {
-      margin-right: 0.5em;
+      margin-right: 0.1em;
     }
 
     .unit-title {
@@ -3166,6 +3245,13 @@ div.show-image:hover div.fullscreen-icon{
         background: #fff;
         position: relative;
         left: 100%;
+
+        .page {
+          >section {
+            margin-left: 50%;
+            transform: translate(-50%);
+          }
+        }
       }
     }
   }

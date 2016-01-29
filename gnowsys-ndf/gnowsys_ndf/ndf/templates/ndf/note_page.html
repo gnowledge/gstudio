@@ -2,7 +2,7 @@
     <div class="row note-toolbar">
         <div class="small-9 columns">
             <i class="fi-torso"></i>
-                        
+
             <span class="note-creator">{{node.created_by|get_username|truncatechars:"10"}}</span>
             &#8226;
             <span class="note-creation-date">{{node.created_at|date:"d M Y h:i A"}}</span>
@@ -23,18 +23,20 @@
         </div>
     </div>
     <div class="row note-content">
-        <div class="note-header">
-            <span class="note-title">{{node.name}}</span>
-            {% if node.tags %}
-            <div class="note-tags">
-            {% for each_tag in node.tags %}
-                <a>{{each_tag}}</a>
-            {% endfor %}
+        <div class="small-12 columns">
+            <div class="note-header row">
+                <span class="note-title">{{node.name}}</span>
+                {% if node.tags %}
+                <div class="note-tags">
+                {% for each_tag in node.tags %}
+                    <a>{{each_tag}}</a>
+                {% endfor %}
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
-        </div>
-        <div class="note-text">
-        {{node.content|safe}}
+            <div class="note-text row">
+            {{node.content|safe}}
+            </div>
         </div>
     </div>
     {% comment %}

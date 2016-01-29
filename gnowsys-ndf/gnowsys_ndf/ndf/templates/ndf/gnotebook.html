@@ -43,23 +43,23 @@
     </div>
     <div class="row notebook-body">
         <div class="small-12 medium-3 columns notebook-index">
-            <div class="row" style="border-bottom: 1px solid #000;">
+            <div class="row">
                 <div class="small-2 columns">Notes</div>
                 <div class="small-4 columns">
                     <a href="#" data-reveal-id="newNoteModal" class="button tiny radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
                 </div>
             </div>
-            <ul class="tabs" data-tab style="margin-top:1em">
-                <li class="tab-title active"><a href="#all-notes">All Notes</a></li>
+            <ul class="tabs" data-tab style="">
                 {% if user.is_authenticated %}
-                    <li class="tab-title"><a href="#my-notes">My Notes</a></li>
+                    <li class="tab-title active"><a href="#my-notes">My Notes</a></li>
                 {% endif %}
+                <li class="tab-title"><a href="#all-notes">All Notes</a></li>
                 {% comment %}
                     <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
                 {% endcomment %}
             </ul>
             <div class="small-12 columns tabs-content">
-                <div class="content active notes" id="all-notes">
+                <div class="content notes" id="all-notes">
                 {% for each_blog in blog_pages %}
                     {% comment %}
                         <div class="date">
@@ -89,7 +89,7 @@
                 {% endfor %}
                 </div>
 
-                <div class="content notes" id="my-notes">
+                <div class="content notes active" id="my-notes">
                 {% for each_user_blog in user_blogs %}
                     {% comment %}
                         <div class="date">
@@ -122,7 +122,7 @@
                 </div>
             </div>
         </div>
-        <div class="small-12 medium-9 columns" id="note-page">
+        <div class="small-12 medium-9 columns note-page" >
         </div>
     </div>
 </div>
@@ -132,7 +132,8 @@
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 <script type="text/javascript">
     $('.notebook-index .notes').on('click', '.note', function() {
-
+        $(this).siblings().removeClass('active');
+        $(this).addClass('active');
         node_id = $(this).attr('id')
         $.ajax({
           url: "{% url 'course_note_page' group_id %}",
@@ -146,7 +147,7 @@
           dataType: "html",
 
           success: function(data){
-            $("#note-page").html(data)
+            $(".note-page").show().html(data);
           },
         });//end of ajax
     });
