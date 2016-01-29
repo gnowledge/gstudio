@@ -1,6 +1,6 @@
 {% load ndf_tags %}
 <div class="gallery-page">
-    <div class="row gallery-header collapse">
+    <div class="row gallery-header">
         <div class="medium-4 columns filters">
             <div class="row collapse">
                 <div class="medium-2 columns"> View By</div>
@@ -16,7 +16,7 @@
                 <i class="fi-list-thumbnails"></i>
                 </div>
                 <div class="medium-2 columns">
-                    Sort By
+                    <span>Sort By</span>
                 </div>
                 <div class="medium-3 columns end">
                     <select placeholder="Sort">
@@ -33,16 +33,16 @@
                     <div class="row collapse prefix-round">
                         <div class="small-2 columns">
                             <i class="fi-filter"></i>
-                            Add Filter
+                            <span>Add Filter</span>
                         </div>
                         <div class="small-2 columns">
-                            <select placeholder="User">
+                            <select placeholder="User" class="primary-filter">
                                 <option value="all">User</option>
                                 <option value="school1">Size</option>
                             </select>
                         </div>
                         <div class="small-2 columns">
-                            <select placeholder="Sort">
+                            <select placeholder="Sort" class="secondary-filter">
                                 <option value="all">Select User</option>
                                 <option value="school1">Bunny</option>
                                 <option value="school2">Apple</option>
@@ -55,20 +55,32 @@
                     </div>
                 </div>
                 <div class="medium-3 side-heading columns">
-                    <input type="text" placeholder="Search gallery"/>
+                    <div class="row collapse prefix-round">
+                        <div class="small-3 columns">
+                            <a href="#" class="button prefix"><i class="fa fa-search"></i></a>
+                        </div>
+                        <div class="small-9 columns">
+                            <input type="text" placeholder="Search">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row gallery-panel collapse">
+    <div class="row gallery-panel">
         <div class="medium-9 columns gallery-content" >
             <div class="gallery-subheader small-12">
-                <div class="row right">
-                    <div class="upload-file" id="upload_form_div">
+                <div class="row">
+                    <div class="upload-file small-2 columns" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
                             {% csrf_token %}
-                            <input type="file" name="doc" id="docFile"/>
+                            <label class="tiny button radius" style="margin: 0px;">
+                                <i class="fa fa-upload"></i>
+                                &nbsp;
+                                <span>Upload File</span>
+                                <input type="file" name="doc" id="docFile" style="display: none;"/>
+                            </label>
                             <div class="save_cancel hide">
                               <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
                               <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
@@ -77,10 +89,6 @@
 
                     </div>
                     <div class="small-12 medium-10 columns gallery-actions hide" >
-                        <div class="download-file">
-                            <i class="fi-download"></i>
-                            <span> Download</span>
-                        </div>
                         <div class="create-note">
                             <i class="fi-page-edit"></i>
                             <span> Create note</span>
@@ -90,21 +98,22 @@
                             <span> Create new collection</span>
                         </div>
                         <div class = "parent-folder">
-                            <i class="fi-folder"></i>
-                            <span>Collection</span>
+                            <i class="fa fa-plus"></i>
+                            <span>Add to collection</span>
                         </div>
-                        <div>
-                            <i class="fi-list-bullet"></i>
+                        <div class="download-file">
+                            <i class="fi-download"></i>
+                            <span> Download</span>
                         </div>
                         <div>
                             <i class="fi-info"></i>
-                            <span>Info</span>
+                            <span>View info</span>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- Files listing div -->
-            <div class="gallery-body small-12">
+            <div class="gallery-body small-12 columns">
                 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5">
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
@@ -118,19 +127,19 @@
         <div class="medium-3 columns file-info-panel">
             <div class="file-name"> File Name </div>
             <div class="row">
-                <div class="small-6 columns"> Type </div>
+                <div class="small-6 columns"> Type : </div>
                 <div class="small-6 columns"> info </div>
             </div>
             <div class="row">
-                <div class="small-6 columns"> Size </div>
+                <div class="small-6 columns"> Size : </div>
                 <div class="small-6 columns"> info </div>
             </div>
             <div class="row">
-                <div class="small-6 columns"> Uploaded By </div>
+                <div class="small-6 columns"> Uploaded By : </div>
                 <div class="small-6 columns"> info </div>
             </div>
             <div class="row">
-                <div class="small-6 columns"> Created Date </div>
+                <div class="small-6 columns"> Created Date : </div>
                 <div class="small-6 columns"> info </div>
             </div>
         </div>
@@ -139,29 +148,44 @@
 
 </div>
 <div class="reveal-container"></div>
-
+{% verbatim %}
+<script id="filter-tag-template" type="text/x-handlebars-template">
+    <div class="filter-tag">{{label}} <span>&times;</span></div>
+</script>
+{% endverbatim %}
 <script type="text/javascript">
-    $('.gallery-img').click(function (){
-        node_id = $(this).attr('id')
-        $.ajax({
-          url: "{% url 'course_gallerymodal' group_id %}",
+    var filterTagSource   = $("#filter-tag-template").html();
+    var filterTagTemplate = Handlebars.compile(filterTagSource);
 
-          data: {
-            node_id: node_id
-          },
+    function createFilterTag(label) {
+        return filterTagTemplate({label});
+    }
+    $(function() {
+        $('.gallery-img>div').click(function (){
+            node_id = $(this).closest('.gallery-img').attr('id')
+            $.ajax({
+              url: "{% url 'course_gallerymodal' group_id %}",
+              data: {
+                node_id: node_id
+              },
+              type: "GET",
+              dataType: "html",
+              success: function(data){
+                $(".reveal-container").html(data);
+                $("#reveal-"+ node_id).foundation('reveal','open');
+              },
+            });//end of ajax
+        });
 
-          type: "GET",
+        //Filter tags creation on changing seconday filter.
+        $(".secondary-filter").on('change', function() {
+            $('.filter-tags').append(createFilterTag($(".secondary-filter option:selected").text()));
+        });
 
-          dataType: "html",
-
-          success: function(data){
-            $(".reveal-container").html(data)
-            $("#reveal-"+ node_id).foundation('reveal','open')
-          },
-        });//end of ajax
-
-
-
+        //Filter tag deletion on cross.
+        $(".filter-tags").on('click', '.filter-tag>span', function() {
+            $(this).closest('.filter-tag').remove();
+        });
     })
 
 </script>
