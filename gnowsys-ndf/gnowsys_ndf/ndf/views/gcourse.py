@@ -1876,17 +1876,26 @@ def course_notebook(request, group_id):
     all_blogs = None
     blog_pages = None
     user_blogs = None
+    user_id = None
+    if request.user.is_authenticated():
+        user_id = request.user.id
     page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
 
-    all_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
-                        'group_set': group_obj._id},{'_id': 1, 'created_at': 1,
+    blog_pages = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+                        'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1,
                         'created_by': 1, 'name': 1}).sort('created_at', -1)
-    if all_blogs:
-        blog_pages = all_blogs.clone()
-        if request.user.id:
-            blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
-            user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
+    if user_id:
+        user_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+                            'group_set': group_obj._id, 'created_by': user_id},{'_id': 1, 'created_at': 1,
+                            'created_by': 1, 'name': 1}).sort('created_at', -1)
+
+    # if all_blogs:
+    #     blog_pages = all_blogs.clone()
+    #     if request.user.id:
+    #         blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
+    #         user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
     # print "\n\n type of blog_pages---", type(blog_pages)
     # print "\n\n type of user_blogs---", type(user_blogs)
     # for each in blog_pages:
