@@ -50,16 +50,33 @@
     </div>
     <div class="activity-slides-container row">
         <div class="columns small-12 activity-slides">
-            <div class="row activity-slide">
-                {{node.content|safe}}
-            </div>
-            <div class="row activity-slide">
-                Activity 2 Content
+            <div class="row activity-slide" style="overflow-y:auto;">
+                {# {{node.content|safe}} #}
+                {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
             </div>
         </div>
     </div>
     <div class="row activity-comments-section">
         <div class="columns small-12 ">
+            <div class="content large-6 columns " id="view-discussion" >
+              <!-- discussion content area -->
+              {% if node.discussion_enable %}
+                {% get_thread_node node.pk as thread_node %}
+                {% if thread_node %}
+                    {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                    {% get_node thread_node as thread_node_obj %}
+                    {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" %}
+                {% else %}            
+                    {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                    {% include 'ndf/gin-line-texteditor.html' with var_name="content_org" %}
+                {% endif %}
+              {% endif %}
+
+              <!-- END of discussion content area -->     
+            </div>
+        </div>
+    </div>
+        {% comment %}
             <div class="row new-comment">
                 <div class="small-1 columns user-prof-image">
                     <i class="fi-torso"></i>
@@ -76,10 +93,9 @@
             </div>
         </div>
     </div>
+    {% endcomment %}
+
 </div>
-{% include "ndf/gcomment.html" %}
-<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 <script type="text/javascript">
      $(function() {
         //Activity slider initialization
@@ -128,130 +144,6 @@
             }
         });
 
-
-        //Comment Section
-        var source   = $("#user-comment-template").html();
-        var template = Handlebars.compile(source);
-        var userComments = [
-            {
-                'commentId': 1,
-                'commentOwnerId': 2,
-                'userName': 'Ranjan',
-                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                'commentedOn': '26-01-2016',
-                'commentRating': 3,
-                'commentContent': 'Lorium Ipsum',
-                'childComments': [
-                    {
-                        'commentId': 1,
-                        'commentOwnerId': 2,
-                        'userName': 'Aditya',
-                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                        'commentedOn': '26-01-2016',
-                        'commentRating': 3,
-                        'commentContent': 'Lorium Ipsum',
-                        'childComments': [
-
-                        ]
-                    },
-                    {
-                        'commentId': 1,
-                        'commentOwnerId': 2,
-                        'userName': 'Kedar',
-                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                        'commentedOn': '26-01-2016',
-                        'commentRating': 3,
-                        'commentContent': 'Lorium Ipsum',
-                        'childComments': [
-                            {
-                                'commentId': 1,
-                                'commentOwnerId': 2,
-                                'userName': 'Rachana',
-                                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                                'commentedOn': '26-01-2016',
-                                'commentRating': 3,
-                                'commentContent': 'Lorium Ipsum',
-                                'childComments': [
-
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                'commentId': 1,
-                'commentOwnerId': 2,
-                'userName': 'VK',
-                'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                'commentedOn': '26-01-2016',
-                'commentRating': 3,
-                'commentContent': 'Lorium Ipsum',
-                'childComments': [
-                    {
-                        'commentId': 1,
-                        'commentOwnerId': 2,
-                        'userName': 'GN',
-                        'userAvatar': 'http://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
-                        'commentedOn': '26-01-2016',
-                        'commentRating': 3,
-                        'commentContent': 'Lorium Ipsum',
-                        'childComments': [
-
-                        ]
-                    }
-                ]
-            }
-        ];
-        $.each(userComments, function(pos, comment) {
-            if (comment.childComments.length === 0) {
-                var context = Object.assign({'gallery': 'userGallery'}, comment);
-                return template(context);
-            }
-        });
-        var commentHTML = '';
-        function renderComments (comments) {
-            var commentsHTML ='';
-            for(var i = 0; i < comments.length; i++) {
-                var comment = comments[i];
-                if (comment.childComments.length != 0) {
-                    var tempHTML = renderComments(comment.childComments);
-                    commentsHTML += renderComment(comment, tempHTML);
-                    // return tempHTML;
-                } else {
-                    commentsHTML += renderComment(comment);
-                }
-            };
-            return commentsHTML;
-        }
-
-        function renderComment(comment, childComment) {
-            var context = Object.assign({'gallery': 'userGallery', 'childComment': childComment}, {comment});
-            return template(context);
-        }
-
-
-        $(".activity-comments-section .activity-comments").empty();
-        $(".activity-comments-section .activity-comments").html(renderComments(userComments));
-
-        CKEDITOR.replaceAll( 'textarea-reply-comment',{
-            enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
-            toolbar:'basic',
-            uiColor:'#f2f2f2',
-            textarea_id: 'textarea-add-comment'
-        });
-        CKEDITOR.replaceAll( 'textarea-add-comment',{
-            enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
-            toolbar:'basic',
-            uiColor:'#f2f2f2',
-            textarea_id: 'textarea-add-comment'
-        });
-
-        $(".activity-comments-section .activity-comments .comment-add").hide();
-        //Handling all reply actions
-        $(".activity-comments-section .activity-comments").on('click', '.comment-reply', function() {
-            $(this).closest('.comment-container').children('.comment-add').toggle();
-        });
 
         //Rating system
         $("body .rate-scale i").hover(function(){
