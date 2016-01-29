@@ -396,7 +396,8 @@ def create_edit_page(request, group_id, node_id=None):
         if ce_id or res or program_res:
             url_name = "/" + group_name + "/" + str(page_node._id)
             if ce_id:
-                url_name = "/" + group_name + "/#journal-tab"
+                # url_name = "/" + group_name + "/#journal-tab"
+                url_name = "/" + group_name
             if res or program_res:
                 url_name = "/" + group_name + "/?selected=" + str(page_node._id) + "#view_page"
             # print "\n\n url_name---",url_name

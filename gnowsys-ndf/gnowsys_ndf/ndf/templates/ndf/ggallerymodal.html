@@ -1,32 +1,40 @@
-<div id="{{id}}" class="reveal-modal " data-reveal >
+{% load get_grid_fs_object from ndf_tags %}
+<div id="reveal-{{node.pk}}" class="reveal-modal" data-reveal>
     <div class="row gmodal-toolbar">
         <div class="small-2 columns file-name">
-            My Photo.jpg
+            {{node.name}}
         </div>
-        <div class="small-7 columns gmodal-actions">
-            <div class="download-file">
-                <i class="fi-download"></i>
-                <a class="download-link">Download</a>
-                <!-- <span> Download</span> -->
-            </div>
+        <div class="small-6 columns gmodal-actions">
             <div class="create-note">
-                <i class="fi-page-edit"></i>
-                <span> Create note</span>
+                <a>
+                    <i class="fi-page-edit"></i>
+                    Create note
+                </a>
             </div>
             <div class="create-collection">
-                <i class="fi-folder"></i>
-                <span> Create new collection</span>
+                <a>
+                    <i class="fi-folder"></i>
+                    Create new collection
+                </a>
             </div>
             <div class = "parent-folder">
-                <i class="fi-folder"></i>
-                <span>Collection</span>
+                <a>
+                    <i class="fa fa-plus"></i>
+                    Add to collection
+                </a>
+            </div>
+            <div class="download-file">
+                {% get_grid_fs_object node as grid_fs_obj %}
+                <a class="download-link" title="Click here to Download" href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                    <i class="fi-download"></i>Download
+                </a>
+                <!-- <span> Download</span> -->
             </div>
             <div>
-                <i class="fi-list-bullet"></i>
-            </div>
-            <div>
-                <i class="fi-info"></i>
-                <span>Info</span>
+                <a>
+                    <i class="fi-info"></i>
+                    View Info
+                </a>
             </div>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
@@ -35,11 +43,13 @@
         <div class="small-9 columns gmodal-item-panel">
             <div class="row gmodal-item-holder ">
                 <div class="small-12 columns gmodal-item">
-                    <img src="#" class="gmodel-item-image"/>
+                    <img  src="{% url 'get_mid_size_img' group_id node.pk %}" class="gmodel-item-image"/>
                 </div>
             </div>
             <div class="row gmodal-footer">
+                {% comment %}
                 <div class="columns small-1 prev-item">< Prev</div>
+                {% endcomment %}
                 <div class="columns small-10 gmodal-item-details">
                     <i class="fi-eye"></i>
                     <span class="viewed-count">214</span>
@@ -49,23 +59,28 @@
                     <span class="comment-count">22</span>
                     <i class="fi-trash"></i>
                 </div>
+                {% comment %}
                 <div class="columns small-1 next-item">Next ></div>
+                {% endcomment %}
             </div>
         </div>
         <div class="small-3 columns gmodal-comments-panel">
             <div class="gmodal-comments">
                 <div class="row">
-                    <div class="columns small-12"><h3>Comments</h3></div>
+                    <div class="columns small-12"><h4>Comments</h4></div>
                 </div>
                 <div class="row">
                     <div class="small-12 columns">
+                    {% comment %}
                         {% include "ndf/gcomment.html" %}
+                    {% endcomment %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% comment %}
 <script type="text/javascript">
 (function( $ ) {
     var _items = [];
@@ -77,8 +92,7 @@
     var _currentIndex;
 
     $.fn.userGalleryModal = function(config) {
-
-        if(config) {
+       if(config) {
             _items = config.items || _items;
             $.each(_items, function(key, val) {
                 _itemsIdMap[val.id] = val;
@@ -88,37 +102,31 @@
         } else {
             return false;
         }
-
-        //initializing gallery functions
+       //initializing gallery functions
         $('#' + _galleryId).find('.prev-item').on('click', function() {
             _currentItem = _itemsPosMap[_currentItem.id] - 1 > -1 ?
                 _items[_itemsPosMap[_currentItem.id] - 1] :
                 _currentItem;
             _renderItem();
         });
-
-        $('#' + _galleryId).find('.next-item').on('click', function() {
-            _currentItem = _itemsPosMap[_currentItem.id] + 1 < _items.length ?
-                _items[_itemsPosMap[_currentItem.id] + 1] :
-                _currentItem;
-            _renderItem();
-        });
-
-        _currentItemGroup = $(this);
-
-        function _renderItem() {
-            $('#' + _galleryId).find('.file-name').html(_currentItem.name);
-            $('#' + _galleryId).find('.gmodel-item-image').attr('src', _currentItem['item-image']);
-            $('#' + _galleryId).find('.viewed-count').html(_currentItem.views);
-            $('#' + _galleryId).find('.download-link')
-                        .attr('href',_currentItem['download-link'])
-                        .attr('download',_currentItem.grid_fs_obj_name)
-
-            $('#' + _galleryId).find('.likes-count').html(_currentItem.rating);
-            $('#' + _galleryId).find('.comment-count').html(_currentItem.comments);
-        }
-
-        return {
+       $('#' + _galleryId).find('.next-item').on('click', function() {
+           _currentItem = _itemsPosMap[_currentItem.id] + 1 < _items.length ?
+               _items[_itemsPosMap[_currentItem.id] + 1] :
+               _currentItem;
+           _renderItem();
+       });
+       _currentItemGroup = $(this);
+       function _renderItem() {
+           $('#' + _galleryId).find('.file-name').html(_currentItem.name);
+           $('#' + _galleryId).find('.gmodel-item-image').attr('src', _currentItem['item-image']);
+           $('#' + _galleryId).find('.viewed-count').html(_currentItem.views);
+           $('#' + _galleryId).find('.download-link')
+                       .attr('href',_currentItem['download-link'])
+                       .attr('download',_currentItem.grid_fs_obj_name)
+           $('#' + _galleryId).find('.likes-count').html(_currentItem.rating);
+           $('#' + _galleryId).find('.comment-count').html(_currentItem.comments);
+       }
+       return {
             getItems : function() {
                 return _items;
             },
@@ -129,8 +137,8 @@
             }
         }
         return this;
-
-    };
+   };
 
 }( jQuery ));
 </script>
+{% endcomment %}

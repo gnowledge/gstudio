@@ -1386,6 +1386,10 @@ def add_units(request, group_id):
         unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
     except:
         unit_node = None
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    page_instances = node_collection.find({"type_of": page_gst._id})
+    page_ins_list = [i for i in page_instances]
+
     variable = RequestContext(request, {
         'group_id': group_id, 'groupid': group_id,
         'css_node': css_node,
@@ -1394,9 +1398,10 @@ def add_units(request, group_id):
         'app_id': app_id,
         'unit_node': unit_node,
         'course_node': course_node,
+        'page_instance': page_ins_list
     })
 
-    template = "ndf/course_units.html"
+    template = "ndf/gcourse_units.html"
     return render_to_response(template, variable)
 
 
@@ -1794,17 +1799,175 @@ def course_summary(request, group_id):
 
 def course_resource_detail(request, group_id):
     if request.method == "GET":
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
         # course_section = request.GET.get("course_section", "")
         # course_sub_section = request.GET.get("course_sub_section", "")
         # course_unit = request.GET.get("course_unit", "")
-        node_id = request.GET.get("node", "")
+        node_id = request.GET.get("node_id", "")
+        unit_id = request.GET.get("unit_id", "")
         # print "\n\n node_id",node_id
+        unit_node = node_collection.one({'_id': ObjectId(unit_id)})
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
         variable = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id,
-            'node': node_obj
+            'group_name':group_name,
+            'node': node_obj,
+            'unit_node': unit_node
         })
 
 
         template = "ndf/unit_player.html"
         return render_to_response(template, variable)
+
+
+# def course_resource_detail(request, group_id, course_section, course_sub_section, course_unit, resource_id):
+#     pass
+
+
+
+
+def course_dashboard(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+    template = 'ndf/gcourse_event_group.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'dashboard'
+        })
+    return render_to_response(template, context_variables)
+
+
+
+def course_content(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+
+    template = 'ndf/gcourse_event_group.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'course content'        
+        })
+    return render_to_response(template, context_variables)
+
+
+def course_notebook(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    all_blogs = None
+    blog_pages = None
+    user_blogs = None
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+
+    all_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+                        'group_set': group_obj._id},{'_id': 1, 'created_at': 1,
+                        'created_by': 1, 'name': 1}).sort('created_at', -1)
+    if all_blogs:
+        blog_pages = all_blogs.clone()
+        if request.user.id:
+            blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
+            user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
+    # print "\n\n type of blog_pages---", type(blog_pages)
+    # print "\n\n type of user_blogs---", type(user_blogs)
+    # for each in blog_pages:
+    #     print each
+    # for each in user_blogs:
+    #     print each
+    template = 'ndf/gcourse_event_group.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'notebook', 'blog_pages': blog_pages,
+            'user_blogs': user_blogs
+        })
+    return render_to_response(template, context_variables)
+
+
+def course_raw_material(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+
+    template = 'ndf/gcourse_event_group.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'raw material'        
+        })
+    return render_to_response(template, context_variables)
+
+
+def course_gallery(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    files_cur = node_collection.find({'group_set': group_id, '_type': "File"},{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1})
+    template = 'ndf/gcourse_event_group.html'
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'gallery', 'files_cur': files_cur
+        })
+    return render_to_response(template, context_variables)
+
+
+def course_about(request, group_id):
+
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+
+    
+    template = 'ndf/gcourse_event_group.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'about'        
+        })
+    return render_to_response(template, context_variables)
+
+def course_gallerymodal(request, group_id):
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    node_id = request.GET.get("node_id", "")
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+
+    template = 'ndf/ggallerymodal.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': node_obj, 'title': 'course_gallerymodall'
+        })
+    return render_to_response(template, context_variables)
+
+def course_note_page(request, group_id):
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    node_id = request.GET.get("node_id", "")
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+
+    template = 'ndf/note_page.html'
+
+    context_variables = RequestContext(request, {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': node_obj, 'title': 'course_gallerymodall'
+        })
+    return render_to_response(template, context_variables)
+

@@ -1,0 +1,67 @@
+{% load get_username from ndf_tags %}
+            <div class="row note-toolbar">
+                <div class="small-9 columns">
+                    <i class="fi-torso"></i>
+                                
+                    <span class="note-creator">{{node.created_by|get_username|truncatechars:"10"}}</span>
+                    &#8226;
+                    <span class="note-creation-date">{{node.created_at|date:"d M Y h:i A"}}</span>
+                </div>
+                <div class="small-3 columns creator-rating">
+                    {# <div>Your rating</div> #}
+
+                    <div>
+                    {% include 'ndf/rating.html'%}
+                    {% comment %}
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                        <i class="fi-like"></i>
+                    {% endcomment %}
+                    </div>
+                </div>
+            </div>
+            <div class="row note-content">
+                <div class="note-header">
+                    <span class="note-title">{{node.name}}</span>
+                    {% if node.tags %}
+                    <div class="note-tags">
+                    {% for each_tag in node.tags %}
+                        <a>{{each_tag}}</a>
+                    {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="note-text">
+                {{node.content|safe}}
+                </div>
+            </div>
+            {% comment %}
+            <div class="comment-sections">
+                <div class="comments-header">
+                    <i class="fi-eye"></i>
+                    <span class="viewed-count">214</span>
+                    views
+                    <i class="fi-like"></i>
+                    <span class="likes-count">10</span>
+                    likes
+                    <i class="fi-comments"></i>
+                    <span class="comment-count">22</span>
+                    comments
+                </div>
+                <div class="new-comment row">
+                    <div class="small-1 columns user-prof-image">
+                        <i class="fi-torso"></i>
+                    </div>
+                    <div class="small-9 columns">
+                        <textarea class="add-comment textarea-add-comment" name="textarea-add-comment"></textarea>
+                    </div>
+                    <div class="small-2 columns">
+                        <a href="#" id="postCommentBtn" class="button small">Post</a>
+                    </div>
+                </div>
+                <div class="row comments">
+                </div>
+            </div>
+            {% endcomment %}

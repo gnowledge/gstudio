@@ -1805,7 +1805,9 @@ def group_dashboard(request, group_id=None):
     alternate_template = ""
     profile_pic_image = None
     list_of_unit_events = []
+    all_blogs = None
     blog_pages = None
+    user_blogs = None
     subgroups_cur = None
     old_profile_pics = []
     selected = request.GET.get('selected','')
@@ -1925,12 +1927,15 @@ def group_dashboard(request, group_id=None):
       if group_obj.collection_set:
           course_structure_exists = True
       if request.user.id:
-          blog_pages = node_collection.find({
+          all_blogs = node_collection.find({
                 'member_of':page_gst._id,
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
             }).sort('created_at', -1)
-
+          if all_blogs:
+              blog_pages = all_blogs.clone()
+              blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
+              user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
       start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
       # if 'start_enroll' in group_obj:
       #     if group_obj.start_enroll:
@@ -1978,6 +1983,7 @@ def group_dashboard(request, group_id=None):
                                                        # 'shelf_list': shelf_list,
                                                        'list_of_unit_events': list_of_unit_events,
                                                        'blog_pages':blog_pages,
+                                                       'user_blogs': user_blogs,
                                                        'selected': selected,
                                                        'files_cur': files_cur,
                                                        'sg_type': sg_type,
@@ -2437,12 +2443,13 @@ def upload_using_save_file(request,group_id):
 
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     usrid = request.user.id
-    url_name = "/"+str(group_id)
+    # url_name = "/"+str(group_id)
     for key,value in request.FILES.items():
         fname=unicode(value.__dict__['_name'])
         # print "key=",key,"value=",value,"fname=",fname
-        fileobj,fs=save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
-        file_obj=node_collection.find_one({'_id': ObjectId(fileobj)})
-        if file_obj:
-            url_name = "/"+str(group_id)+"/#gallery-tab"
-        return HttpResponseRedirect(url_name)
+        fileobj,fs = save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
+        file_obj = node_collection.find_one({'_id': ObjectId(fileobj)})
+        # if file_obj:
+        #     url_name = "/"+str(group_id)+"/#gallery-tab"
+        return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
+        # return HttpResponseRedirect(url_name)

@@ -53,7 +53,7 @@ Image Gallery
     {% for each in imageCollection %}
     
     <li class="card-image-wrapper">
-            <img  data-image-id="{{each.pk}}" src="{% url 'getImageThumbnail' group_name_tag each %}" data-image-src="{% url 'getFullImage' group_id each each.name%}">
+            <img  data-image-id="{{each.pk}}" src="{% url 'get_mid_size_img' group_name_tag each %}" data-image-src="{% url 'getFullImage' group_id each each.name%}">
             <figcaption>{{each.name}}</figcaption>
     
     </li>
@@ -64,7 +64,7 @@ Image Gallery
 <ul class="clearing-thumbs" data-clearing   style="height:100px;width:100px;z-index:-1">
   {% for image in imageCollection %}
   <li  class="clearing-featured-img">
-    <a href="{% url 'get_mid_size_img' group_name_tag image %}">
+    <a href="{% url 'getImageThumbnail' group_name_tag image %}">
       <img src="{% url 'getImageThumbnail' group_name_tag image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' group_name_tag image %}'>{{image.name}}</a> <script type='text/javascript'>
 											   var angle = 0;
 											   $('.img_rotate').on('click', function() {
