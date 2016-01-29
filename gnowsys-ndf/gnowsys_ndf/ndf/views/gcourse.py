@@ -33,7 +33,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access
 from gnowsys_ndf.notification import models as notification
 
 
@@ -1811,9 +1811,16 @@ def course_resource_detail(request, group_id):
         # print "\n\n node_id",node_id
         unit_node = node_collection.one({'_id': ObjectId(unit_id)})
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        node_obj.get_neighbourhood(node_obj.member_of)
+        thread_node = None
+        allow_to_comment = None
+
+        thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
+
         variable = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id,
             'group_name':group_name,
+            'allow_to_comment': allow_to_comment,
             'node': node_obj,
             'unit_node': unit_node
         })

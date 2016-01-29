@@ -517,8 +517,8 @@
           {% if "Info page" not in type_of_list %}
           
 
-    
-          <!-- Discussion -->
+              {% if not no_discussion %}
+                <!-- Discussion -->
                 <div class="content large-6 columns " id="view-discussion" >
                   <!-- discussion content area -->
                   {% if node.discussion_enable %}
@@ -535,6 +535,7 @@
 
                   <!-- END of discussion content area -->     
                 </div>
+              {% endif %}
         
           <br/>
           {% endif %}
