@@ -41,5 +41,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.gcourse',
                         url(r'^/about/$', 'course_about', name='course_about'),
                         url(r'^/course_gallerymodal/$', 'course_gallerymodal', name='course_gallerymodal'),
                         url(r'^/course_note_page/$', 'course_note_page', name='course_note_page'),
+                        url(r'^/inline_edit_res/(?P<node_id>[\w-]+)$', 'inline_edit_res', name='inline_edit_res'),
 
                        )

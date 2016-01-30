@@ -1146,6 +1146,7 @@ def create_course_struct(request, group_id, node_id):
 
 
 @login_required
+@get_execution_time
 def save_course_section(request, group_id):
     '''
     Accepts:
@@ -1192,6 +1193,7 @@ def save_course_section(request, group_id):
 
 
 @login_required
+@get_execution_time
 def save_course_sub_section(request, group_id):
     '''
     Accepts:
@@ -1243,6 +1245,7 @@ def save_course_sub_section(request, group_id):
 
 
 @login_required
+@get_execution_time
 def change_node_name(request, group_id):
     '''
     Accepts:
@@ -1265,6 +1268,7 @@ def change_node_name(request, group_id):
 
 
 @login_required
+@get_execution_time
 def change_order(request, group_id):
     '''
     Accepts:
@@ -1296,6 +1300,7 @@ def change_order(request, group_id):
 
 
 @login_required
+@get_execution_time
 def course_sub_section_prop(request, group_id):
     '''
     Accepts:
@@ -1363,6 +1368,7 @@ def course_sub_section_prop(request, group_id):
 
 
 @login_required
+@get_execution_time
 def add_units(request, group_id):
     '''
     Accepts:
@@ -1406,6 +1412,7 @@ def add_units(request, group_id):
 
 
 @login_required
+@get_execution_time
 def get_resources(request, group_id):
     '''
     Accepts:
@@ -1470,6 +1477,7 @@ def get_resources(request, group_id):
 
 
 @login_required
+@get_execution_time
 def save_resources(request, group_id):
     '''
     Accepts:
@@ -1521,6 +1529,7 @@ def save_resources(request, group_id):
 
 
 @login_required
+@get_execution_time
 def create_edit_unit(request, group_id):
     '''
     Accepts:
@@ -1576,6 +1585,7 @@ def create_edit_unit(request, group_id):
 
 
 @login_required
+@get_execution_time
 def delete_course(request, group_id, node_id):
     del_stat = delete_item(node_id)
     if del_stat:
@@ -1583,6 +1593,7 @@ def delete_course(request, group_id, node_id):
 
 
 @login_required
+@get_execution_time
 def delete_from_course_structure(request, group_id):
     '''
     Accepts:
@@ -1616,7 +1627,8 @@ def delete_from_course_structure(request, group_id):
 
         return HttpResponse(json.dumps(response_dict))
 
-
+@login_required
+@get_execution_time
 def delete_item(item, ce_flag):
     node_item = node_collection.one({'_id': ObjectId(item)})
     if ce_flag:
@@ -1635,8 +1647,8 @@ def delete_item(item, ce_flag):
 
     return del_status
 
-
 @login_required
+@get_execution_time
 def enroll_generic(request, group_id):
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
@@ -1669,6 +1681,7 @@ def enroll_generic(request, group_id):
 
 
 @login_required
+@get_execution_time
 def remove_resource_from_unit(request, group_id):
     '''
     Accepts:
@@ -1696,6 +1709,7 @@ def remove_resource_from_unit(request, group_id):
 
 
 
+@login_required
 @get_execution_time
 def add_course_file(request, group_id):
     # this is context node getting from the url get request
@@ -1736,6 +1750,7 @@ def add_course_file(request, group_id):
 
 
 @login_required
+@get_execution_time
 def enroll_to_course(request, group_id):
     '''
     Accepts:
@@ -1758,6 +1773,8 @@ def enroll_to_course(request, group_id):
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
+@login_required
+@get_execution_time
 def set_release_date_css(request, group_id):
 	response_dict = {"success": False}
 	try:
@@ -1779,7 +1796,8 @@ def set_release_date_css(request, group_id):
 	return HttpResponse(json.dumps(response_dict))
 
 
-
+@login_required
+@get_execution_time
 def course_summary(request, group_id):
 
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -1796,7 +1814,8 @@ def course_summary(request, group_id):
     template = "ndf/course_summary.html"
     return render_to_response(template, variable)
 
-
+@login_required
+@get_execution_time
 def course_resource_detail(request, group_id, course_sub_section, course_unit, resource_id):
     if request.method == "GET":
         try:
@@ -1836,7 +1855,8 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
 
 
 
-
+@login_required
+@get_execution_time
 def course_dashboard(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -1852,7 +1872,8 @@ def course_dashboard(request, group_id):
     return render_to_response(template, context_variables)
 
 
-
+@login_required
+@get_execution_time
 def course_content(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -1868,7 +1889,8 @@ def course_content(request, group_id):
         })
     return render_to_response(template, context_variables)
 
-
+@login_required
+@get_execution_time
 def course_notebook(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -1913,6 +1935,8 @@ def course_notebook(request, group_id):
     return render_to_response(template, context_variables)
 
 
+@login_required
+@get_execution_time
 def course_raw_material(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -1929,6 +1953,8 @@ def course_raw_material(request, group_id):
     return render_to_response(template, context_variables)
 
 
+@login_required
+@get_execution_time
 def course_gallery(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -1942,7 +1968,8 @@ def course_gallery(request, group_id):
         })
     return render_to_response(template, context_variables)
 
-
+@login_required
+@get_execution_time
 def course_about(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -1958,6 +1985,8 @@ def course_about(request, group_id):
         })
     return render_to_response(template, context_variables)
 
+@login_required
+@get_execution_time
 def course_gallerymodal(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
@@ -1973,6 +2002,8 @@ def course_gallerymodal(request, group_id):
         })
     return render_to_response(template, context_variables)
 
+@login_required
+@get_execution_time
 def course_note_page(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
@@ -1987,4 +2018,30 @@ def course_note_page(request, group_id):
             'node': node_obj, 'title': 'course_gallerymodall'
         })
     return render_to_response(template, context_variables)
+
+@login_required
+@get_execution_time
+def inline_edit_res(request, group_id, node_id):
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': node_obj
+            }
+    if request.method == "POST":
+        content_val = request.POST.get("content_val", "")
+        node_obj.content = content_val
+        node_obj.save()
+        template = 'ndf/node_ajax_content.html'
+        context_variables['no_discussion'] = True
+        
+    else:
+        template = 'ndf/html_editor.html'
+        context_variables['var_name'] = "content_org",
+        context_variables['var_value'] = node_obj.content
+        context_variables['node_id'] = node_obj._id
+        context_variables['ckeditor_toolbar'] ="GeneralToolbar" 
+    return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
