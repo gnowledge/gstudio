@@ -259,7 +259,7 @@ body{
         #login-button-medium {
           display: none;
 
-          &hover {
+          &:hover {
             background: inherit;
           }
         }
@@ -3239,12 +3239,12 @@ div.show-image:hover div.fullscreen-icon{
     .activity-slides {
       height: 100%;
       .activity-slide {
-        display: none;
+        // display: none;
+        // left: 100%;
         padding: 1em;
         height: inherit;
         background: #fff;
         position: relative;
-        left: 100%;
 
         .page {
           >section {
