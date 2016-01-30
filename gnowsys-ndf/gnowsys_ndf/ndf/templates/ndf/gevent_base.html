@@ -81,7 +81,7 @@ list-style: none;
 
 <div id="envelop-cover">
   <div class="row course-page-title">
-    <div class="small-12 medium-8 columns heading">{{node.name}}</div>
+    <div class="small-12 medium-8 columns heading">{% firstof node.altnames node.name  %}</div>
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
         {% with node.member_of_names_list.0 as sg_type %}
