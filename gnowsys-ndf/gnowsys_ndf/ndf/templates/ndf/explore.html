@@ -12,8 +12,8 @@
 		<div class="small-1 columns heading"><a href="{% url 'explore' %}">Explore</a></div>
 		<div class="small-3 columns expore-type">
 			<div class="toggleButtons">
-				<a href="#" class="button"> Courses </a>
-				<a href="#" class="button"> Groups </a>
+				<a href="{% url 'explore_courses' %}" class="button"> Courses </a>
+				<a href="{% url 'explore_groups' %}" class="button"> Groups </a>
 			</div>
 		</div>
 		<div class="small-3 columns explore-search">
@@ -27,9 +27,8 @@
 			<a href="{% url 'explore_groups' %}">Groups</a>
 		</div-->
 	</div>
-	<
 	{% if title == 'explore' %}
-		Some static text or trending or upcoming groups, courses, events listing.
+		Plese select between course or a group.
 	{% else %}
 
 	<section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="background-color:#fafafa;border-style:none">
