@@ -33,7 +33,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access
 from gnowsys_ndf.notification import models as notification
 
 
@@ -1811,9 +1811,16 @@ def course_resource_detail(request, group_id):
         # print "\n\n node_id",node_id
         unit_node = node_collection.one({'_id': ObjectId(unit_id)})
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        node_obj.get_neighbourhood(node_obj.member_of)
+        thread_node = None
+        allow_to_comment = None
+
+        thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
+
         variable = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id,
             'group_name':group_name,
+            'allow_to_comment': allow_to_comment,
             'node': node_obj,
             'unit_node': unit_node
         })
@@ -1869,17 +1876,26 @@ def course_notebook(request, group_id):
     all_blogs = None
     blog_pages = None
     user_blogs = None
+    user_id = None
+    if request.user.is_authenticated():
+        user_id = request.user.id
     page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
 
-    all_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
-                        'group_set': group_obj._id},{'_id': 1, 'created_at': 1,
+    blog_pages = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+                        'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1,
                         'created_by': 1, 'name': 1}).sort('created_at', -1)
-    if all_blogs:
-        blog_pages = all_blogs.clone()
-        if request.user.id:
-            blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
-            user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
+    if user_id:
+        user_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+                            'group_set': group_obj._id, 'created_by': user_id},{'_id': 1, 'created_at': 1,
+                            'created_by': 1, 'name': 1}).sort('created_at', -1)
+
+    # if all_blogs:
+    #     blog_pages = all_blogs.clone()
+    #     if request.user.id:
+    #         blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
+    #         user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
     # print "\n\n type of blog_pages---", type(blog_pages)
     # print "\n\n type of user_blogs---", type(user_blogs)
     # for each in blog_pages:

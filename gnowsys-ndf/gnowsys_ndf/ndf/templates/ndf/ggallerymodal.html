@@ -4,7 +4,8 @@
         <div class="small-2 columns file-name">
             {{node.name}}
         </div>
-        <div class="small-6 columns gmodal-actions">
+        <div class="small-2 columns gmodal-actions">
+            {% comment %}
             <div class="create-note">
                 <a>
                     <i class="fi-page-edit"></i>
@@ -23,6 +24,13 @@
                     Add to collection
                 </a>
             </div>
+            <div class="view-info">
+                <a>
+                    <i class="fi-info"></i>
+                    View Info
+                </a>
+            </div>
+            {% endcomment %}
             <div class="download-file">
                 {% get_grid_fs_object node as grid_fs_obj %}
                 <a class="download-link" title="Click here to Download" href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
@@ -30,12 +38,7 @@
                 </a>
                 <!-- <span> Download</span> -->
             </div>
-            <div>
-                <a>
-                    <i class="fi-info"></i>
-                    View Info
-                </a>
-            </div>
+
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
     </div>

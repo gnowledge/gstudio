@@ -88,7 +88,7 @@ list-style: none;
           <span><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny button radius"><i class="fi- pencil"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></span>
         {% endwith %}
 
-        <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+        <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if node.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
         <span><input type="button" class="tiny button radius settings" value="Settings"></span>
       {% else %}
         <ul class="right">
@@ -139,7 +139,7 @@ list-style: none;
   <!-- Envelop box-->
   <div class="small-12 large-12 columns">
     <div style="line-height: 0.7em;">
-      <ul class="tabs">
+      <ul class="tabs course-tabs">
 
         <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
           <a href="{% url 'course_dashboard' group_id %}">
@@ -221,7 +221,7 @@ list-style: none;
               </div>
             </div>
           </div>
-        {% endif %}        
+        {% endif %}
       </div>
     </div>
     <!-- tab-content ends here -->
