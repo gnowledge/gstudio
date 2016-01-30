@@ -2435,7 +2435,7 @@ def create_sub_group(request,group_id):
 
 
 
-
+@login_required
 @get_execution_time
 def upload_using_save_file(request,group_id):
     from gnowsys_ndf.ndf.views.file import save_file
