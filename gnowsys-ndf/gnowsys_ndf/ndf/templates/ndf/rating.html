@@ -85,7 +85,7 @@
         $(".rating-bar input[value="+stars+"]").prop("checked",true);
     }
 
-    setStars({{ratings.user_rating}});
+    setStars({% firstof ratings.user_rating ratings.avg  %});
 
     // Rating script only if user is logged in
     // Send the user's rating to the server on submit

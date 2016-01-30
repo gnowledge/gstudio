@@ -73,7 +73,8 @@
             <div class="gmodal-comments">
                 <div class="row">
                     <div class="columns small-12"><h4>Comments</h4>
-                        {% if group_object.edit_policy != "EDITABLE_MODERATED" or "CourseEventGroup" in group_object.member_of_names_list %}
+            
+                {% if group_object.edit_policy != "EDITABLE_MODERATED" or "CourseEventGroup" in group_object.member_of_names_list %}
                     {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
                     {% get_list_of_fields node.type_of "name" as type_of_list %}
                     {% if "Info page" not in type_of_list %}
