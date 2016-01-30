@@ -141,9 +141,9 @@ list-style: none;
     <div style="line-height: 0.7em;">
       <ul class="tabs course-tabs">
 
-        <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
-          <a href="{% url 'course_dashboard' group_id %}">
-            <i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}
+        <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
+          <a href="{% url 'course_about' group_id %}">
+            <i class="fi-page-edit "></i>{% trans "About the course" %}
           </a>
         </li>
 
@@ -153,15 +153,15 @@ list-style: none;
           </a>
         </li>
 
-        <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
-          <a href="{% url 'course_notebook' group_id %}">
-            <i class="fi-book "></i>{% trans "Notebook" %}
-          </a>
-        </li>
-
         <li class="tab-title {% ifequal title 'raw material' %}active{% endifequal %}">
           <a href="{% url 'course_raw_material' group_id %}">
             <i class="fi-clip "></i>{% trans "Raw Material" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
+          <a href="{% url 'course_notebook' group_id %}">
+            <i class="fi-book "></i>{% trans "Notebook" %}
           </a>
         </li>
 
@@ -170,30 +170,35 @@ list-style: none;
             <i class="fi-photo "></i> {% trans "Gallery" %}
           </a>
         </li>
-
-        <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
+        <!--
+        <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
           <a href="{% url 'course_about' group_id %}">
-            <i class="fi-page-edit "></i>{% trans "About the course" %}
+            <i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}
           </a>
         </li>
-
+         -->
       </ul>
     </div>
 
     <!-- Load tab contents dynamically -->
     <div class="tabs-content course-book">
       <div class="content active" id="course-dashboard">
+        
         {% if title == 'dashboard' %}
           {% include "ndf/gcourseDashboard.html" %}
+      
         {% elif title == 'course content' %}
           {% include "ndf/gcollection_ajax_view.html" %}
-          <!--@anotation("import gcourse_event_group.html for the list of the modules in the course.")-->
+
         {% elif title == 'notebook' %}
           {% include "ndf/gnotebook.html" %}
+
         {% elif title == 'gallery' %}
           {% include "ndf/ggallerypage.html" %}
+
         {% elif title == 'raw material' %}
           {% include "ndf/ggallerypage.html" %}
+
         {% elif title == 'about' %}
           <div id="course-about">
             <div class="row collapse">
