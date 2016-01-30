@@ -1,4 +1,4 @@
-{% load get_username from ndf_tags %}
+{% load get_username get_thread_node get_disc_replies get_node  from ndf_tags %}
     <div class="row note-toolbar">
         <div class="small-9 columns">
             <i class="fi-torso"></i>
@@ -39,8 +39,18 @@
             </div>
         </div>
     </div>
-    {% comment %}
     <div class="comment-sections">
+        {% get_thread_node node.pk as thread_node %}
+            {% if thread_node %}
+                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                {% get_node thread_node as thread_node_obj %}
+                {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+            {% else %}
+                {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                {% include 'ndf/gin-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+            {% endif %}
+    </div>
+    {% comment %}
         <div class="comments-header">
             <i class="fi-eye"></i>
             <span class="viewed-count">214</span>

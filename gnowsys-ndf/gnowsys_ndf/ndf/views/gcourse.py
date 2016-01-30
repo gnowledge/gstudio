@@ -1993,12 +1993,18 @@ def course_gallerymodal(request, group_id):
     group_name  = group_obj.name
     node_id = request.GET.get("node_id", "")
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    thread_node = None
+    allow_to_comment = None
+    thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
 
     template = 'ndf/ggallerymodal.html'
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': node_obj, 'title': 'course_gallerymodall'
+            'node': node_obj, 'title': 'course_gallerymodall',
+            'allow_to_comment': allow_to_comment,
+            'thread_node': thread_node
+
         })
     return render_to_response(template, context_variables)
 
@@ -2010,12 +2016,16 @@ def course_note_page(request, group_id):
     group_name  = group_obj.name
     node_id = request.GET.get("node_id", "")
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
-
+    thread_node = None
+    allow_to_comment = None
+    thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     template = 'ndf/note_page.html'
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': node_obj, 'title': 'course_gallerymodall'
+            'node': node_obj, 'title': 'course_gallerymodall',
+            'allow_to_comment': allow_to_comment,
+            'thread_node': thread_node
         })
     return render_to_response(template, context_variables)
 
