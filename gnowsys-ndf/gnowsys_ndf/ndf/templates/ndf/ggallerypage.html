@@ -74,6 +74,7 @@
         <div class="medium-9 columns gallery-content" >
             <div class="gallery-subheader small-12">
                 <div class="row">
+                  {% if allow_to_upload %}
                     <div class="upload-file small-2 columns" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
                             {% csrf_token %}
@@ -88,8 +89,9 @@
                               <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
                             </div>
                         </form>
-
                     </div>
+                  {% endif %}
+
                     <div class="small-12 medium-10 columns gallery-actions hide" >
                         <div class="create-note">
                             <i class="fi-page-edit"></i>
