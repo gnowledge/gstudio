@@ -1,14 +1,16 @@
-{% extends "ndf/gbase.html" %}
+{# {% extends "ndf/gbase.html" %} #}
 {% load simple_filters %}
+{% xextends "ndf/gbase.html" with first_body_column=0 %}
 <!-- to change the grid of main body content use following "instead" of above extends: -->
-{# {% xextends "ndf/gbase.html" with first_body_column=6 %} #}
 
 {% load i18n %}
 {% load ndf_tags %}
-{% load pagination_tags %}
+{# {% load pagination_tags %} #}
 {% get_group_name groupid as group_name_tag %}
-{% block title %} {{title}} -- khaal version  {% endblock %}
+{% block title %} My Courses  {% endblock %}
 
+{% comment %}
+  
 {% block collection_content %}
 
   {% check_is_gstaff groupid request.user as is_gstaff %}
@@ -47,9 +49,35 @@
 {% block meta_content %}
   {% include "ndf/side_group_panel.html" %}
 {% endblock meta_content %}
+{% endcomment %}
 
 {% block body_content %}
 
+  {% get_user_course_groups request.user.id as user_concern_groups %}
+
+{# {% datetime_now as datetime_now %} #}
+
+  <h3>My Courses</h3>
+  {% for k, v in user_concern_groups.items %}
+  <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="background-color:#fafafa;border-style:none; padding-left: 1em;">
+    {% if v %}
+    <h3><small>{{k}}</small></h3>
+      {% for vk in v %}
+
+    {# <a href="{% url 'course_about' vk.pk %}">{{vk.name}}</a> #}
+    {# {% for each_obj in doc_cur %} #}
+      <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
+            {% include 'ndf/event_card.html' with resource=vk is_event=True no_footer=True has_prof_pic=True url_name="course_about" first_arg=vk.name  next_session=True %}
+          </li>
+    {% endfor %}
+        
+      {# {% endfor %} #}
+    {% endif %}
+    </section>
+  {% endfor %}
+
+
+  {% comment %}
     <div class="tabs-content all-courses"  style="margin-left:18px;margin-top:-1em;">
 
       <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" id="all_events" style="border-style:none">
@@ -61,7 +89,7 @@
         <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
         {% for course in ce_coll %}
           <li class="card-image-wrapper" style="margin-top:13px;">
-            {% include 'ndf/event_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="course_dashboard" first_arg=course.pk  next_session=True %}
+            {% include 'ndf/event_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="course_about" first_arg=course.pk  next_session=True %}
           </li>
         {% empty %}
             <div class="row">
@@ -121,6 +149,7 @@
       </section>
 
   {% paginate %}
+  {% endcomment %}
 
 {% endblock %}
 

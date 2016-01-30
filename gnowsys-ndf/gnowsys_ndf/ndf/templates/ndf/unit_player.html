@@ -62,7 +62,7 @@
               <a data-dropdown="drop1" aria-controls="drop1" aria-expanded="false"><i class="fa fa-align-justify"></i></a>
               <ul id="drop1" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
               {% for each_resource in unit_resources_list_of_dict %}
-                <li>
+                <li class="text-left">
                 {% ifequal forloop.counter resource_index|add:1 %} <b> {% endifequal %}
                   <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit each_resource.pk %}">
                     {{each_resource.name}}
