@@ -205,7 +205,7 @@ list-style: none;
               <div class="about-course-heading">
                 <div class="heading-text">
                   <div>
-                    <h2>{{node.name}}</h2>
+                    <h2>{% firstof node.altnames node.name  %}</h2>
                   </div>
                   <div>Next Session Jan 5 2016 &#8226; 3:00pm</div>
                   <div>
