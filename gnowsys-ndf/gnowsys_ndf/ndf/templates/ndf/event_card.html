@@ -45,6 +45,8 @@
     {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
       {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
         <i class="{{attr_set_dict.educationaluse|lower}}"></i>
+      {% elif resource.fs_file_ids.0 and 'image' in resource.mime_type %}
+        <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
       {% elif resource.mime_type %}
         <i class="{{resource.mime_type|lower|split:'/'|join:' '}}"></i>
       {% else  %}
@@ -131,25 +133,39 @@
        {% endif %}
        Session
       <b class="event-time">{{event_session_status.0|date:"d-m-Y"}}</b>
+      {% comment %}
       <div class="event-time">25th Jan 2016 &#8226; 12:00 pm</div>
+      {% endcomment %}
     {% endif %}
     </div>
     <!-- {{resource.author_set|length}}<i class="fa fa-users"></i> -->
     <!--Event card footer-->
     <div class="event-card-session-footer">
+    
+      {% comment %}
       <div class="date"><i class="fa fa-calendar-o"></i> Jan 5th,2016 - Mar 4, 2016</div>
+      {% endcomment %}
       <div class="row collapse">
         <div class="small-12 columns footer-label">Course Duration</div>
         <div class="small-12 columns date">
-          <i class="fa fa-calendar-o"></i> Jan 5th, 2016 - Mar 4, 2016
-          <i class="fa fa-pencil-square-o edit-course-duration"></i>
+        {% get_attribute_value resource.pk 'start_time' as course_start_date %}
+        {% get_attribute_value resource.pk 'end_time' as course_end_date %}
+          <i class="fa fa-calendar-o"></i> {{course_start_date|date:"d M Y"}} - {{course_end_date|date:"d M Y"}}
+          {% comment %}
+            <i class="fa fa-pencil-square-o edit-course-duration"></i>
+          {% endcomment %}
         </div>
       </div>
       <div class="row collapse">
         <div class="small-12 columns footer-label">Enrolment Dates</div>
         <div class="small-12 columns date">
-          <i class="fa fa-calendar-o "></i> Jan 5th, 2016 - Mar 4, 2016
-          <i class="fa fa-pencil-square-o edit-course-enrollment"></i>
+        {% get_attribute_value resource.pk 'start_enroll' as course_start_enroll %}
+        {% get_attribute_value resource.pk 'end_enroll' as course_end_enroll %}
+
+          <i class="fa fa-calendar-o "></i> {{course_start_enroll|date:"d M Y"}} - {{course_end_enroll|date:"d M Y"}}
+          {% comment %}
+            <i class="fa fa-pencil-square-o edit-course-enrollment"></i>
+          {% endcomment %}
         </div>
       </div>
     </div>

@@ -1,162 +1,159 @@
 {% load simple_filters %}
 {% xextends "ndf/gbase.html" with first_body_column=0 %}
-
 {# {% extends "ndf/gbase.html" %} #}
-
 {% load i18n %}
 {% load cache %}
 {% load ndf_tags %}
-
-{% block title %} Course: {{group_name}} > Resource: {% firstof unit_node.altnames unit_node.name %}  {% endblock %}
+{% block title %} {{group_name}}  {% endblock %}
 
 {% block body_content %}
-  <div class="activity-page">
+<div class="activity-page">
     <div class="row activity-page-header">
-      <div class="small-2 columns activity-page-previous">
-        <a href="{% url 'groupchange' group_name %}"> &lt; <i class="fa fa-home"></i> Course page</a>
-      </div>
-      <div class="small-8 columns unit-title">
-        {{unit_node.name}}
-      </div>
-      <div class="small-2 columns activity-create-note">
-        <div style="float: right;">
-          <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True"><i class="fa fa-pencil-square-o"></i>Create note &gt;</a>
+        <div class="small-2 columns activity-page-previous">
+            <a href="{% url 'groupchange' group_name %}"> &lt; <i class="fa fa-home"></i> Course page</a>
         </div>
-      </div>
+        <div class="small-8 columns unit-title">
+            {{unit_node.name}}
+        </div>
+        <div class="small-2 columns activity-create-note">
+            <div style="float: right;">
+                <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True"><i class="fa fa-pencil-square-o"></i>Create note &gt;</a>
+            </div>
+        </div>
     </div>
     <div class="activity-header row">
-      <div class="small-2 columns">
-        <a href="#" class="button radius tiny prev-activity">
-          <i class="fa fa-hand-o-left"></i>
-          Previous Activity
-        </a>
-      </div>
-      <div class="small-8 columns activity-title-section">
-        <div class="activity-pagination">
-          <i class="fa fa-align-justify"></i>
-          <span class="current-slide">2</span>
-          of
-          <span class="slide-count"></span>
+        <div class="small-2 columns">
+            <a href="#" class="button radius tiny prev-activity">
+                <i class="fa fa-hand-o-left"></i>
+                Previous Activity
+            </a>
         </div>
-        <div class="activity-title">
-          {{node.name}}
+        <div class="small-8 columns activity-title-section">
+            <div class="activity-pagination">
+                <i class="fa fa-align-justify"></i>
+                <span class="current-slide">2</span>
+                of
+                <span class="slide-count"></span>
+            </div>
+            <div class="activity-title">
+                {{node.name}}
+            </div>
         </div>
-      </div>
-      <div class="small-2 columns">
-        <div>
-          <a href="#" class="button radius tiny next-activity">
-            Next Activity
-            <i class="fa fa-hand-o-right"></i>
-          </a>
+        <div class="small-2 columns">
+            <div>
+                <a href="#" class="button radius tiny next-activity">
+                    Next Activity
+                    <i class="fa fa-hand-o-right"></i>
+                </a>
+            </div>
         </div>
-      </div>
     </div>
     <div class="activity-slides-container row">
-      <div class="columns small-12 activity-slides">
-        <div class="row activity-slide" style="overflow-y:auto;">
-          {# {{node.content|safe}} #}
-          {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
+        <div class="columns small-12 activity-slides">
+            <div class="row activity-slide" style="overflow-y:auto;">
+                {# {{node.content|safe}} #}
+                {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
+            </div>
         </div>
-      </div>
     </div>
     <div class="row activity-comments-section">
-      <div class="columns small-12 " id="view-discussion">
-        <!-- discussion content area -->
-        {% if node.discussion_enable %}
-        {% get_thread_node node.pk as thread_node %}
-        {% if thread_node %}
-        {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-        {% get_node thread_node as thread_node_obj %}
-        {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" %}
-        {% else %}
-        {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-        {% include 'ndf/gin-line-texteditor.html' with var_name="content_org" %}
-        {% endif %}
-        {% endif %}
+        <div class="columns small-12 " id="view-discussion">
+              <!-- discussion content area -->
+              {% if node.discussion_enable %}
+                {% get_thread_node node.pk as thread_node %}
+                {% if thread_node %}
+                    {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                    {% get_node thread_node as thread_node_obj %}
+                    {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" %}
+                {% else %}
+                    {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                    {% include 'ndf/gin-line-texteditor.html' with var_name="content_org" %}
+                {% endif %}
+              {% endif %}
 
-        <!-- END of discussion content area -->
-      </div>
+              <!-- END of discussion content area -->
+        </div>
     </div>
-          {% comment %}
-              <div class="row new-comment">
-                  <div class="small-1 columns user-prof-image">
-                      <i class="fi-torso"></i>
-                  </div>
-                  <div class="small-9 columns">
-                      <textarea class="add-comment textarea-add-comment" name="textarea-add-comment" ></textarea>
-                  </div>
-                  <div class="small-2 columns">
-                      <a href="#" id="postCommentBtn" class="button small radius">Post</a>
-                  </div>
-              </div>
-              <div class="activity-comments">
+        {% comment %}
+            <div class="row new-comment">
+                <div class="small-1 columns user-prof-image">
+                    <i class="fi-torso"></i>
+                </div>
+                <div class="small-9 columns">
+                    <textarea class="add-comment textarea-add-comment" name="textarea-add-comment" ></textarea>
+                </div>
+                <div class="small-2 columns">
+                    <a href="#" id="postCommentBtn" class="button small radius">Post</a>
+                </div>
+            </div>
+            <div class="activity-comments">
 
-              </div>
-          </div>
-      </div>
-      {% endcomment %}
-
+            </div>
+        </div>
     </div>
-    <script type="text/javascript">
+    {% endcomment %}
+
+</div>
+<script type="text/javascript">
      $(function() {
-          //Activity slider initialization
-          var slides = [];
-          var currentSlide = 0;
-          $(".activity-slides").children().each(function(pos, activity){
+        //Activity slider initialization
+        var slides = [];
+        var currentSlide = 0;
+        $(".activity-slides").children().each(function(pos, activity){
             slides.push(activity);
-          });
-          $(".activity-slides .activity-slide").hide();
-          $(".activity-slides .activity-slide:nth-child(1)").show();
-          $(".activity-pagination .current-slide").html(currentSlide + 1);
-          $(".activity-pagination .slide-count").html(slides.length);
+        });
+        $(".activity-slides .activity-slide").hide();
+        $(".activity-slides .activity-slide:nth-child(1)").show();
+        $(".activity-pagination .current-slide").html(currentSlide + 1);
+        $(".activity-pagination .slide-count").html(slides.length);
 
-          $(slides[currentSlide]).animate({
+        $(slides[currentSlide]).animate({
             left: '0%',
-          });
+        });
 
-          $(".prev-activity").on('click', function() {
+        $(".prev-activity").on('click', function() {
             if(currentSlide != 0) {
-              $(slides[currentSlide]).animate({
-                left: '100%',
-              } ,600 , function() {
-                $(this).hide();
-                $(slides[currentSlide - 1]).show().animate({
-                  left: '0',
-                  opacity: '1'
-                }, 600);
-                currentSlide--;
-                $(".activity-pagination .current-slide").html(currentSlide + 1);
-              });
+                $(slides[currentSlide]).animate({
+                    left: '100%',
+                } ,600 , function() {
+                    $(this).hide();
+                    $(slides[currentSlide - 1]).show().animate({
+                        left: '0',
+                        opacity: '1'
+                    }, 600);
+                    currentSlide--;
+                    $(".activity-pagination .current-slide").html(currentSlide + 1);
+                });
             }
-          });
-          $(".next-activity").on('click', function() {
+        });
+        $(".next-activity").on('click', function() {
             if(currentSlide != slides.length-1) {
-              $(slides[currentSlide]).animate({
-                left: '-100%',
-              }, 600, function() {
-                $(this).hide();
-                $(slides[currentSlide + 1]).show().animate({
-                  left: '0',
-                  opacity: '1'
-                }, 600);
-                currentSlide++;
-                $(".activity-pagination .current-slide").html(currentSlide + 1);
-              });
+                $(slides[currentSlide]).animate({
+                    left: '-100%',
+                }, 600, function() {
+                    $(this).hide();
+                    $(slides[currentSlide + 1]).show().animate({
+                        left: '0',
+                        opacity: '1'
+                    }, 600);
+                    currentSlide++;
+                    $(".activity-pagination .current-slide").html(currentSlide + 1);
+                });
             }
-          });
+        });
 
 
-          //Rating system
-          $("body .rate-scale i").hover(function(){
+        //Rating system
+        $("body .rate-scale i").hover(function(){
             $(this).nextAll().add($(this)).addClass('hover-rating');
-          },
-          function() {
+        },
+        function() {
             $(this).nextAll().add($(this)).removeClass('hover-rating');
-          });
-          $("body .rate-scale i").on('click', function() {
+        });
+        $("body .rate-scale i").on('click', function() {
             $(this).siblings().removeClass('rated');
             $(this).nextAll().add($(this)).addClass('rated');
-          });
-        })
-  </script>
+        });
+    })
+</script>
 {% endblock body_content %}

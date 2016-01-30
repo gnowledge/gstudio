@@ -3321,6 +3321,8 @@ def get_course_session_status(node):
 		# print upcoming_course,node.name 
 		return status, upcoming_course 
 
+@get_execution_time
+@register.assignment_tag
 def get_user_quiz_resp(node_obj, user_obj):
 	'''
 	Accepts:
