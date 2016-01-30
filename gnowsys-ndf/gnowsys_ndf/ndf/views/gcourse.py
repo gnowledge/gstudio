@@ -2002,7 +2002,7 @@ def course_about(request, group_id):
 
 
 
-@login_required
+
 @get_execution_time
 def course_gallerymodal(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
