@@ -20,7 +20,7 @@
 {% endblock %}
 
 {% block meta_content %}
-  
+
 {% endblock %}
 
 {% block body_content %}
@@ -34,12 +34,12 @@
       var all_css_js_var = {{all_css|safe}}
     </script>
     {% for each_css in all_css %}
-      <div class="row release_date_div text-center">
-          <div class="small-3 columns">
+      <div class="row release_date_div">
+          <div class="small-12 medium-3 columns">
             <label>{{each_css.name}}
             </label>
           </div>
-          <div class="small-3 columns end">
+          <div class="small-12 medium-3 columns end">
             <input type="text" value="{{each_css.start_time}}" placeholder="DD/MM/YYYY" readonly="" class="date_val_{{each_css.id}} date_month_day_year">
           </div>
       </div>

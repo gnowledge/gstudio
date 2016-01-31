@@ -2198,27 +2198,32 @@ div.show-image:hover div.fullscreen-icon{
     }
 }
 
-    .create-discussion {
-        position: relative;
+.create-discussion {
+    position: relative;
 
-        >div {
+    >div {
+      display: inline-block;
+      vertical-align: top;
+      margin: 5px 0px;
+    }
+
+    .button {
+        margin: 5px 0px;
+    }
+    .ckeditor-content-comment {
+        width: 85%;
+        margin-left: 1em;
+
+        >div{
           display: inline-block;
           vertical-align: top;
         }
-        .ckeditor-content-comment {
-            width: 85%;
-            margin-left: 1em;
 
-            >div{
-              display: inline-block;
-              vertical-align: top;
-            }
-
-            .ckeditor-reply-area {
-              width: 90%;
-            }
+        .ckeditor-reply-area {
+          width: 90%;
         }
     }
+}
 
 #replies-area {
     .ckeditor-content-reply {
@@ -2291,8 +2296,6 @@ div.show-image:hover div.fullscreen-icon{
     padding-left: 0.3em;
 
     span {
-      float: right;
-      margin-right: 0.8em;
       a {
         font-size: 15px;
         color: #737373;
@@ -2423,6 +2426,20 @@ div.show-image:hover div.fullscreen-icon{
 
       &.dummy-tab {
 
+      }
+    }
+  }
+  /* For accordian in the mobile view*/
+
+  .accordion {
+    margin-left: 0px;
+
+    .accordion-navigation {
+      a {
+        background-color:  #DEDEDE;
+      }
+      &.active a{
+        background-color: #fff;
       }
     }
   }
@@ -2571,7 +2588,7 @@ div.show-image:hover div.fullscreen-icon{
         border-bottom: 1px solid #CCC;
 
         .tab-title {
-          width: 30%;
+          width: 40%;
           background-color: #DEDEDE;
           border-radius: 5px 5px 0px 0px ;
           margin-left: 1em;
@@ -3544,5 +3561,9 @@ course-title{
   background-image: -moz-linear-gradient(top, #fc9f8a, #fa623f);
   background-image: -o-linear-gradient(top, #fc9f8a, #fa623f);
   background-image: linear-gradient(to bottom, #fc9f8a, #fa623f);
+}
+
+.ui-datepicker {
+
 }
 

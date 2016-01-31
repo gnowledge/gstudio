@@ -9,8 +9,8 @@
 
 {% block body_content %}
 	<div class="row explore-header">
-		<div class="small-2 columns heading"><a href="{% url 'explore' %}">Explore</a></div>
-		<div class="small-3 columns expore-type">
+		<div class="small-12 medium-2 columns heading"><a href="{% url 'explore' %}">Explore</a></div>
+		<div class="small-12 medium-4 columns expore-type">
 			<div class="toggleButtons">
 				<a href="{% url 'explore_courses' %}" class="button {%if title == 'courses'%} active{% endif %}">
 					Courses
@@ -20,7 +20,7 @@
 				</a>
 			</div>
 		</div>
-		<div class="small-3 small-push-4 small-end-4 columns explore-search">
+		<div class="medium-3 columns explore-search small-12">
 			<input type="text" placeholder="Search">
 		</div>
 		<!--div class="small-3 columns {%if title == 'courses'%}label info{% endif %}">

@@ -2,14 +2,14 @@
 {% check_is_gstaff group_id request.user as is_gstaff %}
 
     <div class="row note-toolbar">
-        <div class="small-9 columns creator-title">
+        <div class="small-12 medium-9 columns creator-title">
             <i class="fi-torso"></i>
 
             <span class="note-creator">{{node.created_by|get_username|truncatechars:"10"}}</span>
             &#8226;
             <span class="note-creation-date">{{node.created_at|date:"d M Y h:i A"}}</span>
         </div>
-        <div class="small-3 columns creator-rating">
+        <div class="small-12 medium-3 columns creator-rating">
             {# <div>Your rating</div> #}
 
             <div>
