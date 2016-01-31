@@ -4,7 +4,7 @@
 {% load i18n %}
 {% load cache %}
 {% load ndf_tags %}
-{% block title %}{% trans 'Events' %} -- khaal version {% endblock %}
+{% block title %}{% trans 'Events' %} {% endblock %}
 
 {% block style %}
 .course_outline_table, tr {
@@ -81,7 +81,7 @@ list-style: none;
 
 <div id="envelop-cover">
   <div class="row course-page-title">
-    <div class="small-12 medium-8 columns heading">{{node.name}}</div>
+    <div class="small-12 medium-8 columns heading">{% firstof node.altnames node.name  %}</div>
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
         <span><a class="tiny radius settings" ><i class="fa fa-cog"></i> {% trans "Settings" %}</a></span>
@@ -110,24 +110,29 @@ list-style: none;
         </ul>
       {% endif %}
 
-    <!--div class="small-12 medium-4 columns" style="display: nonw">
+    <div class="small-12 medium-4 columns">
+    <!--
       <label>2 out of 6 modules completed</label>
       <div class="progress success round">
       <div class="meter" style="width: 20%"></div>
       </div>
-    </div-->
+      -->
+    </div>
   </div>
   <div class="row collapse meta">
     <div class="key">Starts on</div>
     <div class="value">
-      <div class="time"> Jan 5 2016 &#8226; 3:00pm </div>
+      {% get_attribute_value node.pk 'start_time' as course_start_date %}
+
+      <div class="time"> {{course_start_date|date:"d M Y"}} </div>
     </div>
   </div>
   <div class="row collapse meta">
+  {% get_course_session_status node True as next_session_in_course %}
     <div class="key">Next Session</div>
     <div class="value">
-      <div class="name">Taking Screenshots of the work</div>
-      <div class="time"> Jan 5 2016 &#8226; 3:00pm </div>
+      <div class="name">{{next_session_in_course.0|default_if_none:"Data Not Available"}}</div>
+      <div class="time"> {{next_session_in_course.1|date:"d M Y"}}</div>
     </div>
   </div>
 </div>
@@ -141,9 +146,9 @@ list-style: none;
     <div style="line-height: 0.7em;">
       <ul class="tabs course-tabs">
 
-        <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
-          <a href="{% url 'course_dashboard' group_id %}">
-            <i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}
+        <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
+          <a href="{% url 'course_about' group_id %}">
+            <i class="fi-page-edit "></i>{% trans "About the course" %}
           </a>
         </li>
 
@@ -153,15 +158,15 @@ list-style: none;
           </a>
         </li>
 
-        <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
-          <a href="{% url 'course_notebook' group_id %}">
-            <i class="fi-book "></i>{% trans "Notebook" %}
-          </a>
-        </li>
-
         <li class="tab-title {% ifequal title 'raw material' %}active{% endifequal %}">
           <a href="{% url 'course_raw_material' group_id %}">
             <i class="fi-clip "></i>{% trans "Raw Material" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
+          <a href="{% url 'course_notebook' group_id %}">
+            <i class="fi-book "></i>{% trans "Notebook" %}
           </a>
         </li>
 
@@ -170,37 +175,41 @@ list-style: none;
             <i class="fi-photo "></i> {% trans "Gallery" %}
           </a>
         </li>
-
-        <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
+        <!--
+        <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
           <a href="{% url 'course_about' group_id %}">
-            <i class="fi-page-edit "></i>{% trans "About the course" %}
+            <i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}
           </a>
         </li>
-
+         -->
       </ul>
     </div>
 
     <!-- Load tab contents dynamically -->
     <div class="tabs-content course-book">
-      <div class="content active" id="course-dashboard" style="padding: 0em 1em;">
+      <div class="content active" id="course-dashboard">
         {% if title == 'dashboard' %}
           {% include "ndf/gcourseDashboard.html" %}
+      
         {% elif title == 'course content' %}
           {% include "ndf/gcollection_ajax_view.html" %}
-          <!--@anotation("import gcourse_event_group.html for the list of the modules in the course.")-->
+
         {% elif title == 'notebook' %}
           {% include "ndf/gnotebook.html" %}
+
         {% elif title == 'gallery' %}
           {% include "ndf/ggallerypage.html" %}
+
         {% elif title == 'raw material' %}
           {% include "ndf/ggallerypage.html" %}
+
         {% elif title == 'about' %}
           <div id="course-about">
             <div class="row collapse">
               <div class="about-course-heading">
                 <div class="heading-text">
                   <div>
-                    <h2>{{node.name}}</h2>
+                    <h2>{% firstof node.altnames node.name  %}</h2>
                   </div>
                   <div>Next Session Jan 5 2016 &#8226; 3:00pm</div>
                   <div>

@@ -522,7 +522,7 @@ GSTUDIO_ORG_NAME = '''<p>
 A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education (HBCSE)</a>, <a href="http://www.tifr.res.in" target="_blank">Tata Institute of Fundamental Research (TIFR), India</a>.
 </p>'''
 GSTUDIO_SITE_FAVICON = "/static/ndf/images/favicon/logo.png"
-GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/CLIX_PANTONE.svg"
+GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
 GSTUDIO_COPYRIGHT = ""
 GSTUDIO_GIT_REPO = "https://github.com/gnowledge/gstudio"
 GSTUDIO_SITE_PRIVACY_POLICY = ""

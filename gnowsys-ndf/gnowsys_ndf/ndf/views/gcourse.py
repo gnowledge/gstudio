@@ -1816,37 +1816,49 @@ def course_summary(request, group_id):
 
 @get_execution_time
 def course_resource_detail(request, group_id, course_sub_section, course_unit, resource_id):
-    if request.method == "GET":
-        try:
-            group_id = ObjectId(group_id)
-        except:
-            group_name, group_id = get_group_name_id(group_id)
-        # course_section = request.GET.get("course_section", "")
-        # course_sub_section = request.GET.get("course_sub_section", "")
-        # course_unit = request.GET.get("course_unit", "")
-        # node_id = request.GET.get("node_id", "")
-        # unit_id = request.GET.get("unit_id", "")
-        # print "\n\n node_id",node_id
+    
+    group_name, group_id = get_group_name_id(group_id)
 
-        unit_node = node_collection.one({'_id': ObjectId(course_unit)})
-        node_obj = node_collection.one({'_id': ObjectId(resource_id)})
-        node_obj.get_neighbourhood(node_obj.member_of)
-        thread_node = None
-        allow_to_comment = None
+    unit_node = node_collection.one({'_id': ObjectId(course_unit)})
+    node_obj = node_collection.one({'_id': ObjectId(resource_id)})
+    unit_obj_collection_set = unit_node.collection_set
 
-        thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
+    # all metadata reg position and next prev of resource
 
-        variable = RequestContext(request, {
-            'group_id': group_id, 'groupid': group_id,
-            'group_name':group_name,
-            'allow_to_comment': allow_to_comment,
-            'node': node_obj,
-            'unit_node': unit_node
-        })
+    resource_index = resource_next_id = resource_prev_id = None
+    resource_count = len(unit_obj_collection_set)
+    unit_resources_list_of_dict = node_collection.find({
+                                    '_id': {'$in': unit_obj_collection_set}},
+                                    {'name': 1, 'altnames': 1})
 
+    resource_index = unit_obj_collection_set.index(node_obj._id)
 
-        template = "ndf/unit_player.html"
-        return render_to_response(template, variable)
+    if (resource_index + 1) < resource_count:
+        resource_next_id = unit_node.collection_set[resource_index + 1]
+        
+    if resource_index > 0:
+        resource_prev_id = unit_node.collection_set[resource_index - 1]
+
+    # --- END of all metadata reg position and next prev of resource ---
+
+    node_obj.get_neighbourhood(node_obj.member_of)
+
+    thread_node = allow_to_comment = None
+    thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
+
+    variable = RequestContext(request, {
+        'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+        'course_sub_section': course_sub_section, 'course_unit': course_unit,
+        'allow_to_comment': allow_to_comment,
+        'node': node_obj, 'unit_node': unit_node, 'resource_id': resource_id,
+        'resource_index': resource_index, 'resource_next_id': resource_next_id,
+        'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
+        'unit_resources_list_of_dict': unit_resources_list_of_dict 
+    })
+
+    template = "ndf/unit_player.html"
+
+    return render_to_response(template, variable)
 
 
 # def course_resource_detail(request, group_id, course_section, course_sub_section, course_unit, resource_id):
@@ -1938,8 +1950,8 @@ def course_raw_material(request, group_id):
     gstaff_users = []
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
-    files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users}},
-        {'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1})
+    files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
+        'tags': {'$regex': u"raw", '$options': "i"}},{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1})
     if request.user.id in gstaff_users:
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
@@ -1962,7 +1974,7 @@ def course_gallery(request, group_id):
     allow_to_upload = True
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
-    files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$nin': gstaff_users}},
+    files_cur = node_collection.find({'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}},
         {'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1})
     template = 'ndf/gcourse_event_group.html'
     context_variables = RequestContext(request, {
@@ -1987,6 +1999,9 @@ def course_about(request, group_id):
             'node': group_obj, 'title': 'about'        
         })
     return render_to_response(template, context_variables)
+
+
+
 
 @get_execution_time
 def course_gallerymodal(request, group_id):

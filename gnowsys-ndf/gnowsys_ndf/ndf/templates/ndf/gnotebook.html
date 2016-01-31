@@ -47,21 +47,24 @@
     <div class="row notebook-body">
         <div class="small-12 medium-3 columns notebook-index">
             <div class="row">
-                <div class="small-12 columns">
-                    <a href="#" data-reveal-id="newNoteModal" class="button radius expand" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
+                <div class="small-2 columns">Notes</div>
+                <div class="small-4 columns">
+                    {% if request.is_authenticated %}
+                    <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
+                     {% endif %} 
                 </div>
             </div>
             <ul class="tabs" data-tab style="">
+                <li class="tab-title active"><a href="#all-notes">All Notes</a></li>
                 {% if user.is_authenticated %}
-                    <li class="tab-title active"><a href="#my-notes">My Notes</a></li>
+                    <li class="tab-title "><a href="#my-notes">My Notes</a></li>
                 {% endif %}
-                <li class="tab-title"><a href="#all-notes">All Notes</a></li>
                 {% comment %}
                     <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
                 {% endcomment %}
             </ul>
             <div class="small-12 columns tabs-content">
-                <div class="content notes" id="all-notes">
+                <div class="content notes active" id="all-notes">
                 {% for each_blog in blog_pages %}
                     {% comment %}
                         <div class="date">
@@ -78,6 +81,7 @@
                             &#8226;
                             <span>{{each_blog.created_at|date:"d M Y h:i A"}}</span>
                         </div>
+                        {% comment %}
                         <div class="note-footer">
                             <i class="fi-eye"></i>
                             <span class="viewed-count">214</span>
@@ -87,11 +91,13 @@
                             <span class="comment-count">22</span>
                             <i class="fi-trash"></i>
                         </div>
+                        {% endcomment %}
+
                     </div>
                 {% endfor %}
                 </div>
 
-                <div class="content notes active" id="my-notes">
+                <div class="content notes " id="my-notes">
                 {% for each_user_blog in user_blogs %}
                     {% comment %}
                         <div class="date">
@@ -108,6 +114,7 @@
                             &#8226;
                             <span>{{each_user_blog.created_at|date:"d M Y h:i A"}}</span>
                         </div>
+                        {% comment %}
                         <div class="note-footer">
                             <i class="fi-eye"></i>
                             <span class="viewed-count">214</span>
@@ -117,6 +124,8 @@
                             <span class="comment-count">22</span>
                             <i class="fi-trash"></i>
                         </div>
+                        {% endcomment %}
+
                     </div>
                 {% endfor %}
                 </div>

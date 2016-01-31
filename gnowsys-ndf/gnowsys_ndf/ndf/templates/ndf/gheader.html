@@ -78,13 +78,9 @@
 
         <ul class="title-area">
           <li class="name">
-            <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
-              {% if user.is_authenticated %}
-                <h3 class="user-heading">{{request.user.username|capfirst}}</h3>
-              {% else %}
-                <img title="Website" src="{{site.LOGO}}">
-              {% endif %}
-            </a></h1>
+            <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+              <img title="{{site.SITE_NAME}}" src="{{site.LOGO}}">
+            </a>
           </li>
           <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
           <li class="toggle-topbar"><a href="#"><span>{% trans "Menu" %}</span></a></li>
@@ -157,24 +153,26 @@
       <ul class="left app-menus">
 
         <!-- Current group selector -->
-          {% if user.is_authenticated %}
-        <li class="">
-
+        {% if user.is_authenticated %}
+          
+        <li>
           <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'course' request.user.username %}">
             {% trans 'MY COURSES' %}
           </a>
         </li>
 
-        <li class="">
+        {% comment %}
+        <li>
           <a title="" class="{%if title == 'My Groups'%}active{%endif%}" href="{% url 'my_groups' request.user.username %}">
             {% trans 'MY GROUPS' %}
           </a>
         </li>
+        {% endcomment %}
           {% endif %}
 
         <li class="group">
           {# <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}"> #}
-          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}">
+          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore_courses' %}">
             {% trans 'EXPLORE' %}
           </a>
         </li>
@@ -261,13 +259,12 @@
         <!-- Closes Right Nav section -->
 
         <!-- Right Nav Section -->
-        {% comment %}
-        <ul class="right">
+        <!-- <ul class="right">
           <li>
             <a href=""><i class="fa fa-bell"></i> Notice Board</a>
           </li>
         </ul>
-        {% endcomment %}
+         -->
         <!-- Closes Right Nav section -->
 
 
@@ -294,7 +291,7 @@
         <!-- Right Nav Section -->
         <ul class="right">
           <li>
-            <a href=""><i class="fa fa-info-circle"></i> Help</a>
+            <a href="/help/"><i class="fa fa-info-circle"></i> Help</a>
           </li>
         </ul>
 

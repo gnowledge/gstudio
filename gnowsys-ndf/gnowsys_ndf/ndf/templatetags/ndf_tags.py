@@ -3290,13 +3290,14 @@ def get_user_course_groups(user_id):
 
 @get_execution_time
 @register.assignment_tag
-def get_course_session_status(node):
+def get_course_session_status(node, get_current=False):
 	
 	"""
 	Returns Session Start_time in Courses 
 	"""
 	status = ""
 	upcoming_course = False
+	session_name = None
 	if node:
 		from datetime import datetime
 		curr_date_time = datetime.now()
@@ -3305,7 +3306,8 @@ def get_course_session_status(node):
 
 		if curr_date_time.date() < start_time_val.date():
 			upcoming_course = True
-			
+		if get_current:
+			session_name = "Data Not Available"	
 		for each_course_section in node.collection_set:
 			each_course_section_node = node_collection.one({"_id":ObjectId(each_course_section)})
 			for each_course_subsection in each_course_section_node.collection_set:
@@ -3315,9 +3317,13 @@ def get_course_session_status(node):
 				if each_sub_section_start_time:
 					if curr_date_time.date() <= each_sub_section_start_time.date():
 						status =  each_sub_section_start_time
-						# print "\n******************"
-						# print upcoming_course,node.name 
+						session_name = each_course_subsection_node.name
+						if get_current:
+							return session_name, status
 						return status, upcoming_course 
+		if get_current:
+			return session_name, status
+			
 		# print upcoming_course,node.name 
 		return status, upcoming_course 
 
