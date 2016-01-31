@@ -154,7 +154,7 @@
         <!-- -END of NROER level one menu -->
       {% else %}
 
-      <ul class="left">
+      <ul class="left app-menus">
 
         <!-- Current group selector -->
           {% if user.is_authenticated %}
@@ -202,7 +202,7 @@
           </a>
 
           {% else %}
-          <a class="user" href="{% url 'dashboard' request.user.pk %}">
+          <a class="user" href="{% url 'dashboard' request.user.pk %}" style="text-transform: capitalize;">
             {{ user.username }}
           </a>
           {% endif %}
@@ -261,18 +261,19 @@
         <!-- Closes Right Nav section -->
 
         <!-- Right Nav Section -->
+        {% comment %}
         <ul class="right">
           <li>
             <a href=""><i class="fa fa-bell"></i> Notice Board</a>
           </li>
         </ul>
-
+        {% endcomment %}
         <!-- Closes Right Nav section -->
 
 
         <ul class="right">
           <li class="has-dropdown">
-            <a>{{request.LANGUAGE_CODE}}</a>
+            <a style="text-transform: capitalize;">{{request.LANGUAGE_CODE}}</a>
             <ul class="dropdown">
 
               {% for lang in LANGUAGES %}
@@ -281,7 +282,7 @@
                     {% csrf_token %}
                     <input name="url" type="hidden" value="{{request.get_full_path}}"/>
                     <input type="hidden"  name="language" value="{{ lang.0 }}">
-                    <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                    <input type="submit" class="button expand secondary" value="{{ lang.1 }}" />
                   </form>
                 </li>
               {% endfor %}

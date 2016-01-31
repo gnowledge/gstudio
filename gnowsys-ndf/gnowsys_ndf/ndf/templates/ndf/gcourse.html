@@ -84,7 +84,7 @@
         <div class="repository-title large-4 columns">My {{title}}</div>
       {% endif %}
         {% for course in enr_ce_coll %}
-          <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
+          <li class="card-image-wrapper" style="margin-top:13px;">
             {% include 'ndf/event_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk %}
           </li>
 

@@ -47,9 +47,8 @@
     <div class="row notebook-body">
         <div class="small-12 medium-3 columns notebook-index">
             <div class="row">
-                <div class="small-2 columns">Notes</div>
-                <div class="small-4 columns">
-                    <a href="#" data-reveal-id="newNoteModal" class="button tiny radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
+                <div class="small-12 columns">
+                    <a href="#" data-reveal-id="newNoteModal" class="button radius expand" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
                 </div>
             </div>
             <ul class="tabs" data-tab style="">
@@ -181,7 +180,7 @@
                 });
             }
         });
-        $(document).on('close.fndtn.reveal', '#newNoteModal[data-reveal]', function () {
+        $(document).on('closed.fndtn.reveal', '#newNoteModal[data-reveal]', function () {
             if (CKEDITOR.instances['textarea-add-note']) {
                 CKEDITOR.instances['textarea-add-note'].destroy(true);
             }
