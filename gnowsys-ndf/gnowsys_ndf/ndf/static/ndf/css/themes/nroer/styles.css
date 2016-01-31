@@ -23774,7 +23774,7 @@ body {
 }
 /* line 229, ../../../scss/_app_styles.scss */
 #top-headers #first-header.top-bar .title-area img {
-  height: 60px;
+  height: 45px;
 }
 /* line 245, ../../../scss/_app_styles.scss */
 #top-headers #first-header.top-bar .top-bar-section #login-button-medium {
@@ -25842,7 +25842,7 @@ div.show-image:hover div.fullscreen-icon{
   border-radius: 0px 10px 10px 0px;
 }
 /* line 2366, ../../../scss/_app_styles.scss */
-.toggleButtons a .active {
+.toggleButtons a.active {
   background-color: #908F8F;
   color: #fff;
 }

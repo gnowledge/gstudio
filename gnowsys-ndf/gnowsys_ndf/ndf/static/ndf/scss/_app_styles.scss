@@ -227,7 +227,7 @@ body{
       height: 4em;
 
       img {
-        height: 60px;
+        height: 45px;
       }
 
       a{
@@ -2363,7 +2363,7 @@ div.show-image:hover div.fullscreen-icon{
     &:last-child {
       border-radius: 0px 10px 10px 0px;
     }
-    .active {
+    &.active {
       background-color: #908F8F;
       color: #fff;
     }
