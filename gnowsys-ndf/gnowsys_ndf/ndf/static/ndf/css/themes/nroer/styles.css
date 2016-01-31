@@ -25697,7 +25697,7 @@ div.show-image:hover div.fullscreen-icon{
 /* line 2224, ../../../scss/_app_styles.scss */
 #replies-area .ckeditor-content-reply {
   margin-top: 1em;
-  width: 97%;
+  /*width: 97%;*/
 }
 /* line 2228, ../../../scss/_app_styles.scss */
 #replies-area .ckeditor-content-reply .ckeditor-reply-area {
