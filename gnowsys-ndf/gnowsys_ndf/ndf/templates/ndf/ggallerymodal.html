@@ -33,6 +33,14 @@
                 </a>
             </div>
             {% endcomment %}
+            <div class="create-note">
+                {% get_edit_url node.pk as edit_url %}
+                <a href="{% url edit_url group_id node.pk %}">
+                    <i class="fi-page-edit" ></i>
+                    Edit
+                </a>
+            </div>
+
             <div class="download-file">
                 {% get_grid_fs_object node as grid_fs_obj %}
                 <a class="download-link" title="Click here to Download" href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
