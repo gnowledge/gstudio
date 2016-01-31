@@ -81,6 +81,7 @@
                             &#8226;
                             <span>{{each_blog.created_at|date:"d M Y h:i A"}}</span>
                         </div>
+                        {% comment %}
                         <div class="note-footer">
                             <i class="fi-eye"></i>
                             <span class="viewed-count">214</span>
@@ -90,6 +91,8 @@
                             <span class="comment-count">22</span>
                             <i class="fi-trash"></i>
                         </div>
+                        {% endcomment %}
+
                     </div>
                 {% endfor %}
                 </div>
@@ -111,6 +114,7 @@
                             &#8226;
                             <span>{{each_user_blog.created_at|date:"d M Y h:i A"}}</span>
                         </div>
+                        {% comment %}
                         <div class="note-footer">
                             <i class="fi-eye"></i>
                             <span class="viewed-count">214</span>
@@ -120,6 +124,8 @@
                             <span class="comment-count">22</span>
                             <i class="fi-trash"></i>
                         </div>
+                        {% endcomment %}
+
                     </div>
                 {% endfor %}
                 </div>
