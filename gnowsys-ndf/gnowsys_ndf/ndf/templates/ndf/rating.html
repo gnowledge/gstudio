@@ -2,7 +2,7 @@
 {% load i18n %}
 <!-- <div id="rating-bar" class="show-on-hover"> -->
 {% get_node_ratings request node.pk as ratings %}
-    <form>
+    <form style="display: inline-block">
     <!-- Sets the rating values as data attributes -->
         <span datat-tooltip title="Your rating" class="lbl_tag" style="display: inline-block">
             <div class="rating-bar show" data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}"  data-user-rating="{{ratings.user_rating}}">
@@ -24,8 +24,8 @@
         </span>
     </form>
         {% if node.rating %}
-            <span data-tooltip title="Average Rating: {{ratings.avg}}<br>No. of Users rated: {{node.rating|length}}" style="display: inline-block">
-                <label class="rating-lbl" id="avg-rating" >Avg. : &nbsp;{{ratings.avg|default:"unrated"}} {% trans ' by ' %}{{ node.rating|length }} <i class="fi-torsos"></i></label>
+            <span data-tooltip title="Average Rating: {{ratings.avg}}<br>No. of Users rated: {{node.rating|length}}" style="display: inline-block;vertical-align: super;">
+                <label class="rating-lbl" style="font-size: 15px;color: #7D7D7D" id="avg-rating" >Avg. : &nbsp;{{ratings.avg|default:"unrated"}} {% trans ' by ' %}{{ node.rating|length }} <i class="fi-torsos"></i></label>
             </span>
         {% else %}
             <small style="display: inline-block"><label class="lbl_tag" id="avg-rating" ><i>{% trans 'Not rated yet!' %}</i></label></small>

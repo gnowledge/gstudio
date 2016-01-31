@@ -84,12 +84,12 @@ list-style: none;
     <div class="small-12 medium-8 columns heading">{{node.name}}</div>
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
+        <span><a class="tiny radius settings" ><i class="fa fa-cog"></i> {% trans "Settings" %}</a></span>
+        <span><a class="tiny radius" href="{% url 'create_course_struct' group_id node.pk %}"> <i class="fa fa-pencil-square-o"></i> {% if node.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
         {% with node.member_of_names_list.0 as sg_type %}
-          <span><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny button radius"><i class="fi- pencil"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></span>
+          <span><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></span>
         {% endwith %}
 
-        <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if node.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
-        <span><input type="button" class="tiny button radius settings" value="Settings"></span>
       {% else %}
         <ul class="right">
           <li class="enroll-btn-li remove-dot">
@@ -182,7 +182,7 @@ list-style: none;
 
     <!-- Load tab contents dynamically -->
     <div class="tabs-content course-book">
-      <div class="content active" id="course-dashboard">
+      <div class="content active" id="course-dashboard" style="padding: 0em 1em;">
         {% if title == 'dashboard' %}
           {% include "ndf/gcourseDashboard.html" %}
         {% elif title == 'course content' %}

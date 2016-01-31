@@ -80,6 +80,7 @@
         var moduleData = data
         $.each(data, function(pos, module) {
           var mod = getModuleHtml(pos, module);
+          //mod.append('<hr />');
           //Assosiating js tree
           var moduleTree = mod.find('.module-part').tree(
             {
@@ -305,7 +306,9 @@
 
       $tree.tree({
         selectable: true,
-        keyboardSupport: false
+        keyboardSupport: false,
+        closedIcon: '<div>+</div>',
+        openedIcon: '-'
       });
 
       // This "tree.open" event helps to open the particular node from browser url
@@ -482,7 +485,6 @@
 <style type="text/css">
 
   .collection {
-    border-bottom: solid thin #ddd;
     margin-bottom: 1em;
     overflow: auto;
   }

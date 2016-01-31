@@ -1,6 +1,6 @@
 {% load get_username get_thread_node get_disc_replies get_node  from ndf_tags %}
     <div class="row note-toolbar">
-        <div class="small-9 columns">
+        <div class="small-9 columns creator-title">
             <i class="fi-torso"></i>
 
             <span class="note-creator">{{node.created_by|get_username|truncatechars:"10"}}</span>
