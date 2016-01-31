@@ -74,7 +74,7 @@
         <div class="medium-9 columns gallery-content" >
             <div class="gallery-subheader small-12">
                 <div class="row">
-                {% if request.is_authenticated %}
+                {% if request.user.is_authenticated %}
                   {% if allow_to_upload %}
                     <div class="upload-file small-2 columns" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
