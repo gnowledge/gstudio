@@ -35,10 +35,14 @@
             {% endcomment %}
             <div class="create-note">
                 {% get_edit_url node.pk as edit_url %}
+                {% check_is_gstaff group_id request.user as is_gstaff %}
+                {% if is_gstaff or node.created_by == request.user.id %}
+
                 <a href="{% url edit_url group_id node.pk %}">
                     <i class="fi-page-edit" ></i>
                     Edit
                 </a>
+                {% endif %}
             </div>
 
             <div class="download-file">
