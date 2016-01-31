@@ -4,7 +4,7 @@
 {% load i18n %}
 {% load cache %}
 {% load ndf_tags %}
-{% block title %}{% trans 'Events' %} -- khaal version {% endblock %}
+{% block title %}{% trans 'Events' %} {% endblock %}
 
 {% block style %}
 .course_outline_table, tr {
@@ -122,14 +122,17 @@ list-style: none;
   <div class="row collapse meta">
     <div class="key">Starts on</div>
     <div class="value">
-      <div class="time"> Jan 5 2016 &#8226; 3:00pm </div>
+      {% get_attribute_value node.pk 'start_time' as course_start_date %}
+
+      <div class="time"> {{course_start_date|date:"d M Y"}} </div>
     </div>
   </div>
   <div class="row collapse meta">
+  {% get_course_session_status node True as next_session_in_course %}
     <div class="key">Next Session</div>
     <div class="value">
-      <div class="name">Taking Screenshots of the work</div>
-      <div class="time"> Jan 5 2016 &#8226; 3:00pm </div>
+      <div class="name">{{next_session_in_course.0|default_if_none:"Data Not Available"}}</div>
+      <div class="time"> {{next_session_in_course.1|date:"d M Y"}}</div>
     </div>
   </div>
 </div>
