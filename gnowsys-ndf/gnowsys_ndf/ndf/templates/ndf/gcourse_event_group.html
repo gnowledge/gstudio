@@ -131,7 +131,9 @@
   //Upload file action validation ---------------------------------------------------------------
   $(document).on('change','#docFile',function(){
     $(".save_cancel").removeClass("hide");
+    /*
     file_mime_type = this.files[0].type;
+
     if(file_mime_type.indexOf("image/") < 0){
       $(this).val("");
       $(".save_cancel").addClass("hide");
@@ -141,6 +143,8 @@
       $("#eventModal").addClass("alert");
       $("#eventModal").foundation('reveal', 'open');
     }
+    */
+
   });
 
   // Update profile photo -----------------------------------------------------------------------
