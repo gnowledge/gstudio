@@ -4322,6 +4322,7 @@ def node_thread_access(group_id, node):
     #     if node['has_thread']:
     #             has_thread_node = node['has_thread'][0]
     if has_thread_node_thread_grel:
+        has_thread_node = has_thread_node_thread_grel[0]
         thread_start_time = get_attribute_value(has_thread_node_thread_grel[0]._id,"start_time")
         thread_end_time = get_attribute_value(has_thread_node_thread_grel[0]._id,"end_time")
         # if has_thread_node_thread_grel[0].attribute_set:

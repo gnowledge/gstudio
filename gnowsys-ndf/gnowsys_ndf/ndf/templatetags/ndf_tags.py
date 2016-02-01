@@ -520,7 +520,7 @@ def get_attribute_value(node_id, attr):
 @register.assignment_tag
 def get_relation_value(node_id, grel):
 	try:
-		grel_val_node = Node
+		grel_val_node = None
 		grel_id = None
 		node_grel = None
 		if node_id:
