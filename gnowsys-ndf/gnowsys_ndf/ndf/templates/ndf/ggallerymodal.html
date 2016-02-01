@@ -1,6 +1,8 @@
 {% load get_grid_fs_object from ndf_tags %}
 {% load i18n %}
 {% load ndf_tags %}
+{% get_grid_fs_object node as grid_fs_obj %}
+
 <div id="reveal-{{node.pk}}" class="reveal-modal" data-reveal>
     <div class="row gmodal-toolbar">
         <div class="small-2 columns file-name">
@@ -46,7 +48,6 @@
             </div>
 
             <div class="download-file">
-                {% get_grid_fs_object node as grid_fs_obj %}
                 <a class="download-link" title="Click here to Download" href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
                     <i class="fi-download"></i>Download
                 </a>
@@ -60,7 +61,7 @@
         <div class="small-9 columns gmodal-item-panel">
             <div class="row gmodal-item-holder ">
                 <div class="small-12 columns gmodal-item">
-                    <img  src="{% url 'get_mid_size_img' group_id node.pk %}" class="gmodel-item-image"/>
+                    <img  src="{% url 'read_file' group_id node grid_fs_obj.filename %}" class="gmodel-item-image"/>
                 </div>
             </div>
             <div class="row gmodal-footer">
