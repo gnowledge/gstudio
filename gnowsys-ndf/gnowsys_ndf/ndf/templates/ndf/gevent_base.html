@@ -63,6 +63,8 @@ list-style: none;
 <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
 <!-- orgitdown! skin -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+<link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+
 {% endblock %}
 
 {% block extended_header %}
@@ -70,6 +72,7 @@ list-style: none;
 {% block body_content %}
 {% check_is_gstaff groupid request.user as gstaff_access %}
 {% user_access_policy groupid request.user as user_access %}
+{% get_course_session_status node True as next_session_in_course %}
 
 <div id="eventModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
   <label id="eventModalLabel"></label>
@@ -138,14 +141,15 @@ list-style: none;
       <div class="time"> {{course_start_date|date:"d M Y"}} </div>
     </div>
   </div>
+  {% if next_session_in_course.1 %}
   <div class="row collapse meta">
-  {% get_course_session_status node True as next_session_in_course %}
     <div class="key">Next Session</div>
     <div class="value">
       <div class="name">{{next_session_in_course.0|default_if_none:"Data Not Available"}}</div>
       <div class="time"> {{next_session_in_course.1|date:"d M Y"}}</div>
     </div>
   </div>
+  {% endif %}
 </div>
 
 
@@ -234,7 +238,10 @@ list-style: none;
                   <div>
                     <h2>{% firstof node.altnames node.name  %}</h2>
                   </div>
-                  <div>Next Session Jan 5 2016 &#8226; 3:00pm</div>
+                  {% if next_session_in_course.1 %}
+                    <div>Next Session: '{{next_session_in_course.0|default_if_none:"Data Not Available"}}' on {{next_session_in_course.1|date:"d M Y"}}</div>
+                  {% endif %}
+
                   <div>
                     <span><i class="fi-list-thumbnails"></i>&nbsp;10</span>
                     &#8226;&nbsp;&nbsp;
