@@ -43,6 +43,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_data_for_batch_drawer/', 'get_data_for_batch_drawer', name='get_data_for_batch_drawer'),
     url(r'^get_resource_by_oid_list$', 'get_resource_by_oid_list', name='get_resource_by_oid_list'),
     url(r'^get_resource_by_oid/?', 'get_resource_by_oid', name='get_resource_by_oid'),
+    url(r'^get_ckeditor/?', 'get_ckeditor', name='get_ckeditor'),
     
 
                        # Ajax-urls required for MIS --------------------------------
@@ -88,4 +89,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^check_date/(?P<node>[\w-]+)$', 'check_date', name='check_date'),
     url(r'^save_time/(?P<node>[\w-]+)$', 'save_time', name='save_time'),
     url(r'^show_coll_cards/$', 'show_coll_cards', name='show_coll_cards'),
+    url(r'^get_visits_count/$', 'get_visits_count', name='get_visits_count'),
+
 )

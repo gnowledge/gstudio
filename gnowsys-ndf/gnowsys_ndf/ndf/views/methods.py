@@ -115,6 +115,9 @@ def get_execution_time(f):
 		        		benchmark_node.action +=  str('/'+url[3])
 		        	else : 
 		        		pass
+	        	if "node_id" in args[0].GET and "collection_nav" in f.func_name:
+	        		benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
+	        		# modify calling_url if collection_nav is called i.e collection-player
 	        except : 
 	        	pass
 	        benchmark_node.save()
@@ -994,9 +997,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         changed = build_collection(node, check_collection, right_drawer_list, checked)
         if changed:
             is_changed = True
-
     #  org-content
-    type_of_val = request.POST.get('type_of','')
+    # type_of_val = request.POST.get('type_of','')
+    type_of_val = request.POST.getlist("type_of",'')
+
     wiki_page_gst = node_collection.one({'_type':'GSystemType', 'name': "Wiki page"},{'_id':1})
 
     '''
@@ -1004,17 +1008,21 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     As org-editor is used ONLY for Wiki pages 
     and rest everywhere ckeditor is used
     '''
-    if type_of_val == str(wiki_page_gst._id):
-        if node.content_org != content_org:
-            node.content_org = unicode(content_org)
+    if type_of_val:
+        node.type_of = [ObjectId(type_of_val[0])]
+        is_changed = True
 
-            # Required to link temporary files with the current user who is
-            # modifying this document
-            usrname = request.user.username
-            filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-            node.content = unicode(org2html(content_org, file_prefix=filename))
-            is_changed = True
-    else:
+    # if type_of_val == str(wiki_page_gst._id):
+    #     if node.content_org != content_org:
+    #         node.content_org = unicode(content_org)
+
+    #         # Required to link temporary files with the current user who is
+    #         # modifying this document
+    #         usrname = request.user.username
+    #         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+    #         node.content = unicode(org2html(content_org, file_prefix=filename))
+    #         is_changed = True
+    if content_org:
         if node.content != content_org:
             node.content = unicode(content_org)
             is_changed = True

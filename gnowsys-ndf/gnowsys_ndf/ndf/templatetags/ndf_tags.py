@@ -675,7 +675,6 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 
 		if fields_value:
 			for each in fields_value:
-				
 				if type(each) == ObjectId:
 					fields_value_id_list.append(each)
 				else:
@@ -683,7 +682,6 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 
 		if types in alltypes:
 			for each in node_collection.find({"_type": types}):
-
 				if fields_value_id_list:
 					if each._id not in fields_value_id_list:
 						drawer1[each._id] = each
@@ -1298,37 +1296,36 @@ def get_event_type(node):
 @get_execution_time
 @register.assignment_tag
 def get_url(groupid):
-     
-    node = node_collection.one({'_id': ObjectId(groupid) }) 
-    
-    if node._type == 'GSystem':
+	node = node_collection.one({'_id': ObjectId(groupid) }) 
+
+	if node._type == 'GSystem':
 
 		type_name = node_collection.one({'_id': node.member_of[0]})
-                if type_name.name == 'Exam' or type_name.name == "Classroom Session":
-                   return ('event_app_instance_detail')
-                if type_name.name == 'Quiz':
-                   return 'quiz_details'
-                elif type_name.name == 'Page':
-                   return 'page_details' 
-                elif type_name.name == 'Theme' or type_name == 'theme_item':
-                   return 'theme_page'
-                elif type_name.name == 'Forum':
-	                 return 'show'
-                elif type_name.name == 'Task' or type_name.name == 'task_update_history':
-	                 return 'task_details'
-                else:
-	                  return 'None'    
-    elif node._type == 'Group' :
-                    return 'group'
-    elif node._type == 'File':
+		if type_name.name == 'Exam' or type_name.name == "Classroom Session":
+			return ('event_app_instance_detail')
+		if type_name.name == 'Quiz':
+			return 'quiz_details'
+		elif type_name.name == 'Page':
+			return 'page_details' 
+		elif type_name.name == 'Theme' or type_name == 'theme_item':
+			return 'theme_page'
+		elif type_name.name == 'Forum':
+			return 'show'
+		elif type_name.name == 'Task' or type_name.name == 'task_update_history':
+			return 'task_details'
+		else:
+			return 'None'    
+	elif node._type == 'Group':
+		return 'group'
+	elif node._type == 'File':
 		if (node.mime_type) == ("application/octet-stream"): 
 			return 'video_detail'       
 		elif 'image' in node.mime_type:
 			return 'file_detail'
 		else:
 			return 'file_detail'
-    else:
-			return 'group'
+	else:
+		return 'group'
 
 @get_execution_time
 @register.assignment_tag
@@ -3216,9 +3213,34 @@ def get_event_status(node):
 @get_execution_time
 @register.assignment_tag
 def get_user_quiz_resp(node_obj, user_obj):
+	'''
+	Accepts:
+		* node_obj
+			QuizItemEvent Object
+		* user_obj
+			django user object
+
+	Actions:
+		* Fetches QuizItemPost of user, i.e user's
+		 quizitem response(answer)
+
+	Returns:
+		* Recently answered value.
+		* Total count of answers for this particular 
+		 node_obj/QuizItemEvent
+
+	'''
+	result = {'count': 0, 'recent_ans': None}
 	if node_obj and user_obj:
 		thread_obj = get_relation_value(node_obj._id,'has_thread')
 		qip = node_collection.find_one({'_id': {'$in':thread_obj[0].post_node}, 'created_by': user_obj.id})
-		qip_sub = get_attribute_value(qip._id,'quizitempost_user_submitted_ans')
-		recent_ans = qip_sub[-1]
-		return recent_ans.values()[0]
+		if qip:
+			qip_sub = get_attribute_value(qip._id,'quizitempost_user_submitted_ans')
+			if qip_sub:
+				result['count'] = len(qip_sub)
+				recent_ans = qip_sub[-1]
+				if node_obj.quiz_type == "Short-Response":
+					result['recent_ans'] = recent_ans
+				else:
+					result['recent_ans'] = recent_ans.values()[0]
+		return result

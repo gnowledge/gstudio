@@ -87,6 +87,7 @@
   </div>
 
 <section class="medium-3 columns"> 
+
 	<ul class="side-nav">
 
 		<!-- PANEL 1
@@ -192,7 +193,7 @@
 					<!-- ste -->
 					{% if user.is_authenticated %}
 						{% if user_is_joined == "joined" or user_is_joined == "author" %}
-							<a href="{% url 'node_translation' group_name_tag node %}" class="tiny button radius left-btn">{% trans "Translate" %}</a>
+							<a href="{% url 'node_translation' group_object.name node %}" class="tiny button radius left-btn">{% trans "Translate" %}</a>
 						{% endif %}
 						<!-- Cross Publish -->
 						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
@@ -236,6 +237,12 @@
 						{% else %}
 						<i><small><label class="lbl_tag">{% trans "No tags defined yet!" %}</label></small></i>
 						{% endif %}
+				</div>
+
+			<!-- Views row -->
+				<div class="row tag-rating-div">
+					<span title="{% trans 'Click to see no. of view ' %}"><label class="lbl_tag lbl_field">{% trans "Views" %}</label></span>
+					{% include "ndf/analytics_views.html" %}
 				</div>
 
 			<!-- Ratings -->
@@ -311,25 +318,25 @@
 							{% if is_gstaff %}
 							<!-- Prevent creating New group from context of top mod group -->
 							{% if group_object.edit_policy != "EDITABLE_MODERATED" and is_gstaff %}
-								<a href="{% url create_url group_name_tag %}" class="tiny button radius expand mod-btn" title="{% trans 'Create New Group' %}">{% trans 'New Group' %}</a>
+								<a href="{% url create_url group_object.name %}" class="tiny button radius expand mod-btn" title="{% trans 'Create New Group' %}">{% trans 'New Group' %}</a>
 							{% endif %}								
 							{% endif %}								
 						{% else %}
 							{% if user_is_joined == "joined" or  user_is_joined == "author" %}
 								{% if node.status != 'MODERATION' %} 
-									{% if "File" in node.member_of_names_list and group_name_tag != "home" %}
-										<a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+									{% if "File" in node.member_of_names_list and group_object.name != "home" %}
+										<a href="{% url create_url group_object.name %}?next={{request.path}}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 									{% else %}
 										{% if "Theme" in node.member_of_names_list or "Topic" in node.member_of_names_list  %}
 											{% if is_gstaff %}
-												<a href="{% url create_url group_name_tag app_id %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+												<a href="{% url create_url group_object.name app_id %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 											{% endif %}
 
 										{% elif "Term" in node.member_of_names_list %}
-											<a href="{% url create_url group_name_tag %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} Topic
+											<a href="{% url create_url group_object.name %}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} Topic
 											</a>
-										{% elif "Group" not in node.member_of_names_list and "ProgramEventGroup" not in node.member_of_names_list and "CourseEventGroup" not in node.member_of_names_list and "ModeratingGroup" not in node.member_of_names_list  and group_name_tag != "home"%}
-											<a href="{% url create_url group_name_tag %}" class="tiny button radius expand mod-btn" title="Create New  {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+										{% elif "Group" not in node.member_of_names_list and "ProgramEventGroup" not in node.member_of_names_list and "CourseEventGroup" not in node.member_of_names_list and "ModeratingGroup" not in node.member_of_names_list  and group_object.name != "home"%}
+											<a href="{% url create_url group_object.name %}" class="tiny button radius expand mod-btn" title="Create New  {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 										{% endif %}
 									{% endif %}
 								{% endif %}
@@ -384,7 +391,7 @@
 							{% if not is_gstaff %}
 								{% if user_is_joined == "joined" %}
 									<input class="tiny button radius right-btn" title="Unsubscribe from this group" type="submit" id="notify" value="{% trans 'Unsubscribe' %}"
-									{% if group_name_tag == "home" %}
+									{% if group_object.name == "home" %}
 										disabled="disabled" 
 									{% endif %}
 									>
@@ -418,7 +425,7 @@
 	            <div class="row btn-row">
 					{% if group_object.edit_policy == "EDITABLE_MODERATED" and "CourseEventGroup" not in group_object.member_of_names_list %}
 						{% if 'ModeratingGroup' in group_object.member_of_names_list or 'ProgramEventGroup' in group_object.member_of_names_list and 'Group' not in group_object.member_of_names_list %}
-							<a class="tiny expand button radius mod-btn" href="{% url 'moderation' group_name_tag %}" title="Moderate Resources of this group">
+							<a class="tiny expand button radius mod-btn" href="{% url 'moderation' group_object.name %}" title="Moderate Resources of this group">
 							{% trans 'Moderate Resources' %}
 							</a>
 						{% endif %}
@@ -475,7 +482,7 @@
 			delete_url = "{% url 'trash_resource' group_id node %}"
 		{% elif "Term" in node.member_of_names_list %}
 			// alert("term_delete")
-			delete_url = "{% url 'term_delete' group_name_tag node %}"
+			delete_url = "{% url 'term_delete' group_object.name node %}"
 		{% endif %}
         $(".delete-btn").attr('href', delete_url)
         $(".delete-btn")[0].click();
@@ -485,5 +492,7 @@
         set_href = false;
         $("#deleteModal").foundation('reveal', 'close');
     });
+
+
 
 </script>

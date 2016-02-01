@@ -30,7 +30,6 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
-
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # ######################################################################################################################################
@@ -1455,8 +1454,10 @@ class EventGroupCreateEditHandler(View):
             group_obj = get_group_name_id(group_id, get_obj=True)
             grel_id = None
 
-            logo_img_node, grel_id = get_relation_value(group_obj._id,'has_profile_pic')
-
+            logo_img_node_grel_id = get_relation_value(group_obj._id,'has_profile_pic')
+            if logo_img_node_grel_id:
+                logo_img_node = logo_img_node_grel_id[0]
+                grel_id = logo_img_node_grel_id[1]
 
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.
@@ -1923,7 +1924,7 @@ def group_dashboard(request, group_id=None):
                 'member_of':page_gst._id,
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
-            }).sort('last_update', -1)
+            }).sort('created_at', -1)
 
       start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
       # if 'start_enroll' in group_obj:

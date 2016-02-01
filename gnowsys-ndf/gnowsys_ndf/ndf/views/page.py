@@ -71,7 +71,6 @@ def page(request, group_id, app_id=None):
     #             group_id = str(auth._id)
     # else :
     #     pass
-        
     try:
         group_id = ObjectId(group_id)
     except:
@@ -332,7 +331,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
-        page_type = request.POST.getlist("type_of",'')
+        # page_type = request.POST.getlist("type_of",'')
         
         ce_id = request.POST.get("ce_id",'')
         blog_type = request.POST.get('blog_type','')
@@ -355,13 +354,13 @@ def create_edit_page(request, group_id, node_id=None):
 
         if blog_type:
             blog_type = eval(blog_type)
-        if page_type:
-            objid= page_type[0]
-            if not ObjectId(objid) in page_node.type_of:
-                page_type1=[]
-                page_type1.append(ObjectId(objid))
-                page_node.type_of = page_type1
-                page_node.type_of
+        # if page_type:
+        #     objid= page_type[0]
+        #     if not ObjectId(objid) in page_node.type_of:
+        #         page_type1=[]
+        #         page_type1.append(ObjectId(objid))
+        #         page_node.type_of = page_type1
+        #         page_node.type_of
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
 
         # if course event grp's id is passed, it means

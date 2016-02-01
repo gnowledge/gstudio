@@ -1385,6 +1385,10 @@ def add_units(request, group_id):
         unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
     except:
         unit_node = None
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    page_instances = node_collection.find({"type_of": page_gst._id})
+    page_ins_list = [i for i in page_instances]
+
     variable = RequestContext(request, {
         'group_id': group_id, 'groupid': group_id,
         'css_node': css_node,
@@ -1393,6 +1397,7 @@ def add_units(request, group_id):
         'app_id': app_id,
         'unit_node': unit_node,
         'course_node': course_node,
+        'page_instance': page_ins_list
     })
 
     template = "ndf/course_units.html"
@@ -1513,7 +1518,7 @@ def save_resources(request, group_id):
             cu_new.status = u"PUBLISHED"
             cu_new.created_by = int(request.user.id)
             cu_new.contributors.append(int(request.user.id))
-
+            cu_new.group_set.append(group_id)
             cu_new.prior_node.append(css_node._id)
             cu_new.save(groupid=group_id)
             response_dict["create_new_unit"] = True

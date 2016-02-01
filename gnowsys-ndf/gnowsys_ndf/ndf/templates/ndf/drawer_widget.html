@@ -47,9 +47,7 @@
 
         {% if drawer1 != "None" %}
         <li class="price">
-            <input type="text" class="margin-0 search_items" 
-
-            id="{{widget_for}}_search" placeholder="{% trans 'Type atleast 3 characters to search' %}"/>            
+            <input type="text" class="margin-0 search_items" id="{{widget_for}}_search" placeholder="{% trans 'Type atleast 3 characters to search' %}"/>            
         </li>
         
         <div class="push-3 searching" style="display:none;"><progress></progress></div>
@@ -404,8 +402,6 @@
     // var innerhtml = $("#{{widget_for}}_drawer1").html()
     // $(".{{widget_for}}.pricing-table.drawer1").html(innerhtml);
 
-    
-
     if (is_RT != "RelationType") {
       // write comment
       var cn_arr = []
@@ -507,17 +503,11 @@
     }
   });
 
-
-
-
-
   // Search-Box for LHS drawer of resources
   // $('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
   $('#{{widget_for}}_search').bind('keydown change', function(e) {
 
-    // if (is_RT == "RelationType" ) {
     if (is_RT == "RelationType" || admin_related_drawer == "True" ) {
-    // if (is_RT == "RelationType" || is_RT == "GSystemType" || is_RT == "AttributeType" ) {
       var search_text = (this.value).toLowerCase();
 
       var search_text_len = (search_text.length + 1);
@@ -569,7 +559,6 @@
         if (len > 2){
           $(".searching").css("display", "block");
 
-
           $.ajax({
             type: "POST",
             url: "{% url 'search_drawer' groupid %}",
@@ -604,8 +593,6 @@
       }
     }
   });
-
-
 
   // Moving ALL elements from left drawer to right drawer
     $("#{{widget_for}}_move_all_left").click(function(event) {
