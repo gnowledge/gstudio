@@ -189,7 +189,7 @@ pre{
 
 body{
     background-color: #EAEAEA;
-    font-family: 'Rubik', sans-serif;
+    font-family: 'Asap', sans-serif;
 }
 //Modals design
 
@@ -210,12 +210,12 @@ body{
 #top-headers {
 
   padding-bottom: 0em;
-  border-bottom: 1px solid gray;
 
   #first-header.top-bar {
 
-    background-color: inherit;
+    background-color: #fff;
     margin: 0px auto;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0 , 0.4);
 
     &.expanded {
       .title-area {
@@ -247,19 +247,27 @@ body{
         color: blue;
       }
 
+      .app-menus li a{
+        font-weight: 600;
+      }
+
       .has-dropdown > a:after {
         border-color: #000000 rgba(0, 0, 0, 0) rgba(0, 0, 0, 0);
       }
 
       ul.dropdown {
         background: #fff;
+        li input[type=submit] {
+          height: 3em;
+          width: 8em;
+        }
       }
 
       @media only screen and (max-width: 40em){
         #login-button-medium {
           display: none;
 
-          &:hover {
+          &hover {
             background: inherit;
           }
         }
@@ -284,9 +292,11 @@ body{
         // background-color: scale-color($topbar-bg-color, $lightness: 10%);
         background-color: inherit;
         color: #333;
+        font-weight: 600;
 
         &:hover {
-          //background: #fff;
+            background: #AA63FF;
+            color: white;
         }
     }
 
@@ -410,9 +420,10 @@ body{
   ul.title-area a{
     color: $oil;
         .user-heading {
-          font-weight: bolder;
-          font-size: 31px;
-          color: #6F6F6F;
+            font-weight: bolder;
+            font-size: 23px;
+            color: #BFBFBF;
+            line-height: 1.8em;
         }
 
         &:hover{
@@ -1133,6 +1144,8 @@ aside#help{
     position: relative;
     transform: translate(-50%);
     border-radius: 5px;
+    box-shadow: 0px 0px 9px rgba(0, 0, 0, 0.2);
+    background-color: #fafafa;
 
     &:hover{
         box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
@@ -1140,13 +1153,11 @@ aside#help{
     }
 }
 .scard {
-    background:#FFF;
-    border:1px solid #AAA;
-    border-bottom:3px solid #BBB;
-    padding:0px;
-    overflow:hidden;
-    width:11rem;
-    height:9rem;
+    background: #FFF;
+    padding: 0px;
+    overflow: hidden;
+    width: 15em;
+    height: 13em;
     border-radius: 5px 5px 0px 0px;
     margin: 0px auto;
     cursor: pointer;
@@ -1156,9 +1167,8 @@ aside#help{
         transition: box-shadow 0.5s ease;
     }*/
     .scard-image {
-          width: 11rem;
-          height: 9rem;
-          background-color: #f2f2f2;
+          height: 100%;
+          background-color: #FFF;
 
           img  {
               height: 100%;
@@ -1228,38 +1238,36 @@ aside#help{
     height: 3em;
     padding: 0.4em 1em;
     overflow: hidden;
-    width: 11rem;
-    background-color: #3e3e3e;
     line-height: 0.7em;
     border-radius: 0px 0px 5px 5px;
     margin: 0px auto;
     cursor: pointer;
-    text-align: center;
+    text-align: left;
+    border-top: 1px solid #D4D3D3;
 
   /*&:hover{
       box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
       transition: box-shadow 0.5s ease;
   }*/
   .scard-title{
-      font-size: 0.8em;
-      color: #ececec;
+      font-size: 14px;
+      color: #565656;
       text-align: center;
-      vertical-align: sub;
-      text-transform: uppercase;
+      vertical-align: top;
+      line-height: 1.3em;
   }
 }
 .scard-desc{
     font-size: 0.7em;
     color: #333333;
     height: 40px;
-    padding: 0.5rem;
+    padding: 0.4em 1.5em;
     margin: 0px auto;
     padding-top: 0.1cm;
     margin-top: -0.25em;
     border-radius: 0 0 5px 5px;
     overflow: hidden;
-    width: 11rem;
-    background-color: #E6E6E6;
+    border-top: 1px solid #D4D3D3;
     display: block;
 }
 
@@ -1594,6 +1602,7 @@ aside#help{
       font-size: 0.7em;
       display: block;
       font-weight: 400;
+      display: inline;
     }
   }
 
@@ -2189,95 +2198,112 @@ div.show-image:hover div.fullscreen-icon{
     }
 }
 
-#view-discussion {
-    .create-discussion {
-        position: relative;
+.create-discussion {
+    position: relative;
 
-        >div {
+    >div {
+      display: inline-block;
+      vertical-align: top;
+      margin: 5px 0px;
+    }
+
+    .button {
+        margin: 5px 0px;
+    }
+    .ckeditor-content-comment {
+        width: 85%;
+        margin-left: 1em;
+
+        >div{
           display: inline-block;
           vertical-align: top;
         }
-        .ckeditor-content-comment {
-            width: 85%;
-            margin-left: 1em;
 
-            >div{
-              display: inline-block;
-              vertical-align: top;
-            }
-
-            .ckeditor-reply-area {
-              width: 90%;
-            }
-        }
-    }
-
-    #replies-area {
-        .ckeditor-content-reply {
-            margin-top: 1em;
-            width: 97%;
-
-            .ckeditor-reply-area {
-                display: inline-block;
-                width: 90%;
-                margin-left: 1em;
-            }
-            .post-btn-div {
-                display: inline-block;
-                vertical-align: top;
-            }
-        }
-
-        .disc-replies {
-
-            background-color:#ddd;
-            margin-left: 48px;
-            margin-top: 10px;
-            padding-bottom:0em;
-
-            .reply-btn{
-                cursor: pointer;
-                color:black !important;
-            }
-
-            .reply-btn:hover {
-                color:#ececec !important;
-            }
-            .discussion-title-username{
-                background-color: #3e3e3e;
-                color: #ececec !important;
-                height: 2em;
-                padding-right: 10px;
-                padding-left: 10px;
-                line-height: 2em;
-                border-radius: 5px 5px 0px 0px;
-            }
-
-            .discussion-footer{
-                background-color:#CCCCCC;
-                color:gray !important;
-                height:2em;
-                padding-right:10px;
-                padding-left:10px;
-                border-radius: 0px 0px 5px 5px;
-
-                >a {
-                    vertical-align: middle;
-                    line-height: 2em;
-                }
-            }
-
-            .discussion-content{
-                color: #262626;
-                word-wrap: break-word;
-            }
+        .ckeditor-reply-area {
+          width: 90%;
         }
     }
 }
+
+#replies-area {
+    .ckeditor-content-reply {
+        margin-top: 1em;
+        /*width: 97%;*/
+
+        .ckeditor-reply-area {
+            display: inline-block;
+            width: 90%;
+            margin-left: 1em;
+        }
+        .post-btn-div {
+            display: inline-block;
+            vertical-align: top;
+        }
+    }
+
+    .disc-replies {
+
+        /*background-color:#ddd;*/
+        margin-left: 48px;
+        margin-top: 10px;
+        padding-bottom:0em;
+        border-top: 1px solid #B1B1B1;
+
+        .reply-btn{
+            cursor: pointer;
+            color:grey !important;
+        }
+
+        .reply-btn:hover {
+            color:#000 !important;
+        }
+        .discussion-title-username{
+            /*background-color: #3e3e3e;*/
+            color: #ececec !important;
+            height: 2em;
+            padding-right: 10px;
+            padding-left: 10px;
+            line-height: 2em;
+            border-radius: 5px 5px 0px 0px;
+        }
+
+        .discussion-footer{
+            /*background-color:#CCCCCC;*/
+            color:gray !important;
+            height:2em;
+            padding-right:10px;
+            padding-left:10px;
+            border-radius: 0px 0px 5px 5px;
+
+            >a {
+                vertical-align: middle;
+                line-height: 2em;
+            }
+        }
+
+        .discussion-content{
+            color: #262626;
+            word-wrap: break-word;
+        }
+    }
+}
+
 #envelop-cover {
   .course-page-title {
     font-size: 35px;
     font-weight: 500;
+    padding-right: 0.3em;
+    padding-left: 0.3em;
+
+    span {
+      a {
+        font-size: 15px;
+        color: #737373;
+        i {
+          font-size: 18px;
+        }
+      }
+    }
   }
 
   .heading {
@@ -2287,6 +2313,8 @@ div.show-image:hover div.fullscreen-icon{
 
   .meta {
     line-height: 2.1em;
+    padding-left: 14px;
+
     .key {
       color: #A7A4A4;
       font-weight: 500;
@@ -2326,11 +2354,21 @@ div.show-image:hover div.fullscreen-icon{
     margin: 0px;
     background: #dddddd;
     color: #000;
-    border: 1px solid #000;
+    border: 1px solid #B7B7B7;
 
     &:first-child{
       margin-right: -3px;
       border-right: 0px solid #000;
+    }
+    &:first-child {
+      border-radius: 10px 0px 0px 10px;
+    }
+    &:last-child {
+      border-radius: 0px 10px 10px 0px;
+    }
+    &.active {
+      background-color: #908F8F;
+      color: #fff;
     }
   }
 }
@@ -2374,7 +2412,7 @@ div.show-image:hover div.fullscreen-icon{
         color: #2B91EA;
         border-radius: inherit;
         margin: 0px 4px;
-        font-size: 18px;
+        font-size: 15px;
         letter-spacing: -0.3px;
       }
 
@@ -2388,6 +2426,20 @@ div.show-image:hover div.fullscreen-icon{
 
       &.dummy-tab {
 
+      }
+    }
+  }
+  /* For accordian in the mobile view*/
+
+  .accordion {
+    margin-left: 0px;
+
+    .accordion-navigation {
+      a {
+        background-color:  #DEDEDE;
+      }
+      &.active a{
+        background-color: #fff;
       }
     }
   }
@@ -2506,9 +2558,6 @@ div.show-image:hover div.fullscreen-icon{
       top: 0.3em;
     }
   }
-  .course-performance {
-    margin-top: 1.5em;
-  }
 }
 
 .notebook {
@@ -2535,14 +2584,16 @@ div.show-image:hover div.fullscreen-icon{
 
       .tabs {
         width: 100%;
-        margin:1em 0em 0.5em;
-        border-top: 1px solid #000;
-        padding-top: 1em;
+        margin:0em 0em 0.5em;
+        border-bottom: 1px solid #CCC;
 
         .tab-title {
-          width: 30%;
+          width: 40%;
           background-color: #DEDEDE;
           border-radius: 5px 5px 0px 0px ;
+          margin-left: 1em;
+          position: relative;
+          top: 1px;
 
           a {
             border-radius: inherit;
@@ -2550,6 +2601,8 @@ div.show-image:hover div.fullscreen-icon{
 
           &.active {
             background-color: #fff;
+            border: 1px solid #CCC;
+            border-bottom: 0px;
           }
         }
       }
@@ -2606,7 +2659,7 @@ div.show-image:hover div.fullscreen-icon{
             background: #FFF;
 
             .note-heading {
-              font-weight: 800;
+              font-weight: 500;
               font-size: 17px;
             }
           }
@@ -2616,25 +2669,37 @@ div.show-image:hover div.fullscreen-icon{
 
     .note-page {
       display: none;
-      background-color: #f7f7f7;
+      background-color: #fff;
+
+      >div{
+        background-color: #fff;
+      }
 
       .note-toolbar {
-        padding: 1em 1em 0.5em;
-        margin: 0em 1em;
+        padding: 1em 0em 0em;
+        margin: 0em;
+        background-color: #F3F3F3;
 
         .note-creator {
 
         }
+        .creator-title {
+          text-align: left;
+          color: #7D7D7D;
+          font-size: 12px;
+          letter-spacing: 0.3px;
+        }
         .creator-rating {
+          text-align: right;
           >div {
             display: inline-block;
           }
         }
       }
       .note-content {
-        padding: 1em 1em 1em;
+        padding: 0em 1em 1em;
         background: #fff;
-        margin: 0em 1em;
+        margin: 0em;
 
         .note-header {
 
@@ -2643,14 +2708,19 @@ div.show-image:hover div.fullscreen-icon{
           }
           .note-title {
             font-size: 1.5em;
-            font-weight: 800;
+            font-weight: 500;
             margin-right: 1em;
+          }
+        }
+        .note-text {
+          p{
+            padding: 0px;
           }
         }
       }
 
       .comment-sections {
-        padding: 1em 3.5em 0em;
+        padding: 1em 1em 0em;
 
         .comments-header {
           span {
@@ -2794,7 +2864,7 @@ div.show-image:hover div.fullscreen-icon{
     background: #F7F7F7;
 
     .gallery-content {
-      border-right: 1px solid grey;
+      min-height: 250px;
 
       .gallery-subheader {
         line-height: 3em;
@@ -2939,12 +3009,27 @@ div.show-image:hover div.fullscreen-icon{
 
 
         a {
-          color: #fff;
+          color: inherit;
           &:hover {
-            color: #08676d;
+            color: #000;
           }
         }
       }
+      .download-file {
+        float: right;
+        margin-right: 2em;
+        border: 1px solid rgba(255, 255,255 , 0.7);
+        border-radius: 4px;
+        padding: 0.1em 0.4em;
+
+        &:hover {
+          background-color: #fff;
+          color: #000;
+          opacity: 0.8;
+
+        }
+      }
+
       .close-reveal-modal {
         top: 0.3rem;
         font-size: 1.3em;
@@ -2964,7 +3049,7 @@ div.show-image:hover div.fullscreen-icon{
         .gmodal-item {
           height: 100%;
           width: 100%;
-          background: #fff;
+          background: transparent;
           padding: 0px;
 
           .gmodel-item-image {
@@ -2979,7 +3064,7 @@ div.show-image:hover div.fullscreen-icon{
       .gmodal-footer {
         height: 2em;
         line-height: 2em;
-        font-size: 1.6em;
+        font-size: 17.1px;
         color: #fff;
         width: 100%;
         position: absolute;
@@ -2997,13 +3082,14 @@ div.show-image:hover div.fullscreen-icon{
 
           i {
             margin-left: 1em;
+            margin-right: 0.5em;
             cursor: pointer;
           }
         }
       }
 
       &:hover .gmodal-footer {
-        opacity: 0.6;
+        opacity: 0.8;
         transition: opacity 1s;
       }
     }
@@ -3093,7 +3179,7 @@ div.show-image:hover div.fullscreen-icon{
 }
 
 .course-content {
-  border-top: 1px solid #000;
+  /*border-top: 1px solid #000;*/
   .alert-box {
     padding: 5px;
     font-size: 1em;
@@ -3131,8 +3217,8 @@ div.show-image:hover div.fullscreen-icon{
 
     .course-module {
       position: relative;
-      padding-left: 1em;
-      border-left: 1px dotted black;
+      border-bottom: 1px solid #CCC;
+      padding: 1em 0em;
 
       .module-header {
 
@@ -3164,6 +3250,18 @@ div.show-image:hover div.fullscreen-icon{
       }
 
       .module-part {
+        margin-left: 1em;
+
+        .jqtree-toggler {
+            color: #585858;
+
+            &.jqtree-closed {
+              color: #CCC;
+            }
+        }
+        span {
+          vertical-align: top;
+        }
         .fa {
           display: inline;
           margin-right: 5px;
@@ -3239,12 +3337,12 @@ div.show-image:hover div.fullscreen-icon{
     .activity-slides {
       height: 100%;
       .activity-slide {
-        // display: none;
-        // left: 100%;
+        display: none;
         padding: 1em;
         height: inherit;
         background: #fff;
         position: relative;
+        left: 100%;
 
         .page {
           >section {
@@ -3463,5 +3561,9 @@ course-title{
   background-image: -moz-linear-gradient(top, #fc9f8a, #fa623f);
   background-image: -o-linear-gradient(top, #fc9f8a, #fa623f);
   background-image: linear-gradient(to bottom, #fc9f8a, #fa623f);
+}
+
+.ui-datepicker {
+
 }
 

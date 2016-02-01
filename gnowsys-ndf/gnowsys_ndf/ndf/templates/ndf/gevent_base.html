@@ -81,15 +81,26 @@ list-style: none;
 
 <div id="envelop-cover">
   <div class="row course-page-title">
-    <div class="small-12 medium-8 columns heading">{% firstof node.altnames node.name  %}</div>
+    <div class="small-12 medium-6 large-8 columns heading">{% firstof node.altnames node.name  %}</div>
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
-        {% with node.member_of_names_list.0 as sg_type %}
-          <span><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny button radius"><i class="fi- pencil"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></span>
-        {% endwith %}
+        <div class="small-12 medium-6 large-4 columns">
+          <div class="row">
+            <div class="small-12 columns medium-3 large-3" >
+              <span><a class="tiny radius settings" ><i class="fa fa-cog"></i> {% trans "Settings" %}</a></span>
+            </div>
+            <div class="small-12 columns medium-5 large-5" >
+              <span><a class="tiny radius" href="{% url 'create_course_struct' group_id node.pk %}"> <i class="fa fa-pencil-square-o"></i> {% if node.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+            </div>
+            <div class="small-12 columns medium-4 large-4 end" >
+              {% with node.member_of_names_list.0 as sg_type %}
+                <span><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></span>
+              {% endwith %}
+            </div>
 
-        <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if node.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
-        <span><input type="button" class="tiny button radius settings" value="Settings"></span>
+          </div>
+        </div>
+
       {% else %}
         <ul class="right">
           <li class="enroll-btn-li remove-dot">
@@ -144,7 +155,7 @@ list-style: none;
   <!-- Envelop box-->
   <div class="small-12 large-12 columns">
     <div style="line-height: 0.7em;">
-      <ul class="tabs course-tabs">
+      <ul class="tabs course-tabs show-for-medium-up">
 
         <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
           <a href="{% url 'course_about' group_id %}">
@@ -184,14 +195,25 @@ list-style: none;
          -->
       </ul>
     </div>
-
+    <div class="row show-for-small-only">
+      <div class="large-12 columns">
+        <label>
+          <select id="selectCourseTab">
+            <option value="about_course" {% ifequal title 'about' %}selected{% endifequal %}>{% trans "About the course" %}</option>
+            <option value="course_content" {% ifequal title 'course content' %}selected{% endifequal %}>{% trans "Course Content" %}</option>
+            <option value="raw_material" {% ifequal title 'raw material' %}selected{% endifequal %}>{% trans "Raw Material" %}g</option>
+            <option value="notebook" {% ifequal title 'notebook' %}selected{% endifequal %}>{% trans "Notebook" %}</option>
+            <option value="gallery" {% ifequal title 'gallery' %}selected{% endifequal %}>{% trans "Gallery" %}</option>
+          </select>
+        </label>
+      </div>
+    </div>
     <!-- Load tab contents dynamically -->
     <div class="tabs-content course-book">
       <div class="content active" id="course-dashboard">
-        
         {% if title == 'dashboard' %}
           {% include "ndf/gcourseDashboard.html" %}
-      
+
         {% elif title == 'course content' %}
           {% include "ndf/gcollection_ajax_view.html" %}
 
@@ -237,11 +259,30 @@ list-style: none;
     <!-- tab-content ends here -->
   </div>
 </div>
-
+<script type="text/javascript">
+  $(function() {
+    $("#selectCourseTab").on('change', function() {
+        switch($(this).val()) {
+          case 'about_course':
+            window.location="{% url 'course_about' group_id %}"
+          break;
+          case 'course_content':
+            window.location="{% url 'course_content' group_id %}"
+          break;
+          case 'raw_material':
+            window.location="{% url 'course_raw_material' group_id %}"
+          break;
+          case 'notebook':
+            window.location="{% url 'course_notebook' group_id %}"
+          break;
+          case 'gallery':
+            window.location="{% url 'course_gallery' group_id %}"
+          break;
+        }
+    })
+  })
+</script>
 {% endblock %}
-
-
-
 {% block script %}
 
 $(document).on('click','.enroll-btn',function(){

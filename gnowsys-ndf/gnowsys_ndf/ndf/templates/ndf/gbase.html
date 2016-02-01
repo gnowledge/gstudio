@@ -29,7 +29,8 @@
   <!-- font-awesome icons -->
   <link rel="stylesheet" href="/static/ndf/bower_components/font-awesome/css/font-awesome.min.css">
 
-  <link href='https://fonts.googleapis.com/css?family=Rubik:400,300,500,700,900' rel='stylesheet' type='text/css'>
+  <!--link href='https://fonts.googleapis.com/css?family=Rubik:400,300,500,700,900' rel='stylesheet' type='text/css'-->
+  <link href='https://fonts.googleapis.com/css?family=Asap:700,400' rel='stylesheet' type='text/css'>
 
   <!-- Handle bar for templating purpose -->
   <script src="/static/ndf/bower_components/handlebars/handlebars.min.js"></script>
@@ -193,7 +194,9 @@
               '-webkit-border-radius': '10px',
               '-moz-border-radius': '10px',
               opacity: 1.0,
-              top: ($(window).height())/2 + 'px', left: '', right: '50px'
+              top: ($(window).height())/2 + 'px',
+              left: $(window).width()/2 + 'px',
+              transform: 'translate( -50%, -50%)'
             }
           });
         })

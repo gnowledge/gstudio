@@ -150,21 +150,21 @@
         <!-- -END of NROER level one menu -->
       {% else %}
 
-      <ul class="left">
+      <ul class="left app-menus">
 
         <!-- Current group selector -->
         {% if user.is_authenticated %}
           
         <li>
           <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'course' request.user.username %}">
-            {% trans 'My Courses' %}
+            {% trans 'MY COURSES' %}
           </a>
         </li>
 
         {% comment %}
         <li>
           <a title="" class="{%if title == 'My Groups'%}active{%endif%}" href="{% url 'my_groups' request.user.username %}">
-            {% trans 'My Groups' %}
+            {% trans 'MY GROUPS' %}
           </a>
         </li>
         {% endcomment %}
@@ -173,7 +173,7 @@
         <li class="group">
           {# <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}"> #}
           <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore_courses' %}">
-            {% trans 'Explore' %}
+            {% trans 'EXPLORE' %}
           </a>
         </li>
       </ul>
@@ -200,7 +200,7 @@
           </a>
 
           {% else %}
-          <a class="user" href="{% url 'dashboard' request.user.pk %}">
+          <a class="user" href="{% url 'dashboard' request.user.pk %}" style="text-transform: capitalize;">
             {{ user.username }}
           </a>
           {% endif %}
@@ -270,7 +270,7 @@
 
         <ul class="right">
           <li class="has-dropdown">
-            <a>{{request.LANGUAGE_CODE}}</a>
+            <a style="text-transform: capitalize;">{{request.LANGUAGE_CODE}}</a>
             <ul class="dropdown">
 
               {% for lang in LANGUAGES %}
@@ -279,7 +279,7 @@
                     {% csrf_token %}
                     <input name="url" type="hidden" value="{{request.get_full_path}}"/>
                     <input type="hidden"  name="language" value="{{ lang.0 }}">
-                    <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                    <input type="submit" class="button expand secondary" value="{{ lang.1 }}" />
                   </form>
                 </li>
               {% endfor %}

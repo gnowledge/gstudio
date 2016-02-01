@@ -80,6 +80,7 @@
         var moduleData = data
         $.each(data, function(pos, module) {
           var mod = getModuleHtml(pos, module);
+          //mod.append('<hr />');
           //Assosiating js tree
           var moduleTree = mod.find('.module-part').tree(
             {
@@ -305,7 +306,9 @@
 
       $tree.tree({
         selectable: true,
-        keyboardSupport: false
+        keyboardSupport: false,
+        closedIcon: '<div>+</div>',
+        openedIcon: '-'
       });
 
       // This "tree.open" event helps to open the particular node from browser url
@@ -482,7 +485,6 @@
 <style type="text/css">
 
   .collection {
-    border-bottom: solid thin #ddd;
     margin-bottom: 1em;
     overflow: auto;
   }
@@ -563,7 +565,7 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
   <!-- <b class="current">{{node.name}}</b> -->
   {% if node.collection_set %}
     <div class="course-content">
-      <div class="row">
+      <!--div class="row">
         <div class="small-12 columns">
           <div data-alert class="alert-box warning ">
             <div class="warning-icon">
@@ -575,7 +577,7 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
             </div>
           </div>
         </div>
-      </div>
+      </div-->
       <div class="collection collapse row" data-url="{% url 'get_collection' group_id node.pk %}">
       </div>
     </div>

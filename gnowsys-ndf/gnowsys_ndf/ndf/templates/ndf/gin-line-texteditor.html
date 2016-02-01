@@ -64,10 +64,10 @@
       {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
       <div class="content">
 
-        <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
+        <div style="margin-left:calc(({{each_reply.level}} - 1) * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
           <div clas="discussion-title row " >
              <div class="discussion-title-username">
-              <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ececec !important" title=" {{ each_reply.username }}">
+              <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
                 {{ each_reply.username|truncatechars:12 }}
               </a>
                 <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>

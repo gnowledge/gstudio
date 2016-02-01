@@ -45,13 +45,12 @@
     {% endcomment %}
 
     <div class="row notebook-body">
-        <div class="small-12 medium-3 columns notebook-index">
+        <div class="small-12 medium-4 large-3 columns notebook-index">
             <div class="row">
-                <div class="small-2 columns">Notes</div>
-                <div class="small-4 columns">
-                    {% if request.is_authenticated %}
-                    <a href="#" data-reveal-id="newNoteModal" class="button tiny radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
-                     {% endif %} 
+                <div class="small-12 columns">
+                    {#% if request.is_authenticated %#}
+                    <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
+                    {#% endif %#}
                 </div>
             </div>
             <ul class="tabs" data-tab style="">
@@ -133,7 +132,7 @@
                 </div>
             </div>
         </div>
-        <div class="small-12 medium-9 columns note-page" >
+        <div class="small-12 medium-8 large-9 columns note-page" >
         </div>
     </div>
 </div>
@@ -189,7 +188,7 @@
                 });
             }
         });
-        $(document).on('close.fndtn.reveal', '#newNoteModal[data-reveal]', function () {
+        $(document).on('closed.fndtn.reveal', '#newNoteModal[data-reveal]', function () {
             if (CKEDITOR.instances['textarea-add-note']) {
                 CKEDITOR.instances['textarea-add-note'].destroy(true);
             }
