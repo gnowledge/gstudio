@@ -28,7 +28,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
@@ -1886,12 +1886,27 @@ def course_content(request, group_id):
     group_id    = group_obj._id
     group_name  = group_obj.name
 
+    allow_to_join = None
+    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
+    if start_enrollment_date:
+      start_enrollment_date = start_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+
+    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
+    if last_enrollment_date:
+      last_enrollment_date = last_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
+          allow_to_join = "Open"
+      else:
+          allow_to_join = "Closed"
 
     template = 'ndf/gcourse_event_group.html'
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'course content'        
+            'node': group_obj, 'title': 'course content',
+            'allow_to_join': allow_to_join  
         })
     return render_to_response(template, context_variables)
 
@@ -1918,6 +1933,20 @@ def course_notebook(request, group_id):
         user_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
                             'group_set': group_obj._id, 'created_by': user_id},{'_id': 1, 'created_at': 1,
                             'created_by': 1, 'name': 1}).sort('created_at', -1)
+    allow_to_join = None
+    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
+    if start_enrollment_date:
+      start_enrollment_date = start_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+
+    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
+    if last_enrollment_date:
+      last_enrollment_date = last_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
+          allow_to_join = "Open"
+      else:
+          allow_to_join = "Closed"
 
     # if all_blogs:
     #     blog_pages = all_blogs.clone()
@@ -1935,7 +1964,7 @@ def course_notebook(request, group_id):
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'notebook', 'blog_pages': blog_pages,
-            'user_blogs': user_blogs
+            'user_blogs': user_blogs, 'allow_to_join': allow_to_join
         })
     return render_to_response(template, context_variables)
 
@@ -1950,6 +1979,21 @@ def course_raw_material(request, group_id):
     gstaff_users = []
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
+    allow_to_join = None
+    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
+    if start_enrollment_date:
+      start_enrollment_date = start_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+
+    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
+    if last_enrollment_date:
+      last_enrollment_date = last_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
+          allow_to_join = "Open"
+      else:
+          allow_to_join = "Closed"
+
     files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
         # 'tags': {'$regex': u"raw", '$options': "i"}
         },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1})
@@ -1960,7 +2004,8 @@ def course_raw_material(request, group_id):
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'raw material',
-            'files_cur': files_cur, 'allow_to_upload': allow_to_upload
+            'files_cur': files_cur, 'allow_to_upload': allow_to_upload,
+            'allow_to_join': allow_to_join
         })
     return render_to_response(template, context_variables)
 
@@ -1973,6 +2018,21 @@ def course_gallery(request, group_id):
     group_name  = group_obj.name
     gstaff_users = []
     allow_to_upload = True
+    allow_to_join = None
+    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
+    if start_enrollment_date:
+      start_enrollment_date = start_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+
+    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
+    if last_enrollment_date:
+      last_enrollment_date = last_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
+          allow_to_join = "Open"
+      else:
+          allow_to_join = "Closed"
+
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
     files_cur = node_collection.find({'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}},
@@ -1981,7 +2041,7 @@ def course_gallery(request, group_id):
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'gallery', 'files_cur': files_cur,
-            'allow_to_upload':allow_to_upload
+            'allow_to_upload':allow_to_upload, 'allow_to_join': allow_to_join
         })
     return render_to_response(template, context_variables)
 
@@ -1991,13 +2051,27 @@ def course_about(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
+    allow_to_join = None
+    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
+    if start_enrollment_date:
+      start_enrollment_date = start_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+
+    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
+    if last_enrollment_date:
+      last_enrollment_date = last_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
+          allow_to_join = "Open"
+      else:
+          allow_to_join = "Closed"
 
     
     template = 'ndf/gcourse_event_group.html'
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'about'        
+            'node': group_obj, 'title': 'about', 'allow_to_join': allow_to_join
         })
     return render_to_response(template, context_variables)
 
@@ -2014,6 +2088,20 @@ def course_gallerymodal(request, group_id):
     thread_node = None
     allow_to_comment = None
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
+    allow_to_join = None
+    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
+    if start_enrollment_date:
+      start_enrollment_date = start_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+
+    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
+    if last_enrollment_date:
+      last_enrollment_date = last_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
+          allow_to_join = "Open"
+      else:
+          allow_to_join = "Closed"
 
     template = 'ndf/ggallerymodal.html'
 
@@ -2021,7 +2109,8 @@ def course_gallerymodal(request, group_id):
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': node_obj, 'title': 'course_gallerymodall',
             'allow_to_comment': allow_to_comment,
-            'thread_node': thread_node
+            'thread_node': thread_node,
+            'allow_to_join': allow_to_join
 
         })
     return render_to_response(template, context_variables)
@@ -2035,6 +2124,21 @@ def course_note_page(request, group_id):
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
     thread_node = None
     allow_to_comment = None
+    allow_to_join = None
+    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
+    if start_enrollment_date:
+      start_enrollment_date = start_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+
+    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
+    if last_enrollment_date:
+      last_enrollment_date = last_enrollment_date.date()
+      curr_date_time = datetime.datetime.now().date()
+      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
+          allow_to_join = "Open"
+      else:
+          allow_to_join = "Closed"
+
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     template = 'ndf/note_page.html'
 
@@ -2042,7 +2146,7 @@ def course_note_page(request, group_id):
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': node_obj, 'title': 'course_gallerymodall',
             'allow_to_comment': allow_to_comment,
-            'thread_node': thread_node
+            'thread_node': thread_node, 'allow_to_join': allow_to_join
         })
     return render_to_response(template, context_variables)
 
