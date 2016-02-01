@@ -2052,26 +2052,37 @@ def course_about(request, group_id):
     group_id    = group_obj._id
     group_name  = group_obj.name
     allow_to_join = None
-    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
-    if start_enrollment_date:
-      start_enrollment_date = start_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
+    weeks_count = 0
+    curr_date_time = datetime.datetime.now().date()
+    start_date = get_attribute_value(group_obj._id,"start_time")
+    last_date = get_attribute_value(group_obj._id,"end_time")
 
+    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
     last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
-    if last_enrollment_date:
+    if start_enrollment_date and last_enrollment_date:
+      start_enrollment_date = start_enrollment_date.date()
       last_enrollment_date = last_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
       if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
           allow_to_join = "Open"
       else:
           allow_to_join = "Closed"
 
+    if start_date and last_date:
+      start_date = start_date.date()
+      last_date = last_date.date()
+    from datetime import  timedelta
+    start_day = (start_date - timedelta(days=start_date.weekday()))
+    end_day = (last_date - timedelta(days=last_date.weekday()))
+
+    # print 'Weeks:', (end_day - start_day).days / 7
+    weeks_count = (end_day - start_day).days / 7
     
     template = 'ndf/gcourse_event_group.html'
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'about', 'allow_to_join': allow_to_join
+            'node': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
+            'weeks_count': weeks_count
         })
     return render_to_response(template, context_variables)
 

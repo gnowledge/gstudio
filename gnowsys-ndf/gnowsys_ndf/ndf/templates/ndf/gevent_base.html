@@ -73,6 +73,7 @@ list-style: none;
 {% check_is_gstaff groupid request.user as gstaff_access %}
 {% user_access_policy groupid request.user as user_access %}
 {% get_course_session_status node True as next_session_in_course %}
+{% get_all_subsections_of_course group_id node.pk as all_css %}
 
 <div id="eventModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
   <label id="eventModalLabel"></label>
@@ -243,11 +244,11 @@ list-style: none;
                   {% endif %}
 
                   <div>
-                    <span><i class="fi-list-thumbnails"></i>&nbsp;10</span>
+                    <span title="No. of Sessions"><i class="fi-list-thumbnails"></i>&nbsp;{{all_css|length}}</span>
                     &#8226;&nbsp;&nbsp;
-                    <span><i class="fi-torso"></i>&nbsp;{{group_object.author_set|length}}</span>
+                    <span title="No. of Enrolled users"><i class="fi-torso"></i>&nbsp;{{group_object.author_set|length}}</span>
                     &#8226;&nbsp;&nbsp;
-                    <span><i class="fi-clock"></i>&nbsp;6 weeks</span>
+                    <span title="Course Duration"><i class="fi-clock"></i>&nbsp;{{weeks_count}} weeks</span>
                   </div>
                 </div>
               </div>
