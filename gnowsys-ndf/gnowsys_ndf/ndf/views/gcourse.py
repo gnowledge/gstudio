@@ -1996,7 +1996,7 @@ def course_raw_material(request, group_id):
 
     files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
         # 'tags': {'$regex': u"raw", '$options': "i"}
-        },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1})
+        },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', 1)
     if request.user.id in gstaff_users:
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
@@ -2036,7 +2036,7 @@ def course_gallery(request, group_id):
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
     files_cur = node_collection.find({'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}},
-        {'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1})
+        {'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', 1)
     template = 'ndf/gcourse_event_group.html'
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
