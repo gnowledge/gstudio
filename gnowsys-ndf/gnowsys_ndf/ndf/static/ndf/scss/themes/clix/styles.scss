@@ -1,5 +1,5 @@
 /*
-*   Metastudio Customization SASS
+*   CLIx Customization SASS
 */
 
 // First load settings for the theme
@@ -10,7 +10,9 @@
 
 // Import foundation 
 @import "../bower_components/foundation/scss/foundation"; 
-// Import the Metastudio platform styles
-@import "../../metastudio_styles";  
+
+// Import the clix platform styles
+@import "../../clix_styles";  
+
 // First import all the common styles for the Metastudio Platform
 @import "../../_app_styles";
