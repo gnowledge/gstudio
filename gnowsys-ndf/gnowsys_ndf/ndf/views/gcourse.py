@@ -1951,7 +1951,8 @@ def course_raw_material(request, group_id):
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
     files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
-        'tags': {'$regex': u"raw", '$options': "i"}},{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1})
+        # 'tags': {'$regex': u"raw", '$options': "i"}
+        },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1})
     if request.user.id in gstaff_users:
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
