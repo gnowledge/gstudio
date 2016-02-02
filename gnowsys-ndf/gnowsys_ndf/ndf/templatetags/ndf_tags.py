@@ -3304,8 +3304,17 @@ def get_course_session_status(node, get_current=False):
 		start_time_val = get_attribute_value(node._id,"start_time")
 		end_time_val = get_attribute_value(node._id,"end_time")
 
-		if curr_date_time.date() < start_time_val.date():
-			upcoming_course = True
+		if start_time_val and end_time_val:
+			# print "\n start_time_val -- ", start_time_val
+			# print "\n start_time_val type -- ", type(start_time_val)
+			# convert to str
+			start_time_val_str = start_time_val.strftime("%d/%m/%Y")
+			end_time_val_str = end_time_val.strftime("%d/%m/%Y")
+			# convert to datetime obj
+			start_time_val = datetime.datetime.strptime(start_time_val_str,"%d/%m/%Y")
+			end_time_val = datetime.datetime.strptime(end_time_val_str,"%d/%m/%Y")
+			if curr_date_time.date() < start_time_val.date():
+				upcoming_course = True
 		if get_current:
 			session_name = "Data Not Available"	
 		for each_course_section in node.collection_set:
