@@ -24,42 +24,22 @@
       <label class='small-1 columns lbl_count_div right_drawer_count_lbl' style='float: right;'> </label>
     </div>
   {% endif %}
-
-      <!-- For collection created on RHS -->
-    {# <div class="small-5 large-5 columns resource-drawer"> #}
-    <div id="selected-items" class ="small-8 columns">
-
-      <ul class="{{widget_for}} pricing-table" id="{{widget_for}}_drawer2">        
-        {% if drawer2 != "None" %}
-
-        {% for value in drawer2 %}
-
-        
-
-        {% endfor %}
-        {% endif %}
-
-      </ul>
-    </div>
-
-
-
-
-
-
   <div class="row">
-    <div class="small-8 columns">
+    <div class="small-5 columns">
       {% trans "Select from following drawer: " %}
     </div>
 
+    <div class="small-5 columns">
+      {% trans "Add selected to following drawer: " %} 
+    </div>
   </div>  
   <br/>
 
-
   <!-- Row containing LHS Resources and middle Navigation and RHS Collection -->
   <div class="row">
-   <!-- LHS Resources drawer -->
-    <div class="small-8 large-6 columns resource-drawer">
+
+    <!-- LHS Resources drawer -->
+    <div class="small-5 large-6 columns resource-drawer">
       
       <ul class="{{widget_for}} pricing-table drawer1" id="{{widget_for}}_drawer1">        
 
@@ -67,13 +47,10 @@
 
         {% if drawer1 != "None" %}
         <li class="price">
-            <input type="text" class="margin-0 search_items" 
-
-            id="{{widget_for}}_search" placeholder="{% trans 'Type atleast 3 characters to search' %}"/>            
+            <input type="text" class="margin-0 search_items" id="{{widget_for}}_search" placeholder="{% trans 'Type atleast 3 characters to search' %}"/>            
         </li>
         
         <div class="push-3 searching" style="display:none;"><progress></progress></div>
-        <div id="to-be-selected">
 
         {% for key,value in drawer1.items %}
 
@@ -100,11 +77,9 @@
             <div class="small-11 columns">
 
               <div class="row">
-                <div class="small-12 columns" >
-                  <div class="item-title">
+                <div class="small-12 columns">
                   <b> {{value.name}} </b>
                   <!-- <b> {{value}} </b> -->
-                  </div>
                 </div>       
 
                 {% if "Author" not in value.member_of_names_list %}
@@ -118,9 +93,7 @@
                 <div class="row">
 
                  <div class="small-12 columns text-left" style="padding-top:5px;">
-                  <div class="item-description">
                   {{ value.html_content|safe|striptags|truncatechars:50 }}
-                  </div>
                  </div>  
                 </div>
               {% endif %}
@@ -129,11 +102,10 @@
 
         </li>
         {% endfor %}
+
         {% else %}  
         <li class="bullet-item" > <i> {% trans "No content of selected type !" %} </i> </li>
         {% endif %}
-
-      </div>
 
        
         {% if is_RT != "RelationType" %}
@@ -237,6 +209,103 @@
       </ul>
     </div>
 
+    <!-- For arrows Up, Down, Left, Right -->
+    <div class="small-2 large-1 columns  text-center" >     
+
+      {% if not selection %}
+        <br/><br/><br/><br/>
+        <span id="{{widget_for}}_btnUp" class="fontsize-x-large">
+          <i class="button fi-arrow-up coll-arrows"></i>
+        </span>
+        <br/>
+
+        <span id="{{widget_for}}_btnRight" class="fontsize-x-large right1">
+          <i class="button fi-arrow-right coll-arrows"></i>
+        </span>
+        <br/>      
+      
+        <span id="{{widget_for}}_btnLeft" class="fontsize-x-large">
+          <i class="button fi-arrow-left coll-arrows"></i>
+        </span>        
+        <br/> 
+
+        <span id="{{widget_for}}_btnDown" class="fontsize-x-large">
+          <i class="button fi-arrow-down coll-arrows"></i>
+        </span>
+
+      {% else %}
+
+        <br/><br/><br/><br/><br/><br/>
+        <span id="{{widget_for}}_btnRight" class="fontsize-x-large">
+          <i class="button fi-arrow-right coll-arrows"></i>
+        </span><br/>
+
+        <span id="{{widget_for}}_btnLeft" class="fontsize-x-large">
+          <i class="button fi-arrow-left coll-arrows"></i>
+        </span>
+
+      {% endif %}      
+   </div>
+
+   <!-- For collection created on RHS -->
+    <div class="small-5 large-5 columns resource-drawer">
+
+      <ul class="{{widget_for}} pricing-table" id="{{widget_for}}_drawer2">        
+        {% if drawer2 != "None" %}
+
+        {% for value in drawer2 %}
+
+        <li class="bullet-item" value="{{value.pk}}" > 
+          <input type="hidden" class="node_id {{widget_for}}_values" value="{{value.pk}}" name="{{value.name}}" />
+          <div class="row">
+            <div class="small-1 columns resource-type-image" 
+            style="background-image: url({% if 'image' in value.mime_type %}
+                                              {% url 'getFileThumbnail' groupid value.pk %}
+                                           {% elif 'video' in value.mime_type and 'Pandora_video' in value.member_of_names_list %} 
+                                              {% get_source_id value.pk as source_id %}
+                                              'http://wetube.gnowledge.org/{{source_id}}/icon128.jpg'
+                                           {% elif 'video' not in value.mime_type %}
+                                              /static/ndf/images/doc.png
+                                           {% endif %}
+                                          ); ">
+                {% if 'video' in value.mime_type and value.member_of_names_list|join:', ' != "Pandora_video" %}
+                  <video width="40px;" src="{% url 'getFileThumbnail' groupid value.pk %}"/>                  
+                {% endif %}
+
+            </div>
+
+            <div class="small-11 columns">
+
+              <div class="row">
+                <!-- <div class="small-5 columns text-left"> -->
+                <div class="small-12 columns text-left">
+                  <b> {{value.name}} </b>   
+                </div>                
+                <!-- <div class="small-7 columns text-right"> -->
+                {% if "Author" not in value.member_of_names_list %}
+                <div class="small-12 columns text-left" style="padding-top:3px">
+                  <i class="posted-by">{{ value.member_of_names_list|join:', ' }} {% trans 'by' %} {{value.user_details_dict.created_by}} {% trans 'on' %} {{value.created_at|date:"j F Y"}} </i>
+                </div>     
+                {% endif %}
+              </div>
+
+              {% if "Author" not in value.member_of_names_list %}
+              <div class="row">
+                <div class="small-12 columns text-left" style="padding-top:5px;">
+                    {{ value.html_content|safe|striptags|truncatechars:50 }}
+                </div>
+             </div>
+             {% endif %}
+            </div>
+          </div>
+
+        </li>
+        {% endfor %}
+
+        {% endif %}
+      </ul>
+    </div>
+  <!-- End of Collection created on RHS -->
   
   {% if is_RT == "RelationType" %}
     <div id="move_list"  class="text-center">    
@@ -258,17 +327,10 @@
 <input type="hidden" name="check_collection" value="{{widget_for}}" />
 <input type="hidden" name="checked" value="{{checked}}" />
 
-
-
-
-
-
-
 <script type="text/javascript">
   
   var is_RT = "{{is_RT}}";
   var admin_related_drawer = "{{admin_related_drawer}}"
-
   $(document).ready(function(){
     if ("{{search_name}}"){
       $(".search_items").val("{{search_name}}");
@@ -277,94 +339,32 @@
       update_drawer_count();
     {% endif %}
   });
-
-
-  selected_options = [ {% for key,value in drawer1.items %}"{{key|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
-
-  // console.log(selected_options);
-  console.log("nfdskjn");
-
-  var $s = function (selector) {
-    return document.querySelector(selector);
-  };
-
-  var $sa = function (selector) {
-    return document.querySelectorAll(selector);
-  };
-
-  toBeSelected = document.getElementById('to-be-selected');
-
-  console.log("cbsjdckn");
-  console.log(toBeSelected);
-
-  selectedItems = document.getElementById('selected-items');
-  drawerWidget = $s('.drawer-widget');
-  sItems = $sa("#to-be-selected .item");
-
-  console.log("kkkk")
-  console.log(sItems)
-
-
-
-
-
-
   //To allocate space of 10 resources listing for drawers.
   liHeight = $("#{{widget_for}}_drawer1 > li").outerHeight();
   $(".resource-drawer").height(430);
-
   // To select the single as well as multiple items from list
   $(document).on('click','#{{widget_for}}_drawer1 li.bullet-item',function(e){
     // $("#{{widget_for}}_drawer1 li.bullet-item").on("click", function(e) {
     if (e.ctrlKey) {
       $(this).toggleClass('selected-resource');
-
-      console.log(" left to right single ");
     }
     else {
-
       $('.bullet-item').removeClass('selected-resource');
       $(this).addClass('selected-resource');
-      console.log(" left to right multiple ");
     }
   });
-
   $(document).on('click','#{{widget_for}}_drawer2 li.bullet-item',function(e){
     // $("#{{widget_for}}_drawer2 li.bullet-item").click(function(e){
     
     if (e.ctrlKey) {
       $(this).toggleClass('selected-resource');
-      console.log(" right to left one ");
-
     }
     else
     {
       $('.bullet-item').removeClass('selected-resource');
       $(this).addClass('selected-resource');
-      console.log(" right to left multiple");
-
     }
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   //Function to display number of elements in both drawers
   function update_drawer_count(){
     left_drawer_count = 0
@@ -374,28 +374,20 @@
     $(".right_drawer_count_lbl").text(right_drawer_count)
     $(".left_drawer_count_lbl").text(left_drawer_count)
   }
-
   //For left drawer selected resources and right button click
   // $("#{{widget_for}}_btnRight").click(function() {
   $(document).off('click',"#{{widget_for}}_btnRight").on('click',"#{{widget_for}}_btnRight",function(){
     $("#{{widget_for}}_drawer1 li.selected-resource input.node_id").addClass("{{widget_for}}_values");
-
     var selectedOpts = $("#{{widget_for}}_drawer1 li.selected-resource");
     $("#{{widget_for}}_drawer1 li.selected-resource").removeClass("selected-resource");
-
     if (selectedOpts.length == 0) {
       alert("{% trans 'Nothing to move.' %}");
     }
-
     // $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
     $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
-
     $(selectedOpts).remove();
     // var innerhtml = $("#{{widget_for}}_drawer1").html()
     // $(".{{widget_for}}.pricing-table.drawer1").html(innerhtml);
-
-    
-
     if (is_RT != "RelationType") {
       // write comment
       var cn_arr = []
@@ -409,19 +401,14 @@
       update_drawer_count();
     }
   });
-
   //For right drawer selected resources and left button click
-
   $(document).off('click',"#{{widget_for}}_btnLeft").on('click',"#{{widget_for}}_btnLeft",function(){
-
     $("#{{widget_for}}_drawer2 li.selected-resource input.node_id.{{widget_for}}_values").removeClass("{{widget_for}}_values");
     var selectedOpts = $("#{{widget_for}}_drawer2 li.selected-resource");
     $("#{{widget_for}}_drawer2 li.selected-resource").removeClass("selected-resource");
-
     if (selectedOpts.length == 0) {
       alert("{% trans 'Nothing to move.' %}");
     }
-
     $("#{{widget_for}}_drawer1").append($(selectedOpts).clone(true));
     $(selectedOpts).remove();
     // var innerhtml = $("#{{widget_for}}_drawer1").html()
@@ -431,7 +418,6 @@
       update_drawer_count();
     }
   });
-
   function checkUpDownButton() {
     for(var i=0; i<collSelected.length-1; i++)
     {
@@ -445,24 +431,18 @@
     }
     return flag;
   }
-
   //For UP Button pressed :
   $(document).on('click',"#{{widget_for}}_btnUp",function(){
     collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
-
     if( collSelected ){
-
       //If multiple element's are selected :
       if( collSelected.length > 1 ){
-
         if( checkUpDownButton ){
           prevFirstSel = collSelected[0].previousElementSibling;
           lastSel = collSelected[collSelected.length-1];
-
           $(prevFirstSel).insertAfter(lastSel);
         }
       }
-
       //If only one element is selected :
       else{
         currSel =  collSelected[0];
@@ -470,25 +450,18 @@
       }
     }
   });
-
   //For DOWN Button pressed :
   $(document).on('click',"#{{widget_for}}_btnDown",function(){
-
     collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
-
     if( collSelected ){
-
       //If multiple element's are selected :
       if( collSelected.length > 1 ){
-
         if( checkUpDownButton ){
           FirstSel = collSelected[0];
           nexttoLastSel = collSelected[collSelected.length-1].nextElementSibling;
-
           $(nexttoLastSel).insertBefore(FirstSel);  
         }
       }
-
       //If only one element is selected :
       else{
         currSel =  collSelected[0];
@@ -496,48 +469,33 @@
       }
     }
   });
-
-
-
-
-
   // Search-Box for LHS drawer of resources
   // $('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
   $('#{{widget_for}}_search').bind('keydown change', function(e) {
-
-    // if (is_RT == "RelationType" ) {
     if (is_RT == "RelationType" || admin_related_drawer == "True" ) {
-    // if (is_RT == "RelationType" || is_RT == "GSystemType" || is_RT == "AttributeType" ) {
       var search_text = (this.value).toLowerCase();
-
       var search_text_len = (search_text.length + 1);
-
       if (e.keyCode == 8) {
         // If backspace pressed, then show all
         search_text_len = 0;
       }
-
       var $li = $( ".{{widget_for}}.pricing-table.drawer1 li.bullet-item" );
-
       if (search_text_len < 3) {
         $li.filter(function() {
           if ($(this).css("display") == "none") {
             return true;
           }
-
           else {
             return false;
           }
         }).show();
       }
-
       else if (search_text_len > 2) {
         $(".searching").css("display", "block");
         $li.each(function() {
           if ($(this).text().toLowerCase().indexOf(search_text) >= 0) {
             $(this).css("display", "block");
           }
-
           else{
             $(this).css("display", "none");
           }
@@ -551,15 +509,10 @@
       var len = (this.value.length);
       var field = "{{widget_for}}";
       var value = this.value;
-
       if (e.which == 13) {
-
         e.preventDefault();
-
         if (len > 2){
           $(".searching").css("display", "block");
-
-
           $.ajax({
             type: "POST",
             url: "{% url 'search_drawer' groupid %}",
@@ -585,7 +538,6 @@
               if (field == "assesses"){
                 $("#assesses_drawer").html(data);
               }
-
               $(".search_items").focus().val('').val(value);
               
             }          
@@ -594,9 +546,6 @@
       }
     }
   });
-
-
-
   // Moving ALL elements from left drawer to right drawer
     $("#{{widget_for}}_move_all_left").click(function(event) {
       var all_li_ele = $("#{{widget_for}}_drawer2 li")
@@ -611,7 +560,6 @@
       $("#{{widget_for}}_drawer1").append(all_li_ele);
       update_drawer_count()
     })
-
   // Moving ALL elements from right drawer to left drawer
     $("#{{widget_for}}_move_all_right").click(function(event) {
       var all_li_ele = $("#{{widget_for}}_drawer1 li:not(:first-child)")
@@ -622,10 +570,8 @@
       if($(all_li_ele).hasClass("selected-resource")){
         $(all_li_ele).removeClass("selected-resource")
       }
-
       $("#{{widget_for}}_drawer1 li:not(:first-child)").remove()
       $("#{{widget_for}}_drawer2").append(all_li_ele);
       update_drawer_count()
     })
-
 </script>
