@@ -77,15 +77,18 @@
       var url = "{% url 'get_collection' group_id node.pk %}";
       var moduleTrees = [];
       $.getJSON( url, function(data) {
+        // console.log(JSON.stringify(data))
         var moduleData = data
         $.each(data, function(pos, module) {
           var mod = getModuleHtml(pos, module);
           //mod.append('<hr />');
           //Assosiating js tree
+          if(moduleData[pos].children){
           var moduleTree = mod.find('.module-part').tree(
             {
               data: moduleData[pos].children,
               onCreateLi: function(node, $li) {
+
                 if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
                   $li.find('.jqtree-title').addClass('module-page');
                   {% comment %}
@@ -102,15 +105,16 @@
                 }
                 // Add 'icon' span before title
               }
-            });
+            });}
           $(".course-content .collection").append(mod);
-
           moduleTrees.push(moduleTree);
         });
 
         //Assigning Click events in each tree
         $.each(moduleTrees, function(pos, tree) {
-          assignTreeEvents(tree);
+          if(moduleTrees[pos]){
+            assignTreeEvents(tree);
+          }
         })
       })
       .fail(function() {
