@@ -3,7 +3,7 @@
 {% load ndf_tags %}
 {% get_grid_fs_object node as grid_fs_obj %}
 
-<div id="reveal-{{node.pk}}" class="reveal-modal" data-reveal>
+<div id="reveal-{{node.pk}}" class="reveal-modal" data-reveal >
     <div class="row gmodal-toolbar">
         <div class="small-2 columns file-name">
             {{node.name}}
@@ -61,12 +61,12 @@
         <div class="small-9 columns gmodal-item-panel">
             <!-- Detail view section -->
             <div class="row gmodal-item-holder ">
-                <div class="small-12 columns gmodal-item">
+                <div class="small-12 columns gmodal-item" style="background-color:white;">
                     {% if 'image' in node.mime_type %}
                         <img  src="{% url 'read_file' group_id node grid_fs_obj.filename %}" class="gmodel-item-image"/>
                     {% else %}
-                        <h3 style="color:white"><i>Preview Not Available</i></h3>
-                        <small style="color:white">This is {{node.mime_type}} type file.<br/>Only images are displayed currently</small>
+                        <h3><i>Preview Not Available</i></h3>
+                        <small>This is {{node.mime_type}} type file.<br/>Only images are displayed currently</small>
                     {% endif %}
                     {% comment %}
                         {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
