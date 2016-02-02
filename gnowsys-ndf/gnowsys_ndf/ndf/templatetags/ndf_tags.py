@@ -3317,19 +3317,21 @@ def get_course_session_status(node, get_current=False):
 				upcoming_course = True
 		if get_current:
 			session_name = "Data Not Available"	
-		for each_course_section in node.collection_set:
-			each_course_section_node = node_collection.one({"_id":ObjectId(each_course_section)})
-			for each_course_subsection in each_course_section_node.collection_set:
-				each_course_subsection_node = node_collection.one({"_id":ObjectId(each_course_subsection)})
-				each_sub_section_start_time = get_attribute_value(each_course_subsection_node._id,"start_time")
-				# print "each_sub_section_start_time",each_sub_section_start_time
-				if each_sub_section_start_time:
-					if curr_date_time.date() <= each_sub_section_start_time.date():
-						status =  each_sub_section_start_time
-						session_name = each_course_subsection_node.name
-						if get_current:
-							return session_name, status
-						return status, upcoming_course 
+		if node:
+			for each_course_section in node.collection_set:
+				each_course_section_node = node_collection.one({"_id":ObjectId(each_course_section)})
+				if each_course_section_node:
+					for each_course_subsection in each_course_section_node.collection_set:
+						each_course_subsection_node = node_collection.one({"_id":ObjectId(each_course_subsection)})
+						each_sub_section_start_time = get_attribute_value(each_course_subsection_node._id,"start_time")
+						# print "each_sub_section_start_time",each_sub_section_start_time
+						if each_sub_section_start_time:
+							if curr_date_time.date() <= each_sub_section_start_time.date():
+								status =  each_sub_section_start_time
+								session_name = each_course_subsection_node.name
+								if get_current:
+									return session_name, status
+								return status, upcoming_course 
 		if get_current:
 			return session_name, status
 			
