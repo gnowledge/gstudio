@@ -1,4 +1,6 @@
 <script type="text/javascript" src="/static/ndf/bower_components/mousetrap/mousetrap.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
 
 <style type="text/css">
   .selector-widget{
@@ -8,12 +10,14 @@
   }
 
   #select-search-container{
-    width: 100%;
+    width: 50%;
     /*background-color: whitesmoke;*/
     padding-right: 5px;
   }
 
   #select-search-container > i.fi-play{
+    min-height: 2px ;
+    max-height: auto ;
     position: absolute;
     right: 12px;
     transform: rotate(90deg);
@@ -21,17 +25,27 @@
   }
 
   #selected-items > .selection{
-    float: absolute;
+    {% if oneline_element = true %}
+      float: center ;
+      width: 50% ;
+    {% endif %}
+    width: 100% ;
+    float: absolute ;
+    text-align: center;
     margin: 0.25rem 0.5rem;
+    background-color: #ffffff;
+    border:1px solid #000;
   }
 
   .selection > .item{
+    text-align: center;
     float: left;
     font-size: larger;
     padding-top: 2.5px;
   }
 
   i.remove-tag{
+    float: right ;
     padding-left: 8px;
     font-size: 1.1em;
     cursor: pointer;
@@ -95,16 +109,15 @@
     <div class="selector-widget" id="{{for}}-selector-widget">
 
       <div class="row">
-        <div class="small-12 medium-12 columns">
+        <div class="small-10 medium-12 columns">
 
-          <div id="select-search-container">
+          <div id="select-search-container"  style="text-align:left" >
 
             <i class="fi-play"></i>
 
-            <div id="selected-items"></div>
+            <div id="selected-items"  ></div>
             
-            <!-- <div id="search-text" class="mousetrap" contenteditable>search</div> -->
-            <input type="text" id="search-text" class="mousetrap" placeholder="search" autocomplete="off">
+            <input type="text" id="search-text" class="mousetrap" placeholder="search" autocomplete="off" style="text-align:left" >
 
           </div>
 
@@ -118,7 +131,6 @@
           {% for each_opt in all_options|dictsort:'name' %}
             <div class="item" data-title="{{each_opt.name}}" data-description="{{each_opt.content_org|default_if_none:''}}" title="{{each_opt.content_org|default_if_none:each_opt.name}}" data-value="{{each_opt.pk}}">
               <div class="row">
-                <!-- <div class="small-1 columns text-center"> </div> -->
                 <div class="small-12 columns">
                   <div class="item-title">
                     {{each_opt.name}}
@@ -139,7 +151,17 @@
 
 <script type="text/javascript">
 
+
+  $(document).ready(function () {
+    $("#selected-items").sortable({
+      // revert: false,
+      scroll: true, 
+    });
+  })
+
+
   selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
+  // console.log(selected_options)
 
   // querySelector, jQuery style
   var $s = function (selector) {
@@ -154,7 +176,6 @@
   selectedItems = document.getElementById('selected-items');
   searchText = document.getElementById('search-text');
   selectorWidget = $s('.selector-widget');
-
   sItems = $sa("#to-be-selected .item");
 
   function removeTag(){
@@ -183,11 +204,11 @@
   function detachEvent() { return false; }
 
   function addToSelection () {
-
+    // console.log(this.textContent);
     selDiv = document.createElement('div');
     linebreak = document.createElement("br");
-    selDiv.classList.add('label', 'secondary', 'selection');
     
+    selDiv.classList.add('label', 'secondary', 'selection');
     this.onclick = detachEvent;
     this.classList.remove('traversing-el');
     this.querySelector('.item-description').classList.add('hide');
@@ -200,10 +221,9 @@
     closeBtn.onmouseenter = lineThrough;
     closeBtn.onmouseleave = removeLineThrough;
     selDiv.appendChild(closeBtn);
-
     selectedItems.appendChild(selDiv);
     selectedItems.appendChild(linebreak);
-    // selDiv.onclick = function(){selectedItems.insertBefore(this, this.previousSibling );}
+   // selDiv.onclick = function(){selectedItems.insertBefore(this, this.previousSibling );}
   }
 
   for (var i = sItems.length - 1; i >= 0; i--) {
@@ -244,11 +264,8 @@
 
   function showOptionItems () {
     toBeSelected.classList.remove('hide');
-    // console.log(this);
-
     toBeSelected.scrollTop = 0
     // document.querySelector('#to-be-selected > .item:first-child').classList.add('traversing-el');
-
     // if(!searchText.textContent || searchText.textContent=='search'){
     //   searchText.textContent = this.id == 'search-text'? '': searchText.textContent;
     // }
@@ -257,10 +274,8 @@
 
   function hideOptionItems () {
     // toBeSelected.style.display = 'none';
-
     elem = document.querySelector('#to-be-selected > .item');
     if(elem) {elem.classList.remove('traversing-el');}
-
     // if(!searchText.textContent || searchText.textContent=='search'){
     //   searchText.textContent = 'search';
     // }
@@ -271,38 +286,30 @@
 
   function getSelectedValues ({{for}}) {
     
-    var selected = selectedItems.querySelectorAll('.selection .item');
-  
+    var selected = selectedItems.querySelectorAll('.selection .item'); 
     var selectedValuesList = [];
-
     for (var i = 0; i < selected.length; i++) {
       selectedValuesList.push( selected[i].getAttribute('data-value') );
     }
-
-    // console.log(selectedValuesList);
     return selectedValuesList
   }
 
   function getSelValuesHiddenElement (name, idToAppend){
 
     var idToAppend = idToAppend || false;
-
     var hiddenInput = document.createElement('input');
     hiddenInput.type = 'hidden';
     hiddenInput.name = name;
     hiddenInput.value = JSON.stringify(getSelectedValues());
-
     if (idToAppend) {
       document.getElementById(idToAppend).appendChild(hiddenInput);
     }
-
     return hiddenInput;
   }
 
   document.querySelector('html').onclick = function (e) {
     // var parentEl = $(e.target).closest('.selector-widget');
     var parentEl = closest(e.target, '.selector-widget');
-    // console.log(parentEl);
     // if (parentEl.hasClass('selector-widget')) {
     if (parentEl) {
       // document.getElementById('to-be-selected').classList.remove('hide');
@@ -323,8 +330,6 @@
     
     currentEl = $s('#to-be-selected > .item.traversing-el');
     // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
-
-    // console.log(currentEl.classList)
     if(currentEl && currentEl.nextElementSibling && (currentEl.nextElementSibling.offsetHeight>0))
     {
       currentEl.nextElementSibling.classList.add('traversing-el');
@@ -334,9 +339,7 @@
     }
     else if(!currentEl)
     {
-      
       // var makeTraversingEl = $('#to-be-selected > .item:visible')[0];
-
       var tempItemList = $sa('#to-be-selected > .item'),
           tempItemListLen = tempItemList.length;
 
@@ -348,7 +351,6 @@
           var makeTraversingEl = tempItemList[i];
           break;
         }
-        // console.log(tempItemList[i])
       };
 
       if(makeTraversingEl){ makeTraversingEl.classList.add('traversing-el'); }
@@ -358,14 +360,12 @@
     }
   }
 
-
   function traverseListUp (ev) {
 
     ev.preventDefault();
     
     var currentEl = $s('#to-be-selected > .item.traversing-el');
     // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
-
     // console.log(currentEl.classList)
     if(currentEl && currentEl.previousElementSibling  && (currentEl.previousElementSibling.offsetHeight>0))
     {
@@ -384,7 +384,6 @@
     Mousetrap.bind('up', traverseListUp );
     Mousetrap.bind('down', traverseListDown );
     Mousetrap.bind('enter', function(){
-      // console.log(this); aaa=this;
       var elemToBeSelected = $s('#to-be-selected > .item.traversing-el');
 
       if(elemToBeSelected)
@@ -405,7 +404,6 @@
   function closest(elem, selector) {
 
    var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
-
     while (elem) {
         if (matchesSelector.bind(elem)(selector)) {
             return true;
