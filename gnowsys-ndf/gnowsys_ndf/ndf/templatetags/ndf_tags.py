@@ -507,7 +507,7 @@ def get_attribute_value(node_id, attr):
 	        # print "attr: ",attr,"\n"
 
 			if node and gattr:
-				node_attr = triple_collection.one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})	
+				node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})	
 
 		if node_attr:
 			attr_val = node_attr.object_value
@@ -3311,8 +3311,8 @@ def get_course_session_status(node, get_current=False):
 			start_time_val_str = start_time_val.strftime("%d/%m/%Y")
 			end_time_val_str = end_time_val.strftime("%d/%m/%Y")
 			# convert to datetime obj
-			start_time_val = datetime.datetime.strptime(start_time_val_str,"%d/%m/%Y")
-			end_time_val = datetime.datetime.strptime(end_time_val_str,"%d/%m/%Y")
+			start_time_val = datetime.strptime(start_time_val_str,"%d/%m/%Y")
+			end_time_val = datetime.strptime(end_time_val_str,"%d/%m/%Y")
 			if curr_date_time.date() < start_time_val.date():
 				upcoming_course = True
 		if get_current:
