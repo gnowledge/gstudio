@@ -91,8 +91,8 @@
             {% endcomment %}
         </div>
         <!-- Comments section -->
-        <div class="small-3 columns gmodal-comments-panel">
-            <div class="gmodal-comments">
+        <div class="small-3 columns gmodal-comments-panel" >
+            <div class="gmodal-comments"   style="overflow-y:auto;">
                 <div class="row">
                     <div class="small-12 columns">
                     <h4>Rating</h4>
@@ -101,7 +101,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="small-12 columns">
+                    <div class="small-12 columns" >
                     <h4>Comments</h4>
                         {% get_thread_node node.pk as thread_node %}
                             {% if thread_node %}
