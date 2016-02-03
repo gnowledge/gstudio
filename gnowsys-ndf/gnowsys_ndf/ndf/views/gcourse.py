@@ -1910,21 +1910,22 @@ def course_content(request, group_id):
         })
     return render_to_response(template, context_variables)
 
+
 @get_execution_time
-def course_notebook(request, group_id):
+def course_notebook(request, group_id, tab=None, notebook_id=None):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-    all_blogs = None
-    blog_pages = None
-    user_blogs = None
-    user_id = None
+
+    all_blogs = blog_pages = user_blogs = user_id = None
+    allow_to_comment = notebook_obj = None
+
     if request.user.is_authenticated():
         user_id = request.user.id
-    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
 
-    blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+    page_gst        = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    blogpage_gst    = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
 
     blog_pages = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
                         'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1,
@@ -1948,6 +1949,23 @@ def course_notebook(request, group_id):
       else:
           allow_to_join = "Closed"
 
+    thread_node = None
+    if notebook_id:
+        notebook_obj = node_collection.one({'_id': ObjectId(notebook_id)})
+        thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
+
+    else:
+        if user_blogs.count():
+            notebook_obj = user_blogs[0]
+            tab = 'my-notes'
+            thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
+        elif blog_pages.count():
+            notebook_obj = blog_pages[0]
+            tab = 'all-notes'
+            thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
+        else:
+            tab = 'all-notes'
+    
     # if all_blogs:
     #     blog_pages = all_blogs.clone()
     #     if request.user.id:
@@ -1964,7 +1982,8 @@ def course_notebook(request, group_id):
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'notebook', 'blog_pages': blog_pages,
-            'user_blogs': user_blogs, 'allow_to_join': allow_to_join
+            'user_blogs': user_blogs, 'allow_to_join': allow_to_join,
+            'tab': tab, 'notebook_obj': notebook_obj, 'allow_to_comment': allow_to_comment
         })
     return render_to_response(template, context_variables)
 
@@ -2126,11 +2145,14 @@ def course_gallerymodal(request, group_id):
         })
     return render_to_response(template, context_variables)
 
+
 @get_execution_time
 def course_note_page(request, group_id):
+
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
+
     node_id = request.GET.get("node_id", "")
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
     thread_node = None
@@ -2160,6 +2182,7 @@ def course_note_page(request, group_id):
             'thread_node': thread_node, 'allow_to_join': allow_to_join
         })
     return render_to_response(template, context_variables)
+
 
 @login_required
 @get_execution_time

@@ -56,17 +56,19 @@
                     {% endif %}
                 </div>
             </div>
+
             <ul class="tabs" data-tab style="">
-                <li class="tab-title active"><a href="#all-notes">All Notes</a></li>
+                <li class="tab-title {% ifequal tab 'all-notes' %} active{% endifequal %}"><a href="#all-notes">All Notes ({{blog_pages.count}})</a></li>
                 {% if user.is_authenticated %}
-                    <li class="tab-title "><a href="#my-notes">My Notes</a></li>
+                    <li class="tab-title {% ifequal tab 'my-notes' %} active{% endifequal %}"><a href="#my-notes">My Notes ({{user_blogs.count}})</a></li>
                 {% endif %}
                 {% comment %}
                     <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
                 {% endcomment %}
             </ul>
+
             <div class="small-12 columns tabs-content">
-                <div class="content notes active" id="all-notes">
+                <div class="content notes{% ifequal tab 'all-notes' %}active{% endifequal %}" id="all-notes">
                 {% for each_blog in blog_pages %}
                     {% comment %}
                         <div class="date">
@@ -74,7 +76,9 @@
                             <span class="notes-count right">2</span>
                         </div>
                     {% endcomment %}
-                    <div class="note {% if forloop.counter == 1%} active {% endif %}" id="{{each_blog.pk}}">
+                    <a href="{% url 'course_notebook_tab_note' group_name 'all-notes' each_blog.pk %}">
+                        
+                    <div class="note {% if notebook_obj.pk == each_user_blog.pk %} active {% endif %}" id="{{each_blog.pk}}">
                         <div class="note-heading"> {{each_blog.name}} </div>
                         <div class="note-meta">
                             <span>
@@ -96,10 +100,11 @@
                         {% endcomment %}
 
                     </div>
+                    </a>
                 {% endfor %}
                 </div>
 
-                <div class="content notes " id="my-notes">
+                <div class="content notes {% ifequal tab 'my-notes' %}active{% endifequal %}" id="my-notes">
                 {% for each_user_blog in user_blogs %}
                     {% comment %}
                         <div class="date">
@@ -107,7 +112,8 @@
                             <span class="notes-count right">2</span>
                         </div>
                     {% endcomment %}
-                    <div class="note {% if forloop.counter == 1%} active {% endif %}" id="{{each_user_blog.pk}}">
+                    <a href="{% url 'course_notebook_tab_note' group_name 'my-notes' each_user_blog.pk %}">
+                    <div class="note {% if notebook_obj.pk == each_user_blog.pk %} active {% endif %}" id="{{each_user_blog.pk}}">
                         <div class="note-heading"> {{each_user_blog.name}} </div>
                         <div class="note-meta">
                             <span>
@@ -129,85 +135,97 @@
                         {% endcomment %}
 
                     </div>
+                    </a>
                 {% endfor %}
                 </div>
-                <div class="content notes" id="my-drafts">
-                </div>
+                    
+                {% comment %}
+                <div class="content notes" id="my-drafts"> </div>
+                {% endcomment %}
+
             </div>
         </div>
         <div class="small-12 medium-8 large-9 columns note-page" >
+        {% if notebook_obj %}
+            {% include "ndf/note_page.html" %}
+        {% endif %}
         </div>
     </div>
 </div>
-{% include "ndf/add_new_note.html" %}
+
+{# {% include "ndf/add_new_note.html" %} #}
 {# {% include "ndf/gcomment.html" %} #}
+
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+
 <script type="text/javascript">
-    $('.notebook-index .notes').on('click', '.note', function() {
-        $(this).siblings().removeClass('active');
-        $(this).addClass('active');
-        node_id = $(this).attr('id')
-        $.ajax({
-          url: "{% url 'course_note_page' group_id %}",
+    // $('.notebook-index .notes').on('click', '.note', function() {
+    //     $(this).siblings().removeClass('active');
+    //     $(this).addClass('active');
+    //     node_id = $(this).attr('id')
+    //     $.ajax({
+    //       url: "{% url 'course_note_page' group_id %}",
 
-          data: {
-            node_id: node_id
-          },
+    //       data: {
+    //         node_id: node_id
+    //       },
 
-          type: "GET",
+    //       type: "GET",
 
-          dataType: "html",
+    //       dataType: "html",
 
-          success: function(data){
-            $(".note-page").show().html(data);
-          },
-        });//end of ajax
+    //       success: function(data){
+    //         $(".note-page").show().html(data);
+    //       },
+    //     });//end of ajax
+    // });
+
+
+    // $(function() {
+    //     // //New Note section
+    //     // $("#newNoteModal").on('click', 'save-note', function() {
+    //     //     //Necessary ajax call
+    //     // });
+    //     // $("#newNoteModal").on('click', 'delete-note', function() {
+    //     //     //Necessary ajax call
+    //     // });
+    //     // $("#newNoteModal").on('click', 'publish-note', function() {
+    //     //     //Necessary ajax call
+    //     // });
+
+
+    //     // $(document).on('opened.fndtn.reveal', '#newNoteModal[data-reveal]', function (e) {
+    //     //     e.stopPropagation();
+    //     //     e.preventDefault();
+    //     //     if(!CKEDITOR.instances['textarea-add-note']){
+    //     //         CKEDITOR.replaceAll('textarea-add-note',{
+    //     //             enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
+    //     //             toolbar:'basic',
+    //     //             uiColor:'#f2f2f2',
+    //     //             textarea_id: 'textarea-add-note'
+    //     //         });
+    //     //     }
+    //     // });
+    //     // $(document).on('closed.fndtn.reveal', '#newNoteModal[data-reveal]', function () {
+    //     //     if (CKEDITOR.instances['textarea-add-note']) {
+    //     //         CKEDITOR.instances['textarea-add-note'].destroy(true);
+    //     //     }
+    //     // });
+
+    //     //Rating system
+    // });
+
+    $("body").on('mouseenter', '.rate-scale i', function() {
+        $(this).nextAll().add($(this)).addClass('hover-rating');
+    });
+    $("body").on('mouseleave', '.rate-scale i', function() {
+        $(this).nextAll().add($(this)).removeClass('hover-rating');
     });
 
-
-    $(function() {
-        //New Note section
-        $("#newNoteModal").on('click', 'save-note', function() {
-            //Necessary ajax call
-        });
-        $("#newNoteModal").on('click', 'delete-note', function() {
-            //Necessary ajax call
-        });
-        $("#newNoteModal").on('click', 'publish-note', function() {
-            //Necessary ajax call
-        });
-
-
-        $(document).on('opened.fndtn.reveal', '#newNoteModal[data-reveal]', function (e) {
-            e.stopPropagation();
-            e.preventDefault();
-            if(!CKEDITOR.instances['textarea-add-note']){
-                CKEDITOR.replaceAll('textarea-add-note',{
-                    enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
-                    toolbar:'basic',
-                    uiColor:'#f2f2f2',
-                    textarea_id: 'textarea-add-note'
-                });
-            }
-        });
-        $(document).on('closed.fndtn.reveal', '#newNoteModal[data-reveal]', function () {
-            if (CKEDITOR.instances['textarea-add-note']) {
-                CKEDITOR.instances['textarea-add-note'].destroy(true);
-            }
-        });
-
-        //Rating system
-        $("body").on('mouseenter', '.rate-scale i', function() {
-            $(this).nextAll().add($(this)).addClass('hover-rating');
-        });
-        $("body").on('mouseleave', '.rate-scale i', function() {
-            $(this).nextAll().add($(this)).removeClass('hover-rating');
-        });
-
-        $("body").on('click', '.rate-scale i' ,function() {
-            $(this).siblings().removeClass('rated');
-            $(this).nextAll().add($(this)).addClass('rated');
-        });
+    $("body").on('click', '.rate-scale i' ,function() {
+        $(this).siblings().removeClass('rated');
+        $(this).nextAll().add($(this)).addClass('rated');
     });
+
 </script>
