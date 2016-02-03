@@ -748,6 +748,41 @@ article{
 }
 }
 
+/* Landing page */
+
+.landing_page {
+  text-align: center;
+
+  h2 {
+    color: #A0148E;
+    font-weight: 600;
+  }
+  .landing-page-text {
+    color: #6153ae;
+
+    p {
+      font-size: 18px;
+    }
+  }
+  .orbit-container {
+    width: 70%;
+    margin: 0px auto;
+
+    img {
+      height: 400px;
+      width: 100%;
+    }
+
+    .orbit-timer {
+      left: -10000px;
+      top: auto;
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      width: 1px;
+    }
+  }
+}
 
 /* Card block */
 .card>*{
