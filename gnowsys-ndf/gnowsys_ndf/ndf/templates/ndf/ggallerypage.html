@@ -157,12 +157,31 @@
 
 </div>
 <div class="reveal-container"></div>
+{% comment %}
 {% verbatim %}
 <script id="filter-tag-template" type="text/x-handlebars-template">
     <div class="filter-tag">{{label}} <span>&times;</span></div>
 </script>
 {% endverbatim %}
+{% endcomment %}
 <script type="text/javascript">
+    $('.gallery-img>div').click(function (){
+        node_id = $(this).closest('.gallery-img').attr('id')
+        $.ajax({
+          url: "{% url 'course_gallerymodal' group_id %}",
+          data: {
+            node_id: node_id
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            $(".reveal-container").html(data);
+            $("#reveal-"+ node_id).foundation('reveal','open');
+          },
+        });//end of ajax
+    });
+
+    /*
     var filterTagSource   = $("#filter-tag-template").html();
     var filterTagTemplate = Handlebars.compile(filterTagSource);
 
@@ -196,5 +215,5 @@
             $(this).closest('.filter-tag').remove();
         });
     })
-
+    */
 </script>
