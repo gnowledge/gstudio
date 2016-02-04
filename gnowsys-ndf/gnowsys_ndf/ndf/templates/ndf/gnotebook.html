@@ -76,9 +76,9 @@
                             <span class="notes-count right">2</span>
                         </div>
                     {% endcomment %}
-                    <a href="{% url 'course_notebook_tab_note' group_name 'all-notes' each_blog.pk %}" title="{{each_blog.content|safe|striptags|default_if_none:each_user_blog.name}}">
+                    <a href="{% url 'course_notebook_tab_note' group_name 'all-notes' each_blog.pk %}" title="{{each_blog.content|safe|striptags|default_if_none:each_blog.name}}">
                         
-                    <div class="note {% if notebook_obj.pk == each_user_blog.pk %} active {% endif %}" id="{{each_blog.pk}}">
+                    <div class="note {% if notebook_obj.pk == each_blog.pk %} active {% endif %}" id="{{each_blog.pk}}">
                         <div class="note-heading"> {{each_blog.name}} </div>
                         <div class="note-meta">
                             <span>
