@@ -1954,11 +1954,11 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
         thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
 
     else:
-        if user_blogs.count():
+        if user_blogs and user_blogs.count():
             notebook_obj = user_blogs[0]
             tab = 'my-notes'
             thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
-        elif blog_pages.count():
+        elif blog_pages and blog_pages.count():
             notebook_obj = blog_pages[0]
             tab = 'all-notes'
             thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)

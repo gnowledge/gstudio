@@ -139,9 +139,8 @@
             {% get_group_type request.path request.user as group_type %}
 
             {% if group_type %}
-
-            {% block body_content %} {% endblock %}
-            {% block extra_content %}  {% endblock %}
+              {% block body_content %} {% endblock %}
+              {% block extra_content %}  {% endblock %}
             {% endif %}
 
             <input type="hidden" value="{{newgroup}}">
