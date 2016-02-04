@@ -40,7 +40,7 @@
                 {% endif %}
             </div>
             <div class="note-text row">
-            {{notebook_obj.content|safe}}
+            {{notebook_obj.content|default_if_none:"No Description added yet!"|safe}}
             </div>
         </div>
     </div>
