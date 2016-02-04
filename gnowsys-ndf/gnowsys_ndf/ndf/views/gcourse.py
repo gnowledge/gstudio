@@ -2015,7 +2015,12 @@ def course_raw_material(request, group_id):
     files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
         # 'tags': {'$regex': u"raw", '$options': "i"}
         },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', 1)
-    if request.user.id in gstaff_users:
+
+    gstaff_access = check_is_gstaff(group_id,request.user)
+
+    # if request.user.id in gstaff_users:
+    #     allow_to_upload = True
+    if gstaff_access:
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
 
