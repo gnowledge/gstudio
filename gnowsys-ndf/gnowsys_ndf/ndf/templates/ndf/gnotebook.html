@@ -68,7 +68,7 @@
             </ul>
 
             <div class="small-12 columns tabs-content">
-                <div class="content notes{% ifequal tab 'all-notes' %}active{% endifequal %}" id="all-notes">
+                <div class="content notes{% ifequal tab 'all-notes' %} active{% endifequal %}" id="all-notes">
                 {% for each_blog in blog_pages %}
                     {% comment %}
                         <div class="date">
@@ -104,7 +104,7 @@
                 {% endfor %}
                 </div>
 
-                <div class="content notes {% ifequal tab 'my-notes' %}active{% endifequal %}" id="my-notes">
+                <div class="content notes{% ifequal tab 'my-notes' %} active{% endifequal %}" id="my-notes">
                 {% for each_user_blog in user_blogs %}
                     {% comment %}
                         <div class="date">

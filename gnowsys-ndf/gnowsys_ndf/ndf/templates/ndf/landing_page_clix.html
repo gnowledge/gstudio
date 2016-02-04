@@ -1,4 +1,8 @@
-{% extends "ndf/gbase.html" %}
+{% load simple_filters %}
+{% xextends "ndf/gbase.html" with first_body_column=0 %}
+
+{# {% extends "ndf/gbase.html" %} #}
+
 {% load i18n %}
 
 {% block title %} {{title}} {% endblock title %}
