@@ -1928,12 +1928,11 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     blogpage_gst    = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
 
     blog_pages = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
-                        'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1,
-                        'created_by': 1, 'name': 1}).sort('created_at', -1)
+                        'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
     if user_id:
         user_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
                             'group_set': group_obj._id, 'created_by': user_id},{'_id': 1, 'created_at': 1,
-                            'created_by': 1, 'name': 1}).sort('created_at', -1)
+                            'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
     allow_to_join = None
     start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
     if start_enrollment_date:
