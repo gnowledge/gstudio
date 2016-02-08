@@ -10,7 +10,6 @@
   }
 
   #select-search-container{
-    width: 50%;
     /*background-color: whitesmoke;*/
     padding-right: 5px;
   }
@@ -18,6 +17,7 @@
   #select-search-container > i.fi-play{
     min-height: 2px ;
     max-height: auto ;
+    max-width: auto ;
     position: absolute;
     right: 12px;
     transform: rotate(90deg);
@@ -25,16 +25,23 @@
   }
 
   #selected-items > .selection{
-    {% if oneline_element = true %}
+    {% if oneline_element %}
       float: center ;
-      width: 50% ;
+      /*width: 50% ;*/
     {% endif %}
-    width: 100% ;
+    width: 50% ;
     float: absolute ;
     text-align: center;
     margin: 0.25rem 0.5rem;
     background-color: #ffffff;
     border:1px solid #000;
+  }
+
+  #selected-items{
+    max-height: 200px ;
+    max-width: hidden ;
+    overflow-y : auto ;
+    overflow-x: hidden;
   }
 
   .selection > .item{
@@ -59,7 +66,7 @@
     display: inline-block;
     float: left;
     margin: auto 1em;
-    width: 5em;
+    width: 15em;
     border: none !important;
     box-shadow: none !important;
     background-color: inherit;
@@ -107,25 +114,17 @@
 </style>
 
     <div class="selector-widget" id="{{for}}-selector-widget">
-
       <div class="row">
         <div class="small-10 medium-12 columns">
-
           <div id="select-search-container"  style="text-align:left" >
-
-            <i class="fi-play"></i>
-
-            <div id="selected-items"  ></div>
-            
+            <i class="fi-play" ></i>
+            <div id="selected-items" > </div>
             <input type="text" id="search-text" class="mousetrap" placeholder="search" autocomplete="off" style="text-align:left" >
-
           </div>
-
         </div>
       </div>
       <div class="row">
         <div class="small-12 medium-12 medium-centered columns">
-
         <div id="to-be-selected" class="hide">
             
           {% for each_opt in all_options|dictsort:'name' %}
@@ -150,18 +149,14 @@
 
 
 <script type="text/javascript">
-
-
   $(document).ready(function () {
     $("#selected-items").sortable({
-      // revert: false,
+      revert: true,
       scroll: true, 
     });
   })
 
-
   selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
-  // console.log(selected_options)
 
   // querySelector, jQuery style
   var $s = function (selector) {
@@ -177,15 +172,13 @@
   searchText = document.getElementById('search-text');
   selectorWidget = $s('.selector-widget');
   sItems = $sa("#to-be-selected .item");
-
+  
   function removeTag(){
     var tempItem = this.parentNode.querySelector('.item');
     tempItem.querySelector('.item-title').style.textDecoration = '';
-
     tempItem.onclick = addToSelection;
     tempItem.querySelector('.item-description').classList.remove('hide');
     toBeSelected.appendChild(tempItem);
-
     this.parentNode.onclick = detachEvent
     this.parentNode.remove();
     toBeSelected.classList.remove('hide');
@@ -206,8 +199,7 @@
   function addToSelection () {
     // console.log(this.textContent);
     selDiv = document.createElement('div');
-    linebreak = document.createElement("br");
-    
+    // linebreak = document.createElement("br");
     selDiv.classList.add('label', 'secondary', 'selection');
     this.onclick = detachEvent;
     this.classList.remove('traversing-el');
@@ -222,13 +214,12 @@
     closeBtn.onmouseleave = removeLineThrough;
     selDiv.appendChild(closeBtn);
     selectedItems.appendChild(selDiv);
-    selectedItems.appendChild(linebreak);
+    // selectedItems.appendChild(linebreak);
    // selDiv.onclick = function(){selectedItems.insertBefore(this, this.previousSibling );}
   }
 
-  for (var i = sItems.length - 1; i >= 0; i--) {
+ for (var i = sItems.length - 1; i >= 0; i--) {
     sItems[i].onclick = addToSelection;
-    // console.log(sItems[i].getAttribute('data-value'))
   }
 
   for (var i = 0; i < selected_options.length; i++) {
@@ -271,7 +262,6 @@
     // }
   }
 
-
   function hideOptionItems () {
     // toBeSelected.style.display = 'none';
     elem = document.querySelector('#to-be-selected > .item');
@@ -306,7 +296,7 @@
     }
     return hiddenInput;
   }
-
+ 
   document.querySelector('html').onclick = function (e) {
     // var parentEl = $(e.target).closest('.selector-widget');
     var parentEl = closest(e.target, '.selector-widget');
@@ -325,7 +315,6 @@
   };
 
   function traverseListDown (ev) {
-
     ev.preventDefault();
     
     currentEl = $s('#to-be-selected > .item.traversing-el');
@@ -354,16 +343,13 @@
       };
 
       if(makeTraversingEl){ makeTraversingEl.classList.add('traversing-el'); }
-
       // var makeTraversingEl = $s('#to-be-selected > .item');
       // if (makeTraversingEl) {makeTraversingEl.classList.add('traversing-el');};
     }
   }
 
   function traverseListUp (ev) {
-
     ev.preventDefault();
-    
     var currentEl = $s('#to-be-selected > .item.traversing-el');
     // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
     // console.log(currentEl.classList)
@@ -402,7 +388,6 @@
   }
 
   function closest(elem, selector) {
-
    var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
     while (elem) {
         if (matchesSelector.bind(elem)(selector)) {
