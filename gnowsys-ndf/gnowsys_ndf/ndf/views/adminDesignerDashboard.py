@@ -33,19 +33,23 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         attribute_type_set = []
         relation_type_set = [] 
         for e in each.member_of:
-            member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
+            member_of_list.append(node_collection.one({'_id':e}).name+" ")
+            # member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
         
         for members in each.member_of:
-            member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
+            member.append(node_collection.one({ '_id': members}).name+" ")
+            # member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
         
         # for coll in each.collection_set:
         #     collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
         
         if class_name in ("GSystemType"):
             for at_set in each.attribute_type_set:
-                attribute_type_set.append(at_set.name+" - "+str(at_set._id))
+                attribute_type_set.append(at_set.name+" ")
+                # attribute_type_set.append(at_set.name+" - "+str(at_set._id))
             for rt_set in each.relation_type_set:
-                relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
+                relation_type_set.append(rt_set.name+" ")
+                # relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
             objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list), "attribute_type_set":",".join(attribute_type_set), "relation_type_set":",".join(relation_type_set)})
         else :
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list)})
@@ -59,7 +63,6 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     for each in systemtype:
         systemtypes.append({'id':each._id,"title":each.name})
 
-
     meta_types = []
     meta_type = node_collection.find({'_type':"MetaType"})
     for each in meta_type:
@@ -69,7 +72,6 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
 	groupid = str(group_obj[0]._id)
-
 
     template = "ndf/adminDashboard.html"
     variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"designer","groupid":groupid,'meta_types':meta_types,'group_id':groupid})
