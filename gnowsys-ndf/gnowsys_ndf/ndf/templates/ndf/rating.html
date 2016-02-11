@@ -1,10 +1,10 @@
 {% load ndf_tags %}
-{% load i18n %}    
+{% load i18n %}
 <!-- <div id="rating-bar" class="show-on-hover"> -->
 {% get_node_ratings request node.pk as ratings %}
-    <form>
+    <form style="display: inline-block">
     <!-- Sets the rating values as data attributes -->
-        <span datat-tooltip title="Your rating" class="lbl_tag">
+        <span datat-tooltip title="Your rating" class="lbl_tag" style="display: inline-block">
             <div class="rating-bar show" data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}"  data-user-rating="{{ratings.user_rating}}">
                 <span>
                     <input type="radio" id="rating-5" name="rating" value="5" />
@@ -19,26 +19,26 @@
                         <label for="rating-1">1</label>
                     <input type="radio" id="rating-0" name="rating" value="0" class="last" />
                         <label for="rating-0">0</label>
-                </span>   
+                </span>
             </div>
-        </span>         
+        </span>
     </form>
-{% if node.rating %}
-    <span data-tooltip title="Average Rating: {{ratings.avg}}<br>No. of Users rated: {{node.rating|length}}">
-
-    <label class="rating-lbl" id="avg-rating" >Avg. : &nbsp;{{ratings.avg|default:"unrated"}} {% trans ' by ' %}{{ node.rating|length }} <i class="fi-torsos"></i></label></span>
-{% else %} 
-    <small><label class="lbl_tag" id="avg-rating" ><i>{% trans 'Not rated yet!' %}</i></label></small>
-{% endif %} 
+        {% if node.rating %}
+            <span data-tooltip title="Average Rating: {{ratings.avg}}<br>No. of Users rated: {{node.rating|length}}" style="display: inline-block;vertical-align: super;">
+                <label class="rating-lbl" style="font-size: 15px;color: #7D7D7D" id="avg-rating" >Avg. : &nbsp;{{ratings.avg|default:"unrated"}} {% trans ' by ' %}{{ node.rating|length }} <i class="fi-torsos"></i></label>
+            </span>
+        {% else %}
+            <small style="display: inline-block"><label class="lbl_tag" id="avg-rating" ><i>{% trans 'Not rated yet!' %}</i></label></small>
+        {% endif %}
 
 
 <script type="text/javascript">
-    
+
     //Ajax to post the user rating and fetch the new average
     function updateRating() {
         // surl="/{{node}}/ratings/add_ratings/";
         user_rating = $('input[name=rating]:checked').val();
-            
+
         $.ajax({
                 // url: surl,
                 url: "{% url 'rate_node' group_id node.pk %}",
@@ -48,17 +48,17 @@
                     node: '{{node.pk}}',
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
-            
+
                 success: function(data){
                    //Replace rating bar with new values
                    //'rating_template' is a div.class of parent template
-                   // $(".rating_template").html(data);   
+                   // $(".rating_template").html(data);
                    // console.log(data)
                    data = JSON.parse(data)
                    setRating(data);
                 }
-        }); 
-    
+        });
+
     }
 
     //Sets the stars in the rating bar based on loaded values
@@ -85,7 +85,7 @@
         $(".rating-bar input[value="+stars+"]").prop("checked",true);
     }
 
-    setStars({{ratings.user_rating}});
+    setStars({% firstof ratings.user_rating ratings.avg  %});
 
     // Rating script only if user is logged in
     // Send the user's rating to the server on submit
@@ -95,7 +95,7 @@
             updateRating();
         }
         else{
-            alert("{% trans 'Please login to rate this resource' %}");    
+            alert("{% trans 'Please login to rate this resource' %}");
             return false;
         }
     });

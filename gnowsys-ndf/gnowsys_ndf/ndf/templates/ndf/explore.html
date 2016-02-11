@@ -1,0 +1,51 @@
+{% load simple_filters %}
+{% xextends "ndf/gbase.html" with first_body_column=0 %}
+
+{% load i18n %}
+
+
+{% block title %} {{title|capfirst}} {% endblock title %}
+
+
+{% block body_content %}
+	<div class="row explore-header">
+		<div class="small-12 medium-2 columns heading"><a href="{% url 'explore' %}">Explore</a></div>
+		<div class="small-12 medium-4 columns expore-type">
+			<div class="toggleButtons">
+				<a href="{% url 'explore_courses' %}" class="button {%if title == 'courses'%} active{% endif %}">
+					Courses
+				</a>
+				<a href="{% url 'explore_groups' %}" class="button {%if title == 'groups'%} active{% endif %}">
+					Groups
+				</a>
+			</div>
+		</div>
+		<div class="medium-3 columns explore-search small-12">
+			<input type="text" placeholder="Search">
+		</div>
+		<!--div class="small-3 columns {%if title == 'courses'%}label info{% endif %}">
+			<a href="{% url 'explore_courses' %}">Courses</a>
+		</div>
+
+		<div class="small-3 columns {% if title == 'groups' %}label info{% endif %}">
+			<a href="{% url 'explore_groups' %}">Groups</a>
+		</div-->
+	</div>
+	{% if title == 'explore' %}
+		Plese select between course or a group.
+	{% else %}
+
+	<section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="background-color:#fafafa;border-style:none">
+		{% for each_obj in doc_cur %}
+			<li class="card-image-wrapper" style="margin-top:13px;">
+            {% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk  next_session=True %}
+          </li>
+		{% endfor %}
+
+		</section>
+
+	{% endif %}
+
+
+
+{% endblock body_content %}

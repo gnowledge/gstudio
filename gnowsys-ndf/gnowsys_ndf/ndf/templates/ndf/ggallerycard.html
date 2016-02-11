@@ -1,0 +1,29 @@
+{% verbatim %}
+<script id="gallery-card-template" type="text/x-handlebars-template">
+    <li class="gallery-card">
+        <div class="row collapse">
+            <div class="small-12 columns">
+                <input id="check-box" data-checkbox-id="{{id}}" class="select-file" type="checkbox">
+                <label for="check-box" class="file-item" data-item-id="{{id}}"  data-reveal-id="{{gallery}}">
+                    <div class="item-thumbnail-image">
+                        <img src="{{item-image}}" />
+                    </div>
+                    <div class="file-details">
+                        <div class="file-name">{{name}}</div>
+                        <div class="file-name">Uploaded {{createdOn}}</div>
+                        <div class="file-name"> {{size}}kb</div>
+                    </div>
+                    <div class="file-actions">
+                        <i class="fi-info"></i>
+                        <a href="{{download-link}}" download="{{ grid_fs_obj_name}}"><i class="fi-download"></i></a>
+                        <i class="fi-page-edit"></i>
+                    </div>
+                    <div class="filename-footer">
+                        {{name}}
+                    </div>
+                </label>
+            </div>
+        </div>
+    </li>
+</script>
+{% endverbatim %}

@@ -58,7 +58,7 @@
 {% block meta_content %}
 {{block.super }}
 <div class="repository-title" itemprop="{{schema.1.name}}" style="font-size:1.2em !important;width:100%;margin-top:8px"> 
-      {% firstof node.altnames node.name %} 
+      {% firstof node.name node.altnames node.name %} 
   </div>
   <br>
 {% endblock %}

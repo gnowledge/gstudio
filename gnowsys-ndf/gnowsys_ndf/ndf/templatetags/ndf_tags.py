@@ -91,24 +91,26 @@ def get_site_variables():
 		return result
 
 	site_var = {}
-	site_var['ORG_NAME']=GSTUDIO_ORG_NAME
-	site_var['LOGO']=GSTUDIO_SITE_LOGO
-	site_var['COPYRIGHT']=GSTUDIO_COPYRIGHT
-	site_var['GIT_REPO']=GSTUDIO_GIT_REPO
-	site_var['PRIVACY_POLICY']=GSTUDIO_SITE_PRIVACY_POLICY
-	site_var['TERMS_OF_SERVICE']=GSTUDIO_SITE_TERMS_OF_SERVICE
-	site_var['ORG_LOGO']=GSTUDIO_ORG_LOGO
-	site_var['ABOUT']=GSTUDIO_SITE_ABOUT
-	site_var['SITE_POWEREDBY']=GSTUDIO_SITE_POWEREDBY
-	site_var['PARTNERS']=GSTUDIO_SITE_PARTNERS
-	site_var['GROUPS']=GSTUDIO_SITE_GROUPS
-	site_var['CONTACT']=GSTUDIO_SITE_CONTACT
-	site_var['CONTRIBUTE']=GSTUDIO_SITE_CONTRIBUTE
-	site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
-	site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
-	site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
-	site_var['SITE_NAME']=GSTUDIO_SITE_NAME
-	site_var['ISSUES_PAGE']=GSTUDIO_SITE_ISSUES_PAGE
+	site_var['ORG_NAME'] = GSTUDIO_ORG_NAME
+	site_var['LOGO'] = GSTUDIO_SITE_LOGO
+	site_var['FAVICON'] = GSTUDIO_SITE_FAVICON
+	site_var['COPYRIGHT'] = GSTUDIO_COPYRIGHT
+	site_var['GIT_REPO'] = GSTUDIO_GIT_REPO
+	site_var['PRIVACY_POLICY'] = GSTUDIO_SITE_PRIVACY_POLICY
+	site_var['TERMS_OF_SERVICE'] = GSTUDIO_SITE_TERMS_OF_SERVICE
+	site_var['ORG_LOGO'] = GSTUDIO_ORG_LOGO
+	site_var['ABOUT'] = GSTUDIO_SITE_ABOUT
+	site_var['SITE_POWEREDBY'] = GSTUDIO_SITE_POWEREDBY
+	site_var['PARTNERS'] = GSTUDIO_SITE_PARTNERS
+	site_var['GROUPS'] = GSTUDIO_SITE_GROUPS
+	site_var['CONTACT'] = GSTUDIO_SITE_CONTACT
+	site_var['CONTRIBUTE'] = GSTUDIO_SITE_CONTRIBUTE
+	site_var['SITE_VIDEO'] = GSTUDIO_SITE_VIDEO
+	site_var['LANDING_PAGE'] = GSTUDIO_SITE_LANDING_PAGE
+	site_var['LANDING_TEMPLATE'] = GSTUDIO_SITE_LANDING_TEMPLATE
+	site_var['HOME_PAGE'] = GSTUDIO_SITE_HOME_PAGE
+	site_var['SITE_NAME'] = GSTUDIO_SITE_NAME
+	site_var['ISSUES_PAGE'] = GSTUDIO_SITE_ISSUES_PAGE
 
 	cache.set('site_var', site_var, 60 * 30)
 
@@ -505,7 +507,7 @@ def get_attribute_value(node_id, attr):
 	        # print "attr: ",attr,"\n"
 
 			if node and gattr:
-				node_attr = triple_collection.one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})	
+				node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})	
 
 		if node_attr:
 			attr_val = node_attr.object_value
@@ -518,7 +520,7 @@ def get_attribute_value(node_id, attr):
 @register.assignment_tag
 def get_relation_value(node_id, grel):
 	try:
-		grel_val_node = Node
+		grel_val_node = None
 		grel_id = None
 		node_grel = None
 		if node_id:
@@ -1670,7 +1672,7 @@ def get_group_type(group_id, user):
                 # If Group is not found with either given ObjectId or name in the database
                 # Then compare with a given list of names as these were used in one of the urls
                 # And still no match found, throw error
-                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta", "welcome"]:
+                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta", "welcome", "explore"]:
                     error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
                     raise Http404(error_message)
 
@@ -2068,15 +2070,20 @@ def check_is_gstaff(groupid, user):
   False -- If above criteria is not met (doesn't belongs to any of the category, mentioned above)!
   """
 
+  groupid = groupid if groupid else 'home'
+
   try:
-    group_node = node_collection.one({'_id': ObjectId(groupid)})
+  	try:
+	    group_node = node_collection.one({'_id': ObjectId(groupid)})
+  	except:
+  		group_node = get_group_name_id(groupid, get_obj=True)
 
-    if group_node:
-      return group_node.is_gstaff(user)
+	if group_node:
+		return group_node.is_gstaff(user)
 
-    else:
-      error_message = "No group exists with this id ("+str(groupid)+") !!!"
-      raise Exception(error_message)
+	else:
+		error_message = "No group exists with this id ("+str(groupid)+") !!!"
+		raise Exception(error_message)
 
   except Exception as e:
     error_message = "\n IsGStaffCheckError: " + str(e) + " \n"
@@ -3188,7 +3195,7 @@ def is_partner(group_obj):
 @get_execution_time
 @register.assignment_tag
 def get_event_status(node):
-	status_msg = ""
+	status_msg = None
 	"""
 	Returns FORTHCOMING/OPEN/CLOSED
 	"""
@@ -3199,16 +3206,137 @@ def get_event_status(node):
 		end_enroll_val = get_attribute_value(node._id,"end_enroll")
 		from datetime import datetime
         curr_date_time = datetime.now()
-
-        if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
-        or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
-            status_msg = "OPEN"
-        elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
-            status_msg = "FORTHCOMING"
-        elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
-            status_msg = "CLOSED"
+        if start_time_val and end_time_val and start_enroll_val and end_enroll_val:
+	        if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
+	        or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
+	            status_msg = "in-progress"
+	        elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
+	            status_msg = "upcoming"
+	        elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
+	            status_msg = "completed"
 	return status_msg
 
+
+# @get_execution_time
+# @register.assignment_tag
+# def get_all_user_groups(user_id):
+
+# 	user_id = int(user_id)
+
+# 	gst_modg = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
+
+# 	all_user_groups = node_collection.find({
+# 				'_type': 'Group',
+# 				'$or':[
+# 						{'author_set': {'$in': [user_id]}},
+# 						{'group_admin': {'$in': [user_id]}},
+# 						{'created_by': user_id} #,
+# 						# {'group_type': u'PUBLIC'}
+# 					],
+# 				'member_of': {'$nin': [gst_modg._id]} 
+# 				})
+
+# 	return all_user_groups
+
+
+@get_execution_time
+@register.assignment_tag
+def get_user_course_groups(user_id):
+
+	user_id = int(user_id) if user_id else user_id
+
+	gst_course = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
+
+	all_user_groups = node_collection.find({
+				'_type': 'Group',
+				'$or':[
+						{'author_set': {'$in': [user_id]}},
+						{'group_admin': {'$in': [user_id]}},
+						{'created_by': user_id} #,
+						# {'group_type': u'PUBLIC'}
+					],
+				'member_of': {'$in': [gst_course._id]} 
+				})
+
+	# all_courses = []
+
+	all_courses_obj_grouped = {
+							# 'all': [],
+							'in-progress': [],
+							'upcoming': [],
+							'completed': []
+						}
+
+	courses_status_count_dict = {
+							'all': all_user_groups.count(),
+							'in-progress': 0,
+							'upcoming': 0,
+							'completed': 0
+						}
+
+	for each_course in all_user_groups:
+		each_course.course_status_field = get_event_status(each_course)
+
+		all_courses_obj_grouped[each_course.course_status_field].append(each_course)
+		# all_courses_obj_grouped['all'].append(each_course)
+
+		courses_status_count_dict[each_course.course_status_field] += 1
+
+		# all_courses.append(each_course)
+
+	# print "::: ", courses_status_count_dict
+	# print "::: ", all_courses_obj_grouped
+	return all_courses_obj_grouped
+
+@get_execution_time
+@register.assignment_tag
+def get_course_session_status(node, get_current=False):
+	
+	"""
+	Returns Session Start_time in Courses 
+	"""
+	status = ""
+	upcoming_course = False
+	session_name = None
+	if node:
+		from datetime import datetime
+		curr_date_time = datetime.now()
+		start_time_val = get_attribute_value(node._id,"start_time")
+		end_time_val = get_attribute_value(node._id,"end_time")
+
+		if start_time_val and end_time_val:
+			# print "\n start_time_val -- ", start_time_val
+			# print "\n start_time_val type -- ", type(start_time_val)
+			# convert to str
+			start_time_val_str = start_time_val.strftime("%d/%m/%Y")
+			end_time_val_str = end_time_val.strftime("%d/%m/%Y")
+			# convert to datetime obj
+			start_time_val = datetime.strptime(start_time_val_str,"%d/%m/%Y")
+			end_time_val = datetime.strptime(end_time_val_str,"%d/%m/%Y")
+			if curr_date_time.date() < start_time_val.date():
+				upcoming_course = True
+		if get_current:
+			session_name = "Data Not Available"	
+		if node:
+			for each_course_section in node.collection_set:
+				each_course_section_node = node_collection.one({"_id":ObjectId(each_course_section)})
+				if each_course_section_node:
+					for each_course_subsection in each_course_section_node.collection_set:
+						each_course_subsection_node = node_collection.one({"_id":ObjectId(each_course_subsection)})
+						each_sub_section_start_time = get_attribute_value(each_course_subsection_node._id,"start_time")
+						# print "each_sub_section_start_time",each_sub_section_start_time
+						if each_sub_section_start_time:
+							if curr_date_time.date() <= each_sub_section_start_time.date():
+								status =  each_sub_section_start_time
+								session_name = each_course_subsection_node.name
+								if get_current:
+									return session_name, status
+								return status, upcoming_course 
+		if get_current:
+			return session_name, status
+			
+		# print upcoming_course,node.name 
+		return status, upcoming_course 
 
 @get_execution_time
 @register.assignment_tag

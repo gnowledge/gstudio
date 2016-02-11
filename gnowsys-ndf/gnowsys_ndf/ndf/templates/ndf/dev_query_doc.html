@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		body { white-space: pre; font-family: monospace; }
+	</style>
+</head>
+<body>
+	{% for each_doc in result %}
+		<div class="json-obj">{{each_doc}}</div>
+		<br/>
+	{% endfor %}
+
+
+	<script type="text/javascript">
+
+		allJSONObjs = document.getElementsByClassName('json-obj');
+		obj = JSON.parse(allJSONObjs[0].textContent);
+
+		document.body.innerHTML = "";
+		document.body.appendChild(document.createTextNode(JSON.stringify(obj, null, 4)));
+
+	</script>
+</body>
+</html>

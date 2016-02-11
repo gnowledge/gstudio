@@ -141,7 +141,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
       - "res_group_name" will contain name of the group.
       - "res_group_id" will contain _id/ObjectId of the group.
 
-      Example 2: res_group_obj = get_group_name_id(group_name_or_id, True)
+      Example 2: res_group_obj = get_group_name_id(group_name_or_id, get_obj=True)
       - "res_group_obj" will contain entire object.
 
       Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
@@ -4315,17 +4315,23 @@ def node_thread_access(group_id, node):
     thread_start_time = None
     thread_end_time = None
     allow_to_comment = True  # default set to True to allow commenting if no date is set for thread
+    from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+    has_thread_node_thread_grel = get_relation_value(node._id,"has_thread")
 
-    if "has_thread" in node:
-        if node['has_thread']:
-                has_thread_node = node['has_thread'][0]
-    if has_thread_node:
-        if has_thread_node.attribute_set:
-            for each_attr in has_thread_node.attribute_set:
-                if each_attr and 'start_time' in each_attr:
-                    thread_start_time = each_attr['start_time']
-                if each_attr and 'end_time' in each_attr:
-                    thread_end_time = each_attr['end_time']
+    # if "has_thread" in node:
+    #     if node['has_thread']:
+    #             has_thread_node = node['has_thread'][0]
+    if has_thread_node_thread_grel:
+        has_thread_node = has_thread_node_thread_grel[0]
+        thread_start_time = get_attribute_value(has_thread_node_thread_grel[0]._id,"start_time")
+        thread_end_time = get_attribute_value(has_thread_node_thread_grel[0]._id,"end_time")
+        # if has_thread_node_thread_grel[0].attribute_set:
+        # if get_attribute_value(has_thread_node_thread_grel[0]._id,"start_time")
+            # for each_attr in has_thread_node_thread_grel[0].attribute_set:
+            #     if each_attr and 'start_time' in each_attr:
+            #         thread_start_time = each_attr['start_time']
+            #     if each_attr and 'end_time' in each_attr:
+            #         thread_end_time = each_attr['end_time']
     else:
         allow_to_comment = False      
     if thread_start_time and thread_end_time:

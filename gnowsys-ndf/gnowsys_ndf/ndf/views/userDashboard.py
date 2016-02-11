@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
+from django.http import Http404
 
 import ast
 try:
@@ -32,7 +33,7 @@ from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.forum import *
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.notification import models as notification
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_user_course_groups
 
 #######################################################################################################################################
 
@@ -64,8 +65,14 @@ def userpref(request, group_id):
 
 @get_execution_time
 def uDashboard(request, group_id):
-    usrid = int(group_id) 
-    auth = node_collection.one({'_type': "Author", 'created_by': usrid})
+
+    try:
+        usrid = int(group_id) 
+        auth = node_collection.one({'_type': "Author", 'created_by': usrid})
+    except:
+        auth = get_group_name_id(group_id, get_obj=True)
+        usrid = auth.created_by
+
     group_id = auth._id
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
 
@@ -524,7 +531,8 @@ def group_dashboard(request, group_id):
 def user_profile(request, group_id):
 	from django.contrib.auth.models import User
 
-	auth_node = node_collection.one({"_id":ObjectId(group_id)})
+	auth_node = get_group_name_id(group_id, get_obj=True)
+
 	user_dict={}
 	user_details = User.objects.get(id=request.user.id)
 	user_dict['fname'] = user_details.first_name
@@ -605,3 +613,56 @@ def upload_prof_pic(request, group_id):
         if user:
             group_id = user
         return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
+
+
+def my_courses(request, group_id):
+
+    if str(request.user) == 'AnonymousUser':
+        raise Http404("You don't have an authority for this page!")
+
+    try:
+        auth_obj = get_group_name_id(group_id, get_obj=True)
+        user_id = auth_obj.created_by
+
+    except:
+        user_id = eval(group_id)
+        auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
+
+    auth_id = auth_obj._id
+    title = 'My Courses'
+    my_course_objs = get_user_course_groups(user_id)
+    # print my_course_objs
+
+    return render_to_response('ndf/my-courses.html',
+                {
+                    'group_id': auth_id, 'groupid': auth_id,
+                    'node': auth_obj, 'title': title,
+                    'my_course_objs': my_course_objs
+                },
+                context_instance=RequestContext(request)
+        )
+
+
+def my_groups(request, group_id):
+
+    # if request.user == 'AnonymousUser':
+        # raise 404
+
+    try:
+        auth_obj = get_group_name_id(group_id, get_obj=True)
+
+    except:
+        user_id = eval(group_id)
+        auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
+
+    auth_id = auth_obj._id
+    title = 'My Groups'
+
+    return render_to_response('ndf/my-groups.html',
+                {
+                    'group_id': auth_id, 'groupid': auth_id,
+                    'node': auth_obj,
+                    'title': title
+                },
+                context_instance=RequestContext(request)
+        )
