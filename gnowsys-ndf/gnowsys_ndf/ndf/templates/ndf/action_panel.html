@@ -318,7 +318,13 @@
 							{% if is_gstaff %}
 							<!-- Prevent creating New group from context of top mod group -->
 							{% if group_object.edit_policy != "EDITABLE_MODERATED" and is_gstaff %}
-								<a href="{% url create_url group_object.name %}" class="tiny button radius expand mod-btn" title="{% trans 'Create New Group' %}">{% trans 'New Group' %}</a>
+								<a href="{% url create_url group_object.name %}" class="tiny button radius expand mod-btn" title="{% trans 'Create New' %}">
+									{% if group_object.agency_type == 'Partner' %}
+										{% trans 'New Partner' %}
+									{% else %}
+										{% trans 'New Group' %}
+									{% endif %}
+								</a>
 							{% endif %}								
 							{% endif %}								
 						{% else %}
