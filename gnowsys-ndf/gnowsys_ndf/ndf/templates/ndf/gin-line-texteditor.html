@@ -35,7 +35,7 @@
   <br/>
     {% if allow_to_comment %}
       <div class="create-discussion">
-      <div  onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="ckeditor-comment button small radius" style="margin-bottom:0;">
+      <div  onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}"  class="ckeditor-comment  button small radius" style="margin-bottom:0;">
         {% if thr_int_type %}
           {{thr_int_type}} {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
@@ -43,8 +43,11 @@
         {% endif %}
       </div>
     {% endif %}
+        <div class="discussion-refresh right">
+          <small><a onclick="location.reload()">Refresh <i class="fi-refresh"></i></a></small>
+        </div>
     </div>
-    
+
     {% comment %}
     {% if sg_type != "Event" %}
       <input type="file" id="uploaded-files" style="" value="" multiple>
@@ -340,7 +343,7 @@
               }
               // updating tab-text
               updateDiscussionTabText();
-              //location.reload();
+              
                
 
      
