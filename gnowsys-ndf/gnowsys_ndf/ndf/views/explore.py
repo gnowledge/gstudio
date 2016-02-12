@@ -11,7 +11,7 @@ from django.template import TemplateDoesNotExist
 # from django.template.loader import render_to_string
 # from django.core.urlresolvers import reverse
 # from django.contrib.auth.models import User
-# from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
 # from django.contrib.sites.models import Site
 # from mongokit import IS
 try:
@@ -25,6 +25,7 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 # from gnowsys_ndf.ndf.views.file import *
 # from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff
 # from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, replicate_resource
@@ -50,7 +51,7 @@ def explore(request):
         context_variable,
         context_instance=RequestContext(request))
 
-
+@get_execution_time
 def explore_courses(request):
 
     title = 'courses'
@@ -65,6 +66,7 @@ def explore_courses(request):
         context_instance=RequestContext(request))
 
 
+@get_execution_time
 def explore_groups(request):
 
     title = 'groups'
@@ -78,6 +80,9 @@ def explore_groups(request):
         context_variable,
         context_instance=RequestContext(request))
 
+
+@login_required
+@get_execution_time
 def explore_basecourses(request):
 
     title = 'base courses'
