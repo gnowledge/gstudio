@@ -6158,3 +6158,25 @@ def get_ckeditor(request,group_id):
             },
             context_instance=RequestContext(request))
 
+@get_execution_time
+def get_gin_line_template(request,group_id,node_id):
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    global_disc_all_replies = []
+    thread_node = get_thread_node(node_id)
+
+    allow_to_comment = node_thread_access(group_id, node_obj)
+    all_replies =  get_disc_replies(thread_node, group_id ,global_disc_all_replies)
+    # print "++++++++++++++++++++++++++thread_node,allow---",thread_node, allow_to_comment,all_replies
+
+
+    print "==================inside ginline",node_obj
+    return render_to_response('ndf/gin-line-texteditor.html',            
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'node': node_obj, 
+                'all_replies' : all_replies,
+                'thread_node':thread_node,
+                'allow_to_comment':allow_to_comment
+                
+            },
+            context_instance=RequestContext(request))
