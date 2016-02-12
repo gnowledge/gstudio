@@ -6166,10 +6166,6 @@ def get_gin_line_template(request,group_id,node_id):
 
     allow_to_comment = node_thread_access(group_id, node_obj)
     all_replies =  get_disc_replies(thread_node, group_id ,global_disc_all_replies)
-    # print "++++++++++++++++++++++++++thread_node,allow---",thread_node, allow_to_comment,all_replies
-
-
-    print "==================inside ginline",node_obj
     return render_to_response('ndf/gin-line-texteditor.html',            
             {
                 'group_id': group_id, 'groupid': group_id,
