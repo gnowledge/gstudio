@@ -102,7 +102,6 @@
 
                 <div class="row">
                     <div class="small-12 columns" >
-                    <h4>Comments</h4>
                         {% get_thread_node node.pk as thread_node %}
                             {% if thread_node %}
                                 {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
