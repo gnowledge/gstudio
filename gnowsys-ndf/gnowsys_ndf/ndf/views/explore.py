@@ -58,7 +58,7 @@ def explore_courses(request):
 
     title = 'courses'
 
-    ce_cur = node_collection.find({'member_of': ce_gst._id})
+    ce_cur = node_collection.find({'member_of': ce_gst._id}).sort('last_update', -1)
 
     context_variable = {'title': title, 'doc_cur': ce_cur, 'card': 'ndf/event_card.html',
                         'group_id': group_id, 'groupid': group_id}
@@ -74,7 +74,7 @@ def explore_groups(request):
 
     title = 'groups'
 
-    group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id})
+    group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id}).sort('last_update', -1)
 
     context_variable = {'title': title, 'doc_cur': group_cur, 'card': 'ndf/simple_card.html',
                         'group_id': group_id, 'groupid': group_id}
@@ -95,7 +95,7 @@ def explore_basecourses(request):
 
     title = 'base courses'
 
-    course_cur = node_collection.find({'member_of': gst_course._id})
+    course_cur = node_collection.find({'member_of': gst_course._id}).sort('last_update', -1)
     context_variable = {'title': title, 'doc_cur': course_cur, 'card': 'ndf/event_card.html',
                         'group_id': group_id, 'groupid': group_id}
     return render_to_response(
