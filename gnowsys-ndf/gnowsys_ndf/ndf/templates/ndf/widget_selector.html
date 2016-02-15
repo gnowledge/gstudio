@@ -177,28 +177,28 @@
     return document.querySelectorAll(selector);
   };
 
-  selectorWidgetID = "{{for}}-selector-widget.selector-widget";
-  selectorWidget = $s('#' + selectorWidgetID);
+  var selectorWidgetID = "{{for}}-selector-widget.selector-widget";
+  var selectorWidget = $s('#' + selectorWidgetID);
 
   $(document).ready(function () {
     $("#" + selectorWidgetID + " .selected-items").sortable({revert: true, scroll: true});
   })
 
-  selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
+  var selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
 
 
   // toBeSelected = document.getElementById('to-be-selected');
-  toBeSelected = $s('#' + selectorWidgetID + ' .to-be-selected');
+  var toBeSelected = $s('#' + selectorWidgetID + ' .to-be-selected');
   toBeSelected.onblur = function(){$s('#' + selectorWidgetID + ' .to-be-selected').classList.add('hide');}
 
   // selectedItems = document.getElementById('selected-items');
-  selectedItems = $s('#' + selectorWidgetID + ' .selected-items');
+  var selectedItems = $s('#' + selectorWidgetID + ' .selected-items');
   
   // searchText = document.getElementById('search-text');
-  searchText = $s('#' + selectorWidgetID + ' .search-text');
+  var searchText = $s('#' + selectorWidgetID + ' .search-text');
 
   // sItems = $sa("#to-be-selected .item");
-  sItems = $sa('#' + selectorWidgetID + ' .to-be-selected' + ' .item');
+  var sItems = $sa('#' + selectorWidgetID + ' .to-be-selected' + ' .item');
   
   function removeTag(){
     var tempItem = this.parentNode.querySelector('.item');
@@ -225,7 +225,7 @@
 
   function addToSelection () {
     // console.log(this.textContent);
-    selDiv = document.createElement('div');
+    var selDiv = document.createElement('div');
     // linebreak = document.createElement("br");
     selDiv.classList.add('label', 'secondary', 'selection');
     this.onclick = detachEvent;
@@ -250,7 +250,7 @@
   }
 
   for (var i = 0; i < selected_options.length; i++) {
-    temp_item = toBeSelected.querySelector('.item[data-value="'+ selected_options[i] +'"]');
+    var temp_item = toBeSelected.querySelector('.item[data-value="'+ selected_options[i] +'"]');
     if(temp_item){temp_item.click()}; 
   };
 
@@ -277,10 +277,6 @@
   }
 
   
-  searchText.oninput = searchOnItems;
-  searchText.onkeydown = function (e) { if(e.keyCode == 13) return false; };
-  // searchText.onchange = searchOnItems;
-
   function showOptionItems () {
     toBeSelected.classList.remove('hide');
     toBeSelected.scrollTop = 0
@@ -291,20 +287,24 @@
   }
 
   function hideOptionItems () {
-    console.log('kjkj')
     // toBeSelected.style.display = 'none';
     // elem = document.querySelector('#to-be-selected > .item');
-    elem = $s('#' + selectorWidgetID + ' .to-be-selected > .item');
+    var elem = $s('#' + selectorWidgetID + ' .to-be-selected > .item');
     if(elem) {elem.classList.remove('traversing-el');}
 
-    toBeSelected.classList.add('hide');
+    // toBeSelected.classList.add('hide');
     // if(!searchText.textContent || searchText.textContent=='search'){
     //   searchText.textContent = 'search';
     // }
   }
 
+
   searchText.onfocus = showOptionItems;
   searchText.onblur = hideOptionItems;
+  // searchText.onchange = searchOnItems;
+  searchText.oninput = searchOnItems;
+  searchText.onkeydown = function (e) { if(e.keyCode == 13) return false; };
+
 
   function getSelectedValues ({{for}}) {
     
@@ -351,7 +351,7 @@
     ev.preventDefault();
     
     // currentEl = $s('#to-be-selected > .item.traversing-el');
-    currentEl = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
+    var currentEl = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
     // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
     if(currentEl && currentEl.nextElementSibling && (currentEl.nextElementSibling.offsetHeight>0))
     {
@@ -388,7 +388,7 @@
     ev.preventDefault();
 
     // var currentEl = $s('#to-be-selected > .item.traversing-el');
-    currentEl = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
+    var currentEl = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
 
     // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
     // console.log(currentEl.classList)
