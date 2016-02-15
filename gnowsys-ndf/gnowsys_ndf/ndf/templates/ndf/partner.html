@@ -19,7 +19,7 @@
     {% autopaginate group_nodes 23 %}
     {% for node in group_nodes %}
       <li class="card-image-wrapper"> 
-        {% include 'ndf/main_simple_card.html' with  resource=node has_prof_pic=True url_name="partnerlist" first_arg=node.pk %}
+        {% include 'ndf/main_simple_card.html' with  resource=node has_prof_pic=True url_name="groupchange" first_arg=node.name %}
       </li>
     {% endfor %}
   </ul>
