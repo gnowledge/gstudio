@@ -58,7 +58,7 @@
         </div>
     </div>
     <div class="row gmodal-body">
-        <div class="small-9 columns gmodal-item-panel">
+        <div class="small-8 columns gmodal-item-panel">
             <!-- Detail view section -->
             <div class="row gmodal-item-holder ">
                 <div class="small-12 columns gmodal-item" style="background-color:white;">
@@ -91,7 +91,7 @@
             {% endcomment %}
         </div>
         <!-- Comments section -->
-        <div class="small-3 columns gmodal-comments-panel" >
+        <div class="small-4 columns gmodal-comments-panel" >
             <div class="gmodal-comments"   style="overflow-y:auto;">
                 <div class="row">
                     <div class="small-12 columns">
@@ -106,10 +106,10 @@
                             {% if thread_node %}
                                 {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
                                 {% get_node thread_node as thread_node_obj %}
-                                {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                                {% include 'ndf/ggallary-discussion.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
                             {% else %}
                                 {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                                {% include 'ndf/gin-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                                {% include 'ndf/ggallary-discussion.html' with var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
                             {% endif %}
                     </div>
                 </div>
