@@ -758,7 +758,7 @@ def topic_detail_view(request, group_id, app_Id=None):
   app_id = app._id
   topic = "Topic"
   theme_id = None
-
+  prior_obj = None
   # First get the navigation list till topic from theme map
   nav_l=request.GET.get('nav_li','')
   breadcrumbs_list = []
