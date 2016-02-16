@@ -23,6 +23,13 @@
 <div id="group_imgs_on_modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
 </div>
 <script>
+    if("{{ckeditor_toolbar}}" == "GgallaryCommentsToolbar"){
+        ckeditor_height = "100px";
+    }
+    else{
+
+        ckeditor_height = "200px";
+    }
     // Replace the <textarea id="editor1"> with a CKEditor
     // instance, using default configuration.
     CKEDITOR.replace( 'ckeditor_textarea',{
@@ -33,6 +40,7 @@
         nodeID: {node_id:'{{node_id}}'},
         textarea_id: 'ckeditor_textarea',
         customConfig : '/static/ndf/js/ckeditor-config.js',
+        height : ckeditor_height,
         // toolbar :
         //                                     [
         //                                         { name: 'basicstyles', items : [ 'Bold','Italic' ] },
