@@ -27,7 +27,7 @@
     <div class="row note-content">
         <div class="small-12 columns">
             <div class="note-header row">
-                <span class="note-title">{{notebook_obj.name}}</span>
+                <span class="note-title">{{notebook_obj.name}}</span>{% include "ndf/analytics_views.html" %}
                 {% if notebook_obj.tags %}
                 <div class="note-tags">
                 {% for each_tag in notebook_obj.tags %}

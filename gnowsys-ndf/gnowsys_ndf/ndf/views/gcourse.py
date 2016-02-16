@@ -1962,8 +1962,11 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
             notebook_obj = blog_pages[0]
             tab = 'all-notes'
             thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
+
         else:
             tab = 'all-notes'
+        if notebook_obj:
+            return HttpResponseRedirect(reverse('course_notebook_tab_note', kwargs={'group_id': group_id, 'tab': tab, "notebook_id": notebook_obj.pk }))
     
     # if all_blogs:
     #     blog_pages = all_blogs.clone()
