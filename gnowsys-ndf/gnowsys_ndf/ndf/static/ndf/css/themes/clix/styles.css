@@ -24534,18 +24534,17 @@ aside#help p, aside#help h5, aside#help h6 {
 }
 /* line 1204, ../../../scss/_app_styles.scss */
 .scard .scard-image {
-  height: 100%;
   background-color: #FFF;
 }
 /* line 1208, ../../../scss/_app_styles.scss */
 .scard .scard-image img {
-  height: 100%;
   margin: 0px auto;
   width: 80%;
   display: block;
 }
 /* line 1215, ../../../scss/_app_styles.scss */
 .scard .scard-image i {
+  width: 80%;
   font-size: 7rem;
   opacity: 0.75;
   display: block;
@@ -24558,62 +24557,62 @@ aside#help p, aside#help h5, aside#help h6 {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1229, ../../../scss/_app_styles.scss */
+/* line 1230, ../../../scss/_app_styles.scss */
 .scard .scard-image i.common-icon:before {
   content: "\f1fb";
 }
-/* line 1232, ../../../scss/_app_styles.scss */
+/* line 1233, ../../../scss/_app_styles.scss */
 .scard .scard-image i.file:before {
   content: "\f18e";
 }
-/* line 1235, ../../../scss/_app_styles.scss */
+/* line 1236, ../../../scss/_app_styles.scss */
 .scard .scard-image i.page:before {
   content: "\f18e";
 }
-/* line 1238, ../../../scss/_app_styles.scss */
+/* line 1239, ../../../scss/_app_styles.scss */
 .scard .scard-image i.collection:before {
   content: "\f18a";
 }
-/* line 1241, ../../../scss/_app_styles.scss */
+/* line 1242, ../../../scss/_app_styles.scss */
 .scard .scard-image i.documents:before {
   content: "\f18b";
 }
-/* line 1244, ../../../scss/_app_styles.scss */
+/* line 1245, ../../../scss/_app_styles.scss */
 .scard .scard-image i.pdf:before {
   content: "\f18b";
 }
-/* line 1247, ../../../scss/_app_styles.scss */
+/* line 1248, ../../../scss/_app_styles.scss */
 .scard .scard-image i.text:before {
   content: "\f18e";
 }
-/* line 1250, ../../../scss/_app_styles.scss */
+/* line 1251, ../../../scss/_app_styles.scss */
 .scard .scard-image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1253, ../../../scss/_app_styles.scss */
+/* line 1254, ../../../scss/_app_styles.scss */
 .scard .scard-image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1256, ../../../scss/_app_styles.scss */
+/* line 1257, ../../../scss/_app_styles.scss */
 .scard .scard-image i.images:before {
   content: "\f125";
 }
-/* line 1259, ../../../scss/_app_styles.scss */
+/* line 1260, ../../../scss/_app_styles.scss */
 .scard .scard-image i.audios:before, .scard .scard-image i.audio:before {
   content: "\f17b";
 }
-/* line 1262, ../../../scss/_app_styles.scss */
+/* line 1263, ../../../scss/_app_styles.scss */
 .scard .scard-image i.videos:before, .scard .scard-image i.video:before {
   content: "\f20e";
 }
 
 /*float:left;*/
-/* line 1268, ../../../scss/_app_styles.scss */
+/* line 1269, ../../../scss/_app_styles.scss */
 .scard-footer {
   border-radius: 0px 0px 5px 5px;
 }
 
-/* line 1272, ../../../scss/_app_styles.scss */
+/* line 1273, ../../../scss/_app_styles.scss */
 .scard-content {
   height: 3em;
   padding: 0.4em 1em;
@@ -24629,7 +24628,7 @@ aside#help p, aside#help h5, aside#help h6 {
       transition: box-shadow 0.5s ease;
   }*/
 }
-/* line 1287, ../../../scss/_app_styles.scss */
+/* line 1288, ../../../scss/_app_styles.scss */
 .scard-content .scard-title {
   font-size: 14px;
   color: #565656;
@@ -24638,7 +24637,7 @@ aside#help p, aside#help h5, aside#help h6 {
   line-height: 1.3em;
 }
 
-/* line 1295, ../../../scss/_app_styles.scss */
+/* line 1296, ../../../scss/_app_styles.scss */
 .scard-desc {
   font-size: 0.7em;
   color: #333333;
@@ -24653,7 +24652,7 @@ aside#help p, aside#help h5, aside#help h6 {
   display: block;
 }
 
-/* line 1309, ../../../scss/_app_styles.scss */
+/* line 1310, ../../../scss/_app_styles.scss */
 .scard_header {
   text-align: center;
   position: fixed;
@@ -24671,7 +24670,7 @@ aside#help p, aside#help h5, aside#help h6 {
   font-weight: bold;
 }
 
-/* line 1326, ../../../scss/_app_styles.scss */
+/* line 1327, ../../../scss/_app_styles.scss */
 .scard-action {
   height: height;
   font-size: 0.6em;
@@ -24681,44 +24680,43 @@ aside#help p, aside#help h5, aside#help h6 {
   margin-top: -0.25em;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
-  width: 11rem;
   background-color: #CCCCCC;
 }
 
-/* line 1342, ../../../scss/_app_styles.scss */
+/* line 1343, ../../../scss/_app_styles.scss */
 p {
   margin: 0px;
   padding: 10px;
 }
 
-/* line 1347, ../../../scss/_app_styles.scss */
+/* line 1348, ../../../scss/_app_styles.scss */
 .published.scard-action {
   background: #A6D9CB;
 }
 
-/* line 1351, ../../../scss/_app_styles.scss */
+/* line 1352, ../../../scss/_app_styles.scss */
 .draft.scard-action {
   content: "Draft";
   background: #DCDCDC;
 }
 
-/* line 1357, ../../../scss/_app_styles.scss */
+/* line 1358, ../../../scss/_app_styles.scss */
 .deleted.scard-action {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
 
-/* line 1362, ../../../scss/_app_styles.scss */
+/* line 1363, ../../../scss/_app_styles.scss */
 .moderation.scard-action {
   border-color: transparent #6153ae transparent transparent;
   border-color: rgba(255, 255, 255, 0) #6153ae rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1366, ../../../scss/_app_styles.scss */
+/* line 1367, ../../../scss/_app_styles.scss */
 .moderation.scard-action .label-text:before {
   content: "Mod";
 }
 
-/* line 1370, ../../../scss/_app_styles.scss */
+/* line 1371, ../../../scss/_app_styles.scss */
 .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -24729,7 +24727,7 @@ p {
 
 /* End Simple Card CSS*/
 /* Horizontal Card */
-/* line 1384, ../../../scss/_app_styles.scss */
+/* line 1385, ../../../scss/_app_styles.scss */
 .hr-card {
   /*background: #F2F2F2;*/
   border: 1px solid #AAA;
@@ -24740,12 +24738,12 @@ p {
   width: 100%;
   height: 32em;
 }
-/* line 1394, ../../../scss/_app_styles.scss */
+/* line 1395, ../../../scss/_app_styles.scss */
 .hr-card:hover {
   box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.5s ease;
 }
-/* line 1399, ../../../scss/_app_styles.scss */
+/* line 1400, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-status {
   z-index: 99;
   width: auto;
@@ -24754,7 +24752,7 @@ p {
   background-color: #00b300;
   color: white;
 }
-/* line 1412, ../../../scss/_app_styles.scss */
+/* line 1413, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-title {
   color: #0d0d0d;
   font-weight: bold;
@@ -24765,19 +24763,19 @@ p {
   transform: translate(-50%, -50%);
   font-size: 25px;
 }
-/* line 1423, ../../../scss/_app_styles.scss */
+/* line 1424, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-desc {
   word-wrap: break-word;
   font-size: 0.7em;
   color: #333333;
   padding-left: 4px;
 }
-/* line 1429, ../../../scss/_app_styles.scss */
+/* line 1430, ../../../scss/_app_styles.scss */
 .hr-card p {
   margin: 0px;
   padding: 10px;
 }
-/* line 1434, ../../../scss/_app_styles.scss */
+/* line 1435, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image {
   max-height: 32rem;
   padding: 0px;
@@ -24791,7 +24789,7 @@ p {
   font-size: 25px;
   background-color: #E5E5E5;
 }
-/* line 1448, ../../../scss/_app_styles.scss */
+/* line 1449, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -24799,7 +24797,7 @@ p {
   opacity: 0.5;
   height: 100%;
 }
-/* line 1457, ../../../scss/_app_styles.scss */
+/* line 1458, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -24813,74 +24811,74 @@ p {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1471, ../../../scss/_app_styles.scss */
+/* line 1472, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.file:before {
   content: "\f18e";
 }
-/* line 1474, ../../../scss/_app_styles.scss */
+/* line 1475, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.page:before {
   content: "\f18e";
 }
-/* line 1477, ../../../scss/_app_styles.scss */
+/* line 1478, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.collection:before {
   content: "\f18a";
 }
-/* line 1480, ../../../scss/_app_styles.scss */
+/* line 1481, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.documents:before {
   content: "\f18b";
 }
-/* line 1483, ../../../scss/_app_styles.scss */
+/* line 1484, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.pdf:before {
   content: "\f18b";
 }
-/* line 1486, ../../../scss/_app_styles.scss */
+/* line 1487, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.text:before {
   content: "\f18e";
 }
-/* line 1489, ../../../scss/_app_styles.scss */
+/* line 1490, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1492, ../../../scss/_app_styles.scss */
+/* line 1493, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1495, ../../../scss/_app_styles.scss */
+/* line 1496, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.images:before {
   content: "\f125";
 }
-/* line 1498, ../../../scss/_app_styles.scss */
+/* line 1499, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.audios:before, .hr-card .hr-card-image i.audio:before {
   content: "\f17b";
 }
-/* line 1501, ../../../scss/_app_styles.scss */
+/* line 1502, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.videos:before, .hr-card .hr-card-image i.video:before {
   content: "\f20e";
 }
-/* line 1507, ../../../scss/_app_styles.scss */
+/* line 1508, ../../../scss/_app_styles.scss */
 .hr-card .published.scard-action {
   background: #A6D9CB;
 }
-/* line 1511, ../../../scss/_app_styles.scss */
+/* line 1512, ../../../scss/_app_styles.scss */
 .hr-card .draft.scard-action {
   content: "Draft";
   background: #DCDCDC;
 }
-/* line 1517, ../../../scss/_app_styles.scss */
+/* line 1518, ../../../scss/_app_styles.scss */
 .hr-card .deleted.scard-action {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1522, ../../../scss/_app_styles.scss */
+/* line 1523, ../../../scss/_app_styles.scss */
 .hr-card .moderation.scard-action {
   border-color: transparent #6153ae transparent transparent;
   border-color: rgba(255, 255, 255, 0) #6153ae rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1526, ../../../scss/_app_styles.scss */
+/* line 1527, ../../../scss/_app_styles.scss */
 .hr-card .moderation.scard-action .label-text:before {
   content: "Mod";
 }
-/* line 1530, ../../../scss/_app_styles.scss */
+/* line 1531, ../../../scss/_app_styles.scss */
 .hr-card .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -24891,12 +24889,12 @@ p {
 
 /* End Horizontal Card */
 /* Course/ Event Card CSS*/
-/* line 1548, ../../../scss/_app_styles.scss */
+/* line 1549, ../../../scss/_app_styles.scss */
 .card-image-wrapper {
   position: relative;
 }
 
-/* line 1552, ../../../scss/_app_styles.scss */
+/* line 1553, ../../../scss/_app_styles.scss */
 .event-card {
   padding: 0px;
   min-height: 22rem;
@@ -24905,12 +24903,12 @@ p {
   border-radius: 10px;
   background-color: #fff;
 }
-/* line 1560, ../../../scss/_app_styles.scss */
+/* line 1561, ../../../scss/_app_styles.scss */
 .event-card:hover {
   box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.5s ease;
 }
-/* line 1565, ../../../scss/_app_styles.scss */
+/* line 1566, ../../../scss/_app_styles.scss */
 .event-card .event-card-status {
   z-index: 99;
   width: auto;
@@ -24925,27 +24923,27 @@ p {
   border-radius: 4px;
   letter-spacing: 0.3px;
 }
-/* line 1579, ../../../scss/_app_styles.scss */
+/* line 1580, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.open {
   background-color: #00b300;
 }
-/* line 1582, ../../../scss/_app_styles.scss */
+/* line 1583, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.closed {
   background-color: red;
 }
-/* line 1585, ../../../scss/_app_styles.scss */
+/* line 1586, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.in-progress {
   background-color: #00b300;
 }
-/* line 1588, ../../../scss/_app_styles.scss */
+/* line 1589, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.forthcoming {
   background-color: #F2910D;
 }
-/* line 1592, ../../../scss/_app_styles.scss */
+/* line 1593, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.completed {
   background-color: #4d4d4d;
 }
-/* line 1597, ../../../scss/_app_styles.scss */
+/* line 1598, ../../../scss/_app_styles.scss */
 .event-card .event-card-notifications {
   position: absolute;
   top: 2px;
@@ -24954,46 +24952,46 @@ p {
   color: #F04124;
   font-weight: 600;
 }
-/* line 1605, ../../../scss/_app_styles.scss */
+/* line 1606, ../../../scss/_app_styles.scss */
 .event-card .event-card-notifications .badge {
   padding: 0px 5px;
   font-size: 1.4em;
   font-weight: 600;
 }
-/* line 1612, ../../../scss/_app_styles.scss */
+/* line 1613, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status {
   font-weight: 500;
   font-size: 1.2em;
   padding: 0.5em 0.8em 0.6em;
 }
-/* line 1617, ../../../scss/_app_styles.scss */
+/* line 1618, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.open {
   color: #00b300;
 }
-/* line 1621, ../../../scss/_app_styles.scss */
+/* line 1622, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.closed {
   color: red;
 }
-/* line 1625, ../../../scss/_app_styles.scss */
+/* line 1626, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.in-progress {
   color: #000;
 }
-/* line 1628, ../../../scss/_app_styles.scss */
+/* line 1629, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.forthcoming {
   color: #F2910D;
 }
-/* line 1632, ../../../scss/_app_styles.scss */
+/* line 1633, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.completed {
   color: #4d4d4d;
 }
-/* line 1636, ../../../scss/_app_styles.scss */
+/* line 1637, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status .event-time {
   font-size: 0.7em;
   display: block;
   font-weight: 400;
   display: inline;
 }
-/* line 1644, ../../../scss/_app_styles.scss */
+/* line 1645, ../../../scss/_app_styles.scss */
 .event-card .event-card-title {
   color: #0d0d0d;
   display: inline-block;
@@ -25004,19 +25002,19 @@ p {
   font-size: 1.5em;
   font-weight: 400;
 }
-/* line 1655, ../../../scss/_app_styles.scss */
+/* line 1656, ../../../scss/_app_styles.scss */
 .event-card .event-card-desc {
   word-wrap: break-word;
   font-size: 0.6em;
   color: #333333;
   padding-left: 4px;
 }
-/* line 1661, ../../../scss/_app_styles.scss */
+/* line 1662, ../../../scss/_app_styles.scss */
 .event-card p {
   margin: 0px;
   padding: 10px;
 }
-/* line 1667, ../../../scss/_app_styles.scss */
+/* line 1668, ../../../scss/_app_styles.scss */
 .event-card .event-card-image {
   padding: 0px;
   margin: 0px;
@@ -25028,7 +25026,7 @@ p {
   background-color: #e5e5e5;
   border-radius: 10px 10px 0px 0px;
 }
-/* line 1678, ../../../scss/_app_styles.scss */
+/* line 1679, ../../../scss/_app_styles.scss */
 .event-card .event-card-image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -25037,7 +25035,7 @@ p {
   opacity: 0.9;
   height: 100%;
 }
-/* line 1687, ../../../scss/_app_styles.scss */
+/* line 1688, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -25045,57 +25043,57 @@ p {
   margin: -15px auto;
   text-align: center;
   color: gray;
-  /*font-family: "foundation-icons";*/
+  font-family: "foundation-icons";
   font-style: normal;
   font-variant: normal;
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 1701, ../../../scss/_app_styles.scss */
+/* line 1702, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.file:before {
   content: "\f18e";
 }
-/* line 1704, ../../../scss/_app_styles.scss */
+/* line 1705, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.page:before {
   content: "\f18e";
 }
-/* line 1707, ../../../scss/_app_styles.scss */
+/* line 1708, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.collection:before {
   content: "\f18a";
 }
-/* line 1710, ../../../scss/_app_styles.scss */
+/* line 1711, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.documents:before {
   content: "\f18b";
 }
-/* line 1713, ../../../scss/_app_styles.scss */
+/* line 1714, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.pdf:before {
   content: "\f18b";
 }
-/* line 1716, ../../../scss/_app_styles.scss */
+/* line 1717, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.text:before {
   content: "\f18e";
 }
-/* line 1719, ../../../scss/_app_styles.scss */
+/* line 1720, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.interactives:before {
   content: "\f1b2";
 }
-/* line 1722, ../../../scss/_app_styles.scss */
+/* line 1723, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.ebooks:before {
   content: "\f11e";
 }
-/* line 1725, ../../../scss/_app_styles.scss */
+/* line 1726, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.images:before {
   content: "\f125";
 }
-/* line 1728, ../../../scss/_app_styles.scss */
+/* line 1729, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.audios:before, .event-card .event-card-image i.audio:before {
   content: "\f17b";
 }
-/* line 1731, ../../../scss/_app_styles.scss */
+/* line 1732, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.videos:before, .event-card .event-card-image i.video:before {
   content: "\f20e";
 }
-/* line 1735, ../../../scss/_app_styles.scss */
+/* line 1736, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-footer {
   padding: 0.7em 1em;
   border-top: 1px solid #DCDCDC;
@@ -25106,7 +25104,7 @@ p {
   background-color: #F3F3F3;
   border-radius: 0px 0px 10px 10px;
 }
-/* line 1745, ../../../scss/_app_styles.scss */
+/* line 1746, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-footer .footer-label {
   text-transform: uppercase;
   font-size: 10px;
@@ -25114,54 +25112,54 @@ p {
   margin-bottom: 2px;
   color: #ADADAD;
 }
-/* line 1753, ../../../scss/_app_styles.scss */
+/* line 1754, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-footer .date {
   color: #929292;
   font-size: 0.85em;
   letter-spacing: 0.5px;
 }
-/* line 1758, ../../../scss/_app_styles.scss */
+/* line 1759, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-footer .date i:not(.edit-course-duration, .edit-course-enrollment) {
   margin-right: 0.3em;
 }
-/* line 1762, ../../../scss/_app_styles.scss */
+/* line 1763, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-footer .row {
   margin: 10px 0px 0px;
 }
-/* line 1766, ../../../scss/_app_styles.scss */
+/* line 1767, ../../../scss/_app_styles.scss */
 .event-card .edit-course-duration, .event-card .edit-course-enrollment {
   float: right;
   font-size: 1.5em;
   color: #DADADA;
 }
-/* line 1770, ../../../scss/_app_styles.scss */
+/* line 1771, ../../../scss/_app_styles.scss */
 .event-card .edit-course-duration:hover, .event-card .edit-course-enrollment:hover {
   color: #565656;
 }
-/* line 1774, ../../../scss/_app_styles.scss */
+/* line 1775, ../../../scss/_app_styles.scss */
 .event-card .published.scard-action {
   background: #A6D9CB;
 }
-/* line 1778, ../../../scss/_app_styles.scss */
+/* line 1779, ../../../scss/_app_styles.scss */
 .event-card .draft.scard-action {
   content: "Draft";
   background: #DCDCDC;
 }
-/* line 1783, ../../../scss/_app_styles.scss */
+/* line 1784, ../../../scss/_app_styles.scss */
 .event-card .deleted.scard-action {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1788, ../../../scss/_app_styles.scss */
+/* line 1789, ../../../scss/_app_styles.scss */
 .event-card .moderation.scard-action {
   border-color: transparent #6153ae transparent transparent;
   border-color: rgba(255, 255, 255, 0) #6153ae rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 1792, ../../../scss/_app_styles.scss */
+/* line 1793, ../../../scss/_app_styles.scss */
 .event-card .moderation.scard-action .label-text:before {
   content: "Mod";
 }
-/* line 1796, ../../../scss/_app_styles.scss */
+/* line 1797, ../../../scss/_app_styles.scss */
 .event-card .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -25172,7 +25170,7 @@ p {
 
 /* End Course/events Card CSS*/
 /* Customized Off-Canvas */
-/* line 1813, ../../../scss/_app_styles.scss */
+/* line 1814, ../../../scss/_app_styles.scss */
 #help-canvas-menu {
   position: fixed;
   top: 52px;
@@ -25185,26 +25183,26 @@ p {
   height: 100%;
 }
 
-/* line 1824, ../../../scss/_app_styles.scss */
+/* line 1825, ../../../scss/_app_styles.scss */
 #help-canvas-menu.expanded {
   left: 0 !important;
   z-index: 100000000;
   left: 150px;
 }
 
-/* line 1829, ../../../scss/_app_styles.scss */
+/* line 1830, ../../../scss/_app_styles.scss */
 #help-canvas-menu.expanded .help-button {
   right: 80px;
   z-index: -1;
 }
 
-/* line 1834, ../../../scss/_app_styles.scss */
+/* line 1835, ../../../scss/_app_styles.scss */
 #help-canvas-menu.animating .help-button {
   -webkit-animation: shake 400ms;
   animation: shake 400ms;
 }
 
-/* line 1838, ../../../scss/_app_styles.scss */
+/* line 1839, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button {
   position: absolute;
   -webkit-transform: rotate(-90deg);
@@ -25231,12 +25229,12 @@ p {
   border-top-right-radius: 5px;
 }
 
-/* line 1864, ../../../scss/_app_styles.scss */
+/* line 1865, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button-text {
   font-size: 18px;
 }
 
-/* line 1867, ../../../scss/_app_styles.scss */
+/* line 1868, ../../../scss/_app_styles.scss */
 #help-canvas-menu .help-button .text {
   color: #f9f9f9;
   letter-spacing: .1em;
@@ -25245,7 +25243,7 @@ p {
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
-/* line 1876, ../../../scss/_app_styles.scss */
+/* line 1877, ../../../scss/_app_styles.scss */
 #help-canvas-menu .mainContainer {
   background: #fff;
   /*-webkit-box-shadow:3px 3px 17px -1px #7b7b7b;
@@ -25259,7 +25257,7 @@ p {
 }
 
 /* End of Customized Off-Canvas */
-/* line 1894, ../../../scss/_app_styles.scss */
+/* line 1895, ../../../scss/_app_styles.scss */
 .rcard {
   overflow: hidden;
   color: #272727;
@@ -25267,56 +25265,56 @@ p {
   background-color: #f5f5f5;
   margin: 5px;
 }
-/* line 1905, ../../../scss/_app_styles.scss */
+/* line 1906, ../../../scss/_app_styles.scss */
 .rcard:hover {
   box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
   transition: box-shadow 0.5s ease;
 }
-/* line 1910, ../../../scss/_app_styles.scss */
+/* line 1911, ../../../scss/_app_styles.scss */
 .rcard .title {
   font-size: 1.1rem;
   font-weight: bold;
 }
-/* line 1916, ../../../scss/_app_styles.scss */
+/* line 1917, ../../../scss/_app_styles.scss */
 .rcard .content {
   padding: 0.5rem 2rem;
   border-radius: 0 0 2px 2px;
   overflow: hidden;
   height: 7.25rem;
 }
-/* line 1923, ../../../scss/_app_styles.scss */
+/* line 1924, ../../../scss/_app_styles.scss */
 .rcard .content .slick-slider {
   margin-bottom: 0;
 }
-/* line 1927, ../../../scss/_app_styles.scss */
+/* line 1928, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev {
   left: 0.25rem;
 }
-/* line 1930, ../../../scss/_app_styles.scss */
+/* line 1931, ../../../scss/_app_styles.scss */
 .rcard .content .slick-prev:before {
   color: #ccc;
 }
-/* line 1936, ../../../scss/_app_styles.scss */
+/* line 1937, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next {
   right: 0.25rem;
 }
-/* line 1939, ../../../scss/_app_styles.scss */
+/* line 1940, ../../../scss/_app_styles.scss */
 .rcard .content .slick-next:before {
   color: #ccc;
 }
-/* line 1945, ../../../scss/_app_styles.scss */
+/* line 1946, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title {
   width: 100%;
   border-bottom: 1px solid #808080;
   line-height: 0.25em;
   margin: 10px 0 20px;
 }
-/* line 1951, ../../../scss/_app_styles.scss */
+/* line 1952, ../../../scss/_app_styles.scss */
 .rcard .content .card-content-title small {
   padding: 0 10px;
   background-color: #f5f5f5;
 }
-/* line 1958, ../../../scss/_app_styles.scss */
+/* line 1959, ../../../scss/_app_styles.scss */
 .rcard .action {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -25324,15 +25322,15 @@ p {
   font-size: small;
   height: 2rem;
 }
-/* line 1965, ../../../scss/_app_styles.scss */
+/* line 1966, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection {
   opacity: 0.5;
 }
-/* line 1968, ../../../scss/_app_styles.scss */
+/* line 1969, ../../../scss/_app_styles.scss */
 .rcard .action .add-to-collection:hover {
   opacity: 1;
 }
-/* line 1982, ../../../scss/_app_styles.scss */
+/* line 1983, ../../../scss/_app_styles.scss */
 .rcard .image {
   position: relative;
   background-color: #ccc;
@@ -25340,7 +25338,7 @@ p {
   height: 8em;
   overflow: hidden;
 }
-/* line 1992, ../../../scss/_app_styles.scss */
+/* line 1993, ../../../scss/_app_styles.scss */
 .rcard .image .title {
   position: absolute;
   bottom: 0;
@@ -25353,7 +25351,7 @@ p {
   text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
   /*font-family: Open Sans Bold;*/
 }
-/* line 2005, ../../../scss/_app_styles.scss */
+/* line 2006, ../../../scss/_app_styles.scss */
 .rcard .image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -25363,14 +25361,14 @@ p {
   filter: brightness(0.75);
   -webkit-filter: brightness(0.75);
 }
-/* line 2017, ../../../scss/_app_styles.scss */
+/* line 2018, ../../../scss/_app_styles.scss */
 .rcard .image img:hover {
   filter: brightness(1);
   -webkit-filter: brightness(1);
   transform: translate3d(0, 0, 0);
   transition: all 1.5s ease;
 }
-/* line 2026, ../../../scss/_app_styles.scss */
+/* line 2027, ../../../scss/_app_styles.scss */
 .rcard .image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -25384,51 +25382,51 @@ p {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 2043, ../../../scss/_app_styles.scss */
+/* line 2044, ../../../scss/_app_styles.scss */
 .rcard .image i.file:before {
   content: "\f18e";
 }
-/* line 2044, ../../../scss/_app_styles.scss */
+/* line 2045, ../../../scss/_app_styles.scss */
 .rcard .image i.page:before {
   content: "\f18e";
 }
-/* line 2045, ../../../scss/_app_styles.scss */
+/* line 2046, ../../../scss/_app_styles.scss */
 .rcard .image i.collection:before {
   content: "\f18a";
 }
-/* line 2047, ../../../scss/_app_styles.scss */
+/* line 2048, ../../../scss/_app_styles.scss */
 .rcard .image i.documents:before {
   content: "\f18b";
 }
-/* line 2048, ../../../scss/_app_styles.scss */
+/* line 2049, ../../../scss/_app_styles.scss */
 .rcard .image i.pdf:before {
   content: "\f18b";
 }
-/* line 2049, ../../../scss/_app_styles.scss */
+/* line 2050, ../../../scss/_app_styles.scss */
 .rcard .image i.text:before {
   content: "\f18e";
 }
-/* line 2050, ../../../scss/_app_styles.scss */
+/* line 2051, ../../../scss/_app_styles.scss */
 .rcard .image i.interactives:before {
   content: "\f1b2";
 }
-/* line 2051, ../../../scss/_app_styles.scss */
+/* line 2052, ../../../scss/_app_styles.scss */
 .rcard .image i.ebooks:before {
   content: "\f11e";
 }
-/* line 2052, ../../../scss/_app_styles.scss */
+/* line 2053, ../../../scss/_app_styles.scss */
 .rcard .image i.images:before {
   content: "\f125";
 }
-/* line 2053, ../../../scss/_app_styles.scss */
+/* line 2054, ../../../scss/_app_styles.scss */
 .rcard .image i.audios:before, .rcard .image i.audio:before {
   content: "\f17b";
 }
-/* line 2054, ../../../scss/_app_styles.scss */
+/* line 2055, ../../../scss/_app_styles.scss */
 .rcard .image i.videos:before, .rcard .image i.video:before {
   content: "\f20e";
 }
-/* line 2057, ../../../scss/_app_styles.scss */
+/* line 2058, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-style: solid;
   border-width: 0 70px 40px 0;
@@ -25441,59 +25439,59 @@ p {
   z-index: 1;
   opacity: 0.75;
 }
-/* line 2070, ../../../scss/_app_styles.scss */
+/* line 2071, ../../../scss/_app_styles.scss */
 .rcard .card-label {
   border-color: transparent #333 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #333 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2075, ../../../scss/_app_styles.scss */
+/* line 2076, ../../../scss/_app_styles.scss */
 .rcard .published.card-label {
   border-color: transparent #43AC6A transparent transparent;
   border-color: rgba(255, 255, 255, 0) #43AC6A rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2079, ../../../scss/_app_styles.scss */
+/* line 2080, ../../../scss/_app_styles.scss */
 .rcard .published.card-label .label-text:before {
   content: "\221A";
   margin-left: 5px;
   font-size: larger;
 }
-/* line 2087, ../../../scss/_app_styles.scss */
+/* line 2088, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label {
   border-color: transparent #cdcdcd transparent transparent;
   border-color: rgba(255, 255, 255, 0) #cdcdcd rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2091, ../../../scss/_app_styles.scss */
+/* line 2092, ../../../scss/_app_styles.scss */
 .rcard .draft.card-label .label-text:before {
   content: "Draft";
 }
-/* line 2096, ../../../scss/_app_styles.scss */
+/* line 2097, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2100, ../../../scss/_app_styles.scss */
+/* line 2101, ../../../scss/_app_styles.scss */
 .rcard .deleted.card-label .label-text:before {
   content: "Deleted";
 }
-/* line 2105, ../../../scss/_app_styles.scss */
+/* line 2106, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label {
   border-color: transparent #6153ae transparent transparent;
   border-color: rgba(255, 255, 255, 0) #6153ae rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2109, ../../../scss/_app_styles.scss */
+/* line 2110, ../../../scss/_app_styles.scss */
 .rcard .moderation.card-label .label-text:before {
   content: "Mod";
 }
-/* line 2112, ../../../scss/_app_styles.scss */
+/* line 2113, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label {
   border-color: transparent #000 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #000 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 2116, ../../../scss/_app_styles.scss */
+/* line 2117, ../../../scss/_app_styles.scss */
 .rcard .hidden.card-label .label-text:before {
   content: "hidden";
 }
-/* line 2119, ../../../scss/_app_styles.scss */
+/* line 2120, ../../../scss/_app_styles.scss */
 .rcard .label-text {
   color: #fff;
   font-size: 0.75rem;
@@ -25504,7 +25502,7 @@ p {
   transform: rotate(30deg);
 }
 
-/* line 2133, ../../../scss/_app_styles.scss */
+/* line 2134, ../../../scss/_app_styles.scss */
 .compulsory:after {
   content: '*';
   color: red;
@@ -25512,19 +25510,19 @@ p {
 }
 
 /* Watermark background for node_ajax_content  */
-/* line 2141, ../../../scss/_app_styles.scss */
+/* line 2142, ../../../scss/_app_styles.scss */
 .allow.draft {
   background-size: 10%;
   background-repeat: repeat;
   background-image: url("/static/ndf/images/draft-watermark.png");
 }
 
-/* line 2149, ../../../scss/_app_styles.scss */
+/* line 2150, ../../../scss/_app_styles.scss */
 .text-gray {
   color: gray;
 }
 
-/* line 2154, ../../../scss/_app_styles.scss */
+/* line 2155, ../../../scss/_app_styles.scss */
 .repository-title {
   color: #D7D7D7;
   font-size: 1.1em;
@@ -25537,7 +25535,7 @@ p {
   text-align: center;
 }
 
-/* line 2165, ../../../scss/_app_styles.scss */
+/* line 2166, ../../../scss/_app_styles.scss */
 .repository-desc {
   font-size: 1.1em;
   width: auto;
@@ -25549,12 +25547,12 @@ p {
   margin-left: 4px;
 }
 
-/* line 2175, ../../../scss/_app_styles.scss */
+/* line 2176, ../../../scss/_app_styles.scss */
 .card-holder {
   padding-left: 2%;
 }
 
-/* line 2179, ../../../scss/_app_styles.scss */
+/* line 2180, ../../../scss/_app_styles.scss */
 .app-card {
   width: 19rem;
   min-height: 10rem;
@@ -25567,7 +25565,7 @@ p {
   border: thin solid #D3D3D3;
 }
 
-/* line 2191, ../../../scss/_app_styles.scss */
+/* line 2192, ../../../scss/_app_styles.scss */
 .app-card:hover {
   box-shadow: 0px 0px 15px #808080;
   border: thin solid #D3D3D3;
@@ -25575,26 +25573,26 @@ p {
   transition: all 0.6s ease 0s;
 }
 
-/* line 2198, ../../../scss/_app_styles.scss */
+/* line 2199, ../../../scss/_app_styles.scss */
 .app-card-icon {
   color: #4c4c4c;
   position: relative;
   font-size: 6em;
 }
 
-/* line 2204, ../../../scss/_app_styles.scss */
+/* line 2205, ../../../scss/_app_styles.scss */
 .app-card-title {
   padding-bottom: -1em;
 }
 
-/* line 2208, ../../../scss/_app_styles.scss */
+/* line 2209, ../../../scss/_app_styles.scss */
 .app-card-content {
   color: #4c4c4c;
   text-align: center;
   margin-top: 0.5cm;
 }
 
-/* line 2214, ../../../scss/_app_styles.scss */
+/* line 2215, ../../../scss/_app_styles.scss */
 .fullscreen-icon {
   display: none;
 }
@@ -25610,57 +25608,57 @@ div.show-image:hover div.fullscreen-icon{
     font-size:2em;
 
 }*/
-/* line 2230, ../../../scss/_app_styles.scss */
+/* line 2231, ../../../scss/_app_styles.scss */
 .cke .cke_toolbox .cke_toolbar:last-child {
   float: right;
 }
 
-/* line 2236, ../../../scss/_app_styles.scss */
+/* line 2237, ../../../scss/_app_styles.scss */
 .create-discussion {
   position: relative;
 }
-/* line 2239, ../../../scss/_app_styles.scss */
+/* line 2240, ../../../scss/_app_styles.scss */
 .create-discussion > div {
   display: inline-block;
   vertical-align: top;
   margin: 5px 0px;
 }
-/* line 2245, ../../../scss/_app_styles.scss */
+/* line 2246, ../../../scss/_app_styles.scss */
 .create-discussion .button {
   margin: 5px 0px;
 }
-/* line 2248, ../../../scss/_app_styles.scss */
+/* line 2249, ../../../scss/_app_styles.scss */
 .create-discussion .ckeditor-content-comment {
   width: 85%;
   margin-left: 1em;
 }
-/* line 2252, ../../../scss/_app_styles.scss */
+/* line 2253, ../../../scss/_app_styles.scss */
 .create-discussion .ckeditor-content-comment > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 2257, ../../../scss/_app_styles.scss */
+/* line 2258, ../../../scss/_app_styles.scss */
 .create-discussion .ckeditor-content-comment .ckeditor-reply-area {
   width: 90%;
 }
 
-/* line 2264, ../../../scss/_app_styles.scss */
+/* line 2265, ../../../scss/_app_styles.scss */
 #replies-area .ckeditor-content-reply {
   margin-top: 1em;
   /*width: 97%;*/
 }
-/* line 2268, ../../../scss/_app_styles.scss */
+/* line 2269, ../../../scss/_app_styles.scss */
 #replies-area .ckeditor-content-reply .ckeditor-reply-area {
   display: inline-block;
   width: 90%;
   margin-left: 1em;
 }
-/* line 2273, ../../../scss/_app_styles.scss */
+/* line 2274, ../../../scss/_app_styles.scss */
 #replies-area .ckeditor-content-reply .post-btn-div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 2279, ../../../scss/_app_styles.scss */
+/* line 2280, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies {
   /*background-color:#ddd;*/
   margin-left: 48px;
@@ -25668,26 +25666,26 @@ div.show-image:hover div.fullscreen-icon{
   padding-bottom: 0em;
   border-top: 1px solid #B1B1B1;
 }
-/* line 2287, ../../../scss/_app_styles.scss */
+/* line 2288, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn {
   cursor: pointer;
   color: grey !important;
 }
-/* line 2292, ../../../scss/_app_styles.scss */
+/* line 2293, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn:hover {
   color: #000 !important;
 }
-/* line 2295, ../../../scss/_app_styles.scss */
+/* line 2296, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .discussion-title-username {
   /*background-color: #3e3e3e;*/
   color: #ececec !important;
   height: 2em;
   padding-right: 10px;
   padding-left: 10px;
-  line-height: 2em;
+  line-height: 1.5em;
   border-radius: 5px 5px 0px 0px;
 }
-/* line 2305, ../../../scss/_app_styles.scss */
+/* line 2306, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .discussion-footer {
   /*background-color:#CCCCCC;*/
   color: gray !important;
@@ -25696,44 +25694,44 @@ div.show-image:hover div.fullscreen-icon{
   padding-left: 10px;
   border-radius: 0px 0px 5px 5px;
 }
-/* line 2313, ../../../scss/_app_styles.scss */
+/* line 2314, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .discussion-footer > a {
   vertical-align: middle;
   line-height: 2em;
 }
-/* line 2319, ../../../scss/_app_styles.scss */
+/* line 2320, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .discussion-content {
   color: #262626;
   word-wrap: break-word;
 }
 
-/* line 2327, ../../../scss/_app_styles.scss */
+/* line 2328, ../../../scss/_app_styles.scss */
 #envelop-cover .course-page-title {
   font-size: 35px;
   font-weight: 500;
   padding-right: 0.3em;
   padding-left: 0.3em;
 }
-/* line 2334, ../../../scss/_app_styles.scss */
+/* line 2335, ../../../scss/_app_styles.scss */
 #envelop-cover .course-page-title span a {
   font-size: 15px;
   color: #737373;
 }
-/* line 2337, ../../../scss/_app_styles.scss */
+/* line 2338, ../../../scss/_app_styles.scss */
 #envelop-cover .course-page-title span a i {
   font-size: 18px;
 }
-/* line 2344, ../../../scss/_app_styles.scss */
+/* line 2345, ../../../scss/_app_styles.scss */
 #envelop-cover .heading {
   letter-spacing: -1.2px;
   font-weight: 400;
 }
-/* line 2349, ../../../scss/_app_styles.scss */
+/* line 2350, ../../../scss/_app_styles.scss */
 #envelop-cover .meta {
   line-height: 2.1em;
   padding-left: 14px;
 }
-/* line 2353, ../../../scss/_app_styles.scss */
+/* line 2354, ../../../scss/_app_styles.scss */
 #envelop-cover .meta .key {
   color: #A7A4A4;
   font-weight: 500;
@@ -25743,29 +25741,29 @@ div.show-image:hover div.fullscreen-icon{
   vertical-align: top;
   margin-right: 10px;
 }
-/* line 2363, ../../../scss/_app_styles.scss */
+/* line 2364, ../../../scss/_app_styles.scss */
 #envelop-cover .meta .value {
   display: inline-block;
 }
-/* line 2366, ../../../scss/_app_styles.scss */
+/* line 2367, ../../../scss/_app_styles.scss */
 #envelop-cover .meta .value .name {
   color: #000;
 }
-/* line 2370, ../../../scss/_app_styles.scss */
+/* line 2371, ../../../scss/_app_styles.scss */
 #envelop-cover .meta .value .time {
   font-size: 13px;
   font-weight: 300;
   color: #000;
 }
 
-/* line 2380, ../../../scss/_app_styles.scss */
+/* line 2381, ../../../scss/_app_styles.scss */
 .note-tags a {
   background: #ffebb2;
   padding: 0.2em 0.7em;
   display: inline-block;
 }
 
-/* line 2387, ../../../scss/_app_styles.scss */
+/* line 2388, ../../../scss/_app_styles.scss */
 .toggleButtons a {
   padding: 0.5em 1em;
   margin: 0px;
@@ -25773,51 +25771,51 @@ div.show-image:hover div.fullscreen-icon{
   color: #000;
   border: 1px solid #B7B7B7;
 }
-/* line 2394, ../../../scss/_app_styles.scss */
+/* line 2395, ../../../scss/_app_styles.scss */
 .toggleButtons a:first-child {
   margin-right: -3px;
   border-right: 0px solid #000;
 }
-/* line 2398, ../../../scss/_app_styles.scss */
+/* line 2399, ../../../scss/_app_styles.scss */
 .toggleButtons a:first-child {
   border-radius: 10px 0px 0px 10px;
 }
-/* line 2401, ../../../scss/_app_styles.scss */
+/* line 2402, ../../../scss/_app_styles.scss */
 .toggleButtons a:last-child {
   border-radius: 0px 10px 10px 0px;
 }
-/* line 2404, ../../../scss/_app_styles.scss */
+/* line 2405, ../../../scss/_app_styles.scss */
 .toggleButtons a.active {
   background-color: #908F8F;
   color: #fff;
 }
 
-/* line 2411, ../../../scss/_app_styles.scss */
+/* line 2412, ../../../scss/_app_styles.scss */
 .explore-header {
   line-height: 3em;
 }
-/* line 2414, ../../../scss/_app_styles.scss */
+/* line 2415, ../../../scss/_app_styles.scss */
 .explore-header > div {
   vertical-align: middle;
   display: inline-block;
 }
-/* line 2418, ../../../scss/_app_styles.scss */
+/* line 2419, ../../../scss/_app_styles.scss */
 .explore-header .heading {
   font-size: 2em;
 }
 
-/* line 2431, ../../../scss/_app_styles.scss */
+/* line 2432, ../../../scss/_app_styles.scss */
 #envelop-content {
   margin-top: 20px;
   /* For accordian in the mobile view*/
 }
-/* line 2434, ../../../scss/_app_styles.scss */
+/* line 2435, ../../../scss/_app_styles.scss */
 #envelop-content .course-tabs {
   border: 0 solid silver;
   border-width: 0px 0px 0px 0px;
   margin-left: 1em;
 }
-/* line 2439, ../../../scss/_app_styles.scss */
+/* line 2440, ../../../scss/_app_styles.scss */
 #envelop-content .course-tabs .tab-title {
   border: 0 solid silver;
   border-width: 0 0 0px 0px;
@@ -25825,7 +25823,7 @@ div.show-image:hover div.fullscreen-icon{
   border-radius: 10px 10px 0px 0px;
   margin-right: 0.4em;
 }
-/* line 2446, ../../../scss/_app_styles.scss */
+/* line 2447, ../../../scss/_app_styles.scss */
 #envelop-content .course-tabs .tab-title a {
   color: #2B91EA;
   border-radius: inherit;
@@ -25833,33 +25831,33 @@ div.show-image:hover div.fullscreen-icon{
   font-size: 15px;
   letter-spacing: -0.3px;
 }
-/* line 2454, ../../../scss/_app_styles.scss */
+/* line 2455, ../../../scss/_app_styles.scss */
 #envelop-content .course-tabs .tab-title.active {
   border-width: 0px 0px 0px 0px;
   background: #FFFFFF;
 }
-/* line 2457, ../../../scss/_app_styles.scss */
+/* line 2458, ../../../scss/_app_styles.scss */
 #envelop-content .course-tabs .tab-title.active a {
   color: #000;
 }
-/* line 2469, ../../../scss/_app_styles.scss */
+/* line 2470, ../../../scss/_app_styles.scss */
 #envelop-content .accordion {
   margin-left: 0px;
 }
-/* line 2473, ../../../scss/_app_styles.scss */
+/* line 2474, ../../../scss/_app_styles.scss */
 #envelop-content .accordion .accordion-navigation a {
   background-color: #DEDEDE;
 }
-/* line 2476, ../../../scss/_app_styles.scss */
+/* line 2477, ../../../scss/_app_styles.scss */
 #envelop-content .accordion .accordion-navigation.active a {
   background-color: #fff;
 }
-/* line 2483, ../../../scss/_app_styles.scss */
+/* line 2484, ../../../scss/_app_styles.scss */
 #envelop-content > div > .tabs-content > .content {
   background: #FFFFFF;
   padding: 1em;
 }
-/* line 2493, ../../../scss/_app_styles.scss */
+/* line 2494, ../../../scss/_app_styles.scss */
 #envelop-content .course-book #course-about .about-course-heading {
   display: block;
   height: 300px;
@@ -25870,7 +25868,7 @@ div.show-image:hover div.fullscreen-icon{
   color: #fff;
   text-align: center;
 }
-/* line 2503, ../../../scss/_app_styles.scss */
+/* line 2504, ../../../scss/_app_styles.scss */
 #envelop-content .course-book #course-about .about-course-heading .heading-text {
   display: inline-block;
   position: absolute;
@@ -25878,22 +25876,22 @@ div.show-image:hover div.fullscreen-icon{
   left: 50%;
   transform: translate(-50%, -50%);
 }
-/* line 2510, ../../../scss/_app_styles.scss */
+/* line 2511, ../../../scss/_app_styles.scss */
 #envelop-content .course-book #course-about .about-course-heading .heading-text div:not(:first-child) {
   font-size: 20px;
 }
-/* line 2514, ../../../scss/_app_styles.scss */
+/* line 2515, ../../../scss/_app_styles.scss */
 #envelop-content .course-book #course-about .about-course-heading .heading-text h2 {
   color: inherit;
 }
-/* line 2520, ../../../scss/_app_styles.scss */
+/* line 2521, ../../../scss/_app_styles.scss */
 #envelop-content .course-book #course-about .about-course-details {
   display: block;
   min-height: 100px;
   width: 100%;
 }
 
-/* line 2535, ../../../scss/_app_styles.scss */
+/* line 2536, ../../../scss/_app_styles.scss */
 .course-dashboard .course-status > .row, .course-dashboard .course-notifications > .row,
 .course-dashboard .course-performance > .row {
   padding: 0px;
@@ -25905,45 +25903,45 @@ div.show-image:hover div.fullscreen-icon{
   margin: 0em 0em;
   border-radius: 10px;
 }
-/* line 2547, ../../../scss/_app_styles.scss */
+/* line 2548, ../../../scss/_app_styles.scss */
 .course-dashboard .dash-tile-heading {
   padding: 0.2em 0.7em;
   border-bottom: 1px solid #DADADA;
   font-weight: 500;
   font-size: 1.3em;
 }
-/* line 2553, ../../../scss/_app_styles.scss */
+/* line 2554, ../../../scss/_app_styles.scss */
 .course-dashboard .dash-tile-row {
   padding: 1em;
 }
-/* line 2556, ../../../scss/_app_styles.scss */
+/* line 2557, ../../../scss/_app_styles.scss */
 .course-dashboard .dash-tile-row:nth-child(n+3) {
   border-top: 1px solid #DCDCDC;
 }
-/* line 2562, ../../../scss/_app_styles.scss */
+/* line 2563, ../../../scss/_app_styles.scss */
 .course-dashboard .course-status .course-update .course-current-state {
   color: #000;
   font-weight: bold;
   font-size: 1.2em;
   padding: 0.5em 0.8em 0.6em;
 }
-/* line 2572, ../../../scss/_app_styles.scss */
+/* line 2573, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications {
   position: relative;
 }
-/* line 2577, ../../../scss/_app_styles.scss */
+/* line 2578, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications .notification-row .notification-text {
   font-size: 0.85em;
   letter-spacing: 0em;
   word-spacing: 0.2em;
 }
-/* line 2582, ../../../scss/_app_styles.scss */
+/* line 2583, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications .notification-row .time-elapsed {
   font-size: 0.6em;
   color: #424242;
   cursor: pointer;
 }
-/* line 2589, ../../../scss/_app_styles.scss */
+/* line 2590, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications .notification-count {
   font-size: 1em;
   position: absolute;
@@ -25951,34 +25949,34 @@ div.show-image:hover div.fullscreen-icon{
   top: 0.3em;
 }
 
-/* line 2599, ../../../scss/_app_styles.scss */
+/* line 2600, ../../../scss/_app_styles.scss */
 .notebook .notebook-header {
   border-color: black;
   border-style: solid;
   border-width: 1px 0px;
   padding-top: 1em;
 }
-/* line 2605, ../../../scss/_app_styles.scss */
+/* line 2606, ../../../scss/_app_styles.scss */
 .notebook .notebook-header a, .notebook .notebook-header input {
   margin: 0px;
 }
-/* line 2611, ../../../scss/_app_styles.scss */
+/* line 2612, ../../../scss/_app_styles.scss */
 .notebook .notebook-body > div {
   padding-top: 15px;
   height: 50em;
   overflow: scroll;
 }
-/* line 2617, ../../../scss/_app_styles.scss */
+/* line 2618, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index {
   border-right: 1px solid #AFAEAE;
 }
-/* line 2620, ../../../scss/_app_styles.scss */
+/* line 2621, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs {
   width: 100%;
   margin: 0em 0em 0.5em;
   border-bottom: 1px solid #CCC;
 }
-/* line 2625, ../../../scss/_app_styles.scss */
+/* line 2626, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs .tab-title {
   width: 40%;
   background-color: #DEDEDE;
@@ -25987,187 +25985,187 @@ div.show-image:hover div.fullscreen-icon{
   position: relative;
   top: 1px;
 }
-/* line 2633, ../../../scss/_app_styles.scss */
+/* line 2634, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs .tab-title a {
   border-radius: inherit;
 }
-/* line 2637, ../../../scss/_app_styles.scss */
+/* line 2638, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs .tab-title.active {
   background-color: #fff;
   border: 1px solid #CCC;
   border-bottom: 0px;
 }
-/* line 2645, ../../../scss/_app_styles.scss */
+/* line 2646, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tab-content {
   padding: 0px;
 }
-/* line 2650, ../../../scss/_app_styles.scss */
+/* line 2651, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .date {
   font-size: 12px;
   font-weight: bold;
   background: #EFEFEF;
   padding: 7px 10px;
 }
-/* line 2656, ../../../scss/_app_styles.scss */
+/* line 2657, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .date .note-count {
   font-size: 11px;
   line-height: 2em;
 }
-/* line 2661, ../../../scss/_app_styles.scss */
+/* line 2662, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes > div {
   border-bottom: 1px solid #AFAEAE;
 }
-/* line 2664, ../../../scss/_app_styles.scss */
+/* line 2665, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note {
   padding: 5px 15px;
   background: #EEEEEE;
   cursor: pointer;
 }
-/* line 2669, ../../../scss/_app_styles.scss */
+/* line 2670, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-heading {
   font-weight: 400;
   font-size: 17px;
 }
-/* line 2674, ../../../scss/_app_styles.scss */
+/* line 2675, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-meta {
   font-size: 13px;
 }
-/* line 2677, ../../../scss/_app_styles.scss */
+/* line 2678, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-meta > span:not(:first-child) {
   font-size: 11px;
   font-weight: 600;
   color: #717171;
 }
-/* line 2684, ../../../scss/_app_styles.scss */
+/* line 2685, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-footer {
   color: #888888;
 }
-/* line 2687, ../../../scss/_app_styles.scss */
+/* line 2688, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-footer span {
   margin-right: 10px;
 }
-/* line 2692, ../../../scss/_app_styles.scss */
+/* line 2693, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note.active {
   border-left: 5px solid blue;
   background: #FFF;
 }
-/* line 2696, ../../../scss/_app_styles.scss */
+/* line 2697, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note.active .note-heading {
   font-weight: 500;
   font-size: 17px;
 }
-/* line 2705, ../../../scss/_app_styles.scss */
+/* line 2706, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page {
   background-color: #fff;
 }
-/* line 2709, ../../../scss/_app_styles.scss */
+/* line 2710, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page > div {
   background-color: #fff;
 }
-/* line 2713, ../../../scss/_app_styles.scss */
+/* line 2714, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar {
   padding: 1em 0em 0em;
   margin: 0em;
   background-color: #F3F3F3;
 }
-/* line 2721, ../../../scss/_app_styles.scss */
+/* line 2722, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-title {
   text-align: left;
   color: #7D7D7D;
   font-size: 12px;
   letter-spacing: 0.3px;
 }
-/* line 2727, ../../../scss/_app_styles.scss */
+/* line 2728, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-rating {
   text-align: right;
 }
-/* line 2729, ../../../scss/_app_styles.scss */
+/* line 2730, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-rating > div {
   display: inline-block;
 }
-/* line 2734, ../../../scss/_app_styles.scss */
+/* line 2735, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content {
   padding: 0em 1em 1em;
   background: #fff;
   margin: 0em;
 }
-/* line 2741, ../../../scss/_app_styles.scss */
+/* line 2742, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-header > div {
   display: inline-block;
 }
-/* line 2744, ../../../scss/_app_styles.scss */
+/* line 2745, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-header .note-title {
   font-size: 1.5em;
   font-weight: 500;
   margin-right: 1em;
 }
-/* line 2751, ../../../scss/_app_styles.scss */
+/* line 2752, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-text p {
   padding: 0px;
 }
-/* line 2757, ../../../scss/_app_styles.scss */
+/* line 2758, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections {
   padding: 1em 1em 0em;
 }
-/* line 2761, ../../../scss/_app_styles.scss */
+/* line 2762, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .comments-header span {
   font-weight: bold;
 }
-/* line 2764, ../../../scss/_app_styles.scss */
+/* line 2765, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .comments-header i:not(:first-child) {
   margin-left: 15px;
 }
-/* line 2769, ../../../scss/_app_styles.scss */
+/* line 2770, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment {
   border-top: 1px solid grey;
   padding: 15px 10px;
   margin-top: 5px;
 }
-/* line 2774, ../../../scss/_app_styles.scss */
+/* line 2775, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-box,
 .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-editor {
   min-height: 200px;
   margin-top: 0px;
 }
-/* line 2780, ../../../scss/_app_styles.scss */
+/* line 2781, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment .user-prof-image {
   font-size: 90px;
   line-height: 0em;
 }
 
-/* line 2790, ../../../scss/_app_styles.scss */
+/* line 2791, ../../../scss/_app_styles.scss */
 #newNoteModal {
   width: 40%;
 }
-/* line 2793, ../../../scss/_app_styles.scss */
+/* line 2794, ../../../scss/_app_styles.scss */
 #newNoteModal > div {
   margin-bottom: 1em;
 }
-/* line 2797, ../../../scss/_app_styles.scss */
+/* line 2798, ../../../scss/_app_styles.scss */
 #newNoteModal input {
   width: 100%;
 }
-/* line 2800, ../../../scss/_app_styles.scss */
+/* line 2801, ../../../scss/_app_styles.scss */
 #newNoteModal .heading {
   margin-right: 1em;
 }
-/* line 2804, ../../../scss/_app_styles.scss */
+/* line 2805, ../../../scss/_app_styles.scss */
 #newNoteModal .note-tags {
   padding: 1em;
   border: 1px solid black;
 }
-/* line 2810, ../../../scss/_app_styles.scss */
+/* line 2811, ../../../scss/_app_styles.scss */
 #newNoteModal .new-note-actions .button {
   float: left;
   margin-left: 1em;
   margin-bottom: 0px;
 }
-/* line 2815, ../../../scss/_app_styles.scss */
+/* line 2816, ../../../scss/_app_styles.scss */
 #newNoteModal .new-note-actions .button:last-child {
   float: right;
 }
 
-/* line 2823, ../../../scss/_app_styles.scss */
+/* line 2824, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header {
   line-height: 2em;
   background: #f0f0f0;
@@ -26177,33 +26175,33 @@ div.show-image:hover div.fullscreen-icon{
   text-align: center;
   padding: 0.7em 0em;
 }
-/* line 2832, ../../../scss/_app_styles.scss */
+/* line 2833, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header input, .gallery-page .gallery-header select, .gallery-page .gallery-header a {
   border-radius: 4px;
   margin-bottom: 0em;
 }
-/* line 2836, ../../../scss/_app_styles.scss */
+/* line 2837, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header input.prefix, .gallery-page .gallery-header select.prefix, .gallery-page .gallery-header a.prefix {
   border-radius: 0px;
 }
-/* line 2841, ../../../scss/_app_styles.scss */
+/* line 2842, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header i {
   font-size: 1em;
   color: #A29E9E;
 }
-/* line 2847, ../../../scss/_app_styles.scss */
+/* line 2848, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .filters .columns {
   padding-left: 5px;
 }
-/* line 2853, ../../../scss/_app_styles.scss */
+/* line 2854, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .search .columns {
   padding-left: 5px;
 }
-/* line 2857, ../../../scss/_app_styles.scss */
+/* line 2858, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .search .filter-tags {
   text-align: left;
 }
-/* line 2860, ../../../scss/_app_styles.scss */
+/* line 2861, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .search .filter-tags .filter-tag {
   padding: 0px 10px;
   background: #cccccc;
@@ -26213,73 +26211,73 @@ div.show-image:hover div.fullscreen-icon{
   font-size: 0.8em;
   color: #757575;
 }
-/* line 2869, ../../../scss/_app_styles.scss */
+/* line 2870, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .search .filter-tags .filter-tag span {
   margin: 0px 2px 0px 6px;
   cursor: pointer;
 }
-/* line 2874, ../../../scss/_app_styles.scss */
+/* line 2875, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .search .filter-tags > div {
   display: inline-block;
 }
-/* line 2881, ../../../scss/_app_styles.scss */
+/* line 2882, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .side-heading {
   font-size: 19px;
 }
-/* line 2884, ../../../scss/_app_styles.scss */
+/* line 2885, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .side-heading a {
   background: #e7e7e7;
   border-width: 1px 0px 1px 1px;
   border-color: #cccccc;
   border-style: solid;
 }
-/* line 2891, ../../../scss/_app_styles.scss */
+/* line 2892, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .side-heading input {
   border-radius: 0px;
   box-shadow: none;
   border-left: 0px;
 }
-/* line 2898, ../../../scss/_app_styles.scss */
+/* line 2899, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel {
   background: #F7F7F7;
 }
-/* line 2901, ../../../scss/_app_styles.scss */
+/* line 2902, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content {
   min-height: 250px;
 }
-/* line 2904, ../../../scss/_app_styles.scss */
+/* line 2905, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader {
   line-height: 3em;
   padding: 10px 0px;
 }
-/* line 2908, ../../../scss/_app_styles.scss */
+/* line 2909, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader upload-file {
   margin: 0px;
   font-size: 1em;
 }
-/* line 2913, ../../../scss/_app_styles.scss */
+/* line 2914, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader .gallery-actions {
   font-size: 1.2em;
   color: #2a79e4;
 }
-/* line 2917, ../../../scss/_app_styles.scss */
+/* line 2918, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader .gallery-actions > div {
   display: inline-block;
   margin-right: 10px;
 }
-/* line 2924, ../../../scss/_app_styles.scss */
+/* line 2925, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel {
   background: #fff;
 }
-/* line 2927, ../../../scss/_app_styles.scss */
+/* line 2928, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel .row {
   margin: 10px 0px;
 }
-/* line 2930, ../../../scss/_app_styles.scss */
+/* line 2931, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel .row > div:first-child {
   font-weight: 500;
 }
-/* line 2935, ../../../scss/_app_styles.scss */
+/* line 2936, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel .file-name {
   font-size: 20px;
   font-weight: bold;
@@ -26287,11 +26285,11 @@ div.show-image:hover div.fullscreen-icon{
   margin: 10px 0px 20px;
 }
 
-/* line 2946, ../../../scss/_app_styles.scss */
+/* line 2947, ../../../scss/_app_styles.scss */
 .gallery-card .select-file {
   vertical-align: top;
 }
-/* line 2950, ../../../scss/_app_styles.scss */
+/* line 2951, ../../../scss/_app_styles.scss */
 .gallery-card .file-item {
   width: 80%;
   color: #fff;
@@ -26302,17 +26300,17 @@ div.show-image:hover div.fullscreen-icon{
   border: 1px solid black;
   overflow: hidden;
 }
-/* line 2960, ../../../scss/_app_styles.scss */
+/* line 2961, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .item-thumbnail-image {
   height: 100%;
   padding: 1em;
 }
-/* line 2965, ../../../scss/_app_styles.scss */
+/* line 2966, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .file-details {
   margin-top: 10%;
   display: none;
 }
-/* line 2970, ../../../scss/_app_styles.scss */
+/* line 2971, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .file-actions {
   display: none;
   position: absolute;
@@ -26321,11 +26319,11 @@ div.show-image:hover div.fullscreen-icon{
   width: 100%;
   font-size: 25px;
 }
-/* line 2978, ../../../scss/_app_styles.scss */
+/* line 2979, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .file-actions i {
   margin: 0px 10px;
 }
-/* line 2983, ../../../scss/_app_styles.scss */
+/* line 2984, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .filename-footer {
   position: absolute;
   bottom: 0px;
@@ -26336,24 +26334,24 @@ div.show-image:hover div.fullscreen-icon{
   font-weight: 600;
   background: #999999;
 }
-/* line 2994, ../../../scss/_app_styles.scss */
+/* line 2995, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover {
   background: #999999;
 }
-/* line 2997, ../../../scss/_app_styles.scss */
+/* line 2998, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover .item-thumbnail-image {
   opacity: 0.2;
 }
-/* line 3001, ../../../scss/_app_styles.scss */
+/* line 3002, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover .file-details, .gallery-card .file-item:hover .file-actions {
   display: block;
 }
-/* line 3004, ../../../scss/_app_styles.scss */
+/* line 3005, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover .filename-footer {
   display: none;
 }
 
-/* line 3012, ../../../scss/_app_styles.scss */
+/* line 3013, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'], dialog[id^='reveal-'] {
   width: 100vw;
   height: 100vh;
@@ -26363,7 +26361,7 @@ div.show-image:hover div.fullscreen-icon{
   padding-top: 1em;
   background: transparent;
 }
-/* line 3021, ../../../scss/_app_styles.scss */
+/* line 3022, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar, dialog[id^='reveal-'] .gmodal-toolbar {
   font-size: 1.2em;
   border-bottom: 1px solid black;
@@ -26371,35 +26369,35 @@ div.show-image:hover div.fullscreen-icon{
   line-height: 1.5em;
   padding-bottom: 0.5em;
 }
-/* line 3028, ../../../scss/_app_styles.scss */
+/* line 3029, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .file-name, dialog[id^='reveal-'] .gmodal-toolbar .file-name {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-/* line 3034, ../../../scss/_app_styles.scss */
+/* line 3035, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions {
   font-size: 0.95em;
 }
-/* line 3037, ../../../scss/_app_styles.scss */
+/* line 3038, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions i, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions i {
   margin-right: 0.2em;
 }
-/* line 3040, ../../../scss/_app_styles.scss */
+/* line 3041, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div {
   display: inline-block;
   padding: 0.2em 0.3em;
   cursor: pointer;
 }
-/* line 3046, ../../../scss/_app_styles.scss */
+/* line 3047, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div a, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div a {
   color: inherit;
 }
-/* line 3048, ../../../scss/_app_styles.scss */
+/* line 3049, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div a:hover, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div a:hover {
   color: #000;
 }
-/* line 3053, ../../../scss/_app_styles.scss */
+/* line 3054, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions .download-file, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions .download-file {
   float: right;
   margin-right: 2em;
@@ -26407,38 +26405,38 @@ div.show-image:hover div.fullscreen-icon{
   border-radius: 4px;
   padding: 0.1em 0.4em;
 }
-/* line 3060, ../../../scss/_app_styles.scss */
+/* line 3061, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions .download-file:hover, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions .download-file:hover {
   background-color: #fff;
   color: #000;
   opacity: 0.8;
 }
-/* line 3068, ../../../scss/_app_styles.scss */
+/* line 3069, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions .close-reveal-modal, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions .close-reveal-modal {
   top: 0.3rem;
   font-size: 1.3em;
   font-weight: 400;
 }
-/* line 3076, ../../../scss/_app_styles.scss */
+/* line 3077, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body, dialog[id^='reveal-'] .gmodal-body {
   position: relative;
 }
-/* line 3078, ../../../scss/_app_styles.scss */
+/* line 3079, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel {
   height: 86vh;
 }
-/* line 3081, ../../../scss/_app_styles.scss */
+/* line 3082, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder {
   height: 100%;
 }
-/* line 3084, ../../../scss/_app_styles.scss */
+/* line 3085, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder .gmodal-item, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder .gmodal-item {
   height: 100%;
   width: 100%;
   background: transparent;
   padding: 0px;
 }
-/* line 3090, ../../../scss/_app_styles.scss */
+/* line 3091, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder .gmodal-item .gmodel-item-image, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder .gmodal-item .gmodel-item-image {
   width: auto;
   margin: 0px auto;
@@ -26446,7 +26444,7 @@ div.show-image:hover div.fullscreen-icon{
   padding: 1em 0em;
   height: 100%;
 }
-/* line 3099, ../../../scss/_app_styles.scss */
+/* line 3100, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer {
   height: 2em;
   line-height: 2em;
@@ -26458,70 +26456,70 @@ div.show-image:hover div.fullscreen-icon{
   opacity: 0;
   background-color: rgba(0, 0, 0, 0.9);
 }
-/* line 3110, ../../../scss/_app_styles.scss */
+/* line 3111, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer > div:not(.gmodal-item-details), dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer > div:not(.gmodal-item-details) {
   cursor: pointer;
 }
-/* line 3114, ../../../scss/_app_styles.scss */
+/* line 3115, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer .gmodal-item-details, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer .gmodal-item-details {
   text-align: center;
   width: 100%;
 }
-/* line 3118, ../../../scss/_app_styles.scss */
+/* line 3119, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer .gmodal-item-details i, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer .gmodal-item-details i {
   margin-left: 1em;
   margin-right: 0.5em;
   cursor: pointer;
 }
-/* line 3126, ../../../scss/_app_styles.scss */
+/* line 3127, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel:hover .gmodal-footer, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel:hover .gmodal-footer {
   opacity: 0.8;
   transition: opacity 1s;
 }
-/* line 3131, ../../../scss/_app_styles.scss */
+/* line 3132, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel {
   height: 86vh;
 }
-/* line 3134, ../../../scss/_app_styles.scss */
+/* line 3135, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments {
   background: #fff;
   height: 100%;
   padding: 0.1em 1em;
 }
-/* line 3139, ../../../scss/_app_styles.scss */
+/* line 3140, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading {
   font-size: 0.9em;
   line-height: 1em;
 }
-/* line 3143, ../../../scss/_app_styles.scss */
+/* line 3144, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .commented-date, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .commented-date,
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .comment-rating,
 dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .comment-rating {
   font-size: 0.7em;
 }
-/* line 3148, ../../../scss/_app_styles.scss */
+/* line 3149, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .comment-rating > div, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .comment-rating > div {
   display: inline-block;
 }
-/* line 3152, ../../../scss/_app_styles.scss */
+/* line 3153, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-text, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-text {
   font-size: 0.9em;
 }
 
-/* line 3161, ../../../scss/_app_styles.scss */
+/* line 3162, ../../../scss/_app_styles.scss */
 .user-comment {
   display: inline-flex;
   width: 100%;
 }
-/* line 3165, ../../../scss/_app_styles.scss */
+/* line 3166, ../../../scss/_app_styles.scss */
 .user-comment > div {
   display: inline-block;
 }
-/* line 3168, ../../../scss/_app_styles.scss */
+/* line 3169, ../../../scss/_app_styles.scss */
 .user-comment > div:last-child {
   width: 100%;
 }
-/* line 3173, ../../../scss/_app_styles.scss */
+/* line 3174, ../../../scss/_app_styles.scss */
 .user-comment .comment-heading {
   color: #9C9C9C;
   border-bottom: 1px solid grey;
@@ -26529,71 +26527,71 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   margin-bottom: 10px;
   margin-top: 10px;
 }
-/* line 3181, ../../../scss/_app_styles.scss */
+/* line 3182, ../../../scss/_app_styles.scss */
 .user-comment .comment-heading > div {
   display: inline-block;
 }
-/* line 3185, ../../../scss/_app_styles.scss */
+/* line 3186, ../../../scss/_app_styles.scss */
 .user-comment .comment-heading .commentor-name span {
   font-weight: bold;
   color: #333333;
 }
-/* line 3190, ../../../scss/_app_styles.scss */
+/* line 3191, ../../../scss/_app_styles.scss */
 .user-comment .comment-footer {
   font-size: 0.9em;
   font-weight: 400;
   border: 1px solid #9E9E9E;
   background: #CCCCCC;
 }
-/* line 3196, ../../../scss/_app_styles.scss */
+/* line 3197, ../../../scss/_app_styles.scss */
 .user-comment .comment-footer > div {
   cursor: pointer;
 }
-/* line 3199, ../../../scss/_app_styles.scss */
+/* line 3200, ../../../scss/_app_styles.scss */
 .user-comment .comment-footer i {
   margin-right: 1em;
 }
-/* line 3205, ../../../scss/_app_styles.scss */
+/* line 3206, ../../../scss/_app_styles.scss */
 .user-comment .comment-container .comment-add {
   margin-top: 0.4em;
 }
-/* line 3209, ../../../scss/_app_styles.scss */
+/* line 3210, ../../../scss/_app_styles.scss */
 .user-comment .user-avatar {
   font-size: 10em;
   font-size: 5em;
   line-height: 1em;
 }
 
-/* line 3216, ../../../scss/_app_styles.scss */
+/* line 3217, ../../../scss/_app_styles.scss */
 .course-content {
   /*border-top: 1px solid #000;*/
 }
-/* line 3218, ../../../scss/_app_styles.scss */
+/* line 3219, ../../../scss/_app_styles.scss */
 .course-content .alert-box {
   padding: 5px;
   font-size: 1em;
 }
-/* line 3222, ../../../scss/_app_styles.scss */
+/* line 3223, ../../../scss/_app_styles.scss */
 .course-content .alert-box > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 3226, ../../../scss/_app_styles.scss */
+/* line 3227, ../../../scss/_app_styles.scss */
 .course-content .alert-box .warning-note {
   width: 96%;
 }
-/* line 3229, ../../../scss/_app_styles.scss */
+/* line 3230, ../../../scss/_app_styles.scss */
 .course-content .alert-box .warning-note > div:nth-child(2) {
   color: #000;
   margin-top: 5px;
   padding-top: 5px;
   border-top: 1px solid #000;
 }
-/* line 3236, ../../../scss/_app_styles.scss */
+/* line 3237, ../../../scss/_app_styles.scss */
 .course-content .alert-box .warning-icon {
   margin: 0px 5px;
 }
-/* line 3239, ../../../scss/_app_styles.scss */
+/* line 3240, ../../../scss/_app_styles.scss */
 .course-content .alert-box .close {
   position: relative;
   top: 0px;
@@ -26603,17 +26601,17 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   text-decoration: underline;
   color: #085394 !important;
 }
-/* line 3250, ../../../scss/_app_styles.scss */
+/* line 3251, ../../../scss/_app_styles.scss */
 .course-content .collection {
   overflow: visible;
 }
-/* line 3253, ../../../scss/_app_styles.scss */
+/* line 3254, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module {
   position: relative;
   border-bottom: 1px solid #CCC;
   padding: 1em 0em;
 }
-/* line 3260, ../../../scss/_app_styles.scss */
+/* line 3261, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-header .fa {
   position: absolute;
   left: -1.1em;
@@ -26622,38 +26620,38 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   background: #EAEAEA;
   font-size: 1.4em;
 }
-/* line 3278, ../../../scss/_app_styles.scss */
+/* line 3279, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-page:hover span {
   text-decoration: underline;
   color: #9900ff !important;
 }
-/* line 3283, ../../../scss/_app_styles.scss */
+/* line 3284, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .jqtree-tree .jqtree-title {
   cursor: pointer;
 }
-/* line 3287, ../../../scss/_app_styles.scss */
+/* line 3288, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-part {
   margin-left: 1em;
 }
-/* line 3290, ../../../scss/_app_styles.scss */
+/* line 3291, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-part .jqtree-toggler {
   color: #585858;
 }
-/* line 3293, ../../../scss/_app_styles.scss */
+/* line 3294, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-part .jqtree-toggler.jqtree-closed {
   color: #CCC;
 }
-/* line 3297, ../../../scss/_app_styles.scss */
+/* line 3298, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-part span {
   vertical-align: top;
 }
-/* line 3300, ../../../scss/_app_styles.scss */
+/* line 3301, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-part .fa {
   display: inline;
   margin-right: 5px;
 }
 
-/* line 3310, ../../../scss/_app_styles.scss */
+/* line 3311, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header {
   font-weight: 400;
   font-size: 1.3em;
@@ -26661,55 +26659,55 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   padding: 0.3em 0em;
   border-bottom: 1px solid #707070;
 }
-/* line 3317, ../../../scss/_app_styles.scss */
+/* line 3318, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header .activity-page-previous {
   cursor: pointer;
 }
-/* line 3321, ../../../scss/_app_styles.scss */
+/* line 3322, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header i {
   margin-right: 0.1em;
 }
-/* line 3325, ../../../scss/_app_styles.scss */
+/* line 3326, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header .unit-title {
   text-align: center;
 }
-/* line 3328, ../../../scss/_app_styles.scss */
+/* line 3329, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header .activity-create-note {
   color: #2a78e3;
   cursor: pointer;
 }
-/* line 3332, ../../../scss/_app_styles.scss */
+/* line 3333, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header .activity-create-note > div {
   float: right;
 }
-/* line 3337, ../../../scss/_app_styles.scss */
+/* line 3338, ../../../scss/_app_styles.scss */
 .activity-page .activity-header {
   padding: 0.5em 0.2em;
 }
-/* line 3340, ../../../scss/_app_styles.scss */
+/* line 3341, ../../../scss/_app_styles.scss */
 .activity-page .activity-header a {
   margin: 0px;
 }
-/* line 3343, ../../../scss/_app_styles.scss */
+/* line 3344, ../../../scss/_app_styles.scss */
 .activity-page .activity-header > div:last-child > div {
   float: right;
 }
-/* line 3347, ../../../scss/_app_styles.scss */
+/* line 3348, ../../../scss/_app_styles.scss */
 .activity-page .activity-header .activity-title-section {
   text-align: center;
   font-size: 1.5em;
 }
-/* line 3351, ../../../scss/_app_styles.scss */
+/* line 3352, ../../../scss/_app_styles.scss */
 .activity-page .activity-header .activity-title-section > div {
   display: inline-block;
 }
-/* line 3354, ../../../scss/_app_styles.scss */
+/* line 3355, ../../../scss/_app_styles.scss */
 .activity-page .activity-header .activity-title-section .activity-pagination {
   color: #949494;
   font-size: 0.8em;
   margin-right: 0.6em;
 }
-/* line 3365, ../../../scss/_app_styles.scss */
+/* line 3366, ../../../scss/_app_styles.scss */
 .activity-page .activity-slides-container {
   border: 1px solid black;
   height: 600px;
@@ -26717,33 +26715,33 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   margin-bottom: 2em;
   padding: 1em;
 }
-/* line 3372, ../../../scss/_app_styles.scss */
+/* line 3373, ../../../scss/_app_styles.scss */
 .activity-page .activity-slides-container .activity-slides {
   height: 100%;
 }
-/* line 3374, ../../../scss/_app_styles.scss */
+/* line 3375, ../../../scss/_app_styles.scss */
 .activity-page .activity-slides-container .activity-slides .activity-slide {
   padding: 1em;
   height: inherit;
   background: #fff;
   position: relative;
 }
-/* line 3383, ../../../scss/_app_styles.scss */
+/* line 3384, ../../../scss/_app_styles.scss */
 .activity-page .activity-slides-container .activity-slides .activity-slide .page > section {
   margin-left: 50%;
   transform: translate(-50%);
 }
-/* line 3391, ../../../scss/_app_styles.scss */
+/* line 3392, ../../../scss/_app_styles.scss */
 .activity-page .activity-comments-section {
   width: 75%;
   margin: 0px auto;
 }
-/* line 3395, ../../../scss/_app_styles.scss */
+/* line 3396, ../../../scss/_app_styles.scss */
 .activity-page .activity-comments-section .user-prof-image {
   font-size: 7em;
   text-align: center;
 }
-/* line 3400, ../../../scss/_app_styles.scss */
+/* line 3401, ../../../scss/_app_styles.scss */
 .activity-page .activity-comments-section #postCommentBtn {
   padding: 2em 3em;
 }
@@ -26764,28 +26762,28 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
    position: absolute;
 }
 */
-/* line 3421, ../../../scss/_app_styles.scss */
+/* line 3422, ../../../scss/_app_styles.scss */
 .rate-scale {
   cursor: pointer;
 }
-/* line 3424, ../../../scss/_app_styles.scss */
+/* line 3425, ../../../scss/_app_styles.scss */
 .rate-scale i {
   margin-right: 0em !important;
   padding-right: 0.5em;
 }
-/* line 3428, ../../../scss/_app_styles.scss */
+/* line 3429, ../../../scss/_app_styles.scss */
 .rate-scale .hover-rating, .rate-scale .rated {
   color: yellow;
 }
 
-/* line 3434, ../../../scss/_app_styles.scss */
+/* line 3435, ../../../scss/_app_styles.scss */
 #left-tab {
   position: absolute;
   left: 0px;
   bottom: 0px;
 }
 
-/* line 3439, ../../../scss/_app_styles.scss */
+/* line 3440, ../../../scss/_app_styles.scss */
 #right-tab {
   position: absolute;
   right: 0px;
@@ -26793,12 +26791,12 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   padding-bottom: 6px;
 }
 
-/* line 3445, ../../../scss/_app_styles.scss */
+/* line 3446, ../../../scss/_app_styles.scss */
 #enrolled-btn {
   margin-bottom: 0px;
 }
 
-/* line 3448, ../../../scss/_app_styles.scss */
+/* line 3449, ../../../scss/_app_styles.scss */
 div.absol-descrip {
   position: absolute;
   top: 190px;
@@ -26809,14 +26807,14 @@ div.absol-descrip {
 }
 
 /*overview-summary styling*/
-/* line 3458, ../../../scss/_app_styles.scss */
+/* line 3459, ../../../scss/_app_styles.scss */
 .course-title, .course-date {
   color: white;
   padding-top: 0px;
   padding-bottom: 0px;
 }
 
-/* line 3463, ../../../scss/_app_styles.scss */
+/* line 3464, ../../../scss/_app_styles.scss */
 .course-description {
   color: #cccccc;
   padding-top: 0px;
@@ -26828,48 +26826,48 @@ div.absol-descrip {
   overflow: hidden;
 }
 
-/* line 3473, ../../../scss/_app_styles.scss */
+/* line 3474, ../../../scss/_app_styles.scss */
 .course-para {
   padding: 0;
 }
 
-/* line 3477, ../../../scss/_app_styles.scss */
+/* line 3478, ../../../scss/_app_styles.scss */
 course-title {
   padding-left: 10px;
 }
 
-/* line 3480, ../../../scss/_app_styles.scss */
+/* line 3481, ../../../scss/_app_styles.scss */
 .enroll-status-margin {
   margin-bottom: 0;
 }
 
-/* line 3484, ../../../scss/_app_styles.scss */
+/* line 3485, ../../../scss/_app_styles.scss */
 .progress-summery {
   color: white;
   margin-top: 20px;
 }
 
-/* line 3488, ../../../scss/_app_styles.scss */
+/* line 3489, ../../../scss/_app_styles.scss */
 .course-description-thumbnails {
   margin: 0;
   padding: 0;
 }
 
-/* line 3493, ../../../scss/_app_styles.scss */
+/* line 3494, ../../../scss/_app_styles.scss */
 .left-shift {
   padding: 0;
   color: white !important;
 }
 
 /*course overview for Small screens*/
-/* line 3499, ../../../scss/_app_styles.scss */
+/* line 3500, ../../../scss/_app_styles.scss */
 .course {
   /*position:relative;*/
   border: 1px solid black;
   background-color: #999999;
 }
 
-/* line 3505, ../../../scss/_app_styles.scss */
+/* line 3506, ../../../scss/_app_styles.scss */
 .course-contents {
   /*position:absolute;*/
   width: 100%;
@@ -26877,7 +26875,7 @@ course-title {
 
 /*Medium screens*/
 @media only screen and (min-width: 40.063em) {
-  /* line 3512, ../../../scss/_app_styles.scss */
+  /* line 3513, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -26885,7 +26883,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 3518, ../../../scss/_app_styles.scss */
+  /* line 3519, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -26895,7 +26893,7 @@ course-title {
 /* min-width 641px, medium screens */
 /* Large screens*/
 @media only screen and (min-width: 64.063em) {
-  /* line 3528, ../../../scss/_app_styles.scss */
+  /* line 3529, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -26903,7 +26901,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 3534, ../../../scss/_app_styles.scss */
+  /* line 3535, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -26912,14 +26910,14 @@ course-title {
 }
 /* min-width 1025px, large screens */
 /*General config css*/
-/* line 3541, ../../../scss/_app_styles.scss */
+/* line 3542, ../../../scss/_app_styles.scss */
 .alert-box.warning {
   background: #ffe7c0;
   border-color: #bf9000;
   color: #966000;
 }
 
-/* line 3548, ../../../scss/_app_styles.scss */
+/* line 3549, ../../../scss/_app_styles.scss */
 .badge {
   display: inline-block;
   line-height: 22px;
@@ -26936,7 +26934,7 @@ course-title {
   font-size: 1.8em;
 }
 
-/* line 3564, ../../../scss/_app_styles.scss */
+/* line 3565, ../../../scss/_app_styles.scss */
 .badge {
   background: #67c1ef;
   border-color: #30aae9;
@@ -26946,7 +26944,7 @@ course-title {
   background-image: linear-gradient(to bottom, #acddf6, #67c1ef);
 }
 
-/* line 3573, ../../../scss/_app_styles.scss */
+/* line 3574, ../../../scss/_app_styles.scss */
 .badge.green {
   background: #77cc51;
   border-color: #59ad33;
@@ -26956,7 +26954,7 @@ course-title {
   background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
 }
 
-/* line 3582, ../../../scss/_app_styles.scss */
+/* line 3583, ../../../scss/_app_styles.scss */
 .badge.yellow {
   background: #faba3e;
   border-color: #f4a306;
@@ -26966,7 +26964,7 @@ course-title {
   background-image: linear-gradient(to bottom, #fcd589, #faba3e);
 }
 
-/* line 3592, ../../../scss/_app_styles.scss */
+/* line 3593, ../../../scss/_app_styles.scss */
 .badge.red {
   background: #fa623f;
   border-color: #fa5a35;

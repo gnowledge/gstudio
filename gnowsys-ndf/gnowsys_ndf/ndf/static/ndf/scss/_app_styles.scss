@@ -1191,7 +1191,7 @@ aside#help{
     background: #FFF;
     padding: 0px;
     overflow: hidden;
-    width: 15em;
+    width:  15em;
     height: 13em;
     border-radius: 5px 5px 0px 0px;
     margin: 0px auto;
@@ -1202,17 +1202,18 @@ aside#help{
         transition: box-shadow 0.5s ease;
     }*/
     .scard-image {
-          height: 100%;
+          //height: 100%;
           background-color: #FFF;
 
           img  {
-              height: 100%;
+              //height: 100%;
               margin: 0px auto;
               width: 80%;
               display: block;
           }
 
         i {
+            width : 80%;
             font-size: 7rem;
             opacity: 0.75;
             display: block;
@@ -1333,7 +1334,7 @@ aside#help{
     margin-top:-0.25em;
     border-radius: 0 0 2px 2px;
     overflow: hidden;
-    width:11rem;
+    //width:11rem;
     background-color:#CCCCCC;
 
 }
@@ -1691,7 +1692,7 @@ aside#help{
     margin: -15px auto;
     text-align: center;
     color: gray;
-    /*font-family: "foundation-icons";*/
+    font-family: "foundation-icons";
     font-style: normal;
     font-variant: normal;
     text-transform: none;
@@ -2298,7 +2299,7 @@ div.show-image:hover div.fullscreen-icon{
             height: 2em;
             padding-right: 10px;
             padding-left: 10px;
-            line-height: 2em;
+            line-height: 1.5em;
             border-radius: 5px 5px 0px 0px;
         }
 
