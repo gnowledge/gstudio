@@ -47,7 +47,6 @@
           <small><a onclick="location.reload()">Refresh <i class="fi-refresh"></i></a></small>
         </div>
     </div>
-  <div class ="button test-btn">helo</div>
     {% comment %}
     {% if sg_type != "Event" %}
       <input type="file" id="uploaded-files" style="" value="" multiple>
@@ -136,12 +135,7 @@
 <script type="text/javascript">
   // for discussion tab
   // storing ndf_tags return values in JS variables
-  $(".test-btn").click(function(){
-      $(".gmodal-comments-panel").toggleClass("small-7 columns gmodal-comments-panel");
-      $(".gmodal-item-panel").toggleClass("small-5 columns gmodal-item-panel");
-  });
-
-  var user_access = "{{ user_access }}"; // "allow" or "disallow"
+   var user_access = "{{ user_access }}"; // "allow" or "disallow"
   {% edit_policy groupid node request.user as status %}
   var edit_policy = "{{ status }}"; // "allow" or "disallow"
   var is_user_authenticated = {{ request.user.is_authenticated|lower }};
