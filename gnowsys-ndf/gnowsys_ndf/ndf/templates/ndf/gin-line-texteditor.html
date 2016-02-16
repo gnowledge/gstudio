@@ -42,10 +42,10 @@
           Comment  {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
         {% endif %}
       </div>
+      <div class="discussion-refresh right">
+        <small><a onclick="location.reload()">Refresh <i class="fi-refresh"></i></a></small>
+      </div>
     {% endif %}
-        <div class="discussion-refresh right">
-          <small><a onclick="location.reload()">Refresh <i class="fi-refresh"></i></a></small>
-        </div>
     </div>
 
     {% comment %}
