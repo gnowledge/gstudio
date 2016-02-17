@@ -2436,6 +2436,7 @@ div.show-image:hover div.fullscreen-icon{
     border: 0 solid silver;
     border-width: 0px 0px 0px 0px;
     margin-left: 1em;
+    text-align:center;
 
     .tab-title {
       border: 0 solid silver;
@@ -2443,6 +2444,8 @@ div.show-image:hover div.fullscreen-icon{
       background: #DEDEDE;
       border-radius: 10px 10px 0px 0px;
       margin-right: 0.4em;
+      float: none !important;
+      display: inline-block;
 
       a {
         color: #2B91EA;

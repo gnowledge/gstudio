@@ -25907,16 +25907,19 @@ div.show-image:hover div.fullscreen-icon{
   border: 0 solid silver;
   border-width: 0px 0px 0px 0px;
   margin-left: 1em;
+  text-align: center;
 }
-/* line 2440, ../../../scss/_app_styles.scss */
+/* line 2441, ../../../scss/_app_styles.scss */
 #envelop-content .course-tabs .tab-title {
   border: 0 solid silver;
   border-width: 0 0 0px 0px;
   background: #DEDEDE;
   border-radius: 10px 10px 0px 0px;
   margin-right: 0.4em;
+  float: none !important;
+  display: inline-block;
 }
-/* line 2447, ../../../scss/_app_styles.scss */
+/* line 2450, ../../../scss/_app_styles.scss */
 #envelop-content .course-tabs .tab-title a {
   color: #2B91EA;
   border-radius: inherit;
@@ -25924,33 +25927,33 @@ div.show-image:hover div.fullscreen-icon{
   font-size: 15px;
   letter-spacing: -0.3px;
 }
-/* line 2455, ../../../scss/_app_styles.scss */
+/* line 2458, ../../../scss/_app_styles.scss */
 #envelop-content .course-tabs .tab-title.active {
   border-width: 0px 0px 0px 0px;
   background: #FFFFFF;
 }
-/* line 2458, ../../../scss/_app_styles.scss */
+/* line 2461, ../../../scss/_app_styles.scss */
 #envelop-content .course-tabs .tab-title.active a {
   color: #000;
 }
-/* line 2470, ../../../scss/_app_styles.scss */
+/* line 2473, ../../../scss/_app_styles.scss */
 #envelop-content .accordion {
   margin-left: 0px;
 }
-/* line 2474, ../../../scss/_app_styles.scss */
+/* line 2477, ../../../scss/_app_styles.scss */
 #envelop-content .accordion .accordion-navigation a {
   background-color: #DEDEDE;
 }
-/* line 2477, ../../../scss/_app_styles.scss */
+/* line 2480, ../../../scss/_app_styles.scss */
 #envelop-content .accordion .accordion-navigation.active a {
   background-color: #fff;
 }
-/* line 2484, ../../../scss/_app_styles.scss */
+/* line 2487, ../../../scss/_app_styles.scss */
 #envelop-content > div > .tabs-content > .content {
   background: #FFFFFF;
   padding: 1em;
 }
-/* line 2494, ../../../scss/_app_styles.scss */
+/* line 2497, ../../../scss/_app_styles.scss */
 #envelop-content .course-book #course-about .about-course-heading {
   display: block;
   height: 300px;
@@ -25961,7 +25964,7 @@ div.show-image:hover div.fullscreen-icon{
   color: #fff;
   text-align: center;
 }
-/* line 2504, ../../../scss/_app_styles.scss */
+/* line 2507, ../../../scss/_app_styles.scss */
 #envelop-content .course-book #course-about .about-course-heading .heading-text {
   display: inline-block;
   position: absolute;
@@ -25969,22 +25972,22 @@ div.show-image:hover div.fullscreen-icon{
   left: 50%;
   transform: translate(-50%, -50%);
 }
-/* line 2511, ../../../scss/_app_styles.scss */
+/* line 2514, ../../../scss/_app_styles.scss */
 #envelop-content .course-book #course-about .about-course-heading .heading-text div:not(:first-child) {
   font-size: 20px;
 }
-/* line 2515, ../../../scss/_app_styles.scss */
+/* line 2518, ../../../scss/_app_styles.scss */
 #envelop-content .course-book #course-about .about-course-heading .heading-text h2 {
   color: inherit;
 }
-/* line 2521, ../../../scss/_app_styles.scss */
+/* line 2524, ../../../scss/_app_styles.scss */
 #envelop-content .course-book #course-about .about-course-details {
   display: block;
   min-height: 100px;
   width: 100%;
 }
 
-/* line 2536, ../../../scss/_app_styles.scss */
+/* line 2539, ../../../scss/_app_styles.scss */
 .course-dashboard .course-status > .row, .course-dashboard .course-notifications > .row,
 .course-dashboard .course-performance > .row {
   padding: 0px;
@@ -25996,45 +25999,45 @@ div.show-image:hover div.fullscreen-icon{
   margin: 0em 0em;
   border-radius: 10px;
 }
-/* line 2548, ../../../scss/_app_styles.scss */
+/* line 2551, ../../../scss/_app_styles.scss */
 .course-dashboard .dash-tile-heading {
   padding: 0.2em 0.7em;
   border-bottom: 1px solid #DADADA;
   font-weight: 500;
   font-size: 1.3em;
 }
-/* line 2554, ../../../scss/_app_styles.scss */
+/* line 2557, ../../../scss/_app_styles.scss */
 .course-dashboard .dash-tile-row {
   padding: 1em;
 }
-/* line 2557, ../../../scss/_app_styles.scss */
+/* line 2560, ../../../scss/_app_styles.scss */
 .course-dashboard .dash-tile-row:nth-child(n+3) {
   border-top: 1px solid #DCDCDC;
 }
-/* line 2563, ../../../scss/_app_styles.scss */
+/* line 2566, ../../../scss/_app_styles.scss */
 .course-dashboard .course-status .course-update .course-current-state {
   color: #000;
   font-weight: bold;
   font-size: 1.2em;
   padding: 0.5em 0.8em 0.6em;
 }
-/* line 2573, ../../../scss/_app_styles.scss */
+/* line 2576, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications {
   position: relative;
 }
-/* line 2578, ../../../scss/_app_styles.scss */
+/* line 2581, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications .notification-row .notification-text {
   font-size: 0.85em;
   letter-spacing: 0em;
   word-spacing: 0.2em;
 }
-/* line 2583, ../../../scss/_app_styles.scss */
+/* line 2586, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications .notification-row .time-elapsed {
   font-size: 0.6em;
   color: #424242;
   cursor: pointer;
 }
-/* line 2590, ../../../scss/_app_styles.scss */
+/* line 2593, ../../../scss/_app_styles.scss */
 .course-dashboard .course-notifications .notification-count {
   font-size: 1em;
   position: absolute;
@@ -26042,34 +26045,34 @@ div.show-image:hover div.fullscreen-icon{
   top: 0.3em;
 }
 
-/* line 2600, ../../../scss/_app_styles.scss */
+/* line 2603, ../../../scss/_app_styles.scss */
 .notebook .notebook-header {
   border-color: black;
   border-style: solid;
   border-width: 1px 0px;
   padding-top: 1em;
 }
-/* line 2606, ../../../scss/_app_styles.scss */
+/* line 2609, ../../../scss/_app_styles.scss */
 .notebook .notebook-header a, .notebook .notebook-header input {
   margin: 0px;
 }
-/* line 2612, ../../../scss/_app_styles.scss */
+/* line 2615, ../../../scss/_app_styles.scss */
 .notebook .notebook-body > div {
   padding-top: 15px;
   height: 50em;
   overflow: scroll;
 }
-/* line 2618, ../../../scss/_app_styles.scss */
+/* line 2621, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index {
   border-right: 1px solid #AFAEAE;
 }
-/* line 2621, ../../../scss/_app_styles.scss */
+/* line 2624, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs {
   width: 100%;
   margin: 0em 0em 0.5em;
   border-bottom: 1px solid #CCC;
 }
-/* line 2626, ../../../scss/_app_styles.scss */
+/* line 2629, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs .tab-title {
   width: 40%;
   background-color: #DEDEDE;
@@ -26078,187 +26081,187 @@ div.show-image:hover div.fullscreen-icon{
   position: relative;
   top: 1px;
 }
-/* line 2634, ../../../scss/_app_styles.scss */
+/* line 2637, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs .tab-title a {
   border-radius: inherit;
 }
-/* line 2638, ../../../scss/_app_styles.scss */
+/* line 2641, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tabs .tab-title.active {
   background-color: #fff;
   border: 1px solid #CCC;
   border-bottom: 0px;
 }
-/* line 2646, ../../../scss/_app_styles.scss */
+/* line 2649, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .tab-content {
   padding: 0px;
 }
-/* line 2651, ../../../scss/_app_styles.scss */
+/* line 2654, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .date {
   font-size: 12px;
   font-weight: bold;
   background: #EFEFEF;
   padding: 7px 10px;
 }
-/* line 2657, ../../../scss/_app_styles.scss */
+/* line 2660, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .date .note-count {
   font-size: 11px;
   line-height: 2em;
 }
-/* line 2662, ../../../scss/_app_styles.scss */
+/* line 2665, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes > div {
   border-bottom: 1px solid #AFAEAE;
 }
-/* line 2665, ../../../scss/_app_styles.scss */
+/* line 2668, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note {
   padding: 5px 15px;
   background: #EEEEEE;
   cursor: pointer;
 }
-/* line 2670, ../../../scss/_app_styles.scss */
+/* line 2673, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-heading {
   font-weight: 400;
   font-size: 17px;
 }
-/* line 2675, ../../../scss/_app_styles.scss */
+/* line 2678, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-meta {
   font-size: 13px;
 }
-/* line 2678, ../../../scss/_app_styles.scss */
+/* line 2681, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-meta > span:not(:first-child) {
   font-size: 11px;
   font-weight: 600;
   color: #717171;
 }
-/* line 2685, ../../../scss/_app_styles.scss */
+/* line 2688, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-footer {
   color: #888888;
 }
-/* line 2688, ../../../scss/_app_styles.scss */
+/* line 2691, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note .note-footer span {
   margin-right: 10px;
 }
-/* line 2693, ../../../scss/_app_styles.scss */
+/* line 2696, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note.active {
   border-left: 5px solid blue;
   background: #FFF;
 }
-/* line 2697, ../../../scss/_app_styles.scss */
+/* line 2700, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index .notes .note.active .note-heading {
   font-weight: 500;
   font-size: 17px;
 }
-/* line 2706, ../../../scss/_app_styles.scss */
+/* line 2709, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page {
   background-color: #fff;
 }
-/* line 2710, ../../../scss/_app_styles.scss */
+/* line 2713, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page > div {
   background-color: #fff;
 }
-/* line 2714, ../../../scss/_app_styles.scss */
+/* line 2717, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar {
   padding: 1em 0em 0em;
   margin: 0em;
   background-color: #F3F3F3;
 }
-/* line 2722, ../../../scss/_app_styles.scss */
+/* line 2725, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-title {
   text-align: left;
   color: #7D7D7D;
   font-size: 12px;
   letter-spacing: 0.3px;
 }
-/* line 2728, ../../../scss/_app_styles.scss */
+/* line 2731, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-rating {
   text-align: right;
 }
-/* line 2730, ../../../scss/_app_styles.scss */
+/* line 2733, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-rating > div {
   display: inline-block;
 }
-/* line 2735, ../../../scss/_app_styles.scss */
+/* line 2738, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content {
   padding: 0em 1em 1em;
   background: #fff;
   margin: 0em;
 }
-/* line 2742, ../../../scss/_app_styles.scss */
+/* line 2745, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-header > div {
   display: inline-block;
 }
-/* line 2745, ../../../scss/_app_styles.scss */
+/* line 2748, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-header .note-title {
   font-size: 1.5em;
   font-weight: 500;
   margin-right: 1em;
 }
-/* line 2752, ../../../scss/_app_styles.scss */
+/* line 2755, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-text p {
   padding: 0px;
 }
-/* line 2758, ../../../scss/_app_styles.scss */
+/* line 2761, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections {
   padding: 1em 1em 0em;
 }
-/* line 2762, ../../../scss/_app_styles.scss */
+/* line 2765, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .comments-header span {
   font-weight: bold;
 }
-/* line 2765, ../../../scss/_app_styles.scss */
+/* line 2768, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .comments-header i:not(:first-child) {
   margin-left: 15px;
 }
-/* line 2770, ../../../scss/_app_styles.scss */
+/* line 2773, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment {
   border-top: 1px solid grey;
   padding: 15px 10px;
   margin-top: 5px;
 }
-/* line 2775, ../../../scss/_app_styles.scss */
+/* line 2778, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-box,
 .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-editor {
   min-height: 200px;
   margin-top: 0px;
 }
-/* line 2781, ../../../scss/_app_styles.scss */
+/* line 2784, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment .user-prof-image {
   font-size: 90px;
   line-height: 0em;
 }
 
-/* line 2791, ../../../scss/_app_styles.scss */
+/* line 2794, ../../../scss/_app_styles.scss */
 #newNoteModal {
   width: 40%;
 }
-/* line 2794, ../../../scss/_app_styles.scss */
+/* line 2797, ../../../scss/_app_styles.scss */
 #newNoteModal > div {
   margin-bottom: 1em;
 }
-/* line 2798, ../../../scss/_app_styles.scss */
+/* line 2801, ../../../scss/_app_styles.scss */
 #newNoteModal input {
   width: 100%;
 }
-/* line 2801, ../../../scss/_app_styles.scss */
+/* line 2804, ../../../scss/_app_styles.scss */
 #newNoteModal .heading {
   margin-right: 1em;
 }
-/* line 2805, ../../../scss/_app_styles.scss */
+/* line 2808, ../../../scss/_app_styles.scss */
 #newNoteModal .note-tags {
   padding: 1em;
   border: 1px solid black;
 }
-/* line 2811, ../../../scss/_app_styles.scss */
+/* line 2814, ../../../scss/_app_styles.scss */
 #newNoteModal .new-note-actions .button {
   float: left;
   margin-left: 1em;
   margin-bottom: 0px;
 }
-/* line 2816, ../../../scss/_app_styles.scss */
+/* line 2819, ../../../scss/_app_styles.scss */
 #newNoteModal .new-note-actions .button:last-child {
   float: right;
 }
 
-/* line 2824, ../../../scss/_app_styles.scss */
+/* line 2827, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header {
   line-height: 2em;
   background: #f0f0f0;
@@ -26268,33 +26271,33 @@ div.show-image:hover div.fullscreen-icon{
   text-align: center;
   padding: 0.7em 0em;
 }
-/* line 2833, ../../../scss/_app_styles.scss */
+/* line 2836, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header input, .gallery-page .gallery-header select, .gallery-page .gallery-header a {
   border-radius: 4px;
   margin-bottom: 0em;
 }
-/* line 2837, ../../../scss/_app_styles.scss */
+/* line 2840, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header input.prefix, .gallery-page .gallery-header select.prefix, .gallery-page .gallery-header a.prefix {
   border-radius: 0px;
 }
-/* line 2842, ../../../scss/_app_styles.scss */
+/* line 2845, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header i {
   font-size: 1em;
   color: #A29E9E;
 }
-/* line 2848, ../../../scss/_app_styles.scss */
+/* line 2851, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .filters .columns {
   padding-left: 5px;
 }
-/* line 2854, ../../../scss/_app_styles.scss */
+/* line 2857, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .search .columns {
   padding-left: 5px;
 }
-/* line 2858, ../../../scss/_app_styles.scss */
+/* line 2861, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .search .filter-tags {
   text-align: left;
 }
-/* line 2861, ../../../scss/_app_styles.scss */
+/* line 2864, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .search .filter-tags .filter-tag {
   padding: 0px 10px;
   background: #cccccc;
@@ -26304,73 +26307,73 @@ div.show-image:hover div.fullscreen-icon{
   font-size: 0.8em;
   color: #757575;
 }
-/* line 2870, ../../../scss/_app_styles.scss */
+/* line 2873, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .search .filter-tags .filter-tag span {
   margin: 0px 2px 0px 6px;
   cursor: pointer;
 }
-/* line 2875, ../../../scss/_app_styles.scss */
+/* line 2878, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .search .filter-tags > div {
   display: inline-block;
 }
-/* line 2882, ../../../scss/_app_styles.scss */
+/* line 2885, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .side-heading {
   font-size: 19px;
 }
-/* line 2885, ../../../scss/_app_styles.scss */
+/* line 2888, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .side-heading a {
   background: #e7e7e7;
   border-width: 1px 0px 1px 1px;
   border-color: #cccccc;
   border-style: solid;
 }
-/* line 2892, ../../../scss/_app_styles.scss */
+/* line 2895, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-header .side-heading input {
   border-radius: 0px;
   box-shadow: none;
   border-left: 0px;
 }
-/* line 2899, ../../../scss/_app_styles.scss */
+/* line 2902, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel {
   background: #F7F7F7;
 }
-/* line 2902, ../../../scss/_app_styles.scss */
+/* line 2905, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content {
   min-height: 250px;
 }
-/* line 2905, ../../../scss/_app_styles.scss */
+/* line 2908, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader {
   line-height: 3em;
   padding: 10px 0px;
 }
-/* line 2909, ../../../scss/_app_styles.scss */
+/* line 2912, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader upload-file {
   margin: 0px;
   font-size: 1em;
 }
-/* line 2914, ../../../scss/_app_styles.scss */
+/* line 2917, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader .gallery-actions {
   font-size: 1.2em;
   color: #2a79e4;
 }
-/* line 2918, ../../../scss/_app_styles.scss */
+/* line 2921, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .gallery-content .gallery-subheader .gallery-actions > div {
   display: inline-block;
   margin-right: 10px;
 }
-/* line 2925, ../../../scss/_app_styles.scss */
+/* line 2928, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel {
   background: #fff;
 }
-/* line 2928, ../../../scss/_app_styles.scss */
+/* line 2931, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel .row {
   margin: 10px 0px;
 }
-/* line 2931, ../../../scss/_app_styles.scss */
+/* line 2934, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel .row > div:first-child {
   font-weight: 500;
 }
-/* line 2936, ../../../scss/_app_styles.scss */
+/* line 2939, ../../../scss/_app_styles.scss */
 .gallery-page .gallery-panel .file-info-panel .file-name {
   font-size: 20px;
   font-weight: bold;
@@ -26378,11 +26381,11 @@ div.show-image:hover div.fullscreen-icon{
   margin: 10px 0px 20px;
 }
 
-/* line 2947, ../../../scss/_app_styles.scss */
+/* line 2950, ../../../scss/_app_styles.scss */
 .gallery-card .select-file {
   vertical-align: top;
 }
-/* line 2951, ../../../scss/_app_styles.scss */
+/* line 2954, ../../../scss/_app_styles.scss */
 .gallery-card .file-item {
   width: 80%;
   color: #fff;
@@ -26393,17 +26396,17 @@ div.show-image:hover div.fullscreen-icon{
   border: 1px solid black;
   overflow: hidden;
 }
-/* line 2961, ../../../scss/_app_styles.scss */
+/* line 2964, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .item-thumbnail-image {
   height: 100%;
   padding: 1em;
 }
-/* line 2966, ../../../scss/_app_styles.scss */
+/* line 2969, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .file-details {
   margin-top: 10%;
   display: none;
 }
-/* line 2971, ../../../scss/_app_styles.scss */
+/* line 2974, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .file-actions {
   display: none;
   position: absolute;
@@ -26412,11 +26415,11 @@ div.show-image:hover div.fullscreen-icon{
   width: 100%;
   font-size: 25px;
 }
-/* line 2979, ../../../scss/_app_styles.scss */
+/* line 2982, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .file-actions i {
   margin: 0px 10px;
 }
-/* line 2984, ../../../scss/_app_styles.scss */
+/* line 2987, ../../../scss/_app_styles.scss */
 .gallery-card .file-item .filename-footer {
   position: absolute;
   bottom: 0px;
@@ -26427,24 +26430,24 @@ div.show-image:hover div.fullscreen-icon{
   font-weight: 600;
   background: #999999;
 }
-/* line 2995, ../../../scss/_app_styles.scss */
+/* line 2998, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover {
   background: #999999;
 }
-/* line 2998, ../../../scss/_app_styles.scss */
+/* line 3001, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover .item-thumbnail-image {
   opacity: 0.2;
 }
-/* line 3002, ../../../scss/_app_styles.scss */
+/* line 3005, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover .file-details, .gallery-card .file-item:hover .file-actions {
   display: block;
 }
-/* line 3005, ../../../scss/_app_styles.scss */
+/* line 3008, ../../../scss/_app_styles.scss */
 .gallery-card .file-item:hover .filename-footer {
   display: none;
 }
 
-/* line 3013, ../../../scss/_app_styles.scss */
+/* line 3016, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'], dialog[id^='reveal-'] {
   width: 100vw;
   height: 100vh;
@@ -26454,7 +26457,7 @@ div.show-image:hover div.fullscreen-icon{
   padding-top: 1em;
   background: transparent;
 }
-/* line 3022, ../../../scss/_app_styles.scss */
+/* line 3025, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar, dialog[id^='reveal-'] .gmodal-toolbar {
   font-size: 1.2em;
   border-bottom: 1px solid black;
@@ -26462,35 +26465,35 @@ div.show-image:hover div.fullscreen-icon{
   line-height: 1.5em;
   padding-bottom: 0.5em;
 }
-/* line 3029, ../../../scss/_app_styles.scss */
+/* line 3032, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .file-name, dialog[id^='reveal-'] .gmodal-toolbar .file-name {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-/* line 3035, ../../../scss/_app_styles.scss */
+/* line 3038, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions {
   font-size: 0.95em;
 }
-/* line 3038, ../../../scss/_app_styles.scss */
+/* line 3041, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions i, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions i {
   margin-right: 0.2em;
 }
-/* line 3041, ../../../scss/_app_styles.scss */
+/* line 3044, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div {
   display: inline-block;
   padding: 0.2em 0.3em;
   cursor: pointer;
 }
-/* line 3047, ../../../scss/_app_styles.scss */
+/* line 3050, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div a, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div a {
   color: inherit;
 }
-/* line 3049, ../../../scss/_app_styles.scss */
+/* line 3052, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div a:hover, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions > div a:hover {
   color: #000;
 }
-/* line 3054, ../../../scss/_app_styles.scss */
+/* line 3057, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions .download-file, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions .download-file {
   float: right;
   margin-right: 2em;
@@ -26498,38 +26501,38 @@ div.show-image:hover div.fullscreen-icon{
   border-radius: 4px;
   padding: 0.1em 0.4em;
 }
-/* line 3061, ../../../scss/_app_styles.scss */
+/* line 3064, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions .download-file:hover, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions .download-file:hover {
   background-color: #fff;
   color: #000;
   opacity: 0.8;
 }
-/* line 3069, ../../../scss/_app_styles.scss */
+/* line 3072, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-toolbar .gmodal-actions .close-reveal-modal, dialog[id^='reveal-'] .gmodal-toolbar .gmodal-actions .close-reveal-modal {
   top: 0.3rem;
   font-size: 1.3em;
   font-weight: 400;
 }
-/* line 3077, ../../../scss/_app_styles.scss */
+/* line 3080, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body, dialog[id^='reveal-'] .gmodal-body {
   position: relative;
 }
-/* line 3079, ../../../scss/_app_styles.scss */
+/* line 3082, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel {
   height: 86vh;
 }
-/* line 3082, ../../../scss/_app_styles.scss */
+/* line 3085, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder {
   height: 100%;
 }
-/* line 3085, ../../../scss/_app_styles.scss */
+/* line 3088, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder .gmodal-item, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder .gmodal-item {
   height: 100%;
   width: 100%;
   background: transparent;
   padding: 0px;
 }
-/* line 3091, ../../../scss/_app_styles.scss */
+/* line 3094, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder .gmodal-item .gmodel-item-image, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-item-holder .gmodal-item .gmodel-item-image {
   width: auto;
   margin: 0px auto;
@@ -26537,7 +26540,7 @@ div.show-image:hover div.fullscreen-icon{
   padding: 1em 0em;
   height: 100%;
 }
-/* line 3100, ../../../scss/_app_styles.scss */
+/* line 3103, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer {
   height: 2em;
   line-height: 2em;
@@ -26549,70 +26552,70 @@ div.show-image:hover div.fullscreen-icon{
   opacity: 0;
   background-color: rgba(0, 0, 0, 0.9);
 }
-/* line 3111, ../../../scss/_app_styles.scss */
+/* line 3114, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer > div:not(.gmodal-item-details), dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer > div:not(.gmodal-item-details) {
   cursor: pointer;
 }
-/* line 3115, ../../../scss/_app_styles.scss */
+/* line 3118, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer .gmodal-item-details, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer .gmodal-item-details {
   text-align: center;
   width: 100%;
 }
-/* line 3119, ../../../scss/_app_styles.scss */
+/* line 3122, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer .gmodal-item-details i, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel .gmodal-footer .gmodal-item-details i {
   margin-left: 1em;
   margin-right: 0.5em;
   cursor: pointer;
 }
-/* line 3127, ../../../scss/_app_styles.scss */
+/* line 3130, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-item-panel:hover .gmodal-footer, dialog[id^='reveal-'] .gmodal-body .gmodal-item-panel:hover .gmodal-footer {
   opacity: 0.8;
   transition: opacity 1s;
 }
-/* line 3132, ../../../scss/_app_styles.scss */
+/* line 3135, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel {
   height: 86vh;
 }
-/* line 3135, ../../../scss/_app_styles.scss */
+/* line 3138, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments {
   background: #fff;
   height: 100%;
   padding: 0.1em 1em;
 }
-/* line 3140, ../../../scss/_app_styles.scss */
+/* line 3143, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading {
   font-size: 0.9em;
   line-height: 1em;
 }
-/* line 3144, ../../../scss/_app_styles.scss */
+/* line 3147, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .commented-date, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .commented-date,
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .comment-rating,
 dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .comment-rating {
   font-size: 0.7em;
 }
-/* line 3149, ../../../scss/_app_styles.scss */
+/* line 3152, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .comment-rating > div, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-heading .comment-rating > div {
   display: inline-block;
 }
-/* line 3153, ../../../scss/_app_styles.scss */
+/* line 3156, ../../../scss/_app_styles.scss */
 .reveal-modal[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-text, dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comment-text {
   font-size: 0.9em;
 }
 
-/* line 3162, ../../../scss/_app_styles.scss */
+/* line 3165, ../../../scss/_app_styles.scss */
 .user-comment {
   display: inline-flex;
   width: 100%;
 }
-/* line 3166, ../../../scss/_app_styles.scss */
+/* line 3169, ../../../scss/_app_styles.scss */
 .user-comment > div {
   display: inline-block;
 }
-/* line 3169, ../../../scss/_app_styles.scss */
+/* line 3172, ../../../scss/_app_styles.scss */
 .user-comment > div:last-child {
   width: 100%;
 }
-/* line 3174, ../../../scss/_app_styles.scss */
+/* line 3177, ../../../scss/_app_styles.scss */
 .user-comment .comment-heading {
   color: #9C9C9C;
   border-bottom: 1px solid grey;
@@ -26620,71 +26623,71 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   margin-bottom: 10px;
   margin-top: 10px;
 }
-/* line 3182, ../../../scss/_app_styles.scss */
+/* line 3185, ../../../scss/_app_styles.scss */
 .user-comment .comment-heading > div {
   display: inline-block;
 }
-/* line 3186, ../../../scss/_app_styles.scss */
+/* line 3189, ../../../scss/_app_styles.scss */
 .user-comment .comment-heading .commentor-name span {
   font-weight: bold;
   color: #333333;
 }
-/* line 3191, ../../../scss/_app_styles.scss */
+/* line 3194, ../../../scss/_app_styles.scss */
 .user-comment .comment-footer {
   font-size: 0.9em;
   font-weight: 400;
   border: 1px solid #9E9E9E;
   background: #CCCCCC;
 }
-/* line 3197, ../../../scss/_app_styles.scss */
+/* line 3200, ../../../scss/_app_styles.scss */
 .user-comment .comment-footer > div {
   cursor: pointer;
 }
-/* line 3200, ../../../scss/_app_styles.scss */
+/* line 3203, ../../../scss/_app_styles.scss */
 .user-comment .comment-footer i {
   margin-right: 1em;
 }
-/* line 3206, ../../../scss/_app_styles.scss */
+/* line 3209, ../../../scss/_app_styles.scss */
 .user-comment .comment-container .comment-add {
   margin-top: 0.4em;
 }
-/* line 3210, ../../../scss/_app_styles.scss */
+/* line 3213, ../../../scss/_app_styles.scss */
 .user-comment .user-avatar {
   font-size: 10em;
   font-size: 5em;
   line-height: 1em;
 }
 
-/* line 3217, ../../../scss/_app_styles.scss */
+/* line 3220, ../../../scss/_app_styles.scss */
 .course-content {
   /*border-top: 1px solid #000;*/
 }
-/* line 3219, ../../../scss/_app_styles.scss */
+/* line 3222, ../../../scss/_app_styles.scss */
 .course-content .alert-box {
   padding: 5px;
   font-size: 1em;
 }
-/* line 3223, ../../../scss/_app_styles.scss */
+/* line 3226, ../../../scss/_app_styles.scss */
 .course-content .alert-box > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 3227, ../../../scss/_app_styles.scss */
+/* line 3230, ../../../scss/_app_styles.scss */
 .course-content .alert-box .warning-note {
   width: 96%;
 }
-/* line 3230, ../../../scss/_app_styles.scss */
+/* line 3233, ../../../scss/_app_styles.scss */
 .course-content .alert-box .warning-note > div:nth-child(2) {
   color: #000;
   margin-top: 5px;
   padding-top: 5px;
   border-top: 1px solid #000;
 }
-/* line 3237, ../../../scss/_app_styles.scss */
+/* line 3240, ../../../scss/_app_styles.scss */
 .course-content .alert-box .warning-icon {
   margin: 0px 5px;
 }
-/* line 3240, ../../../scss/_app_styles.scss */
+/* line 3243, ../../../scss/_app_styles.scss */
 .course-content .alert-box .close {
   position: relative;
   top: 0px;
@@ -26694,17 +26697,17 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   text-decoration: underline;
   color: #085394 !important;
 }
-/* line 3251, ../../../scss/_app_styles.scss */
+/* line 3254, ../../../scss/_app_styles.scss */
 .course-content .collection {
   overflow: visible;
 }
-/* line 3254, ../../../scss/_app_styles.scss */
+/* line 3257, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module {
   position: relative;
   border-bottom: 1px solid #CCC;
   padding: 1em 0em;
 }
-/* line 3261, ../../../scss/_app_styles.scss */
+/* line 3264, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-header .fa {
   position: absolute;
   left: -1.1em;
@@ -26713,38 +26716,38 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   background: #EAEAEA;
   font-size: 1.4em;
 }
-/* line 3279, ../../../scss/_app_styles.scss */
+/* line 3282, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-page:hover span {
   text-decoration: underline;
   color: #9900ff !important;
 }
-/* line 3284, ../../../scss/_app_styles.scss */
+/* line 3287, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .jqtree-tree .jqtree-title {
   cursor: pointer;
 }
-/* line 3288, ../../../scss/_app_styles.scss */
+/* line 3291, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-part {
   margin-left: 1em;
 }
-/* line 3291, ../../../scss/_app_styles.scss */
+/* line 3294, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-part .jqtree-toggler {
   color: #585858;
 }
-/* line 3294, ../../../scss/_app_styles.scss */
+/* line 3297, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-part .jqtree-toggler.jqtree-closed {
   color: #CCC;
 }
-/* line 3298, ../../../scss/_app_styles.scss */
+/* line 3301, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-part span {
   vertical-align: top;
 }
-/* line 3301, ../../../scss/_app_styles.scss */
+/* line 3304, ../../../scss/_app_styles.scss */
 .course-content .collection .course-module .module-part .fa {
   display: inline;
   margin-right: 5px;
 }
 
-/* line 3311, ../../../scss/_app_styles.scss */
+/* line 3314, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header {
   font-weight: 400;
   font-size: 1.3em;
@@ -26752,55 +26755,55 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   padding: 0.3em 0em;
   border-bottom: 1px solid #707070;
 }
-/* line 3318, ../../../scss/_app_styles.scss */
+/* line 3321, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header .activity-page-previous {
   cursor: pointer;
 }
-/* line 3322, ../../../scss/_app_styles.scss */
+/* line 3325, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header i {
   margin-right: 0.1em;
 }
-/* line 3326, ../../../scss/_app_styles.scss */
+/* line 3329, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header .unit-title {
   text-align: center;
 }
-/* line 3329, ../../../scss/_app_styles.scss */
+/* line 3332, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header .activity-create-note {
   color: #2a78e3;
   cursor: pointer;
 }
-/* line 3333, ../../../scss/_app_styles.scss */
+/* line 3336, ../../../scss/_app_styles.scss */
 .activity-page .activity-page-header .activity-create-note > div {
   float: right;
 }
-/* line 3338, ../../../scss/_app_styles.scss */
+/* line 3341, ../../../scss/_app_styles.scss */
 .activity-page .activity-header {
   padding: 0.5em 0.2em;
 }
-/* line 3341, ../../../scss/_app_styles.scss */
+/* line 3344, ../../../scss/_app_styles.scss */
 .activity-page .activity-header a {
   margin: 0px;
 }
-/* line 3344, ../../../scss/_app_styles.scss */
+/* line 3347, ../../../scss/_app_styles.scss */
 .activity-page .activity-header > div:last-child > div {
   float: right;
 }
-/* line 3348, ../../../scss/_app_styles.scss */
+/* line 3351, ../../../scss/_app_styles.scss */
 .activity-page .activity-header .activity-title-section {
   text-align: center;
   font-size: 1.5em;
 }
-/* line 3352, ../../../scss/_app_styles.scss */
+/* line 3355, ../../../scss/_app_styles.scss */
 .activity-page .activity-header .activity-title-section > div {
   display: inline-block;
 }
-/* line 3355, ../../../scss/_app_styles.scss */
+/* line 3358, ../../../scss/_app_styles.scss */
 .activity-page .activity-header .activity-title-section .activity-pagination {
   color: #949494;
   font-size: 0.8em;
   margin-right: 0.6em;
 }
-/* line 3366, ../../../scss/_app_styles.scss */
+/* line 3369, ../../../scss/_app_styles.scss */
 .activity-page .activity-slides-container {
   border: 1px solid black;
   height: 600px;
@@ -26808,33 +26811,33 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   margin-bottom: 2em;
   padding: 1em;
 }
-/* line 3373, ../../../scss/_app_styles.scss */
+/* line 3376, ../../../scss/_app_styles.scss */
 .activity-page .activity-slides-container .activity-slides {
   height: 100%;
 }
-/* line 3375, ../../../scss/_app_styles.scss */
+/* line 3378, ../../../scss/_app_styles.scss */
 .activity-page .activity-slides-container .activity-slides .activity-slide {
   padding: 1em;
   height: inherit;
   background: #fff;
   position: relative;
 }
-/* line 3384, ../../../scss/_app_styles.scss */
+/* line 3387, ../../../scss/_app_styles.scss */
 .activity-page .activity-slides-container .activity-slides .activity-slide .page > section {
   margin-left: 50%;
   transform: translate(-50%);
 }
-/* line 3392, ../../../scss/_app_styles.scss */
+/* line 3395, ../../../scss/_app_styles.scss */
 .activity-page .activity-comments-section {
   width: 75%;
   margin: 0px auto;
 }
-/* line 3396, ../../../scss/_app_styles.scss */
+/* line 3399, ../../../scss/_app_styles.scss */
 .activity-page .activity-comments-section .user-prof-image {
   font-size: 7em;
   text-align: center;
 }
-/* line 3401, ../../../scss/_app_styles.scss */
+/* line 3404, ../../../scss/_app_styles.scss */
 .activity-page .activity-comments-section #postCommentBtn {
   padding: 2em 3em;
 }
@@ -26855,28 +26858,28 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
    position: absolute;
 }
 */
-/* line 3422, ../../../scss/_app_styles.scss */
+/* line 3425, ../../../scss/_app_styles.scss */
 .rate-scale {
   cursor: pointer;
 }
-/* line 3425, ../../../scss/_app_styles.scss */
+/* line 3428, ../../../scss/_app_styles.scss */
 .rate-scale i {
   margin-right: 0em !important;
   padding-right: 0.5em;
 }
-/* line 3429, ../../../scss/_app_styles.scss */
+/* line 3432, ../../../scss/_app_styles.scss */
 .rate-scale .hover-rating, .rate-scale .rated {
   color: yellow;
 }
 
-/* line 3435, ../../../scss/_app_styles.scss */
+/* line 3438, ../../../scss/_app_styles.scss */
 #left-tab {
   position: absolute;
   left: 0px;
   bottom: 0px;
 }
 
-/* line 3440, ../../../scss/_app_styles.scss */
+/* line 3443, ../../../scss/_app_styles.scss */
 #right-tab {
   position: absolute;
   right: 0px;
@@ -26884,12 +26887,12 @@ dialog[id^='reveal-'] .gmodal-body .gmodal-comments-panel .gmodal-comments .comm
   padding-bottom: 6px;
 }
 
-/* line 3446, ../../../scss/_app_styles.scss */
+/* line 3449, ../../../scss/_app_styles.scss */
 #enrolled-btn {
   margin-bottom: 0px;
 }
 
-/* line 3449, ../../../scss/_app_styles.scss */
+/* line 3452, ../../../scss/_app_styles.scss */
 div.absol-descrip {
   position: absolute;
   top: 190px;
@@ -26900,14 +26903,14 @@ div.absol-descrip {
 }
 
 /*overview-summary styling*/
-/* line 3459, ../../../scss/_app_styles.scss */
+/* line 3462, ../../../scss/_app_styles.scss */
 .course-title, .course-date {
   color: white;
   padding-top: 0px;
   padding-bottom: 0px;
 }
 
-/* line 3464, ../../../scss/_app_styles.scss */
+/* line 3467, ../../../scss/_app_styles.scss */
 .course-description {
   color: #cccccc;
   padding-top: 0px;
@@ -26919,48 +26922,48 @@ div.absol-descrip {
   overflow: hidden;
 }
 
-/* line 3474, ../../../scss/_app_styles.scss */
+/* line 3477, ../../../scss/_app_styles.scss */
 .course-para {
   padding: 0;
 }
 
-/* line 3478, ../../../scss/_app_styles.scss */
+/* line 3481, ../../../scss/_app_styles.scss */
 course-title {
   padding-left: 10px;
 }
 
-/* line 3481, ../../../scss/_app_styles.scss */
+/* line 3484, ../../../scss/_app_styles.scss */
 .enroll-status-margin {
   margin-bottom: 0;
 }
 
-/* line 3485, ../../../scss/_app_styles.scss */
+/* line 3488, ../../../scss/_app_styles.scss */
 .progress-summery {
   color: white;
   margin-top: 20px;
 }
 
-/* line 3489, ../../../scss/_app_styles.scss */
+/* line 3492, ../../../scss/_app_styles.scss */
 .course-description-thumbnails {
   margin: 0;
   padding: 0;
 }
 
-/* line 3494, ../../../scss/_app_styles.scss */
+/* line 3497, ../../../scss/_app_styles.scss */
 .left-shift {
   padding: 0;
   color: white !important;
 }
 
 /*course overview for Small screens*/
-/* line 3500, ../../../scss/_app_styles.scss */
+/* line 3503, ../../../scss/_app_styles.scss */
 .course {
   /*position:relative;*/
   border: 1px solid black;
   background-color: #999999;
 }
 
-/* line 3506, ../../../scss/_app_styles.scss */
+/* line 3509, ../../../scss/_app_styles.scss */
 .course-contents {
   /*position:absolute;*/
   width: 100%;
@@ -26968,7 +26971,7 @@ course-title {
 
 /*Medium screens*/
 @media only screen and (min-width: 40.063em) {
-  /* line 3513, ../../../scss/_app_styles.scss */
+  /* line 3516, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -26976,7 +26979,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 3519, ../../../scss/_app_styles.scss */
+  /* line 3522, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -26986,7 +26989,7 @@ course-title {
 /* min-width 641px, medium screens */
 /* Large screens*/
 @media only screen and (min-width: 64.063em) {
-  /* line 3529, ../../../scss/_app_styles.scss */
+  /* line 3532, ../../../scss/_app_styles.scss */
   .course {
     position: relative;
     height: 300px;
@@ -26994,7 +26997,7 @@ course-title {
     background-color: #999999;
   }
 
-  /* line 3535, ../../../scss/_app_styles.scss */
+  /* line 3538, ../../../scss/_app_styles.scss */
   .course-contents {
     position: absolute;
     bottom: 0;
@@ -27003,14 +27006,14 @@ course-title {
 }
 /* min-width 1025px, large screens */
 /*General config css*/
-/* line 3542, ../../../scss/_app_styles.scss */
+/* line 3545, ../../../scss/_app_styles.scss */
 .alert-box.warning {
   background: #ffe7c0;
   border-color: #bf9000;
   color: #966000;
 }
 
-/* line 3549, ../../../scss/_app_styles.scss */
+/* line 3552, ../../../scss/_app_styles.scss */
 .badge {
   display: inline-block;
   line-height: 22px;
@@ -27027,7 +27030,7 @@ course-title {
   font-size: 1.8em;
 }
 
-/* line 3565, ../../../scss/_app_styles.scss */
+/* line 3568, ../../../scss/_app_styles.scss */
 .badge {
   background: #67c1ef;
   border-color: #30aae9;
@@ -27037,7 +27040,7 @@ course-title {
   background-image: linear-gradient(to bottom, #acddf6, #67c1ef);
 }
 
-/* line 3574, ../../../scss/_app_styles.scss */
+/* line 3577, ../../../scss/_app_styles.scss */
 .badge.green {
   background: #77cc51;
   border-color: #59ad33;
@@ -27047,7 +27050,7 @@ course-title {
   background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
 }
 
-/* line 3583, ../../../scss/_app_styles.scss */
+/* line 3586, ../../../scss/_app_styles.scss */
 .badge.yellow {
   background: #faba3e;
   border-color: #f4a306;
@@ -27057,7 +27060,7 @@ course-title {
   background-image: linear-gradient(to bottom, #fcd589, #faba3e);
 }
 
-/* line 3593, ../../../scss/_app_styles.scss */
+/* line 3596, ../../../scss/_app_styles.scss */
 .badge.red {
   background: #fa623f;
   border-color: #fa5a35;
