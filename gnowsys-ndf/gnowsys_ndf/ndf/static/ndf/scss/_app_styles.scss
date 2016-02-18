@@ -1051,8 +1051,101 @@ aside#help{
 
 
 // discussion
+.create-discussion {
+    position: relative;
 
-#replies-area .disc-replies {
+    >div {
+      display: inline-block;
+      vertical-align: top;
+      margin: 5px 0px;
+    }
+
+    .button {
+        margin: 5px 0px;
+    }
+    .ckeditor-content-comment {
+        width: 85%;
+        margin-left: 1em;
+
+        >div{
+          display: inline-block;
+          vertical-align: top;
+        }
+
+        .ckeditor-reply-area {
+          width: 90%;
+        }
+    }
+}
+
+#replies-area {
+    .ckeditor-content-reply {
+        margin-top: 1em;
+        /*width: 97%;*/
+
+        .ckeditor-reply-area {
+            display: inline-block;
+            width: 90%;
+            margin-left: 1em;
+        }
+        .post-btn-div {
+            display: inline-block;
+            vertical-align: top;
+        }
+    }
+
+    .disc-replies {
+
+        /*background-color:#ddd;*/
+        margin-left: 48px;
+        margin-top: 10px;
+        padding-bottom:0em;
+        border-top: 1px solid #B1B1B1;
+        //background-color:  #e6e6e6;
+        width: 50%;
+        .reply-btn{
+            cursor: pointer;
+            color:grey !important;
+        }
+
+        .reply-btn:hover {
+            color:#000 !important;
+        }
+        .discussion-title-username{
+            //background-color: #3e3e3e;
+            color: #ffffff !important;
+            height: 2em;
+            padding-right: 10px;
+            padding-left: 10px;
+            line-height: 1.5em;
+            //border-radius: 5px 5px 0px 0px;
+        }
+
+        .discussion-footer{
+            /*background-color:#CCCCCC;*/
+            color:gray !important;
+            height:2em;
+            padding-right:10px;
+            padding-left:10px;
+            border-radius: 0px 0px 5px 5px;
+            /*background-color:  #f2f2f2;*/
+
+            >a {
+                vertical-align: middle;
+                line-height: 2em;
+            }
+        }
+
+        .discussion-content{
+            color: #262626;
+            word-wrap: break-word;
+            /*background-color:  #f2f2f2;*/
+        }
+    }
+}
+
+
+/*#replies-area .disc-replies {
 
     padding:10px;
     background-color:#ddd;
@@ -1069,7 +1162,7 @@ aside#help{
     .reply-btn:hover {
         color:#ececec !important;
     }
-}
+}*/
 /* Simple  Card CSS*/
 .scard {
     background:#FFF;
@@ -1673,45 +1766,12 @@ aside#help{
     margin-top:0.5cm;
   }
   
-  .discussion-title-username{
-      background-color:#3e3e3e;
-      color:#ececec !important;
-      //width:auto;
-      margin-top:-0.6em;
-      margin-left:-0.7em; 
-      height:2em;
-      top: 0px;
-      left: 0px;
-      width: 105%;
-      right:0;
-      padding-right:10px;
-      padding-left:10px;
-  }
-.discussion-footer{
-      background-color:#CCCCCC;
-      color:gray !important;
-      //width:auto;
-      //margin-top:-1em;
-      margin-left:-0.7em; 
-      height:2em;
-      top: 0px;
-      left: 0px;
-      width: 105%;
-      right:0;
-      padding-right:10px;
-      padding-left:10px;
-      //margin-top:0.2em;
-}
-
-.discussion-content{
-      color: #262626;  
-      word-wrap: break-word;
-}
-
+  
 .fullscreen-icon{
   
   display:none;
 }
+
 /*
 div.show-image:hover div.fullscreen-icon{
     display: block;
