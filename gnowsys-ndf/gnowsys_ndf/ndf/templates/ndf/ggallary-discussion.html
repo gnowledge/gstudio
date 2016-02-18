@@ -43,9 +43,7 @@
         {% endif %}
       </div>
     {% endif %}
-        <div class="discussion-refresh right">
-          <small><a onclick="location.reload()">Refresh <i class="fi-refresh"></i></a></small>
-        </div>
+        
     </div>
     {% comment %}
     {% if sg_type != "Event" %}
@@ -214,7 +212,7 @@
                               url: "{% url 'get_ckeditor' group_id %}",
                               datatype: "html",
                               data:{
-                                      'ckeditor_toolbar' : "BasicToolbar"
+                                      'ckeditor_toolbar' : "{{ckeditor_toolbar}}"
 
                                 },
                             success: function(data) {
