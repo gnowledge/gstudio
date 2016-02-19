@@ -3388,18 +3388,25 @@ def get_course_filters(group_id, filter_context):
 	group_obj   = get_group_name_id(group_id, get_obj=True)
 	filters_dict = {}
 	all_user_objs = None
-	only_gstaff = True
-	if filter_context.lower() == "gallery":
-		only_gstaff = False
+	all_users = False
+	only_gstaff = False
+	if filter_context.lower() == "raw material":
+		only_gstaff = True
+	elif filter_context.lower() == "notebook":
+		all_users = True
 	for each_course_filter_key in GSTUDIO_COURSE_FILTERS_KEYS:
 		if each_course_filter_key == "created_by":
 			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'User'}
 			author_set_list = group_obj.author_set
 			all_user_objs = User.objects.filter(id__in=author_set_list)
-			if only_gstaff:
-				all_user_objs = [eachuser.username for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+			if not all_users:
+				if only_gstaff:
+					all_user_objs = [eachuser.username for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				else:
+					all_user_objs = [eachuser.username for eachuser in all_user_objs if not check_is_gstaff(group_obj._id,eachuser)]
 			else:
-				all_user_objs = [eachuser.username for eachuser in all_user_objs if not check_is_gstaff(group_obj._id,eachuser)]
+				all_user_objs = list(all_user_objs.values_list('username', flat=True).order_by('username'))
+
 			# Type-Cast from 'QuerySet' to 'list' to make it JSON serializable
 			# all_user_names = list(all_user_objs.values_list('username', flat=True).order_by('username'))
 			filters_dict[each_course_filter_key].update({'value': json.dumps(all_user_objs)})
