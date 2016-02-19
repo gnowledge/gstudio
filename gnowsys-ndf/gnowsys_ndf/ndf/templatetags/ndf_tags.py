@@ -3372,3 +3372,29 @@ def get_user_quiz_resp(node_obj, user_obj):
 				else:
 					result['recent_ans'] = recent_ans.values()[0]
 		return result
+
+@get_execution_time
+@register.assignment_tag
+def get_course_filters(group_id, filter_context):
+	'''
+	Returns the static data needed by filters. The data to be return will in following format:
+	{ 
+		"key_name": { "data_type": "<int>/<string>/<...>", "type": "attribute/field", "value": ["val1", "val2"]},
+		... ,
+		... ,
+		"key_name": { "data_type": "<int>/<string>/<...>", "type": "attribute/field", "value": ["val1", "val2"]} 
+	}
+	'''
+	group_obj   = get_group_name_id(group_id, get_obj=True)
+	group_id = group_obj._id
+	filters_dict = {}
+	all_user_objs = None
+	for each_course_filter_key in GSTUDIO_COURSE_FILTERS_KEYS:
+		if each_course_filter_key == "created_by":
+			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'User'}
+			author_set_list = group_obj.author_set
+			all_user_objs = User.objects.filter(id__in=author_set_list)
+			# Type-Cast from 'QuerySet' to 'list' to make it JSON serializable
+			all_user_names = list(all_user_objs.values_list('username', flat=True).order_by('username'))
+			filters_dict[each_course_filter_key].update({'value': json.dumps(all_user_names)})
+	return filters_dict

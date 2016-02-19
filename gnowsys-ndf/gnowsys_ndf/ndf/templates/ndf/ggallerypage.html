@@ -1,6 +1,10 @@
-{% load ndf_tags %}
+{% load get_course_filters from ndf_tags %}
+{% load simple_filters %}
 <div class="gallery-page">
-
+    <div class="row gallery-header">
+        {% get_course_filters group_id "Gallery" as filter_dict %}
+        {% include "ndf/filters.html" with filter_dict=filter_dict %}
+    </div>
     {% comment %}
     <div class="row gallery-header">
         <div class="medium-4 columns filters">
@@ -122,7 +126,7 @@
             </div>
             <!-- Files listing div -->
             <div class="gallery-body small-12 columns">
-                <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5">
+                <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5 gallery-body-ul">
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
                         {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True no_url=True first_arg=group_id second_arg=each_img.pk %}
@@ -216,4 +220,21 @@
         });
     })
     */
+
+    function applyFilter(filtersObjArr){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        $.ajax({
+          url: "{% url 'course_gallery' group_id %}",
+          data: {
+            filter_dict: filtersObjArr,
+            'filter_applied': 'True'
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            $(".gallery-body-ul").html(data)
+          },
+        });//end of ajax
+
+    }
 </script>

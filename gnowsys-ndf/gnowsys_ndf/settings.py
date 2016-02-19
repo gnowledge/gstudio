@@ -645,6 +645,8 @@ GSTUDIO_FILTERS = {
             "Topics": ['educationallevel', 'audience', 'language', 'educationalsubject', 'educationaluse']
             }
 
+GSTUDIO_COURSE_FILTERS_KEYS = ["created_by"]
+
 GSTUDIO_RESOURCES_CREATION_RATING = 5
 
 GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
