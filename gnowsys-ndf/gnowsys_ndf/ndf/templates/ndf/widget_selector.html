@@ -3,18 +3,19 @@
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
 
 <style type="text/css">
+
   .selector-widget{
     margin-bottom: 2rem;
     border: solid thin #efefef;
-    /*background-color: red;*/
   }
 
-  #select-search-container{
-    /*background-color: whitesmoke;*/
-    padding-right: 5px;
+  /*#select-search-container{*/
+  .select-search-container{
+    /*padding-right: 5px;*/
   }
 
-  #select-search-container > i.fi-play{
+  /*#select-search-container > i.fi-play{*/
+  .select-search-container > i.fi-play{
     min-height: 2px ;
     max-height: auto ;
     max-width: auto ;
@@ -24,7 +25,8 @@
     color: gray;
   }
 
-  #selected-items > .selection{
+  /*#selected-items > .selection{*/
+  .selected-items > .selection{
     {% if oneline_element %}
       float: center ;
       /*width: 50% ;*/
@@ -35,9 +37,11 @@
     margin: 0.25rem 0.5rem;
     background-color: #ffffff;
     border:1px solid #000;
+    cursor: move;
   }
 
-  #selected-items{
+  /*#selected-items{*/
+  .selected-items{
     max-height: 200px ;
     max-width: hidden ;
     overflow-y : auto ;
@@ -59,7 +63,8 @@
     font-size: large;
   }
 
-  #search-text{
+  /*#search-text{*/
+  .search-text{
     /*min-height: 2em;
     padding: 2px;
     color: gray;*/
@@ -72,7 +77,8 @@
     background-color: inherit;
   }
 
-  #to-be-selected{
+  /*#to-be-selected{*/
+  .to-be-selected{
     max-height: 10rem;
     min-height: auto;
     background-color: #efefef;
@@ -87,13 +93,15 @@
     border-top: none;
   }
 
-  #to-be-selected > .item{
+  /*#to-be-selected > .item{*/
+  .to-be-selected > .item{
     cursor: pointer;
     padding: 5px;
     border-bottom: solid thin lightgray;
   }
 
-  #to-be-selected > .item:hover{
+  /*#to-be-selected > .item:hover{*/
+  .to-be-selected > .item:hover{
     background-color: lightgray;
   }
 
@@ -110,53 +118,55 @@
     color: gray;
   }
 
-
 </style>
 
-    <div class="selector-widget" id="{{for}}-selector-widget">
-      <div class="row">
-        <div class="small-10 medium-12 columns">
-          <div id="select-search-container"  style="text-align:left" >
-            <i class="fi-play" ></i>
-            <div id="selected-items" > </div>
-            <input type="text" id="search-text" class="mousetrap" placeholder="Search APPs" autocomplete="off" style="text-align:left" >
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="small-12 medium-12 medium-centered columns">
-        <div id="to-be-selected" class="hide">
-            
-          {% for each_opt in all_options|dictsort:'name' %}
-            <div class="item" data-title="{{each_opt.name}}" data-description="{{each_opt.content_org|default_if_none:''}}" title="{{each_opt.content_org|default_if_none:each_opt.name}}" data-value="{{each_opt.pk}}">
-              <div class="row">
-                <div class="small-12 columns">
-                  <div class="item-title">
-                    {{each_opt.name}}
-                  </div>
-                  <div class="item-description">
-                    {{each_opt.content_org|default_if_none:''|safe|truncatewords:5}}
-                  </div>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
 
-        </div>
+<div class="selector-widget" id="{{for}}-selector-widget">
+
+  <div class="row">
+    <div class="small-10 medium-12 columns">
+      <div class="select-search-container"  style="text-align:left" >
+        <i class="fi-play" ></i>
+        <div class="selected-items" > </div>
+        <input type="text" class="search-text mousetrap" placeholder="Search APPs" autocomplete="off" >
       </div>
     </div>
   </div>
 
+  <div class="row">
+    <div class="small-12 medium-12 medium-centered columns">
+      <div class="to-be-selected hide">
+
+      {% for each_opt in all_options|dictsort:'name' %}
+
+        <div class="item" 
+          data-title="{{each_opt.name}}"
+          data-description="{{each_opt.content_org|default_if_none:''}}"
+          title="{{each_opt.content_org|default_if_none:each_opt.name}}"
+          data-value="{{each_opt.pk}}">
+
+          <div class="row">
+            <div class="small-12 columns">
+              <div class="item-title">
+                {{each_opt.name}}
+              </div>
+              <div class="item-description">
+                {{each_opt.content_org|default_if_none:''|safe|truncatewords:5}}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
 
 <script type="text/javascript">
-  $(document).ready(function () {
-    $("#selected-items").sortable({
-      revert: true,
-      scroll: true, 
-    });
-  })
-
-  selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
 
   // querySelector, jQuery style
   var $s = function (selector) {
@@ -167,11 +177,28 @@
     return document.querySelectorAll(selector);
   };
 
-  toBeSelected = document.getElementById('to-be-selected');
-  selectedItems = document.getElementById('selected-items');
-  searchText = document.getElementById('search-text');
-  selectorWidget = $s('.selector-widget');
-  sItems = $sa("#to-be-selected .item");
+  var selectorWidgetID = "{{for}}-selector-widget.selector-widget";
+  var selectorWidget = $s('#' + selectorWidgetID);
+
+  $(document).ready(function () {
+    $("#" + selectorWidgetID + " .selected-items").sortable({revert: true, scroll: true});
+  })
+
+  var selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
+
+
+  // toBeSelected = document.getElementById('to-be-selected');
+  var toBeSelected = $s('#' + selectorWidgetID + ' .to-be-selected');
+  toBeSelected.onblur = function(){$s('#' + selectorWidgetID + ' .to-be-selected').classList.add('hide');}
+
+  // selectedItems = document.getElementById('selected-items');
+  var selectedItems = $s('#' + selectorWidgetID + ' .selected-items');
+  
+  // searchText = document.getElementById('search-text');
+  var searchText = $s('#' + selectorWidgetID + ' .search-text');
+
+  // sItems = $sa("#to-be-selected .item");
+  var sItems = $sa('#' + selectorWidgetID + ' .to-be-selected' + ' .item');
   
   function removeTag(){
     var tempItem = this.parentNode.querySelector('.item');
@@ -198,7 +225,7 @@
 
   function addToSelection () {
     // console.log(this.textContent);
-    selDiv = document.createElement('div');
+    var selDiv = document.createElement('div');
     // linebreak = document.createElement("br");
     selDiv.classList.add('label', 'secondary', 'selection');
     this.onclick = detachEvent;
@@ -215,7 +242,7 @@
     selDiv.appendChild(closeBtn);
     selectedItems.appendChild(selDiv);
     // selectedItems.appendChild(linebreak);
-   // selDiv.onclick = function(){selectedItems.insertBefore(this, this.previousSibling );}
+    // selDiv.onclick = function(){selectedItems.insertBefore(this, this.previousSibling );}
   }
 
  for (var i = sItems.length - 1; i >= 0; i--) {
@@ -223,14 +250,15 @@
   }
 
   for (var i = 0; i < selected_options.length; i++) {
-    temp_item = toBeSelected.querySelector('.item[data-value="'+ selected_options[i] +'"]');
+    var temp_item = toBeSelected.querySelector('.item[data-value="'+ selected_options[i] +'"]');
     if(temp_item){temp_item.click()}; 
   };
 
   function searchOnItems (ev){
     // console.log(this.value)
     var toBeSearch = this.value.trim().toLowerCase();
-    var sItemsTemp = $sa("#to-be-selected .item");
+    // var sItemsTemp = $sa("#to-be-selected .item");
+    var sItemsTemp = currentEl = $sa('#' + selectorWidgetID + ' .to-be-selected .item');
 
     for (var i = sItemsTemp.length - 1; i >= 0; i--) {
 
@@ -246,13 +274,9 @@
           sItemsTemp[i].classList.remove('traversing-el');
         }
     };
-
   }
-  
-  searchText.oninput = searchOnItems;
-  searchText.onkeydown = function (e) { if(e.keyCode == 13) return false; };
-  // searchText.onchange = searchOnItems;
 
+  
   function showOptionItems () {
     toBeSelected.classList.remove('hide');
     toBeSelected.scrollTop = 0
@@ -264,15 +288,23 @@
 
   function hideOptionItems () {
     // toBeSelected.style.display = 'none';
-    elem = document.querySelector('#to-be-selected > .item');
+    // elem = document.querySelector('#to-be-selected > .item');
+    var elem = $s('#' + selectorWidgetID + ' .to-be-selected > .item');
     if(elem) {elem.classList.remove('traversing-el');}
+
+    // toBeSelected.classList.add('hide');
     // if(!searchText.textContent || searchText.textContent=='search'){
     //   searchText.textContent = 'search';
     // }
   }
 
+
   searchText.onfocus = showOptionItems;
   searchText.onblur = hideOptionItems;
+  // searchText.onchange = searchOnItems;
+  searchText.oninput = searchOnItems;
+  searchText.onkeydown = function (e) { if(e.keyCode == 13) return false; };
+
 
   function getSelectedValues ({{for}}) {
     
@@ -307,7 +339,8 @@
       bindKeyEvents();
       // console.log(e);
     } else {
-      document.getElementById('to-be-selected').classList.add('hide');
+      // document.getElementById('to-be-selected').classList.add('hide');
+      toBeSelected.classList.add('hide');
       // hideOptionItems();
       unBindKeyEvents();
 
@@ -317,7 +350,8 @@
   function traverseListDown (ev) {
     ev.preventDefault();
     
-    currentEl = $s('#to-be-selected > .item.traversing-el');
+    // currentEl = $s('#to-be-selected > .item.traversing-el');
+    var currentEl = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
     // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
     if(currentEl && currentEl.nextElementSibling && (currentEl.nextElementSibling.offsetHeight>0))
     {
@@ -329,7 +363,8 @@
     else if(!currentEl)
     {
       // var makeTraversingEl = $('#to-be-selected > .item:visible')[0];
-      var tempItemList = $sa('#to-be-selected > .item'),
+      // var tempItemList = $sa('#to-be-selected > .item'),
+      var tempItemList = $sa('#' + selectorWidgetID + ' .to-be-selected .item'),
           tempItemListLen = tempItemList.length;
 
       for (var i = 0; i < tempItemListLen; i++)
@@ -348,9 +383,13 @@
     }
   }
 
+
   function traverseListUp (ev) {
     ev.preventDefault();
-    var currentEl = $s('#to-be-selected > .item.traversing-el');
+
+    // var currentEl = $s('#to-be-selected > .item.traversing-el');
+    var currentEl = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
+
     // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
     // console.log(currentEl.classList)
     if(currentEl && currentEl.previousElementSibling  && (currentEl.previousElementSibling.offsetHeight>0))
@@ -369,8 +408,10 @@
   function bindKeyEvents () {
     Mousetrap.bind('up', traverseListUp );
     Mousetrap.bind('down', traverseListDown );
+    Mousetrap.bind('tab', traverseListDown );
     Mousetrap.bind('enter', function(){
-      var elemToBeSelected = $s('#to-be-selected > .item.traversing-el');
+      // var elemToBeSelected = $s('#to-be-selected > .item.traversing-el');
+      var elemToBeSelected = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
 
       if(elemToBeSelected)
       {

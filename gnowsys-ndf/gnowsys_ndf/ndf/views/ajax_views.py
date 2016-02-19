@@ -6125,17 +6125,35 @@ def get_visits_count(request, group_id):
 	try:
 		curr_url = request.GET.get('curr_url','')
 		get_params =  request.GET.get('get_params','')
-		group_name = request.GET.get('group_name','')
+		# group_name = request.GET.get('group_name','')
+		# if not group_name:
+		group_obj   = get_group_name_id(group_id, get_obj=True)
+		group_id    = group_obj._id
+		group_name  = group_obj.name
+		group_altnames = group_obj.altnames
+
 		group_id_str = str(group_id)
 		query = {}
+		curr_url_other = []
 		if curr_url and group_name:
+
 			if group_id_str in curr_url:
-				curr_url_other = curr_url.replace(group_id_str,group_name)
+				curr_url_other = [curr_url.replace(group_id_str,group_name), curr_url.replace(group_id_str,group_altnames)]
+
 			elif group_name in curr_url:
-				curr_url_other = curr_url.replace(group_name,group_id_str)
-			query = {'calling_url': {'$in': [curr_url,curr_url_other]}}
+				curr_url_other = [curr_url.replace(group_name,group_id_str), curr_url.replace(group_name,group_altnames)]
+
+			elif group_altnames in curr_url:
+				curr_url_other = [curr_url.replace(group_altnames,group_id_str), curr_url.replace(group_altnames,group_name)]
+
+			# print "\n curr_url_other\n",curr_url_other
+			curr_url_other.append(curr_url)
+			query = {'calling_url': {'$in': curr_url_other}}
+			# query = {'calling_url': {'$in': [curr_url,curr_url_other]}}
 			if get_params:
 				query = {'calling_url': {'$regex': u"/"+ unicode(get_params)},'name': "collection_nav"}
+
+			# print "\n\nquery", query
 			total_views = benchmark_collection.find(query,{'name':1})
 			response_dict['total_views'] = total_views.count()
 			if request.user.is_authenticated():
