@@ -22,7 +22,7 @@
     }
 
   </style>
-<div class="scard-container">
+<div class="scard-container" data-id="{{resource.pk}}">
  <div class="scard">
  {% if is_event %}
   {% get_event_status resource as event_status_msg %}
