@@ -1,8 +1,9 @@
 {% load get_course_filters from ndf_tags %}
+
 {% load simple_filters %}
 <div class="gallery-page">
     <div class="row gallery-header">
-        {% get_course_filters group_id "Gallery" as filter_dict %}
+        {% get_course_filters group_id title as filter_dict %}
         {% include "ndf/filters.html" with filter_dict=filter_dict %}
     </div>
     {% comment %}
