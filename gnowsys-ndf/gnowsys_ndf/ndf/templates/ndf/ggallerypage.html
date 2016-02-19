@@ -170,8 +170,8 @@
 {% endverbatim %}
 {% endcomment %}
 <script type="text/javascript">
-    $('.gallery-img>div').click(function (){
-        node_id = $(this).closest('.gallery-img').attr('id')
+    $(document).on('click','.scard-container',function(){
+        node_id = $(this).attr('data-id')
         $.ajax({
           url: "{% url 'course_gallerymodal' group_id %}",
           data: {
