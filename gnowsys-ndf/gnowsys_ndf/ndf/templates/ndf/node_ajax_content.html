@@ -479,7 +479,7 @@
                   Download 
                 </a>
                
-               {% social_share_resource as social_share %}
+               {% get_gstudio_social_share_resource as social_share %}
                   {% if social_share %}
                     <span>
                         <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
@@ -499,7 +499,7 @@
                   Download 
                 </a>
                
-               {% social_share_resource as social_share %}
+               {% get_gstudio_social_share_resource as social_share %}
                   {% if social_share %}
                     &nbsp;<span>
                         <a title="Please login to share on Facebook" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l" target="_blank">

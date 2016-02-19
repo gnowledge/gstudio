@@ -74,9 +74,12 @@
 						</label>
 					</div>	
 				</div>
+				{% get_is_captcha_visible as is_captcha %}
+				{% if is_captcha %}
 				<div class = "captcha-feild">
 					{% include "ndf/Captcha.html" %}
 				</div>	
+				{% endif %}
 				<!-- Login button -->
 				<div class="row">
 					<div class="small-6 medium-6 large-2 small-offset-3 medium-offset-2 large-offset-3 columns end">
