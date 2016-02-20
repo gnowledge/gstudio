@@ -3410,4 +3410,20 @@ def get_course_filters(group_id, filter_context):
 			# Type-Cast from 'QuerySet' to 'list' to make it JSON serializable
 			# all_user_names = list(all_user_objs.values_list('username', flat=True).order_by('username'))
 			filters_dict[each_course_filter_key].update({'value': json.dumps(all_user_objs)})
+
+		if each_course_filter_key == "tags" and filter_context.lower() == "notebook":
+			all_tags_list = [] # To prevent if no tags are found in any blog pages
+			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'Tags'}
+			page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+			blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+			blog_pages = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+						'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
+						},{'tags': 1, '_id': False})
+			# print "\n\n blog_pages.count()--",blog_pages.count()
+			all_tags_from_cursor = map(lambda x: x['tags'], blog_pages)
+			# all_tags_from_cursor is a list having nested list
+			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
+			if all_tags_list:
+				all_tags_list = json.dumps(all_tags_list)
+			filters_dict[each_course_filter_key].update({'value': all_tags_list})
 	return filters_dict
