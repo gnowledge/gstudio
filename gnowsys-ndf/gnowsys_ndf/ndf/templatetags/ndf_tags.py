@@ -3411,7 +3411,8 @@ def get_course_filters(group_id, filter_context):
 			# all_user_names = list(all_user_objs.values_list('username', flat=True).order_by('username'))
 			filters_dict[each_course_filter_key].update({'value': json.dumps(all_user_objs)})
 
-		if each_course_filter_key == "tags" and filter_context.lower() == "notebook":
+		# if each_course_filter_key == "tags" and filter_context.lower() == "notebook":
+		if each_course_filter_key == "tags":
 			all_tags_list = [] # To prevent if no tags are found in any blog pages
 			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'Tags'}
 			page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
