@@ -1944,7 +1944,6 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
             'node': group_obj, 'title': 'notebook', 'allow_to_join': allow_to_join
             }
 
-    query = {'member_of':page_gst._id, 'type_of': blogpage_gst._id, 'group_set': group_obj._id}
     filter_applied = request.GET.get("filter_applied", "")
     if filter_applied:
         filter_applied = eval(filter_applied)
@@ -1953,7 +1952,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     if filter_applied:
         filter_dict = json.loads(filter_dict)
         query_dict = get_filter_querydict(filter_dict)
-
+        query = {'member_of':page_gst._id, 'type_of': blogpage_gst._id, 'group_set': group_obj._id}
         if query_dict:
             for each_dict in query_dict:
                 query.update(each_dict)
@@ -1966,12 +1965,14 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
         if request.user.is_authenticated():
             user_id = request.user.id
 
-        query.update({'created_by': {'$ne': user_id}})
-        blog_pages = node_collection.find(query,{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+        blog_pages = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+         'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+        # print "\n -- blog --",blog_pages.count()
 
         if user_id:
-            query.update({'created_by': user_id})
-            user_blogs = node_collection.find(query,{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+            user_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+             'group_set': group_obj._id, 'created_by': user_id },{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+            # print "\n -- user --",user_blogs.count()
 
         if notebook_id:
             notebook_obj = node_collection.one({'_id': ObjectId(notebook_id)})
@@ -1996,12 +1997,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
         context_variables.update({'user_blogs': user_blogs})
         context_variables.update({'tab': tab})
         context_variables.update({'notebook_obj': notebook_obj})
-    
-        # if all_blogs:
-        #     blog_pages = all_blogs.clone()
-        #     if request.user.id:
-        #         blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
-        #         user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
+        
     return render_to_response(template, 
                                 context_variables,
                                 context_instance = RequestContext(request)
