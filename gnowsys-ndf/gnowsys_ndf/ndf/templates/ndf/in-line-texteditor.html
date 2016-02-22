@@ -10,7 +10,7 @@
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
-  
+
   <!-- Scripts and stylesheets for SideComments -->
   <!-- <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script> -->
   <!-- <link rel="stylesheet" type"text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css"> -->
@@ -31,10 +31,11 @@
 {% endblock %}
 
 
-<div>
+<div >
   <br/>
     {% if allow_to_comment %}
-      <div  onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="ckeditor-comment button small radius" style="margin-bottom:0;">
+      <div class="create-discussion">
+      <div  onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}"  class="ckeditor-comment  button small radius" style="margin-bottom:0;">
         {% if thr_int_type %}
           {{thr_int_type}} {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
@@ -42,7 +43,11 @@
         {% endif %}
       </div>
     {% endif %}
-    
+        <div class="discussion-refresh right">
+          <small><a onclick="location.reload()">Refresh <i class="fi-refresh"></i></a></small>
+        </div>
+    </div>
+
     {% comment %}
     {% if sg_type != "Event" %}
       <input type="file" id="uploaded-files" style="" value="" multiple>
@@ -51,7 +56,7 @@
     {% endif %}
     {% endcomment %}
     <input type="hidden" id="prior-node" style="visibility:hidden" value="">
-   
+
     <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
     <input type="hidden" id="last-edited-row" data-edited-row-id="">
 
@@ -61,19 +66,19 @@
 
     {% for each_reply in all_replies %}
       {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
-      <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
-
+      <div class="content" content-reply-id="{{ each_reply.oid }}" data-reply-level="{{each_reply.level}}" data-userid="{{each_reply.userid}}" >
+        <div style="margin-left:calc(({{each_reply.level}} - 1) * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
           <div clas="discussion-title row " >
-             <div class="discussion-title-username"> 
-              <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ececec !important" title=" {{ each_reply.username }}">
-                {{ each_reply.username|truncatechars:12 }}
+             <div class="discussion-title-username">
+              <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
+                {{ each_reply.username|truncatechars:12 }} 
               </a>
                 <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
             </div>
-        
+
             </div>
           <div class="discussion-content">
-            {{each_reply.HTMLcontent|safe }} 
+            {{each_reply.HTMLcontent|safe }}
           {% for node in each_reply.collection_set  %}
             <div style="margin: 1em;">
               <br/>
@@ -88,24 +93,28 @@
                         <img style="height:100px;" src="{% url 'getFileThumbnail' group_id node.pk %}" />
                     {% endif %}
                     <p>{{node.name}}</p>
-                  </a>  
+                  </a>
 
               {% endif %}
             </div>
           {% endfor %}
-          
+
           </div>
           <div class="discussion-footer">
-              {% if request.user.id == each_reply.userid or is_gstaff %}
-                <a class="reply-btn" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" >{% trans "Delete" %} </a>
-              {% endif %}
-                <a class="reply-btn"  data-id='{{ each_reply.oid }}' onclick='openCKEditor($(this),"{{each_reply.oid}}")' data-org-content='{{ each_reply.content }}'style="float:right">
-                {% trans "Reply" %}
-                </a>
-              </div>
-          
+            <a class="reply-btn"  data-id='{{ each_reply.oid }}' onclick='openCKEditor($(this),"{{each_reply.oid}}")' data-org-content='{{ each_reply.content }}'>
+              <i class="fa fa-reply"></i>
+              {% trans "Reply" %} 
+            </a>
+            {% if request.user.id == each_reply.userid or is_gstaff %}
+              <a class="reply-btn" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" style="float:right">
+                <i class="fa fa-trash-o"></i>
+                {% trans "Delete" %}
+              </a>
+            {% endif %}
+          </div>
+
+        </div>
       </div>
-          
       {% endif %}
 
     {% endfor %}
@@ -131,42 +140,35 @@
   {% edit_policy groupid node request.user as status %}
   var edit_policy = "{{ status }}"; // "allow" or "disallow"
   var is_user_authenticated = {{ request.user.is_authenticated|lower }};
-  // if( user_access == "allow" && edit_policy == "allow" )
-  // { 
-  //   $("#orgitdownreps").orgitdown(mySettings);
-  // }
-  {% if request.user.is_authenticated %}
-    $("#orgitdownreps").orgitdown(mySettings);
-  {% endif %}
- 
+
   function createDiscussion()
   {
     if( is_user_authenticated){
        if(checkCurrEdit()){
-           return false; 
-         } 
+           return false;
+         }
         $.ajax({
           url: "{% url 'create_discussion' group_id node.pk %}",
           success: function(data){
             data = JSON.parse(data);
             if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
             {
-                
+
                 $.ajax({
                         type: "GET",
                         url: "{% url 'get_ckeditor' group_id %}",
                         datatype: "html",
-                        data:{              
-                                'ckeditor_toolbar' : "BasicToolbar"
+                        data:{
+                                'ckeditor_toolbar' : "{{ckeditor_toolbar}}"
                           },
-                      success: function(data) {                         
-                            
+                      success: function(data) {
+
                             p = $('.ckeditor-comment');
 
-                            p.after('<div class="ckeditor-content-comment row"><div class="ckeditor-reply-area"></div> <div class="post-btn-div"></div> </div>');
+                            p.after('<div class="ckeditor-content-comment"><div class="ckeditor-reply-area"></div> <div class="post-btn-div"></div> </div>');
                                   // '<img width="'+  width + '"src=' + completeURL +  '>' + '</img>'
                                   $('.ckeditor-reply-area').html(data);
-                                  $('.post-btn-div').html('<input data-id="{{ node.pk }}"  type="button" value="Post"  class="button small right radius reply-button" onclick="addReply(this)">');
+                                  $('.post-btn-div').html('<input type="button" value="Post"  class="button small right radius reply-button" onclick="addReply(this)">');
 
                             setCurrNodeEdit(1);
 
@@ -174,25 +176,18 @@
 
                 });
 
-                
+
                 $("#prior-node").val("{{ node.pk }}") // _id
                 // $("input[data-id='{{ node.pk }}']").val("{{ node.pk }}") // _id
-                
+
                 //$("#create-discussion").trigger("click");
               }
-              // else if( data[0] == "Thread-exist" ){
-              //   // alert(data)
-              //   $("#create-discussion").hide();
-              //   $("#prior-node").val("{{ node.pk }}") // _id         
-              //   // changing method to behave same as sub-reply button   
-              //   $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
-              //   $("create-discussion").trigger("click");
-              // }
+              
               else{ alert(data) }
             }//,
-       
+
         });
-   
+
     }
   else{
         $("#alertModalLabel").text("Please login to start discussion.");
@@ -203,39 +198,42 @@
   }
   // --- END of createDiscussion()
   // function called by "Add Reply" and "Reply" buttons to open editor
-  function openCKEditor(sourceObj,each_oid)
+  function openCKEditor(sourceObj)
   {
+      // console.log(sourceObj);
           if(checkCurrEdit()){
-           return false; 
+           return false;
          }
 
-                    
+
           if( is_user_authenticated){
               var sourceObjDataId = $(sourceObj).attr("data-id"); // prior-node _id
             $("#prior-node").val(sourceObjDataId);
-            
+
               $.ajax({
                               type: "GET",
                               url: "{% url 'get_ckeditor' group_id %}",
                               datatype: "html",
-                              data:{              
+                              data:{
                                       'ckeditor_toolbar' : "BasicToolbar"
-                                      
+
                                 },
-                            success: function(data) {                         
+                            success: function(data) {
                                   r = $('.reply-btn[data-id="'+sourceObjDataId+'"]');
-                                  p = r.closest('.disc-replies')
+                                  p = r.closest('.disc-replies');
+                                  parent_div_id = r.closest('.disc-replies').attr("data-reply-id");
+                                  parent_obj = $('div[content-reply-id="' + parent_div_id + '"]');
                                   parent_marginleft = p.css("margin-left");
-                                  parent_marginleft = (parseFloat(parent_marginleft, 10) + 48) + "px";
+                                  parent_marginleft = (parseFloat(parent_marginleft, 10)) + "px";
                                   post_marginleft = (parseFloat(parent_marginleft, 10) + 100 ) + "px";
-                                  p.after('<div class="ckeditor-content-reply row" style="margin-left:'+ parent_marginleft +'"><div class="ckeditor-reply-area"></div> <div class="post-btn-div"></div></div>');
+                                  p.after('<div class="ckeditor-content-reply" style="margin-left:'+ parent_marginleft +'"><div class="ckeditor-reply-area"></div> <div class="post-btn-div"></div></div>');
                                   // '<img width="'+  width + '"src=' + completeURL +  '>' + '</img>'
                                   $('.ckeditor-reply-area').html(data);
 
-                                  $('.post-btn-div').html('<input data-id="{{ node.pk }}"  type="button" value="Post"  class="button small right radius reply-button" onclick="addReply($(this))">');
-                                    
-                                  setCurrNodeEdit(each_oid);
-                                  
+                                  $('.post-btn-div').html('<input data-id=""  type="button" value="Post"  class="button small right radius reply-button" onclick="addReply(parent_obj)">');
+
+                                  setCurrNodeEdit(1);
+
                             }
 
                       });
@@ -258,38 +256,40 @@
       $(".view-discussion span").fadeOut().fadeIn().html("{% trans 'Join Discussion' %}("+totalReplies+")");
     }
   }
-  function createReplyHTML(replyStyle, data)
+  function createReplyHTML(replyStyle, data,child_reply_level)
   {
-    var files = data[8];
-    filesContent = ""
-    files.forEach(function(f){
-        var mime_type = f[1];
-        filesContent += "<div style='margin: 1em;'>"+ f[1] +"<br/>"+
-        "<a class='th' href='/{{group_id}}/file/"+f[2]+"'>";
-        if(mime_type.indexOf("image") >= 0){
-          filesContent += "<img style='height: 100px;' src='/{{group_id}}/file/thumbnail/"+ f[0] +"'/>";}
-        filesContent += "<p>" + f[2] + "</p></a></div>";
-    });
-    var htmlReply = "<div style='"+ replyStyle +"' data-reply-id='"+ data[1] +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
-    + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
-    + "<span class='align-center'><i class='fi-torso'></i></span>"
-    + "<label>" + data[6] + "</label></a></div>"
-    + "<div class='small-9 columns'>"+ data[3] + filesContent +"</div></div>"
-    + "<div class='row'><div class='small-8 columns'><small>"+ data[7] + "</small></div>"
-    + "<div class='reply-btn small-2 small-text-left columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'Delete' %}</div>"
-    + "<div data-org-content='"
-    + data[4] + "' onclick='openCKEditor($(this))' data-id='" 
-    + data[1] + "' class='reply-btn small-2 small-text-left columns'>{% trans  'Reply' %} </div></div></div>"
+      var request_user_id = {{request.user.id}};
+      var reply_user_id = data[5];
+      var oid =  data[1];
+      var htmlReply = "<div class='content' content-reply-id='"+ data[1] +"' data-reply-level=' "+ child_reply_level +" ' >"
+          + "<div style='"+ replyStyle +"' data-reply-id='"+ data[1] +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
+              + "<div class='discussion-title row'>"
+                  + "<div class='discussion-title-username' style='margin-left:10px'>"
+                      + "<a style='color:#ADABAB!important;font-size:15px;'>" + data[6] + "</a><small style='float:right;color:#999999;padding-right:10px!important;'>"+data[7].toLowerCase()+"</small>"
+                  + "</div>"
+              + "</div>"
+          + "<div class='discussion-content'>"+ data[3] + "</div>"
+          + "<div class='discussion-footer'>"
+                + "<a class='reply-btn'  data-id='" + data[1] + "' onclick='openCKEditor($(this))' data-org-content='"+data[3]+"'>"
+               + "<i class='fa fa-reply'></i> Reply"
+               + "</a>"
+              if (request_user_id == reply_user_id){
+                  htmlReply +="<a class='reply-btn' data-userid='"+ data[5] +"' onclick='deleteReply($(this))' style='float:right'><i class='fa fa-trash-o'></i> Delete"
+                  }
+          +"</div>"   
+        +"</div>"
+      +"</div>";
     return htmlReply;
   }
-  
+
   function addReply(sourceObj)
   {
 
     var value = CKEDITOR.instances['ckeditor_textarea'].getData();
     var priorNodeId = $("#prior-node").val(),
         replyContent = value.trim();
-        
+    // alert("priorNodeId"+priorNodeId);
+
     // If reply is non empty - make ajax to save reply.
     if( (replyContent.length > 0) && (priorNodeId.length == 24) )
     {
@@ -306,53 +306,72 @@
         docs_list.append('reply_text_content', replyContent)
         docs_list.append('prior_node_id', priorNodeId)
       $.ajax({
-        
+
         type: "POST",
         url: "{% url 'discussion_reply' group_id node.pk %}",
         data: docs_list,
-        processData: false, 
+        processData: false,
         contentType: false,
         success: function(data){
-            
+          $( ".cke_button__closebtn_label" ).trigger( "click" );
+            //alert("data"+data);
+            //alert("priorNodeId"+priorNodeId)
             data = JSON.parse(data);
             if( data[0] == "reply_saved" )
             {
-              
+
               $("#orgitdownreps").val("");  // make textarea empty
               if(priorNodeId == "{{ node.pk }}")  // main reply
               {
-                // change the text of Start discussion and make it visible
-                $("#create-discussion").html("Comment");                
-                // $("#create-discussion").fadeIn();
+                
                 //sample format of data = [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
                 // add reply text content after #replies-area
-                $("#replies-area").prepend().html(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
+                var parent_margin_level = $(sourceObj).closest("div").attr("class");
+                
+                $("#replies-area").prepend(createReplyHTML('margin-top:25px;margin-left:0px;', data,1));
+                // $(".content").appendChild().(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
               }
               else  // sub-reply
               {
-                $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent().parent();
-                calcMargLeft = $tempPrior.css("margin-left");
-                calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
-                // add reply text content as sub-reply
-                $($tempPrior).after(createReplyHTML('margin-left:'+calcMargLeft, data)).fadeIn(8000);
+                parent_margin_level = $(sourceObj).attr("data-reply-level");
+                child_margin_level = parseInt(parent_margin_level) + 1;          
+                
+
+                $(sourceObj).after(createReplyHTML('margin-left:'+((child_margin_level-1)*48)+'px', data,parseInt(parent_margin_level)+1));
+
               }
               // updating tab-text
               updateDiscussionTabText();
-              location.reload();
+              
+               
+
+     
             }
             else if( data[0] == "no_content" ){
-              
+
               alert("{% trans 'Please provide the reply content.' %}")
             }
             else { alert(data) }
           }
-      });// --- END of ajax to save reply    
+      });// --- END of ajax to save reply
     }
     else // content is not provided
     {
       alert(" {% trans 'Please provide the reply content.' %}")
     } // --- END of IF-ELSE
-  
+                //  $.ajax({
+                //         url: "{% url 'get_gin_line_template' group_id node.pk %}",                        
+                //         type: "GET",
+                //         datatype: "html",
+                        
+                //       success: function(data) {
+                            
+                //             alert(data);
+                //             $(".comment-sections:visible").html(data);
+                //       }
+
+                // });
+
   } // --- END of addReply()
   function deleteReply(sourceObj)
   {
@@ -374,10 +393,10 @@
       if(deleteConfirm)
       {
         $.ajax({
-          
+
           type: 'POST',
           url: "{% url 'discussion_delete_reply' group_id %}",
-          data: { 
+          data: {
               "csrfmiddlewaretoken": "{{ csrf_token }}",
               "nodes_to_delete": JSON.stringify(nodesToDeleteArr)
             },
@@ -417,9 +436,9 @@
   // --- END of discussion code ----
 </script>
 
-   
+
 <script type="text/javascript">
-   
+
   function setCurrNodeEdit(oid)
   {
 
@@ -434,19 +453,15 @@
 
     if(editedRowName.length > 0 || editedRowId.length > 0)
     {
-      alert("At a time you could edit only one row. \n\nNow you are editing: '" + editedRowName + "'\n\nPlease 'SAVE' or 'CANCEL' the changes to edit any other row!");
+      alert("At a time only one editor can be open.!");
 
-      return true; // Row editing is going on.
+      return true; // Editor already open.
     }
     else
     {
-      return false; // NO row is being editing now.
+      return false; // NO Editor is open.
     }
   }
-
-
-
-
 
 
 </script>
