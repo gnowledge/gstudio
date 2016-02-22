@@ -3415,13 +3415,18 @@ def get_course_filters(group_id, filter_context):
 		if each_course_filter_key == "tags":
 			all_tags_list = [] # To prevent if no tags are found in any blog pages
 			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'Tags'}
-			page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-			blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-			blog_pages = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
-						'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
-						},{'tags': 1, '_id': False})
-			# print "\n\n blog_pages.count()--",blog_pages.count()
-			all_tags_from_cursor = map(lambda x: x['tags'], blog_pages)
+			if filter_context.lower() == "notebook":
+				page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+				blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+				result_cur = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+							'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
+							},{'tags': 1, '_id': False})
+			elif filter_context.lower() == "gallery" or filter_context.lower() == "raw material":
+				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+							'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
+							},{'tags': 1, '_id': False})
+			# print "\n\n result_cur.count()--",result_cur.count()
+			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
 			# all_tags_from_cursor is a list having nested list
 			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
 			if all_tags_list:
