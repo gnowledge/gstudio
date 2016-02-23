@@ -43,6 +43,7 @@ urlpatterns = patterns('',
     # all main apps
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
+    (r'^(?P<group_id>[^/]+)/audio', include('gnowsys_ndf.ndf.urls.audio')),
     (r'^(?P<group_id>[^/]+)/video', include('gnowsys_ndf.ndf.urls.video')),
     (r'^(?P<group_id>[^/]+)/page', include('gnowsys_ndf.ndf.urls.page')),
     (r'^(?P<group_id>[^/]+)/group', include('gnowsys_ndf.ndf.urls.group')),
