@@ -1,3 +1,43 @@
+{% comment %}
+  
+<!--
+HOW TO USE
+  
+- EXAMPLE: 
+    {% include 'ndf/widget_selector.html' with for='apps_to_set' all_options=all_gapps selected_options=group_gapps oneline_element=true %}
+    
+    where,
+
+    - "for" is name which will be given to widget.
+        (NOTE: If you are including more than one widget_selector, then be sure that
+               this field's value should be unique to each inclusion).
+
+    - "all_options" is the ALL the options that will be provided in option box (including selected).
+
+    - "selected_options" is field which holds options selected amongst ALL options.
+
+    - "oneline_element" is just CSS which will render selected items either next to each other
+        or one below the other.
+
+- Before calling save method, call "getSelValuesHiddenElement" method.
+  Which will create a hidden input element holding selected values with name 
+  specified as in first arg. So that values can be exctracted from backend accordingly.
+
+  - EXAMPLE:
+      getSelValuesHiddenElement('apps_to_set', 'create_group');
+
+      where,
+      - first arg: should be matching with field specified in the <for>
+        while including widget_selector.html
+      - second arg: optional, id to be assign to this newly created hidden element.
+  - If there are 3 inclusions of widget_selector then "getSelValuesHiddenElement()"
+    should be called (before save) 3 times with appropriate first args (<for>).
+
+-->
+
+{% endcomment %}
+
+
 <script type="text/javascript" src="/static/ndf/bower_components/mousetrap/mousetrap.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
@@ -181,6 +221,7 @@
 
   function getElementByParentRef (currentElemObj, parentSelector, expectedChildSelector) {
     /*
+    This method will return htmlObject based on current element's reference and under which parent element to be look for.
     e.g:
     var toBeSelectedElemObj = getElementByParentRef(this, '.selector-widget', '.to-be-selected');
      */
@@ -222,6 +263,7 @@
   function removeTag(){
 
     var tempItem = this.parentNode.querySelector('.item');
+
     var selectorWidgetFor = tempItem.getAttribute('data-selector-widget-for');
     var toBeSelected = $s('.to-be-selected[data-selector-widget-for="'+ selectorWidgetFor +'"]');
     
@@ -271,8 +313,6 @@
 
     // var selectedItems = getElementByParentRef(this, '.selector-widget', '.selected-items');
 
-    // console.log(this);
-    // aaa = this;
     // if(!selectedItems)
     // {
     //   var selectorWidgetID = "{{for}}-selector-widget.selector-widget";
@@ -286,7 +326,6 @@
 
   for (var i = sItems.length - 1; i >= 0; i--) {
     sItems[i].onclick = addToSelection;
-    // console.log(sItems[i]);
   }
 
   for (var i = 0; i < selected_options.length; i++) {
@@ -398,6 +437,9 @@
 
 
   function getSelectedValues (selectorWidgetFor) {
+    /*
+    this method will return 
+    */
 
     var selectedItems = $s('#' + selectorWidgetFor + ' .selected-items');
     
@@ -411,13 +453,22 @@
     return selectedValuesList
   }
 
-  function getSelValuesHiddenElement (name, idToAppend){
+  function getSelValuesHiddenElement (selectorWidgetFor, idToAppend){
+    /*
+    This method will create a new hidden input element.
+    This input element will be holding values selected.
+    args:
+      - selectorWidgetFor: specify the specific selector widget with it's
+                           <for> value specified at the time of inclusion.  
+      - idToAppend (optional): If you want any specific id to add to this newly created
+                    hidden element then specify id value.
+     */
 
     var idToAppend = idToAppend || false;
     var hiddenInput = document.createElement('input');
     hiddenInput.type = 'hidden';
-    hiddenInput.name = name;
-    hiddenInput.value = JSON.stringify(getSelectedValues(name));
+    hiddenInput.name = selectorWidgetFor;
+    hiddenInput.value = JSON.stringify(getSelectedValues(selectorWidgetFor));
     if (idToAppend) {
       document.getElementById(idToAppend).appendChild(hiddenInput);
     }
@@ -427,7 +478,7 @@
   document.querySelector('html').onclick = function (e) {
     // var parentEl = $(e.target).closest('.selector-widget');
     var parentEl = closest(e.target, '.selector-widget');
-    console.log(parentEl);
+    // console.log(parentEl);
 
     // if (parentEl.hasClass('selector-widget')) {
     if (parentEl) {
