@@ -1172,7 +1172,6 @@ aside#help{
 }
 
 /* Simple  Card CSS*/
-
 .scard-container {
     display: inline-block;
     margin-left: 50%;
@@ -1191,7 +1190,7 @@ aside#help{
     background: #FFF;
     padding: 0px;
     overflow: hidden;
-    width: 15em;
+    width:  15em;
     height: 13em;
     border-radius: 5px 5px 0px 0px;
     margin: 0px auto;
@@ -1202,17 +1201,18 @@ aside#help{
         transition: box-shadow 0.5s ease;
     }*/
     .scard-image {
-          height: 100%;
+          //height: 100%;
           background-color: #FFF;
 
           img  {
-              height: 100%;
+              //height: 100%;
               margin: 0px auto;
               width: 80%;
               display: block;
           }
 
         i {
+            width : 80%;
             font-size: 7rem;
             opacity: 0.75;
             display: block;
@@ -1290,95 +1290,8 @@ aside#help{
       text-align: center;
       vertical-align: top;
       line-height: 1.3em;
-  }
 }
-.scard-desc{
-    font-size: 0.7em;
-    color: #333333;
-    height: 40px;
-    padding: 0.4em 1.5em;
-    margin: 0px auto;
-    padding-top: 0.1cm;
-    margin-top: -0.25em;
-    border-radius: 0 0 5px 5px;
-    overflow: hidden;
-    border-top: 1px solid #D4D3D3;
-    display: block;
 }
-
-.scard_header {
-    text-align:center;
-    position:fixed;
-    height:20rem;
-    border:1px solid #AAA;
-    border-bottom:3px solid #BBB;
-    padding:0px;
-    margin:5px;
-    left:0px;
-    right:0px;
-    background:#FFF;
-    padding:25px 0px 5px 0px;
-    border-bottom:5px solid #CCC;
-    font-size:20px;
-    font-weight:bold;
-  }
-
-.scard-action {
-    //color:#ececec;
-    height: height;
-    font-size:0.6em;
-    padding: 0.5rem;
-    margin:5px;
-    padding-top: 0.1cm;
-    margin-top:-0.25em;
-    border-radius: 0 0 2px 2px;
-    overflow: hidden;
-    width:11rem;
-    background-color:#CCCCCC;
-
-}
-
-
- p {
-    margin:0px;
-    padding:10px;
-  }
-
- .published.scard-action {
-      background: #A6D9CB;
-    }
-
- .draft.scard-action {
-      content: "Draft";
-      background: #DCDCDC;
-
-    }
-
-  .deleted.scard-action {
-      border-color: transparent $alert-color transparent transparent;
-      border-color: rgba(255,255,255,0) $alert-color rgba(255,255,255,0) rgba(255,255,255,0);
-    }
-
-  .moderation.scard-action {
-      border-color: transparent $primary-color transparent transparent;
-      border-color: rgba(255,255,255,0) $primary-color rgba(255,255,255,0) rgba(255,255,255,0);
-
-      .label-text:before{ content: "Mod"; }
-    }
-
-
-.scard_footer {
-  border-top: 1px solid rgba(160, 160, 160, 0.2);
-  padding: 0.25rem 0.5rem;
-  color: gray;
-  font-size: small;
-  height: 2rem;
-  }
-
-
-
-/* End Simple Card CSS*/
-
 /* Horizontal Card */
 
 .hr-card {
@@ -1691,7 +1604,7 @@ aside#help{
     margin: -15px auto;
     text-align: center;
     color: gray;
-    /*font-family: "foundation-icons";*/
+    font-family: "foundation-icons";
     font-style: normal;
     font-variant: normal;
     text-transform: none;
@@ -2209,11 +2122,13 @@ aside#help{
     color:#4c4c4c;
     text-align:center;
     margin-top:0.5cm;
+
 }
 
 .fullscreen-icon{
     display:none;
 }
+
 /*
 div.show-image:hover div.fullscreen-icon{
     display: block;
@@ -2298,7 +2213,7 @@ div.show-image:hover div.fullscreen-icon{
             height: 2em;
             padding-right: 10px;
             padding-left: 10px;
-            line-height: 2em;
+            line-height: 1.5em;
             border-radius: 5px 5px 0px 0px;
         }
 
@@ -2435,6 +2350,7 @@ div.show-image:hover div.fullscreen-icon{
     border: 0 solid silver;
     border-width: 0px 0px 0px 0px;
     margin-left: 1em;
+    text-align:center;
 
     .tab-title {
       border: 0 solid silver;
@@ -2442,6 +2358,8 @@ div.show-image:hover div.fullscreen-icon{
       background: #DEDEDE;
       border-radius: 10px 10px 0px 0px;
       margin-right: 0.4em;
+      float: none !important;
+      display: inline-block;
 
       a {
         color: #2B91EA;
@@ -2629,7 +2547,7 @@ div.show-image:hover div.fullscreen-icon{
           margin-left: 1em;
           position: relative;
           top: 1px;
-
+          
           a {
             border-radius: inherit;
           }
