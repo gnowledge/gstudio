@@ -2071,7 +2071,6 @@ def check_is_gstaff(groupid, user):
   """
 
   groupid = groupid if groupid else 'home'
-
   try:
   	try:
 	    group_node = node_collection.one({'_id': ObjectId(groupid)})
@@ -3377,3 +3376,83 @@ def get_user_quiz_resp(node_obj, user_obj):
 				else:
 					result['recent_ans'] = recent_ans.values()[0]
 		return result
+
+@get_execution_time
+@register.assignment_tag
+def get_course_filters(group_id, filter_context):
+	'''
+	Returns the static data needed by filters. The data to be return will in following format:
+	{ 
+		"key_name": { "data_type": "<int>/<string>/<...>", "type": "attribute/field", "value": ["val1", "val2"]},
+		... ,
+		... ,
+		"key_name": { "data_type": "<int>/<string>/<...>", "type": "attribute/field", "value": ["val1", "val2"]} 
+	}
+	'''
+	group_obj   = get_group_name_id(group_id, get_obj=True)
+	filters_dict = {}
+	gstaff_users = []
+	all_user_objs = None
+	all_users = False
+	only_gstaff = False
+	all_user_objs_uname = all_user_objs_id = None
+
+	if filter_context.lower() == "raw material":
+		only_gstaff = True
+	elif filter_context.lower() == "notebook":
+		all_users = True
+
+	for each_course_filter_key in GSTUDIO_COURSE_FILTERS_KEYS:
+		if each_course_filter_key == "created_by":
+			author_set_list = group_obj.author_set
+			all_user_objs = User.objects.filter(id__in=author_set_list)
+			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'User'}
+			if not all_users:
+				if only_gstaff:
+					all_user_objs_uname = [eachuser.username for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				else:
+					all_user_objs_uname = [eachuser.username for eachuser in all_user_objs if not check_is_gstaff(group_obj._id,eachuser)]
+			else:
+				all_user_objs_uname = list(all_user_objs.values_list('username', flat=True).order_by('username'))
+
+			# Type-Cast from 'QuerySet' to 'list' to make it JSON serializable
+			# all_user_names = list(all_user_objs.values_list('username', flat=True).order_by('username'))
+			filters_dict[each_course_filter_key].update({'value': json.dumps(all_user_objs_uname)})
+
+		# if each_course_filter_key == "tags" and filter_context.lower() == "notebook":
+		if each_course_filter_key == "tags":
+			gstaff_users.extend(group_obj.group_admin)
+			gstaff_users.append(group_obj.created_by)
+
+			all_tags_list = [] # To prevent if no tags are found in any blog pages
+			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'Tags'}
+
+			if filter_context.lower() == "notebook":
+				page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+				blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+				result_cur = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+							'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
+							},{'tags': 1, '_id': False})
+
+			elif filter_context.lower() == "gallery":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs]
+				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
+							'created_by': {'$nin': gstaff_users} 
+							},{'tags': 1, '_id': False})
+
+			elif filter_context.lower() == "raw material":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
+							'created_by': {'$in': gstaff_users} 
+							},{'tags': 1, '_id': False})
+
+			print "\n\n result_cur.count()--",result_cur.count()
+			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
+			# all_tags_from_cursor is a list having nested list
+			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
+			if all_tags_list:
+				all_tags_list = json.dumps(all_tags_list)
+			filters_dict[each_course_filter_key].update({'value': all_tags_list})
+	return filters_dict

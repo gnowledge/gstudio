@@ -4418,7 +4418,7 @@ def get_filter_querydict(filters):
         e.g:
         [{}, {'$or': [{u'attribute_set.educationallevel': {'$in': [u'Upper Primary']}}, {u'attribute_set.educationallevel': {'$in': [u'Primary']}}, {u'attribute_set.interactivitytype': u'Expositive'}]}, {'$or': [{u'attribute_set.educationallevel': {'$in': [u'Upper Primary']}}, {u'attribute_set.educationallevel': {'$in': [u'Primary']}}, {u'attribute_set.interactivitytype': u'Expositive'}]}]
     """
-    query_dict = [{}]
+    query_dict = []
     for each in filters:
           temp_list = []
           filter_grp = each["or"]
@@ -4439,6 +4439,10 @@ def get_filter_querydict(filters):
                 each_filter["selFieldValue"] = u'language'
                 # print 'each_filter["selFieldText"]', each_filter["selFieldValue"]
                 each_filter["selFieldText"] = get_language_tuple(each_filter["selFieldText"])
+              if each_filter["selFieldValue"] == 'created_by':
+                filter_username = each_filter["selFieldText"]
+                filter_user_id = User.objects.get(username=filter_username).id
+                each_filter["selFieldText"] = filter_user_id
               temp_dict[each_filter["selFieldValue"]] = each_filter["selFieldText"]
               temp_list.append(temp_dict)
           

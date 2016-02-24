@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
@@ -1914,26 +1914,17 @@ def course_content(request, group_id):
 @get_execution_time
 def course_notebook(request, group_id, tab=None, notebook_id=None):
 
-    group_obj   = get_group_name_id(group_id, get_obj=True)
-    group_id    = group_obj._id
-    group_name  = group_obj.name
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id = group_obj._id
+    group_name = group_obj.name
 
     all_blogs = blog_pages = user_blogs = user_id = None
     allow_to_comment = notebook_obj = None
-
-    if request.user.is_authenticated():
-        user_id = request.user.id
-
-    page_gst        = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-    blogpage_gst    = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-
-    blog_pages = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
-                        'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
-    if user_id:
-        user_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
-                            'group_set': group_obj._id, 'created_by': user_id},{'_id': 1, 'created_at': 1,
-                            'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
     allow_to_join = None
+    template = 'ndf/gcourse_event_group.html'
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+    thread_node = None
     start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
     if start_enrollment_date:
       start_enrollment_date = start_enrollment_date.date()
@@ -1948,11 +1939,26 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
       else:
           allow_to_join = "Closed"
 
-    thread_node = None
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'notebook', 'allow_to_join': allow_to_join
+            }
+
+    if request.user.is_authenticated():
+        user_id = request.user.id
+
+    blog_pages = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+     'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+    # print "\n -- blog --",blog_pages.count()
+
+    if user_id:
+        user_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+         'group_set': group_obj._id, 'created_by': user_id },{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
+        # print "\n -- user --",user_blogs.count()
+
     if notebook_id:
         notebook_obj = node_collection.one({'_id': ObjectId(notebook_id)})
         thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
-
     else:
         if user_blogs and user_blogs.count():
             notebook_obj = user_blogs[0]
@@ -1962,32 +1968,22 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
             notebook_obj = blog_pages[0]
             tab = 'all-notes'
             thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
-
         else:
             tab = 'all-notes'
+
         if notebook_obj:
             return HttpResponseRedirect(reverse('course_notebook_tab_note', kwargs={'group_id': group_id, 'tab': tab, "notebook_id": notebook_obj.pk }))
-    
-    # if all_blogs:
-    #     blog_pages = all_blogs.clone()
-    #     if request.user.id:
-    #         blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
-    #         user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
-    # print "\n\n type of blog_pages---", type(blog_pages)
-    # print "\n\n type of user_blogs---", type(user_blogs)
-    # for each in blog_pages:
-    #     print each
-    # for each in user_blogs:
-    #     print each
-    template = 'ndf/gcourse_event_group.html'
 
-    context_variables = RequestContext(request, {
-            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'notebook', 'blog_pages': blog_pages,
-            'user_blogs': user_blogs, 'allow_to_join': allow_to_join,
-            'tab': tab, 'notebook_obj': notebook_obj, 'allow_to_comment': allow_to_comment
-        })
-    return render_to_response(template, context_variables)
+    context_variables.update({'allow_to_comment': allow_to_comment})
+    context_variables.update({'blog_pages': blog_pages})
+    context_variables.update({'user_blogs': user_blogs})
+    context_variables.update({'tab': tab})
+    context_variables.update({'notebook_obj': notebook_obj})
+        
+    return render_to_response(template, 
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
 
 
 @get_execution_time
@@ -2043,8 +2039,14 @@ def course_gallery(request, group_id):
     group_id    = group_obj._id
     group_name  = group_obj.name
     gstaff_users = []
+    query = {}
     allow_to_upload = True
-    allow_to_join = None
+    allow_to_join = query_dict = None
+    # filter_applied = request.GET.get("filter_applied", "")
+    # if filter_applied:
+    #     filter_applied = eval(filter_applied)
+    # filter_dict = request.GET.get("filter_dict", "")
+
     start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
     if start_enrollment_date:
       start_enrollment_date = start_enrollment_date.date()
@@ -2059,17 +2061,39 @@ def course_gallery(request, group_id):
       else:
           allow_to_join = "Closed"
 
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'gallery',
+            'allow_to_upload':allow_to_upload, 'allow_to_join': allow_to_join
+        }
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
-    files_cur = node_collection.find({'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}},
-        {'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+    query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}}
     template = 'ndf/gcourse_event_group.html'
-    context_variables = RequestContext(request, {
-            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'gallery', 'files_cur': files_cur,
-            'allow_to_upload':allow_to_upload, 'allow_to_join': allow_to_join
-        })
-    return render_to_response(template, context_variables)
+
+    # if filter_applied:
+    #     filter_dict = json.loads(filter_dict)
+    #     query_dict = get_filter_querydict(filter_dict)
+    #     print "\n\n *********\n\n", query_dict
+    #     if query_dict:
+    #         for each_dict in query_dict:
+    #             query.pop('created_by')
+    #             query.update(each_dict)
+    #             # existing_keys = [key_name for key_name in list_of_dict.keys() if key_name in query.keys()]
+    #             # if existing_keys:
+    #             #     map(query.__delitem__,existing_keys)
+    #             # query.update(list_of_dict)
+    #     template = 'ndf/file_list_tab.html'
+    # # print "\n\n query === ", query
+    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+    # print "\n\n Total files: ", files_cur.count()
+    context_variables.update({'files_cur': files_cur})
+    # if filter_applied:
+    #     context_variables.update({"resource_type": files_cur, "detail_urlname": "file_detail", "res_type_name": "","no_footer":True, "no_description":True, "no_url":True})
+    return render_to_response(template, 
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
 
 @get_execution_time
 def course_about(request, group_id):
@@ -2111,8 +2135,6 @@ def course_about(request, group_id):
             'weeks_count': weeks_count
         })
     return render_to_response(template, context_variables)
-
-
 
 
 @get_execution_time
@@ -2162,6 +2184,7 @@ def course_note_page(request, group_id):
 
     node_id = request.GET.get("node_id", "")
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
+
     thread_node = None
     allow_to_comment = None
     allow_to_join = None
@@ -2217,3 +2240,55 @@ def inline_edit_res(request, group_id, node_id):
         context_variables['ckeditor_toolbar'] ="GeneralToolbar" 
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
+
+@get_execution_time
+def course_filters(request, group_id):
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    gstaff_users = []
+    gstaff_users.extend(group_obj.group_admin)
+    gstaff_users.append(group_obj.created_by)
+
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+        }
+    filter_applied = request.GET.get("filter_applied", "")
+    filter_dict = request.GET.get("filter_dict", "")
+    title = request.GET.get("title", "")
+    if filter_applied:
+        filter_applied = eval(filter_applied)
+    query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}}
+    template = 'ndf/file_list_tab.html'
+
+    if title.lower() == "gallery" or title.lower() == "raw material":
+        query.update({'_type': "File"})
+    elif title.lower() == "notebook":
+        page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+        blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+        query.update({'member_of':page_gst._id, 'type_of': blogpage_gst._id})
+
+    if title.lower() == "gallery":
+        query.update({'created_by': {'$nin': gstaff_users}})
+    elif title.lower() == "raw material":
+        query.update({'created_by': {'$in': gstaff_users}})
+    if filter_applied:
+        filter_dict = json.loads(filter_dict)
+        query_dict = get_filter_querydict(filter_dict)
+        if query_dict:
+            for each_dict in query_dict:
+                query.update(each_dict)
+        elif title.lower() == "notebook":
+            return HttpResponse("reload")
+            # return HttpResponseRedirect(reverse('course_notebook', kwargs={'group_id': group_id}))
+
+    # print "\n\n query === ", title, "\n\n---  \n",query
+    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+    # print "\n\n Total files: ", files_cur.count()
+    context_variables.update({'files_cur': files_cur,"resource_type": files_cur,
+                              "detail_urlname": "file_detail", "res_type_name": "",
+                              "no_footer":True, "no_description":True, "no_url":True})
+    return render_to_response(template, 
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )

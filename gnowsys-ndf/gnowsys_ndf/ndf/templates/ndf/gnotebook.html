@@ -1,5 +1,12 @@
-{% load ndf_tags %}
+{% load get_course_filters get_username from ndf_tags %}
+{% load simple_filters %}
+
 <div class="notebook">
+    <div class="row notebook-header collapse">
+        {% get_course_filters group_id title as filter_dict %}
+        {% include "ndf/filters.html" with filter_dict=filter_dict %}
+    </div>
+
     {% comment %}
     <div class="row notebook-header collapse">
         <div class="medium-6 columns filters">
@@ -227,5 +234,27 @@
         $(this).siblings().removeClass('rated');
         $(this).nextAll().add($(this)).addClass('rated');
     });
+
+    function applyFilter(filtersObjArr){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        $.ajax({
+          url: "{% url 'course_filters' group_id %}",
+          data: {
+            filter_dict: filtersObjArr,
+            'filter_applied': 'True',
+            'title': '{{title}}'
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            if(data == "reload"){
+                location.reload()
+            }
+            else{
+                $(".note-page").html(data)
+            }
+          },
+        });//end of ajax
+    }
 
 </script>
