@@ -238,18 +238,23 @@
     function applyFilter(filtersObjArr){
         filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
         $.ajax({
-          url: "{% url 'course_notebook' group_id %}",
+          url: "{% url 'course_filters' group_id %}",
           data: {
             filter_dict: filtersObjArr,
-            'filter_applied': 'True'
+            'filter_applied': 'True',
+            'title': '{{title}}'
           },
           type: "GET",
           dataType: "html",
           success: function(data){
-            $(".note-page").html(data)
+            if(data == "reload"){
+                location.reload()
+            }
+            else{
+                $(".note-page").html(data)
+            }
           },
         });//end of ajax
-
     }
 
 </script>

@@ -2071,7 +2071,6 @@ def check_is_gstaff(groupid, user):
   """
 
   groupid = groupid if groupid else 'home'
-
   try:
   	try:
 	    group_node = node_collection.one({'_id': ObjectId(groupid)})
@@ -3390,26 +3389,27 @@ def get_course_filters(group_id, filter_context):
 	all_user_objs = None
 	all_users = False
 	only_gstaff = False
+	all_user_objs_uname = all_user_objs_id = None
 	if filter_context.lower() == "raw material":
 		only_gstaff = True
 	elif filter_context.lower() == "notebook":
 		all_users = True
+	author_set_list = group_obj.author_set
+	all_user_objs = User.objects.filter(id__in=author_set_list)
 	for each_course_filter_key in GSTUDIO_COURSE_FILTERS_KEYS:
 		if each_course_filter_key == "created_by":
 			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'User'}
-			author_set_list = group_obj.author_set
-			all_user_objs = User.objects.filter(id__in=author_set_list)
 			if not all_users:
 				if only_gstaff:
-					all_user_objs = [eachuser.username for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+					all_user_objs_uname = [eachuser.username for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
 				else:
-					all_user_objs = [eachuser.username for eachuser in all_user_objs if not check_is_gstaff(group_obj._id,eachuser)]
+					all_user_objs_uname = [eachuser.username for eachuser in all_user_objs if not check_is_gstaff(group_obj._id,eachuser)]
 			else:
-				all_user_objs = list(all_user_objs.values_list('username', flat=True).order_by('username'))
+				all_user_objs_uname = list(all_user_objs.values_list('username', flat=True).order_by('username'))
 
 			# Type-Cast from 'QuerySet' to 'list' to make it JSON serializable
 			# all_user_names = list(all_user_objs.values_list('username', flat=True).order_by('username'))
-			filters_dict[each_course_filter_key].update({'value': json.dumps(all_user_objs)})
+			filters_dict[each_course_filter_key].update({'value': json.dumps(all_user_objs_uname)})
 
 		# if each_course_filter_key == "tags" and filter_context.lower() == "notebook":
 		if each_course_filter_key == "tags":
@@ -3422,10 +3422,17 @@ def get_course_filters(group_id, filter_context):
 							'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
 							},{'tags': 1, '_id': False})
 			elif filter_context.lower() == "gallery" or filter_context.lower() == "raw material":
+				if only_gstaff:
+					all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				else:
+					all_user_objs_id = [eachuser.id for eachuser in all_user_objs if not check_is_gstaff(group_obj._id,eachuser)]
+
 				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
-							'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
+							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
+							'created_by': {'$in': all_user_objs_id} 
 							},{'tags': 1, '_id': False})
-			# print "\n\n result_cur.count()--",result_cur.count()
+
+			print "\n\n result_cur.count()--",result_cur.count()
 			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
 			# all_tags_from_cursor is a list having nested list
 			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
