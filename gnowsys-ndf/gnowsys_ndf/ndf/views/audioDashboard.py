@@ -50,24 +50,8 @@ def audioDashboard(request, group_id, audio_id=None):
         if audio_ins:
             audio_id = str(audio_ins._id)
     audio_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(audio_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-    print "***********audio_col",audio_col
+    # print "***********audio_col",audio_col
     template = "ndf/audioDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
     variable = RequestContext(request, {'audioCollection': audio_col,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
     return render_to_response(template, variable)
-
-@get_execution_time
-def get_audio_file(request, group_id, _id):
-    
-    try:
-        group_id = ObjectId(group_id)
-    except:
-        group_name, group_id = get_group_name_id(group_id)
-
-    audio_obj = node_collection.one({"_id": ObjectId(_id)})
-    try:
-        f = audio_obj.fs.files.get(ObjectId(audio_obj.fs_file_ids[0]))
-        return HttpResponse(f.read(), content_type=f.content_type)
-    except IndexError:
-        f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[0]))
-        return HttpResponse(f.read(), content_type=f.content_type)
