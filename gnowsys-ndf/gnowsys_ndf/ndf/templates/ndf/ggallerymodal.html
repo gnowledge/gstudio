@@ -8,7 +8,7 @@
         <div class="small-2 columns file-name">
             {{node.name}}
         </div>
-        <div class="small-2 columns gmodal-actions">
+        <div class="small-4 columns gmodal-actions">
             {% comment %}
             <div class="create-note">
                 <a>
@@ -29,21 +29,18 @@
                 </a>
             </div>
             {% endcomment %}
-            <div class="view-info">
+            <div class="view-info download-file">
                 <a>
-                    <i class="fi-info"></i>
-                    View Info
+                    <i class="fi-info"></i>View Info
                 </a>
             </div>
             <div class="create-note download-file">
                 {% get_edit_url node.pk as edit_url %}
                 {% check_is_gstaff group_id request.user as is_gstaff %}
                 {% if is_gstaff or node.created_by == request.user.id %}
-
-                <a href="{% url edit_url group_id node.pk %}">
-                    <i class="fi-page-edit" ></i>
-                    Edit
-                </a>
+                    <a href="{% url edit_url group_id node.pk %}">
+                        <i class="fi-page-edit" ></i>Edit
+                    </a>
                 {% endif %}
             </div>
 
@@ -51,7 +48,6 @@
                 <a class="download-link" title="Click here to Download" href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
                     <i class="fi-download"></i>Download
                 </a>
-                <!-- <span> Download</span> -->
             </div>
 
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
@@ -99,12 +95,13 @@
                     <div class="view-info-close right">
                         <a>Close</a>
                     </div>
-                    {{node.name}}<br>
+
+                    <h5>{{node.name}}</h5>
                     <hr>
-                    Date:{{node.created_at}}<br>
-                    Uploader:{{node.created_by|get_username|truncatechars:"10"}}<br>
-                    Format:{{node.mime_type}}
-                    Size:{{node.file_size.size}}{{node.file_size.unit}}
+                    Date: {{node.created_at}}<br>
+                    Uploader: {{node.created_by|get_username}}<br>
+                    Format: {{node.mime_type}}<br>
+                    Size: {{node.file_size.size}}{{node.file_size.unit}}
                 </div>
             </div>
                 <div class="row rating-area">
