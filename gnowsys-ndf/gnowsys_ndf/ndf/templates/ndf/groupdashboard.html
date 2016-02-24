@@ -151,9 +151,9 @@ $(document).ready(function()
 <!-- overide meta_content block from base.html -->
 {% cache 300 groupdashboard_meta_content %}
 {% block meta_content %}
-{{block.super}}
+<div class="repository-title large-4 columns" style="width:100%">{% firstof  node.altnames node.name %}</div>
   <h4>
-  <i class="fi-torsos"></i> {{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}
+  <i class="fi-torsos"></i> {{node.author_set|length}}{% blocktrans %} <span>Group members </span> {% endblocktrans %}
   </h4>
 
   <div id="group_picture">

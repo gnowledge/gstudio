@@ -43,11 +43,8 @@
         {% endif %}
       </div>
     {% endif %}
-        <div class="discussion-refresh right">
-          <small><a onclick="location.reload()">Refresh <i class="fi-refresh"></i></a></small>
-        </div>
+        
     </div>
-
     {% comment %}
     {% if sg_type != "Event" %}
       <input type="file" id="uploaded-files" style="" value="" multiple>
@@ -71,7 +68,7 @@
           <div clas="discussion-title row " >
              <div class="discussion-title-username">
               <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
-                {{ each_reply.username|truncatechars:12 }} 
+                {{ each_reply.username}} 
               </a>
                 <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
             </div>
@@ -136,7 +133,7 @@
 <script type="text/javascript">
   // for discussion tab
   // storing ndf_tags return values in JS variables
-  var user_access = "{{ user_access }}"; // "allow" or "disallow"
+   var user_access = "{{ user_access }}"; // "allow" or "disallow"
   {% edit_policy groupid node request.user as status %}
   var edit_policy = "{{ status }}"; // "allow" or "disallow"
   var is_user_authenticated = {{ request.user.is_authenticated|lower }};
@@ -215,7 +212,7 @@
                               url: "{% url 'get_ckeditor' group_id %}",
                               datatype: "html",
                               data:{
-                                      'ckeditor_toolbar' : "BasicToolbar"
+                                      'ckeditor_toolbar' : "{{ckeditor_toolbar}}"
 
                                 },
                             success: function(data) {
@@ -264,8 +261,8 @@
       var htmlReply = "<div class='content' content-reply-id='"+ data[1] +"' data-reply-level=' "+ child_reply_level +" ' >"
           + "<div style='"+ replyStyle +"' data-reply-id='"+ data[1] +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
               + "<div class='discussion-title row'>"
-                  + "<div class='discussion-title-username' style='margin-left:10px'>"
-                      + "<a style='color:#ADABAB!important;font-size:15px;'>" + data[6] + "</a><small style='float:right;color:#999999;padding-right:10px!important;'>"+data[7].toLowerCase()+"</small>"
+                  + "<div class='discussion-title-username'>"
+                      + "<a style='color:#ADABAB!important;font-size:15px'>" + data[6] + "</a><small style='float:right;color:#999999'>"+data[7]+"</small>"
                   + "</div>"
               + "</div>"
           + "<div class='discussion-content'>"+ data[3] + "</div>"
@@ -328,7 +325,7 @@
                 // add reply text content after #replies-area
                 var parent_margin_level = $(sourceObj).closest("div").attr("class");
                 
-                $("#replies-area").prepend(createReplyHTML('margin-top:25px;margin-left:0px;', data,1));
+                $("#replies-area").prepend(createReplyHTML('margin-top:25px;margin-left:0px', data,1));
                 // $(".content").appendChild().(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
               }
               else  // sub-reply
@@ -462,6 +459,10 @@
       return false; // NO Editor is open.
     }
   }
+
+
+
+
 
 
 </script>

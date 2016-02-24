@@ -291,7 +291,7 @@
             {% if request.path != "/welcome" %}
               <!-- #{#% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %} -->
               <ul class="title-area text-center">
-                <li class="name" title="{{group_object.altnames}}">
+                <li class="name" title="{% firstof  group_object.altnames group_object.name %}">
                   <h1>
                     <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
 
@@ -301,7 +301,7 @@
                             {% else %}
                                     <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
                             {% endif %}
-                            <span>{{group_object.altnames|truncatechars:7}}</span>
+                            <span>{% firstof group_object.altnames|truncatechars:7 group_object.name|truncatechars:7 %}</span>
                     </a>
                   </h1>
                 </li>
