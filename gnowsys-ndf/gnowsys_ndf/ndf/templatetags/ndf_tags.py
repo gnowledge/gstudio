@@ -3172,8 +3172,13 @@ def get_gstudio_help_sidebar():
 
 @get_execution_time
 @register.assignment_tag
-def social_share_resource():
-	return SOCIAL_SHARE_RESOURCE
+def get_is_captcha_visible():
+	return GSTUDIO_CAPTCHA_VISIBLE
+
+@get_execution_time
+@register.assignment_tag
+def get_gstudio_social_share_resource():
+	return GSTUDIO_SOCIAL_SHARE_RESOURCE
 
 @get_execution_time
 @register.assignment_tag
