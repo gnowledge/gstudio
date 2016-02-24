@@ -15,86 +15,58 @@
     <!-- for Edige/FF/Chrome/Opera/etc. getUserMedia support -->
     <script src="https://cdn.rawgit.com/webrtc/adapter/master/adapter.js"></script>
 
-    <style>
-    input {
-        border: 1px solid rgb(46, 189, 235);
-        border-radius: 3px;
-        font-size: 1em;
-        outline: none;
-        padding: .2em .4em;
-        width: 60px;
-        text-align: center;
-    }
-
-    button, select {
-        font-family: Myriad, Arial, Verdana;
-        font-weight: normal;
-        border-top-left-radius: 3px;
-        border-top-right-radius: 3px;
-        border-bottom-right-radius: 3px;
-        border-bottom-left-radius: 3px;
-        padding: 4px 12px;
-        text-decoration: none;
-        color: rgb(27, 26, 26);
-        display: inline-block;
-        box-shadow: rgb(255, 255, 255) 1px 1px 0px 0px inset;
-        text-shadow: none;
-        background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0.05, rgb(241, 241, 241)), to(rgb(230, 230, 230)));
-        font-size: 20px;
-        border: 1px solid red;
-        outline:none;
-    }
-    button:active, button:focus, select:active {
-        background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(5%, rgb(221, 221, 221)), to(rgb(250, 250, 250)));
-        border: 1px solid rgb(142, 142, 142);
-    }
-    button[disabled], select[disabled] {
-        background: rgb(249, 249, 249);
-        border: 1px solid rgb(218, 207, 207);
-        color: rgb(197, 189, 189);
-    }
-    blockquote {
-        font-size: 20px;
-        color: rgb(172, 10, 10);
-        border: 1px solid rgb(172, 10, 10);
-        padding: 5px 10px;
-        border-radius: 5px;
-        margin: 9px 10px;
-    }
-    span {
-        border: 1px dotted red;
-        background: yellow;
-        padding: 0 5px;
-    }
-    </style>
-</head>
-
 <body>
-    <h1>
-        <a href="https://www.webrtc-experiment.com/">WebRTC</a> Audio Recording using <a href="https://github.com/streamproc/MediaStreamRecorder" target="_blank">MediaStreamRecorder</a>
-    </h1>
-
-    <div>
-        <label for="time-interval">Time Interval (milliseconds):</label>
-        <input type="text" id="time-interval" value="5000">ms
+   <!--  <h1>
+        <div id="timer">2:00</div>
+    </h1> -->
+    
+      <i class="fi-info"></i>You can record audio for max 30 seconds.!<br>
+    
+    <div class="center">
+        <label style="display:none!important" for="time-interval hidden">Time Interval (milliseconds):</label>
+        <input  style="display:none!important" type="text" id="time-interval" value="30000 ">
 
         <button id="start-recording">Start</button>
         <button id="stop-recording" disabled>Stop</button>
 
-        <button id="pause-recording" disabled>Pause</button>
-        <button id="resume-recording" disabled>Resume</button>
+        <button style="display:none!important" id="pause-recording" disabled>Pause</button>
+        <button style="display:none!important" id="resume-recording" disabled>Resume</button>
 
         <button id="save-recording" disabled>Save</button>
 
         <br><br>
 
-        <input id="left-channel" type="checkbox" checked style="width:auto;">
-        <label for="left-channel">Only Left Channel?</label>
+        <input style="display:none!important"  id="left-channel" type="checkbox" checked style="width:auto;">
+        <label style="display:none!important" for="left-channel">Only Left Channel?</label>
     </div>
 
     <div id="audios-container"></div>
 
     <script>
+//     function countdown(minutes) {
+//     var seconds = 32;
+//     var mins = minutes                Function for ticker timing
+//     function tick() {
+//         var counter = document.getElementById("timer");
+//         var current_minutes = mins-1
+//         seconds--;
+//         counter.innerHTML =
+//         current_minutes.toString() + ":" + (seconds < 10 ? "0" : "") + String(seconds);
+//         if( seconds > 0 ) {
+//             setTimeout(tick, 1000);
+//         } else {
+ 
+//             if(mins > 1){
+ 
+//                setTimeout(function () { countdown(mins - 1); }, 1000);
+ 
+//             }
+//         }
+//     }
+//     tick();
+// }
+ 
+
     function captureUserMedia(mediaConstraints, successCallback, errorCallback) {
         navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
     }
@@ -104,8 +76,16 @@
     };
 
     document.querySelector('#start-recording').onclick = function() {
+        
         this.disabled = true;
+        // countdown(1);
+
         captureUserMedia(mediaConstraints, onMediaSuccess, onMediaError);
+         setTimeout(function(){
+          mediaRecorder.stop();
+          mediaRecorder.stream.stop();
+  
+         }, 30000);
     };
 
     document.querySelector('#stop-recording').onclick = function() {
@@ -133,7 +113,8 @@
 
     document.querySelector('#save-recording').onclick = function() {
         this.disabled = true;
-        mediaRecorder.save();
+       
+        // mediaRecorder.save();
     };
 
     var mediaRecorder;
@@ -156,10 +137,79 @@
         mediaRecorder.mimeType = 'audio/ogg';
         mediaRecorder.audioChannels = !!document.getElementById('left-channel').checked ? 1 : 2;
         mediaRecorder.ondataavailable = function(blob) {
-            var a = document.createElement('a');
-            a.target = '_blank';
-            a.innerHTML = 'Open Recorded Audio No. ' + (index++) + ' (Size: ' + bytesToSize(blob.size) + ') Time Length: ' + getTimeLength(timeInterval);
+/*****************************************************************************************************************************************************/ 
+/******************************************** Saurabh's Implementation to save blob **********************************************/ 
+            
+            $("#save-recording").click(function(){
+                          var d = new Date();
+                          timeStamp = d.getTime();
+                          timeStamp = timeStamp.toString();
+                         
 
+                          //alert(timeStamp);
+                          console.log(blob);
+                          
+                         
+                      // Create a new FormData object.
+                      var formData = new FormData();
+
+
+                        // // Check the file type.
+                        // if (!file.type.match('image.*')) {  continue; }
+
+                        // Add the file to the request.
+                        formData.append('doc[]', blob, timeStamp);//passing timestamp as file name
+
+                      // appending csrfmiddlewaretoken and user-id
+                      formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+                      formData.append('user','{{request.user.id}}');
+
+                      // Set up the request.
+                      xhr = new XMLHttpRequest();
+
+                      // Open the connection.
+                      xhr.open('POST', "{% url 'save_image' group_id %}", true);
+
+                      // Set up a handler for when the request finishes sucessfully.
+                      xhr.onload = function () {
+
+                        if (xhr.status === 200)
+                        {
+                          // File(s) uploaded.
+                         // if file is not uploaded sucessfully
+                          if(xhr.responseText == "UploadError")
+                          {
+                             alert("Error occurred");
+                          }
+                          // check if image is not in the list, add it.
+                          else if(xhr.responseText.length == 24 )
+                          {
+                              obj_id = parseInt(xhr.responseText);
+                              var completeURL = "/" + "{{group_id}}" + "/file" + "/readDoc" + "/" + xhr.responseText + "/" + timeStamp;
+                                          CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls> <source src="'+ completeURL +'" type="audio/ogg"></audio>');
+                                          $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+
+                          }
+
+                          // updating metadata of files, if file is uploaded sucessfully
+                          // if(xhr.responseText != "UploadError")
+                          // {
+                          //   // alert('xhr.responseText != "UploadError"');
+                          // }
+                        }
+                        else
+                        {
+                          alert('An error occurred!');
+                        }
+                      };
+
+                      // Send the Data.
+                      xhr.send(formData);
+
+
+            });
+/*****************************************************************************************************************************************************/ 
             a.href = URL.createObjectURL(blob);
 
             audiosContainer.appendChild(a);
