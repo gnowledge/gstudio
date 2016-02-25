@@ -50,6 +50,9 @@ log_file_not_found.append(script_start_str)
 log_list = []  # To hold intermediate errors
 log_list.append(script_start_str)
 
+log_error_rows = []
+log_error_rows.append(script_start_str)
+
 file_gst = node_collection.one({'_type': 'GSystemType', "name": "File"})
 home_group = node_collection.one({"name": "home", "_type": "Group"})
 warehouse_group = node_collection.one({"name": 'warehouse', "_type": "Group"})
@@ -201,6 +204,17 @@ class Command(BaseCommand):
                 # print log_file_path
                 with open(log_file_path, 'a') as log_file:
                     log_file.writelines(log_file_not_found)
+
+            if log_error_rows != [script_start_str]:
+
+                log_error_rows.append("============================== End of Iteration =====================================\n")
+                log_error_rows.append("-------------------------------------------------------------------------------------\n")
+
+                log_file_name = args[0].replace('.', '_ERROR_ROWS.').rstrip("csv") + "log"
+                log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+                # print log_file_path
+                with open(log_file_path, 'a') as log_file:
+                    log_file.writelines(log_error_rows)
 
     # --- End of handle() ---
 
@@ -737,6 +751,18 @@ def parse_data_create_gsystem(json_file_path):
 
         except Exception as e:
             error_message = "\n While creating ("+str(json_document['name'])+") got following error...\n " + str(e)
+            print "!!!!!!!!!!!!EEEEEEEERRRRRRRRRRRRRROOOOOOORRRRRRRRRRRRR......................"
+
+            # file_error_msg = "\nFile with following details got an error: \n"
+            file_error_msg = "\n========================" + " Row No : " + str(i + 2) + " ========================\n"
+            # file_error_msg += "- Row No   : " + str(i + 2) + "\n"
+            file_error_msg += "- Name     : " + json_document["name"] + "\n"
+            file_error_msg += "- File Name: " + json_document["file_name"] + "\n"
+            file_error_msg += "- ERROR    : " + str(e) + "\n\n"
+            file_error_msg += "- Following are the row details : \n\n" + unicode(json.dumps(json_document, sort_keys=True, indent=4, ensure_ascii=False)) + "\n"
+            file_error_msg += "============================================================\n\n\n"
+            log_error_rows.append(file_error_msg)
+
             log_print(error_message)
 
 
