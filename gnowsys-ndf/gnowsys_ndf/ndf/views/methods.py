@@ -4542,7 +4542,7 @@ def replicate_resource(request, node, group_id):
         return None
 
 @get_execution_time
-def dig_nodes_field(parent_node, field_name="collection_set", only_leaf_nodes=False, list_of_node_ids = [], member_of=None):
+def dig_nodes_field(parent_node, field_name="collection_set", only_leaf_nodes=False, member_of=None, list_of_node_ids = []):
   '''
   This function fetches list of ObjectIds by
   digging into the node's field_name and
@@ -4582,7 +4582,7 @@ def dig_nodes_field(parent_node, field_name="collection_set", only_leaf_nodes=Fa
         else:
             list_of_node_ids.append(each_id)
 
-      dig_nodes_field(each_obj, field_name,only_leaf_nodes,list_of_node_ids, member_of)
+      dig_nodes_field(each_obj, field_name,only_leaf_nodes, member_of, list_of_node_ids)
 
     # print "\n len(list_of_node_ids) -- ",len(list_of_node_ids)
   return list_of_node_ids
