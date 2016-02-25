@@ -4544,6 +4544,16 @@ def dig_nodes_field(parent_node, field_name="collection_set", only_leaf_nodes=Fa
   If 'only_leaf_nodes' is True, the leaf nodes will be fetched,
   i.e the nodes not having any value in their said field_name
 
+  To invoke this function:
+    result = dig_nodes_field(node_obj)/
+    result = dig_nodes_field(node_obj,'collection_set')/
+    result = dig_nodes_field(node_obj,'collection_set',True)/
+    empty_list = []
+    result = dig_nodes_field(node_obj,'collection_set',True,empty_list)/
+    result = dig_nodes_field(node_obj,'collection_set',True,test_list,['Page'])/
+    result = dig_nodes_field(node_obj,'collection_set',True,test_list,['Page','File])
+
+
   '''
   # print "\n\n Node name -- ", parent_node.name, "-- ",parent_node[field_name]
   for each_id in parent_node[field_name]:
