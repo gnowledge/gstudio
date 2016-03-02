@@ -55,6 +55,7 @@ log_error_rows = []
 log_error_rows.append(script_start_str)
 
 file_gst = node_collection.one({'_type': 'GSystemType', "name": "File"})
+auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
 home_group = node_collection.one({"name": "home", "_type": "Group"})
 warehouse_group = node_collection.one({"name": 'warehouse', "_type": "Group"})
 theme_gst = node_collection.one({'_type': 'GSystemType', "name": "Theme"})
@@ -66,7 +67,9 @@ thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thre
 has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
 has_thumbnail_rt = node_collection.one({'_type': "RelationType", 'name': u"has_thumbnail"})
 discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+
 nroer_team_id = 1
+nroer_team_author_id = None
 
 # setting variable:
 # If set true, despite of having file nlob in gridfs, it fetches concern File which contains this _id in it's fs_file_ids field and returns it.
@@ -240,9 +243,20 @@ def create_user_nroer_team():
     Check for the user: "nroer_team". If it doesn't exists, create one.
     '''
     global nroer_team_id
+    global nroer_team_author_id
 
     if User.objects.filter(username="nroer_team"):
         nroer_team_id = get_user_id("nroer_team")
+        try:
+            nroer_team_author_id = node_collection.one({'_type': 'Author', 'created_by': nroer_team_id})._id
+        except Exception, e:
+            print e
+            info_message = "\n- Creating Author object: 'nroer_team': "
+            nroer_team_author_obj = create_author_object(username='nroer_team', user_id=nroer_team_id, email='nroer_team@example.com')
+            nroer_team_author_id = nroer_team_author_obj.get('_id')
+
+            info_message += "\n- Created Author object having _id: " + str(nroer_team_author_id)
+            log_print(info_message)
     
     else:
         info_message = "\n- Creating super user: 'nroer_team': "
@@ -977,3 +991,43 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     #                                     {'_id': ObjectId(node_id)},
     #                                     {'$set': {'fs_file_ids': node_fs_file_ids}}
     #                                 )
+
+
+def create_author_object(username, user_id, email=None):
+
+    auth = node_collection.one({'_type': u"Author", 'created_by': int(user_id)})
+    # This will create user document in Author collection to behave user as a group.
+    if auth is None:
+
+        if not email:
+            email = unicode(username) + u'@example.com'
+
+        print "\n Creating new Author obj for ", username
+        auth = node_collection.collection.Author()
+        auth.name = unicode(username)
+        auth.email = unicode(email)
+        auth.password = u""
+        auth.member_of.append(auth_gst._id)
+        auth.group_type = u"PUBLIC"
+        auth.edit_policy = u"NON_EDITABLE"
+        auth.subscription_policy = u"OPEN"
+        auth.created_by = user_id
+        auth.modified_by = user_id
+        auth.contributors.append(user_id)
+        auth.group_admin.append(user_id)
+        auth.preferred_languages = {'primary': ('en', 'English')}
+        auth.origin = [{'script': 'nroer_data_entry.py'}]
+        auth.agency_type = "Other"
+        auth_id = ObjectId()
+        auth._id = auth_id
+        auth.save(groupid=auth._id) 
+        home_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("home")})
+        if user_id not in home_group_obj.author_set:
+            node_collection.collection.update({'_id': home_group_obj._id}, {'$push': {'author_set': user_id }}, upsert=False, multi=False)
+            home_group_obj.reload()
+        desk_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("desk")})
+        if desk_group_obj and user_id not in desk_group_obj.author_set:
+            node_collection.collection.update({'_id': desk_group_obj._id}, {'$push': {'author_set': user_id }}, upsert=False, multi=False)
+            desk_group_obj.reload()
+
+    return auth
