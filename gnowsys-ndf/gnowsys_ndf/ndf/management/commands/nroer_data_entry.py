@@ -42,6 +42,7 @@ from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import add
 ##############################################################################
 
 SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files")
+csv_file_name = None
 
 script_start_str = "######### Script ran on : " + time.strftime("%c") + " #########\n------------------------------------------------------------\n"
 log_file_not_found = []
@@ -88,6 +89,10 @@ class Command(BaseCommand):
 
             # processing each file of passed multiple CSV files as args
             for file_name in args:
+
+                global csv_file_name
+                csv_file_name = file_name
+
                 file_path = os.path.join(SCHEMA_ROOT, file_name)
 
                 if os.path.exists(file_path):
@@ -907,7 +912,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
         
         node_collection.collection.update(
                                 {'_id': ObjectId(fileobj_oid)},
-                                {'$push': {'origin': {'csv-import': 'save_file'} }},
+                                {'$push': {'origin': {'csv-import': csv_file_name} }},
                                 upsert=False,
                                 multi=False
                             )
