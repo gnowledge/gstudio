@@ -303,8 +303,6 @@ def inline_edit_comment(request, group_id, node_id=None,call_from_discussion=Non
         node_id = request.GET.get('sourceObjDataId');
     if request.POST:
         node_id = request.POST.get('sourceObjDataId')
-    if node_id == None:
-        
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
