@@ -57,6 +57,7 @@ col = db[Benchmark.collection_name]
 # grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
 # ins_objectid = ObjectId()
 
+
 @login_required
 @get_execution_time
 def create_discussion(request, group_id, node_id):
@@ -293,3 +294,40 @@ def discussion_delete_reply(request, group_id):
             temp_reply.delete()
         
     return HttpResponse(json.dumps(deleted_replies))
+
+@login_required
+@get_execution_time
+def inline_edit_comment(request, group_id, node_id=None,call_from_discussion=None):
+    
+    if request.GET:
+        node_id = request.GET.get('sourceObjDataId');
+    if request.POST:
+        node_id = request.POST.get('sourceObjDataId')
+    if node_id == None:
+        
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    node_id = node_id.strip()
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': node_obj,'node_id':node_id
+            }
+    if request.method == "POST":
+        content_val = request.POST.get("content_val", "")
+        node_obj.content = content_val
+        node_obj.save()
+        template = 'ndf/gin-line-texteditor.html'
+        context_variables['no_discussion'] = True
+        
+    else:
+        template = 'ndf/html_editor.html'
+        context_variables['var_name'] = "content_org",
+        context_variables['var_value'] = node_obj.content
+        context_variables['node_id'] = node_obj._id
+        context_variables['ckeditor_toolbar'] ="BasicToolbar" 
+    return render_to_response(template, context_variables, context_instance = RequestContext(request))
+
+def discussion (request):
+    return 
