@@ -469,12 +469,15 @@
   }
 
 function editreply(sourceObj){
-//alert(sourceObj);
+//alert(sourceObj);discussion-content" data-reply-id="{{ each_reply.oid }}
   var sourceObjDataId = $(sourceObj).attr("data-id");
+  content_thread = $('.discussion-content[data-reply-id='+ sourceObjDataId +']');
   curr_thread = $('.reply-btn[data-id='+ sourceObjDataId +']');
   edit_res = curr_thread.closest('.edit_res');
   reply_res = curr_thread.closest('.reply_res');
   delete_res = curr_thread.closest('.delete_res');
+
+  content_thread.hide();
   delete_res.hide();
   edit_res.hide();
   reply_res.hide();
@@ -539,11 +542,13 @@ function save_reply(sourceObj){
             $('.save_res').remove();
             var node_to_update = $('.discussion-content[data-reply-id='+ sourceObjDataId +']');
             $(node_to_update).html(content_val);
+            content_thread = $('.discussion-content[data-reply-id='+ sourceObjDataId +']');
             curr_thread = $('.reply-btn[data-id='+ sourceObjDataId +']');
             edit_res = curr_thread.closest('.edit_res');
             reply_res = curr_thread.closest('.reply_res');
             delete_res = curr_thread.closest('.delete_res');
             
+            content_thread.show();
             reply_res.show();
             edit_res.show();
             delete_res.show();
