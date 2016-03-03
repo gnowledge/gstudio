@@ -297,20 +297,21 @@ def discussion_delete_reply(request, group_id):
 
 @login_required
 @get_execution_time
-def inline_edit_comment(request, group_id, node_id=None,call_from_discussion=None):
+def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
     
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     if request.GET:
         node_id = request.GET.get('sourceObjDataId');
     if request.POST:
         node_id = request.POST.get('sourceObjDataId')
-    group_obj   = get_group_name_id(group_id, get_obj=True)
-    group_id    = group_obj._id
-    group_name  = group_obj.name
     node_id = node_id.strip()
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
     context_variables = {
-            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': node_obj,'node_id':node_id
+            'group_id': group_id, 'groupid': group_id,'node': node_obj,'node_id':node_id
             }
     if request.method == "POST":
         content_val = request.POST.get("content_val", "")
