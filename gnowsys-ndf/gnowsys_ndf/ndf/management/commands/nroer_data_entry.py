@@ -1019,7 +1019,7 @@ def create_author_object(username, user_id, email=None):
         auth.origin = [{'script': 'nroer_data_entry.py'}]
         auth.agency_type = "Other"
         auth_id = ObjectId()
-        auth._id = auth_id
+        auth['_id'] = auth_id
         auth.save(groupid=auth._id) 
         home_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("home")})
         if user_id not in home_group_obj.author_set:
