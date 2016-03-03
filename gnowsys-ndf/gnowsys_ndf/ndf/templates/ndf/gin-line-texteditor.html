@@ -77,7 +77,7 @@
             </div>
 
             </div>
-          <div class="discussion-content">
+          <div class="discussion-content" data-reply-id="{{ each_reply.oid }}">
             {{each_reply.HTMLcontent|safe }}
           {% for node in each_reply.collection_set  %}
             <div style="margin: 1em;">
@@ -109,6 +109,10 @@
               <a class="reply-btn" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" style="float:right">
                 <i class="fa fa-trash-o"></i>
                 {% trans "Delete" %}
+              </a>
+               <a class="reply-btn edit_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick='editreply($(this))' style="float:right;margin-right:10px!important"> 
+                <i class="fa fa-pencil-square-o"></i>
+                {% trans "Edit" %}
               </a>
             {% endif %}
           </div>
@@ -268,13 +272,14 @@
                       + "<a style='color:#ADABAB!important;font-size:15px;padding-left:10px!important;'>" + data[6] + "</a><small style='float:right;color:#999999'>"+data[7]+"</small>"
                   + "</div>"
               + "</div>"
-          + "<div class='discussion-content'>"+ data[3] + "</div>"
+          + "<div class='discussion-content' data-reply-id='"+ data[1] +"'>"+ data[3] + "</div>"
           + "<div class='discussion-footer'>"
                 + "<a class='reply-btn'  data-id='" + data[1] + "' onclick='openCKEditor($(this))' data-org-content='"+data[3]+"'>"
                + "<i class='fa fa-reply'></i> Reply"
                + "</a>"
               if (request_user_id == reply_user_id){
                   htmlReply +="<a class='reply-btn' data-userid='"+ data[5] +"' onclick='deleteReply($(this))' style='float:right'><i class='fa fa-trash-o'></i> Delete"
+                  htmlReply +="<a class='reply-btn edit_res' data-id='"+ data[1] +"' data-userid='{{each_reply.userid}}' data-userid='"+ data[5] +"' onclick='editreply($(this))' style='float:right;margin-right:10px!important'><i class='fa fa-pencil-square-o'></i> Edit"
                   }
           +"</div>"   
         +"</div>"
@@ -463,10 +468,75 @@
     }
   }
 
+function editreply(sourceObj){
+//alert(sourceObj);
+  var curr_data_id = sourceObj.attr('data-id');
 
+   if(checkCurrEdit()){
+           return false;
+     }
+  
+  var parent_div = sourceObj.parent();
 
+    parent_div.append("<a class='reply-btn save_res' onclick='save_reply($(this))' data-id='" + curr_data_id + "' style='float:right;margin-right:10px!important'>Save</a>");
+ 
+  var sourceObjDataId = $(sourceObj).attr("data-id");
+  var group_id = "{{group_id}}";
+  $.ajax({
+          url: "{% url 'inline_edit_comment' group_id 'None' %}",
 
+          type: "GET",
+
+          dataType: "html",
+
+          data: {
+              "csrfmiddlewaretoken": "{{ csrf_token }}",
+              "sourceObjDataId": sourceObjDataId,
+            },
+
+          success: function(data){
+             r = $('.reply-btn[data-id='+ sourceObjDataId +']');
+             p = r.closest('.disc-replies');
+             parent_marginleft = p.css("margin-left");
+             parent_marginleft = (parseFloat(parent_marginleft, 10)) + "px";
+             // alert("parent_marginleft"+parent_marginleft);
+             p.after('<div class="ckeditor-content-reply" style="margin-left:'+ parent_marginleft +'"><div class="ckeditor-reply-area"></div> <div class="post-btn-div"></div></div>');
+             $('.ckeditor-reply-area').html(data);
+             setCurrNodeEdit(1);
+             // $(sourceObj).append(data);
+          },
+        }); 
+  
+
+}
+
+function save_reply(sourceObj){
+        var sourceObjDataId = $(sourceObj).attr("data-id");
+        var content_val = CKEDITOR.instances['ckeditor_textarea'].getData();
+        $( ".cke_button__closebtn_label" ).trigger( "click" );
+        $.ajax({
+          url: "{% url 'inline_edit_comment' group_id 'None' %}",
+
+          data: {
+            content_val: content_val,
+            'csrfmiddlewaretoken': "{{csrf_token}}",
+            'sourceObjDataId': sourceObjDataId,
+          },
+
+          type: "POST",
+
+          dataType: "html",
+
+          success: function(){
+            $('.save_res').remove();
+            var node_to_update = $('.discussion-content[data-reply-id='+ sourceObjDataId +']');
+            $(node_to_update).html(content_val);
+          },
+        });//end of ajax
+
+}
 
 
 </script>
+
 
