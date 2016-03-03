@@ -112,7 +112,7 @@
               </a>
                <a class="reply-btn edit_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick='editreply($(this))' style="float:right;margin-right:10px!important"> 
                 <i class="fa fa-pencil-square-o"></i>
-                {% trans "Edit" %}
+                {% trans "Edit" %} |
               </a>
             {% endif %}
           </div>
@@ -279,7 +279,7 @@
                + "</a>"
               if (request_user_id == reply_user_id){
                   htmlReply +="<a class='reply-btn delete_res' data-id='" + data[1]+ "'data-userid='"+ data[5] +"' onclick='deleteReply($(this))' style='float:right'><i class='fa fa-trash-o'></i> Delete"
-                  htmlReply +="<a class='reply-btn edit_res' data-id='"+ data[1] +"' data-userid='{{each_reply.userid}}' data-userid='"+ data[5] +"' onclick='editreply($(this))' style='float:right;margin-right:10px!important'><i class='fa fa-pencil-square-o'></i> Edit"
+                  htmlReply +="<a class='reply-btn edit_res' data-id='"+ data[1] +"' data-userid='{{each_reply.userid}}' data-userid='"+ data[5] +"' onclick='editreply($(this))' style='float:right;margin-right:10px!important'><i class='fa fa-pencil-square-o'></i> Edit |"
                   }
           +"</div>"   
         +"</div>"
@@ -490,7 +490,7 @@ function editreply(sourceObj){
   
   var parent_div = sourceObj.parent();
 
-    parent_div.append("<a class='reply-btn save_res' onclick='save_reply($(this))' data-id='" + curr_data_id + "' style='float:right;margin-right:10px!important'><i class='fa fa-floppy-o'></i>Save</a>");
+    parent_div.append("<a class='reply-btn save_res' onclick='save_reply($(this))' data-id='" + curr_data_id + "' style='float:right;margin-right:10px!important'><i class='fa fa-floppy-o'></i> Save</a>");
  
   var group_id = "{{group_id}}";
   $.ajax({
