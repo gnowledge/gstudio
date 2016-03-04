@@ -1525,6 +1525,11 @@ def save_resources(request, group_id):
 
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
         cu_new.reload()
+        res_cur = node_collection.find({'_id': {'$in': list_of_res_ids}})
+        for eachres in res_cur:
+            if cu_new._id not in eachres.prior_node:
+                eachres.prior_node.append(cu_new._id)
+                eachres.save()
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
 

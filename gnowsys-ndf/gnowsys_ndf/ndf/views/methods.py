@@ -4492,6 +4492,7 @@ def replicate_resource(request, node, group_id):
             new_gsystem.member_of = node.member_of
         new_gsystem.modified_by = int(request.user.id)
         new_gsystem.created_by = int(request.user.id)
+        new_gsystem.prior_node = node.prior_node
         new_gsystem.contributors.append(int(request.user.id))
         new_gsystem.tags = node.tags
         new_gsystem.content_org = node.content_org
