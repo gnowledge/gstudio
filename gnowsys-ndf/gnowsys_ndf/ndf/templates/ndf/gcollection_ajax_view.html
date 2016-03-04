@@ -74,7 +74,7 @@
     }
 
     function initCourseModule() {
-      var url = "{% url 'get_collection' group_id node.pk %}";
+      var url = "{% url 'get_course_collection' group_id node.pk True %}";
       var moduleTrees = [];
       $.getJSON( url, function(data) {
         // console.log(JSON.stringify(data))
@@ -582,7 +582,7 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
           </div>
         </div>
       </div-->
-      <div class="collection collapse row" data-url="{% url 'get_collection' group_id node.pk %}">
+      <div class="collection collapse row" data-url="{% url 'get_course_collection' group_id node.pk True %}">
       </div>
     </div>
   {% endif %}
