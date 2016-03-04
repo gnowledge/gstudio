@@ -147,7 +147,10 @@ def create_edit(request, group_id, node_id=None):
                     }
     if node_id:
         course_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
-        logo_img_node, grel_id = get_relation_value(node_id,'has_logo')
+        logo_img_node_grel_id = get_relation_value(node_id,'has_logo')
+        if logo_img_node_grel_id:
+            logo_img_node = logo_img_node_grel_id[0]
+            grel_id = logo_img_node_grel_id[1]
 
     else:
         course_node = node_collection.collection.GSystem()
