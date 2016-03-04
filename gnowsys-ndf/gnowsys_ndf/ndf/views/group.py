@@ -1361,7 +1361,7 @@ class GroupCreateEditHandler(View):
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
         subgroup_flag = request.POST.get('subgroup', '')
-        print "=== subgroup_flag: ", subgroup_flag
+
         partnergroup_flag = request.POST.get('partnergroup_flag', '')
         url_name = 'groupchange'
 
