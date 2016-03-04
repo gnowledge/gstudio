@@ -42,6 +42,7 @@ from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import add
 ##############################################################################
 
 SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files")
+csv_file_name = None
 
 script_start_str = "######### Script ran on : " + time.strftime("%c") + " #########\n------------------------------------------------------------\n"
 log_file_not_found = []
@@ -50,7 +51,11 @@ log_file_not_found.append(script_start_str)
 log_list = []  # To hold intermediate errors
 log_list.append(script_start_str)
 
+log_error_rows = []
+log_error_rows.append(script_start_str)
+
 file_gst = node_collection.one({'_type': 'GSystemType', "name": "File"})
+auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
 home_group = node_collection.one({"name": "home", "_type": "Group"})
 warehouse_group = node_collection.one({"name": 'warehouse', "_type": "Group"})
 theme_gst = node_collection.one({'_type': 'GSystemType', "name": "Theme"})
@@ -62,7 +67,9 @@ thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thre
 has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
 has_thumbnail_rt = node_collection.one({'_type': "RelationType", 'name': u"has_thumbnail"})
 discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+
 nroer_team_id = 1
+nroer_team_author_id = None
 
 # setting variable:
 # If set true, despite of having file nlob in gridfs, it fetches concern File which contains this _id in it's fs_file_ids field and returns it.
@@ -85,6 +92,10 @@ class Command(BaseCommand):
 
             # processing each file of passed multiple CSV files as args
             for file_name in args:
+
+                global csv_file_name
+                csv_file_name = file_name
+
                 file_path = os.path.join(SCHEMA_ROOT, file_name)
 
                 if os.path.exists(file_path):
@@ -202,6 +213,17 @@ class Command(BaseCommand):
                 with open(log_file_path, 'a') as log_file:
                     log_file.writelines(log_file_not_found)
 
+            if log_error_rows != [script_start_str]:
+
+                log_error_rows.append("============================== End of Iteration =====================================\n")
+                log_error_rows.append("-------------------------------------------------------------------------------------\n")
+
+                log_file_name = args[0].replace('.', '_ERROR_ROWS.').rstrip("csv") + "log"
+                log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+                # print log_file_path
+                with open(log_file_path, 'a') as log_file:
+                    log_file.writelines(log_error_rows)
+
     # --- End of handle() ---
 
 
@@ -221,9 +243,20 @@ def create_user_nroer_team():
     Check for the user: "nroer_team". If it doesn't exists, create one.
     '''
     global nroer_team_id
+    global nroer_team_author_id
 
     if User.objects.filter(username="nroer_team"):
         nroer_team_id = get_user_id("nroer_team")
+        try:
+            nroer_team_author_id = node_collection.one({'_type': 'Author', 'created_by': nroer_team_id})._id
+        except Exception, e:
+            print e
+            info_message = "\n- Creating Author object: 'nroer_team': "
+            nroer_team_author_obj = create_author_object(username='nroer_team', user_id=nroer_team_id, email='nroer_team@example.com')
+            nroer_team_author_id = nroer_team_author_obj.get('_id')
+
+            info_message += "\n- Created Author object having _id: " + str(nroer_team_author_id)
+            log_print(info_message)
     
     else:
         info_message = "\n- Creating super user: 'nroer_team': "
@@ -737,6 +770,18 @@ def parse_data_create_gsystem(json_file_path):
 
         except Exception as e:
             error_message = "\n While creating ("+str(json_document['name'])+") got following error...\n " + str(e)
+            print "!!!!!!!!!!!!EEEEEEEERRRRRRRRRRRRRROOOOOOORRRRRRRRRRRRR......................"
+
+            # file_error_msg = "\nFile with following details got an error: \n"
+            file_error_msg = "\n========================" + " Row No : " + str(i + 2) + " ========================\n"
+            # file_error_msg += "- Row No   : " + str(i + 2) + "\n"
+            file_error_msg += "- Name     : " + json_document["name"] + "\n"
+            file_error_msg += "- File Name: " + json_document["file_name"] + "\n"
+            file_error_msg += "- ERROR    : " + str(e) + "\n\n"
+            file_error_msg += "- Following are the row details : \n\n" + unicode(json.dumps(json_document, sort_keys=True, indent=4, ensure_ascii=False)) + "\n"
+            file_error_msg += "============================================================\n\n\n"
+            log_error_rows.append(file_error_msg)
+
             log_print(error_message)
 
 
@@ -881,7 +926,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
         
         node_collection.collection.update(
                                 {'_id': ObjectId(fileobj_oid)},
-                                {'$push': {'origin': {'csv-import': 'save_file'} }},
+                                {'$push': {'origin': {'csv-import': csv_file_name} }},
                                 upsert=False,
                                 multi=False
                             )
@@ -946,3 +991,43 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     #                                     {'_id': ObjectId(node_id)},
     #                                     {'$set': {'fs_file_ids': node_fs_file_ids}}
     #                                 )
+
+
+def create_author_object(username, user_id, email=None):
+
+    auth = node_collection.one({'_type': u"Author", 'created_by': int(user_id)})
+    # This will create user document in Author collection to behave user as a group.
+    if auth is None:
+
+        if not email:
+            email = unicode(username) + u'@example.com'
+
+        print "\n Creating new Author obj for ", username
+        auth = node_collection.collection.Author()
+        auth.name = unicode(username)
+        auth.email = unicode(email)
+        auth.password = u""
+        auth.member_of.append(auth_gst._id)
+        auth.group_type = u"PUBLIC"
+        auth.edit_policy = u"NON_EDITABLE"
+        auth.subscription_policy = u"OPEN"
+        auth.created_by = user_id
+        auth.modified_by = user_id
+        auth.contributors.append(user_id)
+        auth.group_admin.append(user_id)
+        auth.preferred_languages = {'primary': ('en', 'English')}
+        auth.origin = [{'script': 'nroer_data_entry.py'}]
+        auth.agency_type = "Other"
+        auth_id = ObjectId()
+        auth['_id'] = auth_id
+        auth.save(groupid=auth._id) 
+        home_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("home")})
+        if user_id not in home_group_obj.author_set:
+            node_collection.collection.update({'_id': home_group_obj._id}, {'$push': {'author_set': user_id }}, upsert=False, multi=False)
+            home_group_obj.reload()
+        desk_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("desk")})
+        if desk_group_obj and user_id not in desk_group_obj.author_set:
+            node_collection.collection.update({'_id': desk_group_obj._id}, {'$push': {'author_set': user_id }}, upsert=False, multi=False)
+            desk_group_obj.reload()
+
+    return auth
