@@ -494,7 +494,7 @@ def get_metadata_values():
 
 @get_execution_time
 @register.assignment_tag
-def get_attribute_value(node_id, attr):
+def get_attribute_value(node_id, attr,get_data_type=False):
 	try:
 		attr_val = ""
 		node_attr = None
@@ -503,13 +503,17 @@ def get_attribute_value(node_id, attr):
 			gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr) })
 	        # print "node: ",node.name,"\n"
 	        # print "attr: ",attr,"\n"
-
+        	if get_data_type:
+        		data_type = gattr.data_type
 			if node and gattr:
 				node_attr = triple_collection.one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})	
 
+		
 		if node_attr:
 			attr_val = node_attr.object_value
 		# print "attr_val: ",attr_val,"\n"
+		if get_data_type:
+			return {'value': attr_val, 'data_type': data_type}
 		return attr_val
 	except:
 		return attr_val
