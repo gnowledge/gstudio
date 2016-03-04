@@ -122,15 +122,14 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     newdict = {}
     if node_id:
         new_instance_type = node_collection.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
-
     else:
         new_instance_type = eval("node_collection.collection"+"."+class_name)()
 
     if request.method=="POST":
         if translate:
             new_instance_type = eval("node_collection.collection"+"."+class_name)()
-        # print new_instance_type    
         for key,value in class_structure.items():
+
             if value == bool:
                 if request.POST.get(key,""):
                     if request.POST.get(key,"") in ('1','2'):
@@ -160,7 +159,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                         else:
                             new_instance_type[key] = unicode(request.POST.get(key,""))
 
-            elif value == list:
+            elif value == list: 
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"").split(",")
 
@@ -173,11 +172,15 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                         for each in request.POST.get(key,"").split(","):
                             listoflist.append(node_collection.one({"_id":ObjectId(each)}))
                         new_instance_type[key] = listoflist
+
+                    elif key in ["member_of","prior_node","type_of"]:
+                        new_mem = request.POST.get(key,"").split(",")
+                        new_mem_list = [ObjectId(each) for each in new_mem]
+                        new_instance_type[key] = new_mem_list
+
                     else :
                         listoflist = []
-                        
                         for each in request.POST.get(key,"").split(","):
-                            
                             listoflist.append(ObjectId(each))
                         new_instance_type[key] = listoflist
 
@@ -234,8 +237,8 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
 
     # If GET request ---------------------------------------------------------------------------------------
-
     for key,value in class_structure.items():
+
         if value == bool:
             # newdict[key] = "bool"
             newdict[key] = ["bool", new_instance_type[key]]
@@ -248,11 +251,12 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
               
         elif value == list:
             # newdict[key] = "list"
-            
             newdict[key] = ["list", new_instance_type[key]]
+
         elif type(value) == list:
             # newdict[key] = "list"
             newdict[key] = ["list", new_instance_type[key]]
+
         elif value == datetime.datetime:
             # newdict[key] = "datetime"
             newdict[key] = ["datetime", new_instance_type[key]]
