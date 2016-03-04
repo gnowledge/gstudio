@@ -80,8 +80,10 @@
               <div class="activity-title">
                   {{node.name}}
                   {% if is_gstaff or node.created_by == request.user.id %}
+                      {% get_edit_url node.pk as edit_url %}
                       <small>
-                          <a title="Edit this {{node.member_of_names_list.0}}" class="fi-pencil edit_res">{% trans " Edit" %}</a>
+                          <a title="Edit this {{node.member_of_names_list.0}}" class="edit_res">{% trans " Edit Content" %}</a>|
+                          <a title="Edit this {{node.member_of_names_list.0}}" class="edit_settings" href="{% url edit_url group_id node.pk %}">{% trans " Edit Settings" %}</a>
                       </small>
                   {% endif %}
 
@@ -114,16 +116,13 @@
       <div class="row activity-comments-section">
           <div class="columns small-12 " id="view-discussion">
                 <!-- discussion content area -->
-                {% if node.discussion_enable %}
-                  {% get_thread_node node.pk as thread_node %}
-                  {% if thread_node %}
-                      {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                      {% get_node thread_node as thread_node_obj %}
-                      {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" %}
-                  {% else %}
-                      {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                      {% include 'ndf/gin-line-texteditor.html' with var_name="content_org" %}
-                  {% endif %}
+                {% get_thread_node node.pk as thread_node %}
+                {% if thread_node %}
+                    {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                    {{all_replies}}
+                    {% get_node thread_node as thread_node_obj %}
+                    {{thread_node_obj.pk}}
+                    {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True thread_node_exists=True %}
                 {% endif %}
 
                 <!-- END of discussion content area -->
