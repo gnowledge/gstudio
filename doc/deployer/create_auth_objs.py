@@ -27,7 +27,7 @@ for each_user in all_users:
 
 		auth.agency_type = "Student"
 		auth_id = ObjectId()
-		auth._id = auth_id
+		auth['_id'] = auth_id
 		auth.save(groupid=auth._id) 
 		home_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("home")})
 		if each_user.id not in home_group_obj.author_set:
