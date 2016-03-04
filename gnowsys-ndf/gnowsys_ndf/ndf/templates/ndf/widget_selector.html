@@ -460,11 +460,16 @@ HOW TO USE
 
     var idToAppend = idToAppend || false;
     var hiddenInput = document.createElement('input');
+    console.log(hiddenInput)
     hiddenInput.type = 'hidden';
     hiddenInput.name = selectorWidgetFor;
-    hiddenInput.value = JSON.stringify(getSelectedValues(selectorWidgetFor));
+    hiddenInput.value = getSelectedValues(selectorWidgetFor);
+    // hiddenInput.value = JSON.stringify(getSelectedValues(selectorWidgetFor));
+
     if (idToAppend) {
+      // document.getElementById(idToAppend).appendChild(hiddenInput.value);
       document.getElementById(idToAppend).appendChild(hiddenInput);
+
     }
     return hiddenInput;
   }
