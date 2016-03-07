@@ -4530,3 +4530,50 @@ def replicate_resource(request, node, group_id):
         print replicate_resource_err
         print "Failed replicating resource"
         return None
+
+@get_execution_time
+def dig_nodes_field(parent_node, field_name="collection_set", only_leaf_nodes=False, member_of=None, list_of_node_ids = []):
+  '''
+  This function fetches list of ObjectIds by
+  digging into the node's field_name and
+  the result's field_name recursively.
+
+  'field_name' can be collection_set/prior_node/post_node etc.
+  'member_of' is a list of GST names e.g ['Page', 'File']
+
+  If 'only_leaf_nodes' is True, the leaf nodes will be fetched,
+  i.e the nodes not having any value in their said field_name
+
+  To invoke this function:
+    result = dig_nodes_field(node_obj)/
+    result = dig_nodes_field(node_obj,'collection_set')/
+    result = dig_nodes_field(node_obj,'collection_set',True)/
+    empty_list = []
+    result = dig_nodes_field(node_obj,'collection_set',True,empty_list)/
+    result = dig_nodes_field(node_obj,'collection_set',True,test_list,['Page'])/
+    result = dig_nodes_field(node_obj,'collection_set',True,test_list,['Page','File])
+
+
+  '''
+  # print "\n\n Node name -- ", parent_node.name, "-- ",parent_node[field_name]
+  for each_id in parent_node[field_name]:
+    if each_id not in list_of_node_ids:
+      each_obj = node_collection.one({'_id': ObjectId(each_id)})
+      # print "\n each_obj--",each_obj._id, " -- ", each_obj.name, " - - ", each_obj.member_of_names_list, "=== ", member_of
+      member_of_match = True
+      if member_of:
+        member_of_match = [each_ele for each_ele in member_of if each_ele in each_obj.member_of_names_list]
+      # print "\n\nmember_of_match",member_of_match
+      if member_of_match and each_id not in list_of_node_ids:
+        # print "\n File Found", len(each_obj[field_name])
+        if only_leaf_nodes:
+          if not each_obj[field_name]:
+            list_of_node_ids.append(each_id)
+        else:
+            list_of_node_ids.append(each_id)
+
+      dig_nodes_field(each_obj, field_name,only_leaf_nodes, member_of, list_of_node_ids)
+
+    # print "\n len(list_of_node_ids) -- ",len(list_of_node_ids)
+  return list_of_node_ids
+    
