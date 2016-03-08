@@ -101,6 +101,15 @@ urlpatterns = patterns('',
 
     # (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
 
+<<<<<<< HEAD
+=======
+    # --discussion--
+    # url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/create_discussion$', 'gnowsys_ndf.ndf.views.discussion.create_discussion', name='create_discussion'),    
+    # url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/discussion_reply$', 'gnowsys_ndf.ndf.views.discussion.discussion_reply', name='discussion_reply'),
+    # url(r'^(?P<group_id>[^/]+)/discussion_delete_reply$', 'gnowsys_ndf.ndf.views.discussion.discussion_delete_reply', name='discussion_delete_reply'),    
+    # --end of discussion
+
+>>>>>>> 0fa2c3970ab6fdd6e7900e3434b49969e4f3119f
     url(r'^(?P<group_id>[^/]+)/visualize', include('gnowsys_ndf.ndf.urls.visualise_urls')),
 
     (r'^explore/', include('gnowsys_ndf.ndf.urls.explore')),

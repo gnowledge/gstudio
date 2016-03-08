@@ -68,6 +68,10 @@ def create_discussion(request, group_id, node_id):
   '''
 
   try:
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     twist_st = node_collection.one({'_type':'GSystemType', 'name':'Twist'})
 
@@ -303,6 +307,11 @@ def discussion_reply(request, group_id, node_id):
 @get_execution_time
 def discussion_delete_reply(request, group_id, node_id):
 
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     nodes_to_delete = json.loads(request.POST.get("nodes_to_delete", "[]"))
     
     reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
@@ -344,20 +353,10 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
     context_variables = {
             'group_id': group_id, 'groupid': group_id,'node': node_obj,'node_id':node_id
             }
-    if request.method == "POST":
-        content_val = request.POST.get("content_val", "")
-        node_obj.content = content_val
-        node_obj.save()
-        template = 'ndf/gin-line-texteditor.html'
-        context_variables['no_discussion'] = True
-        
-    else:
-        template = 'ndf/html_editor.html'
-        context_variables['var_name'] = "content_org",
-        context_variables['var_value'] = node_obj.content
-        context_variables['node_id'] = node_obj._id
-        context_variables['ckeditor_toolbar'] ="BasicToolbar" 
+    template = 'ndf/html_editor.html'
+    context_variables['var_name'] = "content_org",
+    context_variables['var_value'] = node_obj.content
+    context_variables['node_id'] = node_obj._id
+    context_variables['ckeditor_toolbar'] ="BasicToolbar" 
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
-def discussion (request):
-    return 
