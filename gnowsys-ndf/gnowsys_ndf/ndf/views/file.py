@@ -798,7 +798,7 @@ def submitDoc(request, group_id):
         co_contributors = request.POST.get("co_contributors", "")
         map_geojson_data = request.POST.get('map-geojson-data')
         subject = request.POST.get("Subject", "")
-        level = request.POST.getlisr("Level", "")
+        level = request.POST.getlist("Level", "")
 
         subject = '' if (subject=='< Not Sure >') else subject
         level = '' if (level=='< Not Sure >') else level
