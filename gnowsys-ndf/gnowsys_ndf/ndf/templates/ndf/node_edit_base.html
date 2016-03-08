@@ -462,12 +462,15 @@
 						<h5>{% trans "Educational Alignment:" %}</h5>
 						{% endif %}      
 
-		         		{% get_attribute_value node.pk k as attr_val %} 
-
-		         		<select name="{{k}}" id ="{{k}}">
+		         		{% get_attribute_value node.pk k "True" as attr_val %} 
+		         		{% if attr_val.data_type == "list" %}
+		         		 <select name="{{k}}" id ="{{k}}" multiple style="height:5em!important;">
+		         		{% else %}
+		         		 <select name="{{k}}" id ="{{k}}">
+						{% endif %}
 							<option> --Select-- </option>
 							{% for opts in v %} 
-								{% if opts == attr_val|stringformat:"s" or opts in attr_val  %}	        				
+								{% if opts == attr_val.value|stringformat:"s" or opts in attr_val.value  %}	        				
 								<option selected>{% trans opts %}</option>
 								{% else %}
 								<option>{% trans opts %}</option>
