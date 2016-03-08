@@ -2128,12 +2128,12 @@ def course_about(request, group_id):
     if start_date and last_date:
       start_date = start_date.date()
       last_date = last_date.date()
-    from datetime import  timedelta
-    start_day = (start_date - timedelta(days=start_date.weekday()))
-    end_day = (last_date - timedelta(days=last_date.weekday()))
+      from datetime import  timedelta
+      start_day = (start_date - timedelta(days=start_date.weekday()))
+      end_day = (last_date - timedelta(days=last_date.weekday()))
 
-    # print 'Weeks:', (end_day - start_day).days / 7
-    weeks_count = (end_day - start_day).days / 7
+      # print 'Weeks:', (end_day - start_day).days / 7
+      weeks_count = (end_day - start_day).days / 7
     
     template = 'ndf/gcourse_event_group.html'
 
