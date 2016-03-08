@@ -9,6 +9,7 @@ from gnowsys_ndf.ndf.views.methods import *
 from django.core.urlresolvers import reverse
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 
+@get_execution_time
 def trash_resource(request,group_id,node_id):
 	'''
 	Delete Action.
@@ -42,6 +43,7 @@ def trash_resource(request,group_id,node_id):
 		return HttpResponseRedirect(reverse('group_dashboard', kwargs={'group_id': group_id}))
 		# return(eval('group_dashboard')(request, group_id))   
 
+@get_execution_time
 def delete_resource(request,group_id):
 	node_id = request.GET.getlist('node_id','')[0]
 	if node_id:
@@ -50,7 +52,7 @@ def delete_resource(request,group_id):
 		return HttpResponse("Nothing Deleted.")
 	return HttpResponse("Deleted Successfully")
 
-
+@get_execution_time
 def restore_resource(request, group_id):
 	# NOTE: purge of themes need to be handled differently.
 	# all the collection hierarchy needs to be purged in this case.
