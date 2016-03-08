@@ -199,7 +199,7 @@
     }
     if(this.id == "id_username")
     {
-      $(this).attr("pattern", "^[a-zA-Z](([\._\-][a-zA-Z0-9])|[a-zA-Z0-9])*[a-z0-9]$");
+      $(this).attr("pattern", "^[a-z](([\._\-][a-z0-9])|[a-z0-9])*[a-z0-9]$");
     }
 
     $(this).css("width", "95%");
@@ -208,7 +208,7 @@
 
     if(this.name == 'username')
     {
-      $(this).after("<small class='error'>Username should start with letters and can have digits and - / . / _ only</small>");
+      $(this).after("<small class='error'>Username should start with letters and can have digits and - / . / _ / Lower case letters only</small>");
     }
     else{
       $(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
