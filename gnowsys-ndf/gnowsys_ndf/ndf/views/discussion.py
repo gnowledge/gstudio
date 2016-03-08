@@ -302,3 +302,29 @@ def discussion_delete_reply(request, group_id, node_id):
             temp_reply.delete()
         
     return HttpResponse(json.dumps(deleted_replies))
+
+
+@login_required
+@get_execution_time
+def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
+    
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    if request.GET:
+        node_id = request.GET.get('sourceObjDataId');
+    if request.POST:
+        node_id = request.POST.get('sourceObjDataId')
+    node_id = node_id.strip()
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id,'node': node_obj,'node_id':node_id
+            }
+    template = 'ndf/html_editor.html'
+    context_variables['var_name'] = "content_org",
+    context_variables['var_value'] = node_obj.content
+    context_variables['node_id'] = node_obj._id
+    context_variables['ckeditor_toolbar'] ="BasicToolbar" 
+    return render_to_response(template, context_variables, context_instance = RequestContext(request))
