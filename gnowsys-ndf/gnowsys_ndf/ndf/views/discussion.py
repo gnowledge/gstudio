@@ -66,6 +66,10 @@ def create_discussion(request, group_id, node_id):
   '''
 
   try:
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     twist_st = node_collection.one({'_type':'GSystemType', 'name':'Twist'})
 
@@ -278,7 +282,12 @@ def discussion_reply(request, group_id, node_id):
 
 
 @get_execution_time
-def discussion_delete_reply(request, group_id):
+def discussion_delete_reply(request, group_id, node_id):
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     nodes_to_delete = json.loads(request.POST.get("nodes_to_delete", "[]"))
     
