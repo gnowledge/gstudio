@@ -869,7 +869,10 @@ def get_collection(request, group_id, node_id, stats_flag=False):
         # all_prior_node_ids.extend(list_of_leaf_node_ids)
         all_prior_node_ids = list(set(all_prior_node_ids))
         # print "\n\n len === ", len(all_prior_node_ids), all_prior_node_ids
-        completed_ids_list,incompleted_ids_list = get_course_completed_ids(all_prior_node_ids,list_of_leaf_node_ids)
+        completed_return_list = []
+        incompleted_return_list = []
+        completed_ids_list,incompleted_ids_list = get_course_completed_ids(all_prior_node_ids,list_of_leaf_node_ids,completed_return_list, incompleted_return_list)
+        completed_ids_list.extend(list_of_leaf_node_ids)
         # print "\n\n completed_ids_list --- ", len(completed_ids_list)
         # print "\n\n incompleted_ids_list --- ", len(incompleted_ids_list)
 

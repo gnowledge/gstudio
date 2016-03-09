@@ -4605,17 +4605,25 @@ def sublistExists(parent_list, child_list):
       return exists
     return False
 
-def get_course_completed_ids(list_of_all_ids,leaf_ids):
-    completed = leaf_ids
-    incompleted = []
-    all_nodes = node_collection.find({'_id': {'$in': list_of_all_ids}},{'name':1, 'collection_set':1, '_id': 1, 'member_of': 1,'created_at':1}).sort('created_at',-1)
+def get_course_completed_ids(list_of_all_ids,children_ids,return_completed_list,return_incompleted_list):
+    completed = return_completed_list
+    incompleted = return_incompleted_list
+    # children_ids_list = children_ids
+    children_ids_list = []
+    all_nodes = node_collection.find({'_id': {'$in': list_of_all_ids}},
+      {'name':1, 'collection_set':1, '_id': 1, 'member_of': 1,'created_at':1}).sort('created_at',-1)
+
     for eachnode in all_nodes:
       # print "\n eachnode.name --- ",eachnode.name , eachnode.member_of_names_list
-      if sublistExists(completed, eachnode.collection_set):
+      if sublistExists(children_ids, eachnode.collection_set):
         completed.append(eachnode._id)
+        children_ids_list.append(eachnode._id)
+        if eachnode._id in incompleted:
+          incompleted.remove(eachnode._id)
       else:
         incompleted.append(eachnode._id)
     # print "\n\n completed_ids_list 1--- ", completed
     # print "\n\n incompleted_ids_list1 --- ", incompleted
-
+    if children_ids_list:
+      get_course_completed_ids(list_of_all_ids,children_ids_list,completed,incompleted)
     return completed, incompleted
