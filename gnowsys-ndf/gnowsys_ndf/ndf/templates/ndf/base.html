@@ -92,7 +92,8 @@
 
         <main class="row">
           <!-- Start of sidebar section (main aside) -->
-          <aside class="medium-2 columns">
+          <!-- <aside class="medium-2 columns"> -->
+          <aside class='medium-{% firstof first_body_column 2 %} columns'>
             <div>
               <header>
                 {% block meta_content %}  {% endblock %} 
@@ -118,7 +119,8 @@
           <!-- End of related content -->
 
           <!-- Start of content section -->
-          <article class="medium-10 columns">
+          <!-- <article class="medium-10 columns"> -->
+          <article class="medium{% firstof first_body_column|default_if_none:'2'|safe|add:'-12' %} columns">
             <!-- The actual body content -->
             <!-- Url redirection -->
   
@@ -186,7 +188,9 @@
               '-webkit-border-radius': '10px', 
               '-moz-border-radius': '10px', 
               opacity: 1.0,
-              top: ($(window).height())/2 + 'px', left: '', right: '50px'
+              top: ($(window).height())/2 + 'px', left: '', right: '50px',
+              left: $(window).width()/2 + 'px',
+              transform: 'translate( -50%, -50%)'
             }
           });
         })

@@ -38,7 +38,7 @@
         <ul class="title-area">
           <li class="name">
             <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
-              <img src="{{site.LOGO}}">
+              <img  title="{{site.SITE_NAME}}" src="{{site.LOGO}}">
             </a></h1>
           </li>
           <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
@@ -79,7 +79,7 @@
                   <a
                   {% for mapk, mapv in nroer_menu.mapping.items %}
 
-                    {% if mapv %}
+                    {% if mapv in "Teachers, Schools, Interest Groups" %}
                       {% if each_sub_menu == mapk %}
                         href="/{{mapv}}"
                         {% if nroer_menu.sub_menu_selected == mapk %}
@@ -107,7 +107,8 @@
 
         </ul>
         <!-- -END of NROER level one menu -->
-      {% else %}
+      {% comment %}
+        
       {% if "CourseEventGroup" in group_object.member_of_names_list %}
       <ul class="left">
 
@@ -121,6 +122,7 @@
       {% else %}
 
       <ul class="left">
+       <ul class="left app-menus">
 
         <!-- Current group selector -->
         <li class="has-dropdown group">
@@ -171,6 +173,42 @@
       </ul>
       {% endif %}
       {% endif %}
+      {% endcomment %}
+
+       {% else %}
+
+      <ul class="left app-menus">
+
+        <!-- Current group selector -->
+        {% if user.is_authenticated %}
+          
+        <li>
+          <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'course' request.user.username %}">
+            {% trans 'MY COURSES' %}
+          </a>
+        </li>
+
+        {% comment %}
+        <li>
+          <a title="" class="{%if title == 'My Groups'%}active{%endif%}" href="{% url 'my_groups' request.user.username %}">
+            {% trans 'MY GROUPS' %}
+          </a>
+        </li>
+        {% endcomment %}
+          {% endif %}
+
+        <li class="group">
+          {# <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}"> #}
+          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore_courses' %}">
+            {% trans 'EXPLORE' %}
+          </a>
+        </li>
+      </ul>
+
+      {% endif %}
+
+
+
       <!-- {#% endcache %} -->
 
       <!-- Closes Left Nav section -->
@@ -240,6 +278,10 @@
         -->
 
         <li>
+
+           {# <a href="#" data-reveal-id="loginModal" id="login-button-medium">{% trans "Login to your clix account" %}</a> #}
+          {# <a href="#" data-reveal-id="loginModal" id="login-button-small">{% trans "Login" %}</a> #}
+
           <a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
             <i class="fi-key"></i>&nbsp; {% trans "Login" %}
           </a>
@@ -247,6 +289,17 @@
         {% endif %}
         </ul>
         <!-- Closes Right Nav section -->
+
+
+        <!-- Right Nav Section -->
+        <!-- <ul class="right">
+          <li>
+            <a href=""><i class="fa fa-bell"></i> Notice Board</a>
+          </li>
+        </ul>
+         -->
+        <!-- Closes Right Nav section -->
+
 
         <ul class="right">
           <li class="has-dropdown">
@@ -267,6 +320,17 @@
             </ul>
           </li>
         </ul>
+
+        
+        <!-- Right Nav Section -->
+        <ul class="right">
+          <li>
+            <a href="/help/"><i class="fa fa-info-circle"></i> Help</a>
+          </li>
+        </ul>
+
+        <!-- Closes Right Nav section -->
+
         </section>
 
       </nav>

@@ -1,5 +1,5 @@
 {% load simple_filters %}
-{% xextends "ndf/gbase.html" with first_body_column=0 %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
 
 {# {% extends "ndf/gbase.html" %} #}
 
@@ -65,7 +65,9 @@ list-style: none;
 <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
 <!-- orgitdown! skin -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
-<link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+
+<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css">
 
 {% endblock %}
 
