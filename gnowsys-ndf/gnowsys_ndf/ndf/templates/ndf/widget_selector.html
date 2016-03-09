@@ -256,7 +256,6 @@ HOW TO USE
   var sItems = $sa('#' + selectorWidgetID + ' .to-be-selected' + ' .item');
 
   var oneline_element = "{{oneline_element}}";
-  console.log(oneline_element)
   
   function removeTag(){
 
@@ -463,17 +462,14 @@ HOW TO USE
 
     var idToAppend = idToAppend || false;
     var hiddenInput = document.createElement('input');
-    console.log(hiddenInput)
     hiddenInput.type = 'hidden';
     hiddenInput.name = selectorWidgetFor;
     // hiddenInput.value = getSelectedValues(selectorWidgetFor);
-    // console.log(hiddenInput.value)
     if (oneline_element) {
       hiddenInput.value = JSON.stringify(getSelectedValues(selectorWidgetFor));
     } else {
       hiddenInput.value = getSelectedValues(selectorWidgetFor);
     }
-
 
     if (idToAppend) {
       // document.getElementById(idToAppend).appendChild(hiddenInput.value);

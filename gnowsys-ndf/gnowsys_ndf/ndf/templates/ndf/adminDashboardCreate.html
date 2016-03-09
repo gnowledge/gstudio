@@ -156,6 +156,7 @@
 </dl>
 </div>
 {# <input id="{{fields_name}}_type" type="hidden" name="{{fields_name}}" /> #}
+<!-- This input type creates hidden element for drawer_widget -->
 <input type="submit" name="submit" class="button" id="save-node-type" value="Submit">
 </form>
 <!-- {% if translate %}    -->
@@ -196,11 +197,11 @@
 		var rts = getSelValuesHiddenElement('relation_type_set','{{class_name}}');
 		var typ = getSelValuesHiddenElement('type_of','{{class_name}}');
 		var prn = getSelValuesHiddenElement('prior_node','{{class_name}}');
-		
-			<!--for(each in type_list){-->
-			<!--	eval(type_list[each] + "()");-->
-			<!--} -->
-			<!-- this code was used to fetch drawer_widget code and then eval it. -->
+		<!--Above code calls widget_selector  -->
+		<!--for(each in type_list){-->
+		<!--	eval(type_list[each] + "()");-->
+		<!--} -->
+		<!-- this code was used to fetch drawer_widget code and then eval it. -->
 
 		for(reqfields in required_fields){
 			if($("#definitionlist [name = "+required_fields[reqfields]+" ]").val()){
