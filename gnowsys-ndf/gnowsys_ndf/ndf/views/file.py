@@ -792,13 +792,13 @@ def submitDoc(request, group_id):
         tags = request.POST.get('tags', "")
         license = request.POST.get("License", "")
         source = request.POST.get("Source", "")
-        Audience = request.POST.get("audience", "")
+        Audience = request.POST.getlist("audience", "")
         fileType = request.POST.get("FileType", "")
         Based_url = request.POST.get("based_url", "")
         co_contributors = request.POST.get("co_contributors", "")
         map_geojson_data = request.POST.get('map-geojson-data')
         subject = request.POST.get("Subject", "")
-        level = request.POST.get("Level", "")
+        level = request.POST.getlist("Level", "")
 
         subject = '' if (subject=='< Not Sure >') else subject
         level = '' if (level=='< Not Sure >') else level

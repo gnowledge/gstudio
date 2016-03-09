@@ -1649,12 +1649,14 @@ def update_mobwrite_content_org(node_system):
 
 @get_execution_time
 def cast_to_data_type(value, data_type):
+    # print "\n\n\ninitial value and datatype",value,data_type
     '''
     This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
     '''
     # print "\n\t\tin method: ", value, " == ", data_type
 
-    value = value.strip()
+    if data_type != "list":
+      value = value.strip()
     casted_value = value
     if data_type == "unicode":
         casted_value = unicode(value)
@@ -1731,8 +1733,15 @@ def get_node_metadata(request, node, **kwargs):
             at = node_collection.one({"_type": "AttributeType", "name": atname})
 
             if at:
-
+                # print "\n\nfirst field_value datatype",at.data_type
+                if at.data_type == "list":
+                  field_value = request.POST.getlist(atname, "")
+                  # print "\n\nlist field value",field_value
+                else:
+                  field_value = request.POST.get(atname, "")
+                  # print "\n\nnon list field value",field_value
                 field_value = cast_to_data_type(field_value, at["data_type"])
+                # print "\n\n\n\n\n\n\n\n\n\n\nfield_value",field_value
                 if "is_changed" in kwargs:
                     # print "field value"
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
