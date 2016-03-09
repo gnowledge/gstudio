@@ -12,7 +12,7 @@
 
 {% block body_content %} 
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
-<form method="post" action="" class="{{class_name}}" name="{{class_name}}" id="{{class_name}}">
+<form method="post" action="" name="{{class_name}}" id="{{class_name}}">
 {% csrf_token %}
 {% if translate %}
 <div class="large-12 columns">
@@ -190,13 +190,13 @@
 	
 	$("form").submit(function(event) {
 		flag = 0;
-		var memb = getSelValuesHiddenElement('member_of','{{class_name}}-member_of');
-		var meta = getSelValuesHiddenElement('meta_type_set','{{class_name}}-meta_type_set');
-		var ats = getSelValuesHiddenElement('attribute_type_set','{{class_name}}-attribute_type_set');
-		var rts = getSelValuesHiddenElement('relation_type_set','{{class_name}}-relation_type_set');
-		var typ = getSelValuesHiddenElement('type_of','{{class_name}}-type_of');
-		var prn = getSelValuesHiddenElement('prior_node','{{class_name}}-prior_node');
-
+		var memb = getSelValuesHiddenElement('member_of','{{class_name}}');
+		var meta = getSelValuesHiddenElement('meta_type_set','{{class_name}}');
+		var ats = getSelValuesHiddenElement('attribute_type_set','{{class_name}}');
+		var rts = getSelValuesHiddenElement('relation_type_set','{{class_name}}');
+		var typ = getSelValuesHiddenElement('type_of','{{class_name}}');
+		var prn = getSelValuesHiddenElement('prior_node','{{class_name}}');
+		
 			<!--for(each in type_list){-->
 			<!--	eval(type_list[each] + "()");-->
 			<!--} -->
