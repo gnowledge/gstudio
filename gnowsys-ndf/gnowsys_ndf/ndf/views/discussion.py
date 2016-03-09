@@ -304,6 +304,7 @@ def discussion_delete_reply(request, group_id, node_id):
         
     return HttpResponse(json.dumps(deleted_replies))
 
+
 @login_required
 @get_execution_time
 def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
@@ -322,6 +323,7 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
     context_variables = {
             'group_id': group_id, 'groupid': group_id,'node': node_obj,'node_id':node_id
             }
+
     if request.method == "POST":
         content_val = request.POST.get("content_val", "")
         node_obj.content = content_val
@@ -337,5 +339,3 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
         context_variables['ckeditor_toolbar'] ="BasicToolbar" 
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
-def discussion (request):
-    return 
