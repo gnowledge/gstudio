@@ -866,10 +866,10 @@ def get_collection(request, group_id, node_id, stats_flag=False):
         for each_leaf_node in list_of_leaf_node_cur:
             test_replies_ids = []
             all_prior_node_ids.extend(dig_nodes_field(each_leaf_node,'prior_node',False, ['CourseSectionEvent', 'CourseSubSectionEvent', 'CourseUnitEvent'],test_replies_ids))
-        all_prior_node_ids.extend(list_of_leaf_node_ids)
+        # all_prior_node_ids.extend(list_of_leaf_node_ids)
         all_prior_node_ids = list(set(all_prior_node_ids))
         # print "\n\n len === ", len(all_prior_node_ids), all_prior_node_ids
-        completed_ids_list,incompleted_ids_list = get_course_completed_ids(all_prior_node_ids)
+        completed_ids_list,incompleted_ids_list = get_course_completed_ids(all_prior_node_ids,list_of_leaf_node_ids)
         # print "\n\n completed_ids_list --- ", len(completed_ids_list)
         # print "\n\n incompleted_ids_list --- ", len(incompleted_ids_list)
 

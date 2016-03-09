@@ -4605,13 +4605,13 @@ def sublistExists(parent_list, child_list):
       return exists
     return False
 
-def get_course_completed_ids(list_of_all_ids):
-    completed = []
+def get_course_completed_ids(list_of_all_ids,leaf_ids):
+    completed = leaf_ids
     incompleted = []
     all_nodes = node_collection.find({'_id': {'$in': list_of_all_ids}},{'name':1, 'collection_set':1, '_id': 1, 'member_of': 1,'created_at':1}).sort('created_at',-1)
     for eachnode in all_nodes:
       # print "\n eachnode.name --- ",eachnode.name , eachnode.member_of_names_list
-      if sublistExists(completed, eachnode.collection_set) and sublistExists(list_of_all_ids, eachnode.collection_set) or sublistExists(['Page', 'File', 'Image'],eachnode.member_of_names_list):
+      if sublistExists(completed, eachnode.collection_set):
         completed.append(eachnode._id)
       else:
         incompleted.append(eachnode._id)
