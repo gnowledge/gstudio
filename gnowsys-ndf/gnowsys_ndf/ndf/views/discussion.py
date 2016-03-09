@@ -346,10 +346,17 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
 
     if request.GET:
         node_id = request.GET.get('sourceObjDataId');
+    content_val = None
     if request.POST:
+        content_val = request.POST.get("content_val", "")
         node_id = request.POST.get('sourceObjDataId')
-    node_id = node_id.strip()
-    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    if node_id:
+        node_id = node_id.strip()
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        if content_val:
+            node_obj.content = content_val
+            node_obj.save()
+
     context_variables = {
             'group_id': group_id, 'groupid': group_id,'node': node_obj,'node_id':node_id
             }
