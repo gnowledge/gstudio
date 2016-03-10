@@ -5,7 +5,7 @@
         <div class="small-12 medium-9 columns creator-title">
             <i class="fi-torso"></i>
 
-            <span class="note-creator">{{notebook_obj.created_by|get_username|truncatechars:"10"}}</span>
+            <span class="note-creator" title="{{notebook_obj.created_by|get_username}}">{{notebook_obj.created_by|get_username|truncatechars:"10"}}</span>
             &#8226;
             <span class="note-creation-date">{{notebook_obj.created_at|date:"d M Y h:i A"}}</span>
         </div>

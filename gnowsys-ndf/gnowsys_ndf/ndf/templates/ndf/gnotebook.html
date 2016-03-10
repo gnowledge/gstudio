@@ -88,7 +88,7 @@
                     <div class="note {% if notebook_obj.pk == each_blog.pk %} active {% endif %}" id="{{each_blog.pk}}">
                         <div class="note-heading"> {{each_blog.name}} </div>
                         <div class="note-meta">
-                            <span>
+                            <span title="{{each_blog.created_by|get_username}}">
                                 {{each_blog.created_by|get_username|truncatechars:"10"}}
                             </span>
                             &#8226;
@@ -123,7 +123,7 @@
                     <div class="note {% if notebook_obj.pk == each_user_blog.pk %} active {% endif %}" id="{{each_user_blog.pk}}">
                         <div class="note-heading"> {{each_user_blog.name}} </div>
                         <div class="note-meta">
-                            <span>
+                            <span title="{{each_user_blog.created_by|get_username}}">
                                 {{each_user_blog.created_by|get_username|truncatechars:"10"}}
                             </span>
                             &#8226;
