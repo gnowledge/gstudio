@@ -510,6 +510,8 @@ GSTUDIO_WORKING_GAPPS = [
     u"Course", u"Observation", u"Event", u"Quiz"
 ]
 
+GSTUDIO_SECOND_LEVEL_HEADER = True
+
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
 # if not set by specific group
 # DON'T EDIT this variable here.
