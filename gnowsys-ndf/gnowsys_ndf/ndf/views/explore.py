@@ -96,7 +96,7 @@ def explore_basecourses(request):
     title = 'base courses'
 
     course_cur = node_collection.find({'member_of': gst_course._id}).sort('last_update', -1)
-    context_variable = {'title': title, 'doc_cur': course_cur, 'card': 'ndf/event_card.html',
+    context_variable = {'title': title, 'doc_cur': course_cur, 'card': 'ndf/simple_card.html',
                         'group_id': group_id, 'groupid': group_id}
     return render_to_response(
         "ndf/explore.html",
