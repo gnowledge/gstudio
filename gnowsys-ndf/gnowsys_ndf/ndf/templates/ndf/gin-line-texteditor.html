@@ -71,7 +71,7 @@
           <div clas="discussion-title row " >
              <div class="discussion-title-username">
               <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
-                {{ each_reply.username|truncatechars:12 }} 
+                {{ each_reply.username }} 
               </a>
                 <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
             </div>
@@ -153,6 +153,12 @@
          }
         $.ajax({
           url: "{% url 'create_discussion' group_id node.pk %}",
+          data: {
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+
+          type: "POST",
+
           success: function(data){
             data = JSON.parse(data);
             if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
@@ -181,7 +187,7 @@
                 });
 
 
-                $("#prior-node").val("{{ node.pk }}") // _id
+                $("#prior-node").val(data[1]) // _id
                 // $("input[data-id='{{ node.pk }}']").val("{{ node.pk }}") // _id
 
                 //$("#create-discussion").trigger("click");
@@ -400,7 +406,7 @@
         $.ajax({
 
           type: 'POST',
-          url: "{% url 'discussion_delete_reply' group_id %}",
+          url: "{% url 'discussion_delete_reply' group_id node.pk %}",
           data: {
               "csrfmiddlewaretoken": "{{ csrf_token }}",
               "nodes_to_delete": JSON.stringify(nodesToDeleteArr)

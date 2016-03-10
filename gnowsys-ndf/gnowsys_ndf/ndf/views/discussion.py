@@ -28,6 +28,8 @@ from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.views.moderation import create_moderator_task
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_thread_node, get_relation_value
+from gnowsys_ndf.ndf.views.methods import create_thread_for_node
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
@@ -73,44 +75,55 @@ def create_discussion(request, group_id, node_id):
 
     twist_st = node_collection.one({'_type':'GSystemType', 'name':'Twist'})
 
-    # node = node_collection.one({'_id': ObjectId(node_id)})
-    thread = node_collection.one({'_id': ObjectId(node_id)})
+    node = node_collection.one({'_id': ObjectId(node_id)})
+    thread = None
 
+    if "Twist" in node.member_of_names_list:
+        thread = node
+
+    if not thread:
+        thread_id = get_thread_node(node_id)
+        if thread_id:
+            thread = node_collection.one({'_id': ObjectId(thread_id)})
     # group = node_collection.one({'_id':ObjectId(group_id)})
     # thread = node_collection.one({"member_of": ObjectId(twist_st._id),"relation_set.thread_of.0": ObjectId(node._id)})
-    # print "\n thread is ---", thread._id
+    # print "\n thread is ---", thread
     # thread = node_collection.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
     
     # the following code will never be executed
     # not commenting it for now.
     if not thread:
-      
+      # print "\n\n Creating Thread"
+      thread_obj = create_thread_for_node(request, group_id, node)
+      # print "\n thread_obj===",thread_obj
       # retriving RelationType
       # relation_type = node_collection.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
       
       # Creating thread with the name of node
-      thread_obj = node_collection.collection.GSystem()
+      # thread_obj = node_collection.collection.GSystem()
 
-      thread_obj.name = unicode(node.name)
-      thread_obj.status = u"PUBLISHED"
+      # thread_obj.name = unicode(node.name)
+      # thread_obj.status = u"PUBLISHED"
 
-      thread_obj.created_by = int(request.user.id)
-      thread_obj.modified_by = int(request.user.id)
-      thread_obj.contributors.append(int(request.user.id))
+      # thread_obj.created_by = int(request.user.id)
+      # thread_obj.modified_by = int(request.user.id)
+      # thread_obj.contributors.append(int(request.user.id))
 
-      thread_obj.member_of.append(ObjectId(twist_st._id))
-      thread_obj.prior_node.append(ObjectId(node_id))
-      thread_obj.group_set.append(ObjectId(group_id))
+      # thread_obj.member_of.append(ObjectId(twist_st._id))
+      # thread_obj.prior_node.append(ObjectId(node_id))
+      # thread_obj.group_set.append(ObjectId(group_id))
       
-      thread_obj.save()
-
+      # thread_obj.save()
+      # print "\n\n Thread id ", thread_obj._id
       # creating GRelation
       # create_grelation(node_id, relation_type, twist_st)
-      response_data = [ "thread-created", str(thread_obj._id) ]
+      if thread_obj:
+          response_data = [ "thread-created", str(thread_obj._id) ]
 
       return HttpResponse(json.dumps(response_data))
 
     else:
+      # print "\n\n Thread id Thread-exist ", thread._id
       response_data =  [ "Thread-exist", str(thread._id) ]
 
       return HttpResponse(json.dumps(response_data))
@@ -135,6 +148,11 @@ def discussion_reply(request, group_id, node_id):
         group_object = node_collection.one({'_id': ObjectId(group_id)})
         prior_node = request.POST.get("prior_node_id", "")
         content_org = request.POST.get("reply_text_content", "") # reply content
+        node = node_collection.one({"_id": ObjectId(node_id)})
+        gs_type_node_id = get_relation_value(node_id,'thread_of')
+        # print "\n gs_type_node_id",gs_type_node_id
+
+        # print "\n\n node.name === ", node.member_of_names_list, node._id, node.name
 
         # process and save node if it reply has content  
         if content_org:
@@ -163,6 +181,10 @@ def discussion_reply(request, group_id, node_id):
             filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
             # reply_obj.content = org2html(content_org, file_prefix=filename)
             reply_obj.content = content_org
+            if gs_type_node_id:
+                reply_obj.origin.append({'prior_node_id_of_thread': gs_type_node_id})
+            if node_id:
+                reply_obj.origin.append({'thread_id': ObjectId(node_id)})
 
             # ==============================
             # try:
@@ -236,10 +258,11 @@ def discussion_reply(request, group_id, node_id):
 
             # ---------- mail/notification sending -------
             try:
-                node = node_collection.one({"_id": ObjectId(node_id)})
                 node_creator_user_obj = User.objects.get(id=node.created_by)
                 node_creator_user_name = node_creator_user_obj.username
-
+                if int(request.user.id) not in node.author_set:
+                    node.author_set.append(int(request.user.id))
+                    node.save()
                 site = Site.objects.get(pk=1)
                 site = site.name.__str__()
                 
@@ -292,16 +315,24 @@ def discussion_delete_reply(request, group_id, node_id):
     nodes_to_delete = json.loads(request.POST.get("nodes_to_delete", "[]"))
     
     reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
-
     deleted_replies = []
-    
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    # print "\n\nnode_obj.name", node_obj.name, node_obj.member_of_names_list,node_obj._id
+
     for each_reply in nodes_to_delete:
         temp_reply = node_collection.one({"_id": ObjectId(each_reply)})
         
         if temp_reply:
             deleted_replies.append(temp_reply._id.__str__())
             temp_reply.delete()
-        
+
+    replies_cur = node_collection.find({'origin.thread_id': ObjectId(node_id)})
+    # print "\n replies_cur",replies_cur.count()
+    if not replies_cur.count():
+        author_set_ids = node_obj.author_set
+        author_set_ids.remove(int(request.user.id))
+        node_obj.author_set = author_set_ids
+        node_obj.save()
     return HttpResponse(json.dumps(deleted_replies))
 
 
@@ -316,26 +347,26 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
 
     if request.GET:
         node_id = request.GET.get('sourceObjDataId');
+    content_val = None
     if request.POST:
+        content_val = request.POST.get("content_val", "")
         node_id = request.POST.get('sourceObjDataId')
-    node_id = node_id.strip()
-    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    if node_id:
+        node_id = node_id.strip()
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        if content_val:
+            node_obj.content = content_val
+            node_obj.save()
+
     context_variables = {
             'group_id': group_id, 'groupid': group_id,'node': node_obj,'node_id':node_id
             }
 
-    if request.method == "POST":
-        content_val = request.POST.get("content_val", "")
-        node_obj.content = content_val
-        node_obj.save()
-        template = 'ndf/gin-line-texteditor.html'
-        context_variables['no_discussion'] = True
-        
-    else:
-        template = 'ndf/html_editor.html'
-        context_variables['var_name'] = "content_org",
-        context_variables['var_value'] = node_obj.content
-        context_variables['node_id'] = node_obj._id
-        context_variables['ckeditor_toolbar'] ="BasicToolbar" 
+    template = 'ndf/html_editor.html'
+    context_variables['var_name'] = "content_org",
+    context_variables['var_value'] = node_obj.content
+    context_variables['node_id'] = node_obj._id
+    context_variables['ckeditor_toolbar'] ="BasicToolbar" 
+
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
