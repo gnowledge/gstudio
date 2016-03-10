@@ -25,3 +25,262 @@
     height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
   }
 }
+
+
+
+#top-headers {
+
+  padding-bottom: 0em;
+
+  #first-header.top-bar {
+
+    background-color: #fff !important;
+    margin: 0px auto;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0 , 0.4);
+
+    &.expanded {
+      .title-area {
+        background: $ghost;
+      }
+    }
+
+    .title-area {
+      height: 4em;
+
+      img {
+        height: 45px;
+      }
+
+      a{
+        &:hover{
+          // background-color: scale-color($topbar-bg-color, $lightness: 5%);
+          //box-shadow: inset 0px 100px 50px #fff;
+          // box-shadow: inset 0px 100px 50px scale-color($theme-color-invert, $lightness: 10%);
+          // transition: 0.8s all;
+        }
+      }
+    }
+
+
+    .top-bar-section {
+      #login-button-medium {
+        text-decoration: underline;
+        color: blue !important;
+      }
+
+      .app-menus li a{
+        font-weight: 600;
+      }
+
+      .has-dropdown > a:after {
+        border-color: #000000 rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) !important;
+      }
+
+      ul.dropdown {
+        background: #fff !important;
+        li input[type=submit] {
+          height: 3em;
+          width: 8em;
+        }
+      }
+
+      @media only screen and (max-width: 40em){
+        #login-button-medium {
+          display: none;
+
+          &:hover {
+            background: inherit;
+          }
+        }
+      }
+
+      @media only screen and (min-width: 40.063em) {
+        ul {
+          li:hover {
+            background: inherit;
+          }
+        }
+
+        #login-button-small {
+          display: none;
+        }
+      }
+    }
+
+    .top-bar-section li a.active:not(.button){ color: #ececec !important; }
+
+    .top-bar-section li a:not(.button), .top-bar-section li {
+        // background-color: scale-color($topbar-bg-color, $lightness: 10%);
+        background-color: inherit !important;
+        color: #333 !important;
+        font-weight: 600;
+
+        &:hover {
+            background: $theme-color;
+            color: white !important;
+        }
+    }
+
+
+    /*.top-bar-section li a:not(.button):hover, .top-bar-section li:not(.has-form):hover {
+        background-color: scale-color($theme-color-invert, $lightness: 10%) !important;
+        color: #ececec;
+        // background-color: #E1E1E1;
+    }*/
+  }
+
+
+  #group-level-header{
+
+    opacity: 0.9;
+    background-color: #E1E1E1 !important;
+
+    &:hover{
+      opacity: 1;
+      transition: 0.1s all;
+      box-shadow: 0px 2px 3px #E1E1E1 !important;
+    }
+
+    #group-apps{
+
+      .back-btn.fi-play:before{
+        transform: rotate( 180deg );
+      }
+    }
+
+    #second-header.top-bar {
+      background-color: #fafafa;
+      //border-top: solid thin gray;
+      height: 52px;
+      span{
+        font-size: 1em!important;
+      }
+
+
+      img{
+
+        height:45px;
+        width:50px;
+        //margin-left: -20px!important;
+      }
+      // &:hover{
+      //     box-shadow: inset 0px 101px 50px #E1E1E1;
+      //     transition: 0.8s all;
+      // }
+
+      .top-bar-section li.active a:not(.button), .top-bar-section li.active{
+        background-color: #fafafa !important;
+        color: #000;
+        border-bottom: solid 1px gray !important;
+      }
+
+      .top-bar-section li.active a:not(.button):hover, .top-bar-section li.active:hover{
+        background-color: scale-color($theme-color-invert, $lightness: 10%) !important;
+      }
+
+      .top-bar-section li.active:not(.has-form) > a:not(.button){
+          background-color: scale-color($theme-color-invert, $lightness: 15%);
+          // background-color: #fafafa
+      }
+
+      .top-bar-section li a:not(.button), .top-bar-section li {
+          // background-color: scale-color($topbar-bg-color, $lightness: 10%);
+          background-color: #fafafa;
+          color: gray;
+          // line-height: 49px;
+      }
+
+      .top-bar-section li a:not(.button):hover, .top-bar-section li:not(.has-form):hover {
+          background-color: scale-color($theme-color-invert, $lightness: 10%);
+          color: #fff;
+          // background-color: #E1E1E1;
+      }
+    }
+  }
+
+  ul.dropdown{
+    box-shadow: 0px 2px 5px black;
+    opacity: 1;
+  }
+
+  #search_text {
+    border-bottom: solid thin #E1E1E1;
+    background-color: #fafafa;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    padding: none !important;
+    /*color: #fff !important;*/
+    height: inherit;
+    box-shadow: none;
+    top: 10px;
+
+    &:focus{
+      border-bottom-color: #2b2c2d;
+      transition: 1s ease-out;
+    }
+  }
+
+  #search-submit{
+    background-color: #fafafa;
+    // color: gray;
+    top: 10px;
+    position: absolute;
+    left: -30px;
+    opacity: 0.3;
+    color: black;
+  }
+
+  #search-submit:hover {
+    opacity: 1;
+    color: white;
+    background-color: gray;
+    transition: 0.8s ease-out;
+  }
+
+  ul.title-area a{
+    color: $oil !important;
+        .user-heading {
+            font-weight: bolder;
+            font-size: 23px;
+            color: #BFBFBF !important;
+            line-height: 1.8em;
+        }
+
+        &:hover{
+        // background-color: scale-color($topbar-bg-color, $lightness: 5%);
+        //box-shadow: inset 0px 75px 50px #cccccc;
+        //color: #black;
+        //transition: 0.8s all;
+    }
+
+  }
+
+//     div.two-nav-container{
+//         padding: 0;
+//     }
+
+//     ul.dropdown{
+//         box-shadow: 0px 2px 5px black;
+//     }
+
+//     a.logo{
+//         height: 101px;
+
+//         img{
+//           margin: 10% auto;
+//           // height: 100px;
+//           display: block;
+//           // width: 100%;
+//           // padding: 3px;
+//         }
+
+//         &:hover{
+//             // background-color: scale-color($topbar-bg-color, $lightness: 5%);
+//             box-shadow: inset 0px 101px 50px #222;
+//             transition: 0.8s all;
+//         }
+//     }
+
+}
+

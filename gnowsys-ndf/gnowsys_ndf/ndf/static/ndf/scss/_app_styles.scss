@@ -194,10 +194,14 @@ body{
 #top-headers {
 
   margin-bottom: 0.5rem;
+  // padding-bottom: 0em;   // khaal
 
   #first-header.top-bar {
 
     background-color: #3e3e3e;
+    // background-color: #fff;        // khaal
+    // margin: 0px auto;              // khaal
+    // box-shadow: 0px 2px 5px rgba(0, 0, 0 , 0.4);    // khaal
 
     .title-area a{
 
@@ -681,7 +685,7 @@ article{
     z-index: 200;
 
     b{
-      font-family:  Georgia, Serif;
+      // font-family:  Georgia, Serif;
     }
   }
 
@@ -820,7 +824,7 @@ article{
   }
 
   section.content{
-    background-color:white;
+    // background-color:white;
     border: 1px solid #eee;
 }
 
@@ -1354,12 +1358,135 @@ aside#help{
   font-size: small;
   height: 2rem;
   }
-
-
-
-
-
 /* End Simple Card CSS*/
+
+
+
+
+// /* Simple  Card from khaal branch CSS*/
+// .scard-container {
+//     display: inline-block;
+//     margin-left: 50%;
+//     position: relative;
+//     transform: translate(-50%);
+//     border-radius: 5px;
+//     box-shadow: 0px 0px 9px rgba(0, 0, 0, 0.2);
+//     background-color: #fafafa;
+
+//     &:hover{
+//         box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
+//         transition: box-shadow 0.5s ease;
+//     }
+// }
+// .scard {
+//     background: #FFF;
+//     padding: 0px;
+//     overflow: hidden;
+//     width:  15em;
+//     height: 13em;
+//     border-radius: 5px 5px 0px 0px;
+//     margin: 0px auto;
+//     cursor: pointer;
+
+//      /*&:hover{
+//         box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
+//         transition: box-shadow 0.5s ease;
+//     }*/
+//     .scard-image {
+//           //height: 100%;
+//           background-color: #FFF;
+
+//           img  {
+//               //height: 100%;
+//               margin: 0px auto;
+//               width: 80%;
+//               display: block;
+//           }
+
+//         i {
+//             width : 80%;
+//             font-size: 7rem;
+//             opacity: 0.75;
+//             display: block;
+//             margin: -15px auto;
+//             text-align: center;
+//             color: gray;
+//             font-family: "foundation-icons";
+//             font-style: normal;
+//             font-variant: normal;
+//             text-transform: none;
+//             text-decoration: inherit;
+//         }
+
+//         i.common-icon:before{
+//            content: "\f1fb";
+//         }
+//         i.file:before {
+//             content: "\f18e";
+//         }
+//         i.page:before {
+//             content: "\f18e";
+//         }
+//         i.collection:before {
+//             content: "\f18a";
+//         }
+//         i.documents:before {
+//             content: "\f18b";
+//         }
+//         i.pdf:before {
+//             content: "\f18b";
+//         }
+//         i.text:before {
+//             content: "\f18e";
+//         }
+//         i.interactives:before {
+//             content: "\f1b2";
+//         }
+//         i.ebooks:before {
+//             content: "\f11e";
+//         }
+//         i.images:before {
+//             content: "\f125";
+//         }
+//         i.audios:before, i.audio:before {
+//             content: "\f17b";
+//         }
+//         i.videos:before, i.video:before {
+//             content: "\f20e";
+//         }
+//     }
+// }
+// /*float:left;*/
+// .scard-footer {
+//   border-radius: 0px 0px 5px 5px;
+// }
+
+// .scard-content {
+//     height: 3em;
+//     padding: 0.4em 1em;
+//     overflow: hidden;
+//     line-height: 0.7em;
+//     border-radius: 0px 0px 5px 5px;
+//     margin: 0px auto;
+//     cursor: pointer;
+//     text-align: left;
+//     border-top: 1px solid #D4D3D3;
+
+//   /*&:hover{
+//       box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.16), 0 2px 10px 1px rgba(0, 0, 0, 0.12);
+//       transition: box-shadow 0.5s ease;
+//   }*/
+//   .scard-title{
+//       font-size: 14px;
+//       color: #565656;
+//       text-align: center;
+//       vertical-align: top;
+//       line-height: 1.3em;
+// }
+// }
+// /* END of Simple Card from khaal branch CSS*/
+
+
 
 /* Customized Off-Canvas */
 #help-canvas-menu {
@@ -1551,7 +1678,7 @@ aside#help{
       box-shadow: 0px -25px 25px -20px rgb(128, 128, 128) inset;
       text-transform: uppercase;
       text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
-      font-family: Open Sans Bold;
+      // font-family: Open Sans Bold;
     }
 
     img {
@@ -3422,7 +3549,41 @@ course-title{
     height: 2rem;
   }
 }
-
-
-
 /* End Course/events Card CSS*/
+
+
+/* Landing page */
+.landing_page {
+  text-align: center;
+
+  h2 {
+    color: #A0148E;
+    font-weight: 600;
+  }
+  .landing-page-text {
+    color: #6153ae;
+
+    p {
+      font-size: 18px;
+    }
+  }
+  .orbit-container {
+    width: 70%;
+    margin: 0px auto;
+
+    img {
+      height: 400px;
+      width: 100%;
+    }
+
+    .orbit-timer {
+      left: -10000px;
+      top: auto;
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      width: 1px;
+    }
+  }
+}
+/* END of Landing page */
