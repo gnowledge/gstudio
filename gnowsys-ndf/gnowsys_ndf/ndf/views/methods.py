@@ -1649,12 +1649,14 @@ def update_mobwrite_content_org(node_system):
 
 @get_execution_time
 def cast_to_data_type(value, data_type):
+    # print "\n\n\ninitial value and datatype",value,data_type
     '''
     This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
     '''
     # print "\n\t\tin method: ", value, " == ", data_type
 
-    value = value.strip()
+    if data_type != "list":
+      value = value.strip()
     casted_value = value
     if data_type == "unicode":
         casted_value = unicode(value)
@@ -1731,8 +1733,15 @@ def get_node_metadata(request, node, **kwargs):
             at = node_collection.one({"_type": "AttributeType", "name": atname})
 
             if at:
-
+                # print "\n\nfirst field_value datatype",at.data_type
+                if at.data_type == "list":
+                  field_value = request.POST.getlist(atname, "")
+                  # print "\n\nlist field value",field_value
+                else:
+                  field_value = request.POST.get(atname, "")
+                  # print "\n\nnon list field value",field_value
                 field_value = cast_to_data_type(field_value, at["data_type"])
+                # print "\n\n\n\n\n\n\n\n\n\n\nfield_value",field_value
                 if "is_changed" in kwargs:
                     # print "field value"
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
@@ -4206,97 +4215,99 @@ def create_thread_for_node(request, group_id, node):
         * Success - True/False
 
 	"""
-	if request.method == "POST":
-		from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
-		# release_response_status = False
-		# thread_interaction_type_status = False
-		# thread_start_time_status = False
-		# thread_end_time_status = False
-		has_thread_status = False
-		if get_relation_value(node._id,"has_thread") != None:
-			has_thread_status = True
+	try:
+		if request.method == "POST":
+			from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+			# release_response_status = False
+			# thread_interaction_type_status = False
+			# thread_start_time_status = False
+			# thread_end_time_status = False
+			has_thread_status = False
+			if get_relation_value(node._id,"has_thread") != None:
+				has_thread_status = True
 
-		release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
-		interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
-		start_time = request.POST.get("thread_start_date", '')
-		if start_time:
-			start_time = datetime.strptime(start_time, "%d/%m/%Y")
-		end_time = request.POST.get("thread_close_date", '')
-		if end_time:
-			end_time = datetime.strptime(end_time, "%d/%m/%Y")
+			release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
+			interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
+			start_time = request.POST.get("thread_start_date", '')
+			if start_time:
+				start_time = datetime.strptime(start_time, "%d/%m/%Y")
+			end_time = request.POST.get("thread_close_date", '')
+			if end_time:
+				end_time = datetime.strptime(end_time, "%d/%m/%Y")
 
 
-		twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
-		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
-		has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
-		if thread_obj:
-			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
-			thread_obj.reload()
-			# print "\n\n Found old model thread node existing"
-		else:
-			thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
-			# print "\n\n Found updated thread node existing"
-		if thread_obj:
-			if thread_obj.name != u"Thread of "+ unicode(node.name):
-				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
+			twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
+			thread_obj = node_collection.find_one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
+			has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+			if thread_obj:
+				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
 				thread_obj.reload()
-				# print "\n\n thread_obj found -- name update if needed"
-		else:
-			# print "\n\n Creating new thread node"
-			thread_obj = node_collection.collection.GSystem()
+				print "\n\n Found old model thread node existing"
+			else:
+				thread_obj = node_collection.find_one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
+				print "\n\n Found updated thread node existing"
+			if thread_obj:
+				if thread_obj.name != u"Thread of "+ unicode(node.name):
+					node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
+					thread_obj.reload()
+					print "\n\n thread_obj found -- name update if needed"
+			else:
+				print "\n\n Creating new thread node"
+				thread_obj = node_collection.collection.GSystem()
 
-			thread_obj.name = u"Thread of " + unicode(node.name)
-			thread_obj.status = u"PUBLISHED"
+				thread_obj.name = u"Thread of " + unicode(node.name)
+				thread_obj.status = u"PUBLISHED"
 
-			thread_obj.created_by = int(request.user.id)
-			thread_obj.modified_by = int(request.user.id)
-			thread_obj.contributors.append(int(request.user.id))
-			thread_obj.prior_node.append(node._id)
-			thread_obj.member_of.append(ObjectId(twist_gst._id))
-			# thread_obj.prior_node.append(ObjectId(node._id))
-			thread_obj.group_set.append(ObjectId(group_id))
-			thread_obj.save()
-		'''
-		if thread_obj:
-			if get_attribute_value(thread_obj._id,"release_response") != "":
-				release_response_status = True
-			if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
-				thread_interaction_type_status = True
-			if get_attribute_value(thread_obj._id,"start_time") != "":
-				thread_start_time_status = True
-			if get_attribute_value(thread_obj._id,"end_time") != "":
-				thread_end_time_status = True
-		print "\n thread_end_time_status---",thread_end_time_status
-		print "\n thread_start_time_status---",thread_start_time_status
-		print "\n release_response_status---",release_response_status
-		print "\n thread_interaction_type_status---",thread_interaction_type_status
-		print "\n has_thread_status---",has_thread_status
-		'''
-		if not has_thread_status:
-			# creating GRelation
-			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
-			node.reload()
+				thread_obj.created_by = int(request.user.id)
+				thread_obj.modified_by = int(request.user.id)
+				thread_obj.contributors.append(int(request.user.id))
+				thread_obj.prior_node.append(node._id)
+				thread_obj.member_of.append(ObjectId(twist_gst._id))
+				# thread_obj.prior_node.append(ObjectId(node._id))
+				thread_obj.group_set.append(ObjectId(group_id))
+				thread_obj.save()
+			'''
+			if thread_obj:
+				if get_attribute_value(thread_obj._id,"release_response") != "":
+					release_response_status = True
+				if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
+					thread_interaction_type_status = True
+				if get_attribute_value(thread_obj._id,"start_time") != "":
+					thread_start_time_status = True
+				if get_attribute_value(thread_obj._id,"end_time") != "":
+					thread_end_time_status = True
+			print "\n thread_end_time_status---",thread_end_time_status
+			print "\n thread_start_time_status---",thread_start_time_status
+			print "\n release_response_status---",release_response_status
+			print "\n thread_interaction_type_status---",thread_interaction_type_status
+			print "\n has_thread_status---",has_thread_status
+			'''
+			if not has_thread_status:
+				# creating GRelation
+				gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
+				node.reload()
+				thread_obj.reload()
+				print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
+				print "\n\n node", node._id, "--", node.relation_set
+			if release_response_val:
+				rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
+				release_response_val = eval(release_response_val)
+				create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+			if interaction_type_val:
+				thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
+				create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+
+			if start_time and end_time:
+				start_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'start_time'})
+				end_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'end_time'})
+				create_gattribute(thread_obj._id, start_time_at, start_time)
+				create_gattribute(thread_obj._id, end_time_at, end_time)
+
 			thread_obj.reload()
-			# print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
-			# print "\n\n node", node._id, "--", node.relation_set
-		if release_response_val:
-			rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
-			release_response_val = eval(release_response_val)
-			create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
-		if interaction_type_val:
-			thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
-			create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
-
-		if start_time and end_time:
-			start_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'start_time'})
-			end_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'end_time'})
-			create_gattribute(thread_obj._id, start_time_at, start_time)
-			create_gattribute(thread_obj._id, end_time_at, end_time)
-
-		thread_obj.reload()
-		# print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
-		return thread_obj
-
+			print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
+			return thread_obj
+	except Exception as e:
+		print "000\n\n",e
 def node_thread_access(group_id, node):
     """
       Accepts:
@@ -4490,6 +4501,7 @@ def replicate_resource(request, node, group_id):
             new_gsystem.member_of = node.member_of
         new_gsystem.modified_by = int(request.user.id)
         new_gsystem.created_by = int(request.user.id)
+        new_gsystem.prior_node = node.prior_node
         new_gsystem.contributors.append(int(request.user.id))
         new_gsystem.tags = node.tags
         new_gsystem.content_org = node.content_org
@@ -4562,28 +4574,56 @@ def dig_nodes_field(parent_node, field_name="collection_set", only_leaf_nodes=Fa
     result = dig_nodes_field(node_obj,'collection_set',True,empty_list)/
     result = dig_nodes_field(node_obj,'collection_set',True,test_list,['Page'])/
     result = dig_nodes_field(node_obj,'collection_set',True,test_list,['Page','File])
-
-
   '''
   # print "\n\n Node name -- ", parent_node.name, "-- ",parent_node[field_name]
   for each_id in parent_node[field_name]:
     if each_id not in list_of_node_ids:
       each_obj = node_collection.one({'_id': ObjectId(each_id)})
-      # print "\n each_obj--",each_obj._id, " -- ", each_obj.name, " - - ", each_obj.member_of_names_list, "=== ", member_of
+      # print "each_obj--",each_obj._id, " -- ", each_obj.name, " - - ", each_obj.member_of_names_list, "=== ", member_of
       member_of_match = True
       if member_of:
+        member_of_match = False
         member_of_match = [each_ele for each_ele in member_of if each_ele in each_obj.member_of_names_list]
-      # print "\n\nmember_of_match",member_of_match
+        # print "member_of_match",member_of_match
       if member_of_match and each_id not in list_of_node_ids:
-        # print "\n File Found", len(each_obj[field_name])
+        # print "File Found", len(each_obj[field_name])
         if only_leaf_nodes:
           if not each_obj[field_name]:
             list_of_node_ids.append(each_id)
         else:
             list_of_node_ids.append(each_id)
-
       dig_nodes_field(each_obj, field_name,only_leaf_nodes, member_of, list_of_node_ids)
 
-    # print "\n len(list_of_node_ids) -- ",len(list_of_node_ids)
+  # print "\n len(list_of_node_ids) -- ",len(list_of_node_ids)
   return list_of_node_ids
-    
+
+def sublistExists(parent_list, child_list):
+    # print "\n parent_list == ",parent_list
+    # print "\n child_list == ",child_list
+    if parent_list and child_list:
+      exists = all(each_item in parent_list for each_item in child_list)
+      return exists
+    return False
+
+def get_course_completed_ids(list_of_all_ids,children_ids,return_completed_list,return_incompleted_list):
+    completed = return_completed_list
+    incompleted = return_incompleted_list
+    # children_ids_list = children_ids
+    children_ids_list = []
+    all_nodes = node_collection.find({'_id': {'$in': list_of_all_ids}},
+      {'name':1, 'collection_set':1, '_id': 1, 'member_of': 1,'created_at':1}).sort('created_at',-1)
+
+    for eachnode in all_nodes:
+      # print "\n eachnode.name --- ",eachnode.name , eachnode.member_of_names_list
+      if sublistExists(children_ids, eachnode.collection_set):
+        completed.append(eachnode._id)
+        children_ids_list.append(eachnode._id)
+        if eachnode._id in incompleted:
+          incompleted.remove(eachnode._id)
+      else:
+        incompleted.append(eachnode._id)
+    # print "\n\n completed_ids_list 1--- ", completed
+    # print "\n\n incompleted_ids_list1 --- ", incompleted
+    if children_ids_list:
+      get_course_completed_ids(list_of_all_ids,children_ids_list,completed,incompleted)
+    return completed, incompleted

@@ -147,7 +147,10 @@ def create_edit(request, group_id, node_id=None):
                     }
     if node_id:
         course_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
-        logo_img_node, grel_id = get_relation_value(node_id,'has_logo')
+        logo_img_node_grel_id = get_relation_value(node_id,'has_logo')
+        if logo_img_node_grel_id:
+            logo_img_node = logo_img_node_grel_id[0]
+            grel_id = logo_img_node_grel_id[1]
 
     else:
         course_node = node_collection.collection.GSystem()
@@ -1522,6 +1525,11 @@ def save_resources(request, group_id):
 
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
         cu_new.reload()
+        res_cur = node_collection.find({'_id': {'$in': list_of_res_ids}})
+        for eachres in res_cur:
+            if cu_new._id not in eachres.prior_node:
+                eachres.prior_node.append(cu_new._id)
+                eachres.save()
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
 
@@ -2120,12 +2128,12 @@ def course_about(request, group_id):
     if start_date and last_date:
       start_date = start_date.date()
       last_date = last_date.date()
-    from datetime import  timedelta
-    start_day = (start_date - timedelta(days=start_date.weekday()))
-    end_day = (last_date - timedelta(days=last_date.weekday()))
+      from datetime import  timedelta
+      start_day = (start_date - timedelta(days=start_date.weekday()))
+      end_day = (last_date - timedelta(days=last_date.weekday()))
 
-    # print 'Weeks:', (end_day - start_day).days / 7
-    weeks_count = (end_day - start_day).days / 7
+      # print 'Weeks:', (end_day - start_day).days / 7
+      weeks_count = (end_day - start_day).days / 7
     
     template = 'ndf/gcourse_event_group.html'
 

@@ -496,22 +496,26 @@ def get_metadata_values():
 
 @get_execution_time
 @register.assignment_tag
-def get_attribute_value(node_id, attr):
+def get_attribute_value(node_id, attr,get_data_type=False):
 	try:
 		attr_val = ""
 		node_attr = None
 		if node_id:
 			node = node_collection.one({'_id': ObjectId(node_id) })
 			gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr) })
-	        # print "node: ",node.name,"\n"
-	        # print "attr: ",attr,"\n"
-
+			# print "node: ",node.name,"\n"
+			# print "attr: ",gattr.name,"\n"
+			if get_data_type:
+				data_type = gattr.data_type
 			if node and gattr:
 				node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})	
 
+		# print "\n\n node_attr==",node_attr
 		if node_attr:
 			attr_val = node_attr.object_value
 		# print "attr_val: ",attr_val,"\n"
+		if get_data_type:
+			return {'value': attr_val, 'data_type': data_type}
 		return attr_val
 	except:
 		return attr_val
@@ -3116,7 +3120,7 @@ def get_all_subsections_of_course(group_id, node_id):
 	if node_obj.collection_set:
 		for each_node in node_obj.collection_set:
 			each_node_obj = node_collection.one({'_id': ObjectId(each_node)})
-			if "CourseSectionEvent" in each_node_obj.member_of_names_list:
+			if each_node_obj and "CourseSectionEvent" in each_node_obj.member_of_names_list:
 				if each_node_obj.collection_set:
 					for each_node in each_node_obj.collection_set:
 						each_css = node_collection.one({'_id': ObjectId(each_node)})
@@ -3280,7 +3284,6 @@ def get_user_course_groups(user_id):
 
 	for each_course in all_user_groups:
 		each_course.course_status_field = get_event_status(each_course)
-
 		all_courses_obj_grouped[each_course.course_status_field].append(each_course)
 		# all_courses_obj_grouped['all'].append(each_course)
 

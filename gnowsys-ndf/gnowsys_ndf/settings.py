@@ -12,7 +12,7 @@ TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
 
-LANGUAGES = (('en', 'English'), ('hi', 'Hindi'))
+LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'))
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
     ('pi','Pali'), ('raj','Rajasthani'), ('gu','Gujarati'),
