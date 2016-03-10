@@ -341,9 +341,12 @@
 
 
       <!-- start of second nav  or group level header-->
+      {% if site.SECOND_LEVEL_HEADER %}
+
       {% get_sg_member_of group_object.pk as list_of_sg_member_of %}
       {% if "CourseEventGroup" not in group_object.member_of_names_list and "ProgramEventGroup" not in list_of_sg_member_of or site.SITE_NAME == "NROER" %}
       {% if not landing_page %}
+      {% if not is_ac_url %}
 
 
       <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %}" id="group-level-header">
@@ -492,6 +495,8 @@
       </div>
       {% endif %} <!-- landing page if -->
 
+      {% endif %}
+      {% endif %}
       {% endif %}
       <!-- end of second nav -->
 
