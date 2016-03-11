@@ -122,7 +122,7 @@
     <!-- suppy no_description=True for not having description -->
     {% if not no_description %}
       <div class="scard-desc" title="{{resource.content_org}}">
-       {{resource.content_org|safe|default_if_none:"Add some description."|truncatechars:75}}
+       {{resource.content_org|safe|default_if_none:"Add some description."|truncatechars:50}}
       </div>
     {% endif %}
 </div>

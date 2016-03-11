@@ -3214,15 +3214,15 @@ def get_event_status(node):
 		start_enroll_val = get_attribute_value(node._id,"start_enroll")
 		end_enroll_val = get_attribute_value(node._id,"end_enroll")
 		from datetime import datetime
-        curr_date_time = datetime.now()
-        if start_time_val and end_time_val and start_enroll_val and end_enroll_val:
-	        if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
-	        or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
-	            status_msg = "in-progress"
-	        elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
-	            status_msg = "upcoming"
-	        elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
-	            status_msg = "completed"
+		curr_date_time = datetime.now()
+		if start_time_val and end_time_val and start_enroll_val and end_enroll_val:
+			if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
+			or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
+				status_msg = "in-progress"
+			elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
+				status_msg = "upcoming"
+			elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
+				status_msg = "completed"
 	return status_msg
 
 
