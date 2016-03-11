@@ -5,8 +5,8 @@
 
 <div id="reveal-{{node.pk}}" class="reveal-modal" data-reveal >
     <div class="row gmodal-toolbar">
-        <div class="small-2 columns file-name">
-            {{node.name}}
+        <div class="small-8 columns file-name" title="{{node.name}}">
+            {% firstof node.altnames node.name %}
         </div>
         <div class="small-4 columns gmodal-actions">
             {% comment %}
@@ -96,7 +96,7 @@
                         <a>Close</a>
                     </div>
 
-                    <h5>{{node.name}}</h5>
+                    <h5>{% firstof node.altnames node.name %}</h5>
                     <hr>
                     Date: {{node.created_at}}<br>
                     Uploader: {{node.created_by|get_username}}<br>
