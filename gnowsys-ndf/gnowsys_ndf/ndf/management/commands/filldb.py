@@ -628,18 +628,27 @@ def create_rts(factory_relation_types,user_id):
           member_of_type_id = member_of_type._id
 
       for s in value['subject_type']:
-        node_s = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name': s}]})
-        if node_s is None:
-          node_s = node_collection.one({'$and':[{'_type': u'MetaType'},{'name': s}]})
-          
-        subject_type_id_list.append(node_s._id)
+        if s == "*":
+          node_s = node_collection.find({'_type': u'GSystemType'},{'_id':1})
+          subject_type_id_list = [each_node._id for each_node in node_s]
+
+        else:
+          node_s = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name': s}]})
+          if node_s is None:
+            node_s = node_collection.one({'$and':[{'_type': u'MetaType'},{'name': s}]})
+          subject_type_id_list.append(node_s._id)
        
       for rs in value['object_type']:
-        node_rs = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name': rs}]})
-        if node_rs is None:
-          node_rs =node_collection.one({'$and':[{'_type': u'MetaType'},{'name': rs}]})
-  
-        object_type_id_list.append(node_rs._id)
+        if rs == "*":
+          node_s = node_collection.find({'_type': u'GSystemType'},{'_id':1})
+          object_type_id_list = [each_node._id for each_node in node_s]
+
+        else:
+          node_rs = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name': rs}]})
+          if node_rs is None:
+            node_rs =node_collection.one({'$and':[{'_type': u'MetaType'},{'name': rs}]})
+    
+          object_type_id_list.append(node_rs._id)
       
       if "object_cardinality" in value:
         object_cardinality = value["object_cardinality"]
