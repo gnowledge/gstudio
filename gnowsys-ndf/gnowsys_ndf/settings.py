@@ -411,7 +411,7 @@ INSTALLED_APPS = (
     'djangoratings',
     'notification',
     'pagination',
-    'captcha',	
+    'captcha',
     # 'gnowsys_ndf.mobwrite',       #textb
     # 'south',                      #textb
     # 'django_extensions',          #textb
@@ -510,6 +510,10 @@ GSTUDIO_WORKING_GAPPS = [
     u"Course", u"Observation", u"Event", u"Quiz"
 ]
 
+GSTUDIO_SECOND_LEVEL_HEADER = True
+GSTUDIO_MY_GROUPS_IN_HEADER = True
+GSTUDIO_MY_COURSES_IN_HEADER = False
+
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
 # if not set by specific group
 # DON'T EDIT this variable here.
@@ -521,6 +525,7 @@ GSTUDIO_USER_GAPPS_LIST = ['Page', 'File']
 GSTUDIO_ORG_NAME = '''<p>
 A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education (HBCSE)</a>, <a href="http://www.tifr.res.in" target="_blank">Tata Institute of Fundamental Research (TIFR), India</a>.
 </p>'''
+GSTUDIO_SITE_FAVICON = "/static/ndf/images/favicon/logo.png"
 GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
 GSTUDIO_COPYRIGHT = ""
 GSTUDIO_GIT_REPO = "https://github.com/gnowledge/gstudio"
@@ -537,10 +542,11 @@ GSTUDIO_SITE_ORG = ""
 GSTUDIO_SITE_CONTRIBUTE = ""
 GSTUDIO_SITE_VIDEO = "pandora_and_local"  # possible values are 'local','pandora' and 'pandora_and_local'
 GSTUDIO_SITE_LANDING_PAGE = "home"  # possible values are 'home' and 'udashboard'
+GSTUDIO_SITE_LANDING_TEMPLATE = ""  # possible value is template name.
 GSTUDIO_SITE_HOME_PAGE = None  # it is url rendered on template. e.g: "/welcome". Default is: "/home"
 GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" etc. (Override it in local_settings)
 GSTUDIO_SITE_ISSUES_PAGE = ""
-GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebooks") 
+GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebooks")
 
 # terms & conditions
 GSTUDIO_OID_TC = None
@@ -642,6 +648,8 @@ GSTUDIO_FILTERS = {
             "E-Book": ['educationallevel', 'audience', 'language', 'educationalsubject'],
             "Topics": ['educationallevel', 'audience', 'language', 'educationalsubject', 'educationaluse']
             }
+
+GSTUDIO_COURSE_FILTERS_KEYS = ["created_by", "tags"]
 
 GSTUDIO_RESOURCES_CREATION_RATING = 5
 

@@ -1,0 +1,87 @@
+{% extends "ndf/base.html" %}
+{% load simple_filters %}
+<!-- to change the grid of main body content use following "instead" of above extends: -->
+{# {% xextends "ndf/base.html" with first_body_column=6 %} #}
+
+{% load i18n %}
+{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+{% block title %} {{title}} -- khaal version  {% endblock %}
+
+{% block meta_content %}
+  {% include "ndf/side_group_panel.html" %}
+{% endblock meta_content %}
+
+{% block body_content %}
+{% check_is_gstaff groupid request.user as gstaff_access %}
+{% user_access_policy groupid request.user as user_access %}
+
+<div class="small-12 columns">
+	<div class=" row course">
+		<div class="course-contents">
+
+			<div>
+				<div class="small-12 medium-6 large-6 column">
+					<div><h3 class="course-title">Course Name</h3></div>
+					<div>
+						<div class="course-date"><b>START DATE</b></div>
+						<div class="course-description"><p class="course-para">This is the Discription Part, 
+						describe the course in 2 lines </p></div>
+					</div>
+					<div>	
+						<div class="large-6 column left-shift">
+						<div class="small-12 medium-4 large-4 column course-description-thumbnails "><i class="fa fa-file-text-o fa-lg"></i> Tab 1</div>
+
+						<div class="small-12 medium-4 large-4 column course-description-thumbnails"><i class="fa fa-clock-o fa-lg"></i>1</div>
+
+
+						<div class="small-12 medium-4 large-4 column course-description-thumbnails"><i class="fa fa-user fa-lg"></i>25</div>
+						<div class="medium-4 large-4 column"></div>
+						</div>
+					</div>
+				</div>
+				<div class="small-12 medium-3 large-3 column enroll-top-height">
+
+						<div>
+							<label class="progress-summery">2 out of 6 sessions</label>
+							<div>
+								<div class=" small-10 medium-8 large-10 column progress success round">
+									<div class="meter " style="width: 20%"></div>
+								</div>
+								<div class="small-2 medium-2 large-2 column" style="color:white;"><i class="fa fa-flag-checkered fa-1x"></i></div>
+							</div>
+						</div>
+
+
+						<!-- Right Nav Section for enrollment -->
+						{% if not gstaff_access %}
+
+						{% if user_access == "allow" %}
+
+						<a class="button small expand enroll-status-margin"><i class="fa fa-check fa-lg"></i> <span>Enrolled</span></a>
+						{% else %}
+						{% if user.is_authenticated %}
+						{% if allow_to_join == "Open" %}
+						<a class="button success enroll-status-margin"><i class="fa fa-pencil-square-o fa-lg"></i> <span class="fa-lg">Enroll Now</span></a>
+
+						{% else %}
+						<input class="button enroll-status-margin" type="button" value="Enrollment {{allow_to_join}}" disabled="disabled">
+						{% endif %}
+						{% else %}
+						<a href="{% url 'auth_login' %}" class="button enroll-status-margin" title="Please login to Enroll">ENROLL</a>
+						{% endif %}
+						{% endif %}
+
+
+						{% endif %}
+				</div>
+			</div>	
+		</div>
+	</div>
+	<br/>
+	<br/>
+	
+  		{% include "ndf/gcollection_ajax_view.html" %}
+
+		{% endblock %}
+</div>

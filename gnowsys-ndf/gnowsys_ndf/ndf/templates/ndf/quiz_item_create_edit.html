@@ -25,6 +25,9 @@
 	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script>
 	  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css">
 	  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> 
+  <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+  <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+
 {% endblock %}
 
 
@@ -59,7 +62,7 @@
 				</div>
 
 				<div class="small-8 large-8 columns left ck-editor-div">
-			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk %}		  
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}		  
 				</div>
 			</div>
 
@@ -271,7 +274,6 @@
 $('#quiz_type').change(function (){
     $("#quiz_type_val").val($(this).val())
     var targetDivId = $(this).val();
-    console.log(targetDivId)
     if(targetDivId == "Single-Choice" || targetDivId == "Multiple-Choice"){
     	$(".quiz_type_based_correct_ans_div").removeClass("hide");
 	    if ($(this).val() != $('#' + $(this).attr('id') + ' option:nth-child(1)').val()) {
@@ -438,6 +440,9 @@ $('#add_option').click(function (){
 			},
 		});
 
+	    var inner_text_content = CKEDITOR.instances['ckeditor_textarea'].getData();
+	    inner_text_content = $(inner_text_content).text()
+	    $("#quiz_item_create_form").append('<input type="hidden" value="'+inner_text_content+'"  name="quiz_item_name"/>')
 
 </script>
 

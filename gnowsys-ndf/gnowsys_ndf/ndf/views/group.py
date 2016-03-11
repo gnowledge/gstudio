@@ -15,7 +15,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.views.generic import View
-
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -24,9 +23,12 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget, get_collection
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value  # get_existing_groups
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
@@ -1802,11 +1804,16 @@ def group_dashboard(request, group_id=None):
     alternate_template = ""
     profile_pic_image = None
     list_of_unit_events = []
+    all_blogs = None
     blog_pages = None
+    user_blogs = None
     subgroups_cur = None
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
+    if "CourseEventGroup" in group_obj.member_of_names_list:
+        return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
+
     if group_obj and group_obj.post_node:
         # subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, 'edit_policy': {'$ne': "EDITABLE_MODERATED"},
         # now we are showing moderating group too:
@@ -1897,7 +1904,7 @@ def group_dashboard(request, group_id=None):
   files_cur = None
   allow_to_join = ""
   sg_type = None
-
+  course_collection_data = []
   if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
       sg_type = "ProgramEventGroup"
       # files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
@@ -1905,10 +1912,13 @@ def group_dashboard(request, group_id=None):
       if parent_groupid_of_pe:
         parent_groupid_of_pe = parent_groupid_of_pe._id
 
-      alternate_template = "ndf/program_event_group.html"
+      alternate_template = "ndf/gprogram_event_group.html"
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
-      alternate_template = "ndf/course_event_group.html"
+      alternate_template = "ndf/gcourse_event_group.html"
+      course_collection_data = get_collection(request,group_obj._id,group_obj._id)
+      course_collection_data = json.loads(course_collection_data.content)
+
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
   # if  u"ProgramEventGroup" not in group_obj.member_of_names_list:
@@ -1919,12 +1929,15 @@ def group_dashboard(request, group_id=None):
       if group_obj.collection_set:
           course_structure_exists = True
       if request.user.id:
-          blog_pages = node_collection.find({
+          all_blogs = node_collection.find({
                 'member_of':page_gst._id,
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
             }).sort('created_at', -1)
-
+          if all_blogs:
+              blog_pages = all_blogs.clone()
+              blog_pages = blog_pages.where("this.created_by!=" + str(request.user.id))
+              user_blogs = all_blogs.where("this.created_by==" + str(request.user.id))
       start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
       # if 'start_enroll' in group_obj:
       #     if group_obj.start_enroll:
@@ -1972,9 +1985,11 @@ def group_dashboard(request, group_id=None):
                                                        # 'shelf_list': shelf_list,
                                                        'list_of_unit_events': list_of_unit_events,
                                                        'blog_pages':blog_pages,
+                                                       'user_blogs': user_blogs,
                                                        'selected': selected,
                                                        'files_cur': files_cur,
                                                        'sg_type': sg_type,
+                                                       'course_collection_data':course_collection_data,
                                                        'parent_groupid_of_pe':parent_groupid_of_pe,
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
@@ -2419,7 +2434,7 @@ def create_sub_group(request,group_id):
 
 
 
-
+@login_required
 @get_execution_time
 def upload_using_save_file(request,group_id):
     from gnowsys_ndf.ndf.views.file import save_file
@@ -2429,13 +2444,24 @@ def upload_using_save_file(request,group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    title = request.POST.get('context_name','')
     usrid = request.user.id
-    url_name = "/"+str(group_id)
+    # url_name = "/"+str(group_id)
     for key,value in request.FILES.items():
         fname=unicode(value.__dict__['_name'])
         # print "key=",key,"value=",value,"fname=",fname
-        fileobj,fs=save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
-        file_obj=node_collection.find_one({'_id': ObjectId(fileobj)})
+        fileobj,fs = save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
+        file_obj = node_collection.find_one({'_id': ObjectId(fileobj)})
         if file_obj:
-            url_name = "/"+str(group_id)+"/#gallery-tab"
-        return HttpResponseRedirect(url_name)
+            #set interaction-settings
+            discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+            create_gattribute(file_obj._id, discussion_enable_at, True)
+            return_status = create_thread_for_node(request,group_obj._id, file_obj)
+
+        # if file_obj:
+        #     url_name = "/"+str(group_id)+"/#gallery-tab"
+        if title == "gallery":
+            return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
+        else:
+            return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
+        # return HttpResponseRedirect(url_name)
