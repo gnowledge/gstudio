@@ -138,6 +138,10 @@
 						  	<a>{% trans "Interaction Settings" %} </a> 
 						</dd>  
 					{% endif %}
+				<dd class="help_rt_tab" title="Click here to add/remove Help page for this resource">
+				 	<a>{% trans "Help" %} </a> 
+				</dd>	
+
 				{% else %}
 					<input type="hidden" name="blog_type" value="{{blog_type}}">
 				{% endif %}
@@ -583,6 +587,29 @@
 	    </div>
 	</div>	
 
+
+    <div class="content contents" id="panel-help" style="width:95%; display:none;" >      
+      	<div class="row">
+		  	<h7>{% trans "Select help page for this resource"%} </h7>
+		</div>
+
+	    <div class="help-settings-div">
+		{% get_relation_value node.pk 'has_help' as help_node_and_grel %}
+		{% get_info_pages group_id as all_info_pages %}
+		<select class="help_onfo_page" name="help_info_page">
+		<option value="">Select HELP page</option>
+			{% for each_page in all_info_pages %}
+				<option value="{{each_page.id}}" 
+				{% if help_node_and_grel %}
+					{% if each_page.id == help_node_and_grel.0|safe %} selected {% endif %}
+				{% endif %}>
+					{{each_page.name}}	
+				</option>
+			{% endfor %}
+		</select>
+	    </div>
+	</div>	
+
     
     <!-- Kept this bellow commented part for future reference(Don't delete this) -->
 
@@ -1005,6 +1032,18 @@
 		$("dl.select > dd").removeClass("active")
 		$(this).addClass("active")
 	});			
+
+	$(".help_rt_tab").click(function() {
+		// for activating "panel-metadata" div and deactivate other div's
+		$("div.contents").css("display", "none");
+		$("#panel-help").css("display", "block");
+		$("#save-node").css("display", "block");
+		// For highlighting current clicked element
+
+		$("dl.select > dd").removeClass("active")
+		$(this).addClass("active")
+	});			
+
 
 	$(".prior_node_tab").click(function() {
 
