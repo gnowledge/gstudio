@@ -57,7 +57,7 @@ HOW TO USE
   .select-search-container > i.fi-play{
     min-height: 2px ;
     max-height: auto ;
-    max-width: auto ;
+    max-width: 50px ;
     position: absolute;
     right: 12px;
     transform: rotate(90deg);
@@ -68,11 +68,10 @@ HOW TO USE
   .selected-items > .selection{
     {% if oneline_element == "true" %}
       width: 50% ;
-    {% else %}
-      width: 70% ;
     {% endif %}
     float: center ;
     text-align: center;
+    min-width: 300px;
     margin: 0.25rem 0.5rem;
     background-color: #ffffff;
     border:1px solid #000;
@@ -82,7 +81,7 @@ HOW TO USE
   /*#selected-items{*/
   .selected-items{
     max-height: 200px ;
-    max-width: hidden ;
+    width: 500px ;
     overflow-y : auto ;
     overflow-x: hidden;
   }
