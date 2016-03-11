@@ -209,12 +209,23 @@ def video_edit(request,group_id,_id):
         # get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
         vid_node.save(is_changed=get_node_common_fields(request, vid_node, group_id, GST_VIDEO),groupid=group_id)
         thread_create_val = request.POST.get("thread_create",'')
+        help_info_page = request.POST.get('help_info_page','')
+        
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
             create_gattribute(vid_node._id, discussion_enable_at, True)
             return_status = create_thread_for_node(request,group_id, vid_node)
         else:
             create_gattribute(vid_node._id, discussion_enable_at, False)
+        if help_info_page and help_info_page != "null":
+            try:
+                help_info_page = ObjectId(help_info_page)
+                has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+                create_grelation(img_node._id, has_help_rt,help_info_page)
+            except Exception as invalidobjectid:
+                # print invalidobjectid
+                pass
+                # print "\n\n help_info_page ================ ",help_info_page
 
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             get_node_metadata(request,vid_node)

@@ -840,6 +840,7 @@ def submitDoc(request, group_id):
                         f = f[1]
                 fileobj = node_collection.one({'_id': ObjectId(f)})
                 thread_create_val = request.POST.get("thread_create",'')
+                help_info_page = request.POST.get('help_info_page','')
                 discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
                 if thread_create_val == "Yes":
                   create_gattribute(fileobj._id, discussion_enable_at, True)
@@ -847,6 +848,14 @@ def submitDoc(request, group_id):
                   return_status = create_thread_for_node(reaquest,group_id, fileobj)
                 else:
                   create_gattribute(fileobj._id, discussion_enable_at, False)
+                if help_info_page and help_info_page != "null":
+                  try:
+                    help_info_page = ObjectId(help_info_page)
+                    has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+                    create_grelation(file_node._id, has_help_rt,help_info_page)
+                  except Exception as invalidobjectid:
+                    # print invalidobjectid
+                    pass
 
             # print "=============== : ", f
             try:
@@ -1663,12 +1672,22 @@ def file_edit(request,group_id,_id):
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE),groupid=group_id)
 
         thread_create_val = request.POST.get("thread_create",'')
+        help_info_page = request.POST.get('help_info_page','')
+
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
           create_gattribute(file_node._id, discussion_enable_at, True)
           return_status = create_thread_for_node(request,group_id, file_node)
         else:
           create_gattribute(file_node._id, discussion_enable_at, False)
+        if help_info_page and help_info_page != "null":
+          try:
+            help_info_page = ObjectId(help_info_page)
+            has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+            create_grelation(file_node._id, has_help_rt,help_info_page)
+          except Exception as invalidobjectid:
+            # print invalidobjectid
+            pass
 
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             # To fill the metadata info while creating and editing file node
