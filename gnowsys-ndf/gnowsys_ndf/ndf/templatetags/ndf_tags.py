@@ -3462,3 +3462,17 @@ def get_course_filters(group_id, filter_context):
 				all_tags_list = json.dumps(all_tags_list)
 			filters_dict[each_course_filter_key].update({'value': all_tags_list})
 	return filters_dict
+
+
+@get_execution_time
+@register.assignment_tag
+def get_info_pages(group_id):
+	list_of_nodes = []
+	page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+	info_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Info page"})
+	info_page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': info_page_gst._id},{'_id':1, 'name':1})
+	# print "\n\n info_page_nodes===",info_page_nodes.count()
+	if info_page_nodes.count():
+		for eachnode in info_page_nodes:
+			list_of_nodes.append({'name': eachnode.name,'id': str(eachnode._id)})
+	return list_of_nodes
