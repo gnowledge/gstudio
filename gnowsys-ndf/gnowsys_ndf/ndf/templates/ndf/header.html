@@ -182,20 +182,24 @@
         <!-- Current group selector -->
         {% if user.is_authenticated %}
           
-        <li>
-          <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'course' request.user.username %}">
-            {% trans 'MY COURSES' %}
-          </a>
-        </li>
+          {% if site.MY_COURSES_IN_HEADER %}
+            <li>
+              <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'course' request.user.username %}">
+                {% trans 'MY COURSES' %}
+              </a>
+            </li>
+          {% endif %}        
+                  
+          {% if site.MY_GROUPS_IN_HEADER %}
+            <li>
+              <a title="" class="{%if title == 'My Groups'%}active{%endif%}" href="{% url 'my_groups' request.user.username %}">
+                {% trans 'MY GROUPS' %}
+              </a>
+            </li>
+          {% endif %}        
+        
+        {% endif %}
 
-        {% comment %}
-        <li>
-          <a title="" class="{%if title == 'My Groups'%}active{%endif%}" href="{% url 'my_groups' request.user.username %}">
-            {% trans 'MY GROUPS' %}
-          </a>
-        </li>
-        {% endcomment %}
-          {% endif %}
 
         <li class="group">
           {# <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}"> #}

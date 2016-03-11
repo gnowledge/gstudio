@@ -111,6 +111,8 @@ def get_site_variables():
 	site_var['HOME_PAGE'] = GSTUDIO_SITE_HOME_PAGE
 	site_var['SITE_NAME'] = GSTUDIO_SITE_NAME
 	site_var['SECOND_LEVEL_HEADER'] = GSTUDIO_SECOND_LEVEL_HEADER
+	site_var['MY_GROUPS_IN_HEADER'] = GSTUDIO_MY_GROUPS_IN_HEADER
+	site_var['MY_COURSES_IN_HEADER'] = GSTUDIO_MY_COURSES_IN_HEADER
 	site_var['ISSUES_PAGE'] = GSTUDIO_SITE_ISSUES_PAGE
 
 	cache.set('site_var', site_var, 60 * 30)

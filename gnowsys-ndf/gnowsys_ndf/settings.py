@@ -511,6 +511,8 @@ GSTUDIO_WORKING_GAPPS = [
 ]
 
 GSTUDIO_SECOND_LEVEL_HEADER = True
+GSTUDIO_MY_GROUPS_IN_HEADER = True
+GSTUDIO_MY_COURSES_IN_HEADER = False
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
 # if not set by specific group
