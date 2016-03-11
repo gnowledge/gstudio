@@ -393,8 +393,14 @@ def create_edit_page(request, group_id, node_id=None):
 
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
-        if "CourseEventGroup" in group_obj.member_of_names_list and blog_type and GSTUDIO_SITE_NAME == "clix":
-            return HttpResponseRedirect(reverse('course_notebook', kwargs={'group_id': group_id}))
+        if "CourseEventGroup" in group_obj.member_of_names_list and blog_type:
+            return HttpResponseRedirect(reverse('course_notebook_tab_note',
+                                    kwargs={
+                                            'group_id': group_id,
+                                            'tab': 'my-notes',
+                                            'notebook_id': page_node._id
+                                            })
+                                      )
 
         if ce_id or res or program_res:
             url_name = "/" + group_name + "/" + str(page_node._id)
