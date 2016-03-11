@@ -24,6 +24,11 @@
   height:40px;
   background-repeat:no-repeat; background-size: 48px 48px
   }
+
+  #list_widget {
+    width: 500px;
+  }
+  
 </style>
 {% if fields_type == "unicode" or fields_name == "tags" %}
 <div style="display:table-cell;">
@@ -58,7 +63,7 @@
 </select>
 
 {% elif fields_type == "list" %}
-<div id="list_drawer" style="border-spacing:0px;">
+<div id="list_drawer" style="border-spacing:0px" class="list_drawer">
 
   
   {% if fields_name == "subject_type" or fields_name == "language" or fields_name == "object_type" or fields_name == "applicable_node_type" or fields_name == "subject_applicable_nodetype" or fields_name == "object_applicable_nodetype" or fields_name == "data_type" %}
