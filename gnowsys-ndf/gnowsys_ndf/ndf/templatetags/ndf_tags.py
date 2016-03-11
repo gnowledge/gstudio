@@ -91,24 +91,29 @@ def get_site_variables():
 		return result
 
 	site_var = {}
-	site_var['ORG_NAME']=GSTUDIO_ORG_NAME
-	site_var['LOGO']=GSTUDIO_SITE_LOGO
-	site_var['COPYRIGHT']=GSTUDIO_COPYRIGHT
-	site_var['GIT_REPO']=GSTUDIO_GIT_REPO
-	site_var['PRIVACY_POLICY']=GSTUDIO_SITE_PRIVACY_POLICY
-	site_var['TERMS_OF_SERVICE']=GSTUDIO_SITE_TERMS_OF_SERVICE
-	site_var['ORG_LOGO']=GSTUDIO_ORG_LOGO
-	site_var['ABOUT']=GSTUDIO_SITE_ABOUT
-	site_var['SITE_POWEREDBY']=GSTUDIO_SITE_POWEREDBY
-	site_var['PARTNERS']=GSTUDIO_SITE_PARTNERS
-	site_var['GROUPS']=GSTUDIO_SITE_GROUPS
-	site_var['CONTACT']=GSTUDIO_SITE_CONTACT
-	site_var['CONTRIBUTE']=GSTUDIO_SITE_CONTRIBUTE
-	site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
-	site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
-	site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
-	site_var['SITE_NAME']=GSTUDIO_SITE_NAME
-	site_var['ISSUES_PAGE']=GSTUDIO_SITE_ISSUES_PAGE
+	site_var['ORG_NAME'] = GSTUDIO_ORG_NAME
+	site_var['LOGO'] = GSTUDIO_SITE_LOGO
+	site_var['FAVICON'] = GSTUDIO_SITE_FAVICON
+	site_var['COPYRIGHT'] = GSTUDIO_COPYRIGHT
+	site_var['GIT_REPO'] = GSTUDIO_GIT_REPO
+	site_var['PRIVACY_POLICY'] = GSTUDIO_SITE_PRIVACY_POLICY
+	site_var['TERMS_OF_SERVICE'] = GSTUDIO_SITE_TERMS_OF_SERVICE
+	site_var['ORG_LOGO'] = GSTUDIO_ORG_LOGO
+	site_var['ABOUT'] = GSTUDIO_SITE_ABOUT
+	site_var['SITE_POWEREDBY'] = GSTUDIO_SITE_POWEREDBY
+	site_var['PARTNERS'] = GSTUDIO_SITE_PARTNERS
+	site_var['GROUPS'] = GSTUDIO_SITE_GROUPS
+	site_var['CONTACT'] = GSTUDIO_SITE_CONTACT
+	site_var['CONTRIBUTE'] = GSTUDIO_SITE_CONTRIBUTE
+	site_var['SITE_VIDEO'] = GSTUDIO_SITE_VIDEO
+	site_var['LANDING_PAGE'] = GSTUDIO_SITE_LANDING_PAGE
+	site_var['LANDING_TEMPLATE'] = GSTUDIO_SITE_LANDING_TEMPLATE
+	site_var['HOME_PAGE'] = GSTUDIO_SITE_HOME_PAGE
+	site_var['SITE_NAME'] = GSTUDIO_SITE_NAME
+	site_var['SECOND_LEVEL_HEADER'] = GSTUDIO_SECOND_LEVEL_HEADER
+	site_var['MY_GROUPS_IN_HEADER'] = GSTUDIO_MY_GROUPS_IN_HEADER
+	site_var['MY_COURSES_IN_HEADER'] = GSTUDIO_MY_COURSES_IN_HEADER
+	site_var['ISSUES_PAGE'] = GSTUDIO_SITE_ISSUES_PAGE
 
 	cache.set('site_var', site_var, 60 * 30)
 
@@ -501,14 +506,14 @@ def get_attribute_value(node_id, attr,get_data_type=False):
 		if node_id:
 			node = node_collection.one({'_id': ObjectId(node_id) })
 			gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr) })
-	        # print "node: ",node.name,"\n"
-	        # print "attr: ",attr,"\n"
-        	if get_data_type:
-        		data_type = gattr.data_type
+			# print "node: ",node.name,"\n"
+			# print "attr: ",gattr.name,"\n"
+			if get_data_type:
+				data_type = gattr.data_type
 			if node and gattr:
-				node_attr = triple_collection.one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})	
+				node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})	
 
-		
+		# print "\n\n node_attr==",node_attr
 		if node_attr:
 			attr_val = node_attr.object_value
 		# print "attr_val: ",attr_val,"\n"
@@ -522,7 +527,7 @@ def get_attribute_value(node_id, attr,get_data_type=False):
 @register.assignment_tag
 def get_relation_value(node_id, grel):
 	try:
-		grel_val_node = Node
+		grel_val_node = None
 		grel_id = None
 		node_grel = None
 		if node_id:
@@ -1674,7 +1679,7 @@ def get_group_type(group_id, user):
                 # If Group is not found with either given ObjectId or name in the database
                 # Then compare with a given list of names as these were used in one of the urls
                 # And still no match found, throw error
-                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta", "welcome"]:
+                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta", "welcome", "explore"]:
                     error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
                     raise Http404(error_message)
 
@@ -2072,15 +2077,19 @@ def check_is_gstaff(groupid, user):
   False -- If above criteria is not met (doesn't belongs to any of the category, mentioned above)!
   """
 
+  groupid = groupid if groupid else 'home'
   try:
-    group_node = node_collection.one({'_id': ObjectId(groupid)})
+  	try:
+	    group_node = node_collection.one({'_id': ObjectId(groupid)})
+  	except:
+  		group_node = get_group_name_id(groupid, get_obj=True)
 
-    if group_node:
-      return group_node.is_gstaff(user)
+	if group_node:
+		return group_node.is_gstaff(user)
 
-    else:
-      error_message = "No group exists with this id ("+str(groupid)+") !!!"
-      raise Exception(error_message)
+	else:
+		error_message = "No group exists with this id ("+str(groupid)+") !!!"
+		raise Exception(error_message)
 
   except Exception as e:
     error_message = "\n IsGStaffCheckError: " + str(e) + " \n"
@@ -3114,7 +3123,7 @@ def get_all_subsections_of_course(group_id, node_id):
 	if node_obj.collection_set:
 		for each_node in node_obj.collection_set:
 			each_node_obj = node_collection.one({'_id': ObjectId(each_node)})
-			if "CourseSectionEvent" in each_node_obj.member_of_names_list:
+			if each_node_obj and "CourseSectionEvent" in each_node_obj.member_of_names_list:
 				if each_node_obj.collection_set:
 					for each_node in each_node_obj.collection_set:
 						each_css = node_collection.one({'_id': ObjectId(each_node)})
@@ -3197,7 +3206,7 @@ def is_partner(group_obj):
 @get_execution_time
 @register.assignment_tag
 def get_event_status(node):
-	status_msg = ""
+	status_msg = None
 	"""
 	Returns FORTHCOMING/OPEN/CLOSED
 	"""
@@ -3207,17 +3216,137 @@ def get_event_status(node):
 		start_enroll_val = get_attribute_value(node._id,"start_enroll")
 		end_enroll_val = get_attribute_value(node._id,"end_enroll")
 		from datetime import datetime
-        curr_date_time = datetime.now()
-
-        if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
-        or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
-            status_msg = "OPEN"
-        elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
-            status_msg = "FORTHCOMING"
-        elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
-            status_msg = "CLOSED"
+		curr_date_time = datetime.now()
+		if start_time_val and end_time_val and start_enroll_val and end_enroll_val:
+			if curr_date_time.date() >= start_time_val.date() and curr_date_time.date() <= end_time_val.date() \
+			or curr_date_time.date() >= start_enroll_val.date() and curr_date_time.date() <= end_enroll_val.date():
+				status_msg = "in-progress"
+			elif curr_date_time.date() < start_time_val.date() or curr_date_time.date() < start_enroll_val.date():
+				status_msg = "upcoming"
+			elif curr_date_time.date() > end_time_val.date() or curr_date_time.date() > end_enroll_val.date():
+				status_msg = "completed"
 	return status_msg
 
+
+# @get_execution_time
+# @register.assignment_tag
+# def get_all_user_groups(user_id):
+
+# 	user_id = int(user_id)
+
+# 	gst_modg = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
+
+# 	all_user_groups = node_collection.find({
+# 				'_type': 'Group',
+# 				'$or':[
+# 						{'author_set': {'$in': [user_id]}},
+# 						{'group_admin': {'$in': [user_id]}},
+# 						{'created_by': user_id} #,
+# 						# {'group_type': u'PUBLIC'}
+# 					],
+# 				'member_of': {'$nin': [gst_modg._id]} 
+# 				})
+
+# 	return all_user_groups
+
+
+@get_execution_time
+@register.assignment_tag
+def get_user_course_groups(user_id):
+
+	user_id = int(user_id) if user_id else user_id
+
+	gst_course = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
+
+	all_user_groups = node_collection.find({
+				'_type': 'Group',
+				'$or':[
+						{'author_set': {'$in': [user_id]}},
+						{'group_admin': {'$in': [user_id]}},
+						{'created_by': user_id} #,
+						# {'group_type': u'PUBLIC'}
+					],
+				'member_of': {'$in': [gst_course._id]} 
+				})
+
+	# all_courses = []
+
+	all_courses_obj_grouped = {
+							# 'all': [],
+							'in-progress': [],
+							'upcoming': [],
+							'completed': []
+						}
+
+	courses_status_count_dict = {
+							'all': all_user_groups.count(),
+							'in-progress': 0,
+							'upcoming': 0,
+							'completed': 0
+						}
+
+	for each_course in all_user_groups:
+		each_course.course_status_field = get_event_status(each_course)
+		all_courses_obj_grouped[each_course.course_status_field].append(each_course)
+		# all_courses_obj_grouped['all'].append(each_course)
+
+		courses_status_count_dict[each_course.course_status_field] += 1
+
+		# all_courses.append(each_course)
+
+	# print "::: ", courses_status_count_dict
+	# print "::: ", all_courses_obj_grouped
+	return all_courses_obj_grouped
+
+@get_execution_time
+@register.assignment_tag
+def get_course_session_status(node, get_current=False):
+	
+	"""
+	Returns Session Start_time in Courses 
+	"""
+	status = ""
+	upcoming_course = False
+	session_name = None
+	if node:
+		from datetime import datetime
+		curr_date_time = datetime.now()
+		start_time_val = get_attribute_value(node._id,"start_time")
+		end_time_val = get_attribute_value(node._id,"end_time")
+
+		if start_time_val and end_time_val:
+			# print "\n start_time_val -- ", start_time_val
+			# print "\n start_time_val type -- ", type(start_time_val)
+			# convert to str
+			start_time_val_str = start_time_val.strftime("%d/%m/%Y")
+			end_time_val_str = end_time_val.strftime("%d/%m/%Y")
+			# convert to datetime obj
+			start_time_val = datetime.strptime(start_time_val_str,"%d/%m/%Y")
+			end_time_val = datetime.strptime(end_time_val_str,"%d/%m/%Y")
+			if curr_date_time.date() < start_time_val.date():
+				upcoming_course = True
+		if get_current:
+			session_name = "Data Not Available"	
+		if node:
+			for each_course_section in node.collection_set:
+				each_course_section_node = node_collection.one({"_id":ObjectId(each_course_section)})
+				if each_course_section_node:
+					for each_course_subsection in each_course_section_node.collection_set:
+						each_course_subsection_node = node_collection.one({"_id":ObjectId(each_course_subsection)})
+						each_sub_section_start_time = get_attribute_value(each_course_subsection_node._id,"start_time")
+						# print "each_sub_section_start_time",each_sub_section_start_time
+						if each_sub_section_start_time:
+							if curr_date_time.date() <= each_sub_section_start_time.date():
+								status =  each_sub_section_start_time
+								session_name = each_course_subsection_node.name
+								if get_current:
+									return session_name, status
+								return status, upcoming_course 
+		if get_current:
+			return session_name, status
+			
+		# print upcoming_course,node.name 
+		return status, upcoming_course 
 
 @get_execution_time
 @register.assignment_tag
@@ -3253,3 +3382,83 @@ def get_user_quiz_resp(node_obj, user_obj):
 				else:
 					result['recent_ans'] = recent_ans.values()[0]
 		return result
+
+@get_execution_time
+@register.assignment_tag
+def get_course_filters(group_id, filter_context):
+	'''
+	Returns the static data needed by filters. The data to be return will in following format:
+	{ 
+		"key_name": { "data_type": "<int>/<string>/<...>", "type": "attribute/field", "value": ["val1", "val2"]},
+		... ,
+		... ,
+		"key_name": { "data_type": "<int>/<string>/<...>", "type": "attribute/field", "value": ["val1", "val2"]} 
+	}
+	'''
+	group_obj   = get_group_name_id(group_id, get_obj=True)
+	filters_dict = {}
+	gstaff_users = []
+	all_user_objs = None
+	all_users = False
+	only_gstaff = False
+	all_user_objs_uname = all_user_objs_id = None
+
+	if filter_context.lower() == "raw material":
+		only_gstaff = True
+	elif filter_context.lower() == "notebook":
+		all_users = True
+
+	for each_course_filter_key in GSTUDIO_COURSE_FILTERS_KEYS:
+		if each_course_filter_key == "created_by":
+			author_set_list = group_obj.author_set
+			all_user_objs = User.objects.filter(id__in=author_set_list)
+			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'User'}
+			if not all_users:
+				if only_gstaff:
+					all_user_objs_uname = [eachuser.username for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				else:
+					all_user_objs_uname = [eachuser.username for eachuser in all_user_objs if not check_is_gstaff(group_obj._id,eachuser)]
+			else:
+				all_user_objs_uname = list(all_user_objs.values_list('username', flat=True).order_by('username'))
+
+			# Type-Cast from 'QuerySet' to 'list' to make it JSON serializable
+			# all_user_names = list(all_user_objs.values_list('username', flat=True).order_by('username'))
+			filters_dict[each_course_filter_key].update({'value': json.dumps(all_user_objs_uname)})
+
+		# if each_course_filter_key == "tags" and filter_context.lower() == "notebook":
+		if each_course_filter_key == "tags":
+			gstaff_users.extend(group_obj.group_admin)
+			gstaff_users.append(group_obj.created_by)
+
+			all_tags_list = [] # To prevent if no tags are found in any blog pages
+			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'Tags'}
+
+			if filter_context.lower() == "notebook":
+				page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+				blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+				result_cur = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+							'group_set': group_obj._id, 'tags':{'$exists': True, '$not': {'$size': 0}} #'tags':{'$exists': True, '$ne': []}}
+							},{'tags': 1, '_id': False})
+
+			elif filter_context.lower() == "gallery":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs]
+				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
+							'created_by': {'$nin': gstaff_users} 
+							},{'tags': 1, '_id': False})
+
+			elif filter_context.lower() == "raw material":
+				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
+				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
+							'created_by': {'$in': gstaff_users} 
+							},{'tags': 1, '_id': False})
+
+			print "\n\n result_cur.count()--",result_cur.count()
+			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
+			# all_tags_from_cursor is a list having nested list
+			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
+			if all_tags_list:
+				all_tags_list = json.dumps(all_tags_list)
+			filters_dict[each_course_filter_key].update({'value': all_tags_list})
+	return filters_dict

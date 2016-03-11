@@ -1,0 +1,42 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% load simple_filters %}
+
+{% get_user_course_groups request.user.id as user_concern_groups %}
+
+{# {% datetime_now as datetime_now %} #}
+
+	<h3>My Courses</h3>
+	{% for k, v in user_concern_groups.items %}
+		<h3><small>{{k}}</small></h3>
+		{% if v %}
+			{% for vk in v %}
+		<a href="{% url 'course_about' vk %}">{{vk.name}}</a>
+				
+			{% endfor %}
+		{% endif %}
+	{% endfor %}
+{% if user_concern_groups.count > 0 %}
+	{# 
+	<h3><small>In Progress</small></h3>
+	{% for each_gr in user_concern_groups %}
+		{% if each_gr.course_status_field == 'OPEN' %}
+		<a href="{% url 'course_summary' each_gr.pk %}">{{each_gr.name}}</a>
+		{% endif %}
+	{% endfor %}
+	<hr/>
+	<h3><small>Upcoming</small></h3>
+	{% for each_gr in user_concern_groups %}
+		{% if each_gr.course_status_field == 'FORTHCOMING' %}
+		<a href="{% url 'course_summary' each_gr.pk %}">{{each_gr.name}}</a>
+		{% endif %}
+	{% endfor %}
+	<hr/>
+	<h3><small>Completed</small></h3>
+	{% for each_gr in user_concern_groups %}
+		{% if each_gr.course_status_field == 'CLOSED' %}
+		<a href="{% url 'course_summary' each_gr.pk %}">{{each_gr.name}}</a>
+		{% endif %}
+	{% endfor %}
+ #}
+{% endif %}

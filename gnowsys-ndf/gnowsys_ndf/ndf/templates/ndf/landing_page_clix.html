@@ -1,0 +1,56 @@
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+
+{# {% extends "ndf/base.html" %} #}
+
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock title %}
+
+{% block body_content %}
+    <div class="row landing_page">
+        <div class="small-12">
+            <div class="row">
+                <div class="small-12">
+                    <!-- Slider Area  -->
+                    <ul class="landing-orbit" data-orbit data-options="slide_number: false; resume_on_mouseout: true;timer_speed: 5000;animation_speed: 700;">
+                      <li class="active">
+                        <img src="/static/ndf/images/landing_pg_slides/clix-logo-i2c-site.svg" alt="slide 1" />
+                      </li>
+                      <li>
+                        <img src="/static/ndf/images/landing_pg_slides/i2c-trippy-cloud.svg" alt="slide 2" />
+                      </li>
+                      <li>
+                        <img src="/static/ndf/images/landing_pg_slides/Slider10.jpg" alt="slide 3" />
+                      </li>
+                      <li>
+                        <img src="/static/ndf/images/landing_pg_slides/Slider11.jpg" alt="slide 4" />
+                      </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-12">
+                    <h2>
+                		An Invitation to CLIx (Connected Learning Initiative X) Course
+                	</h2>
+                </div>
+            </div>
+            <div class="row landing-page-text">
+                <div class="small-12">
+                    <p>
+                        In this course you will learn how to make and do many things with a computer. We want this experience to be fun for you. You will be able to express your ideas through the things that you create.You will be able to create drawings, posters, maps, web pages, and many more things.
+                    </p>
+                    <p>
+                        As a part of this course you will also be interacting collaborating and communicating with your friends on the computer, and presenting all your work to them. You in turn, will be able to see their work and encourage them by giving them feedback.
+                    </p>
+                    <p>
+                        Overall we hope that this will help you learn with computers and do things with computers in a new way!
+                   </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock body_content %}

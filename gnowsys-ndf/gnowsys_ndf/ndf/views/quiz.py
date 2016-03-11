@@ -133,10 +133,12 @@ def create_edit_quiz_item(request, group_id, node_id=None):
             # Add miscellaneous question
             quiz_item_node = node_collection.collection.GSystem()
             # quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
-        question_content = request.POST.get('content_org','')
+        # question_content = request.POST.get('content_org','')
+        question_content = request.POST.get('quiz_item_name','Unititled')
         question_content = question_content.split(' ')
         question_content = question_content[:4]
         question_content = ' '.join(question_content)
+        # print "\n\n question_content---",question_content
         quiz_item_node.name = unicode(question_content)
         quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
         options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})

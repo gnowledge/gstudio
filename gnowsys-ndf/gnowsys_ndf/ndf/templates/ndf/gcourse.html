@@ -1,0 +1,156 @@
+{# {% extends "ndf/base.html" %} #}
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+<!-- to change the grid of main body content use following "instead" of above extends: -->
+
+{% load i18n %}
+{% load ndf_tags %}
+{# {% load pagination_tags %} #}
+{% get_group_name groupid as group_name_tag %}
+{% block title %} My Courses  {% endblock %}
+
+{% comment %}
+  
+{% block collection_content %}
+
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% user_access_policy groupid request.user as user_access %}
+    <!--
+      Tab 1 - All CourseEvents  (Displayed to all : Anonymous, Authenticated, Group member/admin/owner, SuperUser)
+      Tab 2 - User enrolled CourseEvents
+      Tab 3 - Courses
+    -->
+    <div class="panel" style="background-color:#ddd;margin-top:1.8em;padding: 1rem;">
+      <ul class="no-bullet" data-tab role="tablist" >
+        {% if is_gstaff %}
+          {% if req_from_course %}
+              <a class="tiny expand button radius btn-width" href="{% url 'create_edit' group_name_tag %}">
+                <i class="fi-plus"></i>{% trans " New Course" %}
+              </a>
+          {% else %}
+              <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="tiny expand button radius btn-width">
+                <i class="fi-plus"></i>{% trans " New Event" %}
+              </a>
+          {% endif %}
+        {% endif %}
+
+        <li class="active"><a href="#all_events" class="tiny expand button radius  btn-width">{% if req_from_course %}{% trans "All eCourses" %}{% else %}{% trans "All Events" %}{% endif %}</a></li>
+        {% if request.user.is_authenticated  and not is_gstaff %}
+          <li><a href="#my_events" class="tiny expand button radius  btn-width">{% if req_from_course %}{% trans "My eCourses" %}{% else %}{% trans "My Events" %}{% endif %}</a></li>
+        {% endif %}
+        {% if req_from_course and is_gstaff %}
+            <li><a href="#courses" class="tiny expand button radius  btn-width">{% trans "Courses" %}</a></li>
+        {% endif %}
+      </ul>
+    </div>
+
+{% endblock %}
+
+{% block meta_content %}
+  {% include "ndf/side_group_panel.html" %}
+{% endblock meta_content %}
+{% endcomment %}
+
+{% block body_content %}
+
+  {% get_user_course_groups request.user.id as user_concern_groups %}
+
+{# {% datetime_now as datetime_now %} #}
+
+  <h3>My Courses</h3>
+  {% for k, v in user_concern_groups.items %}
+  <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="background-color:#fafafa;border-style:none; padding-left: 1em;">
+    {% if v %}
+    <h3><small>{{k}}</small></h3>
+      {% for vk in v %}
+
+    {# <a href="{% url 'course_about' vk.pk %}">{{vk.name}}</a> #}
+    {# {% for each_obj in doc_cur %} #}
+      <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
+            {% include 'ndf/event_card.html' with resource=vk is_event=True no_footer=True has_prof_pic=True url_name="course_about" first_arg=vk.name  next_session=True %}
+          </li>
+    {% endfor %}
+        
+      {# {% endfor %} #}
+    {% endif %}
+    </section>
+  {% endfor %}
+
+
+  {% comment %}
+    <div class="tabs-content all-courses"  style="margin-left:18px;margin-top:-1em;">
+
+      <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" id="all_events" style="border-style:none">
+      {% if title == "Course" %}
+        <div class="repository-title large-4 columns">All Courses</div>
+      {% else %}
+        <div class="repository-title large-4 columns">All {{title}}1</div>
+      {% endif %}
+        <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+        {% for course in ce_coll %}
+          <li class="card-image-wrapper" style="margin-top:13px;">
+            {% include 'ndf/event_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="course_about" first_arg=course.pk  next_session=True %}
+          </li>
+        {% empty %}
+            <div class="row">
+              <div class="small-12 columns">
+                <h5>
+                {% if req_from_course %}No Course Available!
+                {% else %}No Program Available!
+                {% endif %}
+                </h5>
+              </div>
+            </div>
+        {% endfor %}
+        </ul>
+      </section>
+
+      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-3 large-block-grid-4" id="my_events">
+      {% if title == "Course" %}
+        <div class="repository-title large-4 columns">My Courses</div>
+      {% else %}
+        <div class="repository-title large-4 columns">My {{title}}</div>
+      {% endif %}
+        {% for course in enr_ce_coll %}
+          <li class="card-image-wrapper" style="margin-top:13px;">
+            {% include 'ndf/event_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk %}
+          </li>
+
+        {% empty %}
+            <div class="row">
+              <div class="small-12 columns">
+                <h5>
+                {% if req_from_course %}Not Enrolled to Any Courses!
+                {% else %}Not Enrolled to Any Programs!
+                {% endif %}
+                </h5>
+              </div>
+            </div>
+
+        {% endfor %}
+      </section>
+
+      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-3 large-block-grid-4" id="courses" style="border-style:none">
+       <div class="repository-title large-4 columns">All Courses</div>
+        {% for course in course_coll %}
+          <li class="card-image-wrapper" style="margin-top:13px;margin-left:15px">
+            {% include 'ndf/horizontal_card.html' with resource=course has_logo=True url_name="course_detail" first_arg=group_id second_arg=course.pk %}
+          </li>
+
+        {% empty %}
+            <div class="row">
+              <div class="small-12 columns">
+                <h5> No Course Created!
+                </h5>
+              </div>
+            </div>
+
+        {% endfor %}
+      </section>
+
+  {% paginate %}
+  {% endcomment %}
+
+{% endblock %}
+
+

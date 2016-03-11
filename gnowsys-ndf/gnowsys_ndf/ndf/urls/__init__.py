@@ -22,8 +22,9 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
-    (r'^admin/data[\/]?', include('gnowsys_ndf.ndf.urls.adminDashboard')),
-    (r'^admin/designer[\/]?', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
+    (r'^admin/', include('gnowsys_ndf.ndf.urls.gstudio_admin')),
+    (r'^admin/', include(admin.site.urls)),
+
     (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
 
     # --mobwrite-- commented for time being
@@ -34,7 +35,6 @@ urlpatterns = patterns('',
     # (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
     # (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
     # --end of mobwrite
-    (r'^admin/', include(admin.site.urls)),
     # (r'^$', HomeRedirectView.as_view()),        
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
@@ -51,7 +51,11 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/forum', include('gnowsys_ndf.ndf.urls.forum')),
     (r'^(?P<group_id>[^/]+)/quiz', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_id>[^/]+)/discussion', include('gnowsys_ndf.ndf.urls.discussion')),
-    (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
+
+    # Commented following url for khaal hackathon
+    # (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
+    (r'^(?P<group_id>[^/]+)/gcourse', include('gnowsys_ndf.ndf.urls.gcourse')),
+
     (r'^(?P<group_id>[^/]+)/program', include('gnowsys_ndf.ndf.urls.program')),
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
     (r'^(?P<group_id>[^/]+)/search', include('gnowsys_ndf.ndf.urls.search_urls')),
@@ -108,6 +112,8 @@ urlpatterns = patterns('',
 
     url(r'^(?P<group_id>[^/]+)/visualize', include('gnowsys_ndf.ndf.urls.visualise_urls')),
 
+    (r'^explore/', include('gnowsys_ndf.ndf.urls.explore')),
+
     url(r'^(?P<group_id>[^/]+)/$', 'gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),
     # ---listing sub partners---                    
     url(r'^(?P<group_id>[^/]+)/partners$', 'gnowsys_ndf.ndf.views.partner.partner_list', name='partnerlist'),
@@ -135,6 +141,7 @@ urlpatterns = patterns('',
     # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
 
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
+
 
     url(r'^(?P<group_id>[^/]+)/repository/?$', 'gnowsys_ndf.ndf.views.methods.repository', name='repository'),
     url(r'^get_gridfs_resource/(?P<gridfs_id>[^/]+)/?$', 'gnowsys_ndf.ndf.views.file.get_gridfs_resource', name='get_gridfs_resource'),
