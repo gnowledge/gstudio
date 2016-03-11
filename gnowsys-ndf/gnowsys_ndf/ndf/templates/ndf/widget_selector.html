@@ -66,12 +66,12 @@ HOW TO USE
 
   /*#selected-items > .selection{*/
   .selected-items > .selection{
-    {% if oneline_element %}
-      float: center ;
-      /*width: 50% ;*/
+    {% if oneline_element == "true" %}
+      width: 50% ;
+    {% else %}
+      width: 70% ;
     {% endif %}
-    width: 50% ;
-    float: absolute ;
+    float: center ;
     text-align: center;
     margin: 0.25rem 0.5rem;
     background-color: #ffffff;
