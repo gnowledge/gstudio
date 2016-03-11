@@ -57,19 +57,18 @@ def adminDashboardClass(request, class_name="GSystem"):
         attribute_type_set = []
         relation_type_set = []
         if class_name == "GSystemType":
-            for e in each.member_of:
-                member_of_list.append(node_collection.one({'_id':e}).name+"  ")
-                
             for members in each.member_of:
                 member.append(node_collection.one({ '_id': members}).name+"  ")
-
+                # member_of_list.append(node_collection.one({'_id':members}).name+" - "+str(members))
             for coll in each.collection_set:
                 collection_list.append(node_collection.one({ '_id': coll}).name+"  ")
-
+                # collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
             for at_set in each.attribute_type_set:
                 attribute_type_set.append(at_set.name+"  ")
+                # attribute_type_set.append(at_set.name+" - "+str(at_set._id))
             for rt_set in each.relation_type_set:
                 relation_type_set.append(rt_set.name+"  ")
+                # relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
 
 	if class_name in ("GSystem","File"):
       		group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
