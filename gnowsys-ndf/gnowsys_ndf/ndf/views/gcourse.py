@@ -2260,7 +2260,9 @@ def course_filters(request, group_id):
     gstaff_users = []
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
-
+    notebook_filter = False
+    no_url_flag = True
+    detail_urlname = None
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
         }
@@ -2274,15 +2276,19 @@ def course_filters(request, group_id):
 
     if title.lower() == "gallery" or title.lower() == "raw material":
         query.update({'_type': "File"})
+
     elif title.lower() == "notebook":
         page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
         blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
         query.update({'member_of':page_gst._id, 'type_of': blogpage_gst._id})
-
+        notebook_filter = True
+        no_url_flag = False
+        detail_urlname = "course_notebook_tab_note"
     if title.lower() == "gallery":
         query.update({'created_by': {'$nin': gstaff_users}})
     elif title.lower() == "raw material":
         query.update({'created_by': {'$in': gstaff_users}})
+
     if filter_applied:
         filter_dict = json.loads(filter_dict)
         query_dict = get_filter_querydict(filter_dict)
@@ -2291,14 +2297,13 @@ def course_filters(request, group_id):
                 query.update(each_dict)
         elif title.lower() == "notebook":
             return HttpResponse("reload")
-            # return HttpResponseRedirect(reverse('course_notebook', kwargs={'group_id': group_id}))
 
     # print "\n\n query === ", title, "\n\n---  \n",query
     files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
     # print "\n\n Total files: ", files_cur.count()
     context_variables.update({'files_cur': files_cur,"resource_type": files_cur,
-                              "detail_urlname": "file_detail", "res_type_name": "",
-                              "no_footer":True, "no_description":True, "no_url":True})
+                              "no_footer":True, "no_description":True, "no_url":no_url_flag, 
+                              "notebook_filter": notebook_filter, "detail_urlname": detail_urlname})
     return render_to_response(template, 
                                 context_variables,
                                 context_instance = RequestContext(request)
