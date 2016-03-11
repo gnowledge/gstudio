@@ -1,0 +1,322 @@
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+
+{# {% extends "ndf/base.html" %} #}
+
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+{% block title %}{% trans 'Events' %} {% endblock %}
+
+{% block style %}
+.course_outline_table, tr {
+border: 2px solid #0b8a91 !important;
+border-collapse: collapse;
+}
+
+.gray-text{
+color: gray;
+}
+
+#content > p { color: #6F6F6F !important; /*font-size: inherit;*/ }
+
+tr:hover{
+cursor:pointer;
+}
+
+.tab{
+padding-left: 2em;
+background-color:yellow !important;
+}
+
+.tab2{
+padding-left: 4em;
+}
+
+#eventModal > label {
+color: white;
+font-weight: bold;
+font-size: 1rem;
+}
+
+.all_blogs{
+overflow-y: auto;
+height:500px;
+}
+
+.jqtree-tree .jqtree-title {
+margin: 5px;
+font-size: 15px;
+color: black !important;
+/*Change the color here to change font color of tree*/
+}
+
+li.remove-dot{
+list-style: none;
+
+}
+
+
+{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+<!-- orgitdown! toolbar settings -->
+<script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+<!-- orgitdown! skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css">
+
+{% endblock %}
+
+{% block extended_header %}
+{% endblock %}
+{% block body_content %}
+{% check_is_gstaff groupid request.user as gstaff_access %}
+{% user_access_policy groupid request.user as user_access %}
+{% get_course_session_status node True as next_session_in_course %}
+
+<div id="eventModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+  <label id="eventModalLabel"></label>
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+{% comment %}
+<div id="view-page" class="small-12 large-12 columns"></div>
+{% endcomment %}
+
+<div id="envelop-cover">
+  <div class="row course-page-title">
+    <div class="small-12 medium-6 large-8 columns heading">{% firstof node.altnames node.name  %}</div>
+      {% check_is_gstaff groupid request.user as is_gstaff %}
+      {% if is_gstaff %}
+        <div class="small-12 medium-6 large-4 columns">
+          <div class="row">
+            <div class="small-12 columns medium-3 large-3" >
+              <span><a class="tiny radius settings" ><i class="fa fa-cog"></i> {% trans "Settings" %}</a></span>
+            </div>
+            <div class="small-12 columns medium-5 large-5" >
+              <span><a class="tiny radius" href="{% url 'create_course_struct' group_id node.pk %}"> <i class="fa fa-pencil-square-o"></i> {% if node.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+            </div>
+            <div class="small-12 columns medium-4 large-4 end" >
+              {% with node.member_of_names_list.0 as sg_type %}
+                <span><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></span>
+              {% endwith %}
+            </div>
+
+          </div>
+        </div>
+
+      {% else %}
+        <ul class="right">
+          <li class="enroll-btn-li remove-dot">
+          {% if user_access == "allow" %}
+            <input class="button tiny" type="button" value="ENROLLED" disabled="disabled">
+          {% else %}
+            {% if user.is_authenticated %}
+              {% if allow_to_join == "Open" %}
+                <input class="enroll-btn button tiny" type="button" value="ENROLL">
+              {% else %}
+                <input class="button tiny" type="button" value="Enrollment {{allow_to_join}}" disabled="disabled">
+              {% endif %}
+            {% else %}
+                <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
+            {% endif %}
+          {% endif %}
+          </li>
+        </ul>
+      {% endif %}
+
+    <div class="small-12 medium-4 columns">
+    <!--
+      <label>2 out of 6 modules completed</label>
+      <div class="progress success round">
+      <div class="meter" style="width: 20%"></div>
+      </div>
+      -->
+    </div>
+  </div>
+  <div class="row collapse meta">
+    <div class="key">Starts on</div>
+    <div class="value">
+      {% get_attribute_value node.pk 'start_time' as course_start_date %}
+
+      <div class="time"> {{course_start_date|date:"d M Y"}} </div>
+    </div>
+  </div>
+  {% if next_session_in_course.1 %}
+  <div class="row collapse meta">
+    <div class="key">Next Session</div>
+    <div class="value">
+      <div class="name">{{next_session_in_course.0|default_if_none:"Data Not Available"}}</div>
+      <div class="time"> {{next_session_in_course.1|date:"d M Y"}}</div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+
+
+<!-- Tabs -->
+<div class="row" id="envelop-content" >
+  <!-- Envelop box-->
+  <div class="small-12 large-12 columns">
+    <div style="line-height: 0.7em;">
+      <ul class="tabs course-tabs show-for-medium-up">
+
+        <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
+          <a href="{% url 'course_about' group_id %}">
+            <i class="fi-page-edit "></i>{% trans "About the course" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'course content' %}active{% endifequal %}">
+          <a href="{% url 'course_content' group_id %}">
+            <i class="fi-clipboard-notes"></i>{% trans "Course Content" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'raw material' %}active{% endifequal %}">
+          <a href="{% url 'course_raw_material' group_id %}">
+            <i class="fi-clip "></i>{% trans "Raw Material" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
+          <a href="{% url 'course_notebook' group_id %}">
+            <i class="fi-book "></i>{% trans "Notebook" %}
+          </a>
+        </li>
+
+        <li class="tab-title {% ifequal title 'gallery' %}active{% endifequal %}">
+          <a href="{% url 'course_gallery' group_id %}">
+            <i class="fi-photo "></i> {% trans "Gallery" %}
+          </a>
+        </li>
+        <!--
+        <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
+          <a href="{% url 'course_about' group_id %}">
+            <i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}
+          </a>
+        </li>
+         -->
+      </ul>
+    </div>
+    <div class="row show-for-small-only">
+      <div class="large-12 columns">
+        <label>
+          <select id="selectCourseTab">
+            <option value="about_course" {% ifequal title 'about' %}selected{% endifequal %}>{% trans "About the course" %}</option>
+            <option value="course_content" {% ifequal title 'course content' %}selected{% endifequal %}>{% trans "Course Content" %}</option>
+            <option value="raw_material" {% ifequal title 'raw material' %}selected{% endifequal %}>{% trans "Raw Material" %}g</option>
+            <option value="notebook" {% ifequal title 'notebook' %}selected{% endifequal %}>{% trans "Notebook" %}</option>
+            <option value="gallery" {% ifequal title 'gallery' %}selected{% endifequal %}>{% trans "Gallery" %}</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <!-- Load tab contents dynamically -->
+    <div class="tabs-content course-book">
+      <div class="content active" id="course-dashboard">
+        {% if title == 'dashboard' %}
+          {% include "ndf/gcourseDashboard.html" %}
+
+        {% elif title == 'course content' %}
+          {% include "ndf/gcollection_ajax_view.html" %}
+
+        {% elif title == 'notebook' %}
+          {% include "ndf/gnotebook.html" %}
+
+        {% elif title == 'gallery' %}
+          {% include "ndf/ggallerypage.html" %}
+
+        {% elif title == 'raw material' %}
+          {% include "ndf/ggallerypage.html" %}
+
+        {% elif title == 'about' %}
+          <div id="course-about">
+            <div class="row collapse">
+              <div class="about-course-heading">
+                <div class="heading-text">
+                  <div>
+                    <h2>{% firstof node.altnames node.name  %}</h2>
+                  </div>
+                  {% if next_session_in_course.1 %}
+                    <div>Next Session: '{{next_session_in_course.0|default_if_none:"Data Not Available"}}' on {{next_session_in_course.1|date:"d M Y"}}</div>
+                  {% endif %}
+
+                  <div>
+                    <span title="No. of Modules"><i class="fi-list-thumbnails"></i>&nbsp;{{group_object.collection_set|length}}</span>
+                    &#8226;&nbsp;&nbsp;
+                    <span title="No. of Enrolled users"><i class="fi-torso"></i>&nbsp;{{group_object.author_set|length}}</span>
+                    &#8226;&nbsp;&nbsp;
+                    <span title="Course Duration"><i class="fi-clock"></i>&nbsp;{{weeks_count}} weeks</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row collapse">
+              <div class="about-course-details">
+                <!--@anotation('replace this with the about course details')-->
+                <p>{{group_object.content_org}}
+                </p>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <!-- tab-content ends here -->
+  </div>
+</div>
+<script type="text/javascript">
+  $(function() {
+    $("#selectCourseTab").on('change', function() {
+        switch($(this).val()) {
+          case 'about_course':
+            window.location="{% url 'course_about' group_id %}"
+          break;
+          case 'course_content':
+            window.location="{% url 'course_content' group_id %}"
+          break;
+          case 'raw_material':
+            window.location="{% url 'course_raw_material' group_id %}"
+          break;
+          case 'notebook':
+            window.location="{% url 'course_notebook' group_id %}"
+          break;
+          case 'gallery':
+            window.location="{% url 'course_gallery' group_id %}"
+          break;
+        }
+    })
+  })
+</script>
+{% endblock %}
+{% block script %}
+
+$(document).on('click','.enroll-btn',function(){
+//trigger the ajax call to enroll
+$.ajax({
+url: "{% url 'enroll_to_course' node.pk %}",
+
+data: {
+'csrfmiddlewaretoken': "{{csrf_token}}"
+},
+
+type: "POST",
+
+dataType: "json",
+
+success: function(data){
+success_state = data["success"]
+if(success_state){
+$(".enroll-btn").attr('value', 'ENROLLED')
+$(".enroll-btn").attr("disabled","disabled")
+location.reload();
+}
+},
+});//end of ajax
+})
+{% endblock %}

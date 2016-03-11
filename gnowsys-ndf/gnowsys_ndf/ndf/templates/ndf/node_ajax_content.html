@@ -16,16 +16,19 @@
       color:black !important;
     }
 </style>
+{% comment %}
 <script type="text/javascript">
+
   $( document ).ready(function() {
     var x = location.href;
     var hostname = location.host;
     
-    x = "https://www.facebook.com/dialog/feed?app_id=1663958913874619&redirect_uri=http://www.metastudio.org/home/&link="+location.href+"&caption=  {{node.name}}&description={{node.content_org}}&picture=" + hostname + "{% url 'read_file' group_name_tag node grid_fs_obj.filename %}";
+    x = "https://www.facebook.com/dialog/feed?app_id=1663958913874619&redirect_uri=http://www.metastudio.org/home/&link="+location.href+"&caption=  {{node.name}}&description={{node.content|safe}}&picture=" + hostname + "{% url 'read_file' group_name_tag node grid_fs_obj.filename %}";
     $(".share_link").attr("href",x);
    
 });
 </script>
+{% endcomment %}
 
 
 <div class="row page" itemscope itemtype="{{schema.1.type}}"> 
@@ -126,6 +129,7 @@
         <div class="{{ group_policy }} {{ node.status|lower }} content active commentable-section" id="view-page" data-section-id="1">
 
           <div class="{{node.pk}}-collection-set" data-cs="{{node.collection_set|safe}}"></div>
+
         {% comment %}
           <div class="row">  
         {% endcomment %}
@@ -249,6 +253,7 @@
               {% if not topic %}
                 <h3 class="text-gray">{{node.name}}:</h3>
               {% endif %}
+
               {% if 'image' in node.mime_type %}
                <center>
                 <div class="show-image">
@@ -417,7 +422,10 @@
             
             {% endif %}
           {% endif %}
-          
+            {% if "QuizItemEvent" in node.member_of_names_list %}
+                {% include 'ndf/quiz_player.html' %}
+            {% endif %}
+
           {% block add_fields %} {% endblock %}
 
           <ul class="inline-list">
@@ -453,6 +461,7 @@
           {% endfor %}
         
           <!-- <div id="commentable-area"> -->
+          {% if "QuizItemEvent" not in node.member_of_names_list %}
           <div>
             {% with node.content|safe as description %}
             {% if description != "None" %}
@@ -460,6 +469,7 @@
             {% endif %}
             {% endwith %}
           </div>
+          {% endif %}
         
 
      {% if not topic and not is_group %} 
@@ -837,7 +847,7 @@
           <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
             {% for subgroup_node in subgroups_cur %}
               <li class="card-image-wrapper"> 
-                {% include 'ndf/simple_card.html' with resource=subgroup_node has_prof_pic=True url_name="groupchange" first_arg=subgroup_node.pk %}
+                {% include 'ndf/simple_card.html' with resource=subgroup_node has_prof_pic=True url_name="groupchange" first_arg=subgroup_node.pk no_checkbox=True %}
               </li>
             {% comment %}
                 

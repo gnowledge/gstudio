@@ -1,3 +1,5 @@
+# Commented for khaal hackathon
+'''
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.course',
@@ -31,3 +33,4 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.course',
                         url(r'^/set_release_date_css/$', 'set_release_date_css', name='set_release_date_css'),
                        
                        )
+'''

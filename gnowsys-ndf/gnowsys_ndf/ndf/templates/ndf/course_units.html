@@ -526,7 +526,8 @@
     $(document).on('click','.done_units',function(){
       {% get_group_object groupid as group_object %}
       {% if "CourseEventGroup" in group_object.member_of_names_list %}
-        $(this).attr('href', '/{{group_id}}/course/structure/create/{{group_id}}')
+        // $(this).attr('href', '/{{group_id}}/course/structure/create/{{group_id}}')
+        $(this).attr('href', '/{{group_id}}/gcourse/structure/create/{{group_id}}')
       {% else %}
         turl = "{% url 'create_course_struct' groupid course_node.pk %}"
         if("{{app_id}}"!= ""){
@@ -572,7 +573,7 @@
               {% else %}
                 k = "{% url res_node.member_of_names_list.0|lower|concat:"_detail" groupid res_node.pk %}"
               {% endif %}
-              var str_unit = "<a href='"+k+"' target='_blank' >{{res_node.name}}</a><br>"
+              var str_unit = "<a href='"+k+"' target='_blank' >"+{{res_node.name|removetags:'p'}}+"</a><br>"
               
 
               var row = table.insertRow(-1);

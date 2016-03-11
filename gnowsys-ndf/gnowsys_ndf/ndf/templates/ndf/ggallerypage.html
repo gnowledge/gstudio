@@ -1,0 +1,242 @@
+{% load get_course_filters from ndf_tags %}
+
+{% load simple_filters %}
+<div class="gallery-page">
+    <div class="row gallery-header">
+        {% get_course_filters group_id title as filter_dict %}
+        {% include "ndf/filters.html" with filter_dict=filter_dict %}
+    </div>
+    {% comment %}
+    <div class="row gallery-header">
+        <div class="medium-4 columns filters">
+            <div class="row collapse">
+                <div class="medium-2 columns"> View By</div>
+                <div class="medium-3 columns">
+                    <select placeholder="Select File Types">
+                        <option value="all">All File Types</option>
+                        <option value="pdf">Pdf</option>
+                        <option value="image">Image</option>
+                        <option value="compressed">Compressed</option>
+                    </select>
+                </div>
+                <div class="medium-1 columns">
+                <i class="fi-list-thumbnails"></i>
+                </div>
+                <div class="medium-2 columns">
+                    <span>Sort By</span>
+                </div>
+                <div class="medium-3 columns end">
+                    <select placeholder="Sort">
+                        <option value="all">Top Rated</option>
+                        <option value="school1">Recent</option>
+                        <option value="school2">Most Commented</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="medium-8 columns">
+            <div class="row">
+                <div class="medium-9 search columns">
+                    <div class="row collapse prefix-round">
+                        <div class="small-2 columns">
+                            <i class="fi-filter"></i>
+                            <span>Add Filter</span>
+                        </div>
+                        <div class="small-2 columns">
+                            <select placeholder="User" class="primary-filter">
+                                <option value="all">User</option>
+                                <option value="school1">Size</option>
+                            </select>
+                        </div>
+                        <div class="small-2 columns">
+                            <select placeholder="Sort" class="secondary-filter">
+                                <option value="all">Select User</option>
+                                <option value="school1">Bunny</option>
+                                <option value="school2">Apple</option>
+                            </select>
+                        </div>
+                        <div class="small-6 columns filter-tags">
+                            <div class="filter-tag">Filter 1 <span>&times;</span></div>
+                            <div class="filter-tag">Filter 1 <span>&times;</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="medium-3 side-heading columns">
+                    <div class="row collapse prefix-round">
+                        <div class="small-3 columns">
+                            <a href="#" class="button prefix"><i class="fa fa-search"></i></a>
+                        </div>
+                        <div class="small-9 columns">
+                            <input type="text" placeholder="Search">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcomment %}
+
+    <div class="row gallery-panel">
+        <div class="medium-12 columns gallery-content" >
+            <div class="gallery-subheader small-12">
+                <div class="row">
+                {% if request.user.is_authenticated %}
+                  {% if allow_to_upload %}
+                    <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
+                        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
+                            {% csrf_token %}
+                            <label class="tiny button radius expand" style="margin: 0px;">
+                                <i class="fa fa-upload"></i>
+                                &nbsp;
+                                <span>Upload File</span>
+                                <input type="file" name="doc" id="docFile" style="display: none;"/>
+                            </label>
+                            <div class="save_cancel hide">
+                              <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
+                              <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
+                            </div>
+                            <input type="hidden" name="context_name" value="{{title}}">
+                        </form>
+                    </div>
+                  {% endif %}
+                  {% endif %}
+
+                    <div class="small-12 medium-10 columns gallery-actions hide" >
+                        <div class="create-note">
+                            <i class="fi-page-edit"></i>
+                            <span> Create note</span>
+                        </div>
+                        <div class="create-collection">
+                            <i class="fi-folder"></i>
+                            <span> Create new collection</span>
+                        </div>
+                        <div class = "parent-folder">
+                            <i class="fa fa-plus"></i>
+                            <span>Add to collection</span>
+                        </div>
+                        <div class="download-file">
+                            <i class="fi-download"></i>
+                            <span> Download</span>
+                        </div>
+                        <div>
+                            <i class="fi-info"></i>
+                            <span>View info</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Files listing div -->
+            <div class="gallery-body small-12 columns">
+                <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5 gallery-body-ul">
+                {% for each_img in files_cur %}
+                    <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
+                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True no_url=True first_arg=group_id second_arg=each_img.pk %}
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <!-- File info panel div -->
+
+        <!--div class="medium-3 columns file-info-panel">
+            <div class="file-name"> File Name </div>
+            <div class="row">
+                <div class="small-6 columns"> Type : </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Size : </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Uploaded By : </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns"> Created Date : </div>
+                <div class="small-6 columns"> info </div>
+            </div>
+        </div-->
+
+    </div>
+
+</div>
+<div class="reveal-container"></div>
+{% comment %}
+{% verbatim %}
+<script id="filter-tag-template" type="text/x-handlebars-template">
+    <div class="filter-tag">{{label}} <span>&times;</span></div>
+</script>
+{% endverbatim %}
+{% endcomment %}
+<script type="text/javascript">
+    $(document).on('click','.scard-container',function(){
+        node_id = $(this).attr('data-id')
+        $.ajax({
+          url: "{% url 'course_gallerymodal' group_id %}",
+          data: {
+            node_id: node_id
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            $(".reveal-container").html(data);
+            $("#reveal-"+ node_id).foundation('reveal','open');
+          },
+        });//end of ajax
+    });
+
+    /*
+    var filterTagSource   = $("#filter-tag-template").html();
+    var filterTagTemplate = Handlebars.compile(filterTagSource);
+
+    function createFilterTag(label) {
+        return filterTagTemplate({label});
+    }
+    $(function() {
+        $('.gallery-img>div').click(function (){
+            node_id = $(this).closest('.gallery-img').attr('id')
+            $.ajax({
+              url: "{% url 'course_gallerymodal' group_id %}",
+              data: {
+                node_id: node_id
+              },
+              type: "GET",
+              dataType: "html",
+              success: function(data){
+                $(".reveal-container").html(data);
+                $("#reveal-"+ node_id).foundation('reveal','open');
+              },
+            });//end of ajax
+        });
+
+        //Filter tags creation on changing seconday filter.
+        $(".secondary-filter").on('change', function() {
+            $('.filter-tags').append(createFilterTag($(".secondary-filter option:selected").text()));
+        });
+
+        //Filter tag deletion on cross.
+        $(".filter-tags").on('click', '.filter-tag>span', function() {
+            $(this).closest('.filter-tag').remove();
+        });
+    })
+    */
+
+    function applyFilter(filtersObjArr){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        $.ajax({
+          url: "{% url 'course_filters' group_id %}",
+          data: {
+            filter_dict: filtersObjArr,
+            'filter_applied': 'True',
+            'title': '{{title}}'
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            $(".gallery-body-ul").html(data)
+          },
+        });//end of ajax
+
+    }
+</script>

@@ -1,0 +1,20 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock title %}
+
+{% block body_content %}
+	<h3>
+		My courses
+	</h3>
+
+	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
+	{% for course_state, each_course_list in my_course_objs.items %}
+		{% for each_course in each_course_list %}
+			<li class="card-image-wrapper" style=""> 
+            {% include 'ndf/event_card.html' with resource=each_course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_course.pk  next_session=True %}
+          </li>
+		{% endfor %}
+	{% endfor %}
+	</ul>
+{% endblock body_content %}

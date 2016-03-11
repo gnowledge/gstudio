@@ -4,7 +4,10 @@ all_users = User.objects.all()
 auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
 new_auth_instances = 0
 for each_user in all_users:
-	auth = node_collection.one({'_type': u"Author", 'created_by': int(each_user.id)})
+	try:
+		auth = node_collection.find_one({'_type': u"Author", 'created_by': int(each_user.id)})
+	except:
+		pass
 	# This will create user document in Author collection to behave user as a group.
 	if auth is None and each_user.is_active:
 		print "\n Creating new Author obj for ",each_user.username
