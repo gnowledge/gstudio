@@ -53,6 +53,9 @@ def course(request, group_id, course_id=None):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
+    if request.user.is_anonymous():
+        return HttpResponseRedirect(reverse('explore_courses', kwargs={}))
+
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
     group_obj_post_node_list = []
