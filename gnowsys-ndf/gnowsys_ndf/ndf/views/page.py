@@ -344,6 +344,7 @@ def create_edit_page(request, group_id, node_id=None):
         # for the current page node.
         thread_create_val = request.POST.get("thread_create",'')
         # print "\n\n thread_create_val", thread_create_val
+        help_info_page = request.POST.get('help_info_page','')
 
         #program_res and res are boolean values
         if program_res:
@@ -390,6 +391,16 @@ def create_edit_page(request, group_id, node_id=None):
           return_status = create_thread_for_node(request,group_id, page_node)
         else:
           create_gattribute(page_node._id, discussion_enable_at, False)
+
+        if help_info_page and help_info_page != "null":
+          try:
+            help_info_page = ObjectId(help_info_page)
+            has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+            create_grelation(page_node._id, has_help_rt,help_info_page)
+          except Exception as invalidobjectid:
+            # print invalidobjectid
+            pass
+          # print "\n\n help_info_page ================ ",help_info_page
 
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
