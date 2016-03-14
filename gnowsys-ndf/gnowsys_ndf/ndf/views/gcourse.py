@@ -124,18 +124,6 @@ def course(request, group_id, course_id=None):
 def create_edit(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    # ins_objectid = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False:
-    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else:
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth:
-    #             group_id = str(auth._id)
-    # else:
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
@@ -226,18 +214,6 @@ def create_edit(request, group_id, node_id=None):
 # @login_required
 @get_execution_time
 def course_detail(request, group_id, _id):
-    # ins_objectid = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False:
-    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else:
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth:
-    #             group_id = str(auth._id)
-    # else:
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
@@ -315,22 +291,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     """
     auth = None
     tiss_site = False
-    # if ObjectId.is_valid(group_id) is False:
-    #     group_ins = node_collection.one({'_type': "Group", "name": group_id})
-    #     auth = node_collection.one({
-    #         '_type': 'Author', 'name': unicode(request.user.username)
-    #     })
-
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else:
-    #         auth = node_collection.one({
-    #             '_type': 'Author', 'name': unicode(request.user.username)
-    #         })
-    #         if auth:
-    #             group_id = str(auth._id)
-    # else:
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
@@ -830,17 +790,6 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
   # print "\n Found course_detail n gone inn this...\n\n"
 
   auth = None
-  # if ObjectId.is_valid(group_id) is False:
-  #   group_ins = node_collection.one({'_type': "Group", "name": group_id})
-  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #   if group_ins:
-  #     group_id = str(group_ins._id)
-  #   else:
-  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #     if auth:
-  #       group_id = str(auth._id)
-  # else:
-  #   pass
   try:
       group_id = ObjectId(group_id)
   except:
@@ -1076,19 +1025,6 @@ def create_course_struct(request, group_id, node_id):
           2.1. CourseSubSection3
 
     """
-
-    # ins_objectid = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False:
-    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else:
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth:
-    #             group_id = str(auth._id)
-    # else:
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
@@ -1602,7 +1538,7 @@ def create_edit_unit(request, group_id):
 def delete_course(request, group_id, node_id):
     del_stat = delete_item(node_id)
     if del_stat:
-        return HttpResponseRedirect(reverse('course', kwargs={'group_id': ObjectId(group_id)}))
+        return HttpResponseRedirect(reverse('gcourse', kwargs={'group_id': ObjectId(group_id)}))
 
 
 @login_required
@@ -1640,9 +1576,8 @@ def delete_from_course_structure(request, group_id):
 
         return HttpResponse(json.dumps(response_dict))
 
-@login_required
 @get_execution_time
-def delete_item(item, ce_flag):
+def delete_item(item, ce_flag=False):
     node_item = node_collection.one({'_id': ObjectId(item)})
     if ce_flag:
         cu_name = u"CourseUnit"
