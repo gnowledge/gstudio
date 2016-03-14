@@ -6221,6 +6221,11 @@ def get_visits_count(request, group_id):
 
 @get_execution_time
 def get_ckeditor(request,group_id):
+    temp = get_subdirectories('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/JHApp')
+    print temp
+    # for root, directories, filenames in os.walk('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/JHApp'):
+    #   for directory in directories: 
+    #     print "directory",directory  
     ckeditor_toolbar_val = request.GET.get('ckeditor_toolbar')
     return render_to_response('ndf/html_editor.html',            
             {
@@ -6247,3 +6252,7 @@ def get_gin_line_template(request,group_id,node_id):
                 
             },
             context_instance=RequestContext(request))
+
+def get_subdirectories(a_dir):
+    return [name for name in os.listdir(a_dir)
+            if os.path.isdir(os.path.join(a_dir, name))]

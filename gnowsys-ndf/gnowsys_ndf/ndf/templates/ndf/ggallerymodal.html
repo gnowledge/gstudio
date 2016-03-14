@@ -56,19 +56,9 @@
     <div class="row gmodal-body">
         <div class="small-8 columns gmodal-item-panel">
             <!-- Detail view section -->
-            <div class="row gmodal-item-holder ">
-                <div class="small-12 columns gmodal-item" style="background-color:white;">
-                    {% if 'image' in node.mime_type %}
-                        <img  src="{% url 'read_file' group_id node grid_fs_obj.filename %}" class="gmodel-item-image"/>
-                    {% else %}
-                        <h3><i>Preview Not Available</i></h3>
-                        <small>This is {{node.mime_type}} type file.<br/>Only images are displayed currently</small>
-                    {% endif %}
-                    {% comment %}
-                        {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
-                    {% endcomment %}
-                </div>
-            </div>
+            {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
+
+        </div>
             {% comment %}
             <div class="row gmodal-footer">
                 <div class="columns small-1 prev-item">< Prev</div>
