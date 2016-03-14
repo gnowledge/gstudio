@@ -1449,13 +1449,15 @@ def get_resources(request, group_id):
             if resource_type:
                 if resource_type == "Pandora":
                     resource_type = "Pandora_video"
+                if resource_type == "Quiz":
+                    resource_type = "QuizItem"
 
                 resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
                 res = node_collection.find(
                     {
                         'member_of': resource_gst._id,
-                        'group_set': ObjectId(group_id),
-                        'status': u"PUBLISHED"
+                        'status': u"PUBLISHED",
+                        '$or':[{'group_set': ObjectId(group_id)},{'contributors': request.user.id}]
                     }
                 )
                 for each in res:
