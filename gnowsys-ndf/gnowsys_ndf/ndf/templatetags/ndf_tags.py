@@ -335,10 +335,13 @@ def get_group_gapps(group_id=None):
 		group_name = group_obj.name
 		for attr in group_obj.attribute_set: 
 			if attr and "apps_list" in attr: 
-				gapps_list = attr["apps_list"] 
+				gapps_list = attr["apps_list"]
+				# print "\n", gapps_list,"\n"
 
 				all_gapp_ids_list = [node_collection.one({'_id':ObjectId(g['_id'])}) for g in gapps_list]
+				# print all_gapp_ids_list,">>>>>>>>>>\n\n works like prior_node"
 				return all_gapp_ids_list
+
 
 	return []
 
@@ -634,8 +637,8 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 
 @get_execution_time
 @register.inclusion_tag('tags/dummy.html')
-def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
-	
+# def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
+def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_widget.html'):
 	drawer1 = {}
 	drawer2 = None
 	# groupid = ""
@@ -648,8 +651,7 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 	alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
 
 	fields_selection1 = ["subject_type","language","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
-
-	fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
+	# fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
 
 	fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType","language":"GSystemType"}
 	types = fields[fields_name]
@@ -678,7 +680,78 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 				drawer1[str(each._id)]=each
 		return {'template': template1, 'widget_for': fields_name, 'drawer1': drawer1, 'selected_value': fields_value}
 
+	# if fields_name in fields_selection2:
+	# 	fields_value_id_list = []
+
+	# 	if fields_value:
+	# 		for each in fields_value:
+	# 			if type(each) == ObjectId:
+	# 				fields_value_id_list.append(each)
+	# 			else:
+	# 				fields_value_id_list.append(each._id)
+
+	# 	if types in alltypes:
+	# 		for each in node_collection.find({"_type": types}):
+	# 			if fields_value_id_list:
+	# 				if each._id not in fields_value_id_list:
+	# 					drawer1[each._id] = each
+	# 			else:
+	# 				drawer1[each._id] = each
+
+	# 	if types in ["all_types"]:
+	# 		for each in alltypes:
+	# 			for eachnode in node_collection.find({"_type": each}):
+	# 				if fields_value_id_list:
+	# 					if eachnode._id not in fields_value_id_list:
+	# 						drawer1[eachnode._id] = eachnode
+	# 				else:
+	# 					drawer1[eachnode._id] = eachnode
+
+	# 	if fields_value_id_list:
+	# 		drawer2 = []
+	# 		for each_id in fields_value_id_list:
+	# 			each_node = node_collection.one({'_id': each_id})
+	# 			if each_node:
+	# 				drawer2.append(each_node)
+
 	
+	# 	return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid,'groupid': groupid, 'admin_related_drawer': admin_related_drawer }
+
+
+
+
+
+
+
+
+	
+@get_execution_time
+@register.assignment_tag
+@register.inclusion_tag('ndf/admin_fields.html')
+def get_all_drawer_items(fields_name,fields_value):
+	drawer1 = {}
+	alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
+	fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","member_of","type_of"]
+	fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType","language":"GSystemType"}
+	types = fields[fields_name]
+
+	if fields_name in fields_selection2:
+		if types in alltypes:
+			for each in node_collection.find({"_type": types}):
+				drawer1[each] = each
+		return drawer1
+	return []
+
+@get_execution_time
+@register.assignment_tag
+@register.inclusion_tag('ndf/admin_fields.html')
+def get_selected_drawer_items(fields_name,fields_value):
+	drawer2 = None
+	alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
+	fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
+	fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType","language":"GSystemType"}
+	types = fields[fields_name]
+
 	if fields_name in fields_selection2:
 		fields_value_id_list = []
 
@@ -689,23 +762,6 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 				else:
 					fields_value_id_list.append(each._id)
 
-		if types in alltypes:
-			for each in node_collection.find({"_type": types}):
-				if fields_value_id_list:
-					if each._id not in fields_value_id_list:
-						drawer1[each._id] = each
-				else:
-					drawer1[each._id] = each
-
-		if types in ["all_types"]:
-			for each in alltypes:
-				for eachnode in node_collection.find({"_type": each}):
-					if fields_value_id_list:
-						if eachnode._id not in fields_value_id_list:
-							drawer1[eachnode._id] = eachnode
-					else:
-						drawer1[eachnode._id] = eachnode
-
 		if fields_value_id_list:
 			drawer2 = []
 			for each_id in fields_value_id_list:
@@ -713,8 +769,27 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 				if each_node:
 					drawer2.append(each_node)
 
-	
-		return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid,'groupid': groupid, 'admin_related_drawer': admin_related_drawer }
+		return drawer2
+
+	return []
+
+
+@get_execution_time
+@register.assignment_tag
+@register.inclusion_tag('ndf/admin_fields.html')
+def get_all_priornode_items(fields_name,fields_value):
+	drawer1 = {}
+	drawer = {}
+	alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
+	fields = {"meta_type_set":"MetaType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types","type_of": "GSystemType"}
+	types = fields[fields_name]
+
+	for each in alltypes:
+		for eachnode in node_collection.find({"_type":each}):
+			drawer[eachnode] = eachnode._id
+	return drawer
+
+	return []
 
 
 @get_execution_time
@@ -1857,9 +1932,10 @@ def get_policy(group, user):
 def get_input_fields(fields_type, fields_name, translate=None ):
 	"""Get html tags 
 	"""
-	field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
-	return {"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
-					"field_type_list":field_type_list,"translate":translate }
+	# field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
+	return {"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1],"translate":translate }
+	# return {"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
+					# "field_type_list":field_type_list,"translate":translate }
 	# return {'template': 'ndf/admin_fields.html', 
 	# 				"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
 	# 				"field_type_list":field_type_list,"translate":translate}
