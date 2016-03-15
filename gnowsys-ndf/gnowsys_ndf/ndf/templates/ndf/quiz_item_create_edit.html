@@ -263,82 +263,82 @@
  * Description : 
    (1) Based on which type of quiz is selected, it's corresponding answer-div is displayed (along with options, wherever required). 
  */
- $(document).ready(function(){
-	{% if node %}
-		$(".sel_show_correct_ans").val("{{node.quizitem_show_correct_ans}}")
-		$(".sel_check_ans").val("{{node.quizitem_check_answer}}")
+		 $(document).ready(function(){
+			{% if node %}
+				$(".sel_show_correct_ans").val("{{node.quizitem_show_correct_ans}}")
+				$(".sel_check_ans").val("{{node.quizitem_check_answer}}")
 
-	{% endif %}
- })
+			{% endif %}
+		 })
 
-$('#quiz_type').change(function (){
-    $("#quiz_type_val").val($(this).val())
-    var targetDivId = $(this).val();
-    if(targetDivId == "Single-Choice" || targetDivId == "Multiple-Choice"){
-    	$(".quiz_type_based_correct_ans_div").removeClass("hide");
-	    if ($(this).val() != $('#' + $(this).attr('id') + ' option:nth-child(1)').val()) {
-			$('#options').css('display', 'block');
-	    }
-	    else {
-			$('#options').css('display', 'none');
-	    }
-	    $('.quiz-type-based-div').hide('fast');
-	    $('div#' + targetDivId).show('fast');
-    }
-    else if(targetDivId == "Short-Response"){
-    	$(".quiz_type_based_correct_ans_div").addClass("hide");
-		$('#options').css('display', 'none');
-	    $('div#' + targetDivId).hide('fast');
-    }
+		$('#quiz_type').change(function (){
+		    $("#quiz_type_val").val($(this).val())
+		    var targetDivId = $(this).val();
+		    if(targetDivId == "Single-Choice" || targetDivId == "Multiple-Choice"){
+		    	$(".quiz_type_based_correct_ans_div").removeClass("hide");
+			    if ($(this).val() != $('#' + $(this).attr('id') + ' option:nth-child(1)').val()) {
+					$('#options').css('display', 'block');
+			    }
+			    else {
+					$('#options').css('display', 'none');
+			    }
+			    $('.quiz-type-based-div').hide('fast');
+			    $('div#' + targetDivId).show('fast');
+		    }
+		    else if(targetDivId == "Short-Response"){
+		    	$(".quiz_type_based_correct_ans_div").addClass("hide");
+				$('#options').css('display', 'none');
+			    $('div#' + targetDivId).hide('fast');
+		    }
 
-}).change();
+		});
 
-/*
- * Element     : quiz_type
- * Type        : select (Drop-down list)
- * Event       : on change
- * Description : 
-   (1) Based on which type of quiz is selected, it's corresponding answer-div is displayed (along with options, wherever required). 
- */
+		/*
+		 * Element     : quiz_type
+		 * Type        : select (Drop-down list)
+		 * Event       : on change
+		 * Description : 
+		   (1) Based on which type of quiz is selected, it's corresponding answer-div is displayed (along with options, wherever required). 
+		 */
 
-var no_of_options = 2;
-/*
- * Element     : add_option
- * Type        : button
- * Event       : on click
- * Description : 
-   (1) It clones the structure of very first option element (div) and does the necessary renaming of it's elements; and then after pastes it above 
-       the '+ Add Option' button.
-   (2) Also adds the corresponding option number to the correct answer's drop-down list.
- */
-$('#add_option').click(function (){
-    no_of_options = no_of_options + 1;
+		var no_of_options = 2;
+		/*
+		 * Element     : add_option
+		 * Type        : button
+		 * Event       : on click
+		 * Description : 
+		   (1) It clones the structure of very first option element (div) and does the necessary renaming of it's elements; and then after pastes it above 
+		       the '+ Add Option' button.
+		   (2) Also adds the corresponding option number to the correct answer's drop-down list.
+		 */
+		$('#add_option').click(function (){
+		    no_of_options = no_of_options + 1;
 
-    // Cloneing the very first option's div
-    var option_div_clone = $('#option_div').clone();
+		    // Cloneing the very first option's div
+		    var option_div_clone = $('#option_div').clone();
 
-    // Performing renaming of it's various elements
-    var name_val = 'option_div_' + no_of_options;
-    option_div_clone.attr({id: name_val, name: name_val});
+		    // Performing renaming of it's various elements
+		    var name_val = 'option_div_' + no_of_options;
+		    option_div_clone.attr({id: name_val, name: name_val});
 
-    option_div_clone.children().children('label').text(no_of_options + '.');
-    option_div_clone.children().children('label').attr('for', 'option_' + no_of_options);
+		    option_div_clone.children().children('label').text(no_of_options + '.');
+		    option_div_clone.children().children('label').attr('for', 'option_' + no_of_options);
 
-    option_div_clone.children().children('textarea').attr({id: 'option_' + no_of_options, name: 'option_' + no_of_options});
+		    option_div_clone.children().children('textarea').attr({id: 'option_' + no_of_options, name: 'option_' + no_of_options});
 
-    // Pasting the cloned element, after modifying it, above the '+ Add Option' button
-    $(this).before(option_div_clone);
+		    // Pasting the cloned element, after modifying it, above the '+ Add Option' button
+		    $(this).before(option_div_clone);
 
-    // Fetching the appropriate correct answer (having drop-down list) based on the option selected (Single-choice/Multiple-choice) 
-    drop_down_answer_list_div_id = $('div#' + $('#quiz_type').val()).attr('id');
-    
-    // Fetching the corresponding drop-down list & appending the option number to it
-    drop_down_answer_list = $("#" + drop_down_answer_list_div_id).children('select');
-    drop_down_answer_list.append($('<option>', {value:no_of_options, text:no_of_options}));
+		    // Fetching the appropriate correct answer (having drop-down list) based on the option selected (Single-choice/Multiple-choice) 
+		    drop_down_answer_list_div_id = $('div#' + $('#quiz_type').val()).attr('id');
+		    
+		    // Fetching the corresponding drop-down list & appending the option number to it
+		    drop_down_answer_list = $("#" + drop_down_answer_list_div_id).children('select');
+		    drop_down_answer_list.append($('<option>', {value:no_of_options, text:no_of_options}));
 
-    // Updating number of options value to hidden element
-    $("#no_of_options").val(no_of_options);
-});
+		    // Updating number of options value to hidden element
+		    $("#no_of_options").val(no_of_options);
+		});
 
 		var startEnrollDt = $("#thread_start_date");
 		var endEnrollDt = $("#thread_close_date");
@@ -440,9 +440,19 @@ $('#add_option').click(function (){
 			},
 		});
 
-	    var inner_text_content = CKEDITOR.instances['ckeditor_textarea'].getData();
-	    inner_text_content = $(inner_text_content).text()
-	    $("#quiz_item_create_form").append('<input type="hidden" value="'+inner_text_content+'"  name="quiz_item_name"/>')
+		$("#save_quiz_item").click(function(event){
+			var inner_text_content = CKEDITOR.instances['ckeditor_textarea'].getData();
+			// inner_text_content = $(inner_text_content).text()
+			if(inner_text_content){
+				$("#quiz_item_create_form").append('<input type="hidden" value="'+inner_text_content+'"  name="quiz_item_name"/>')
+			}
+			else{
+				alert("Please enter question content");
+				event.preventDefault()
+			}
+
+		})
+
 
 </script>
 
