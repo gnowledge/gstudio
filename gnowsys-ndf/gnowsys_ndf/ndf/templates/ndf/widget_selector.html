@@ -239,7 +239,7 @@ HOW TO USE
     $(".selected-items").sortable({revert: true, scroll: true});
   })
 
-  var selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
+  var selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
 
   // toBeSelected = document.getElementById('to-be-selected');
   var toBeSelected = $s('#' + selectorWidgetID + ' .to-be-selected');
