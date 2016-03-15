@@ -2764,6 +2764,29 @@ div.show-image:hover div.fullscreen-icon{
   .gmodal-body {
     position: relative;
     .gmodal-item-panel {
+
+      .text-gray{
+        display:none;
+      }
+      
+      iframe{
+        height: 550px!important;
+        width:130%!important;
+      }
+      
+      #view-page{
+        margin-top: -10px!important;
+      }
+      
+      span{
+        display:none!important;
+      }
+      
+      .button{
+        display:none!important;
+      }
+
+      background-color:#fff;
       height: 86vh;
 
       .gmodal-item-holder {
