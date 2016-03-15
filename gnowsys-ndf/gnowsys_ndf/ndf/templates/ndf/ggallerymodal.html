@@ -2,7 +2,24 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% get_grid_fs_object node as grid_fs_obj %}
-
+<!--<style type="text/css">
+    .gmodal-item-panel .text-gray{
+        display:none;
+    }
+    .gmodal-item-panel iframe{
+        height: 550px!important;
+        width:130%!important;
+    }
+    #view-page{
+        margin-top: -10px!important;
+    }
+    .gmodal-item-panel span{
+        display:none!important;
+    }
+    .gmodal-item-panel .button{
+        display:none!important;
+    }
+</style>-->
 <div id="reveal-{{node.pk}}" class="reveal-modal" data-reveal >
     <div class="row gmodal-toolbar">
         <div class="small-8 columns file-name" title="{{node.name}}">
