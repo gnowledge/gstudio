@@ -115,9 +115,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         options = []
 
     class_structure = eval(class_name).structure
-
     required_fields = eval(class_name).required_fields
-
 
     newdict = {}
     if node_id:
@@ -129,7 +127,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         if translate:
             new_instance_type = eval("node_collection.collection"+"."+class_name)()
         for key,value in class_structure.items():
-
+            
             if value == bool:
                 if request.POST.get(key,""):
                     if request.POST.get(key,"") in ('1','2'):
@@ -183,6 +181,10 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                         for each in request.POST.get(key,"").split(","):
                             listoflist.append(ObjectId(each))
                         new_instance_type[key] = listoflist
+                else:
+                    listoflist=[]
+                    new_instance_type[key]=listoflist
+
 
             elif type(value) == tuple:
                 new_instance_type[key] = tuple(eval(request.POST.get(key,"")))
@@ -203,7 +205,6 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                     new_instance_type[key] = int(request.POST.get(key,""))
 
             else: 
-
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"")
 
