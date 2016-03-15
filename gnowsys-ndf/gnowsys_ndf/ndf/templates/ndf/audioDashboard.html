@@ -1,7 +1,6 @@
 {% load ndf_tags %}
 {% load i18n %}
-
-{% block body_content %} 
+ 
 {% get_group_name groupid as group_name_tag %}
  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
  <!--
@@ -17,14 +16,13 @@
     <!<script src="https://cdn.rawgit.com/webrtc/adapter/master/adapter.js"></script> -->
 
 
-<body>
    <!--  <h1>
         <div id="timer">2:00</div>
     </h1> -->
     
       <i class="fi-info"></i>You can record audio for max 30 seconds.!<br>
     
-    <div class="center">
+    <div class="center btn-group">
         <label style="display:none!important" for="time-interval hidden">Time Interval (milliseconds):</label>
         <input  style="display:none!important" type="text" id="time-interval" value="30000 ">
 
@@ -115,6 +113,7 @@
 
     document.querySelector('#save-recording').onclick = function() {
         this.disabled = true;
+
        
         // mediaRecorder.save();
     };
@@ -189,7 +188,9 @@
                               obj_id = parseInt(xhr.responseText);
                               var completeURL = "/" + "{{group_id}}" + "/file" + "/readDoc" + "/" + xhr.responseText + "/" + timeStamp;
                                           CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls> <source src="'+ completeURL +'" type="audio/ogg"></audio>');
-                                          $('#group_imgs_on_modal').foundation('reveal', 'close');
+                                             $(".btn-group").remove();
+                                             $("#audios-container").remove();
+                                             $('#group_imgs_on_modal').foundation('reveal', 'close');
 
 
                           }
@@ -257,4 +258,3 @@
     };
     </script>
 
-{% endblock %}
