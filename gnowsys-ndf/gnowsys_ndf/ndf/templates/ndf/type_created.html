@@ -1,0 +1,103 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{%block title %} Node.html {% endblock %}
+
+{% block body_content %}
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+<form method="post" action="" name="" id="type_create">
+
+<div class="row">
+
+    <div style="display:table-row;">
+        <div style="display:table-cell;"> 
+            <select id="widget_for" name="widget_for" onchange="GetSelectedTextValue(this)" >
+                <option value="">select</option>
+                {% for list in opt_list %}
+                    <option value="{{list}}" size="5" > {{list}} </option>
+                {% endfor %}
+            </select>
+
+
+        </div>
+    </div>
+
+
+    {# <div style="display:table-row;"> #}
+        {# <div style="display:table-cell;">  #}
+        
+        {# {% object_type_created opt_list option_list %} {{"ndf tag it list the entire object in the final widget"}} #}
+
+        {# {% include 'ndf/option_widget.html' with widget_for='object_type_created' drawer1=opt_list selected_value=option_list  dummy='true' %} {{'included txt'}} #}
+
+
+
+        {# <!-- {% get_edit_url pass the _id with it  %} --> #}
+
+    {# <a class="tiny round button" href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}"> #}
+        {# <span class="fi-plus">&nbsp;&nbsp;{% trans "Create to create new page " %}</span> #}
+    {# </a> #}
+
+        {# </div> #}
+
+    {# </div> #}
+
+
+</div>
+
+</form>
+<input type="submit" name="submit" class="button" id="save-node-type" value="Create" onclick="NavigateToSite()" />
+
+<script type="text/javascript">
+var list = "{{list}}"
+var selectedValue = null 
+
+function GetSelectedTextValue(widget_for) {
+    var selectedText = widget_for.options[widget_for.selectedIndex].innerHTML;
+    selectedValue = widget_for.value;
+    return selectedValue
+}
+
+function NavigateToSite(){
+    // document.location.href=document.getElementById('widget_for')
+    var selectedValue = document.getElementById('widget_for').value
+    var selected_val = null 
+    console.log(selectedValue)
+
+    if (selectedValue == "Page"){
+        selected_val = '{% url 'page_create_edit' group_name_tag %}';
+    } else if (selectedValue == "File"){
+        selected_val = '{% url 'uploadDoc' group_name_tag %}';
+    } else if (selectedValue == "Group"){
+        selected_val = '{% url 'create_group' group_name_tag %}';
+    } else if (selectedValue == "Forum"){
+        selected_val = '{% url 'create_forum' group_name_tag %}';
+    } else if (selectedValue == "Course"){
+        selected_val = '{% url 'create_edit' group_name_tag %}';
+    } else if (selectedValue == "Task"){
+        selected_val = '{% url 'task_create_edit' group_name_tag %}';
+    } else if (selectedValue == "ProgramEventGroup"){
+        selected_val = '{% url 'create_event_group' group_id 'ProgramEventGroup' %}';
+    } else if (selectedValue == "Quiz"){
+        selected_val = '{% url 'quiz_create' group_name_tag %}';
+    } else if (selectedValue == "QuizItem"){
+        selected_val = '{% url 'quiz_item_create' group_name_tag %}';
+    } else if (selectedValue == "Quiz"){
+        selected_val = '{% url 'quiz_create' group_name_tag %}';
+    } else if (selectedValue == "Image"){
+        selected_val = '{% url 'uploadDoc' group_name_tag %}';
+    } else if (selectedValue == "Video"){
+        selected_val = '{% url 'uploadDoc' group_name_tag %}';
+    } else if (selectedValue == "E-Book"){
+        selected_val = '{% url 'uploadDoc' group_name_tag %}';
+    } 
+
+
+    window.location = selected_val;
+}
+
+
+</script>
+{% endblock %}
