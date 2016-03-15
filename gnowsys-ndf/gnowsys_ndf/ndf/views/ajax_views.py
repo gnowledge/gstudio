@@ -6221,8 +6221,8 @@ def get_visits_count(request, group_id):
 
 @get_execution_time
 def get_ckeditor(request,group_id):
-    temp = get_subdirectories('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/JHApp')
-    print temp
+    # temp = get_subdirectories('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/JHApp')
+    # print temp
     # for root, directories, filenames in os.walk('/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/JHApp'):
     #   for directory in directories: 
     #     print "directory",directory  
