@@ -831,48 +831,22 @@ def get_collection(request, group_id, node_id, stats_flag=False):
   # print "\nnode: ",node.name,"\n"
   collection_list = []
   gstaff_access = False
-  completed_ids_list = incompleted_ids_list = []
+  completed_ids_list = []
+  incompleted_ids_list = []
   gstaff_access = check_is_gstaff(group_id,request.user)
+
+  completed_node_ids = request.GET.getlist("completed_nodes[]","")
+  incompleted_node_ids = request.GET.getlist("incompleted_nodes[]","")
+  leaf_ids = request.GET.getlist("leaf_nodes[]","")
   # collection_list_append_temp=collection_list.append
   # print "\n\n gstaff_access---",gstaff_access
 
-  all_prior_node_ids = []
   list_of_leaf_node_ids = []
   if stats_flag:
     if request.user.id:
-      all_res_nodes = dig_nodes_field(node,'collection_set',True,['Page','File'])
-      twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
-      reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"})
-      rec = node_collection.collection.aggregate([
-                  {'$match': {'member_of': twist_gst._id, 'relation_set.thread_of':{'$in': all_res_nodes}, 'author_set': int(1)}},
-                  {'$project': {'_id': 1,
-                          'node_id': '$relation_set.thread_of',
-                  }},
-                  ])
-
-      resultlist = rec["result"]
-      if resultlist:
-        for eachele in resultlist:
-          for eachk,eachv in eachele.items():
-            if eachk == "node_id":
-              try:
-                node_id_val = eachv[0][0]
-                list_of_leaf_node_ids.append(node_id_val)
-              except IndexError as ie:
-                pass
-
-      if list_of_leaf_node_ids:
-        list_of_leaf_node_cur = node_collection.find({'_id': {'$in': list_of_leaf_node_ids}})
-        for each_leaf_node in list_of_leaf_node_cur:
-            test_replies_ids = []
-            all_prior_node_ids.extend(dig_nodes_field(each_leaf_node,'prior_node',False, ['CourseSectionEvent', 'CourseSubSectionEvent', 'CourseUnitEvent'],test_replies_ids))
-        # all_prior_node_ids.extend(list_of_leaf_node_ids)
-        all_prior_node_ids = list(set(all_prior_node_ids))
-        # print "\n\n len === ", len(all_prior_node_ids), all_prior_node_ids
-        completed_return_list = []
-        incompleted_return_list = []
-        completed_ids_list,incompleted_ids_list = get_course_completed_ids(all_prior_node_ids,list_of_leaf_node_ids,completed_return_list, incompleted_return_list)
-        completed_ids_list.extend(list_of_leaf_node_ids)
+        completed_ids_list = map(ObjectId, completed_node_ids)
+        incompleted_ids_list = map(ObjectId, incompleted_node_ids)
+        list_of_leaf_node_ids = map(ObjectId, leaf_ids)
         # print "\n\n completed_ids_list --- ", len(completed_ids_list)
         # print "\n\n incompleted_ids_list --- ", len(incompleted_ids_list)
 
