@@ -1943,7 +1943,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
 
 
 @get_execution_time
-def course_raw_material(request, group_id):
+def course_raw_material(request, group_id, node_id=None):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
@@ -1952,8 +1952,12 @@ def course_raw_material(request, group_id):
     gstaff_users = []
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
+    allow_to_join = None
+    files_cur = None
     result_status = course_complete_percentage = None
     total_count = completed_count = None
+
+    allow_to_join = get_group_join_status(group_obj)
     if request.user.is_authenticated:
         result_status = get_course_completetion_status(group_obj, request.user.id)
         if result_status:
@@ -1964,10 +1968,23 @@ def course_raw_material(request, group_id):
             if "completed_count" in result_status:
                 completed_count = result_status['completed_count']
 
-    allow_to_join = get_group_join_status(group_obj)
-    files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
-        # 'tags': {'$regex': u"raw", '$options': "i"}
-        },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'raw material', "completed_count": completed_count,
+            'total_count':total_count, "course_complete_percentage":course_complete_percentage
+        }
+    if node_id:
+        file_obj = node_collection.one({'_id': ObjectId(node_id)})
+        thread_node = None
+        allow_to_comment = None
+        thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
+        context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
+    else:
+
+        files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
+            # 'tags': {'$regex': u"raw", '$options': "i"}
+            },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
 
     gstaff_access = check_is_gstaff(group_id,request.user)
 
@@ -1977,18 +1994,15 @@ def course_raw_material(request, group_id):
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
 
-    context_variables = RequestContext(request, {
-            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'raw material',
-            'files_cur': files_cur, 'allow_to_upload': allow_to_upload,
-            'allow_to_join': allow_to_join, "course_complete_percentage":course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count
-        })
-    return render_to_response(template, context_variables)
+    context_variables.update({'files_cur': files_cur, 'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
+    return render_to_response(template, 
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
 
 
 @get_execution_time
-def course_gallery(request, group_id):
+def course_gallery(request, group_id,node_id=None):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
@@ -1996,13 +2010,7 @@ def course_gallery(request, group_id):
     gstaff_users = []
     query = {}
     allow_to_upload = True
-    query_dict = None
-    # filter_applied = request.GET.get("filter_applied", "")
-    # if filter_applied:
-    #     filter_applied = eval(filter_applied)
-    # filter_dict = request.GET.get("filter_dict", "")
-
-    allow_to_join =  None
+    allow_to_join = query_dict = None
     allow_to_join = get_group_join_status(group_obj)
     result_status = course_complete_percentage = None
     total_count = completed_count = None
@@ -2018,35 +2026,26 @@ def course_gallery(request, group_id):
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'gallery',
-            'allow_to_upload':allow_to_upload, 'allow_to_join': allow_to_join,
-            "course_complete_percentage":course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count
+            'node': group_obj, 'title': 'gallery', 'allow_to_upload':allow_to_upload, 
+            'allow_to_join':allow_to_join, "completed_count": completed_count,
+            'total_count':total_count, "course_complete_percentage":course_complete_percentage
         }
-    gstaff_users.extend(group_obj.group_admin)
-    gstaff_users.append(group_obj.created_by)
-    query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}}
+
+    if node_id:
+        file_obj = node_collection.one({'_id': ObjectId(node_id)})
+        thread_node = None
+        allow_to_comment = None
+        thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
+        context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
+    else:
+        gstaff_users.extend(group_obj.group_admin)
+        gstaff_users.append(group_obj.created_by)
+        query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}}
+        files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+        # print "\n\n Total files: ", files_cur.count()
+        context_variables.update({'files_cur': files_cur})
     template = 'ndf/gcourse_event_group.html'
 
-    # if filter_applied:
-    #     filter_dict = json.loads(filter_dict)
-    #     query_dict = get_filter_querydict(filter_dict)
-    #     print "\n\n *********\n\n", query_dict
-    #     if query_dict:
-    #         for each_dict in query_dict:
-    #             query.pop('created_by')
-    #             query.update(each_dict)
-    #             # existing_keys = [key_name for key_name in list_of_dict.keys() if key_name in query.keys()]
-    #             # if existing_keys:
-    #             #     map(query.__delitem__,existing_keys)
-    #             # query.update(list_of_dict)
-    #     template = 'ndf/file_list_tab.html'
-    # # print "\n\n query === ", query
-    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
-    # print "\n\n Total files: ", files_cur.count()
-    context_variables.update({'files_cur': files_cur})
-    # if filter_applied:
-    #     context_variables.update({"resource_type": files_cur, "detail_urlname": "file_detail", "res_type_name": "","no_footer":True, "no_description":True, "no_url":True})
     return render_to_response(template, 
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -2099,12 +2098,13 @@ def course_about(request, group_id):
 
 
 @get_execution_time
-def course_gallerymodal(request, group_id):
+def course_gallerymodal(request, group_id, node_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-    node_id = request.GET.get("node_id", "")
+    # node_id = request.GET.get("node_id", "")
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    # print "\n\n node_obj == ", node_obj.name
     thread_node = None
     allow_to_comment = None
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
@@ -2236,8 +2236,12 @@ def course_filters(request, group_id):
         detail_urlname = "course_notebook_tab_note"
     if title.lower() == "gallery":
         query.update({'created_by': {'$nin': gstaff_users}})
+        no_url_flag = False
+        detail_urlname = "course_gallery_detail"
     elif title.lower() == "raw material":
         query.update({'created_by': {'$in': gstaff_users}})
+        no_url_flag = False
+        detail_urlname = "course_raw_material_detail"
 
     if filter_applied:
         filter_dict = json.loads(filter_dict)
