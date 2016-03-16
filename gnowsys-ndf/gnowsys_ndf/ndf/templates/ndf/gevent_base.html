@@ -229,10 +229,10 @@ list-style: none;
           {% include "ndf/gnotebook.html" %}
 
         {% elif title == 'gallery' %}
-          {% include "ndf/ggallerypage.html" %}
+          {% include "ndf/ggallerypage.html" with file_detail_url='course_gallery_detail' redirect_tab_url='course_gallery' %}
 
         {% elif title == 'raw material' %}
-          {% include "ndf/ggallerypage.html" %}
+          {% include "ndf/ggallerypage.html" with file_detail_url='course_raw_material_detail' redirect_tab_url='course_raw_material'%}
 
         {% elif title == 'about' %}
           <div id="course-about">
