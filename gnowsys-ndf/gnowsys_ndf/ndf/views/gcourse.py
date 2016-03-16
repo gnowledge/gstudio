@@ -1954,13 +1954,10 @@ def course_raw_material(request, group_id, node_id=None):
     gstaff_users.append(group_obj.created_by)
     allow_to_join = None
     files_cur = None
-    context_variables = {
-            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'raw material', 
-        }
-    allow_to_join = get_group_join_status(group_obj)
     result_status = course_complete_percentage = None
     total_count = completed_count = None
+
+    allow_to_join = get_group_join_status(group_obj)
     if request.user.is_authenticated:
         result_status = get_course_completetion_status(group_obj, request.user.id)
         if result_status:
@@ -1972,6 +1969,11 @@ def course_raw_material(request, group_id, node_id=None):
                 completed_count = result_status['completed_count']
 
 
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'node': group_obj, 'title': 'raw material', "completed_count": completed_count,
+            'total_count':total_count, "course_complete_percentage":course_complete_percentage
+        }
     if node_id:
         file_obj = node_collection.one({'_id': ObjectId(node_id)})
         thread_node = None
@@ -2025,7 +2027,8 @@ def course_gallery(request, group_id,node_id=None):
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'gallery', 'allow_to_upload':allow_to_upload, 
-            'allow_to_join':allow_to_join
+            'allow_to_join':allow_to_join, "completed_count": completed_count,
+            'total_count':total_count, "course_complete_percentage":course_complete_percentage
         }
 
     if node_id:
