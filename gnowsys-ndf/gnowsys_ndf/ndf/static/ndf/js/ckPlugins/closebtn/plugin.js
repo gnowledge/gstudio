@@ -20,6 +20,8 @@ CKEDITOR.plugins.add( 'closebtn', {
                 $( "div" ).remove( ".ckeditor-content-reply" );
                 $( "div" ).remove( ".ckeditor-content-comment" );
                 $('.reply-button').remove();
+                $(".btn-group").remove();
+                $("#audios-container").remove();
                 
     	}
     });
