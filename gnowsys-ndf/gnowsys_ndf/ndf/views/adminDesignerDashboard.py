@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 
 from gnowsys_ndf.settings import LANGUAGES
+from gnowsys_ndf.settings import GSTUDIO_HELP_TIP
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import *
 
@@ -90,6 +91,8 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     contentlist = []
     dependencylist = []
     options = []
+
+
     translate=request.GET.get('translate','')
     if class_name == "AttributeType":
         definitionlist = ['name','altnames','language','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
@@ -116,6 +119,8 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
     class_structure = eval(class_name).structure
     required_fields = eval(class_name).required_fields
+
+    help_tip = GSTUDIO_HELP_TIP
 
     newdict = {}
     if node_id:
@@ -292,7 +297,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                                             'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
                                             'options': options, 'required_fields': required_fields,"translate":translate,"lan":LANGUAGES,
-                                            'groupid': groupid,'group_id':groupid 
+                                            'groupid': groupid,'group_id':groupid ,'help_tip':help_tip
                                         })
 
     else:
