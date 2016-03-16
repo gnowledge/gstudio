@@ -1952,7 +1952,10 @@ def course_raw_material(request, group_id, node_id=None):
         }
     if node_id:
         file_obj = node_collection.one({'_id': ObjectId(node_id)})
-        context_variables.update({'file_obj': file_obj})
+        thread_node = None
+        allow_to_comment = None
+        thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
+        context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
     else:
         start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
         if start_enrollment_date:
@@ -2004,7 +2007,10 @@ def course_gallery(request, group_id,node_id=None):
         }
     if node_id:
         file_obj = node_collection.one({'_id': ObjectId(node_id)})
-        context_variables.update({'file_obj': file_obj})
+        thread_node = None
+        allow_to_comment = None
+        thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
+        context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
     else:
         start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
         if start_enrollment_date:
