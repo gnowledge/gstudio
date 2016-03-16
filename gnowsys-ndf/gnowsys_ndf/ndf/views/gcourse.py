@@ -31,9 +31,9 @@ from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status
 from gnowsys_ndf.notification import models as notification
 
 
@@ -124,18 +124,6 @@ def course(request, group_id, course_id=None):
 def create_edit(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    # ins_objectid = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False:
-    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else:
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth:
-    #             group_id = str(auth._id)
-    # else:
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
@@ -226,18 +214,6 @@ def create_edit(request, group_id, node_id=None):
 # @login_required
 @get_execution_time
 def course_detail(request, group_id, _id):
-    # ins_objectid = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False:
-    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else:
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth:
-    #             group_id = str(auth._id)
-    # else:
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
@@ -315,22 +291,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     """
     auth = None
     tiss_site = False
-    # if ObjectId.is_valid(group_id) is False:
-    #     group_ins = node_collection.one({'_type': "Group", "name": group_id})
-    #     auth = node_collection.one({
-    #         '_type': 'Author', 'name': unicode(request.user.username)
-    #     })
-
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else:
-    #         auth = node_collection.one({
-    #             '_type': 'Author', 'name': unicode(request.user.username)
-    #         })
-    #         if auth:
-    #             group_id = str(auth._id)
-    # else:
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
@@ -830,17 +790,6 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
   # print "\n Found course_detail n gone inn this...\n\n"
 
   auth = None
-  # if ObjectId.is_valid(group_id) is False:
-  #   group_ins = node_collection.one({'_type': "Group", "name": group_id})
-  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #   if group_ins:
-  #     group_id = str(group_ins._id)
-  #   else:
-  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #     if auth:
-  #       group_id = str(auth._id)
-  # else:
-  #   pass
   try:
       group_id = ObjectId(group_id)
   except:
@@ -1076,19 +1025,6 @@ def create_course_struct(request, group_id, node_id):
           2.1. CourseSubSection3
 
     """
-
-    # ins_objectid = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False:
-    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else:
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth:
-    #             group_id = str(auth._id)
-    # else:
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
@@ -1602,7 +1538,7 @@ def create_edit_unit(request, group_id):
 def delete_course(request, group_id, node_id):
     del_stat = delete_item(node_id)
     if del_stat:
-        return HttpResponseRedirect(reverse('course', kwargs={'group_id': ObjectId(group_id)}))
+        return HttpResponseRedirect(reverse('gcourse', kwargs={'group_id': ObjectId(group_id)}))
 
 
 @login_required
@@ -1640,9 +1576,8 @@ def delete_from_course_structure(request, group_id):
 
         return HttpResponse(json.dumps(response_dict))
 
-@login_required
 @get_execution_time
-def delete_item(item, ce_flag):
+def delete_item(item, ce_flag=False):
     node_item = node_collection.one({'_id': ObjectId(item)})
     if ce_flag:
         cu_name = u"CourseUnit"
@@ -1877,6 +1812,9 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
 # def course_resource_detail(request, group_id, course_section, course_sub_section, course_unit, resource_id):
 #     pass
 
+
+# ::::COURSE-PLAYER VIEWS::::
+
 @get_execution_time
 def course_dashboard(request, group_id):
 
@@ -1898,28 +1836,33 @@ def course_content(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
+    result_status = course_complete_percentage = None
+    leaf_ids = completed_ids = incompleted_ids = course_complete_percentage = total_count = completed_count = None
+    if request.user.is_authenticated:
+        result_status = get_course_completetion_status(group_obj, request.user.id, True)
+        if result_status:
+            if "course_complete_percentage" in result_status:
+                course_complete_percentage = result_status['course_complete_percentage']
+            if "completed_ids_list" in result_status:
+                completed_ids = result_status['completed_ids_list']
+            if "incompleted_ids_list" in result_status:
+                incompleted_ids = result_status['incompleted_ids_list']
+            if "list_of_leaf_node_ids" in result_status:
+                leaf_ids = result_status['list_of_leaf_node_ids']
+            if "total_count" in result_status:
+                total_count = result_status['total_count']
+            if "completed_count" in result_status:
+                completed_count = result_status['completed_count']
 
-    allow_to_join = None
-    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
-    if start_enrollment_date:
-      start_enrollment_date = start_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-
-    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
-    if last_enrollment_date:
-      last_enrollment_date = last_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
-          allow_to_join = "Open"
-      else:
-          allow_to_join = "Closed"
-
+    allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'course content',
-            'allow_to_join': allow_to_join  
+            'allow_to_join': allow_to_join, "course_complete_percentage": course_complete_percentage,
+            "leaf_ids":leaf_ids,"completed_ids":completed_ids,"incompleted_ids":incompleted_ids,
+            "total_count": total_count, "completed_count":completed_count
         })
     return render_to_response(template, context_variables)
 
@@ -1933,28 +1876,28 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
 
     all_blogs = blog_pages = user_blogs = user_id = None
     allow_to_comment = notebook_obj = None
-    allow_to_join = None
     template = 'ndf/gcourse_event_group.html'
     page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
     thread_node = None
-    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
-    if start_enrollment_date:
-      start_enrollment_date = start_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-
-    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
-    if last_enrollment_date:
-      last_enrollment_date = last_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
-          allow_to_join = "Open"
-      else:
-          allow_to_join = "Closed"
-
+    result_status = course_complete_percentage = None
+    total_count = completed_count = None
+    if request.user.is_authenticated:
+        result_status = get_course_completetion_status(group_obj, request.user.id)
+        if result_status:
+            if "course_complete_percentage" in result_status:
+                course_complete_percentage = result_status['course_complete_percentage']
+            if "total_count" in result_status:
+                total_count = result_status['total_count']
+            if "completed_count" in result_status:
+                completed_count = result_status['completed_count']
+    
+    allow_to_join = get_group_join_status(group_obj)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'notebook', 'allow_to_join': allow_to_join
+            'node': group_obj, 'title': 'notebook', 'allow_to_join': allow_to_join,
+            "course_complete_percentage": course_complete_percentage,
+            "total_count":total_count, "completed_count":completed_count
             }
 
     if request.user.is_authenticated():
@@ -2009,21 +1952,19 @@ def course_raw_material(request, group_id):
     gstaff_users = []
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
-    allow_to_join = None
-    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
-    if start_enrollment_date:
-      start_enrollment_date = start_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
+    result_status = course_complete_percentage = None
+    total_count = completed_count = None
+    if request.user.is_authenticated:
+        result_status = get_course_completetion_status(group_obj, request.user.id)
+        if result_status:
+            if "course_complete_percentage" in result_status:
+                course_complete_percentage = result_status['course_complete_percentage']
+            if "total_count" in result_status:
+                total_count = result_status['total_count']
+            if "completed_count" in result_status:
+                completed_count = result_status['completed_count']
 
-    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
-    if last_enrollment_date:
-      last_enrollment_date = last_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
-          allow_to_join = "Open"
-      else:
-          allow_to_join = "Closed"
-
+    allow_to_join = get_group_join_status(group_obj)
     files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
         # 'tags': {'$regex': u"raw", '$options': "i"}
         },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
@@ -2040,7 +1981,8 @@ def course_raw_material(request, group_id):
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'raw material',
             'files_cur': files_cur, 'allow_to_upload': allow_to_upload,
-            'allow_to_join': allow_to_join
+            'allow_to_join': allow_to_join, "course_complete_percentage":course_complete_percentage,
+            "total_count":total_count, "completed_count":completed_count
         })
     return render_to_response(template, context_variables)
 
@@ -2054,30 +1996,32 @@ def course_gallery(request, group_id):
     gstaff_users = []
     query = {}
     allow_to_upload = True
-    allow_to_join = query_dict = None
+    query_dict = None
     # filter_applied = request.GET.get("filter_applied", "")
     # if filter_applied:
     #     filter_applied = eval(filter_applied)
     # filter_dict = request.GET.get("filter_dict", "")
 
-    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
-    if start_enrollment_date:
-      start_enrollment_date = start_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-
-    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
-    if last_enrollment_date:
-      last_enrollment_date = last_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
-          allow_to_join = "Open"
-      else:
-          allow_to_join = "Closed"
+    allow_to_join =  None
+    allow_to_join = get_group_join_status(group_obj)
+    result_status = course_complete_percentage = None
+    total_count = completed_count = None
+    if request.user.is_authenticated:
+        result_status = get_course_completetion_status(group_obj, request.user.id)
+        if result_status:
+            if "course_complete_percentage" in result_status:
+                course_complete_percentage = result_status['course_complete_percentage']
+            if "total_count" in result_status:
+                total_count = result_status['total_count']
+            if "completed_count" in result_status:
+                completed_count = result_status['completed_count']
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'gallery',
-            'allow_to_upload':allow_to_upload, 'allow_to_join': allow_to_join
+            'allow_to_upload':allow_to_upload, 'allow_to_join': allow_to_join,
+            "course_complete_percentage":course_complete_percentage,
+            "total_count":total_count, "completed_count":completed_count
         }
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
@@ -2114,21 +2058,24 @@ def course_about(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-    allow_to_join = None
+    
     weeks_count = 0
     curr_date_time = datetime.datetime.now().date()
     start_date = get_attribute_value(group_obj._id,"start_time")
     last_date = get_attribute_value(group_obj._id,"end_time")
 
-    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
-    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
-    if start_enrollment_date and last_enrollment_date:
-      start_enrollment_date = start_enrollment_date.date()
-      last_enrollment_date = last_enrollment_date.date()
-      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
-          allow_to_join = "Open"
-      else:
-          allow_to_join = "Closed"
+    allow_to_join = get_group_join_status(group_obj)
+    result_status = course_complete_percentage = None
+    total_count = completed_count = None
+    if request.user.is_authenticated:
+        result_status = get_course_completetion_status(group_obj, request.user.id)
+        if result_status:
+            if "course_complete_percentage" in result_status:
+                course_complete_percentage = result_status['course_complete_percentage']
+            if "total_count" in result_status:
+                total_count = result_status['total_count']
+            if "completed_count" in result_status:
+                completed_count = result_status['completed_count']
 
     if start_date and last_date:
       start_date = start_date.date()
@@ -2145,7 +2092,8 @@ def course_about(request, group_id):
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
-            'weeks_count': weeks_count
+            'weeks_count': weeks_count, "course_complete_percentage": course_complete_percentage,
+            "total_count":total_count, "completed_count":completed_count
         })
     return render_to_response(template, context_variables)
 
@@ -2160,20 +2108,18 @@ def course_gallerymodal(request, group_id):
     thread_node = None
     allow_to_comment = None
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
-    allow_to_join = None
-    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
-    if start_enrollment_date:
-      start_enrollment_date = start_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-
-    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
-    if last_enrollment_date:
-      last_enrollment_date = last_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
-          allow_to_join = "Open"
-      else:
-          allow_to_join = "Closed"
+    allow_to_join = get_group_join_status(group_obj)
+    result_status = course_complete_percentage = None
+    total_count = completed_count = None
+    if request.user.is_authenticated:
+        result_status = get_course_completetion_status(group_obj, request.user.id)
+        if result_status:
+            if "course_complete_percentage" in result_status:
+                course_complete_percentage = result_status['course_complete_percentage']
+            if "total_count" in result_status:
+                total_count = result_status['total_count']
+            if "completed_count" in result_status:
+                completed_count = result_status['completed_count']
 
     template = 'ndf/ggallerymodal.html'
 
@@ -2182,8 +2128,8 @@ def course_gallerymodal(request, group_id):
             'node': node_obj, 'title': 'course_gallerymodall',
             'allow_to_comment': allow_to_comment,
             'thread_node': thread_node,
-            'allow_to_join': allow_to_join
-
+            'allow_to_join': allow_to_join, "course_complete_percentage": course_complete_percentage,
+            "total_count":total_count, "completed_count":completed_count           
         })
     return render_to_response(template, context_variables)
 
@@ -2200,20 +2146,20 @@ def course_note_page(request, group_id):
 
     thread_node = None
     allow_to_comment = None
-    allow_to_join = None
-    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
-    if start_enrollment_date:
-      start_enrollment_date = start_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-
-    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
-    if last_enrollment_date:
-      last_enrollment_date = last_enrollment_date.date()
-      curr_date_time = datetime.datetime.now().date()
-      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
-          allow_to_join = "Open"
-      else:
-          allow_to_join = "Closed"
+    
+    
+    allow_to_join = get_group_join_status(group_obj)
+    result_status = course_complete_percentage = None
+    total_count = completed_count = None
+    if request.user.is_authenticated:
+        result_status = get_course_completetion_status(group_obj, request.user.id)
+        if result_status:
+            if "course_complete_percentage" in result_status:
+                course_complete_percentage = result_status['course_complete_percentage']
+            if "total_count" in result_status:
+                total_count = result_status['total_count']
+            if "completed_count" in result_status:
+                completed_count = result_status['completed_count']
 
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     template = 'ndf/note_page.html'
@@ -2222,7 +2168,9 @@ def course_note_page(request, group_id):
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': node_obj, 'title': 'course_gallerymodall',
             'allow_to_comment': allow_to_comment,
-            'thread_node': thread_node, 'allow_to_join': allow_to_join
+            'thread_node': thread_node, 'allow_to_join': allow_to_join,
+            "course_complete_percentage": course_complete_percentage,
+            "total_count":total_count, "completed_count":completed_count           
         })
     return render_to_response(template, context_variables)
 

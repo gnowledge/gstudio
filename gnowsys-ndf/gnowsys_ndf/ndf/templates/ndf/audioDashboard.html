@@ -1,0 +1,260 @@
+{% load ndf_tags %}
+{% load i18n %}
+ 
+{% get_group_name groupid as group_name_tag %}
+ <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+ <!--
+> Muaz Khan     - https://github.com/muaz-khan
+> MIT License   - https://www.webrtc-experiment.com/licence/
+> Documentation - https://github.com/streamproc/MediaStreamRecorder
+> =================================================================
+> audio-recorder.html
+-->
+  <!-- <script src="https://cdn.webrtc-experiment.com/MediaStreamRecorder.js"></script> 
+   <script src="/static/ndf/bower_components/recordrtc/dev/MediaStreamRecorder.js"></script> 
+    <! for Edige/FF/Chrome/Opera/etc. getUserMedia support 
+    <!<script src="https://cdn.rawgit.com/webrtc/adapter/master/adapter.js"></script> -->
+
+
+   <!--  <h1>
+        <div id="timer">2:00</div>
+    </h1> -->
+    
+      <i class="fi-info"></i>You can record audio for max 30 seconds.!<br>
+    
+    <div class="center btn-group">
+        <label style="display:none!important" for="time-interval hidden">Time Interval (milliseconds):</label>
+        <input  style="display:none!important" type="text" id="time-interval" value="30000 ">
+
+        <button id="start-recording">Start</button>
+        <button id="stop-recording" disabled>Stop</button>
+
+        <button style="display:none!important" id="pause-recording" disabled>Pause</button>
+        <button style="display:none!important" id="resume-recording" disabled>Resume</button>
+
+        <button id="save-recording" disabled>Save</button>
+
+        <br><br>
+
+        <input style="display:none!important"  id="left-channel" type="checkbox" checked style="width:auto;">
+        <label style="display:none!important" for="left-channel">Only Left Channel?</label>
+    </div>
+
+    <div id="audios-container"></div>
+
+    <script>
+//     function countdown(minutes) {
+//     var seconds = 32;
+//     var mins = minutes                Function for ticker timing
+//     function tick() {
+//         var counter = document.getElementById("timer");
+//         var current_minutes = mins-1
+//         seconds--;
+//         counter.innerHTML =
+//         current_minutes.toString() + ":" + (seconds < 10 ? "0" : "") + String(seconds);
+//         if( seconds > 0 ) {
+//             setTimeout(tick, 1000);
+//         } else {
+ 
+//             if(mins > 1){
+ 
+//                setTimeout(function () { countdown(mins - 1); }, 1000);
+ 
+//             }
+//         }
+//     }
+//     tick();
+// }
+ 
+
+    function captureUserMedia(mediaConstraints, successCallback, errorCallback) {
+        navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
+    }
+
+    var mediaConstraints = {
+        audio: true
+    };
+
+    document.querySelector('#start-recording').onclick = function() {
+        
+        this.disabled = true;
+        // countdown(1);
+
+        captureUserMedia(mediaConstraints, onMediaSuccess, onMediaError);
+         setTimeout(function(){
+          mediaRecorder.stop();
+          mediaRecorder.stream.stop();
+  
+         }, 30000);
+    };
+
+    document.querySelector('#stop-recording').onclick = function() {
+        this.disabled = true;
+        mediaRecorder.stop();
+        mediaRecorder.stream.stop();
+
+        document.querySelector('#pause-recording').disabled = true;
+        document.querySelector('#start-recording').disabled = false;
+    };
+
+    document.querySelector('#pause-recording').onclick = function() {
+        this.disabled = true;
+        mediaRecorder.pause();
+
+        document.querySelector('#resume-recording').disabled = false;
+    };
+
+    document.querySelector('#resume-recording').onclick = function() {
+        this.disabled = true;
+        mediaRecorder.resume();
+
+        document.querySelector('#pause-recording').disabled = false;
+    };
+
+    document.querySelector('#save-recording').onclick = function() {
+        this.disabled = true;
+
+       
+        // mediaRecorder.save();
+    };
+
+    var mediaRecorder;
+
+    function onMediaSuccess(stream) {
+        var audio = document.createElement('audio');
+
+        audio = mergeProps(audio, {
+            controls: true,
+            muted: true,
+            src: URL.createObjectURL(stream)
+        });
+        audio.play();
+
+        audiosContainer.appendChild(audio);
+        audiosContainer.appendChild(document.createElement('hr'));
+
+        mediaRecorder = new MediaStreamRecorder(stream);
+        mediaRecorder.stream = stream;
+        mediaRecorder.mimeType = 'audio/ogg';
+        mediaRecorder.audioChannels = !!document.getElementById('left-channel').checked ? 1 : 2;
+        mediaRecorder.ondataavailable = function(blob) {
+/*****************************************************************************************************************************************************/ 
+/******************************************** Saurabh's Implementation to save blob **********************************************/ 
+            
+            $("#save-recording").click(function(){
+                          var d = new Date();
+                          timeStamp = d.getTime();
+                          timeStamp = timeStamp.toString();
+                         
+
+                          //alert(timeStamp);
+                          console.log(blob);
+                          
+                         
+                      // Create a new FormData object.
+                      var formData = new FormData();
+
+
+                        // // Check the file type.
+                        // if (!file.type.match('image.*')) {  continue; }
+
+                        // Add the file to the request.
+                        formData.append('doc[]', blob, timeStamp);//passing timestamp as file name
+
+                      // appending csrfmiddlewaretoken and user-id
+                      formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+                      formData.append('user','{{request.user.id}}');
+
+                      // Set up the request.
+                      xhr = new XMLHttpRequest();
+
+                      // Open the connection.
+                      xhr.open('POST', "{% url 'save_image' group_id %}", true);
+
+                      // Set up a handler for when the request finishes sucessfully.
+                      xhr.onload = function () {
+
+                        if (xhr.status === 200)
+                        {
+                          // File(s) uploaded.
+                         // if file is not uploaded sucessfully
+                          if(xhr.responseText == "UploadError")
+                          {
+                             alert("Error occurred");
+                          }
+                          // check if image is not in the list, add it.
+                          else if(xhr.responseText.length == 24 )
+                          {
+                              obj_id = parseInt(xhr.responseText);
+                              var completeURL = "/" + "{{group_id}}" + "/file" + "/readDoc" + "/" + xhr.responseText + "/" + timeStamp;
+                                          CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls> <source src="'+ completeURL +'" type="audio/ogg"></audio>');
+                                             $(".btn-group").remove();
+                                             $("#audios-container").remove();
+                                             $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+
+                          }
+
+                          // updating metadata of files, if file is uploaded sucessfully
+                          // if(xhr.responseText != "UploadError")
+                          // {
+                          //   // alert('xhr.responseText != "UploadError"');
+                          // }
+                        }
+                        else
+                        {
+                          alert('An error occurred!');
+                        }
+                      };
+
+                      // Send the Data.
+                      xhr.send(formData);
+
+
+            });
+/*****************************************************************************************************************************************************/ 
+            a.href = URL.createObjectURL(blob);
+
+            audiosContainer.appendChild(a);
+            audiosContainer.appendChild(document.createElement('hr'));
+        };
+
+        var timeInterval = document.querySelector('#time-interval').value;
+        if (timeInterval) timeInterval = parseInt(timeInterval);
+        else timeInterval = 5 * 1000;
+
+        // get blob after specific time interval
+        mediaRecorder.start(timeInterval);
+
+        document.querySelector('#stop-recording').disabled = false;
+        document.querySelector('#pause-recording').disabled = false;
+        document.querySelector('#save-recording').disabled = false;
+    }
+
+    function onMediaError(e) {
+        console.error('media error', e);
+    }
+
+    var audiosContainer = document.getElementById('audios-container');
+    var index = 1;
+
+    // below function via: http://goo.gl/B3ae8c
+    function bytesToSize(bytes) {
+        var k = 1000;
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes === 0) return '0 Bytes';
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(k)), 10);
+        return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+    }
+
+    // below function via: http://goo.gl/6QNDcI
+    function getTimeLength(milliseconds) {
+        var data = new Date(milliseconds);
+        return data.getUTCHours() + " hours, " + data.getUTCMinutes() + " minutes and " + data.getUTCSeconds() + " second(s)";
+    }
+
+    window.onbeforeunload = function() {
+        document.querySelector('#start-recording').disabled = false;
+    };
+    </script>
+
