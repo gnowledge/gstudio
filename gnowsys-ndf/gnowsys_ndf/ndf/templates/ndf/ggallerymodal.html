@@ -2,6 +2,11 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% get_grid_fs_object node as grid_fs_obj %}
+<style type="text/css">
+    .visits_info{
+        font-size: 20px;
+    }
+</style>
 <!--<style type="text/css">
     .gmodal-item-panel .text-gray{
         display:none;
@@ -20,7 +25,7 @@
         display:none!important;
     }
 </style>-->
-<div id="reveal-{{node.pk}}" class="reveal-modal" data-reveal >
+<div id="reveal-{{node.pk}}" class="reveal-modal file-detail-modal" data-reveal >
     <div class="row gmodal-toolbar">
         <div class="small-8 columns file-name" title="{{node.name}}">
             {% firstof node.altnames node.name %}
@@ -66,7 +71,7 @@
                     <i class="fi-download"></i>Download
                 </a>
             </div>
-
+            <a href="{% url redirect_tab_url group_id %}" class="file-detail-modal-close"></a>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
     </div>
@@ -112,10 +117,14 @@
                 </div>
             </div>
                 <div class="row rating-area">
-                    <div class="small-12 columns">
-                    <h4>Rating</h4>
+                    <div class="small-6 columns">
+                        <h4>Rating</h4>
                         {% include "ndf/rating.html" %} 
                     </div>
+                    <div class="small-6 columns right">
+                        {% include "ndf/analytics_views.html" %}
+                    </div>
+
                 </div>
 
                 <div class="row comments-area">
