@@ -12,6 +12,20 @@
 
 {% block body_content %} 
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
+
+<script type="text/javascript" src="/static/ndf/bower_components/tipped-4.5.5-light/tipped.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/tipped-4.5.5-light/tipped.css" />
+
+<script type='text/javascript'>
+$(document).ready(function() {
+  Tipped.create('.boxes .box');
+});
+</script>
+
 <form method="post" action="" name="{{class_name}}" id="{{class_name}}">
 {% csrf_token %}
 {% if translate %}
@@ -65,6 +79,7 @@
 			<div style="display:table-row;">
 				<div style="display:table-cell;"> 
 					<font size="3"> {{list}} </font> 
+
 				</div>
 	{% get_input_fields class_structure|get_dict_item:list list translate  %}
 
@@ -77,10 +92,10 @@
 			</div>
 			{% endif %}
 			
-			{% if not translate %}
-			<div style="display:table-row;">
-				<div style="display:table-cell;"> 
-					<font size="3"> {{list}} </font> 
+			{% if not translate %} <!--Used when the page is not translated -->
+			<div class='boxes' style="display:table-row;">
+				<div style="display:table-cell;" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %} " class='box' > 
+					<span><font size="3"> {{list}} </font> </span>
 				</div>
 				{% get_input_fields class_structure|get_dict_item:list list translate  %}
 				{% if list in  required_fields %}
@@ -99,7 +114,7 @@
 		<div id="contentlist" class="content">
 			{% for list in contentlist %}
 			<div class="medium-12 columns">
-	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+	{# {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %} #}
 			</div>
 			{% endfor %}
 			<script type="text/javascript">
