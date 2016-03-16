@@ -1952,7 +1952,6 @@ def course_raw_material(request, group_id, node_id=None):
     gstaff_users = []
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
-<<<<<<< HEAD
     allow_to_join = None
     files_cur = None
     context_variables = {
