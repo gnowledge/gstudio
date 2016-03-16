@@ -3530,7 +3530,7 @@ def get_course_filters(group_id, filter_context):
 							'created_by': {'$in': gstaff_users} 
 							},{'tags': 1, '_id': False})
 
-			print "\n\n result_cur.count()--",result_cur.count()
+			# print "\n\n result_cur.count()--",result_cur.count()
 			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
 			# all_tags_from_cursor is a list having nested list
 			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
