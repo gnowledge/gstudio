@@ -1,5 +1,4 @@
 {% load get_course_filters from ndf_tags %}
-
 {% load simple_filters %}
 <div class="gallery-page">
     <div class="row gallery-header">
@@ -130,7 +129,7 @@
                 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5 gallery-body-ul">
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
-                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True no_url=True first_arg=group_id second_arg=each_img.pk %}
+                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
                     </li>
                 {% endfor %}
                 </ul>
@@ -161,7 +160,12 @@
     </div>
 
 </div>
-<div class="reveal-container"></div>
+<div class="reveal-container">
+    {% if file_obj %}
+        {% include "ndf/ggallerymodal.html" with node=file_obj %}
+    {% endif %}
+    
+</div>
 {% comment %}
 {% verbatim %}
 <script id="filter-tag-template" type="text/x-handlebars-template">
@@ -170,20 +174,15 @@
 {% endverbatim %}
 {% endcomment %}
 <script type="text/javascript">
-    $(document).on('click','.scard-container',function(){
-        node_id = $(this).attr('data-id')
-        $.ajax({
-          url: "{% url 'course_gallerymodal' group_id %}",
-          data: {
-            node_id: node_id
-          },
-          type: "GET",
-          dataType: "html",
-          success: function(data){
-            $(".reveal-container").html(data);
-            $("#reveal-"+ node_id).foundation('reveal','open');
-          },
-        });//end of ajax
+    $(document).ready(function(){
+        {% if file_obj %}
+            $("#reveal-{{file_obj.pk}}").foundation('reveal','open');
+        {% endif %}
+    })
+    
+    // On close event of reveal-modal ----------------------------------------------
+    $(document).on('close', '.file-detail-modal', function () {
+        $('.file-detail-modal-close')[0].click()
     });
 
     /*
@@ -194,22 +193,7 @@
         return filterTagTemplate({label});
     }
     $(function() {
-        $('.gallery-img>div').click(function (){
-            node_id = $(this).closest('.gallery-img').attr('id')
-            $.ajax({
-              url: "{% url 'course_gallerymodal' group_id %}",
-              data: {
-                node_id: node_id
-              },
-              type: "GET",
-              dataType: "html",
-              success: function(data){
-                $(".reveal-container").html(data);
-                $("#reveal-"+ node_id).foundation('reveal','open');
-              },
-            });//end of ajax
-        });
-
+      
         //Filter tags creation on changing seconday filter.
         $(".secondary-filter").on('change', function() {
             $('.filter-tags').append(createFilterTag($(".secondary-filter option:selected").text()));

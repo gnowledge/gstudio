@@ -4708,6 +4708,7 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
         result_dict['completed_ids_list'] = json.dumps(completed_ids_list,cls=NodeJSONEncoder)
         result_dict['incompleted_ids_list'] = json.dumps(incompleted_ids_list,cls=NodeJSONEncoder)
         result_dict['list_of_leaf_node_ids'] = json.dumps(list_of_leaf_node_ids,cls=NodeJSONEncoder)
+      # print "\n\nresult_dict == ",result_dict
       return result_dict
     except Exception as error_in_get_course_completion_status:
       # print "\n ERROR in get_course_completetion_status", error_in_get_course_completion_status
