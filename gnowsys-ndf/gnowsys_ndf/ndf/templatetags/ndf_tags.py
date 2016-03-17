@@ -530,28 +530,35 @@ def get_attribute_value(node_id, attr,get_data_type=False):
 @register.assignment_tag
 def get_relation_value(node_id, grel):
 	try:
-		grel_val_node = None
-		grel_id = None
-		node_grel = None
+		result_dict = {}
 		if node_id:
 			node = node_collection.one({'_id': ObjectId(node_id) })
-			grel = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
-			if node and grel:
-				node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id,'status':"PUBLISHED"})
-				if node_grel:
-					grel_val = node_grel.right_subject
-					grel_id = node_grel._id
-					grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
-					# returns right_subject of grelation and GRelation _id 
-					return grel_val_node, grel_id
+			relation_type_node = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
+			if node and relation_type_node:
+				if relation_type_node.object_cardinality > 1:
+					node_grel = triple_collection.find({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
+					if node_grel:
+						grel_val = []
+						grel_id = []
+						for each_node in node_grel:
+							grel_val.append(each_node.right_subject)
+							grel_id.append(each_node._id)
+						grel_val_node_cur = node_collection.find({'_id':{'$in' : grel_val}})
+						# nodes = [grel_node_val for grel_node_val in grel_val_node_cur]
+						# print "\n\n grel_val_node, grel_id == ",grel_val_node, grel_id
+						result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node_cur, "cursor": True})
 				else:
-					return None
-			else:
-				return None
-		else:
-			return None
-
+					node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
+					if node_grel:
+						grel_val = node_grel.right_subject
+						grel_id = node_grel._id
+						grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+						# returns right_subject of grelation and GRelation _id 
+						result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node, "cursor": False})
+		# print "\n\nresult_dict === ",result_dict
+		return result_dict
 	except Exception as e:
+		print e
 		return None
 
 @get_execution_time
@@ -3546,9 +3553,9 @@ def get_info_pages(group_id):
 	list_of_nodes = []
 	page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
 	info_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Info page"})
-	info_page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': info_page_gst._id},{'_id':1, 'name':1})
+	info_page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': info_page_gst._id})
 	# print "\n\n info_page_nodes===",info_page_nodes.count()
-	if info_page_nodes.count():
-		for eachnode in info_page_nodes:
-			list_of_nodes.append({'name': eachnode.name,'id': str(eachnode._id)})
-	return list_of_nodes
+	# if info_page_nodes.count():
+	# 	for eachnode in info_page_nodes:
+	# 		list_of_nodes.append({'name': eachnode.name,'id': eachnode._id})
+	return info_page_nodes
