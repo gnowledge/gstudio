@@ -54,7 +54,12 @@
     </div>
     <a class="close-reveal-modal">&#215;</a>
 
-    </div>
+    </div> 
+      {% if title == "gallery" %} 
+        {% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_name_tag second_arg=""  third_arg="" page_info=gallery_page_info %}
+      {% elif title == "raw material" %}
+        {% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_name_tag second_arg=""  third_arg="" page_info=raw_material_page_info %}
+      {% endif  %}
 
 {% endblock %}
 
