@@ -1989,6 +1989,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
             },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
 
         raw_material_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        context_variables.update({'raw_material_page_info':raw_material_page_info})
     # print "\n\n\n\n **course_raw_page_info",course_raw_page_info
     gstaff_access = check_is_gstaff(group_id,request.user)
 
@@ -1998,7 +1999,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
 
-    context_variables.update({'files_cur': files_cur, 'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join,'raw_material_page_info':raw_material_page_info})
+    context_variables.update({'files_cur': files_cur, 'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
     return render_to_response(template, 
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -2050,7 +2051,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # print "\n\n Total files: ", files_cur.count()
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-    context_variables.update({'gallery_page_info':gallery_page_info})
+        context_variables.update({'gallery_page_info':gallery_page_info})
     template = 'ndf/gcourse_event_group.html'
 
     return render_to_response(template, 
