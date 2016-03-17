@@ -16,7 +16,7 @@ from gnowsys_ndf.settings import META_TYPE, GAPPS  # , MEDIA_ROOT
 from gnowsys_ndf.ndf.models import node_collection  # , triple_collection
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_thread_for_node
 # from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
-from gnowsys_ndf.ndf.views.methods import get_execution_time, create_grelation_list, node_thread_access, get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_execution_time, create_grelation_list, node_thread_access, get_group_name_id, create_grelation, delete_grelation
 
 gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
 GST_VIDEO = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[4]})
@@ -217,16 +217,32 @@ def video_edit(request,group_id,_id):
             return_status = create_thread_for_node(request,group_id, vid_node)
         else:
             create_gattribute(vid_node._id, discussion_enable_at, False)
-        if help_info_page and help_info_page != "null":
+
+        # print "\n\n help_info_page ================ ",help_info_page
+        if "None" not in help_info_page:
+            has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
             try:
-                help_info_page = ObjectId(help_info_page)
-                has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
-                create_grelation(img_node._id, has_help_rt,help_info_page)
+                help_info_page = map(ObjectId, help_info_page)
+                create_grelation(page_node._id, has_help_rt,help_info_page)
             except Exception as invalidobjectid:
                 # print invalidobjectid
                 pass
-                # print "\n\n help_info_page ================ ",help_info_page
+        else:
 
+            # Check if node had has_help RT
+            grel_dict = get_relation_value(page_node._id,"has_help")
+            # print "\n\n grel_dict ==== ", grel_dict
+            if grel_dict:
+                grel_id = grel_dict.get("grel_id","")
+                if grel_id:
+                    for each_grel_id in grel_id:
+                        del_status, del_status_msg = delete_grelation(
+                            subject_id=page_node._id,
+                            node_id=each_grel_id,
+                            deletion_type=0
+                        )
+                        # print "\n\n del_status == ",del_status
+                        # print "\n\n del_status_msg == ",del_status_msg
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             get_node_metadata(request,vid_node)
             teaches_list = request.POST.get('teaches_list', '')  # get the teaches list
