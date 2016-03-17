@@ -324,7 +324,12 @@ def save_quizitem_answer(request, group_id):
         node_id = request.POST.get("node", '')
         # print "\n\n user_give_ans",user_given_ans
         node_obj = node_collection.one({'_id': ObjectId(node_id)})
-        thread_obj,thread_grel = get_relation_value(node_obj._id,"has_thread")
+        # thread_obj,thread_grel = get_relation_value(node_obj._id,"has_thread")
+        grel_dict = get_relation_value(node_obj._id,"has_thread")
+        is_cursor = grel_dict.get("cursor",False)
+        if not is_cursor:
+            thread_obj = grel_dict.get("grel_node")
+            thread_grel = grel_dict.get("grel_id")
 
         user_action = request.POST.get("user_action", '')
 

@@ -4223,8 +4223,14 @@ def create_thread_for_node(request, group_id, node):
 			# thread_start_time_status = False
 			# thread_end_time_status = False
 			has_thread_status = False
-			if get_relation_value(node._id,"has_thread") != None:
-				has_thread_status = True
+			# if get_relation_value(node._id,"has_thread") != None:
+			# 	has_thread_status = True
+			grel_dict = get_relation_value(node._id,"has_thread")
+			is_cursor = grel_dict.get("cursor",False)
+			if not is_cursor:
+				thread_node_status = grel_dict.get("grel_node", None)
+				if thread_node_status:
+					has_thread_status = True
 
 			release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
 			interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
@@ -4327,15 +4333,19 @@ def node_thread_access(group_id, node):
     thread_end_time = None
     allow_to_comment = True  # default set to True to allow commenting if no date is set for thread
     from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
-    has_thread_node_thread_grel = get_relation_value(node._id,"has_thread")
+    # has_thread_node_thread_grel = get_relation_value(node._id,"has_thread")
+    grel_dict = get_relation_value(node._id,"has_thread")
+    is_cursor = grel_dict.get("cursor",False)
+    if not is_cursor:
+        has_thread_node = grel_dict.get("grel_node")
 
     # if "has_thread" in node:
     #     if node['has_thread']:
     #             has_thread_node = node['has_thread'][0]
-    if has_thread_node_thread_grel:
+    if has_thread_node:
         has_thread_node = has_thread_node_thread_grel[0]
-        thread_start_time = get_attribute_value(has_thread_node_thread_grel[0]._id,"start_time")
-        thread_end_time = get_attribute_value(has_thread_node_thread_grel[0]._id,"end_time")
+        thread_start_time = get_attribute_value(has_thread_node._id,"start_time")
+        thread_end_time = get_attribute_value(has_thread_node._id,"end_time")
         # if has_thread_node_thread_grel[0].attribute_set:
         # if get_attribute_value(has_thread_node_thread_grel[0]._id,"start_time")
             # for each_attr in has_thread_node_thread_grel[0].attribute_set:
@@ -4514,11 +4524,18 @@ def replicate_resource(request, node, group_id):
         if "QuizItem" in node.member_of_names_list:
             thread_obj = None
             from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
-            thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
+
+            # thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
+            grel_dict = get_relation_value(node._id,"has_thread")
+            is_cursor = grel_dict.get("cursor",False)
+            if not is_cursor:
+                thread_obj = grel_dict.get("grel_node")
+                thread_grel = grel_dict.get("grel_id")
+    
+
             if thread_obj != None:
                 has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
                 gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
-
             # Setup all relevant Attributes for QuizItemEvent
             node.get_neighbourhood(node.member_of)
     
@@ -4544,7 +4561,6 @@ def replicate_resource(request, node, group_id):
                 create_gattribute(new_gsystem._id,quizitem_problem_weight_AT, node.quizitem_problem_weight)
             if node.quizitem_max_attempts:
                 create_gattribute(new_gsystem._id,quizitem_max_attempts_AT, node.quizitem_max_attempts)
-
 
         new_gsystem.reload()
         return new_gsystem

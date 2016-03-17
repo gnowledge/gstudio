@@ -138,10 +138,16 @@ def create_edit(request, group_id, node_id=None):
                     }
     if node_id:
         course_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
-        logo_img_node_grel_id = get_relation_value(node_id,'has_logo')
-        if logo_img_node_grel_id:
-            logo_img_node = logo_img_node_grel_id[0]
-            grel_id = logo_img_node_grel_id[1]
+        grel_dict = get_relation_value(node_id,'has_logo')
+        is_cursor = grel_dict.get("cursor",False)
+        if not is_cursor:
+            logo_img_node = grel_dict.get("grel_node")
+            grel_id = grel_dict.get("grel_id")
+
+        # logo_img_node_grel_id = get_relation_value(node_id,'has_logo')
+        # if logo_img_node_grel_id:
+        #     logo_img_node = logo_img_node_grel_id[0]
+        #     grel_id = logo_img_node_grel_id[1]
 
     else:
         course_node = node_collection.collection.GSystem()
