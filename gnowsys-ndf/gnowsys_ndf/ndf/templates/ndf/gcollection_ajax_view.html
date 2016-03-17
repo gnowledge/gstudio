@@ -74,53 +74,66 @@
     }
 
     function initCourseModule() {
-      var url = "{% url 'get_course_collection' group_id node.pk True %}";
-      var moduleTrees = [];
-      $.getJSON( url, function(data) {
-        // console.log(JSON.stringify(data))
-        var moduleData = data
-        $.each(data, function(pos, module) {
-          var mod = getModuleHtml(pos, module);
-          //mod.append('<hr />');
-          //Assosiating js tree
-          if(moduleData[pos].children){
-          var moduleTree = mod.find('.module-part').tree(
-            {
-              data: moduleData[pos].children,
-              onCreateLi: function(node, $li) {
 
-                if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
-                  $li.find('.jqtree-title').addClass('module-page');
-                  {% comment %}
-                  // url = "{% url 'course_resource_detail' group_name_tag  %}"
-                  // url += "?unit_id=" + node.parent.id +"&node_id="+node.id
-                  {% endcomment %}
-                  url = '/{{group_name_tag}}/gcourse/course_section/' + node.parent.parent.id + '/' + node.parent.id + '/' + node.id
-                  $li.find('.jqtree-title')
-                    .html('<i class="fa ' + iconMapping[node.status] + '"></i><a href="'+url+'" id='+node.id+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
-                }
-                else{
-                  $li.find('.jqtree-title')
-                    .html('<i class="fa ' + iconMapping[node.status] + '"></i><span>' + $li.find('.jqtree-title').html() + ' </span>');
-                }
-                // Add 'icon' span before title
+        $.ajax({
+          url: "{% url 'get_course_collection' group_id node.pk True %}",
+
+          data: {
+            "completed_nodes": {% if completed_ids %}{{completed_ids|safe}}{% else %}null{% endif %},
+            "incompleted_nodes": {% if incompleted_ids %}{{incompleted_ids|safe}}{% else %}null{% endif %},
+            "leaf_nodes": {% if leaf_ids %}{{leaf_ids|safe}}{% else %}null{% endif %}
+          },
+
+          type: "GET",
+
+          dataType: "json",
+
+          success: function(data){
+            // console.log(JSON.stringify(data))
+            var moduleTrees = [];
+            var moduleData = data;
+            $.each(data, function(pos, module) {
+              var mod = getModuleHtml(pos, module);
+              //mod.append('<hr />');
+              //Assosiating js tree
+              if(moduleData[pos].children){
+              var moduleTree = mod.find('.module-part').tree(
+                {
+                  data: moduleData[pos].children,
+                  onCreateLi: function(node, $li) {
+
+                    if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
+                      $li.find('.jqtree-title').addClass('module-page');
+                      {% comment %}
+                      // url = "{% url 'course_resource_detail' group_name_tag  %}"
+                      // url += "?unit_id=" + node.parent.id +"&node_id="+node.id
+                      {% endcomment %}
+                      url = '/{{group_name_tag}}/gcourse/course_section/' + node.parent.parent.id + '/' + node.parent.id + '/' + node.id
+                      $li.find('.jqtree-title')
+                        .html('<i class="fa ' + iconMapping[node.status] + '"></i><a href="'+url+'" id='+node.id+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
+                    }
+                    else{
+                      $li.find('.jqtree-title')
+                        .html('<i class="fa ' + iconMapping[node.status] + '"></i><span>' + $li.find('.jqtree-title').html() + ' </span>');
+                    }
+                    // Add 'icon' span before title
+                  }
+                });}
+              $(".course-content .collection").append(mod);
+              moduleTrees.push(moduleTree);
+            });
+
+            //Assigning Click events in each tree
+            $.each(moduleTrees, function(pos, tree) {
+              if(moduleTrees[pos]){
+                assignTreeEvents(tree);
               }
-            });}
-          $(".course-content .collection").append(mod);
-          moduleTrees.push(moduleTree);
-        });
+            })
 
-        //Assigning Click events in each tree
-        $.each(moduleTrees, function(pos, tree) {
-          if(moduleTrees[pos]){
-            assignTreeEvents(tree);
-          }
-        })
-      })
-      .fail(function() {
-        console.log( "error" );
-      });
-    }
+          }})}
+
+
+
     function assignTreeEvents (moduleTree) {
       {% get_node_type node as node_type %}
 

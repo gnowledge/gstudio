@@ -57,27 +57,26 @@ def adminDashboardClass(request, class_name="GSystem"):
         attribute_type_set = []
         relation_type_set = []
         if class_name == "GSystemType":
-            for e in each.member_of:
-                member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
-                
             for members in each.member_of:
-                member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
-
+                member.append(node_collection.one({ '_id': members}).name)
+                # member_of_list.append(node_collection.one({'_id':members}).name+" - "+str(members))
             for coll in each.collection_set:
-                collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
-
+                collection_list.append(node_collection.one({ '_id': coll}).name)
+                # collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
             for at_set in each.attribute_type_set:
-                attribute_type_set.append(at_set.name+" - "+str(at_set._id))
+                attribute_type_set.append(at_set.name)
+                # attribute_type_set.append(at_set.name+" - "+str(at_set._id))
             for rt_set in each.relation_type_set:
-                relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
+                relation_type_set.append(rt_set.name)
+                # relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
 
 	if class_name in ("GSystem","File"):
       		group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(group_set),"Creation":each.created_at})
+		objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
         elif class_name in ("GAttribute","GRelation"):
             objects_details.append({"Id":each._id,"Title":each.name,"Type":"","Author":"","Creation":""})
 	else :
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list), "attribute_type_set":",".join(attribute_type_set), "relation_type_set":",".join(relation_type_set)})
+		objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list), "attribute_type_set":", ".join(attribute_type_set), "relation_type_set":", ".join(relation_type_set)})
     groups = []
     group = node_collection.find({'_type':"Group"})
     for each in group:
