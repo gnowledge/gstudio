@@ -74,7 +74,7 @@
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
                   <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
           {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
+                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height" >
         {% endif %}
 
 
@@ -83,7 +83,7 @@
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
                   <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
           {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
+                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height" >
         {% endif %}
       {% endif %}
 

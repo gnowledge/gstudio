@@ -38,18 +38,18 @@
 
         {% get_relation_value resource.pk 'has_logo' as grel_dict %}
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
-                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.1 %}" alt="" />
+                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.1 %}" alt="" style="width:50%" />
           {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
+                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  style="width:50%" class="img-height" >
         {% endif %}
 
       {% else %}
 
         {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
-                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
+                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" style="width:50%" />
           {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
+                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  style="width:50%" class="img-height">
         {% endif %}
 
       {% endif %}
