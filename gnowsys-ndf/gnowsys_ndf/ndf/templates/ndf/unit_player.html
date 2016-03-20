@@ -79,6 +79,7 @@
             </div>
               <div class="activity-title">
                   {{node.name}}
+                  {% if "QuizItemEvent" not in node.member_of_names_list %}
                   {% if is_gstaff or node.created_by == request.user.id %}
                       {% get_edit_url node.pk as edit_url %}
                       <small>
@@ -95,6 +96,7 @@
                                 </ul>
                             {% endif %}
                       </small>
+                  {% endif %}
                   {% endif %}
 
               </div>
