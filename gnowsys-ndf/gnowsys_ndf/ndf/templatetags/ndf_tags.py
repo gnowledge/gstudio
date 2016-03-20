@@ -1359,12 +1359,12 @@ def get_edit_url(groupid):
 			return 'term_create_edit' 
 		elif type_name == 'Theme' or type_name == 'Topic':
 			return 'theme_topic_create'
-		elif type_name == 'QuizItem':
+		elif type_name == 'QuizItem' or type_name == 'QuizItemEvent':
 			return 'quiz_item_edit'
-                elif type_name == 'Forum':
-                        return 'edit_forum'
-                elif type_name == 'Twist' or type_name == 'Thread':
-                        return 'edit_thread'
+		elif type_name == 'Forum':
+			return 'edit_forum'
+		elif type_name == 'Twist' or type_name == 'Thread':
+			return 'edit_thread'
 
 
 	elif node._type == 'Group' or node._type == 'Author' :
@@ -3452,18 +3452,27 @@ def get_user_quiz_resp(node_obj, user_obj):
 
 	'''
 	result = {'count': 0, 'recent_ans': None}
+	thread_obj = None
 	if node_obj and user_obj:
-		thread_obj = get_relation_value(node_obj._id,'has_thread')
-		qip = node_collection.find_one({'_id': {'$in':thread_obj[0].post_node}, 'created_by': user_obj.id})
-		if qip:
-			qip_sub = get_attribute_value(qip._id,'quizitempost_user_submitted_ans')
-			if qip_sub:
-				result['count'] = len(qip_sub)
-				recent_ans = qip_sub[-1]
-				if node_obj.quiz_type == "Short-Response":
-					result['recent_ans'] = recent_ans
-				else:
-					result['recent_ans'] = recent_ans.values()[0]
+		try:
+			for each_rel in node_obj.relation_set:
+				if each_rel and "has_thread" in each_rel:
+					thread_id = each_rel['has_thread'][0]
+					thread_obj = node_collection.one({'_id': ObjectId(thread_id)})
+		except:
+			pass
+		if thread_obj:
+
+			qip = node_collection.one({'_id':{'$in': thread_obj.post_node}, 'created_by': user_obj.id})
+			if qip:
+				qip_sub = get_attribute_value(qip._id,'quizitempost_user_submitted_ans')
+				if qip_sub:
+					result['count'] = len(qip_sub)
+					recent_ans = qip_sub[-1]
+					if node_obj.quiz_type == "Short-Response":
+						result['recent_ans'] = recent_ans
+					else:
+						result['recent_ans'] = recent_ans.values()[0]
 		return result
 
 @get_execution_time
