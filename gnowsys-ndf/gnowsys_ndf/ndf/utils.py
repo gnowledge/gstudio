@@ -37,10 +37,12 @@ def get_current_dbs_path(sqlite_dbname=None, rcs_repo_dirname=None, search_in_pa
           if found in the search_in_path, otherwise None
     """
     if not sqlite_dbname:
-        sqlite_dbname = "*.db"
+        from gnowsys_ndf.settings import SQLITE3_DBNAME
+        sqlite_dbname = SQLITE3_DBNAME
 
     if not rcs_repo_dirname:
-        rcs_repo_dirname = "rcs-repo"
+        from gnowsys_ndf.settings import RCS_REPO_DIRNAME
+        rcs_repo_dirname = RCS_REPO_DIRNAME
 
     if not search_in_path:
         search_in_path = get_project_abspath()
@@ -68,7 +70,7 @@ def get_current_dbs_path(sqlite_dbname=None, rcs_repo_dirname=None, search_in_pa
             if sqlite_db_found and rcs_repo_found:
                 break
     except Exception as e:
-        raise Exception("\n Exception (ndf.utils.get_current_dbs_path): {0}".format(str(e)))
+        raise Exception("Exception (ndf.utils.get_current_dbs_path): {0}".format(str(e)))
 
     return {
         'current_sqlite_db_abspath': current_sqlite_db_abspath,
@@ -79,7 +81,10 @@ def get_current_dbs_path(sqlite_dbname=None, rcs_repo_dirname=None, search_in_pa
 def is_dir_exists(dir_path):
     """Returns whether given directory-path exists or not.
     """
-    return OS_PATH.exists(dir_path)
+    try:
+        return OS_PATH.exists(OS_PATH.expanduser(dir_path))
+    except AttributeError:
+        return False
 
 
 def ensure_dir(dir_path):
@@ -96,8 +101,7 @@ def ensure_dir(dir_path):
         if not is_dir_exists(dir_path):
             OS_MD(dir_path)
     except Exception as e:
-        raise Exception("\n Exception (ndf.utils.ensure_dir): {0}".format(str(e)))
-
+        raise Exception("InvalidDirectoryPath - {0}".format(str(e)))
     return True
 
 
@@ -119,9 +123,6 @@ def move_file_or_dirctory(src_path, dest_path):
         > False: If invalid arguments are passed or exception/error occurs while
             moving file or directory.
     """
-    if not src_path or not dest_path or not ensure_dir(dest_path):
-        return False
-
     src_path = OS_PATH.expanduser(src_path)
     dest_path = OS_PATH.expanduser(dest_path)
 
@@ -132,9 +133,12 @@ def move_file_or_dirctory(src_path, dest_path):
             # If not done, only the sub-folders of the given parent-directory will be moved
             src_path += os_path_sep
 
+    ensure_dir(dest_path)
+
     try:
         SHUTIL_MOVE(src_path, dest_path)
     except Exception as e:
-        raise Exception("\n Exception (ndf.utils.move_file_or_dirctory): {0}".format(str(e)))
+        raise Exception("InvalidSourceOrDestination - {0}".format(str(e)))
 
     return True
+

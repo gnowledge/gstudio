@@ -269,20 +269,6 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Don't edit this below path
 GSTUDIO_DATA_ROOT = os.path.join(os.path.expanduser("~/"), 'gstudio_data')
 
-try:
-    if not is_dir_exists(GSTUDIO_DATA_ROOT):
-        ensure_dir(GSTUDIO_DATA_ROOT)
-        print "\nGSTUDIO_DATA_ROOT path: {0}... created succesfully.".format(GSTUDIO_DATA_ROOT)
-        for each_path in get_current_dbs_path().values():
-            if each_path:
-                # If exists, then only move.
-                move_file_or_dirctory(each_path, GSTUDIO_DATA_ROOT)
-                print "  {0} moved succesfully to {1}".format(os.path.basename(each_path), GSTUDIO_DATA_ROOT)
-        print ""
-except Exception as e:
-    pass
-    # raise Exception("\nException (settings.GSTUDIO_DATA_ROOT): {0}\n".format(str(e)))
-
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
@@ -292,10 +278,11 @@ MANAGERS = ADMINS
 # Don't edit default database's NAME attribute
 # If overridden in local settings file, then
 # follow the same pattern and edit only the database-name
+SQLITE3_DBNAME = 'example-sqlite3.db'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(GSTUDIO_DATA_ROOT, 'example-sqlite3.db'),
+        'NAME': os.path.join(GSTUDIO_DATA_ROOT, SQLITE3_DBNAME),
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
@@ -629,7 +616,8 @@ VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes',
 
 # Absolute filesystem path to the directory that will hold all rcs-files
 # (history-files corresponding to every json-file created for each document)
-RCS_REPO_DIR = os.path.join(GSTUDIO_DATA_ROOT, "rcs-repo")
+RCS_REPO_DIRNAME = "rcs-repo"
+RCS_REPO_DIR = os.path.join(GSTUDIO_DATA_ROOT, RCS_REPO_DIRNAME)
 
 # Indicates the "hash-level-number", i.e the number of sub-directories that
 # will be created for the corresponding document under it's

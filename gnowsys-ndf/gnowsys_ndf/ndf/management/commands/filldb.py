@@ -60,19 +60,6 @@ class Command(BaseCommand):
   option_list = option_list + user_defined_option_list
 
   def handle(self, *args, **options):
-    try:
-        # Written here in order to make sure required database(s) exist(s) at their specified path.
-        if not is_dir_exists(GSTUDIO_DATA_ROOT):
-            ensure_dir(GSTUDIO_DATA_ROOT)
-            print "\nGSTUDIO_DATA_ROOT path: {0}... created succesfully.".format(GSTUDIO_DATA_ROOT)
-            for each_path in get_current_dbs_path().values():
-                if each_path:
-                    # If exists, then only move.
-                    move_file_or_dirctory(each_path, GSTUDIO_DATA_ROOT)
-                    print "  {0} moved succesfully to {1}".format(os.path.basename(each_path), GSTUDIO_DATA_ROOT)
-    except Exception as e:
-        raise Exception("\nException (filldb): {0}\n".format(str(e)))
-
     if options["setup_structure"]:
       try:
 
