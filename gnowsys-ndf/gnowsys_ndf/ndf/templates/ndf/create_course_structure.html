@@ -10,16 +10,16 @@
 
 {% block meta_content %}
   {% get_group_object groupid as group_object %}
+
   {% if "CourseEventGroup" in group_object.member_of_names_list %}
-      <a href="{% url 'groupchange' groupid %}"><h3><u>{{cnode.name}}</u></h3></a>
+      <a href="{% url 'groupchange' groupid %}"><h3><u>Go back to Course '{{cnode.name}}' </u></h3></a>
   {% else %}
     {% if 'NUSSD Course' in cnode.member_of_names_list %}
-      <a href="{% url 'mis_course_detail' group_name_tag app_id app_set_id cnode %}"><h3><u>{{cnode.name}}</u></h3></a>
+      <a href="{% url 'mis_course_detail' group_name_tag app_id app_set_id cnode %}"><h3><u>Go back to Course '{{cnode.name}}' </u></h3></a>
     {% else %}
-      <a href="{% url 'course_detail' group_name_tag cnode %}"><h3><u>{{cnode.name}}</h3></u></a>
+      <a href="{% url 'course_detail' group_name_tag cnode %}"><h3><u>Go back to Course '{{cnode.name}}' </h3></u></a>
     {% endif %}
   {% endif %}
-
 {% endblock %}
 
 
@@ -172,10 +172,10 @@
     <p id="alertModalLabel"></p>
     <div class="row deletion">
       <div class="small-3 small-offset-3 columns">
-        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+        <input type="button" id="btnConfirmYes" class="button radius tiny expand" value="Yes">
       </div>
       <div class="small-3 columns end">
-        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
+        <input type="button" id="btnConfirmNo" class="button radius tiny expand " value="No">
       </div>
     </div>
     <a class="close-reveal-modal">&#215;</a>
@@ -194,14 +194,14 @@
       </div>
 
       <div class="small-6 columns">
-        <input type="button" value="Save" class="button small hoverstyle  save-cs">
-        <input type="button" value="Cancel" class="button small hoverstyle  cancel-cs">
+        <input type="button" value="Save" class="button radius small hoverstyle  save-cs">
+        <input type="button" value="Cancel" class="button radius small hoverstyle  cancel-cs">
       </div>
    </div>
 
     <div class="row">
       <div class="small-10 small-centered columns sub-section-btn-div">
-        <input type="button" value="+ New Subsection" class="button  expand tiny secondary sub-section-btn" disabled="disabled">
+        <input type="button" value="+ New Subsection" class="button radius  expand tiny secondary sub-section-btn" disabled="disabled">
       </div>
     </div> 
   </li>
@@ -217,13 +217,13 @@
         {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.0 %}
       </div>
       <div class="small-4 columns">
-            <input type="button" value="Save" class="button small hoverstyle  save-css" >
-            <input type="button" value="Cancel" class="button small hoverstyle  cancel-cs cancel-css" >
+            <input type="button" value="Save" class="button radius small hoverstyle  save-css" >
+            <input type="button" value="Cancel" class="button radius small hoverstyle  cancel-cs cancel-css" >
       </div>
     </div>
     <div class="row">
       <div class="small-10 small-centered columns units-btn-div hide"> 
-      <a class="button  expand expand secondary tiny units-btn new-units-btn"> + New Units</a>
+      <a class="button radius  expand expand secondary tiny units-btn new-units-btn"> + New Units</a>
       </div>
     </div>
   </li>
@@ -232,7 +232,7 @@
     <div class="large-8 large-centered columns">
     
   <ul class="ul-course-section no-bullet">
-    <input type="button" class="button expand tiny secondary course-sec-btn" value="+ New Section">
+    <input type="button" class="button radius expand tiny secondary course-sec-btn" value="+ New Section">
   </ul>
   </div></div>
 
@@ -298,7 +298,7 @@
     </div>
 
     <div class="small-4 small-centered columns">
-        <input type="button" class="button  expand set_prop_class" id="set_prop" value="Done">        
+        <input type="button" class="button radius  expand set_prop_class" id="set_prop" value="Done">        
     </div>
     <a class="close-reveal-modal">&#215;</a>
   </div>
@@ -891,7 +891,7 @@
               {% for each_unit in css_node.collection_set %}
                 {% get_node each_unit as unit_node %}
 
-                    str_unit = "<li class='course-unit-class' value='{{unit_node.pk}}'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span data-tooltip title='{{unit_node.name}}'><div class='small-4 columns end contains-unit'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='units-btn unit-anch' data-unit-id='{{unit_node.pk}}' data-css-id='{{css_node.pk}}'>{{unit_node.name}}</a></div></span>"
+                    str_unit = "<li class='course-unit-class' value='{{unit_node.pk}}'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span data-tooltip title='{{unit_node.name}}'><div class='small-4 columns end contains-unit'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='units-btn unit-anch' data-unit-id='{{unit_node.pk}}' data-css-id='{{css_node.pk}}' target='_blank'>{{unit_node.name}}</a></div></span>"
                     str_opt = "<div class='small-2 columns end'>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+" "+"<span data-tooltip title='Delete'><i class='fi-trash largesize'></i></span></div></li>"
                     $("#"+cloned_ss_ele_id).find(".new-units-btn").before(str_unit+ str_opt)
 

@@ -3,6 +3,7 @@
         top:-1;
     }
 </style>
+{% load i18n %}
 
 <div id="container">
     <div id="myModal" class="reveal-modal" animation="None" data-reveal>
@@ -33,7 +34,9 @@
                 {% if j != "id" and j != "collection" and j != "owner" %}
                     {% if j == "Status" %}
                         {% if i.collection %}
-                        <td class="view" ><a onClick="collection_overlay('{{i.id }}')" >{{v|default_if_none:" -- "}} ({% trans 'Group Task' %}) </a></td>
+
+                        <td class="view" ><a onClick="collection_overlay('{{i.id }}')" >{{v|default_if_none:" -- "}} ({% trans "Group Task" %}) </a></td>
+
     	    
                         {% else %}
                         <td class="view" ><a href="{% url 'task_details' group_name i.id %}">{{v|default_if_none:" -- "}}  </a></td>

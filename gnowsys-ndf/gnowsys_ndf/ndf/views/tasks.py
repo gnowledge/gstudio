@@ -27,7 +27,11 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 
-sitename = Site.objects.all()[0]
+# sitename = Site.objects.all()[0]
+site = Site.objects.get(pk=1)
+site_domain = site.domain
+# print "=== site_domain: ", site_domain
+sitename = unicode(site.name.__str__())
 
 @task
 def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
@@ -38,7 +42,7 @@ def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
     to_send_user = User.objects.get(id=to_user)
     try:
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        site = sitename.name.__str__()
+        # site = sitename.name.__str__()
         objurl = "http://test"
         render = render_to_string(
             "notification/label.html",
@@ -47,7 +51,7 @@ def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
                 'activity': activ,
                 'conjunction': '-',
                 'object': group_obj,
-                'site': site,
+                'site': sitename,
                 'link': objurl
             }
         )
@@ -124,11 +128,47 @@ def convertVideo(userid, file_id, filename):
     
     webmfiles = files
     '''storing thumbnail of video with duration in saved object'''
-    tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
+    th_gridfs_id = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="image/png") 
+
+    # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':th_gridfs_id}})
+
+    # print "fileobj.fs_file_ids: ", fileobj.fs_file_ids
+    node_fs_file_ids = fileobj.fs_file_ids
+
+    if len(node_fs_file_ids) == 1:
+        node_fs_file_ids.append(ObjectId(th_gridfs_id))
+    elif len(node_fs_file_ids) > 1:
+        node_fs_file_ids[1] = ObjectId(th_gridfs_id)
+
+    # print "node_fs_file_ids: ", node_fs_file_ids
+
+    node_collection.collection.update(
+                                        {'_id': ObjectId(fileobj._id)},
+                                        {'$set': {'fs_file_ids': node_fs_file_ids}}
+                                    )
+
     
-    node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
     if filename.endswith('.webm') == False:
-        tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+
+
+        vid_gridfs_id = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+
+        fileobj.reload()
+        # print "fileobj.fs_file_ids: ", fileobj.fs_file_ids
+        node_fs_file_ids = fileobj.fs_file_ids
+
+        if len(node_fs_file_ids) == 2:
+            node_fs_file_ids.append(ObjectId(vid_gridfs_id))
+        elif len(node_fs_file_ids) > 2:
+            node_fs_file_ids[2] = ObjectId(vid_gridfs_id)
+
+        # print "node_fs_file_ids: ", node_fs_file_ids
+
+        node_collection.collection.update(
+                                            {'_id': ObjectId(fileobj._id)},
+                                            {'$set': {'fs_file_ids': node_fs_file_ids}}
+                                        )
 
         # --saving webm video id into file object
-        node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+        # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':vid_gridfs_id}})
+

@@ -43,7 +43,7 @@
 				<div class="row">
 					<div class="small-10 medium-8 large-8 columns end">
 						<label class="left">
-							{{ form.username.label_tag }}
+							Username or {{ form.username.label }}
 						</label>
 					</div>
 				</div>
@@ -70,13 +70,16 @@
 				<div class="row">
 					<div class="medium-4 large-4 small-text-left  medium-offset-6 large-offset-6 columns end">
 						<label>
-							<a title="Recover your password" href="{{ auth_pwd_reset_url }}">{% trans "Forgot your password?" %}</a>
+							<a title={% trans "Recover your password" %} href="{{ auth_pwd_reset_url }}">{% trans "Forgot your password?" %}</a>
 						</label>
 					</div>	
 				</div>
+				{% get_is_captcha_visible as is_captcha %}
+				{% if is_captcha %}
 				<div class = "captcha-feild">
 					{% include "ndf/Captcha.html" %}
 				</div>	
+				{% endif %}
 				<!-- Login button -->
 				<div class="row">
 					<div class="small-6 medium-6 large-2 small-offset-3 medium-offset-2 large-offset-3 columns end">
@@ -85,20 +88,26 @@
 				</div>
 
 				<!-- Forgot password link & New Registration link -->
-      			{% if site.SITE_NAME != "NROER" %} 
+      			{# {% if site.SITE_NAME != "NROER" %}  #}
 					<div class="row">
 						<div class="small-6 medium-6 large-6 small-offset-3 large-offset-1 columns end">
 							<center>
 							<label>
-							<a title="Click here to register" href="{{ register_url }}">
+							<a title={% trans "Click here to register" %} href="{{ register_url }}">
 								{% trans "Don't have an account? Register yourself now." %}
 							</a>
 							</label>
+							{% if site.SITE_NAME == "NROER" %}
+							<br/>
+							<a href="mailto:nroer.support@gnowledge.org">
+								Can't register? Contact us for help.
+							</a>  
+							{% endif %}
 							</center>
 						</div>
 					</div>
-				{% endif %}
-				<!-- <input type="hidden" name="next" value="{{ next }}" /> -->
+				{# {% endif %} #}
+				<input type="hidden" name="next" value="{{ next }}" />
 			</form>
 
 		</div>

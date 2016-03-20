@@ -1,10 +1,98 @@
-{% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
-{% block title %} Image Gallery {% endblock %}
+
+<script type="text/javascript">
+  var form = document.getElementById('file-form');
+  var fileSelect = document.getElementById('file-select');
+  var uploadButton = document.getElementById('upload-button');
+        form.onsubmit = function(event) {
+
+        event.preventDefault();
+
+        // Update button text.
+        uploadButton.innerHTML = 'Uploading...';
+
+        // Get the selected files from the input.
+        var files = fileSelect.files;
+
+        // Create a new FormData object.
+        var formData = new FormData();
+
+        // Loop through each of the selected files.
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+
+          // // Check the file type.
+          // if (!file.type.match('image.*')) {  continue; }
+
+          // Add the file to the request.
+          formData.append('doc[]', file, file.name);
+        }
+
+        // appending csrfmiddlewaretoken and user-id
+        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('user','{{request.user.id}}');
+
+        // Set up the request.
+        xhr = new XMLHttpRequest();
+
+        // Open the connection.
+        xhr.open('POST', "{% url 'save_image' group_id %}", true);
+
+        // Set up a handler for when the request finishes sucessfully.
+        xhr.onload = function () {
+
+          if (xhr.status === 200) 
+          {
+            // File(s) uploaded.
+           // if file is not uploaded sucessfully
+            if(xhr.responseText == "UploadError")
+            {
+               alert("Error occurred");
+            }
+            // check if image is not in the list, add it.
+            else if(xhr.responseText.length == 24 )
+            {
+              // alert("success"+xhr.responseText);
+              var imageURL = "/" + "{{group_id}}" + "/image/get_mid_size_img/" + xhr.responseText;
+                            var completeURL = imageURL
+                            var width = prompt("Please enter width in px",'100');
+                            if(width == null)
+                            {
+                                return false;
+                            }
+                            CKEDITOR.instances['ckeditor_textarea'].insertHtml('<img width="'+  width + '"src=' + completeURL +  '>' + '</img>');
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+            }
+
+            uploadButton.innerHTML = 'Upload';
+
+            // updating metadata of files, if file is uploaded sucessfully
+            // if(xhr.responseText != "UploadError")
+            // {
+            //   // alert('xhr.responseText != "UploadError"');
+            // }
+          }
+          else
+          {
+            alert('An error occurred!');
+          }
+        };
+
+        // Send the Data.
+        xhr.send(formData);
+      }
+
+  
+</script>
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
+   <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+{% comment %}
 <script type="text/javascript" src="http://jqueryrotate.googlecode.com/svn/trunk/jQueryRotate.js"></script> <!-- required ? -->
+
+
 {% if already_uploaded %} 
 <div id="message">
   <span style="color:red">Listed below files are already uploaded please choose different files</span>
@@ -16,34 +104,62 @@
 </div>
 {% endif %}
 
-
+{% endcomment %}
+<div class = "repository-title" style="width:100%">
+Image Gallery
+</div>
+<br>
+<br>
+{% comment %}
 <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name_tag %}">
   <div class="row"  style="padding-top:20px">
     <div class="large-7 columns">
       <div class="row collapse">
-	  <div class="small-8 columns">
+    <div class="small-8 columns">
             <input type="text" placeholder="search images" name="search">
-	  </div>
-	  <div class="small-2 columns">
+    </div>
+    <div class="small-2 columns">
             <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
-	      <i class="fi-magnifying-glass large">{% trans "Search" %}</i>
-	    </a>
-	  </div>
-	  <div class="small-2 columns">
-            <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="button postfix secondary">
-	      <i class="fi-paperclip">{% trans "Upload" %}</i>
-	    </a>
-	  </div>
+        <i class="fi-magnifying-glass large">{% trans "Search" %}</i>
+      </a>
+    </div>
+    <div class="small-2 columns">
+            <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" target="_blank" class="button postfix secondary">
+        <i class="fi-paperclip">{% trans "Upload" %}</i>
+      </a>
+    </div>
+      {% endcomment %}
+
+      <form id="file-form" action="{% url 'save_image' group_id %}" method="POST">
+      {% csrf_token %}
+        <input type="file" id="file-select" name="doc[]" />
+        <button type="submit" id="upload-button">Upload</button>
+      </form>
+
+
+
       </div>
     </div>
   </div>
 </form>
 
-<ul class="clearing-thumbs" data-clearing>
+  <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-8" >
+    {% for each in imageCollection %}
+    
+    <li class="card-image-wrapper">
+            <img  data-image-id="{{each.pk}}" src="{% url 'get_mid_size_img' group_name_tag each %}" data-image-src="{% url 'get_mid_size_img' group_id each.pk %}">
+            <figcaption>{{each.name}}</figcaption>
+    
+    </li>
+    {% endfor %}
+  </ul>     
+  
+
+<ul class="clearing-thumbs" data-clearing   style="height:100px;width:100px;z-index:-1">
   {% for image in imageCollection %}
   <li  class="clearing-featured-img">
-    <a href="{% url 'get_mid_size_img' group_name_tag image %}">
-      <img  src="{% url 'getImageThumbnail' group_name_tag image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' group_name_tag image %}'>{{image.name}}</a> <script type='text/javascript'>
+    <a href="{% url 'getImageThumbnail' group_name_tag image %}">
+      <img src="{% url 'getImageThumbnail' group_name_tag image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' group_name_tag image %}'>{{image.name}}</a> <script type='text/javascript'>
 											   var angle = 0;
 											   $('.img_rotate').on('click', function() {
 											   angle += 90;

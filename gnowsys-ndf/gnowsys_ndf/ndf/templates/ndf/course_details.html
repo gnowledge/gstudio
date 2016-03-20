@@ -2,7 +2,7 @@
 {% load ndf_tags %}
 {% load url from future %}
 {% load i18n %}
-{% block title %} {{title}} {% endblock %}
+{% block title %} {{title}} - {{node.name}} {% endblock %}
 {% block url %}{% url 'create_edit' groupid node %}{% endblock %}
 
 <!-- overide head block from base.html -->
@@ -26,7 +26,7 @@
   <div id="view_collection">
     {% include "ndf/collection_ajax_view.html" %}  
   </div>
-  <span><a class="tiny button" href="{% url 'create_course_struct' groupid node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+  <span><a class="tiny radius button" href="{% url 'create_course_struct' groupid node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
 
 {% endblock %}
 
@@ -54,14 +54,18 @@
               <div class="age">
                 {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
                 by <a class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
+
+                {% check_is_gstaff groupid request.user as is_gstaff %}
+                {% if is_gstaff %}
+                  <span data-tooltip title="Edit this Course"><a class="fi-pencil" href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id node.pk %}">Edit</a></span>
+                {% endif %}
+
+
               <!-- <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span> -->
               <!-- <a href=""><i class="fi-clock"></i> {% trans "View history" %}</a> -->
               </div>
 
         </small>
-    </section>
-    <section class="medium-3 columns name-section" >
-      <span>{% include "ndf/rating.html" %} </span>
     </section>
   </header>
 

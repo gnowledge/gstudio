@@ -9,48 +9,14 @@
 
 {% block style %}
 
-	.card-holder{
-		padding-left: 5%;
-	}
-
-	.app-card{
-		width: 17rem;
-		min-height: 12rem;
-		margin: 20px 1rem;
-		background-color: #efefef;
-		border: thin solid lightgray;
-		float: left;
-		padding: 1em;
-	}
-
-	.app-card:hover{
-		box-shadow: 0px 0px 15px gray;
-		border: thin solid lightgray;
-		border-radius: 5px;
-		transition: ease 0.6s;
-	}
-
-	.icons{
-		position: absolute;
-		font-size: 7em;
-		z-index: 0;
-		opacity: 0.1;
-		margin-top: -35px;
-		/*padding-top: 2rem;*/
-	}
 
 {% endblock %}
 
-
-{% block meta_content %}
-	<h2 class="subheader">{% trans "Repository" %}</h2>
-{% endblock %}
-
-{% block related_content%}
-	{% trans "Digital" %} {% trans "resources" %} {% trans "grouped in multiple ways" %}
-{% endblock %}
 
 {% block body_content %}
+		<div class="repository-title large-4 columns">{% trans "Repository" %}
+		</div>
+		<div class="repository-desc large-8 columns">{% trans "Digital resource grouped in multiple ways" %}</div>
 	
 	<!-- <ul class="inline-list card-holder"> -->
 	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-3">
@@ -63,21 +29,26 @@
 					href="{% url each_gapp.name|lower group_id %}"
 				{% endif %}
 				>
-					<h4>{% firstof each_gapp.altnames each_gapp.name %}</h4>
-					<hr/>
-					<i class="icons {{ each_gapp.url }}"></i>
-					<p>{{ each_gapp.content|safe }}</p>
+				<div class="app-card-title"><h4>  
+				{% if each_gapp.altnames %}
+					{% trans each_gapp.altnames %}
+				{% elif each_gapp.name %}
+					{% trans each_gapp.name %}
+				{% endif %}
+				</h4></div>
+					<!-- <div class="app-card-title"><h4>{% firstof each_gapp.altnames each_gapp.name %}</h4></div> -->
+					<div class="app-card-icon"><img src="{{ each_gapp.url }}" width="50%"></div>
+					<div class="app-card-content">{{each_gapp.content_org|truncatechars:60 }}</div>
 				</a>
 			</li>
 		{% endfor %}
 		<li>
-			<a class="app-card text-center" href="/home/e-library">
-				<h4>Partner Resources</h4>
-				<hr/>
-				<i class="icons fi-results-demographics"></i>
-				<p>
-					<b>Contributions from institutions and individuals</b>
-				</p>
+			<a class="app-card text-center" href="{% url 'partner_showcase' group_id %}">
+				<div class="app-card-title"><h4>{% trans "Partner Showcase" %}</h4></div>
+				<div class="app-card-icon"><img src="/static/ndf/images/partner-01.svg" width="50%" style="padding-top:-2em"></div>
+				
+					<div class="app-card-content">{% trans "Contributions from institutions and individuals" %}</div>
+				
 			</a>
 		</li>
 	</ul>

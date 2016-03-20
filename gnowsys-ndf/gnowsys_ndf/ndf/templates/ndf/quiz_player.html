@@ -1,0 +1,278 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% get_group_name groupid as group_name_tag %}
+{% get_user_quiz_resp node request.user as total_and_curr_ans_dict %}
+<style type="text/css">
+	.quiz_qtn{
+		margin-left:20px !important;
+		font-size: 20px;
+	}
+	.question_edit{
+		margin-left: 20px !important;
+	}
+
+	input[type=checkbox], input[type=radio]{
+	    margin-right: 10px;
+	    width: 15px;
+		height: 15px;
+	}
+
+	.chk_ans_lbl, .rad_ans_lbl{
+		font-size: 22px;
+		margin-left: 5px;
+	}
+
+	.fi-check{
+		color: green;
+	}
+
+	.fi-x{
+		color: red;
+	}
+</style>
+
+<div class="row">
+<label class="attempts_count right fi-info">You attempted this question {{total_and_curr_ans_dict.count}} times </label>
+	<fieldset>
+	    <legend >
+	    	<span>Question</span>
+			{% check_is_gstaff groupid request.user as is_gstaff %}
+			{% if is_gstaff %}
+		    	<a href="{% url 'quiz_item_edit' group_id node.pk %}?return_url={{ request.META.HTTP_REFERER }}" class="right question_edit" target="_blank" >Edit</a>
+		    {% endif %}
+	    </legend>
+
+		<div class="row">
+			<div class="quiz_qtn">
+				<b>{{node.content|safe}}</b>
+				<div class="quiz_qtn">
+					{% if node.quiz_type == "Single-Choice" %}
+						{% for each_opt in node.options %}
+							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
+							{% if each_opt in node.correct_answer %}
+								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
+							{% else %}
+								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
+							{% endif %}
+							<br/>
+						{% endfor %}
+						{% comment %}
+						<div class="row">
+							{% if node.quizitem_check_answer %}
+								<input type="button" value="Check" class="button tiny check-ans radius check-btn">
+							{% endif %}
+							{% if node.quizitem_show_correct_ans %}
+								<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
+							{% endif %}
+						</div>
+						{% endcomment %}
+					{% elif node.quiz_type == "Multiple-Choice" %}
+						{% for each_opt in node.options %}
+							<input type="checkbox" name="quiz_ans" value="{{each_opt}}"
+							{% if each_opt in node.correct_answer %}
+								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
+							{% else %}
+								class="choice"  id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
+							{% endif %}
+							<br/>
+						{% endfor %}
+					{% elif node.quiz_type == "Short-Response" %}
+						<textarea rows="4" cols="50" name="quiz_ans" class="choice" placeholder="Enter answer here" class="short_ans_txt" >{{total_and_curr_ans_dict.recent_ans|default_if_none:""}}</textarea>
+						<!-- <input type="button" value="Submit" class="button tiny radius short-ans_chk"> -->
+					{% endif %}
+					<div class="row">
+						{% if node.quizitem_check_answer and node.quiz_type != "Short-Response"  %}
+							<input type="button" value="Check" class="button tiny check-ans radius check-btn">
+						{% endif %}
+						{% if node.quizitem_show_correct_ans %}
+							<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
+						{% endif %}
+						{% if not node.quizitem_show_correct_ans %}
+						<input type="button" value="Submit" class="tiny button radius submit-btn">
+						{% endif %}
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</fieldset>
+</div>
+
+<script type="text/javascript">
+	user_submitted_ans_list = {{total_and_curr_ans_dict.recent_ans|jsonify|safe}}
+
+	// On load ---------------------------------------------------------------
+		$(document).ready(function() {
+			display_sub_ans()
+		})
+
+	// Toggle Check to Clear btn after some actions --------------------------
+		$(".check-btn").click(function(){
+			{% if node.quiz_type == "Multiple-Choice" %}
+				var selected_ans = $('input:checkbox:checked')
+			{% elif node.quiz_type == "Single-Choice" %}
+				var selected_ans = $('input:radio:checked')
+			{% endif %}
+
+			if($(this).val() == "Check"){
+				if( selected_ans.length > 0){
+					all_ans = user_ans()
+					$(".check-btn").val("Clear")
+					$(".show-ans-btn").removeClass("hide")
+					save_user_action("check",all_ans)
+				}
+				else{
+					alert("Please select an answer")
+				}
+			}
+			else if ($(this).val() == "Clear"){
+				hide_options();
+				display_sub_ans()
+			}
+		})
+
+	// Show/Hide Submit button -----------------------------------------------
+		function submit_btn_status(show_hide){
+			if(show_hide == "show"){
+				$(".submit-btn")
+					.removeAttr("disabled")
+					.removeClass("secondary")
+			}
+			else{
+				$(".submit-btn")
+					.attr("disabled","disabled")
+					.addClass("secondary")
+			}
+		}
+
+	// Select user's recent submitted answer ---------------------------------
+		function display_sub_ans(){
+			{% if node.quiz_type != "Short-Response" %}
+			user_ans_list = user_submitted_ans_list
+			if(user_ans_list){
+				$.each(user_ans_list,function(ind,each_opt_val){
+					var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
+					if(re.test(each_opt_val)){
+						each_opt_val = each_opt_val.replace(re,"\\$&")
+						$(":radio[value='"+each_opt_val+"']").prop("checked", true)
+					}
+					else{
+						$("#"+each_opt_val).prop("checked", true)
+					}
+				})
+				submit_btn_status("hide")
+			}
+			{% endif %}
+		}
+
+	// Fecth user's selected answer ------------------------------------------
+
+		function user_ans(){
+			list_name = []
+			$.each($('.choice:checked'), function(a,b){
+				list_name.push(b.id)
+				n = b.nextSibling.nextSibling
+				n.classList.remove("hide")
+			})
+			return list_name;
+
+		}
+
+	// Hide correct/incorrect marks ------------------------------------------
+		function hide_options(){
+			{% if node.quiz_type == "Multiple-Choice" %}
+				$('input:checkbox').removeAttr('checked')
+				var selected_ans = $('input:checkbox:checked')
+			{% elif node.quiz_type == "Single-Choice" %}
+				$('input:radio').removeAttr('checked')
+				var selected_ans = $('input:radio:checked')
+			{% endif %}
+			$(".chk_ans_lbl").addClass("hide")
+			$(".check-btn").val("Check")
+			$(".show-ans-btn").addClass("hide")
+		}
+
+	// On radio-btn check event ----------------------------------------------
+		$('input:radio').change(function() {
+			$(".chk_ans_lbl").addClass("hide")
+			if($(".check-btn").val() == "Clear"){
+				hide_options();
+				$(this).prop("checked", true)
+			}
+			// Check if user's selected answer is not 
+			// same as already submitted answer
+			if(user_submitted_ans_list == $(this).attr('id') ){
+				submit_btn_status("hide")
+			}
+			else{
+				submit_btn_status("show")
+			}
+		})
+
+	// On checkbox check event -----------------------------------------------
+		$('input:checkbox').change(function() {
+			if($(".check-btn").val() == "Clear"){
+				hide_options();
+				$(this).prop("checked", true)
+			}
+			selected_ans = user_ans()
+			if(user_submitted_ans_list == selected_ans || selected_ans.length == 0){
+				submit_btn_status("hide")
+			}
+			else{
+				submit_btn_status("show")
+			}
+			$(".chk_ans_lbl").addClass("hide")
+
+		})
+
+	// Show correct answers --------------------------------------------------
+		$(".show-ans-btn").click(function(){
+			$(".fi-check").removeClass("hide")
+		})
+
+	// Submit user selected answer -------------------------------------------
+		$(".submit-btn").click(function(){
+			{% if node.quiz_type == "Short-Response" %}
+				var user_given_ans = $(".choice").val()
+				user_given_ans = [user_given_ans]
+			{% else %}
+				var user_given_ans = user_ans()
+			{% endif %}
+			save_user_action("submit",user_given_ans)
+		})
+
+	// Ajax call to save user's answer ---------------------------------------
+		function save_user_action(user_action, user_given_ans){
+			if(JSON.stringify(user_submitted_ans_list) != JSON.stringify(user_given_ans)){
+				$.ajax({
+					url: "{% url 'save_quizitem_answer' group_id %}",
+
+					data: {
+						node: "{{node.pk}}",
+						user_action: user_action,
+						user_given_ans: user_given_ans,
+						'csrfmiddlewaretoken': "{{csrf_token}}"
+					},
+
+					type: "POST",
+
+					dataType: "json",
+
+					success: function(data){
+						if(user_action == "submit"){
+							submit_btn_status("hide")
+							user_submitted_ans_list = user_given_ans;
+							if(data['count']){
+								$(".attempts_count").text("You attempted this question "+ data['count']+" times")
+							}
+						}
+					},
+				});//end of ajax
+			}
+			else{
+				alert("This answer is already submitted.")
+			}
+		}
+
+</script>

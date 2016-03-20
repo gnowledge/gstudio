@@ -1,0 +1,84 @@
+{% load get_username get_thread_node get_disc_replies get_node check_is_gstaff from ndf_tags %}
+{% check_is_gstaff group_id request.user as is_gstaff %}
+
+    <div class="row note-toolbar">
+        <div class="small-12 medium-9 columns creator-title">
+            <i class="fi-torso"></i>
+
+            <span class="note-creator" title="{{notebook_obj.created_by|get_username}}">{{notebook_obj.created_by|get_username|truncatechars:"10"}}</span>
+            &#8226;
+            <span class="note-creation-date">{{notebook_obj.created_at|date:"d M Y h:i A"}}</span>
+        </div>
+        <div class="small-12 medium-3 columns creator-rating">
+            {# <div>Your rating</div> #}
+
+            <div>
+            {% include 'ndf/rating.html'%}
+            {% comment %}
+                <i class="fi-like"></i>
+                <i class="fi-like"></i>
+                <i class="fi-like"></i>
+                <i class="fi-like"></i>
+                <i class="fi-like"></i>
+            {% endcomment %}
+            </div>
+        </div>
+    </div>
+    <div class="row note-content">
+        <div class="small-12 columns">
+            <div class="note-header row">
+                <span class="note-title">{{notebook_obj.name}}</span>{% include "ndf/analytics_views.html" %}
+                {% if notebook_obj.tags %}
+                <div class="note-tags">
+                {% for each_tag in notebook_obj.tags %}
+                    <a>{{each_tag}}</a>
+                {% endfor %}
+                </div>
+                {% endif %}
+                {% if is_gstaff or notebook_obj.created_by == request.user.id %}
+                    <a href="{% url 'page_create_edit' group_id notebook_obj.pk %}?course_event_id={{group_id}}&blog_type=True" class="fi-pencil" style="float:right;">Edit</a>
+                {% endif %}
+            </div>
+            <div class="note-text row">
+            {{notebook_obj.content|default_if_none:"No Description added yet!"|safe}}
+            </div>
+        </div>
+    </div>
+    <div class="comment-sections">
+        {% get_thread_node notebook_obj.pk as thread_node %}
+            {% if thread_node %}
+                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                {% get_node thread_node as thread_node_obj %}
+                {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+            {% else %}
+                {% get_disc_replies notebook_obj.pk group_id global_disc_all_replies as all_replies %}
+                {% include 'ndf/gin-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+            {% endif %}
+    </div>
+    {% comment %}
+        <div class="comments-header">
+            <i class="fi-eye"></i>
+            <span class="viewed-count">214</span>
+            views
+            <i class="fi-like"></i>
+            <span class="likes-count">10</span>
+            likes
+            <i class="fi-comments"></i>
+            <span class="comment-count">22</span>
+            comments
+        </div>
+        <div class="new-comment row">
+            <div class="small-1 columns user-prof-image">
+                <i class="fi-torso"></i>
+            </div>
+            <div class="small-9 columns">
+                <textarea class="add-comment textarea-add-comment" name="textarea-add-comment"></textarea>
+            </div>
+            <div class="small-2 columns">
+                <a href="#" id="postCommentBtn" class="button small">Post</a>
+            </div>
+        </div>
+        <div class="row comments">
+        </div>
+    </div>
+    {% endcomment %}

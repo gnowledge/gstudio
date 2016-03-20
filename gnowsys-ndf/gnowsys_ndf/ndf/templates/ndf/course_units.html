@@ -11,21 +11,21 @@
       font-size:1rem !important;
     }
 
-  	.td_cell{
-  		background-color:#0b8a91 !important;
-  		font-size:19px;
-  		text-align:center; 
-    	vertical-align:middle;
-  		color: white !important;
-  	}
+    .td_cell{
+      background-color:#0b8a91 !important;
+      font-size:19px;
+      text-align:center; 
+      vertical-align:middle;
+      color: white !important;
+    }
 
     .td_cell:hover{
-    	cursor:pointer;
+      cursor:pointer;
     }
 
     table, th, td{
       border: 1px solid white;
-  	}
+    }
 
     .largesize{
       font-size:22px;
@@ -90,70 +90,93 @@
 {% endblock %}
 
 {% block meta_content %} 
+  <div id="view_collection">
+    {% include "ndf/collection_ajax_view.html" with node=course_node selected=unit_node.pk %}  
+  </div>
 
 {% endblock %}
 
 
 {% block body_content %} 
-
-    <div class="row unit-name-div">
-      <div class="small-3 columns">
+   
+    <div class="row small-12 large-12  columns unit-name-div">
+      <div class="small-12 large-3 columns">
           <label><h5>{% trans "Unit Name: " %}</label></h5>
       </div>
-      <div class="small-4 columns name-field">
+      <div class="small-12 columns large-4 name-field">
         {% if unit_node %}
-          <label id="{{unit_node.pk}}" class="unit_name" value="{{unit_node.name}}"><h5>{{unit_node.name}}</h5></label>
+          <label id="{{unit_node.pk}}" class="unit_name small-6 large-10 columns " value="{{unit_node.name}}"><h5>{{unit_node.name}}</h5></label>
         {% else %}
-          <input type="text" class="unit_name" value="{% if unit_node %} {{unit_node.name}}{% endif %}">
+          <input type="text" class="unit_name small-6 columns" value="{% if unit_node %} {{unit_node.name}}{% endif %}">
         {% endif %}
       </div>
-
-      <div class="small-2 columns">
-
+      <div class="row small-10 large-4 columns">
+      <div class="small-8 large-2 columns">
           {% if unit_node %}
-            <input type="button" value="Edit Title" class="edit_unit tiny round button"/>
+            <input type="button" value="Edit Title" class="edit_unit tiny tiny button"/>
           {% else %}
-            <input type="button"  value="Create Unit" class="create_unit tiny round button"/>
+            <input type="button"  value="Create Unit" class="create_unit tiny  button"/>
           {% endif %}
       </div>
-      <div class="small-3 columns">
-          <span data-tooltip title="You will be redirected previous page" style="float:right;">
-            <a class="done_units tiny button round" style="float:right;">Back</a>
+      <div class="small-3 large-3 columns">
+          <span data-tooltip title="You will be redirected previous page">
+            <a class="done_units tiny button ">Back</a>
           </span>
       </div>
-
+      </div>
     </div>
+   <!--End of  unit-name-div-->
+     <div class="small-12 large-12 columns"> 
       <div class="unit-list-div hide">
-        <ul class="button-group">
-          <li><a onclick="open_div('Page',this)" class="Page button res-btn">Page</a></li>
-          <li><a onclick="open_div('File',this)" class="File button res-btn">File </a></li>
-          <li><a onclick="open_div('Image',this)" class="Image button res-btn">Image </a></li>
-          <li><a onclick="open_div('Video',this)" class="Video button res-btn">Video </a></li>
-          <li><a onclick="open_div('Quiz',this)" class="Quiz button res-btn">Quiz</a></li>
+        <ul class="row tiny button-group">
+          <li><a onclick="open_div('Page',this)" class="Page button tiny res-btn">Page</a></li>
+          <li><a onclick="open_div('File',this)" class="File button tiny res-btn">File </a></li>
+          <li><a onclick="open_div('Image',this)" class="Image button tiny res-btn">Image </a></li>
+          <li><a onclick="open_div('Video',this)" class="Video button tiny res-btn">Video </a></li>
+          <li><a onclick="open_div('Quiz',this)" class="Quiz button tiny res-btn">Quiz</a></li>
 
         </ul>
       </div>
-      <div class="res-opt-btns hide">
-          <input type="button" id="new_res" value="+ New Resource" class="small button">
-          <input type="button" id="add_res" value="Add existing resource" class="small button">
+      </div>
+      <div class="row small-2 large-8 columns  res-opt-btns hide">
+          <input type="button" id="new_res" value="+ New Resource" class="small tiny button ">
+          <input type="button" id="add_res" value="Add existing resource" class="small tiny button ">
           <a class="display_res">&#215;</a>
+     </div>
 
+      <div class="row small-12 columns collection_details">
       </div>
 
-      <div class="row collection_details">
-      </div>
-
-      <div class="res-opt-div">
-        <div id="view_add_page" class="row hide"> 
-
+      <div class="row small-12 large-6 columns res-opt-div">
+        <div id="view_add_page" class="row small-12 large-12 columns hide"> 
+          <div class ="small-12 large-12 columns">
           <h5>{% trans "Add New Page: " %}</h5>
+          </div>
           <!-- To enter name of the page -->
-          <div class="small-6 columns">
+          <div class="small-12 columns">
             <input class="name_id" name="name" type="text" placeholder="Enter name ...">
+            <div class="row">
+                  <div class="large-4 columns">
+                    <label class="inline">{% trans "Page Type:" %}</label>
+                    </div>
+                  <div class="large-8 columns">
+                  <select name="type_of" id="type_of">
+                  {% for i in page_instance %}
+                    {% if i.name == "Wiki page" %}                  
+                    <option value = {{i.pk}} selected>{{ i.name }}</option>
+
+                  {% else %}
+                    <option value = {{i.pk}}>{{ i.name }}</option>
+                  {% endif %}
+                  {% endfor %}
+              </select>
+                    </div>
+            </div>
+
           </div>              
-          <div class="small-6 columns">
-            <input type="submit" id="add_page" value="Save Page" class="tiny round button"/>
-            <input type="button" id="cancel_btn" value="Cancel" class="tiny round button"/>
+          <div class="small-12 columns">
+            <input type="submit" id="add_page" value="Save Page" class="tiny  button"/>
+            <input type="button" id="cancel_btn" value="Cancel" class="tiny  button"/>
           </div>
         </div>          
 
@@ -163,7 +186,7 @@
           <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_course_file' group_id %}?context_node={{unit_node.pk}}">
           {% csrf_token %}
             <div>
-              <span class="fi-upload"><input type="file" name="doc[]" id="docFile" multiple/></span>
+              <span class="fi-upload"><input type="file" name="doc" id="docFile"/></span>
             </div>
             <!-- For making access policy of files PUBLIC initially by uploading it from topic page -->
             <input type="hidden" name="login-mode" value="PUBLIC">
@@ -180,8 +203,8 @@
             <input type="hidden" name="css_node_id" id="css_node_id" value="{{css_node.pk}}">
 
             <input type="hidden" name="user" value="{{request.user.pk}}">
-            <input type="submit" class="tiny round button" id="add_file" value="Save File">
-            <input type="button" id="cancel_btn" value="Cancel" class="tiny round button"/>
+            <input type="submit" class="tiny  button" id="add_file" value="Save File">
+            <input type="button" id="cancel_btn" value="Cancel" class="tiny  button"/>
           </form>
         </div>
       </div>
@@ -193,6 +216,9 @@
           <input type="hidden" name="hidden_unit_node_id" id="hidden_unit_node_id" value="{{unit_node.pk}}">
           <input type="hidden" name="res_type_name" id="res_type_name">
       </div>
+    </div>
+
+    
 {% endblock %}
 
 <script>
@@ -200,7 +226,6 @@
   {{block.super}}
 
   var res_name_flag = "";
-
   //create unit button click
     $(document).on("click", ".create_unit", function(event){
       unit_name_val = $(".unit_name").val();
@@ -387,6 +412,7 @@
             css_node: "{{css_node.pk}}",
             unit_name: unit_name,
             context_name: "Course",
+            type_of: $("#type_of option:selected").val(),
             csrfmiddlewaretoken: '{{ csrf_token }}'
           },
           success: function(data) {
@@ -457,33 +483,33 @@
           });
 
           existing_list = JSON.stringify(resources_in_RHS)
-      		$.ajax({
+          $.ajax({
 
-        		type: "POST",
+            type: "POST",
 
-        		url: "{% url 'save_resources' groupid %}",
+            url: "{% url 'save_resources' groupid %}",
 
-        		datatype: "json",
+            datatype: "json",
 
-        		data:{
+            data:{
               list_of_res: existing_list,
               css_node: "{{css_node.pk}}",
               unit_name: unit_name_val,
               unit_node_id: unit_node_id,
-        		  csrfmiddlewaretoken: '{{ csrf_token }}'
-        		},
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
 
-        		success: function (data) {
-        		  resp_dict = JSON.parse(data)
-        		  $(".resources_drawer_div").html(""); 
+            success: function (data) {
+              resp_dict = JSON.parse(data)
+              $(".resources_drawer_div").html(""); 
               $(".save_units").addClass("hide")
               $(".res-opt-btns").addClass("hide");
               $(".button").removeClass("success")
-        		  $(".done_units").removeClass("hide")
+              $(".done_units").removeClass("hide")
               $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
               location.reload();
-        		},
-      		});
+            },
+          });
         }
         else{
           alert("You need to create Unit first");
@@ -500,7 +526,8 @@
     $(document).on('click','.done_units',function(){
       {% get_group_object groupid as group_object %}
       {% if "CourseEventGroup" in group_object.member_of_names_list %}
-        $(this).attr('href', '/{{group_id}}/course/structure/create/{{group_id}}')
+        // $(this).attr('href', '/{{group_id}}/course/structure/create/{{group_id}}')
+        $(this).attr('href', '/{{group_id}}/gcourse/structure/create/{{group_id}}')
       {% else %}
         turl = "{% url 'create_course_struct' groupid course_node.pk %}"
         if("{{app_id}}"!= ""){
@@ -538,12 +565,15 @@
               else{
                 dict_res[mem_of_name] = dict_res[mem_of_name] + 1
               }
-              {% if res_node.member_of_names_list.0|lower == "page" or res_node.member_of_names_list.0|lower == "quiz" %}
+              {% if res_node.member_of_names_list.0|lower == "page" %}
                 k = "{% url res_node.member_of_names_list.0|lower|concat:"_details" groupid res_node.pk %}"
+              {% elif res_node.member_of_names_list.0|lower == "quizitemevent" or res_node.member_of_names_list.0|lower == "quizitem" %}
+                k = "{% url 'quiz_item_edit' groupid res_node.pk %}?return_url=groupchange"
+
               {% else %}
                 k = "{% url res_node.member_of_names_list.0|lower|concat:"_detail" groupid res_node.pk %}"
               {% endif %}
-              var str_unit = "<a href='"+k+"' target='_blank' >{{res_node.name}}</a><br>"
+              var str_unit = "<a href='"+k+"' target='_blank' >"+{{res_node.name|removetags:'p'}}+"</a><br>"
               
 
               var row = table.insertRow(-1);

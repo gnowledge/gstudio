@@ -111,7 +111,7 @@ function cancel(){
     <div class="row">
       <div class="large-8 large-pull-4 large-offset-4 columns" 
            style="padding:0 1.65em 0 1.4em;">
-{% include "ndf/add_editor.html" with var_name="content_org" var_value=thread.content_org|default_if_none:"" node_id=thread.pk %}
+{% include "ndf/html_editor.html" with var_name="content_org" var_value=thread.content_org|default_if_none:"" node_id=thread.pk  %}
 
         <div id="message" style="display:none; color:red"></div>
         <!-- <input type="button" id="save_edit_cont" class="button" value="Save"> -->

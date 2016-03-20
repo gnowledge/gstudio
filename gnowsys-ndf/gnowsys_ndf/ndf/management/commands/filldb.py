@@ -44,6 +44,7 @@ log_list = []  # To hold intermediate error and information messages
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
 ###############################################################################
+bin_member_of_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':"Binary"}]})
 
 class Command(BaseCommand):
   help = "This performs activities required for setting up default structure or updating it." 
@@ -74,6 +75,7 @@ class Command(BaseCommand):
 
     if options["setup_structure"]:
       try:
+
         info_message = "\n Performing structure create/update...\n"
         print info_message
         log_list.append(info_message)
@@ -142,13 +144,90 @@ class Command(BaseCommand):
             gs_node.contributors.append(user_id)
 
           gs_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
-          gs_node.disclosure_policy=u'DISCLOSED_TO_MEM'
+          gs_node.disclosure_policy = u'DISCLOSED_TO_MEM'
+          gs_node.subscription_policy = u'OPEN'
+          gs_node.visibility_policy = u'ANNOUNCED'
+          gs_node.encryption_policy = u'NOT_ENCRYPTED'
+          gs_node.group_type = u'PUBLIC'
+          gs_node.edit_policy  = u'NON_EDITABLE'
+          gs_node.status = u'PUBLISHED'
+          gs_node.origin.append({'source': 'filldb'})
+          gs_node.save()
+          print "Group: 'home' created."
+        
+                   
+        # Create default group 'warehouse' wherein intermediate uploads like:
+        # profile_pic, group_banner, thumbnail etc. will happen.
+        node_doc = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'warehouse'}]})
+        if node_doc is None:
+          gs_node = node_collection.collection.Group()
+          gs_node.name = u'warehouse'
+          gs_node.created_by = user_id
+          gs_node.modified_by = user_id
+
+          if user_id not in gs_node.contributors:
+            gs_node.contributors.append(user_id)
+
+          gs_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
+          gs_node.disclosure_policy =u'DISCLOSED_TO_MEM'
           gs_node.subscription_policy=u'OPEN'
           gs_node.visibility_policy=u'ANNOUNCED'
           gs_node.encryption_policy=u'NOT_ENCRYPTED'
           gs_node.group_type= u'PUBLIC'
-          gs_node.edit_policy =u'NON_EDITABLE'
+          gs_node.edit_policy =u'EDITABLE_NON_MODERATED'
+          gs_node.status = u'PUBLISHED'
+          gs_node.origin.append({'source': 'filldb'})
           gs_node.save()
+          print "Group: 'warehouse' created."
+
+
+        # Create default group 'desk' wherein all initial uploads will happen
+        node_doc = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'desk'}]})
+        if node_doc is None:
+          gs_node = node_collection.collection.Group()
+          gs_node.name = u'desk'
+          gs_node.created_by = user_id
+          gs_node.modified_by = user_id
+
+          if user_id not in gs_node.contributors:
+            gs_node.contributors.append(user_id)
+
+          gs_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
+          gs_node.disclosure_policy =u'DISCLOSED_TO_MEM'
+          gs_node.subscription_policy=u'OPEN'
+          gs_node.visibility_policy=u'ANNOUNCED'
+          gs_node.encryption_policy=u'NOT_ENCRYPTED'
+          gs_node.group_type= u'PUBLIC'
+          # edit policy needs to be decided.
+          # should it be moderated with 2 level of moderation ?
+          gs_node.edit_policy =u'EDITABLE_NON_MODERATED'
+          gs_node.status = u'PUBLISHED'
+          gs_node.origin.append({'source': 'filldb'})
+          gs_node.save()
+          print "Group: 'desk' created."
+
+        node_doc = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'help'}]})
+        if node_doc is None:
+          gs_node = node_collection.collection.Group()
+          gs_node.name = u'help'
+          gs_node.created_by = user_id
+          gs_node.modified_by = user_id
+
+          if user_id not in gs_node.contributors:
+            gs_node.contributors.append(user_id)
+
+          gs_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
+          gs_node.disclosure_policy =u'DISCLOSED_TO_MEM'
+          gs_node.subscription_policy=u'OPEN'
+          gs_node.visibility_policy=u'ANNOUNCED'
+          gs_node.encryption_policy=u'NOT_ENCRYPTED'
+          gs_node.group_type= u'PUBLIC'
+          gs_node.edit_policy =u'EDITABLE_NON_MODERATED'
+          gs_node.status = u'PUBLISHED'
+          gs_node.origin.append({'source': 'filldb'})
+          gs_node.save()
+          print "Group: 'help' created."
+
         
         # Creating factory GSystemType's 
         create_sts(factory_gsystem_types,user_id)
@@ -178,7 +257,7 @@ class Command(BaseCommand):
 
           else:
             print 'file name should be ATs.json,STs.json or RTs.json to load Ats,STs or RTs of json'
-        
+        '''
         # Retrieve 'Quiz' GSystemType's id -- in order to append it to 'meta_type_set' for 'QuizItem' GSystemType
         quiz_type = node_collection.one({'_type': u'GSystemType', 'name': u'Quiz'})
         quiz_item_type = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
@@ -195,7 +274,7 @@ class Command(BaseCommand):
           quiz_type.attribute_type_set.append(node_collection.one({'_type': u'AttributeType', 'name': u'start_time'}))
           quiz_type.attribute_type_set.append(node_collection.one({'_type': u'AttributeType', 'name': u'end_time'}))
           quiz_type.save()
-
+        '''
         #Creation Gsystem Eventtype as a container to hold the Event types
         glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
         GlistItem=node_collection.one({'_type': "GSystemType","name":"GListItem"})
@@ -207,7 +286,8 @@ class Command(BaseCommand):
           glist_container = node_collection.collection.GSystem()
           glist_container.name=u"Eventtype"
           glist_container.status = u"PUBLISHED"
-          glist_container.created_by=user_id
+          glist_container.created_by = user_id
+          glist_container.modified_by = user_id	
           glist_container.member_of.append(glist._id)
           glist_container.save()
           print "\n Eventtype Created."
@@ -217,6 +297,7 @@ class Command(BaseCommand):
             node.name=u"CollegeEvents"
             node.status = u"PUBLISHED"
             node.created_by=user_id
+            node.modified_by=user_id
             node.member_of.append(glist._id)
             node.save()
             print "\n CollegeEvents Created."
@@ -397,6 +478,10 @@ def create_meta_type(user_id,meta_type):
   meta.save()
   print "succesfully created META_TYPE:",meta_type
 
+if not bin_member_of_type:
+  create_meta_type(1,u"Binary")
+  bin_member_of_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':"Binary"}]})
+
 def create_gsystem_type(st_name, user_id, meta_type_id = None):
   '''
   creating factory GSystemType's 
@@ -471,7 +556,7 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
     else:
       print 'AttributeType',at_name,'already created'
 
-def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id=None, object_cardinality=None):
+def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id=None, object_cardinality=None,member_of_type_id=bin_member_of_type._id):
   '''
   creating factory RelationType's
   '''
@@ -491,8 +576,10 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
       
       rt_node.created_by = user_id
       rt_node.modified_by = user_id
-      if meta_type_id:
-        rt_node.member_of.append(meta_type_id)
+      # if meta_type_id:
+      #   rt_node.member_of.append(meta_type_id)
+      if member_of_type_id:
+        rt_node.member_of.append(member_of_type_id)
 
       if user_id not in rt_node.contributors:
         rt_node.contributors.append(user_id)
@@ -557,6 +644,7 @@ def create_ats(factory_attribute_types,user_id):
 
 def create_rts(factory_relation_types,user_id):
   meta_type_id = ""
+  member_of_type_id = ""
   for each in factory_relation_types:
     subject_type_id_list = []
     object_type_id_list = []
@@ -571,6 +659,12 @@ def create_rts(factory_relation_types,user_id):
         meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
         if meta_type:
           meta_type_id = meta_type._id
+
+      if "member_of" in value:
+        member_of_name = value['member_of']
+        member_of_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':member_of_name}]})
+        if member_of_type:
+          member_of_type_id = member_of_type._id
 
       for s in value['subject_type']:
         node_s = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name': s}]})
@@ -589,7 +683,7 @@ def create_rts(factory_relation_types,user_id):
       if "object_cardinality" in value:
         object_cardinality = value["object_cardinality"]
 
-    create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id, object_cardinality)
+    create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id, object_cardinality, member_of_type_id)
 
 def create_sts(factory_gsystem_types,user_id):
   meta_type_id = ""

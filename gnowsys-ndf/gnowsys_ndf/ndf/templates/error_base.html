@@ -57,7 +57,9 @@
 
 		<li class="name">
 		    <h1>
-		      <a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
+		      <a href="/home/" class="group" accesskey="q" id="home-group">
+		      	<img src="{{site.LOGO}}" style="height:45px;">
+		      </a>
 		    </h1>
 		</li>
 
@@ -76,7 +78,15 @@
     <br/>
 
 	<div class="text-center">
-		{% block error_body_text %}	{% endblock %}
+		{% block error_body_text %}	
+			{% if message %}
+				<h2>{{message}}</h2>
+				<br/>
+				<a href="javascript:window.history.back();">
+					{% trans "Click here to go back" %}
+				</a>
+			{% endif %}
+		{% endblock %}
 	</div>
 
 	{% include "ndf/footer.html" with site=site %} 

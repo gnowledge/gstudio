@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load ndf_tags %}
+{% load simple_filters %}
 {% load cache %}
 
 {% block title %}   
@@ -15,66 +16,70 @@
 {% cache 3600 node_edit_base style %}
 {% block style %}
 
-.divider-line { font-size: xx-large; color:lightgray; }
-.line-height-2 { line-height:2; }
-.line-height-2pt5 { line-height:2.5; }
-.fontsize-x-large { font-size: x-large; }
+	.divider-line { font-size: xx-large; color:lightgray; }
+	.line-height-2 { line-height:2; }
+	.line-height-2pt5 { line-height:2.5; }
+	.fontsize-x-large { font-size: x-large; }
 
-.margin-0 { margin: 0 !important ;}
+	.margin-0 { margin: 0 !important ;}
 
-.resource-drawer { 
-border-color: #D3D3D3; border-style: solid; 
-padding: 0 !important; 
-overflow-y: auto;
-}
+	.resource-drawer { 
+	border-color: #D3D3D3; border-style: solid; 
+	padding: 0 !important; 
+	overflow-y: auto;
+	}
 
-.resource-drawer li.bullet-item:hover{
-background-color: #ecf0f1; cursor:pointer;
-}
+	.resource-drawer li.bullet-item:hover{
+	background-color: #ecf0f1; cursor:pointer;
+	}
 
-.posted-by{ color: #808080; font-size: small; }
+	.posted-by{ color: #808080; font-size: small; }
 
-.selected-resource { background-color:lightgray !important ; }
+	.selected-resource { background-color:lightgray !important ; }
 
-.resource-type-image {
-height:40px; 		
-background-repeat:no-repeat; background-size: 48px 48px
-}
+	.resource-type-image {
+	height:40px; 		
+	background-repeat:no-repeat; background-size: 48px 48px
+	}
 
-#tags_error{
-	color: red;
-}
+	#tags_error{
+		color: red;
+	}
 
-div.tags{ 
-	/*padding: 5px 10px; */
-	margin: 2px 5px;
-	/*color: white;*/
-	font-size: 1em;
-	border: solid thin #FFD400;
-}
+	div.tags{ 
+		/*padding: 5px 10px; */
+		margin: 2px 5px;
+		/*color: white;*/
+		font-size: 1em;
+		border: solid thin #FFD400;
+	}
 
-i.remove-tag{
-	padding-left: 8px;
-	font-size: 1.1em;
-	cursor: pointer;
-}
+	i.remove-tag{
+		padding-left: 8px;
+		font-size: 1.1em;
+		cursor: pointer;
+	}
 
+	#type_of{
+		height:36px;	
+	}
 {% endblock %}
 {% endcache %}
- {% block head %}
+
+{% block head %}
 	{{block.super}}
-{% if title == "Page" or "File" in node.member_of_names_list %}
-  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
-  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
- {% endif %}
- {% endblock %}
+	{% if title == "Page" or "File" in node.member_of_names_list %}
+	  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+	  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+	  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+	{% endif %}
+{% endblock %}
 
 {% block body_content %}
 
-<form data-abide id="form-edit-node" method="POST" action="">    
+<form data-abide id="form-edit-node" method="POST" action="" enctype="multipart/form-data">    
     
     <header> 
 	    <div class="row">
@@ -83,7 +88,11 @@ i.remove-tag{
 					{% if node %}
 						{% trans "Editing " %} {{title}} : {{node.name}}
 					{% else %}
-						{% trans "Create New " %} {{title}} :
+						{% if blog_type %}
+							{% trans "Create New Blog" %} :
+						{% else %}
+							{% trans "Create New " %} {{title}} :
+						{% endif  %}
 					{% endif %} 
 				</span></h3>
 
@@ -96,18 +105,16 @@ i.remove-tag{
 		    </div>     
 	    </div> 
     </header>
-    {% check_group node as is_group %}
+    {% check_group node.pk as is_group %}
+
     <div class="edit-card">
-        
 	    <div class="row">
-
-	      	<dl class="tabs pill large-12 columns select">
-
+	      	<dl class="tabs pill large-12 columns select" id = "tabs">
+				{% if not blog_type %}
 				<dd class="active node_tab" title="Click here to add Name, Description, Privacy and Tags">
-		  		<!-- change name of collection tab overide block in your code -->
+		  			<!-- change name of collection tab overide block in your code -->
 		  			<a>{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
 				</dd>
-				{% if not ce_id %}
 				<dd class="prior_node_tab" title="Click here to add/edit Prior Node">
 				  	<a>{% block prior_node_tab %} {% trans "Requires" %} {% endblock %}</a>
 				</dd>
@@ -126,19 +133,15 @@ i.remove-tag{
 				<dd class="assesses_tab" title="Click here to add/edit teaches">
 				 	<a>{% trans "Assesses" %} </a> 
 				</dd>	
-				{% endif %}
-
-				{% check_is_gstaff groupid request.user as is_gstaff %}
-				{% if is_gstaff %}
 					{% if title == "Page" or "File" in node.member_of_names_list %}
 						<dd class="thread_prop_tab" title="Click here to add/edit properties of Thread">
 						  	<a>{% trans "Interaction Settings" %} </a> 
 						</dd>  
 					{% endif %}
+				{% else %}
+					<input type="hidden" name="blog_type" value="{{blog_type}}">
 				{% endif %}
-		
 	     	</dl>     
-	            
 	   	</div>
 	</div>
         
@@ -154,16 +157,44 @@ i.remove-tag{
   	<div id="node-details-edit-div" class="tabs-content" > 
 
     	<div class="active content row contents" id="panel-name-description">
-
-      		<div class="medium-8 columns">
-		  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
-			</div>
 		
-			<!--  -->
+		<div class="medium-8 columns editor-div">
+
+	  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}		  
+		</div>
+	
+	{% comment %}
+			
+
+    	{% if node.pk %}
+	    	{% get_list_of_fields node.type_of "name" as type_of_list %}
+		   	{% if "Wiki page" in type_of_list  %}
+				<div class="medium-8 columns editor-div">
+			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
+				</div>
+			{% else %}
+				<div class="medium-8 columns editor-div">
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_color="#f2f2f2" ckeditor_toolbar="GeneralToolbar" %}		  
+				</div>
+			{% endif %}
+		{% else  %}
+			{% if title == "Page" %}
+				<div class="medium-8 columns editor-div org-editor">
+			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}		  
+				</div>
+			{% endif %}
+				<div class="medium-8 columns editor-div ck-editor hide">
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}		  
+				</div>
+				
+		{% endif %}
+		{% endcomment %}
+
 			{% if ce_id %}
 				<input type="hidden" name="ce_id" value="{{ce_id}}">
 				<input type="hidden" name="res" value="{{res}}">
 			{% endif %}
+
 			{% if program_res %}
 				<input type="hidden" name="program_res" value="{{program_res}}">
 			{% endif %}
@@ -226,17 +257,19 @@ i.remove-tag{
 
 	            </div>                
 	            	
-	    			{% cache 300 node_edit_base_lang_loc request.LANGUAGE_CODE %}
-
 	            	<div class="row">
 	                	<div class="large-4 columns">
 	                		<label class="inline">{% trans "Language" %}</label>
 	                    </div>
 	                	<div class="large-8 columns">
 	               			<select name="lan">
-                                       {% get_language_info_list for LANGUAGES as languages %}
-                                       {% for language in languages %}
-                                       <option value="{{language.code}}">{% trans language.name %}</option>{% endfor %}</select>
+                               {% get_language_info_list for LANGUAGES as languages %}
+                               {% for language in languages %}
+                           		<option value="{{language.code}}" {% ifequal node.language.0  language.code %} selected=selected {% endifequal %}>
+                               		{% trans language.name %}
+                               	</option>
+                               	{% endfor %}
+                            </select>
 	                    </div>
 	                </div>
 	                
@@ -245,38 +278,38 @@ i.remove-tag{
 	                		<label class="inline">{% trans "Location:" %}</label>
 	                    </div>
 	                	<div class="large-8 columns">
-							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand">
+							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button radius expand">
 							<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 							</a>
 	                    </div>
 		     		</div>
-		     		{% endcache %}
-		     		{% if title == "Page" %}
-		     		<div class = "page type" >
-		     			<div class="row">
-		     			 	<div class = "small-2 columns">	
-			     				<span  style="width: 70px; float: left;" >{% trans 'Page Type' %}:  </span>
- 							</div>
- 							<div class="small-8 columns" ends>
+
+		     		{% if title == "Page" and "Author" not in group_object.member_of_names_list %}
+	                <div class="row">
+	                	<div class="large-4 columns">
+	                		<label class="inline">{% trans "Page Type:" %}</label>
+	                    </div>
+	                	<div class="large-8 columns">
 					     			<select name="type_of" id="type_of">
 						  			{% for i in page_instance %}
-
 						  				{% if i.name == "Wiki page" %}	        				
-											<option value = {{i.pk}} selected> {% trans i.name %} </option>
+											<option value = {{i.pk}} selected>{{ i.name }}</option>
 
 										{% else %}
-											<option value = {{i.pk}} > {% trans i.name %} </option>
+											<option value = {{i.pk}}>{{ i.name }}</option>
 										{% endif %}
 			  						{% endfor %}
 								</select>
-							</div>
-						</div>	
+	                    </div>
 		     		</div>
 		     		{% endif %}
                     	                
 	            </div> 
 			</div>  
 			{% endif %}
+			<div class="row">
+				{% block upload_logo %} {% endblock %} 
+			</div>
 
 			<div class="row">
 				<div class="small-8 columns">
@@ -296,7 +329,7 @@ i.remove-tag{
 						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
 					        </div>
 					        <div class="small-2 columns">
-					          <span tabindex="3" id="add-tag-btn" class="tiny button">{% trans 'Add Tag' %}</span>
+					          <span tabindex="3" id="add-tag-btn" class="tiny button radius">{% trans 'Add Tag' %}</span>
 					        </div>
 							</div>							
 
@@ -319,7 +352,8 @@ i.remove-tag{
 
 			    	</span>
 		    	</div>
-	    	</div>      
+	    	</div>   
+
     	</div>
     
     {% block prior_node %}
@@ -345,33 +379,33 @@ i.remove-tag{
 		
 		{% cache 3600 node_edit_base_coll_type_radio request.LANGUAGE_CODE %}
 
-		<div class="choose" style="display:none;">
+		<div class="choose" style="display:none">
 		  	
 			<div class="row">
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns" >
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Page"/>
 			      {% trans "Page" %} <i class="step fi-page-filled"></i></span>
 			    </div>
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="File" />
 			      {% trans "File" %} <i class="step fi-book"></i></span>
 			    </div>
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Image" />
 			      {% trans "Image" %} <i class="step fi-photo"></i>
 			      </span>
 			    </div>
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Video" />
 			      {% trans "Video" %} <i class="step fi-video"></i>
 			      </span>
 			    </div>
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Pandora Video" />
 			      {% trans "Pandora" %} <i class="step fi-video"></i>
 			      </span>
 			    </div>	    
-			    <div class="small-2 columns">
+			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="QuizObj" />
 			      {% trans "Quiz" %} <i class="step fi-pencil"></i>
 			      </span>
@@ -394,71 +428,95 @@ i.remove-tag{
     {% endblock %}
     
 	{% cache 300 node_edit_base_metadata request.LANGUAGE_CODE %}
-    <div class="content contents" id="panel-metadata" style="width:95%; display:none;" >      
+    <div class="content contents panel" id="panel-metadata" style="width:100%; display:none;" >      
       	<div class="row">
-		  	<h4>{% trans "Please add or edit Metadata" %} </h4>
-
+		  	<div class="small-12 large-12 columns"><h4>{% trans "Please add or edit Metadata" %} </h4></div>
+		  	<!-- Educational Language is Removed from ndf tags and here  __ Saurabh -->
 		  	{% get_metadata_values as metadata %}
 	  		{% for k,v in metadata.items %}
-	  			<div class="small-6 columns">			  	
+	  		  
+  											
+	  			<div class="small-12 large-6 columns">			  	
 			  		<label>
 			  			{% if k == "educationaluse" %}
-			  				<h5>{% trans "Educational Use:" %} </h5> 
-			  			{% elif k == "interactivitytype" %}
-			  				<h5>{% trans "Interactivity Type: " %}</h5> 
-			  			{% elif k == "educationallevel" %}
-			  				<h5>{% trans "Educational Level:" %} </h5> 
-			  			{% elif k == "educationalsubject" %}
-			  				<h5>{% trans "Educational Subject:" %} </h5> 
-			  			{% elif k == "timerequired" %}
-			  				<h5>{% trans "Time Required: " %}</h5> 
-			  			{% elif k == "audience" %}
-			  				<h5>{% trans "Target Audience:" %} </h5> 
-			  			{% elif k == "textcomplexity" %}
-			  				<h5>{% trans "Text Complexity" %}</h5>  
-			  			{% elif k == "age_range" %}			
-		         			<h5>{% trans "Age Range:" %}</h5>
-		         		{% elif k == "readinglevel" %}
-		         			<h5>{% trans "Reading Level:" %} </h5> 
-		         		{% endif %}
+						<h5 >{% trans "Educational Use:" %} </h5> 
+						{% elif k == "interactivitytype" %}
+						<h5>{% trans "Interactivity Type: " %}</h5> 
+						{% elif k == "educationallevel" %}
+						<h5 class= "compulsory">{% trans "Educational Level:" %} </h5>
+						{% elif k == "educationalsubject" %}
+						<h5 class= "compulsory">{% trans "Educational Subject:" %} </h5>
+						{% elif k == "timerequired" %}
+						<h5>{% trans "Time Required: " %}</h5> 
+						{% elif k == "audience" %}
+						<h5 class= "compulsory">{% trans "Target Audience:" %} </h5> 
+						{% elif k == "textcomplexity" %}
+						<h5>{% trans "Text Complexity" %}</h5>  
+						{% elif k == "age_range" %}			
+						<h5>{% trans "Age Range:" %}</h5>
+						{% elif k == "readinglevel" %}
+						<h5>{% trans "Reading Level:" %} </h5>  
+						{% elif k == "curricular" %}			
+						<h5>{% trans "Curricular:" %}</h5>
+						{% elif k == "educationalalignment" %}			
+						<h5>{% trans "Educational Alignment:" %}</h5>
+						{% endif %}      
 
-		         		{% get_attribute_value node.pk k as attr_val %}
-		         		<select name="{{k}}">
-		         			<option></option>
-		        			{% for opts in v %}
-	        					{% if opts == attr_val %}	        				
-									<option selected>{% trans opts %}</option>
+		         		{% get_attribute_value node.pk k "True" as attr_val %} 
+		         		{% if attr_val.data_type == "list" %}
+		         		 <select name="{{k}}" id ="{{k}}" multiple style="height:5em!important;">
+		         		{% else %}
+		         		 <select name="{{k}}" id ="{{k}}">
+						{% endif %}
+							<option> --Select-- </option>
+							{% for opts in v %} 
+								{% if opts == attr_val.value|stringformat:"s" or opts in attr_val.value  %}	        				
+								<option selected>{% trans opts %}</option>
 								{% else %}
-									<option>{% trans opts %}</option>
+								<option>{% trans opts %}</option>
 								{% endif %}
 							{% endfor %}
 						</select>
 					</label>
 				</div>
+				
 		  	{% endfor %}
-		  	<div class="small-6 columns">			  	
+  		<div class=" small-12 large-12 columns">
+		  	<div class="small-12 large-4 columns">			  	
 		  		<label>
 					<h5>{% trans "Based on Url: " %} </h5> 
 					<input name="basedonurl" type="text" value="{{node.basedonurl}}">		  	
 				</label>
 			</div>
-		  	
-		</div>
-		<div class="row">
-			<div class="small-6 columns">
-				<label>
-					<h5>{% trans "License: " %} </h5> 
-					<input name="license" type="text" value="{{node.license}}">		  	
-				</label>
-			</div>
-			<div class="small-6 columns">
+			<div class="small-12 large-4 columns">
 				<label>
 					<h5>{% trans "Source: " %} </h5> 
 					<input name="source" type="text" value="{{node.source}}">		  	
 				</label>
 			</div>
-		</div>
-		<div id="metadata_info"></div>
+
+			<div class="small-12 large-4 columns">
+				<label><h5>License</h5></label>
+				<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
+				{% get_license as license %}
+				<select name="license"  required>
+						{% for each_license in license %}
+	        			{# <option value="{{each_license}}"  #}
+	        			{% if each_license == node.license %}
+	        				<option selected>{% trans each_license %}</option>
+	        			{% else %}>
+	        			 	<option>{% trans each_license %}</option>
+	        			{% endif %}>
+					{% endfor %}
+				</select>
+				<small class="error">Please select resource Subject</small>
+
+			</div>
+			
+		</div>	
+	</div>
+			
+	<div id="metadata_info"></div>
 	</div>	
 	{% endcache %}
 
@@ -468,13 +526,14 @@ i.remove-tag{
 		</div>
 
 	    <div class="row yes_no_disc_div">
-	      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction :" %}</h5>
+	      <div class="large-2 medium-4 columns"><h5>{% trans "Interaction : " %}</h5>
 	      </div>
 	      <div class="large-pull-4 large-6 medium-8 columns">
 			<input type="radio" name="thread_create" value="Yes">Yes &nbsp;&nbsp;
-			<input type="radio" name="thread_create" value="No">No
+			<input type="radio" name="thread_create" value="No" checked="checked">No
 	      </div>
 	    </div>
+
 	    <div class="thread-settings-div hide">
 		    <div class="row">
 		      <div class="large-2 medium-4 columns "><h5>{% trans "Release Option:" %}</h5>
@@ -604,127 +663,132 @@ i.remove-tag{
     {% endcache %}
 
     <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}"> -->
-    <input type="submit" tabindex="4" id="save-node" value=" {% trans 'Save as Draft And Preview' %}" class="button" />
+    <input type="submit" tabindex="4" id="save-node" value=" {% trans 'Save as Draft And Preview' %}" class="button radius" />
 
 </form>
 
 <!-- Reveal Modals begin -->
 
 <script type="text/javascript">
-
-	$("input[name=thread_create]").change(function(){
-		var radio_sel = $('input[name=thread_create]:checked').val()
-		if(radio_sel=="Yes"){
-			$(".thread-settings-div").removeClass("hide");
-		}
-		else{
-			$(".thread-settings-div").addClass("hide");
-		}
-	})
-
-	$("select#release_resp_sel").change(function() {
-		$("select#interaction_type_sel").removeAttr("disabled");
-	})
-
-	var startEnrollDt = $("#thread_start_date");
-	var endEnrollDt = $("#thread_close_date");
-
-	currentDate = new Date();
-	var currentDay = currentDate.getDate();
-	var currentMonth = currentDate.getMonth();
-	var currentYear = currentDate.getFullYear();
-	lowerYearLimit = currentYear;
-	upperYearLimit = currentYear + 20;
+	
+	{% if title == "Page" or "File" in node.member_of_names_list %}
+	
+		$("input[name=thread_create]").change(function(){
+			var radio_sel = $('input[name=thread_create]:checked').val()
+			if(radio_sel=="Yes"){
+				$(".thread-settings-div").removeClass("hide");
+			}
+			else{
+				$(".thread-settings-div").addClass("hide");
+			}
+		})
 
 
-	$(".date_month_day_year").datepicker({ 
-		changeMonth: true,
-		changeYear: true,
-		dateFormat: 'dd/mm/yy',
-		yearRange: lowerYearLimit + ":" + upperYearLimit,
-		defaultDate: '0',
+		$("select#release_resp_sel").change(function() {
+			$("select#interaction_type_sel").removeAttr("disabled");
+		})
 
-		onClose: function(dateText, inst) {
-		  $(this).val(dateText);
-		  
-		  var month_year = $(this).val();
-		  day = currentDay;
-		  month = currentMonth;
-		  year = currentYear;
-		  
-		  if ($(this).attr('id') == "thread_start_date") {
-		    if (month_year) {
-		      month_year = month_year.split("/");
-		      day = parseInt(month_year[0]);
-		      month = parseInt(month_year[1]);
-		      year = parseInt(month_year[2]);
-		    }
+		var startEnrollDt = $("#thread_start_date");
+		var endEnrollDt = $("#thread_close_date");
 
-		    if (endEnrollDt.val() != '') {
-		      var testStartDate = startEnrollDt.datepicker('getDate');
-		      var testEndDate = endEnrollDt.datepicker('getDate');
+		currentDate = new Date();
+		var currentDay = currentDate.getDate();
+		var currentMonth = currentDate.getMonth();
+		var currentYear = currentDate.getFullYear();
+		lowerYearLimit = currentYear;
+		upperYearLimit = currentYear + 20;
 
-		      if (testStartDate > testEndDate) {
-		        endEnrollDt.datepicker('setDate', testStartDate);
-		      }
 
-		      else {
-		        $(this).val(day+"/"+month+"/"+year);
-		        $(this).datepicker('setDate', new Date(year, (month-1), day));
-		      }
-		    }
+		$(".date_month_day_year").datepicker({ 
+			changeMonth: true,
+			changeYear: true,
+			dateFormat: 'dd/mm/yy',
+			yearRange: lowerYearLimit + ":" + upperYearLimit,
+			defaultDate: '0',
 
-		    else {
-		      endEnrollDt.val(day+"/"+month+"/"+year);
-		      $(this).datepicker('setDate', new Date(year, (month-1), day));
-		    }
-		    $("#thread_close_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
-		  }
+			onClose: function(dateText, inst) {
+			  $(this).val(dateText);
+			  
+			  var month_year = $(this).val();
+			  day = currentDay;
+			  month = currentMonth;
+			  year = currentYear;
+			  
+			  if ($(this).attr('id') == "thread_start_date") {
+			    if (month_year) {
+			      month_year = month_year.split("/");
+			      day = parseInt(month_year[0]);
+			      month = parseInt(month_year[1]);
+			      year = parseInt(month_year[2]);
+			    }
 
-		  else if ($(this).attr('id') == "thread_close_date") {
-		    if (month_year) {
-		      month_year = month_year.split("/");
-		      day = parseInt(month_year[0]);
-		      month = parseInt(month_year[1]);
-		      year = parseInt(month_year[2]);
-		    }
+			    if (endEnrollDt.val() != '') {
+			      var testStartDate = startEnrollDt.datepicker('getDate');
+			      var testEndDate = endEnrollDt.datepicker('getDate');
 
-		    if (startEnrollDt.val() != '') {
-		      var testStartDate = startEnrollDt.datepicker('getDate');
-		      var testEndDate = endEnrollDt.datepicker('getDate');
+			      if (testStartDate > testEndDate) {
+			        endEnrollDt.datepicker('setDate', testStartDate);
+			      }
 
-		      if (testStartDate > testEndDate) {
-		        startEnrollDt.datepicker('setDate', testEndDate);
-		      }
-		      else {
-		        $(this).val(day+"/"+month+"/"+year);
-		        $(this).datepicker('setDate', new Date(year, (month-1), day));
-		      }
-		    }
+			      else {
+			        $(this).val(day+"/"+month+"/"+year);
+			        $(this).datepicker('setDate', new Date(year, (month-1), day));
+			      }
+			    }
 
-		    else {
-		      startEnrollDt.val(day+"/"+month+"/"+year);
-		      $(this).datepicker('setDate', new Date(year, (month-1), day));
-		    }
-		  }
-		},
+			    else {
+			      endEnrollDt.val(day+"/"+month+"/"+year);
+			      $(this).datepicker('setDate', new Date(year, (month-1), day));
+			    }
+			    $("#thread_close_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
+			  }
 
-		beforeShow: function() {
-		  var month_year = $(this).val();
-		  day = currentDay;
-		  month = currentMonth;
-		  year = currentYear;
+			  else if ($(this).attr('id') == "thread_close_date") {
+			    if (month_year) {
+			      month_year = month_year.split("/");
+			      day = parseInt(month_year[0]);
+			      month = parseInt(month_year[1]);
+			      year = parseInt(month_year[2]);
+			    }
 
-		  if (month_year) {
-		    month_year = month_year.split("/");
-		    day = parseInt(month_year[0]);
-		    month = parseInt(month_year[1]);
-		    year = parseInt(month_year[2]);
-		  }
-		  $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
-		  $(this).datepicker('setDate', new Date(year, (month-1), day));
-		},
-	});
+			    if (startEnrollDt.val() != '') {
+			      var testStartDate = startEnrollDt.datepicker('getDate');
+			      var testEndDate = endEnrollDt.datepicker('getDate');
+
+			      if (testStartDate > testEndDate) {
+			        startEnrollDt.datepicker('setDate', testEndDate);
+			      }
+			      else {
+			        $(this).val(day+"/"+month+"/"+year);
+			        $(this).datepicker('setDate', new Date(year, (month-1), day));
+			      }
+			    }
+
+			    else {
+			      startEnrollDt.val(day+"/"+month+"/"+year);
+			      $(this).datepicker('setDate', new Date(year, (month-1), day));
+			    }
+			  }
+			},
+
+			beforeShow: function() {
+			  var month_year = $(this).val();
+			  day = currentDay;
+			  month = currentMonth;
+			  year = currentYear;
+
+			  if (month_year) {
+			    month_year = month_year.split("/");
+			    day = parseInt(month_year[0]);
+			    month = parseInt(month_year[1]);
+			    year = parseInt(month_year[2]);
+			  }
+			  $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+			  $(this).datepicker('setDate', new Date(year, (month-1), day));
+			},
+		});
+
+	{% endif %}
 
 	var data_list = ""
 	var saveflag = 0
@@ -787,11 +851,12 @@ i.remove-tag{
 
 	// doument ready function
 	$(document).ready(function(){
-
 		$(".assesses_tab").hide();
 		$(".teaches_tab").hide();
 		$(".prior_node_tab").hide();
 		$("#metadata_info").empty();
+		
+    
 
 		if (nt == "Page" || nt == "File" || nt == "Pandora_video" || nt == "Concept")
 		{
@@ -811,35 +876,41 @@ i.remove-tag{
 		{% if node %}
 			old_name = "{{node.name}}"
 		    old_name = old_name.toLowerCase();
-		    $("select[name='type_of'] option[value='{{node.type_of.0}}']").prop("selected", true);
+		    $("select#type_of option[value='{{node.type_of.0}}']").prop("selected", true);
+		    // $("select#type_of").prop("disabled", true)
 			{% if is_auth_node %}
 				$("#name_id").attr("disabled",true)
 			{% endif %}
 
-			{% if 'has_thread' in node %}
-				{% with node.has_thread.0 as disc_thread_node %}
-					{% if disc_thread_node %}
-						$("input[name='thread_create'][value='Yes']").attr("checked","checked");
-						$("input[name='thread_create']").trigger("change");
-						$(".yes_no_disc_div").addClass("hide");
+			{% if node.discussion_enable == False %}
+				$("input[name='thread_create'][value='No']").attr("checked","checked");
+			{% else %}
+			{% get_relation_value node.pk 'has_thread' as grel_rt_sub_and_grelid %}
+				{% if grel_rt_sub_and_grelid.0 %}
+					{% with grel_rt_sub_and_grelid.0 as disc_thread_node %}
+						{% if disc_thread_node %}
+							$("input[name='thread_create'][value='Yes']").attr("checked","checked");
+							$("input[name='thread_create']").trigger("change");
+							$("input[name='thread_create']").attr("disabled",true);
+							// $(".yes_no_disc_div").addClass("hide");
 
-						{% get_attribute_value disc_thread_node.pk 'release_response' as resp_val %}
-						{% get_attribute_value disc_thread_node.pk 'thread_interaction_type' as thr_int_type %}
-						{% get_attribute_value disc_thread_node.pk 'start_time' as thr_start_time %}
-						{% get_attribute_value disc_thread_node.pk 'end_time' as thr_end_time %}
-						$("#release_resp_sel").val("{{resp_val}}")
-						$("#interaction_type_sel").val("{{thr_int_type}}")
-						$("#thread_start_date").val('{{thr_start_time|date:"d/m/Y"}}')
-						$("#thread_close_date").val('{{thr_end_time|date:"d/m/Y"}}')
-					{% endif %}
-				{% endwith %}
+							{% get_attribute_value disc_thread_node.pk 'release_response' as resp_val %}
+							{% get_attribute_value disc_thread_node.pk 'thread_interaction_type' as thr_int_type %}
+							{% get_attribute_value disc_thread_node.pk 'start_time' as thr_start_time %}
+							{% get_attribute_value disc_thread_node.pk 'end_time' as thr_end_time %}
+							$("#release_resp_sel").val("{{resp_val}}")
+							$("#interaction_type_sel").val("{{thr_int_type}}")
+							$("#thread_start_date").val('{{thr_start_time|date:"d/m/Y"}}')
+							$("#thread_close_date").val('{{thr_end_time|date:"d/m/Y"}}')
+						{% endif %}
+					{% endwith %}
+				{% endif %}
 			{% endif %}
 
 		{% endif %}
-		{% if ce_id or program_res %}
-	    $("#group-level-header").addClass("hide");
+		{% if title != "Page" %}
+			$(".ck-editor").removeClass("hide")
 		{% endif %}
-
 	});
 
 	$("input[type='radio'][name='col']").click(function() {
@@ -1310,8 +1381,8 @@ i.remove-tag{
 	addTagBtn.onkeypress = addTag;
 
 	$("#save-node").click(function(event) {
-                      
-      	pn_arr = []
+	
+		pn_arr = []
 		cn_arr = []
 		md_arr = [] //for adding module
 		tch_arr=[]  // for teaches
@@ -1324,7 +1395,7 @@ i.remove-tag{
 		// 	event.preventDefault();
 
 		// }
-		$("#type_of").removeAttr("disabled")
+		// $("#type_of").removeAttr("disabled")
  		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
 				pn_arr.push($(this).val());
@@ -1389,8 +1460,41 @@ i.remove-tag{
     	{
           $("#message").css("display", "none");
 	    }
+		$("select#type_of").prop("disabled", false)
+	    if($("#type_of option:selected").text() == "Wiki page"){
+	    	$(".ck-editor").remove();
+	    }
+	    else{
+	    	$(".org-editor").remove();
+	    }
+		{% if not blog_type %}
 
+			{% get_site_name_from_settings as site_name %}
+	       
+			{%  if site_name == "NROER" and "File" in node.member_of_names_list %}
+	            if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
+	                    // $('#tabs').find('a[href="#tab2"]').trigger('click');
+	                    $('.meta_tab').trigger('click');
+	                    $("#message").css("display", "block");
+	                    $("#message").text("{% trans 'Please fill compulsory metadata fields(marked with a *)' %}");
+	                    event.preventDefault();
+	            }
+			{% endif %}
+
+			$("input[name='thread_create']").attr("disabled",false);
+
+			// {% if title == "Page" or "File" in node.member_of_names_list %}
+			// 	if (!$("input[name='thread_create']:checked").val()) {
+			// 		$('.thread_prop_tab').trigger('click');
+			// 		$("#message").css("display", "block");
+			// 		$("#message").text("{% trans 'Please fill compulsory fields(marked with a *)' %}");
+			// 		event.preventDefault();
+			// 	}
+			// {% endif %}
+		{% endif %}
 	    updateAllTags();
+
+
 	});
 
 
@@ -1481,14 +1585,38 @@ i.remove-tag{
 	// 	lastVisitedLocationVal.push(mapZoom)
 	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
 	// });
-	function update()
-	{
-		$('#page_type').empty();
-		$('#page_type').append($('#type_of :selected').text());	
-		$('#select_page_type').foundation('reveal', 'close');
-	} 
+	// function update()
+	// {
+	// 	$('#page_type').empty();
+	// 	$('#page_type').append($('#type_of :selected').text());	
+	// 	$('#select_page_type').foundation('reveal', 'close');
+	// } 
+	/*
+	$("select#type_of").change(function() {
+		sel_val_type_of = $("option:selected", this).text();
+		if(sel_val_type_of == "Wiki page"){
+			$(".ck-editor").addClass("hide");
+			$(".org-editor").removeClass("hide");
+		}
+		else{
+			$(".ck-editor").removeClass("hide");
+			$(".org-editor").addClass("hide");
+		}
+	})
+	*/
 
 
 </script>
 
+{% endblock %}
+
+{% block document_ready %}
+	{{block.super}}
+	$("input[id='educational']").each(function(){
+		$(this).attr("required", "");
+		$(this).css("width", "98%");
+		$(this).css("float", "left");
+		$(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+		$(this).after("<i style='color:red; float:left display:inline'>*</i>");
+	});
 {% endblock %}

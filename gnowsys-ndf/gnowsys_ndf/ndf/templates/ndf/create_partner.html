@@ -3,9 +3,10 @@
 {% load ndf_tags %}
 {% load cache %}
 
-{% block title %} Create a new partner {% endblock %}
+{% block title %} {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}} {{node.name}}{% endblock %}
 
-{% block meta_content %}
+{% block meta_content %}  
+<h2 class="subheader"> {{parent_obj_partner.name}}</h2>
 {% endblock %}
 
 {% block related_content %}
@@ -21,181 +22,136 @@
 
 {% block body_content %}
 
-  <h2>{% trans "Create a new partner" %}</h2><br>
-
-  <form data-abide id="create_group" class="row" method="post" action="{% url 'create_partner' group_id %}">
+  <h3> {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}} {{node.name}}</h3><br>
+  <form id="create_group" class="" method="post"
+  {% if node %} action="{% url 'edit_group' node.pk %}"
+  {% else %} action="{% url 'create_group' parent_obj_partner.pk %}"
+  {% endif %}
+  data-abide enctype="multipart/form-data">
     {% csrf_token %}
     {% cache 3600 create_partner request.user.id request.LANGUAGE_CODE %}
     <fieldset>
-    <legend>Partners Details</legend>
-   
-     <div class="row">
-       <div class="small-2 columns">
-       <lable for="right-label" class="right inline">Name
-       </div>
-     <div class ="small-5 end columns">
-       <input type="text"  id="" name="groupname" placeholder="Enter partner name" required>
-       <small class="error">Name is required and must be a string.</small>     
-  
-     </div><br><br><br>
-     </div>     
-     <div class="row">
-       <div class="small-2 columns">
-       <lable for="right-label" class="right inline">Category</lable>
-       </div>
-     <div class ="small-5 end columns">
-       <input type="text"  id="" name="" placeholder="Enter partner category" required>
-       <small class="error">required</small>     
-  
-     </div>
-     </div>     
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">Description</lable>
-       </div>
-       <div class ="small-9 columns">
-	 {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
 
-     </div>
-     </div>
-     </div>
-    </div>
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">Street</lable>
-       </div>
-     <div class ="small-9 columns">
-       <input type="text"  id="" name="house_street" placeholder="Enter Street" required>
-       <small class="error">required</small>     
+    <div id="people-details-edit-div" class="tabs-content">
+        <div class="row">
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">Name
+              </label>
+            </div>
+            <div class="small-5 columns end">
+            <input type="text" name="name" id="name_input" value="{% if node %}{{node.name}}{% endif %}" {% if node %}disabled="disabled"{% endif %}>
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">Altnames
+              </label>
+            </div>
+            <div class="small-5 columns end">
+            <input type="text" name="altnames" id="altname_input" value="{% if node %}{{node.altnames}}{% endif %}" >
+            </div>
+          </div>
 
-     </div><br><br><br>
-     </div>
-     </div>
-    </div>
-      
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">Description
+              </label>
+            </div>
+            <div class="small-5 columns end">
+              {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}      
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">House/Street
+              </label>
+            </div>
+            <div class="small-5 columns end">
+            <input type="text" name="house_street" value="{{node.house_street}}" >
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">Town/City
+              </label>
+            </div>
+            <div class="small-5 columns end">
+            <input type="text" name="town_city" id="town_city" value="{{node.town_city}}">
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">Pin Code
+              </label>
+            </div>
+            <div class="small-5 columns end">
+              <input type="text" name="pin_code" id="pin_code" value="{{node.pin_code}}" pattern="[0-9]{6}" class="input_only_num" maxlength="6">
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">E-mail Id
+              </label>
+            </div>
+            <div class="small-5 columns end">
+              <input type="email" name="email_id" id="email_id" required pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$" class="compulsory" value="{{node.email_id}}">
+            <small class="error">{% trans "Please fill a valid email" %}! </small>
 
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">Place</lable>
-       </div>
-     <div class ="small-9 columns">
-       <input type="text"  id="" name="town_city" placeholder="Enter Place" required>
-       <small class="error">required</small>     
-     </div><br><br><br>
-     </div>
-     </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">Website
+              </label>
+            </div>
+            <div class="small-5 columns end">
+              <input type="text" name="website" id="website" value="{{node.website}}">
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">Mobile No.
+              </label>
+            </div>
+            <div class="small-5 columns end">
+              <input type="tel" name="mobile_number" id="mobile_num" class="input_only_num" value="{{node.mobile_number}}" maxlength='10' pattern="[1-9][0-9]{9}">
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label class="right inline">Altertnate No.
+              </label>
+            </div>
+            <div class="small-5 columns end">
+            <input type="text" name="alternate_number" id="alternate_num" value="{{node.alternate_number}}"  maxlength='10' pattern="[1-9][0-9]{9}" class="input_only_num">
+            </div>
+          </div>
+        </div>
+    <div class="row">
+      <div class="small-3 columns">
+          <label class="right inline">{% trans "Upload thumbnail" %}</label>
+            <small><i>(.svg images are currently not supported)</i></small>
+      </div>
+      <div class="small-5 columns end">
+          {% if logo_img_node %}
+            <a target="_blank" href="{% url 'read_file' group_id logo_img_node.pk %}">{% trans "View existing thumbnail " %}</a>
+            <input type="button" class="button tiny" id="change_logo" value="Edit">
+            <input type="button" class="button tiny hide" id="cancel_change_logo" value="Cancel">
+            <input type="file" name="docFile" id="docFile" class="hide" accept="image/*"/>
+          {% else %}
+          <input type="file" name="docFile" id="docFile" accept="image/*"/>
+          {% endif %}
+      </div>
     </div>
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">PIN</lable>
-       </div>
-     <div class ="small-9 columns">
-       <input type="text"  id="" name="pin_code" placeholder="Enter PIN" required>
-       <small class="error">required</small>     
-     </div><br><br><br>
-     </div>
-     </div>
     </div>
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">Contact Point</lable>
-       </div>
-     <div class ="small-9 columns">
-       <input type="text"  id="" name="contact_point" placeholder="Enter Contact Point">
-     </div>
-     </div>
-     </div>
-    </div>
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">Email</lable>
-       </div>
-     <div class ="small-9 columns">
-       <input type="email"  id="" name="email_id" value={{request.user.email}} placeholder="Email" required>
-       <small class="error">required</small>     
-     
-     </div><br><br>
-     </div>
-     </div>
-    </div>
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">Logo</lable>
-       </div>
-     <div class ="small-9 columns">
-	<input type="file" name="doc[]"  id="docFile"/>
-       </div>
-     </div>
-     </div>
-    </div>
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">Banner</lable>
-       </div>
-     <div class ="small-9 columns">
-	<input type="file" name="doc[]"  id="docFile"/>
+    {% if subgroup_flag %}
+      <input type="hidden" name="subgroup" value="{{subgroup_flag}}">
+    {% endif %}
+    {% if partnergroup_flag %}
+      <input type="hidden" name="partnergroup_flag" value="{{partnergroup_flag}}">
+    {% endif %}
 
-     </div>
-     </div>
-     </div>
-    </div>
-
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">Telephone</lable>
-       </div>
-     <div class ="small-9 columns">
-       <input type="tel"  id="" name="telephone" placeholder="">
-     </div>
-     </div>
-     </div>
-    </div>
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">Website</lable>
-       </div>
-     <div class ="small-9 columns">
-       <input type="url"  id="" name="website" placeholder="" >
-     </div>
-     </div>
-     </div>
-    </div>
-     <div class="row">
-     <div class="small-8">
-      <div class ="row">
-       <div class="small-3 columns">
-       <lable for="right-label" class="right inline">Location</lable>
-       </div>
-     <div class ="small-9 columns">
-       <a href="#view-map-edit-widget" id="label-location" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-         <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
-          </a>
-      
-     </div>
-     </div>
-     </div>
-    </div>
-     
 </fieldset>
   {% endcache %}
 
@@ -272,7 +228,8 @@
         </div>
   {% endcomment %}
         <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">            -->
-<input type="" value="Create Partner" id="grpsubmit" class="button disabled">
+            <input type="submit" value="Create Partner" id="grpsubmit" class="button">
+<!-- <input type="" value="Create Partner" id="grpsubmit" class="button disabled"> -->
       </div>
   </form>
 {% endblock %}
@@ -358,6 +315,21 @@
 
 {% block script %}
 
+  $(".input_only_num").keydown(function (e) {
+        // Allow ctrl+A
+    if ((e.keyCode == 65 && e.ctrlKey === true) || 
+             // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+            (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9) {
+                 // let it happen, don't do anything
+                 return;
+        }
+   // Ensure that it is a number and stop the keypress
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+        e.preventDefault();
+    }        
+  });
+
+
   $("#node_search_form").parent().hide();
 
   // method to provide autocomplete/intellisence of forum names
@@ -385,5 +357,26 @@
       $("#message").css("display", "none");
     }
   });
+  $(document).on('click',"#change_logo",function(){
+    $("#cancel_change_logo").removeClass("hide");
+    $("#docFile").removeClass("hide");
+  })
 
+  $(document).on('click',"#cancel_change_logo",function(){
+    $("#cancel_change_logo").addClass("hide");
+    $("#docFile").addClass("hide");
+    $("#docFile").val("")
+  })
+
+  $("#docFile").change(function(event) {
+    file_mime_type = this.files[0].type;
+    if(file_mime_type.indexOf("svg") >= 0 ){
+      alert(".svg images are currently not supported")
+      $("#docFile").val("");
+      event.preventDefault();
+    }
+  });
+  $("#grpsubmit").click(function(event) {
+    $("#name_input,#email_id").removeAttr("disabled")
+  });
 {% endblock %}

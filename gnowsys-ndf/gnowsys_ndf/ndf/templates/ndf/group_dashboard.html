@@ -99,69 +99,20 @@
   <!-- <h3>{% trans "About" %}</h3> -->
 
   {% blocktrans %}
-    <b> Group Dashboard </b> Shows the tasks and activities in the site.
+    <b> Group Dashboard </b> Shows the tasks and activities on the site.
   {% endblocktrans %}
   <br><br>
 
   <!-- form for group/profile picture on LHS -->
-  <form id="frmProfilePic" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
-    {% csrf_token %}       
-
-    <div id="group_picture"> 
-            
-      {% cache 600 group_profile_pic group_id  %}
-      {% if prof_pic_obj %}
-        <img alt="profile picture for this group." src="{% url 'get_mid_size_img' group_id prof_pic_obj.pk %}" id="group-image" class="group-images th">
-
-      {% else %}
-        <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." id="group-image" class="group-images th">
-
-      {% endif %}
-      {% endcache %}
-      
-      <!-- empty image tag to hold uploaded image -->
-      <img src="" class="hide group-images" id="temp-group-image">
-
-    </div>
-    
-    {% if request.user.is_authenticated %}
-
-      {% user_access_policy group_id request.user as user_policy %}
-      {% if user_policy == "allow" %}
-
-        <input type="file" name="has_profile_pic" class="hide" />
-        <input type="hidden" name="type" value=" {% trans 'profile_pic' %}" />
-        <input type="hidden" name="user" value="{{usr}}" />
-        
-        <div class="button expand tiny" id="group-img-edit-btn">{% trans  'Edit' %} </div>
-        <input class="button expand tiny hide" id="group-img-browse-btn" accept="image/*" name="has_profile_pic" type="file">
-
-        <div class="row hide" id="group-img-save-cancel-btn">
-
-          <div class="small-6 columns">
-            <input type="submit" class="button tiny expand" value="{% trans 'Save' %}">
-          </div>
-
-          <div class="small-6 columns">
-            <div class="button tiny expand" id="group-img-cancel-btn">
-              Cancel
-            </div>
-          </div>
-
-        </div>
-        
-      {% endif %} <!-- user access policy check -->
-    {% endif %} <!-- authentication check -->
-
-  </form>
-  <!-- ---END OF form for group/profile picture on LHS -->
+  {% include "ndf/upload_pic_widget.html" with url_name='group_dashboard'  widget_for="Group_updates" %}
+  <!-- END OF form for group/profile picture on LHS -->
 {% endblock %}
 <!-- END of LHS block -->
 
 
 {% block body_content %}
-  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
-    <label id="alertModalLabel"></label>
+  <div id="GroupUpdatesModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="GroupUpdatesModalLabel"></label>
     <div class="row approval_modal hide">
       <div class="small-3 small-offset-3 columns">
         <input type="button" id="btnConfirmYes" class="button tiny expand" value="{% trans 'Yes' %}">
@@ -190,19 +141,21 @@
             <img src="/static/ndf/images/{{site.SITE_NAME|lower}}-site-banner.png" alt="Banner picture for this group." width="100%" style="background-color:white; border:solid 1px darkgray;">
         {% endif %}   
 
+      {% comment %}
         <div class="row">
           <div class="row" style="margin-top:80px; margin-left:20px; background: transparent;position:absolute z-index:1"  align="Left">
             <input type="file" name="has_Banner_pic" id="docFile" accept="image/*" class="hide"/>
             <input type="hidden" name="type" value="banner_pic">           
             <input type="hidden" name="user" value="{{usr}}">         
             <p id="message" style="display:none">
-              {% trans "Please wait while profile picture is uploading .." %}
+              {% trans "Please wait while profile picture is uploaded .." %}
             </p>
           </div> 
         </div>
+      {% endcomment %}
       </div>
       <div class="height-div" style="height:5px">
-        <!-- this div is used for spaceing between the button Add phot button and profile picture area -->
+        <!-- this div is used for spaceing between the button Add photo button and profile picture area -->
       </div>
         
       {% comment %}
@@ -396,6 +349,7 @@
   // --- update/upload/edit of group/profile picture ---
 
   // on click of Edit button
+  /*
   $("#group-img-edit-btn").click(function () {
     $(this).addClass("hide");
     $("#group-img-browse-btn").removeClass("hide").val("");
@@ -466,9 +420,9 @@
   //     $('#groupdocfile').val(this.value);
 
   //     var message = "{% trans 'Only image files should be selected for setting your profile picture!' %}"
-  //     $("#alertModalLabel").text(message);
-  //     $("#alertModal").addClass("alert");
-  //     $("#alertModal").foundation('reveal', 'open');
+  //     $("#GroupUpdatesModalLabel").text(message);
+  //     $("#GroupUpdatesModal").addClass("alert");
+  //     $("#GroupUpdatesModal").foundation('reveal', 'open');
 
   //     $("#pic_div").addClass("hide");
   //   }
@@ -482,9 +436,9 @@
 
     else {
       var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
-      $("#alertModalLabel").text(message);
-      $("#alertModal").addClass("warning");
-      $("#alertModal").foundation('reveal', 'open');
+      $("#GroupUpdatesModalLabel").text(message);
+      $("#GroupUpdatesModal").addClass("warning");
+      $("#GroupUpdatesModal").foundation('reveal', 'open');
 
       $("#pic_div").addClass("hide");
 
@@ -506,9 +460,9 @@
       $('#docFile').val(this.value);
 
       var message = "{% trans 'Only image files should be selected for setting your profile picture!' %}"
-      $("#alertModalLabel").text(message);
-      $("#alertModal").addClass("alert");
-      $("#alertModal").foundation('reveal', 'open');
+      $("#GroupUpdatesModalLabel").text(message);
+      $("#GroupUpdatesModal").addClass("alert");
+      $("#GroupUpdatesModal").foundation('reveal', 'open');
 
       $("#pic_div").addClass("hide");
     }
@@ -522,15 +476,16 @@
 
     else {
       var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
-      $("#alertModalLabel").text(message);
-      $("#alertModal").addClass("warning");
-      $("#alertModal").foundation('reveal', 'open');
+      $("#GroupUpdatesModalLabel").text(message);
+      $("#GroupUpdatesModal").addClass("warning");
+      $("#GroupUpdatesModal").foundation('reveal', 'open');
 
       $("#pic_div").addClass("hide");
 
       return false;
     }
   });
+*/
 
   // Detail view
     $(".detail-view").click(function(event) {
@@ -600,10 +555,10 @@
           }
 
           else {
-            $("#alertModalLabel").text(data["message"]);
-            $("#alertModal").removeClass("success").removeClass("warning");
-            $("#alertModal").addClass("alert");
-            $("#alertModal").foundation('reveal', 'open');
+            $("#GroupUpdatesModalLabel").text(data["message"]);
+            $("#GroupUpdatesModal").removeClass("success").removeClass("warning");
+            $("#GroupUpdatesModal").addClass("alert");
+            $("#GroupUpdatesModal").foundation('reveal', 'open');
           }
         },
 
@@ -646,16 +601,16 @@
       approval_state = $(this).val();
       if ( !is_approve_confirm && !is_reject_confirm) {
         if(approval_state == "Approve"){
-          $("#alertModalLabel").text("{% trans 'Do you want to continue approving the selected students?' %}");
+          $("#GroupUpdatesModalLabel").text("{% trans 'Do you want to continue approving the selected students?' %}");
         }
         else if(approval_state == "Reject"){
-          $("#alertModalLabel").text("{% trans 'Do you want to continue rejecting the selected stuffdents?' %}");
+          $("#GroupUpdatesModalLabel").text("{% trans 'Do you want to continue rejecting the selected students?' %}");
         }
-        $("#alertModal")
+        $("#GroupUpdatesModal")
           .removeClass("medium").addClass("small")
           .addClass("alert")
           .find("div.approval_modal").removeClass("hide")
-        $("#alertModal").foundation('reveal', 'open');
+        $("#GroupUpdatesModal").foundation('reveal', 'open');
         return false;
       }
       students_selected = []
@@ -702,10 +657,10 @@
             }
 
             else {
-              $("#alertModalLabel").text(data["message"]);
-              $("#alertModal").removeClass("success").removeClass("warning");
-              $("#alertModal").addClass("alert");
-              $("#alertModal").foundation('reveal', 'open');
+              $("#GroupUpdatesModalLabel").text(data["message"]);
+              $("#GroupUpdatesModal").removeClass("success").removeClass("warning");
+              $("#GroupUpdatesModal").addClass("alert");
+              $("#GroupUpdatesModal").foundation('reveal', 'open');
             }
           },
 
@@ -733,13 +688,13 @@
       if(approval_state == "Approve"){
         is_approve_confirm = true;
         is_reject_confirm = false;
-        $("#alertModal").foundation('reveal', 'close');
+        $("#GroupUpdatesModal").foundation('reveal', 'close');
         $("#btnApp_id").trigger("click");
       }
       else if(approval_state == "Reject"){
         is_reject_confirm = true;
         is_approve_confirm = false;
-        $("#alertModal").foundation('reveal', 'close');
+        $("#GroupUpdatesModal").foundation('reveal', 'close');
         $("#btnRej_id").trigger("click");
       }
     });
@@ -753,14 +708,14 @@
         is_reject_confirm = false;
         is_approve_confirm = false;
       }
-      $("#alertModal").foundation('reveal', 'close');
+      $("#GroupUpdatesModal").foundation('reveal', 'close');
     });
 
 
   // Reset reveal-modal content & it's setting
-    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
-      $("#alertModalLabel").text("");
-      $("#alertModal")
+    $(document).on('closed.fndtn.reveal', '#GroupUpdatesModal[data-reveal]', function () {
+      $("#GroupUpdatesModalLabel").text("");
+      $("#GroupUpdatesModal")
         .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
         .addClass("medium")
         .find("div.approval_modal").addClass("hide")

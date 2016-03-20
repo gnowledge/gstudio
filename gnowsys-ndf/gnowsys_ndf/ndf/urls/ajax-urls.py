@@ -19,6 +19,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^Collection_create/', 'collection_create', name='collection_create'),
     url(r'^get_tree_hierarchy/(?P<node_id>[\w-]+)$', 'get_tree_hierarchy', name='get_tree_hierarchy'),
     url(r'^get_collection/(?P<node_id>[\w-]+)$', 'get_collection', name='get_collection'),
+    url(r'^get_collection/(?P<node_id>[\w-]+)/(?P<stats_flag>[\w-]+)$', 'get_collection', name='get_course_collection'),
     url(r'^get_contents/', 'get_topic_contents', name='get_topic_contents'),
     url(r'^drawer/', 'drawer_widget', name='drawer_widget'),
     url(r'^search/', 'search_drawer', name='search_drawer'),
@@ -41,6 +42,10 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^remove_user_from_author_set/', 'remove_user_from_author_set', name="remove_user_from_author_set"),
     url(r'^get_data_for_user_drawer/', 'get_data_for_user_drawer', name='get_data_for_user_drawer'),
     url(r'^get_data_for_batch_drawer/', 'get_data_for_batch_drawer', name='get_data_for_batch_drawer'),
+    url(r'^get_resource_by_oid_list$', 'get_resource_by_oid_list', name='get_resource_by_oid_list'),
+    url(r'^get_resource_by_oid/?', 'get_resource_by_oid', name='get_resource_by_oid'),
+    url(r'^get_ckeditor/?', 'get_ckeditor', name='get_ckeditor'),
+    url(r'^get_gin_line_template/(?P<node_id>[\w-]+)$', 'get_gin_line_template', name='get_gin_line_template'),
     
 
                        # Ajax-urls required for MIS --------------------------------
@@ -85,4 +90,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^page_scroll/(?P<page>[^/]+)$', 'page_scroll', name='page_scroll'),
     url(r'^check_date/(?P<node>[\w-]+)$', 'check_date', name='check_date'),
     url(r'^save_time/(?P<node>[\w-]+)$', 'save_time', name='save_time'),
+    url(r'^show_coll_cards/$', 'show_coll_cards', name='show_coll_cards'),
+    url(r'^get_visits_count/$', 'get_visits_count', name='get_visits_count'),
+
 )

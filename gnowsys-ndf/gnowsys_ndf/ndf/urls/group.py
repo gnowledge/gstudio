@@ -12,6 +12,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.group',
                         url(r'^/switch_group/(?P<node_id>[\w-]+)$', 'switch_group', name='switch_group'),
                         url(r'^/app_selection/', 'app_selection', name='app_selection'),
                         url(r'^/create_sub_group/', 'create_sub_group', name='create_sub_group'),
+                        url(r'^/upload_using_save_file/', 'upload_using_save_file', name='upload_using_save_file'),
                         #url(r'^/(?P<groups_category>[\w-]+)/nroer_groups/?$', 'nroer_groups', name='nroer_groups'),
                         url(r'^/(?P<app_id>[\w-]+)/value/(?P<agency_type>[\w-]+)/?$', 'group', name='groups_by_agency_type'),
                     )

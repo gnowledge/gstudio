@@ -34,7 +34,8 @@ sitename=Site.objects.all()
 app = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
 
 if sitename :
-	sitename = sitename[0]
+  sitename = sitename[0]
+  site_domain = sitename.domain
 else : 
 	sitename = ""
 
@@ -493,7 +494,7 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
           "\n     - Changes: " + str(change_list).strip('[]') + \
           "\n     - Status: " + request.POST.get('Status','') + \
           "\n     - Assignee: " + ", ".join(assignee_list) + \
-          "\n     - Url: http://" + sitename.domain + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
+          "\n     - Url: http://" + site_domain + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
         bx=User.objects.get(username=eachuser)
         set_notif_val(request,group_id,msg,activ,bx)
 
@@ -653,7 +654,7 @@ def create_task_at_rt(request,rt_list,at_list,task_node,assign,group_name,group_
             "' has been reported by " + request.user.username + \
             "\n     - Status: " + request.POST.get('Status', '') + \
             "\n     - Assignee: " + ", ".join(assignee_list) + \
-            "\n     - Url: http://" + sitename.name + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
+            "\n     - Url: http://" + site_domain + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
 
           set_notif_val(request, group_id, msg, activ, eachuser)
 
@@ -722,9 +723,9 @@ def delete_task(request, group_name, _id):
     #     pass
 
     try:
-        group_id = ObjectId(group_id)
+        group_id = ObjectId(group_name)
     except:
-        group_name, group_id = get_group_name_id(group_id)
+        group_name, group_id = get_group_name_id(group_name)
 
     pageurl = request.GET.get("next", "")
     try:
@@ -774,9 +775,9 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     # else :
     #     pass
     try:
-        group_id = ObjectId(group_id)
+        group_id = ObjectId(group_name)
     except:
-        group_name, group_id = get_group_name_id(group_id)
+        group_name, group_id = get_group_name_id(group_name)
         
     
     #section to get the Tasks 
@@ -846,13 +847,13 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
                 if int(choice) == int(3):
                     message="No Task Created"
                     auth1 = node_collection.one({'_type': 'Author', 'created_by': each.created_by })   
-                    if auth:    		
-                        if auth.name == auth1.name:
+                    if auth1:    		
+                        if request.user.username == auth1.name:
                             task_list.append(dict(attr_value))
                 
                 if int(choice) == int(4):
                     message="Nothing Assigned"
-                    attr1 = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type.$id": attributetype_key1._id, "object_value": request.user.username})
+                    attr1 = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type.$id": attributetype_key1._id, "object_value": request.user.id})
                     if attr1:
                         task_list.append(dict(attr_value))
                 

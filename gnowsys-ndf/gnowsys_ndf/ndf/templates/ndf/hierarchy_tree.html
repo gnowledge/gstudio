@@ -17,6 +17,10 @@
     	margin-left: 36px;
     }
     
+    .topic_stats{
+    	margin-top: 8em;
+
+    }
 </style>
 
 
@@ -71,10 +75,10 @@
     		onCreateLi: function(node, $li) {
 					
 				if (node.node_type == "Topic"){
-					$li.find('.jqtree-title').before('&nbsp <span class="fi-page"></span> &nbsp;');				        	
+					$li.find('.jqtree-title').before('&nbsp <span class="fa fa-file-o"></span> &nbsp;');				        	
 				}
 				else{
-					$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:orange"></span> &nbsp;');				        		
+					$li.find('.jqtree-title').before('&nbsp <span class="fa fa-folder" style="color:#4c4c4c"></span> &nbsp;');				        		
 				}
     			   
 				if (node.node_type == "Topic"){        					
@@ -90,7 +94,7 @@
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
 
-                				'&nbsp;&nbsp;<a href="/{{groupid}}/topics/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/topics/'+node.id+'/"> <i class="fa fa-pencil" style="color:#4c4c4c"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
                 			
                 			{% endif %}
         				);
@@ -246,7 +250,7 @@
 
  		}
  		else{
- 			count += "No Resources !<br/>";
+ 			count += "{% trans 'No Resources' %}!<br/>";
  		}
 
  		return count

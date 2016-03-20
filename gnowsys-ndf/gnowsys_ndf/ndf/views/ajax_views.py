@@ -39,10 +39,12 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time,get_group_name_id
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
+from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
@@ -131,10 +133,11 @@ def collection_nav(request, group_id):
   '''
   This ajax function retunrs the node on main template, when clicked on collection hierarchy
   '''
-  if request.is_ajax() and request.method == "POST":
-    node_id = request.POST.get("node_id", '')
-    curr_node_id = request.POST.get("curr_node", '')
-    node_type = request.POST.get("nod_type", '')
+  if request.is_ajax() and request.method == "GET":
+    curr_node_obj = None
+    node_id = request.GET.get("node_id", '')
+    curr_node_id = request.GET.get("curr_node", '')
+    node_type = request.GET.get("nod_type", '')
     template = "ndf/node_ajax_view.html"
     breadcrumbs_list = []
     curr_node_obj = node_collection.one({'_id': ObjectId(curr_node_id)})
@@ -162,10 +165,14 @@ def collection_nav(request, group_id):
         sg_type = "ProgramEventGroup"
       elif "CourseEventGroup" in list_of_sg_member_of:
         sg_type = "CourseEventGroup"
+      if "QuizItemEvent" in node_obj.member_of_names_list:
+        template = "ndf/quiz_player.html"
+
       thread_node, allow_to_comment = node_thread_access(group_obj._id, node_obj)
 
-    nav_list = request.POST.getlist("nav[]", '')
-    n_list = request.POST.get("nav", '')
+
+    nav_list = request.GET.getlist("nav[]", '')
+    n_list = request.GET.get("nav", '')
 
     # This "n_list" is for manipulating breadcrumbs events and its navigation
     if n_list:
@@ -206,6 +213,10 @@ def collection_nav(request, group_id):
           else:
             breadcrumbs_list.remove(e)
     # print "breadcrumbs_list: ",breadcrumbs_list,"\n"
+    node_obj.get_neighbourhood(node_obj.member_of)
+    thread_node = None
+    allow_to_comment = None
+    thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     return render_to_response(template, 
                                 { 'node': node_obj,
                                   'original_node':curr_node_obj,
@@ -215,7 +226,8 @@ def collection_nav(request, group_id):
                                   'sg_type': sg_type,
                                   'allow_to_comment': allow_to_comment,
                                   'thread_node': thread_node,
-                                  'app_id': node_id, 'topic':topic, 'nav_list':nav_list
+                                  'app_id': node_id, 'topic':topic, 'nav_list':nav_list,
+                                  'allow_to_comment':allow_to_comment,'thread_node': thread_node
                                 },
                                 context_instance = RequestContext(request)
     )
@@ -763,7 +775,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 ##### bellow part is for manipulating nodes collections#####
 
 @get_execution_time
-def get_inner_collection(collection_list, node):
+def get_inner_collection(collection_list, node, gstaff_access, completed_ids, incompleted_ids):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
@@ -774,43 +786,81 @@ def get_inner_collection(collection_list, node):
         for cl in collection_list:
           if cl['id'] == node.pk:
             node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
-            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
+            if col_obj._id in completed_ids:
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "COMPLETED"}
+              # print "\n completed_ids -- ",completed_ids
+              # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
+            elif col_obj._id in incompleted_ids:
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "WARNING"}
+              # print "\n completed_ids -- ",completed_ids
+              # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
+            else:
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
             inner_sub_list = [inner_sub_dict]
-            inner_sub_list = get_inner_collection(inner_sub_list, col_obj)
-
+            inner_sub_list = get_inner_collection(inner_sub_list, col_obj, gstaff_access, completed_ids, incompleted_ids)
+            # if "CourseSubSectionEvent" == node_type:
+            #   start_date_val = get_attribute_value(col_obj._id, "start_time")
+            #   if start_date_val:
+            #     curr_date_val = datetime.datetime.now().date()
+            #     start_date_val = start_date_val.date()
+            #     if curr_date_val >= start_date_val or gstaff_access:
+            #         inner_sub_dict.update({'start_time_val':start_date_val.strftime("%d/%m/%Y")})
+            #     else:
+            #         # do not send this CSS
+            #         inner_sub_list.remove(inner_sub_dict)
+            #         # pass
             if inner_sub_list:
               inner_list_append_temp(inner_sub_list[0])
             else:
               inner_list_append_temp(inner_sub_dict)
+            # elif "CourseSubSectionEvent" != node_type:
+            #   inner_list_append_temp(inner_sub_dict)
 
             cl.update({'children': inner_list })
       else:
         error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
         print "\n " + error_message
-
     return collection_list
-
   else:
     return collection_list
 
 
 @get_execution_time
-def get_collection(request, group_id, node_id):
+def get_collection(request, group_id, node_id, stats_flag=False):
   node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
   collection_list = []
+  gstaff_access = False
+  completed_ids_list = []
+  incompleted_ids_list = []
+  gstaff_access = check_is_gstaff(group_id,request.user)
+
+  completed_node_ids = request.GET.getlist("completed_nodes[]","")
+  incompleted_node_ids = request.GET.getlist("incompleted_nodes[]","")
+  leaf_ids = request.GET.getlist("leaf_nodes[]","")
   # collection_list_append_temp=collection_list.append
-  
+  # print "\n\n gstaff_access---",gstaff_access
+
+  list_of_leaf_node_ids = []
+  if stats_flag:
+    if request.user.id:
+        completed_ids_list = map(ObjectId, completed_node_ids)
+        incompleted_ids_list = map(ObjectId, incompleted_node_ids)
+        list_of_leaf_node_ids = map(ObjectId, leaf_ids)
+        # print "\n\n completed_ids_list --- ", len(completed_ids_list)
+        # print "\n\n incompleted_ids_list --- ", len(incompleted_ids_list)
+
   for each in node.collection_set:
     obj = node_collection.one({'_id': ObjectId(each) })
     if obj:
       node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
       collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
 
-      collection_list = get_inner_collection(collection_list, obj)
+      collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
 
- # def a(p,q,r):
-#		collection_list.append({'name': p, 'id': q,'node_type': r})
+
+  # def a(p,q,r):
+  #		collection_list.append({'name': p, 'id': q,'node_type': r})
   #this empty list will have the Process objects as its elements
   # processes=[]
   #Function used by Processes implemented below
@@ -838,7 +888,12 @@ def get_collection(request, group_id, node_id):
   #   for i in range(x):
   #     processes[i].join()#each Process converges
   data = collection_list
-
+  updated_data = []
+  # print "\n node.member_of_names_list",node.member_of_names_list
+  # if "CourseEventGroup" in node.member_of_names_list:
+  #   get_course_units_tree(data,updated_data)
+  #   data = updated_data
+  # print data
   return HttpResponse(json.dumps(data))
 
 
@@ -956,13 +1011,13 @@ def add_page(request, group_id):
 
     if name not in collection_list:
         page_node = node_collection.collection.GSystem()
-
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page),groupid=group_id)
         page_node.status = u"PUBLISHED"
         page_node.save()
-
         context_node.collection_set.append(page_node._id)
         context_node.save(groupid=group_id)
+        page_node.prior_node.append(context_node._id)
+        page_node.save()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
@@ -1655,7 +1710,8 @@ def set_drawer_widget_for_users(st, coll_obj_list):
     for each in st:
        dic = {}
        dic['id'] = str(each.id)
-       dic['name'] = each.email  # username
+       dic['email'] = each.email  # username
+       dic['username'] = each.username  # username
        d1.append(dic)
     draw1['drawer1'] = d1
     data_list.append(draw1)
@@ -1663,8 +1719,11 @@ def set_drawer_widget_for_users(st, coll_obj_list):
     for each in coll_obj_list:
        dic = {}
        dic['id'] = str(each.id)
-       dic['name'] = each.email  # username
+       # dic['name'] = each.email  # username
+       dic['email'] = each.email  # username
+       dic['username'] = each.username  # username
        d2.append(dic)
+
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return data_list
@@ -1713,7 +1772,7 @@ def get_data_for_batch_drawer(request, group_id):
     return HttpResponse(json.dumps(data_list))
 
 @get_execution_time        
-def set_drawer_widget(st, coll_obj_list):
+def set_drawer_widget(st, coll_obj_list, extra_key=None):
     '''
     this method will set data for drawer widget
     '''
@@ -1741,6 +1800,10 @@ def set_drawer_widget(st, coll_obj_list):
        dic = {}
        dic['id'] = str(each['_id'])
        dic['name'] = each['name']
+       try:
+         dic[extra_key] = each[extra_key]
+       except:
+         pass
        d1.append(dic)
     draw1['drawer1'] = d1
     data_list.append(draw1)
@@ -1748,6 +1811,10 @@ def set_drawer_widget(st, coll_obj_list):
        dic = {}
        dic['id'] = str(each['_id'])
        dic['name'] = each['name']
+       try:
+         dic[extra_key] = each[extra_key]
+       except:
+         pass
        d2.append(dic)
     draw2['drawer2'] = d2
     data_list.append(draw2)
@@ -2146,19 +2213,23 @@ def get_author_set_users(request, group_id):
     if request.is_ajax():
         _id = request.GET.get('_id',"")
         node = node_collection.one({'_id':ObjectId(_id)})
-        course_name = ""
-        rt_has_course = node_collection.one({'_type':'RelationType', 'name':'has_course'})
-        if rt_has_course and node._id:
-            course = triple_collection.one({"_type": "GRelation", 'right_subject':node._id, 'relation_type.$id':rt_has_course._id})
-            if course:
-                course_name = node_collection.one({'_id':ObjectId(course.subject)}).name
+        # course_name = ""
+        # rt_has_course = node_collection.one({'_type':'RelationType', 'name':'has_course'})
+        # if rt_has_course and node._id:
+        #     course = triple_collection.one({"_type": "GRelation", 'right_subject':node._id, 'relation_type.$id':rt_has_course._id})
+        #     if course:
+        #         course_name = node_collection.one({'_id':ObjectId(course.subject)}).name
         if node.created_by == request.user.id:
             can_remove = True
         if node.author_set:
-            for each in node.author_set:
-                user_list.append(User.objects.get(id = each))
+            user_list = User.objects.filter(id__in=node.author_set).order_by('id')
+            # for each in node.author_set:
+            #     user_list.append(User.objects.get(id = each))
             return render_to_response("ndf/refresh_subscribed_users.html",
-                                       {"user_list":user_list,'can_remove':can_remove,'node_id':node._id,'course_name':course_name}, 
+                                       {
+                                       "user_list":user_list,'can_remove':can_remove,'node_id':node._id,
+                                       # 'course_name':course_name
+                                       }, 
                                        context_instance=RequestContext(request)
             )
         else:
@@ -5986,4 +6057,169 @@ def get_detailed_report(request, group_id):
     error_message = "ReportFetchError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+
+def get_resource_by_oid(request, group_id):
+
+    oid = request.GET.get('oid', None)
+    if oid:
+      # print "oid : ", oid
+      node_obj = node_collection.one({  '_id': ObjectId(oid)},
+                                      {
+                                        'name': 1,
+                                        'altnames': 1,
+                                        'content': 1,
+                                        '_id': 0
+                                      }
+                                    )
+      return HttpResponse(json.dumps(node_obj))
+
+    return HttpResponse('false')
+
+
+def get_resource_by_oid_list(request, group_id):
+
+    oid_list = request.GET.get('oid_list', None)
+
+    oid_list = eval(oid_list)
+    # print oid_list
+    oid_list = [ObjectId(each_oid) for each_oid in oid_list if each_oid]
+
+    if oid_list:
+
+      node_obj = node_collection.find({  '_id': {'$in': oid_list}},
+                                      {
+                                        'name': 1,
+                                        'altnames': 1,
+                                        'content': 1,
+                                        '_id': 1
+                                      }
+                                    )
+
+      # print node_obj.count()
+      if node_obj.count() > 0:
+          node_list = [n for n in node_obj]
+          # print node_list
+          return HttpResponse(json.dumps(node_list, cls=NodeJSONEncoder))
+      else:
+          pass
+
+    return HttpResponse('false')
+
+
+def show_coll_cards(request, group_id):
+
+    node_id = request.GET.get('node_id')
+    node = node_collection.one({'_id': ObjectId(node_id)})
+
+    node_collection_set = list(node.collection_set)
+    coll_objs = node_collection.find({'_id': {'$in': node_collection_set} })
+
+    return render_to_response('ndf/collection_set_cards.html',
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'coll_objs': coll_objs, 'node': node
+            },
+            context_instance=RequestContext(request))
+
+
+
+
+def get_visits_count(request, group_id):
+	'''
+	Accepts:
+	* group_id
+	* current-url
+		pathname used to search in benchmark_collection 'calling_url'
+	* group_name
+		To avoid fetching group_obj and then name
+	* get_params
+		get_params is used for get-parameters
+		This param is passed only in case of collections
+		Currently, Course and Event player are only considered.
+
+	Actions:
+	* Fetches from benchmark_collection,
+		the total instances matching the query
+	* From the total, fetches user related instances
+
+	Returns:
+	* success (i.e True/False)
+	* Count of total visits
+	* Count of user visits
+	'''
+	response_dict = {'success': False, 'total_views': 0}
+	try:
+		curr_url = request.GET.get('curr_url','')
+		get_params =  request.GET.get('get_params','')
+		# group_name = request.GET.get('group_name','')
+		# if not group_name:
+		group_obj   = get_group_name_id(group_id, get_obj=True)
+		group_id    = group_obj._id
+		group_name  = group_obj.name
+		group_altnames = group_obj.altnames
+
+		group_id_str = str(group_id)
+		query = {}
+		curr_url_other = []
+		if curr_url and group_name:
+
+			if group_id_str in curr_url:
+				curr_url_other = [curr_url.replace(group_id_str,group_name), curr_url.replace(group_id_str,group_altnames)]
+
+			elif group_name in curr_url:
+				curr_url_other = [curr_url.replace(group_name,group_id_str), curr_url.replace(group_name,group_altnames)]
+
+			elif group_altnames in curr_url:
+				curr_url_other = [curr_url.replace(group_altnames,group_id_str), curr_url.replace(group_altnames,group_name)]
+
+			# print "\n curr_url_other\n",curr_url_other
+			curr_url_other.append(curr_url)
+			query = {'calling_url': {'$in': curr_url_other}}
+			# query = {'calling_url': {'$in': [curr_url,curr_url_other]}}
+			if get_params:
+				query = {'calling_url': {'$regex': u"/"+ unicode(get_params)},'name': "collection_nav"}
+
+			# print "\n\nquery", query
+			total_views = benchmark_collection.find(query,{'name':1})
+			response_dict['total_views'] = total_views.count()
+			if request.user.is_authenticated():
+				username = request.user.username
+				user_views = total_views.where("this.user =='"+str(username)+"'")
+				response_dict['user_views'] = user_views.count()
+		response_dict['success'] = True
+		return HttpResponse(json.dumps(response_dict))
+	except Exception as e:
+		print e
+		return HttpResponse(json.dumps(response_dict))
+
+@get_execution_time
+def get_ckeditor(request,group_id): 
+    ckeditor_toolbar_val = request.GET.get('ckeditor_toolbar')
+    return render_to_response('ndf/html_editor.html',            
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'ckeditor_toolbar': ckeditor_toolbar_val
+            },
+            context_instance=RequestContext(request))
+
+@get_execution_time
+def get_gin_line_template(request,group_id,node_id):
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    global_disc_all_replies = []
+    thread_node = get_thread_node(node_id)
+
+    allow_to_comment = node_thread_access(group_id, node_obj)
+    all_replies =  get_disc_replies(thread_node, group_id ,global_disc_all_replies)
+    return render_to_response('ndf/gin-line-texteditor.html',            
+            {
+                'group_id': group_id, 'groupid': group_id,
+                'node': node_obj, 
+                'all_replies' : all_replies,
+                'thread_node':thread_node,
+                'allow_to_comment':allow_to_comment
+                
+            },
+            context_instance=RequestContext(request))
+
 

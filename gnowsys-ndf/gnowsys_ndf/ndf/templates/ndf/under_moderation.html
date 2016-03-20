@@ -3,149 +3,137 @@
 {% load ndf_tags %}
 {% get_group_name groupid as group_name_tag %}
 
+{% block title %} {{title}} {% endblock %}
 {% block style %}
-  {{block.super}}
-  .current-group{
-    color: green;
+{{ block.super }}
+  .info-text{
+    margin-left:2rem !important;
   }
+  .img-mid-size, .card-thumbnail{
+        margin-left:4rem !important;
+        border:1px solid grey;
+  }
+
 {% endblock %}
 
-{% block title %} {{title}} {% endblock %}
+{% block concern_information %}
+  <span data-tooltip title='Go to {{top_group_obj.name}}'><a href="{% url 'groupchange' top_group_obj.name %}" class="small button">{{top_group_obj.name}}</a></span>
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% if is_gstaff and current_mod_group_obj and is_under_moderation%}
+    <span data-tooltip title='Moderate resource'><a class="small button" href="{% url 'moderation' current_mod_group_obj.name %}" >{% trans 'Moderate Resources' %}</a></span>
+  {% endif %}
+{% endblock %}
 
 {% block body_content %}
 	
-  {% if request.user.id == node.created_by or user.is_superuser %}
+  <h5> File "{{node.name}}" - submitted by {{node.created_by|get_username}}</h5>
 
-    {% if is_under_moderation %}
-    <h3> Hello {{request.user.username}},</h3>
-    <h4> "{{node.name}}" resource is successfully uploaded!</h4>
-    <h4><small>
-     As resource has been uploaded in the Moderated group, it will undergo moderation process and then published to "{{top_group_name}}". We will intimate you as on when resource gets published to this group.
-     Till that time resource is accesible to your user group.
-    </small></h4>
+      {% if is_under_moderation %}
+      This resource is under '{{top_group_obj.moderation_level}}-step Moderation'. 
+      {% if request.user.id == node.created_by %}
+        You will get an email notification for any update on this resource.</br>
+        However, you can access it from <a href="/{{node.created_by|get_username}}/file/{{node.pk}}" target="_blank">your work space</a>.
+      {% endif %}
+  {% else %}
+     This resource is successfully moderated and has been published to "{{top_group_obj.name}}".
+  {% endif %} <!-- is_under_moderation bool check -->
     <br/>
-      
+        <div class="row mod-status-info-div info-text">
+          {% if cleared_group_objs %}
+              <li>Approved in  '{{cleared_group_objs|join:", "}}'</li>
+          {% endif %}
+          {% if current_mod_group_obj %}
+              <li>Currently in '{% firstof current_mod_group_obj.altnames current_mod_group_obj.name %}' </li>
+          {% endif %}
+          {% if next_mod_group_objs %}
+              <li>Next in ' {{next_mod_group_objs|join:", "}}'</li>
+          {% endif %}
+        </div>
+        <br/>
     {% group_type_info group_id request.user as grouptype %}
     <div class="row">
       <div class="small-6 columns">
-        
-    <ul class="small-block-grid-1 medium-block-grid-1 large-block-grid-2">
+        <ul class="small-block-grid-1 medium-block-grid-1 large-block-grid-2">
 
-      <li class="card"></li>
-      <li class="card">
-        {% if grouptype == "Moderated" %}
-          {% if node.status == "DRAFT" %}
-            <div class="draft">
-          {% elif node.status == "PUBLISHED" %}
-            <div class="published">
+          {% if "image" in node.mime_type %}
+          {% if node.fs_file_ids.1 %}
+            <img src="{% url 'get_gridfs_resource' node.fs_file_ids.2 %}" class="img-mid-size" alt="" />
           {% endif %}
-        {% else %}
-          <div class='{% if node.status == "PUBLISHED" %}published{% endif %}'>
-        {% endif %} 
-
-        <a href="{% url 'file_detail' request.user.username node %}">
-
-          <div class="row">
-            <div class="small-8 column">
-              <b>
-                {{ node.name }} {% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-              </b>
-            </div>
-            <div class="small-4 column">
-              {% if "image" in node.mime_type %}
-                <img src="{% url 'getFileThumbnail' group_id node.pk %}" alt="No thumbnail available!" />
-              {% elif "audio" in node.mime_type %}
-                <span class="fi-music" style="font-size:40px"></span>
-              {% elif "Pandora_video" in node.member_of_names_list and "video" in node.mime_type %}
-              {% get_source_id node.pk as source_id %}
-                <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
-              {% elif "video" in node.mime_type and node.member_of_names_list|join:', ' != "Pandora_video" %}
-          {% get_source_id node.pk as source_id %}
-          {% if source_id %}
-                <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
-          {% endif %}
-                <img src="{% url 'getFileThumbnail' group_id node.pk %}" alt="No thumbnail available!"/>
-               {% comment %}
-               <!--
-                <video width="100px" src="{% url 'getFileThumbnail' group_id node.pk %}">
-                 No thumbnail available!
-                </video>
-               -->
-               {% endcomment %}
+          {% else %}
+            <li class="card">
+              {% if grouptype == "Moderated" %}
+                {% if node.status == "DRAFT" %}
+                  <div class="draft">
+                {% elif node.status == "PUBLISHED" %}
+                  <div class="published">
+                {% endif %}
               {% else %}
-                <span class="fi-page-filled" style="font-size:40px"></span>
-              {% endif %}
-            </div>
-          </div>
-          <hr/>
-          <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span></br>
-          
-          <footer>
-            <div class="small-6 columns">{{node.mime_type|truncatechars:15}}</div>
-            <div class="small-6 columns"><div class="right"><strong>{{node.file_size.size}}</strong> {{node.file_size.unit}}</div></div>
-          </footer>
-          <footer>
-              <div class="age">
-                {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-                <br/>
-              <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}} | </span>
-                by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
+                <div class='{% if node.status == "PUBLISHED" %}published{% endif %}'>
+              {% endif %} 
+                <div class="row">
+                  <div class="small-8 column">
+                    <b>
+                      {{ node.name }} {% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+                    </b>
+                  </div>
+                  <div class="small-4 column">
+                    {% if "image" in node.mime_type %}
+                      <img src="{% url 'getFileThumbnail' group_id node.pk %}" alt="No thumbnail available!" />
+                    {% elif "audio" in node.mime_type %}
+                      <span class="fi-music" style="font-size:40px"></span>
+                    {% elif "Pandora_video" in node.member_of_names_list and "video" in node.mime_type %}
+                    {% get_source_id node.pk as source_id %}
+                      <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
+                    {% elif "video" in node.mime_type and node.member_of_names_list|join:', ' != "Pandora_video" %}
+                      {% get_source_id node.pk as source_id %}
+                      {% if source_id %}
+                            <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
+                      {% endif %}
+                      <img src="{% url 'getFileThumbnail' group_id node.pk %}" alt="No thumbnail available!"/>
+                     {% comment %}
+                     <!--
+                      <video width="100px" src="{% url 'getFileThumbnail' group_id node.pk %}">
+                       No thumbnail available!
+                      </video>
+                     -->
+                     {% endcomment %}
+                    {% else %}
+                      <span class="fi-page-filled" style="font-size:40px"></span>
+                    {% endif %}
+                  </div>
+                </div>
+                <hr/>
+                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span></br>
+                
+
+                <footer>
+                  <div class="small-6 columns">{{node.mime_type|truncatechars:15}}</div>
+                  <div class="small-6 columns"><div class="right"><strong>{{node.file_size.size}}</strong> {{node.file_size.unit}}</div></div>
+                </footer>
+                <footer>
+                    <div class="age">
+                      {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                      <br/>
+                    <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}} | </span>
+                      by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
+                    </div>
+                  </footer>
+
+                  <div class="label-list small-12 columns">
+                    {% for tag in node.tags|slice:":3" %}
+                    <a href="{% url 'tag_info' group_name_tag tag %}">
+                      <span class="label" style="background-color:yellow">{{tag}}</span>
+                    </a>{% endfor %}
+                  </div>
               </div>
-            </footer>
-            </a>
-
-            <div class="label-list small-12 columns">
-              {% for tag in node.tags|slice:":3" %}
-              <a href="{% url 'tag_info' group_name_tag tag %}">
-                <span class="label" style="background-color:yellow">{{tag}}</span>
-              </a>{% endfor %}
-            </div>
-
-
-        </div>
-      </li>
-        <!-- end new -->      
-    </ul>
-    </div>
-      
-      <div class="small-6 columns">
-          
-        <b>Resource will pass moderated through following moderation levels:</b>
-        <br/>
-        <br/>
-        <ol>
-        {% for each_group in group_hierarchy_obj_list %}
-          {% if not forloop.first %}
-          <li {% if each_group.pk == current_mod_group_obj.pk %} class="current-group" {% endif %} >
-            "{{each_group.altnames}}"</li>
+            </li>
           {% endif %}
-        {% endfor %}
-        </ol>
-        <hr/>
-        Currently, resource is in "{{current_mod_group_obj.altnames}}".
+            <!-- end new -->      
+        </ul>
+        {% if not is_under_moderation %}
+           <a href="{% url 'file_detail' top_group_obj.name node %}">View this file</a>
+        {% endif %}
+      
       </div>
-
     </div>
-    
-    {% else %}
-
-      <h3> Hello {{request.user.username}}, "{{node.name}}" resource is successfully moderated!</h3>
-      <h4><small>
-       Resource has undergone moderation process and then published to "{{top_group_name}}".
-      </small></h4>
-        
-    {% endif %} <!-- is_under_moderation bool check -->
-
-  {% else %}
-
-    <h3> Hello {{request.user.username}}, </h3>
-    <br/> 
-    <h4><small>
-    "{{node.name}}" resource is successfully moderated!
-    <br/> 
-     Resource has undergone moderation process and then published to "{{top_group_name}}".
-    </small></h4>
-
-  {% endif %} <!-- is creator/superuser check -->
-
 {% endblock%}

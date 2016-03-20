@@ -28,11 +28,11 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, replicate_resource
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation
 from gnowsys_ndf.notification import models as notification
 
 
@@ -47,23 +47,14 @@ def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
     """
-    # ins_objectid = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False:
-    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else:
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth:
-    #             group_id = str(auth._id)
-    # else:
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
 
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+    group_obj_post_node_list = []
     app_id = None
     app_id = app._id
     course_coll = None
@@ -73,22 +64,41 @@ def course(request, group_id, course_id=None):
     enr_ce_coll = []
     course_enrollment_status = None
     app_set_id = None
+    query = {}
+
     course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
+
     if course_ins:
         course_id = str(course_ins._id)
 
+    group_obj_post_node_list = group_obj.post_node
     app_set = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
     app_set_id = app_set._id
     ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
 
     # Course search view
-    title = GST_COURSE.name
-
+    # title = GST_COURSE.name
+    # if GST_COURSE.name == "Course":
+    title = "eCourses"
+    
+    query = {'member_of': ce_gst._id,'_id':{'$in': group_obj_post_node_list}}
+    gstaff_access = False
     if request.user.id:
-        course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"})
-        enr_ce_coll = node_collection.find({'member_of': ce_gst._id,'author_set': int(request.user.id)}).sort('last_update', -1)
+        # if user is admin then show all ce
+        gstaff_access = check_is_gstaff(group_id,request.user)
+        if not gstaff_access:
+            query.update({'author_set':{'$ne':int(request.user.id)}})
 
-    ce_coll = node_collection.find({'member_of': ce_gst._id})
+        course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"}).sort('last_update', -1)
+        enr_ce_coll = node_collection.find({'member_of': ce_gst._id,'author_set': int(request.user.id),'_id':{'$in': group_obj_post_node_list}}).sort('last_update', -1)
+
+        user_access =  user_access_policy(group_id ,request.user)
+        if user_access == "allow":
+            # show PRIVATE CourseEvent
+            query.update({'group_type': {'$in':[u"PRIVATE",u"PUBLIC"]}})
+
+    ce_coll = node_collection.find(query).sort('last_update', -1)
+    # print "\n\n ce_coll",ce_coll.count()
     return render_to_response("ndf/course.html",
                             {'title': title,
                              'app_id': app_id, 'course_gst': GST_COURSE,
@@ -110,18 +120,25 @@ def course(request, group_id, course_id=None):
 def create_edit(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False:
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else:
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth:
-                group_id = str(auth._id)
-    else:
-        pass
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False:
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else:
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth:
+    #             group_id = str(auth._id)
+    # else:
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    logo_img_node = None
+    grel_id = None
+    fileobj = None
     at_course_type = node_collection.one({'_type': 'AttributeType', 'name': 'nussd_course_type'})
     context_variables = {'title': GST_COURSE.name,
                         'group_id': group_id,
@@ -129,6 +146,8 @@ def create_edit(request, group_id, node_id=None):
                     }
     if node_id:
         course_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
+        logo_img_node, grel_id = get_relation_value(node_id,'has_logo')
+
     else:
         course_node = node_collection.collection.GSystem()
 
@@ -138,18 +157,58 @@ def create_edit(request, group_id, node_id=None):
     for each in available_nodes:
       nodes_list.append(str((each.name).strip().lower()))
 
+
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE),groupid=group_id)
         create_gattribute(course_node._id, at_course_type, u"General")
-        return HttpResponseRedirect(reverse('course', kwargs={'group_id': group_id}))
+        
+        # adding thumbnail 
+        f = request.FILES.get("doc", "")
+        # print "\nf is ",f
 
+        if f:
+
+            # if existing logo image is found
+            if logo_img_node:
+                # print "\nlogo_img_node--",logo_img_node
+                # check whether it appears in any other node's grelation
+                rel_obj = None
+                rel_obj = triple_collection.find({"_type": "GRelation", 'subject': {'$ne': ObjectId(course_node._id)}, 'right_subject': logo_img_node._id})
+                file_cur = node_collection.find({'_type':"File",'fs_file_ids':logo_img_node.fs_file_ids,'_id': {'$ne': logo_img_node._id}})
+                # print "\nrel_obj--",rel_obj.count()
+                # print "\nfile_cur.count()--",file_cur.count()
+                if rel_obj.count() > 0 or file_cur.count() > 0:
+                    # if found elsewhere too, delete it from current node's grelation ONLY
+                    # print "\n Image exists for others"
+                    if grel_id:
+                        del_status, del_status_msg = delete_grelation(
+                            node_id=ObjectId(grel_id),
+                            deletion_type=1
+                        )
+                        # print del_status, "--", del_status_msg
+                else:
+                    # else delete the logo file
+                    # print "\n delete node"
+                    del_status, del_status_msg = delete_node(
+                        node_id=logo_img_node._id,
+                        deletion_type=1
+                    )
+                    # print del_status, "--", del_status_msg
+
+            fileobj,fs = save_file(f,f.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            if fileobj:
+                rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
+                # print "\n creating GRelation has_logo\n"
+                create_grelation(course_node._id, rt_has_logo, ObjectId(fileobj))
+        return HttpResponseRedirect(reverse('course', kwargs={'group_id': group_id}))
     else:
         if node_id:
             context_variables['node'] = course_node
             context_variables['groupid'] = group_id
             context_variables['group_id'] = group_id
             context_variables['app_id'] = app._id
+            context_variables['logo_img_node'] = logo_img_node
         context_variables['nodes_list'] = json.dumps(nodes_list)
         return render_to_response("ndf/course_create_edit.html",
                                   context_variables,
@@ -160,27 +219,32 @@ def create_edit(request, group_id, node_id=None):
 # @login_required
 @get_execution_time
 def course_detail(request, group_id, _id):
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False:
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else:
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth:
-                group_id = str(auth._id)
-    else:
-        pass
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False:
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else:
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth:
+    #             group_id = str(auth._id)
+    # else:
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     course_structure_exists = False
     enrolled_status = False
     check_enroll_status = False
     title = GST_COURSE.name
 
     course_node = node_collection.one({"_id": ObjectId(_id)})
-
-    if course_node.collection_set:
-        course_structure_exists = True
+    if course_node:
+        if course_node.collection_set:
+            course_structure_exists = True
 
     gs_name = course_node.member_of_names_list[0]
     context_variables = {'groupid': group_id,
@@ -244,22 +308,26 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     """
     auth = None
     tiss_site = False
-    if ObjectId.is_valid(group_id) is False:
-        group_ins = node_collection.one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({
-            '_type': 'Author', 'name': unicode(request.user.username)
-        })
+    # if ObjectId.is_valid(group_id) is False:
+    #     group_ins = node_collection.one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({
+    #         '_type': 'Author', 'name': unicode(request.user.username)
+    #     })
 
-        if group_ins:
-            group_id = str(group_ins._id)
-        else:
-            auth = node_collection.one({
-                '_type': 'Author', 'name': unicode(request.user.username)
-            })
-            if auth:
-                group_id = str(auth._id)
-    else:
-        pass
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else:
+    #         auth = node_collection.one({
+    #             '_type': 'Author', 'name': unicode(request.user.username)
+    #         })
+    #         if auth:
+    #             group_id = str(auth._id)
+    # else:
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     if GSTUDIO_SITE_NAME is "TISS":
         tiss_site = True
@@ -755,17 +823,21 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
   # print "\n Found course_detail n gone inn this...\n\n"
 
   auth = None
-  if ObjectId.is_valid(group_id) is False:
-    group_ins = node_collection.one({'_type': "Group", "name": group_id})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-      group_id = str(group_ins._id)
-    else:
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth:
-        group_id = str(auth._id)
-  else:
-    pass
+  # if ObjectId.is_valid(group_id) is False:
+  #   group_ins = node_collection.one({'_type': "Group", "name": group_id})
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #   if group_ins:
+  #     group_id = str(group_ins._id)
+  #   else:
+  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #     if auth:
+  #       group_id = str(auth._id)
+  # else:
+  #   pass
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
 
   app = None
   if app_id is None:
@@ -1313,6 +1385,10 @@ def add_units(request, group_id):
         unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
     except:
         unit_node = None
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    page_instances = node_collection.find({"type_of": page_gst._id})
+    page_ins_list = [i for i in page_instances]
+
     variable = RequestContext(request, {
         'group_id': group_id, 'groupid': group_id,
         'css_node': css_node,
@@ -1321,6 +1397,7 @@ def add_units(request, group_id):
         'app_id': app_id,
         'unit_node': unit_node,
         'course_node': course_node,
+        'page_instance': page_ins_list
     })
 
     template = "ndf/course_units.html"
@@ -1351,20 +1428,31 @@ def get_resources(request, group_id):
             resource_type = resource_type.strip()
             list_resources = []
             css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+            units_res = []
             try:
                 unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
+                units_res = [ObjectId(each_res_of_unit) for each_res_of_unit in unit_node.collection_set]
+                units_res_nodes = node_collection.find({'_id': {'$in': units_res}})
+                for each_res_node in units_res_nodes:
+                    # print "\n\n each_res_node.relation_set----",each_res_node.relation_set
+                    clone_of_obj,grel_node = get_relation_value(each_res_node._id,"clone_of")
+                    if clone_of_obj:
+                        units_res.append(clone_of_obj._id)
             except:
                 unit_node = None
+
             if resource_type:
                 if resource_type == "Pandora":
                     resource_type = "Pandora_video"
-
+                if resource_type == "Quiz":
+                    resource_type = "QuizItem"
                 resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
                 res = node_collection.find(
                     {
                         'member_of': resource_gst._id,
-                        'group_set': ObjectId(group_id),
-                        'status': u"PUBLISHED"
+                        'status': u"PUBLISHED",
+                        '$or':[{'created_by': request.user.id},{'group_set': ObjectId(group_id)}],
+                        '_id':{ '$nin': units_res }
                     }
                 )
                 for each in res:
@@ -1403,6 +1491,11 @@ def save_resources(request, group_id):
     '''
     response_dict = {"success": False,"create_new_unit": True}
     if request.is_ajax() and request.method == "POST":
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
+
         list_of_res = json.loads(request.POST.get('list_of_res', ""))
         css_node_id = request.POST.get('css_node', "")
         unit_name = request.POST.get('unit_name', "")
@@ -1425,7 +1518,7 @@ def save_resources(request, group_id):
             cu_new.status = u"PUBLISHED"
             cu_new.created_by = int(request.user.id)
             cu_new.contributors.append(int(request.user.id))
-
+            cu_new.group_set.append(group_id)
             cu_new.prior_node.append(css_node._id)
             cu_new.save(groupid=group_id)
             response_dict["create_new_unit"] = True
@@ -1433,12 +1526,31 @@ def save_resources(request, group_id):
 
         if cu_new._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
+        # print "\n\n member_of_names_list----", cu_new.member_of_names_list, "list_of_res_ids", list_of_res_ids
+        new_res_set = []
+        if "CourseUnitEvent" in cu_new.member_of_names_list:
+            list_of_res_nodes = node_collection.find({'_id': {'$in': list_of_res_ids}})
 
-        node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
-        cu_new.reload()
+            for each_res_node in list_of_res_nodes:
+                if each_res_node._id not in cu_new.collection_set:
+                    new_gs = replicate_resource(request, each_res_node, group_id)
+                    # if "QuizItem" in each_res_node.member_of_names_list:
+                    #     node_collection.collection.update({'_id': cu_new._id}, {'$push': {'post_node':new_gs._id}},upsert=False,multi=False)
+                    # else:
+                    if new_gs:
+                        new_res_set.append(new_gs._id)
+                        node_collection.collection.update({'_id': new_gs._id}, {'$push': {'prior_node':cu_new._id}},upsert=False,multi=False)
+        else:
+            for each_res_node_course in list_of_res_ids:
+                if each_res_node_course not in cu_new.collection_set:
+                    new_res_set.append(each_res_node_course)
+
+        for each_res_in_unit in new_res_set:
+            if each_res_in_unit not in cu_new.collection_set:
+                cu_new.collection_set.append(each_res_in_unit)
+                cu_new.save()
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
-
         return HttpResponse(json.dumps(response_dict))
 
 
@@ -1499,7 +1611,7 @@ def create_edit_unit(request, group_id):
 
 @login_required
 def delete_course(request, group_id, node_id):
-    del_stat = delete_item(node_id)
+    del_stat = delete_item(node_id, "CourseUnit")
     if del_stat:
         return HttpResponseRedirect(reverse('course', kwargs={'group_id': ObjectId(group_id)}))
 
@@ -1643,39 +1755,17 @@ def add_course_file(request, group_id):
             node_collection.collection.update({'_id': ObjectId(context_node_id)}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
 
         new_list = []
+        file_uploaded = request.FILES.get("doc", "")
         # For checking the node is already available in gridfs or not
-        for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-            fileobj = node_collection.collection.File()
-            filemd5 = hashlib.md5(each.read()).hexdigest()
-            if not fileobj.fs.files.exists({"md5": filemd5}):
-                # If not available append to the list for making the collection for topic below
-                new_list.append(each)
-            else:
-                # If file exists, PUBLISH it and add to collection set
-                cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
-                old_file_node = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
-                if old_file_node._id not in context_node.collection_set:
-                        context_node.collection_set.append(old_file_node._id)
-                        old_file_node.status = u"PUBLISHED"
-                        old_file_node.prior_node.append(context_node._id)
-                        old_file_node.save()
-                        context_node.save()
-        # After taking new_lst[] , now go for saving the files
-        # save_file(new_list,"File", request.user.id, group_id, content_org=None, tags=None, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, request=None, map_geojson_data=[])
-
-        submitDoc(request, group_id)
-
-    # After file gets saved , that file's id should be saved in collection_set of context topic node
-
-    for k in new_list:
-        cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
-        if cur_oid and 'docid' in cur_oid:
-            file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
-            file_obj.prior_node.append(context_node._id)
-            file_obj.status = u"PUBLISHED"
-            file_obj.save()
-            context_node.collection_set.append(file_obj._id)
-            file_obj.save()
+        if file_uploaded:
+            fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            file_node = node_collection.find_one({'_id': ObjectId(fileobj)})
+            file_node.prior_node.append(context_node._id)
+            file_node.status = u"PUBLISHED"
+            file_node.save()
+            context_node.collection_set.append(file_node._id)
+            file_node.prior_node.append(context_node._id)
+            file_node.save()
         context_node.save()
     return HttpResponseRedirect(url_name)
 
@@ -1702,3 +1792,24 @@ def enroll_to_course(request, group_id):
         group_obj.save()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
+
+def set_release_date_css(request, group_id):
+	response_dict = {"success": False}
+	try:
+		if request.is_ajax() and request.method == "POST":
+			css_date_dict = request.POST.get("css_date_dict", "")
+			if css_date_dict:
+				css_date_dict = json.loads(css_date_dict)
+			# print "\n\ncss_date_dict",css_date_dict,"type--",type(css_date_dict)
+			start_date_AT = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
+			for each_css in css_date_dict:
+				if each_css['start_time']:
+					start_date_val = datetime.datetime.strptime(each_css['start_time'], "%d/%m/%Y")
+					create_gattribute(ObjectId(each_css['id']), start_date_AT, start_date_val)
+			response_dict["success"] = True
+			response_dict["message"] = "Release dates have been set successfully!"
+	except Exception as e:
+		response_dict["success"] = False
+		response_dict["message"] = "Something went wrong! Please try after some time"
+	return HttpResponse(json.dumps(response_dict))
+

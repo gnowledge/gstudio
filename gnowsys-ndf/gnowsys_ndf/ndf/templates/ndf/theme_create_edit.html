@@ -113,7 +113,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
 					      {% get_language_info_list for LANGUAGES as languages %}
 					      {% for language in languages %}
-					      <option value="{{ language.code }}">{{ language.name }}
+					      <option value="{{ language.code }}" {% ifequal node.language.0  language.code %} selected=selected {% endifequal %}>{{ language.name }}
 					      </option>
 					      {% endfor %}
 					    </select>

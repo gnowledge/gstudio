@@ -1,0 +1,168 @@
+{% load ndf_tags %}
+{% load simple_filters %}
+{% load i18n %}
+  
+{% if filtered_topics %}
+  {% if primary_lang_resources or other_lang_resources %}
+    <!-- after applying filters following block gets-->
+    {% for each_educationaluse in all_educationaluse %}
+      <fieldset id="{{each_educationaluse}}">
+        <legend>{{each_educationaluse}}</legend>
+
+        {% for each_primary_lang_resource in primary_lang_resources|get_dict_value_from_key:each_educationaluse %}
+          {# {{each_primary_lang_resource.name}} #}
+          {% if each_educationaluse == "Images" or each_educationaluse == "Videos" %}
+            {% if each_educationaluse == "Images" %}
+              <a href ="{% url 'image_detail' group_id each_primary_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+            {% elif each_educationaluse == "Videos" %}
+              <a href ="{% url 'video_detail' group_id each_primary_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+            {% endif %}
+              {# <img src="{% url 'getFileThumbnail' group_id each_primary_lang_resource.pk %}" /> #}
+              {# <br/><div> #}
+              {{each_primary_lang_resource.name}}
+              {# </div> #}
+              </a>&nbsp;&nbsp;&nbsp;&nbsp;
+          {% else %}
+          <a href ="{% url 'file_detail' group_id each_primary_lang_resource.pk %}?nav_li={{nav_list}}"> {{each_primary_lang_resource.name}} </a>&nbsp;
+                          &nbsp;&nbsp;
+          {% endif %}
+        {% endfor %}
+
+        {% if other_lang_resources|get_dict_value_from_key:each_educationaluse %}
+          
+          <fieldset>
+            <legend>{% trans "In other languages" %}</legend>
+            {% for each_other_lang_resource in other_lang_resources|get_dict_value_from_key:each_educationaluse %}
+              {# {{each_other_lang_resource.name}} #}
+              {% comment %}
+                
+          {% if each_educationaluse == "Images" or each_educationaluse == "Videos" %}
+            {% if each_educationaluse == "Images" %}
+              <a href ="{% url 'image_detail' group_id each_other_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+            {% elif each_educationaluse == "Videos" %}
+              <a href ="{% url 'video_detail' group_id each_other_lang_resource.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+            {% endif %}
+                          <img src="{% url 'getFileThumbnail' group_id each_other_lang_resource.pk %}" />
+                          <br/><div>{{each_other_lang_resource.name}}</div>
+                          </a>&nbsp;&nbsp;&nbsp;&nbsp;
+          {% else %}
+              {% endcomment %}
+            <a href ="{% url 'file_detail' group_id each_other_lang_resource.pk %}?nav_li={{nav_list}}"> {{each_other_lang_resource.name}} </a>&nbsp;
+                            &nbsp;&nbsp;
+          {# {% endif %} #}
+            {% endfor %}        
+          </fieldset>
+        {% endif %}
+
+      </fieldset>
+    {% endfor %}
+
+  {% else %}
+
+    {% trans "No resources found with the selected filter" %}
+    
+  {% endif %}
+
+{% else %}  
+        <!-- Resource contents of topic -->
+        <!-- <div class="content" id="view-graph">  </div> -->
+        <div class="topic_content" id="contents"> 
+
+          {% get_all_resources request node.pk as resources %}
+              {% for key, val in resources.items %}
+              <fieldset id="{{key}}">
+                <legend>{{key}}</legend>
+                {% if  key == "Images" %}
+                  {% for k,v in val.items %}
+                    {% if k == "fallback_lang" %}
+                      {% for each in v %}
+              
+                        <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                        {# <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" /> #}
+                        {# <br/><div> #}
+                        {{each.name}}
+                        {# </div> #}
+                        </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                      {% endfor %}
+                    {% elif k == "other_languages" %}
+                      {% if v %}
+                      <fieldset id="{{k}}">
+                        <legend>{% trans "In other languages" %}</legend>
+                        {% for each in v %}
+                          <!--{# <a href="#" data-reveal-id="file-resource-overlay" data-url="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" data-resource-id="{{each.pk}}" data-group-id="{{group_id}}" class="file-resource"> #}-->
+
+                          <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block" class="file-resource">
+                          {# <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" /> #}
+                          {# <br/><div> #}
+                          {{each.name}}
+                          {# </div> #}
+                          </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endfor %}
+                      </fieldset>
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+
+                {% elif  key == "Videos" %}
+                  {% for k,v in val.items %}
+                    {% if k == "fallback_lang" %}
+                      {% for each in v %}
+                        <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                        {# <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" /> #}
+                        {# <br/><div> #}
+                        {{each.name}}
+                        {# </div> #}
+                        </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                      {% endfor %}
+                    {% elif k == "other_languages" %}
+                      {% if v %}
+                      <fieldset id="{{k}}">
+                        <legend>{% trans "In other languages" %}</legend>
+                        {% for each in v %}
+                        <!-- {# <a href="#" data-reveal-id="file-resource-overlay" data-url="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" data-resource-id="{{each.pk}}" data-group-id="{{group_id}}" class="file-resource">
+                         #}  -->
+                          <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block" class="file-resource">
+                          {# <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" /> #}
+                          {# <br/><div> #}
+                          {{each.name}}
+                          {# </div> #}
+                          </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endfor %}
+                      </fieldset>
+                      {% endif %}          
+                    {% endif %}                
+                  {% endfor %}
+                
+                {% else %}
+                  {% for k,v in val.items %}
+                    {% if k == "fallback_lang" %}
+                      {% for each in v %}
+                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
+                        &nbsp;&nbsp;
+                      {% endfor %}
+                    {% elif k == "other_languages" %}
+                      {% if v %}
+                        <fieldset id="{{k}}">
+                          <legend>{% trans "In other languages" %}</legend>
+                          {% for each in v %}
+                          <!--{# <a href="#" data-reveal-id="file-resource-overlay" data-url="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" data-resource-id="{{each.pk}}" data-group-id="{{group_id}}" class="file-resource">
+                           #}-->
+                            <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" class="file-resource">
+                             
+                             {{each.name}} </a>&nbsp;
+                            &nbsp;&nbsp;
+                          {% endfor %}
+                        </fieldset>       
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+              
+                {% endif %}
+
+              </fieldset>
+              {% endfor %}
+            
+
+        </div>
+        <!-- End of displaying topic page contents -->
+{% endif %}

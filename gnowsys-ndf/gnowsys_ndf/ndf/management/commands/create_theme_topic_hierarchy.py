@@ -168,11 +168,12 @@ def create_theme_topic_hierarchy(row):
     """
 
     # print row
-    curricular = row[0] # CR or XCR
-    featured = int(row[1])   # 0 or 1
-    alignment = row[2]  # like NCF
-    content_org = row[3]
-    theme_name = row[4] # theme-name like National Curriculum
+    language = row[0]   # language field will get populated in this case.
+    curricular = row[1] # CR or XCR
+    featured = int(row[2])   # 0 or 1
+    alignment = row[3]  # like NCF
+    content_org = row[4]
+    theme_name = row[5] # theme-name like National Curriculum
     # topic_name = row[-1:]
 
     # --- Theme processing ---
@@ -186,7 +187,7 @@ def create_theme_topic_hierarchy(row):
 
     # creating a new theme node:
     if not theme_node:
-        theme_node = create_object(name=theme_name, member_of_id=theme_gst._id, featured=bool(featured))
+        theme_node = create_object(name=theme_name, member_of_id=theme_gst._id, featured=bool(featured), language=language)
 
         info_message = "- Created New Object : "+ str(theme_node.name) + "\n"
         print info_message 
@@ -218,8 +219,8 @@ def create_theme_topic_hierarchy(row):
     # --- END of Theme processing ---
     
     # --- theme-item and topic processing ---
-    # from 4th item or 3rd index of row there will be start of theme-item and topic(at last)
-    theme_item_topic_list = row[5:]
+    # from 5th item or 4rd index of row there will be start of theme-item and topic(at last)
+    theme_item_topic_list = row[6:]
     
     # do not entertain any blank values here:
     theme_item_topic_list = [i for i in theme_item_topic_list if i]
@@ -245,7 +246,7 @@ def create_theme_topic_hierarchy(row):
 
         if not theme_item_node:
             
-            theme_item_node = create_object(name=each_theme_item, member_of_id=theme_item_gst._id, prior_node_id=parent_node._id)
+            theme_item_node = create_object(name=each_theme_item, member_of_id=theme_item_gst._id, prior_node_id=parent_node._id, language=language)
             
             info_message = "\n- Created theme-item : "+ str(theme_item_node.name) + "\n"
             print info_message 
@@ -278,7 +279,8 @@ def create_theme_topic_hierarchy(row):
         topic_node = create_object(name=topic_name, \
                                  member_of_id=topic_gst._id, \
                                  prior_node_id=parent_node._id, \
-                                 content_org=content_org)
+                                 content_org=content_org,\
+                                 language=language)
 
         info_message = "\n--- Created topic : "+ str(topic_node.name) + "\n"
         print info_message
@@ -295,12 +297,12 @@ def create_theme_topic_hierarchy(row):
         add_to_collection_set(node_object=parent_node, id_to_be_added=topic_node._id)
 
 
-def create_object(name, member_of_id, prior_node_id=None, content_org=None, group_set_id=home_group_id, featured=None):
+def create_object(name, member_of_id, prior_node_id=None, content_org=None, group_set_id=home_group_id, featured=None, language=('en', 'English')):
 
     node                = node_collection.collection.GSystem()
     node.name           = unicode(name)
     node.featured       = featured
-    node.language       = u"en"
+    node.language       = eval(language)
     node.access_policy  = u"PUBLIC"
     node.status         = u"PUBLISHED"
     node.modified_by    = nroer_team_id
@@ -331,7 +333,8 @@ def add_to_collection_set(node_object, id_to_be_added):
     Returns:
         updates an object but returns nothing
     """
-    if not ObjectId(id_to_be_added) in node_object.collection_set:
+    if not ObjectId(id_to_be_added) in node_object.collection_set and \
+    node_object._id != id_to_be_added:
 
         node_collection.collection.update({
                 '_id': node_object._id},

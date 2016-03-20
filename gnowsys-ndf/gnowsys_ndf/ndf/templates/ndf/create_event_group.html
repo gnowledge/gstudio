@@ -47,7 +47,7 @@ this template is modified. So for the fields in the template it supports -
   {% if node %} action="{% url 'edit_event_group' group_id spl_group_type %}"
   {% else %} action="{% url 'create_event_group' group_id spl_group_type %}"
   {% endif %}
-  data-abide>
+  data-abide enctype="multipart/form-data">
     {% csrf_token %}
 
     <!-- node_id, name -->
@@ -68,7 +68,7 @@ this template is modified. So for the fields in the template it supports -
           <div class="small-8 columns">
             <input type="text" name="name" id="group_name" required placeholder="{% trans 'Enter the unique group name' %}" {% if node %}disabled=disabled title="Group name can not be changed" {% endif %} value="{{node.name}}">
             <label id="message" style="display:none; color:red"></label>
-            <small class="error">Group Name is required and it must be a string.</small>
+            <small class="error">{% trans "Group Name is required and it must be a string. " %}</small>
           </div>
 
         </div>
@@ -113,13 +113,42 @@ this template is modified. So for the fields in the template it supports -
                 </option>
               {% endfor %}
             </select> 
-            <small class="error">Please select group type.</small>
+            <small class="error">{% trans "Please select group type." %}</small>
           </div>
 
         </div>
       </div>
     </div>
-    
+    {% if spl_group_type == "ProgramEventGroup" %}
+    <!-- moderation level -->
+    <div class="row" id="moderation-level">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+      
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Level of moderation" %}</label>
+          </div>
+
+          <div class="small-8 columns">
+            <select name="moderation_level">
+              <!-- EDITABLE_MODERATED group cannot have moderation_level to 0 -->
+              <option value="1">--- {% trans "Select Level" %} ---</option>
+              {% get_allowed_moderation_levels as mod_levels %}
+              {% for each_level in mod_levels %}
+                <option value="{{each_level}}" 
+                {% if each_level == node.moderation_level %}selected=selected{% endif %}>
+                  {{each_level}}
+                </option>
+              {% endfor %}
+            </select>
+            <small class="error">{% trans "Please select moderation level." %}</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
 
       <!-- start date -->
       <div class="row">
@@ -132,7 +161,7 @@ this template is modified. So for the fields in the template it supports -
 
             <div class="small-8 columns">
             <input type="text" id="event_start_date" name="event_start_date" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="width:15rem">      
-              <small class="error">Please select start date.</small>
+              <small class="error">{% trans "Please select start date." %}</small>
             </div>
 
           </div>
@@ -151,7 +180,7 @@ this template is modified. So for the fields in the template it supports -
             <div class="small-8 columns">
             <input type="text" id="event_end_date" name="event_end_date" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="width:15rem">      
 
-              <small class="error">Please select end date.</small>
+              <small class="error">{% trans "Please select end date." %}</small>
             </div>
 
           </div>
@@ -170,7 +199,7 @@ this template is modified. So for the fields in the template it supports -
 
             <div class="small-8 columns">
             <input type="text" id="event_start_enroll_date" name="event_start_enroll_date" value="" placeholder="DD/MM/YYYY" readonly="" required="" class="date_month_day_year" style="width:15rem">      
-              <small class="error">Please select enrollment start date.</small>
+              <small class="error">{% trans "Please select enrollment start date." %}</small>
             </div>
 
           </div>
@@ -286,23 +315,46 @@ this template is modified. So for the fields in the template it supports -
 
     <br/>
     {% endcomment %}
+    
+
+    <!-- Upload logo for ProgramEvent -->
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <div class="row">
+              
+          <div class="small-4 columns">
+            <label for="right-label" class="inline">{% trans "Upload thumbnail" %}</label>
+            <small><i>(.svg images are currently not supported)</i></small>
+          </div>
+          <div class="small-8 columns">
+          {% if logo_img_node %}
+            <a target="_blank" href="{% url 'read_file' group_id logo_img_node.pk %}">{% trans "View existing thumbnail " %}</a>
+            <input type="button" class="button tiny" id="change_logo" value="Edit">
+            <input type="button" class="button tiny hide" id="cancel_change_logo" value="Cancel">
+            <input type="file" name="docFile" id="docFile" class="hide" accept="image/*"/>
+          {% else %}
+          <input type="file" name="docFile" id="docFile" accept="image/*"/>
+          {% endif %}
+
+          </div>
+
+        </div>
+      </div>
+    </div>
 
     <!-- description -->
           
       <!-- <div class="small-12 medium-6 medium-centered columns"> -->
     <dl class="accordion row" title="Click to Add/Edit Description" data-accordion>
       <dd class="accordion-navigation small-12 medium-6 medium-centered columns">
-
         <a href="#content_org">
           <label for="right-label" class="">
             {% if node.content_org %}Edit{% else %}Add{% endif %} {% trans "Description" %}
           </label>
         </a>
-
         <div id="content_org" class="content">
           {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
         </div>
-
       </dd>
     </dl>
     
@@ -310,13 +362,12 @@ this template is modified. So for the fields in the template it supports -
 
     <div class="row">
       <div class="small-12 medium-6 medium-centered columns">
-    
-        <input type="hidden" name="moderation_level" value="2">
+      {% if spl_group_type == "CourseEventGroup" %}
+        <input type="hidden" name="course_node_id" value="{{course_node_id}}">
+      {% endif %}
+
         <input type="hidden" name="edit_policy" value="EDITABLE_MODERATED">
         <input type="hidden" name="agency_type" value="Other">
-        {% if spl_group_type == "CourseEventGroup" %}
-          <input type="hidden" name="course_node_id" value="{{course_node_id}}">
-        {% endif %}
 
         {% if node %}
           <input type="submit" value="Update {{spl_group_type}}" id="group-submit" class="button expand">
@@ -355,16 +406,36 @@ this template is modified. So for the fields in the template it supports -
       }
       else if (val_chk != -1){
           $("#message").css("display", "block");
-          $("#message").text("Group name cannot include 'Mod' or 'mod' text at end.");
+          $("#message").text("{% trans 'Group name cannot include 'Mod' or 'mod' text at end.' %}");
           event.preventDefault();
       }
     }
     else if (name == ""){
       $("#message").css("display", "block");
-      $("#message").text("Group name cannot be empty.");
+      $("#message").text("{% trans 'Group name cannot be empty.' %}");
       event.preventDefault();
     }
   });
+  $(document).on('click',"#change_logo",function(){
+    $("#cancel_change_logo").removeClass("hide");
+    $("#docFile").removeClass("hide");
+  })
+
+  $(document).on('click',"#cancel_change_logo",function(){
+    $("#cancel_change_logo").addClass("hide");
+    $("#docFile").addClass("hide");
+    $("#docFile").val("")
+  })
+
+  $("#docFile").change(function(event) {
+    file_mime_type = this.files[0].type;
+    if(file_mime_type.indexOf("svg") >= 0 ){
+      alert("{% trans '.svg images are currently not supported' %}")
+      $("#docFile").val("");
+      event.preventDefault();
+    }
+  });
+
 
 // </script>
 {% endblock %}
@@ -389,7 +460,7 @@ this template is modified. So for the fields in the template it supports -
     var currentDay = currentDate.getDate();
     var currentMonth = currentDate.getMonth();
     var currentYear = currentDate.getFullYear();
-    lowerYearLimit = currentYear;
+    lowerYearLimit = currentYear - 5;
     upperYearLimit = currentYear + 5;
 
     $(".date_month_day_year").datepicker({ 
@@ -398,8 +469,8 @@ this template is modified. So for the fields in the template it supports -
       dateFormat: 'dd/mm/yy',
       yearRange: lowerYearLimit + ":" + upperYearLimit,
       defaultDate: '0',
-      minDate: '0',
-
+      //minDate: '0',
+      //setDate: new Date(),
       onClose: function(dateText, inst) {
         if($(this).attr('id') == 'event_start_date' || $(this).attr('id') == 'event_end_date'){
           eventStartDt = $("#event_start_date")

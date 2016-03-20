@@ -57,7 +57,7 @@
 
 			<div class ="row">
 				<div class="large-5 columns">
-					<b>Add Description</b>
+					<b class="compulsory">Add Description</b>
 					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Describe the file" %}
 
 					<div class="row">
@@ -69,12 +69,12 @@
 							<div class="row collapse" data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}">
 									
 								<div class="small-9 columns">
-							    	<input id="tags_id" tabindex="10" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
+							    	<input id="tags_id" tabindex="11" type="text" value="" placeholder="{% trans 'Add one tag at a time' %}">
 							    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
 						        </div>
 						        <div class="small-3 columns">
-						        	<span tabindex="11" id="add-tag-btn" class="tiny button">
-						        		{% trans 'Add Tag' %}
+						        	<span tabindex="12" id="add-tag-btn" class="tiny button">
+						        		{% trans 'Add' %}
 						        	</span>
 						        </div>
 
@@ -100,7 +100,7 @@
 				<div class="large-7 columns">
 					<div class ="row">
 						<div class="large-4 columns">
-							<b>Language</b>
+							<b class="compulsory">Language</b>
 							<select name="lan" tabindex=3 required>
 								<option value="">--- Select Language ---</option>
 								{% get_language_info_list for LANGUAGES as languages %}
@@ -132,7 +132,7 @@
 					<br/>
 					<div class ="row">
 						<div class="large-4 columns">
-							<b>Target Audience</b>
+							<b class="compulsory">Target Audience</b>
 							{% get_metadata_values as metadata %}
 	  						{% for k,v in metadata.items %}
 	  						{% if k == "audience" %}
@@ -165,7 +165,7 @@
 						{% endcomment %}
 
 						<div class="large-4 columns">
-							<b>Subject</b>
+							<b class="compulsory">Subject</b>
 							{% get_metadata_values as metadata %}
 	  						{% for k,v in metadata.items %}
 	  						{% if k == "educationalsubject" %}
@@ -174,7 +174,7 @@
 			        			{% for opts in v %}
 									<option>{% trans opts %}</option>
 								{% endfor %}
-								<option>Not Sure</option>
+								<option>< Not Sure ></option>
 							</select>
 							<small class="error">Please select resource Subject</small>
 
@@ -183,7 +183,7 @@
 						</div>
 
 						<div class="large-4 columns">
-							<b>Educational Level</b>
+							<b class="compulsory">Educational Level</b>
 							{% get_metadata_values as metadata %}
 	  						{% for k,v in metadata.items %}
 	  						{% if k == "educationallevel" %}
@@ -192,7 +192,7 @@
 			        			{% for opts in v %}
 									<option>{% trans opts %}</option>
 								{% endfor %}
-								<option>Not Sure</option>
+								<option>< Not Sure ></option>
 							</select>
 							<small class="error">Please select resource audience</small>
 
@@ -200,19 +200,31 @@
 							{% endfor %}
 						</div>
 					</div>
+					<small>({% trans "ctrl + click to select multiple values" %})</small>
 					<br/>
+					<br/>
+
+					<div class ="row">
+						<div class="large-3 columns">
+							<b>Co-Contributors:</b>
+						</div>
+						<div class="large-9 columns">
+							<input id="co_contributors" name="co_contributors" type="text" placeholder="Names of co-creators separated by commas" tabindex="7"/>
+						</div>
+					</div>
+					
 					<div class ="row">
 						<div class="large-2 columns">
 							<b>License</b>
 						</div>
 						<div class="large-10 columns">
 							<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
-							{% get_licence as licence %}
-							<select name="License" tabindex="7" required>
-		  						{% for each_licence in licence %}
-				        			<option value="{{each_licence}}" 
+							{% get_license as license %}
+							<select name="License" tabindex="8" required>
+		  						{% for each_license in license %}
+				        			<option value="{{each_license}}" 
 				        			{% if each_license == "CC BY-SA"%}selected{% endif %}>
-				        				{% trans each_licence %}
+				        				{% trans each_license %}
 				        			</option>
 								{% endfor %}
 							</select>
@@ -226,7 +238,7 @@
 							<b>Source</b>
 						</div>
 						<div class="large-10 columns">
-							<input id="source_id" name="Source" type="text" placeholder="Owner of the file" tabindex="8"/>
+							<input id="source_id" name="Source" type="text" placeholder="Owner of the file" tabindex="9"/>
 						</div>
 					</div>
 
@@ -235,7 +247,7 @@
 							<b>Based on url</b>
 						</div>
 						<div class="large-9 columns">
-							<input id="based_on_id" name="based_url" type="text" placeholder="Web Address (url) of the file if you sourced it from a website" tabindex="9"/>
+							<input id="based_on_id" name="based_url" type="text" placeholder="Web Address (url) of the file you sourced it from" tabindex="10"/>
 						</div>
 					</div>
 
@@ -246,7 +258,7 @@
 		
 		<input type="hidden" name="user" value="{{user.id}}">
 		<input type="hidden" name="page_url" value="{{page_url}}">
-		<input type="submit" id="submitpostid" value="Submit" class="button round medium">
+		<input type="submit" id="submitpostid" value="Submit" class="button medium expand">
 		<p id="message" style="display:none"> 
 			{% trans "Depending on the size of file/s and your Internet speed, upload process may take time. Please do not close this window." %} <br/>
 			{% trans "Please upload videos in webm format. If you upload videos of other formats, it will take longer to publish them." %} 

@@ -13,10 +13,14 @@
   }
 </style>
 <div>
+
   <!-- Title only row -->
+  
   {% if is_RT == "RelationType" %}
+   
     <div class='row drawer_count_lbl'>
       <label class='small-1 columns  lbl_count_div left_drawer_count_lbl' style='float: left;'> </label>
+      
       <label class='small-1 columns lbl_count_div right_drawer_count_lbl' style='float: right;'> </label>
     </div>
   {% endif %}
@@ -35,7 +39,7 @@
   <div class="row">
 
     <!-- LHS Resources drawer -->
-    <div class="small-6 columns resource-drawer">
+    <div class="small-5 large-6 columns resource-drawer">
       
       <ul class="{{widget_for}} pricing-table drawer1" id="{{widget_for}}_drawer1">        
 
@@ -80,7 +84,7 @@
 
                 {% if "Author" not in value.member_of_names_list %}
                   <div class="small-12 columns text-left" style="padding-top:3px">
-                    <i class="posted-by" >{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
+                    <i class="posted-by" >{{ value.member_of_names_list|join:', ' }} by {{value.user_details_dict.created_by}} on {{value.created_at|date:"j F Y"}} </i>
                   </div>
                 {% endif %}     
               </div>
@@ -103,17 +107,19 @@
         <li class="bullet-item" > <i> {% trans "No content of selected type !" %} </i> </li>
         {% endif %}
 
+       
         {% if is_RT != "RelationType" %}
         <!-- pagination -->
         {% if page_info %}
           {% if page_info.num_pages > 1 %}
             <div class="pagination-centered">
+   
               <ul class="pagination" role="menubar" aria-label="Pagination">
                 {% if page_info.num_pages < 11 %}
-          
+                 
+                  
 
                   {% for each_page in page_info.page_range %}
-
                     {% if page_info.current_page == each_page %}
                     <li class="current">
                     {% else %}
@@ -121,7 +127,6 @@
                     {% endif %}
                       <a class="next_prev" name="{{each_page}}"> {{ each_page }} </a>
                     </li>
-
                   {% endfor %}
                 
                 {% else %}
@@ -205,7 +210,7 @@
     </div>
 
     <!-- For arrows Up, Down, Left, Right -->
-    <div class="small-1 columns  text-center" >     
+    <div class="small-2 large-1 columns  text-center" >     
 
       {% if not selection %}
         <br/><br/><br/><br/>
@@ -243,7 +248,7 @@
    </div>
 
    <!-- For collection created on RHS -->
-    <div class="small-5 columns resource-drawer">
+    <div class="small-5 large-5 columns resource-drawer">
 
       <ul class="{{widget_for}} pricing-table" id="{{widget_for}}_drawer2">        
         {% if drawer2 != "None" %}
@@ -279,7 +284,7 @@
                 <!-- <div class="small-7 columns text-right"> -->
                 {% if "Author" not in value.member_of_names_list %}
                 <div class="small-12 columns text-left" style="padding-top:3px">
-                  <i class="posted-by">{{ value.member_of_names_list|join:', ' }} {% trans 'by' %} <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> {% trans 'on' %} {{value.created_at|date:"j F Y"}} </i>
+                  <i class="posted-by">{{ value.member_of_names_list|join:', ' }} {% trans 'by' %} {{value.user_details_dict.created_by}} {% trans 'on' %} {{value.created_at|date:"j F Y"}} </i>
                 </div>     
                 {% endif %}
               </div>
@@ -287,7 +292,7 @@
               {% if "Author" not in value.member_of_names_list %}
               <div class="row">
                 <div class="small-12 columns text-left" style="padding-top:5px;">
-      {{ value.html_content|safe|striptags|truncatechars:50 }}
+                    {{ value.html_content|safe|striptags|truncatechars:50 }}
                 </div>
              </div>
              {% endif %}
@@ -301,6 +306,7 @@
       </ul>
     </div>
   <!-- End of Collection created on RHS -->
+  
   {% if is_RT == "RelationType" %}
     <div id="move_list"  class="text-center">    
       <input type='button' id='{{widget_for}}_move_all_right' value="{% trans 'Move ALL to Right' %}" class='button round small'>
@@ -322,8 +328,9 @@
 <input type="hidden" name="checked" value="{{checked}}" />
 
 <script type="text/javascript">
+  
   var is_RT = "{{is_RT}}";
-
+  var admin_related_drawer = "{{admin_related_drawer}}"
   $(document).ready(function(){
     if ("{{search_name}}"){
       $(".search_items").val("{{search_name}}");
@@ -332,12 +339,9 @@
       update_drawer_count();
     {% endif %}
   });
-
-
   //To allocate space of 10 resources listing for drawers.
   liHeight = $("#{{widget_for}}_drawer1 > li").outerHeight();
   $(".resource-drawer").height(430);
-
   // To select the single as well as multiple items from list
   $(document).on('click','#{{widget_for}}_drawer1 li.bullet-item',function(e){
     // $("#{{widget_for}}_drawer1 li.bullet-item").on("click", function(e) {
@@ -349,7 +353,6 @@
       $(this).addClass('selected-resource');
     }
   });
-
   $(document).on('click','#{{widget_for}}_drawer2 li.bullet-item',function(e){
     // $("#{{widget_for}}_drawer2 li.bullet-item").click(function(e){
     
@@ -362,8 +365,6 @@
       $(this).addClass('selected-resource');
     }
   });
-
-
   //Function to display number of elements in both drawers
   function update_drawer_count(){
     left_drawer_count = 0
@@ -373,26 +374,20 @@
     $(".right_drawer_count_lbl").text(right_drawer_count)
     $(".left_drawer_count_lbl").text(left_drawer_count)
   }
-
   //For left drawer selected resources and right button click
   // $("#{{widget_for}}_btnRight").click(function() {
   $(document).off('click',"#{{widget_for}}_btnRight").on('click',"#{{widget_for}}_btnRight",function(){
     $("#{{widget_for}}_drawer1 li.selected-resource input.node_id").addClass("{{widget_for}}_values");
-
     var selectedOpts = $("#{{widget_for}}_drawer1 li.selected-resource");
     $("#{{widget_for}}_drawer1 li.selected-resource").removeClass("selected-resource");
-
     if (selectedOpts.length == 0) {
       alert("{% trans 'Nothing to move.' %}");
     }
-
     // $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
     $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
-
     $(selectedOpts).remove();
     // var innerhtml = $("#{{widget_for}}_drawer1").html()
     // $(".{{widget_for}}.pricing-table.drawer1").html(innerhtml);
-
     if (is_RT != "RelationType") {
       // write comment
       var cn_arr = []
@@ -406,28 +401,23 @@
       update_drawer_count();
     }
   });
-
   //For right drawer selected resources and left button click
-
   $(document).off('click',"#{{widget_for}}_btnLeft").on('click',"#{{widget_for}}_btnLeft",function(){
-
     $("#{{widget_for}}_drawer2 li.selected-resource input.node_id.{{widget_for}}_values").removeClass("{{widget_for}}_values");
     var selectedOpts = $("#{{widget_for}}_drawer2 li.selected-resource");
     $("#{{widget_for}}_drawer2 li.selected-resource").removeClass("selected-resource");
-
     if (selectedOpts.length == 0) {
       alert("{% trans 'Nothing to move.' %}");
     }
-
     $("#{{widget_for}}_drawer1").append($(selectedOpts).clone(true));
     $(selectedOpts).remove();
     // var innerhtml = $("#{{widget_for}}_drawer1").html()
     // $(".{{widget_for}}.pricing-table.drawer1").html(innerhtml);
+   
     if (is_RT == "RelationType") {
       update_drawer_count();
     }
   });
-
   function checkUpDownButton() {
     for(var i=0; i<collSelected.length-1; i++)
     {
@@ -441,24 +431,18 @@
     }
     return flag;
   }
-
   //For UP Button pressed :
   $(document).on('click',"#{{widget_for}}_btnUp",function(){
     collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
-
     if( collSelected ){
-
       //If multiple element's are selected :
       if( collSelected.length > 1 ){
-
         if( checkUpDownButton ){
           prevFirstSel = collSelected[0].previousElementSibling;
           lastSel = collSelected[collSelected.length-1];
-
           $(prevFirstSel).insertAfter(lastSel);
         }
       }
-
       //If only one element is selected :
       else{
         currSel =  collSelected[0];
@@ -466,25 +450,18 @@
       }
     }
   });
-
   //For DOWN Button pressed :
   $(document).on('click',"#{{widget_for}}_btnDown",function(){
-
     collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
-
     if( collSelected ){
-
       //If multiple element's are selected :
       if( collSelected.length > 1 ){
-
         if( checkUpDownButton ){
           FirstSel = collSelected[0];
           nexttoLastSel = collSelected[collSelected.length-1].nextElementSibling;
-
           $(nexttoLastSel).insertBefore(FirstSel);  
         }
       }
-
       //If only one element is selected :
       else{
         currSel =  collSelected[0];
@@ -492,40 +469,33 @@
       }
     }
   });
-
   // Search-Box for LHS drawer of resources
   // $('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
   $('#{{widget_for}}_search').bind('keydown change', function(e) {
-    if (is_RT == "RelationType") {
+    if (is_RT == "RelationType" || admin_related_drawer == "True" ) {
       var search_text = (this.value).toLowerCase();
       var search_text_len = (search_text.length + 1);
-
       if (e.keyCode == 8) {
         // If backspace pressed, then show all
         search_text_len = 0;
       }
-
       var $li = $( ".{{widget_for}}.pricing-table.drawer1 li.bullet-item" );
-
       if (search_text_len < 3) {
         $li.filter(function() {
           if ($(this).css("display") == "none") {
             return true;
           }
-
           else {
             return false;
           }
         }).show();
       }
-
       else if (search_text_len > 2) {
         $(".searching").css("display", "block");
         $li.each(function() {
           if ($(this).text().toLowerCase().indexOf(search_text) >= 0) {
             $(this).css("display", "block");
           }
-
           else{
             $(this).css("display", "none");
           }
@@ -533,19 +503,16 @@
         $(".searching").css("display", "none");
       }
     }
-
+   
     else {
+      
       var len = (this.value.length);
       var field = "{{widget_for}}";
       var value = this.value;
-
       if (e.which == 13) {
-
         e.preventDefault();
-
         if (len > 2){
           $(".searching").css("display", "block");
-
           $.ajax({
             type: "POST",
             url: "{% url 'search_drawer' groupid %}",
@@ -571,7 +538,6 @@
               if (field == "assesses"){
                 $("#assesses_drawer").html(data);
               }
-
               $(".search_items").focus().val('').val(value);
               
             }          
@@ -580,7 +546,6 @@
       }
     }
   });
-
   // Moving ALL elements from left drawer to right drawer
     $("#{{widget_for}}_move_all_left").click(function(event) {
       var all_li_ele = $("#{{widget_for}}_drawer2 li")
@@ -595,7 +560,6 @@
       $("#{{widget_for}}_drawer1").append(all_li_ele);
       update_drawer_count()
     })
-
   // Moving ALL elements from right drawer to left drawer
     $("#{{widget_for}}_move_all_right").click(function(event) {
       var all_li_ele = $("#{{widget_for}}_drawer1 li:not(:first-child)")
@@ -606,10 +570,8 @@
       if($(all_li_ele).hasClass("selected-resource")){
         $(all_li_ele).removeClass("selected-resource")
       }
-
       $("#{{widget_for}}_drawer1 li:not(:first-child)").remove()
       $("#{{widget_for}}_drawer2").append(all_li_ele);
       update_drawer_count()
     })
-
 </script>

@@ -3,17 +3,16 @@
 {% load i18n %}
 {% block title %} Admin {% endblock %}
 {% block meta_content %}
-     {% ifequal url 'data' %}
+		 {% ifequal url 'data' %}
 	{% get_class_list groupid class_name %}
-     {% else %}
-        {% get_class_type_list groupid class_name %}
-     {% endifequal %}
+		 {% else %}
+				{% get_class_type_list groupid class_name %}
+		 {% endifequal %}
 {% endblock %}
-
 
 {% block body_content %} 
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
-<form method="post" action="" name="{{class_name}}">
+<form method="post" action="" name="{{class_name}}" id="{{class_name}}">
 {% csrf_token %}
 {% if translate %}
 <div class="large-12 columns">
@@ -33,78 +32,77 @@
 </div>
 </table></div>
 {% endif %}
- 
-<h2>{{node.name}}</h2>
+<h2> {{node.name}}</h2>
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
 {% for list in definitionlist %}
 {% if translate %}
 {% if list == "name" or list == "inverse_name" %}
 <div style="display:table-row;">
-      <div style="display:table-cell;"> 
-	<font size="3"> {{list}}</font> 
-      </div>
+			<div style="display:table-cell;"> 
+			<font size="3"> {{list}} </font> 
+			</div>
 
-{% get_input_fields class_structure|get_dict_item:list list translate %}
-
+{% get_input_fields class_structure|get_dict_item:list list translate  %}
 </div>
 {% endif %}
 {% endif %}
-  
+	
 {% endfor %}
 </div>
 {% if translate %}
-<div style="display:table; display:none; border:1px;   border-spacing:15px;" class="small-12 columns">
+<div style="display:table; display:none; border:1px; border-spacing:15px;" class="small-12 columns">
 {% else %}
-<div style="display:table; border:1px;   border-spacing:15px;" class="small-12 columns">
+<div style="display:table; border:1px; border-spacing:15px;" class="small-12 columns">
 
 {% endif %}
 
 <dl class="accordion" data-accordion>
-  <dd class="accordion-navigation">
-    <a href="#definitionlist">Definition</a>
-    <div id="definitionlist" class="content active">
-      {% for list in definitionlist %}
-      {% if translate and list != "language" %}
-      <div style="display:table-row;">
-	<div style="display:table-cell;"> 
-	  <font size="3"> {{list}}</font> 
-	</div>
-	{% get_input_fields class_structure|get_dict_item:list list %}
+	<dd class="accordion-navigation">
+		<a href="#definitionlist">Definition</a>
+		<div id="definitionlist" class="content active">
+		{% for list in definitionlist %}
+			{% if translate and list != "language" %}
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3"> {{list}} </font> 
+				</div>
+	{% get_input_fields class_structure|get_dict_item:list list translate  %}
+
 	{% if list in  required_fields %}
 	<div style="display:table-cell;">
-          <font size="3" color="red"> * </font>
-          <font id="{{list}}_required" style="display:none" color="red">This field required</font>
-        </div>
-        {% endif %}
-      </div>
-      {% endif %}
-      
-      {% if not translate %}
-      <div style="display:table-row;">
-        <div style="display:table-cell;"> 
-	  <font size="3"> {{list}}</font> 
-        </div>
-        {% get_input_fields class_structure|get_dict_item:list list %}
-        {% if list in  required_fields %}
-        <div style="display:table-cell;">
-          <font size="3" color="red"> * </font>
-          <font id="{{list}}_required" style="display:none" color="red">This field required</font>
-        </div>
-        {% endif %}
-      </div>
-      {% endif %}
-      {% endfor %}
-    </div>
-  </dd>
-  <dd class="accordion-navigation">
-    <a href="#contentlist">Content</a>
-    <div id="contentlist" class="content">
-      {% for list in contentlist %}
-      <div class="medium-12 columns">
+					<font size="3" color="red"> * </font>
+					<font id="{{list}}_required" style="display:none" color="red">This field required</font>
+				</div>
+				{% endif %}
+			</div>
+			{% endif %}
+			
+			{% if not translate %}
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3"> {{list}} </font> 
+				</div>
+				{% get_input_fields class_structure|get_dict_item:list list translate  %}
+				{% if list in  required_fields %}
+				<div style="display:table-cell;">
+					<font size="3" color="red"> * </font>
+					<font id="{{list}}_required" style="display:none" color="red">This field required</font>
+				</div>
+				{% endif %}
+			</div>
+			{% endif %}
+			{% endfor %}
+		</div>
+	</dd>
+	<dd class="accordion-navigation">
+		<a href="#contentlist">Content</a>
+		<div id="contentlist" class="content">
+			{% for list in contentlist %}
+			<div class="medium-12 columns">
 	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
-      </div>
-      {% endfor %}
-      <script type="text/javascript">
+			</div>
+			{% endfor %}
+			<script type="text/javascript">
 	$(".orgitdown .orgitdownButton1 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/bold.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 	$(".orgitdown .orgitdownButton2 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/italic.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 	$(".orgitdown .orgitdownButton3 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/stroke.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
@@ -115,7 +113,8 @@
 	$(".orgitdown .orgitdownButton8 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/html.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 	$(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/close.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 	$(document).ready(function(){
-	$("#lan option[value={{node.language}}]").remove();
+		var temp_var = "{{node.language|safe}}";
+	$('#lan option[value="'+ temp_var +'"]').remove();
 	{% if node %}
 	{% get_possible_translations node as translations %}
 	{% for each in translations %}
@@ -125,38 +124,39 @@
 	{% endfor %}
 	{% endif %}
 	});
-      </script>
-    </div>
-  </dd>
-  <dd class="accordion-navigation">
-    <a href="#dependencylist">Dependency</a>
-    <div id="dependencylist" class="content">
-      {% for list in dependencylist %}
-      <div style="display:table-row;">
+			</script>
+		</div>
+	</dd>
+	<dd class="accordion-navigation">
+		<a href="#dependencylist">Dependency</a>
+		<div id="dependencylist" class="content">
+			{% for list in dependencylist %}
+			<div style="display:table-row;">
 	<div style="display:table-cell;"> 
-	  <font size="3"> {{list}}</font> 
+		<font size="3"> {{list}}</font> 
 	</div>
-	{% get_input_fields class_structure|get_dict_item:list list %}
-      </div>
-      {% endfor %}
-    </div>
-  </dd>
-  <dd class="accordion-navigation">
-    <a href="#options">Options</a>
-    <div id="options" class="content">
-      {% for list in options %}
-      <div style="display:table-row;">
-        <div style="display:table-cell;"> 
-          <font size="3"> {{list}}</font> 
-        </div>
-        {% get_input_fields class_structure|get_dict_item:list list %}
-      </div>
-      {% endfor %}
-    </div>
-  </dd>
+	{% get_input_fields class_structure|get_dict_item:list list translate  %}
+			</div>
+			{% endfor %}
+		</div>
+	</dd>
+	<dd class="accordion-navigation">
+		<a href="#options">Options</a>
+		<div id="options" class="content">
+			{% for list in options %}
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3"> {{list}}</font> 
+				</div>
+				{% get_input_fields class_structure|get_dict_item:list list translate  %}
+			</div>
+			{% endfor %}
+		</div>
+	</dd>
 </dl>
 </div>
-
+{# <input id="{{fields_name}}_type" type="hidden" name="{{fields_name}}" /> #}
+<!-- This input type creates hidden element for drawer_widget -->
 <input type="submit" name="submit" class="button" id="save-node-type" value="Submit">
 </form>
 <!-- {% if translate %}    -->
@@ -179,37 +179,45 @@
 
 {% block script %}
 {% autoescape off %}
-  var required_fields = [];
-  required_fields = {{ required_fields }}
-  var index = required_fields.indexOf('_type');
-  if(index>-1){
-     required_fields.splice(index, 1);
-  }
-  var flag = 0;
-  
-  {% endautoescape %}
-  
-  $("form").submit(function(event) {
-    flag = 0;
-    for(each in type_list){
-      eval(type_list[each] + "()");
-    }
-    for(reqfields in required_fields){
-      if($("#definitionlist [name = "+required_fields[reqfields]+" ]").val()){
-        $("#"+required_fields[reqfields]+"_required").hide();
-      }
-      else{
-        flag = 1;
-        $("#"+required_fields[reqfields]+"_required").show();
-      }
-    }
-  
-    <!-- if(flag == 1) -->
-    <!-- { -->
-    <!--   alert("* mandatory fields requiredss"); -->
-    <!--   event.preventDefault(); -->
-    <!-- } -->
-  });
+	var required_fields = [];
+	required_fields = {{ required_fields }}
+	var index = required_fields.indexOf('_type');
+	if(index>-1){
+		 required_fields.splice(index, 1);
+	}
+	var flag = 0;
+	
+	{% endautoescape %}
+	
+	$("form").submit(function(event) {
+		flag = 0;
+		var memb = getSelValuesHiddenElement('member_of','{{class_name}}');
+		var meta = getSelValuesHiddenElement('meta_type_set','{{class_name}}');
+		var ats = getSelValuesHiddenElement('attribute_type_set','{{class_name}}');
+		var rts = getSelValuesHiddenElement('relation_type_set','{{class_name}}');
+		var typ = getSelValuesHiddenElement('type_of','{{class_name}}');
+		var prn = getSelValuesHiddenElement('prior_node','{{class_name}}');
+		<!--Above code calls widget_selector  -->
+		<!--for(each in type_list){-->
+		<!--	eval(type_list[each] + "()");-->
+		<!--} -->
+		<!-- this code was used to fetch drawer_widget code and then eval it. -->
+
+		for(reqfields in required_fields){
+			if($("#definitionlist [name = "+required_fields[reqfields]+" ]").val()){
+				$("#"+required_fields[reqfields]+"_required").hide();
+			}
+			else{
+				flag = 1;
+				$("#"+required_fields[reqfields]+"_required").show();
+			}
+		}
+		<!-- if(flag == 1) -->
+		<!-- { -->
+		<!--   alert("* mandatory fields requiredss"); -->
+		<!--   event.preventDefault(); -->
+		<!-- } -->
+	});
 
 {% endblock %}	
 
@@ -218,4 +226,3 @@
 var type_list = []
 </script>
 {% endblock %}
-

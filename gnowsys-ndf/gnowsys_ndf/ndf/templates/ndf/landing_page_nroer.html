@@ -17,6 +17,31 @@
 
 {% endblock %}
 
+{% block style %}
+
+article.columns{
+    padding: 0;
+    min-height: auto;
+}
+
+#top-headers{
+    margin-bottom: 0;
+}
+
+.workspace{
+    min-height: auto;
+}
+
+#landing-slider-container{
+}
+
+.slick-slider{
+    margin-bottom: 0;
+}    
+    
+{% endblock style %}
+
+
 {% block body_content %}
 
     {% get_site_variables as site %}
@@ -25,7 +50,9 @@
 
     {% cache 1800 welcome_slider request.LANGUAGE_CODE %} <!-- caching slider for 30 mins -->
 
-    <article class="landing row">
+    {% comment %}
+    <article class="landing row hide">
+
         <section class="promo">
             <div class="banner">
                 <div id="group-banner">
@@ -51,7 +78,7 @@
                                     <span class="count"> {{all_files}}</span> {% trans "Resources" %} <br>
                                     <span class="count"> {{all_users}}</span> {% trans "Members" %} <br>
                                     <br>
-                                    <a href="../accounts/register/" class="ui button">{% trans "Let's Join NROER" %}</a>
+                                    {# <a href="../accounts/register/" class="ui button"> #}{% trans "Let's Join NROER" %}{# </a> #}
                                 </div>
                                     
                                 <div>
@@ -115,6 +142,22 @@
         </section>
 
     </article>
+    {% endcomment %}
+
+    <div id="landing-slider-container">
+    <div>
+        <img src="static/ndf/images/landing_pg_slides/Slider1.png" style="width:100%;">
+    </div>
+    <div>
+        <img src="static/ndf/images/landing_pg_slides/Slider2.png" style="width:100%;">
+        </div>
+    <div>
+        <img src="static/ndf/images/landing_pg_slides/Slider3.png" style="width:100%;">
+        </div>
+    </div>
+    <div class="text-center">
+        <a href="http://nroer.in" target="_blank"> Click here to visit the old site</a>
+    </div>
     {% endcache %}
     
     <script>
@@ -126,29 +169,25 @@
         $article = $("main.row > article.columns");
         $article.removeClass("medium-10").addClass("large-12");
         
-        // for (i = 0; i < 0; i++) {
-        //     $("#partner-list li").clone().appendTo("#partner-list");
-        // }
-
         // redundantly kept to improve the speed of forming slideshow.
         // Along with that to ensure this script found it's elements. Hence forth kept in .ready() too.
-        $("#group-banner").slick({
-            dots: true,
-            autoplaySpeed: 7000,
-            autoplay: true
-        });
+        // $("#group-banner").slick({
+        //     dots: true,
+        //     autoplaySpeed: 7000,
+        //     autoplay: true
+        // });
 
-        $(document).ready(function(){
+        // $(document).ready(function(){
   
-            try{
-                $("#group-banner").slick({
-                    dots: true,
-                    autoplaySpeed: 7000,
-                    autoplay: true
-                });
-            }
-            finally{
-            }
+        //     try{
+        //         $("#group-banner").slick({
+        //             dots: true,
+        //             autoplaySpeed: 7000,
+        //             autoplay: true
+        //         });
+        //     }
+        //     finally{
+        //     }
 	
 /*
             function resize()
@@ -168,9 +207,17 @@
             setTimeout(function() {window.onresize = resize; resize()}, 7000);
 */
             
-      });
+      // });
 
-
+    $(document).ready(function(){
+        $('#landing-slider-container').slick({
+            // adaptiveHeight: true,
+            // speed: 300,
+            // fade: true,
+            autoplaySpeed: 5000,
+            autoplay: true
+        });
+    });
     </script>
 
 {% endblock %}

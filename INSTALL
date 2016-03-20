@@ -1,194 +1,208 @@
 * Dockerfile for gstudio
-Please use [[https://github.com/gnowledge/gstudio-docker/]] for a quick and best method to get a running instance 
-of gstudio with code as well as all the dependencies satisfied. 
+
+  Please use https://github.com/gnowledge/gstudio-docker/ for a quick & best method to
+  get a running instance of gstudio with code as well as all the dependencies satisfied.
 
 
-* Manual INSTALLATION Procedure for for gstudio
+* Manual INSTALLATION Procedure for gstudio
 
-If you are on a debian or Ubuntu PC install the following packages.
-Use corresponding package names if you are using an RPM based distro
-(fedora or centos). 
+  If you are on a debian or Ubuntu PC install the following packages.
+  Use corresponding package names if you are using an RPM based distro
+  (fedora or centos).
 
+  [1] Installing required following packages and its dependencies:
 
-1. Installing required packages and its dependencies
-	// first use 3 commands to download ppa repository and then 	use this command as ffmpeg doesn't exist now
-	sudo add-apt-repository ppa:mc3man/trusty-media
-	sudo apt-get update
-	sudo apt-get install ffmpeg gstreamer0.10-ffmpeg
-    (1) sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg ffmpeg2theora
+      > sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv ipython libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg2theora
 
-2. Get latest version of gstudio-mongokit -  Try one of the following commands:
+  [2] Get latest version of gstudio-mongokit using one of the following commands:
 
-    (1) git clone git@github.com:gnowledge/gstudio.git  
-    (2) git clone https://github.com/gnowledge/gstudio.git
+      (1) git clone https://github.com/gnowledge/gstudio.git
+      (2) git clone git@github.com:gnowledge/gstudio.git  
 
-3. Set up virtual environment for gstudio-mongokit
+  [3] Use following commands to install ffmpeg package:
 
-    (1) cd gstudio
-    (2) virtualenv --system-site-packages .      # NOTE: Here '.' indicates current directory
-    (3) source bin/activate                      # Activates virtual environment [To deactivate, please use given command - "deactivate"]
-    (4) ./bin/pip install -r requirements.txt    # NOTE: Here '.' indicates current directory
+      (1) sudo add-apt-repository ppa:mc3man/trusty-media
+      (2) sudo apt-get update
+      (3) sudo apt-get install ffmpeg gstreamer0.10-ffmpeg
 
-3. In case your distribution of GNU/Linux is not latest, you may not
-   find emacs24 in your repositories. In that case, satisfy the requirement
-   by following these instructions:
+  [4] In case your distribution of GNU/Linux is not latest, you may not
+      find emacs24 in your repositories. In that case, satisfy the requirement
+      by following these instructions:
 
-    (1) sudo add-apt-repository ppa:cassou/emacs
-    (2) sudo apt-get update
-    (3) sudo apt-get install emacs24 emacs24-el emacs24-common-non-dfsg
+      (1) sudo add-apt-repository ppa:cassou/emacs
+      (2) sudo apt-get update
+      (3) sudo apt-get install emacs24 emacs24-el emacs24-common-non-dfsg
 
-4. Setting up Emacs working environment:
+  [5] Setting up Emacs working environment:
 
-   Create an init file for emacs's default settings at given path "~/.emacs"
-   with following code in it:
+      Create an init file in your user directory with filename as '.emacs'
+      (i.e., /home/<username>/.emacs) to store default settings for emacs
+      , which includes following lines of code:
 
-   NOTE: How to get org-version?
-	 (1) Open emacs editor
-	 (2) Press Alt + "X"
-	 (3) Enter following command: org-version [Then Press Enter]
+      NOTE: How to get org-version?
+      (1) Open emacs editor
+      (2) Press Alt+X
+      (3) Enter following command: org-version [Then Press Enter]
 
-   (a) For org-version < 8.0: Copy following lines of code in above specified file and save it
-      	(custom-set-variables
-      	  '(inhibit-startup-screen t)
-      	  '(org-export-html-preamble nil)
-      	  '(org-export-html-postamble nil)
-      	)
+      (a) For org-version < 8.0: Copy following lines of code in above specified file and save it
+          (custom-set-variables
+            '(inhibit-startup-screen t)
+            '(org-export-html-preamble nil)
+            '(org-export-html-postamble nil)
+          )
 
-   (b) For org-version >= 8.0: : Copy following lines of code in above specified file and save it
-      	(custom-set-variables
-      	  '(inhibit-startup-screen t)
-      	  '(org-html-preamble nil)
-      	  '(org-html-postamble nil)
-      	)
+      (b) For org-version >= 8.0: : Copy following lines of code in above specified file and save it
+          (custom-set-variables
+            '(inhibit-startup-screen t)
+            '(org-html-preamble nil)
+            '(org-html-postamble nil)
+          )
 
-5. SMTP configuration for notifications
- 
-   (1) To make SMTP server ready for sending mail (development purpose only) -
+  [6] Set up virtual environment for gstudio-mongokit:
 
-       There are two options: 
-       1. After running project, run following command: python -m
-          smtpd -n -c DebuggingServer localhost:1025 (This will ready
-          to listen smtp messages and will print in terminal)
+      (1) cd gstudio
+      (2) virtualenv --system-site-packages .      # NOTE: Here '.' indicates current directory
+      (3) source bin/activate                      # Activates virtual environment
+      (4) ./bin/pip install -r requirements.txt    # NOTE: Here '.' indicates current directory
 
-       2. To use gmail smtp server: (If you have another smarthost to
-          deliver use that instead)
-	
-	(a) Go to settings.py file and search for "#SMTP setting for
-	sending mail" and uncomment gmail smtp setting and comment
-	default python smtp settings.  
+  [7] SMTP configuration for notifications:
+   
+      To make SMTP server ready for sending mail (development purpose only), you can use
+      either of the following methods:
 
-	(b) Edit following with your gmail credentials and save
-	settings.py file - EMAIL_HOST_USER = 'yourcompleteemailid'
-	EMAIL_HOST_PASSWORD = 'yourpassword'
-						 
-6. Install JS/CSS dependencies with Bower:
-    
-    (1) Activate your virtual environment: 
-        source bin/activate
+      (1) After running project, run following command:
+          > python -m smtpd -n -c DebuggingServer localhost:1025
+            # This will ready system to listen smtp messages and will print in terminal
 
-    (2) A tool to create isolated node.js environment which is integrated 
-        with environment built by python virtualenv: 
-        sudo apt-get install curl
-        pip install nodeenv
+      (2) To use gmail smtp server (If you have another smarthost to
+          deliver use that instead):
 
-    (3) Appending nodeenv settings to virtualenv: (This takes time .. wait till it complete)
-        nodeenv --python-virtualenv
+          (a) Go to settings.py file and search for "#SMTP setting for
+              sending mail" and uncomment gmail smtp setting and comment
+              default python smtp settings.  
 
-        If above step gives an error, install NodeJS at root level with following commands:  
+          (b) Edit following with your gmail credentials and save
+              settings.py file:-
+              EMAIL_HOST_USER = 'yourcompleteemailid'
+              EMAIL_HOST_PASSWORD = 'yourpassword'
+
+  [8] Install JS/CSS dependencies using Bower:
+
+      (1) Activate your virtual environment: 
+          > source bin/activate
+
+      (2) A tool to create isolated node.js environment which is integrated 
+          with environment built by python virtualenv: 
+          > sudo apt-get install curl
+          > pip install nodeenv
+
+      (3) Appending nodeenv settings to virtualenv: (This takes time.. wait
+          till it completes)
+          > nodeenv --python-virtualenv
+
+          If above step gives an error, install NodeJS at root level with
+          following commands:  
           (a) sudo add-apt-repository ppa:chris-lea/node.js
           (b) sudo apt-get update
           (c) sudo apt-get install python-software-properties python g++ make nodejs
 
-    (4) Installing Bower:
-        sudo npm install -g bower
+      (4) Installing Bower:
+          > sudo npm install -g bower
 
-    (5) To install JS/CSS dependencies: (Navigate to project root - cd gstudio/gnowsys-ndf )
-        bower install
+      (5) To install JS/CSS dependencies:
+          > cd gstudio/gnowsys-ndf  # Navigate to project-root
+          > bower install           # Install depenedencies
 
-7.  Install Search Dependencies
-    Follow instructions in search_dependencies.txt
+  [9] Install Search Dependencies:
+      (1) Run following command:
+      > pip install -U pyyaml nltk
 
+      (2) Activate the environment:
+      > source bin/activate
 
-	// REQUIREMENTS.TXT
-		pip install -U pyyaml nltk
+      (3) Go to project-root:
+      > cd gstudio/gnowsys-ndf  # directory containing manage.py
 
-		Install.txt-----------------
-		1. Activate the environment
-		2. Go to gstudio/gnowsys-ndf (directory containing manage.py)
-		3. run ipython / python
-		4. in python shell run the foll. commands:-
-			>>> import nltk
-			>>> nltk.download()
-	
-			CASE 1: GUI OPENS
-			-- Go to the 'Corpora' tab
-			-- Download the module with identifier - "stopwords"
-			-- Download the module with identifier - "wordnet"
-			-- Go to "Models" tab
-			-- Download the module with identifier - "maxnet_treebank_pos_tagger"
-			-- Download the module with identifier - "punkt"
+      (4) Run ipython [or python] shell
 
-			Case 2: GUI Does not open
-			-- Press d
-			-- It prompts for the identifier => Enter "stopwords" => It gets downloaded
-			-- It prompts for the identifier => Enter "wordnet" => It gets downloaded
-			-- It prompts for the identifier => Enter "maxent_treebank_pos_tagger" => It gets downloaded
-			-- Download the module with identifier - "punkt"
+          In ipython [or python] shell run the following commands:-
+          >>> import nltk
+          >>> nltk.download()
 
-		exit ipython
+          CASE 1: GUI OPENS
+          -- Go to the 'Corpora' tab
+          -- Download the module with identifier - "stopwords"
+          -- Download the module with identifier - "wordnet"
+          -- Go to "Models" tab
+          -- Download the module with identifier - "maxnet_treebank_pos_tagger"
+          -- Download the module with identifier - "punkt"
 
+          Case 2: GUI Does not open
+          -- Press d
+          -- It prompts for the identifier => Enter "stopwords" => It gets downloaded
+          -- It prompts for the identifier => Enter "wordnet" => It gets downloaded
+          -- It prompts for the identifier => Enter "maxent_treebank_pos_tagger" => It gets downloaded
+          -- Download the module with identifier - "punkt"
 
-8. To run "gstudio" project, perform following steps: 
-
-    (1) Make sure you are in the virtualenv-folder and it's activated
-        (source bin/activate).  
-
-    (2) Move to folder where your "manage.py" file resides: cd gstudio/gnowsys-ndf 
-
-    (3) Start mongodb server: sudo service mongodb start 
-
-    (4) Run the following commands: 
-
-        (a) python manage.py syncdb
-
-        (b) python manage.py filldb 
-
-        (c) python manage.py sync_existing_documents
-
-        (d) python manage.py runserver 
+          Exit ipython [or python]
 
 
-* After running (c) point your browser to http://localhost:8000 to see
-  gstudio on your browser.  Enjoy.  
+* Procedure to RUN gstudio
 
-* Since gstudio is frequently updated, please obtain the latest code
-  from git repo. After each update run (a) & (b) commands before running (c).
+  (1) Make sure you are in the virtualenv-folder and it's activated, i.e.
+      > source bin/activate
 
-  git pull origin mongokit
+  (2) Move to project-root directory (where your "manage.py" file resides), i.e.
+      > cd gstudio/gnowsys-ndf
 
-8. To edit SCSS/SAAS stylesheets:
+  (3) Start mongodb server:
+      > sudo service mongodb start 
 
-  Installing Ruby and compass:
-    (1) sudo apt-get install ruby
-    (2) sudo gem install compass
+  (4) Run following management commands:
 
-  Running compass:
-    (1) Navigate to project root manage.py file.
-    (2) Run following command (to start compass) and then edit scss stylesheets:
-        compass watch
+      > python manage.py syncdb
+      > python manage.py filldb
+      > python manage.py sync_existing_documents
+      > python manage.py create_index
+      > python manage.py runserver
+
+      NOTE: For creating structure related to Course & MIS,
+      refer following file: gstudio/doc/schema_setup.og
+
+  (5) Now point your browser to http://localhost:8000 to see
+      gstudio on your browser. Enjoy.  
 
 
-* Any issues with this procedure or you need any further help, or to
-  file bugs etc. visit ask us in the mailing list:
+* Follow gstudio UPDATE(s)
+
+  Since gstudio is frequently updated, please obtain the latest code
+  from project's git repository. After each update run above specified
+  management commands in the given order.
+
+  > git pull https://github.com/gnowledge/gstudio.git mongokit
+  > git pull origin mongokit  # Or Simply
+
+
+* Edit SCSS/SAAS stylesheet(s)
+
+  (a) Installing Ruby and compass:
+
+      > sudo apt-get install ruby
+      > sudo gem install compass
+
+  (b) Running compass:
+
+      (1) Navigate to project-root directory (where your "manage.py" file resides), i.e.
+          > cd gstudio/gnowsys-ndf 
+
+      (2) Run following command (to start compass) and then edit scss stylesheets:
+          > compass watch
+
+
+* Help query(ies) / Suggestion(s)
+
+  Any issues with this procedure or you need any further help, or to
+  file bugs etc. visit us in the mailing list:
 
   - http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
-
-
-
-
-
-
-sudo mongod --fork --dbpath /var/lib/mongodb/ --smallfiles --logpath /var/log/mongodb.log --logappend
-
-  
 

@@ -17,13 +17,18 @@
 
 
 <!-- Card -->
-<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
 
   <!-- Existing card list-->
   {% for each_res in resource_type %}      
     <!-- #{#%# get_grid_fs_object each_res as grid_fs_obj %} -->
-    <li class="card-image-wrapper">
-      {% include 'ndf/card.html' with resource=each_res url_name=detail_urlname first_arg=group_id second_arg=each_res.pk %}
+    <li class="card-image-wrapper" > 
+    <!--old card-view > card.html &&  new card-view > simple_card.html  -->
+    {% if notebook_filter %}
+      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name=detail_urlname first_arg=group_id second_arg="all-notes" third_arg=each_res.pk %}
+    {% else %}
+      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name=detail_urlname first_arg=group_id second_arg=each_res.pk %}
+    {% endif %}
     </li>
 
     {% comment %}
@@ -121,19 +126,16 @@
             {% if res_type_name == "collection" %}
               <h5> {% trans "This group doesn't have any collections." %}</h5>
             {% elif filter_result == "False" %}
-              <h5> {% trans "Sorry, No resources found with selected filters" %} :( </h5>
+              <h5> {% trans "Sorry, No such files found." %}.</h5>
             {% else %}
               {% if not dont_show_error %}
-              {% if "CourseEventGroup" in node.member_of_names_list %}
-              <h5> 
-                {% blocktrans %}No files have been uploaded yet.{% endblocktrans %}
-              </h5>
-              {% else %}
-              <h5> 
-                {% blocktrans %}This group doesn't have any files. <b>Be the first to upload a file!</b>{% endblocktrans %}
-              </h5>
-              {% endif %}
-              
+                {% if "CourseEventGroup" in node.member_of_names_list %}
+                <h5> 
+                  {% blocktrans %}No files have been uploaded yet.{% endblocktrans %}
+                </h5>
+                {% else %}
+                  <h5> {% trans "Sorry, No such files found." %}.</h5>
+                {% endif %}
               {% endif %}
             {% endif %}
 
@@ -151,6 +153,10 @@
 
   <div class="hide" data-educationaluse-stats='{{ educationaluse_stats }}'></div>
   
+{% elif title == "eBooks" %}
+
+    {% include 'ndf/pagination.html' with urlname="e-book_filter_page" first_arg=group_name_tag second_arg=""  third_arg="" page_info=page_info %}
+
 {% else %}
 
   {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
@@ -164,14 +170,15 @@
 
 <script type="text/javascript">
   $(document).ready(function () {
-    $('.content').slick({
-    // dots: true,
-    infinite: true,
-    arrows: true,
-    speed: 500,
-    // fade: true,
-    cssEase: 'linear'
-  });
+
+      $('.rcard .content').slick({
+      // dots: true,
+      infinite: true,
+      arrows: true,
+      speed: 500,
+      // fade: true,
+      cssEase: 'linear'
+    });
     
   })
 </script>

@@ -31,7 +31,10 @@
 
 
 {% block meta_content %}
-  {% blocktrans %}<h2 class="subheader">Forums</h2>{% endblocktrans %}
+  <div class="repository-title large-4 columns" style="width:100%">{% trans 'Forums' %}
+  </div>
+  <br>
+  <br>
 
  {% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
@@ -58,11 +61,18 @@
 
 {% block body_content %}
 
+    <div class="repository-title large-4 columns"> 
+      {% trans 'All Forums' %} {% if existing_forums|length %}({{ existing_forums|length }}){% endif %}
+    </div><br><br>
+
+
+{% comment %}
 <header class="row">
   <dl class="tabs" data-tab data-options="deep_linking:true">
     <dd class="active"><a href="#panel2-1"><i class="fi-comment-quotes gray-text"></i> {% trans 'All Forums' %} {% if existing_forums|length %}({{ existing_forums|length }}){% endif %}</a></dd>
   </dl>
 </header>
+{% endcomment %}
 
 {% if searching and existing_forums.count > 0 %}
 <div class="row">
@@ -85,58 +95,11 @@
   {% autopaginate existing_forums 23 %}
 
   {% for each in existing_forums %}
-  <!-- #{#% for each in forum_detail_list %} -->
-  <li class="card">
-    <div class="forum">
-
-         <a href="{% url 'show' groupid each.id %}">
-    <header>
-      <div class="label-list">
-      {% for tag in each.tags|slice:":3" %}
-        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-      {% endfor %}
-      </div>
-
-
-      <h5>
-        {{ each.name }}</h5>
-             
-    </header>
-      <section>
-    <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-</section>
-
-
-    {% comment %}
-    {% if node.created_by == request.user.id %}
-    <a class="button alert tiny" href="{% url '' group_name_tag each.id %}">Delete</a>
-    {% endif %}
-    {% endcomment %}
-
-    <footer>
-        
-        <div class="age">
-         {{ each.member_of_names_list|join:', ' }} {% trans 'created' %} {{each.created_at|timesince}}{% trans 'ago' %} 
-          {% trans by %} <span href="#" class="user" data-gnow="">{{ each.user_details_dict.created_by }}</span> 
-        
-        </div>
-        
-      <span><i class="fi-torsos-all gray-text"> </i> <strong>{{each.contributors|length}}</strong> <span class="gray-text">{% trans 'Contributor' %}{{each.contributors|pluralize}}</span></span>
-      <span class="right"><i class="fi-shuffle gray-text"> </i> <strong>{{each.threads}}</strong> <span class="gray-text">{% trans Thread %}{{each.threads|pluralize}}</span></span> 
-    </footer>
-</a>
-        
-    </div>
-  </li>
-  
-  {% empty %}
-    {% if not searching %}
-  	<div class="row">
-  	  <div class="small-12 columns">
-  	   <h5> {% blocktrans %}This group doesn't have any forums. <b>Be the first to create a forum!</b></h5>{% endblocktrans %}<h5>
-  	  </div>
-  	</div>
-    {% endif %}
+  <li class="card-image-wrapper" > 
+    
+      {% include 'ndf/simple_card.html' with  has_contributor=True resource=each url_name="show" first_arg=groupid second_arg=each.pk %}
+    
+    </li>
   
   {% endfor %}
 </ul>

@@ -22,8 +22,9 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.models import Node, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata,create_grelation
-
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata,create_grelation, get_language_tuple
+from gnowsys_ndf.ndf.views.methods import get_filter_querydict
+from gnowsys_ndf.ndf.templatetags.simple_filters import get_dict_from_list_of_dicts
 #######################################################################################################################################
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -33,11 +34,13 @@ app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
 
 @get_execution_time
 def themes(request, group_id, app_id=None, app_set_id=None):
-    
+
     try:
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+
+    theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 
     if app_id is None:
         # app_ins = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
@@ -81,7 +84,8 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     nodes = ""
     unfold_tree = request.GET.get('unfold','')
     selected = request.GET.get('selected','')
-    tree = request.GET.get('tree','collapsible')
+    # print "selected: ", selected
+    tree = request.GET.get('tree', 'hierarchical')
     unfold = "false"
 
     # topics_GST = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
@@ -113,11 +117,13 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     else:
         # This will show Themes as a card view on landing page of Topics
         themes_cards = True
-        nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
         # if request.user.username:
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
         # else:
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+        
+    lang = list(get_language_tuple(request.LANGUAGE_CODE))
+    nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}, 'language': lang})
 
     return render_to_response("ndf/theme.html",
                                {'theme_GST_id':theme_GST._id, 'theme_GST':theme_GST, 'themes_cards': themes_cards, 'theme_GST':theme_GST,
@@ -704,7 +710,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                        },context_instance = RequestContext(request)
                               
         )
-        
+
     return render_to_response("ndf/theme.html",
                        {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards, 'theme_GST':theme_GST, 'theme_GST':theme_GST,
                             'shelf_list': shelf_list,'shelves': shelves,
@@ -716,6 +722,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                        },context_instance = RequestContext(request)
                               
     )
+
+
 @get_execution_time
 def get_coll_set(node):
   obj = node_collection.one({'_id': ObjectId(node)})
@@ -735,31 +743,22 @@ def get_coll_set(node):
   
                               get_coll_set(n._id)
   return list_trans_coll
+
+
 @get_execution_time
 def topic_detail_view(request, group_id, app_Id=None):
 
-  #####################
-  ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-        group_id = str(group_ins._id)
-    else :
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-            group_id = str(auth._id)
-  else :
-    pass
-    
-  ###################### 
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
 
   obj = node_collection.one({'_id': ObjectId(app_Id)})
   app = node_collection.one({'_id': ObjectId(obj.member_of[0])})
   app_id = app._id
   topic = "Topic"
   theme_id = None
-
+  prior_obj = None
   # First get the navigation list till topic from theme map
   nav_l=request.GET.get('nav_li','')
   breadcrumbs_list = []
@@ -776,6 +775,7 @@ def topic_detail_view(request, group_id, app_Id=None):
         # Theme object needs to be added in breadcrumbs for full navigation path from theme to topic
         # "nav_l" doesnt includes theme object since its not in tree hierarchy level, 
         # hence Match the first element and get its prior node which is theme object, to include it in breadcrumbs list
+        # print "!!!!!!!!! ", each_obj.name
         if each == nav_l[0]:
             if each_obj.prior_node:
                 theme_obj = node_collection.one({'_id': ObjectId(each_obj.prior_node[0] ) })
@@ -818,6 +818,7 @@ def topic_detail_view(request, group_id, app_Id=None):
 	  else:
 	    shelves = []
   
+  # print "theme_id: ", theme_id
   return render_to_response('ndf/topic_details.html', 
 	                                { 'node': obj,'app_id': app_id,"theme_id": theme_id, "prior_obj": prior_obj,
 	                                  'group_id': group_id,'shelves': shelves,'topic': topic, 'nav_list':nav_li,
@@ -827,4 +828,75 @@ def topic_detail_view(request, group_id, app_Id=None):
   )
 
 
+def get_filtered_topic_resources(request, group_id, node_id):
 
+    selfilters = request.POST.get('filters', None)
+    query_dict = get_filter_querydict(json.loads(selfilters)) if selfilters else {}
+    # print query_dict
+
+    node_rel_cur = node_collection.one(
+                                    {
+                                        '_id': ObjectId( node_id ),
+                                        'relation_set.taught_by': {'$exists': 'true'}
+                                    },
+                                    {
+                                        'relation_set.taught_by': 1, '_id': 0
+                                    }
+                                )
+    
+    node_rel_list = node_rel_cur.relation_set[0].get('taught_by', [])
+
+    filtered_taught_by_res = node_collection.find({
+                        '_id': {'$in': node_rel_list},
+                        '$and': query_dict
+                    })
+
+    primary_lang_resources = {}
+    other_lang_resources = {}
+    all_educationaluse = []
+    language_selected = list(get_language_tuple(request.LANGUAGE_CODE))
+    # print language_selected,"request.LANGUAGE_CODE: ", request.LANGUAGE_CODE
+
+    # print filtered_taught_by_res.count()
+    for each_res in filtered_taught_by_res:
+        # if each_res.language :
+        #     pass
+        att_set_dict = get_dict_from_list_of_dicts(each_res.attribute_set)
+        educationaluse = att_set_dict['educationaluse']
+
+        all_educationaluse.append(educationaluse)
+
+        if language_selected == each_res.language:
+            temp = primary_lang_resources.get(educationaluse, [])
+            temp.append(each_res)
+            primary_lang_resources[educationaluse] = temp
+            temp = ""
+        else:
+            temp = other_lang_resources.get(educationaluse, [])
+            temp.append(each_res)
+            other_lang_resources[educationaluse] = temp
+            temp = ""
+
+    # print "primary_lang_resources : ", primary_lang_resources
+    # print "other_lang_resources: ", other_lang_resources
+
+    all_educationaluse = list(set(all_educationaluse))
+
+    # data = json.dumps({'primary_lang_resources': primary_lang_resources, 'other_lang_resources': other_lang_resources, 'all_educationaluse': all_educationaluse })
+
+    # return HttpResponse(data)
+
+    # return HttpResponse({'primary_lang_resources': primary_lang_resources, 'other_lang_resources': other_lang_resources, 'all_educationaluse': all_educationaluse })
+
+
+    return render_to_response('ndf/topic_resources_listing.html', 
+                                    { 
+                                    'primary_lang_resources': primary_lang_resources, 'other_lang_resources': other_lang_resources, 'all_educationaluse': all_educationaluse,
+                                    # 'node': obj,'app_id': app_id,"theme_id": theme_id, "prior_obj": prior_obj,
+                                      'group_id': group_id,'groupid':group_id,
+                                      'filtered_topics': 'filtered_topics'
+                                      # 'shelves': shelves,'topic': topic, 'nav_list':nav_li,
+                                      # 'shelf_list': shelf_list,'breadcrumbs_list': breadcrumbs_list
+                                    },
+                                    context_instance = RequestContext(request)
+                            )

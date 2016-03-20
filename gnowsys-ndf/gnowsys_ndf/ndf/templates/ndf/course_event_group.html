@@ -1,71 +1,30 @@
-{% extends "ndf/base.html" %}
+{% extends "ndf/event_base.html" %}
 {% load i18n %}
-{% load cache %}
 {% load ndf_tags %}
-{% block title %} CourseEvent {{node.name}} {% endblock %}
+{% block title %} eCourse {{node.name}} {% endblock %}
 {% block style %}
-  .course_outline_table, tr {
-    border: 2px solid #0b8a91 !important;
-    border-collapse: collapse;
+  {{block.super}}
+
+  #upload_form_div{
+    display: inline-block;
   }
-
-  .gray-text{
-    color: gray;
-  }
-
-  #content > p { color: #6F6F6F !important; /*font-size: inherit;*/ }
-
-
-  tr:hover{
-    cursor:pointer;
-  }
-
-  .tab{
-    padding-left: 2em;
-    background-color:yellow !important;
-  }
-
-  .tab2{
-    padding-left: 4em;
-  }
-
-
-  .all_blogs{
-      overflow-y: auto;
-      height:500px;
-  }
-
-  .jqtree-tree .jqtree-title {
-      margin: 5px;
-      font-size: 15px;
-      color: black !important;
-      /*Change the color here to change font color of tree*/
-  }
-  
-  .jqtree-tree {
-      border-color:#0b8a91;
-      border-width:1px;
-      border-style: solid;
-  }
-
-
 
 {% endblock %}
 
 {% block head %}
-    <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
-    <!-- orgitdown! toolbar settings -->
-    <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
-    <!-- orgitdown! skin -->
-    <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+{{block.super}}
+    <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
 
 {% endblock %}
 
 {% block meta_content %}
-  <h3>Course Outline</h3>
+  <h3 class="subheader">{{node.name}}</h3>
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
-        <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+        <span><a class="tiny button radius" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+        <span><input type="button" class="tiny button radius settings" value="Settings"></span>
       {% endif %}
   
   <div id="view_collection">
@@ -74,171 +33,144 @@
 {% endblock %}
 
 {% block body_content %}
-{% if user.is_authenticated %}
-  {% get_user_object request.user.id as user_obj %}
-  {% check_is_gstaff groupid user_obj as gstaff_access %}
-{% endif %}
+  {{block.super}}
+    <!-- start date -->
 
-	<div id="view-page"></div>
-      <dl class="tabs" data-tab data-options="deep_linking:true"  > 
-
-          {% user_access_policy node.pk request.user as user_access %} 
-
-            <dd class="tab-title active">
-              <a href="#about-tab"><i class="fi-info"></i> {% trans "About" %}</a>
-            </dd>
-            <dd class="tab-title">
-              <a href="#view_page" class="view_page_link"><i class="fi-list-thumbnails"></i> {% trans "Activities" %}</a>
-            </dd>
-
-          {% if user_access == "allow" %}
-            <dd class="tab-title">
-              <a href="#journal-tab"><i class="fi-page-edit"></i> {% trans "Note Book" %}</a>
-            </dd>
-
-            <dd class="tab-title">
-              <a href="#gallery-tab"><i class="fi-photo"></i> {% trans "Gallery" %}</a>
-            </dd>
-
-            <dd class="tab-title">
-              <a href="#analytics-tab"><i class="fi-graph-trend"></i> {% trans "Analytics" %}</a>
-            </dd>
-          {% endif %}
-      </dl>
-      <!-- Right Nav Section -->
-      {% if request.user.is_authenticated and not gstaff_access %}
-          <section>
-            <ul class="right" >
-            {% user_access_policy groupid request.user as user_access %} 
-              <li>
-              {% if user_access == "allow" %}
-                <input class="enroll-btn button tiny" type="button" value="ENROLLED" disabled="disabled">
-              {% else %}
-                {% if allow_to_join %}
-                  <input class="enroll-btn button tiny" type="button" value="ENROLL">
-                {% else %}
-                  <input class="enroll-btn button tiny" type="button" value="ENROLLMENT NOT OPEN" disabled="disabled">
-                {% endif %}
-              {% endif %}
-              </li>
-            </ul> 
-          </section>
-        {% endif %}
-
-    <div class="row">
-      
-		<section class="medium-12 columns content">
-      <div class="tabs-content">
-        <!-- Tab content -->
-        <div class="content active" id="about-tab">
-          <div class="row">
-            {% include "ndf/res_node_ajax_view.html" %} 
+    <div id="date_reveal_modal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label>{% trans 'Release Date' %}</label>
+    {% get_all_subsections_of_course group_id node.pk as all_css %}
+    <script type="text/javascript">
+      var all_css_js_var = {{all_css|safe}}
+    </script>
+    {% for each_css in all_css %}
+      <div class="row release_date_div text-center">
+          <div class="small-3 columns">
+            <label>{{each_css.name}}
+            </label>
           </div>
-        </div>
+          <div class="small-3 columns end">
+            <input type="text" value="{{each_css.start_time}}" placeholder="DD/MM/YYYY" readonly="" class="date_val_{{each_css.id}} date_month_day_year">
+          </div>
+      </div>
+    {% endfor %}
+    <div class="small-3 columns end">
+        <input type="button" value="Save" class="save_date button small" disabled="disabled">
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
 
-        <div class="content" id="view_page">
-            <div id="activities-area">
-            </div>
-        </div>
-        {% if user_access == "allow" %}
-
-        <div class="content" id="journal-tab">
-            <div class="">
-              <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="button small" style="float:right"> Add Page </a>
-            </div>
-            <div class="row all_blogs">
-            	{% for each_blog in blog_pages %}
-                <div class="blogpage"  style="margin-left:10px;">
-                  <h4>
-                    <a href="{% url 'page_details' group_id each_blog.pk %}">{{each_blog.name}}</a>
-                  </h4>
-                  {% if request.user.id == each_blog.created_by or gstaff_access %}
-
-                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}"> Edit </a>
-                  {% endif %}
-                  <span>
-                  Created at {{each_blog.created_at}}
-                  </span>
-                  <div>
-                    {{each_blog.html_content|safe}}
-                  </div>
-                </div>
-                <hr/>
-              {% empty %}
-                <div class="blogpage"  style="margin-left:10px;">
-                  <h4><u>
-                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}">Start writing blogs </a>
-                  </u></h4>
-                </div>
-              {% endfor %}
-            </div>
-        </div>
-        <div class="content" id="gallery-tab">
-                <div class="row">
-                      {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
-                </div>
-        </div>
-
-        <div class="content" id="analytics-tab">
-                <div class="row">
-                {% get_user_object request.user.id as user_obj %}
-                {% check_is_gstaff node.pk user_obj as gstaff_access %}
-                {{check_is_gstaff}}
-                {% if gstaff_access %}
-                    <a href='{% url "group_summary" node.pk %}' target="_blank">{%  trans "Click here to view Group Analytics" %}</a>
-
-                {% else %}
-                    <a href='{% url "user_summary" node.pk %}' target="_blank">{%  trans "Click here to view  My Analytics" %}</a>
-                {% endif %}
-                </div>
-        </div>
-        {% endif %}
-
-			</div>
-    </section>
-  
-  	</div>
+    </div>
 
 {% endblock %}
 
 
-
 {% block script %}
-
-  $(document).on('click','.enroll-btn',function(){
-    //trigger the ajax call to enroll
-      $.ajax({
-        url: "{% url 'enroll_to_course' node.pk %}",
-
-        data: {
-          'csrfmiddlewaretoken': "{{csrf_token}}"
-        },
-
-        type: "POST",
-
-        dataType: "json",
-
-        success: function(data){
-          success_state = data["success"]
-          if(success_state){
-            $(".enroll-btn").attr('value', 'ENROLLED')
-            $(".enroll-btn").attr("disabled","disabled")
-            location.reload();
-          }
-        },
-      });//end of ajax
+{{block.super}}
+  $(document).on("change", ".date_month_day_year", function(){
+    $(".save_date").attr("disabled",false);
   })
 
-  $("main.row > aside.columns")
-    .removeClass("medium-2")
-    .addClass('medium-3').addClass("large-3");
+  $(document).on('click','.save_date',function(){
+    $.each(all_css_js_var,function(index,css_dict){
+      if($(".date_val_"+css_dict['id']).val()){
+        css_dict['start_time'] = $(".date_val_"+css_dict['id']).val()
+      }
+      else{
+        css_dict['start_time'] = null;
+      }
+    })
+    $.ajax({
+      url: "{% url 'set_release_date_css' node.pk %}",
 
-  $("main.row > article.columns")
-    .removeClass("medium-10")
-    .addClass("medium-9")
-    .addClass("large-9")
-    .css('float','left');
-    $(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder')
+      data: {
+        'css_date_dict':JSON.stringify(all_css_js_var),
+        'csrfmiddlewaretoken': "{{csrf_token}}"
+      },
 
-  $("#group-level-header").addClass("hide");
+      type: "POST",
+
+      dataType: "json",
+
+      success: function(data){
+          success_state = data["success"]
+          $("#eventModalLabel").text(data["message"]);
+          if(success_state){
+            $("#eventModal").addClass("success");
+          }
+          else{
+            $("#eventModal").addClass("warning");
+          }
+          $("#eventModal").foundation('reveal', 'open');
+          location.reload();
+      },
+    });//end of ajax
+
+    // console.log(JSON.stringify(all_css_js_var))
+
+  })
+
+  // Settings-------------------------------------------------------------
+  $(".settings").click(function() {
+    $("#date_reveal_modal").foundation('reveal', 'open');
+  });
+
+  // On close event of reveal-modal (eventModal) -------------------------------------------------------------
+    $(document).on('closed.fndtn.reveal', '#eventModal[data-reveal]', function () {
+      // Reset reveal-modal content & it's setting
+      $("#eventModalLabel").text("<p>Please select course type.</p>");
+      $("#eventModal")
+        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+        .addClass("medium")
+    });
+
+  $(".date_month_day_year").datepicker({ 
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'dd/mm/yy',
+    defaultDate: '0'
+  });
+
+
+  // Cancel/Abort Upload-------------------------------------------------------------
+  $("#btnUploadCancel").click(function() {
+    $(".save_cancel").addClass("hide");
+    $("#docFile").val("");
+  });
+
+  
+  //Upload file action validation ---------------------------------------------------------------
+  $(document).on('change','#docFile',function(){
+    $(".save_cancel").removeClass("hide");
+    file_mime_type = this.files[0].type;
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $(".save_cancel").addClass("hide");
+      $('#docFile').val(this.value);
+      var message = "{% trans 'Only image files can be uploaded!' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("alert");
+      $("#eventModal").foundation('reveal', 'open');
+    }
+  });
+
+  // Update profile photo -----------------------------------------------------------------------
+  $("#submitpostid").click(function() {
+    if($("#docFile").val() != "") { 
+      $("#message").show();
+      $(".save_cancel").addClass("hide");
+      var message = "{% trans 'Please wait while file is Uploading...' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("success");
+      $("#eventModal").foundation('reveal', 'open');
+    }
+
+    else {
+      var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("warning");
+      $("#eventModal").foundation('reveal', 'open');
+      $(".save_cancel").addClass("hide");
+      return false;
+    }
+  });
+
 {% endblock %}

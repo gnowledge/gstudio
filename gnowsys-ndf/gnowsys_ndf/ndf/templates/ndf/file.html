@@ -11,7 +11,8 @@
 
   .first-load { display: none; }
 
-  .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; }
+  .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; color: black; }
+  .tabs dd > a, .tabs .tab-title > a {color: #4c4c4c;}
 
   .tabs dd { width: 100%; }
 
@@ -21,7 +22,14 @@
 
   .panel > .side-nav > .tabs i {margin-right: 0.5rem;}
 
+  .tabs-content > .content.active{
+  margin-left:-1px !important;
+  }
+
 {% endblock %}
+
+
+
 
 <!--
 {% comment %}
@@ -50,37 +58,35 @@
 
 <!-- left top panel -->
 {% block meta_content %}
-
-  <a href="{% url app_gst.name|lower group_name_tag %}">
-    <h2 class="subheader">
-      {% if app_gst.altnames and app_gst.altnames != "None" %}
-         {% trans app_gst.altnames %}
-      {% else %}
-        {% trans app_gst.name %}
-      {% endif%}
-    </h2>
-    {{app_gst.content|default_if_none:""|safe}}
-  </a>
-
+  
 {% endblock %}
 
 
 {% block related_content %}
   {% check_user_join request groupid as user_is_joined %}
 
-  <div class="panel" style="background-color:#ddd; padding: 0.25rem;">
+  <div class="panel" style="background-color:#ddd; padding: 0.25rem;margin-top:1em">
     
     <ul class="side-nav">
       <dl class="tabs" data-tab >
 
+        <!-- Collections -->
+        <dd {% if collection.count > 0 %} class="active" {% endif %} data-filetype="Collections">
+          <a href="#view-collection"><i class="fi-page-multiple"></i>
+            {% trans "Collections" %}
+            <span class="count">
+              {{ collection.count }}
+            </span>
+          </a>
+        </dd><br/>
 
         <!-- all files -->
-        <dd class="active" data-filetype="all">
+        <dd {% if collection.count < 1 %} class="active" {% endif %} data-filetype="all">
           <a href="#view-all">
             <i class="fi-eye"></i>
             {% trans "All files" %}
             <span class="count text-right">
-              {% if file_pages.count > 0 %} {{ file_pages.count }} {% endif %}
+              {{ file_pages.count }}
             </span>
           </a>
         </dd>
@@ -91,35 +97,37 @@
             <i class="fi-page-doc"></i>
             {% trans "Documents" %}
             <span class="count">
-              {% if doc_pages %} {{ doc_pages }} {% endif %}
+              {{ doc_pages }}
             </span>
           </a>
         </dd><br/>
 
+        {% comment %}
         <!-- Pages -->
         <dd data-filetype="Pages">
           <a href="#view-page">
             <i class="fi-page-filled"></i>
             {% trans "Pages" %}
             <span class="count">
-              {% if page_count %} {{ page_count }} {% endif %}
+              {{ page_count }}
             </span>
           </a>
         </dd><br/>   
+        {% endcomment %}
         
         <!-- Interactives -->
-        {% if interactive_pages %}
-          <dd data-filetype="Interactives">
-            <a href="#view-interactive">
-              <i class="fi-shuffle"></i>
-              {% trans "Interactives" %}
-              <span class="count">
-                {{ interactive_pages }}
-              </span>
-            </a>
-          </dd><br/>
-        {% endif %}
+        <dd data-filetype="Interactives">
+          <a href="#view-interactive">
+            <i class="fi-shuffle"></i>
+            {% trans "Interactives" %}
+            <span class="count">
+              {{ interactive_pages }}
+            </span>
+          </a>
+        </dd><br/>
 
+          
+        {% comment %}
         <!-- eBooks -->
         {% if ebook_pages %}
           <dd data-filetype="eBooks">
@@ -132,26 +140,25 @@
             </a>
           </dd><br/>
         {% endif %}
+        {% endcomment %}
         
         <!-- Audio -->
-        {% if audio_pages %}
-          <dd data-filetype="Audios">
-            <a href="#view-audio">
-              <i class="fi-music"></i>
-              {% trans "Audios" %}
-              <span class="count">
-                {% if audio_pages %} {{ audio_pages }} {% endif %}
-              </span>
-            </a>
-          </dd><br/>
-        {% endif %}
+        <dd data-filetype="Audios">
+          <a href="#view-audio">
+            <i class="fi-music"></i>
+            {% trans "Audios" %}
+            <span class="count">
+              {{ audio_pages }}
+            </span>
+          </a>
+        </dd><br/>
         
         <!-- Image -->
         <dd data-filetype="Images">
           <a href="#view-image"><i class="fi-camera"></i>
             {% trans "Images" %}
             <span class="count">
-              {% if image_pages %} {{ image_pages }} {% endif %}
+              {{ image_pages }}
             </span>
           </a>
         </dd><br/>
@@ -163,7 +170,7 @@
             <a href="#view-video"><i class="fi-video"></i>
               {% trans "Videos" %}
               <span class="count">
-                {% if video_pages %} {{ video_pages }} {% endif %}
+                {{ video_pages }}
               </span>
             </a>
           </dd><br/>
@@ -188,28 +195,29 @@
             <a href="#view-pandora-video"><i class="fi-video"></i>
               {% trans "Videos" %}
               <span class="count">
-                {% if video_pages %} {{ video_pages }} {% endif %}
+                {{ video_pages }}
               </span>
             </a>
           </dd><br/>
         {% endif %}
 
         <dd>
-        <!-- <dd data-filetype="all"> -->
-          <a href="#view-collection">
-            <i class="fi-page-multiple"></i> {% trans "Collections" %}
-          </a>
-        </dd>
-
+        
       </dl><br/>
 
       {% if user.is_authenticated %}
       {% if user_is_joined == "joined" or user_is_joined == "author" %}
       <!-- <b>{% trans "Actions" %}</b><br/><br/> -->
       
-          <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny expand button">
+        {% if group_name_tag == "home" %}
+          <a href="{% url 'uploadDoc' 'desk' %}" class="tiny expand button radius" title="To have file in this group, upload in desk group">
+            {% trans "Upload File in desk" %}
+          </a> <br/>
+        {% else %}
+          <a href="{% url 'uploadDoc' group_name_tag %}" class="tiny expand button radius">
             {% trans "Upload File" %}
-          </a><br/>
+          </a> <br/>
+        {% endif %}
 
         {% comment %}
         {% user_access_policy groupid request.user as user_access %}
@@ -218,14 +226,14 @@
 
         {% if user.is_superuser %}
           <!-- <b>{% trans "Review" %}</b> -->
-            <a href="{% url 'data_review' group_name_tag %}" class="tiny button expand">
+            <a href="{% url 'data_review' group_name_tag %}" class="tiny button radius expand">
             {% trans "Data Review" %}
           </a>
         {% endif %}
       {% endif %}
       {% endif %}
 
-      <a href="#" data-reveal-id="library-statistics" class="tiny button expand">
+      <a href="#" data-reveal-id="library-statistics" class="tiny button radius expand">
         {% trans "File Statistics" %}
       </a>
       <div class="medium reveal-modal" id="library-statistics" data-reveal>
@@ -244,8 +252,16 @@
 
 
 {% block body_content %}
-  
-  {% if files.count > 1  and title == "E-Library" %}
+  <div class="large-4 columns repository-title">
+      {% if app_gst.altnames and app_gst.altnames != "None" %}
+         {% trans app_gst.altnames %}
+      {% else %}
+        {% trans app_gst.name %}
+      {% endif%}
+  </div>
+    
+    <div class="large-8 columns repository-desc">{{app_gst.content_org|default_if_none:""|safe}}</div>
+  {% if title == "E-Library" %}
     {% get_filters_data "File" as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
   {% endif %}
@@ -267,13 +283,28 @@
 
     {% group_type_info groupid request.user as grouptype %}
 
-    <!-- Tab View #1 - All -->
-    <div class="content row active" id="view-all" data-filetype="all">
-
-      {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
-
+    {% if collection.count > 0 %}
+      <div class="content row active" id="view-collection" data-filetype="Collections">
+        {% include "ndf/file_list_tab.html" with has_contributor=True resource_type=collection detail_urlname="page_details" filetype="Collections" res_type_name="" page_info=collection_pages %}
+      </div>
+  
+    {% else %}
+      <!-- Tab View #1 - All (Case -I: default landing)-->
+      <div class="content row active" id="view-all" data-filetype="all">
+        {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
+      </div>
+    {% endif %}
+      
+    <!-- Tab View #1 - All (Case -II: ajax) -->
+    <div class="content" id="view-all" data-filetype="all">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "all" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "all" 1 %}' class="first-load">1</a>
+      {% endif %}
     </div>
 
+      
     <!-- Tab View 2 - Documents -->
     <div class="content" id="view-doc" data-filetype="Documents">
       {% if title == "E-Library" %}
@@ -283,7 +314,8 @@
       {% endif %}
     </div>
 
-
+    {% comment %}
+      
     <!-- Tab View 2 - Pages -->
     <div class="content" id="view-page" data-filetype="Pages">
       {% if title == "E-Library" %}
@@ -292,42 +324,40 @@
         <a href='{% url "paged_file_objs" group_name_tag "Pages" 1 %}' class="first-load">1</a>
       {% endif %}
     </div>
+    {% endcomment %}
 
 
     <!-- Tab View 3 - Interactives -->
-    {% if interactive_pages %}
-      <div class="content" id="view-interactive" data-filetype="Interactives">
-        {% if title == "E-Library" %}
-          <a href='{% url "elib_paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
-        {% else %}
-          <a href='{% url "paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
-        {% endif %}
-      </div>
-    {% endif %}
+    <div class="content" id="view-interactive" data-filetype="Interactives">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Interactives" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
 
 
     <!-- Tab View 4 - e-book -->
-    {% if ebook_pages %}
-      <div class="content" id="view-ebook" data-filetype="eBooks">
-        {% if title == "E-Library" %}
-          <a href='{% url "elib_paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
-        {% else %}
-          <a href='{% url "paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
-        {% endif %}
-      </div>
-    {% endif %}
-
+    {% comment %}
+      {% if ebook_pages %}
+        <div class="content" id="view-ebook" data-filetype="eBooks">
+          {% if title == "E-Library" %}
+            <a href='{% url "elib_paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+          {% else %}
+            <a href='{% url "paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endcomment %}
 
     <!-- Tab View 5 - Audios -->
-    {% if audio_pages %}
-      <div class="content" id="view-audio" data-filetype="Audios">
-        {% if title == "E-Library" %}
-          <a href='{% url "elib_paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
-        {% else %}
-          <a href='{% url "paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
-        {% endif %}
-      </div>
-    {% endif %}
+    <div class="content" id="view-audio" data-filetype="Audios">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "Audios" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
 
     <!-- Tab View 6 - Images -->
     <div class="content" id="view-image" data-filetype="Images">
@@ -356,11 +386,21 @@
         {% endif %}
       </div>
       
+      {% comment %}
       <div class="content" id="view-collection" data-filetype="collection">
         {% get_resource_collection groupid "File" as file_collections %}
 
         {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" filetype="collection" res_type_name="collection" %}
+
+        {% if title == "E-Library" %}
+          <a href='{% url "elib_paged_file_objs" group_name_tag "Collections" 1 %}' class="first-load">1</a>
+        {% else %}
+          <a href='{% url "paged_file_objs" group_name_tag "Collections" 1 %}' class="first-load">1</a>
+        {% endif %}
+
       </div>
+      {% endcomment %}
+
 
     </div>
 
@@ -369,6 +409,7 @@
 
   {% block script %}
   // <script type="text/javascript">
+
 
     $(document).on('change','.filenode',function(){
 
@@ -431,11 +472,14 @@
 
     $("dl.tabs dd").click(function(e){
 
+
       var tabDivId = $(this).children("a").attr("href");
 
-      if((tabDivId != "#view-collection") && (tabDivId != "view-pandora-video"))
+      // if((tabDivId != "#view-collection") && (tabDivId != "view-pandora-video"))
+      if(tabDivId != "view-pandora-video")
       {
         var pageAnchor = $(tabDivId).children("a.first-load")[0];
+        // console.log(pageAnchor);
         if(! pageAnchor)
         {
           var pageAnchor = $(tabDivId).find("ul.pagination > li > a:first")[0];
@@ -472,7 +516,10 @@
 
     // getting already added filers as an array of objects, holding entire properties of it.
     {% if title == "E-Library" %}
-      var filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+      var filtersObjArr = {};
+      if (getFiltersObjsInAndOrFormat){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+      }
     {% endif %}
 
     var tabContainerDiv = $(pageAnchor).closest("div.content");
@@ -506,6 +553,11 @@
           populateFileList(this);
 
           });
+          
+          var pageAnchors = document.querySelectorAll('ul.pagination > li > a');
+          for (var i = pageAnchors.length - 1; i >= 0; i--) {
+            pageAnchors[i].href += location.search; 
+          }
 
           if(isFilterChanged) { updateLHSpanelCounters(); }
         }
@@ -515,6 +567,8 @@
     // providing function to handle filtering part
     function applyFilter(filtersArr)
     {
+      if (updateFilterUrl){ updateFilterUrl("{% url 'e-library' group_name_tag %}"); }
+
       var url = html = "";
 
       {% if title == "E-Library" %}

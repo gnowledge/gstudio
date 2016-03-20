@@ -17,6 +17,7 @@ import json
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -42,6 +43,7 @@ from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
 from collections import OrderedDict
+
 col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
@@ -113,6 +115,9 @@ def get_execution_time(f):
 		        		benchmark_node.action +=  str('/'+url[3])
 		        	else : 
 		        		pass
+	        	if "node_id" in args[0].GET and "collection_nav" in f.func_name:
+	        		benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
+	        		# modify calling_url if collection_nav is called i.e collection-player
 	        except : 
 	        	pass
 	        benchmark_node.save()
@@ -136,7 +141,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
       - "res_group_name" will contain name of the group.
       - "res_group_id" will contain _id/ObjectId of the group.
 
-      Example 2: res_group_obj = get_group_name_id(group_name_or_id, True)
+      Example 2: res_group_obj = get_group_name_id(group_name_or_id, get_obj=True)
       - "res_group_obj" will contain entire object.
 
       Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
@@ -229,7 +234,7 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
                            task_node.group_set.append(grp._id)
                    task_node.status=u'DRAFT'
                    task_node.url= u'task'
-                   task_node.language=u'en'
+                   task_node.language = ('en', 'English')
                    contr=[]
                    contr.append(usr)
                    task_node.contributors=contr
@@ -347,7 +352,7 @@ def create_task_for_activity(request,group_id,activity_dict,get_assignee_list,se
 
 
 def get_all_subscribed_users(group_id):
-  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  grp=node_collection.one({'_id':ObjectId(group_id)})
   ins_objectid  = ObjectId()
   all_users=[]
   if ins_objectid.is_valid(group_id) :
@@ -358,14 +363,14 @@ def get_all_subscribed_users(group_id):
   return all_users
   
 def get_all_admins(group_id):
-  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  grp=node_collection.one({'_id':ObjectId(group_id)})
   return grp.group_admin
 
 
 def check_if_moderated_group(group_id):
-  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  grp=node_collection.one({'_id':ObjectId(group_id)})
   ins_objectid  = ObjectId()
-  print "edtpol",grp.edit_policy
+  # print "edtpol",grp.edit_policy
   if ins_objectid.is_valid(group_id) :
     if grp.edit_policy == "EDITABLE_MODERATED":
       return True
@@ -795,7 +800,7 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
       node.member_of.append(node_type._id)
  
   node.name = unicode(name)
-  node.language=unicode(language)
+  node.language = get_language_tuple(language)
  
   node.modified_by = usrid
   if access_policy:
@@ -848,8 +853,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     else:
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
+        # print "\n\n\n content_org",content_org
         tags = request.POST.get('tags','')
     language = request.POST.get('lan')
+    license = request.POST.get('license')
     sub_theme_name = request.POST.get("sub_theme_name", '')
     add_topic_name = request.POST.get("add_topic_name", '')
     is_changed = False
@@ -935,9 +942,13 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     #  language
     if language:
-        node.language = unicode(language)
+        node.language = get_language_tuple(language)
+        # print "=========node.language-==========\n", node.language
+        is_changed = True
     else:
-        node.language = u"en"
+        node.language = get_language_tuple(u"en")
+        # node.language = ("en","English")
+        is_changed = True
 
     #  access_policy
     if access_policy:
@@ -970,24 +981,53 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # tags
     # if tags:
     tags_list = []
+    if tags:
+        for tag in tags.split(","):
+            tag = unicode(tag.strip())
 
-    for tag in tags.split(","):
-        tag = unicode(tag.strip())
+            if tag:
+                tags_list.append(tag)
 
-        if tag:
-            tags_list.append(tag)
-
-    if set(node.tags) != set(tags_list):
-        node.tags = tags_list
-        is_changed = True
+        if set(node.tags) != set(tags_list):
+            node.tags = tags_list
+            is_changed = True
       
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
         changed = build_collection(node, check_collection, right_drawer_list, checked)
         if changed:
             is_changed = True
-
     #  org-content
+    # type_of_val = request.POST.get('type_of','')
+    type_of_val = request.POST.getlist("type_of",'')
+
+    wiki_page_gst = node_collection.one({'_type':'GSystemType', 'name': "Wiki page"},{'_id':1})
+
+    '''
+    Exceptional case for "Wiki pages".
+    As org-editor is used ONLY for Wiki pages 
+    and rest everywhere ckeditor is used
+    '''
+    if type_of_val:
+        node.type_of = [ObjectId(type_of_val[0])]
+        is_changed = True
+
+    # if type_of_val == str(wiki_page_gst._id):
+    #     if node.content_org != content_org:
+    #         node.content_org = unicode(content_org)
+
+    #         # Required to link temporary files with the current user who is
+    #         # modifying this document
+    #         usrname = request.user.username
+    #         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+    #         node.content = unicode(org2html(content_org, file_prefix=filename))
+    #         is_changed = True
+    if content_org:
+        if node.content != content_org:
+            node.content = unicode(content_org)
+            is_changed = True
+
+    '''
     if node.content_org != content_org:
         node.content_org = unicode(content_org)
 
@@ -995,13 +1035,36 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         # modifying this document
         usrname = request.user.username
         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-        node.content = unicode(org2html(content_org, file_prefix=filename))
+        
+        node_page_type_list = []
+        if node.get("_id",None):  
+            get_node = node_collection.one({'_id': ObjectId(node._id)})
+            node_type_of = get_node.type_of 
+            if node_type_of:
+              for each_node_type_of in node_type_of:
+                node_type_of_name = node_collection.one({'_id': each_node_type_of})
+                node_page_type_list.append(node_type_of_name.name)
+
+        # org editor for wiki page and ckeditor for blog and info pages
+        if node_page_type_list:
+          if "Wiki page" in node_page_type_list:
+            node.content = unicode(org2html(content_org, file_prefix=filename))
+          else:
+            node.content = unicode(content_org)
+        else:
+          node.content = unicode(org2html(content_org, file_prefix=filename))
         is_changed = True
+    '''
+          
 
     # visited_location in author class
     if node.location != map_geojson_data:
         node.location = map_geojson_data  # Storing location data
         is_changed = True
+
+    if node.license != license:
+        node.license = license
+        is_changed = True 
 
     if user_last_visited_location:
         user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
@@ -1586,19 +1649,20 @@ def update_mobwrite_content_org(node_system):
 
 @get_execution_time
 def cast_to_data_type(value, data_type):
+    # print "\n\n\ninitial value and datatype",value,data_type
     '''
     This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
     '''
     # print "\n\t\tin method: ", value, " == ", data_type
 
-    value = value.strip()
+    if data_type != "list":
+      value = value.strip()
     casted_value = value
-
     if data_type == "unicode":
         casted_value = unicode(value)
 
     elif data_type == "basestring":
-        casted_value = str(value)
+        casted_value = unicode(value)
 
     elif (data_type == "int") and str(value):
         casted_value = int(value) if (str.isdigit(str(value))) else value
@@ -1619,14 +1683,18 @@ def cast_to_data_type(value, data_type):
                 casted_value = False
 
     elif (data_type == "list") and (not isinstance(value, list)):
+        # print "coming here",value      
         value = value.replace("\n", "").split(",")
         
         # check for complex list type like: [int] or [unicode]
         if isinstance(data_type, list) and len(data_type) and isinstance(data_type[0], type):
+            # print "before",value
             casted_value = [data_type[0](i.strip()) for i in value if i]
-
+            # print "casted_value",casted_value  
         else:  # otherwise normal list
+            # print "before",value
             casted_value = [i.strip() for i in value if i]
+            # print "casted_value",casted_value
 
     elif data_type == "datetime.datetime":
         # "value" should be in following example format
@@ -1665,10 +1733,17 @@ def get_node_metadata(request, node, **kwargs):
             at = node_collection.one({"_type": "AttributeType", "name": atname})
 
             if at:
-
+                # print "\n\nfirst field_value datatype",at.data_type
+                if at.data_type == "list":
+                  field_value = request.POST.getlist(atname, "")
+                  # print "\n\nlist field value",field_value
+                else:
+                  field_value = request.POST.get(atname, "")
+                  # print "\n\nnon list field value",field_value
                 field_value = cast_to_data_type(field_value, at["data_type"])
-
+                # print "\n\n\n\n\n\n\n\n\n\n\nfield_value",field_value
                 if "is_changed" in kwargs:
+                    # print "field value"
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
                     if temp_res["is_changed"]:  # if value is true
                         updated_ga_nodes.append(temp_res)
@@ -2063,7 +2138,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
   ga_node = None
   info_message = ""
   old_object_value = None
-
   ga_node = triple_collection.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
     # Code for creation
@@ -2786,7 +2860,8 @@ def create_task(task_dict, task_type_creation="single"):
         # i.e. either single or multiple
         if not task_dict.has_key("_id"):
           site = Site.objects.get(pk=1)
-          site = site.name.__str__()
+          # site = site.name.__str__()
+          site = site.domain.__str__()
 
           from_user = task_node.user_details_dict["created_by"]  # creator of task
 
@@ -3169,7 +3244,7 @@ def parse_data(doc):
                                                     for each in v1:
                                                         str1 += str(each["name"]) + ", "
                                                 else:
-                                                    str1 = ",".join(v1)
+                                                    str1 = ",".join(str(v1))
                                                 att_dic[k1] = str1
                                         else:
                                                 att_dic[k1] = str(v1)
@@ -3181,7 +3256,15 @@ def parse_data(doc):
                               for each in doc[i]:
                                       for k1, v1 in each.items():
                                               for rel in v1:
-                                                      rel = node_collection.one({'_id':ObjectId(rel)})
+                                                      if isinstance(rel, ObjectId):
+                                                              rel = node_collection.one({'_id':ObjectId(rel)})
+                                                              att_dic[k1] = rel.name
+                                                      elif '$oid' in rel:
+                                                              rel = rel['$oid']
+                                                              rel = node_collection.one({'_id':ObjectId(rel)})
+                                                              att_dic[k1] = rel.name
+                                                      #print "\n\n\nrel", rel
+                                                      rel = node_collection.one({'_id':ObjectId(rel._id)})
                                                       att_dic[k1] = rel.name
                               for att,value in att_dic.items():
                                   str1 =  str1 + att + " : " + value + "  "+"\n"
@@ -4132,70 +4215,99 @@ def create_thread_for_node(request, group_id, node):
         * Success - True/False
 
 	"""
-	if request.method == "POST":
-		release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
-		interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
-		start_time = request.POST.get("thread_start_date", '')
-		if start_time:
-			start_time = datetime.strptime(start_time, "%d/%m/%Y")
-		end_time = request.POST.get("thread_close_date", '')
-		if end_time:
-			end_time = datetime.strptime(end_time, "%d/%m/%Y")
-		twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
-		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
-		has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
-		if thread_obj:
-			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': []}}, upsert = False, multi = False)
-			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
-			node.reload()
-			thread_obj.reload()
-			# print "\n\n Found old model thread node existing"
-		else:
-			thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
-			# print "\n\n Found updated thread node existing"
-		if thread_obj:
-			if thread_obj.name != u"Thread of "+ unicode(node.name):
-				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
+	try:
+		if request.method == "POST":
+			from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+			# release_response_status = False
+			# thread_interaction_type_status = False
+			# thread_start_time_status = False
+			# thread_end_time_status = False
+			has_thread_status = False
+			if get_relation_value(node._id,"has_thread") != None:
+				has_thread_status = True
+
+			release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
+			interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
+			start_time = request.POST.get("thread_start_date", '')
+			if start_time:
+				start_time = datetime.strptime(start_time, "%d/%m/%Y")
+			end_time = request.POST.get("thread_close_date", '')
+			if end_time:
+				end_time = datetime.strptime(end_time, "%d/%m/%Y")
+
+
+			twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
+			thread_obj = node_collection.find_one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
+			has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+			if thread_obj:
+				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
 				thread_obj.reload()
-		else:
-			# print "\n\n Creating new thread node"
-			thread_obj = node_collection.collection.GSystem()
+				print "\n\n Found old model thread node existing"
+			else:
+				thread_obj = node_collection.find_one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
+				print "\n\n Found updated thread node existing"
+			if thread_obj:
+				if thread_obj.name != u"Thread of "+ unicode(node.name):
+					node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
+					thread_obj.reload()
+					print "\n\n thread_obj found -- name update if needed"
+			else:
+				print "\n\n Creating new thread node"
+				thread_obj = node_collection.collection.GSystem()
 
-			thread_obj.name = u"Thread of " + unicode(node.name)
-			thread_obj.status = u"PUBLISHED"
+				thread_obj.name = u"Thread of " + unicode(node.name)
+				thread_obj.status = u"PUBLISHED"
 
-			thread_obj.created_by = int(request.user.id)
-			thread_obj.modified_by = int(request.user.id)
-			thread_obj.contributors.append(int(request.user.id))
+				thread_obj.created_by = int(request.user.id)
+				thread_obj.modified_by = int(request.user.id)
+				thread_obj.contributors.append(int(request.user.id))
+				thread_obj.prior_node.append(node._id)
+				thread_obj.member_of.append(ObjectId(twist_gst._id))
+				# thread_obj.prior_node.append(ObjectId(node._id))
+				thread_obj.group_set.append(ObjectId(group_id))
+				thread_obj.save()
+			'''
+			if thread_obj:
+				if get_attribute_value(thread_obj._id,"release_response") != "":
+					release_response_status = True
+				if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
+					thread_interaction_type_status = True
+				if get_attribute_value(thread_obj._id,"start_time") != "":
+					thread_start_time_status = True
+				if get_attribute_value(thread_obj._id,"end_time") != "":
+					thread_end_time_status = True
+			print "\n thread_end_time_status---",thread_end_time_status
+			print "\n thread_start_time_status---",thread_start_time_status
+			print "\n release_response_status---",release_response_status
+			print "\n thread_interaction_type_status---",thread_interaction_type_status
+			print "\n has_thread_status---",has_thread_status
+			'''
+			if not has_thread_status:
+				# creating GRelation
+				gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
+				node.reload()
+				thread_obj.reload()
+				print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
+				print "\n\n node", node._id, "--", node.relation_set
+			if release_response_val:
+				rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
+				release_response_val = eval(release_response_val)
+				create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+			if interaction_type_val:
+				thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
+				create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
 
-			thread_obj.member_of.append(ObjectId(twist_gst._id))
-			# thread_obj.prior_node.append(ObjectId(node._id))
-			thread_obj.group_set.append(ObjectId(group_id))
+			if start_time and end_time:
+				start_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'start_time'})
+				end_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'end_time'})
+				create_gattribute(thread_obj._id, start_time_at, start_time)
+				create_gattribute(thread_obj._id, end_time_at, end_time)
 
-			thread_obj.save()
-			# creating GRelation
-			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
-			node.reload()
 			thread_obj.reload()
-			# print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
-			# print "\n\n thread", node._id, "--", node.relation_set
-		if release_response_val:
-			rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
-			release_response_val = eval(release_response_val)
-			create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
-		if interaction_type_val:
-			thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
-			create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
-		if start_time and end_time:
-			start_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'start_time'})
-			end_time_at = node_collection.one({'_type': 'AttributeType', 'name': 'end_time'})
-			create_gattribute(thread_obj._id, start_time_at, start_time)
-			create_gattribute(thread_obj._id, end_time_at, end_time)
-
-		thread_obj.reload()
-		# print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
-		return True
-
+			print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
+			return thread_obj
+	except Exception as e:
+		print "000\n\n",e
 def node_thread_access(group_id, node):
     """
       Accepts:
@@ -4214,20 +4326,28 @@ def node_thread_access(group_id, node):
     thread_start_time = None
     thread_end_time = None
     allow_to_comment = True  # default set to True to allow commenting if no date is set for thread
+    from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+    has_thread_node_thread_grel = get_relation_value(node._id,"has_thread")
 
-    if "has_thread" in node:
-        if node['has_thread']:
-                has_thread_node = node['has_thread'][0]
-    if has_thread_node:
-        if has_thread_node.attribute_set:
-            for each_attr in has_thread_node.attribute_set:
-                if each_attr and 'start_time' in each_attr:
-                    thread_start_time = each_attr['start_time']
-                if each_attr and 'end_time' in each_attr:
-                    thread_end_time = each_attr['end_time']
+    # if "has_thread" in node:
+    #     if node['has_thread']:
+    #             has_thread_node = node['has_thread'][0]
+    if has_thread_node_thread_grel:
+        has_thread_node = has_thread_node_thread_grel[0]
+        thread_start_time = get_attribute_value(has_thread_node_thread_grel[0]._id,"start_time")
+        thread_end_time = get_attribute_value(has_thread_node_thread_grel[0]._id,"end_time")
+        # if has_thread_node_thread_grel[0].attribute_set:
+        # if get_attribute_value(has_thread_node_thread_grel[0]._id,"start_time")
+            # for each_attr in has_thread_node_thread_grel[0].attribute_set:
+            #     if each_attr and 'start_time' in each_attr:
+            #         thread_start_time = each_attr['start_time']
+            #     if each_attr and 'end_time' in each_attr:
+            #         thread_end_time = each_attr['end_time']
+    else:
+        allow_to_comment = False      
     if thread_start_time and thread_end_time:
         curr_date_time = datetime.now()
-        if curr_date_time < thread_start_time or curr_date_time > thread_end_time:
+        if curr_date_time.date() < thread_start_time.date() or curr_date_time.date() > thread_end_time.date():
             allow_to_comment = False
     return has_thread_node,allow_to_comment
 
@@ -4257,3 +4377,339 @@ def get_prior_node_hierarchy(oid):
             hierarchy_list.append(prev_obj)
 
     return hierarchy_list
+
+
+def get_language_tuple(lang):
+    """
+    from input argument of language code of language name
+    get the std matching tuple from settings.
+    
+    Returns:
+        tuple: (<language code>, <language name>)
+    
+    Args:
+        lang (str or unicode): it is the one of item from tuple.
+        It may either language-code or language-name.
+    """
+
+    all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
+
+    # check if lang argument itself is a complete, valid tuple that exists in all_languages.
+    if (lang in all_languages) or (tuple(lang) in all_languages):
+        return lang
+
+    all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
+
+    # iterating over each document in the cursor:
+    # - Secondly, replacing invalid language values to valid tuple from settings
+    if lang in all_languages_concanated:
+        for each_lang in all_languages:
+            if lang in each_lang:
+                return each_lang
+
+    # as a default return: ('en', 'English')
+    return ('en', 'English')
+
+
+def get_filter_querydict(filters):
+    """
+    After getting the filters from request,
+    this method converts it into mongo query-able.
+    suitable form. Which can be passed to '$and'.
+    
+    Args:
+        filter (JSON): It's a nested list of '$or' dicts.
+        e.g:
+        [{"$or":[{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Upper Primary","selFieldPrimaryType":"list"},{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Primary","selFieldPrimaryType":"list"}]},{"$or":[{"selFieldValue":"interactivitytype","selFieldValueAltnames":"interactivitytype","selFieldGstudioType":"attribute","selFieldText":"Expositive","selFieldPrimaryType":"basestring"}]}]
+
+
+    
+    Returns:
+        JSON: JSON format which can be directly feed to query.
+        e.g:
+        [{}, {'$or': [{u'attribute_set.educationallevel': {'$in': [u'Upper Primary']}}, {u'attribute_set.educationallevel': {'$in': [u'Primary']}}, {u'attribute_set.interactivitytype': u'Expositive'}]}, {'$or': [{u'attribute_set.educationallevel': {'$in': [u'Upper Primary']}}, {u'attribute_set.educationallevel': {'$in': [u'Primary']}}, {u'attribute_set.interactivitytype': u'Expositive'}]}]
+    """
+    query_dict = []
+    for each in filters:
+          temp_list = []
+          filter_grp = each["or"]
+          for each_filter in filter_grp:
+            temp_dict = {}
+            each_filter["selFieldText"] = cast_to_data_type(each_filter["selFieldText"], each_filter["selFieldPrimaryType"])
+
+            if each_filter["selFieldPrimaryType"] == unicode("list"):
+              each_filter["selFieldText"] = {"$in": each_filter["selFieldText"]}
+
+            if each_filter["selFieldGstudioType"] == "attribute":
+
+              temp_dict["attribute_set." + each_filter["selFieldValue"]] = each_filter["selFieldText"]
+              temp_list.append(temp_dict)
+              # print "\n===temp_list : ", temp_list, "\===n"
+            elif each_filter["selFieldGstudioType"] == "field":
+              if each_filter["selFieldValue"] == 'Language':
+                each_filter["selFieldValue"] = u'language'
+                # print 'each_filter["selFieldText"]', each_filter["selFieldValue"]
+                each_filter["selFieldText"] = get_language_tuple(each_filter["selFieldText"])
+              if each_filter["selFieldValue"] == 'created_by':
+                filter_username = each_filter["selFieldText"]
+                filter_user_id = User.objects.get(username=filter_username).id
+                each_filter["selFieldText"] = filter_user_id
+              temp_dict[each_filter["selFieldValue"]] = each_filter["selFieldText"]
+              temp_list.append(temp_dict)
+          
+          # print " ::: ",temp_list
+          if temp_list:               
+            query_dict.append({ "$or": temp_list})
+
+    return query_dict
+
+
+def get_course_units_tree(data,list_ele):
+    # print data
+    if type(data) == list:
+        for each_dict in data:
+            # print type(each_dict)
+            if type(each_dict) == dict:
+                # print "each_dict",each_dict
+                if each_dict['node_type']=="CourseSubSectionEvent":
+                    if 'children' in each_dict:
+                        list_ele.extend(each_dict['children'])
+                else:
+                    # print "\n each_dict---",each_dict
+                    if "children" in each_dict:
+                        get_course_units_tree(each_dict['children'],list_ele)
+
+
+
+def replicate_resource(request, node, group_id):
+    try:
+        if "Page" in node.member_of_names_list or "QuizItem" in node.member_of_names_list:
+            new_gsystem = node_collection.collection.GSystem()
+        else:
+            new_gsystem = node_collection.collection.File()
+            new_gsystem.fs_file_ids = node.fs_file_ids
+            new_gsystem.file_size = node.file_size
+            new_gsystem.mime_type = node.mime_type
+
+        new_gsystem.group_set.append(group_id)
+        new_gsystem.name = unicode(node.name)
+        new_gsystem.status = u"PUBLISHED"
+        if "QuizItem" in node.member_of_names_list:
+            quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
+            new_gsystem.member_of.append(quiz_item_event_gst._id)
+        else:
+            new_gsystem.member_of = node.member_of
+        new_gsystem.modified_by = int(request.user.id)
+        new_gsystem.created_by = int(request.user.id)
+        new_gsystem.prior_node = node.prior_node
+        new_gsystem.contributors.append(int(request.user.id))
+        new_gsystem.tags = node.tags
+        new_gsystem.content_org = node.content_org
+        new_gsystem.content = node.content
+        new_gsystem.save()
+        discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+        create_gattribute(new_gsystem._id, discussion_enable_at, False)
+        clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
+        create_grelation(new_gsystem._id, clone_of_RT, node._id)
+        if "QuizItem" in node.member_of_names_list:
+            thread_obj = None
+            from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
+            thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
+            if thread_obj != None:
+                has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+                gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
+
+            # Setup all relevant Attributes for QuizItemEvent
+            node.get_neighbourhood(node.member_of)
+    
+            quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
+            options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
+            correct_answer_AT = node_collection.one({'_type': "AttributeType", 'name': "correct_answer"})
+            quizitem_show_correct_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_show_correct_ans"})
+            quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
+            quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
+            quizitem_check_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_check_answer"})
+
+            if node.quiz_type:
+                create_gattribute(new_gsystem._id,quiz_type_AT, node.quiz_type)
+            if node.options:
+                create_gattribute(new_gsystem._id,options_AT, node.options)
+            if node.correct_answer:
+                create_gattribute(new_gsystem._id,correct_answer_AT, node.correct_answer)
+            if "quizitem_show_correct_ans" in node and node.quizitem_show_correct_ans != None:
+                create_gattribute(new_gsystem._id,quizitem_show_correct_ans_AT, node.quizitem_show_correct_ans)
+            if "quizitem_check_answer" in node and node.quizitem_show_correct_ans != None:
+                create_gattribute(new_gsystem._id,quizitem_check_ans_AT, node.quizitem_check_answer)
+            if node.quizitem_problem_weight:
+                create_gattribute(new_gsystem._id,quizitem_problem_weight_AT, node.quizitem_problem_weight)
+            if node.quizitem_max_attempts:
+                create_gattribute(new_gsystem._id,quizitem_max_attempts_AT, node.quizitem_max_attempts)
+
+
+        new_gsystem.reload()
+        return new_gsystem
+    except Exception as replicate_resource_err:
+        print replicate_resource_err
+        print "Failed replicating resource"
+        return None
+
+@get_execution_time
+def dig_nodes_field(parent_node, field_name="collection_set", only_leaf_nodes=False, member_of=None, list_of_node_ids = []):
+  '''
+  This function fetches list of ObjectIds by
+  digging into the node's field_name and
+  the result's field_name recursively.
+
+  'field_name' can be collection_set/prior_node/post_node etc.
+  'member_of' is a list of GST names e.g ['Page', 'File']
+
+  If 'only_leaf_nodes' is True, the leaf nodes will be fetched,
+  i.e the nodes not having any value in their said field_name
+
+  To invoke this function:
+    result = dig_nodes_field(node_obj)/
+    result = dig_nodes_field(node_obj,'collection_set')/
+    result = dig_nodes_field(node_obj,'collection_set',True)/
+    empty_list = []
+    result = dig_nodes_field(node_obj,'collection_set',True,empty_list)/
+    result = dig_nodes_field(node_obj,'collection_set',True,test_list,['Page'])/
+    result = dig_nodes_field(node_obj,'collection_set',True,test_list,['Page','File])
+  '''
+  # print "\n\n Node name -- ", parent_node.name, "-- ",parent_node[field_name]
+  for each_id in parent_node[field_name]:
+    if each_id not in list_of_node_ids:
+      each_obj = node_collection.one({'_id': ObjectId(each_id)})
+      # print "each_obj--",each_obj._id, " -- ", each_obj.name, " - - ", each_obj.member_of_names_list, "=== ", member_of
+      member_of_match = True
+      if member_of:
+        member_of_match = False
+        member_of_match = [each_ele for each_ele in member_of if each_ele in each_obj.member_of_names_list]
+        # print "member_of_match",member_of_match
+      if member_of_match and each_id not in list_of_node_ids:
+        # print "File Found", len(each_obj[field_name])
+        if only_leaf_nodes:
+          if not each_obj[field_name]:
+            list_of_node_ids.append(each_id)
+        else:
+            list_of_node_ids.append(each_id)
+      dig_nodes_field(each_obj, field_name,only_leaf_nodes, member_of, list_of_node_ids)
+
+  # print "\n len(list_of_node_ids) -- ",len(list_of_node_ids)
+  return list_of_node_ids
+
+def sublistExists(parent_list, child_list):
+    # print "\n parent_list == ",parent_list
+    # print "\n child_list == ",child_list
+    if parent_list and child_list:
+      exists = all(each_item in parent_list for each_item in child_list)
+      return exists
+    return False
+
+def get_course_completed_ids(list_of_all_ids,children_ids,return_completed_list,return_incompleted_list):
+    completed = return_completed_list
+    incompleted = return_incompleted_list
+    # children_ids_list = children_ids
+    children_ids_list = []
+    all_nodes = node_collection.find({'_id': {'$in': list_of_all_ids}},
+      {'name':1, 'collection_set':1, '_id': 1, 'member_of': 1,'created_at':1}).sort('created_at',-1)
+
+    for eachnode in all_nodes:
+      # print "\n eachnode.name --- ",eachnode.name , eachnode.member_of_names_list
+      if sublistExists(children_ids, eachnode.collection_set):
+        completed.append(eachnode._id)
+        children_ids_list.append(eachnode._id)
+        if eachnode._id in incompleted:
+          incompleted.remove(eachnode._id)
+      else:
+        incompleted.append(eachnode._id)
+    # print "\n\n completed_ids_list 1--- ", completed
+    # print "\n\n incompleted_ids_list1 --- ", incompleted
+    if children_ids_list:
+      get_course_completed_ids(list_of_all_ids,children_ids_list,completed,incompleted)
+    return completed, incompleted
+
+@get_execution_time
+def get_group_join_status(group_obj):
+    from gnowsys_ndf.ndf.templatetags.ndf_tags import get_attribute_value
+    allow_to_join = None
+    start_enrollment_date = get_attribute_value(group_obj._id,"start_enroll")
+    last_enrollment_date = get_attribute_value(group_obj._id,"end_enroll")
+    curr_date_time = datetime.now().date()
+
+    if start_enrollment_date and last_enrollment_date:
+      start_enrollment_date = start_enrollment_date.date()
+      last_enrollment_date = last_enrollment_date.date()
+      if start_enrollment_date <= curr_date_time and last_enrollment_date >= curr_date_time:
+          allow_to_join = "Open"
+      else:
+          allow_to_join = "Closed"
+
+    return allow_to_join
+
+@get_execution_time
+def get_course_completetion_status(group_obj, user_id,ids_list=False):
+    result_dict = {'success': False}
+    try:
+      list_of_leaf_node_ids = []
+      all_prior_node_ids = []
+      completed_return_list = []
+      incompleted_return_list = []
+      return_perc = "0"
+      all_res_nodes = []
+      all_coursesection_nodes = []
+      all_res_nodes = dig_nodes_field(group_obj,'collection_set',True,['Page','File'],all_res_nodes)
+      all_coursesection_nodes = dig_nodes_field(group_obj,'collection_set',False,['CourseSectionEvent'],all_coursesection_nodes)
+      twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
+      reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"})
+      rec = node_collection.collection.aggregate([
+                  {'$match': {'member_of': twist_gst._id, 'relation_set.thread_of':{'$in': all_res_nodes}, 'author_set': int(user_id)}},
+                  {'$project': {'_id': 1,
+                          'node_id': '$relation_set.thread_of',
+                  }},
+                  ])
+
+      resultlist = rec["result"]
+      if resultlist:
+        for eachele in resultlist:
+          for eachk,eachv in eachele.items():
+            if eachk == "node_id":
+              try:
+                node_id_val = eachv[0][0]
+                list_of_leaf_node_ids.append(node_id_val)
+              except IndexError as ie:
+                pass
+
+      if list_of_leaf_node_ids:
+        list_of_leaf_node_cur = node_collection.find({'_id': {'$in': list_of_leaf_node_ids}})
+        for each_leaf_node in list_of_leaf_node_cur:
+            test_replies_ids = []
+            all_prior_node_ids.extend(dig_nodes_field(each_leaf_node,'prior_node',False, ['CourseSectionEvent', 'CourseSubSectionEvent', 'CourseUnitEvent'],test_replies_ids))
+        # all_prior_node_ids.extend(list_of_leaf_node_ids)
+        all_prior_node_ids = list(set(all_prior_node_ids))
+        # print "\n\n len === ", len(all_prior_node_ids), all_prior_node_ids
+
+      completed_ids_list,incompleted_ids_list = get_course_completed_ids(all_prior_node_ids,list_of_leaf_node_ids,completed_return_list, incompleted_return_list)
+      completed_ids_list.extend(list_of_leaf_node_ids)
+
+
+      ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSectionEvent"})
+      completed_coursesection_nodes = node_collection.find({'_id':{'$in': completed_ids_list}, 'member_of': ce_gst._id},{'_id':1})
+      # print "\ncompleted_coursesection_nodes.count() == ",completed_coursesection_nodes.count()
+      # print "\nlen(all_coursesection_nodes) === ",len(all_coursesection_nodes)
+      count_of_completed_cs = completed_coursesection_nodes.count()
+      count_of_total_cs = len(all_coursesection_nodes)
+      return_perc = (count_of_completed_cs/float(count_of_total_cs))*100
+      # print "\n\n return_perc==== ",return_perc
+      result_dict['course_complete_percentage'] = return_perc
+      result_dict['completed_count'] = count_of_completed_cs
+      result_dict['total_count'] = count_of_total_cs
+
+      if ids_list:
+        result_dict['completed_ids_list'] = json.dumps(completed_ids_list,cls=NodeJSONEncoder)
+        result_dict['incompleted_ids_list'] = json.dumps(incompleted_ids_list,cls=NodeJSONEncoder)
+        result_dict['list_of_leaf_node_ids'] = json.dumps(list_of_leaf_node_ids,cls=NodeJSONEncoder)
+      # print "\n\nresult_dict == ",result_dict
+      return result_dict
+    except Exception as error_in_get_course_completion_status:
+      # print "\n ERROR in get_course_completetion_status", error_in_get_course_completion_status
+      return result_dict

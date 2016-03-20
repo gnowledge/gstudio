@@ -3,62 +3,31 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
-
-{% block title %} {{groups_category}}s {% endblock %}
+{% block title %} {{group_obj.name}} {% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader">{{groups_category}}s</h2>
-<!-- 
-  {% comment %}
-  <a href="{% url app_gst.name|lower group_name_tag %}">
-    <h2 class="subheader">
-      {% if app_gst.altnames and app_gst.altnames != "None" %}
-        {{app_gst.altnames}}
-      {% else %}
-        {{app_gst.name}}
-      {% endif%}
-    </h2>
-    {{app_gst.content|safe}}
-  </a>
-  {% endcomment %} -->
-{% endblock %}
-
-
-{% block help_content %}
-
-{% endblock %}
-
-
-{% block search_content %}
-  {% include "ndf/node_search_base.html" %}
 {% endblock %}
 
 
 {% block related_content %}
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
-  <br/>
-  <div class="create card">
-    <div class="group">
-      <br/>
-      <a class="button medium" 
-        {% if groups_category == "Partner" %}
-          href="{% url 'create_partner' group_name_tag %}">
-        {% else%}
-          href="{% url 'create_group' group_name_tag %}">
-        {% endif %}
-    	<span class="fi-plus">&nbsp;&nbsp;{% trans "New" %} {{groups_category}} </span>
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% if is_gstaff %}
+   <div class="panel" style="background-color:#ddd;margin-top:1.8em;padding: 1rem;">
+      <a class="tiny expand button radius " 
+          href="{% url 'create_group' group_obj.pk %}?subgroup=True&partnergroup=True">
+        	<span class="fi-plus">&nbsp;&nbsp;{% trans "New" %} {{group_obj.name}}</span>
       </a>
-    </div>
   </div>
-  {% endif %}
   {% endif %}
 {% endblock %}
 
 
 {% block body_content %}
-<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+<div class="repository-title large-4 columns"> {{group_obj.name}}</div>
+
+<div>
+  
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5">
   
   <!-- Existing card list-->
   <!-- #{#% get_group_type request.path request.user as group_type %} -->
@@ -67,63 +36,19 @@
   {% autopaginate group_nodes 23 %}
 
   {% for node in group_nodes %}
-  {% if node.name != request.user.username %}
-  
-    <li class="card">
-      {% if grouptype == "Moderated" %}
-        {% if node.status == "DRAFT" %}
-          <div class="draft group">
-        {% elif node.status == "PUBLISHED" %}
-          <div class="published group">
-        {% endif %}
-      {% else %}
-        <div class='{% if node.status == "PUBLISHED" %}published{% endif %} group'>
-      {% endif %} 
-
-      <a href="{% url 'groupchange' node.pk %}">
-      <div class="row">
-        <div class="small-10 columns">                             
-            <b>
-              {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-            </b>
-        </div>
-      </div>
-      
-      <hr/>
-      <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-      
-      <footer>
-          <div class="age">
-            {{ node.agency_type}} {% trans "created" %} {{node.created_at|timesince}} {% trans "ago by" %} <span class="user" href="" data-gnow="">{{node.user_details_dict.created_by}}</span>
-        </div>
-        <span><strong>{{node.author_set|length}}</strong> {% trans "Members" %}</span>
-        {% get_group_resources node as obj_count %}
-        <span class="right"><strong>{{obj_count}}</strong> {% trans "Objects" %}</span>
-      </footer>
-      </a>
-
-      <div class="label-list small-12 columns">
-        {% for tag in node.tags|slice:":3" %}
-          <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
-        {% endfor %}
-      </div>
-
-    </div>
-  </li>
-  {% endif %}
-
+    <li class="card-image-wrapper"> 
+      {% include 'ndf/simple_card.html' with resource=node has_prof_pic=True url_name="groupchange" first_arg=node.pk %}
+    </li>
   {% empty %}
-    {% if not searching %}
-      <div class="row">
-        <div class="small-12 columns">
-         <h5>{% trans "There are no" %} {{groups_category}} {% trans "created yet." %} <b>{% trans "Be the first to create a" %} {{groups_category}}!</b></h5>
-        </div>
+    
+      <div class="repository-desc large-8 columns">
+       {% trans "There are no" %} {{group_obj.name}} {% trans "created yet." %} 
       </div>
-    {% endif %}
-
+  
   {% endfor %}
   
 </ul>
+</div>
 
 {% paginate %}
 

@@ -8,157 +8,271 @@
 {
 	width:1900px; 
 }
+hr{
+	width:40%;
+}
 </style>
 
-{% get_metadata_values as values%}
-<div class = "information-div" style="position:relative; ">
-			<div style=" position:relative; float:left; width:45%; border-radius: 1px; box-shadow:1px 0.3px 0.6px 1.2px rgba(9,9,9,0.2);" style="position:relative;">
-				<!-- space to fill the information -->
-				<div align="center">
-						<div class="row" align="left" >
+	{% get_metadata_values as values%}
+	{% get_all_possible_languages as languages %}
+	<div class = "information-div panel" style="position:relative">
 
+		<!-- <div style=" position:relative; float:left; width:45%; border-radius: 1px; box-shadow:1px 0.3px 0.6px 1.2px rgba(9,9,9,0.2);" style="position:relative;"> -->
+		<!-- <div class="small-12 large-5 columns"> -->
+			<!-- space to fill the information -->
 
-							<div class="small-4 large-4 columns" style=" left:2%;width:75%;">
-								<label id="first_name_info"> </label>
-							</div>
-							<!--
-							<div class="small-3 columns" style="right:10%; width:auto;">
-								<b><label id="last_name_info"> </label></b>
-							</div> -->
-
-							<div class="small-3 large-3 columns" style="left:1% width:auto">
-								<a class="fi-pencil" onclick="load_profile()"> Edit</a>
-							</div>
-						</div>
-						
-						
-						<div class="row">
-							<div class="small-3 small-text-left large-4 columns" style="left:1%;">
-								<label > <h6> {% trans 'Language proficiency' %} </h6> </label>
-							</div>
-							<div class="small-9 small-text-right large-4 columns" style="right:5%; ">
-								<label id="language_proficiency_info"></label>
-							</div>
-							<div class="small-3 columns">
-								
-							</div>
-						</div>
-						<div class="row">
-							
-							<div class="small-3 small-text-left columns large-4" style="left:1%;">
-								<label> <h6> {% trans 'Subject Proficiency' %}</h6></label>
-							</div>
-							
-							<div class="small-9 small-text-right columns large-3" style="right:1%; " > 
-								<label id="subject_proficiecncy_info"></label>
-							</div>
-
-							<div class="small-3 columns">
-								
-
-							</div>
-						</div>
-				</div>		
+			<div class="row">
+				<div class="small-3 large-3 columns">
+					<label> <h6> {% trans 'First Name' %}</h6></label>
+				</div>
+				
+				<div class="small-4 columns large-2 end"> 
+					<label class="fname">{{usr_fname}}</label>
+				</div>
+				<div class="small-4 columns large-2 end"> 
+					{% if request.user.id == author.created_by %}
+						<a class="fi-pencil edit_profile-btn"> Edit Profile</a>
+					{% endif %}
+				</div>
+				<hr>
 			</div>
-			
-</div>
-<div id ='user_profile_edit' method="post" action="{% url 'user_profile' group_id %}" hidden>
-	{% csrf_token %}
-	<div class = "first_name textarea">
-	   <div class="row">
-	   		<div class="small-12 large-6 columns"> 	
-				<label> <b> <h5> {% trans "First name" %} </h5> </b> </label>
-			</div>
-			<div <div class="small-12  large-6 columns ">
-				<span > <input type="text"   id = "first_name" name = "first_name"> </span>	
-			</div>
-		</div>	
-	</div>
 
-	<div class = "last_name textarea">
-		<div class="row">
-			<div class="small-12 large-6 columns">
-				<label>  <b> <h5> {% trans "Last name" %} </h5> </b> </label>
+			<div class="row">
+				<div class="small-3 large-3 columns">
+					<label> <h6> {% trans 'Last Name' %}</h6></label>
+				</div>
+				
+				<div class="small-4 columns large-2 end"> 
+					<label class="lname">{{usr_lname}}</label>
+				</div>
+		
 			</div>
-			<div class="small-12 large-6 columns">	
-				<span> <input type="text" id="last_name" name = "last_name"> </span>	
-			</div>	
-		</div>
-	</div>
+			<hr>
 
-	<div class = "language_proficiency textarea" >
-		<div class="row">
-			<div class="small-12 large-6 columns">	
-				<label> <b> <h5> {% trans "Language proficiency" %}  </h5> </b> </label>
-			</div>	
-			<div class="small-12 large-6 columns">
-				<select name="language_proficiency" id="language_proficiency">
-					<option  value=" "> --- Select --- </option>
-					{% for i in values.language %}
-						<option name = '{{i}}' value="{{i}}"> {% trans  i  %}</option>
-					{% endfor %}
-				</select>
-			</div>	
-		</div>
-	</div>
-
-	<div class = "subject_proficiency textarea">
-		<div class="row">
-			<div class="small-12 large-6 columns">
-				<label> <b> <h5> {% trans "Subject proficiency" %}   </h5> </b> </label>
-			</div>
-			<div class="small-12 large-6 columns">
-				<select name="subject_proficiency" id="subject_proficiency">
-					<option  value=" "> --- Select --- </option>
-					{% for i in values.educationalsubject %}
-						<option name = '{{i}}' value="{{i}}"> {% trans i %} </option>
-					{% endfor %}
-				</select>	
+			<div class="row">
+				<div class="small-3 large-3 columns">
+					<label > <h6> {% trans 'Language proficiency' %} </h6> </label>
+				</div>
+				<div class="small-4 large-2 columns end" >
+					<div id="language_proficiency_info">
+						{% for i in author.language_proficiency %}
+						     <label  style="display:inline-block;">{{i.1}} </label> 
+	                    {% endfor %}
+                    </div>
+                    
+				</div>
 				
 			</div>
-		</div>
-	</div>
-	<input type="button" onclick="save()" value="submit">
-	<input type="button" onclick="$('#user_profile_edit').hide()
-                  				$('.information-div').show()
-                  				" value="cancel">	
-</div>
+			<hr>
 
+			<div class="row">
+				<div class="small-3 large-3 columns">
+					<label> <h6> {% trans 'Subject Proficiency' %}</h6></label>
+				</div>
+				
+				<div class="small-4 columns large-2 end" > 
+					<label id="subject_proficiency_info">{{author.subject_proficiency|default:""|join:","}}</label>
+				</div>
+				
+			</div>
+			<hr>
+
+			<div class="row">
+				<div class="small-3 large-3 columns">
+					<label> <h6> {% trans 'Joined on' %}</h6></label>
+				</div>
+				
+				<div class="small-4 columns large-2 end"> 
+					<label>{{DOJ|date:"d M Y"}}</label>
+				</div>
+				
+			</div>
+			<hr>
+
+			<div class="row">
+				<div class="small-3 large-3 columns">
+					<label> <h6> {% trans 'Member of' %}</h6></label>
+				</div>
+				
+				<div class="small-4 columns large-2 end"> 
+					<label>{{group_count}} {% trans " Groups" %}</label>
+				</div>
+				
+			</div>
+			<hr>
+
+			<div class="row">
+				<div class="small-3 large-3 columns">
+					<label> <h6> {% trans 'Files uploaded' %}</h6></label>
+				</div>
+				
+				<div class="small-4 columns large-2 end"> 
+					<label>{% firstof file_count 'Not uploaded yet!'%}</label>
+				</div>
+			</div>
+			<hr>
+			{% if site_name != "NROER" %}
+				<div class="row">
+					<div class="small-3 large-3 columns">
+						<label> <h6> {% trans 'Pages created' %}</h6></label>
+					</div>
+					<div class="small-4 columns large-2 end">
+						<label>{% firstof page_count 'Not created yet!'%}</label>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="small-3 large-3 columns">
+						<label> <h6> {% trans 'Quiz' %}</h6></label>
+					</div>
+					<div class="small-4 columns large-2 end">
+						<label>{% firstof quiz_count 'Not created yet!'%}</label>
+					</div>
+				</div>
+			{% endif %}
+
+			<div class="row">
+				<div class="small-3 large-3 columns">
+					<label> <h6> {% trans 'Forum' %}</h6></label>
+				</div>
+				
+				<div class="small-4 columns large-2 end">
+					<label>{% firstof forum_count 'Not created yet!'%}</label>
+				</div>
+			</div>
+	</div>
+	<!--  Edit section -->
+	<div id ='user_profile_edit' method="post" action="{% url 'user_profile' group_id %}" hidden>
+		{% csrf_token %}
+		<div class="textarea">
+		   <div class="row">
+		   		<div class="small-12 large-6 columns"> 	
+					<label> <b> <h5> {% trans "First name" %} </h5> </b> </label>
+				</div>
+				<div <div class="small-12  large-6 columns ">
+					<span> <input type="text" id="first_name" name="first_name" value="{{usr_fname}}"> </span>	
+				</div>
+			</div>	
+		</div>
+
+		<div class="textarea">
+			<div class="row">
+				<div class="small-12 large-6 columns">
+					<label>  <b> <h5> {% trans "Last name" %} </h5> </b> </label>
+				</div>
+				<div class="small-12 large-6 columns">	
+					<span> <input type="text" id="last_name" name="last_name" value="{{usr_lname}}"> </span>
+				</div>	
+			</div>
+		</div>
+		<div class = "language_proficiency textarea">
+			<div class="row">
+				<div class="small-12 large-6 columns">	
+					<label> <b> <h5> {% trans "Language proficiency" %}  </h5> </b> </label>
+				</div>	
+				<div class="small-12 large-6 columns">
+					<select name="language_proficiency" id="language_proficiency" multiple style="height:5%;">
+						<option  value=" "> --- Select --- </option>
+						{% for i in languages %}
+							{% if  i|jsonify in author.language_proficiency|jsonify %}
+								<option name = '{{i.0}}' value="{{i.0}}" selected="true"> {% trans  i.1  %}</option>
+							{% else %}
+								<option name = '{{i.0}}' value="{{i.0}}">  {% trans i.1 %}  </option>
+							{% endif %}
+						{% endfor %}
+					</select>
+				</div>	
+			</div>
+		</div>
+
+		<div class = "subject_proficiency textarea">
+			<div class="row">
+				<div class="small-12 large-6 columns">
+					<label> <b> <h5> {% trans "Subject proficiency" %}   </h5> </b> </label>
+				</div>
+				<div class="small-12 large-6 columns">
+					<select name="subject_proficiency" id="subject_proficiency" multiple style="height:5%;">
+						<option  value=" "> --- Select --- </option>
+						{% for i in values.educationalsubject %}
+							{% if i in  author.subject_proficiency %}
+								<option name = '{{i}}' value="{{i}}" selected="true"> {% trans  i  %}</option>
+							{% else %}
+								<option name = '{{i}}' value="{{i}}"> {% trans i %} </option>
+							{% endif %}
+						{% endfor %}
+					</select>	
+				</div>
+			</div>
+		</div>
+		<input type="button" class="button small" onclick="save()" value="Submit">
+		<input type="button" class="button small cancel-btn" value="Cancel">	
+	</div>
 
 <script type="text/javascript">
 
-function  save()
-	{
+	function  save(){
 		var forminputData = []
 		var formselectData = []
-		$('#user_profile_edit').find("input[name]").each(function (index, node) {
-	    forminputData.push('{"' + String(node.name) +'"' +':'+ '"'+ String(node.value)+'"}');
-	    });	
-		$('#user_profile_edit').find("select[name]").each(function (index, node) {
-	    formselectData.push('{"' + String(node.name) +'"' +':'+ '"'+ String(node.value)+'"}');
-	    });	
+		$('#user_profile_edit').find("input[name]").each(function (index, node) {	
+			if (node.name !=  '--- Select ---')
+			 	{	
+		   	 		forminputData.push('{"' + String(node.name) +'"' +':'+ '"'+ String(node.value)+'"}');
+				}
+			else
+				{
+					//skip -- Select --
+				}	
+			});
+
+		$('#user_profile_edit').find("select[name]").each(function (index, node)
+		 {
+			values = []
+			for ( i=0 ;i<node.selectedOptions.length;i++)
+			     {  c = node
+				if (node.selectedOptions[i].selected) {
+                                         values.push(String('"'+node.selectedOptions[i].value+'"'));
+		  		}
+			     }
+			if (node.name !=  '--- Select ---')
+			{
+				formselectData.push('{"' + String(node.name) +'"' +':'+ '['+ values +']}');
+			}
+			else
+			{
+					//skip -- Select --
+			}		
+		    
+		});
+
 		$.ajax({
 				url: "{% url 'user_profile' group_id %}",
 				type:"POST",
 				data:{
-						forminputData,
-						formselectData,	
+						forminputs:forminputData,
+						formselects:formselectData,	
 						csrfmiddlewaretoken: '{{ csrf_token }}'},
 
 				success:function(data)
 					{   
-						if (data == 'Details Successfully Updated')
-							{
+						data = JSON.parse(data)
+						if (data['success'])
+							{	
 								$('#user_profile_edit').hide()
-                  				$('.information-div').show()
-                  				load_information()
-                  
+                                language = [] 
+                                data['node']['language_proficiency'].forEach( function(value) { 
+                                	language.push(value[1]) })
+								$(".fname").html(data['fname'])
+								$(".lname").html(data['lname'])
+								$("#language_proficiency_info").html(language.join(','))				
+								$("#subject_proficiency_info").html(data['node']['subject_proficiency'].join(','))								
+                                $('.information-div').show()
 							}
-
 					}
 			   });
-	
+		
 	}
+
+/*
 $(document).ready()
 {	
 	
@@ -188,48 +302,47 @@ $(document).ready()
 		
 					}
 			   });
-	*/
+	
 	load_information();
-}
-/*
-$('#view-profile').on('r', function (event, tab) {
-             load_information();
-        });
-*/
-function load_information()
-{
-		$.ajax({
+}*/
+
+	// document.ready()--------------------------------------------------------
+	/*
+	$(document).ready()
+	{	
+		{% if usr %}
+			$("select[name='subject_proficiency'] option[value='{{author.subject_proficiency}}']").prop("selected", true)
+		{% endif %}
+	}
+
+		$('#view-profile').on('r', function (event, tab) {
+		             load_information();
+		        });
+		
+		function load_information(){
+			$.ajax({
 				url: "{% url 'user_data_profile' group_id %}",
 				type:"GET",
 				dataType: "json",
 				success:function(data)
-					{   $('#first_name_info').html("<b> <h4>" + "" + data['first_name']+ " "+ data['last_name'] + ""+ "<h4></b>")
-						$('#last_name_info').html ("<b><h4>" + data['last_name']+ "</h4></b>")
-						$('#language_proficiency_info').html("<b>" +data['node']['language_proficiency'] +"</b>" )
-						$('#subject_proficiecncy_info').html ("<b>" +data['node']['subject_proficiency'] + "</b>" )
-		
+					{   
+						console.log(data['node']['language_proficiency'])
 					}
-			   });
+			});
+		}
+	*/
+	
+	// Edit Profile-----------------------------------------
+	$(".edit_profile-btn").click(function() {
+		$('#user_profile_edit').show()
+		$('.information-div').hide()
+	});
 
-}
-function load_profile()
-    {
-
-        $.ajax({
-
-              url:"{% url 'user_profile' group_id %}",
-              type:'GET',
-              success:function(data){
-              	  $('#user_profile_edit').show()
-                  $('.information-div').hide()
-                  
-              }   
-                   
-
-
-          });
-          
-    }  
+	// Cancel-----------------------------------------------
+	$(".cancel-btn").click(function() {
+		$('#user_profile_edit').hide();
+		$('.information-div').show()
+	});
 
 
 </script>

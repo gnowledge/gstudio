@@ -163,6 +163,22 @@
         </div>
         {% endif %}
 
+        <!-- T & C -->
+        <div class="row">
+          <div class="small-12 large-9 large-push-3 columns end">
+
+            <input type="checkbox" id="tc-check" class="text-right" title="check to accept T&C" required>
+            <label for="tc-check" class="overlay-description-by-oid-caller" data-reveal-id="overlay-description-by-oid" data-oid="{{oids.tc}}" title="click to read T&C">
+            {% trans "I agree to the terms and conditions" %}.
+            </label>
+            <small class="error">Please accept terms & conditions.</small>
+
+          </div>
+        </div>
+        <!-- END of T & C -->
+        
+        <br/>
+
         <!-- Send Activation button -->
         <div class="row">
           <div class="small-7 large-3 small-offset-3 large-offset-4 columns end">
@@ -176,16 +192,28 @@
 
 {% block document_ready %}
   {{block.super}}
-
+  
   $("input[id='id_email'], input[id='id_username'], input[id='id_password1'], input[id='id_password2'], select[id='id_agency_type']").each(function(){
     if (this.id == "id_email") {
       $(this).prop("type", "email");
+    }
+    if(this.id == "id_username")
+    {
+      $(this).attr("pattern", "^[a-z](([\._\-][a-z0-9])|[a-z0-9])*[a-z0-9]$");
     }
 
     $(this).css("width", "95%");
     $(this).attr("required", "");
     $(this).css("float", "left");
-    $(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+
+    if(this.name == 'username')
+    {
+      $(this).after("<small class='error'>Username should start with letters and can have digits and - / . / _ / Lower case letters only</small>");
+    }
+    else{
+      $(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+    }
+
     $(this).after("<i style='color:red; float:left display:inline'>*</i>");
   });
 

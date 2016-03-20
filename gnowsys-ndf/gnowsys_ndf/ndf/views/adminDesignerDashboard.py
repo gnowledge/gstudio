@@ -17,7 +17,7 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     '''
     fetching class's objects
     '''
-    if request.method=="POST":
+    if request.method == "POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
         nodes = node_collection.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype}).sort('last_update', -1)
@@ -33,22 +33,26 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         attribute_type_set = []
         relation_type_set = [] 
         for e in each.member_of:
-            member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
+            member_of_list.append(node_collection.one({'_id':e}).name)
+            # member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
         
         for members in each.member_of:
-            member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
+            member.append(node_collection.one({ '_id': members}).name)
+            # member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
         
         # for coll in each.collection_set:
         #     collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
         
         if class_name in ("GSystemType"):
             for at_set in each.attribute_type_set:
-                attribute_type_set.append(at_set.name+" - "+str(at_set._id))
+                attribute_type_set.append(at_set.name)
+                # attribute_type_set.append(at_set.name+" - "+str(at_set._id))
             for rt_set in each.relation_type_set:
-                relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
-            objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list), "attribute_type_set":",".join(attribute_type_set), "relation_type_set":",".join(relation_type_set)})
+                relation_type_set.append(rt_set.name)
+                # relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
+            objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list), "attribute_type_set":", ".join(attribute_type_set), "relation_type_set":", ".join(relation_type_set)})
         else :
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list)})
+		objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list)})
     groups = []
     group = node_collection.find({'_type':"Group"})
     for each in group:
@@ -58,7 +62,6 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     systemtype = node_collection.find({'_type':"GSystemType"})
     for each in systemtype:
         systemtypes.append({'id':each._id,"title":each.name})
-
 
     meta_types = []
     meta_type = node_collection.find({'_type':"MetaType"})
@@ -90,6 +93,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     translate=request.GET.get('translate','')
     if class_name == "AttributeType":
         definitionlist = ['name','altnames','language','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        # definitionlist = ['name','altnames','language','subject_type','data_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
@@ -100,6 +104,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
     elif class_name == "RelationType":
         definitionlist = ['name','inverse_name','altnames','language','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','is_symmetric','is_reflexive','is_transitive','status','member_of']
+        # definitionlist = ['name','inverse_name','altnames','language','subject_type','object_type','subject_cardinality','object_cardinality','is_symmetric','is_reflexive','is_transitive','status','member_of']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
@@ -111,18 +116,18 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
     class_structure = eval(class_name).structure
     required_fields = eval(class_name).required_fields
+
     newdict = {}
     if node_id:
         new_instance_type = node_collection.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
-
     else:
         new_instance_type = eval("node_collection.collection"+"."+class_name)()
 
     if request.method=="POST":
         if translate:
             new_instance_type = eval("node_collection.collection"+"."+class_name)()
-            
         for key,value in class_structure.items():
+            
             if value == bool:
                 if request.POST.get(key,""):
                     if request.POST.get(key,"") in ('1','2'):
@@ -145,14 +150,14 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                             if key in ("name","inverse_name"):
                                 new_instance_type[key] = unicode(request.POST.get(key+"_trans",""))
                                 language= request.POST.get('lan')
-                                new_instance_type.language=language
+                                new_instance_type.language = get_language_tuple(language)
                                 
                             else:
                                 new_instance_type[key] = unicode(request.POST.get(key,""))
                         else:
                             new_instance_type[key] = unicode(request.POST.get(key,""))
 
-            elif value == list:
+            elif value == list: 
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"").split(",")
 
@@ -165,11 +170,24 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                         for each in request.POST.get(key,"").split(","):
                             listoflist.append(node_collection.one({"_id":ObjectId(each)}))
                         new_instance_type[key] = listoflist
+
+                    elif key in ["member_of","prior_node","type_of"]:
+                        new_mem = request.POST.get(key,"").split(",")
+                        new_mem_list = [ObjectId(each) for each in new_mem]
+                        new_instance_type[key] = new_mem_list
+
                     else :
                         listoflist = []
                         for each in request.POST.get(key,"").split(","):
                             listoflist.append(ObjectId(each))
                         new_instance_type[key] = listoflist
+                else:
+                    listoflist=[]
+                    new_instance_type[key]=listoflist
+
+
+            elif type(value) == tuple:
+                new_instance_type[key] = tuple(eval(request.POST.get(key,"")))
 
             elif value == datetime.datetime:
                 if key == "last_update":
@@ -191,7 +209,6 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                     new_instance_type[key] = request.POST.get(key,"")
 
         user_id = request.user.id
-
         if not new_instance_type.has_key('_id'):
             new_instance_type.created_by = user_id
 
@@ -221,8 +238,8 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
 
     # If GET request ---------------------------------------------------------------------------------------
-
     for key,value in class_structure.items():
+
         if value == bool:
             # newdict[key] = "bool"
             newdict[key] = ["bool", new_instance_type[key]]
@@ -235,11 +252,12 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
               
         elif value == list:
             # newdict[key] = "list"
-            
             newdict[key] = ["list", new_instance_type[key]]
+
         elif type(value) == list:
             # newdict[key] = "list"
             newdict[key] = ["list", new_instance_type[key]]
+
         elif value == datetime.datetime:
             # newdict[key] = "datetime"
             newdict[key] = ["datetime", new_instance_type[key]]
@@ -254,6 +272,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
             newdict[key] = [value, new_instance_type[key]]
 
     class_structure = newdict
+
     groupid = ""
     group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
@@ -268,14 +287,16 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         for key, value in class_structure.items():
             class_structure_with_values[key] = [class_structure[key][0], new_instance_type[key]]
 
+
         variable = RequestContext(request, {'node': new_instance_type,
                                             'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
                                             'options': options, 'required_fields': required_fields,"translate":translate,"lan":LANGUAGES,
-                                            'groupid': groupid,'group_id':groupid
+                                            'groupid': groupid,'group_id':groupid 
                                         })
+
     else:
-        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid})
 
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid })
+      
     return render_to_response(template, variable)
-

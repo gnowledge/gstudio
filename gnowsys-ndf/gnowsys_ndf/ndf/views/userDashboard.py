@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
+from django.http import Http404
+
 import ast
 try:
     from bson import ObjectId
@@ -23,7 +25,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
 
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time, get_group_name_id,get_language_tuple
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity,get_execution_time
 
@@ -31,7 +33,7 @@ from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.forum import *
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.notification import models as notification
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_user_course_groups
 
 #######################################################################################################################################
 
@@ -45,7 +47,7 @@ ins_objectid  = ObjectId()
 #                                                                     V I E W S   D E F I N E D   F O R   U S E R   D A S H B O A R D
 #######################################################################################################################################
 @get_execution_time
-def userpref(request,group_id):
+def userpref(request, group_id):
     usrid = int(group_id)
     auth = node_collection.one({'_type': "Author", 'created_by': usrid})
     # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -61,21 +63,33 @@ def userpref(request,group_id):
         auth.save(groupid=group_id)
     return HttpResponse("Success")
 
-@login_required
 @get_execution_time
 def uDashboard(request, group_id):
-    usrid = int(group_id) 
-    auth = node_collection.one({'_type': "Author", 'created_by': usrid})
+
+    try:
+        usrid = int(group_id) 
+        auth = node_collection.one({'_type': "Author", 'created_by': usrid})
+    except:
+        auth = get_group_name_id(group_id, get_obj=True)
+        usrid = auth.created_by
+
     group_id = auth._id
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
 
     group_name = auth.name
     usrname = auth.name
     date_of_join = auth['created_at']
-    current_user = request.user.pk
+    # current_user = request.user.pk
+    current_user = usrid
 
     has_profile_pic = None
     profile_pic_image = None
+    current_user_obj = None
+    usr_fname = None
+    usr_lname = None
+    success_state = True
+    old_profile_pics = []
+
     is_already_selected = None
 
     task_gst = node_collection.one(
@@ -91,59 +105,6 @@ def uDashboard(request, group_id):
     else:
           Access_policy=["PUBLIC"]  
           exclued_from_public =  ObjectId(task_gst._id)  
-	    
-    
-     
-    if request.method == "POST" :
-        """
-        This will take the image uploaded by user and it searches if its already availale in gridfs 
-        using its md5 
-        """
-        has_profile_pic_str = "has_profile_pic"
-        pp = None
-
-        if has_profile_pic_str in request.FILES:
-            pp = request.FILES[has_profile_pic_str]
-            has_profile_pic = node_collection.one({'_type': "RelationType", 'name': has_profile_pic_str})
-
-            # Find md5
-            pp_md5 = hashlib.md5(pp.read()).hexdigest()
-            pp.seek(0)
-
-            # Check whether this md5 exists in file collection
-            gridfs_node = gridfs_collection.one({'md5': pp_md5})
-            if gridfs_node:
-                # md5 exists
-                right_subject = gridfs_node["docid"]
-
-                # Check whether already selected
-                is_already_selected = triple_collection.one(
-                    {'subject': auth._id, 'status': u"PUBLISHED", 'right_subject': right_subject}
-                )
-
-                if is_already_selected:
-                    # Already selected found
-                    # Signify already selected
-                    is_already_selected = gridfs_node["filename"]
-
-                else:
-                    # Already uploaded found
-                    # Reset already uploaded as to be selected
-                    profile_pic_image = create_grelation(auth._id, has_profile_pic, right_subject)
-
-                profile_pic_image = node_collection.one({'_type': "File", '_id': right_subject})
-
-            else:
-                # Otherwise (md5 doesn't exists)
-                # Upload image
-                # submitDoc(request, group_id)
-                #save_file(each,title,userid,group_object._id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-                field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
-                if field_value:
-                    profile_pic_image = node_collection.one({'_type': "File", '_id': ObjectId(field_value)})
-                # Create new grelation and append it to that along with given user
-                if profile_pic_image:
-                    gr_node = create_grelation(auth._id, has_profile_pic, profile_pic_image._id)
 
     dashboard_count = {}
     group_list = []
@@ -178,8 +139,11 @@ def uDashboard(request, group_id):
             {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':usrid}
         ).sort('last_update', -1).limit(10)
                    dashboard_count.update({'Task': task_cur.count()})
-  
-   
+        
+        current_user_obj = User.objects.get(id=current_user)
+        usr_fname = current_user_obj.first_name
+        usr_lname = current_user_obj.last_name
+
     group_cur = node_collection.find(
         {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
         '$or': [{'group_admin': int(usrid)}, {'author_set': int(usrid)}]}).sort('last_update', -1).limit(10)
@@ -222,25 +186,25 @@ def uDashboard(request, group_id):
             user_activity_append_temp(each)
 
     '''
-    notification_list=[]
-    notification_object = notification.NoticeSetting.objects.filter(user_id=int(ID))
-    for each in notification_object:
-        ntid = each.notice_type_id
-        ntype = notification.NoticeType.objects.get(id=ntid)
-        label = ntype.label.split("-")[0]
-        notification_list.append(label)
-    Retrieving Tasks Assigned for User (Only "New" and "In Progress")
-    user_assigned = []
-    attributetype_assignee = node_collection.find_one({"_type":'AttributeType', 'name':'Assignee'})
-    attr_assignee = triple_collection.find(
-        {"_type": "GAttribute", "attribute_type.$id": attributetype_assignee._id, "object_value": request.user.id}
-    ).sort('last_update', -1).limit(10)
-    dashboard_count.update({'Task':attr_assignee.count()})
-    for attr in attr_assignee :
-        task_node = node_collection.one({'_id':attr.subject})
-        if task_node:
-            user_assigned.append(task_node)
-    task_cur gives the task asigned to users
+        notification_list=[]
+        notification_object = notification.NoticeSetting.objects.filter(user_id=int(ID))
+        for each in notification_object:
+            ntid = each.notice_type_id
+            ntype = notification.NoticeType.objects.get(id=ntid)
+            label = ntype.label.split("-")[0]
+            notification_list.append(label)
+        Retrieving Tasks Assigned for User (Only "New" and "In Progress")
+        user_assigned = []
+        attributetype_assignee = node_collection.find_one({"_type":'AttributeType', 'name':'Assignee'})
+        attr_assignee = triple_collection.find(
+            {"_type": "GAttribute", "attribute_type.$id": attributetype_assignee._id, "object_value": request.user.id}
+        ).sort('last_update', -1).limit(10)
+        dashboard_count.update({'Task':attr_assignee.count()})
+        for attr in attr_assignee :
+            task_node = node_collection.one({'_id':attr.subject})
+            if task_node:
+                user_assigned.append(task_node)
+        task_cur gives the task asigned to users
     '''
 
     obj = node_collection.find(
@@ -272,8 +236,14 @@ def uDashboard(request, group_id):
                     profile_pic_image = node_collection.one(
                         {'_type': "File", '_id': each["has_profile_pic"][0]}
                     )
-
                     break
+    has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            if n not in old_profile_pics:
+                old_profile_pics.append(n)
 
     forum_create_rate = forum_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
     file_create_rate = file_cur.count() * GSTUDIO_RESOURCES_CREATION_RATING
@@ -296,8 +266,11 @@ def uDashboard(request, group_id):
         "ndf/uDashboard.html",
         {
             'usr': current_user, 'username': usrname, 'user_id': usrid,
+            'success': success_state,
+            'usr_fname':usr_fname, 'usr_lname':usr_lname,
             'DOJ': date_of_join, 'author': auth, 'group_id': group_id,
             'groupid': group_id, 'group_name': group_name,
+            'current_user_obj':current_user_obj,
             'already_set': is_already_selected, 'user_groups': group_cur,
             'prof_pic_obj': profile_pic_image, 'user_task': task_cur,
             'group_count': group_cur.count(), 'page_count': page_cur.count(),
@@ -305,13 +278,14 @@ def uDashboard(request, group_id):
             'dashboard_count': dashboard_count, 'show_only_pie': show_only_pie,
             'datavisual': json.dumps(datavisual),
             'total_activity_rating': total_activity_rating,
+            'old_profile_pics':old_profile_pics,
             'site_name': GSTUDIO_SITE_NAME,
          },
         context_instance=RequestContext(request)
     )
        
 @get_execution_time
-def user_preferences(request,group_id,auth_id):
+def user_preferences(request, group_id, auth_id):
     try:
         grp = node_collection.one({'_id': ObjectId(auth_id)})
         if request.method == "POST":
@@ -356,7 +330,7 @@ def user_preferences(request,group_id,auth_id):
         return HttpResponse("Failure")
 
 @get_execution_time
-def user_template_view(request,group_id):
+def user_template_view(request, group_id):
     auth_group = None
     group_list=[]
     group_cur = node_collection.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}}).limit(4)
@@ -434,77 +408,27 @@ def group_dashboard(request, group_id):
     """
     This view returns data required for group's dashboard.
     """
+    has_profile_pic = None
     profile_pic_image = None
+    old_profile_pics = []
     has_profile_pic_str = ""
+    is_already_selected = None
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    group_obj = node_collection.one({"_id": ObjectId(group_id)})
+    has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
     
-    if ObjectId.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_id)})
-        if group_ins:
-            group_id = group_ins._id
-    
-    if request.method == "POST" :
-        """
-        This will take the image uploaded by user and it searches if its already availale in gridfs 
-        using its md5 
-        """
-        if (request.POST.get('type','')=='banner_pic'):
-          has_profile_pic_str = "has_Banner_pic"
-        if (request.POST.get('type','')=='profile_pic'):
-          has_profile_pic_str="has_profile_pic"  
-        
-        pp = None
-        profile_pic_image=""
-        if has_profile_pic_str in request.FILES:
-            pp = request.FILES[has_profile_pic_str]
-            has_profile_pic = node_collection.one({'_type': "RelationType", 'name': has_profile_pic_str})
-            # Find md5
-            pp_md5 = hashlib.md5(pp.read()).hexdigest()
-            pp.seek(0)
-            # Check whether this md5 exists in file collection
-            gridfs_node = gridfs_collection.one({'md5': pp_md5})
-            if gridfs_node:
-                # md5 exists
-                right_subject = gridfs_node["docid"]
-                
-                # Check whether already selected
-                is_already_selected = triple_collection.one(
-                    {'subject': group_id, 'right_subject': right_subject, 'status': u"PUBLISHED"}
-                )
-
-                if is_already_selected:
-                    # Already selected found
-                    # Signify already selected
-                    is_already_selected = gridfs_node["filename"]
-                
-                else:
-                    # Already uploaded found
-                    # Reset already uploaded as to be selected
-                    profile_pic_image = create_grelation(ObjectId(group_id), has_profile_pic, right_subject)
-
-                profile_pic_image = node_collection.one({'_type': "File", '_id': right_subject})
-            else:
-                # Otherwise (md5 doesn't exists)
-                # Upload image
-                # submitDoc(request, group_id)
-                
-                field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
-                profile_pic_image = node_collection.one({'_type': "File", 'name': unicode(pp)})
-                # Create new grelation and append it to that along with given user
-                if profile_pic_image:
-                    gr_node = create_grelation(group_id, has_profile_pic, profile_pic_image._id)
-
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            old_profile_pics.append(n)
     banner_pic=""
-    group = node_collection.one({"_id": ObjectId(group_id)})
-    for each in group.relation_set:
+    
+    for each in group_obj.relation_set:
                 if "has_profile_pic" in each:
                     if each["has_profile_pic"]:
                         profile_pic_image = node_collection.one(
@@ -515,7 +439,6 @@ def group_dashboard(request, group_id):
                         banner_pic = node_collection.one(
                             {'_type': "File", '_id': each["has_Banner_pic"][0]}
                         )
-
     # Approve StudentCourseEnrollment view
     approval = False
     enrollment_details = []
@@ -596,57 +519,150 @@ def group_dashboard(request, group_id):
                 enrollment_details.append(data)
     
     page = '1'
-    
     return render_to_response (
         "ndf/group_dashboard.html",
         {
-            'group_id': group_id, 'groupid': group_id,
+            'group_id': group_id, 'groupid': group_id,'old_profile_pics':old_profile_pics,
             'approval': approval, 'enrollment_columns': enrollment_columns, 'enrollment_details': enrollment_details,'prof_pic_obj': profile_pic_image,'banner_pic':banner_pic,'page':page
         },
         context_instance=RequestContext(request)
     )
 
-def user_profile(request,group_id):
+def user_profile(request, group_id):
 	from django.contrib.auth.models import User
-	if request.method == "POST":
-		
 
-		Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
+	auth_node = get_group_name_id(group_id, get_obj=True)
+
+	user_dict={}
+	user_details = User.objects.get(id=request.user.id)
+	user_dict['fname'] = user_details.first_name
+	user_dict['lname']  = user_details.last_name
+
+	if request.method == "POST":
 		user = User.objects.get(id=request.user.id)
-		user_data = request.POST.getlist('forminputData[]','')
-		user_select_data = request.POST.getlist('formselectData[]','')
+		user_data = request.POST.getlist('forminputs[]','')
+		user_select_data = request.POST.getlist('formselects[]','')
 		for i in user_data:
 			a=ast.literal_eval(i)
 			if  a.get('first_name',None) != None:
 			  	user.first_name = a['first_name']
+			  	user_dict['fname'] = user.first_name
 			if a.get('last_name',None) != None:
 				user.last_name = a['last_name']
+			  	user_dict['lname'] = user.last_name
 		user.save()
 		for i in user_select_data:
 			a=ast.literal_eval(i)
-                        if  a.get('language_proficiency','') :
-				Author_group['language_proficiency'] = a.get('language_proficiency','')	
-			if  a.get('subject_proficiency',''):			
-				Author_group['subject_proficiency'] =  a.get('subject_proficiency','')
-		Author_group.save()	 
-		return HttpResponse("Details Successfully Updated")
+			if  a.get('language_proficiency',None) != None:
+				auth_node['language_proficiency'] = []
+				for k in a.get('language_proficiency',''):
+					language = get_language_tuple(k)
+					auth_node['language_proficiency'].append(language)
+			if  a.get('subject_proficiency',None) != None:			
+				auth_node['subject_proficiency'] =  list(a.get('subject_proficiency',''))
+		auth_node.save()
+		user_dict['node'] = auth_node
+		user_dict['success'] = True
+		return HttpResponse(json.dumps(user_dict,cls=NodeJSONEncoder))
 	else:
-		user={}		
-		Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
-		user_details = User.objects.get(id=request.user.id)
-		user['first_name'] = user_details.first_name
-		user['last_name']  = user_details.last_name	
- 	return render_to_response(	"ndf/user_profile_form.html",
-					{'group_id':group_id,'node':Author_group,'user':user},
-					context_instance=RequestContext(request)
-		
-	)
+		user_dict['node'] = auth_node
+		return render_to_response(  "ndf/user_profile_form.html",
+				{'group_id':group_id,'node':auth_node,'user':json.dumps(user_dict,cls=NodeJSONEncoder)},
+				context_instance=RequestContext(request)
+		)
 
-def user_data_profile(request,group_id):
+def user_data_profile(request, group_id):
 	user = {}
-	Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
+	auth_node = node_collection.one({"_id":ObjectId(group_id)})
 	user_details = User.objects.get(id=request.user.id)
 	user['first_name'] = user_details.first_name
 	user['last_name']  = user_details.last_name
-	user['node'] = Author_group
+	user['node'] = auth_node
 	return HttpResponse(json.dumps(user,cls=NodeJSONEncoder))
+
+def upload_prof_pic(request, group_id):
+    if request.method == "POST" :
+        user = request.POST.get('user','')
+        url_name = request.POST.get('url_name','') # used for reverse
+        # print "\n\n url_name", url_name
+        group_obj = node_collection.one({'_id': ObjectId(group_id)})
+        file_uploaded = request.FILES.get("has_profile_pic", "")
+        choose_from_existing_pic = request.POST.get("old_pic_ele","")
+        has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
+        warehouse_grp_obj = node_collection.one({'_type': "Group", 'name': "warehouse"})
+        if file_uploaded:
+            fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            if fileobj:
+                profile_pic_image = node_collection.one({'_id': ObjectId(fileobj)})
+                # The 'if' below is required in case file node is deleted but exists in grid_fs
+                if profile_pic_image:
+                    gr_node = create_grelation(group_obj._id, has_profile_pic_rt, profile_pic_image._id)
+                    # Move fileobj to "Warehouse" group 
+                    node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
+                else:
+                    success_state = False
+        elif choose_from_existing_pic:
+            # update status of old GRelation
+            profile_pic_image = node_collection.one({'_id': ObjectId(choose_from_existing_pic)})
+            gr_node = create_grelation(group_obj._id, has_profile_pic_rt, profile_pic_image._id)
+            # Move fileobj to "Warehouse" group 
+            if warehouse_grp_obj._id not in profile_pic_image.group_set:
+                node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
+            group_obj.reload()
+
+        if user:
+            group_id = user
+        return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
+
+
+def my_courses(request, group_id):
+
+    if str(request.user) == 'AnonymousUser':
+        raise Http404("You don't have an authority for this page!")
+
+    try:
+        auth_obj = get_group_name_id(group_id, get_obj=True)
+        user_id = auth_obj.created_by
+
+    except:
+        user_id = eval(group_id)
+        auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
+
+    auth_id = auth_obj._id
+    title = 'My Courses'
+    my_course_objs = get_user_course_groups(user_id)
+    # print my_course_objs
+
+    return render_to_response('ndf/my-courses.html',
+                {
+                    'group_id': auth_id, 'groupid': auth_id,
+                    'node': auth_obj, 'title': title,
+                    'my_course_objs': my_course_objs
+                },
+                context_instance=RequestContext(request)
+        )
+
+
+def my_groups(request, group_id):
+
+    # if request.user == 'AnonymousUser':
+        # raise 404
+
+    try:
+        auth_obj = get_group_name_id(group_id, get_obj=True)
+
+    except:
+        user_id = eval(group_id)
+        auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
+
+    auth_id = auth_obj._id
+    title = 'My Groups'
+
+    return render_to_response('ndf/my-groups.html',
+                {
+                    'group_id': auth_id, 'groupid': auth_id,
+                    'node': auth_obj,
+                    'title': title
+                },
+                context_instance=RequestContext(request)
+        )

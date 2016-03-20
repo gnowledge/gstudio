@@ -1,0 +1,260 @@
+{% load get_course_filters get_username from ndf_tags %}
+{% load simple_filters %}
+
+<div class="notebook">
+    <div class="row notebook-header collapse">
+        {% get_course_filters group_id title as filter_dict %}
+        {% include "ndf/filters.html" with filter_dict=filter_dict %}
+    </div>
+
+    {% comment %}
+    <div class="row notebook-header collapse">
+        <div class="medium-6 columns filters">
+            <div class="row" data-equalizer>
+                <div class="medium-2 columns" data-equalizer-watch> View By</div>
+                <div class="medium-4 columns" data-equalizer-watch>
+                    <select>
+                        <option value="husker">User</option>
+                        <option value="husker">School</option>
+                        <option value="husker">Tags</option>
+                    </select>
+                </div>
+                <div class="medium-4 columns end" data-equalizer-watch>
+                    <select>
+                        <option value="husker">Pinky Bunny</option>
+                        <option value="husker">Fluffy Apple</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="medium-6 columns">
+            <div class="row">
+                <div class="medium-6 medium-offset-3 columns">
+                    <div class="row collapse prefix-round">
+                        <div class="small-3 columns">
+                          <span class="prefix">
+                              <i class="fi-magnifying-glass"></i>
+                          </span>
+                        </div>
+                        <div class="small-9 columns">
+                            <input type="text" placeholder="Search">
+                        </div>
+                    </div>
+                </div>
+                <div class="medium-3 columns">
+                    <!--a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}&blog_type=True" class="button tiny radius"><i class="fi-plus"></i>  New Note</a-->
+                    <a href="#" data-reveal-id="newNoteModal" class="button tiny radius"><i class="fi-plus"></i>  New Note</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endcomment %}
+
+    <div class="row notebook-body">
+        <div class="small-12 medium-4 large-3 columns notebook-index">
+            <div class="row">
+                <div class="small-12 columns">
+                    {% if request.user.is_authenticated %}
+                    {% comment %}
+                    <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
+                    {% endcomment %}
+                    <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <ul class="tabs" data-tab style="">
+                <li class="tab-title {% ifequal tab 'all-notes' %} active{% endifequal %}"><a href="#all-notes">All Notes ({{blog_pages.count}})</a></li>
+                {% if user.is_authenticated %}
+                    <li class="tab-title {% ifequal tab 'my-notes' %} active{% endifequal %}"><a href="#my-notes">My Notes ({{user_blogs.count}})</a></li>
+                {% endif %}
+                {% comment %}
+                    <li class="tab-title"><a href="#my-drafts">My Drafts</a></li>
+                {% endcomment %}
+            </ul>
+
+            <div class="small-12 columns tabs-content">
+                <div class="content notes{% ifequal tab 'all-notes' %} active{% endifequal %}" id="all-notes">
+                {% for each_blog in blog_pages %}
+                    {% comment %}
+                        <div class="date">
+                            December 2015
+                            <span class="notes-count right">2</span>
+                        </div>
+                    {% endcomment %}
+                    <a href="{% url 'course_notebook_tab_note' group_name 'all-notes' each_blog.pk %}" title="{{each_blog.content|safe|striptags|default_if_none:each_blog.name}}">
+                        
+                    <div class="note {% if notebook_obj.pk == each_blog.pk %} active {% endif %}" id="{{each_blog.pk}}">
+                        <div class="note-heading"> {{each_blog.name}} </div>
+                        <div class="note-meta">
+                            <span title="{{each_blog.created_by|get_username}}">
+                                {{each_blog.created_by|get_username|truncatechars:"10"}}
+                            </span>
+                            &#8226;
+                            <span>{{each_blog.created_at|date:"d M Y h:i A"}}</span>
+                        </div>
+                        {% comment %}
+                        <div class="note-footer">
+                            <i class="fi-eye"></i>
+                            <span class="viewed-count">214</span>
+                            <i class="fi-like"></i>
+                            <span class="likes-count">10</span>
+                            <i class="fi-comments"></i>
+                            <span class="comment-count">22</span>
+                            <i class="fi-trash"></i>
+                        </div>
+                        {% endcomment %}
+
+                    </div>
+                    </a>
+                {% endfor %}
+                </div>
+
+                <div class="content notes{% ifequal tab 'my-notes' %} active{% endifequal %}" id="my-notes">
+                {% for each_user_blog in user_blogs %}
+                    {% comment %}
+                        <div class="date">
+                            December 2015
+                            <span class="notes-count right">2</span>
+                        </div>
+                    {% endcomment %}
+                    <a href="{% url 'course_notebook_tab_note' group_name 'my-notes' each_user_blog.pk %}" title="{{each_user_blog.content|safe|striptags|default_if_none:each_user_blog.name}}">
+                    <div class="note {% if notebook_obj.pk == each_user_blog.pk %} active {% endif %}" id="{{each_user_blog.pk}}">
+                        <div class="note-heading"> {{each_user_blog.name}} </div>
+                        <div class="note-meta">
+                            <span title="{{each_user_blog.created_by|get_username}}">
+                                {{each_user_blog.created_by|get_username|truncatechars:"10"}}
+                            </span>
+                            &#8226;
+                            <span>{{each_user_blog.created_at|date:"d M Y h:i A"}}</span>
+                        </div>
+                        {% comment %}
+                        <div class="note-footer">
+                            <i class="fi-eye"></i>
+                            <span class="viewed-count">214</span>
+                            <i class="fi-like"></i>
+                            <span class="likes-count">10</span>
+                            <i class="fi-comments"></i>
+                            <span class="comment-count">22</span>
+                            <i class="fi-trash"></i>
+                        </div>
+                        {% endcomment %}
+
+                    </div>
+                    </a>
+                {% endfor %}
+                </div>
+                    
+                {% comment %}
+                <div class="content notes" id="my-drafts"> </div>
+                {% endcomment %}
+
+            </div>
+        </div>
+        <div class="small-12 medium-8 large-9 columns note-page" >
+        {% if notebook_obj %}
+            {% include "ndf/note_page.html" %}
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+{# {% include "ndf/add_new_note.html" %} #}
+{# {% include "ndf/gcomment.html" %} #}
+
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+
+<script type="text/javascript">
+    // $('.notebook-index .notes').on('click', '.note', function() {
+    //     $(this).siblings().removeClass('active');
+    //     $(this).addClass('active');
+    //     node_id = $(this).attr('id')
+    //     $.ajax({
+    //       url: "{% url 'course_note_page' group_id %}",
+
+    //       data: {
+    //         node_id: node_id
+    //       },
+
+    //       type: "GET",
+
+    //       dataType: "html",
+
+    //       success: function(data){
+    //         $(".note-page").show().html(data);
+    //       },
+    //     });//end of ajax
+    // });
+
+
+    // $(function() {
+    //     // //New Note section
+    //     // $("#newNoteModal").on('click', 'save-note', function() {
+    //     //     //Necessary ajax call
+    //     // });
+    //     // $("#newNoteModal").on('click', 'delete-note', function() {
+    //     //     //Necessary ajax call
+    //     // });
+    //     // $("#newNoteModal").on('click', 'publish-note', function() {
+    //     //     //Necessary ajax call
+    //     // });
+
+
+    //     // $(document).on('opened.fndtn.reveal', '#newNoteModal[data-reveal]', function (e) {
+    //     //     e.stopPropagation();
+    //     //     e.preventDefault();
+    //     //     if(!CKEDITOR.instances['textarea-add-note']){
+    //     //         CKEDITOR.replaceAll('textarea-add-note',{
+    //     //             enterMode : 'GeneralToolbar', //override default behaviour that adds <p></p> in ck editor
+    //     //             toolbar:'basic',
+    //     //             uiColor:'#f2f2f2',
+    //     //             textarea_id: 'textarea-add-note'
+    //     //         });
+    //     //     }
+    //     // });
+    //     // $(document).on('closed.fndtn.reveal', '#newNoteModal[data-reveal]', function () {
+    //     //     if (CKEDITOR.instances['textarea-add-note']) {
+    //     //         CKEDITOR.instances['textarea-add-note'].destroy(true);
+    //     //     }
+    //     // });
+
+    //     //Rating system
+    // });
+
+    $("body").on('mouseenter', '.rate-scale i', function() {
+        $(this).nextAll().add($(this)).addClass('hover-rating');
+    });
+    $("body").on('mouseleave', '.rate-scale i', function() {
+        $(this).nextAll().add($(this)).removeClass('hover-rating');
+    });
+
+    $("body").on('click', '.rate-scale i' ,function() {
+        $(this).siblings().removeClass('rated');
+        $(this).nextAll().add($(this)).addClass('rated');
+    });
+
+    function applyFilter(filtersObjArr){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        $.ajax({
+          url: "{% url 'course_filters' group_id %}",
+          data: {
+            filter_dict: filtersObjArr,
+            'filter_applied': 'True',
+            'title': '{{title}}'
+          },
+          type: "GET",
+          dataType: "html",
+          success: function(data){
+            if(data == "reload"){
+                location.reload()
+            }
+            else{
+                $(".note-page").html(data)
+            }
+          },
+        });//end of ajax
+    }
+
+</script>

@@ -7,7 +7,21 @@
 
 {% get_group_name groupid as group_name_tag %}
 
-{% block title %} {{ title }} {% endblock %}
+{% block title %} {{ title  }} {% endblock %}
+ {% block style %}
+
+
+ @media screen and (max-width: 600px) {
+  .collapsible_tree {
+    visibility: hidden;
+    display: none;
+  
+  }
+	.themes {
+  	margin: 0;
+  }  
+}
+{% endblock %}
 
 {% block head %}  
 
@@ -71,17 +85,10 @@
  -->
 
 
-{% block meta_content %}
-	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
-		<h2 class="subheader">
-			{% if theme_GST.altnames and theme_GST.altnames != "None" %}
-				{{theme_GST.altnames}}
-			{% else %}
-				{{theme_GST.name}}
-			{% endif%}
-		</h2>
-	</a>
-	{{theme_GST.content|default_if_none:""|safe}}
+
+
+{% block collection_content %}  
+
 {% endblock %}
 
 
@@ -89,10 +96,15 @@
 	{% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
 
-	<div class="panel" style="background-color:#ddd;">
+	<div class="panel" style="background-color:#ddd;margin-top:1em">
 	<ul class="no-bullet" id="app-set-item"> 
 
-	    {% get_memberof_objects_count theme_GST.pk groupid as count %}
+		<!--
+		There is no need of following ndf_tag - 'get_memberof_objects_count'.
+		because, nodes from back-end are according to selected language.
+		Still this needs to be checked for future use-cases.
+		-->
+	    {# {% get_memberof_objects_count request theme_GST.pk groupid as count %} #}
 
 	      <li class="selected-app-set-item"> 
 	        <div>
@@ -104,7 +116,7 @@
 
 	          {# <a href="{% url "theme_list" groupid app_id theme_GST.pk %}" style="color:#0b8a91;"> #}
 	          <a href="{% url "list_themes" group_name_tag %}">
-	            Theme ({{count}})
+	            Theme ({{nodes.count}})
 	          </a> 
 
 	        </div>
@@ -114,12 +126,11 @@
 	</div>
 
 	{% endif %}
-	<br/>
-    <!-- <br/> -->
+
     <div>
-    {% if tree == "hierarchical" %}
-		{% if user.is_authenticated %}
-    		{% if user_access == "allow" %}
+    {% if tree == "hierarchical" and user_access == "allow" and user.is_authenticated %}
+		{# {% if user.is_authenticated %} #}
+    		{# {% if user_access == "allow" %} #}
     		
 				<div>
 
@@ -158,25 +169,64 @@
 
 		      	</div>		
 
-    		{% endif %}
-		{% endif %}
+    		{# {% endif %} #}
+		{# {% endif %} #}
+
+	{% elif tree == "collapsible" %}
+		<h4>Using the Theme Tree:</h4>
+			
+		<ul>
+			<small>
+				<li>Expand or Collapse the map by clicking on the node(circle). </li>
+				<br/>
+				<li>Pan the map by dragging an empty part around.</li>
+				<br/>
+				<li>Zoom the map by either double clicking on an empty part or by scrolling.</li>
+				<br/>
+				<li>To zoom out hold shift when double clicking.</li>
+				<br/>
+				<li>The last node in expanded branch is a topic. Click on it to view topic details.</li>
+			</small>
+		</ul>
+
 	{% endif %}
 	</div>
 
 	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;border: 1px solid #1a1a1a;"> </div>
 
 {% endblock %}
-
+{% block meta_content %}
+	<div class="large-4 columns repository-title" style="width:100%">
+		{% if theme_GST.altnames and theme_GST.altnames != "None" and not node.name %}
+			{{theme_GST.altnames}}		
+		{% endif %}
+	</div>
+{% endblock %}
 
 {% block body_content %}
+		<div class="large-4 columns repository-title">
+				{% if node.name %}
+					{{node.name}}
+				{% endif%}
+		</div>
+
+	<div class="large-8 columns repository-desc">
+				{% if node.content_org %}
+					{{node.content_org}}
+				{% elif theme_GST.content_org and theme_GST.content_org != "None" %}
+					{{theme_GST.content_org}}
+				{% endif%}
+	</div>
+
+
 
 	{% user_access_policy groupid request.user as user_access %}
 
 	{% if themes_hierarchy and node %}
 
-		<div style="float:left; font-size: 2em; line-height: 0.8;"> {{node.name}}</div> 
-
-        <div style="float:right;  margin:0 2em;">
+<!-- 		<div class="large-4 columns repository-title"> {{node.name}}</div> 
+ -->
+        <div style="float:right; margin:0 4em; font-size:0.8em" >
 
 			<a class="collapsible_tree {% if tree == 'collapsible' or not tree %} highlight {% endif %}" style="">
 				{% trans "Theme" %} {% trans "Graph" %}
@@ -195,8 +245,7 @@
 
 		<br/>
 		<br/>
-
-		{% cache 300 theme_tree node.pk request.LANGUAGE_CODE tree unfold %}
+		{% cache 300 theme_tree node.pk request.LANGUAGE_CODE tree unfold selected %}
 
 			{% include "ndf/hierarchy_tree.html" %}
 			<div id="app-set-item" class="themes hide" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}">
@@ -215,69 +264,39 @@
 		
 	{% endif %}
 
+	
+
+
 	<!-- For displaying themes items -->
+
 	{% if themes_cards  %}
 
 		{% cache 300 theme_card_listing request.LANGUAGE_CODE %}
 			
-		<div class="content row" id="panel2-4">
+  		<!-- following ndf_tag is commented for time being. which is fetching the themes from relation and current selected language.
+  		Now by changing query at backend, it shows resources related to selected language.
+  		Still this needs to be checked. So do not deletethis commented ndf_tag - 'get_preferred_lang' -->
 
-		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+		{{ each.name }}
+        {# {% get_preferred_lang request group_id nodes "Theme" as nodes %} #}
 
-  		<!-- Existing card list-->
-        {% get_preferred_lang request group_id nodes "Theme" as nodes %}
 		{% group_type_info groupid request.user as grouptype %}
-	  	{% for each in nodes %}
+  		<!-- Existing card list-->
+	
 
-	      <li class="card">
-	        {% if grouptype == "Moderated" %}
-	          {% if each.status == "DRAFT" %}
-	            <div class="draft page">
-	          {% elif each.status == "PUBLISHED" %}
-	            <div class="published page">
-	          {% endif %}
-	        {% else %}
-	          <div class='{% if each.status == "PUBLISHED" %}published{% endif %} page'>
-	        {% endif %} 
 
-		      <a href="{% url 'theme_page' group_name_tag each.pk %}">
-		      <div class="row">
-            	<div class="small-10 columns">                             
-	                <b>
-	                  {{ each.name }}{% if each.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-	                </b>
-            	</div>
-          	  </div>
-		      <span style="font-size:12px;">{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-		      
-		      <footer>
-		          <div class="age">
-		            {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
-		            <br/>
-		            by <span class="user" href="{% url 'dashboard' each.created_by %}" data-gnow="">{{each.user_details_dict.created_by}}</span> 
-		          </div>
-		        <span><strong>{{each.contributors|length}}</strong> Contributor{{each.contributors|pluralize}}</span>
-		        <span class="right"><strong>{{each.version_dict|length}}</strong> Edit{{each.version_dict|pluralize}}</span>
-          
-      		  </footer>
-      		  </a>
 
-      		  <div class="label-list small-12 columns">
-	            {% for tag in each.tags|slice:":3" %}
-	              <a href="{% url 'tag_info' group_name_tag tag %}">
-	                <span class="label" style="background-color:yellow">{{tag}}</span>
-	              </a>
-	            {% endfor %}
-	          </div>
+<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-5" style="margin-top:40px" >
 
-		      </div>
-		    </li>  
-	  
-	  	{% endfor %}
+  	{% for each in nodes %}
+     <li class="card-image-wrapper"> 
 
-		</ul>
+ 		{% include 'ndf/simple_card.html' with  resource=each url_name="theme_page" first_arg=group_id second_arg=each.pk %}
+	     
+	{% endfor %}
 
-		</div>
+</li>
+</ul>
 		
 	{% endcache %}
 	

@@ -36,22 +36,40 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, get_language_tuple
 from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import add_to_collection_set
 
 ##############################################################################
 
 SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files")
+csv_file_name = None
+
+script_start_str = "######### Script ran on : " + time.strftime("%c") + " #########\n------------------------------------------------------------\n"
+log_file_not_found = []
+log_file_not_found.append(script_start_str)
 
 log_list = []  # To hold intermediate errors
-log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
+log_list.append(script_start_str)
+
+log_error_rows = []
+log_error_rows.append(script_start_str)
 
 file_gst = node_collection.one({'_type': 'GSystemType', "name": "File"})
+auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
 home_group = node_collection.one({"name": "home", "_type": "Group"})
+warehouse_group = node_collection.one({"name": 'warehouse', "_type": "Group"})
 theme_gst = node_collection.one({'_type': 'GSystemType', "name": "Theme"})
 theme_item_gst = node_collection.one({'_type': 'GSystemType', "name": "theme_item"})
 topic_gst = node_collection.one({'_type': 'GSystemType', "name": "Topic"})
+twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
+rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
+thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
+has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+has_thumbnail_rt = node_collection.one({'_type': "RelationType", 'name': u"has_thumbnail"})
+discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+
 nroer_team_id = 1
+nroer_team_author_id = None
 
 # setting variable:
 # If set true, despite of having file nlob in gridfs, it fetches concern File which contains this _id in it's fs_file_ids field and returns it.
@@ -74,6 +92,10 @@ class Command(BaseCommand):
 
             # processing each file of passed multiple CSV files as args
             for file_name in args:
+
+                global csv_file_name
+                csv_file_name = file_name
+
                 file_path = os.path.join(SCHEMA_ROOT, file_name)
 
                 if os.path.exists(file_path):
@@ -171,9 +193,7 @@ class Command(BaseCommand):
         finally:
             if log_list:
 
-                log_list.append("\n =====================================\
-                    ======================= End of Iteration ============\
-                    ================================================\n")
+                log_list.append("\n ============================================================ End of Iteration ============================================================\n\n\n")
                 # print log_list
 
                 log_file_name = args[0].rstrip("csv") + "log"
@@ -182,7 +202,40 @@ class Command(BaseCommand):
                 with open(log_file_path, 'a') as log_file:
                     log_file.writelines(log_list)
 
-  # --- End of handle() ---
+            if log_file_not_found != [script_start_str]:
+
+                log_file_not_found.append("============================== End of Iteration =====================================\n")
+                log_file_not_found.append("-------------------------------------------------------------------------------------\n")
+
+                log_file_name = args[0].replace('.', '_FILES_NOT_FOUND.').rstrip("csv") + "log"
+                log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+                # print log_file_path
+                with open(log_file_path, 'a') as log_file:
+                    log_file.writelines(log_file_not_found)
+
+            if log_error_rows != [script_start_str]:
+
+                log_error_rows.append("============================== End of Iteration =====================================\n")
+                log_error_rows.append("-------------------------------------------------------------------------------------\n")
+
+                log_file_name = args[0].replace('.', '_ERROR_ROWS.').rstrip("csv") + "log"
+                log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+                # print log_file_path
+                with open(log_file_path, 'a') as log_file:
+                    log_file.writelines(log_error_rows)
+
+    # --- End of handle() ---
+
+
+def log_print(log_string):
+    try:
+        log_list.append(log_string)
+        print log_string
+
+    except:
+        error_message = '\n !! Error while doing log and print.\n\n'
+        print error_message
+        log_list.append(error_message)
 
 
 def create_user_nroer_team():
@@ -190,9 +243,20 @@ def create_user_nroer_team():
     Check for the user: "nroer_team". If it doesn't exists, create one.
     '''
     global nroer_team_id
+    global nroer_team_author_id
 
     if User.objects.filter(username="nroer_team"):
         nroer_team_id = get_user_id("nroer_team")
+        try:
+            nroer_team_author_id = node_collection.one({'_type': 'Author', 'created_by': nroer_team_id})._id
+        except Exception, e:
+            print e
+            info_message = "\n- Creating Author object: 'nroer_team': "
+            nroer_team_author_obj = create_author_object(username='nroer_team', user_id=nroer_team_id, email='nroer_team@example.com')
+            nroer_team_author_id = nroer_team_author_obj.get('_id')
+
+            info_message += "\n- Created Author object having _id: " + str(nroer_team_author_id)
+            log_print(info_message)
     
     else:
         info_message = "\n- Creating super user: 'nroer_team': "
@@ -202,8 +266,8 @@ def create_user_nroer_team():
     
         info_message += "\n- Created super user with following creadentials: "
         info_message += "\n\n\tusername = 'nroer_team', \n\tpassword = 'nroer_team', \n\temail = 'nroer_team@example.com', \n\tid = '" + str(nroer_team_id) + "'"
-        print info_message
-        log_list.append(info_message)
+
+        log_print(info_message)
 
 
 def get_user_id(user_name):
@@ -216,10 +280,10 @@ def get_user_id(user_name):
     try:
         user_obj = User.objects.get(username=user_name)
         return int(user_obj.id)
+
     except Exception as e:
         error_message = e + "\n!! for username: " + user_name
-        print error_message
-        log_list.append(str(error_message))
+        log_print(error_message)
         return False
 
 
@@ -354,14 +418,13 @@ def parse_data_create_gsystem(json_file_path):
 
     except Exception as e:
         error_message = "\n!! While parsing the file ("+json_file_path+") got following error...\n " + str(e)
-        log_list.append(str(error_message))
+        log_print(error_message)
         raise error_message
 
     for i, json_document in enumerate(json_documents_list):
       
-        info_message = "\n\n\n********** Processing row number : ["+ str(i) + "] **********"
-        print info_message
-        log_list.append(str(info_message))
+        info_message = "\n\n\n********** Processing row number : ["+ str(i + 2) + "] **********"
+        log_print(info_message)
         
         try:
 
@@ -430,14 +493,41 @@ def parse_data_create_gsystem(json_file_path):
             # --END of for loop ---  
 
             # calling method to create File GSystems
-            nodeid = create_resource_gsystem(parsed_json_document)
+            nodeid = create_resource_gsystem(parsed_json_document, i)
+            # print "nodeid : ", nodeid
 
+            # ----- for updating language -----
+            node_lang = get_language_tuple(eval(parsed_json_document['language']))
+            # print "============= 1 :", type(eval(parsed_json_document['language']))
+            # print "============= 2 :", node_lang
+
+            temp_node = node_collection.one({'_id': ObjectId(nodeid) })
+            # print "============= lang :", temp_node.language
+
+            update_res = node_collection.collection.update(
+                                {'_id': ObjectId(nodeid), 'language': {'$ne': node_lang}},
+                                {'$set': {'language': node_lang}},
+                                upsert=False,
+                                multi=False
+                            )
+
+            if update_res['updatedExisting']:
+                temp_node.reload()
+
+                info_message = "\n\n- Update to language of resource: " + str(update_res)
+                log_print(info_message)
+
+                info_message = "\n\n- Now language of resource updates to: " + str(temp_node.language)
+                log_print(info_message)
+            # print "============= lang :", temp_node.language
+
+            # ----- END of updating language -----
 
             collection_name = parsed_json_document.get('collection', '')
 
-            if collection_name:
+            if collection_name and nodeid:
 
-                collection_node = node_collection.one({
+                collection_node = node_collection.find_one({
                         '_type': 'File',
                         'group_set': {'$in': [home_group._id]},
                         'name': unicode(collection_name)
@@ -449,13 +539,20 @@ def parse_data_create_gsystem(json_file_path):
             thumbnail_url = parsed_json_document.get('thumbnail')
             # print "thumbnail_url : ", thumbnail_url
 
-            if thumbnail_url:
+            if thumbnail_url and nodeid:
                 try:
-                    attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document)
-                except:
-                    pass
+                    info_message = "\n\n- Attaching thumbnail to resource\n"
+                    log_print(info_message)
+                    attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document, i)
+
+                except Exception, e:
+                    print e
 
             # print type(nodeid), "-------", nodeid, "\n"
+
+            # create thread node 
+            if isinstance(nodeid, ObjectId):
+                thread_result = create_thread_obj(nodeid)
 
             # starting processing for the attributes and relations saving
             if isinstance(nodeid, ObjectId) and attribute_relation_list:
@@ -489,8 +586,7 @@ def parse_data_create_gsystem(json_file_path):
                                 # print "key : ", key, "\nvalue : ",json_document[key]
 
                                 info_message = "\n- For GAttribute parsing content | key: '" + attr_key + "' having value: '" + json_document[key]  + "'"
-                                print info_message
-                                log_list.append(str(info_message))
+                                log_print(info_message)
 
                                 cast_to_data_type(json_document[key], attr_value['data_type'])
 
@@ -529,22 +625,19 @@ def parse_data_create_gsystem(json_file_path):
                                 ga_node = None
 
                                 info_message = "\n- Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
-                                print info_message
-                                log_list.append(str(info_message))
+                                log_print(info_message)
 
                                 ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
                                 
                                 info_message = "- Created ga_node : "+ str(ga_node.name) + "\n"
-                                print info_message
-                                log_list.append(str(info_message))
+                                log_print(info_message)
                                 
                                 # To break outer for loop as key found
                                 break
 
                             else:
                                 error_message = "\n!! DataNotFound: No data found for field ("+str(attr_key)+") while creating GSystem ( -- "+str(node.name)+")\n"
-                                print error_message
-                                log_list.append(str(error_message))
+                                log_print(error_message)
 
                         # ---END of if (key == attr_key)
 
@@ -554,8 +647,7 @@ def parse_data_create_gsystem(json_file_path):
                 if not relation_list:
                     # No possible relations defined for this node
                     info_message = "\n!! ("+str(node.name)+"): No possible relations defined for this node.\n"
-                    print info_message
-                    log_list.append(str(info_message))
+                    log_print(info_message)
                     return
 
                 gst_possible_relations_dict = node.get_possible_relations(file_gst._id)
@@ -573,106 +665,6 @@ def parse_data_create_gsystem(json_file_path):
                         is_relation = False
 
                         if json_document[key]:
-
-                            # # -----------------------------
-                            # hierarchy_output = None
-                            # def _get_id_from_hierarchy(hier_list, oid=None):
-                            #     '''
-                            #     Returns the last hierarchical element's ObjectId.
-                            #     Arguments to be passes is list of unicode names.
-                            #     e.g.
-                            #     hier_list = [u'NCF', u'Science', u'Physical world', u'Materials', u'States of matter', u'Liquids']
-                            #     '''
-                            #     # print oid
-                            #     if len(hier_list) >= 2:
-                            #         # print hier_list, "len(hier_list) : ", len(hier_list)
-                            #         # object_exist = ""
-                            #         try:
-                            #             if oid:
-                            #                 curr_oid = node_collection.one({ "_id": oid })
-                            #                 # print "curr_oid._id", curr_oid._id
-
-                            #             else:
-                            #                 row_list = []
-
-                            #                 for e in hier_list:
-                            #                     row_list.append(e)
-
-                            #                 curr_oid = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-
-                            #             if curr_oid:
-                            #                 # object_exist = True
-                            #                 next_oid = node_collection.one({ 
-                            #                                           "name": hier_list[1],
-                            #                                           'group_set': {'$all': [ObjectId(home_group._id)]},
-                            #                                           'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
-                            #                                           '_id': {'$in': curr_oid.collection_set }
-                            #                                           })
-
-                                        
-                            #                 # print "||||||", next_oid.name
-                            #                 hier_list.remove(hier_list[0])
-                            #                 # print "calling _get_id_from_hierarchy(", hier_list,", ", next_oid._id,")" 
-
-                            #                 _get_id_from_hierarchy(hier_list, next_oid._id)
-      
-                            #             else:
-                            #                 error_message = "!! ObjectId of curr_oid does not found."
-                            #                 print error_message
-                            #                 log_list.append(error_message)
-
-                            #         except Exception as e:
-                            #             error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
-                            #             # print error_message
-                            #             log_list.append(error_message)
-
-                            #     else:
-                            #         print "==== return oid: ", oid
-                            #         global hierarchy_output
-                            #         hierarchy_output = oid
-
-                            #     print "==== hierarchy_output"
-                            #     return hierarchy_output
-                            #     print "==== hierarchy_output"
-
-                            #     # -----------------------------                  
-                          
-                            #     # if len(hier_list) == 1:
-                            #     #     if oid:
-                            #     #       print "oid: ", oid
-                            #     #       return oid
-                            #     #     else:
-                            #     #       # print "else - hier_list : ", hier_list
-                            #     #       temp_obj = node_collection.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                            #     #       # temp_obj = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                            #     #       # print temp_obj
-                            #     #       if temp_obj.count() > 0:
-                            #     #           for e in temp_obj:
-                            #     #               if e.prior_node:
-                            #     #                   for k in e.prior_node:
-                            #     #                       obj = node_collection.one({'_id':ObjectId(k) })
-                            #     #                       # print "\nitem: ",row_list[len(row_list)-2],"\n"
-                            #     #                       if obj.name == row_list[len(row_list)-2]:
-                            #     #                           # print e._id
-                            #     #                           return e._id
-
-                            #     #           return None
-                            #     #       else:
-                            #     #           return None
-                            #     #       # if temp_obj:
-                            #     #       #   return temp_obj._id
-                            #     #       # else:
-                            #     #       #   return None
-
-                            #     #   # if any one of the item of hierarchy does not exist in database then:
-                            #     # elif not object_exist:
-                            #     #     temp_obj = node_collection.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                            #     #     if temp_obj:
-                            #     #       return temp_obj._id
-                            #     #     else:
-                            #     #       return None
-
-                            #   # -------------- END of _get_id_from_hierarchy() ---------------                  
 
                             # most often the data is hierarchy sep by ":"
                             if ":" in json_document[key]:
@@ -698,8 +690,7 @@ def parse_data_create_gsystem(json_file_path):
 
                                 else:
                                     error_message = "\n!! While creating teaches rel: Any one of the item in hierarchy"+ str(json_document[key]) +"does not exist in Db. \n!! So relation: " + str(key) + " cannot be created.\n"
-                                    print error_message
-                                    log_list.append(error_message)
+                                    log_print(error_message)
                                     break
                               
                             # sometimes direct leaf-node may be present without hierarchy and ":"
@@ -711,8 +702,7 @@ def parse_data_create_gsystem(json_file_path):
 
                             # print "\n----------", json_document[key]
                             info_message = "\n- For GRelation parsing content | key: " + str(rel_key) + " -- " + str(json_document[key])
-                            print info_message
-                            log_list.append(str(info_message))
+                            log_print(info_message)
                             # print list(json_document[key])
 
                             # perform_eval_type(key, json_document, "GSystem", "GSystem")
@@ -755,43 +745,91 @@ def parse_data_create_gsystem(json_file_path):
                                         right_subject_id_or_list.append(n.right_subject)
 
                                 info_message = "\n- Creating GRelation ("+ str(node.name)+ " -- "+ str(rel_key)+ " -- "+ str(right_subject_id_or_list)+") ..."
-                                print info_message
-                                log_list.append(str(info_message))
+                                log_print(info_message)
                                 
                                 gr_node = create_grelation(subject_id, relation_type_node, right_subject_id_or_list)
                                                           
                                 info_message = "\n- Grelation processing done.\n"
-                                print info_message
-                                log_list.append(str(info_message))
+                                log_print(info_message)
 
                             # To break outer for loop if key found
                             break
 
                         else:
                             error_message = "\n!! DataNotFound: No data found for relation ("+ str(rel_key)+ ") while creating GSystem (" + str(file_gst.name) + " -- " + str(node.name) + ")\n"
-                            print error_message
-                            log_list.append(str(error_message))
+                            log_print(error_message)
 
                             break
 
               # print relation_list
             else:
-                info_message = "\n!! Either resource is already created or file is already saved into gridfs/DB"
-                print info_message
-                log_list.append(str(info_message))
+                info_message = "\n!! Either resource is already created or file is already saved into gridfs/DB or file not found"
+                log_print(info_message)
 
                 continue
 
         except Exception as e:
             error_message = "\n While creating ("+str(json_document['name'])+") got following error...\n " + str(e)
-            print error_message # Keep it!
-            log_list.append(str(error_message))
+            print "!!!!!!!!!!!!EEEEEEEERRRRRRRRRRRRRROOOOOOORRRRRRRRRRRRR......................"
+
+            # file_error_msg = "\nFile with following details got an error: \n"
+            file_error_msg = "\n========================" + " Row No : " + str(i + 2) + " ========================\n"
+            # file_error_msg += "- Row No   : " + str(i + 2) + "\n"
+            file_error_msg += "- Name     : " + json_document["name"] + "\n"
+            file_error_msg += "- File Name: " + json_document["file_name"] + "\n"
+            file_error_msg += "- ERROR    : " + str(e) + "\n\n"
+            file_error_msg += "- Following are the row details : \n\n" + unicode(json.dumps(json_document, sort_keys=True, indent=4, ensure_ascii=False)) + "\n"
+            file_error_msg += "============================================================\n\n\n"
+            log_error_rows.append(file_error_msg)
+
+            log_print(error_message)
 
 
-def create_resource_gsystem(resource_data):
+def create_thread_obj(node_id):
+    '''
+    Creates thread object.
+        RT : has_thread
+        AT : release_response, thread_interaction_type
+    '''
+    try:
+        node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        release_response_val = True
+        interaction_type_val = unicode('Comment')
+        thread_obj = None
+        thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node_obj._id)})
+
+        if thread_obj == None:
+            # print "\n\n Creating new thread node"
+            thread_obj = node_collection.collection.GSystem()
+            thread_obj.name = u"Thread_of_" + unicode(node_obj.name)
+            thread_obj.status = u"PUBLISHED"
+            thread_obj.created_by = int(nroer_team_id)
+            thread_obj.modified_by = int(nroer_team_id)
+            thread_obj.contributors.append(int(nroer_team_id))
+            thread_obj.member_of.append(ObjectId(twist_gst._id))
+            thread_obj.group_set.append(home_group._id)
+            thread_obj.save()
+            # creating GRelation
+            gr = create_grelation(node_obj._id, has_thread_rt, thread_obj._id)
+            create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+            create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+            create_gattribute(node_obj._id, discussion_enable_at, True)
+            thread_obj.reload()
+            node_obj.reload()
+            # print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
+            info_message = "\n- Successfully created thread obj - " + thread_obj._id.__str__() +" for - " + node_obj._id.__str__()
+            log_print(info_message)
+
+    except Exception as e:
+        info_message = "\n- Error occurred while creating thread obj for - " + node_obj._id.__str__() +" - " + str(e)
+        log_print(info_message)
+
+
+def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
   
     # fetching resource from url
     resource_link = resource_data.get("resource_link")  # actual download file link
+    resource_link = resource_link.replace(' ', '%20')
 
     if not resource_link:
         resource_link = resource_link_common + resource_data.get("file_name")
@@ -800,11 +838,28 @@ def create_resource_gsystem(resource_data):
     filename = resource_link.split("/")[-1]  # actual download file name with extension. e.g: neuron.jpg 
 
     info_message = "\n- Fetching resource from : '" + resource_link + "'"
-    print info_message
-    log_list.append(info_message)
+    log_print(info_message)
+
     print "  (Might take some time. please hold on ...)\n"
 
-    files = urllib2.urlopen(resource_link)
+    try:
+        files = urllib2.urlopen(resource_link)
+        info_message = "  Fetched the resource successfully!\n"
+        log_print(info_message)
+
+    except urllib2.URLError, e:
+        error_message = "\n!! File Not Found at: " + resource_link
+        log_print(error_message)
+
+        file_not_found_msg = "\nFile with following details not found: \n"
+        file_not_found_msg += "- Row No   : " + str(row_no) + "\n"
+        file_not_found_msg += "- Name     : " + resource_data["name"] + "\n"
+        file_not_found_msg += "- File Name: " + resource_data["file_name"] + "\n"
+        file_not_found_msg += "- URL      : " + resource_link + "\n\n"
+        file_not_found_msg += "- ERROR    : " + str(e) + "\n\n"
+        log_file_not_found.append(file_not_found_msg)
+        return None
+
     files = io.BytesIO(files.read())
     files.name = filename
 
@@ -812,26 +867,14 @@ def create_resource_gsystem(resource_data):
     userid = resource_data["created_by"]
     content_org = resource_data["content_org"]
     tags = resource_data["tags"]
-    language = resource_data["language"]
+    language = get_language_tuple(eval(resource_data['language']))
+    group_set_id = ObjectId(group_set_id) if group_set_id else home_group._id
 
     img_type = None
     access_policy = None
     usrname = "nroer_team"
 
     filemd5 = hashlib.md5(files.read()).hexdigest()
-    # size, unit = getFileSize(files)
-    # size = {'size':round(size, 2), 'unit':unicode(unit)}
-    
-    # fcol = get_database()[File.collection_name]
-    # fileobj = fcol.File()
-
-    # fileobj = node_collection.collection.File()
-
-    # there can be two different files with same name.
-    # e.g: "The Living World" exists with epub, document, audio etc.
-    # hence not to check by name.
-    # check_obj_by_name = node_collection.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
-    # print "\n====", check_obj_by_name, "==== ", fileobj.fs.files.exists({"md5":filemd5})
 
     check_file_in_gridfs = gridfs_collection.find_one({"md5": filemd5})
     # even though file resource exists as a GSystem or in gridfs return None
@@ -851,16 +894,14 @@ def create_resource_gsystem(resource_data):
         # elif cur_oid:
         info_message = "\n- Resource file exists in gridfs having id: '" + \
         str(check_file_in_gridfs["_id"]) + "'"
-        print info_message
-        log_list.append(str(info_message))
+        log_print(info_message)
 
         if update_file_exists_in_gridfs:
             file_obj = node_collection.one({'_type': 'File', 'fs_file_ids': {'$in': [ObjectId(check_file_in_gridfs['_id'])]} })
 
             if file_obj:
                 info_message = "\n- Returning file _id despite of having in gridfs"
-                print info_message
-                log_list.append(str(info_message))
+                log_print(info_message)
 
                 return file_obj._id
 
@@ -874,54 +915,119 @@ def create_resource_gsystem(resource_data):
 
     else:  # creating new resource
 
-        files.seek(0)
-        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
-        # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
-        
         info_message = "\n- Creating resource: " + str(resource_data["name"])
         log_list.append(str(info_message))
         print info_message
         
-        # filetype = magic.from_buffer(files.read(100000), mime = 'true')  # Gusing filetype by python-magic
+        files.seek(0)
+
+        fileobj_oid, video = save_file(files, name, userid, group_set_id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
+        # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
+        
+        node_collection.collection.update(
+                                {'_id': ObjectId(fileobj_oid)},
+                                {'$push': {'origin': {'csv-import': csv_file_name} }},
+                                upsert=False,
+                                multi=False
+                            )
+
+        print "\n\n Printing newly created object:\n", node_collection.one({'_id': ObjectId(fileobj_oid)})
+        print "\n ===================================\n\n"
 
         info_message = "\n- Created resource/GSystem object of name: '" + unicode(name) + "' having ObjectId: " + unicode(fileobj_oid) + "\n- Saved resource into gridfs. \n"
-        log_list.append(info_message)
-        print info_message
+        log_print(info_message)
 
         # print "\n----------", fileobj
         return fileobj_oid
 
 
-def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
+def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     
     updated_res_data = resource_data.copy()
 
     updated_res_data['resource_link'] = thumbnail_url
-    updated_res_data['name'] = u'thumbnail'
+    updated_res_data['name'] = u'Thumbnail: ' + thumbnail_url.split('/')[-1]
     
     updated_res_data['content_org'] = ''
     updated_res_data['tags'] = []
 
     # th_id: thumbnail id
-    th_id = create_resource_gsystem(updated_res_data)
-    print "th_id: ", th_id
+    th_id = create_resource_gsystem(updated_res_data, row_no, group_set_id=warehouse_group._id)
+
+    # th_obj = node_collection.one({'_id': ObjectId(th_id)})
+
+    # # tring to keep mid-size image otherwise thumbnail
+    # try:
+    #     th_gridfs_id = th_obj.fs_file_ids[2]
+    # except:
+    #     th_gridfs_id = th_obj.fs_file_ids[1]
+    # # print "th_gridfs_id: ", th_gridfs_id
+
+    # node_obj = node_collection.one({'_id': ObjectId(node_id)})
     
-    th_obj = node_collection.one({'_id': ObjectId(th_id)})
-    th_gridfs_id = th_obj.fs_file_ids[1]
-    print "th_gridfs_id: ", th_gridfs_id
+    # print "~~~~~~~~~~", ObjectId(node_id), " : ", has_thumbnail_rt, " : ", ObjectId(th_id)
+    
+    info_message = "\n- Creating GRelation ("+ str(node_id)+ " -- has_thumbnail -- "+ str(th_id)+") ..."
+    log_print(info_message)
 
-    node_obj = node_collection.one({'_id': ObjectId(node_id)})
-    print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
-    node_fs_file_ids = node_obj.fs_file_ids
+    print '\n Created/Updated GRelation Object:\n'
+    print create_grelation(ObjectId(node_id), has_thumbnail_rt, ObjectId(th_id))
+    print '\n\n'
 
-    if len(node_fs_file_ids) == 1:
-        node_fs_file_ids.append(ObjectId(th_gridfs_id))
-    elif len(node_fs_file_ids) > 1:
-        node_fs_file_ids[1] = ObjectId(th_gridfs_id)
+    info_message = "\n- Grelation processing done for has_thumbnail.\n"
+    log_print(info_message)
 
-    print "node_fs_file_ids: ", node_fs_file_ids
+    # # print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
+    # node_fs_file_ids = node_obj.fs_file_ids
 
-    node_collection.collection.update(
-                                        {'_id': ObjectId(node_id)},
-                                        {'$set': {'fs_file_ids': node_fs_file_ids}}
-                                    )
+    # if len(node_fs_file_ids) == 1:
+    #     node_fs_file_ids.append(ObjectId(th_gridfs_id))
+    # elif len(node_fs_file_ids) > 1:
+    #     node_fs_file_ids[1] = ObjectId(th_gridfs_id)
+
+    # # print "node_fs_file_ids: ", node_fs_file_ids
+
+    # node_collection.collection.update(
+    #                                     {'_id': ObjectId(node_id)},
+    #                                     {'$set': {'fs_file_ids': node_fs_file_ids}}
+    #                                 )
+
+
+def create_author_object(username, user_id, email=None):
+
+    auth = node_collection.one({'_type': u"Author", 'created_by': int(user_id)})
+    # This will create user document in Author collection to behave user as a group.
+    if auth is None:
+
+        if not email:
+            email = unicode(username) + u'@example.com'
+
+        print "\n Creating new Author obj for ", username
+        auth = node_collection.collection.Author()
+        auth.name = unicode(username)
+        auth.email = unicode(email)
+        auth.password = u""
+        auth.member_of.append(auth_gst._id)
+        auth.group_type = u"PUBLIC"
+        auth.edit_policy = u"NON_EDITABLE"
+        auth.subscription_policy = u"OPEN"
+        auth.created_by = user_id
+        auth.modified_by = user_id
+        auth.contributors.append(user_id)
+        auth.group_admin.append(user_id)
+        auth.preferred_languages = {'primary': ('en', 'English')}
+        auth.origin = [{'script': 'nroer_data_entry.py'}]
+        auth.agency_type = "Other"
+        auth_id = ObjectId()
+        auth['_id'] = auth_id
+        auth.save(groupid=auth._id) 
+        home_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("home")})
+        if user_id not in home_group_obj.author_set:
+            node_collection.collection.update({'_id': home_group_obj._id}, {'$push': {'author_set': user_id }}, upsert=False, multi=False)
+            home_group_obj.reload()
+        desk_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("desk")})
+        if desk_group_obj and user_id not in desk_group_obj.author_set:
+            node_collection.collection.update({'_id': desk_group_obj._id}, {'$push': {'author_set': user_id }}, upsert=False, multi=False)
+            desk_group_obj.reload()
+
+    return auth

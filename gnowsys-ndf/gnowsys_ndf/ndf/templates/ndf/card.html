@@ -13,9 +13,9 @@
 {% endif %}
 
   <div class="image">
-  <div class="{{resource.status|lower}} card-label">
-    <div class="label-text"></div>
-  </div>
+    <div class="{{resource.status|lower}} card-label">
+      <div class="label-text"></div>
+    </div>
         {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
     {% if resource.fs_file_ids.1 %}
       <img src="{% url 'get_gridfs_resource' resource.fs_file_ids.1 %}" alt="">
@@ -49,19 +49,8 @@
     {% if resource.tags %}
       <div>
         <h4 class="text-center card-content-title"><small>Tags</small></h4>
-        {# {{resource.tags.0}} #}
         <div>
-        {% comment %}
-          
-          {# <div class="label secondary">{{resource.tags.0}}</div>
-          <div class="label secondary">{{resource.tags.1}}</div>
-          <div class="label secondary">{{resource.tags.2}}</div>
-          <div class="label secondary">{{resource.tags.3}}</div>
-          <div class="label secondary">{{resource.tags.4}}</div>
-          <div class="label secondary">{{resource.tags.5}}</div> 
-          {% if resource.tags.6 %} ... {% endif %}
-           #}
-        {% endcomment %}
+        
           {% for each_tag in resource.tags %}
             {% if forloop.counter < 7 %}
               <div class="label secondary"><a href="{% url 'tag_info' group_id each_tag %}">
@@ -77,6 +66,8 @@
     {% endif %}
     
     <!-- properties -->
+      
+    {% comment %}
     {% if resource.attribute_set %}
       <div>
         <h4 class="text-center card-content-title"><small>Properties</small></h4>
@@ -94,15 +85,18 @@
         
       </div>
     {% endif %}
+    {% endcomment %}
 
     <!-- file info data -->
-    {% if "File" in resource.member_of_names_list %}
-      <div>
-        <h4 class="text-center card-content-title"><small>Resource Metadata</small></h4>
-          <div><b>Type</b>: {{resource.mime_type}}</div>
-          <div><b>Size</b>: {{resource.file_size.size}} {{resource.file_size.unit}}</div>
-      </div>
-    {% endif %}
+    {% comment %}
+      {% if "File" in resource.member_of_names_list %}
+        <div>
+          <h4 class="text-center card-content-title"><small>Resource Metadata</small></h4>
+            <div><b>Type</b>: {{resource.mime_type}}</div>
+            <div><b>Size</b>: {{resource.file_size.size}} {{resource.file_size.unit}}</div>
+        </div>
+      {% endif %}
+    {% endcomment %}
         
   </div>
   <!-- end of content -->
@@ -116,3 +110,12 @@
     </span>
   </div>
 </div>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+      $('.rcard .content').slick({
+      // dots: true, fade: true,
+      infinite: true, arrows: true, speed: 500, cssEase: 'linear'
+    });
+  })
+</script>

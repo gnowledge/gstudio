@@ -69,8 +69,8 @@ def data_review(request, group_id, page_no=1, **kwargs):
     except:
         group_name, group_id = get_group_name_id(group_id)
     
-    files_obj = node_collection.find({'$or': [
-                                    {'member_of': {'$in': [
+    files_obj = node_collection.find({
+                                    'member_of': {'$in': [
                                         ObjectId(file_id._id),
                                         ObjectId(page_id._id),
                                         ObjectId(theme_gst_id._id)
@@ -84,9 +84,9 @@ def data_review(request, group_id, page_no=1, **kwargs):
                                             {'created_by': request.user.id}
                                             ]
                                         }
-                                    ]},
-                                        {'member_of': {'$all': [pandora_video_st._id]}}
-                                        ]}).sort("created_at", -1)
+                                    ]
+                                        # {'member_of': {'$all': [pandora_video_st._id]}}
+                                        }).sort("created_at", -1)
 
     # implementing pagination: paginator.Paginator(cursor_obj, <int: page no>, <int: no of obj in each page>)
     # (ref: https://github.com/namlook/mongokit/blob/master/mongokit/paginator.py)
@@ -104,6 +104,7 @@ def data_review(request, group_id, page_no=1, **kwargs):
         # for each, val in each_resource.iteritems():
           # print each, "--", val,"\n"
 
+    # print "files_obj.count: ", files_obj.count()
     files_obj.close()
 
     context_variables = {

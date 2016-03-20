@@ -10,7 +10,7 @@ from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
-from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_execution_time, get_all_subscribed_users, get_group_name_id
 from gnowsys_ndf.ndf.views.tasks import task_set_notify_val
 import json
 
@@ -78,6 +78,11 @@ def send_invitation(request,group_id):
 
 @get_execution_time
 def notifyuser(request,group_id):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     # usobj=User.objects.filter(username=usern)
     colg = node_collection.one({'_id': ObjectId(group_id)})
     groupname=colg.name

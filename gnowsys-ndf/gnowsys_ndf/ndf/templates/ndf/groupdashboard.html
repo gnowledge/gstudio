@@ -8,6 +8,8 @@
 
 {% block head %}
 
+  <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
+
 
 <script type="text/javascript" >
   var chk_login = "{{ user }}";
@@ -16,7 +18,12 @@
 <!-- Ajax for getting user List  -->
 <script type="text/javascript">
   jQuery(document).ready(function($) {
-
+  {% get_sg_member_of groupid as list_of_sg_member_of %}
+  {% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
+    $("#group-level-header").addClass("hide");
+  {% endif %}
+  });
+  /*
   $('#btn_list_member').on("click",function() {
   var ajurl ="{% url 'get_author_set_users' groupid %}?_id={{node.pk}}";
   $.ajax({
@@ -35,11 +42,7 @@
   success: function(data){
   $('#firstModal').html(data); },
   });}); 
-  {% get_sg_member_of groupid as list_of_sg_member_of %}
-  {% if "ProgramEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
-    $("#group-level-header").addClass("hide");
-  {% endif %}
-  });
+  */
 
 
 </script> 
@@ -48,6 +51,8 @@
 
 <script type="text/javascript">
 //function to toggle the lable Join and Unsubscribe
+
+/* 
 function change_label(label)
 {   
 	if(chk_login=="AnonymousUser")
@@ -67,7 +72,7 @@ function change_label(label)
         }
 
 }
-
+*/
 //function for sending notifications for Join and Unsubscribe
 function notify(node,activity)
 {
@@ -92,11 +97,12 @@ function notify(node,activity)
 
 
 }
-
+/*
 
 $(document).ready(function()
 {
-  var groupn = $("#groupname").val();
+  // var groupn = $("#groupname").val();
+  var groupn = '{{group_id}}'
   var label = $("#notify").val();
   $("#notify").click(function(){
    if (label == "Follow")
@@ -127,6 +133,7 @@ $(document).ready(function()
   }); //end notify_click()
 }); //end document_ready()
 
+*/
 </script>
 {% endblock %}
 <!-- end of head block -->
@@ -144,28 +151,37 @@ $(document).ready(function()
 <!-- overide meta_content block from base.html -->
 {% cache 300 groupdashboard_meta_content %}
 {% block meta_content %}
-
+<div class="repository-title large-4 columns" style="width:100%">{% firstof  node.altnames node.name %}</div>
   <h4>
-  <i class="fi-torsos"></i> {{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}
+  <i class="fi-torsos"></i> {{node.author_set|length}}{% blocktrans %} <span>Group members </span> {% endblocktrans %}
   </h4>
 
   <div id="group_picture">
-  
-    {% if prof_pic_obj %}
-      <img alt="profile picture for this group." src="{% url 'get_mid_size_img' group_id prof_pic_obj.pk %}" id="group-image" class="group-images th">
-
-    {% else %}
-      <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." id="group-image" class="group-images th">
-
-    {% endif %}   
-
+  {% include "ndf/upload_pic_widget.html" with url_name='groupchange'  widget_for="Group_about" %}
   </div>
+
+</br>
+{% if group_object.prior_node %}
+<div class="repository-title large-4 columns" style="width:100%">Parent Group(s)</div></br>
+ {% for each in group_object.prior_node  %}
+    {% get_group_name each as prior_node_name %}
+      
+     <ul style="list-style: none; border-bottom: solid thin #ddd;">
+      <li style="border-bottom: solid thin #ddd;">
+        <a href="{% url 'groupchange' each %}">
+          {{prior_node_name}}
+        </a>
+      </li>
+    </ul>
+ {% endfor %}
+{% endif %}
+
 {% endblock %}
 {% endcache %}
 <!-- end of meta_content block -->
 
 {% block app_action_list %}
-
+{% comment %}
   {% check_is_user_group group_id as is_user_group %}
   {% get_policy node request.user as policy  %}
 
@@ -221,6 +237,7 @@ $(document).ready(function()
     {% include "ndf/invite_users.html" %}
     {% include "ndf/invite_admins.html" %}
   {% endif %} 
+{% endcomment %}
 
 
 {% endblock %}

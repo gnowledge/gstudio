@@ -11,8 +11,9 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
 
 class Command(BaseCommand):
@@ -23,21 +24,57 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     # Keep latest changes in field(s) to be added at top
 
-    # adding all activated and logged-in user's id into author_set of "home" group ---
+    # --------------------------------------------------------------------------
+    # Adding <'origin': []> field to all objects and inheritance of GSystem class
+    # fetching all GSystem and it's inheritance class objects
+    # all_gsystem_inherited_nodes = node_collection.find({'_type': {'$in': [u'GSystem', u'File', u'Group']}, 'origin': {'$exists': False} })
+
+    res = node_collection.collection.update({'_type': {'$in': [u'GSystem', u'File', u'Group']}, 'origin': {'$exists': False} }, {'$set': {'origin': [] }}, upsert=False, multi=True)
+
+    if res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'origin' field to " + res['n'].__str__() + " GSystem instances."
+
+    # -----------------------------------------------------------------------------
+
+    # Updating language fields data type:
+    # - Firstly, replacing None to ('en', 'English')
+    node_collection.collection.update({ '_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']}, 'language': {'$in': [None, '', u'']} }, {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
+
+    all_nodes = node_collection.find({'_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']} })
+
+    all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
+    all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
+
+    # iterating over each document in the cursor:
+    # - Secondly, replacing invalid language values to valid tuple from settings
+    for each_node in all_nodes:
+        if each_node.language and (each_node.language in all_languages_concanated):
+            for each_lang in all_languages:
+                if each_node.language in each_lang:
+                    # printing msg without checking update result for performance. 
+                    print "Updated language field of: ", each_node.name 
+                    print "\tFrom", each_node.language, " to: ", each_lang, '\n'
+                    node_collection.collection.update({'_id': each_node._id}, {"$set": {"language": each_lang}}, upsert=False, multi=False)
+
+    # --- END of Language processing ---
+
+
+    # adding all activated and logged-in user's id into author_set of "home" and "desk" group ---
     all_authors = node_collection.find({"_type": "Author"})
     authors_list = [auth.created_by for auth in all_authors]
 
-    home_group = node_collection.one({"_type":"Group", "name": "home"}) 
+    # updating author_set of desk and home group w.ref. to home group's author_set
+    home_group = node_collection.one({"_type":"Group", "name": "home"})
     prev_home_author_set = home_group.author_set
     total_author_set = list(set(authors_list + home_group.author_set))
 
-    result = node_collection.collection.update({"_type": "Group", "name": u"home", "author_set": {"$ne": total_author_set} }, {"$set": {"author_set": total_author_set}}, upsert=False, multi=False )
+    result = node_collection.collection.update({"_type": "Group", "name": {"$in": [u"home", u"desk"]}, "author_set": {"$ne": total_author_set} }, {"$set": {"author_set": total_author_set}}, upsert=False, multi=True )
 
     if result['updatedExisting']: # and result['nModified']:
         home_group.reload()
-        print "\n Updated author_set of 'home' group:" + \
-            "\n\t - Previously it was   : " + str(prev_home_author_set) + \
-            "\n\t - Now it's updated to : " + str(home_group.author_set)
+        print "\n Updated author_set of 'home' and 'desk' group:" + \
+            "\n\t - Previously it was   : " + str(len(prev_home_author_set)) + " users."\
+            "\n\t - Now it's updated to : " + str(len(home_group.author_set)) + " users."
 
     
     # --------------------------------------------------------------------------
@@ -62,7 +99,7 @@ class Command(BaseCommand):
 
     # --------------------------------------------------------------------------
     # Adding <'moderation_level': -1> field to Group objects
-    node_collection.collection.update({'_type': {'$in': ['Group']}, 'edit_policy': {'$nin': ['EDITABLE_MODERATED']}}, {'$set': {'moderation_level': -1 }}, upsert=False, multi=True)
+    res = node_collection.collection.update({'_type': {'$in': ['Group']}, 'edit_policy': {'$nin': ['EDITABLE_MODERATED']}, 'moderation_level': {'$exists': False}}, {'$set': {'moderation_level': -1 }}, upsert=False, multi=True)
 
     if res['updatedExisting']: # and res['nModified']:
         print "\n Added 'moderation_level' field to " + res['n'].__str__() + " Group instances."
@@ -239,7 +276,7 @@ class Command(BaseCommand):
     assignee_at = node_collection.one(
         {'_type': "AttributeType", 'name': "Assignee"}
     )
-
+    assignee_at = False
     if assignee_at:
         res = 0
         assignee_cur = triple_collection.find(
@@ -569,13 +606,13 @@ class Command(BaseCommand):
     gstpage_node = node_collection.find_one({"name":"Page"})
     gstwiki = node_collection.find_one({"name":"Wiki page"})
 
-    page_nodes = node_collection.find({"member_of":gstpage_node._id})
-    for i in page_nodes:
-        if gstwiki._id not in i.type_of:
-            i.type_of.append(gstwiki._id)
-            i.save()
-        else:
-            print i.name,"Page already Updated"	
+    # page_nodes = node_collection.find({"member_of":gstpage_node._id})
+    # for i in page_nodes:
+    #     if gstwiki._id not in i.type_of:
+    #         i.type_of.append(gstwiki._id)
+    #         i.save()
+    #     else:
+    #         print i.name,"Page already Updated"	
 
     nodes = node_collection.find({"_type":"Author",
 			'$or':[{'language_proficiency':{'$exists':False}},{'subject_proficiency':{'$exists':False}}]}) 
@@ -587,51 +624,91 @@ class Command(BaseCommand):
 
     # Add attributes to discussion thread for every page node.
     # If thread does not exist, create it.
-    pages_files_not_updated = []
+    # pages_files_not_updated = []
+    '''
+    Commented on Dec 5 2015 katkam.rachana@gmail.com to avoid unnecessary processing. This is a one-time script
+
+    pages_files_not_updated = {}
     page_gst = node_collection.one( { '_type': "GSystemType", 'name': "Page" })
-    file_gst = node_collection.one( { '_type': "GSystemType", 'name': "File" } )
+    file_gst = node_collection.one( { '_type': "GSystemType", 'name': "File" })
     page_file_cur = node_collection.find( { 'member_of': {'$in':[page_gst._id, file_gst._id]} , 'status': { '$in': [u'DRAFT', u'PUBLISHED']}} ).sort('last_update', -1)
     has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
     twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
     reply_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Reply'})
     rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
     thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
-    print "\n Total pages and files found : ", page_file_cur.count()
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+    all_count =  page_file_cur.count()
+    print "\n Total pages and files found : ", all_count
+    print "\n Processing " + str(all_count) + " will take time. Plase hold on ...\n"
     for idx, each_node in enumerate(page_file_cur):
         try:
-            # print "\nPage# ",idx, "\t - ", each_node._id, '\t - ' , each_node.name
+            # print "Processing #",idx, " of ",all_count
+            print ".",
+            # print "\nPage# ",idx, "\t - ", each_node._id, '\t - ' , each_node.name, each_node.attribute_set
             release_response_val = True
             interaction_type_val = unicode('Comment')
             userid = each_node.created_by
-            thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(each_node._id) })
+            thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(each_node._id)})
+            release_response_status = False
+            thread_interaction_type_status = False
+            discussion_enable_status = False
+            has_thread_status = False
+            # if get_attribute_value(each_node._id,"discussion_enable") != "":
+            #     discussion_enable_status = True
+            if get_relation_value(each_node._id,"has_thread") != ("",""):
+                has_thread_status = True
 
             if thread_obj:
-                # print "thread_obj exists ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
                 reply_cur = node_collection.find({'prior_node': each_node._id, 'member_of': reply_gst._id})
                 if reply_cur:
                     for each_rep in reply_cur:
                         node_collection.collection.update({'_id': each_rep._id},{'$set':{'prior_node':[thread_obj._id]}}, upsert = False, multi = False)
                         each_rep.reload()
-                node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': [each_node._id]}}, upsert = False, multi = False)
-                thread_obj.reload()
 
-                # print "thread_obj updated ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
                 # creating GRelation
-                gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
-                if release_response_val:
-                    create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
-                if interaction_type_val:
-                    create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+                if not has_thread_status:
+                    gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
+                    each_node.reload()
+                if get_attribute_value(thread_obj._id,"release_response") != "":
+                    release_response_status = True
+                if get_attribute_value(thread_obj._id,"thread_interaction_type") != "":
+                    thread_interaction_type_status = True
+                if not release_response_status:
+                    if release_response_val:
+                        create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+                        thread_obj.reload()
 
-                each_node.reload()
-                thread_obj.reload()
+                if not thread_interaction_type_status:
+                    if interaction_type_val:
+                        create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+                        thread_obj.reload()
                 # print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
+            else:
+                thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(each_node._id)})
+
+            if thread_obj:
+                if get_attribute_value(each_node._id,"discussion_enable") != True:
+                    create_gattribute(each_node._id, discussion_enable_at, True)
+            else:
+                if get_attribute_value(each_node._id,"discussion_enable") != False:
+                    create_gattribute(each_node._id, discussion_enable_at, False)
+                # print "\n\n discussion_enable False"
         except Exception as e:
-            pages_files_not_updated.append(each_node._id)
-            print "\n\nError occurred for page ", each_node._id, "--", each_node.name
-            print e
+
+            pages_files_not_updated[str(each_node._id)] = str(e)
+            print "\n\nError occurred for page ", each_node._id, "--", each_node.name,"--",e
+            # print e, each_node._id
             pass
-
-
     print "\n------- Discussion thread for Page and File GST successfully completed-------\n"
     print "\n\n Pages/Files that were not able to updated\t", pages_files_not_updated
+    '''
+    # Correct Eventype and CollegeEventtype Node  by setting their modified by field
+    glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
+    node = node_collection.find({'member_of':ObjectId(glist._id),"name":{'$in':['Eventtype','CollegeEvents']}}) 
+    for i in node:
+        if i is None:
+            i.modified_by = 1
+            i.save()
+            print "Updated",i.name,"'s modified by feild from null to 1"
+

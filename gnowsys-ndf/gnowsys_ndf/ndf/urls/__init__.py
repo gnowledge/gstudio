@@ -22,8 +22,9 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
-    (r'^admin/data[\/]?', include('gnowsys_ndf.ndf.urls.adminDashboard')),
-    (r'^admin/designer[\/]?', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
+    (r'^admin/', include('gnowsys_ndf.ndf.urls.gstudio_admin')),
+    (r'^admin/', include(admin.site.urls)),
+
     (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
 
     # --mobwrite-- commented for time being
@@ -34,7 +35,6 @@ urlpatterns = patterns('',
     # (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
     # (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
     # --end of mobwrite
-    (r'^admin/', include(admin.site.urls)),
     # (r'^$', HomeRedirectView.as_view()),        
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
@@ -43,13 +43,19 @@ urlpatterns = patterns('',
     # all main apps
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
+    (r'^(?P<group_id>[^/]+)/audio', include('gnowsys_ndf.ndf.urls.audio')),
     (r'^(?P<group_id>[^/]+)/video', include('gnowsys_ndf.ndf.urls.video')),
     (r'^(?P<group_id>[^/]+)/page', include('gnowsys_ndf.ndf.urls.page')),
     (r'^(?P<group_id>[^/]+)/group', include('gnowsys_ndf.ndf.urls.group')),
     (r'^(?P<group_id>[^/]+)/partner', include('gnowsys_ndf.ndf.urls.partner')),
     (r'^(?P<group_id>[^/]+)/forum', include('gnowsys_ndf.ndf.urls.forum')),
     (r'^(?P<group_id>[^/]+)/quiz', include('gnowsys_ndf.ndf.urls.quiz')),
-    (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
+    (r'^(?P<group_id>[^/]+)/discussion', include('gnowsys_ndf.ndf.urls.discussion')),
+
+    # Commented following url for khaal hackathon
+    # (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
+    (r'^(?P<group_id>[^/]+)/gcourse', include('gnowsys_ndf.ndf.urls.gcourse')),
+
     (r'^(?P<group_id>[^/]+)/program', include('gnowsys_ndf.ndf.urls.program')),
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
     (r'^(?P<group_id>[^/]+)/search', include('gnowsys_ndf.ndf.urls.search_urls')),
@@ -99,12 +105,14 @@ urlpatterns = patterns('',
     # (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
 
     # --discussion--
-    url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/create_discussion$', 'gnowsys_ndf.ndf.views.discussion.create_discussion', name='create_discussion'),    
-    url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/discussion_reply$', 'gnowsys_ndf.ndf.views.discussion.discussion_reply', name='discussion_reply'),
-    url(r'^(?P<group_id>[^/]+)/discussion_delete_reply$', 'gnowsys_ndf.ndf.views.discussion.discussion_delete_reply', name='discussion_delete_reply'),    
+    # url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/create_discussion$', 'gnowsys_ndf.ndf.views.discussion.create_discussion', name='create_discussion'),    
+    # url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/discussion_reply$', 'gnowsys_ndf.ndf.views.discussion.discussion_reply', name='discussion_reply'),
+    # url(r'^(?P<group_id>[^/]+)/discussion_delete_reply$', 'gnowsys_ndf.ndf.views.discussion.discussion_delete_reply', name='discussion_delete_reply'),    
     # --end of discussion
 
     url(r'^(?P<group_id>[^/]+)/visualize', include('gnowsys_ndf.ndf.urls.visualise_urls')),
+
+    (r'^explore/', include('gnowsys_ndf.ndf.urls.explore')),
 
     url(r'^(?P<group_id>[^/]+)/$', 'gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),
     # ---listing sub partners---                    
@@ -134,12 +142,13 @@ urlpatterns = patterns('',
 
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
 
+
     url(r'^(?P<group_id>[^/]+)/repository/?$', 'gnowsys_ndf.ndf.views.methods.repository', name='repository'),
     url(r'^get_gridfs_resource/(?P<gridfs_id>[^/]+)/?$', 'gnowsys_ndf.ndf.views.file.get_gridfs_resource', name='get_gridfs_resource'),
 
     # django-registration
-    url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
-    url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform}),
+    url(r'^accounts/password/change/done/', auth_views.password_change_done, {'template_name': 'registration/password_change_done.html'}, name='password_change_done'),
+    url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform, 'template_name': 'registration/password_change_form.html'}),
     url(r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form': UserResetform},name='password_reset_confirm'),
     url(r'^accounts/password/reset/complete/$', auth_views.password_reset_complete, name='password_reset_complete'),
     url(r'^accounts/password/reset/done/$',auth_views.password_reset_done,name="password_reset_done"),

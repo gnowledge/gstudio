@@ -16,7 +16,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE, GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE, GSTUDIO_SITE_NAME, GSTUDIO_SITE_LANDING_TEMPLATE
 from gnowsys_ndf.ndf.models import GSystemType, Node
 from gnowsys_ndf.ndf.models import node_collection
 
@@ -28,20 +28,25 @@ from gnowsys_ndf.ndf.models import node_collection
 def homepage(request, group_id):
     
     if request.user.is_authenticated():
-        auth_obj = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
-        if auth_obj:
-            auth_type = auth_obj._id
-        auth = ""
-        auth = node_collection.one({'_type': u"Author", 'name': unicode(request.user)})            
+        # auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
+        # if auth_obj:
+        #     auth_type = auth_obj._id
+        auth = node_collection.one({'_type': u"Author", 'created_by': int(request.user.id)})
+
         # This will create user document in Author collection to behave user as a group.
+        '''
+        The code below is commented whose purpose was to create Author
+        group on first-time login.
+        This functionality is implemented by using django-registration
+        signal 'user_activated'. (See 'def create_auth_grp' in signals.py)
         
         if auth is None:
             auth = node_collection.collection.Author()
-            
             auth.name = unicode(request.user)
             auth.email = unicode(request.user.email)
             auth.password = u""
-            auth.member_of.append(auth_type)
+            # auth.member_of.append(auth_type)
+            auth.member_of.append(auth_gst._id)
             auth.group_type = u"PUBLIC"
             auth.edit_policy = u"NON_EDITABLE"
             auth.subscription_policy = u"OPEN"
@@ -68,7 +73,7 @@ def homepage(request, group_id):
             # directly add user's id into author_set of home group without anymore checking overhead.
             home_group_obj.author_set.append(request.user.id)
             home_group_obj.save(groupid=group_id)
-            
+        '''
 
         if GSTUDIO_SITE_LANDING_PAGE == "home":
             return HttpResponseRedirect( reverse('landing_page') )
@@ -92,12 +97,24 @@ def landing_page(request):
     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
         return render_to_response(
                                 "ndf/landing_page_nroer.html",
-                                {"group_id": "home", 'groupid':"home"},
+                                {
+                                    "group_id": "home", 'groupid':"home",
+                                    'landing_page': 'landing_page'
+                                },
+                                context_instance=RequestContext(request)
+                            )
+
+    elif GSTUDIO_SITE_LANDING_TEMPLATE:
+        return render_to_response(
+                                GSTUDIO_SITE_LANDING_TEMPLATE,
+                                {
+                                    "group_id": "home", 'groupid':"home",
+                                    'title': 'CLIx'
+                                },
                                 context_instance=RequestContext(request)
                             )
     else:
         return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home"}) )
-
 
 
 # This class overrides the django's default RedirectView class and allows us to redirect it into user group after user logsin   

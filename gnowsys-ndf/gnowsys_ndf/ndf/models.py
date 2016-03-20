@@ -32,7 +32,6 @@ from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.rcslib import RCS
-from django.dispatch import receiver
 from registration.signals import user_registered
 
 
@@ -115,25 +114,6 @@ QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
 
 
-# FRAME CLASS DEFINITIONS
-@receiver(user_registered)
-def user_registered_handler(sender, user, request, **kwargs):
-    tmp_hold = node_collection.collection.node_holder()
-    dict_to_hold = {}
-    dict_to_hold['node_type'] = 'Author'
-    dict_to_hold['userid'] = user.id
-    agency_type = request.POST.get("agency_type", "")
-    if agency_type:
-        dict_to_hold['agency_type'] = agency_type
-    else:
-        # Set default value for agency_type as "Other"
-        dict_to_hold['agency_type'] = "Other"
-    dict_to_hold['group_affiliation'] = request.POST.get("group_affiliation", "")
-    tmp_hold.details_to_hold = dict_to_hold
-    tmp_hold.save()
-    return
-
-
 @connection.register
 class Node(DjangoDocument):
     '''Everything is a Node.  Other classes should inherit this Node class.  
@@ -179,7 +159,9 @@ class Node(DjangoDocument):
         'prior_node': [ObjectId], 
         'post_node': [ObjectId],
         
-        'language': unicode,
+        # 'language': unicode,  # previously it was unicode.
+        'language': (basestring, basestring),  # Tuple are converted into a simple list
+                                               # ref: https://github.com/namlook/mongokit/wiki/Structure#tuples
 
         'type_of': [ObjectId], # check required: only ObjectIDs of GSystemType 
         'member_of': [ObjectId], # check required: only ObjectIDs of
@@ -227,14 +209,69 @@ class Node(DjangoDocument):
         'rating':[{'score':int,
                   'user_id':int,
                   'ip_address':basestring}],
-    	'snapshot':dict
+        'snapshot':dict
     }
-    
+
+    indexes = [
+        {
+            # 1: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('name', INDEX_ASCENDING)
+            ]
+        }, {
+            # 2: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('created_by', INDEX_ASCENDING)
+            ]
+        }, {
+            # 3: Single index
+            'fields': [
+                ('group_set', INDEX_ASCENDING)
+            ]
+        }, {
+            # 4: Single index
+            'fields': [
+                ('member_of', INDEX_ASCENDING)
+            ]
+        }, {
+            # 5: Single index
+            'fields': [
+                ('name', INDEX_ASCENDING)
+            ]
+        }, {
+            # 6: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('status', INDEX_ASCENDING), \
+                ('access_policy', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 7: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('status', INDEX_ASCENDING), \
+                ('access_policy', INDEX_ASCENDING), ('created_at' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 8: Compound index
+            'fields': [
+                ('created_by', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, {
+            # 9: Compound index
+            'fields': [
+                ('status', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
+            ]
+        }, 
+    ]
+
     required_fields = ['name', '_type'] # 'group_set' to be included
                                         # here after the default
                                         # 'Administration' group is
                                         # ready.
-    default_values = {'created_at': datetime.datetime.utcnow, 'status': u'DRAFT'}
+    default_values = {
+                        'created_at': datetime.datetime.utcnow,
+                        'status': u'DRAFT',
+                        'language': ('en', 'English')
+                    }
     use_dot_notation = True
     
     ########## Setter(@x.setter) & Getter(@property) ##########
@@ -1109,10 +1146,15 @@ class GSystem(Node):
         'author_set': [int],                     # List of Authors
 
         'annotations': [dict],      # List of json files for annotations on the page
-        'license': basestring       # contains license/s in string format
+        'license': basestring,       # contains license/s in string format
+        # TODO: Adding one more field 'origin', kedar2a, 12-sep-15
+        'origin': []          # e.g: [{"csv-import": <fn name>}, {"sync_source": "<system-pub-key>"}]
     }
 
     use_dot_notation = True
+
+    # TODO: Make default value for license as 'CC-BY-SA 4.0 ...', kedar2a, 12-sep-15
+    # default_values = "CC-BY-SA 4.0 unported"
 
 
 @connection.register
@@ -1128,6 +1170,15 @@ class File(GSystem):
             'unit': unicode
         }  # dict used to hold file size in int and unit palace in term of KB,MB,GB
     }
+
+    indexes = [
+        {
+            # 12: Single index
+            'fields': [
+                ('mime_type', INDEX_ASCENDING)
+            ]
+        }
+    ]
 
     gridfs = {
         'containers': ['files']
@@ -1206,8 +1257,8 @@ class Author(Group):
         'visited_location': [],
         'preferred_languages': dict,          # preferred languages for users like preferred lang. , fall back lang. etc.
         'group_affiliation': basestring,
-	'language_proficiency':basestring,
-	'subject_proficiency':basestring
+	'language_proficiency':list,
+	'subject_proficiency':list
     }
 
     use_dot_notation = True
@@ -1585,8 +1636,6 @@ class Analytics(DjangoDocument):
     return self.__unicode__()
 
 
-
-
 #  TRIPLE CLASS DEFINITIONS
 @connection.register
 class Triple(DjangoDocument):
@@ -1806,13 +1855,23 @@ class Triple(DjangoDocument):
 
 @connection.register
 class GAttribute(Triple):
-
     structure = {
         'attribute_type_scope': basestring,
-        'attribute_type': AttributeType,  # DBRef of AttributeType Class
+        'attribute_type': AttributeType,  # Embedded document of AttributeType Class
         'object_value_scope': basestring,
-        'object_value': None		  # value -- it's data-type, is determined by attribute_type field
+        'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
+
+    indexes = [
+        {
+            # 1: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
+                ('attribute_type.$id', INDEX_ASCENDING), ('status', INDEX_ASCENDING)
+            ],
+            'check': False  # Required because $id is not explicitly specified in the structure
+        }
+    ]
 
     required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
@@ -1829,9 +1888,26 @@ class GRelation(Triple):
         'right_subject': OR(ObjectId, list)
     }
 
+    indexes = [{
+        # 1: Compound index
+        'fields': [
+            ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
+            ('relation_type.$id'), ('status', INDEX_ASCENDING), \
+            ('right_subject', INDEX_ASCENDING)
+        ],
+        'check': False  # Required because $id is not explicitly specified in the structure
+    }, {
+        # 2: Compound index
+        'fields': [
+            ('_type', INDEX_ASCENDING), ('right_subject', INDEX_ASCENDING), \
+            ('relation_type.$id'), ('status', INDEX_ASCENDING)
+        ],
+        'check': False  # Required because $id is not explicitly specified in the structure
+    }]
+
     required_fields = ['relation_type', 'right_subject']
     use_dot_notation = True
-    use_autorefs = True                   # To support Embedding of Documents
+    use_autorefs = True  # To support Embedding of Documents
 
 
 
@@ -1895,5 +1971,7 @@ class allLinks(DjangoDocument):
 # DATABASE Variables
 db = get_database()
 node_collection = db[Node.collection_name].Node
+benchmark_collection = db[Benchmark.collection_name]
 triple_collection = db[Triple.collection_name].Triple
 gridfs_collection = db["fs.files"]
+import signals

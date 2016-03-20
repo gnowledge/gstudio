@@ -23,7 +23,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, get_prior_node_hierarchy
-
+from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
 
 def program_event_list(request, group_id):
     """
@@ -33,39 +33,51 @@ def program_event_list(request, group_id):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
     course_coll = None
     enr_ce_coll = []
     list_of_pe = []
-
+    all_pe = []
     pe_gst = node_collection.one({'_type': "GSystemType", 'name': "ProgramEventGroup"})
 
     # program events
-    title = pe_gst.name
+    title = "Events"
 
-    pe_coll = node_collection.find({'member_of': pe_gst._id})
+    pe_coll = node_collection.find({'member_of': pe_gst._id}).sort('last_update', -1)
     for each_pe in pe_coll:
         list_of_hierarchy = get_prior_node_hierarchy(each_pe._id)
         if list_of_hierarchy:
             pe_obj = list_of_hierarchy[len(list_of_hierarchy)-1]
-        if pe_obj not in list_of_pe:
+        if pe_obj not in list_of_pe and pe_obj._id in group_obj.post_node:
             list_of_pe.append(pe_obj)
+    # print "\n\n list_of_pe",list_of_pe
+    gstaff_access = False
     if request.user.id:
+        gstaff_access = check_is_gstaff(group_id,request.user)
         userid = int(request.user.id)
         for each in list_of_pe:
             if userid in each.author_set:
                 if each not in enr_ce_coll:
-                    enr_ce_coll.append(each)        
+                    enr_ce_coll.append(each)     
+            else:
+                all_pe.append(each)   
+    else:
+        all_pe = list_of_pe
+    if gstaff_access:
+        all_pe = enr_ce_coll
+    # If request.user is admin, enr_ce_coll is all_pe. 
+    # As admin is added in author set of all pe
         # enr_ce_coll = node_collection.find({'$in': list_of_pe,'author_set': int(request.user.id)}).sort('last_update', -1)
 
-    ce_coll = node_collection.find({'member_of': pe_gst._id})
+    # ce_coll = node_collection.find({'member_of': pe_gst._id, 'author_set': {'$ne': int(request.user.id)}})
 
     return render_to_response("ndf/course.html",
                             {'title': title,
                              'course_gst': pe_gst,
                              'course_coll': list_of_pe,
                              'groupid': group_id, 'group_id': group_id,
-                             'ce_coll':list_of_pe,
+                             'ce_coll':all_pe,
                              'enr_ce_coll':enr_ce_coll,
                             },
                             context_instance=RequestContext(request)

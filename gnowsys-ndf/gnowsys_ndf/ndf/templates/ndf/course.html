@@ -7,145 +7,91 @@
 
 {% block help_content %}
 {% endblock %}
-
-
-{% block meta_content %}
-  {% check_is_gstaff groupid request.user as is_gstaff %}
-    <h4 class="subheader">
-        {{course_gst.name}}
-    </h4>
-{% if is_gstaff %}
-  {% if req_from_course %}
-        <a class="small button" href="{% url 'create_edit' group_name_tag %}">
-          <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
-        </a>
-  {% else %}
-        <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="small button">
-          <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
-        </a>
-  {% endif %}
-{% endif %}
+{% block style %}
+  {{block.super}}
+  li{
+    list-style:none;
+  }
+  .btn-width{
+    //width:100% !important;
+    //max-width:100% !important;
+  }
 {% endblock %}
 
+{% block collection_content %}
 
-{% block search_content %}
-{% endblock %}
-
-
-{% block related_content %}
-{% endblock %}
-
-
-{% block body_content %}
-  
   {% check_is_gstaff groupid request.user as is_gstaff %}
   {% user_access_policy groupid request.user as user_access %}
-    <!-- 
+    <!--
       Tab 1 - All CourseEvents  (Displayed to all : Anonymous, Authenticated, Group member/admin/owner, SuperUser)
       Tab 2 - User enrolled CourseEvents
       Tab 3 - Courses
     -->
-    <header class="row" data-tab data-options="deep_linking:true">
-      <dl class="tabs " data-tab role="tablist">
-
-        <dd class="tab-title active" role="presentational" ><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">{% if req_from_course %}{% trans "CourseEvents" %}{% else %}{% trans "ProgramEvents" %}{% endif %}</a></dd>
-        {% if request.user.is_authenticated  and not is_gstaff %}
-          <dd class="tab-title" role="presentational" ><a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" controls="panel2-2">{% if req_from_course %}{% trans "My Courses" %}{% else %}{% trans "My Programs" %}{% endif %}</a></dd>
-        {% endif %}    
-        {% if req_from_course and is_gstaff %}
-            <dd class="tab-title" role="presentational" ><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" controls="panel2-3">{% trans "Courses" %}</a></dd>
+    <div class="panel" style="background-color:#ddd;margin-top:1.8em;padding: 1rem;">
+      <ul class="" data-tab role="tablist" >
+        {% if is_gstaff %}
+          {% if req_from_course %}
+              <a class="tiny expand button radius btn-width" href="{% url 'create_edit' group_name_tag %}">
+                <i class="fi-plus"></i>{% trans " New Course" %}
+              </a>
+          {% else %}
+              <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="tiny expand button radius btn-width">
+                <i class="fi-plus"></i>{% trans " New Event" %}
+              </a>
+          {% endif %}
         {% endif %}
 
-      </dl>
-    </header>
+        <li class="active"><a href="#all_events" class="tiny expand button radius  btn-width">{% if req_from_course %}{% trans "All eCourses" %}{% else %}{% trans "All Events" %}{% endif %}</a></li>
+        {% if request.user.is_authenticated  and not is_gstaff %}
+          <li><a href="#my_events" class="tiny expand button radius  btn-width">{% if req_from_course %}{% trans "My eCourses" %}{% else %}{% trans "My Events" %}{% endif %}</a></li>
+        {% endif %}
+        {% if req_from_course and is_gstaff %}
+            <li><a href="#courses" class="tiny expand button radius  btn-width">{% trans "Courses" %}</a></li>
+        {% endif %}
+      </ul>
+    </div>
 
-    <div class="tabs-content ">
+{% endblock %}
 
-      <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-1">
+{% block body_content %}
+
+    <div class="tabs-content"  style="margin-left:18px;margin-top:-1em;">
+
+      <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-5" id="all_events" style="border-style:none">
+      {% if title == "Course" %}
+        <div class="repository-title large-4 columns">All eCourses</div>
+      {% else %}
+        <div class="repository-title large-4 columns">All {{title}}</div>
+      {% endif %}
 
         {% for course in ce_coll %}
-          <li class="card">
-              <div class="published course">
-              <a href="{% url 'groupchange' course.name %}">
-                <div class="row">
-                  <div class="small-8 column">
-                    <b>{{course.name}}
-                    </b>
-                  </div>
-                </div>
-                <span data-tooltip title="Course Event"></span>
-                <hr/>
-                <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-              </a>
-
-                <footer>
-                  <div class="age">
-                    {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-                    <br/>
-                    by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-                  </div>
-                  <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
-                </footer>
-
-              <div class="label-list small-12 columns">
-                {% for tag in course.tags|slice:":3" %}
-                <a href="{% url 'tag_info' group_name_tag tag %}">
-                  <span class="label" style="background-color:yellow">{{tag}}</span>
-                </a>{% endfor %}
-              </div>
-                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-            </div>
-          </li>        
-
+          <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
+            {% include 'ndf/simple_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk  %}
+          </li>
         {% empty %}
             <div class="row">
               <div class="small-12 columns">
-                <h5> 
+                <h5>
                 {% if req_from_course %}No Course Available!
                 {% else %}No Program Available!
                 {% endif %}
                 </h5>
               </div>
             </div>
-        
+
         {% endfor %}
       </section>
 
-      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-2">
-
+      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-5" id="my_events">
+      {% if title == "Course" %}
+        <h4>My eCourses</h4>
+      {% else %}
+        <h4>My {{title}}</h4>
+      {% endif %}
         {% for course in enr_ce_coll %}
-          <li class="card">
-              <div class="course">
-              <a href="{% url 'groupchange' course.name %}">
-                <div class="row">
-                  <div class="small-8 column">
-                    <b>{{course.name}}
-                    </b>
-                  </div>
-                </div>
-                <span data-tooltip title="Course"></span>
-                <hr/>
-                <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-              </a>
-
-                <footer>
-                  <div class="age">
-                    {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-                    <br/>
-                    by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-                  </div>
-                  <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
-                </footer>
-
-              <div class="label-list small-12 columns">
-                {% for tag in course.tags|slice:":3" %}
-                <a href="{% url 'tag_info' group_name_tag tag %}">
-                  <span class="label" style="background-color:yellow">{{tag}}</span>
-                </a>{% endfor %}
-              </div>
-                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-            </div>
-          </li>        
+          <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
+            {% include 'ndf/simple_card.html' with resource=course is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=course.pk %}
+          </li>
 
         {% empty %}
             <div class="row">
@@ -157,47 +103,18 @@
                 </h5>
               </div>
             </div>
-        
+
         {% endfor %}
       </section>
 
 
 
-      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-3">
-
+      <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-5" id="courses" style="border-style:none">
+       <div class="repository-title large-4 columns">All Courses</div>
         {% for course in course_coll %}
-          <li class="card">
-              <div class="course">
-              <a href="{% url 'course_detail' group_name_tag course %}">
-                <div class="row">
-                  <div class="small-8 column">
-                    <b>{{course.name}}
-                    </b>
-                  </div>
-                </div>
-                <span data-tooltip title="Course"></span>
-                <hr/>
-                <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-              </a>
-
-                <footer>
-                  <div class="age">
-                    {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-                    <br/>
-                    by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-                  </div>
-                  <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
-                </footer>
-
-              <div class="label-list small-12 columns">
-                {% for tag in course.tags|slice:":3" %}
-                <a href="{% url 'tag_info' group_name_tag tag %}">
-                  <span class="label" style="background-color:yellow">{{tag}}</span>
-                </a>{% endfor %}
-              </div>
-                <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-            </div>
-          </li>        
+          <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
+            {% include 'ndf/simple_card.html' with resource=course has_logo=True url_name="course_detail" first_arg=group_id second_arg=course.pk %}
+          </li>
 
         {% empty %}
             <div class="row">
@@ -206,7 +123,7 @@
                 </h5>
               </div>
             </div>
-        
+
         {% endfor %}
       </section>
 

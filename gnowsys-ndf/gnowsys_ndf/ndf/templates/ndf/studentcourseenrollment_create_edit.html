@@ -362,12 +362,12 @@
   //On click of select All, highlight all rows
     $(document).on('click','.select_all_rows',function(){
       $(sce_dt_var.fnGetNodes()).addClass('selected')
-      $("#lbl_displ").text("All " + $(sce_dt_var.fnGetNodes()).length + " rows are selected")
+      $("#lbl_displ").text("All " + $(sce_dt_var.fnGetNodes()).length + " Colleges are selected")
     });
 
   //On click of De-Select All, remove highlight from all rows
     $(document).on('click','.deselect_all_rows',function(){
-        $("#lbl_displ").text("All rows are de-selected")
+        $("#lbl_displ").text("All Colleges are de-selected")
         $(sce_dt_var.fnGetNodes()).removeClass("selected");
     });
 

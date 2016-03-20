@@ -28,7 +28,12 @@ this template is modified. So for the fields in the template it supports -
   <h2 class="text-center">
     <small>
       {% if node %} Edit | {{node.name}}
-      {% else %} {% trans "Create New Group" %}
+      {% else %} 
+      {% if subgroup_flag %}
+      {% trans "Create New Sub Group" %}
+      {% else %}
+      {% trans "Create New Group" %}
+      {% endif %}
       {% endif %}
     </small>
   </h2>
@@ -46,6 +51,9 @@ this template is modified. So for the fields in the template it supports -
       <input type="hidden" name="node_id" value="{{node.pk}}">
       <input type="hidden" name="name" value="{{node.name}}">
     {% endif %}
+    {% if subgroup_flag %}
+    <input type="hidden" name="subgroup" value="{{subgroup_flag}}">
+    {% endif %}
 
     <!-- name -->
     <div class="row">
@@ -57,9 +65,9 @@ this template is modified. So for the fields in the template it supports -
           </div>
 
           <div class="small-8 columns">
-            <input type="text" name="name" id="group_name" required placeholder="{% trans 'Enter the unique group name' %}" {% if node %}disabled=disabled title="Group name can not be changed" {% endif %} value="{{node.name}}">
+            <input type="text" name="name" id="group_name" required placeholder="{% trans 'Enter the unique group name' %}" {% if node %}disabled=disabled title="{% trans 'Group name can not be changed' %}" {% endif %} value="{{node.name}}">
             <label id="message" style="display:none; color:red"></label>
-            <small class="error">Group Name is required and it must be a string.</small>
+            <small class="error">{% trans "Group Name is required and it must be a string." %}</small>
           </div>
 
         </div>
@@ -308,7 +316,7 @@ this template is modified. So for the fields in the template it supports -
     <div class="row">
       <div class="small-12 medium-6 medium-centered columns">
         <label>Select Apps:</label>
-        {% include 'ndf/widget_selector.html' with for='gapps' all_options=all_gapps selected_options=group_gapps %}
+        {% include 'ndf/widget_selector.html' with for='apps_to_set' all_options=all_gapps selected_options=group_gapps oneline_element='true' %}
       </div>
     </div>
         
@@ -362,19 +370,19 @@ this template is modified. So for the fields in the template it supports -
         if (nodes.indexOf(name) >= 0)  
           { 
             $("#message").css("display", "block");
-            $("#message").text("Group '"+ name +"' already exist. Please choose another name");
+            $("#message").text("Group '"+ name +"' {% trans ' already exist. Please choose another name' %}");
             event.preventDefault();
           }
       }
       else if (val_chk != -1){
           $("#message").css("display", "block");
-          $("#message").text("Group name cannot include 'Mod' or 'mod' text at end.");
+          $("#message").text(" {% trans 'Group name cannot include 'Mod' or 'mod' text at end. ' %}");
           event.preventDefault();
       }
     }
     else if (name == ""){
       $("#message").css("display", "block");
-      $("#message").text("Group name cannot be empty.");
+      $("#message").text("{% trans 'Group name cannot be empty.' %}");
       event.preventDefault();
     }
 

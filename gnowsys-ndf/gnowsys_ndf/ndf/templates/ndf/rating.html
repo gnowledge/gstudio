@@ -1,95 +1,102 @@
 {% load ndf_tags %}
-{% load i18n %}    
+{% load i18n %}
 <!-- <div id="rating-bar" class="show-on-hover"> -->
-<div id="rating-bar">
-    <form>
-        
-    <b>{% trans "Rating" %} <span class="subheader" id="avg-rating">{{ratings.tot|default:"unrated"}}</span></b><br/>
-       {% get_node_ratings request node as ratings %}
-      
+{% get_node_ratings request node.pk as ratings %}
+    <form style="display: inline-block">
     <!-- Sets the rating values as data attributes -->
-      
-
-       <div class="rating-bar show" data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}"  data-user-rating="{{ratings.user_rating}}">
-
-          <span>
-            <input type="radio" id="rating-5" name="rating" value="5" /><label for="rating-5">5</label>
-            <input type="radio" id="rating-4" name="rating" value="4" /><label for="rating-4">4</label>
-            <input type="radio" id="rating-3" name="rating" value="3" /><label for="rating-3">3</label>
-            <input type="radio" id="rating-2" name="rating" value="2" /><label for="rating-2">2</label>
-            <input type="radio" id="rating-1" name="rating" value="1" /><label for="rating-1">1</label>
-            <input type="radio" id="rating-0" name="rating" value="0" class="last" /><label for="rating-0">0</label>
-        </span>   
-
-        <div>
-            {% if node.rating %} {% trans  'Numberof persons rated' %}: {{ node.rating|length }} {% endif %} 
-        </div>
-              
-    </div>
-         
-  </form>
-    </div>
+        <span datat-tooltip title="Your rating" class="lbl_tag" style="display: inline-block">
+            <div class="rating-bar show" data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}"  data-user-rating="{{ratings.user_rating}}">
+                <span>
+                    <input type="radio" id="rating-5" name="rating" value="5" />
+                        <label for="rating-5">5</label>
+                    <input type="radio" id="rating-4" name="rating" value="4" />
+                        <label for="rating-4">4</label>
+                    <input type="radio" id="rating-3" name="rating" value="3" />
+                        <label for="rating-3">3</label>
+                    <input type="radio" id="rating-2" name="rating" value="2" />
+                        <label for="rating-2">2</label>
+                    <input type="radio" id="rating-1" name="rating" value="1" />
+                        <label for="rating-1">1</label>
+                    <input type="radio" id="rating-0" name="rating" value="0" class="last" />
+                        <label for="rating-0">0</label>
+                </span>
+            </div>
+        </span>
+    </form>
+        {% if node.rating %}
+            <span data-tooltip title="Average Rating: {{ratings.avg}}<br>No. of Users rated: {{node.rating|length}}" style="display: inline-block;vertical-align: super;">
+                <label class="rating-lbl" style="font-size: 15px;color: #7D7D7D" id="avg-rating" >Avg. : &nbsp;{{ratings.avg|default:"unrated"}} {% trans ' by ' %}{{ node.rating|length }} <i class="fi-torsos"></i></label>
+            </span>
+        {% else %}
+            <small style="display: inline-block"><label class="lbl_tag" id="avg-rating" ><i>{% trans 'Not rated yet!' %}</i></label></small>
+        {% endif %}
 
 
 <script type="text/javascript">
-    
+
     //Ajax to post the user rating and fetch the new average
     function updateRating() {
-        surl="/{{node}}/ratings/add_ratings/";
-        userRating = $('input[name=rating]:checked').val();
-        nodeId=$(".rating-bar").attr("data-node");
-            
+        // surl="/{{node}}/ratings/add_ratings/";
+        user_rating = $('input[name=rating]:checked').val();
+
         $.ajax({
-                url: surl,
+                // url: surl,
+                url: "{% url 'rate_node' group_id node.pk %}",
                 type: 'POST',
                 data: {
-                    rating: userRating, node: nodeId, csrfmiddlewaretoken: '{{ csrf_token }}'
+                    rating: user_rating,
+                    node: '{{node.pk}}',
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
-            
-               success: function(data){
+
+                success: function(data){
                    //Replace rating bar with new values
-                               $("#rating-bar").html(data);   
-                   setRating();
-                                     }
-        }); 
-    
+                   //'rating_template' is a div.class of parent template
+                   // $(".rating_template").html(data);
+                   // console.log(data)
+                   data = JSON.parse(data)
+                   setRating(data);
+                }
+        });
+
     }
+
     //Sets the stars in the rating bar based on loaded values
-    function setRating(){
-        userRating = parseInt($(".rating-bar").attr("data-user-rating"));
-        avgRating = parseFloat($(".rating-bar").attr("data-avg-rating")).toFixed(2);
+    function setRating(data_dict){
+        userRating = data_dict['user_rating']
+        avgRating = data_dict['avg']
+        // userRating = parseInt($(".rating-bar").attr("data-user-rating"));
+        // avgRating = parseFloat($(".rating-bar").attr("data-avg-rating")).toFixed(1);
         //If the user has already rated, set the stars to the user rating, else set to the average value
-        if( userRating ){
-            setStars( userRating );
+        if(userRating){
+            setStars(userRating);
         }
-        else{
-            setStars( Math.round(avgRating) );
-            $(".rating-bar").addClass("unrated");
-        }
+        // else{
+        //     setStars( Math.round(avgRating) );
+        //     $(".rating-bar").addClass("unrated");
+        // }
         //Update the average value text
-        $("#avg-rating").html(avgRating);
+        $("#avg-rating").html("Avg. : &nbsp;"+ avgRating+" {% trans ' by ' %}"+data_dict['tot']+"<i class='fi-torsos'></i>");
+        $("#avg-rating").removeClass("lbl_tag").addClass("rating-lbl")
     }
-    setRating();
 
     //Sets the number of stars in the rating bar
     function setStars(stars){
         $(".rating-bar input[value="+stars+"]").prop("checked",true);
     }
-    
-</script>
 
-  <!-- Rating script only if user is logged in -->
-<script type="text/javascript">
+    setStars({% firstof ratings.user_rating ratings.avg  %});
 
-// Send the user's rating to the server on submit
-$("input[name=rating]").click(function() {
-    var user = "{{user.is_authenticated}}";
-    if (user == "True"){
-        updateRating();
-    }
-    else{
-        alert("{% trans 'Please login to rate this resource' %}");    
-    }
-    
-});
+    // Rating script only if user is logged in
+    // Send the user's rating to the server on submit
+    $("input[name=rating]").click(function() {
+        var user = "{{user.is_authenticated}}";
+        if (user == "True"){
+            updateRating();
+        }
+        else{
+            alert("{% trans 'Please login to rate this resource' %}");
+            return false;
+        }
+    });
 </script>
