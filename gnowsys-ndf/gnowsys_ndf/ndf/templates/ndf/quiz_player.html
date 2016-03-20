@@ -244,7 +244,7 @@
 
 	// Ajax call to save user's answer ---------------------------------------
 		function save_user_action(user_action, user_given_ans){
-			if(JSON.stringify(user_submitted_ans_list) != JSON.stringify(user_given_ans)){
+			if(user_given_ans.length > 0 && JSON.stringify(user_submitted_ans_list) != JSON.stringify(user_given_ans)){
 				$.ajax({
 					url: "{% url 'save_quizitem_answer' group_id %}",
 
@@ -260,15 +260,24 @@
 					dataType: "json",
 
 					success: function(data){
-						if(user_action == "submit"){
-							submit_btn_status("hide")
-							user_submitted_ans_list = user_given_ans;
-							if(data['count']){
-								$(".attempts_count").text("You attempted this question "+ data['count']+" times")
+						console.log(data)
+						if(data['success']){
+							if(user_action == "submit"){
+								submit_btn_status("hide")
+								user_submitted_ans_list = user_given_ans;
+								if(data['count']){
+									$(".attempts_count").text("You attempted this question "+ data['count']+" times")
+								}
 							}
+						}
+						else{
+							alert("Something went wrong.. Your answer has not been submitted. Please try again after some time.")
 						}
 					},
 				});//end of ajax
+			}
+			else if(user_given_ans.length == 0 ){
+				alert("Please select an answer.")
 			}
 			else{
 				alert("This answer is already submitted.")
