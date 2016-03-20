@@ -42,7 +42,9 @@ is_json_file_exists = False
 gsystem_type_node = None
 gsystem_type_id = None
 gsystem_type_name = ""
-
+home_grp = node_collection.one({'_type': "Group", 'name': "home"})
+group_id = home_grp._id
+user_id = 1
 mis_group = node_collection.one({
     '_type': "Group",
     '$or': [{
@@ -172,7 +174,7 @@ class Command(BaseCommand):
                         log_list.append(info_message)
 
                         t0 = time.time()
-                        parse_data_create_gsystem(file_path)
+                        parse_data_create_gsystem(file_path, file_name)
                         t1 = time.time()
                         time_diff = t1 - t0
                         # print time_diff
@@ -211,10 +213,12 @@ class Command(BaseCommand):
 # -----------------------------------------------------------------------------------------------------------------
 
 
-def parse_data_create_gsystem(json_file_path):
+def parse_data_create_gsystem(json_file_path, file_name):
     json_file_content = ""
 
     try:
+        print "\n file_name == ",file_name
+
         with open(json_file_path) as json_file:
             json_file_content = json_file.read()
 
@@ -240,11 +244,23 @@ def parse_data_create_gsystem(json_file_path):
     except Exception as e:
         error_message = "\n While parsing the file ("+json_file_path+") got following error...\n " + str(e)
         log_list.append(error_message)
+        print error_message
         raise error_message
 
 
     for i, json_document in enumerate(json_documents_list):
         try:
+            if file_name == "QuizItem.csv":
+                print "\n\n *******************"
+                question_content = json_document['content']
+                question_content = question_content.split(' ')
+                question_content = question_content[:4]
+                question_content = ' '.join(question_content)
+                json_document['name'] = question_content
+                json_document['altnames'] = json_document['content']
+                group_id = ObjectId(json_document['group_id'])
+                user_id = int(json_document['user_id'])
+                print "\n\n NAME ======= ", json_document['name'], group_id, user_id
             global node_repeated
             node_repeated = False
             n_name = ""
@@ -263,6 +279,7 @@ def parse_data_create_gsystem(json_file_path):
             parsed_json_document = {}
             attribute_relation_list = []
             for key in json_document.iterkeys():
+                # print "\n key ",key
                 parsed_key = key.lower()
                 parsed_key = parsed_key.replace(" ", "_")
                 if parsed_key in node_keys:
@@ -278,8 +295,10 @@ def parse_data_create_gsystem(json_file_path):
 
             info_message = "\n Creating "+gsystem_type_name+" ("+parsed_json_document["name"]+")..."
             log_list.append(info_message)
+            print "\n HERE == "
             node = create_edit_gsystem(gsystem_type_id, gsystem_type_name, parsed_json_document, user_id)
-
+            print "\n node created === ", node._id, " === ", node.name, node.altnames
+            # print "attribute_relation_list == ",attribute_relation_list
             if node:
                 if not attribute_relation_list:
                     # Neither possible attribute fields, nor possible relations defined for this node
@@ -288,7 +307,7 @@ def parse_data_create_gsystem(json_file_path):
                     continue
 
                 gst_possible_attributes_dict = node.get_possible_attributes(gsystem_type_id)
-
+                print "\n gsystem_type_id ===",gst_possible_attributes_dict
                 relation_list = []
                 json_document['name'] = node.name
 
@@ -297,6 +316,8 @@ def parse_data_create_gsystem(json_file_path):
                     is_relation = True
 
                     for attr_key, attr_value in gst_possible_attributes_dict.iteritems():
+                        # print "\n\n attr_key === ", attr_key
+                        # print "\n\n altnames --  === ", attr_value['altnames']
                         if key == attr_value['altnames'].lower() or key == attr_key.lower():
                             is_relation = False
 
@@ -568,6 +589,9 @@ def parse_data_create_gsystem(json_file_path):
             error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
             log_list.append(error_message)
             print error_message # Keep it!
+            import sys
+            print "\n ****\n"
+            print 'Error on line {}'.format(sys.exc_info()[-1].tb_lineno)
 
 
 def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_id):
@@ -575,7 +599,6 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
     and GRelation(s)
     """
     node = None
-
     if "(" in json_document['name'] or ")" in json_document['name']:
         query = {
             "_type": "GSystem",
@@ -630,8 +653,8 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
 
     info_message = "\n query for " + json_document['name'] + " : " + str(query) +  "\n"
     log_list.append(info_message)
-
-    node = node_collection.one(query)
+    if gsystem_type_name != "QuizItem":
+        node = node_collection.one(query)
 
     if node is None:
         try:
