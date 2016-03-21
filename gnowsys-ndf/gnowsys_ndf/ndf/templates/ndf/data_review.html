@@ -854,6 +854,8 @@
 	function deleteNode(oid)
 	{ 
 		$(".action_val").attr("value", 'purge')
+		$(".oid_val").attr("value", oid)
+
 		if(purge_confirm){
 			$.ajax({
 			    url:"{% url 'delete_resource' groupid  %}",
@@ -862,9 +864,9 @@
 					'node_id':oid
 			    },
 			    success:function(data){
+			 		data = JSON.parse(data)
 			 		if(data['success']){
 						//updateContent();
-						alert("done delete")
 						removeRow(oid);
 						purge_confirm = false
 			    	}
@@ -874,6 +876,7 @@
 			    	}
 				}               
 			});
+			$(".oid_val").attr("value", "")
 		}
 		else{
 			$("#purgeRestoreNodeAlertLabel").html("<p>Are you sure you want to Purge this resource?<br> \
@@ -886,6 +889,8 @@
 
 	function restoreNode (oid) {
 		$(".action_val").attr("value", 'restore')
+		$(".oid_val").attr("value", oid)
+
 		if(restore_confirm){
 			$.ajax({
 
@@ -896,6 +901,8 @@
 			 	},
 
 			 	success:function(data){
+			 		data = JSON.parse(data)
+
 			 		if(data['success']){
 				 		//updateContent();
 						removeRow(oid); 
@@ -907,6 +914,8 @@
 			 		};
 			 	}		
 			});	
+			$(".oid_val").attr("value", "")
+
 		}
 		else{
 
@@ -923,7 +932,6 @@
     $(document).on("click", "#btnPurgeRestoreConfirmYes", function() {
 		$("#purgeRestoreNodeAlert").foundation('reveal', 'close');
 		node_id = $(".oid_val").val()
-		alert(node_id)
 		action_value = $(".action_val").val()
 		if(action_value == "purge"){
 			purge_confirm = true
