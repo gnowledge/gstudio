@@ -4,6 +4,18 @@
 {% if not user_is_joined %}
 	{% check_user_join request groupid as user_is_joined %}
 {% endif %}
+  <div id="purgeRestoreNodeAlert" class="reveal-modal small alert-box radius" data-reveal data-alert>
+    <div class="row mod_msg">
+      	<label id="purgeRestoreNodeAlertLabel"></label>
+	</div>
+	<div class="row text-center purge_cofirm_btn_div">
+        <input type="button" id="btnPurgeRestoreConfirmYes" class="button tiny secondary" value="{% trans 'Yes' %}">
+        <input type="button" id="btnPurgeRestoreConfirmNo" class="button tiny secondary" value="{% trans 'No' %}">
+    </div>
+    <input type="hidden" class="oid_val">
+    <input type="hidden" class="action_val">
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
 
 <tr id="view-row-{{resource.pk}}">
 
@@ -301,10 +313,10 @@
 	{% if user.is_superuser %}
 		<td class="deletedata">
 		   	 
-			<div class="button tiny exapnd" id ="{{resource.pk}}" onclick = "deleteNode('{{resource.pk}}')"> Delete </div> 
+			<div class="button tiny expand" id ="{{resource.pk}}" onclick = "deleteNode('{{resource.pk}}')"> Delete </div> 
 		</td>
 		<td class="right-border">
-			<div class="button tiny exapnd" id ="{{resource.pk}}" onclick = "restoreNode('{{resource.pk}}')"> restore </div>
+			<div class="button tiny expand" id ="{{resource.pk}}" onclick = "restoreNode('{{resource.pk}}')"> Restore </div>
 		</td>
 	{% endif %}
 

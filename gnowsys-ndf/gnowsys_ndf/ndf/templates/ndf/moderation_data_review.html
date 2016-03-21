@@ -87,13 +87,13 @@
 		var appr_confirm_msg = "This action will APPROVE the following resource: <br/><li> ID : "+ String(oid) +". </li><li>Name: "+String(objname)+"</li>Are you sure you want continue?"
 		// var msg = "Resource having ID: " + String(oid) + " will be approved from this group.  Press 'OK' to Approve the resource\n- Press 'Cancel' to cancel the action"
 		
-	  // approveConfirm = window.confirm(msg);
-	  var approve_rej_confirm = false;
-    $("#mod_appr_rej_ModalLabel").html(appr_confirm_msg);
-    $("#mod_appr_rej_Modal").find(".appr_rej_btn_div").removeClass("hide")
-    $("#mod_appr_rej_Modal").find(".reject_options_div").addClass("hide");
-    $(".oid").val(oid);
-    $("#mod_appr_rej_Modal").foundation('reveal', 'open');
+		// approveConfirm = window.confirm(msg);
+		var approve_rej_confirm = false;
+		$("#mod_appr_rej_ModalLabel").html(appr_confirm_msg);
+		$("#mod_appr_rej_Modal").find(".appr_rej_btn_div").removeClass("hide")
+		$("#mod_appr_rej_Modal").find(".reject_options_div").addClass("hide");
+		$(".oid").val(oid);
+		$("#mod_appr_rej_Modal").foundation('reveal', 'open');
 	}
 
 	function rejectResource (oid,objname) {
