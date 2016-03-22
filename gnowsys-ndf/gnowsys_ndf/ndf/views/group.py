@@ -210,7 +210,8 @@ class CreateGroup(object):
             # Required to link temporary files with the current user who is:
             usrname = self.request.user.username
             filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-            group_obj.content = org2html(content_org, file_prefix=filename)
+            # group_obj.content = org2html(content_org, file_prefix=filename)
+            group_obj.content = content_org
             is_changed = True
 
         # decision for adding moderation_level
