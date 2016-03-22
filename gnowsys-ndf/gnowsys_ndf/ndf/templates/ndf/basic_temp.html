@@ -1,0 +1,63 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{%block title %} Basic Template {% endblock %}
+
+{% block body_content %}
+{# hello world #}	
+
+{# {{node}} #}
+{# {{basic_list}} #}
+
+<script type="text/javascript" src="/static/ndf/bower_components/tipped-4.5.5-light/tipped.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/tipped-4.5.5-light/tipped.css" />
+
+<form method="post" action="" name="{{node_gs.name}}" id="{{node_gs.name}}">
+{% csrf_token %}
+
+
+<table>
+<div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
+
+<font size="5"> {{node_gs.name}} </font> 
+
+    <div style="display:table-row;">
+    	{% for e in basic_list %}
+    	<tr><td>
+        <div style="display:table-cell;" >
+            <font size="3"> {{e}}  </font> 
+        </div></td>
+        <td> <input type="text"/> </td></tr>
+        {% endfor %}
+    </div>
+    <div style="display:table-row;">
+    	{% for e in ats %}
+    	<tr><td>
+        <div style="display:table-cell;"> 
+           <font size="3"> {{e.altnames}} : </font> 
+        </div></td>
+
+           <td>
+        <input type="text"/> </td></tr>
+        {% endfor %}
+    </div>
+    <div style="display:table-row;">
+    	{% for each in rts %}
+    	<tr><td>
+        <div style="display:table-cell;"> 
+           <font size="3"> {{each.altnames}} : </font> 
+        </div></td>
+        <td>
+        <input type="text"/> </td></tr>
+        {% endfor %}
+    </div>
+
+
+
+</div>
+</table>
+
+</form>
+
+{% endblock %}
