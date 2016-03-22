@@ -26,31 +26,11 @@
     }
 </style>-->
 <div id="reveal-{{node.pk}}" class="reveal-modal file-detail-modal" data-reveal >
-    <div class="row gmodal-toolbar">
+    <!--div class="row gmodal-toolbar">
         <div class="small-8 columns file-name" title="{{node.name}}">
             {% firstof node.altnames node.name %}
         </div>
         <div class="small-4 columns gmodal-actions">
-            {% comment %}
-            <div class="create-note">
-                <a>
-                    <i class="fi-page-edit"></i>
-                    Create note
-                </a>
-            </div>
-            <div class="create-collection">
-                <a>
-                    <i class="fi-folder"></i>
-                    Create new collection
-                </a>
-            </div>
-            <div class = "parent-folder">
-                <a>
-                    <i class="fa fa-plus"></i>
-                    Add to collection
-                </a>
-            </div>
-            {% endcomment %}
             <div class="view-info download-file">
                 <a>
                     <i class="fi-info"></i>View Info
@@ -72,9 +52,8 @@
                 </a>
             </div>
             <a href="{% url redirect_tab_url group_id %}" class="file-detail-modal-close"></a>
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
-    </div>
+    </div-->
     <div class="row gmodal-body">
         <div class="small-8 columns gmodal-item-panel">
             <!-- Detail view section -->
@@ -99,45 +78,79 @@
             {% endcomment %}
         </div>
         <!-- Comments section -->
-        <div class="small-4 columns gmodal-comments-panel" >
-            <div class="gmodal-comments"   style="overflow-y:auto;">
-
-            <div class="row view-info-area" hidden>
-                <div class="small-12 columns">
-                    <div class="view-info-close right">
-                        <a>Close</a>
+        <div class="small-4 columns gmodal-side-panel" >
+            <div class="gmodal-side row"   style="overflow-y:auto;">
+                <div class="small-12">
+                    <div class="row view-info-area image-name">
+                        <div class="small-12 columns">
+                            <h5>{% firstof node.altnames node.name %}</h5>
+                        </div>
+                        <a class="file-detail-modal-close close-reveal-modal" aria-label="Close">&#215;</a>
                     </div>
-
-                    <h5>{% firstof node.altnames node.name %}</h5>
-                    <hr>
-                    Date: {{node.created_at}}<br>
-                    Uploader: {{node.created_by|get_username}}<br>
-                    Format: {{node.mime_type}}<br>
-                    Size: {{node.file_size.size}}{{node.file_size.unit}}
-                </div>
-            </div>
-                <div class="row rating-area">
-                    <div class="small-6 columns">
-                        <h4>Rating</h4>
-                        {% include "ndf/rating.html" %} 
+                    <div class="row image-brief">
+                        <div class="small-12 columns">
+                            <i class="fi-eye"></i>
+                            <span class="viewed-count">214 Views</span>
+                            <span>Avg&nbsp;</span>
+                            <span class="image-rating">3.4</span>
+                            <span>Rate this</span>
+                            <span>
+                                {% include "ndf/rating.html" %}
+                            </span>
+                        </div>
                     </div>
-                    <div class="small-6 columns right">
-                        {% include "ndf/analytics_views.html" %}
-                    </div>
-
-                </div>
-
-                <div class="row comments-area">
-                    <div class="small-12 columns" >
-                        {% get_thread_node node.pk as thread_node %}
-                            {% if thread_node %}
-                                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                                {% get_node thread_node as thread_node_obj %}
-                                {% include 'ndf/ggallery-discussion.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
-                            {% else %}
-                                {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                                {% include 'ndf/ggallery-discussion.html' with var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                    <div class="row image-actions">
+                        <div class="small-12 columns">
+                            <a href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}"><i class="fa fa-arrow-circle-down"></i>&nbsp;Download</a>
+                            <a><i class="fa fa-pencil"></i>&nbsp;Create Note</a>
+                            {% get_edit_url node.pk as edit_url %}
+                            {% check_is_gstaff group_id request.user as is_gstaff %}
+                            {% if is_gstaff or node.created_by == request.user.id %}
+                                <a href="{% url edit_url group_id node.pk %}">
+                                    <i class="fi-page-edit" ></i>Edit
+                                </a>
                             {% endif %}
+                        </div>
+                    </div>
+                    <!--div class="row rating-area">
+                        <div class="small-6 columns">
+                            <h4>Rating</h4>
+                        </div>
+                        <div class="small-6 columns right">
+                            {% include "ndf/analytics_views.html" %}
+                        </div>
+
+                    </div-->
+                    <div class="row image-details">
+                        <div class="small-12 columns ">
+                            <ul class="tabs" data-tab>
+                              <li class="tab-title active"><a href="#image-comments">Comments</a></li>
+                              <li class="tab-title"><a href="#image-info">Info</a></li>
+                            </ul>
+                            <div class="tabs-content">
+                                <div class="content" id="image-info">
+                                    <span>Created At: </span>{{node.created_at}}<br>
+                                    <span>Uploader: </span>{{node.created_by|get_username}}<br>
+                                    <span>Format: </span>{{node.mime_type}}<br>
+                                    <span>Size: </span>{{node.file_size.size}}{{node.file_size.unit}}>
+                                </div>
+                                <div class="content active" id="image-comments">
+                                    <div class="row comments-area">
+                                        <div class="small-12 columns" >
+                                            {% get_thread_node node.pk as thread_node %}
+                                                {% if thread_node %}
+                                                    {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                                                    {% get_node thread_node as thread_node_obj %}
+                                                    {% include 'ndf/ggallery-discussion.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                                                {% else %}
+                                                    {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                                                    {% include 'ndf/ggallery-discussion.html' with var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                                                {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
