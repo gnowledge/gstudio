@@ -1,12 +1,13 @@
 from gnowsys_ndf.ndf.models import *
 twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
 reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"})
+qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
 twist_cur = node_collection.find({'member_of': twist_gst._id})
 
 print "\n Total threads found: ", twist_cur.count()
 print "\n Latest script ======================"
 def get_replies(node_id, list_of_user_ids,thread_id, nested=False):
-	reply_cur = node_collection.find({'member_of': reply_gst._id, 'prior_node': ObjectId(node_id)})
+	reply_cur = node_collection.find({'member_of': {'$in': [reply_gst._id, qip_gst._id]}, 'prior_node': ObjectId(node_id)})
 	# if not list_of_user_ids and reply_cur.count():
 	# 	print "\n First level comments -- ", reply_cur.count()
 	# if nested:

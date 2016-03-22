@@ -277,7 +277,13 @@ def approve_resource(request, group_id):
 		reject_reason_msg = request.POST.get('reject_reason', '')
 		# print "reject_reason_msg----", reject_reason_msg
 		# raise Exception("bb")
-		task_node,task_rt = get_relation_value(node_obj._id,"has_current_approval_task")
+		# task_node,task_rt = get_relation_value(node_obj._id,"has_current_approval_task")
+		grel_dict = get_relation_value(node_obj._id,"has_current_approval_task")
+		is_cursor = grel_dict.get("cursor",False)
+		if not is_cursor:
+			task_node = grel_dict.get("grel_node")
+			task_rt = grel_dict.get("grel_id")
+
 		auth_grp = node_collection.one({'_type': "Author", 'created_by': int(node_obj.created_by)})
 		node_obj.group_set = [auth_grp._id]
 		node_obj.status = u"DRAFT"
@@ -343,9 +349,18 @@ def create_moderator_task(request, group_id, node_id, \
 		task_dict = {}
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		
-		task_id_val = get_relation_value(node_obj._id,"has_current_approval_task")
-		if task_id_val != None:
-			task_dict['_id'] = get_relation_value(node_obj._id,"has_current_approval_task")
+		# task_id_val = get_relation_value(node_obj._id,"has_current_approval_task")
+		grel_dict = get_relation_value(node_obj._id,"has_current_approval_task")
+		is_cursor = grel_dict.get("cursor",False)
+		if not is_cursor:
+			task_node = grel_dict.get("grel_node",None)
+			if task_node:
+				task_dict['_id'] = task_node._id
+			# grel_id = grel_dict.get("grel_id")
+		# if task_id_val != None:
+		# 	task_dict['_id'] = get_relation_value(node_obj._id,"has_current_approval_task")
+
+
 		# if node_obj.relation_set:
 		# 	for rel in node_obj.relation_set:
 		# 		if rel and 'has_current_approval_task' in rel:

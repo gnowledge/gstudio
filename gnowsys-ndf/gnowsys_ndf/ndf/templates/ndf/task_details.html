@@ -50,13 +50,17 @@
   <div class="repository-desc large-8 columns">{{node.name}}</div></br> 
     <h2>
         {% get_user_object node.created_by as user_obj %}
-        {% get_relation_value node.pk 'has_type' as task_type_name %}
 
-       {% if task_type_name.0.name != "Moderation" %} 
-        {% if user_obj.username == request.user.username or request.user.is_superuser %}
-        <a href="#" class="button tiny" style="float:right" data-reveal-id="titleModal"> {% trans 'Edit' %}</a>
+        {% get_relation_value node.pk 'has_type' as grel_dict %}
+        {% if not grel_dict.cursor %}
+          {% if grel_dict.grel_node.name != "Moderation" %}
+            {% if user_obj.username == request.user.username or request.user.is_superuser %}
+            <a href="#" class="button tiny" style="float:right" data-reveal-id="titleModal"> {% trans 'Edit' %}</a>
+            {% endif %}
+
+          {% endif %}
         {% endif %}
-       {% endif %}
+
       </span> 
     </h2>
 

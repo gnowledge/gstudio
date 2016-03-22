@@ -146,7 +146,12 @@ def create_edit(request, group_id, node_id=None):
                     }
     if node_id:
         course_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
-        logo_img_node, grel_id = get_relation_value(node_id,'has_logo')
+        # logo_img_node, grel_id = get_relation_value(node_id,'has_logo')
+        grel_dict = get_relation_value(node_id,'has_logo')
+        is_cursor = grel_dict.get("cursor",False)
+        if not is_cursor:
+            logo_img_node = grel_dict.get("grel_node")
+            grel_id = grel_dict.get("grel_id")
 
     else:
         course_node = node_collection.collection.GSystem()
@@ -1435,7 +1440,13 @@ def get_resources(request, group_id):
                 units_res_nodes = node_collection.find({'_id': {'$in': units_res}})
                 for each_res_node in units_res_nodes:
                     # print "\n\n each_res_node.relation_set----",each_res_node.relation_set
-                    clone_of_obj,grel_node = get_relation_value(each_res_node._id,"clone_of")
+                    grel_dict = get_relation_value(each_res_node._id,"clone_of")
+                    is_cursor = grel_dict.get("cursor",False)
+                    if not is_cursor:
+                        clone_of_obj = grel_dict.get("grel_node", None)
+                        grel_id = grel_dict.get("grel_id")
+
+                    # clone_of_obj,grel_node = get_relation_value(each_res_node._id,"clone_of")
                     if clone_of_obj:
                         units_res.append(clone_of_obj._id)
             except:

@@ -8,6 +8,7 @@
 {% check_is_gstaff groupid request.user as is_gstaff %}
 {% check_group node.pk as is_group %}
 {% check_is_user_group node.pk as is_user_group %}
+{% get_relation_value node.pk 'has_help' as grel_dict %}
 <style type="text/css">
 	.right-btn, .left-btn{
 		/*float: left;*/
@@ -263,7 +264,7 @@
 			<!-- Location	-->
 				
 				{% if node.location %}
-		        	<a data-reveal-id="view-map-widget" class="lbl_field tag-rating-div" title={% trans "Click to view the location" %}><i class="fi-marker"></i> {% trans "Location" %}</a>
+		        	<a data-reveal-id="view-map-widget" class="lbl_field tag-rating-div" title='{% trans "Click to view the location" %}'><i class="fi-marker"></i> {% trans "Location" %}</a>
 	        	{% endif %}
 
 		    <!-- Graphs For Topics or Concept -->
@@ -294,9 +295,16 @@
 		        </ul>
 		        {% endif %}
 		      {% endif %}
+
+				{% if grel_dict.cursor and grel_dict.grel_node.count %}
+						<a class="lbl_field tag-rating-div" data-dropdown="help-list" data-options="is_hover:true;align:left"><i class="fi-info"></i> {% trans "Help" %}</a>
+						<ul id="help-list" class="f-dropdown" data-dropdown-content>
+						{% for each_help_page in grel_dict.grel_node %}
+							<li><a href="{% url 'page_details' groupid each_help_page.pk %}" target="_blank" title='{% trans "Click to view help page" %}'>{{each_help_page.name}}</a></li>
+						{% endfor %}
+						</ul>
+				{% endif %}
 	        
-	
-		        
 			{% endif %}
 
 			{% endif %}

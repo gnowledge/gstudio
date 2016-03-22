@@ -27,9 +27,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget, get_collection
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value  # get_existing_groups
-from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget, get_collection, set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -336,10 +334,15 @@ class CreateGroup(object):
         # adding thumbnail 
         logo_img_node = None
         grel_id = None
-        logo_img_node_grel_id = get_relation_value(group_obj._id,unicode(logo_rt))
-        if logo_img_node_grel_id:
-            logo_img_node = logo_img_node_grel_id[0]
-            grel_id = logo_img_node_grel_id[1]
+        # logo_img_node_grel_id = get_relation_value(group_obj._id,unicode(logo_rt))
+        grel_dict = get_relation_value(group_obj._id,unicode(logo_rt))
+        is_cursor = grel_dict.get("cursor",False)
+        if not is_cursor:
+            logo_img_node = grel_dict.get("grel_node")
+            grel_id = grel_dict.get("grel_id")
+        # if logo_img_node_grel_id:
+        #     logo_img_node = logo_img_node_grel_id[0]
+        #     grel_id = logo_img_node_grel_id[1]
         f = request.FILES.get("docFile", "")
         # print "\nf is ",f
 
@@ -1329,7 +1332,13 @@ class GroupCreateEditHandler(View):
         if partnergroup_flag:
             template = "ndf/create_partner.html"
             if group_obj:
-                logo_img_node, grel_id = get_relation_value(group_obj._id,'has_profile_pic')
+                # logo_img_node, grel_id = get_relation_value(group_obj._id,'has_profile_pic')
+                grel_dict = get_relation_value(group_obj._id, "has_profile_pic")
+                is_cursor = grel_dict.get("cursor",False)
+                if not is_cursor:
+                    logo_img_node = grel_dict.get("grel_node")
+                    grel_id = grel_dict.get("grel_id")
+
                 group_obj.get_neighbourhood(group_obj.member_of)
 
         # print "\n\ngroup_obj",group_obj.name,"----",group_obj.relation_set
@@ -1455,10 +1464,17 @@ class EventGroupCreateEditHandler(View):
             group_obj = get_group_name_id(group_id, get_obj=True)
             grel_id = None
 
-            logo_img_node_grel_id = get_relation_value(group_obj._id,'has_profile_pic')
-            if logo_img_node_grel_id:
-                logo_img_node = logo_img_node_grel_id[0]
-                grel_id = logo_img_node_grel_id[1]
+            # logo_img_node_grel_id = get_relation_value(group_obj._id,'has_profile_pic')
+            # if logo_img_node_grel_id:
+            #     logo_img_node = logo_img_node_grel_id[0]
+            #     grel_id = logo_img_node_grel_id[1]
+
+            grel_dict = get_relation_value(group_obj._id, "has_profile_pic")
+            is_cursor = grel_dict.get("cursor",False)
+            if not is_cursor:
+                logo_img_node = grel_dict.get("grel_node")
+                grel_id = grel_dict.get("grel_id")
+
 
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.
@@ -1840,9 +1856,16 @@ def group_dashboard(request, group_id=None):
 
       # getting the profile pic File object
       # profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
-      profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")      
-      if profile_pic_image:
-        profile_pic_image =  profile_pic_image[0]
+      # profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")      
+      # if profile_pic_image:
+      #   profile_pic_image =  profile_pic_image[0]
+
+      grel_dict = get_relation_value(group_obj._id, "has_profile_pic")
+      is_cursor = grel_dict.get("cursor",False)
+      if not is_cursor:
+          profile_pic_image = grel_dict.get("grel_node")
+          # grel_id = grel_dict.get("grel_id")
+
 
       # for each in group_obj.relation_set:
       #     if "has_profile_pic" in each:
@@ -1883,9 +1906,14 @@ def group_dashboard(request, group_id=None):
     pass
 
   # profile_pic_image, grelation_node = get_relation_value(group_obj._id,"has_profile_pic")      
-  profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")      
-  if profile_pic_image:
-    profile_pic_image = profile_pic_image[0]
+  # profile_pic_image = get_relation_value(group_obj._id,"has_profile_pic")      
+  # if profile_pic_image:
+  #   profile_pic_image = profile_pic_image[0]
+  grel_dict = get_relation_value(group_obj._id, "has_profile_pic")
+  is_cursor = grel_dict.get("cursor",False)
+  if not is_cursor:
+      profile_pic_image = grel_dict.get("grel_node")
+      # grel_id = grel_dict.get("grel_id")
 
   has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
   all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})

@@ -296,28 +296,30 @@ list-style: none;
 </script>
 {% endblock %}
 {% block script %}
+  $(document).on('click','.enroll-btn',function(){
+  //trigger the ajax call to enroll
+    $.ajax({
+      url: "{% url 'enroll_to_course' node.pk %}",
 
-$(document).on('click','.enroll-btn',function(){
-//trigger the ajax call to enroll
-$.ajax({
-url: "{% url 'enroll_to_course' node.pk %}",
+      data: {
+        'csrfmiddlewaretoken': "{{csrf_token}}"
+      },
 
-data: {
-'csrfmiddlewaretoken': "{{csrf_token}}"
-},
+      type: "POST",
 
-type: "POST",
+      dataType: "json",
 
-dataType: "json",
+      success: function(data){
+        success_state = data["success"]
+        if(success_state){
+          $(".enroll-btn").attr('value', 'ENROLLED')
+          $(".enroll-btn").attr("disabled","disabled")
+          location.reload();
+        }
+      },
+    });//end of ajax
+  })
 
-success: function(data){
-success_state = data["success"]
-if(success_state){
-$(".enroll-btn").attr('value', 'ENROLLED')
-$(".enroll-btn").attr("disabled","disabled")
-location.reload();
-}
-},
-});//end of ajax
-})
+
+
 {% endblock %}
