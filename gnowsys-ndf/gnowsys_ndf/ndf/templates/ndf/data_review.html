@@ -1,11 +1,11 @@
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
-
-{% block title %} {{title}} {% endblock %}
-
 {% get_group_name groupid as group_name_tag %}
 {% get_group_object groupid as group_object %}
+
+{% block title %} {% firstof title group_name_tag %} {% endblock %}
+
 
 {% block style %}
 
@@ -848,25 +848,50 @@
  		}
 	}
 
+	purge_confirm = false
+	restore_confirm = false
 
 	function deleteNode(oid)
 	{ 
-		$.ajax({
+		$(".action_val").attr("value", 'purge')
+		$(".oid_val").attr("value", oid)
 
-			 	url:"{% url 'delete_resource' groupid  %}",
-			 	type:'Get',
-			 	data:{
-			 			'node_id':oid
-			 	},
-
-			 	success:function(data){
-			 		//updateContent();
-			 		removeRow(oid);
-			 	}		
+		if(purge_confirm){
+			$.ajax({
+			    url:"{% url 'delete_resource' groupid  %}",
+			    type:'Get',
+			    data:{
+					'node_id':oid
+			    },
+			    success:function(data){
+			 		data = JSON.parse(data)
+			 		if(data['success']){
+						//updateContent();
+						removeRow(oid);
+						purge_confirm = false
+			    	}
+			    	else{
+			 			alert("Something went wrong! Resource unable to purge.\
+			 		 		Please try again after sometime."); 
+			    	}
+				}               
 			});
+			$(".oid_val").attr("value", "")
+		}
+		else{
+			$("#purgeRestoreNodeAlertLabel").html("<p>Are you sure you want to Purge this resource?<br> \
+				Please click 'Yes' to continue or 'No' to abort this action.<br><br>\
+				<small>* Purge will delete this resource forever. </small></p>");
+			$("#purgeRestoreNodeAlert").foundation('reveal', 'open');
+		}
+
 	}
 
 	function restoreNode (oid) {
+		$(".action_val").attr("value", 'restore')
+		$(".oid_val").attr("value", oid)
+
+		if(restore_confirm){
 			$.ajax({
 
 			 	url:"{% url 'restore_resource' groupid  %}",
@@ -876,14 +901,57 @@
 			 	},
 
 			 	success:function(data){
-			 		
-			 		//updateContent();
-			 		if (Boolean(data)) { removeRow(oid); }
-			 		else { alert("Oops some error occured! Resource could not get restored!"); };
-			 		
+			 		data = JSON.parse(data)
+
+			 		if(data['success']){
+				 		//updateContent();
+						removeRow(oid); 
+						restore_confirm = false
+			 		}
+			 		else {
+			 			alert("Something went wrong! Resource unable to restore.\
+			 		 		Please try again after sometime."); 
+			 		};
 			 	}		
 			});	
+			$(".oid_val").attr("value", "")
+
+		}
+		else{
+
+			$("#purgeRestoreNodeAlertLabel").html("<p>Are you sure you want to Restore this resource?<br> \
+				Please click 'Yes' to continue or 'No' to abort this action.<br><br> \
+				<small>* Restore will move this resource to its previous state. </small></p>");
+			$("#purgeRestoreNodeAlert").foundation('reveal', 'open');
+		}
+
 	}
+
+
+  //Confirm or Cancel Deletion
+    $(document).on("click", "#btnPurgeRestoreConfirmYes", function() {
+		$("#purgeRestoreNodeAlert").foundation('reveal', 'close');
+		node_id = $(".oid_val").val()
+		action_value = $(".action_val").val()
+		if(action_value == "purge"){
+			purge_confirm = true
+			deleteNode(node_id)
+		}
+		else if(action_value == "restore"){
+			restore_confirm = true
+			restoreNode(node_id)
+		}
+    });
+
+
+
+    $(document).on("click", "#btnPurgeRestoreConfirmNo", function() {
+        $("#purgeRestoreNodeAlert").foundation('reveal', 'close');
+		purge_confirm = false
+		restore_confirm = false
+        
+    });
+
 
 // </script>
 {% endblock %}
