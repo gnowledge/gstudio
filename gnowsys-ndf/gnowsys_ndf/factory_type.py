@@ -269,7 +269,18 @@ factory_relation_types = [
             'member_of': 'Binary',
             'object_cardinality': 1
         }
-    }
+    },
+
+    {'has_help': {
+            'subject_type':['*'],
+            'object_type':['*'], 
+            'inverse_name':'help_of', 
+            'meta_type':'factory_types',
+            'member_of': 'Binary',
+            'object_cardinality': 100
+        }
+    }, 
+
 ]
 
 

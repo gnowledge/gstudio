@@ -46,6 +46,26 @@
           <div class="small-8 columns">
               <div class="unit-title">{{unit_node.name}}</div>
               <div class="activity-title">
+                  {{node.name}}
+                  {% if "QuizItemEvent" not in node.member_of_names_list %}
+                  {% if is_gstaff or node.created_by == request.user.id %}
+                      {% get_edit_url node.pk as edit_url %}
+                      <small>
+                          <a title="Edit this {{node.member_of_names_list.0}}" class="edit_res_unit">{% trans " Edit Content" %}</a>|
+                          <a title="Edit this {{node.member_of_names_list.0}}" class="edit_settings" href="{% url edit_url group_id node.pk %}">{% trans " Edit Settings" %}</a>
+
+                          {% get_relation_value node.pk 'has_help' as grel_dict %}
+                            {% if grel_dict.cursor and grel_dict.grel_node.count %}
+                                |<a class="lbl_field tag-rating-div" data-dropdown="help-list" data-options="is_hover:true;align:bottom"><i class="fi-info"></i> {% trans "Help" %}</a>
+                                <ul id="help-list" class="f-dropdown" data-dropdown-content>
+                                {% for each_help_page in grel_dict.grel_node %}
+                                  <li><a href="{% url 'page_details' groupid each_help_page.pk %}" target="_blank" title='{% trans "Click to view help page" %}'>{{each_help_page.name}}</a></li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                      </small>
+                  {% endif %}
+                  {% endif %}
 
                 <a data-dropdown="drop1" aria-controls="drop1" aria-expanded="false"><i class="fa fa-align-justify"></i></a>
                 <ul id="drop1" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">

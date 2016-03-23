@@ -55,24 +55,18 @@
 
     {% elif "Group" in resource.member_of_names_list or has_logo == True or has_prof_pic == True %}
       {% if "Course" in resource.member_of_names_list or has_logo == True %}
-        {% get_relation_value resource.pk 'has_logo' as logo_img_and_grel_hl %}
-        {% if logo_img_and_grel_hl.0 %}
-          {% get_node logo_img as logo_img_and_grel_hl.0 %}
-          {% if logo_img_and_grel_hl.0.fs_file_ids.1 %}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.2 %}" alt="" />
-          {% endif %}
-        {% else %}
-          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
 
+        {% get_relation_value resource.pk 'has_logo' as grel_dict %}
+        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.2  %}
+                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
+        {% else %}
+                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height" >
         {% endif %}
 
       {% else %}
-        {% get_relation_value resource.pk 'has_profile_pic' as logo_img_and_grel_pp %}
-        {% if logo_img_and_grel_pp.0 %}
-          {% get_node logo_img as logo_img_and_grel_pp.0 %}
-          {% if logo_img_and_grel_pp.0.fs_file_ids.1 %}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.2 %}" alt="" />
-          {% endif %}
+        {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
+        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.2 %}
+          <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
         {% else %}
           <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
         {% endif %}

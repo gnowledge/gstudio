@@ -14,7 +14,7 @@ from gnowsys_ndf.ndf.models import File
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import node_collection
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time, delete_grelation
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, node_thread_access, create_thread_for_node
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id 
@@ -259,6 +259,7 @@ def image_edit(request,group_id,_id):
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
         img_node.save(is_changed=get_node_common_fields(request, img_node, group_id, GST_IMAGE),groupid=group_id)
         thread_create_val = request.POST.get("thread_create",'')
+        help_info_page = request.POST.get('help_info_page','')
 
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
@@ -266,6 +267,32 @@ def image_edit(request,group_id,_id):
             return_status = create_thread_for_node(request,group_id, img_node)
         else:
             create_gattribute(img_node._id, discussion_enable_at, False)
+
+        # print "\n\n help_info_page ================ ",help_info_page
+        if "None" not in help_info_page:
+          has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+          try:
+            help_info_page = map(ObjectId, help_info_page)
+            create_grelation(page_node._id, has_help_rt,help_info_page)
+          except Exception as invalidobjectid:
+            # print invalidobjectid
+            pass
+        else:
+
+          # Check if node had has_help RT
+          grel_dict = get_relation_value(page_node._id,"has_help")
+          # print "\n\n grel_dict ==== ", grel_dict
+          if grel_dict:
+            grel_id = grel_dict.get("grel_id","")
+            if grel_id:
+              for each_grel_id in grel_id:
+                del_status, del_status_msg = delete_grelation(
+                    subject_id=page_node._id,
+                    node_id=each_grel_id,
+                    deletion_type=0
+                )
+                # print "\n\n del_status == ",del_status
+                # print "\n\n del_status_msg == ",del_status_msg
 
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             get_node_metadata(request,img_node)

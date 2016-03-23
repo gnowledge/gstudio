@@ -149,8 +149,12 @@ def discussion_reply(request, group_id, node_id):
         prior_node = request.POST.get("prior_node_id", "")
         content_org = request.POST.get("reply_text_content", "") # reply content
         node = node_collection.one({"_id": ObjectId(node_id)})
-        gs_type_node_id = get_relation_value(node_id,'thread_of')
-        # print "\n gs_type_node_id",gs_type_node_id
+        # gs_type_node_id = get_relation_value(node_id,'thread_of')
+        grel_dict = get_relation_value(node_id,'thread_of')
+        is_cursor = grel_dict.get("cursor",False)
+        if not is_cursor:
+            gs_type_node_id = grel_dict.get("grel_node")
+            # grel_id = grel_dict.get("grel_id")
 
         # print "\n\n node.name === ", node.member_of_names_list, node._id, node.name
 
