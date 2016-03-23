@@ -1027,7 +1027,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
                     fileobj.content_org = unicode(content_org)
                     # Required to link temporary files with the current user who is modifying this document
                     filename_content = slugify(title) + "-" + usrname + "-"
-                    fileobj.content = org2html(content_org, file_prefix=filename_content)
+                    fileobj.content = content_org
                 if tags:
                     # print "\n\n tags",tags
                     if not type(tags) is list:
