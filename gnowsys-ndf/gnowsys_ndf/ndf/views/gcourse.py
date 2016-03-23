@@ -16,6 +16,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from mongokit import IS
+from mongokit import paginator
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -31,7 +32,7 @@ from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status
+from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status
 from gnowsys_ndf.notification import models as notification
@@ -138,10 +139,16 @@ def create_edit(request, group_id, node_id=None):
                     }
     if node_id:
         course_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
-        logo_img_node_grel_id = get_relation_value(node_id,'has_logo')
-        if logo_img_node_grel_id:
-            logo_img_node = logo_img_node_grel_id[0]
-            grel_id = logo_img_node_grel_id[1]
+        grel_dict = get_relation_value(node_id,'has_logo')
+        is_cursor = grel_dict.get("cursor",False)
+        if not is_cursor:
+            logo_img_node = grel_dict.get("grel_node")
+            grel_id = grel_dict.get("grel_id")
+
+        # logo_img_node_grel_id = get_relation_value(node_id,'has_logo')
+        # if logo_img_node_grel_id:
+        #     logo_img_node = logo_img_node_grel_id[0]
+        #     grel_id = logo_img_node_grel_id[1]
 
     else:
         course_node = node_collection.collection.GSystem()
@@ -1433,6 +1440,11 @@ def save_resources(request, group_id):
     '''
     response_dict = {"success": False,"create_new_unit": True}
     if request.is_ajax() and request.method == "POST":
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
+
         list_of_res = json.loads(request.POST.get('list_of_res', ""))
         css_node_id = request.POST.get('css_node', "")
         unit_name = request.POST.get('unit_name', "")
@@ -1455,7 +1467,7 @@ def save_resources(request, group_id):
             cu_new.status = u"PUBLISHED"
             cu_new.created_by = int(request.user.id)
             cu_new.contributors.append(int(request.user.id))
-
+            cu_new.group_set.append(group_id)
             cu_new.prior_node.append(css_node._id)
             cu_new.save(groupid=group_id)
             response_dict["create_new_unit"] = True
@@ -1463,18 +1475,33 @@ def save_resources(request, group_id):
 
         if cu_new._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
+        # print "\n\n member_of_names_list----", cu_new.member_of_names_list, "list_of_res_ids", list_of_res_ids
+        new_res_set = []
+        if "CourseUnitEvent" in cu_new.member_of_names_list:
+            list_of_res_nodes = node_collection.find({'_id': {'$in': list_of_res_ids}})
 
-        node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
-        cu_new.reload()
-        res_cur = node_collection.find({'_id': {'$in': list_of_res_ids}})
-        for eachres in res_cur:
-            if cu_new._id not in eachres.prior_node:
-                eachres.prior_node.append(cu_new._id)
-                eachres.save()
+            for each_res_node in list_of_res_nodes:
+                if each_res_node._id not in cu_new.collection_set:
+                    new_gs = replicate_resource(request, each_res_node, group_id)
+                    # if "QuizItem" in each_res_node.member_of_names_list:
+                    #     node_collection.collection.update({'_id': cu_new._id}, {'$push': {'post_node':new_gs._id}},upsert=False,multi=False)
+                    # else:
+                    if new_gs:
+                        new_res_set.append(new_gs._id)
+                        node_collection.collection.update({'_id': new_gs._id}, {'$push': {'prior_node':cu_new._id}},upsert=False,multi=False)
+        else:
+            for each_res_node_course in list_of_res_ids:
+                if each_res_node_course not in cu_new.collection_set:
+                    new_res_set.append(each_res_node_course)
+
+        for each_res_in_unit in new_res_set:
+            if each_res_in_unit not in cu_new.collection_set:
+                cu_new.collection_set.append(each_res_in_unit)
+                cu_new.save()
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
-
         return HttpResponse(json.dumps(response_dict))
+
 
 
 @login_required
@@ -1943,8 +1970,9 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
 
 
 @get_execution_time
-def course_raw_material(request, group_id, node_id=None):
-
+def course_raw_material(request, group_id, node_id=None,page_no=1):
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
+    
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     allow_to_upload = False
@@ -1986,6 +2014,9 @@ def course_raw_material(request, group_id, node_id=None):
             # 'tags': {'$regex': u"raw", '$options': "i"}
             },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
 
+        raw_material_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        context_variables.update({'raw_material_page_info':raw_material_page_info})
+    # print "\n\n\n\n **course_raw_page_info",course_raw_page_info
     gstaff_access = check_is_gstaff(group_id,request.user)
 
     # if request.user.id in gstaff_users:
@@ -2002,7 +2033,8 @@ def course_raw_material(request, group_id, node_id=None):
 
 
 @get_execution_time
-def course_gallery(request, group_id,node_id=None):
+def course_gallery(request, group_id,node_id=None,page_no=1):
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
@@ -2044,6 +2076,8 @@ def course_gallery(request, group_id,node_id=None):
         files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
         # print "\n\n Total files: ", files_cur.count()
         context_variables.update({'files_cur': files_cur})
+        gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        context_variables.update({'gallery_page_info':gallery_page_info})
     template = 'ndf/gcourse_event_group.html'
 
     return render_to_response(template, 

@@ -80,8 +80,8 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     quiz_item_node = None
 
     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
-    # if "CourseEventGroup" in group_object.member_of_names_list:
-    #     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
+    if "CourseEventGroup" in group_object.member_of_names_list:
+        gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
 
     # if node_id:
     #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
@@ -203,18 +203,30 @@ def create_edit_quiz_item(request, group_id, node_id=None):
             correct_ans_val_list = [options[each_val-1] for each_val in correct_answer]
             create_gattribute(quiz_item_node._id, correct_answer_AT, correct_ans_val_list)
 
-        thread_obj = create_thread_for_node(request,group_id, quiz_item_node)
+        # thread_obj = create_thread_for_node(request,group_id, quiz_item_node)
 
         quiz_item_node.reload()
         quiz_item_node.status = u"PUBLISHED"
 
         quiz_item_node.save(groupid=group_id)
         if "QuizItemEvent" in quiz_item_node.member_of_names_list:
+            # Create thread node
+            create_thread_for_node_flag = True
+            if quiz_item_node.relation_set:
+                for eachrel in quiz_item_node.relation_set:
+                    if eachrel and "has_thread" in eachrel:
+                        create_thread_for_node_flag = False
+            if create_thread_for_node_flag:
+                return_status = create_thread_for_node(request,group_id, quiz_item_node)
+                print "\n\n return_status === ", return_status
+
             return_url = request.POST.get("return_url")
             # print "\n\n return_url", return_url, type(return_url)
             if return_url:
                 if return_url == "groupchange":
                     return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))
+                elif return_url == "course_content":
+                    return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': group_id}))
                 return HttpResponseRedirect(return_url)
         if quiz_node:
             quiz_node.collection_set.append(quiz_item_node._id)
@@ -311,82 +323,100 @@ def quiz_details(request, group_id, node_id):
 @get_execution_time
 def save_quizitem_answer(request, group_id):
     response_dict = {"success": False}
+    try:
+        if request.is_ajax() and request.method == "POST":
+            try:
+                group_id = ObjectId(group_id)
+            except:
+                group_name, group_id = get_group_name_id(group_id)
+            import datetime
+            # group_obj = node_collection.one({'_id': ObjectId(group_id)})
+            new_list = []
+            user_given_ans = request.POST.getlist("user_given_ans[]", '')
+            node_id = request.POST.get("node", '')
+            # print "\n\n user_give_ans",user_given_ans
+            node_obj = node_collection.one({'_id': ObjectId(node_id)})
+            thread_obj = user_ans = None
+            try:
+                for each_rel in node_obj.relation_set:
+                    if each_rel and "has_thread" in each_rel:
+                        thread_id = each_rel['has_thread'][0]
+                        thread_obj = node_collection.one({'_id': ObjectId(thread_id)})
+                        # print "\n\n thread_obj === ", thread_obj.name , "==="
+            except:
+                pass
+            # grel_dict = get_relation_value(node_obj._id,"has_thread")
+            # is_cursor = grel_dict.get("cursor",False)
+            # print "\n\n is_cursor === ",is_cursor
+            # if is_cursor:
+            #     thread_obj = grel_dict.get("grel_node")
+            #     thread_grel = grel_dict.get("grel_id")
 
-    if request.is_ajax() and request.method == "POST":
-        try:
-            group_id = ObjectId(group_id)
-        except:
-            group_name, group_id = get_group_name_id(group_id)
-        import datetime
-        # group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        new_list = []
-        user_given_ans = request.POST.getlist("user_given_ans[]", '')
-        node_id = request.POST.get("node", '')
-        # print "\n\n user_give_ans",user_given_ans
-        node_obj = node_collection.one({'_id': ObjectId(node_id)})
-        thread_obj,thread_grel = get_relation_value(node_obj._id,"has_thread")
+            user_action = request.POST.get("user_action", '')
 
-        user_action = request.POST.get("user_action", '')
+            user_id = int(request.user.id)
+            user_name = unicode(request.user.username)
 
-        user_id = int(request.user.id)
-        user_name = unicode(request.user.username)
+            qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
+            qip_user_submitted_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_submitted_ans"})
+            qip_user_checked_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_checked_ans"})
+            already_ans_obj = None
+            if thread_obj != None:
+                already_ans_obj = node_collection.find_one({'member_of': qip_gst._id,'created_by': user_id, 'prior_node': thread_obj._id})
+                if already_ans_obj:
+                    # check whether user has already checked or submitted ans
+                    user_ans = already_ans_obj
+                else:
+                    user_ans = node_collection.collection.GSystem()
+                    user_ans.created_by = user_id
+                    user_ans.modified_by = user_id
+                    user_ans.contributors.append(user_id)
+                    user_ans.member_of.append(qip_gst._id)
+                    user_ans.group_set.append(group_id)
+                    user_ans.origin = [{'thread_id': thread_obj._id, 'prior_node_id_of_thread': node_obj._id}]
+                    user_ans.status = u"PUBLISHED"
 
-        qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
-        qip_user_submitted_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_submitted_ans"})
-        qip_user_checked_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_checked_ans"})
-        already_ans_obj = None
-        if thread_obj != None:
-            already_ans_obj = node_collection.find_one({'member_of': qip_gst._id,'created_by': user_id, 'prior_node': thread_obj._id})
-        if already_ans_obj:
-            # check whether user has already checked or submitted ans
-            user_ans = already_ans_obj
-        else:
-            user_ans = node_collection.collection.GSystem()
-            user_ans.created_by = user_id
-            user_ans.modified_by = user_id
-            user_ans.contributors.append(user_id)
-            user_ans.member_of.append(qip_gst._id)
-            user_ans.group_set.append(group_id)
-            user_ans.status = u"PUBLISHED"
+                user_ans.name = unicode("Answer_of:" + str(node_obj.name) + "-Answer_by:"+ str(user_name))
+                user_ans.save()
 
-        user_ans.name = unicode("Answer_of:" + str(node_obj.name) + "-Answer_by:"+ str(user_name))
-        user_ans.save()
+                if thread_obj._id not in user_ans.prior_node:
+                    # add user's post/reply obj to thread obj's post_node
+                    node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
+                if user_ans._id not in thread_obj.post_node:
+                    # add thread obj to user's post/reply prior_node
+                    node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
+                quiz_type_val = get_attribute_value(node_obj._id,"quiz_type")
 
-        if thread_obj != None:
-            if thread_obj._id not in user_ans.prior_node:
-                # add user's post/reply obj to thread obj's post_node
-                node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
-            if user_ans._id not in thread_obj.post_node:
-                # add thread obj to user's post/reply prior_node
-                node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
-        quiz_type_val = get_attribute_value(node_obj._id,"quiz_type")
+                # print "\n get_attribute_value--", get_attribute_value
+                if user_given_ans and user_ans:
+                    if quiz_type_val == "Short-Response":
+                        create_gattribute(user_ans._id, qip_user_submitted_ans_AT, user_given_ans)
+                    else:
+                        curr_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        if user_given_ans:
+                            if user_action == "check":
+                                if already_ans_obj:
+                                    old_checked_ans = get_attribute_value(user_ans._id,"quizitempost_user_checked_ans")
+                                    if old_checked_ans != "None" and old_checked_ans != "":
+                                        new_list = old_checked_ans
+                                new_list.append({str(curr_datetime):user_given_ans})
+                                if new_list:
+                                    create_gattribute(user_ans._id, qip_user_checked_ans_AT, new_list)
+                            elif user_action == "submit":
+                                if already_ans_obj:
+                                    old_submitted_ans = get_attribute_value(user_ans._id,"quizitempost_user_submitted_ans")
+                                    if old_submitted_ans != "None" and old_submitted_ans != "":
+                                        new_list = old_submitted_ans
+                                new_list.append({str(curr_datetime):user_given_ans})
+                                if new_list:
+                                    create_gattribute(user_ans._id, qip_user_submitted_ans_AT, new_list)
+                            user_ans.reload()
+                # print "\n user_ans.attribute_set",user_ans.attribute_set
+                response_dict['count'] = len(new_list)
+                response_dict['success'] = True
+            return HttpResponse(json.dumps(response_dict))
 
-        # print "\n get_attribute_value--", get_attribute_value
-        if user_given_ans:
-            if quiz_type_val == "Short-Response":
-                create_gattribute(user_ans._id, qip_user_submitted_ans_AT, user_given_ans)
-            else:
-                curr_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                if user_given_ans:
-                    if user_action == "check":
-                        if already_ans_obj:
-                            old_checked_ans = get_attribute_value(user_ans._id,"quizitempost_user_checked_ans")
-                            if old_checked_ans != "None" and old_checked_ans != "":
-                                new_list = old_checked_ans
-                        new_list.append({str(curr_datetime):user_given_ans})
-                        if new_list:
-                            create_gattribute(user_ans._id, qip_user_checked_ans_AT, new_list)
-                    elif user_action == "submit":
-                        if already_ans_obj:
-                            old_submitted_ans = get_attribute_value(user_ans._id,"quizitempost_user_submitted_ans")
-                            if old_submitted_ans != "None" and old_submitted_ans != "":
-                                new_list = old_submitted_ans
-                        new_list.append({str(curr_datetime):user_given_ans})
-                        if new_list:
-                            create_gattribute(user_ans._id, qip_user_submitted_ans_AT, new_list)
-                    user_ans.reload()
-        # print "\n user_ans.attribute_set",user_ans.attribute_set
-        response_dict['count'] = len(new_list)
-        response_dict['success'] = True
-        return HttpResponse(json.dumps(response_dict))
 
+    except Exception as e:
+        print "\n Something went wrong while saving quiz answer!!! ", str(e)
+        return response_dict
