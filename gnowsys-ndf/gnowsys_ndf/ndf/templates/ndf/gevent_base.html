@@ -51,12 +51,20 @@ color: black !important;
 /*Change the color here to change font color of tree*/
 }
 
-li.remove-dot{
-list-style: none;
+  li.remove-dot{
+  list-style: none;
 
-}
+  }
 
+  .div-height {
+      margin-bottom: 0px !important; 
+      height: 258px !important;
+  }
 
+  .course-banner{
+      text-shadow: 2px 2px black !important;
+      background: none !important;
+  }
 {% endblock %}
 
 {% block head %}
@@ -238,7 +246,8 @@ list-style: none;
         {% elif title == 'about' %}
           <div id="course-about">
             <div class="row collapse">
-              <div class="about-course-heading">
+              <div class="about-course-heading course-banner" >
+	              {% include 'ndf/upload_pic_widget.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False %}
                 <div class="heading-text">
                   <div>
                     <h2>{% firstof node.altnames node.name  %}</h2>
