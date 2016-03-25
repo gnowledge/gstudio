@@ -99,11 +99,14 @@
                     </div>
                   {% endif %}
                   {% endif %}
-
-                    <div class="small-12 medium-10 columns gallery-actions hide" >
+                
+                   {% comment %}
+                    <div class="small-12 medium-10 columns gallery-actions" >
                         <div class="create-note">
+                         <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" style="margin: 0em 0em 1em;">
                             <i class="fi-page-edit"></i>
                             <span> Create note</span>
+                        </a>
                         </div>
                         <div class="create-collection">
                             <i class="fi-folder"></i>
@@ -122,11 +125,20 @@
                             <span>View info</span>
                         </div>
                     </div>
-                </div>
+                     <div id="create_collection_model" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
+                    </div>
+                    
             </div>
+                   {% endcomment %}
             <!-- Files listing div -->
             <div class="gallery-body small-12 columns">
                 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5 gallery-body-ul">
+                
+                {% for each_coll in coll_cur %}
+                    <li class="card-image-wrapper gallery-img" id="{{each_coll.pk}}" style="margin-top:13px;margin-left:-10px">
+                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_coll.pk third_arg=False %}
+                    </li>
+                {% endfor %}
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
                         {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
@@ -223,4 +235,56 @@
         });//end of ajax
 
     }
+
+     $(document).on('change','.filenode',function(){
+
+        var checked = $('.filenode:checked').length;
+        if (checked){
+          $(".collection-area").css("display", "block");          
+        }
+        else{
+          $(".collection-area").css("display", "none");          
+        }
+        
+    });
+
+    $('.create-collection').click(function() {
+        var checked = $('.filenode:checked').length;
+        
+        if (checked){
+          $.ajax({
+            type: "GET",
+            url: "{% url 'course_create_collection' group_id %}",
+            datatype: "html",
+            data:{
+              
+            },
+            success: function(data) {
+                $("#create_collection_model").html(data);
+                $("#create_collection_model").foundation('reveal', 'open');
+              // location.href = "{% url 'course_gallery' group_id %}";
+
+            }
+          });          
+        }
+        
+        else{
+          alert("Select atleast 1 resource");
+
+        
+        }
+          
+    });
+
+  $(".create-note").click(function(){
+
+    $('.filenode:checked').each(function() {
+        alert($(this).closest("div").attr("class"));
+         var url = $(this).closest('.scard-container').find('img').attr('src');
+         alert(url); 
+         CKEDITOR.instances['ckeditor_textarea'].insertHtml('<div>shree ganesha</div>');
+      });
+
+  })
+
 </script>
