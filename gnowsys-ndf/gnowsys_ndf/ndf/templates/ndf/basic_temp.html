@@ -32,10 +32,10 @@
         {% endfor %}
     </div>
     <div style="display:table-row;">
-    	{% for e in ats %}
+    	{% for each in ats %}
     	<tr><td>
         <div style="display:table-cell;"> 
-           <font size="3"> {{e.altnames}} : </font> 
+           <font size="3"> {% firstof each.altnames each.name %} : </font> 
         </div></td>
 
            <td>
@@ -43,10 +43,30 @@
         {% endfor %}
     </div>
     <div style="display:table-row;">
-    	{% for each in rts %}
+        {% for each in rts %}
+        <tr><td>
+        <div style="display:table-cell;"> 
+           <font size="3"> {% firstof each.altnames each.name %} : </font> 
+        </div></td>
+        <td>
+        <input type="text"/> </td></tr>
+        {% endfor %}
+    </div>
+    <div style="display:table-row;">
+        {% for key,value in pos_ats.iteritems %}
+        <tr><td>
+        <div style="display:table-cell;"> 
+           <font size="3"> {{value.altnames}} : </font> 
+        </div></td>
+        <td>
+        <input type="text"/> </td></tr>
+        {% endfor %}
+    </div>
+    <div style="display:table-row;">
+    	{% for key,value in pos_rts.iteritems %}
     	<tr><td>
         <div style="display:table-cell;"> 
-           <font size="3"> {{each.altnames}} : </font> 
+           <font size="3"> {{value.altnames}} : </font> 
         </div></td>
         <td>
         <input type="text"/> </td></tr>
@@ -57,7 +77,7 @@
 
 </div>
 </table>
-
+<input type="submit" class="button" id="save-node-type" value="Save" />
 </form>
 
 {% endblock %}
