@@ -56,7 +56,7 @@
         {% for key,value in pos_ats.iteritems %}
         <tr><td>
         <div style="display:table-cell;"> 
-           <font size="3"> {{value.altnames}} : </font> 
+           <font size="3"> {% firstof value.altnames key value.inverse_name %} : </font> 
         </div></td>
         <td>
         <input type="text"/> </td></tr>
@@ -66,7 +66,7 @@
     	{% for key,value in pos_rts.iteritems %}
     	<tr><td>
         <div style="display:table-cell;"> 
-           <font size="3"> {{value.altnames}} : </font> 
+           <font size="3"> {% firstof value.altnames key value.inverse_name %} : </font> 
         </div></td>
         <td>
         <input type="text"/> </td></tr>
