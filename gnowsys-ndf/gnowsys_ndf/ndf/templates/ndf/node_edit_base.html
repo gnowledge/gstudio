@@ -138,6 +138,10 @@
 						  	<a>{% trans "Interaction Settings" %} </a> 
 						</dd>  
 					{% endif %}
+				<dd class="help_rt_tab" title="Click here to add/remove Help page for this resource">
+				 	<a>{% trans "Help" %} </a> 
+				</dd>	
+
 				{% else %}
 					<input type="hidden" name="blog_type" value="{{blog_type}}">
 				{% endif %}
@@ -583,7 +587,31 @@
 	    </div>
 	</div>	
 
+
+    <div class="content contents" id="panel-help" style="width:95%; display:none;" >      
+      	<div class="row">
+		  	<h7>{% trans "Select help page for this resource"%} </h7>
+		</div>
+	    <div class="help-settings-div">
+			{% get_dict_from_list_of_dicts node.relation_set True as node_rel_set %}
+			{% get_info_pages group_id as all_info_pages %}
+			<select class="help_onfo_page" name="help_info_page" multiple style="height:200px;">
+				<option value="None" {% if not node_rel_set %}selected{% endif %}> --- Select --- </option>
+				{% for each_page in all_info_pages %}
+					<option value="{{each_page.pk}}"
+					{% if node_rel_set.has_help %}{% if each_page.pk in node_rel_set.has_help %}
+					selected
+					{% endif %}{% endif %}>
+						{{each_page.name}}
+					</option>
+				{% endfor %}
+			</select>
+	    </div>
+
+	</div>	
+
     
+
     <!-- Kept this bellow commented part for future reference(Don't delete this) -->
 
         <!--
@@ -885,25 +913,19 @@
 			{% if node.discussion_enable == False %}
 				$("input[name='thread_create'][value='No']").attr("checked","checked");
 			{% else %}
-			{% get_relation_value node.pk 'has_thread' as grel_rt_sub_and_grelid %}
-				{% if grel_rt_sub_and_grelid.0 %}
-					{% with grel_rt_sub_and_grelid.0 as disc_thread_node %}
-						{% if disc_thread_node %}
-							$("input[name='thread_create'][value='Yes']").attr("checked","checked");
-							$("input[name='thread_create']").trigger("change");
-							$("input[name='thread_create']").attr("disabled",true);
-							// $(".yes_no_disc_div").addClass("hide");
-
-							{% get_attribute_value disc_thread_node.pk 'release_response' as resp_val %}
-							{% get_attribute_value disc_thread_node.pk 'thread_interaction_type' as thr_int_type %}
-							{% get_attribute_value disc_thread_node.pk 'start_time' as thr_start_time %}
-							{% get_attribute_value disc_thread_node.pk 'end_time' as thr_end_time %}
-							$("#release_resp_sel").val("{{resp_val}}")
-							$("#interaction_type_sel").val("{{thr_int_type}}")
-							$("#thread_start_date").val('{{thr_start_time|date:"d/m/Y"}}')
-							$("#thread_close_date").val('{{thr_end_time|date:"d/m/Y"}}')
-						{% endif %}
-					{% endwith %}
+	        	{% get_relation_value resource.pk 'has_thread' as grel_dict %}
+		        {% if not grel_dict.cursor and grel_dict.grel_node %}
+					$("input[name='thread_create'][value='Yes']").attr("checked","checked");
+					$("input[name='thread_create']").trigger("change");
+					$("input[name='thread_create']").attr("disabled",true);
+					{% get_attribute_value grel_dict.grel_node.pk 'release_response' as resp_val %}
+					{% get_attribute_value grel_dict.grel_node.pk 'thread_interaction_type' as thr_int_type %}
+					{% get_attribute_value grel_dict.grel_node.pk 'start_time' as thr_start_time %}
+					{% get_attribute_value grel_dict.grel_node.pk 'end_time' as thr_end_time %}
+					$("#release_resp_sel").val("{{resp_val}}")
+					$("#interaction_type_sel").val("{{thr_int_type}}")
+					$("#thread_start_date").val('{{thr_start_time|date:"d/m/Y"}}')
+					$("#thread_close_date").val('{{thr_end_time|date:"d/m/Y"}}')
 				{% endif %}
 			{% endif %}
 
@@ -1005,6 +1027,18 @@
 		$("dl.select > dd").removeClass("active")
 		$(this).addClass("active")
 	});			
+
+	$(".help_rt_tab").click(function() {
+		// for activating "panel-metadata" div and deactivate other div's
+		$("div.contents").css("display", "none");
+		$("#panel-help").css("display", "block");
+		$("#save-node").css("display", "block");
+		// For highlighting current clicked element
+
+		$("dl.select > dd").removeClass("active")
+		$(this).addClass("active")
+	});			
+
 
 	$(".prior_node_tab").click(function() {
 

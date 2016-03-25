@@ -530,28 +530,35 @@ def get_attribute_value(node_id, attr,get_data_type=False):
 @register.assignment_tag
 def get_relation_value(node_id, grel):
 	try:
-		grel_val_node = None
-		grel_id = None
-		node_grel = None
+		result_dict = {}
 		if node_id:
 			node = node_collection.one({'_id': ObjectId(node_id) })
-			grel = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
-			if node and grel:
-				node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': grel._id,'status':"PUBLISHED"})
-				if node_grel:
-					grel_val = node_grel.right_subject
-					grel_id = node_grel._id
-					grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
-					# returns right_subject of grelation and GRelation _id 
-					return grel_val_node, grel_id
+			relation_type_node = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
+			if node and relation_type_node:
+				if relation_type_node.object_cardinality > 1:
+					node_grel = triple_collection.find({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
+					if node_grel:
+						grel_val = []
+						grel_id = []
+						for each_node in node_grel:
+							grel_val.append(each_node.right_subject)
+							grel_id.append(each_node._id)
+						grel_val_node_cur = node_collection.find({'_id':{'$in' : grel_val}})
+						# nodes = [grel_node_val for grel_node_val in grel_val_node_cur]
+						# print "\n\n grel_val_node, grel_id == ",grel_val_node, grel_id
+						result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node_cur, "cursor": True})
 				else:
-					return None
-			else:
-				return None
-		else:
-			return None
-
+					node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
+					if node_grel:
+						grel_val = node_grel.right_subject
+						grel_id = node_grel._id
+						grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+						# returns right_subject of grelation and GRelation _id 
+						result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node, "cursor": False})
+		# print "\n\nresult_dict === ",result_dict
+		return result_dict
 	except Exception as e:
+		print e
 		return None
 
 @get_execution_time
@@ -1352,12 +1359,12 @@ def get_edit_url(groupid):
 			return 'term_create_edit' 
 		elif type_name == 'Theme' or type_name == 'Topic':
 			return 'theme_topic_create'
-		elif type_name == 'QuizItem':
+		elif type_name == 'QuizItem' or type_name == 'QuizItemEvent':
 			return 'quiz_item_edit'
-                elif type_name == 'Forum':
-                        return 'edit_forum'
-                elif type_name == 'Twist' or type_name == 'Thread':
-                        return 'edit_thread'
+		elif type_name == 'Forum':
+			return 'edit_forum'
+		elif type_name == 'Twist' or type_name == 'Thread':
+			return 'edit_thread'
 
 
 	elif node._type == 'Group' or node._type == 'Author' :
@@ -3445,18 +3452,27 @@ def get_user_quiz_resp(node_obj, user_obj):
 
 	'''
 	result = {'count': 0, 'recent_ans': None}
+	thread_obj = None
 	if node_obj and user_obj:
-		thread_obj = get_relation_value(node_obj._id,'has_thread')
-		qip = node_collection.find_one({'_id': {'$in':thread_obj[0].post_node}, 'created_by': user_obj.id})
-		if qip:
-			qip_sub = get_attribute_value(qip._id,'quizitempost_user_submitted_ans')
-			if qip_sub:
-				result['count'] = len(qip_sub)
-				recent_ans = qip_sub[-1]
-				if node_obj.quiz_type == "Short-Response":
-					result['recent_ans'] = recent_ans
-				else:
-					result['recent_ans'] = recent_ans.values()[0]
+		try:
+			for each_rel in node_obj.relation_set:
+				if each_rel and "has_thread" in each_rel:
+					thread_id = each_rel['has_thread'][0]
+					thread_obj = node_collection.one({'_id': ObjectId(thread_id)})
+		except:
+			pass
+		if thread_obj:
+
+			qip = node_collection.one({'_id':{'$in': thread_obj.post_node}, 'created_by': user_obj.id})
+			if qip:
+				qip_sub = get_attribute_value(qip._id,'quizitempost_user_submitted_ans')
+				if qip_sub:
+					result['count'] = len(qip_sub)
+					recent_ans = qip_sub[-1]
+					if node_obj.quiz_type == "Short-Response":
+						result['recent_ans'] = recent_ans
+					else:
+						result['recent_ans'] = recent_ans.values()[0]
 		return result
 
 @get_execution_time
@@ -3538,3 +3554,17 @@ def get_course_filters(group_id, filter_context):
 				all_tags_list = json.dumps(all_tags_list)
 			filters_dict[each_course_filter_key].update({'value': all_tags_list})
 	return filters_dict
+
+
+@get_execution_time
+@register.assignment_tag
+def get_info_pages(group_id):
+	list_of_nodes = []
+	page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+	info_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Info page"})
+	info_page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': info_page_gst._id})
+	# print "\n\n info_page_nodes===",info_page_nodes.count()
+	# if info_page_nodes.count():
+	# 	for eachnode in info_page_nodes:
+	# 		list_of_nodes.append({'name': eachnode.name,'id': eachnode._id})
+	return info_page_nodes
