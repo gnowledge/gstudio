@@ -3,16 +3,23 @@ import os
 import hashlib
 import datetime
 import json
-from itertools import chain  # Using from_iterable()
+import magic
+import mimetypes
 
+from itertools import chain     # Using from_iterable()
+from hashfs import HashFS       # content-addressable file management system
+from StringIO import StringIO
+from PIL import Image
 
 # imports from installed packages
 from django.contrib.auth.models import User
 from django.db import models
+from django.http import HttpRequest
 
 from django_mongokit import connection
 from django_mongokit import get_database
 from django_mongokit.document import DjangoDocument
+from django.core.files.images import get_image_dimensions
 
 from mongokit import IS
 from mongokit import OR
@@ -25,11 +32,12 @@ except ImportError:  # old pymongo
 
 
 # imports from application folders/files
-from gnowsys_ndf.settings import RCS_REPO_DIR
+from gnowsys_ndf.settings import RCS_REPO_DIR, MEDIA_ROOT
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_AUTHOR_AGENCY_TYPES
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.rcslib import RCS
 from registration.signals import user_registered
@@ -112,6 +120,12 @@ STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
 
 QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
+
+# Designate a root folder for HashFS. If the folder does not exists already, it will be created. 
+# Set the `depth` to the number of subfolders the file's hash should be split when saving.
+# Set the `width` to the desired width of each subfolder.
+gfs = HashFS(MEDIA_ROOT, depth=3, width=1, algorithm='sha256')
+# gfs: gstudio file system
 
 
 @connection.register
@@ -273,6 +287,217 @@ class Node(DjangoDocument):
                         'language': ('en', 'English')
                     }
     use_dot_notation = True
+
+    
+    def fill_node_values(self, request=HttpRequest(), **kwargs):
+
+        # 'name': unicode,
+        if kwargs.has_key('name'):
+            name = kwargs.get('name', '')
+        else:
+            name = request.POST.get('name', '').strip()
+        self.name = unicode(name)
+
+        # 'altnames': unicode,
+        if kwargs.has_key('altnames'):
+            altnames = kwargs.get('altnames', name) 
+        else:
+            altnames = request.POST.get('altnames', name).strip()
+        self.altnames = unicode(altnames)
+
+        # 'plural': unicode,
+        if kwargs.has_key('plural'):
+            plural = kwargs.get('plural', None) 
+        else:
+            plural = request.POST.get('plural', None)
+        self.plural = unicode(plural)
+
+        # 'prior_node': [ObjectId],
+        if kwargs.has_key('prior_node'):
+            prior_node = kwargs.get('prior_node', []) 
+        else:
+            prior_node = request.POST.get('prior_node', [])
+        self.prior_node = prior_node
+        if prior_node and not isinstance(prior_node, list):
+            self.prior_node = [ObjectId(each) for each in prior_node]
+
+        # 'post_node': [ObjectId]
+        if kwargs.has_key('post_node'):
+            post_node = kwargs.get('post_node', []) 
+        else:
+            post_node = request.POST.get('post_node', [])
+        self.post_node = post_node
+        if post_node and not isinstance(post_node, list):
+            self.post_node = [ObjectId(each) for each in post_node]
+
+        # 'language': (basestring, basestring)
+        if kwargs.has_key('language'):
+            language = kwargs.get('language', ('en', 'English')) 
+        else:
+            language = request.POST.get('language', ('en', 'English'))
+        self.language = language
+
+        # 'type_of': [ObjectId]
+        if kwargs.has_key('type_of'):
+            type_of = kwargs.get('type_of', []) 
+        else:
+            type_of = request.POST.get('type_of', [])
+        self.type_of = type_of
+        if type_of and not isinstance(type_of, list):
+            self.type_of = [ObjectId(each) for each in type_of]
+
+        # 'member_of': [ObjectId]
+        if kwargs.has_key('member_of'):
+            member_of = kwargs.get('member_of', []) 
+        else:
+            member_of = request.POST.get('member_of', [])
+        self.member_of = member_of
+        if member_of and not isinstance(member_of, list):
+            self.member_of = [ObjectId(each) for each in member_of]
+
+        # 'access_policy': unicode
+        if kwargs.has_key('access_policy'):
+            access_policy = kwargs.get('access_policy', u'PUBLIC') 
+        else:
+            access_policy = request.POST.get('access_policy', u'PUBLIC')
+        self.access_policy = unicode(access_policy)
+        
+        # 'created_at': datetime.datetime
+        #   - this will be system generated (while instantiation time), always.
+
+        # 'last_update': datetime.datetime,
+        #   - this will be system generated (from save method), always.
+
+        # 'created_by': int
+        if not self.created_by:
+            if kwargs.has_key('created_by'):
+                created_by = kwargs.get('created_by', '') 
+            elif request:
+                created_by = request.user.id
+            self.created_by = int(created_by) if created_by else 0
+
+        # 'modified_by': int, # test required: only ids of Users
+        if kwargs.has_key('modified_by'):
+            modified_by = kwargs.get('modified_by', None) 
+        elif request:
+            modified_by = request.user.id
+        self.modified_by = int(modified_by) if modified_by else 0
+
+        # 'contributors': [int]
+        if kwargs.has_key('contributors'):
+            contributors = kwargs.get('contributors', []) 
+        else:
+            contributors = request.POST.get('contributors', [])
+        self.contributors = contributors
+        if contributors and not isinstance(contributors, list):
+            self.contributors = [int(each) for each in contributors]        
+
+        # 'location': [dict]
+        if kwargs.has_key('location'):
+            location = kwargs.get('location', []) 
+        else:
+            location = request.POST.get('location', [])
+        self.location = list(location) if not isinstance(location, list) else location
+
+        # 'content': unicode
+        if kwargs.has_key('content'):
+            content = kwargs.get('content', '')
+        else:
+            content = request.POST.get('content', '')
+        self.content = unicode(content)
+
+        # 'content_org': unicode
+        if kwargs.has_key('content_org'):
+            content_org = kwargs.get('content_org', '')
+        else:
+            content_org = request.POST.get('content_org', '')
+        self.content_org = unicode(content_org)
+
+        # 'group_set': [ObjectId]
+        if kwargs.has_key('group_set'):
+            group_set = kwargs.get('group_set', []) 
+        else:
+            group_set = request.POST.get('group_set', [])
+        self.group_set = group_set
+        if group_set and not isinstance(group_set, list):
+            self.group_set = [ObjectId(each) for each in group_set]
+
+        # 'collection_set': [ObjectId]
+        if kwargs.has_key('collection_set'):
+            collection_set = kwargs.get('collection_set', []) 
+        else:
+            collection_set = request.POST.get('collection_set', [])
+        self.collection_set = collection_set
+        if collection_set and not isinstance(collection_set, list):
+            self.collection_set = [ObjectId(each) for each in collection_set]
+
+        # 'property_order': []
+        if kwargs.has_key('property_order'):
+            property_order = kwargs.get('property_order', []) 
+        else:
+            property_order = request.POST.get('property_order', [])
+        self.property_order = list(property_order) if not isinstance(property_order, list) else property_order
+
+        # 'start_publication': datetime.datetime,
+        if kwargs.has_key('start_publication'):
+            start_publication = kwargs.get('start_publication', None)
+        else:
+            start_publication = request.POST.get('start_publication', None)
+        self.start_publication = start_publication
+        # self.start_publication = datetime.datetime(start_publication) if not isinstance(start_publication, datetime.datetime) else start_publication
+
+        # 'tags': [unicode],
+        if kwargs.has_key('tags'):
+            tags = kwargs.get('tags', []) 
+        else:
+            tags = request.POST.get('tags', [])
+        self.tags = tags
+        if tags and not isinstance(tags, list):
+            self.tags = [unicode(each.strip()) for each in tags.split(',')]
+
+        # 'featured': bool,
+        if kwargs.has_key('featured'):
+            featured = kwargs.get('featured', None)
+        else:
+            featured = request.POST.get('featured', None)
+        self.featured = bool(featured)
+
+        # 'url': unicode,
+        if kwargs.has_key('url'):
+            url = kwargs.get('url', None)
+        else:
+            url = request.POST.get('url', None)
+        self.url = unicode(url)
+
+        # 'comment_enabled': bool,
+        if kwargs.has_key('comment_enabled'):
+            comment_enabled = kwargs.get('comment_enabled', None)
+        else:
+            comment_enabled = request.POST.get('comment_enabled', None)
+        self.comment_enabled = bool(comment_enabled)
+
+        # 'login_required': bool,
+        if kwargs.has_key('login_required'):
+            login_required = kwargs.get('login_required', None)
+        else:
+            login_required = request.POST.get('login_required', None)
+        self.login_required = bool(login_required)
+
+        # 'status': STATUS_CHOICES_TU,
+        if kwargs.has_key('status'):
+            status = kwargs.get('status', u'DRAFT')
+        else:
+            status = request.POST.get('status', u'DRAFT')
+        self.status = unicode(status)
+
+        # 'rating':[{'score':int, 'user_id':int, 'ip_address':basestring}],
+        #       - mostly, it's on detail view and by AJAX and not in/within forms.
+
+        # 'snapshot':dict
+        #       - needs to think on this.
+
+        return self
+
     
     ########## Setter(@x.setter) & Getter(@property) ##########
     @property
@@ -288,7 +513,6 @@ class Node(DjangoDocument):
         contributor_names = []
         for each_pk in self.contributors:
             contributor_names.append(User.objects.get(pk=each_pk).username)
-        # user_details['modified_by'] = contributor_names
         user_details['contributors'] = contributor_names
 
         if self.modified_by:
@@ -1124,7 +1348,6 @@ class GSystemType(Node):
         'attribute_type_set': [AttributeType],  # Embed list of Attribute Type Class as Documents
         'relation_type_set': [RelationType],    # Holds list of Relation Types
         'process_type_set': [ProcessType],      # List of Process Types
-
         'property_order': []                    # List of user-defined attributes in template-view order
     }
 
@@ -1136,25 +1359,454 @@ class GSystemType(Node):
 class GSystem(Node):
     """GSystemType instance
     """
-    use_schemaless = True
+
+    # static vars:
+    image_sizes_name = ['original', 'mid', 'thumbnail']
+    image_sizes = {'mid': (500, 300), 'thumbnail': (128, 128)}
+    sys_gen_image_prefix = 'gstudio-'
 
     structure = {
-        'attribute_set': [dict],		# ObjectIds of GAttributes
-        'relation_set': [dict],		            # ObjectIds of GRelations
-        'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements
-                                                # along with their sub-collection elemnts too
-        'author_set': [int],                     # List of Authors
-
+        'attribute_set': [dict],    # ObjectIds of GAttributes
+        'relation_set': [dict],     # ObjectIds of GRelations
+        'module_set': [dict],       # Holds the ObjectId & SnapshotID (version_number) 
+                                        # of collection elements
+                                        # along with their sub-collection elemnts too
+        'if_file': {
+                        'mime_type': basestring,
+                        'original': {'_id': ObjectId, 'relurl': basestring},
+                        'mid': {'_id': ObjectId, 'relurl': basestring},
+                        'thumbnail': {'_id': ObjectId, 'relurl': basestring}
+                    },
+        'author_set': [int],        # List of Authors
         'annotations': [dict],      # List of json files for annotations on the page
-        'license': basestring,       # contains license/s in string format
-        # TODO: Adding one more field 'origin', kedar2a, 12-sep-15
-        'origin': []          # e.g: [{"csv-import": <fn name>}, {"sync_source": "<system-pub-key>"}]
+        'license': basestring,      # contains license/s in string format
+        'origin': []                # e.g: 
+                                        # [
+                                        #   {"csv-import": <fn name>},
+                                        #   {"sync_source": "<system-pub-key>"}
+                                        # ]
     }
 
     use_dot_notation = True
-
-    # TODO: Make default value for license as 'CC-BY-SA 4.0 ...', kedar2a, 12-sep-15
+    
     # default_values = "CC-BY-SA 4.0 unported"
+    default_values = {
+                        'license': GSTUDIO_DEFAULT_LICENSE
+                    }
+    
+    def fill_gstystem_values(self,
+                            request=None,
+                            attribute_set=[],
+                            relation_set=[],
+                            author_set=[],
+                            license=GSTUDIO_DEFAULT_LICENSE,
+                            origin=[],
+                            uploaded_file=None,
+                            **kwargs):
+
+        self.fill_node_values(request, **kwargs)
+
+        if not self.has_key('_id'):
+            self['_id'] = ObjectId()
+
+        if uploaded_file:
+
+            original_filehive_obj = filehive_collection.collection.Filehive()
+            original_file = uploaded_file
+
+            mime_type = original_filehive_obj.get_file_mimetype(original_file)
+            file_name = original_filehive_obj.get_file_name(original_file)
+            original_file_extension = original_filehive_obj.get_file_extension(file_name, mime_type)
+
+            original_filehive_obj = original_filehive_obj.save_file_in_filehive(
+                file_blob=original_file,
+                file_name=file_name,
+                first_uploader=request.user.id,
+                first_parent=self._id,
+                mime_type=mime_type,
+                file_extension=original_file_extension,
+                if_image_size_name='original',
+                get_obj=True
+                )
+
+            mime_type = original_filehive_obj.mime_type
+
+            # print "original_filehive_obj: ", original_filehive_obj
+            if original_filehive_obj:
+
+                self.if_file.mime_type       = mime_type
+                self.if_file.original._id    = original_filehive_obj._id 
+                self.if_file.original.relurl = original_filehive_obj.relurl
+
+                if 'image' in original_filehive_obj.mime_type.lower():
+
+                    for each_image_size in self.image_sizes_name[1:]:
+                        
+                        parent_id = self.if_file[self.image_sizes_name[self.image_sizes_name.index(each_image_size) - 1]]['_id']
+
+                        each_image_size_filename =  self.sys_gen_image_prefix \
+                                                    + each_image_size \
+                                                    + '-' \
+                                                    + original_filehive_obj.filename
+
+                        each_image_size_filehive_obj = filehive_collection.collection.Filehive()
+                        each_image_size_file, dimension = each_image_size_filehive_obj.convert_image_to_size(files=original_file,
+                                                  file_name=each_image_size_filename,
+                                                  file_extension=original_file_extension,
+                                                  file_size=self.image_sizes[each_image_size])
+
+                        if each_image_size_file:
+                            each_image_size_id_url = each_image_size_filehive_obj.save_file_in_filehive(
+                                file_blob=each_image_size_file,
+                                file_name=each_image_size_filename,
+                                first_uploader=request.user.id,
+                                first_parent=parent_id,
+                                mime_type=mime_type,
+                                file_extension=original_file_extension,
+                                if_image_size_name=each_image_size,
+                                if_image_dimensions=dimension)
+
+                            # print "each_image_size_id_url : ",each_image_size_id_url 
+                            self.if_file[each_image_size]['_id']    = each_image_size_id_url['_id'] 
+                            self.if_file[each_image_size]['relurl'] = each_image_size_id_url['relurl']
+
+        return self
+
+
+@connection.register
+class Filehive(DjangoDocument):
+    """
+    Filehive class to hold any resource in file system.
+    """
+
+    objects = models.Manager()
+    collection_name = 'Filehives'
+
+    structure = {
+        '_type': unicode,
+        'md5': basestring,
+        'relurl': basestring,
+        'mime_type': basestring,             # Holds the type of file
+        'length': float,
+        'filename': unicode,
+        'first_uploader': int,
+        'first_parent': ObjectId,
+        'uploaded_at': datetime.datetime,    
+        'if_image_size_name': basestring,
+        'if_image_dimensions': basestring,
+        }
+
+    indexes = [
+        {
+            # 12: Single index
+            'fields': [
+                ('mime_type', INDEX_ASCENDING)
+            ]
+        }
+    ]
+
+    use_dot_notation = True
+    required_fields = ['md5', 'mime_type']
+    default_values = {
+                        'uploaded_at': datetime.datetime.utcnow
+                    }
+
+
+    def __unicode__(self):
+        return self._id
+
+
+    def identity(self):
+        return self.__unicode__()
+
+
+    def _put_file(self, file_blob, file_extension):
+        '''
+        - Put's file under specified root.
+        - After saving file blob or if file already exists,
+            returns it's relative path.
+        '''
+
+        file_hash = gfs.computehash(file_blob)
+
+        if gfs.exists(file_hash):
+            # file with same hash already exists in file system.
+            hash_addr_obj = gfs.get(file_hash)
+        else:
+            hash_addr_obj = gfs.put(file_blob, file_extension)
+
+        return hash_addr_obj
+
+
+    def save_file_in_filehive(self,
+                              file_blob,
+                              first_uploader,
+                              first_parent,
+                              file_name='',
+                              mime_type=None,
+                              file_extension='',
+                              if_image_size_name='',
+                              if_image_dimensions=None,
+                              **kwargs):
+
+        # file_hash = gfs.computehash(file_blob)
+
+        file_metadata_dict = self.get_file_metadata(file_blob, mime_type, file_extension, file_name, if_image_dimensions)
+
+        # file_blob.seek(0)
+        addr_obj = self._put_file(file_blob, file_metadata_dict['file_extension'])
+        # print "addr_obj : ", addr_obj
+
+        md5 = str(addr_obj.id)
+        filehive_obj = filehive_collection.find_one({'md5': md5})
+
+        id_url_dict = {'_id': None, 'relurl': ''}
+
+        if not filehive_obj:
+            
+            # instantiating empty instance
+            # filehive_obj = filehive_collection.collection.Filehive()
+            filehive_obj = self
+
+            filehive_obj.md5                 = str(md5)
+            filehive_obj.relurl              = str(addr_obj.relpath)
+            filehive_obj.mime_type           = str(file_metadata_dict['file_mime_type']) 
+            filehive_obj.length              = float(file_metadata_dict['file_size'])
+            filehive_obj.filename            = unicode(file_metadata_dict['file_name'])
+            filehive_obj.first_uploader      = int(first_uploader)
+            filehive_obj.first_parent        = ObjectId(first_parent)
+            filehive_obj.if_image_size_name  = str(if_image_size_name)
+            filehive_obj.if_image_dimensions= str(file_metadata_dict['image_dimension'])
+
+            filehive_obj.save()
+            # print "filehive_obj : ", filehive_obj
+
+        id_url_dict['_id'] = filehive_obj._id
+        id_url_dict['relurl'] = filehive_obj.relurl
+
+        if kwargs.has_key('get_obj') and kwargs['get_obj']:
+            return filehive_obj
+        else:
+            return id_url_dict
+
+
+    # -- file helper methods --
+    def get_file_metadata(self,
+                          file_blob,
+                          mime_type=None,
+                          file_extension='',
+                          file_name='',
+                          image_dimensions=None):
+
+        # as file_blob is mostly uploaded file, using some of django's
+        # <django.core.files.uploadedfile> class's built in properties.
+        file_metadata_dict = {
+            'file_name': '',
+            'file_size': 0,
+            'file_mime_type': '',
+            'file_extension': '',
+            'image_dimension': None
+        }
+
+        file_name = file_name if file_name else file_blob.name if hasattr(file_blob, 'name') else ''
+        file_metadata_dict['file_name'] = file_name
+
+        file_mime_type = mime_type if mime_type else self.get_file_mimetype(file_blob)
+        file_metadata_dict['file_mime_type'] = file_mime_type
+
+        if file_extension:
+            file_metadata_dict['file_extension'] = file_extension
+        else:
+            file_extension = self.get_file_extension(file_name, file_mime_type)
+
+        try:
+            if hasattr(file_blob, 'size'):
+                file_size = file_blob.size
+            else:
+                file_blob.seek(0, os.SEEK_END)
+                file_size = file_blob.tell()
+                file_blob.seek(0)
+        except Exception, e:
+            print "Exception in calculating file_size: ", e
+            file_size = 0
+
+        file_metadata_dict['file_size'] = file_size
+
+        # get_image_dimensions: Returns the (width, height) of an image
+        image_dimension_str = ''
+        image_dimension_tuple = None
+        if image_dimensions:
+            image_dimension_tuple = image_dimensions
+        else:            
+            try:
+                image_dimension_tuple = get_image_dimensions(file_blob)
+            except Exception, e:
+                print "Exception in calculating file dimensions: ", e
+                pass
+
+        if image_dimension_tuple:
+            image_dimension_str = str(image_dimension_tuple[0])
+            image_dimension_str += ' X '
+            image_dimension_str += str(image_dimension_tuple[1])
+        file_metadata_dict['image_dimension'] = image_dimension_str
+
+        # print "\nfile_metadata_dict : ", file_metadata_dict
+        return file_metadata_dict
+
+
+    def get_file_mimetype(self, file_blob):
+    
+        file_mime_type = ''
+        file_content_type = file_blob.content_type if hasattr(file_blob, 'content_type') else None
+
+        if file_content_type and file_content_type != 'application/octet-stream':
+            file_mime_type = file_blob.content_type
+        else:
+            file_blob.seek(0)
+            file_mime_type = magic.from_buffer(file_blob.read(), mime=True)
+            file_blob.seek(0)
+
+        return file_mime_type
+
+
+    def get_file_name(self, file_blob):
+
+        file_name = file_blob.name if hasattr(file_blob, 'name') else ''
+        return file_name
+
+
+    def get_file_extension(self, file_name, file_mime_type):
+        # if uploaded file is of mimetype: 'text/plain':
+        #     - use extension of original file if provided.
+        #     - if extension is not provided, use '.txt' as extension.
+        file_extension = ''
+
+        poss_ext = '.'
+        poss_ext += file_name.split('.')[-1]
+
+        # possible extension from file name
+        # get all possible extensions as a list
+        # e.g for text/plain:
+        # ['.ksh', '.pl', '.bat', '.h', '.c', '.txt', '.asc', '.text', '.pot', '.brf', '.srt']
+        all_poss_ext = mimetypes.guess_all_extensions(file_mime_type)
+
+        if poss_ext in all_poss_ext:
+            file_extension = poss_ext
+
+        elif file_mime_type == 'text/plain':
+            file_extension = '.txt'
+            
+        else:
+            file_extension = mimetypes.guess_extension(file_mime_type)
+        
+        return file_extension
+
+
+    def convert_image_to_size(self, files, file_name='', file_extension='', file_size=()):
+        """
+        convert image into mid size image w.r.t. max width of 500
+        """
+        try:
+
+            files.seek(0)
+            mid_size_img = StringIO()
+            size = file_size if file_size else (500, 300)
+            file_name = file_name if file_name else files.name if hasattr(files, 'name') else ''
+
+            try:
+                img = Image.open(StringIO(files.read()))
+            except Exception, e:
+                print "Exception in opening file with PIL.Image.Open(): ", e
+                return None, None
+
+            size_to_comp = size[0]
+            if (img.size > size) or (img.size[0] >= size_to_comp):
+                # both width and height are more than width:500 and height:300
+                # or
+                # width is more than width:500
+                factor = img.size[0]/size_to_comp
+                img = img.resize((size_to_comp, int(img.size[1] / factor)), Image.ANTIALIAS)
+
+            elif (img.size <= size) or (img.size[0] <= size_to_comp): 
+                img = img.resize(img.size, Image.ANTIALIAS)
+
+            if 'jpg' in file_extension or 'jpeg' in file_extension: 
+                extension = 'JPEG'
+            elif 'png' in file_extension:
+                extension = 'PNG'
+            elif 'gif' in file_extension:
+                extension = 'GIF'
+            elif 'svg' in file_extension:
+                extension = 'SVG'
+            else:
+                extension = ''
+
+            if extension:
+                img.save(mid_size_img, extension)
+            else:    
+                img.save(mid_size_img, "JPEG")
+
+            img_size = img.size if img else None
+            mid_size_img.name = file_name
+            mid_size_img.seek(0)
+
+            return mid_size_img, img_size
+
+        except Exception, e:
+            print "Exception in converting image to mid size: ", e
+            return None
+
+
+    def save(self, *args, **kwargs):
+        
+        is_new = False if ('_id' in self) else True
+        
+        if is_new:
+            self.uploaded_at = datetime.datetime.now()
+
+        super(Filehive, self).save(*args, **kwargs)
+
+        # storing Filehive JSON in RSC system:
+        history_manager = HistoryManager()
+        rcs_obj = RCS()
+
+        if is_new:
+
+            # Create history-version-file
+            if history_manager.create_or_replace_json_file(self):
+                fp = history_manager.get_file_path(self)
+                message = "This document (" + str(self.md5) + ") is created on " + self.uploaded_at.strftime("%d %B %Y")
+                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+        else:
+            # Update history-version-file
+            fp = history_manager.get_file_path(self)
+
+            try:
+                rcs_obj.checkout(fp)
+
+            except Exception as err:
+                try:
+                    if history_manager.create_or_replace_json_file(self):
+                        fp = history_manager.get_file_path(self)
+                        message = "This document (" + str(self.md5) + ") is re-created on " + datetime.uploaded_at.strftime("%d %B %Y")
+                        rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+                except Exception as err:
+                    print "\n DocumentError: This document (", self._id, ":", str(self.md5), ") can't be re-created!!!\n"
+                    node_collection.collection.remove({'_id': self._id})
+                    raise RuntimeError(err)
+
+            try:
+                if history_manager.create_or_replace_json_file(self):
+                    message = "This document (" + str(self.md5) + ") is lastly updated on " + datetime.datetime.now().strftime("%d %B %Y")
+                    rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+
+            except Exception as err:
+                print "\n DocumentError: This document (", self._id, ":", str(self.md5), ") can't be updated!!!\n"
+                raise RuntimeError(err)
+
+        # --- END of storing Filehive JSON in RSC system ---
 
 
 @connection.register
@@ -1437,7 +2089,7 @@ class HistoryManager():
         (b) False - Otherwise
         """
 
-        collection_tuple = (MetaType, GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation)
+        collection_tuple = (MetaType, GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation, Filehive)
         file_res = False    # True, if no error/exception occurred
 
         if document_object is not None and \
@@ -1498,7 +2150,7 @@ class HistoryManager():
             + "not matching given instances-type list " + str(collection_tuple) + ":-" \
             + "\n\tObjectId: " + document_object._id.__str__() \
             + "\n\t    Type: " + document_object._type \
-            + "\n\t    Name: " + document_object.name
+            + "\n\t    Name: " + document_object.get('name', '')
             raise RuntimeError(msg)
 
         return file_res
@@ -1974,4 +2626,5 @@ node_collection = db[Node.collection_name].Node
 benchmark_collection = db[Benchmark.collection_name]
 triple_collection = db[Triple.collection_name].Triple
 gridfs_collection = db["fs.files"]
+filehive_collection = db[Filehive.collection_name].Filehive
 import signals
