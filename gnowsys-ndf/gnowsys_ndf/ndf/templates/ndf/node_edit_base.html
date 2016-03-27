@@ -537,15 +537,21 @@
 			<input type="radio" name="thread_create" value="No" checked="checked">No
 	      </div>
 	    </div>
-
-	    <div class="thread-settings-div hide">
+	    <div class="thread-settings-div {% if not node.discussion_enable %} hide {% endif %}">
+			{% get_relation_value node.pk 'has_thread' True as grel_dict %}
+			{% if not grel_dict.cursor and grel_dict.grel_node %}
+				{% get_attribute_value grel_dict.grel_node.pk 'release_response' as resp_val %}
+				{% get_attribute_value grel_dict.grel_node.pk 'thread_interaction_type' as thr_int_type %}
+				{% get_attribute_value grel_dict.grel_node.pk 'start_time' as thr_start_time %}
+				{% get_attribute_value grel_dict.grel_node.pk 'end_time' as thr_end_time %}
+			{% endif %}
 		    <div class="row">
 		      <div class="large-2 medium-4 columns "><h5>{% trans "Release Option:" %}</h5>
 		      </div>
 		      <div class="large-pull-4 large-6 medium-8 columns">
 		        <select id="release_resp_sel" name="release_resp_sel">
-		          <option value="True">Show Replies to All</option>
-		          <option value="False">Hide Replies from All</option>
+		          <option value="True" {% if resp_val %} selected{% endif %}>Show Replies to All</option>
+		          <option value="False" {% if not resp_val %} selected{% endif %}>Hide Replies from All</option>
 		        </select>
 		      </div>
 		    </div>
@@ -553,16 +559,13 @@
 		    <div class="row">
 		      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction Type:" %}</h5>
 		      </div>
-
+		      {% get_gstudio_interaction_types as all_interaction_values %}
 		      <div class="large-pull-4 large-6 medium-8 columns">
 		        <select id="interaction_type_sel" name="interaction_type_sel">
-		          <option value="Comment">Comment</option>
-		          <option value="Discuss">Discuss</option>
-		          <option value="Reply">Reply</option>
-		          <option value="Submit">Submit</option>
-		          <option value="Voice-Response">Voice-Response</option>
-		          <option value="Answer">Answer</option>
-		          <option value="Feedback">Feedback</option>
+		        {% for each_int in all_interaction_values %}
+		          <option value="{{each_int}}" {% if thr_int_type == each_int %} selected {% endif %}>{{each_int}}</option>
+		        {% endfor %}
+		        
 		        </select>
 		      </div>
 		    </div>
@@ -572,7 +575,7 @@
 		      </div>
 		      
 		      <div class="large-pull-4 large-6 medium-8 columns">
-		      	<input type="text" id="thread_start_date" name="thread_start_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+		      	<input type="text" id="thread_start_date" name="thread_start_date" value="{% if thr_start_time %}{{thr_start_time|date:'d/m/Y'}}{% endif %}" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
 		      </div>
 		    </div>
 
@@ -581,7 +584,7 @@
 		      </div>
 		      
 		      <div class="large-pull-4 large-6 medium-8 columns">
-		      	<input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+		      	<input type="text" id="thread_close_date" name="thread_close_date" value="{% if thr_end_time %}{{thr_end_time|date:'d/m/Y'}}{% endif %}" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
 		      </div>
 		    </div>
 	    </div>
@@ -595,7 +598,7 @@
 	    <div class="help-settings-div">
 			{% get_dict_from_list_of_dicts node.relation_set True as node_rel_set %}
 			{% get_info_pages group_id as all_info_pages %}
-			<select class="help_onfo_page" name="help_info_page" multiple style="height:200px;">
+			<select class="help_info_page" name="help_info_page" multiple style="height:200px;">
 				<option value="None" {% if not node_rel_set %}selected{% endif %}> --- Select --- </option>
 				{% for each_page in all_info_pages %}
 					<option value="{{each_page.pk}}"
@@ -909,24 +912,12 @@
 			{% if is_auth_node %}
 				$("#name_id").attr("disabled",true)
 			{% endif %}
-
 			{% if node.discussion_enable == False %}
 				$("input[name='thread_create'][value='No']").attr("checked","checked");
 			{% else %}
-	        	{% get_relation_value resource.pk 'has_thread' as grel_dict %}
-		        {% if not grel_dict.cursor and grel_dict.grel_node %}
-					$("input[name='thread_create'][value='Yes']").attr("checked","checked");
+				$("input[name='thread_create'][value='Yes']").attr("checked","checked");
 					$("input[name='thread_create']").trigger("change");
 					$("input[name='thread_create']").attr("disabled",true);
-					{% get_attribute_value grel_dict.grel_node.pk 'release_response' as resp_val %}
-					{% get_attribute_value grel_dict.grel_node.pk 'thread_interaction_type' as thr_int_type %}
-					{% get_attribute_value grel_dict.grel_node.pk 'start_time' as thr_start_time %}
-					{% get_attribute_value grel_dict.grel_node.pk 'end_time' as thr_end_time %}
-					$("#release_resp_sel").val("{{resp_val}}")
-					$("#interaction_type_sel").val("{{thr_int_type}}")
-					$("#thread_start_date").val('{{thr_start_time|date:"d/m/Y"}}')
-					$("#thread_close_date").val('{{thr_end_time|date:"d/m/Y"}}')
-				{% endif %}
 			{% endif %}
 
 		{% endif %}

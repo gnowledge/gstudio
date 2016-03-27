@@ -4313,6 +4313,7 @@ def create_thread_for_node(request, group_id, node):
 			return thread_obj
 	except Exception as e:
 		print "000\n\n",e
+
 def node_thread_access(group_id, node):
     """
       Accepts:
@@ -4332,8 +4333,8 @@ def node_thread_access(group_id, node):
     thread_end_time = None
     allow_to_comment = True  # default set to True to allow commenting if no date is set for thread
     from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
-    has_thread_node_thread_grel = get_relation_value(node._id,"has_thread")
-    grel_dict = get_relation_value(node._id,"has_thread")
+    # has_thread_node_thread_grel = get_relation_value(node._id,"has_thread")
+    grel_dict = get_relation_value(node._id,"has_thread", True)
     is_cursor = grel_dict.get("cursor",False)
     if not is_cursor:
         has_thread_node = grel_dict.get("grel_node")
@@ -4342,7 +4343,7 @@ def node_thread_access(group_id, node):
     #     if node['has_thread']:
     #             has_thread_node = node['has_thread'][0]
     if has_thread_node:
-        has_thread_node = has_thread_node_thread_grel['grel_node']
+        has_thread_node = grel_dict['grel_node']
         thread_start_time = get_attribute_value(has_thread_node._id,"start_time")
         thread_end_time = get_attribute_value(has_thread_node._id,"end_time")
         # if has_thread_node_thread_grel[0].attribute_set:

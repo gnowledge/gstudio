@@ -674,6 +674,8 @@ GSTUDIO_MODERATING_GROUP_ALTNAMES = ['Clearing House', 'Curation House']
 GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
 GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
+
+GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Discuss', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
 # #textb
 # import warnings
 # warnings.filterwarnings(
