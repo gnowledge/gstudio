@@ -595,7 +595,7 @@
 	    <div class="help-settings-div">
 			{% get_dict_from_list_of_dicts node.relation_set True as node_rel_set %}
 			{% get_info_pages group_id as all_info_pages %}
-			<select class="help_onfo_page" name="help_info_page" multiple style="height:200px;">
+			<select class="help_info_page" name="help_info_page" multiple style="height:200px;">
 				<option value="None" {% if not node_rel_set %}selected{% endif %}> --- Select --- </option>
 				{% for each_page in all_info_pages %}
 					<option value="{{each_page.pk}}"
