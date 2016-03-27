@@ -451,7 +451,7 @@ class Node(DjangoDocument):
             tags = kwargs.get('tags', []) 
         else:
             tags = request.POST.get('tags', [])
-        self.tags = tags
+        self.tags = tags if tags else []
         if tags and not isinstance(tags, list):
             self.tags = [unicode(each.strip()) for each in tags.split(',')]
 
