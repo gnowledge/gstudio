@@ -912,12 +912,12 @@
 			{% if is_auth_node %}
 				$("#name_id").attr("disabled",true)
 			{% endif %}
-			{% if node.discussion_enable == False %}
-				$("input[name='thread_create'][value='No']").attr("checked","checked");
-			{% else %}
+			{% if node.discussion_enable %}
 				$("input[name='thread_create'][value='Yes']").attr("checked","checked");
-					$("input[name='thread_create']").trigger("change");
-					$("input[name='thread_create']").attr("disabled",true);
+				$("input[name='thread_create']").trigger("change");
+				$("input[name='thread_create']").attr("disabled",true);
+			{% else %}
+				$("input[name='thread_create'][value='No']").attr("checked","checked");
 			{% endif %}
 
 		{% endif %}
