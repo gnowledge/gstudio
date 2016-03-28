@@ -41,6 +41,14 @@ def type_created(request,group_id):
 
 
 
+
+
+
+
+
+
+
+
 def default_template(request,group_id,node=None):
 
     # print "\n\n\n\n\n", "default_template","//////////////////",group_id , "\n\n\n\n\n\n\n\n"
@@ -70,14 +78,17 @@ def default_template(request,group_id,node=None):
 
     gs = node_collection.find({'_type':'GSystem'})
 
+    gs_sys2 = "GSystemType"
+    class_structure =  eval(gs_sys2).structure
+    print "gst\n", class_structure, "\n\n"
+    
     gs_sys = "GSystem"
-    class_structure =  eval(gs_sys).structure
     gs_struc =  eval(gs_sys).structure
-    print "gs_sys\n",gs_struc,"\n\n\n"
+    print "gs_sys\n", gs_struc, "\n\n\n"
     
 # For Display
 
-    basic_list = ['Name : ', 'Alternate Name : '];
+    basic_list = ['name', 'altnames']
 
     if node :
         print "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
@@ -87,11 +98,17 @@ def default_template(request,group_id,node=None):
         # print node_gs
 
         node_gs_id = node_gs._id
-        print node_gs_id
+        # print node_gs_id
 
         ats = node_gs.attribute_type_set
-        # print ats
+        # for e in ats:
+            # print e._type,e.name,e.data_type,"\n\n"
+
+
         rts = node_gs.relation_type_set
+        # for e in rts:
+            # print e,"\n\n"
+        
         # print rts
 
 
@@ -103,7 +120,7 @@ def default_template(request,group_id,node=None):
         gsys_node = node_collection.collection.GSystem()
         
         gsys_node.name = unicode(st_name)
-        print gsys_node.name        
+        # print gsys_node.name        
 
         # gsys_node.created_by = user_id
         # gsys_node.modified_by = user_id
@@ -125,24 +142,27 @@ def default_template(request,group_id,node=None):
 
 
         # gsys_node.save()
-        print gsys_node.member_of
+
+        # print gsys_node.member_of
 
         # gsys_node = node_collection.collection.GSystem()
         # gsys_node.name = unicode(st_name)
 
         pos_ats = gsys_node.get_possible_attributes(node_gs_id)
 
-        print pos_ats
+        # print pos_ats
 
         pos_rts = gsys_node.get_possible_relations(node_gs_id)
 
-        print pos_rts
+        # print pos_rts
 
+        # DONOT DELETE THIS CODE -------------------------
         for key,value in pos_ats.iteritems():
-            print value['altnames'],value['_id']
-        for key,value in pos_rts.iteritems():
-            print value['altnames'],value['_id']
-
+            print value ,"\n\n"
+            # print value['altnames'],value['_id']
+        # for key,value in pos_rts.iteritems():
+            # print value['altnames'],value['_id']
+        # --------------------------------------------------
 
 
 
@@ -154,13 +174,11 @@ def default_template(request,group_id,node=None):
         
     else:
         st_name = " "
-        # print st_name
         node_gs = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name':st_name}]})
-        # print node_gs
-
         ats = node_gs.attribute_type_set
-
         rts = node_gs.relation_type_set
+        pos_ats = gsys_node.get_possible_attributes(node_gs_id)
+        pos_rts = gsys_node.get_possible_relations(node_gs_id)
 
 
 
@@ -217,6 +235,6 @@ def default_template(request,group_id,node=None):
 
 
     template = "ndf/basic_temp.html"
-    variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list, 'ats':ats , 'rts':rts , 'node_gs':node_gs ,'pos_ats':pos_ats , 'pos_rts':pos_rts  })
+    variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list, 'ats':ats , 'rts':rts , 'node_gs':node_gs ,'pos_ats':pos_ats , 'pos_rts':pos_rts ,'gs_struc':gs_struc  })
 
     return render_to_response(template,variable)

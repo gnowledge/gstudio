@@ -674,6 +674,14 @@ GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Discuss', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
+
+GSTUDIO_HELP_TIP = { 'name':'States the title of the object', 'altnames':'Alternate Names', 'language':'Spoken Toungue', 'subject_type':'subjects type' , 'data_type':'datas types ' , 'applicable_node_type':'Nodes that are applicable' ,
+    'member_of':'mem ' ,'verbose_name':'verbose_name' ,'null':'null variable' ,'blank':'blank' ,'help_text':'help_text', 'max_digits':'maximum digits' ,'decimal_places':'decimal places' ,'auto_now':'auto_now ' ,'auto_now_add':'auto_now_add' ,
+    'path':'path of something' ,'verify_exist':'verifying exist' ,'status':'status' ,'content_org':'type content', 
+    'prior_node':'node coming before', 'featured':'featured', 'created_at':'created at location' , 'start_publication':'pub' ,
+    'tags':'tags' ,'url':'url' ,'last_update':'updated last' ,'login_required':'required login' , 'meta_type_set':'meta_type_set' ,
+    'attribute_type_set':'attribute_type_set defn' ,'relation_type_set':'relation def ','type_of':'Type of' }
+
 # #textb
 # import warnings
 # warnings.filterwarnings(

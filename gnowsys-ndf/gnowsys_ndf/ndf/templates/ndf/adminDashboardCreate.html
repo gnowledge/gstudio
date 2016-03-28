@@ -50,6 +50,9 @@
 			<font size="3"> {{list}} </font> 
 			</div>
 {% get_input_fields class_structure|get_dict_item:list list translate  %}
+
+
+
 </div>
 {% endif %}
 {% endif %}
@@ -90,6 +93,9 @@
 				<div style="display:table-cell;" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %} " class='box' > 
 					<span><font size="3"> {{list}} </font> </span>
 				</div>
+				{# {{class_structure|get_dict_item:list }} #}
+
+				
 				{% get_input_fields class_structure|get_dict_item:list list translate  %}
 				{% if list in  required_fields %}
 				<div style="display:table-cell;">

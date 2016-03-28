@@ -28,19 +28,31 @@
         <div style="display:table-cell;" >
             <font size="3"> {{e}}  </font> 
         </div></td>
-        <td> <input type="text"/> </td></tr>
+        <td> 
+
+
+        {# {{ gs_struc|get_dict_item:e }} #}
+        {# {{gs_struc}} #}
+        {% fetch_req_fields gs_struc|get_dict_item:e e %} 
+
+        </td></tr>
         {% endfor %}
     </div>
     <div style="display:table-row;">
-    	{% for each in ats %}
-    	<tr><td>
+        {% for each in ats %}
+        <tr><td>
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} : </font> 
+           <font size="3"> {% firstof each.altnames each.name %} : {{each.data_type}} {{each.name}} </font> 
+        
         </div></td>
 
-           <td>
-        <input type="text"/> </td></tr>
+        <!-- field_name {{each.name}}  field_value field_type {{each.data_type}}  -->
+
+           <td>{% ats_fields each.data_type each.name %} 
+                 </td></tr>
         {% endfor %}
+        {# {{ gs_struc|get_dict_item:'attribute_set' }} #}
+        {# {% fetch_req_fields gs_struc|get_dict_item:'attribute_set' 'attribute_set' %}  #}
     </div>
     <div style="display:table-row;">
         {% for each in rts %}
@@ -56,10 +68,15 @@
         {% for key,value in pos_ats.iteritems %}
         <tr><td>
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof value.altnames key value.inverse_name %} : </font> 
+           <font size="3"> {% firstof value.altnames key value.inverse_name %} : {{value.data_type}} 
+            </font> 
+
         </div></td>
         <td>
-        <input type="text"/> </td></tr>
+            {# {{value}} #}
+            {% html_widget groupid node_gs.pk value %}
+            {# {% ats_fields value.altnames %}  #}
+         </td></tr>
         {% endfor %}
     </div>
     <div style="display:table-row;">
