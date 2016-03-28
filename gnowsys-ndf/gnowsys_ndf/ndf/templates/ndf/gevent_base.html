@@ -195,13 +195,11 @@ list-style: none;
             <i class="fi-photo "></i> {% trans "Gallery" %}
           </a>
         </li>
-        <!--
         <li class="tab-title {% ifequal title 'dashboard' %}active{% endifequal %}">
-          <a href="{% url 'course_about' group_id %}">
+          <a href="{% url 'course_dashboard' group_id %}">
             <i class="fi-clipboard-notes"></i>{% trans "Dashboard" %}
           </a>
         </li>
-         -->
       </ul>
     </div>
     <div class="row show-for-small-only">
@@ -213,6 +211,7 @@ list-style: none;
             <option value="raw_material" {% ifequal title 'raw material' %}selected{% endifequal %}>{% trans "Raw Material" %}g</option>
             <option value="notebook" {% ifequal title 'notebook' %}selected{% endifequal %}>{% trans "Notebook" %}</option>
             <option value="gallery" {% ifequal title 'gallery' %}selected{% endifequal %}>{% trans "Gallery" %}</option>
+            <option value="dashboard" {% ifequal title 'dashboard' %}selected{% endifequal %}>{% trans "Dashboard" %}</option>
           </select>
         </label>
       </div>
@@ -289,6 +288,9 @@ list-style: none;
           break;
           case 'gallery':
             window.location="{% url 'course_gallery' group_id %}"
+          break;
+          case 'dashboard':
+            window.location="{% url 'course_dashboard' group_id %}"
           break;
         }
     })
