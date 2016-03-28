@@ -4,4 +4,5 @@ from django.views.generic import TemplateView
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.filehive',
                         url(r'^[/]$', 'write_file', name='write_file'),
+                        url(r'^/list/?$', 'read_file', name='read_file'),
             )
