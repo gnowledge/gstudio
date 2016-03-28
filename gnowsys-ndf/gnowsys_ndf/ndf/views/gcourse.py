@@ -34,6 +34,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
+from gnowsys_ndf.ndf.views.analytics_methods import *
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status
 from gnowsys_ndf.notification import models as notification
 
@@ -1849,11 +1850,43 @@ def course_dashboard(request, group_id):
     group_id    = group_obj._id
     group_name  = group_obj.name
 
+    allow_to_join = get_group_join_status(group_obj)
+    result_status = course_complete_percentage = None
+    total_count = completed_count = None
+    if request.user.is_authenticated:
+        result_status = get_course_completetion_status(group_obj, request.user.id)
+        if result_status:
+            if "course_complete_percentage" in result_status:
+                course_complete_percentage = result_status['course_complete_percentage']
+            if "total_count" in result_status:
+                total_count = result_status['total_count']
+            if "completed_count" in result_status:
+                completed_count = result_status['completed_count']
+
     template = 'ndf/gcourse_event_group.html'
+
+    anaytics_instance = AnalyticsMethods(request, group_id)
+    all_units = anaytics_instance.get_total_units_count()
+    print "\n\n Total Units =  ", all_units
+    completed_units = anaytics_instance.get_completed_units_count()
+    print "\n\n Completed Units =  ", completed_units
+    total_res = anaytics_instance.get_total_resources_count()
+    print "\n\n Total Resources === ", total_res
+    completed_res = anaytics_instance.get_completed_resources_count()
+    print "\n\n Completed Resources === ", completed_res
+    total_quizitems = anaytics_instance.get_total_quizitems_count()
+    print "\n\n Total QuizItemEvents === ", total_quizitems
+    attempted_quizitems = anaytics_instance.get_attempted_quizitems_count()
+    print "\n\n Attempted QuizItemEvents === ", attempted_quizitems
+
+    correct_attempted_quizitems = anaytics_instance.get_correct_quizitems_count()
+    print "\n\n Correct Attempted QuizItemEvents === ", correct_attempted_quizitems
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'dashboard'
+            'node': group_obj, 'title': 'dashboard', 'allow_to_join': allow_to_join,
+            "course_complete_percentage": course_complete_percentage,
+            "total_count":total_count, "completed_count":completed_count
         })
     return render_to_response(template, context_variables)
 
@@ -2180,8 +2213,6 @@ def course_note_page(request, group_id):
 
     thread_node = None
     allow_to_comment = None
-    
-    
     allow_to_join = get_group_join_status(group_obj)
     result_status = course_complete_percentage = None
     total_count = completed_count = None
