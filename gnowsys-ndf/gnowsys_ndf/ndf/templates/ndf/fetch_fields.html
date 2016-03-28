@@ -1,6 +1,17 @@
 {% load ndf_tags %}
 {% load i18n %}
 
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> 
+<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+
+<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+<link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+
 {% if fields_name == 'name' or fields_name == "altnames" %}
 
 <!-- <type 'unicode'> -->
@@ -10,40 +21,160 @@
 
 {% else %}
 
-	{% if fields_type == "bool" %}
-	<select id="id_auto_now_add" name="{{fields_name}}" style="width:50%">
-	  <option value="0">{% trans "Unknown" %}</option>
-	  <option value="1" {% if fields_value == 1 %}selected{% endif %} >{% trans "Yes" %}</option>
-	  <option value="2" {% if fields_value == 2 %}selected{% endif %} >{% trans "No" %}</option>
-	</select>
+    {% if fields_type == "bool" %}
+    <select id="id_auto_now_add" name="{{fields_name}}" style="width:50%">
+      <option value="0">{% trans "Unknown" %}</option>
+      <option value="1" {% if fields_value == 1 %}selected{% endif %} >{% trans "Yes" %}</option>
+      <option value="2" {% if fields_value == 2 %}selected{% endif %} >{% trans "No" %}</option>
+    </select>
 
-	{% elif fields_type == "datetime" %}
-	<label>{% now "jS F Y H:i" %}</label>
+    {% elif fields_type == "datetime" %}
+    <label>{% now "jS F Y H:i" %}</label>
+   
 
-	{% elif fields_type == "datetime.datetime" %}
-	<label>{% now "jS F Y H:i" %}</label>
+    <div class="medium-3 columns end">
+    {% elif fields_type == "datetime.datetime" %}
+    <label>{% now "jS F Y H:i" %}</label>
 
-	{% elif fields_type == "status" %}
-	<select id="id_auto_now_add" name="{{fields_name}}" style="width:60%">
-	  <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >{% trans "PUBLISHED" %}</option>
-	  <option value="DRAFT" {% if fields_value == "DRAFT" %}selected{% endif %} >{% trans "DRAFT" %}</option>
-	  <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >{% trans "HIDDEN" %}</option>
-	</select>
+    <input id="{{fields_name}}" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="{{fields_name}}" readonly="" >
 
-	{% elif fields_type == "int" %}
-	<div style="display:table-cell;">
-	  <font size="3"> <input type="number" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
-	</div>
+    </div>
 
-	{% elif fields_type == "list" %}
-	<div id="list_drawer" style="border-spacing:0px" class="list_drawer">
-		
-	</div>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        {% if start_time %}
+            var start_date  = document.getElementById("start_date");
+            start_date.value = "{{start_time|date:'d/m/Y'}}";
+        {% endif %}
+    })
+
+      // Start-date & End-date settings -------------------------------------------
+    var start_date = $("#start_date");
+    var end_date = $("#end_date");
+    currentDate = new Date();
+    var currentDay = currentDate.getDate();
+    var currentMonth = currentDate.getMonth();
+    var currentYear = currentDate.getFullYear();
+  
+    $(".date_month_day_year").datepicker({
+      changeMonth: true,
+      dateFormat: 'dd/mm/yy',
+      minDate: '0',
+      maxDate: '+2m',
+      defaultDate: '0',
+
+      onClose: function(dateText, inst) {
+        $(this).val(dateText);
+        
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+        
+        if ($(this).attr('id') == "start_date") {
+          if (month_year) {
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
+          }
+
+          if (end_date.val() != '') {
+            var testStartDate = start_date.datepicker('getDate');
+            var testEndDate = end_date.datepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              end_date.datepicker('setDate', testStartDate);
+            }
+
+            else {
+              $(this).val(day+"/"+month+"/"+year);
+              $(this).datepicker('setDate', new Date(year, (month-1), day));
+            }
+          }
+
+          else {
+            end_date.val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+
+          $("#end_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
+        }
+
+        else if ($(this).attr('id') == "end_date") {
+          if (month_year) {
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
+          }
+
+          if (start_date.val() != '') {
+            var testStartDate = start_date.datepicker('getDate');
+            var testEndDate = end_date.datepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              start_date.datepicker('setDate', testEndDate);
+            }
+
+            else {
+              $(this).val(day+"/"+month+"/"+year);
+              $(this).datepicker('setDate', new Date(year, (month-1), day));
+            }
+          }
+
+          else {
+            start_date.val(day+"/"+month+"/"+year);
+
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+      },
+
+      beforeShow: function() {
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+
+        $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+        $(this).datepicker('setDate', new Date(year, (month-1), day));
+      },
+    });
+
+
+
+    </script>
+
+
+    {% elif fields_type == "status" %}
+    <select id="id_auto_now_add" name="{{fields_name}}" style="width:60%">
+      <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >{% trans "PUBLISHED" %}</option>
+      <option value="DRAFT" {% if fields_value == "DRAFT" %}selected{% endif %} >{% trans "DRAFT" %}</option>
+      <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >{% trans "HIDDEN" %}</option>
+    </select>
+
+    {% elif fields_type == "int" %}
+    <div style="display:table-cell;">
+      <font size="3"> <input type="number" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
+    </div>
+
+    {% elif fields_type == "list" %}
+    <div id="list_drawer" style="border-spacing:0px" class="list_drawer">
+        
+    </div>
 
 
 
 
-	{% endif %}
+    {% endif %}
 
 {# {{ fields_name }} #}
 {# {{ fields_type }} #}
