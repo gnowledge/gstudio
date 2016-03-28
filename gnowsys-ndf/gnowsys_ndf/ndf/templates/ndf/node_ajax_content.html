@@ -521,14 +521,14 @@
           
           {% endif %}           
               </div>
-       {% endif %}
+      {% endif %}
           
 
-         {% get_list_of_fields node.type_of "name" as type_of_list %}
+          {% get_list_of_fields node.type_of "name" as type_of_list %}
           {% if "Info page" not in type_of_list %}
               {% if not no_discussion %}
                 <!-- Discussion -->
-                <div class="content columns" id="view-discussion" >
+                <div class="content large-6 columns" id="view-discussion" >
                   <!-- discussion content area -->
                   {% if node.discussion_enable %}
                     {% get_thread_node node.pk as thread_node %}
@@ -548,6 +548,7 @@
           <br/>
           {% endif %}
           
+
           <div>
             {% get_grid_fs_object each_node as grid_fs_obj %}
             {% if "Group" in node.member_of_names_list %}
