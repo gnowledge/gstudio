@@ -1946,7 +1946,31 @@ def get_input_fields(fields_type, fields_name, translate=None ):
 	# return {'template': 'ndf/admin_fields.html', 
 	# 				"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
 	# 				"field_type_list":field_type_list,"translate":translate}
-	
+
+@get_execution_time
+@register.inclusion_tag('ndf/fetch_fields.html')
+def fetch_req_fields(fields_type, fields_name ):
+	'''
+	this ndf tag returns the fields_name and fields_type of the GSystem object
+	'''
+	print fields_name,"??????????????????????????????"
+	print fields_type,"???????????????????????????????"
+	return {"fields_name":fields_name, "fields_type": fields_type }
+
+
+@get_execution_time
+@register.inclusion_tag('ndf/fetch_fields.html')
+def ats_fields(fields_type, fields_name ):
+	'''
+	this ndf tag returns the fields_name and fields_type of the GSystem object -- ats
+	'''
+	print fields_name,"??????????????????????????????"
+	print fields_type,"???????????????????????????????"
+	return {"fields_name":fields_name, "fields_type": fields_type }
+	# return 
+
+
+
 
 @get_execution_time
 @register.assignment_tag
@@ -2666,6 +2690,9 @@ def html_widget(groupid, node_id, field):
   field_name (as attribute's name) and field_type (as attribute's data-type)
   """
   # gs = None
+
+
+
   field_value_choices = []
 
   # This field is especially required for drawer-widets to work used in cases of RelationTypes
@@ -2702,7 +2729,8 @@ def html_widget(groupid, node_id, field):
     # field_type = gs.structure[field['name']]
     field_type = field['data_type']
     field_altnames = field['altnames']
-    field_value = field['value']
+    # field_value = field['value']
+    field_value = None
 
     if type(field_type) == IS:
       field_value_choices = field_type._operands
