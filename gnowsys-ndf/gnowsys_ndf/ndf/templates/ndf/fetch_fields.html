@@ -1,0 +1,51 @@
+{% load ndf_tags %}
+{% load i18n %}
+
+{% if fields_name == 'name' or fields_name == "altnames" %}
+
+<!-- <type 'unicode'> -->
+<div style="display:table-cell;">
+  <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|join:', '|default_if_none:''}}"></font>
+</div>
+
+{% else %}
+
+	{% if fields_type == "bool" %}
+	<select id="id_auto_now_add" name="{{fields_name}}" style="width:50%">
+	  <option value="0">{% trans "Unknown" %}</option>
+	  <option value="1" {% if fields_value == 1 %}selected{% endif %} >{% trans "Yes" %}</option>
+	  <option value="2" {% if fields_value == 2 %}selected{% endif %} >{% trans "No" %}</option>
+	</select>
+
+	{% elif fields_type == "datetime" %}
+	<label>{% now "jS F Y H:i" %}</label>
+
+	{% elif fields_type == "datetime.datetime" %}
+	<label>{% now "jS F Y H:i" %}</label>
+
+	{% elif fields_type == "status" %}
+	<select id="id_auto_now_add" name="{{fields_name}}" style="width:60%">
+	  <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >{% trans "PUBLISHED" %}</option>
+	  <option value="DRAFT" {% if fields_value == "DRAFT" %}selected{% endif %} >{% trans "DRAFT" %}</option>
+	  <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >{% trans "HIDDEN" %}</option>
+	</select>
+
+	{% elif fields_type == "int" %}
+	<div style="display:table-cell;">
+	  <font size="3"> <input type="number" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
+	</div>
+
+	{% elif fields_type == "list" %}
+	<div id="list_drawer" style="border-spacing:0px" class="list_drawer">
+		
+	</div>
+
+
+
+
+	{% endif %}
+
+{# {{ fields_name }} #}
+{# {{ fields_type }} #}
+
+{% endif %}
