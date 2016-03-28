@@ -158,7 +158,9 @@ def default_template(request,group_id,node=None):
 
         # DONOT DELETE THIS CODE -------------------------
         for key,value in pos_ats.iteritems():
-            print value ,"\n\n"
+            pos_ats[key].update({'value':None})
+
+            print key ,"\n", pos_ats[key] , "\n\n\n"
             # print value['altnames'],value['_id']
         # for key,value in pos_rts.iteritems():
             # print value['altnames'],value['_id']

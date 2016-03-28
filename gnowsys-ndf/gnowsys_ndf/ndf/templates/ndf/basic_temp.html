@@ -47,9 +47,11 @@
         </div></td>
 
         <!-- field_name {{each.name}}  field_value field_type {{each.data_type}}  -->
+        <!-- This ndf tag ats_fields is done to fetch the attribute_type_set. donot replace this with html_widget tag cause it will not allow it to be saved. The field 'value' in the dict is not present as it is fetched directly from the database  -->
 
-           <td>{% ats_fields each.data_type each.name %} 
-                 </td></tr>
+        <td>{% ats_fields each.data_type each.name %}
+
+        </td></tr>
         {% endfor %}
         {# {{ gs_struc|get_dict_item:'attribute_set' }} #}
         {# {% fetch_req_fields gs_struc|get_dict_item:'attribute_set' 'attribute_set' %}  #}
