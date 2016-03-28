@@ -2778,7 +2778,8 @@ def html_widget(groupid, node_id, field):
 
     elif is_AT_RT_base == "AttributeType":
       is_attribute_field = True
-      is_required_field = field["required"]
+      is_required_field = None
+      # is_required_field = field["required"]
 
     elif is_AT_RT_base == "RelationType":
       is_relation_field = True
