@@ -1373,9 +1373,9 @@ class GSystem(Node):
                                         # along with their sub-collection elemnts too
         'if_file': {
                         'mime_type': basestring,
-                        'original': {'_id': ObjectId, 'relurl': basestring},
-                        'mid': {'_id': ObjectId, 'relurl': basestring},
-                        'thumbnail': {'_id': ObjectId, 'relurl': basestring}
+                        'original': {'id': ObjectId, 'relurl': basestring},
+                        'mid': {'id': ObjectId, 'relurl': basestring},
+                        'thumbnail': {'id': ObjectId, 'relurl': basestring}
                     },
         'author_set': [int],        # List of Authors
         'annotations': [dict],      # List of json files for annotations on the page
@@ -1435,14 +1435,14 @@ class GSystem(Node):
             if original_filehive_obj:
 
                 self.if_file.mime_type       = mime_type
-                self.if_file.original._id    = original_filehive_obj._id 
+                self.if_file.original.id    = original_filehive_obj._id 
                 self.if_file.original.relurl = original_filehive_obj.relurl
 
                 if 'image' in original_filehive_obj.mime_type.lower():
 
                     for each_image_size in self.image_sizes_name[1:]:
                         
-                        parent_id = self.if_file[self.image_sizes_name[self.image_sizes_name.index(each_image_size) - 1]]['_id']
+                        parent_id = self.if_file[self.image_sizes_name[self.image_sizes_name.index(each_image_size) - 1]]['id']
 
                         each_image_size_filename =  self.sys_gen_image_prefix \
                                                     + each_image_size \
@@ -1467,7 +1467,7 @@ class GSystem(Node):
                                 if_image_dimensions=dimension)
 
                             # print "each_image_size_id_url : ",each_image_size_id_url 
-                            self.if_file[each_image_size]['_id']    = each_image_size_id_url['_id'] 
+                            self.if_file[each_image_size]['id']    = each_image_size_id_url['id'] 
                             self.if_file[each_image_size]['relurl'] = each_image_size_id_url['relurl']
 
         return self
@@ -1560,7 +1560,7 @@ class Filehive(DjangoDocument):
         md5 = str(addr_obj.id)
         filehive_obj = filehive_collection.find_one({'md5': md5})
 
-        id_url_dict = {'_id': None, 'relurl': ''}
+        id_url_dict = {'id': None, 'relurl': ''}
 
         if not filehive_obj:
             
@@ -1581,7 +1581,7 @@ class Filehive(DjangoDocument):
             filehive_obj.save()
             # print "filehive_obj : ", filehive_obj
 
-        id_url_dict['_id'] = filehive_obj._id
+        id_url_dict['id'] = filehive_obj._id
         id_url_dict['relurl'] = filehive_obj.relurl
 
         if kwargs.has_key('get_obj') and kwargs['get_obj']:
