@@ -150,11 +150,12 @@ def discussion_reply(request, group_id, node_id):
         content_org = request.POST.get("reply_text_content", "") # reply content
         node = node_collection.one({"_id": ObjectId(node_id)})
         # gs_type_node_id = get_relation_value(node_id,'thread_of')
-        grel_dict = get_relation_value(node_id,'thread_of')
-        is_cursor = grel_dict.get("cursor",False)
-        if not is_cursor:
-            gs_type_node_id = grel_dict.get("grel_node")
-            # grel_id = grel_dict.get("grel_id")
+        gs_type_node_id = None
+        if node and node.relation_set:
+            for each_rel in node.relation_set:
+                if each_rel and "thread_of" in each_rel:
+                    gs_type_node_id = each_rel['thread_of'][0]
+                    break
 
         # print "\n\n node.name === ", node.member_of_names_list, node._id, node.name
 
@@ -186,7 +187,7 @@ def discussion_reply(request, group_id, node_id):
             # reply_obj.content = org2html(content_org, file_prefix=filename)
             reply_obj.content = content_org
             if gs_type_node_id:
-                reply_obj.origin.append({'prior_node_id_of_thread': gs_type_node_id})
+                reply_obj.origin.append({'prior_node_id_of_thread': ObjectId(gs_type_node_id)})
             if node_id:
                 reply_obj.origin.append({'thread_id': ObjectId(node_id)})
 
@@ -240,7 +241,6 @@ def discussion_reply(request, group_id, node_id):
         
             # saving the reply obj
             reply_obj.save()
-
             formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
 
             files = []
