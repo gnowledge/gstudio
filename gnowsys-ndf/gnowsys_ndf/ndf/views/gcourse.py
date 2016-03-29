@@ -1865,7 +1865,7 @@ def course_dashboard(request, group_id):
 
     template = 'ndf/gcourse_event_group.html'
 
-    anaytics_instance = AnalyticsMethods(request, group_id)
+    anaytics_instance = AnalyticsMethods(request, request.user.id, group_id)
     all_units = anaytics_instance.get_total_units_count()
     print "\n\n Total Units =  ", all_units
     completed_units = anaytics_instance.get_completed_units_count()
@@ -1878,9 +1878,28 @@ def course_dashboard(request, group_id):
     print "\n\n Total QuizItemEvents === ", total_quizitems
     attempted_quizitems = anaytics_instance.get_attempted_quizitems_count()
     print "\n\n Attempted QuizItemEvents === ", attempted_quizitems
-
-    correct_attempted_quizitems = anaytics_instance.get_correct_quizitems_count()
+    correct_attempted_quizitems = anaytics_instance.get_evaluated_quizitems_count(True,False)
     print "\n\n Correct Attempted QuizItemEvents === ", correct_attempted_quizitems
+    incorrect_attempted_quizitems = anaytics_instance.get_evaluated_quizitems_count(False,True)
+    print "\n\n InCorrect Attempted QuizItemEvents === ", incorrect_attempted_quizitems
+    total_notes = anaytics_instance.get_total_notes_count()
+    print "\n\n Total Notes === ", total_notes
+    user_notes = anaytics_instance.get_user_notes_count()
+    print "\n\n User Notes === ", user_notes
+    cmts_on_user_notes = anaytics_instance.get_comments_counts_on_users_notes()
+    print "\n\n Total Comments User Notes === ", cmts_on_user_notes
+    total_files = anaytics_instance.get_total_files_count()
+    print "\n\n Total Files === ", total_files
+    user_files = anaytics_instance.get_user_files_count()
+    print "\n\n User Files === ", user_files
+    cmts_on_user_files = anaytics_instance.get_comments_counts_on_users_files()
+    print "\n\n Total Comments User Files === ", cmts_on_user_files
+
+
+
+
+
+
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
