@@ -660,6 +660,8 @@ class Node(DjangoDocument):
         # "attribute_type_set"; If exists, add them to the document
         # Otherwise, throw an error -- " Illegal access: Invalid field
         # found!!! "
+        invalid_fields = []
+
         for key, value in self.iteritems():
             if key == '_id':
                 continue
@@ -686,10 +688,15 @@ class Node(DjangoDocument):
                         break
 
                 if not field_found:
+                    invalid_fields.append(field_found)
                     print "\n Invalid field(", key, ") found!!!\n"
                     # Throw an error: " Illegal access: Invalid field
                     # found!!! "
 
+        if invalid_fields:
+            for each_invalid_field in invalid_fields:
+                if each_invalid_field in self.iteritems:
+                    del self.iteritems[each_invalid_field]
         super(Node, self).save(*args, **kwargs)
 
     	#This is the save method of the node class.It is still not
