@@ -2293,9 +2293,104 @@ div.show-image:hover div.fullscreen-icon{
     a, input {
       margin: 0px;
     }
+    .notes-count {
+      text-align: center;
+
+      span
+        {
+          &:first-child {
+            font-size: 21px;
+            font-weight: 600;
+            padding: 15px;
+          }
+          &:last-child {
+            background: lightgrey;
+            padding: 2px 5px;
+            vertical-align: text-bottom;
+          }
+
+        }
+    }
 
   }
   .notebook-body {
+    padding: 0px 20px;
+
+    .note-cards {
+      .row {
+        margin: 30px 0px;
+      }
+      .note-card, .note-details {
+        border: 1px solid #ccc;
+        padding: 10px 15px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+        border-radius: 5px;
+        line-height: 23px;
+        cursor: pointer;
+        position: relative;
+
+        .note-heading{
+          font-weight: 800;
+          font-size: 20px;
+        }
+        .note-close {
+            position: absolute;
+            right: 7px;
+            top: 3px;
+            font-size: 25px;
+            font-weight: 700;
+            color: #929292;
+        }
+        .note-summary{
+          margin: 15px 0px;
+        }
+        .note-info,.note-extra-data{
+          color: #989898;
+          font-size: 13px;
+          letter-spacing: 0.9px;
+          font-weight: 500;
+
+          >span{
+            margin-right: 5px;
+          }
+        }
+        .note-tags {
+            >span {
+              display: inline-block;
+              margin: 10px;
+              background: #ffebb2;
+              color: #cba552;
+              padding: 2px 5px;
+            }
+        }
+        .note-actions {
+          color: #989898;
+          cursor: pointer;
+
+          span {
+            margin-right: 10px 5px;
+          }
+        }
+      }
+      .note-details {
+          .note-info, .note-extra-data, .note-tags, .note-actions {
+              display: inline-block;
+              margin-right: 10px;
+          }
+          .note-extra-data {
+
+          }
+          .note-tags {
+              float: right;
+              >span {
+                margin: 0px;
+              }
+          }
+          .note-actions {
+          }
+      }
+    }
+
     >div {
       padding-top: 15px;
       height: 50em;
@@ -3087,104 +3182,6 @@ div.show-image:hover div.fullscreen-icon{
   }
 }
 
-.login-page {
-    position: relative;
-    background: url(/static/ndf/images/login-background.png);
-    background-size: 100% 100%;
-    height: 100%;
-
-    .login-page-opacity {
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        opacity: 0.6;
-        background: -webkit-gradient(linear, left top, right top, from(#E9A900), to(#B0108D));
-        background: -webkit-linear-gradient(left, #E9A900, #B0108D);
-        background: -moz-linear-gradient(left, #E9A900, #B0108D);
-        background: -ms-linear-gradient(left, #E9A900, #B0108D);
-        background: -o-linear-gradient(left, #E9A900, #B0108D);
-    }
-
-    .login-page-form {
-        background-color: #fff;
-        margin-top: 100px;
-        margin-bottom: 100px;
-        border-radius: 10px;
-        padding: 10px 40px;
-        opacity: 0.95;
-        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-
-        .login-page-header {
-            img {
-                height: 80px;
-                width: 280px;
-            }
-            span {
-                display: block;
-                text-transform: uppercase;
-                color: #d5d5d5;
-                font-weight: 600;
-                letter-spacing: 1px;
-            }
-        }
-        .login-captcha {
-          margin: 10px 0;
-
-          >div {
-            display: inline-block;
-            vertical-align: top;
-          }
-          .fi-refresh {
-            color: #A0148E;
-            font-size: 25px;
-          }
-          #captcha-content {
-              th{
-                display: none;
-              }
-              td>input {
-                display: inline-block;
-
-                &#id_captcha_1 {
-                  width: 130px;
-                }
-              }
-          }
-        }
-        .login-button {
-            .button {
-              font-size: 15px;
-              background-color: #B1B1B1;
-              font-weight: 600;
-              border-bottom: 3.5px solid #DADADA;
-              border-radius: 5px;
-              padding: 9px;
-
-              &:hover {
-                background-color: #CC1AB5;
-                border-color: #881378;
-              }
-            }
-        }
-        .forgot-password {
-          label {
-            font-size: 10px;
-            text-align: center;
-            text-decoration: underline;
-          }
-        }
-        .register-user {
-          label {
-            font-size: 10px;
-            margin: 10px 0px 0px;
-          }
-          span {
-            color: #A0148E;
-          }
-        }
-    }
-}
-
 .activity-page {
   .activity-page-header {
     font-weight: 400;
@@ -3276,6 +3273,14 @@ div.show-image:hover div.fullscreen-icon{
           }
         }
       }
+      .related-content-close {
+          position: absolute;
+          right: -2px;
+          top: -8px;
+          font-size: 25px !important;
+          display: none;
+          color: #8E8E8E;
+      }
       .content-expanded {
         >i {
           font-size: 20px !important;
@@ -3295,10 +3300,15 @@ div.show-image:hover div.fullscreen-icon{
             border: 1px solid #ccc;
             font-size: 13px;
             color: #757575;
+            margin-right: 20px;
           }
           .related-content-title {
             font-size: 15px !important;
+            position: relative;
 
+            .related-content-close {
+                display: block;
+            }
             >i {
               display: none !important;
             }

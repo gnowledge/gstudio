@@ -16014,6 +16014,72 @@ th.hide-for-touch {
       color: #BFBFBF !important;
       line-height: 1.8em; }
 
+.login-page {
+  position: relative;
+  background: url(/static/ndf/images/login-background.png);
+  background-size: 100% 100%;
+  height: 100%; }
+  .login-page .login-page-opacity {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    opacity: 0.6;
+    background: -webkit-gradient(linear, left top, right top, from(#E9A900), to(#B0108D));
+    background: -webkit-linear-gradient(left, #E9A900, #B0108D);
+    background: -moz-linear-gradient(left, #E9A900, #B0108D);
+    background: -ms-linear-gradient(left, #E9A900, #B0108D);
+    background: -o-linear-gradient(left, #E9A900, #B0108D); }
+  .login-page .login-page-form {
+    background-color: #fff;
+    margin-top: 100px;
+    margin-bottom: 100px;
+    border-radius: 10px;
+    padding: 10px 40px;
+    opacity: 0.95;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5); }
+    .login-page .login-page-form .login-page-header img {
+      height: 80px;
+      width: 280px; }
+    .login-page .login-page-form .login-page-header span {
+      display: block;
+      text-transform: uppercase;
+      color: #d5d5d5;
+      font-weight: 600;
+      letter-spacing: 1px; }
+    .login-page .login-page-form .login-captcha {
+      margin: 10px 0; }
+      .login-page .login-page-form .login-captcha > div {
+        display: inline-block;
+        vertical-align: top; }
+      .login-page .login-page-form .login-captcha .fi-refresh {
+        color: #A0148E;
+        font-size: 25px; }
+      .login-page .login-page-form .login-captcha #captcha-content th {
+        display: none; }
+      .login-page .login-page-form .login-captcha #captcha-content td > input {
+        display: inline-block; }
+        .login-page .login-page-form .login-captcha #captcha-content td > input#id_captcha_1 {
+          width: 130px; }
+    .login-page .login-page-form .login-button .button {
+      font-size: 15px;
+      background-color: #B1B1B1;
+      font-weight: 600;
+      border-bottom: 3.5px solid #DADADA;
+      border-radius: 5px;
+      padding: 9px; }
+      .login-page .login-page-form .login-button .button:hover {
+        background-color: #CC1AB5;
+        border-color: #881378; }
+    .login-page .login-page-form .forgot-password label {
+      font-size: 10px;
+      text-align: center;
+      text-decoration: underline; }
+    .login-page .login-page-form .register-user label {
+      font-size: 10px;
+      margin: 10px 0px 0px; }
+    .login-page .login-page-form .register-user span {
+      color: #A0148E; }
+
 /*
 *   The Foundation Stylesheet
 *   You can paste sass snippets from compass or foundation here
@@ -17406,110 +17472,169 @@ div.show-image:hover div.fullscreen-icon{
   padding-top: 1em; }
   .notebook .notebook-header a, .notebook .notebook-header input {
     margin: 0px; }
-.notebook .notebook-body > div {
-  padding-top: 15px;
-  height: 50em;
-  overflow: scroll; }
-.notebook .notebook-body .notebook-index {
-  border-right: 1px solid #AFAEAE; }
-  .notebook .notebook-body .notebook-index .tabs {
-    width: 100%;
-    margin: 0em 0em 0.5em;
-    border-bottom: 1px solid #CCC; }
-    .notebook .notebook-body .notebook-index .tabs .tab-title {
-      width: 40%;
-      background-color: #DEDEDE;
-      border-radius: 5px 5px 0px 0px;
-      margin-left: 1em;
-      position: relative;
-      top: 1px; }
-      .notebook .notebook-body .notebook-index .tabs .tab-title a {
-        border-radius: inherit; }
-      .notebook .notebook-body .notebook-index .tabs .tab-title.active {
-        background-color: #fff;
-        border: 1px solid #CCC;
-        border-bottom: 0px; }
-  .notebook .notebook-body .notebook-index .tab-content {
-    padding: 0px; }
-  .notebook .notebook-body .notebook-index .notes .date {
-    font-size: 12px;
-    font-weight: bold;
-    background: #EFEFEF;
-    padding: 7px 10px; }
-    .notebook .notebook-body .notebook-index .notes .date .note-count {
-      font-size: 11px;
-      line-height: 2em; }
-  .notebook .notebook-body .notebook-index .notes > div {
-    border-bottom: 1px solid #AFAEAE; }
-  .notebook .notebook-body .notebook-index .notes .note {
-    padding: 5px 15px;
-    background: #EEEEEE;
-    cursor: pointer; }
-    .notebook .notebook-body .notebook-index .notes .note .note-heading {
-      font-weight: 400;
-      font-size: 17px; }
-    .notebook .notebook-body .notebook-index .notes .note .note-meta {
-      font-size: 13px; }
-      .notebook .notebook-body .notebook-index .notes .note .note-meta > span:not(:first-child) {
-        font-size: 11px;
-        font-weight: 600;
-        color: #717171; }
-    .notebook .notebook-body .notebook-index .notes .note .note-footer {
-      color: #888888; }
-      .notebook .notebook-body .notebook-index .notes .note .note-footer span {
-        margin-right: 10px; }
-    .notebook .notebook-body .notebook-index .notes .note.active {
-      border-left: 5px solid blue;
-      background: #FFF; }
-      .notebook .notebook-body .notebook-index .notes .note.active .note-heading {
-        font-weight: 500;
-        font-size: 17px; }
-.notebook .notebook-body .note-page {
-  background-color: #fff; }
-  .notebook .notebook-body .note-page > div {
-    background-color: #fff; }
-  .notebook .notebook-body .note-page .note-toolbar {
-    padding: 1em 0em 0em;
-    margin: 0em;
-    background-color: #F3F3F3; }
-    .notebook .notebook-body .note-page .note-toolbar .creator-title {
-      text-align: left;
-      color: #7D7D7D;
-      font-size: 12px;
-      letter-spacing: 0.3px; }
-    .notebook .notebook-body .note-page .note-toolbar .creator-rating {
-      text-align: right; }
-      .notebook .notebook-body .note-page .note-toolbar .creator-rating > div {
-        display: inline-block; }
-  .notebook .notebook-body .note-page .note-content {
-    padding: 0em 1em 1em;
-    background: #fff;
-    margin: 0em; }
-    .notebook .notebook-body .note-page .note-content .note-header > div {
-      display: inline-block; }
-    .notebook .notebook-body .note-page .note-content .note-header .note-title {
-      font-size: 1.5em;
-      font-weight: 500;
-      margin-right: 1em; }
-    .notebook .notebook-body .note-page .note-content .note-text p {
+  .notebook .notebook-header .notes-count {
+    text-align: center; }
+    .notebook .notebook-header .notes-count span:first-child {
+      font-size: 21px;
+      font-weight: 600;
+      padding: 15px; }
+    .notebook .notebook-header .notes-count span:last-child {
+      background: lightgrey;
+      padding: 2px 5px;
+      vertical-align: text-bottom; }
+.notebook .notebook-body {
+  padding: 0px 20px; }
+  .notebook .notebook-body .note-cards .row {
+    margin: 30px 0px; }
+  .notebook .notebook-body .note-cards .note-card, .notebook .notebook-body .note-cards .note-details {
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    line-height: 23px;
+    cursor: pointer;
+    position: relative; }
+    .notebook .notebook-body .note-cards .note-card .note-heading, .notebook .notebook-body .note-cards .note-details .note-heading {
+      font-weight: 800;
+      font-size: 20px; }
+    .notebook .notebook-body .note-cards .note-card .note-close, .notebook .notebook-body .note-cards .note-details .note-close {
+      position: absolute;
+      right: 7px;
+      top: 3px;
+      font-size: 25px;
+      font-weight: 700;
+      color: #929292; }
+    .notebook .notebook-body .note-cards .note-card .note-summary, .notebook .notebook-body .note-cards .note-details .note-summary {
+      margin: 15px 0px; }
+    .notebook .notebook-body .note-cards .note-card .note-info, .notebook .notebook-body .note-cards .note-card .note-extra-data, .notebook .notebook-body .note-cards .note-details .note-info, .notebook .notebook-body .note-cards .note-details .note-extra-data {
+      color: #989898;
+      font-size: 13px;
+      letter-spacing: 0.9px;
+      font-weight: 500; }
+      .notebook .notebook-body .note-cards .note-card .note-info > span, .notebook .notebook-body .note-cards .note-card .note-extra-data > span, .notebook .notebook-body .note-cards .note-details .note-info > span, .notebook .notebook-body .note-cards .note-details .note-extra-data > span {
+        margin-right: 5px; }
+    .notebook .notebook-body .note-cards .note-card .note-tags > span, .notebook .notebook-body .note-cards .note-details .note-tags > span {
+      display: inline-block;
+      margin: 10px;
+      background: #ffebb2;
+      color: #cba552;
+      padding: 2px 5px; }
+    .notebook .notebook-body .note-cards .note-card .note-actions, .notebook .notebook-body .note-cards .note-details .note-actions {
+      color: #989898;
+      cursor: pointer; }
+      .notebook .notebook-body .note-cards .note-card .note-actions span, .notebook .notebook-body .note-cards .note-details .note-actions span {
+        margin-right: 10px 5px; }
+  .notebook .notebook-body .note-cards .note-details .note-info, .notebook .notebook-body .note-cards .note-details .note-extra-data, .notebook .notebook-body .note-cards .note-details .note-tags, .notebook .notebook-body .note-cards .note-details .note-actions {
+    display: inline-block;
+    margin-right: 10px; }
+  .notebook .notebook-body .note-cards .note-details .note-tags {
+    float: right; }
+    .notebook .notebook-body .note-cards .note-details .note-tags > span {
+      margin: 0px; }
+  .notebook .notebook-body > div {
+    padding-top: 15px;
+    height: 50em;
+    overflow: scroll; }
+  .notebook .notebook-body .notebook-index {
+    border-right: 1px solid #AFAEAE; }
+    .notebook .notebook-body .notebook-index .tabs {
+      width: 100%;
+      margin: 0em 0em 0.5em;
+      border-bottom: 1px solid #CCC; }
+      .notebook .notebook-body .notebook-index .tabs .tab-title {
+        width: 40%;
+        background-color: #DEDEDE;
+        border-radius: 5px 5px 0px 0px;
+        margin-left: 1em;
+        position: relative;
+        top: 1px; }
+        .notebook .notebook-body .notebook-index .tabs .tab-title a {
+          border-radius: inherit; }
+        .notebook .notebook-body .notebook-index .tabs .tab-title.active {
+          background-color: #fff;
+          border: 1px solid #CCC;
+          border-bottom: 0px; }
+    .notebook .notebook-body .notebook-index .tab-content {
       padding: 0px; }
-  .notebook .notebook-body .note-page .comment-sections {
-    padding: 1em 1em 0em; }
-    .notebook .notebook-body .note-page .comment-sections .comments-header span {
-      font-weight: bold; }
-    .notebook .notebook-body .note-page .comment-sections .comments-header i:not(:first-child) {
-      margin-left: 15px; }
-    .notebook .notebook-body .note-page .comment-sections .new-comment {
-      border-top: 1px solid grey;
-      padding: 15px 10px;
-      margin-top: 5px; }
-      .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-box,
-      .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-editor {
-        min-height: 200px;
-        margin-top: 0px; }
-      .notebook .notebook-body .note-page .comment-sections .new-comment .user-prof-image {
-        font-size: 90px;
-        line-height: 0em; }
+    .notebook .notebook-body .notebook-index .notes .date {
+      font-size: 12px;
+      font-weight: bold;
+      background: #EFEFEF;
+      padding: 7px 10px; }
+      .notebook .notebook-body .notebook-index .notes .date .note-count {
+        font-size: 11px;
+        line-height: 2em; }
+    .notebook .notebook-body .notebook-index .notes > div {
+      border-bottom: 1px solid #AFAEAE; }
+    .notebook .notebook-body .notebook-index .notes .note {
+      padding: 5px 15px;
+      background: #EEEEEE;
+      cursor: pointer; }
+      .notebook .notebook-body .notebook-index .notes .note .note-heading {
+        font-weight: 400;
+        font-size: 17px; }
+      .notebook .notebook-body .notebook-index .notes .note .note-meta {
+        font-size: 13px; }
+        .notebook .notebook-body .notebook-index .notes .note .note-meta > span:not(:first-child) {
+          font-size: 11px;
+          font-weight: 600;
+          color: #717171; }
+      .notebook .notebook-body .notebook-index .notes .note .note-footer {
+        color: #888888; }
+        .notebook .notebook-body .notebook-index .notes .note .note-footer span {
+          margin-right: 10px; }
+      .notebook .notebook-body .notebook-index .notes .note.active {
+        border-left: 5px solid blue;
+        background: #FFF; }
+        .notebook .notebook-body .notebook-index .notes .note.active .note-heading {
+          font-weight: 500;
+          font-size: 17px; }
+  .notebook .notebook-body .note-page {
+    background-color: #fff; }
+    .notebook .notebook-body .note-page > div {
+      background-color: #fff; }
+    .notebook .notebook-body .note-page .note-toolbar {
+      padding: 1em 0em 0em;
+      margin: 0em;
+      background-color: #F3F3F3; }
+      .notebook .notebook-body .note-page .note-toolbar .creator-title {
+        text-align: left;
+        color: #7D7D7D;
+        font-size: 12px;
+        letter-spacing: 0.3px; }
+      .notebook .notebook-body .note-page .note-toolbar .creator-rating {
+        text-align: right; }
+        .notebook .notebook-body .note-page .note-toolbar .creator-rating > div {
+          display: inline-block; }
+    .notebook .notebook-body .note-page .note-content {
+      padding: 0em 1em 1em;
+      background: #fff;
+      margin: 0em; }
+      .notebook .notebook-body .note-page .note-content .note-header > div {
+        display: inline-block; }
+      .notebook .notebook-body .note-page .note-content .note-header .note-title {
+        font-size: 1.5em;
+        font-weight: 500;
+        margin-right: 1em; }
+      .notebook .notebook-body .note-page .note-content .note-text p {
+        padding: 0px; }
+    .notebook .notebook-body .note-page .comment-sections {
+      padding: 1em 1em 0em; }
+      .notebook .notebook-body .note-page .comment-sections .comments-header span {
+        font-weight: bold; }
+      .notebook .notebook-body .note-page .comment-sections .comments-header i:not(:first-child) {
+        margin-left: 15px; }
+      .notebook .notebook-body .note-page .comment-sections .new-comment {
+        border-top: 1px solid grey;
+        padding: 15px 10px;
+        margin-top: 5px; }
+        .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-box,
+        .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-editor {
+          min-height: 200px;
+          margin-top: 0px; }
+        .notebook .notebook-body .note-page .comment-sections .new-comment .user-prof-image {
+          font-size: 90px;
+          line-height: 0em; }
 
 #newNoteModal {
   width: 40%; }
@@ -17919,72 +18044,6 @@ div.show-image:hover div.fullscreen-icon{
           display: inline;
           margin-right: 5px; }
 
-.login-page {
-  position: relative;
-  background: url(/static/ndf/images/login-background.png);
-  background-size: 100% 100%;
-  height: 100%; }
-  .login-page .login-page-opacity {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    opacity: 0.6;
-    background: -webkit-gradient(linear, left top, right top, from(#E9A900), to(#B0108D));
-    background: -webkit-linear-gradient(left, #E9A900, #B0108D);
-    background: -moz-linear-gradient(left, #E9A900, #B0108D);
-    background: -ms-linear-gradient(left, #E9A900, #B0108D);
-    background: -o-linear-gradient(left, #E9A900, #B0108D); }
-  .login-page .login-page-form {
-    background-color: #fff;
-    margin-top: 100px;
-    margin-bottom: 100px;
-    border-radius: 10px;
-    padding: 10px 40px;
-    opacity: 0.95;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5); }
-    .login-page .login-page-form .login-page-header img {
-      height: 80px;
-      width: 280px; }
-    .login-page .login-page-form .login-page-header span {
-      display: block;
-      text-transform: uppercase;
-      color: #d5d5d5;
-      font-weight: 600;
-      letter-spacing: 1px; }
-    .login-page .login-page-form .login-captcha {
-      margin: 10px 0; }
-      .login-page .login-page-form .login-captcha > div {
-        display: inline-block;
-        vertical-align: top; }
-      .login-page .login-page-form .login-captcha .fi-refresh {
-        color: #A0148E;
-        font-size: 25px; }
-      .login-page .login-page-form .login-captcha #captcha-content th {
-        display: none; }
-      .login-page .login-page-form .login-captcha #captcha-content td > input {
-        display: inline-block; }
-        .login-page .login-page-form .login-captcha #captcha-content td > input#id_captcha_1 {
-          width: 130px; }
-    .login-page .login-page-form .login-button .button {
-      font-size: 15px;
-      background-color: #B1B1B1;
-      font-weight: 600;
-      border-bottom: 3.5px solid #DADADA;
-      border-radius: 5px;
-      padding: 9px; }
-      .login-page .login-page-form .login-button .button:hover {
-        background-color: #CC1AB5;
-        border-color: #881378; }
-    .login-page .login-page-form .forgot-password label {
-      font-size: 10px;
-      text-align: center;
-      text-decoration: underline; }
-    .login-page .login-page-form .register-user label {
-      font-size: 10px;
-      margin: 10px 0px 0px; }
-    .login-page .login-page-form .register-user span {
-      color: #A0148E; }
-
 .activity-page .activity-page-header {
   font-weight: 400;
   font-size: 1.3em;
@@ -18045,6 +18104,13 @@ div.show-image:hover div.fullscreen-icon{
       .activity-page .activity-slides-container .activity-slides .activity-slide .page > section {
         margin-left: 50%;
         transform: translate(-50%); }
+    .activity-page .activity-slides-container .activity-slides .related-content-close {
+      position: absolute;
+      right: -2px;
+      top: -8px;
+      font-size: 25px !important;
+      display: none;
+      color: #8E8E8E; }
     .activity-page .activity-slides-container .activity-slides .content-expanded > i {
       font-size: 20px !important;
       color: #ccc !important;
@@ -18060,9 +18126,13 @@ div.show-image:hover div.fullscreen-icon{
         padding: 2px 7px;
         border: 1px solid #ccc;
         font-size: 13px;
-        color: #757575; }
+        color: #757575;
+        margin-right: 20px; }
       .activity-page .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title {
-        font-size: 15px !important; }
+        font-size: 15px !important;
+        position: relative; }
+        .activity-page .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title .related-content-close {
+          display: block; }
         .activity-page .activity-slides-container .activity-slides .content-expanded .related-content-header .related-content-title > i {
           display: none !important; }
     .activity-page .activity-slides-container .activity-slides .content-expanded .related-content-body {

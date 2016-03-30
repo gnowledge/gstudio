@@ -128,6 +128,7 @@
                   <span class="related-content-title">
                     <i class="fa fa-caret-right"></i>&nbsp;Demo Heading
                     <a href="#related-content-button" class="back-to-activity"><i class="fa fa-arrow-circle-up"></i>&nbsp;Go back to activity</a>
+                    <div class="related-content-close">&times;</div>
                   </span>
                 </div>
                 <div class="related-content-body">
@@ -230,6 +231,10 @@
 
     $(".related-content-title").on('click', function(){
       $(this).closest('#related-content').toggleClass('content-expanded');
+    });
+    $('.related-content-close').on('click', function(e){
+      e.stopPropagation();
+      $(this).closest('#related-content').removeClass('content-expanded');
     })
 
 
