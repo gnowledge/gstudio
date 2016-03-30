@@ -40,6 +40,7 @@ from gnowsys_ndf.notification import models as notification
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+gst_file = node_collection.one({'_type': "GSystemType", 'name': u"File"})
 
 app = GST_COURSE
 
@@ -2010,9 +2011,21 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
     else:
 
-        files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
-            # 'tags': {'$regex': u"raw", '$options': "i"}
-            },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+        files_cur = node_collection.find({
+                                            '_type': {'$in': ["File", "GSystem"]},
+                                            'member_of': {'$in': [gst_file._id]},
+                                            'group_set': group_id,
+                                            'created_by': {'$in': gstaff_users},
+                                            # 'tags': {'$regex': u"raw", '$options': "i"}
+                                        },
+                                        {
+                                            'name': 1,
+                                            '_id': 1,
+                                            'fs_file_ids': 1,
+                                            'if_file': 1,
+                                            'member_of': 1,
+                                            'mime_type': 1
+                                        }).sort('created_at', -1)
 
         raw_material_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
         context_variables.update({'raw_material_page_info':raw_material_page_info})
@@ -2072,8 +2085,29 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     else:
         gstaff_users.extend(group_obj.group_admin)
         gstaff_users.append(group_obj.created_by)
-        query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}}
-        files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+        # query = {
+        #             'group_set': group_id,
+        #             'relation_set.clone_of':{'$exists': False},
+        #             '_type': "File",
+        #             'created_by': {'$nin': gstaff_users}
+        #         }
+        # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+
+        files_cur = node_collection.find({
+                                    '_type': {'$in': ["File", "GSystem"]},
+                                    'member_of': {'$in': [gst_file._id]},
+                                    'group_set': group_id,
+                                    'created_by': {'$nin': gstaff_users},
+                                },
+                                {
+                                    'name': 1,
+                                    '_id': 1,
+                                    'fs_file_ids': 1,
+                                    'if_file': 1,
+                                    'member_of': 1,
+                                    'mime_type': 1
+                                }).sort('created_at', -1)
+
         # print "\n\n Total files: ", files_cur.count()
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
