@@ -15,44 +15,71 @@ from gnowsys_ndf.ndf.models import node_collection, filehive_collection, gfs
 from gnowsys_ndf.ndf.models import GSystem
 from gnowsys_ndf.ndf.views.methods import get_language_tuple
 
+try:
+    from bson import ObjectId
+except ImportError:  # old pymongo
+    from pymongo.objectid import ObjectId
+
 gst_file = node_collection.one({'_type': u'GSystemType', 'name': u'File'})
 gst_file_id = gst_file._id
 
-def write_file(request, group_id):
+def upload_form(request, group_id):
 	if request.method == 'GET':
 		return render_to_response('ndf/filehive.html', {
 			'group_id': group_id, 'groupid': group_id,
-
 			}, context_instance=RequestContext(request))
 
-	if request.method == 'POST':
-		uploaded_files = request.FILES.getlist('files', [])
-		first_obj = None
-		collection_set = []
-		for each_file in uploaded_files:
-			gs_obj = node_collection.collection.GSystem()
-			language = request.POST.get('language', GSTUDIO_SITE_DEFAULT_LANGUAGE)
-			language = get_language_tuple(language)
-			gs_obj.fill_gstystem_values(request=request,
-										language=language,
-										uploaded_file=each_file)
-			print "\n=========in view============\n"
-			print each_file
-			gs_obj.member_of.append(gst_file_id)
-			gs_obj.save()
 
-			if not first_obj:
-				first_obj = gs_obj
-			else:
-				collection_set.append(gs_obj._id)
+def write_files(request, group_id, make_collection=False):
 
-		if collection_set:
-			first_obj.collection_set = collection_set
-			first_obj.save()
+	author_obj = node_collection.one({'_type': u'Author', 'created_by': request.user.id})
+	author_obj_id = author_obj._id
 
-		return render_to_response('ndf/filehive.html', {
-			'group_id': group_id, 'groupid': group_id,
-			}, context_instance=RequestContext(request))
+	first_obj = None
+	collection_set = []
+	uploaded_files = request.FILES.getlist('files', [])
+	name = request.POST.get('name', 'untitled')
+	gs_obj_list = []
+
+	for each_file in uploaded_files:
+
+		gs_obj = node_collection.collection.GSystem()
+
+		language = request.POST.get('language', GSTUDIO_SITE_DEFAULT_LANGUAGE)
+		language = get_language_tuple(language)
+
+		group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
+
+		if not first_obj and (name != 'untitled'):
+			file_name = name
+		else:
+			file_name = each_file.name if hasattr(each_file, 'name') else name
+
+		gs_obj.fill_gstystem_values(request=request,
+									name=file_name,
+									group_set=group_set,
+									language=language,
+									uploaded_file=each_file)
+
+		gs_obj.member_of.append(gst_file_id)
+		gs_obj.save(groupid=group_id)
+
+		if not first_obj:
+			first_obj = gs_obj
+		else:
+			collection_set.append(gs_obj._id)
+
+		gs_obj_list.append(gs_obj)
+
+	if make_collection and collection_set:
+		first_obj.collection_set = collection_set
+		first_obj.save()
+
+	return gs_obj_list
+
+	# return render_to_response('ndf/filehive.html', {
+	# 	'group_id': group_id, 'groupid': group_id,
+	# 	}, context_instance=RequestContext(request))
 
 
 def read_file(request, group_id):
