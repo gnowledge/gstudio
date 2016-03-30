@@ -37,7 +37,7 @@ def write_files(request, group_id, make_collection=False):
 
 	first_obj = None
 	collection_set = []
-	uploaded_files = request.FILES.getlist('files', [])
+	uploaded_files = request.FILES.getlist('filehive', [])
 	name = request.POST.get('name', 'untitled')
 	gs_obj_list = []
 
