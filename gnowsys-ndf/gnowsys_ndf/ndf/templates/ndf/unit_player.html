@@ -81,18 +81,6 @@
                 {% endfor %}
                 </ul>
 
-                <span class="current-slide">{{resource_index|add:1}}</span>
-                of
-                <span class="slide-count">{{resource_count}}</span>
-                &#8226;
-                {{node.name}}
-                {% if is_gstaff or node.created_by == request.user.id %}
-                    {% get_edit_url node.pk as edit_url %}
-                    <small>
-                        <a title="Edit this {{node.member_of_names_list.0}}" class="edit_res_unit">{% trans " Edit Content" %}</a>|
-                        <a title="Edit this {{node.member_of_names_list.0}}" class="edit_settings" href="{% url edit_url group_id node.pk %}">{% trans " Edit Settings" %}</a>
-                    </small>
-                {% endif %}
               </div>
               <div class="activity-title">
               </div>
