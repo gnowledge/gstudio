@@ -1519,7 +1519,16 @@
 		{% endif %}
 	    updateAllTags();
 
+	    if(checkTag())
+	    {
+	    	var tagsStr = tags.value.trim();
 
+	    	$("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+	    }
+	    else
+	    {
+	    	event.preventDefault();
+	    }
 	});
 
 
