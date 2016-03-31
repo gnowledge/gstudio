@@ -156,15 +156,142 @@ def default_template(request,group_id,node=None):
 
         # print pos_rts
 
-        # DONOT DELETE THIS CODE -------------------------
-        for key,value in pos_ats.iteritems():
-            pos_ats[key].update({'value':None})
+        pos_rts_value = []
 
-            print key ,"\n", pos_ats[key] , "\n\n\n"
+
+        # DONOT DELETE THIS CODE -------------------------
+        # for key,value in pos_ats.iteritems():
+            # pos_ats[key].update({'value':None})
+
+            # print key ,"\n", pos_ats[key] , "\n\n\n"
             # print value['altnames'],value['_id']
-        # for key,value in pos_rts.iteritems():
-            # print value['altnames'],value['_id']
+        for key,value in pos_rts.iteritems():
+            print key ,"\n"
+            # print value,"\n\n"
+
+        for key,value in pos_rts.iteritems():
+            pos_rts_value = value['subject_or_object_type']
+            print pos_rts_value
+            # this has all the rightside gst of the relationtype
+
+            # subject_or_object_type': [ObjectId('564c7451a78dd024cb05b7dd')
+        # the below code is to get the union or intersection of the items 
+        # ats_set = set(ats)
+        # pos_ats_set = set(pos_ats)
+        # print ats_set.intersection(pos_ats_set)
+        # print ats_set.union(pos_ats_set)    
+
+
         # --------------------------------------------------
+        # code to remove the extra fields from the possible values.
+
+        # For AT
+        ats_id = []
+
+        for e in ats:
+            ats_id.append(e._id)
+
+        pos_ats_id = []
+
+        for key,value in pos_rts.iteritems():
+            pos_ats_id.append(e._id)
+
+        final_pos_ats = []
+
+        for e in pos_ats_id:
+            if e not in ats_id:
+                final_pos_ats.append(e)
+
+        # for e in ats_id:
+        #     for f in pos_ats_id:
+        #         if e != f
+        #             final_pos_ats.append(f)
+
+
+        final_ats = []
+
+        for e in final_pos_ats:
+            fl_ats = node_collection.one({'_id':e})
+            print fl_ats
+            final_ats.append(fl_ats)
+
+
+        # For RT 
+        rts_id = []
+
+        for e in rts:
+            rts_id.append(e._id)
+
+        pos_rts_id = []
+
+        for key,value in pos_rts.iteritems():
+            pos_rts_id.append(value['_id'])
+
+        final_pos_rts = []
+
+        for e in pos_rts_id:
+            if e not in rts_id:
+                
+                final_pos_rts.append(e)
+
+        final_rts = []
+
+        for e in final_pos_rts:
+            fl_rts = node_collection.one({'_id':e})
+            print fl_rts
+            final_rts.append(fl_rts)
+
+        # the final_rts list would have all the possible relationtype for the given GS.
+        # the ones preent in this list are not present in the RTs assosicated with the given GS
+
+        # rts_options = []
+
+        # for e in rts:/
+            # print e.subject_type
+            # print e.object_type , "\n\n\n\n\n"
+            # rts_options.append(e.subject_type)
+            # rts_options.append(e.object_type)
+
+        f_rts_object_dict=[]
+        rts_object_dict = []
+        rts_obj= None
+
+        # for e in rts:
+        #     rts_obj = e.object_type
+        #     rts_object_dict = dict ({'name':e.name,'object_type':rts_obj})
+        #     f_rts_object_dict.append(rts_object_dict)
+
+        # -- this is the o/p obtained: its a list of dict
+# for e in f_rts_object_dict:
+#     print e
+# {'object_type': [ObjectId('564c77f7a78dd02e0db18cee'), ObjectId('564c77f7a78dd02e0db18cec')], 'name': u'event_organised_by'}
+# {'object_type': [ObjectId('564c77f7a78dd02e0db18cf4')], 'name': u'event_coordinator'}
+# {'object_type': [ObjectId('564c77f7a78dd02e0db18cf4'), ObjectId('564c7451a78dd024cb05b7d5')], 'name': u'has_attendees'}
+# {'object_type': [ObjectId('564c77f7a78dd02e0db18cf4'), ObjectId('564c7451a78dd024cb05b7d5')], 'name': u'has_attended'}
+# {'object_type': [ObjectId('564c7450a78dd024cb05b7bb')], 'name': u'event_has_batch'}
+# {'object_type': [ObjectId('564c77f8a78dd02e0db18d28')], 'name': u'session_of'}
+
+        # ---------------- inorder to obtain the object_type 's
+
+#         for e in f_rts_object_dict:
+#             print e['object_type']
+
+
+# for e in rts_obj:
+#     k = node_collection.one({'_id':ObjectId(e)})
+#     print k
+
+
+
+        k = None
+        for e in rts:
+            rts_obj = e.object_type
+            name_rst = []
+            for each in rts_obj:
+                k = node_collection.one({'_id':ObjectId(each) })
+                name_rst.append(k.name)
+            rts_object_dict = dict({'name':e.name , 'object_type':name_rst})
+            f_rts_object_dict.append(rts_object_dict)
 
 
 
@@ -236,7 +363,12 @@ def default_template(request,group_id,node=None):
 
 
 
+
+
     template = "ndf/basic_temp.html"
-    variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list, 'ats':ats , 'rts':rts , 'node_gs':node_gs ,'pos_ats':pos_ats , 'pos_rts':pos_rts ,'gs_struc':gs_struc  })
+    variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
+     'ats':ats , 'rts':rts , 'node_gs':node_gs ,'pos_ats':pos_ats , 'pos_rts':pos_rts ,
+     'gs_struc':gs_struc , 'final_pos_ats':final_pos_ats ,'final_pos_rts':final_pos_rts , 
+     'final_rts':final_rts , 'final_ats':final_ats , 'f_rts_object_dict':f_rts_object_dict  })
 
     return render_to_response(template,variable)
