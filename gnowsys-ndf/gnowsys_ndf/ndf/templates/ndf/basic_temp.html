@@ -41,8 +41,9 @@
     <div style="display:table-row;">
         {% for each in ats %}
         <tr><td>
+        {% trans "AttributeType "%}
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} : {{each.data_type}} {{each.name}} </font> 
+           <font size="3"> {% firstof each.altnames each.name %} : {{each.data_type}} </font> 
         
         </div></td>
 
@@ -57,8 +58,23 @@
         {# {% fetch_req_fields gs_struc|get_dict_item:'attribute_set' 'attribute_set' %}  #}
     </div>
     <div style="display:table-row;">
+        {% for each in final_ats %}
+        <tr>
+            <td>
+        {% trans "PossibleAttributeType "%}
+        <div style="display:table-cell;"> 
+           <font size="3"> {% firstof each.altnames each.name %} {{each.data_type}} </font> 
+        </div></td>
+        <td>
+        <input type="text"/> </td></tr>
+        {% endfor %}
+    </div>
+
+    <div style="display:table-row;">
         {% for each in rts %}
-        <tr><td>
+        <tr>
+            <td>
+        {% trans "RelationType "%}
         <div style="display:table-cell;"> 
            <font size="3"> {% firstof each.altnames each.name %} : </font> 
         </div></td>
@@ -67,8 +83,69 @@
         {% endfor %}
     </div>
     <div style="display:table-row;">
+        {% for each in f_rts_object_dict %}
+        <tr>
+            <td>
+        {% trans "RelationType "%}
+        <div style="display:table-cell;"> 
+           <font size="3"> {{each.name}} : </font> 
+        </div></td>
+        <td>
+            <select name="each.name">
+            <option value="">select</option>
+            {% for value in each.object_type %}
+
+
+            <option value="{{value}}"> {{value}} </option>
+
+            {% endfor %}
+            </select>
+
+
+        </td></tr>
+        {% endfor %}
+    </div>
+    <div style="display:table-row;">
+        {% for each in final_rts %}
+        <tr>
+            <td>
+        {% trans "PossibleRelationType "%}
+        <div style="display:table-cell;"> 
+           <font size="3"> {% firstof each.altnames each.name %} </font> 
+        </div></td>
+        <td>
+        <input type="text"/> </td></tr>
+        {% endfor %}
+    </div>
+
+
+
+
+
+</div>
+</table>
+<input type="submit" class="button" id="save-node-type" value="Save" />
+</form>
+
+{% endblock %}
+
+
+    <!-- the loop below is for the items directly fetched from the models.
+    <div style="display:table-row;">
+        {% for key,value in pos_rts.iteritems %}
+        <tr><td>
+        {% trans "PossibleRelationType "%}
+        <div style="display:table-cell;"> 
+           <font size="3"> {% firstof value.altnames key value.inverse_name %} : </font> 
+        </div></td>
+        <td>
+        <input type="text"/> </td></tr>
+        {% endfor %}
+    </div>
+    <div style="display:table-row;">
         {% for key,value in pos_ats.iteritems %}
         <tr><td>
+        {% trans "PossibleAttributeType "%}
         <div style="display:table-cell;"> 
            <font size="3"> {% firstof value.altnames key value.inverse_name %} : {{value.data_type}} 
             </font> 
@@ -81,22 +158,8 @@
          </td></tr>
         {% endfor %}
     </div>
-    <div style="display:table-row;">
-    	{% for key,value in pos_rts.iteritems %}
-    	<tr><td>
-        <div style="display:table-cell;"> 
-           <font size="3"> {% firstof value.altnames key value.inverse_name %} : </font> 
-        </div></td>
-        <td>
-        <input type="text"/> </td></tr>
-        {% endfor %}
-    </div>
 
 
 
-</div>
-</table>
-<input type="submit" class="button" id="save-node-type" value="Save" />
-</form>
 
-{% endblock %}
+    -->
