@@ -106,15 +106,24 @@
         {% endfor %}
     </div>
     <div style="display:table-row;">
-        {% for each in final_rts %}
+        {% for each in f_pos_rts_object_dict %}
         <tr>
             <td>
         {% trans "PossibleRelationType "%}
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} </font> 
+           <font size="3"> {{ each.name }} </font> 
         </div></td>
         <td>
-        <input type="text"/> </td></tr>
+            <select name="each.name">
+            <option value="">select</option>
+            {% for value in each.object_type %}
+
+
+            <option value="{{value}}"> {{value}} </option>
+
+            {% endfor %}
+            </select>
+        </td></tr>
         {% endfor %}
     </div>
 
