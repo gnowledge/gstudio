@@ -3,17 +3,13 @@
 
 
 <div class = "row">
-  <div class = "small-9  medium-12 columns"   id = "captcha-content" >
-    <label class='fi-refresh js-captcha-refresh'>  </label>
+  <div class = "small-9  medium-12 columns login-captcha"  >
+    <div>
+        <label class='fi-refresh js-captcha-refresh'>  </label>
+    </div>
+    <div id = "captcha-content"></div>
     <!-- Area to append captcha -->
   </div>
-
-  <br>
-
-  <div class="small-3 medium-3 large-3 columns" ends>
-  	<label class='fi-refresh js-captcha-refresh'>  </label>
-  </div>
-
 </div>
 <div class = "invalid-captcha">
 
@@ -62,6 +58,7 @@
 				type:"GET",
 				success:function(data)
 					{
+                        console.log(data);
 						$('#captcha-content').empty()
 						$('#captcha-content').append(data)
 						$('.invalid-captcha').empty();
