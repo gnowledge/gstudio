@@ -252,9 +252,6 @@ def default_template(request,group_id,node=None):
             # rts_options.append(e.subject_type)
             # rts_options.append(e.object_type)
 
-        f_rts_object_dict=[]
-        rts_object_dict = []
-        rts_obj= None
 
         # for e in rts:
         #     rts_obj = e.object_type
@@ -283,6 +280,9 @@ def default_template(request,group_id,node=None):
 
 
 
+        f_rts_object_dict=[]
+        rts_object_dict = []
+        rts_obj= None
         k = None
         for e in rts:
             rts_obj = e.object_type
@@ -294,6 +294,19 @@ def default_template(request,group_id,node=None):
             f_rts_object_dict.append(rts_object_dict)
 
 
+        f_pos_rts_object_dict=[]
+        pos_rts_object_dict = []
+        pos_rts_obj= None
+        pos_k = None
+        for e in final_rts:
+            pos_rts_obj = e.object_type
+            name_pos_rst = []
+            for each in pos_rts_obj:
+                k = node_collection.one({'_id':ObjectId(each) })
+                print k.name,k._id        
+                name_pos_rst.append(k.name)
+            pos_rts_object_dict = dict({'name':e.name , 'object_type':name_rst})
+            f_pos_rts_object_dict.append(pos_rts_object_dict)
 
 
 
@@ -369,6 +382,7 @@ def default_template(request,group_id,node=None):
     variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
      'ats':ats , 'rts':rts , 'node_gs':node_gs ,'pos_ats':pos_ats , 'pos_rts':pos_rts ,
      'gs_struc':gs_struc , 'final_pos_ats':final_pos_ats ,'final_pos_rts':final_pos_rts , 
-     'final_rts':final_rts , 'final_ats':final_ats , 'f_rts_object_dict':f_rts_object_dict  })
+     'final_rts':final_rts , 'final_ats':final_ats , 'f_rts_object_dict':f_rts_object_dict ,
+     'f_pos_rts_object_dict':f_pos_rts_object_dict })
 
     return render_to_response(template,variable)
