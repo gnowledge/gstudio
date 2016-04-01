@@ -660,6 +660,18 @@ class Node(DjangoDocument):
         # "attribute_type_set"; If exists, add them to the document
         # Otherwise, throw an error -- " Illegal access: Invalid field
         # found!!! "
+
+        try:
+            invalid_struct_fields_list = list(set(self.structure.keys()) - set(self.keys()))
+
+            if invalid_struct_fields_list:
+                for each_invalid_field in invalid_struct_fields_list:
+                    if each_invalid_field in self.structure:
+                        print "=== removed ", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
+        except Exception, e:
+            print e
+            pass
+
         invalid_fields = []
 
         for key, value in self.iteritems():
@@ -1478,6 +1490,17 @@ class GSystem(Node):
                             self.if_file[each_image_size]['relurl'] = each_image_size_id_url['relurl']
 
         return self
+
+    def get_gsystem_mime_type(self):
+
+        if hasattr(self, 'mime_type') and self.mime_type:
+            mime_type = self.mime_type
+        elif self.if_file.mime_type:
+            mime_type = self.if_file.mime_type
+        else:
+            mime_type = ''
+
+        return mime_type
 
 
 @connection.register
