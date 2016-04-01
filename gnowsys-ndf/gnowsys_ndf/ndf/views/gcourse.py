@@ -1864,12 +1864,16 @@ def course_dashboard(request, group_id):
                 completed_count = result_status['completed_count']
 
     template = 'ndf/gcourse_event_group.html'
+    import time
+    t0 = time.time()
+    
 
-    anaytics_instance = AnalyticsMethods(request, request.user.id, group_id)
+    anaytics_instance = AnalyticsMethods(request, request.user.id,request.user.username, group_id)
     all_units = anaytics_instance.get_total_units_count()
     print "\n\n Total Units =  ", all_units
     completed_units = anaytics_instance.get_completed_units_count()
     print "\n\n Completed Units =  ", completed_units
+
     total_res = anaytics_instance.get_total_resources_count()
     print "\n\n Total Resources === ", total_res
     completed_res = anaytics_instance.get_completed_resources_count()
@@ -1888,13 +1892,35 @@ def course_dashboard(request, group_id):
     print "\n\n User Notes === ", user_notes
     cmts_on_user_notes = anaytics_instance.get_comments_counts_on_users_notes()
     print "\n\n Total Comments User Notes === ", cmts_on_user_notes
+
+    unique_users_commented_on_user_notes = anaytics_instance.get_commented_unique_users_count(True,False)
+    print "\n\n Total Unique Users Commented on User Notes === ", unique_users_commented_on_user_notes
+
+
     total_files = anaytics_instance.get_total_files_count()
     print "\n\n Total Files === ", total_files
     user_files = anaytics_instance.get_user_files_count()
     print "\n\n User Files === ", user_files
     cmts_on_user_files = anaytics_instance.get_comments_counts_on_users_files()
     print "\n\n Total Comments User Files === ", cmts_on_user_files
+    unique_users_commented_on_user_files = anaytics_instance.get_commented_unique_users_count(False,True)
+    print "\n\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files
+    total_cmnts_by_user = anaytics_instance.get_total_comments_by_user()
+    print "\n\n Total Comments By User === ", total_cmnts_by_user
 
+    others_notes = anaytics_instance.get_others_notes_read_count()
+    print "\n\n Others Notes === ", others_notes
+
+    others_files = anaytics_instance.get_others_files_read_count()
+    print "\n\n Others Files === ", others_files
+
+
+
+    t1 = time.time()
+    time_diff = t1 - t0
+    print "\n ALL Total seconds == ", time_diff
+
+    del anaytics_instance
 
 
 
