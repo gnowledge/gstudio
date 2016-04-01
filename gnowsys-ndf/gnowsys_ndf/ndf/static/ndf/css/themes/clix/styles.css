@@ -15939,7 +15939,7 @@ th.hide-for-touch {
     #top-headers #first-header.top-bar .top-bar-section li a.active:not(.button) {
       color: #ececec !important; }
     #top-headers #first-header.top-bar .top-bar-section li a:not(.button), #top-headers #first-header.top-bar .top-bar-section li {
-      background-color: inherit !important;
+      background-color: #fff !important;
       color: #333 !important;
       font-weight: 600; }
       #top-headers #first-header.top-bar .top-bar-section li a:not(.button):hover, #top-headers #first-header.top-bar .top-bar-section li:hover {
