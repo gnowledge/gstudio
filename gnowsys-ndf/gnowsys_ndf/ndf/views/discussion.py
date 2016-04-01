@@ -156,6 +156,11 @@ def discussion_reply(request, group_id, node_id):
                 if each_rel and "thread_of" in each_rel:
                     gs_type_node_id = each_rel['thread_of'][0]
                     break
+        # grel_dict = get_relation_value(node_id,'thread_of')
+        # is_cursor = grel_dict.get("cursor",False)
+        # if not is_cursor:
+        #     gs_type_node_id = grel_dict.get("grel_node")
+        #     # grel_id = grel_dict.get("grel_id")
 
         # print "\n\n node.name === ", node.member_of_names_list, node._id, node.name
 
