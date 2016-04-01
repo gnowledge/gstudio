@@ -981,7 +981,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # tags
     # if tags:
     tags_list = []
-    if tags:
+    if tags != node.tags:
         for tag in tags.split(","):
             tag = unicode(tag.strip())
 
