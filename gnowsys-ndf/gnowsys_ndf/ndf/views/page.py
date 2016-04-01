@@ -294,6 +294,8 @@ def create_edit_page(request, group_id, node_id=None):
     group_name, group_id = get_group_name_id(group_id)
     ce_id = request.GET.get('course_event_id','')
     blog_type = request.GET.get('blog_type','')
+    my = request.GET.get('my','')
+    print "my@@\n\n\n\n",my
     res = request.GET.get('res','')
     program_res = request.GET.get('program_res','')
     context_variables = { 'title': gst_page.name,

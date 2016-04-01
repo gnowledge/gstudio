@@ -3164,7 +3164,7 @@ def get_breadcrumb(url):
 @get_execution_time
 @register.assignment_tag
 def get_thread_node(node_id):
-	node_obj = node_collection.one({'_id': ObjectId(node_id)})
+	node_obj = node_collection.one({'_id': ObjectaId(node_id)})
 	thread_obj = None
 	if node_obj.relation_set:
 		for rel in node_obj.relation_set:

@@ -1,0 +1,24 @@
+<input type="button" id="add_res_to_ck">
+	
+</input>
+<div class ="small-12 large-12 columns">
+          <h5>Add New Page:</h5>
+</div>
+
+<div class="small-12 columns">
+            <input class="name_id" name="name" type="text" placeholder="Enter name ...">
+</div>
+ <div class="small=12 columns">
+     {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}
+ </div>
+
+     <div class="small-12 columns">
+            <input type="submit" id="add_page" value="Save Page" class="tiny  button"/>
+            <input type="button" id="cancel_btn" value="Cancel" class="tiny  button"/>
+          </div>
+
+<script type="text/javascript">
+
+    setTimeout(function(){ CKEDITOR.instances['ckeditor_textarea'].insertHtml('hello'); },3000);
+    
+</script>

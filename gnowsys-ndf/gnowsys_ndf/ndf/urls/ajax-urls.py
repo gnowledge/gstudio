@@ -46,7 +46,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_resource_by_oid/?', 'get_resource_by_oid', name='get_resource_by_oid'),
     url(r'^get_ckeditor/?', 'get_ckeditor', name='get_ckeditor'),
     url(r'^get_gin_line_template/(?P<node_id>[\w-]+)$', 'get_gin_line_template', name='get_gin_line_template'),
-    url(r'^[/]$', 'course_create_collection', name='course_create_collection'),
+    url(r'^course_create_collection/', 'course_create_collection', name='course_create_collection'),
+    url(r'^course_create_note/', 'course_create_note', name='course_create_note'),#create note in gallery and raw material
     
 
                        # Ajax-urls required for MIS --------------------------------

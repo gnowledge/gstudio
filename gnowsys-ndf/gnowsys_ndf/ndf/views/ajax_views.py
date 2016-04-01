@@ -6250,7 +6250,7 @@ def course_create_collection(request, group_id):
                                             ],
                                             'collection_set': {'$exists': "true", '$not': {'$size': 0} }
                                         }).sort("last_update", -1)
-  print "\n\n\n result",result_cur.count()
+  # print "\n\n\n result",result_cur.count()
 
 
   return render_to_response('ndf/course_create_collection.html',
@@ -6258,4 +6258,10 @@ def course_create_collection(request, group_id):
       "group_id":group_id,"result_cur":result_cur
     },context_instance=RequestContext(request))
   
-
+@get_execution_time
+def course_create_note(request, group_id):
+  # image_coll =  request.GET.get('image_coll','')
+  return render_to_response('ndf/course_create_note.html',
+      {
+        "group_id":group_id
+      },context_instance=RequestContext(request))
