@@ -29,7 +29,7 @@
 
   <div class="activity-page">
       <div class="row activity-page-header">
-          <div class="small-2 columns activity-page-previous">
+          <div class="small-4 medium-4 large-3 columns activity-page-previous">
               <a href="{% url 'course_content' group_name %}"><i class="fa fa-home"></i></a>
               {% if resource_prev_id %}
               <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_prev_id %}" class="prev-activity">
@@ -43,7 +43,7 @@
               </a>
               {% endif %}
           </div>
-          <div class="small-8 columns">
+          <div class="small-4 medium-4 large-6 columns">
               <div class="unit-title">{{unit_node.name}}</div>
               <div class="activity-title">
                   {{node.name}}
@@ -76,7 +76,7 @@
               <div class="activity-title">
               </div>
           </div>
-          <div class="small-2 columns activity-create-note">
+          <div class="small-4 medium-4 large-3 columns activity-create-note">
               <div style="float: right;">
                   {% if resource_next_id %}
                   <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_next_id %}" class="next-activity">
@@ -104,9 +104,9 @@
                   {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
               </div>
               {% if grel_dict.cursor and grel_dict.grel_node.count %}
+              {% for each_help_page in grel_dict.grel_node %}
               <div id="related-content">
                 <i class="fa fa-info-circle"></i>
-                {% for each_help_page in grel_dict.grel_node %}
                 <div class="related-content-header">
                   <span>Related Help Topic</span>
                     <span class="related-content-title">
@@ -119,8 +119,8 @@
                   {{each_help_page.content|safe}}
                   </div>
 
-                {% endfor %}
               </div>
+              {% endfor %}
               {% endif %}
 
           </div>
