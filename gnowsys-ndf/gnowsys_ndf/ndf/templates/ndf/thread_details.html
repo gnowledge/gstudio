@@ -153,13 +153,15 @@ color: #7a7a7a;
  -->
  			{% endcomment %}
 
+            {{thread.pk}}        {% get_thread_node thread.pk as thread_node %}
 
 			<div id="smalldiv" >
 
 				{% if user.is_authenticated %}
 					{% if thread %}
-						{% include "ndf/replytwistrep.html" %}
-					{% endif %}
+                   		{% include "ndf/replytwistrep.html" %}
+                   {% endif %}
+
 				{% endif %}
 
 			</div>

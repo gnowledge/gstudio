@@ -1,4 +1,6 @@
-{% load get_course_filters from ndf_tags %}
+{% load get_course_filters get_group_name from ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+
 {% load simple_filters %}
 <div class="gallery-page">
     <div class="row gallery-header">
@@ -79,7 +81,7 @@
         <div class="medium-12 columns gallery-content" >
             <div class="gallery-subheader small-12">
                 <div class="row">
-                {% if request.user.is_authenticated %}
+`                {% if request.user.is_authenticated %}
                   {% if allow_to_upload %}
                     <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
@@ -99,11 +101,13 @@
                     </div>
                   {% endif %}
                   {% endif %}
-
-                    <div class="small-12 medium-10 columns gallery-actions hide" >
+                
+                    <div class="small-12 medium-10 columns gallery-actions" >
                         <div class="create-note">
+                         <a   style="margin: 0em 0em 1em;">
                             <i class="fi-page-edit"></i>
                             <span> Create note</span>
+                        </a>
                         </div>
                         <div class="create-collection">
                             <i class="fi-folder"></i>
@@ -122,12 +126,15 @@
                             <span>View info</span>
                         </div>
                     </div>
-                </div>
+                     <div id="create_collection_model" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
+                    </div>
+                    
             </div>
             <!-- Files listing div -->
             <div class="gallery-body small-12 columns">
                 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5 gallery-body-ul">
-                {% for each_img in files_cur %}
+                
+                {% for each_img in coll_file_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
                         {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
                     </li>
@@ -223,4 +230,77 @@
         });//end of ajax
 
     }
+
+     $(document).on('change','.filenode',function(){
+
+        var checked = $('.filenode:checked').length;
+        if (checked){
+          $(".collection-area").css("display", "block");          
+        }
+        else{
+          $(".collection-area").css("display", "none");          
+        }
+        
+    });
+
+    $('.create-collection').click(function() {
+        var checked = $('.filenode:checked').length;
+        
+        if (checked){
+          $.ajax({
+            type: "GET",
+            url: "{% url 'course_create_collection' group_id %}",
+            datatype: "html",
+            data:{
+              
+            },
+            success: function(data) {
+                $("#create_collection_model").html(data);
+                $("#create_collection_model").foundation('reveal', 'open');
+              // location.href = "{% url 'course_gallery' group_id %}";
+
+            }
+          });          
+        }
+        
+        else{
+          alert("Select atleast 1 resource");
+
+        
+        }
+          
+    });
+
+  $(".create-note").click(function(){
+    var checked = $('.filenode:checked').length;
+    var coll_list= " ";
+    var url_list = " ";
+    $('.filenode:checked').each(function() {
+
+        // alert("{% url 'page_create_edit' group_name_tag %}?course_event_id={{group_id}}&blog_type=True");
+        // alert("{{group_id}}");
+        url_list = $(this).closest('.scard-container').find('img').attr('src');
+        coll_list = coll_list + url_list + ",";
+            // uri= "{% url 'page_create_edit' group_name_tag %}?course_event_id={{group_id}}&blog_type=True&my="+url;
+      
+      });
+          $.ajax({
+            type: "GET",
+            url: "{% url 'course_create_note' group_id %}",
+            datatype: "html",
+
+            data:{
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+                "coll_list" : coll_list,             
+            },
+            success: function(data) {
+                $("#create_collection_model").html(data);
+                
+                $("#create_collection_model").foundation('reveal', 'open');
+            }
+          });          
+        
+
+  })
+
 </script>

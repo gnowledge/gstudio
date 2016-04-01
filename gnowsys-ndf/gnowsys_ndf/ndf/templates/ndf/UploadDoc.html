@@ -106,8 +106,7 @@ i.remove-tag{
 
 		<fieldset>
 			<legend>{% trans "Add Description" %}</legend>
-			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter description here" %}
-			
+				{% include "ndf/html_editor.html" with var_name="content_org" var_value=node.content|default_if_none:"" node_id=node.pk var_placeholder="Describe the file" %}			
 		</fieldset>
 		<!-- <fieldset>
 			<legend>{% trans "Add Tag" %}</legend>

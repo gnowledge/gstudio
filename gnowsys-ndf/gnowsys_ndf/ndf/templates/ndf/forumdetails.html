@@ -174,9 +174,7 @@
             </td>
           
             <td class="org-content-style">
-              {% with each.content|safe as thread_content %}
-                {{thread_content|truncatewords:25}}
-              {% endwith %}
+                {{each.content_org|safe|truncatewords:25}}
             </td>
           
             <td class="text-center">{{ each.thread_reply_count }}</td>

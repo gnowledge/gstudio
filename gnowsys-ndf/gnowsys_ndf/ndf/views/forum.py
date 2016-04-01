@@ -658,7 +658,7 @@ def add_node(request, group_id):
             # Required to link temporary files with the current user who is modifying this document
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
-            colrep.content = org2html(content_org, file_prefix = filename)
+            colrep.content = content_org
 
        
         colrep.created_by = usrid
@@ -674,7 +674,7 @@ def add_node(request, group_id):
             # Required to link temporary files with the current user who is modifying this document
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
-            colrep.content = org2html(content_org, file_prefix=filename)
+            colrep.content = content_org
 
         usrid=int(request.user.id)
         colrep.created_by=usrid
@@ -903,7 +903,7 @@ def edit_thread(request,group_id,forum_id,thread_id):
             thread.content_org = unicode(content_org)
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
-            thread.content = org2html(content_org, file_prefix=filename)
+            thread.content = content_org
         thread.save(groupid=group_id) 
         link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(thread._id)
         for each in colg.author_set:
