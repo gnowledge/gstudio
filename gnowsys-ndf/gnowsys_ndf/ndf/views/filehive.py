@@ -13,7 +13,7 @@ from django.template import RequestContext
 from gnowsys_ndf.settings import MEDIA_ROOT, GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.models import node_collection, filehive_collection, gfs
 from gnowsys_ndf.ndf.models import GSystem
-from gnowsys_ndf.ndf.views.methods import get_language_tuple
+from gnowsys_ndf.ndf.views.methods import get_language_tuple, get_group_name_id
 
 try:
     from bson import ObjectId
@@ -34,6 +34,8 @@ def write_files(request, group_id, make_collection=False):
 
 	author_obj = node_collection.one({'_type': u'Author', 'created_by': request.user.id})
 	author_obj_id = author_obj._id
+
+	group_name, group_id = get_group_name_id(group_id)
 
 	first_obj = None
 	collection_set = []
