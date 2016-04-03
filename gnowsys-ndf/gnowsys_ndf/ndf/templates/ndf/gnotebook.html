@@ -177,11 +177,132 @@
 
 {# {% include "ndf/add_new_note.html" %} #}
 {# {% include "ndf/gcomment.html" %} #}
+{% comment %}
+{% verbatim %}
+<script id="note-card-temp" type="text/x-handlebars-template">
+    <div class="small-4 columns">
+        <div class="note-card" data-note-id={{id}}>
+            <div class="note-heading">{{name}}</div>
+            <div class="note-summary">{{summary}}</div>
+            <div class="note-info">{{teacher}}&nbsp;&#8226;&nbsp;{{date}}&nbsp;&#8226;&nbsp;{{time}}</div>
+            <div class="note-extra-data">
+                <i class="fa fa-eye"></i>
+                <span>{{views}}</span>
+                <i class="fa fa-smile-o"></i>
+                <span>{{likes}}</span>
+                <i class="fa fa-comment-o"></i>
+                <span>{{comments}}</span>
+            </div>
+            <div class="note-tags">
+                {{#each tags}}
+                <span>
+                    {{this}}
+                </span>
+                {{/each}}
+            </div>
+            <div class="note-actions">
+                <i class="fa fa-trash-o"></i>
+                <span>Delete</span>
+                <i class="fa fa-flag"></i>
+                <span>Report</span>
+            </div>
+        </div>
+    </div>
+</script>
+<script id="note-card-exp-temp" type="text/x-handlebars-template">
+    <div class="small-12 columns">
+        <div class="note-details" data-note-id='note_{{id}}'>
+            <div class="note-heading">{{name}}</div>
+            <div class="note-close">&times;</div>
+            <div class="note-summary">{{noteText}}</div>
+            <div class="note-info">{{teacher}}&nbsp;&#8226;&nbsp;{{date}}&nbsp;&#8226;&nbsp;{{time}}</div>
+            <div class="note-extra-data">
+                <i class="fa fa-eye"></i>
+                <span>{{views}}</span>
+                <i class="fa fa-smile-o"></i>
+                <span>{{likes}}</span>
+                <i class="fa fa-comment-o"></i>
+                <span>{{comments}}</span>
+            </div>
+            <div class="note-tags">
+                {{#each tags}}
+                <span>
+                    {{this}}
+                </span>
+                {{/each}}
+            </div>
+            <div class="note-actions">
+                <i class="fa fa-trash-o"></i>
+                <span>Delete</span>
+                <i class="fa fa-flag"></i>
+                <span>Report</span>
+            </div>
+        </div>
+    </div>
+</script>
 
+{% endverbatim %}
+{% endcomment %}
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 <script type="text/javascript">
     
+    // var notes = [{
+    //     id: 1,
+    //     name: 'BLOG 1',
+    //     summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit...',
+    //     noteText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit. Sed vitae volutpat ligula. Praesent congue ipsum ut metus pretium vestibulum. Phasellus at molestie turpis.',
+    //     teacher: 'Madam X',
+    //     date: '25 Dec 2015',
+    //     time: '3 PM',
+    //     views: '55',
+    //     likes: '125',
+    //     comments: '56',
+    //     tags: ['tag1', 'tag2'],
+
+    // },
+    // {
+    //     id: 2,
+    //     name: 'BLOG 2',
+    //     summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit...',
+    //     noteText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit. Sed vitae volutpat ligula. Praesent congue ipsum ut metus pretium vestibulum. Phasellus at molestie turpis.',
+    //     teacher: 'Madam X',
+    //     date: '25 Dec 2015',
+    //     time: '3 PM',
+    //     views: '55',
+    //     likes: '125',
+    //     comments: '56',
+    //     tags: ['tag1', 'tag2'],
+
+    // },
+    // {
+    //     id: 3,
+    //     name: 'BLOG 3',
+    //     summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit...',
+    //     noteText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit. Sed vitae volutpat ligula. Praesent congue ipsum ut metus pretium vestibulum. Phasellus at molestie turpis.',
+    //     teacher: 'Madam X',
+    //     date: '25 Dec 2015',
+    //     time: '3 PM',
+    //     views: '55',
+    //     likes: '125',
+    //     comments: '56',
+    //     tags: ['tag1', 'tag2'],
+
+    // },
+    // {
+    //     id: 4,
+    //     name: 'BLOG 4',
+    //     summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit...',
+    //     noteText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vel dapibus sem. Suspendisse non ex nulla. Pellentesque cursus, neque vitae sodales pellentesque, urna libero sagittis justo, vitae suscipit leo eros vitae velit. Vestibulum vitae euismod velit. Sed vitae volutpat ligula. Praesent congue ipsum ut metus pretium vestibulum. Phasellus at molestie turpis.',
+    //     teacher: 'Madam X',
+    //     date: '25 Dec 2015',
+    //     time: '3 PM',
+    //     views: '55',
+    //     likes: '125',
+    //     comments: '56',
+    //     tags: ['tag1', 'tag2'],
+
+    // }];
 
     // $(function(){
     //     var noteCardSource   = $("#note-card-temp").html();
