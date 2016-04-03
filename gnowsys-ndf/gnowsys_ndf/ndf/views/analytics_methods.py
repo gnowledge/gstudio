@@ -268,7 +268,7 @@ class AnalyticsMethods(object):
 			else:
 				notes_or_files_cur = self.all_comments_on_user_notes.rewind()
 		if for_files:
-			if not hasattr(self,"self.all_comments_on_user_files"):
+			if not hasattr(self,"all_comments_on_user_files"):
 				notes_or_files_cur = self.get_comments_counts_on_users_files(True)
 			else:
 				notes_or_files_cur = self.all_comments_on_user_files.rewind()
@@ -353,54 +353,20 @@ class AnalyticsMethods(object):
 	def get_others_notes_read_count(self):
 		t0 = time.time()
 		if not hasattr(self, 'page_gst'):
-			self.reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"},{'_id': 1})
+			self.page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"},{'_id': 1})
 		if not hasattr(self, 'blog_page_gst'):
 			self.blog_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"},{'_id': 1})
 
-		self.others_notes = node_collection.find({'type_of': self.blog_page_gst._id,
+		self.other_than_user_notes = node_collection.find({'type_of': self.blog_page_gst._id,
 		 'member_of': self.page_gst._id, 'group_set': self.group_obj._id, 'created_by': {'$ne': self.user_id}},{'_id': 1})
-		others_notes_ids = [str(each_note_by_others._id) for each_note_by_others in self.others_notes]
+		others_notes_ids = [str(each_note_by_others._id) for each_note_by_others in self.other_than_user_notes]
 		others_notes_ids_str = "|".join(others_notes_ids)
 
-		self.others_notes_read_count = benchmark_collection.find({'name': "course_notebook",
+		self.other_than_user_notes_read_count = benchmark_collection.find({'name': "course_notebook",
 			'group': unicode(self.group_obj._id), 'calling_url': {'$regex': others_notes_ids_str}, 'user':self.username}).sort('last_update',-1)
 
 
-		'''
-		self.others_notes_read_count = benchmark_collection.aggregate([
-								{
-									'$match': {
-										'name': "course_notebook",
-										'calling_url': {'$regex': others_notes_ids_str},
-										'user':self.username,
-										'group': unicode(self.group_obj._id)
-
-									}
-								},
-								{
-									'$group': {
-										'_id': {
-											"URL": '$calling_url'
-										},
-										'No of Notes': {'$sum': 1}
-									}
-								}
-							])
-		for res in self.others_notes_read_count["result"]:
-			print res
-
-
-		'''
-		unique_notes_read_list = []
-
-		for each in self.others_notes_read_count:
-			oid = ObjectId(each['calling_url'].split('/')[-1])
-			try:
-				oid = ObjectId(oid)
-				if oid not in unique_notes_read_list :
-					unique_notes_read_list.append(oid)
-			except:
-				pass
+		unique_notes_read_list = self.calc_my_visits(self.other_than_user_notes_read_count)
 
 		t1 = time.time()
 		time_diff = t1 - t0
@@ -412,27 +378,110 @@ class AnalyticsMethods(object):
 
 		if not hasattr(self,"file_gst"):
 			self.file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"},{'_id': 1})
-		self.others_files = node_collection.find({'member_of': self.file_gst._id,
+		self.other_than_user_files = node_collection.find({'member_of': self.file_gst._id,
 		 'group_set': self.group_obj._id, 'created_by': {'$ne': self.user_id}},{'_id': 1})
 
-		others_files_ids = [str(each_file_by_others._id) for each_file_by_others in self.others_files]
+		others_files_ids = [str(each_file_by_others._id) for each_file_by_others in self.other_than_user_files]
 		others_files_ids_str = "|".join(others_files_ids)
 
-		self.others_files_read_count = benchmark_collection.find({'name': "course_gallery",
+		self.other_than_user_files_read_count = benchmark_collection.find({'name': {'$regex': "course_gallery|course_raw_material"},
 			'group': unicode(self.group_obj._id), 'calling_url': {'$regex': others_files_ids_str}, 'user':self.username}).sort('last_update',-1)
-		unique_files_read_list = []
 
-		for each in self.others_files_read_count:
-			oid = ObjectId(each['calling_url'].split('/')[-1])
-			try:
-				oid = ObjectId(oid)
-				if oid not in unique_files_read_list :
-					unique_files_read_list.append(oid)
-			except:
-				pass
+		unique_files_read_list = self.calc_my_visits(self.other_than_user_files_read_count)
+
 		t1 = time.time()
 		time_diff = t1 - t0
 		print "\n get_others_files_read_count == ", time_diff
 		# print "\n get_others_files_read_count == ", unique_files_read_list
 
 		return len(unique_files_read_list)
+
+	def calc_my_visits(self, cursor_obj):
+
+		unique_list = []
+		for each in cursor_obj:
+			oid = ObjectId(each['calling_url'].split('/')[-1])
+			try:
+				oid = ObjectId(oid)
+				if oid not in unique_list :
+					unique_list.append(oid)
+			except:
+				pass
+		return unique_list
+
+	def calc_unique_users(self, cursor_obj):
+		# unique_user_list = []
+		unique_user_list = [each['user'] for each in cursor_obj if each['user']]
+		unique_user_list = list(set(list(unique_user_list)))
+		# for each in cursor_obj:
+
+		# 	authenticated_user = each['user']
+		# 	if authenticated_user:
+		# 		if authenticated_user not in unique_user_list :
+		# 			unique_user_list.append(authenticated_user)
+		return unique_user_list
+
+	def total_users_read_my_notes(self):
+		t0 = time.time()
+		if not hasattr(self,"user_notes_cur"):
+			self.user_notes_cur = self.get_user_notes_count(True)
+		else:
+			self.user_notes_cur.rewind()
+		users_notes_ids = [str(each_user_note_obj._id) for each_user_note_obj in self.user_notes_cur]
+		users_notes_ids_str = "|".join(users_notes_ids)
+
+		self.my_notes_read_count = benchmark_collection.find({'name': "course_notebook",
+			'group': unicode(self.group_obj._id), 'calling_url': {'$regex': users_notes_ids_str},
+			'user':{'$ne': self.username}}).sort('last_update',-1)
+		unique_users_read_my_notes = self.calc_unique_users(self.my_notes_read_count)
+		t1 = time.time()
+		time_diff = t1 - t0
+		print "\n total_users_read_my_notes == ", time_diff
+		# print "\n get_others_files_read_count == ", unique_files_read_list
+
+		return len(unique_users_read_my_notes)
+
+	def total_users_visted_my_files(self):
+		t0 = time.time()
+		if not hasattr(self,"user_files_cur"):
+			self.user_files_cur = self.get_user_files_count(True)
+		else:
+			self.user_files_cur.rewind()
+		users_files_ids = [str(each_user_file_obj._id) for each_user_file_obj in self.user_files_cur]
+		users_files_ids_str = "|".join(users_files_ids)
+		# print "\n users_files_ids_str --", users_files_ids_str
+		self.my_files_read_count = benchmark_collection.find({'name': {'$regex': "course_gallery|course_raw_material"},
+			'group': unicode(self.group_obj._id), 'calling_url': {'$regex': users_files_ids_str},
+			'user':{'$ne': self.username}}).sort('last_update',-1)
+		# print "self.my_files_read_count.count()",self.my_files_read_count.count()
+		unique_users_read_my_files = self.calc_unique_users(self.my_files_read_count)
+
+		t1 = time.time()
+		time_diff = t1 - t0
+		print "\n total_users_visted_my_files == ", time_diff
+
+		return len(unique_users_read_my_files)
+
+	def get_other_files_commented_by_user_count(self):
+		print "10"
+
+	def get_other_notes_commented_by_user_count(self):
+		t0 = time.time()
+		prior_node_ids = []
+		self.twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
+		twist_cur = node_collection.find({'member_of': self.twist_gst._id, 'author_set': self.user_id})
+		for eachtw in twist_cur:
+			if eachtw.prior_node:
+				prior_node_ids.append(eachtw.prior_node)
+		if not hasattr(self, 'page_gst'):
+			self.page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"},{'_id': 1})
+		if not hasattr(self, 'blog_page_gst'):
+			self.blog_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"},{'_id': 1})
+		notes_count = node_collection.find({'type_of': self.blog_page_gst._id,
+		 'member_of': self.page_gst._id, 'group_set': self.group_obj._id, 'created_by': {'$ne': self.user_id},
+		 '_id': {'$in': prior_node_ids}})
+
+		t1 = time.time()
+		time_diff = t1 - t0
+		print "\n get_other_notes_commented_by_user_count == ", time_diff
+		return notes_count.count()
