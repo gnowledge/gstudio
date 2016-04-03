@@ -2,9 +2,21 @@
 import re
 # import magic
 from collections import OrderedDict
+import os
 from time import time
 import json
 import ox
+import mailbox
+import email.utils
+import datetime
+from bson import json_util
+
+
+#for creating deault mailbox : Metabox
+from django_mailbox.models import Mailbox
+from imaplib import IMAP4
+import socket
+
 import multiprocessing as mp 
 
 ''' -- imports from installed packages -- '''
@@ -17,6 +29,7 @@ from django.core.exceptions import PermissionDenied
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
+from django_mailbox.models import Mailbox
 
 # cache imports
 from django.core.cache import cache
@@ -38,6 +51,13 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy
 from gnowsys_ndf.mobwrite.models import TextObj
+
+# mailclient
+
+count = 0
+first_object = ''
+
+
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
 
@@ -45,7 +65,9 @@ from django.contrib.sites.models import Site
 # from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES,GSTUDIO_AUTHOR_AGENCY_TYPES
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
+from django_mailbox.models import Mailbox
 import itertools
+
 register = Library()
 at_apps_list = node_collection.one({
     "_type": "AttributeType", "name": "apps_list"
@@ -842,11 +864,13 @@ def get_gapps_iconbar(request, group_id):
         group_name = ""
         group_id = ObjectId(group_id)
         # Fetch group
+        print group_id
         group_obj = node_collection.one({
             "_id": group_id
         }, {
             "name": 1, "attribute_set.apps_list": 1, '_type': 1
         })
+        
         if group_obj:
             group_name = group_obj.name
 
@@ -866,8 +890,7 @@ def get_gapps_iconbar(request, group_id):
             if node:
                 i += 1
                 gapps[i] = {"id": node["_id"], "name": node["name"].lower()}
-
-        if group_obj._type == "Author":
+        if group_obj and group_obj._type == "Author":
 			# user_gapps = ["page", "file"]
 			user_gapps = [gapp_name.lower() for gapp_name in GSTUDIO_USER_GAPPS_LIST]
 			for k, v in gapps.items():
@@ -3042,6 +3065,22 @@ def get_filters_data(gst_name, group_name_or_id='home'):
 	# print "@@@ ", filter_dict
 	return filter_dict
 
+
+import shutil
+
+def sorted_ls(path):
+    '''
+    takes {
+        path : Path to the folder location
+    }
+    returns {
+        list of file-names sorted based on time
+    }
+    '''
+    mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
+    return list(sorted(os.listdir(path), key=mtime))
+
+
 @get_execution_time
 @register.assignment_tag
 def get_sg_member_of(group_id):
@@ -3074,7 +3113,8 @@ def get_sg_member_of(group_id):
 	return sg_member_of_list
 
 def get_objectid_name(nodeid):
- 
+ print ';' * 50
+ print nodeid
  return (node_collection.find_one({'_id':ObjectId(nodeid)}).name)
 
 @register.filter

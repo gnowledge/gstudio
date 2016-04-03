@@ -306,5 +306,3 @@ relation_types = [{'_type':'RelationType','name':'group_has_course_event'},
 ]
 
 
-
-
