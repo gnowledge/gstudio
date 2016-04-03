@@ -1958,10 +1958,10 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
             tab = 'all-notes'
 
         print "\n Comming here 3-- "
-    if notebook_obj:
-        print "\n Comming here 4-- "
-        print "notebokk found"
-        return HttpResponseRedirect(reverse('course_notebook_tab_note', kwargs={'group_id': group_id, 'tab': tab, "notebook_id": notebook_obj.pk }))
+        if notebook_obj:
+            print "\n Comming here 4-- "
+            print "notebokk found"
+            return HttpResponseRedirect(reverse('course_notebook_tab_note', kwargs={'group_id': group_id, 'tab': tab, "notebook_id": notebook_obj.pk }))
 
     context_variables.update({'allow_to_comment': allow_to_comment})
     context_variables.update({'blog_pages': blog_pages})

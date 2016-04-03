@@ -1006,7 +1006,7 @@ def add_topics(request, group_id):
 def add_page(request, group_id):
   is_create_note = request.POST.get("is_create_note", '')
   tags = request.POST.get("tags", '')
-  # print "\ninside add_page",request.POST
+  print "\ninside add_page",request
   if request.is_ajax() and request.method == "POST" and  is_create_note == "True":
       # blog_type = request.POST.get("blog_type", '')
       # return HttpResponseRedirect(reverse('page_create_edit', kwargs={'group_id': group_id}))
@@ -6282,7 +6282,7 @@ def course_create_collection(request, group_id):
 def course_create_note(request, group_id):
   coll_list =  request.GET.get('coll_list','')
   fetch_res = coll_list.split(',')
-    
+  print "fetch_res",fetch_res
   print "\n\n",fetch_res 
   # print "image_coll",image_coll
   return render_to_response('ndf/course_create_note.html',

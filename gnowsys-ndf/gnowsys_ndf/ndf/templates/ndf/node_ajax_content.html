@@ -260,17 +260,15 @@
                 </ul>                
               <!-- end of if 'image' in node.mime_type ... -->
 
-            {% endif %}
 
             <!-- END of commenting following block which shows slider if resource is collection of all images/videos/audios -->
 
 
               <!-- not a collection -->
-              {% if not topic %}
+              {% elif not topic %}
                 <h3 class="text-gray">{{node.name}}:</h3>
-              {% endif %}
 
-              {% if 'image' in node.mime_type %}
+              {% elif 'image' in node.mime_type %}
                <center>
                 <div class="show-image">
                   <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">

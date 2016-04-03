@@ -272,15 +272,22 @@
     });
 
   $(".create-note").click(function(){
-    var checked = $('.filenode:checked').length;
+    // var checked = $('.filenode:checked').length;
     var coll_list= " ";
     var url_list = " ";
+    var audio_list = " ";
     $('.filenode:checked').each(function() {
-
+        curr_obj = $(this).attr("value");
         // alert("{% url 'page_create_edit' group_name_tag %}?course_event_id={{group_id}}&blog_type=True");
         // alert("{{group_id}}");
         url_list = $(this).closest('.scard-container').find('img').attr('src');
         coll_list = coll_list + url_list + ",";
+
+        audio_list = $(this).closest('.scard-container').find('i').attr('class');
+        if(audio_list == "audio mpeg"){
+            // audio_list = "/"+{{group_id}}+"/file/readdoc/";
+        }
+        
             // uri= "{% url 'page_create_edit' group_name_tag %}?course_event_id={{group_id}}&blog_type=True&my="+url;
       
       });

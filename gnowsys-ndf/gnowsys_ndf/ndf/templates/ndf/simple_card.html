@@ -123,7 +123,7 @@
       {{resource.created_by|get_username|truncatechars:"10"}}</a>|
      {% endif %}
          <i style="float">{{resource.created_at|date:"d-m-Y"}}</i>
-        </a> <input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
+        </a> <input type="checkbox" style="margin:0; float:right;" "{% if resource.mime_type in 'audio' %}" audio-url="jell" {% endif %} class="filenode" name="filenode" value="{{resource.pk}}">
   </div>
 </a>
 </div>
