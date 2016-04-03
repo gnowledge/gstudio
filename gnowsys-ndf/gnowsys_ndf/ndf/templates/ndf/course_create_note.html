@@ -174,9 +174,12 @@
       }
     });
 
-	{% for each in fetch_res %}
-		{% if each != "" %}
-    		setTimeout(function(){ CKEDITOR.instances['ckeditor_textarea'].insertHtml('<img width=50% src={{each}} > </img>'); },3000);
-		{% endif %}
-    {% endfor %}
+    		setTimeout(function()
+    			{ 
+					{% for each in fetch_res %}
+						{% if "img" in each %}
+    						CKEDITOR.instances['ckeditor_textarea'].insertHtml('<img width=50% src={{each}} > </img>'); 
+					{% endif %}
+			    {% endfor %}
+    			},3000);
 </script>
