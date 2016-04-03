@@ -1869,50 +1869,80 @@ def course_dashboard(request, group_id):
     
 
     anaytics_instance = AnalyticsMethods(request, request.user.id,request.user.username, group_id)
+    '''
+    # Units Section
     all_units = anaytics_instance.get_total_units_count()
-    print "\n\n Total Units =  ", all_units
+    print "\n Total Units =  ", all_units, "\n\n"
     completed_units = anaytics_instance.get_completed_units_count()
-    print "\n\n Completed Units =  ", completed_units
+    print "\n Completed Units =  ", completed_units, "\n\n"
 
+
+    # Resources Section
     total_res = anaytics_instance.get_total_resources_count()
-    print "\n\n Total Resources === ", total_res
+    print "\n Total Resources === ", total_res, "\n\n"
     completed_res = anaytics_instance.get_completed_resources_count()
-    print "\n\n Completed Resources === ", completed_res
+    print "\n Completed Resources === ", completed_res, "\n\n"
+
+
+    # QuizItem Section
     total_quizitems = anaytics_instance.get_total_quizitems_count()
-    print "\n\n Total QuizItemEvents === ", total_quizitems
+    print "\n Total QuizItemEvents === ", total_quizitems, "\n\n"
     attempted_quizitems = anaytics_instance.get_attempted_quizitems_count()
-    print "\n\n Attempted QuizItemEvents === ", attempted_quizitems
+    print "\n Attempted QuizItemEvents === ", attempted_quizitems, "\n\n"
     correct_attempted_quizitems = anaytics_instance.get_evaluated_quizitems_count(True,False)
-    print "\n\n Correct Attempted QuizItemEvents === ", correct_attempted_quizitems
+    print "\n Correct Attempted QuizItemEvents === ", correct_attempted_quizitems, "\n\n"
     incorrect_attempted_quizitems = anaytics_instance.get_evaluated_quizitems_count(False,True)
-    print "\n\n InCorrect Attempted QuizItemEvents === ", incorrect_attempted_quizitems
+    print "\n InCorrect Attempted QuizItemEvents === ", incorrect_attempted_quizitems, "\n\n"
+
+
+    # Notes Section
     total_notes = anaytics_instance.get_total_notes_count()
-    print "\n\n Total Notes === ", total_notes
+    print "\n Total Notes === ", total_notes, "\n\n"
     user_notes = anaytics_instance.get_user_notes_count()
-    print "\n\n User Notes === ", user_notes
-    cmts_on_user_notes = anaytics_instance.get_comments_counts_on_users_notes()
-    print "\n\n Total Comments User Notes === ", cmts_on_user_notes
-
-    unique_users_commented_on_user_notes = anaytics_instance.get_commented_unique_users_count(True,False)
-    print "\n\n Total Unique Users Commented on User Notes === ", unique_users_commented_on_user_notes
+    print "\n User Notes === ", user_notes, "\n\n"
 
 
+    # Files Section
     total_files = anaytics_instance.get_total_files_count()
-    print "\n\n Total Files === ", total_files
+    print "\n Total Files === ", total_files, "\n\n"
     user_files = anaytics_instance.get_user_files_count()
-    print "\n\n User Files === ", user_files
-    cmts_on_user_files = anaytics_instance.get_comments_counts_on_users_files()
-    print "\n\n Total Comments User Files === ", cmts_on_user_files
-    unique_users_commented_on_user_files = anaytics_instance.get_commented_unique_users_count(False,True)
-    print "\n\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files
+    print "\n User's Files === ", user_files, "\n\n"
+
+
+    # Comments
     total_cmnts_by_user = anaytics_instance.get_total_comments_by_user()
-    print "\n\n Total Comments By User === ", total_cmnts_by_user
+    print "\n Total Comments By User === ", total_cmnts_by_user, "\n\n"
 
-    others_notes = anaytics_instance.get_others_notes_read_count()
-    print "\n\n Others Notes === ", others_notes
 
-    others_files = anaytics_instance.get_others_files_read_count()
-    print "\n\n Others Files === ", others_files
+    # Comments on Notes Section
+    cmts_on_user_notes = anaytics_instance.get_comments_counts_on_users_notes()
+    print "\n Total Comments On User Notes === ", cmts_on_user_notes, "\n\n"
+    unique_users_commented_on_user_notes = anaytics_instance.get_commented_unique_users_count(True,False)
+    print "\n Total Unique Users - Commented on User Notes === ", unique_users_commented_on_user_notes, "\n\n"
+
+
+    # Comments on Files Section
+    cmts_on_user_files = anaytics_instance.get_comments_counts_on_users_files()
+    print "\n Total Comments User Files === ", cmts_on_user_files, "\n\n"
+    unique_users_commented_on_user_files = anaytics_instance.get_commented_unique_users_count(False,True)
+    print "\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files, "\n\n"
+
+    # BY User
+    total_notes_read_by_user = anaytics_instance.get_others_notes_read_count()
+    print "\n Total Notes read by User === ", total_notes_read_by_user, "\n\n"
+
+    total_files_viewed_by_user = anaytics_instance.get_others_files_read_count()
+    print "\n Total Files viewed by User === ", total_files_viewed_by_user, "\n\n"
+
+    other_viewing_my_files = anaytics_instance.total_users_visted_my_files()
+    print "\n Total Users viewing My FILES === ", other_viewing_my_files, "\n\n"
+
+    others_reading_my_notes = anaytics_instance.total_users_read_my_notes()
+    print "\n Total Users reading My NOTES === ", others_reading_my_notes, "\n\n"
+
+    '''
+    commented_on_others_notes = anaytics_instance.get_other_notes_commented_by_user_count()
+    print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
 
 
 
