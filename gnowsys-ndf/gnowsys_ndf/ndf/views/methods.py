@@ -4518,8 +4518,6 @@ def replicate_resource(request, node, group_id):
         new_gsystem.content_org = node.content_org
         new_gsystem.content = node.content
         new_gsystem.save()
-        discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-        create_gattribute(new_gsystem._id, discussion_enable_at, False)
         clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
         create_grelation(new_gsystem._id, clone_of_RT, node._id)
         try:
@@ -4530,6 +4528,8 @@ def replicate_resource(request, node, group_id):
         except:
             pass
         if create_thread_for_node_flag:
+            discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+            create_gattribute(new_gsystem._id, discussion_enable_at, False)
             thread_obj = create_thread_for_node(request,group_id, new_gsystem)
             if thread_obj != None:
                 has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
@@ -4601,6 +4601,7 @@ def dig_nodes_field(parent_node, field_name="collection_set", only_leaf_nodes=Fa
     result = dig_nodes_field(node_obj,'collection_set',True,test_list,['Page','File])
   '''
   # print "\n\n Node name -- ", parent_node.name, "-- ",parent_node[field_name]
+
   for each_id in parent_node[field_name]:
     if each_id not in list_of_node_ids:
       each_obj = node_collection.one({'_id': ObjectId(each_id)})
@@ -4617,6 +4618,7 @@ def dig_nodes_field(parent_node, field_name="collection_set", only_leaf_nodes=Fa
             list_of_node_ids.append(each_id)
         else:
             list_of_node_ids.append(each_id)
+
       dig_nodes_field(each_obj, field_name,only_leaf_nodes, member_of, list_of_node_ids)
 
   # print "\n len(list_of_node_ids) -- ",len(list_of_node_ids)
@@ -4651,6 +4653,7 @@ def get_course_completed_ids(list_of_all_ids,children_ids,return_completed_list,
     # print "\n\n incompleted_ids_list1 --- ", incompleted
     if children_ids_list:
       get_course_completed_ids(list_of_all_ids,children_ids_list,completed,incompleted)
+
     return completed, incompleted
 
 @get_execution_time
