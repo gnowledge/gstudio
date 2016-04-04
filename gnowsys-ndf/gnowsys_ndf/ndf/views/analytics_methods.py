@@ -401,12 +401,10 @@ class AnalyticsMethods(object):
 		unique_list = []
 		for each in cursor_obj:
 			oid = ObjectId(each['calling_url'].split('/')[-1])
-			try:
+			if isinstance(oid, ObjectId):
 				oid = ObjectId(oid)
 				if oid not in unique_list :
 					unique_list.append(oid)
-			except:
-				pass
 		return unique_list
 
 	def calc_unique_users(self, cursor_obj):
@@ -463,16 +461,35 @@ class AnalyticsMethods(object):
 		return len(unique_users_read_my_files)
 
 	def get_other_files_commented_by_user_count(self):
-		print "10"
+		t0 = time.time()
+		prior_node_ids = []
+		self.twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
+		twist_cur = node_collection.find({'member_of': self.twist_gst._id, 'author_set': self.user_id})
+		prior_node_ids = [eachtw.prior_node for eachtw in twist_cur if eachtw.prior_node]
+		# for eachtw in twist_cur:
+		# 	if eachtw.prior_node:
+		# 		prior_node_ids.append(eachtw.prior_node)
+		if not hasattr(self,"file_gst"):
+			self.file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"},{'_id': 1})
+
+		files_count = node_collection.find({'member_of': self.file_gst._id,
+		 'group_set': self.group_obj._id, 'created_by': {'$ne': self.user_id},
+		 '_id': {'$in': prior_node_ids}})
+
+		t1 = time.time()
+		time_diff = t1 - t0
+		print "\n get_other_files_commented_by_user_count == ", time_diff
+		return files_count.count()
 
 	def get_other_notes_commented_by_user_count(self):
 		t0 = time.time()
 		prior_node_ids = []
 		self.twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
 		twist_cur = node_collection.find({'member_of': self.twist_gst._id, 'author_set': self.user_id})
-		for eachtw in twist_cur:
-			if eachtw.prior_node:
-				prior_node_ids.append(eachtw.prior_node)
+		prior_node_ids = [eachtw.prior_node for eachtw in twist_cur if eachtw.prior_node]
+		# for eachtw in twist_cur:
+		# 	if eachtw.prior_node:
+		# 		prior_node_ids.append(eachtw.prior_node)
 		if not hasattr(self, 'page_gst'):
 			self.page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"},{'_id': 1})
 		if not hasattr(self, 'blog_page_gst'):
