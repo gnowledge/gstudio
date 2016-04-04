@@ -40,7 +40,8 @@ def write_files(request, group_id, make_collection=False):
 	first_obj = None
 	collection_set = []
 	uploaded_files = request.FILES.getlist('filehive', [])
-	name = request.POST.get('name', 'untitled')
+	name = request.POST.get('name')
+
 	gs_obj_list = []
 
 	for each_file in uploaded_files:
@@ -52,7 +53,7 @@ def write_files(request, group_id, make_collection=False):
 
 		group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
 
-		if not first_obj and (name != 'untitled'):
+		if name and not first_obj and (name != 'untitled'):
 			file_name = name
 		else:
 			file_name = each_file.name if hasattr(each_file, 'name') else name
