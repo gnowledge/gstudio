@@ -361,6 +361,7 @@ def save_quizitem_answer(request, group_id):
             qip_user_submitted_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_submitted_ans"})
             qip_user_checked_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_checked_ans"})
             already_ans_obj = None
+            # print "\n\n thread_obj == ", thread_obj
             if thread_obj != None:
                 already_ans_obj = node_collection.find_one({'member_of': qip_gst._id,'created_by': user_id, 'prior_node': thread_obj._id})
                 if already_ans_obj:
@@ -373,11 +374,13 @@ def save_quizitem_answer(request, group_id):
                     user_ans.contributors.append(user_id)
                     user_ans.member_of.append(qip_gst._id)
                     user_ans.group_set.append(group_id)
-                    user_ans.origin = [{'thread_id': thread_obj._id, 'prior_node_id_of_thread': node_obj._id}]
-                    user_ans.status = u"PUBLISHED"
-
+                if node_obj._id not in user_ans.prior_node:
+                    user_ans.prior_node.append(node_obj._id)
+                user_ans.origin = [{'thread_id': thread_obj._id, 'prior_node_id_of_thread': node_obj._id}]
+                user_ans.status = u"PUBLISHED"
                 user_ans.name = unicode("Answer_of:" + str(node_obj.name) + "-Answer_by:"+ str(user_name))
                 user_ans.save()
+                # print "\n\n user_ans== ",user_ans
 
                 if thread_obj._id not in user_ans.prior_node:
                     # add user's post/reply obj to thread obj's post_node

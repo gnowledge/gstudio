@@ -34,6 +34,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
+from gnowsys_ndf.ndf.views.analytics_methods import *
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status
 from gnowsys_ndf.notification import models as notification
 
@@ -1849,11 +1850,27 @@ def course_dashboard(request, group_id):
     group_id    = group_obj._id
     group_name  = group_obj.name
 
+    allow_to_join = get_group_join_status(group_obj)
+    result_status = course_complete_percentage = None
+    total_count = completed_count = None
+    if request.user.is_authenticated:
+        result_status = get_course_completetion_status(group_obj, request.user.id)
+        if result_status:
+            if "course_complete_percentage" in result_status:
+                course_complete_percentage = result_status['course_complete_percentage']
+            if "total_count" in result_status:
+                total_count = result_status['total_count']
+            if "completed_count" in result_status:
+                completed_count = result_status['completed_count']
+
     template = 'ndf/gcourse_event_group.html'
+
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'dashboard'
+            'node': group_obj, 'title': 'dashboard', 'allow_to_join': allow_to_join,
+            "course_complete_percentage": course_complete_percentage,
+            "total_count":total_count, "completed_count":completed_count,
         })
     return render_to_response(template, context_variables)
 
@@ -2180,8 +2197,6 @@ def course_note_page(request, group_id):
 
     thread_node = None
     allow_to_comment = None
-    
-    
     allow_to_join = get_group_join_status(group_obj)
     result_status = course_complete_percentage = None
     total_count = completed_count = None
@@ -2296,3 +2311,94 @@ def course_filters(request, group_id):
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
+
+
+def course_analytics(request, group_id):
+    import time
+    t0 = time.time()
+    analytics_data = {}
+
+    anaytics_instance = AnalyticsMethods(request, request.user.id,request.user.username, group_id)
+    # Units Section
+    analytics_data['all_units'] = anaytics_instance.get_total_units_count()
+    # print "\n Total Units =  ", all_units, "\n\n"
+    analytics_data['completed_units'] = anaytics_instance.get_completed_units_count()
+    # print "\n Completed Units =  ", completed_units, "\n\n"
+
+
+    # Resources Section
+    analytics_data['total_res'] = anaytics_instance.get_total_resources_count()
+    # print "\n Total Resources === ", total_res, "\n\n"
+    analytics_data['completed_res'] = anaytics_instance.get_completed_resources_count()
+    # print "\n Completed Resources === ", completed_res, "\n\n"
+
+
+    # QuizItem Section
+    analytics_data['total_quizitems'] = anaytics_instance.get_total_quizitems_count()
+    # print "\n Total QuizItemEvents === ", total_quizitems, "\n\n"
+    analytics_data['attempted_quizitems'] = anaytics_instance.get_attempted_quizitems_count()
+    # print "\n Attempted QuizItemEvents === ", attempted_quizitems, "\n\n"
+    analytics_data['correct_attempted_quizitems'] = anaytics_instance.get_evaluated_quizitems_count(True,False)
+    # print "\n Correct Attempted QuizItemEvents === ", correct_attempted_quizitems, "\n\n"
+    analytics_data['incorrect_attempted_quizitems'] = anaytics_instance.get_evaluated_quizitems_count(False,True)
+    # print "\n InCorrect Attempted QuizItemEvents === ", incorrect_attempted_quizitems, "\n\n"
+
+
+    # Notes Section
+    analytics_data['total_notes'] = anaytics_instance.get_total_notes_count()
+    # print "\n Total Notes === ", total_notes, "\n\n"
+    analytics_data['user_notes'] = anaytics_instance.get_user_notes_count()
+    # print "\n User Notes === ", user_notes, "\n\n"
+
+
+    # Files Section
+    analytics_data['total_files'] = anaytics_instance.get_total_files_count()
+    # print "\n Total Files === ", total_files, "\n\n"
+    analytics_data['user_files'] = anaytics_instance.get_user_files_count()
+    # print "\n User's Files === ", user_files, "\n\n"
+
+
+    # Comments
+    analytics_data['total_cmnts_by_user'] = anaytics_instance.get_total_comments_by_user()
+    # print "\n Total Comments By User === ", total_cmnts_by_user, "\n\n"
+
+
+    # Comments on Notes Section
+    analytics_data['cmts_on_user_notes'] = anaytics_instance.get_comments_counts_on_users_notes()
+    # print "\n Total Comments On User Notes === ", cmts_on_user_notes, "\n\n"
+    analytics_data['unique_users_commented_on_user_notes'] = anaytics_instance.get_commented_unique_users_count(True,False)
+    # print "\n Total Unique Users - Commented on User Notes === ", unique_users_commented_on_user_notes, "\n\n"
+
+
+    # Comments on Files Section
+    analytics_data['cmts_on_user_files'] = anaytics_instance.get_comments_counts_on_users_files()
+    # print "\n Total Comments User Files === ", cmts_on_user_files, "\n\n"
+    analytics_data['unique_users_commented_on_user_files'] = anaytics_instance.get_commented_unique_users_count(False,True)
+    # print "\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files, "\n\n"
+
+    # BY User
+    analytics_data['total_notes_read_by_user'] = anaytics_instance.get_others_notes_read_count()
+    # print "\n Total Notes read by User === ", total_notes_read_by_user, "\n\n"
+
+    analytics_data['total_files_viewed_by_user'] = anaytics_instance.get_others_files_read_count()
+    # print "\n Total Files viewed by User === ", total_files_viewed_by_user, "\n\n"
+
+    analytics_data['other_viewing_my_files'] = anaytics_instance.total_users_visted_my_files()
+    # print "\n Total Users viewing My FILES === ", other_viewing_my_files, "\n\n"
+
+    analytics_data['others_reading_my_notes'] = anaytics_instance.total_users_read_my_notes()
+    # print "\n Total Users reading My NOTES === ", others_reading_my_notes, "\n\n"
+
+    analytics_data['commented_on_others_notes'] = anaytics_instance.get_other_notes_commented_by_user_count()
+    # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
+
+    analytics_data['commented_on_others_files'] = anaytics_instance.get_other_files_commented_by_user_count()
+    # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
+    
+
+    t1 = time.time()
+    time_diff = t1 - t0
+    print "\n ALL Total seconds == ", time_diff
+
+    del anaytics_instance
+    return HttpResponse(json.dumps(analytics_data))
