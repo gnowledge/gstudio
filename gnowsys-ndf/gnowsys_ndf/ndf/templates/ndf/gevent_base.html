@@ -10,7 +10,7 @@
 
 {% block style %}
 .course_outline_table, tr {
-border: 2px solid #0b8a91 !important;
+border: 2px solid #0b8a91;
 border-collapse: collapse;
 }
 
@@ -175,7 +175,7 @@ list-style: none;
 
           <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
             <a href="{% url 'course_about' group_id %}">
-              <i class="fi-page-edit "></i>{% trans "About the course" %}
+              <i class="fi-page-edit "></i>{% trans "Overview" %}
             </a>
           </li>
 
@@ -212,14 +212,14 @@ list-style: none;
         </ul>
       </div>
     </div>
-    <div class="row collapse meta">
+    <!--div class="row collapse meta">
       <div class="key">Starts on</div>
       <div class="value">
         {% get_attribute_value node.pk 'start_time' as course_start_date %}
 
         <div class="time"> {{course_start_date|date:"d M Y"}} </div>
       </div>
-    </div>
+    </div-->
     {% if next_session_in_course.1 %}
     <div class="row collapse meta">
       <div class="key">Next Session</div>
@@ -233,7 +233,8 @@ list-style: none;
   </div>
 
   <!-- Tabs -->
-  <div class="container" id="envelop-content" >
+  <div id="envelop-content" >
+    <div class="container">
     <div class="row">
     <!-- Envelop box-->
     <div class="small-12 large-12 columns">
@@ -270,8 +271,184 @@ list-style: none;
 
           {% elif title == 'about' %}
             <div id="course-about">
-              <div class="row collapse">
-                <div class="about-course-heading">
+              <div class="row collapse course-overview">
+                <div class="columns small-12 medium-6">
+                  <div class="ongoing-session">
+                    <h5>ONGOING SESSION </h5>
+                    <h3>Taking Screenshots of the work and doing something</h3>
+                    <button class="tiny button"><i class="fa fa-sign-in"></i>&nbsp;Enter Session</button>
+                  </div>
+                  <div class="course-status">
+                    <h5>Course status</h5>
+                    <div class="row">
+                      <div class="small-12 columns">
+                        <span class="course-metric-heading">Total Units</span>
+                        <h4>2 of 6 modles completed</h4>
+                        <div>Progress Bar</div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="small-12 columns">
+                        <span class="course-metric-heading">Units Completion</span>
+                        <h4>2 of 6 modles completed</h4>
+                        <div>Progress Bar</div>
+                      </div>
+                    </div>
+                    <ul class="tabs" data-tab role="tablist">
+                      <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">Notifications</a></li>
+                      <li class="tab-title" ><a href="#course-act-logs" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2">Activity Log</a></li>
+                    </ul>
+                    <div class="tabs-content">
+                      <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification">
+                        <div class="row">
+                          <div class="small-2 columns"><i class="fa fa-comment-o"></i></div>
+                          <div class="small-10 columns">Summer daisy reported the file.</div>
+                        </div>
+                      </section>
+                      <section role="tabpanel" aria-hidden="true" class="content" id="course-act-logs">
+                        <ul>
+                          <li>Activity log 1</li>
+                          <li>Activity log 2</li>
+                        </ul>
+                      </section>
+                    </div>
+                  </div>
+                </div>
+                <div class="columns small-12 medium-6">
+                  <h5>Total points gained</h5>
+                  <span class="course-metric-count">167</span>
+                  <div class="course-points-breakup">
+
+                  </div>
+                  <div class="course-interactions course-section">
+                    <span class="course-section-heading">Interactions</span>
+                    <span class="course-section-icon">
+                      <i class="fa fa-users"></i>
+                    </span>
+                    <div class="row">
+                      <div class="columns small-12 medium-6">
+                        <span class="course-metric-heading">Comments By me</span>
+                        <span class="course-metric-count">167</span>
+                      </div>
+                      <div class="columns small-12 medium-6">
+                        <span class="course-metric-heading">Avg Rating for my comments</span>
+                        <span class="course-metric-count">Star rating</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="columns small-12 medium-6">
+                        <span class="course-metric-heading">Comments for me</span>
+                        <span class="course-metric-count">32</span>
+                      </div>
+                      <div class="columns small-12 medium-6">
+                        <span class="course-metric-heading">Avg Ratings to others</span>
+                        <span class="course-metric-count">Star Rating</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="course-gallery-uploads course-section">
+                    <span class="course-section-heading">Gallery uploads</span>
+                    <span class="course-section-icon">
+                      <i class="fa fa-file-text"></i>
+                    </span>
+                    <div class="row">
+                      <div class="columns small-12 medium-4">
+                        <span class="course-metric-heading">Files Created</span>
+                        <span class="course-metric-count">42</span>
+                      </div>
+                      <div class="columns small-12 medium-4">
+                        <span class="course-metric-heading">Visits gained</span>
+                        <span class="course-metric-count">62</span>
+                      </div>
+                      <div class="columns small-12 medium-4">
+                        <span class="course-metric-heading">Comments recieved</span>
+                        <span class="course-metric-count">17</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="columns small-12">
+                        <span class="course-metric-heading">Avg. Rating</span>
+                        <span class="course-metric-count">Star Rating</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="columns small-12 medium-4">
+                        <span class="course-metric-heading">Others File Visited</span>
+                        <span class="course-metric-count">29</span>
+                      </div>
+                      <div class="columns small-12 medium-4">
+                        <span class="course-metric-heading">Comments on other files</span>
+                        <span class="course-metric-count">15</span>
+                      </div>
+                      <div class="columns small-12 medium-4">
+                        <span class="course-metric-heading">Comments by unique users</span>
+                        <span class="course-metric-count">5</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="columns small-12">
+                        <span class="course-metric-heading">Avg. Rating Awarded</span>
+                        <span class="course-metric-count">Star Rating</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="course-quiz-perf course-section">
+                    <span class="course-section-heading">Quiz Performance</span>
+                    <span class="course-section-icon">
+                      <i class="fa fa-question-circle"></i>
+                    </span>
+                    <div class="row">
+                      <div class="columns small-12 medium-6">
+                        <span class="course-metric-heading">Questions Attempted</span>
+                        <span class="course-metric-count">93</span>
+                      </div>
+                      <div class="columns small-12 medium-6">
+                        <span class="course-metric-heading">Total Questions</span>
+                        <span class="course-metric-count">105</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="columns small-12 medium-6">
+                        <span class="course-metric-heading">Correct Answers</span>
+                        <span class="course-metric-count correct-count">87</span>
+                      </div>
+                      <div class="columns small-12 medium-6">
+                        <span class="course-metric-heading">Incorrect answers</span>
+                        <span class="course-metric-count incorrect-count">6</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="course-notes course-section">
+                    <span class="course-section-heading">Note Making</span>
+                    <span class="course-section-icon">
+                      <i class="fa fa-book"></i>
+                    </span>
+                    <div class="row">
+                      <div class="columns small-12 medium-6">
+                        <span class="course-metric-heading">Notes Written</span>
+                        <span class="course-metric-count">93</span>
+                      </div>
+                      <div class="columns small-12 medium-6">
+                        <span class="course-metric-heading">Views Gained</span>
+                        <span class="course-metric-count">105</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="columns small-12 medium-12">
+                        <span class="course-metric-heading">Others notes visited</span>
+                        <span class="course-metric-count">87</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="course-warning course-section">
+                      <h5>WAITING FOR YOUR FEEDBACK</h5>
+                      <div><i class="fa fa-sign-in"></i><a>3 New notes added</a></div>
+                      <div><i class="fa fa-file-image-o"></i><a>36 New files uploaded in the gallery</a></div>
+                      <div></div>
+                  </div>
+
+                </div>
+                <!--div class="about-course-heading">
                   <div class="heading-text">
                     <div>
                       <h2>{% firstof node.altnames node.name  %}</h2>
@@ -288,20 +465,83 @@ list-style: none;
                       <span title="Course Duration"><i class="fi-clock"></i>&nbsp;{{weeks_count}} weeks</span>
                     </div>
                   </div>
+                </div-->
+              </div>
+              <div class="row">
+                <div class="small-12 columns about-course">
+                  <h5>About</h5>
+                  <div class="row">
+                    <div class="small-12 medium-8 columns">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce auctor, mi facilisis blandit sodales, est nisl eleifend metus, eu venenatis dolor ante ac nulla. Donec at molestie nisi. Curabitur vulputate vitae velit ac ornare. Fusce nec bibendum tellus. Phasellus interdum porta purus, vel cursus turpis. Ut tempus luctus nibh, sit amet feugiat felis. Nullam elementum porta vehicula. Donec tristique efficitur sapien, eu imperdiet velit condimentum eget.
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                      <div class="course-highlight">
+                        <i class="fa fa-list"></i>
+                        <span>10 Modules</span>
+                      </div>
+                      <div class="course-highlight">
+                        <i class="fa fa-clock-o"></i>
+                        <span>6 weeks</span>
+                      </div>
+                      <div class="course-highlight">
+                        <i class="fa fa-user"></i>
+                        <span>54 students enrolled</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="row collapse">
+              <div class="row course-students-data">
+                <div class="small-12 medium-4 columns">
+                  Points table for students
+                </div>
+                <div class="small-12 medium-8 columns students-table-legends">
+                  <span class=" badge yellow">&nbsp;</span>
+                  <span>Interations</span>
+                  <span class=" badge green">&nbsp;</span>
+                  <span>Gallery uploads</span>
+                  <span class=" badge">&nbsp;</span>
+                  <span>Note Making</span>
+                  <span class=" badge red">&nbsp;</span>
+                  <span>Quiz Performance</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="small-12 columns">
+                  <table class="student-overview-table">
+                    <thead>
+                      <tr>
+                        <th>Student Name</th>
+                        <th>Total Points</th>
+                        <th>Points Breakup</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <i class="fa fa-user"></i>
+                          <span>Fluffy Apple</span>
+                        </td>
+                        <td>346</td>
+                        <td>Bars</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <!--div class="row collapse">
                 <div class="about-course-details">
-                  <!--@anotation('replace this with the about course details')-->
+                  <!--@anotation('replace this with the about course details')>
                   <p>{{group_object.content_org}}
                   </p>
                 </div>
-              </div>
+              </div-->
             </div>
           {% endif %}
         </div>
       </div>
       <!-- tab-content ends here -->
+    </div>
     </div>
     </div>
   </div>
