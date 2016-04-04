@@ -259,6 +259,11 @@ def parse_data_create_gsystem(json_file_path, file_name):
                 json_document['name'] = question_content
                 json_document['altnames'] = json_document['content']
                 group_id = ObjectId(json_document['group_id'])
+                group_obj = node_collection.one({'_id': group_id})
+                if group_obj:
+                    group_id = group_obj._id
+                else:
+                    group_id = home_grp._id
                 user_id = int(json_document['user_id'])
                 print "\n\n NAME ======= ", json_document['name'], group_id, user_id
             global node_repeated
