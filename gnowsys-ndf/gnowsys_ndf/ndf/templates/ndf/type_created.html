@@ -6,6 +6,13 @@
 
 {% block body_content %}
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+<script type="text/javascript" src="/static/ndf/bower_components/mousetrap/mousetrap.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
+
+
+
+
 
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
 <div class="row">
@@ -15,8 +22,7 @@
         {% trans 'Select GSystemType : ' %}</center>
     </div>
     <div style="display:table-cell;"> 
-        <select id="widget_for" name="widget_for" onchange="GetSelectedTextValue(this)" >
-            <option value="select">select</option>
+        <select id="select_gs" name="widget_for" class="demo-default" placeholder=" Select GST " onchange="GetSelectedTextValue(this)" >
             {% for list in opt_list %}
                 <option value="{{list.name}}" size="5" > {{list.name}} </option>
             {% endfor %}
@@ -34,6 +40,12 @@
 <script type="text/javascript">
 var list = "{{list}}"
 var selectedValue = null 
+
+
+$('#select_gs').selectize();
+
+
+
 var opt_list = "{{opt_list}}"
 
 // console.log(opt_list)
