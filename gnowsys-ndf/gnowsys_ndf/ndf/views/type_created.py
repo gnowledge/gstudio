@@ -80,11 +80,11 @@ def default_template(request,group_id,node=None):
 
     gs_sys2 = "GSystemType"
     class_structure =  eval(gs_sys2).structure
-    print "gst\n", class_structure, "\n\n"
+    # print "gst\n", class_structure, "\n\n"
     
     gs_sys = "GSystem"
     gs_struc =  eval(gs_sys).structure
-    print "gs_sys\n", gs_struc, "\n\n\n"
+    # print "gs_sys\n", gs_struc, "\n\n\n"
     
 # For Display
 
@@ -165,13 +165,13 @@ def default_template(request,group_id,node=None):
 
             # print key ,"\n", pos_ats[key] , "\n\n\n"
             # print value['altnames'],value['_id']
-        for key,value in pos_rts.iteritems():
-            print key ,"\n"
+        # for key,value in pos_rts.iteritems():
+            # print key ,"\n"
             # print value,"\n\n"
 
-        for key,value in pos_rts.iteritems():
-            pos_rts_value = value['subject_or_object_type']
-            print pos_rts_value
+        # for key,value in pos_rts.iteritems():
+            # pos_rts_value = value['subject_or_object_type']
+            # print pos_rts_value
             # this has all the rightside gst of the relationtype
 
             # subject_or_object_type': [ObjectId('564c7451a78dd024cb05b7dd')
@@ -212,7 +212,7 @@ def default_template(request,group_id,node=None):
 
         for e in final_pos_ats:
             fl_ats = node_collection.one({'_id':e})
-            print fl_ats
+            # print fl_ats
             final_ats.append(fl_ats)
 
 
@@ -231,14 +231,13 @@ def default_template(request,group_id,node=None):
 
         for e in pos_rts_id:
             if e not in rts_id:
-                
                 final_pos_rts.append(e)
 
         final_rts = []
 
         for e in final_pos_rts:
             fl_rts = node_collection.one({'_id':e})
-            print fl_rts
+            # print fl_rts
             final_rts.append(fl_rts)
 
         # the final_rts list would have all the possible relationtype for the given GS.
@@ -290,7 +289,7 @@ def default_template(request,group_id,node=None):
             for each in rts_obj:
                 k = node_collection.one({'_id':ObjectId(each) })
                 name_rst.append(k.name)
-            rts_object_dict = dict({'name':e.name , 'object_type':name_rst})
+            rts_object_dict = dict({ 'name':e.name, 'altnames':e.altnames, 'object_type':name_rst })
             f_rts_object_dict.append(rts_object_dict)
 
 
@@ -303,9 +302,9 @@ def default_template(request,group_id,node=None):
             name_pos_rst = []
             for each in pos_rts_obj:
                 k = node_collection.one({'_id':ObjectId(each) })
-                print k.name,k._id        
+                # print k.name,k._id        
                 name_pos_rst.append(k.name)
-            pos_rts_object_dict = dict({'name':e.name , 'object_type':name_rst})
+            pos_rts_object_dict = dict({'name':e.name ,'altnames':e.altnames, 'object_type':name_rst})
             f_pos_rts_object_dict.append(pos_rts_object_dict)
 
 
@@ -324,7 +323,7 @@ def default_template(request,group_id,node=None):
 
 
 
-    print "\n\n\n\n\n\n\n"
+    # print "\n\n\n\n\n\n\n"
 
 
 
@@ -339,11 +338,44 @@ def default_template(request,group_id,node=None):
 
 
 
-    # if request.method=="POST":
-        # for key,value in class_structure.items():
+    if request.method == "POST":
+        print request.POST
+        # request.POST.get('IDoftheobject to be fetched')
+
+        for key,value in gs_struc.items():
+            print key , value,"\n"
 
 
+            if key == "name":
+                print "name"
+                if request.POST.get(key,""):
+                    new_instance_type[key] = unicode(request.POST.get(key,""))
 
+
+            if key == "altnames":
+                print "altnames"
+
+            if key == "attribute_set":
+                print "this attribute_set "
+
+
+            if key == "relation_set":
+                print "this relation_set "
+
+
+            # if request.POST.get('name',''):
+        print request.user.id , ">>>>>>>>>>>>>>>>>>>" 
+
+        user_id = request.user.id
+        if not new_instance_type.has_key('_id'):
+            new_instance_type.created_by = user_id
+
+        new_instance_type.modified_by = user_id
+
+        if user_id not in new_instance_type.contributors:
+            new_instance_type.contributors.append(user_id)
+
+        new_instance_type.save()
     # If GET request ---------------------------------------------------------------------------------------
     # for key,value in class_structure.items():
 
@@ -381,8 +413,7 @@ def default_template(request,group_id,node=None):
     template = "ndf/basic_temp.html"
     variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
      'ats':ats , 'rts':rts , 'node_gs':node_gs ,'pos_ats':pos_ats , 'pos_rts':pos_rts ,
-     'gs_struc':gs_struc , 'final_pos_ats':final_pos_ats ,'final_pos_rts':final_pos_rts , 
-     'final_rts':final_rts , 'final_ats':final_ats , 'f_rts_object_dict':f_rts_object_dict ,
+     'gs_struc':gs_struc , 'final_pos_ats':final_pos_ats ,'final_ats':final_ats , 'f_rts_object_dict':f_rts_object_dict ,
      'f_pos_rts_object_dict':f_pos_rts_object_dict })
 
     return render_to_response(template,variable)
