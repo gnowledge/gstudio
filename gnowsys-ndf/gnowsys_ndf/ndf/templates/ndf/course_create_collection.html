@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load ndf_tags %}
 
+{% if is_create_collection %}
 <div class="collection-area large-12 columns">
         <div class="large-6 columns">
 			Create New Collection:
@@ -8,6 +9,8 @@
         </div>
         <a class="create_coll"><span class="fi-check" style="color:green;"></span></a>
 </div>
+{% endif %}
+{% if is_add_to_collection %}
 <div class="large-12 columns">
 	
 Choose From existing collection:
@@ -16,12 +19,12 @@ Choose From existing collection:
 	{% for each_node in result_cur %}
                     
                     <li class="card-image-wrapper " id="{{each_node.pk}}" style="margin-top:13px;margin-left:-10px">
-						{% include 'ndf/simple_card.html' with no_url=True resource=each_node first_arg=group_id second_arg=each_node.pk third_arg=False %}
+						            {% include 'ndf/simple_card.html' with no_url=True resource=each_node first_arg=group_id second_arg=each_node.pk third_arg=False %}
                     </li>
                 {% endfor %}
 </ul>
-
 </div>
+{% endif %}
 <script type="text/javascript">
 	
 	$(document).on('change','.filenode',function(){

@@ -39,7 +39,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
@@ -1008,12 +1008,19 @@ def add_page(request, group_id):
   tags = request.POST.get("tags", '')
   print "\ninside add_page",request
   if request.is_ajax() and request.method == "POST" and  is_create_note == "True":
-      # blog_type = request.POST.get("blog_type", '')
+      blog_type = request.POST.get("blog_type", '')
       # return HttpResponseRedirect(reverse('page_create_edit', kwargs={'group_id': group_id}))
       gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
       page_node = node_collection.collection.GSystem()
       page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
       page_node.status = u"PUBLISHED"
+      blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+      page_node.type_of = [blogpage_gst._id]
+      page_node.save()
+      discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+      if blog_type:
+        create_gattribute(page_node._id, discussion_enable_at, True)
+        return_status = create_thread_for_node(request,group_id, page_node)
       page_node.save()
       return HttpResponseRedirect(reverse('course_notebook_tab_note',
                                     kwargs={
@@ -6257,6 +6264,8 @@ def get_gin_line_template(request,group_id,node_id):
 
 @get_execution_time
 def course_create_collection(request, group_id):
+  is_create_collection =  request.GET.get('is_create_collection','')
+  is_add_to_collection =  request.GET.get('is_add_to_collection','')
   result_cur = node_collection.find({
                           'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
                                             'group_set': {'$all': [ObjectId(group_id)]},
@@ -6275,7 +6284,7 @@ def course_create_collection(request, group_id):
 
   return render_to_response('ndf/course_create_collection.html',
     {
-      "group_id":group_id,"result_cur":result_cur
+      "group_id":group_id,"result_cur":result_cur,"is_create_collection":is_create_collection,"is_add_to_collection":is_add_to_collection
     },context_instance=RequestContext(request))
   
 @get_execution_time
