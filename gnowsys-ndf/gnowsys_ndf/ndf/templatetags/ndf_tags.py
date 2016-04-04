@@ -3585,3 +3585,25 @@ def get_info_pages(group_id):
 	# 	for eachnode in info_page_nodes:
 	# 		list_of_nodes.append({'name': eachnode.name,'id': eachnode._id})
 	return info_page_nodes
+
+
+@get_execution_time
+@register.assignment_tag
+def get_download_filename(node, file_size_name='original'):
+
+	if hasattr(node, 'if_file') and node.if_file[file_size_name].relurl:
+
+		from django.template.defaultfilters import slugify
+
+		relurl = node.if_file[file_size_name].relurl
+		extension = relurl.split('.')[-1]
+		name = node.altnames if node.altnames else node.name
+
+		file_name = slugify(name) + '.' + extension
+
+		return file_name
+
+	else:
+		name = node.altnames if node.altnames else node.name
+
+		return name
