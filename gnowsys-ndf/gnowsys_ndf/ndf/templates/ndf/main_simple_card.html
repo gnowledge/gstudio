@@ -34,29 +34,22 @@
       {% endif %}
     {% elif "PartnerGroup" in resource.member_of_names_list or "Group" in resource.member_of_names_list or "Course" in resource.member_of_names_list or has_logo == True %}
       {% if "Course" in resource.member_of_names_list or has_logo == True %}
-        {% get_relation_value resource.pk 'has_logo' as logo_img_and_grel_hl %}
-        {% if logo_img_and_grel_hl.0 %}
-          {% get_node logo_img as logo_img_and_grel_hl.0 %}
-          {% if logo_img_and_grel_hl.0.fs_file_ids.1 %}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_hl.0.fs_file_ids.1 %}" style="width:50%" alt="" />
-          {% endif %}
-        {% else %}
-          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." style="width:50%" class="img-height">
 
+
+        {% get_relation_value resource.pk 'has_logo' as grel_dict %}
+        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
+                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.1 %}" alt="" style="width:50%" />
+          {% else %}
+                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  style="width:50%" class="img-height" >
         {% endif %}
 
       {% else %}
-        {% get_relation_value resource.pk 'has_profile_pic' as logo_img_and_grel_pp %}
-        {% if logo_img_and_grel_pp.0 %}
-          {% get_node logo_img as logo_img_and_grel_pp.0 %}
-          {% if logo_img_and_grel_pp.0.fs_file_ids.1 %}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.1 %}" alt="" style="width:50%" />
-        {% elif logo_img_and_grel_pp.0.fs_file_ids.0%}
-            <img src="{% url 'get_gridfs_resource' logo_img_and_grel_pp.0.fs_file_ids.0 %}" alt="" style="width:50%" />
-          {% endif %}
 
-        {% else %}
-          <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." style="width:50%"  class="img-height">
+        {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
+        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
+                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" style="width:50%" />
+          {% else %}
+                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  style="width:50%" class="img-height">
         {% endif %}
 
       {% endif %}

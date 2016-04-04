@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load cache %}
 
-{% get_schema node as schema %} 
+{% get_schema node as schema %}
 {% get_group_name groupid as group_name_tag %}
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
@@ -22,33 +22,33 @@
   $( document ).ready(function() {
     var x = location.href;
     var hostname = location.host;
-    
+
     x = "https://www.facebook.com/dialog/feed?app_id=1663958913874619&redirect_uri=http://www.metastudio.org/home/&link="+location.href+"&caption=  {{node.name}}&description={{node.content|safe}}&picture=" + hostname + "{% url 'read_file' group_name_tag node grid_fs_obj.filename %}";
     $(".share_link").attr("href",x);
-   
+
 });
 </script>
 {% endcomment %}
 
 
-<div class="row page" itemscope itemtype="{{schema.1.type}}"> 
-  
+<div class="row page" itemscope itemtype="{{schema.1.type}}">
+
   <section class="medium-9 columns">
   {% block breadcrumb %} {% get_breadcrumb request.path %} {% endblock breadcrumb %}
 
   {% if breadcrumbs_list %}
-  <ul class="breadcrumbs"> 
+  <ul class="breadcrumbs">
     {% for e in breadcrumbs_list %}
       <li>
       {% if node.pk != e.0 %}
         <a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a>
-      {% else %} 
-        {{e.1}} 
+      {% else %}
+        {{e.1}}
       {% endif %}
       </li>
     {% endfor %}
   </ul>
-    
+
   {% endif %}
 
   {% check_group node.pk as is_group %}
@@ -71,7 +71,7 @@
       <a href="{% url 'moderation_status' group_id node.pk %}">{% trans 'Check the current status of Moderation' %}</a>
     </small></h4>
   {% endif %}
-    
+
 
   <!-- new  -->
 
@@ -85,37 +85,37 @@
     <meta itemprop="{{schema.1.timerequired}}" content="{{node.timerequired}}">
     {% for contributor_name in node.user_details.contributors %}
     <meta itemprop="{{schema.1.contributor}}" content="{{contributor_name}}">
-    {% endfor %}                                                             
-    {% if node|is_File %}         
-    <meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " >  
-    <meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >      
-    {% endif %}                                 
-  {% endif %}   
+    {% endfor %}
+    {% if node|is_File %}
+    <meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " >
+    <meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >
+    {% endif %}
+  {% endif %}
 
-  {% for neighbour in node.teaches %}                                 
+  {% for neighbour in node.teaches %}
   <div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
     <meta itemprop="{{schema.1.educationalframework}}" content="">
-    <meta itemprop="{{schema.1.alignmenttype}}" content="teaches">  
-    <meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
+    <meta itemprop="{{schema.1.alignmenttype}}" content="teaches">
+    <meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}">
     <meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
-    <meta itemprop ="{{Schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
+    <meta itemprop ="{{Schema.1.targetdescription}}" content ="{{neighbour.html_content}}">
   </div>
   {% endfor %}
 
-  {% for neighbour in node.assesses %}                                
+  {% for neighbour in node.assesses %}
   <div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
     <meta itemprop="{{schema.1.educationalframework}}" content="">
-    <meta itemprop="{{schema.1.alignmenttype}}" content="assesses"> 
-    <meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
+    <meta itemprop="{{schema.1.alignmenttype}}" content="assesses">
+    <meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}">
     <meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
-    <meta itemprop ="{{schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
+    <meta itemprop ="{{schema.1.targetdescription}}" content ="{{neighbour.html_content}}">
   </div>
   {% endfor %}
 
   <div class="row">
     {% if topic %}
       {% get_filters_data "Topics" as filter_dict %}
-  
+
       {% include "ndf/filters.html" with filter_dict=filter_dict %}
     {% endif %}
 
@@ -125,13 +125,13 @@
 
     <section class="medium-12 columns content">
       <div class="tabs-content">
-        
+
         <div class="{{ group_policy }} {{ node.status|lower }} content active commentable-section" id="view-page" data-section-id="1">
 
           <div class="{{node.pk}}-collection-set" data-cs="{{node.collection_set|safe}}"></div>
 
         {% comment %}
-          <div class="row">  
+          <div class="row">
         {% endcomment %}
 
             {% comment %}
@@ -157,7 +157,7 @@
               -->
             {% endcomment %}
 
-              
+
             {% comment %}
             <div class="small-4 columns"> </div>
 
@@ -180,7 +180,7 @@
             </div>
           </div>
           {% endcomment %}
-    
+
           <!-- Code for showing media details -->
           {% if node.mime_type %}
 
@@ -188,34 +188,34 @@
 
             <!-- commenting following block which shows slider if resource is collection of all images/videos/audios -->
             {% comment %}
-              
-            {% if node.collection_set and node.pk|is_media_collection %} 
+
+            {% if node.collection_set and node.pk|is_media_collection %}
 
               {% if 'image' in node.mime_type or 'video' in node.mime_type %}
-                <!-- Orbit image slider only for image and video collections--> 
-                  
+                <!-- Orbit image slider only for image and video collections-->
+
                     {% if 'image' in node.mime_type %}
                     <a class="th" target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                      <img style="min-height:200px;" src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                      <img style="min-height:200px;" src="{% url 'get_mid_size_img' group_name_tag node.pk %}" />
                       </a>
                     {% elif 'video' in node.mime_type %}
                      <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
-                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">    
+                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">
                         <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="{{node.mime_type}}">    
+                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">
+                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="{{node.mime_type}}">
                         {% trans "Your browser does not support the video tag." %}
                       </video>
                     {% elif 'Pandora_video' in node.member_of_names_list %}
                       {% get_source_id node.pk as source_id %}
                       <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                        <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                        <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm">
                         {% trans "Your browser does not support the video tag." %}
-                      </video>  
+                      </video>
                     {% endif %}
-                             
 
-                <!-- End of slider --> 
+
+                <!-- End of slider -->
               {% else %}
                   {% if 'audio' in node.mime_type %}
                     <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
@@ -228,18 +228,18 @@
                     {% elif 'pdf' in node.mime_type %}
                         <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                         <br/>
-                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">  
+                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                           <center>
                             <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">{% trans 'View in full screen' %}
-                             <i class="fi-projection-screen"> </i>   
+                             <i class="fi-projection-screen"> </i>
                             </figcaption>
-                          </center>                
+                          </center>
                         </a>
                   {% else %}
                     <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                       {{ grid_fs_obj.filename }}
                     </a>
-                  {% endif %}       
+                  {% endif %}
               {% endif %}
               <!-- end of if 'image' in node.mime_type ... -->
 
@@ -259,10 +259,10 @@
                 <div class="show-image">
                   <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
                     <img  src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;" />
-                    
+
                   </a>
                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
-                      <a  target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">  
+                      <a  target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                          View in Full Screen
                          <i class="fi-projection-screen"> </i>
                     </figcaption>
@@ -272,16 +272,16 @@
               {% elif 'Pandora_video' in node.member_of_names_list %}
                 {% get_source_id node.pk as source_id %}
                 <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                  <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                  <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm">
                   {% trans "Your browser does not support the video tag." %}
-                </video>  
+                </video>
               {% elif 'video' in node.mime_type %}
 
               {% comment "commented getting video from wetube" %}
                 {% get_source_id node.pk as source_id %}
                 {% if source_id %}
                             <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                              <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                              <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm">
                               {% trans "Your browser does not support the video tag." %}
                             </video>
                 {% else %}
@@ -290,8 +290,8 @@
                 <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
                   <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">
                   <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="{{node.mime_type}}">    
+                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">
+                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="{{node.mime_type}}">
                   {% trans "Your browser does not support the video tag." %}
                 </video>
               {% elif 'audio' in node.mime_type %}
@@ -310,17 +310,17 @@
                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                       {% trans 'View in full screen' %} <i class="fi-projection-screen"> </i><a>
                    </figcaption>
-                </center> 
-                  
+                </center>
+
                 </a>
 
 
               {% elif 'epub' in node.mime_type %}
                 {% comment %}
-                  
+
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
-               
+
                 <div class="row" style="margin-top:-0.1em;">
                   <h4 class="small-4 columns redirection" onclick="Book.prevPage();">
                     <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
@@ -330,11 +330,11 @@
                     <small>Next <i class="fi-arrow-right"></i></small>
                   </h4>
                 </div>
-                
+
                 <div class="row ebook-container border-thin-lightgray">
                   <div class="small-12 columns" id="ebook-area"></div>
                 </div>
-                
+
                 <div class="row">
                   <h4 class="small-4 columns redirection" onclick="Book.prevPage();">
                     <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
@@ -346,7 +346,7 @@
                   <h4 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
                     <small>Next <i class="fi-arrow-right"></i></small>
                   </h4>
-                  
+
                 </div>
                   <!-- <p class="large-text-right"><small>
                   <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}
@@ -399,7 +399,7 @@
                   // });
                 </script>
                 {% endcomment %}
-                
+
               {% else %}
                 <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   {{ grid_fs_obj.filename }}
@@ -411,7 +411,7 @@
 
               {% endif %}
             {% endcomment %}
-                
+
 
             {% if user.is_authenticated %}
               {% comment %}
@@ -419,7 +419,7 @@
                 <a class="button small secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
               {% elif 'video' in node.mime_type %}
               {% endcomment %}
-            
+
             {% endif %}
           {% endif %}
             {% if "QuizItemEvent" in node.member_of_names_list %}
@@ -437,7 +437,7 @@
           {% for tab_name, tab_fields_list in property_order_list %}
             {% for field in tab_fields_list %}
             <div class="row">
-              <div class="small-3 columns"> 
+              <div class="small-3 columns">
                 <label>{{field.altnames}}</label>
               </div>
               <div class="small-7 end columns">
@@ -459,7 +459,7 @@
             <br>
             {% endfor %}
           {% endfor %}
-        
+
           <!-- <div id="commentable-area"> -->
           {% if "QuizItemEvent" not in node.member_of_names_list %}
           <div>
@@ -470,65 +470,64 @@
             {% endwith %}
           </div>
           {% endif %}
-        
 
-     {% if not topic and not is_group %} 
-             <div>  
+
+     {% if not topic and not is_group %}
+             <div>
                <small class="text-gray">
                   [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
-                </small> 
+                </small>
                 </br>
-          {% if user.is_authenticated %}  
-           
-            {% if node.mime_type %}    
+          {% if user.is_authenticated %}
+
+            {% if node.mime_type %}
               {% if 'video' in node.mime_type  %}
                 <a class="button tiny" title="Click here to Download" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
               {% else %}
                 <a class="button tiny" title="Click here to Download" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
               {% endif %}
-                  Download 
+                  Download
                 </a>
-               
+
                {% get_gstudio_social_share_resource as social_share %}
                   {% if social_share %}
                     <span>
                         <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
                         <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
                         </a>
-                      </span>  
+                      </span>
                   {% endif %}
               {% endif %}
-         
+
           {%  else %}
-            {% if node.mime_type %}    
+            {% if node.mime_type %}
               {% if 'video' in node.mime_type  %}
                 <a class="button tiny disabled secondary" title="Please login to download" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
               {% else %}
                 <a class="button tiny disabled secondary" title="Please login to download" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
               {% endif %}
-                  Download 
+                  Download
                 </a>
-               
+
                {% get_gstudio_social_share_resource as social_share %}
                   {% if social_share %}
                     &nbsp;<span>
                         <a title="Please login to share on Facebook" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l" target="_blank">
                         <img src="/static/ndf/images/Facebook_logo.png"  width="35px">
                         </a>
-                      </span>  
+                      </span>
                   {% endif %}
               {% endif %}
-          
-          {% endif %}           
+
+          {% endif %}
               </div>
        {% endif %}
-          
 
-         {% get_list_of_fields node.type_of "name" as type_of_list %}
+          {% get_list_of_fields node.type_of "name" as type_of_list %}
           {% if "Info page" not in type_of_list %}
               {% if not no_discussion %}
                 <!-- Discussion -->
-                <div class="content columns" id="view-discussion" >
+                <div class="content large-6 columns" id="view-discussion" >
                   <!-- discussion content area -->
                   {% if node.discussion_enable %}
                     {% get_thread_node node.pk as thread_node %}
@@ -536,18 +535,18 @@
                         {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
                         {% get_node thread_node as thread_node_obj %}
                         {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
-                    {% else %}            
+                    {% else %}
                         {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
                         {% include 'ndf/in-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
                     {% endif %}
                   {% endif %}
 
-                  <!-- END of discussion content area -->     
+                  <!-- END of discussion content area -->
                 </div>
               {% endif %}
           <br/>
           {% endif %}
-          
+
           <div>
             {% get_grid_fs_object each_node as grid_fs_obj %}
             {% if "Group" in node.member_of_names_list %}
@@ -557,10 +556,10 @@
               {% for key, value in objvalue.items %}
               <tr>
                 {% if key == "Website" %}
-                <td align ="left"> {{key}}</td>  
+                <td align ="left"> {{key}}</td>
                 <td align = "right"><a href="{{value}}">{{value}}</a> </td>
                 {% else %}
-                <td align ="left"> {{key}}</td>  
+                <td align ="left"> {{key}}</td>
                 <td align = "right">{{value}}</td>
                 {% endif %}
               </tr>
@@ -570,7 +569,7 @@
             {% endif %}
           </div>
         </div>
-        
+
         {% if topic %}
           <div id="topic-resources">
           {% include "ndf/topic_resources_listing.html" %}
@@ -587,7 +586,7 @@
 
           <!-- Content for Concept Graph -->
           {% comment %}
-            
+
           <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
             <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
             {% include "ndf/graph_concept.html" %}
@@ -597,10 +596,10 @@
 
           <div id="view-levels" style="display:none;">
           </div>
-          
+
           <!-- Content for Collection Graph -->
           {% if node.collection_set %}
-            <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+            <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>
               <a class="close-reveal-modal">&#215;</a>
               {% include "ndf/graph_collection.html" %}
             </div>
@@ -608,12 +607,12 @@
 
           <!-- Content for dependency Graph -->
           {% if node.prior_node %}
-            <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+            <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>
              <a class="close-reveal-modal">&#215;</a>
              {% include "ndf/graph_dependency.html" %}
             </div>
           {% endif %}
-          
+
         {% endif %}
           <!-- Tab View Map Widget -->
         {% if node.location %}
@@ -638,19 +637,19 @@
             <dd class="accordion-navigation">
               <!-- Title-1 -->
               <a href="#panel1a" style="font-color:blue"> {% trans 'Overview' %}</a>
-              
+
               <!-- Content-1 -->
               <div id="panel1a" class="content active">
               <table id="panel1a" align ="center" style="width:80%; border-width:0px; height: 200px; display: block;overflow-y: scroll;">
                 <tbody>
-         
+
                 {% get_json node.pk as jsonobj %}
                 {% str_to_dict jsonobj as obj %}
                 {% for key, value in obj.items %}
                 <tr>
                 {% if key != "attribute_set" and key != "relation_set" and key != "collection_set" %}
                 <td align ="left"><strong>{{key|del_underscore|title}}</strong></td>
-                <td align = "right"> 
+                <td align = "right">
                 {% if "None" not in value %}
                 {% if key|is_in:"attribute_set, file_size, relation_set" %}
 
@@ -665,12 +664,12 @@
                 {{value}}
                 {% endif %}
                 </td>
-                {% else %}       
+                {% else %}
                 Not set</td>
                 {% endif %}
                 </tr>
                 {% endif %}
-                {% endfor %}      
+                {% endfor %}
                 </tbody>
               </table>
               </div>
@@ -680,7 +679,7 @@
             <dd class="accordion-navigation">
               <!-- Title-2 -->
               <a href="#panel2a">{% trans 'Collection Set' %}</a>
-    
+
               <!-- Content-2 -->
               <div id="panel2a" class="content">
               {% get_json node.pk as jsonobj %}
@@ -713,7 +712,7 @@
             <dd class="accordion-navigation">
               <!-- Title-3 -->
               <a href="#panel3a">{% trans 'Attribute Set' %}</a>
-    
+
               <!-- Content-3 -->
               <div id="panel3a" class="content">
               {% get_json node.pk as jsonobj %}
@@ -733,7 +732,7 @@
               </table>
               {% endif %}
               {% endif %}
-              {% endfor %}    
+              {% endfor %}
               {% for key, value in obj.items %}
               {% if key == "attribute_set" and "None" in value %}
               {% blocktrans %} No Attributes associted with {{node.name}} resource {% endblocktrans %}.
@@ -746,7 +745,7 @@
             <dd class="accordion-navigation">
               <!-- Title-4 -->
               <a href="#panel4a"> {% trans 'Relation Set' %}</a>
-    
+
               <!-- Content-4 -->
               <div id="panel4a" class="content">
               {% get_json node.pk as jsonobj %}
@@ -785,7 +784,7 @@
             <div class="small-6 columns">
               <a href="#" data-options="align:right; is_hover:true" data-dropdown="clearing_house" aria-controls="clearing_house" data-reveal-id="cl_house_modal" aria-expanded="false" class="button secondary medium"> {% trans 'Manage Clearing House' %}&nbsp;&nbsp;&raquo;</a><br/>
               <ul id="clearing_house" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                <li><a data-reveal-id="approver" class="approvers">{% trans 'Manage Approvers' %}</a></li>    
+                <li><a data-reveal-id="approver" class="approvers">{% trans 'Manage Approvers' %}</a></li>
                 <li><a href="#">{% trans 'Manage Curators' %}</a></li>
                 <li><a href="#">{% trans 'Manage Group Admins' %}</a></li>
               </ul>
@@ -794,7 +793,7 @@
                 <a class="close-reveal-modal" aria-label="Close">&#215;</a>
               </div>
 
-              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_partners" aria-controls="manage_partners" aria-expanded="false" class="button secondary medium">{% trans 'Manage Partners' %}&nbsp;&nbsp;&raquo;</a><br/> 
+              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_partners" aria-controls="manage_partners" aria-expanded="false" class="button secondary medium">{% trans 'Manage Partners' %}&nbsp;&nbsp;&raquo;</a><br/>
               <ul id="manage_partners" data-dropdown-content class="f-dropdown" aria-hidden="true">
                 <li><a href="#">{% trans 'Manage Partner Admins' %}</a></li>
                 <li><a href="#">{% trans "Manage Partner MOU's" %}</a></li>
@@ -837,24 +836,24 @@
         {% endcomment %}
         <!-- /////////////////// -->
 
-        
+
       </div><!-- end of tab's content -->
-      
+
       {% check_group node.pk as is_group %}
       {% if is_group %}
         {% if subgroups_cur %}
           <div >
           <section class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
             {% for subgroup_node in subgroups_cur %}
-              <li class="card-image-wrapper"> 
+              <li class="card-image-wrapper">
                 {% include 'ndf/simple_card.html' with resource=subgroup_node has_prof_pic=True url_name="groupchange" first_arg=subgroup_node.pk no_checkbox=True %}
               </li>
             {% comment %}
-                
+
             {% empty %}
               <div class="row">
                 <div class="small-12 columns">
-                  <h5> 
+                  <h5>
                   No Subgroups Found!
                   </h5>
                 </div>
