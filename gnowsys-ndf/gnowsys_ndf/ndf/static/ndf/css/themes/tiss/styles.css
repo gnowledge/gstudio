@@ -17120,38 +17120,120 @@ div.show-image:hover div.fullscreen-icon{
     color: #262626;
     word-wrap: break-word; }
 
-#envelop-cover .course-page-title {
-  font-size: 35px;
-  font-weight: 500;
-  padding-right: 0.3em;
-  padding-left: 0.3em; }
-  #envelop-cover .course-page-title span a {
-    font-size: 15px;
-    color: #737373; }
-    #envelop-cover .course-page-title span a i {
-      font-size: 18px; }
-#envelop-cover .heading {
-  letter-spacing: -1.2px;
-  font-weight: 400; }
-#envelop-cover .meta {
-  line-height: 2.1em;
-  padding-left: 14px; }
-  #envelop-cover .meta .key {
-    color: #A7A4A4;
+/* Large desktop */
+@media (min-width: 34em) {
+  .container {
+    max-width: 34rem;
+    margin: 0px auto; } }
+/* Large desktop */
+@media (min-width: 48em) {
+  .container {
+    max-width: 45rem;
+    margin: 0px auto; } }
+/* Large desktop */
+@media (min-width: 62em) {
+  .container {
+    max-width: 60rem;
+    margin: 0px auto; } }
+/* Large desktop */
+@media (min-width: 75em) {
+  .container {
+    max-width: 72.25rem;
+    margin: 0px auto; } }
+#envelop-cover {
+  background: #9900ff;
+  height: 250px; }
+  #envelop-cover .course-page-header {
+    font-size: 35px;
     font-weight: 500;
-    font-size: 13px;
-    text-transform: uppercase;
-    display: inline-block;
-    vertical-align: top;
-    margin-right: 10px; }
-  #envelop-cover .meta .value {
-    display: inline-block; }
-    #envelop-cover .meta .value .name {
-      color: #000; }
-    #envelop-cover .meta .value .time {
+    padding-right: 0.3em;
+    padding-left: 0.3em;
+    position: relative;
+    height: 250px;
+    color: #fff; }
+    #envelop-cover .course-page-header label {
+      color: #fff; }
+    #envelop-cover .course-page-header .course-header-background, #envelop-cover .course-page-header .course-header-background-layer {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      height: 250px; }
+      #envelop-cover .course-page-header .course-header-background img, #envelop-cover .course-page-header .course-header-background-layer img {
+        width: 100%;
+        height: 250px; }
+    #envelop-cover .course-page-header .course-header-background-layer {
+      background-color: rgba(0, 0, 0, 0.5);
+      opacity: 0.6; }
+    #envelop-cover .course-page-header .course-settings {
+      margin-left: 15px; }
+      #envelop-cover .course-page-header .course-settings a {
+        font-size: 15px;
+        color: #737373; }
+        #envelop-cover .course-page-header .course-settings a:first-child {
+          background: rgba(50, 50, 50, 0.5);
+          padding: 7px 12px;
+          color: #fff;
+          border: 1px solid #999;
+          font-size: 12px;
+          margin: 0px; }
+    #envelop-cover .course-page-header span a {
+      font-size: 15px;
+      color: #737373; }
+      #envelop-cover .course-page-header span a i {
+        font-size: 18px; }
+  #envelop-cover .heading {
+    letter-spacing: -1.2px;
+    font-weight: 400; }
+  #envelop-cover .meta {
+    line-height: 2.1em;
+    padding-left: 14px; }
+    #envelop-cover .meta .key {
+      color: #A7A4A4;
+      font-weight: 500;
       font-size: 13px;
-      font-weight: 300;
-      color: #000; }
+      text-transform: uppercase;
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 10px; }
+    #envelop-cover .meta .value {
+      display: inline-block; }
+      #envelop-cover .meta .value .name {
+        color: #000; }
+      #envelop-cover .meta .value .time {
+        font-size: 13px;
+        font-weight: 300;
+        color: #000; }
+  #envelop-cover .course-tabs {
+    border: 0 solid silver;
+    border-width: 0px 0px 0px 0px;
+    margin-left: 1em;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%; }
+    #envelop-cover .course-tabs .tab-title {
+      border: 0 solid silver;
+      border-width: 0 0 0px 0px;
+      background: #DEDEDE;
+      border-radius: 10px 10px 0px 0px;
+      margin-right: 0.4em;
+      float: none !important;
+      display: inline-block; }
+      #envelop-cover .course-tabs .tab-title a {
+        color: #2B91EA;
+        border-radius: inherit;
+        margin: 0px 4px;
+        font-size: 15px;
+        letter-spacing: -0.3px; }
+      #envelop-cover .course-tabs .tab-title.active {
+        border-width: 0px 0px 0px 0px;
+        background: #FFFFFF; }
+        #envelop-cover .course-tabs .tab-title.active a {
+          color: #000; }
 
 .note-tags a {
   background: #ffebb2;
@@ -17186,30 +17268,6 @@ div.show-image:hover div.fullscreen-icon{
 #envelop-content {
   margin-top: 20px;
   /* For accordian in the mobile view*/ }
-  #envelop-content .course-tabs {
-    border: 0 solid silver;
-    border-width: 0px 0px 0px 0px;
-    margin-left: 1em;
-    text-align: center; }
-    #envelop-content .course-tabs .tab-title {
-      border: 0 solid silver;
-      border-width: 0 0 0px 0px;
-      background: #DEDEDE;
-      border-radius: 10px 10px 0px 0px;
-      margin-right: 0.4em;
-      float: none !important;
-      display: inline-block; }
-      #envelop-content .course-tabs .tab-title a {
-        color: #2B91EA;
-        border-radius: inherit;
-        margin: 0px 4px;
-        font-size: 15px;
-        letter-spacing: -0.3px; }
-      #envelop-content .course-tabs .tab-title.active {
-        border-width: 0px 0px 0px 0px;
-        background: #FFFFFF; }
-        #envelop-content .course-tabs .tab-title.active a {
-          color: #000; }
   #envelop-content .accordion {
     margin-left: 0px; }
     #envelop-content .accordion .accordion-navigation a {
