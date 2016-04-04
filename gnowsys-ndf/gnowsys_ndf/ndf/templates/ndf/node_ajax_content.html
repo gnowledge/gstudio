@@ -181,12 +181,11 @@
           </div>
           {% endcomment %}    
           <!-- Code for showing media details -->
-          {% if node.mime_type or node.collection_set %}
-
+          {% if node.mime_type  %}
+            here
             {% get_grid_fs_object node as grid_fs_obj %}
 
             <!-- commenting following block which shows slider if resource is collection of all images/videos/audios -->
-
               
             {% if node.collection_set  %} 
                <ul data-orbit data-options="variable_height: true;timer:false;">
@@ -257,21 +256,24 @@
                     {% endif %} 
 
                   {% endfor %}
-                </ul>                
+                </ul>   
               <!-- end of if 'image' in node.mime_type ... -->
 
 
             <!-- END of commenting following block which shows slider if resource is collection of all images/videos/audios -->
 
 
+              {% endif %}             
               <!-- not a collection -->
-              {% elif not topic %}
+              {% if not topic %}
                 <h3 class="text-gray">{{node.name}}:</h3>
-
-              {% elif 'image' in node.mime_type %}
+              {% endif %}
+              
+              {% if 'image' in node.mime_type  and not node.collection_set %}
+              
                <center>
                 <div class="show-image">
-                  <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
+                  <a class="th {% if node.collection_set %}collection-exists{% endif %}" data-oid="{{node.pk|safe}}">
                     <img  src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;" />
 
                   </a>
