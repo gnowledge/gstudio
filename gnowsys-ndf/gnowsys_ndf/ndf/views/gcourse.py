@@ -2041,8 +2041,8 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
             coll_file_cur.append(each)
         
 
-        # raw_material_page_info = paginator.Paginator(coll_file_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-        context_variables.update({'coll_file_cur':coll_file_cur})
+    raw_material_page_info = paginator.Paginator(coll_file_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    context_variables.update({'coll_file_cur':coll_file_cur})
     # print "\n\n\n\n **course_raw_page_info",course_raw_page_info
     gstaff_access = check_is_gstaff(group_id,request.user)
 
