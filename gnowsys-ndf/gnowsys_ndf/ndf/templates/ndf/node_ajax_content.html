@@ -181,8 +181,7 @@
           </div>
           {% endcomment %}    
           <!-- Code for showing media details -->
-          {% if node.mime_type  %}
-            here
+          {% if node.mime_type  or node.collection_set %}
             {% get_grid_fs_object node as grid_fs_obj %}
 
             <!-- commenting following block which shows slider if resource is collection of all images/videos/audios -->
@@ -291,7 +290,7 @@
                   <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm">
                   {% trans "Your browser does not support the video tag." %}
                 </video>
-              {% elif 'video' in node.mime_type %}
+              {% elif 'video' in node.mime_type and not node.collection_set %}
 
               {% comment "commented getting video from wetube" %}
                 {% get_source_id node.pk as source_id %}
@@ -310,15 +309,15 @@
                   <source src="{% url 'getFullvideo' group_name_tag node %}" type="{{node.mime_type}}">
                   {% trans "Your browser does not support the video tag." %}
                 </video>
-              {% elif 'audio' in node.mime_type %}
+              {% elif 'audio' in node.mime_type and not node.collection_set %}
                 <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
                   <p>{% trans 'Your browser does not support the audio element' %} </p>
                 </audio>
-              {% elif 'html' in node.mime_type %}
+              {% elif 'html' in node.mime_type and not node.collection_set %}
                 <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   <p>{% trans 'Your browser does not support the audio element' %} </p>
                 </iframe>
-              {% elif 'pdf' in node.mime_type %}
+              {% elif 'pdf' in node.mime_type and not node.collection_set %}
                 <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                 <br/>
                 <center>
@@ -331,7 +330,7 @@
                 </a>
 
 
-              {% elif 'epub' in node.mime_type %}
+              {% elif 'epub' in node.mime_type and not node.collection_set %}
                 {% comment %}
 
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>

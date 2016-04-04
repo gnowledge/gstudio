@@ -102,29 +102,29 @@
                   {% endif %}
                   {% endif %}
                 
-                    <div class="small-12 medium-10 columns gallery-actions" >
-                        <div class="create-note">
+                    <div class="small-12 medium-10 columns gallery-actions" style="display:none" >
+                        <div class="create-note " id="create-note">
                          <a style="margin: 0em 0em 1em;">
                             <i class="fi-page-edit"></i>
                             <span> Create note</span>
                         </a>
                         </div>
-                        <div class="create-collection">
+                        <div class="create-collection " id="create-collection">
                             <i class="fi-folder"></i>
                             <span> Create new collection</span>
                         </div>
-                        <div class ="add-to-collection">
+                        <div class ="add-to-collection " id="add-to-collection">
                             <i class="fa fa-plus"></i>
                             <span>Add to collection</span>
                         </div>
-                        <div class="download-file hide">
+                        <!-- <div class="download-file hide">
                             <i class="fi-download"></i>
                             <span> Download</span>
                         </div>
                         <div class="hide">
                             <i class="fi-info "></i>
                             <span>View info</span>
-                        </div>
+                        </div> -->
                     </div>
                      <div id="create_collection_model" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
                     </div>
@@ -136,7 +136,7 @@
                 
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
-                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer=True no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
+                        {% include 'ndf/simple_card.html' with resource=each_img   no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
                     </li>
                 {% endfor %}
                 </ul>
@@ -234,11 +234,16 @@
      $(document).on('change','.filenode',function(){
 
         var checked = $('.filenode:checked').length;
-        if (checked>1){
-          $(".collection-area").css("display", "block");          
+        if (checked > 1){
+          $(".gallery-actions").css("display", "block");          
+          //$(".create-collection").css("display", "block");          
+          //$(".add-to-collection").css("display", "block");          
         }
         else{
-          $(".collection-area").css("display", "none");          
+          $(".gallery-actions").css("display", "none");          
+          // $(".create-note").css("display", "none");          
+          // $(".create-collection").css("display", "none");          
+          // $(".add-to-collection").css("display", "none");          
         }
         
     });
