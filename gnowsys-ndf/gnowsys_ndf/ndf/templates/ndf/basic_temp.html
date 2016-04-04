@@ -5,17 +5,13 @@
 {%block title %} Basic Template {% endblock %}
 
 {% block body_content %}
-{# hello world #}	
-
-{# {{node}} #}
-{# {{basic_list}} #}
 
 <script type="text/javascript" src="/static/ndf/bower_components/tipped-4.5.5-light/tipped.js"></script>
 <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/tipped-4.5.5-light/tipped.css" />
-
-<form method="post" action="" name="{{node_gs.name}}" id="{{node_gs.name}}">
-{% csrf_token %}
-
+<!--
+<form method="post" action="{% url 'type_created' groupid %}" name="{{node_gs.name}}" id="{{node_gs.name}}"> -->
+<form method="post" action=" " name="{{node_gs.name}}" id="{{node_gs.name}}">
+{% csrf_token %} 
 
 <table>
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
@@ -29,10 +25,6 @@
             <font size="3"> {{e}}  </font> 
         </div></td>
         <td> 
-
-
-        {# {{ gs_struc|get_dict_item:e }} #}
-        {# {{gs_struc}} #}
         {% fetch_req_fields gs_struc|get_dict_item:e e %} 
 
         </td></tr>
@@ -43,14 +35,15 @@
         <tr><td>
         {% trans "AttributeType "%}
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} : {{each.data_type}} </font> 
+           <font size="3"> {% firstof each.altnames each.name %} : {{each.data_type}}
+           {{each.complex_data_type}} </font> 
         
         </div></td>
 
         <!-- field_name {{each.name}}  field_value field_type {{each.data_type}}  -->
         <!-- This ndf tag ats_fields is done to fetch the attribute_type_set. donot replace this with html_widget tag cause it will not allow it to be saved. The field 'value' in the dict is not present as it is fetched directly from the database  -->
 
-        <td>{% ats_fields each.data_type each.name %}
+        <td>{% ats_fields each.data_type each.name groupid each.complex_data_type %}
 
         </td></tr>
         {% endfor %}
@@ -69,26 +62,15 @@
         <input type="text"/> </td></tr>
         {% endfor %}
     </div>
-
-    <div style="display:table-row;">
-        {% for each in rts %}
-        <tr>
-            <td>
-        {% trans "RelationType "%}
-        <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} : </font> 
-        </div></td>
-        <td>
-        <input type="text"/> </td></tr>
-        {% endfor %}
-    </div>
+    
+    <!--        {% trans "RelationType "%}  -->
     <div style="display:table-row;">
         {% for each in f_rts_object_dict %}
+        <div id="{{each.name}}">
         <tr>
             <td>
-        {% trans "RelationType "%}
         <div style="display:table-cell;"> 
-           <font size="3"> {{each.name}} : </font> 
+           <font size="3"> {% firstof each.altnames each.name %} </font> 
         </div></td>
         <td>
             <select name="each.name">
@@ -103,15 +85,19 @@
 
 
         </td></tr>
+        </div>
         {% endfor %}
     </div>
+
+    <!-- {% trans "PossibleRelationType "%}     -->
     <div style="display:table-row;">
         {% for each in f_pos_rts_object_dict %}
+        <div id="{{each.name}}">
         <tr>
             <td>
-        {% trans "PossibleRelationType "%}
+         {{each.name}}
         <div style="display:table-cell;"> 
-           <font size="3"> {{ each.name }} </font> 
+           <font size="3"> {% firstof each.altnames each.name %} </font> 
         </div></td>
         <td>
             <select name="each.name">
@@ -124,6 +110,7 @@
             {% endfor %}
             </select>
         </td></tr>
+        </div>
         {% endfor %}
     </div>
 
@@ -137,9 +124,29 @@
 </form>
 
 {% endblock %}
+<script type="text/javascript">
+$("form").submit(function(event) {
 
+    
+});
+</script>
 
     <!-- the loop below is for the items directly fetched from the models.
+    <div style="display:table-row;">
+        {% for each in rts %}
+        <tr>
+            <td>
+        {% trans "RelationType "%}
+        <div style="display:table-cell;"> 
+           <font size="3"> {% firstof each.altnames each.name %} : </font> 
+        </div></td>
+        <td>
+        <input type="text"/> </td></tr>
+        {% endfor %}
+    </div>
+
+
+
     <div style="display:table-row;">
         {% for key,value in pos_rts.iteritems %}
         <tr><td>
