@@ -1503,6 +1503,20 @@ class GSystem(Node):
         return mime_type
 
 
+    def get_file(self, md5_or_relurl=None):
+
+        file_blob = None
+
+        try:
+            if md5_or_relurl:
+                file_blob = gfs.open(md5_or_relurl)
+        except Exception, e:
+                print "File '", md5_or_relurl, "' not found: ", e
+
+        return file_blob
+
+
+
 @connection.register
 class Filehive(DjangoDocument):
     """
