@@ -1,0 +1,116 @@
+{% block head %}
+  <script src="/static/ndf/bower_components/pace/pace.js"></script>
+  <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
+{% endblock %}
+
+<div class="pre-analytics-msg-div text-center">
+    Your analytics is loading. Please wait.
+</div>
+<div class="analytics-div hide">
+    <fieldset class="interactions">
+        <legend>
+            Interactions
+        </legend>
+        <div>
+            <small>Comments by me: </small>
+            <small class="total_cmnts_by_user"></small>
+        </div>
+        <div>
+            <small>Comments for ME: </small>
+        </div>
+    </fieldset>
+
+    <fieldset class="gallery">
+        <legend>
+            Gallery Uploads
+        </legend>
+        <div>
+            <small>Files Created: </small>
+            <small class="user_files"></small>
+            <small>Visits Gained: </small>
+            <small class="other_viewing_my_files"></small>
+            <small>Comments Received: </small>
+            <small class="cmts_on_user_files"></small>
+            <small>Comments by Unique Users: </small>
+            <small class="unique_users_commented_on_user_files"></small>
+        </div>
+        <div>
+            <small>Commented on Others Files: </small>
+            <small class="commented_on_others_files">100</small>
+             <small>Others Files visited: </small>
+            <small class="total_files_viewed_by_user"></small>
+
+        </div>
+    </fieldset>
+
+    <fieldset class="quiz">
+        <legend>
+            Quiz Performance
+        </legend>
+        <div>
+            <small>Questions Attempted: </small>
+            <small class="attempted_quizitems"></small>
+            <small>Total Questions: </small>
+            <small class="total_quizitems"></small>
+        </div>
+        <div>
+            <small>Correct Answers: </small>
+            <small class="correct_attempted_quizitems"></small>
+            <small>InCorrect Answers: </small>
+            <small class="incorrect_attempted_quizitems"></small>
+        </div>
+    </fieldset>
+
+    <fieldset class="notes">
+        <legend>
+            Note Making
+        </legend>
+        <div>
+            <small >Notes written: </small>
+            <small class="user_notes"></small>
+            <small >Views Gained: </small>
+            <small class="others_reading_my_notes"></small>
+            <small >Comments Received: </small>
+            <small class="cmts_on_user_notes"></small>
+            <small >Comments by Unique Users: </small>
+            <small class="unique_users_commented_on_user_notes"></small>
+        </div>
+        <div>
+            <small>Other Notes viewed: </small>
+            <small class="total_notes_read_by_user"></small>
+            <small>Commented on Others Notes: </small>
+            <small class="commented_on_others_notes"></small>
+        </div>
+    </fieldset>
+</div>
+
+<script type="text/javascript">
+   
+    $(document).ready(function() {
+
+        $.ajax({
+            url: "{% url 'course_analytics' group_id %}",
+
+            type: "GET",
+
+            dataType: "html",
+            global: false,
+            beforeSend: function(){
+
+            },
+
+            success: function(data){
+                data = JSON.parse(data)
+                $.map( data, function( val, i ) {
+                    $("."+i)
+                        .text(val)
+                        .css('font-weight', 'bold')
+                        .css("font-size", "20px")
+                });
+                $(".analytics-div").removeClass("hide")
+                $(".pre-analytics-msg-div").addClass("hide")
+            },
+        });//end of ajax
+    })
+
+</script>
