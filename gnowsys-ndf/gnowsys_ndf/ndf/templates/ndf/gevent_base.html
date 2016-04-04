@@ -220,7 +220,8 @@ list-style: none;
     <div class="tabs-content course-book">
       <div class="content active" id="course-dashboard">
         {% if title == 'dashboard' %}
-          {% include "ndf/gcourseDashboard.html" %}
+          {# {% include "ndf/gcourseDashboard.html" %} #}
+          {% include "ndf/course_analytics.html" %}
 
         {% elif title == 'course content' %}
           {% include "ndf/gcollection_ajax_view.html" %}
