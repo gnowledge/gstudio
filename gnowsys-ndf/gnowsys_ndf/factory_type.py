@@ -210,10 +210,10 @@ factory_relation_types = [
         }
     },
     
-    {'has_Banner_pic': {
-            'subject_type':['Author','Group'],
+    {'has_banner_pic': {
+            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup'],
             'object_type':['Image'], 
-            'inverse_name':'profile_pic_of', 
+            'inverse_name':'banner_pic_of', 
             'meta_type':'factory_types'
         }
     }, 
