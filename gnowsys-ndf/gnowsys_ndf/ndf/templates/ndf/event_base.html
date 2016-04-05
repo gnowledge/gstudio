@@ -6,7 +6,7 @@
 
 {% block style %}
   .course_outline_table, tr {
-    border: 2px solid #0b8a91 !important;
+    border: 2px solid #0b8a91;
     border-collapse: collapse;
   }
 
@@ -156,7 +156,7 @@
 			            </div>
 			            <div class="row all_blogs small-block-grid-1 medium-block-grid-2 large-block-grid-5">
 			            	{% for each_blog in blog_pages %}
-                      <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px"> 
+                      <li class="card-image-wrapper" style="margin-top:13px;margin-left:-10px">
                         {% include 'ndf/simple_card.html' with resource=each_blog has_contributor=True no_description=True no_checkbox=True url_name="page_details" first_arg=group_id second_arg=each_blog.pk %}
                       </li>
 
