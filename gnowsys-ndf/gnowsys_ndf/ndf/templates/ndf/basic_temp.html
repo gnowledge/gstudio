@@ -19,10 +19,10 @@
 <font size="5"> {{node_gs.name}} </font> 
 
     <div style="display:table-row;">
-    	{% for e in basic_list %}
+    	{% for e,f in basic_list.iteritems %}
     	<tr><td>
         <div style="display:table-cell;" >
-            <font size="3"> {{e}}  </font> 
+            <font size="3"> {{f}} : </font> 
         </div></td>
         <td> 
         {% fetch_req_fields gs_struc|get_dict_item:e e %} 
@@ -33,10 +33,9 @@
     <div style="display:table-row;">
         {% for each in ats %}
         <tr><td>
-        {% trans "AttributeType "%}
+        <!-- {% trans "AttributeType "%} -->
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} : {{each.data_type}}
-           {{each.complex_data_type}} </font> 
+           <font size="3"> {% firstof each.altnames each.name %} : </font> 
         
         </div></td>
 
@@ -54,9 +53,9 @@
         {% for each in final_ats %}
         <tr>
             <td>
-        {% trans "PossibleAttributeType "%}
+        <!--   {% trans "PossibleAttributeType "%} -->
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} {{each.data_type}} </font> 
+           <font size="3"> {% firstof each.altnames each.name %} : </font> 
         </div></td>
         <td>
         <input type="text"/> </td></tr>
@@ -70,20 +69,10 @@
         <tr>
             <td>
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} </font> 
+           <font size="3"> {% firstof each.altnames each.name %} : </font> 
         </div></td>
         <td>
-            <select name="each.name">
-            <option value="">select</option>
-            {% for value in each.object_type %}
-
-
-            <option value="{{value}}"> {{value}} </option>
-
-            {% endfor %}
-            </select>
-
-
+            {% rts_fields each.name each.object_type groupid %}
         </td></tr>
         </div>
         {% endfor %}
@@ -95,20 +84,11 @@
         <div id="{{each.name}}">
         <tr>
             <td>
-         {{each.name}}
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} </font> 
+           <font size="3"> {% firstof each.altnames each.name %} : </font> 
         </div></td>
         <td>
-            <select name="each.name">
-            <option value="">select</option>
-            {% for value in each.object_type %}
-
-
-            <option value="{{value}}"> {{value}} </option>
-
-            {% endfor %}
-            </select>
+            {% rts_fields each.name each.object_type groupid %}
         </td></tr>
         </div>
         {% endfor %}
