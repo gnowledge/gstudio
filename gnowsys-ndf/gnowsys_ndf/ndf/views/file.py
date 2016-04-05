@@ -37,8 +37,8 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id, get_language_tuple  # , get_page
-from gnowsys_ndf.ndf.views.methods import node_thread_access, create_thread_for_node
-
+from gnowsys_ndf.ndf.views.methods import node_thread_access, create_thread_for_node, create_grelation, delete_grelation
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -840,6 +840,8 @@ def submitDoc(request, group_id):
                         f = f[1]
                 fileobj = node_collection.one({'_id': ObjectId(f)})
                 thread_create_val = request.POST.get("thread_create",'')
+                help_info_page = request.POST.getlist('help_info_page','')
+                # print "\n\n help_info_page  === ", help_info_page
                 discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
                 if thread_create_val == "Yes":
                   create_gattribute(fileobj._id, discussion_enable_at, True)
@@ -847,6 +849,33 @@ def submitDoc(request, group_id):
                   return_status = create_thread_for_node(reaquest,group_id, fileobj)
                 else:
                   create_gattribute(fileobj._id, discussion_enable_at, False)
+
+                # print "\n\n help_info_page ================ ",help_info_page
+                if help_info_page and u"None" not in help_info_page:
+                  has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+                  try:
+                    help_info_page = map(ObjectId, help_info_page)
+                    create_grelation(fileobj._id, has_help_rt,help_info_page)
+                  except Exception as invalidobjectid:
+                    # print invalidobjectid
+                    pass
+                else:
+
+                  # Check if node had has_help RT
+                  grel_dict = get_relation_value(fileobj._id,"has_help")
+                  # print "\n\n grel_dict ==== ", grel_dict
+                  if grel_dict:
+                    grel_id = grel_dict.get("grel_id","")
+                    if grel_id:
+                      for each_grel_id in grel_id:
+                        del_status, del_status_msg = delete_grelation(
+                            subject_id=fileobj._id,
+                            node_id=each_grel_id,
+                            deletion_type=0
+                        )
+                        # print "\n\n del_status == ",del_status
+                        # print "\n\n del_status_msg == ",del_status_msg
+
 
             # print "=============== : ", f
             try:
@@ -1663,12 +1692,40 @@ def file_edit(request,group_id,_id):
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE),groupid=group_id)
 
         thread_create_val = request.POST.get("thread_create",'')
+        help_info_page = request.POST.getlist('help_info_page','')
+
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
           create_gattribute(file_node._id, discussion_enable_at, True)
           return_status = create_thread_for_node(request,group_id, file_node)
         else:
           create_gattribute(file_node._id, discussion_enable_at, False)
+
+        # print "\n\n help_info_page ================ ",help_info_page
+        if help_info_page and u"None" not in help_info_page:
+          has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+          try:
+            help_info_page = map(ObjectId, help_info_page)
+            create_grelation(file_node._id, has_help_rt,help_info_page)
+          except Exception as invalidobjectid:
+            # print invalidobjectid
+            pass
+        else:
+
+          # Check if node had has_help RT
+          grel_dict = get_relation_value(file_node._id,"has_help")
+          # print "\n\n grel_dict ==== ", grel_dict
+          if grel_dict:
+            grel_id = grel_dict.get("grel_id","")
+            if grel_id:
+              for each_grel_id in grel_id:
+                del_status, del_status_msg = delete_grelation(
+                    subject_id=file_node._id,
+                    node_id=each_grel_id,
+                    deletion_type=0
+                )
+                # print "\n\n del_status == ",del_status
+                # print "\n\n del_status_msg == ",del_status_msg
 
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             # To fill the metadata info while creating and editing file node

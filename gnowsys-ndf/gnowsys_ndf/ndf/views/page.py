@@ -33,9 +33,9 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string, node_thread_access
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id, create_thread_for_node
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id, create_thread_for_node,delete_grelation
 
-from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
+from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info, get_relation_value
 
 from gnowsys_ndf.mobwrite.diff_match_patch import diff_match_patch
 
@@ -344,6 +344,9 @@ def create_edit_page(request, group_id, node_id=None):
         # for the current page node.
         thread_create_val = request.POST.get("thread_create",'')
         # print "\n\n thread_create_val", thread_create_val
+        # print "\n\n request.POST === ",request.POST
+        # raise Exception("demo")
+        help_info_page = request.POST.getlist('help_info_page','')
 
         #program_res and res are boolean values
         if program_res:
@@ -390,6 +393,32 @@ def create_edit_page(request, group_id, node_id=None):
           return_status = create_thread_for_node(request,group_id, page_node)
         else:
           create_gattribute(page_node._id, discussion_enable_at, False)
+
+        # print "\n\n help_info_page ================ ",help_info_page
+        if "None" not in help_info_page:
+          has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+          try:
+            help_info_page = map(ObjectId, help_info_page)
+            create_grelation(page_node._id, has_help_rt,help_info_page)
+          except Exception as invalidobjectid:
+            # print invalidobjectid
+            pass
+        else:
+
+          # Check if node had has_help RT
+          grel_dict = get_relation_value(page_node._id,"has_help")
+          # print "\n\n grel_dict ==== ", grel_dict
+          if grel_dict:
+            grel_id = grel_dict.get("grel_id","")
+            if grel_id:
+              for each_grel_id in grel_id:
+                del_status, del_status_msg = delete_grelation(
+                    subject_id=page_node._id,
+                    node_id=each_grel_id,
+                    deletion_type=0
+                )
+                # print "\n\n del_status == ",del_status
+                # print "\n\n del_status_msg == ",del_status_msg
 
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
