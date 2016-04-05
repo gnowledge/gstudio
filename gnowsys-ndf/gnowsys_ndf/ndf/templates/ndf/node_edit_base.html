@@ -593,7 +593,7 @@
 
     <div class="content contents" id="panel-help" style="width:95%; display:none;" >      
       	<div class="row">
-		  	<h7>{% trans "Select help page for this resource"%} </h7>
+		  	<h7>{% trans "Select help page(s) for this resource from following options:"%} </h7>
 		</div>
 	    <div class="help-settings-div">
 			{% get_dict_from_list_of_dicts node.relation_set True as node_rel_set %}
@@ -1312,20 +1312,26 @@
 		var textValue = tags.value.trim();
 		// console.log(textValue.length);
 
-		if(textValue.length < 1){ return false; }
+		// if(textValue.length < 1){ return false; }
+		if(textValue.length > 0){ 
 
-		// re expression containing special characters
-		var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
+			// re expression containing special characters
+			var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
 
-		if(re.test(textValue))
-		{	// having special characters
-			$('#tags_error').removeClass("hide");
-			return false;
+			if(re.test(textValue))
+			{	// having special characters
+				$('#tags_error').removeClass("hide");
+				return false;
+			}
+			else
+			{	// passed the test and now add tag label
+				$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
+				return true;
+			}
 		}
-		else
-		{	// passed the test and now add tag label
-			$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
+		else{
 			return true;
+			//no tags added
 		}
 	}
 
@@ -1519,7 +1525,16 @@
 		{% endif %}
 	    updateAllTags();
 
+	    if(checkTag())
+	    {
+	    	var tagsStr = tags.value.trim();
 
+	    	$("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+	    }
+	    else
+	    {
+	    	event.preventDefault();
+	    }
 	});
 
 

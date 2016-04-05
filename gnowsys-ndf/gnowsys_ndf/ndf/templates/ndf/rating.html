@@ -24,7 +24,7 @@
         </span>
     </form>
         {% if node.rating %}
-            <span data-tooltip title="Average Rating: {{ratings.avg}}<br>No. of Users rated: {{node.rating|length}}" style="display: inline-block;vertical-align: super;">
+            <span data-tooltip title="Average Rating: {{ratings.avg}}<br>No. of Users rated: {{node.rating|length}}" style="display: inline-block;vertical-align: baseline;">
                 <label class="rating-lbl" style="font-size: 15px;color: #7D7D7D" id="avg-rating" >Avg. : &nbsp;{{ratings.avg|default:"unrated"}} {% trans ' by ' %}{{ node.rating|length }} <i class="fi-torsos"></i></label>
             </span>
         {% else %}
