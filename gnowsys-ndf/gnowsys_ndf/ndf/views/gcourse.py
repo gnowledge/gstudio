@@ -2083,10 +2083,31 @@ def course_about(request, group_id):
     
     template = 'ndf/gcourse_event_group.html'
 
+    banner_pic_obj = None
+    old_profile_pics = []
+    if not banner_pic_obj:
+        for each in group_obj.relation_set:
+            if "has_banner_pic" in each:
+                banner_pic_obj = node_collection.one(
+                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                )
+                break
+
+    has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            if n not in old_profile_pics:
+                old_profile_pics.append(n)
+
+    # print "\n\n prof_pic_obj" ,banner_pic_obj
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
-            'weeks_count': weeks_count
+            'weeks_count': weeks_count, "course_complete_percentage": course_complete_percentage,
+            "total_count":total_count, "completed_count":completed_count,
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
         })
     return render_to_response(template, context_variables)
 
