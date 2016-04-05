@@ -1980,7 +1980,15 @@ def ats_fields(fields_type, fields_name,groupid,complex_dt):
 	# 	print cmplx_dt, "+++++++++++++"
 
 	return {"fields_name":fields_name, "fields_type": fields_type,'groupid':groupid,
-	'complex_dt':complex_dt }
+	'complex_dt':complex_dt ,'gs_type':'attribute_set' }
+
+@get_execution_time
+@register.inclusion_tag('ndf/fetch_fields.html')
+def rts_fields(fields_name,fields_object_type,groupid):
+	return {"fields_name":fields_name, "groupid":groupid, "fields_object_type":fields_object_type 
+	,'gs_type':'relation_set'}
+
+
 
 
 @get_execution_time
