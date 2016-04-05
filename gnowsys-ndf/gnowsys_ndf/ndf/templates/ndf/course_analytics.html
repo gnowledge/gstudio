@@ -2,11 +2,27 @@
   <script src="/static/ndf/bower_components/pace/pace.js"></script>
   <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
 {% endblock %}
-
 <div class="pre-analytics-msg-div text-center">
     Your analytics is loading. Please wait.
 </div>
 <div class="analytics-div hide">
+
+    <fieldset class="modules-progress">
+        <legend>
+            Course Status
+        </legend>
+      <label class='module_progress_stmt'></label>
+      <div class="progress success round">
+          <div class="module_progress_meter meter"></div>
+      </div>
+
+      <label class='units_progress_stmt'></label>
+      <div class="progress success round">
+          <div class="unit_progress_meter meter"></div>
+      </div>
+
+    </fieldset>
+
     <fieldset class="interactions">
         <legend>
             Interactions
@@ -95,22 +111,29 @@
 
             dataType: "html",
             global: false,
-            beforeSend: function(){
-
-            },
 
             success: function(data){
                 data = JSON.parse(data)
+                // console.log(data)
                 $.map( data, function( val, i ) {
-                    $("."+i)
-                        .text(val)
-                        .css('font-weight', 'bold')
-                        .css("font-size", "20px")
+                    if(i == "module_progress_meter" || i == "unit_progress_meter"){
+                        $("."+i)
+                            .css("width",val+"%")
+                    }
+                    else{
+                        $("."+i)
+                            .text(val)
+                            .css('font-weight', 'bold')
+                            .css("font-size", "20px")
+                    }
                 });
                 $(".analytics-div").removeClass("hide")
                 $(".pre-analytics-msg-div").addClass("hide")
             },
         });//end of ajax
     })
+
+
+
 
 </script>
