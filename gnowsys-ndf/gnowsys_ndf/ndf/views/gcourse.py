@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from mongokit import IS
 from mongokit import paginator
 try:
@@ -36,7 +37,6 @@ from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_gro
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status
 from gnowsys_ndf.notification import models as notification
-
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
@@ -1864,7 +1864,9 @@ def course_content(request, group_id):
     group_id    = group_obj._id
     group_name  = group_obj.name
     result_status = course_complete_percentage = None
-    leaf_ids = completed_ids = incompleted_ids = course_complete_percentage = total_count = completed_count = None
+
+    leaf_ids = completed_ids = incompleted_ids = total_count = completed_count = None
+
     if request.user.is_authenticated:
         result_status = get_course_completetion_status(group_obj, request.user.id, True)
         if result_status:
@@ -1887,10 +1889,9 @@ def course_content(request, group_id):
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'course content',
-            'allow_to_join': allow_to_join, "course_complete_percentage": course_complete_percentage,
+            'allow_to_join': allow_to_join,
             "leaf_ids":leaf_ids,"completed_ids":completed_ids,"incompleted_ids":incompleted_ids,
-            "total_count": total_count, "completed_count":completed_count
-        })
+            })
     return render_to_response(template, context_variables)
 
 
@@ -1907,24 +1908,13 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
     thread_node = None
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
+    
+    
     
     allow_to_join = get_group_join_status(group_obj)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'notebook', 'allow_to_join': allow_to_join,
-            "course_complete_percentage": course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count
             }
 
     if request.user.is_authenticated():
@@ -1982,25 +1972,15 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     gstaff_users.append(group_obj.created_by)
     allow_to_join = None
     files_cur = None
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
+    
+    
 
     allow_to_join = get_group_join_status(group_obj)
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
 
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'raw material', "completed_count": completed_count,
-            'total_count':total_count, "course_complete_percentage":course_complete_percentage
+            'node': group_obj, 'title': 'raw material'
         }
     if node_id:
         file_obj = node_collection.one({'_id': ObjectId(node_id)})
@@ -2044,23 +2024,13 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     allow_to_upload = True
     allow_to_join = query_dict = None
     allow_to_join = get_group_join_status(group_obj)
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
+    
+    
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'gallery', 'allow_to_upload':allow_to_upload, 
-            'allow_to_join':allow_to_join, "completed_count": completed_count,
-            'total_count':total_count, "course_complete_percentage":course_complete_percentage
+            'allow_to_join':allow_to_join
         }
 
     if node_id:
@@ -2098,17 +2068,8 @@ def course_about(request, group_id):
     last_date = get_attribute_value(group_obj._id,"end_time")
 
     allow_to_join = get_group_join_status(group_obj)
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
+    
+    
 
     if start_date and last_date:
       start_date = start_date.date()
@@ -2163,17 +2124,8 @@ def course_gallerymodal(request, group_id, node_id):
     allow_to_comment = None
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     allow_to_join = get_group_join_status(group_obj)
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
+    
+    
 
     template = 'ndf/ggallerymodal.html'
 
@@ -2182,8 +2134,7 @@ def course_gallerymodal(request, group_id, node_id):
             'node': node_obj, 'title': 'course_gallerymodall',
             'allow_to_comment': allow_to_comment,
             'thread_node': thread_node,
-            'allow_to_join': allow_to_join, "course_complete_percentage": course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count           
+            'allow_to_join': allow_to_join
         })
     return render_to_response(template, context_variables)
 
@@ -2203,17 +2154,8 @@ def course_note_page(request, group_id):
     
     
     allow_to_join = get_group_join_status(group_obj)
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
+    
+    
 
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     template = 'ndf/note_page.html'
@@ -2223,8 +2165,7 @@ def course_note_page(request, group_id):
             'node': node_obj, 'title': 'course_gallerymodall',
             'allow_to_comment': allow_to_comment,
             'thread_node': thread_node, 'allow_to_join': allow_to_join,
-            "course_complete_percentage": course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count           
+            
         })
     return render_to_response(template, context_variables)
 
@@ -2316,3 +2257,23 @@ def course_filters(request, group_id):
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
+
+
+@login_required
+@get_execution_time
+def build_progress_bar(request, group_id, node_id):
+    cache_key = u'build_progress_bar_' + unicode(group_id) + "_" + unicode(node_id) + "_" + unicode(request.user.id) 
+    cache_result = cache.get(cache_key)
+    if cache_result:
+        return HttpResponse(cache_result)
+    result_status = {}
+    try:
+        group_obj   = get_group_name_id(group_id, get_obj=True)
+        course_complete_percentage = total_count = completed_count = None
+        if request.user.is_authenticated:
+            result_status = get_course_completetion_status(group_obj, request.user.id)
+    except Exception as e:
+        # print "\n\n Error while fetching ---", e
+        pass
+    cache.set(cache_key, json.dumps(result_status), 60*15)
+    return HttpResponse(json.dumps(result_status))
