@@ -88,7 +88,10 @@ def default_template(request,group_id,node=None):
     
 # For Display
 
-    basic_list = ['name', 'altnames']
+    # basic_list = ['name', 'altnames']
+    basic_list = { 'name':'Name' , 'altnames':'Alternate Name' }
+
+
 
     if node :
         print "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
@@ -193,7 +196,7 @@ def default_template(request,group_id,node=None):
 
         pos_ats_id = []
 
-        for key,value in pos_rts.iteritems():
+        for key,value in pos_ats.iteritems():
             pos_ats_id.append(e._id)
 
         final_pos_ats = []
@@ -201,12 +204,6 @@ def default_template(request,group_id,node=None):
         for e in pos_ats_id:
             if e not in ats_id:
                 final_pos_ats.append(e)
-
-        # for e in ats_id:
-        #     for f in pos_ats_id:
-        #         if e != f
-        #             final_pos_ats.append(f)
-
 
         final_ats = []
 
@@ -251,34 +248,6 @@ def default_template(request,group_id,node=None):
             # rts_options.append(e.subject_type)
             # rts_options.append(e.object_type)
 
-
-        # for e in rts:
-        #     rts_obj = e.object_type
-        #     rts_object_dict = dict ({'name':e.name,'object_type':rts_obj})
-        #     f_rts_object_dict.append(rts_object_dict)
-
-        # -- this is the o/p obtained: its a list of dict
-# for e in f_rts_object_dict:
-#     print e
-# {'object_type': [ObjectId('564c77f7a78dd02e0db18cee'), ObjectId('564c77f7a78dd02e0db18cec')], 'name': u'event_organised_by'}
-# {'object_type': [ObjectId('564c77f7a78dd02e0db18cf4')], 'name': u'event_coordinator'}
-# {'object_type': [ObjectId('564c77f7a78dd02e0db18cf4'), ObjectId('564c7451a78dd024cb05b7d5')], 'name': u'has_attendees'}
-# {'object_type': [ObjectId('564c77f7a78dd02e0db18cf4'), ObjectId('564c7451a78dd024cb05b7d5')], 'name': u'has_attended'}
-# {'object_type': [ObjectId('564c7450a78dd024cb05b7bb')], 'name': u'event_has_batch'}
-# {'object_type': [ObjectId('564c77f8a78dd02e0db18d28')], 'name': u'session_of'}
-
-        # ---------------- inorder to obtain the object_type 's
-
-#         for e in f_rts_object_dict:
-#             print e['object_type']
-
-
-# for e in rts_obj:
-#     k = node_collection.one({'_id':ObjectId(e)})
-#     print k
-
-
-
         f_rts_object_dict=[]
         rts_object_dict = []
         rts_obj= None
@@ -291,6 +260,7 @@ def default_template(request,group_id,node=None):
                 name_rst.append(k.name)
             rts_object_dict = dict({ 'name':e.name, 'altnames':e.altnames, 'object_type':name_rst })
             f_rts_object_dict.append(rts_object_dict)
+        # the code above returns a dict for the object display in template -- for rts
 
 
         f_pos_rts_object_dict=[]
@@ -306,6 +276,7 @@ def default_template(request,group_id,node=None):
                 name_pos_rst.append(k.name)
             pos_rts_object_dict = dict({'name':e.name ,'altnames':e.altnames, 'object_type':name_rst})
             f_pos_rts_object_dict.append(pos_rts_object_dict)
+        # the code above returns a dict for the object display in template -- for possible rts
 
 
 
@@ -324,6 +295,25 @@ def default_template(request,group_id,node=None):
 
 
     # print "\n\n\n\n\n\n\n"
+    key_ats = []
+    for e in ats:
+        # print e.name
+        key_ats.append(e.name)
+    for e in final_ats:
+        # print e.name
+        key_ats.append(e.name)
+
+    # print key_ats
+
+
+    key_rts = []
+    for e in rts:
+        # print e.name
+        key_rts.append(e.name)
+    for e in final_rts:
+        # print e.name 
+        key_rts.append(e.name)
+    # print key_rts
 
 
 
@@ -343,7 +333,7 @@ def default_template(request,group_id,node=None):
         # request.POST.get('IDoftheobject to be fetched')
 
         for key,value in gs_struc.items():
-            print key , value,"\n"
+            # print key , value,"\n"
 
 
             if key == "name":
@@ -354,13 +344,29 @@ def default_template(request,group_id,node=None):
 
             if key == "altnames":
                 print "altnames"
+                if request.POST.get(key,""):
+                    new_instance_type[key] = unicode(request.POST.get(key,""))
+
 
             if key == "attribute_set":
                 print "this attribute_set "
 
+                for e in key_ats:
+                    # print e
+                    for k in request.POST.get(e,"").split(","):
+                        print e,k ,"\n"
+                        # here e -- key name , k -- key value eg. e -- nussd_course_type, k -- General
+
 
             if key == "relation_set":
                 print "this relation_set "
+
+                for e in key_rts:
+                    for k in request.POST.get(e,"").split(","):
+                        print e,k ,"\n"
+                        # here e -- key name , k -- key value eg. e -- event_coordinator , k -- Person
+
+
 
 
             # if request.POST.get('name',''):
