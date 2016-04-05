@@ -179,25 +179,25 @@
               {% endif %}
             </div>
           </div>
-          {% endcomment %}
-
+          {% endcomment %}    
           <!-- Code for showing media details -->
-          {% if node.mime_type %}
-
+          {% if node.mime_type  or node.collection_set %}
             {% get_grid_fs_object node as grid_fs_obj %}
 
             <!-- commenting following block which shows slider if resource is collection of all images/videos/audios -->
-            {% comment %}
-
-            {% if node.collection_set and node.pk|is_media_collection %}
-
-              {% if 'image' in node.mime_type or 'video' in node.mime_type %}
-                <!-- Orbit image slider only for image and video collections-->
-
+              
+            {% if node.collection_set  %} 
+               <ul data-orbit data-options="variable_height: true;timer:false;">
+                  <li class="active small-12 large-columns">
+                    <center>                   
                     {% if 'image' in node.mime_type %}
-                    <a class="th" target="_blank" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                      <img style="min-height:200px;" src="{% url 'get_mid_size_img' group_name_tag node.pk %}" />
+                    <a class="th">
+                      <img style="min-height:200px;" src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
                       </a>
+                     {% elif 'audio' in node.mime_type %}
+                          <audio  src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
+                          <p>{% trans 'Your browser does not support the audio element' %} </p>
+                      </audio><br><br><br>
                     {% elif 'video' in node.mime_type %}
                      <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
                         <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">
@@ -213,51 +213,66 @@
                         {% trans "Your browser does not support the video tag." %}
                       </video>
                     {% endif %}
+                    <div class="orbit-caption"> {{node.name}} </div>             
+                  </li>                
 
-
-                <!-- End of slider -->
-              {% else %}
-                  {% if 'audio' in node.mime_type %}
-                    <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
-                      <p>{% trans 'Your browser does not support the audio element' %} </p>
-                    </audio>
-                  {% elif 'html' in node.mime_type %}
-                    <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                      <p>{% trans 'Your browser does not support the audio element' %} </p>
-                    </iframe>
-                    {% elif 'pdf' in node.mime_type %}
-                        <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
-                        <br/>
-                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                          <center>
-                            <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">{% trans 'View in full screen' %}
-                             <i class="fi-projection-screen"> </i>
-                            </figcaption>
-                          </center>
+                  {% for k in node.collection_set %}
+                    {% get_node k as obj %}
+                    {% get_grid_fs_object obj as grid_fs_obj %}
+                    {% if 'image' in obj.mime_type or 'video' in obj.mime_type or 'audio' in obj.mime_type or 'pdf' in obj.mime_type %}
+                    <li>
+                      <center>
+                        {% if 'image' in obj.mime_type %}
+                        <a class="th">
+                          <img src="{% url 'get_mid_size_img' group_name_tag k %}" style="min-height:200px;"/> 
                         </a>
-                  {% else %}
-                    <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                      {{ grid_fs_obj.filename }}
-                    </a>
-                  {% endif %}
-              {% endif %}
+                         {% elif 'audio' in obj.mime_type %}
+                            <audio src="{% url 'read_file' group_name_tag k grid_fs_obj.filename %}" controls loop>
+                            <p>{% trans 'Your browser does not support the audio element' %} </p>
+                          </audio><br><br><br><br><br><br>
+                        {% elif 'pdf' in obj.mime_type %}
+                          <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag k grid_fs_obj.filename %}"></iframe>
+                          <br/>
+                        {% elif 'Pandora_video' in obj.member_of_names_list %}
+                          {% get_source_id k as source_id %}
+                          <!-- <video width="480px" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls> -->
+                          <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
+                            <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                            {% trans "Your browser does not support the video tag." %}
+                          </video>  
+                        {% elif 'video' in obj.mime_type %}
+                          <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
+
+                            <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/webm">
+                            <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/ogg">    
+                            <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/mp4">    
+                            {% trans "Your browser does not support the video tag." %}
+                          </video>                    
+                        {% endif %}    
+                        <div class="orbit-caption"> {{obj.name}} </div> 
+                      </center>
+                    </li>
+                    {% endif %} 
+
+                  {% endfor %}
+                </ul>   
               <!-- end of if 'image' in node.mime_type ... -->
 
-            {% else %}
-            {% endcomment %}
 
             <!-- END of commenting following block which shows slider if resource is collection of all images/videos/audios -->
 
 
+              {% endif %}             
               <!-- not a collection -->
               {% if not topic %}
                 <h3 class="text-gray">{{node.name}}:</h3>
               {% endif %}
-
-              {% if 'image' in node.mime_type %}
+              
+              {% if 'image' in node.mime_type  and not node.collection_set %}
+              
                <center>
                 <div class="show-image">
-                  <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
+                  <a class="th {% if node.collection_set %}collection-exists{% endif %}" data-oid="{{node.pk|safe}}">
                     <img  src="{% url 'get_mid_size_img' group_name_tag node.pk %}" style="min-height:200px;" />
 
                   </a>
@@ -275,7 +290,7 @@
                   <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm">
                   {% trans "Your browser does not support the video tag." %}
                 </video>
-              {% elif 'video' in node.mime_type %}
+              {% elif 'video' in node.mime_type and not node.collection_set %}
 
               {% comment "commented getting video from wetube" %}
                 {% get_source_id node.pk as source_id %}
@@ -294,15 +309,15 @@
                   <source src="{% url 'getFullvideo' group_name_tag node %}" type="{{node.mime_type}}">
                   {% trans "Your browser does not support the video tag." %}
                 </video>
-              {% elif 'audio' in node.mime_type %}
+              {% elif 'audio' in node.mime_type and not node.collection_set %}
                 <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
                   <p>{% trans 'Your browser does not support the audio element' %} </p>
                 </audio>
-              {% elif 'html' in node.mime_type %}
+              {% elif 'html' in node.mime_type and not node.collection_set %}
                 <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   <p>{% trans 'Your browser does not support the audio element' %} </p>
                 </iframe>
-              {% elif 'pdf' in node.mime_type %}
+              {% elif 'pdf' in node.mime_type and not node.collection_set %}
                 <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                 <br/>
                 <center>
@@ -315,7 +330,7 @@
                 </a>
 
 
-              {% elif 'epub' in node.mime_type %}
+              {% elif 'epub' in node.mime_type and not node.collection_set %}
                 {% comment %}
 
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
