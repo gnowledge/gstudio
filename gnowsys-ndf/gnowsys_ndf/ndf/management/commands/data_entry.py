@@ -323,7 +323,7 @@ def parse_data_create_gsystem(json_file_path, file_name):
                     for attr_key, attr_value in gst_possible_attributes_dict.iteritems():
                         # print "\n\n attr_key === ", attr_key
                         # print "\n\n altnames --  === ", attr_value['altnames']
-                        if key == attr_value['altnames'].lower() or key == attr_key.lower():
+                        if attr_value['altnames'] and key == attr_value['altnames'].lower() or key == attr_key.lower():
                             is_relation = False
 
                             if json_document[key]:
