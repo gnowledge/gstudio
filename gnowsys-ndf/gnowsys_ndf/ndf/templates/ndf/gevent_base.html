@@ -129,11 +129,8 @@ list-style: none;
       {% endif %}
 
     {% if request.user.is_authenticated %}
-      <div class="small-12 medium-4 columns">
-        <label>{{completed_count}} out of {{total_count}} modules completed</label>
-        <div class="progress success round">
-        <div class="meter" style="width: {{course_complete_percentage}}%"></div>
-        </div>
+      <div class="small-12 medium-4 columns progress-div">
+        <label class="progress_stmt"></label>
       </div>
     {% endif %}
 
@@ -296,30 +293,54 @@ list-style: none;
 </script>
 {% endblock %}
 {% block script %}
-  $(document).on('click','.enroll-btn',function(){
-  //trigger the ajax call to enroll
-    $.ajax({
-      url: "{% url 'enroll_to_course' node.pk %}",
+	$(document).ready(function() {
+		//trigger the ajax call to enroll
+		$.ajax({
+			url: "{% url 'build_progress_bar' group_id node.pk %}",
 
-      data: {
-        'csrfmiddlewaretoken': "{{csrf_token}}"
-      },
+			type: "GET",
 
-      type: "POST",
+			dataType: "json",
 
-      dataType: "json",
+			beforeSend: function(){
+				$(".progress_stmt").html("Building Progress bar..")
+			},
 
-      success: function(data){
-        success_state = data["success"]
-        if(success_state){
-          $(".enroll-btn").attr('value', 'ENROLLED')
-          $(".enroll-btn").attr("disabled","disabled")
-          location.reload();
-        }
-      },
-    });//end of ajax
-  })
+			success: function(data){
+				var pr_outer_div = document.createElement('div');
+				pr_outer_div.className = "progress success round"
+				var pr_innerDiv = document.createElement('div');
+				pr_innerDiv.className = 'meter';
+				pr_innerDiv.style.width = data['course_complete_percentage']+ "%";
+				$(pr_outer_div).append(pr_innerDiv)
+				$(".progress-div").append(pr_outer_div)
+				$(".progress_stmt").html(data['completed_count'] + " out of " + data['total_count'] + " completed")
+			},
+		});//end of ajax
+	})
 
+	$(document).on('click','.enroll-btn',function(){
+		//trigger the ajax call to enroll
+		$.ajax({
+			url: "{% url 'enroll_to_course' node.pk %}",
 
+			data: {
+				'csrfmiddlewaretoken': "{{csrf_token}}"
+			},
+
+			type: "POST",
+
+			dataType: "json",
+
+			success: function(data){
+				success_state = data["success"]
+				if(success_state){
+				$(".enroll-btn").attr('value', 'ENROLLED')
+				$(".enroll-btn").attr("disabled","disabled")
+				location.reload();
+				}
+			},
+		});//end of ajax
+	})
 
 {% endblock %}
