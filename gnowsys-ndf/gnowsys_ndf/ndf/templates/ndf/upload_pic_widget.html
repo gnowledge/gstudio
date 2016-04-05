@@ -51,7 +51,13 @@
                 <div id="{{widget_for}}_pic_div" class="hide row">
                     <form class="dropzone" id ="{{widget_for}}_docPost" enctype="multipart/form-data" method="post"  action="{% url 'upload_prof_pic' group_id %}">
                         {% csrf_token %}
-                        <input type="file" name="has_profile_pic" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
+                        <input type="file" name="docFile_img" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
+                        {% if is_banner and not is_profile %}
+                          <input type="hidden" name="pic_rt" value="is_banner"></input>
+                        {% elif  is_profile and not is_banner %}
+                          <input type="hidden" name="pic_rt" value="is_profile"></input>
+                        {% endif %}
+
                         <div class="{{widget_for}}_upload_cancel_div">
                             <img id="{{widget_for}}_img_preview" src="#" alt="New profile photo" />
                             <input type="submit" id="{{widget_for}}_submitpostid" value="Save" style="margin-left:2rem;" class="button tiny margin-p5" />
