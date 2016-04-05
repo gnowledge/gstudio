@@ -2122,8 +2122,7 @@ def course_about(request, group_id):
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
-            'weeks_count': weeks_count, "course_complete_percentage": course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count,
+            'weeks_count': weeks_count,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
         })
     return render_to_response(template, context_variables)
@@ -2282,17 +2281,20 @@ def course_analytics(request, group_id):
     analytics_data = {}
 
     anaytics_instance = AnalyticsMethods(request, request.user.id,request.user.username, group_id)
+    # Modules Section
+    all_modules= anaytics_instance.get_total_modules_count()
+    completed_modules = anaytics_instance.get_completed_modules_count()
+
     # Units Section
-    analytics_data['all_units'] = anaytics_instance.get_total_units_count()
+    all_units = anaytics_instance.get_total_units_count()
     # print "\n Total Units =  ", all_units, "\n\n"
-    analytics_data['completed_units'] = anaytics_instance.get_completed_units_count()
+    completed_units = anaytics_instance.get_completed_units_count()
     # print "\n Completed Units =  ", completed_units, "\n\n"
 
-
     # Resources Section
-    analytics_data['total_res'] = anaytics_instance.get_total_resources_count()
+    # analytics_data['total_res'] = anaytics_instance.get_total_resources_count()
     # print "\n Total Resources === ", total_res, "\n\n"
-    analytics_data['completed_res'] = anaytics_instance.get_completed_resources_count()
+    # analytics_data['completed_res'] = anaytics_instance.get_completed_resources_count()
     # print "\n Completed Resources === ", completed_res, "\n\n"
 
 
@@ -2358,6 +2360,13 @@ def course_analytics(request, group_id):
     analytics_data['commented_on_others_files'] = anaytics_instance.get_other_files_commented_by_user_count()
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
     
+    analytics_data['units_progress_stmt'] = str(completed_units) + " out of " + str(all_units) + " completed"
+    analytics_data['module_progress_stmt'] = str(completed_modules) + " out of " + str(all_modules) + " completed"
+    
+
+    analytics_data['module_progress_meter'] = (completed_modules/float(all_modules))*100
+    
+    analytics_data['unit_progress_meter'] = (completed_units/float(all_units))*100
 
     t1 = time.time()
     time_diff = t1 - t0
