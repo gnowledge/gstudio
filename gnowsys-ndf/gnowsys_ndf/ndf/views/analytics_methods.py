@@ -550,14 +550,66 @@ class AnalyticsMethods(object):
 		if not hasattr(self, 'blog_page_gst'):
 			self.blog_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"},{'_id': 1})
 		query = {'member_of': self.page_gst._id,'type_of': self.blog_page_gst._id,'group_set': self.group_obj._id }
-		print "\n\nquery", query
-		all_notes = node_collection.collection.aggregate([
-						{ "$match": query},
-						{ "$project": { "count": { "$size": "$rating" } } }, 
-						{ "$group": { "_id": None, "total": { "$sum": "$count" } } }
-					])
-		# print "\n\n\nall_notes",all_notes
+		# print "\n\nquery", query
+		# all_notes = node_collection.collection.aggregate([
+		# 				{ "$match": query},
+		# 				{ "$project": { "count": { "$size": "$rating" } } }, 
+		# 				{ "$group": { "_id": None, "total": { "$sum": "$count" } } }
+		# 			])
 
+		all_notes = node_collection.collection.aggregate([
+						{ "$match": query },
+						{ "$unwind": "$rating" },
+						{ "$group": { "_id": None, "count": { "$sum": 1 }, "rating": { "$addToSet": "$rating" } } }
+					])
+		if 'result' in all_notes:
+			result = all_notes['result']
+			cnt = result[0]['count']
+			rating_list = result[0]['rating']
+			avg_rating_notes = total_rating = 0
+			unique_user_list = []
+			for rdict in rating_list:
+				total_rating += rdict['score']
+				if rdict['user_id'] not in unique_user_list:
+					unique_user_list.append(rdict['user_id'])
+		# print "\n\n\nall_notes",all_notes
+		# print "\n\n\ntotal_rating",total_rating
+		avg_rating_notes = int(total_rating/float(cnt))
+		# print "avg_rating_notes",avg_rating_notes
+		# print "unique_users_rated_notes",len(unique_user_list)
 		t1 = time.time()
 		time_diff = t1 - t0
 		print "\n get_ratings_received_on_user_notes == ", time_diff
+		return avg_rating_notes,len(unique_user_list)
+
+
+	def get_ratings_received_on_user_files(self):
+		t0 = time.time()
+
+		if not hasattr(self,"file_gst"):
+			self.file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"},{'_id': 1})
+		query = {'member_of': self.file_gst._id, 'created_by': self.user_id, 'group_set': self.group_obj._id}
+		all_files = node_collection.collection.aggregate([
+						{ "$match": query },
+						{ "$unwind": "$rating" },
+						{ "$group": { "_id": None, "count": { "$sum": 1 }, "rating": { "$addToSet": "$rating" } } }
+					])
+		if 'result' in all_files:
+			result = all_files['result']
+			cnt = result[0]['count']
+			rating_list = result[0]['rating']
+			avg_rating_files = total_rating = 0
+			unique_user_list = []
+			for rdict in rating_list:
+				total_rating += rdict['score']
+				if rdict['user_id'] not in unique_user_list:
+					unique_user_list.append(rdict['user_id'])
+		# print "\n\n\nall_files",all_files
+		# print "\n\n\ntotal_rating",total_rating
+		avg_rating_files = int(total_rating/float(cnt))
+		# print "avg_rating_files",avg_rating_files
+		# print "unique_users_rated_notes",len(unique_user_list)
+		t1 = time.time()
+		time_diff = t1 - t0
+		print "\n get_ratings_received_on_user_files == ", time_diff
+		return avg_rating_files,len(unique_user_list)
