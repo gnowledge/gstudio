@@ -19,17 +19,18 @@
 <font size="5"> {{node_gs.name}} </font> 
 
     <div style="display:table-row;">
-    	{% for e,f in basic_list.iteritems %}
+    	{% for val,dummyval in basic_list.iteritems %}
     	<tr><td>
         <div style="display:table-cell;" >
-            <font size="3"> {{f}} : </font> 
+            <font size="3"> {{dummyval}} : </font> 
         </div></td>
         <td> 
-        {% fetch_req_fields gs_struc|get_dict_item:e e %} 
+        {% fetch_req_fields gs_struc|get_dict_item:val val %} 
 
         </td></tr>
         {% endfor %}
     </div>
+
     <div style="display:table-row;">
         {% for each in ats %}
         <tr><td>
@@ -46,9 +47,8 @@
 
         </td></tr>
         {% endfor %}
-        {# {{ gs_struc|get_dict_item:'attribute_set' }} #}
-        {# {% fetch_req_fields gs_struc|get_dict_item:'attribute_set' 'attribute_set' %}  #}
     </div>
+
     <div style="display:table-row;">
         {% for each in final_ats %}
         <tr>
@@ -95,10 +95,6 @@
         {% endfor %}
     </div>
 
-
-
-
-
 </div>
 </table>
 <input type="submit" class="button" id="save-node-type" value="Save" />
@@ -107,56 +103,6 @@
 {% endblock %}
 <script type="text/javascript">
 $("form").submit(function(event) {
-
     
 });
 </script>
-
-    <!-- the loop below is for the items directly fetched from the models.
-    <div style="display:table-row;">
-        {% for each in rts %}
-        <tr>
-            <td>
-        {% trans "RelationType "%}
-        <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} : </font> 
-        </div></td>
-        <td>
-        <input type="text"/> </td></tr>
-        {% endfor %}
-    </div>
-
-
-
-    <div style="display:table-row;">
-        {% for key,value in pos_rts.iteritems %}
-        <tr><td>
-        {% trans "PossibleRelationType "%}
-        <div style="display:table-cell;"> 
-           <font size="3"> {% firstof value.altnames key value.inverse_name %} : </font> 
-        </div></td>
-        <td>
-        <input type="text"/> </td></tr>
-        {% endfor %}
-    </div>
-    <div style="display:table-row;">
-        {% for key,value in pos_ats.iteritems %}
-        <tr><td>
-        {% trans "PossibleAttributeType "%}
-        <div style="display:table-cell;"> 
-           <font size="3"> {% firstof value.altnames key value.inverse_name %} : {{value.data_type}} 
-            </font> 
-
-        </div></td>
-        <td>
-            {# {{value}} #}
-            {% html_widget groupid node_gs.pk value %}
-            {# {% ats_fields value.altnames %}  #}
-         </td></tr>
-        {% endfor %}
-    </div>
-
-
-
-
-    -->
