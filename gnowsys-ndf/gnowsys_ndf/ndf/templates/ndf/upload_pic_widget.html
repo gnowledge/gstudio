@@ -148,7 +148,6 @@
 
   // Upload/Change Profile photo ----------------------------------------------------------------
   $(document).on('click','#{{widget_for}}_btnUploadProfilePic',function(){
-    alert("Change btn clicked")
     $("#{{widget_for}}_prof_pic_prop").foundation('reveal', 'open');
   });
 
@@ -162,7 +161,6 @@
 
   // Upload photo btn in overlay ----------------------------------------------------------------
   $(document).on('click','#{{widget_for}}_upload_photo',function(){
-    console.log("demo")
     $("#{{widget_for}}_docFile").trigger("click");
     // $(this).addClass("hide")
     // $("#{{widget_for}}_existing-photo-fieldset").addClass("hide")
@@ -181,13 +179,11 @@
 
 
   //Upload file action validation ---------------------------------------------------------------
-  $(document).on('click','#{{widget_for}}_docFile',function(){
+  $(document).on('change','#{{widget_for}}_docFile',function(){
     $("#{{widget_for}}_upload_photo").addClass("hide")
     $("#{{widget_for}}_existing-photo-fieldset").addClass("hide")
-    console.log("{{widget_for}}_docFile change function")
     $("#{{widget_for}}_pic_div").removeClass("hide");
     file_mime_type = this.files[0].type;
-    console.log(file_mime_type)
     if(file_mime_type.indexOf("image/") < 0){
       $("#{{widget_for}}_btnUploadCancel").click()
       var message = "{% trans 'Only image files should be selected for setting your profile picture!' %}"
@@ -197,7 +193,6 @@
     }
     else{
       //$('#txtSelectedFiles').val(this.value);
-      console.log("hi")
       var reader = new FileReader();
       reader.onload = function (e) {
         $('#{{widget_for}}_img_preview')
@@ -235,7 +230,6 @@
 
   // Reveal modal close event -------------------------------------------------------------------
   $(document).on('closed.fndtn.reveal', '.reveal-modal', function () {
-    console.log("close-reveal-modal")
     $(this).removeClass("success").removeClass("alert").removeClass("warning");
   });
     
