@@ -84,7 +84,7 @@ color: black !important;
 {% block body_content %}
 {% check_is_gstaff groupid request.user as gstaff_access %}
 {% user_access_policy groupid request.user as user_access %}
-{% get_course_session_status node True as next_session_in_course %}
+{% get_course_session_status group_obj True as next_session_in_course %}
 
 <div id="eventModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
   <label id="eventModalLabel"></label>
@@ -98,7 +98,7 @@ color: black !important;
     <div class="container">
     <div class="row course-page-header" >
       <div class="course-header-background">
-        <img src="/static/ndf/images/landing_pg_slides/Slider10.jpg"/>
+        {% include 'ndf/upload_pic_widget.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True%}
         <div class="course-header-background-layer"></div>
       </div>
       <div class="row" style="position: relative;z-index: 2;">
@@ -108,16 +108,19 @@ color: black !important;
             </a>
             <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
               <li><a class="tiny radius settings" ><i class="fa fa-cog"></i> {% trans "Settings" %}</a></li>
-              <li><a class="tiny radius" href="{% url 'create_course_struct' group_id node.pk %}"> <i class="fa fa-pencil-square-o"></i> {% if node.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></li>
-              {% with node.member_of_names_list.0 as sg_type %}
-              <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
+              <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fa fa-pencil-square-o"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></li>
+              {% with group_obj.member_of_names_list.0 as sg_type %}
+                <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
               {% endwith %}
+              <li>
+                <a data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="fi-pencil">Edit Photo</a>
+              </li>
             </ul>
           </div>
       </div>
       <div class="row">
         <div class="columns small-3 small-centered">
-          {% firstof node.altnames node.name  %}
+          {% firstof group_obj.altnames group_obj.name  %}
         </div>
       </div>
       {% comment %}
@@ -142,10 +145,10 @@ color: black !important;
             <span><a class="tiny radius settings" ><i class="fa fa-cog"></i> {% trans "Settings" %}</a></span>
           </div>
           <div class="small-12 columns medium-5 large-5" style="white-space: nowrap;" >
-            <span><a class="tiny radius" href="{% url 'create_course_struct' group_id node.pk %}"> <i class="fa fa-pencil-square-o"></i> {% if node.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+            <span><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fa fa-pencil-square-o"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
           </div>
           <div class="small-12 columns medium-4 large-4 end" >
-            {% with node.member_of_names_list.0 as sg_type %}
+            {% with group_obj.member_of_names_list.0 as sg_type %}
               <span><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></span>
             {% endwith %}
           </div>
@@ -229,7 +232,7 @@ color: black !important;
     <!--div class="row collapse meta">
       <div class="key">Starts on</div>
       <div class="value">
-        {% get_attribute_value node.pk 'start_time' as course_start_date %}
+        {% get_attribute_value group_obj.pk 'start_time' as course_start_date %}
 
         <div class="time"> {{course_start_date|date:"d M Y"}} </div>
       </div>
@@ -472,7 +475,7 @@ color: black !important;
                 <!--div class="about-course-heading">
                   <div class="heading-text">
                     <div>
-                      <h2>{% firstof node.altnames node.name  %}</h2>
+                      <h2>{% firstof group_obj.altnames group_obj.name  %}</h2>
                     </div>
                     {% if next_session_in_course.1 %}
                       <div>Next Session: '{{next_session_in_course.0|default_if_none:"Data Not Available"}}' on {{next_session_in_course.1|date:"d M Y"}}</div>
@@ -602,7 +605,7 @@ color: black !important;
 	$(document).on('click','.enroll-btn',function(){
 		//trigger the ajax call to enroll
 		$.ajax({
-			url: "{% url 'enroll_to_course' node.pk %}",
+			url: "{% url 'enroll_to_course' group_obj.pk %}",
 
 			data: {
 				'csrfmiddlewaretoken': "{{csrf_token}}"
