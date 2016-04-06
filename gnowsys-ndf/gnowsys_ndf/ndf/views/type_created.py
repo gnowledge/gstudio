@@ -304,6 +304,39 @@ def default_template(request,group_id,node=None):
         new_instance_type.save()
 
         # print new_instance_type
+        # print new_instance_type._id
+
+        n_at = new_instance_type.attribute_set
+        n_at_full = []
+
+        for e in n_at:
+            for k,l in e:
+                if l:
+                    n_at_full.append(e)
+                    q = node_collection.one({'_type':'AttributeType','name':k})
+                    z=create_gattribute(gsys_node._id,q,l)
+                    # print z
+
+        # print n_at_full,"n_at_full"
+
+        n_rt = new_instance_type.relation_set
+        n_rt_full = []
+
+        for e in n_rt:
+            for k,l in e:
+                if l:
+                    n_rt_full.append(e)
+        # print n_rt_full,"n_rt_full"
+
+        right_sub_list = []
+        for e in n_rt_full:
+            for k,l in e:
+                if l:
+                    q = node_collection.one({'_type':'RelationType','name':l })
+                    r = node_collection.one({'_type':'GSystem','name':k })
+                    z = create_grelation(gsys_node._id,q,r._id)
+                    # print z , "GRELATION"
+
     # If GET request ---------------------------------------------------------------------------------------
     # for key,value in class_structure.items():
 
