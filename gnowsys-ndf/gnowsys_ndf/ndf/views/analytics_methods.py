@@ -572,11 +572,7 @@ class AnalyticsMethods(object):
 				total_rating += rdict['score']
 				if rdict['user_id'] not in unique_user_list:
 					unique_user_list.append(rdict['user_id'])
-		# print "\n\n\nall_notes",all_notes
-		# print "\n\n\ntotal_rating",total_rating
 		avg_rating_notes = int(total_rating/float(cnt))
-		# print "avg_rating_notes",avg_rating_notes
-		# print "unique_users_rated_notes",len(unique_user_list)
 		t1 = time.time()
 		time_diff = t1 - t0
 		print "\n get_ratings_received_on_user_notes == ", time_diff
@@ -604,11 +600,8 @@ class AnalyticsMethods(object):
 				total_rating += rdict['score']
 				if rdict['user_id'] not in unique_user_list:
 					unique_user_list.append(rdict['user_id'])
-		# print "\n\n\nall_files",all_files
-		# print "\n\n\ntotal_rating",total_rating
+
 		avg_rating_files = int(total_rating/float(cnt))
-		# print "avg_rating_files",avg_rating_files
-		# print "unique_users_rated_notes",len(unique_user_list)
 		t1 = time.time()
 		time_diff = t1 - t0
 		print "\n get_ratings_received_on_user_files == ", time_diff
