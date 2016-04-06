@@ -22,7 +22,7 @@
         {% trans 'Select GSystemType : ' %}</center>
     </div>
     <div style="display:table-cell;"> 
-        <select id="select_gs" name="widget_for" class="demo-default" placeholder=" Select GST " onchange="GetSelectedTextValue(this)" >
+        <select id="widget_for" name="widget_for" class="demo-default" placeholder=" Select GST " onchange="GetSelectedTextValue(this)" >
                 <option value="search" > </option> 
             {% for list in opt_list %}
                 <option value="{{list.name}}" size="5" > {{list.name}} </option>
@@ -41,11 +41,6 @@
 <script type="text/javascript">
 var list = "{{list}}"
 var selectedValue = null 
-
-
-$('#select_gs').selectize();
-
-
 
 var opt_list = "{{opt_list}}"
 

@@ -1958,10 +1958,7 @@ def fetch_req_fields(fields_type, fields_name ):
 	this ndf tag returns the fields_name and fields_type of the GSystem object
 	for name and altname of the GS
 	'''
-	# print fields_name,"??????????????????????????????"
-	# print fields_type,"???????????????????????????????"
 	return {"fields_name":fields_name, "fields_type": fields_type }
-
 
 @get_execution_time
 @register.inclusion_tag('ndf/fetch_fields.html')
@@ -1969,27 +1966,17 @@ def ats_fields(fields_type, fields_name,groupid,complex_dt):
 	'''
 	this ndf tag returns the fields_name and fields_type of the GSystem object -- ats
 	'''
-	# print fields_name,"??????????????????????????????"
-	# print fields_type,"???????????????????????????????"
-	# cmplx_dt = []
-	# print fields_type , complex_dt
-	# if fields_type == 'IS()':
-	# 	for e in complex_dt:
-	# 		cmplx_dt.append(e)
-	# 		print e
-	# 	print cmplx_dt, "+++++++++++++"
-
 	return {"fields_name":fields_name, "fields_type": fields_type,'groupid':groupid,
 	'complex_dt':complex_dt ,'gs_type':'attribute_set' }
 
 @get_execution_time
 @register.inclusion_tag('ndf/fetch_fields.html')
 def rts_fields(fields_name,fields_object_type,groupid):
+	'''
+	this ndf tag returns the fields_name and fields_type of the GSystem object -- rts
+	'''
 	return {"fields_name":fields_name, "groupid":groupid, "fields_object_type":fields_object_type 
 	,'gs_type':'relation_set'}
-
-
-
 
 @get_execution_time
 @register.assignment_tag
