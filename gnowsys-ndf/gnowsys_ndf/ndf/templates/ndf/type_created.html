@@ -10,10 +10,6 @@
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
 
-
-
-
-
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
 <div class="row">
 <form method="post" name="" id="type_create">
@@ -41,15 +37,6 @@
 <script type="text/javascript">
 var list = "{{list}}"
 var selectedValue = null 
-
-var opt_list = "{{opt_list}}"
-
-// console.log(opt_list)
-
-for (each in opt_list){
-    // console.log(each.name)
-}
-
 
 function GetSelectedTextValue(widget_for) {
     var selectedText = widget_for.options[widget_for.selectedIndex].innerHTML;
@@ -356,7 +343,6 @@ function NavigateToSite(){
     }
     window.location = selected_val;
 }
-
 
 </script>
 {% endblock %}

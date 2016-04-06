@@ -21,8 +21,6 @@
 </div>
 
 {% endif %}
-
-
   
 {% if gs_type == 'attribute_set' %}
 
@@ -33,13 +31,10 @@
         <option value="2" {% if fields_value == 2 %}selected{% endif %} >{% trans "No" %}</option>
       </select>
 
-
       <div class="medium-3 columns end">
       {% elif fields_type == "datetime.datetime" %}
       <input id="{{fields_name}}" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="{{fields_name}}" readonly="" >
-
       </div>
-
       <script type="text/javascript">
       $(document).ready(function () {
           {% if start_time %}
@@ -221,9 +216,6 @@
       </script>
 
 
-
-
-
       {% elif fields_type == "unicode" or fields_type == "basestring" %}
 
         {% if fields_name == "Location" %}
@@ -285,28 +277,17 @@
 
           </script>
 
-
-
         {% else %}
         <input type="text" id="{{fields_name}}" name="{{fields_name}}"   />
         
         {% endif %}
 
-
-
-
   {% endif %}
 {% elif gs_type == 'relation_set' %}
-
-  
     <select name="{{fields_name}}">
     <option value="">select</option>
     {% for value in fields_object_type %}
-
     <option value="{{value}}"> {{value}} </option>
-
     {% endfor %}
     </select>
-
-
 {% endif %}

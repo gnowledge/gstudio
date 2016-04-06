@@ -90,8 +90,12 @@
 			
 			{% if not translate %} <!--Used when the page is not translated -->
 			<div class='boxes' style="display:table-row;">
+				<div style="display:table-cell;" >
+				<!--
 				<div style="display:table-cell;" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %} " class='box' > 
-					<span><font size="3"> {{list}} </font> </span>
+					<span><font size="3"> {{list}} </font> </span> -->
+					<span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %}">
+					<font size="3"> {{list}} </font> </span>
 				</div>
 				{# {{class_structure|get_dict_item:list }} #}
 
