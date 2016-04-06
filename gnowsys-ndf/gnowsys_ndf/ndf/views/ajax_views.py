@@ -39,7 +39,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy
@@ -52,6 +52,8 @@ from gnowsys_ndf.notification import models as notification
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
+GST_FILE = node_collection.one({'_type':'GSystemType', 'name': 'File'})
+GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': 'Page'})
 # This function is used to check (while creating a new group) group exists or not
 # This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 
@@ -110,7 +112,18 @@ def collection_create(request, group_id):
   '''
   This ajax view creates the page collection of selected nodes from list view
   '''  
-  if request.is_ajax() and request.method == "POST":
+  existing_collection = request.POST.get("existing_collection")
+  print "\n\n\n here",existing_collection
+  if existing_collection == "True":
+    Collections = request.POST.getlist("collection[]", '')
+    cur_collection_id = request.POST.get("cur_collection_id")
+    obj = node_collection.one({'_id': ObjectId(cur_collection_id)})
+    print "\n\n\n\n obj",obj
+    for each in Collections:
+      node_collection.collection.update({'_id': ObjectId(cur_collection_id) }, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
+      return HttpResponse("success")
+
+  elif request.is_ajax() and request.method == "POST":
     Collections = request.POST.getlist("collection[]", '')
     # name is comming from post request ajax
     
@@ -991,6 +1004,33 @@ def add_topics(request, group_id):
 
 @get_execution_time
 def add_page(request, group_id):
+  is_create_note = request.POST.get("is_create_note", '')
+  tags = request.POST.get("tags", '')
+  print "\ninside add_page",request
+  if request.is_ajax() and request.method == "POST" and  is_create_note == "True":
+      blog_type = request.POST.get("blog_type", '')
+      # return HttpResponseRedirect(reverse('page_create_edit', kwargs={'group_id': group_id}))
+      gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+      page_node = node_collection.collection.GSystem()
+      page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+      page_node.status = u"PUBLISHED"
+      blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+      page_node.type_of = [blogpage_gst._id]
+      page_node.save()
+      discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+      if blog_type:
+        create_gattribute(page_node._id, discussion_enable_at, True)
+        return_status = create_thread_for_node(request,group_id, page_node)
+      page_node.save()
+      return HttpResponseRedirect(reverse('course_notebook_tab_note',
+                                    kwargs={
+                                            'group_id': group_id,
+                                            'tab': 'my-notes',
+                                            'notebook_id': page_node._id
+                                            })
+                                      )
+
+  
   if request.is_ajax() and request.method == "POST":
     context_node_id = request.POST.get("context_node", '')
     css_node_id = request.POST.get("css_node", '')
@@ -4806,7 +4846,7 @@ def edit_task_content(request, group_id):
   	# Required to link temporary files with the current user who is modifying this document
     	usrname = request.user.username
     	filename = slugify(task.name) + "-" + usrname + "-"
-    	task.content = org2html(content_org, file_prefix=filename)
+    	task.content = content_org
 	task.save(groupid=group_id)
         return HttpResponse(task.content)
     else:
@@ -6222,4 +6262,39 @@ def get_gin_line_template(request,group_id,node_id):
             },
             context_instance=RequestContext(request))
 
+@get_execution_time
+def course_create_collection(request, group_id):
+  is_create_collection =  request.GET.get('is_create_collection','')
+  is_add_to_collection =  request.GET.get('is_add_to_collection','')
+  result_cur = node_collection.find({
+                          'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+                                            '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                    {'access_policy': u"PRIVATE"},
+                                                    {'created_by': request.user.id}
+                                                ]
+                                             }
+                                            ],
+                                            'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                        }).sort("last_update", -1)
+  # print "\n\n\n result",result_cur.count()
 
+
+  return render_to_response('ndf/course_create_collection.html',
+    {
+      "group_id":group_id,"result_cur":result_cur,"is_create_collection":is_create_collection,"is_add_to_collection":is_add_to_collection
+    },context_instance=RequestContext(request))
+  
+@get_execution_time
+def course_create_note(request, group_id):
+  coll_list =  request.GET.get('coll_list','')
+  fetch_res = coll_list.split(',')
+  print "fetch_res",fetch_res
+  print "\n\n",fetch_res 
+  # print "image_coll",image_coll
+  return render_to_response('ndf/course_create_note.html',
+      {
+        "group_id":group_id,"fetch_res":fetch_res
+      },context_instance=RequestContext(request))

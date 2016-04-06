@@ -354,6 +354,13 @@ color: black !important;
                     </tbody>
                   </table>
                 </div>
+            </div>
+            {% comment %}
+            <div class="row collapse">
+              <div class="about-course-details">
+                <!--@anotation('replace this with the about course details')-->
+                <p>{{group_object.content_org|safe}}
+                </p>
               </div>
               <!--div class="row collapse">
                 <div class="about-course-details">
@@ -363,6 +370,7 @@ color: black !important;
                 </div>
               </div-->
             </div>
+            {% endcomment %}
           {% endif %}
         </div>
       </div>
