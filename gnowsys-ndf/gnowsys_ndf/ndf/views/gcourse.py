@@ -2435,8 +2435,14 @@ def course_analytics(request, group_id):
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
     
 
-    n = analytics_instance.get_ratings_received_on_user_notes()
-   
+    analytics_data['total_rating_rcvd_on_notes'] = analytics_instance.get_ratings_received_on_user_notes()
+    print "\n\n analytics_data['total_rating_rcvd_on_notes'] === ",analytics_data['total_rating_rcvd_on_notes']
+
+    analytics_data['total_rating_rcvd_on_files'] = analytics_instance.get_ratings_received_on_user_files()
+    print "\n\n analytics_data['total_rating_rcvd_on_files'] === ",analytics_data['total_rating_rcvd_on_files']
+
+    
+
     analytics_data['units_progress_stmt'] = str(completed_units) + " out of " + str(all_units) + " Units completed"
     analytics_data['module_progress_stmt'] = str(completed_modules) + " out of " + str(all_modules) + " Modules completed"
     
