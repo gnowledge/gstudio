@@ -8,17 +8,19 @@
 <div class="course-overview-container hide">
     <div class="row collapse course-overview">
         <div class="columns small-12 medium-6">
+        {% comment %}
           <div class="ongoing-session">
             <h5>ONGOING SESSION </h5>
             <h3>Taking Screenshots of the work and doing something</h3>
             <button class="tiny button"><i class="fa fa-sign-in"></i>&nbsp;Enter Session</button>
           </div>
+          {% endcomment %}
           <div class="course-status">
             <h5>Course status</h5>
             <div class="row">
               <div class="small-12 columns">
                 <span class="course-metric-heading">Module's Completion</span>
-                <h4>2 of 6 modles completed</h4>
+                <h4 class="module_progress_stmt"></h4>
                 <div class="progress success round">
                     <div class="module_progress_meter meter"></div>
                 </div>
@@ -27,7 +29,7 @@
             <div class="row">
               <div class="small-12 columns">
                 <span class="course-metric-heading">Unit's Completion</span>
-                <h4>2 of 6 modles completed</h4>
+                <h4 class='units_progress_stmt'></h4>
                 <div class="progress success round">
                     <div class="unit_progress_meter meter"></div>
                 </div>
@@ -68,7 +70,7 @@
             <div class="row">
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Comments By me</span>
-                <span class="course-metric-count">167</span>
+                <span class="course-metric-count total_cmnts_by_user"></span>
               </div>
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Avg Rating for my comments</span>
@@ -94,15 +96,15 @@
             <div class="row">
               <div class="columns small-12 medium-4">
                 <span class="course-metric-heading">Files Created</span>
-                <span class="course-metric-count">42</span>
+                <span class="course-metric-count user_files"></span>
               </div>
               <div class="columns small-12 medium-4">
                 <span class="course-metric-heading">Visits gained</span>
-                <span class="course-metric-count">62</span>
+                <span class="course-metric-count other_viewing_my_files"></span>
               </div>
               <div class="columns small-12 medium-4">
                 <span class="course-metric-heading">Comments recieved</span>
-                <span class="course-metric-count">17</span>
+                <span class="course-metric-count cmts_on_user_files"></span>
               </div>
             </div>
             <div class="row">
@@ -114,15 +116,15 @@
             <div class="row">
               <div class="columns small-12 medium-4">
                 <span class="course-metric-heading">Others File Visited</span>
-                <span class="course-metric-count">29</span>
+                <span class="course-metric-count total_files_viewed_by_user"></span>
               </div>
               <div class="columns small-12 medium-4">
                 <span class="course-metric-heading">Comments on other files</span>
-                <span class="course-metric-count">15</span>
+                <span class="course-metric-count commented_on_others_files"></span>
               </div>
               <div class="columns small-12 medium-4">
                 <span class="course-metric-heading">Comments by unique users</span>
-                <span class="course-metric-count">5</span>
+                <span class="course-metric-count unique_users_commented_on_user_files"></span>
               </div>
             </div>
             <div class="row">
@@ -140,21 +142,21 @@
             <div class="row">
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Questions Attempted</span>
-                <span class="course-metric-count">93</span>
+                <span class="course-metric-count attempted_quizitems"></span>
               </div>
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Total Questions</span>
-                <span class="course-metric-count">105</span>
+                <span class="course-metric-count total_quizitems"></span>
               </div>
             </div>
             <div class="row">
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Correct Answers</span>
-                <span class="course-metric-count correct-count">87</span>
+                <span class="course-metric-count correct-count correct_attempted_quizitems"></span>
               </div>
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Incorrect answers</span>
-                <span class="course-metric-count incorrect-count">6</span>
+                <span class="course-metric-count incorrect-count incorrect_attempted_quizitems"></span>
               </div>
             </div>
           </div>
@@ -166,17 +168,17 @@
             <div class="row">
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Notes Written</span>
-                <span class="course-metric-count">93</span>
+                <span class="course-metric-count user_notes"></span>
               </div>
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Views Gained</span>
-                <span class="course-metric-count">105</span>
+                <span class="course-metric-count others_reading_my_notes"></span>
               </div>
             </div>
             <div class="row">
               <div class="columns small-12 medium-12">
                 <span class="course-metric-heading">Others notes visited</span>
-                <span class="course-metric-count">87</span>
+                <span class="course-metric-count total_notes_read_by_user"></span>
               </div>
             </div>
           </div>
@@ -188,118 +190,8 @@
           </div>
 
         </div>
-        <!--div class="about-course-heading">
-          <div class="heading-text">
-            <div>
-              <h2>{% firstof node.altnames node.name  %}</h2>
-            </div>
-            {% if next_session_in_course.1 %}
-              <div>Next Session: '{{next_session_in_course.0|default_if_none:"Data Not Available"}}' on {{next_session_in_course.1|date:"d M Y"}}</div>
-            {% endif %}
-
-            <div>
-              <span title="No. of Modules"><i class="fi-list-thumbnails"></i>&nbsp;{{group_object.collection_set|length}}</span>
-              &#8226;&nbsp;&nbsp;
-              <span title="No. of Enrolled users"><i class="fi-torso"></i>&nbsp;{{group_object.author_set|length}}</span>
-              &#8226;&nbsp;&nbsp;
-              <span title="Course Duration"><i class="fi-clock"></i>&nbsp;{{weeks_count}} weeks</span>
-            </div>
-          </div>
-        </div-->
 
       </div>
-
-    <fieldset class="modules-progress">
-        <legend>
-            Course Status
-        </legend>
-      <label class='module_progress_stmt'></label>
-      <div class="progress success round">
-          <div class="module_progress_meter meter"></div>
-      </div>
-
-      <label class='units_progress_stmt'></label>
-      <div class="progress success round">
-          <div class="unit_progress_meter meter"></div>
-      </div>
-
-    </fieldset>
-
-    <fieldset class="interactions">
-        <legend>
-            Interactions
-        </legend>
-        <div>
-            <small>Comments by me: </small>
-            <small class="total_cmnts_by_user"></small>
-        </div>
-        <div>
-            <small>Comments for ME: </small>
-        </div>
-    </fieldset>
-
-    <fieldset class="gallery">
-        <legend>
-            Gallery Uploads
-        </legend>
-        <div>
-            <small>Files Created: </small>
-            <small class="user_files"></small>
-            <small>Visits Gained: </small>
-            <small class="other_viewing_my_files"></small>
-            <small>Comments Received: </small>
-            <small class="cmts_on_user_files"></small>
-            <small>Comments by Unique Users: </small>
-            <small class="unique_users_commented_on_user_files"></small>
-        </div>
-        <div>
-            <small>Commented on Others Files: </small>
-            <small class="commented_on_others_files">100</small>
-             <small>Others Files visited: </small>
-            <small class="total_files_viewed_by_user"></small>
-
-        </div>
-    </fieldset>
-
-    <fieldset class="quiz">
-        <legend>
-            Quiz Performance
-        </legend>
-        <div>
-            <small>Questions Attempted: </small>
-            <small class="attempted_quizitems"></small>
-            <small>Total Questions: </small>
-            <small class="total_quizitems"></small>
-        </div>
-        <div>
-            <small>Correct Answers: </small>
-            <small class="correct_attempted_quizitems"></small>
-            <small>InCorrect Answers: </small>
-            <small class="incorrect_attempted_quizitems"></small>
-        </div>
-    </fieldset>
-
-    <fieldset class="notes">
-        <legend>
-            Note Making
-        </legend>
-        <div>
-            <small >Notes written: </small>
-            <small class="user_notes"></small>
-            <small >Views Gained: </small>
-            <small class="others_reading_my_notes"></small>
-            <small >Comments Received: </small>
-            <small class="cmts_on_user_notes"></small>
-            <small >Comments by Unique Users: </small>
-            <small class="unique_users_commented_on_user_notes"></small>
-        </div>
-        <div>
-            <small>Other Notes viewed: </small>
-            <small class="total_notes_read_by_user"></small>
-            <small>Commented on Others Notes: </small>
-            <small class="commented_on_others_notes"></small>
-        </div>
-    </fieldset>
 </div>
 
 <script type="text/javascript">
