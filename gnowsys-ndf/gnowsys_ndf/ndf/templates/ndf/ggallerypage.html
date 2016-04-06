@@ -101,8 +101,8 @@
                     </div>
                   {% endif %}
                   {% endif %}
-                
-                    <div class="small-12 medium-10 columns gallery-actions" style="display:none" >
+                <!-- Commented  create collection and create note for this commit-->
+                    <!-- <div class="small-12 medium-10 columns gallery-actions" style="display:none" >
                         <div class="create-note " id="create-note">
                          <a style="margin: 0em 0em 1em;">
                             <i class="fi-page-edit"></i>
@@ -117,7 +117,7 @@
                             <i class="fa fa-plus"></i>
                             <span>Add to collection</span>
                         </div>
-                        <!-- <div class="download-file hide">
+                     -->    <!-- <div class="download-file hide">
                             <i class="fi-download"></i>
                             <span> Download</span>
                         </div>
@@ -136,7 +136,7 @@
                 
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
-                        {% include 'ndf/simple_card.html' with resource=each_img   no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
+                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer="True" no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
                     </li>
                 {% endfor %}
                 </ul>
