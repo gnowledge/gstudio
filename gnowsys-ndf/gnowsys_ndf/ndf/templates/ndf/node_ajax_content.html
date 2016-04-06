@@ -1,7 +1,8 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% load cache %}
-
+{% get_thread_node node.pk as thread_node %}
+{% get_attribute_value thread_node 'thread_interaction_type' as thr_int_type %}
 {% get_schema node as schema %}
 {% get_group_name groupid as group_name_tag %}
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
@@ -504,6 +505,7 @@
                   Download
                 </a>
 
+               {% comment %}
                {% get_gstudio_social_share_resource as social_share %}
                   {% if social_share %}
                     <span>
@@ -512,8 +514,8 @@
                         </a>
                       </span>
                   {% endif %}
+              {% endcomment %}
               {% endif %}
-
           {%  else %}
             {% if node.mime_type %}
               {% if 'video' in node.mime_type  %}
@@ -545,23 +547,21 @@
                 <div class="content large-6 columns" id="view-discussion" >
                   <!-- discussion content area -->
                   {% if node.discussion_enable %}
-                    {% get_thread_node node.pk as thread_node %}
+                    
                     {% if thread_node %}
-                        {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                        {% get_node thread_node as thread_node_obj %}
-                        {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+                          {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                          {% get_node thread_node as thread_node_obj %}
+                          {% include 'ndf/in-line-texteditor.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
                     {% else %}
                         {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
                         {% include 'ndf/in-line-texteditor.html' with var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
                     {% endif %}
                   {% endif %}
-
                   <!-- END of discussion content area -->
                 </div>
               {% endif %}
           <br/>
           {% endif %}
-
           <div>
             {% get_grid_fs_object each_node as grid_fs_obj %}
             {% if "Group" in node.member_of_names_list %}
