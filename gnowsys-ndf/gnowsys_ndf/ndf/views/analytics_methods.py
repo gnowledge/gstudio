@@ -542,3 +542,22 @@ class AnalyticsMethods(object):
 		time_diff = t1 - t0
 		print "\n get_other_notes_commented_by_user_count == ", time_diff
 		return notes_count.count()
+
+	def get_ratings_received_on_user_notes(self):
+		t0 = time.time()
+		if not hasattr(self, 'page_gst'):
+			self.page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"},{'_id': 1})
+		if not hasattr(self, 'blog_page_gst'):
+			self.blog_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"},{'_id': 1})
+		query = {'member_of': self.page_gst._id,'type_of': self.blog_page_gst._id,'group_set': self.group_obj._id }
+		print "\n\nquery", query
+		all_notes = node_collection.collection.aggregate([
+						{ "$match": query},
+						{ "$project": { "count": { "$size": "$rating" } } }, 
+						{ "$group": { "_id": None, "total": { "$sum": "$count" } } }
+					])
+		# print "\n\n\nall_notes",all_notes
+
+		t1 = time.time()
+		time_diff = t1 - t0
+		print "\n get_ratings_received_on_user_notes == ", time_diff
