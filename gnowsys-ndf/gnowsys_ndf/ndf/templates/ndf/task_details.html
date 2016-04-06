@@ -189,7 +189,7 @@
       
         <div id="contentlist" class="content" style="padding-left:20px;">
           <font id="nodeContentId">
-          {% with node.content_org|safe as description %}
+          {% with node.html_content|safe as description %}
           {% if description != "None" %}
             {{ description }}
           {% else %}
