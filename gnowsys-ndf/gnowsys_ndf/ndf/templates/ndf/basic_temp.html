@@ -58,7 +58,8 @@
            <font size="3"> {% firstof each.altnames each.name %} : </font> 
         </div></td>
         <td>
-        <input type="text"/> </td></tr>
+            {% ats_fields each.data_type each.name groupid each.complex_data_type %}
+        </td></tr>
         {% endfor %}
     </div>
     

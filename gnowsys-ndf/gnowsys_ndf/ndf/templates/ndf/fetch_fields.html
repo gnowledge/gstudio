@@ -9,6 +9,7 @@
 <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
 <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
 <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+{# <script src="static/ndf/bower_components/handlebars/handlebars.min.js"></script> #}
 <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 
@@ -34,7 +35,7 @@
 
 
       <div class="medium-3 columns end">
-      {% elif fields_type == "datetime.datetime" or fields_type == "datetime" %}
+      {% elif fields_type == "datetime.datetime" %}
       <input id="{{fields_name}}" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="{{fields_name}}" readonly="" >
 
       </div>
@@ -44,20 +45,23 @@
           {% if start_time %}
               var start_date  = document.getElementById("start_date");
               start_date.value = "{{start_time|date:'d/m/Y'}}";
-          {% elif end_time %}
-              var end_date  = document.getElementById("end_date");
-              end_date.value = "{{end_time|date:'d/m/Y'}}";
+          {% endif %}
+          {% if end_time %}
+              var end_time  = document.getElementById("end_time");
+              end_time.value = "{{end_time|date:'d/m/Y'}}";
           {% endif %}
       })
 
         // Start-date & End-date settings -------------------------------------------
       var start_date = $("#start_date");
-      var end_date = $("#end_date");
-      currentDate = new Date();
+      var end_time = $("#end_time");
+      var currentDate = new Date();
       var currentDay = currentDate.getDate();
       var currentMonth = currentDate.getMonth();
       var currentYear = currentDate.getFullYear();
-    
+      // var currentYear = (new Date()).getFullYear();
+      var lowerYearLimit = currentYear - 30;
+      
       $(".date_month_day_year").datepicker({
         changeMonth: true,
         dateFormat: 'dd/mm/yy',
@@ -81,12 +85,12 @@
               year = parseInt(month_year[2]);
             }
 
-            if (end_date.val() != '') {
+            if (end_time.val() != '') {
               var testStartDate = start_date.datepicker('getDate');
-              var testEndDate = end_date.datepicker('getDate');
+              var testEndDate = end_time.datepicker('getDate');
 
               if (testStartDate > testEndDate) {
-                end_date.datepicker('setDate', testStartDate);
+                end_time.datepicker('setDate', testStartDate);
               }
 
               else {
@@ -96,14 +100,14 @@
             }
 
             else {
-              end_date.val(day+"/"+month+"/"+year);
+              end_time.val(day+"/"+month+"/"+year);
               $(this).datepicker('setDate', new Date(year, (month-1), day));
             }
 
-            $("#end_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
+            $("#end_time").datepicker('option', 'minDate', new Date(year, (month-1), day));
           }
 
-          else if ($(this).attr('id') == "end_date") {
+          else if ($(this).attr('id') == "end_time") {
             if (month_year) {
               month_year = month_year.split("/");
               day = parseInt(month_year[0]);
@@ -113,7 +117,7 @@
 
             if (start_date.val() != '') {
               var testStartDate = start_date.datepicker('getDate');
-              var testEndDate = end_date.datepicker('getDate');
+              var testEndDate = end_time.datepicker('getDate');
 
               if (testStartDate > testEndDate) {
                 start_date.datepicker('setDate', testEndDate);
@@ -153,7 +157,6 @@
 
       </script>
 
-
       {% elif fields_type == "status" %}
       <select id="id_auto_now_add" name="{{fields_name}}" style="width:60%">
         <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >{% trans "PUBLISHED" %}</option>
@@ -186,25 +189,36 @@
         </select>
       </div>
         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      {% elif fields_type == "ObjectId" %}
+      <style type="text/css">
+        .fileUpload input.upload {
+          position: absolute;
+          top: 0;
+          right: 0;
+          margin: 0;
+          padding: 0;
+          font-size: 20px;
+          cursor: pointer;
+          opacity: 0;
+          filter: alpha(opacity=0);
+        }
+      </style>
+      <div style="float:left;">
+        <input type="text" id="uploadFile_{{field.name}}" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:18rem; margin-right:0.5rem;" {% if is_required_field %}required{% endif %} />
+        <div href="#" class="fileUpload button tiny round" style="margin-top:2px;">
+            <span>{% trans "Upload" %}</span>
+            <input id="uploadBtn_{{field.name}}" type="file" name="{{field.name}}" class="upload" {% if is_required_field %}required{% endif %} />
+        </div>
+        {% if is_required_field %}
+        <i style="color:red; float:left display:inline">*</i>
+        {% endif %}
+      </div>
+      <script type="text/javascript">
+        $('#uploadBtn_{{field.name}}').change(function () {
+          // alert("coming here " + this.value)
+          $('#uploadFile_{{field.name}}').val(this.value);
+        });
+      </script>
 
 
 
@@ -270,7 +284,7 @@
               });
 
           </script>
-          
+
 
 
         {% else %}
@@ -280,12 +294,6 @@
 
 
 
-
-
-
-
-  {# {{ fields_name }} #}
-  {# {{ fields_type }} #}
 
   {% endif %}
 {% elif gs_type == 'relation_set' %}
