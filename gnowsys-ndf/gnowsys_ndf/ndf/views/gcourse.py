@@ -1868,7 +1868,7 @@ def course_dashboard(request, group_id):
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'dashboard', 'allow_to_join': allow_to_join,
+            'group_obj': group_obj, 'title': 'dashboard', 'allow_to_join': allow_to_join,
             "course_complete_percentage": course_complete_percentage,
             "total_count":total_count, "completed_count":completed_count,
         })
@@ -1902,12 +1902,31 @@ def course_content(request, group_id):
 
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
+    banner_pic_obj = None
+    old_profile_pics = []
+    if not banner_pic_obj:
+        for each in group_obj.relation_set:
+            if "has_banner_pic" in each:
+                banner_pic_obj = node_collection.one(
+                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                )
+                break
+
+    has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            if n not in old_profile_pics:
+                old_profile_pics.append(n)
+
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'course content',
+            'group_obj': group_obj, 'title': 'course content',
             'allow_to_join': allow_to_join,
             "leaf_ids":leaf_ids,"completed_ids":completed_ids,"incompleted_ids":incompleted_ids,
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
             })
     return render_to_response(template, context_variables)
 
@@ -1926,12 +1945,31 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
     thread_node = None
     
+    banner_pic_obj = None
+    old_profile_pics = []
+    if not banner_pic_obj:
+        for each in group_obj.relation_set:
+            if "has_banner_pic" in each:
+                banner_pic_obj = node_collection.one(
+                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                )
+                break
+
+    has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            if n not in old_profile_pics:
+                old_profile_pics.append(n)
+
     
     
     allow_to_join = get_group_join_status(group_obj)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'notebook', 'allow_to_join': allow_to_join,
+            'group_obj': group_obj, 'title': 'notebook', 'allow_to_join': allow_to_join,
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
             }
 
     if request.user.is_authenticated():
@@ -1968,7 +2006,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     context_variables.update({'blog_pages': blog_pages})
     context_variables.update({'user_blogs': user_blogs})
     context_variables.update({'tab': tab})
-    context_variables.update({'notebook_obj': notebook_obj})
+    context_variables.update({'node': notebook_obj})
         
     return render_to_response(template, 
                                 context_variables,
@@ -1994,10 +2032,29 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
 
     allow_to_join = get_group_join_status(group_obj)
 
+    banner_pic_obj = None
+    old_profile_pics = []
+    if not banner_pic_obj:
+        for each in group_obj.relation_set:
+            if "has_banner_pic" in each:
+                banner_pic_obj = node_collection.one(
+                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                )
+                break
+
+    has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            if n not in old_profile_pics:
+                old_profile_pics.append(n)
+
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'raw material'
+            'group_obj': group_obj, 'title': 'raw material',
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
         }
     if node_id:
         file_obj = node_collection.one({'_id': ObjectId(node_id)})
@@ -2042,12 +2099,31 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     allow_to_join = query_dict = None
     allow_to_join = get_group_join_status(group_obj)
     
+    banner_pic_obj = None
+    old_profile_pics = []
+    if not banner_pic_obj:
+        for each in group_obj.relation_set:
+            if "has_banner_pic" in each:
+                banner_pic_obj = node_collection.one(
+                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                )
+                break
+
+    has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            if n not in old_profile_pics:
+                old_profile_pics.append(n)
+
     
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'gallery', 'allow_to_upload':allow_to_upload, 
-            'allow_to_join':allow_to_join
+            'group_obj': group_obj, 'title': 'gallery', 'allow_to_upload':allow_to_upload, 
+            'allow_to_join':allow_to_join,
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
         }
 
     if node_id:
@@ -2121,7 +2197,7 @@ def course_about(request, group_id):
     # print "\n\n prof_pic_obj" ,banner_pic_obj
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
+            'group_obj': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
             'weeks_count': weeks_count,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
         })
@@ -2140,8 +2216,6 @@ def course_gallerymodal(request, group_id, node_id):
     allow_to_comment = None
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     allow_to_join = get_group_join_status(group_obj)
-    
-    
 
     template = 'ndf/ggallerymodal.html'
 
@@ -2280,88 +2354,91 @@ def course_analytics(request, group_id):
     t0 = time.time()
     analytics_data = {}
 
-    anaytics_instance = AnalyticsMethods(request, request.user.id,request.user.username, group_id)
+    analytics_instance = AnalyticsMethods(request, request.user.id,request.user.username, group_id)
     # Modules Section
-    all_modules= anaytics_instance.get_total_modules_count()
-    completed_modules = anaytics_instance.get_completed_modules_count()
+    all_modules= analytics_instance.get_total_modules_count()
+    completed_modules = analytics_instance.get_completed_modules_count()
 
     # Units Section
-    all_units = anaytics_instance.get_total_units_count()
+    all_units = analytics_instance.get_total_units_count()
     # print "\n Total Units =  ", all_units, "\n\n"
-    completed_units = anaytics_instance.get_completed_units_count()
+    completed_units = analytics_instance.get_completed_units_count()
     # print "\n Completed Units =  ", completed_units, "\n\n"
 
     # Resources Section
-    # analytics_data['total_res'] = anaytics_instance.get_total_resources_count()
+    # analytics_data['total_res'] = analytics_instance.get_total_resources_count()
     # print "\n Total Resources === ", total_res, "\n\n"
-    # analytics_data['completed_res'] = anaytics_instance.get_completed_resources_count()
+    # analytics_data['completed_res'] = analytics_instance.get_completed_resources_count()
     # print "\n Completed Resources === ", completed_res, "\n\n"
 
 
     # QuizItem Section
-    analytics_data['total_quizitems'] = anaytics_instance.get_total_quizitems_count()
+    analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
     # print "\n Total QuizItemEvents === ", total_quizitems, "\n\n"
-    analytics_data['attempted_quizitems'] = anaytics_instance.get_attempted_quizitems_count()
+    analytics_data['attempted_quizitems'] = analytics_instance.get_attempted_quizitems_count()
     # print "\n Attempted QuizItemEvents === ", attempted_quizitems, "\n\n"
-    analytics_data['correct_attempted_quizitems'] = anaytics_instance.get_evaluated_quizitems_count(True,False)
+    analytics_data['correct_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(True,False)
     # print "\n Correct Attempted QuizItemEvents === ", correct_attempted_quizitems, "\n\n"
-    analytics_data['incorrect_attempted_quizitems'] = anaytics_instance.get_evaluated_quizitems_count(False,True)
+    analytics_data['incorrect_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(False,True)
     # print "\n InCorrect Attempted QuizItemEvents === ", incorrect_attempted_quizitems, "\n\n"
 
 
     # Notes Section
-    analytics_data['total_notes'] = anaytics_instance.get_total_notes_count()
+    analytics_data['total_notes'] = analytics_instance.get_total_notes_count()
     # print "\n Total Notes === ", total_notes, "\n\n"
-    analytics_data['user_notes'] = anaytics_instance.get_user_notes_count()
+    analytics_data['user_notes'] = analytics_instance.get_user_notes_count()
     # print "\n User Notes === ", user_notes, "\n\n"
 
 
     # Files Section
-    analytics_data['total_files'] = anaytics_instance.get_total_files_count()
+    analytics_data['total_files'] = analytics_instance.get_total_files_count()
     # print "\n Total Files === ", total_files, "\n\n"
-    analytics_data['user_files'] = anaytics_instance.get_user_files_count()
+    analytics_data['user_files'] = analytics_instance.get_user_files_count()
     # print "\n User's Files === ", user_files, "\n\n"
 
 
     # Comments
-    analytics_data['total_cmnts_by_user'] = anaytics_instance.get_total_comments_by_user()
+    analytics_data['total_cmnts_by_user'] = analytics_instance.get_total_comments_by_user()
     # print "\n Total Comments By User === ", total_cmnts_by_user, "\n\n"
 
 
     # Comments on Notes Section
-    analytics_data['cmts_on_user_notes'] = anaytics_instance.get_comments_counts_on_users_notes()
+    analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
     # print "\n Total Comments On User Notes === ", cmts_on_user_notes, "\n\n"
-    analytics_data['unique_users_commented_on_user_notes'] = anaytics_instance.get_commented_unique_users_count(True,False)
+    analytics_data['unique_users_commented_on_user_notes'] = analytics_instance.get_commented_unique_users_count(True,False)
     # print "\n Total Unique Users - Commented on User Notes === ", unique_users_commented_on_user_notes, "\n\n"
 
 
     # Comments on Files Section
-    analytics_data['cmts_on_user_files'] = anaytics_instance.get_comments_counts_on_users_files()
+    analytics_data['cmts_on_user_files'] = analytics_instance.get_comments_counts_on_users_files()
     # print "\n Total Comments User Files === ", cmts_on_user_files, "\n\n"
-    analytics_data['unique_users_commented_on_user_files'] = anaytics_instance.get_commented_unique_users_count(False,True)
+    analytics_data['unique_users_commented_on_user_files'] = analytics_instance.get_commented_unique_users_count(False,True)
     # print "\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files, "\n\n"
 
     # BY User
-    analytics_data['total_notes_read_by_user'] = anaytics_instance.get_others_notes_read_count()
+    analytics_data['total_notes_read_by_user'] = analytics_instance.get_others_notes_read_count()
     # print "\n Total Notes read by User === ", total_notes_read_by_user, "\n\n"
 
-    analytics_data['total_files_viewed_by_user'] = anaytics_instance.get_others_files_read_count()
+    analytics_data['total_files_viewed_by_user'] = analytics_instance.get_others_files_read_count()
     # print "\n Total Files viewed by User === ", total_files_viewed_by_user, "\n\n"
 
-    analytics_data['other_viewing_my_files'] = anaytics_instance.total_users_visted_my_files()
+    analytics_data['other_viewing_my_files'] = analytics_instance.total_users_visted_my_files()
     # print "\n Total Users viewing My FILES === ", other_viewing_my_files, "\n\n"
 
-    analytics_data['others_reading_my_notes'] = anaytics_instance.total_users_read_my_notes()
+    analytics_data['others_reading_my_notes'] = analytics_instance.total_users_read_my_notes()
     # print "\n Total Users reading My NOTES === ", others_reading_my_notes, "\n\n"
 
-    analytics_data['commented_on_others_notes'] = anaytics_instance.get_other_notes_commented_by_user_count()
+    analytics_data['commented_on_others_notes'] = analytics_instance.get_other_notes_commented_by_user_count()
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
 
-    analytics_data['commented_on_others_files'] = anaytics_instance.get_other_files_commented_by_user_count()
+    analytics_data['commented_on_others_files'] = analytics_instance.get_other_files_commented_by_user_count()
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
     
-    analytics_data['units_progress_stmt'] = str(completed_units) + " out of " + str(all_units) + " completed"
-    analytics_data['module_progress_stmt'] = str(completed_modules) + " out of " + str(all_modules) + " completed"
+
+    n = analytics_instance.get_ratings_received_on_user_notes()
+   
+    analytics_data['units_progress_stmt'] = str(completed_units) + " out of " + str(all_units) + " Units completed"
+    analytics_data['module_progress_stmt'] = str(completed_modules) + " out of " + str(all_modules) + " Modules completed"
     
 
     analytics_data['module_progress_meter'] = (completed_modules/float(all_modules))*100
@@ -2372,7 +2449,7 @@ def course_analytics(request, group_id):
     time_diff = t1 - t0
     print "\n ALL Total seconds == ", time_diff
 
-    del anaytics_instance
+    del analytics_instance
     return HttpResponse(json.dumps(analytics_data))
 
 
