@@ -2178,8 +2178,7 @@ def course_about(request, group_id):
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
-            'weeks_count': weeks_count, "course_complete_percentage": course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count,
+            'weeks_count': weeks_count,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
         })
     return render_to_response(template, context_variables)
