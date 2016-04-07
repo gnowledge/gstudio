@@ -1897,7 +1897,6 @@ def course_content(request, group_id):
 
 @get_execution_time
 def course_notebook(request, group_id, tab=None, notebook_id=None):
-    print "inside notebook_"
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
@@ -1908,9 +1907,6 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
     thread_node = None
-    
-    
-    
     allow_to_join = get_group_join_status(group_obj)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
@@ -1930,12 +1926,9 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
         # print "\n -- user --",user_blogs.count()
 
     if notebook_id:
-        print "notebokk_id found"
         notebook_obj = node_collection.one({'_id': ObjectId(notebook_id)})
         thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
-        # print "\n Comming here 1-- "
     else:
-        # print "\n Comming here 2-- "
         if user_blogs and user_blogs.count():
             notebook_obj = user_blogs[0]
             tab = 'my-notes'
@@ -1947,10 +1940,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
         else:
             tab = 'all-notes'
 
-        # print "\n Comming here 3-- "
         if notebook_obj:
-            # print "\n Comming here 4-- "
-            # print "notebokk found"
             return HttpResponseRedirect(reverse('course_notebook_tab_note', kwargs={'group_id': group_id, 'tab': tab, "notebook_id": notebook_obj.pk }))
 
     context_variables.update({'allow_to_comment': allow_to_comment})
