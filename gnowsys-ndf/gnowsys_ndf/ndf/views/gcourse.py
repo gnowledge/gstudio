@@ -2457,14 +2457,14 @@ def course_analytics(request, group_id):
 
 
     # Notes Section
-    analytics_data['total_notes'] = analytics_instance.get_total_notes_count()
+    # analytics_data['total_notes'] = analytics_instance.get_total_notes_count()
     # print "\n Total Notes === ", total_notes, "\n\n"
     analytics_data['user_notes'] = analytics_instance.get_user_notes_count()
     # print "\n User Notes === ", user_notes, "\n\n"
 
 
     # Files Section
-    analytics_data['total_files'] = analytics_instance.get_total_files_count()
+    # analytics_data['total_files'] = analytics_instance.get_total_files_count()
     # print "\n Total Files === ", total_files, "\n\n"
     analytics_data['user_files'] = analytics_instance.get_user_files_count()
     # print "\n User's Files === ", user_files, "\n\n"
@@ -2476,9 +2476,9 @@ def course_analytics(request, group_id):
 
 
     # Comments on Notes Section
-    analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
+    # analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
     # print "\n Total Comments On User Notes === ", cmts_on_user_notes, "\n\n"
-    analytics_data['unique_users_commented_on_user_notes'] = analytics_instance.get_commented_unique_users_count(True,False)
+    # analytics_data['unique_users_commented_on_user_notes'] = analytics_instance.get_commented_unique_users_count(True,False)
     # print "\n Total Unique Users - Commented on User Notes === ", unique_users_commented_on_user_notes, "\n\n"
 
 
