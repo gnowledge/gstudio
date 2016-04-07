@@ -1056,7 +1056,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
                     fileobj.content_org = unicode(content_org)
                     # Required to link temporary files with the current user who is modifying this document
                     filename_content = slugify(title) + "-" + usrname + "-"
-                    fileobj.content = org2html(content_org, file_prefix=filename_content)
+                    fileobj.content = content_org
                 if tags:
                     # print "\n\n tags",tags
                     if not type(tags) is list:
@@ -1643,8 +1643,16 @@ def readDoc(request, _id, group_id, file_name=""):
 
 
     file_node = node_collection.one({"_id": ObjectId(_id)})
+
+
     if file_node is not None:
-        if file_node.fs_file_ids:
+            
+        if hasattr(file_node, 'if_file') and file_node.if_file.original.relurl:
+            # print "md5_or_relurl : ", file_node.if_file.original
+            return HttpResponse(file_node.get_file(file_node.if_file.original.relurl),
+                                content_type=file_node.if_file.mime_type)
+
+        elif file_node.fs_file_ids:
             if file_node.mime_type == 'video':
                 if len(file_node.fs_file_ids) > 2:
                     if (file_node.fs.files.exists(file_node.fs_file_ids[2])):

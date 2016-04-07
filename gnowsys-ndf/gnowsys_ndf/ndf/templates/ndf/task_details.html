@@ -182,7 +182,7 @@
           <b>{% trans "Description:" %}</b>
         {% if task_type_name.0.name != "Moderation" %}
           {% if user_obj.username == request.user.username or request.user.is_superuser %}
-          <a href="#" class="button tiny" style="float:right" data-reveal-id="contentModal"> {% trans 'Edit' %}</a>
+          <a href="#" class="button tiny edit-desc" style="float:right" > {% trans 'sEdit' %}</a>
           {% endif %}
         {% endif %}
         </label>
@@ -283,12 +283,12 @@
     <a class="close-reveal-modal"> &#215;</a>
   </div>
 
-  <div id="contentModal" class="reveal-modal" data-reveal>
+  <div id="contentModal" class="get_editor" style="display:none">
     <div class="medium-12 columns">
       <label><b>{% trans "Description" %}</b></label>
 
       <div id="contentlist" class="content">
-        {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder=" trans Enter the content here " var_value=node.content_org %}
+        {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
       </div>
 
       <a href="#" class="button tiny" id="content_save">{% trans "Save" %}</a>
@@ -304,6 +304,9 @@
 {% get_user_object node.created_by as user_obj %}
 {% if user_obj.username = request.user.username or request.user.is_superuser %}
 var task_title = "{{node.name}}"
+$(document).on('click',".edit-desc",function(){
+  $(".get_editor").css("display","block");
+});
 
 $(document).on('click',"#title_save",function(){
 var editedTitle = $('input[name=name]').val();
@@ -329,14 +332,16 @@ else {
 });
 
 $(document).on('click',"#content_save",function(){
-var editedContent = $('#orgitdown_content_org').val();
+var editedContent = CKEDITOR.instances['ckeditor_textarea'].getData();;
              $.ajax({
              url: "{% url 'edit_task_content' groupid %}",
              type: 'POST',
              data: {taskid:"{{node}}",csrfmiddlewaretoken: '{{ csrf_token }}',content_org:editedContent},
              beforeSend: function() {     },
              success: function(result){
-      $('#nodeContentId').html(result);
+                  $(".get_editor").css("display","none");
+
+                $('#nodeContentId').html(result);
 
              },
              complete: function(){ 

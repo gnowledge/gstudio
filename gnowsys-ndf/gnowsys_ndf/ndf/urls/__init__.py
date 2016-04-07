@@ -49,6 +49,7 @@ urlpatterns = patterns('',
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
     # all main apps
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
+    (r'^(?P<group_id>[^/]+)/filehive', include('gnowsys_ndf.ndf.urls.filehive')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_id>[^/]+)/audio', include('gnowsys_ndf.ndf.urls.audio')),
     (r'^(?P<group_id>[^/]+)/video', include('gnowsys_ndf.ndf.urls.video')),
@@ -195,4 +196,14 @@ urlpatterns = patterns('',
 
    (r'^status/cache/$', 'gnowsys_ndf.ndf.views.cache.cache_status'),
     # url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
+)
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+        url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
+            'document_root': settings.STATIC_ROOT,
+        }),
 )

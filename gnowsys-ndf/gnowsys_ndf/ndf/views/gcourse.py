@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from mongokit import IS
 from mongokit import paginator
 try:
@@ -37,9 +38,9 @@ from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status
 from gnowsys_ndf.notification import models as notification
 
-
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+gst_file = node_collection.one({'_type': "GSystemType", 'name': u"File"})
 
 app = GST_COURSE
 
@@ -1864,7 +1865,9 @@ def course_content(request, group_id):
     group_id    = group_obj._id
     group_name  = group_obj.name
     result_status = course_complete_percentage = None
-    leaf_ids = completed_ids = incompleted_ids = course_complete_percentage = total_count = completed_count = None
+
+    leaf_ids = completed_ids = incompleted_ids = total_count = completed_count = None
+
     if request.user.is_authenticated:
         result_status = get_course_completetion_status(group_obj, request.user.id, True)
         if result_status:
@@ -1887,16 +1890,14 @@ def course_content(request, group_id):
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'course content',
-            'allow_to_join': allow_to_join, "course_complete_percentage": course_complete_percentage,
+            'allow_to_join': allow_to_join,
             "leaf_ids":leaf_ids,"completed_ids":completed_ids,"incompleted_ids":incompleted_ids,
-            "total_count": total_count, "completed_count":completed_count
-        })
+            })
     return render_to_response(template, context_variables)
 
 
 @get_execution_time
 def course_notebook(request, group_id, tab=None, notebook_id=None):
-
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
     group_name = group_obj.name
@@ -1907,24 +1908,10 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
     thread_node = None
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
-    
     allow_to_join = get_group_join_status(group_obj)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'notebook', 'allow_to_join': allow_to_join,
-            "course_complete_percentage": course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count
             }
 
     if request.user.is_authenticated():
@@ -1973,6 +1960,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
 def course_raw_material(request, group_id, node_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     
+    coll_file_cur = []
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     allow_to_upload = False
@@ -1982,25 +1970,15 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     gstaff_users.append(group_obj.created_by)
     allow_to_join = None
     files_cur = None
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
+    
+    
 
     allow_to_join = get_group_join_status(group_obj)
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
 
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'node': group_obj, 'title': 'raw material', "completed_count": completed_count,
-            'total_count':total_count, "course_complete_percentage":course_complete_percentage
+            'node': group_obj, 'title': 'raw material'
         }
     if node_id:
         file_obj = node_collection.one({'_id': ObjectId(node_id)})
@@ -2010,12 +1988,39 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
     else:
 
-        files_cur = node_collection.find({'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
-            # 'tags': {'$regex': u"raw", '$options': "i"}
-            },{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+        files_cur = node_collection.find({
+                                        '_type': {'$in': ["File", "GSystem"]},
+                                        'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        'created_by': {'$in': gstaff_users},
+                            # '$or': [
+                                    # {
+                                    # },
+                                    # {
+                                    #     '$or': [
+                                    #             {'access_policy': u"PUBLIC"},
+                                    #             {
+                                    #                 '$and': [
+                                    #                         {'access_policy': u"PRIVATE"},
+                                    #                         {'created_by': request.user.id}
+                                    #                     ]
+                                    #             }
+                                    #         ],
+                                    # }
+                                    # {    'collection_set': {'$exists': "true", '$not': {'$size': 0} }}
+                                # ]
+                        },
+                        {
+                            'name': 1,
+                            '_id': 1,
+                            'fs_file_ids': 1,
+                            'member_of': 1,
+                            'mime_type': 1
+                        }).sort("last_update", -1)
 
-        raw_material_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-        context_variables.update({'raw_material_page_info':raw_material_page_info})
+    raw_material_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    # context_variables.update({'coll_file_cur':files_cur})
+
     # print "\n\n\n\n **course_raw_page_info",course_raw_page_info
     gstaff_access = check_is_gstaff(group_id,request.user)
 
@@ -2025,7 +2030,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
 
-    context_variables.update({'files_cur': files_cur, 'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
+    context_variables.update({'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
     return render_to_response(template, 
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -2044,23 +2049,13 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     allow_to_upload = True
     allow_to_join = query_dict = None
     allow_to_join = get_group_join_status(group_obj)
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
+    
+    
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'gallery', 'allow_to_upload':allow_to_upload, 
-            'allow_to_join':allow_to_join, "completed_count": completed_count,
-            'total_count':total_count, "course_complete_percentage":course_complete_percentage
+            'allow_to_join':allow_to_join
         }
 
     if node_id:
@@ -2070,14 +2065,80 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
     else:
+        coll_cur = node_collection.find({
+                          'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+                                            '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                    {'access_policy': u"PRIVATE"},
+                                                    {'created_by': request.user.id}
+                                                ]
+                                             }
+                                            ],
+                                            'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                        }).sort("last_update", -1)
+
         gstaff_users.extend(group_obj.group_admin)
         gstaff_users.append(group_obj.created_by)
-        query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}}
-        files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+        # query = {
+        #             'group_set': group_id,
+        #             'relation_set.clone_of':{'$exists': False},
+        #             '_type': "File",
+        #             'created_by': {'$nin': gstaff_users}
+        #         }
+        # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+
+        # files_cur = node_collection.find({
+        #                             '_type': {'$in': ["File", "GSystem"]},
+        #                             'member_of': {'$in': [gst_file._id]},
+        #                             'group_set': group_id,
+        #                             'created_by': {'$nin': gstaff_users},
+        #                         },
+        #                         {
+        #                             'name': 1,
+        #                             '_id': 1,
+        #                             'fs_file_ids': 1,
+        #                             'if_file': 1,
+        #                             'member_of': 1,
+        #                             'mime_type': 1
+        #                         }).sort('created_at', -1)
+
+        # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
         # print "\n\n Total files: ", files_cur.count()
+        files_cur = node_collection.find({
+                                        '_type': "File",
+                                        'member_of': {'$in': [GST_FILE._id, GST_PAGE._id] },
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        'relation_set.clone_of': {'$exists': False},
+                                    '$or': [
+                                            {
+                                                'created_by': {'$nin': gstaff_users},
+                                            },
+                                            {
+                                                '$or': [
+                                                        {'access_policy': u"PUBLIC"},
+                                                        {
+                                                            '$and': [
+                                                            {'access_policy': u"PRIVATE"},
+                                                            {'created_by': request.user.id}
+                                                        ]
+                                                     }
+                                                    ],
+                                                # 'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                            }
+                                        ]},
+                                        {
+                                            'name': 1,
+                                            '_id': 1,
+                                            'fs_file_ids': 1,
+                                            'member_of': 1,
+                                            'mime_type': 1
+                                        }).sort("last_update", -1)
+
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-        context_variables.update({'gallery_page_info':gallery_page_info})
+        context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':coll_cur})
     template = 'ndf/gcourse_event_group.html'
 
     return render_to_response(template, 
@@ -2098,17 +2159,8 @@ def course_about(request, group_id):
     last_date = get_attribute_value(group_obj._id,"end_time")
 
     allow_to_join = get_group_join_status(group_obj)
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
+    
+    
 
     if start_date and last_date:
       start_date = start_date.date()
@@ -2122,11 +2174,30 @@ def course_about(request, group_id):
     
     template = 'ndf/gcourse_event_group.html'
 
+    banner_pic_obj = None
+    old_profile_pics = []
+    if not banner_pic_obj:
+        for each in group_obj.relation_set:
+            if "has_banner_pic" in each:
+                banner_pic_obj = node_collection.one(
+                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                )
+                break
+
+    has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            if n not in old_profile_pics:
+                old_profile_pics.append(n)
+
+    # print "\n\n prof_pic_obj" ,banner_pic_obj
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'node': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
-            'weeks_count': weeks_count, "course_complete_percentage": course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count
+            'weeks_count': weeks_count,
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
         })
     return render_to_response(template, context_variables)
 
@@ -2143,17 +2214,8 @@ def course_gallerymodal(request, group_id, node_id):
     allow_to_comment = None
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     allow_to_join = get_group_join_status(group_obj)
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
+    
+    
 
     template = 'ndf/ggallerymodal.html'
 
@@ -2162,8 +2224,7 @@ def course_gallerymodal(request, group_id, node_id):
             'node': node_obj, 'title': 'course_gallerymodall',
             'allow_to_comment': allow_to_comment,
             'thread_node': thread_node,
-            'allow_to_join': allow_to_join, "course_complete_percentage": course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count           
+            'allow_to_join': allow_to_join
         })
     return render_to_response(template, context_variables)
 
@@ -2183,17 +2244,8 @@ def course_note_page(request, group_id):
     
     
     allow_to_join = get_group_join_status(group_obj)
-    result_status = course_complete_percentage = None
-    total_count = completed_count = None
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
+    
+    
 
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     template = 'ndf/note_page.html'
@@ -2203,8 +2255,7 @@ def course_note_page(request, group_id):
             'node': node_obj, 'title': 'course_gallerymodall',
             'allow_to_comment': allow_to_comment,
             'thread_node': thread_node, 'allow_to_join': allow_to_join,
-            "course_complete_percentage": course_complete_percentage,
-            "total_count":total_count, "completed_count":completed_count           
+            
         })
     return render_to_response(template, context_variables)
 
@@ -2296,3 +2347,23 @@ def course_filters(request, group_id):
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
+
+
+@login_required
+@get_execution_time
+def build_progress_bar(request, group_id, node_id):
+    cache_key = u'build_progress_bar_' + unicode(group_id) + "_" + unicode(node_id) + "_" + unicode(request.user.id) 
+    cache_result = cache.get(cache_key)
+    if cache_result:
+        return HttpResponse(cache_result)
+    result_status = {}
+    try:
+        group_obj   = get_group_name_id(group_id, get_obj=True)
+        course_complete_percentage = total_count = completed_count = None
+        if request.user.is_authenticated:
+            result_status = get_course_completetion_status(group_obj, request.user.id)
+    except Exception as e:
+        # print "\n\n Error while fetching ---", e
+        pass
+    cache.set(cache_key, json.dumps(result_status), 60*15)
+    return HttpResponse(json.dumps(result_status))

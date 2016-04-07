@@ -1,0 +1,18 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load cache %}
+
+{% load ndf_tags %}
+{% block title %} filehive {% endblock %}
+
+{% block body_content %}
+	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
+	{% for each_filehive in all_filehives %}
+		<li class="card-image-wrapper" > 
+		{% include 'ndf/simple_card.html' with  has_contributor=True resource=each_filehive url_name='file_detail' first_arg=group_id second_arg=each_filehive.pk third_arg='' %}
+		</li>
+	{% empty %}
+		No files found
+	{% endfor %}
+	</ul>
+{% endblock body_content %}

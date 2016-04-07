@@ -217,9 +217,12 @@ def get_schema(node):
    if(nam == 'Page'):
         return [1,schema_dict[nam]]
    elif(nam=='File'):
-	if( 'image' in node.mime_type):
+
+   	mime_type = node.get_gsystem_mime_type()
+
+	if 'image' in mime_type:
 		return [1,schema_dict['Image']]
-        elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+        elif('video' in mime_type or 'Pandora_video' in mime_type):
         	return [1,schema_dict['Video']]
 	else:
 		return [1,schema_dict['Document']]	
@@ -1354,7 +1357,7 @@ def get_edit_url(groupid):
 	if node._type == 'GSystem':
 
 		type_name = node_collection.one({'_id': node.member_of[0]}).name
-                
+
 		if type_name == 'Quiz':
 			return 'quiz_edit'    
 		elif type_name == 'Page':
@@ -1369,15 +1372,20 @@ def get_edit_url(groupid):
 			return 'edit_forum'
 		elif type_name == 'Twist' or type_name == 'Thread':
 			return 'edit_thread'
+		elif type_name == 'File':
+			return 'file_edit'
 
 
 	elif node._type == 'Group' or node._type == 'Author' :
 		return 'edit_group'
 
 	elif node._type == 'File':
-		if node.mime_type == 'video':      
+
+		mime_type = node.get_gsystem_mime_type()
+
+		if 'video' in mime_type:      
 			return 'video_edit'       
-		elif 'image' in node.mime_type:
+		elif 'image' in mime_type:
 			return 'image_edit'
 		else:
 			return 'file_edit'
@@ -3577,3 +3585,25 @@ def get_info_pages(group_id):
 	# 	for eachnode in info_page_nodes:
 	# 		list_of_nodes.append({'name': eachnode.name,'id': eachnode._id})
 	return info_page_nodes
+
+
+@get_execution_time
+@register.assignment_tag
+def get_download_filename(node, file_size_name='original'):
+
+	if hasattr(node, 'if_file') and node.if_file[file_size_name].relurl:
+
+		from django.template.defaultfilters import slugify
+
+		relurl = node.if_file[file_size_name].relurl
+		extension = relurl.split('.')[-1]
+		name = node.altnames if node.altnames else node.name
+
+		file_name = slugify(name) + '.' + extension
+
+		return file_name
+
+	else:
+		name = node.altnames if node.altnames else node.name
+
+		return name

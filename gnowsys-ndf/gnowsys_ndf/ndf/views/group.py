@@ -208,7 +208,8 @@ class CreateGroup(object):
             # Required to link temporary files with the current user who is:
             usrname = self.request.user.username
             filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-            group_obj.content = org2html(content_org, file_prefix=filename)
+            # group_obj.content = org2html(content_org, file_prefix=filename)
+            group_obj.content = content_org
             is_changed = True
 
         # decision for adding moderation_level
@@ -2474,22 +2475,35 @@ def upload_using_save_file(request,group_id):
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
     usrid = request.user.id
-    # url_name = "/"+str(group_id)
-    for key,value in request.FILES.items():
-        fname=unicode(value.__dict__['_name'])
-        # print "key=",key,"value=",value,"fname=",fname
-        fileobj,fs = save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
-        file_obj = node_collection.find_one({'_id': ObjectId(fileobj)})
-        if file_obj:
-            #set interaction-settings
-            discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-            create_gattribute(file_obj._id, discussion_enable_at, True)
-            return_status = create_thread_for_node(request,group_obj._id, file_obj)
 
-        # if file_obj:
-        #     url_name = "/"+str(group_id)+"/#gallery-tab"
-        if title == "gallery":
-            return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
-        else:
-            return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
-        # return HttpResponseRedirect(url_name)
+    # # url_name = "/"+str(group_id)
+    # for key,value in request.FILES.items():
+    #     fname=unicode(value.__dict__['_name'])
+    #     # print "key=",key,"value=",value,"fname=",fname
+    #     fileobj,fs = save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=group_obj.access_policy, count=0, first_object="", oid=True)
+    #     file_obj = node_collection.find_one({'_id': ObjectId(fileobj)})
+    #     if file_obj:
+    #         #set interaction-settings
+    #         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+    #         create_gattribute(file_obj._id, discussion_enable_at, True)
+    #         return_status = create_thread_for_node(request,group_obj._id, file_obj)
+
+    #     # if file_obj:
+    #     #     url_name = "/"+str(group_id)+"/#gallery-tab"
+    
+    from gnowsys_ndf.ndf.views.filehive import write_files
+
+    gs_obj_list = write_files(request, group_id)
+    # print "gs_obj_list: ", gs_obj_list
+
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+    for each_gs_file in gs_obj_list:
+        #set interaction-settings
+        create_gattribute(each_gs_file._id, discussion_enable_at, True)
+        return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
+
+    if title == "gallery":
+        return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
+    else:
+        return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
+    # return HttpResponseRedirect(url_name)
