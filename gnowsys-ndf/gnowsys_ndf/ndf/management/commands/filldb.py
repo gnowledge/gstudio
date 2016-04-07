@@ -22,10 +22,11 @@ from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 # from gnowsys_ndf.ndf.models import Node, GSystemType, ToReduceDocs, ReducedDocs, IndexedWordList
 # from gnowsys_ndf.ndf.models import Group
 # from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES, QUIZ_TYPE_CHOICES_TU
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GAPPS
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.settings import GSTUDIO_TASK_TYPES
 from gnowsys_ndf.factory_type import factory_gsystem_types, factory_attribute_types, factory_relation_types
+from gnowsys_ndf.ndf.utils import is_dir_exists, get_current_dbs_path, move_file_or_dirctory
 
 ###############################################################################
 # Global variables
