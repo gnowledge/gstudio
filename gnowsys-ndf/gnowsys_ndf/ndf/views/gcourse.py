@@ -2509,12 +2509,10 @@ def course_analytics(request, group_id):
     
 
     analytics_data['total_rating_rcvd_on_notes'] = analytics_instance.get_ratings_received_on_user_notes()
-    print "\n\n analytics_data['total_rating_rcvd_on_notes'] === ",analytics_data['total_rating_rcvd_on_notes']
+    # print "\n\n analytics_data['total_rating_rcvd_on_notes'] === ",analytics_data['total_rating_rcvd_on_notes']
 
     analytics_data['total_rating_rcvd_on_files'] = analytics_instance.get_ratings_received_on_user_files()
-    print "\n\n analytics_data['total_rating_rcvd_on_files'] === ",analytics_data['total_rating_rcvd_on_files']
-
-    
+    # print "\n\n analytics_data['total_rating_rcvd_on_files'] === ",analytics_data['total_rating_rcvd_on_files']
 
     analytics_data['units_progress_stmt'] = str(completed_units) + " out of " + str(all_units) + " Units completed"
     analytics_data['module_progress_stmt'] = str(completed_modules) + " out of " + str(all_modules) + " Modules completed"
@@ -2523,6 +2521,8 @@ def course_analytics(request, group_id):
     analytics_data['module_progress_meter'] = (completed_modules/float(all_modules))*100
     
     analytics_data['unit_progress_meter'] = (completed_units/float(all_units))*100
+    
+    analytics_data['users_points'] = analytics_instance.get_users_points()
 
     t1 = time.time()
     time_diff = t1 - t0

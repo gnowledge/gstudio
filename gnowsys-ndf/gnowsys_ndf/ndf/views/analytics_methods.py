@@ -615,3 +615,15 @@ class AnalyticsMethods(object):
 		time_diff = t1 - t0
 		print "\n get_ratings_received_on_user_files == ", time_diff
 		return avg_rating_files,len(unique_user_list)
+
+
+
+	def get_users_points(self):
+		t0 = time.time()
+		total_points = 0
+		user_files = self.get_user_files_count()
+		user_notes = self.get_user_notes_count()
+		correct_attempted_quizitems = self.get_evaluated_quizitems_count(True,False)
+		total_points = (user_files*25) + (user_notes*30) + (correct_attempted_quizitems*5)
+		print "\n get_users_points -- ",total_points
+		return total_points
