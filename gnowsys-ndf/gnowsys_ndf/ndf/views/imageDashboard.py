@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
+from mongokit import paginator
 
 try:
     from bson import ObjectId
@@ -24,7 +25,8 @@ GST_IMAGE = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
 
 
 @get_execution_time
-def imageDashboard(request, group_id, image_id=None):
+def imageDashboard(request, group_id, image_id=None,page_no=1):
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     '''
     fetching image acording to group name
     '''
@@ -49,10 +51,41 @@ def imageDashboard(request, group_id, image_id=None):
         image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
         if image_ins:
             image_id = str(image_ins._id)
-    img_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    # img_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': ObjectId(group_id)}).sort("last_update", -1)
+    files_cur = node_collection.find({
+                                        '_type': {'$in': ["File", "GSystem"]},
+                                        'member_of': {'$in': [GST_IMAGE._id]},
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        # 'created_by': {'$in': gstaff_users},
+                            # '$or': [
+                                    # {
+                                    # },
+                                    # {
+                                    #     '$or': [
+                                    #             {'access_policy': u"PUBLIC"},
+                                    #             {
+                                    #                 '$and': [
+                                    #                         {'access_policy': u"PRIVATE"},
+                                    #                         {'created_by': request.user.id}
+                                    #                     ]
+                                    #             }
+                                    #         ],
+                                    # }
+                                    # {    'collection_set': {'$exists': "true", '$not': {'$size': 0} }}
+                                # ]
+                        },
+                        {
+                            'name': 1,
+                            '_id': 1,
+                            'fs_file_ids': 1,
+                            'member_of': 1,
+                            'mime_type': 1,
+                            'if_file':1
+                        }).sort("last_update", -1)
+    image_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'imageCollection': img_col,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
+    variable = RequestContext(request, {'imageCollection': files_cur,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id,'image_page_info':image_page_info })
     return render_to_response(template, variable)
 
 @get_execution_time
