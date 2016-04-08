@@ -15,7 +15,7 @@ from gnowsys_ndf.settings import *
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import *
 
-
+@login_required
 def type_created(request,group_id):
     print "\n\n\n\n\n", "type_created" ,group_id , "\n\n\n\n\n\n\n\n"
 
@@ -38,6 +38,7 @@ def type_created(request,group_id):
     return render_to_response(template,variable)
 
 
+@login_required
 def default_template(request,group_id,node=None):
 
     try:
@@ -166,23 +167,42 @@ def default_template(request,group_id,node=None):
         f_rts_object_dict=[]
         rts_object_dict = []
         rts_obj= None
+        rts_obj1= None
+        rts_obj2= None
         k = None
+        rts_name = None
+        rts_alt = None
         for e in rts:
-            rts_obj = e.object_type
+            rts_name = e.name
+            rts_alt = e.altnames
+            r_oo = []
+            rts_obj1 = e.object_type
+            rts_obj2 = e.subject_type
+
+            for each in rts_obj1:
+                r_oo.append(each)
+            for each in rts_obj2:
+                r_oo.append(each)
+            for e in r_oo:
+                if e == node_gs_id:
+                    r_oo.remove(e)
+
             name_rst = []
             id_rst = []
-            for each in rts_obj:
-                k = node_collection.one({'_id':ObjectId(each) })
-                name_rst.append(k.name) 
-                # below code is to extract gs for each of them, the above would give gst
-                # id_rst.append(k._id)
 
-                # for v in id_rst:
-                #     m = node_collection.find({'_type':'GSystem','member_of':ObjectId(v) })
-                #     for c in m:
-                #         # print e.name
-                #         name_rst.append(c.name)
-            rts_object_dict = dict({ 'name':e.name, 'altnames':e.altnames, 'object_type':name_rst })
+            for each in r_oo:
+                k = node_collection.one({'_id':ObjectId(each) })
+                # name_rst.append(k.name) 
+                # below code is to extract gs for each of them, the above would give gst
+                id_rst.append(k._id)
+
+            for v in id_rst:
+                m = node_collection.find({'_type':'GSystem','member_of':ObjectId(v) })
+                for c in m:
+                    # print e.name
+                    name_rst.append(c.name)
+                    
+            rts_object_dict = dict({ 'name':rts_name, 'altnames':rts_alt, 'object_type':name_rst })
             f_rts_object_dict.append(rts_object_dict)
         # the code above returns a dict for the object display in template -- for rts
 
@@ -190,25 +210,41 @@ def default_template(request,group_id,node=None):
         f_pos_rts_object_dict=[]
         pos_rts_object_dict = []
         pos_rts_obj= None
+        pos_rts_obj1= None
+        pos_rts_obj2= None
         pos_k = None
+        final_rts_name = None
+        final_rts_alt = None
         for e in final_rts:
-            pos_rts_obj = e.object_type
+            final_rts_name = e.name
+            final_rts_alt = e.altnames
+            pos_r = []
+            # pos_rts_obj = e.object_type
+            pos_rts_obj1 = e.object_type
+            pos_rts_obj2 = e.subject_type
+            for e in pos_rts_obj1:
+                pos_r.append(e)
+            for e in pos_rts_obj2:
+                pos_r.append(e)
+            for e in pos_r:
+                if e == node_gs_id:
+                    pos_r.remove(e)
+
             name_pos_rst = []
             id_pos_rst = []
-            for each in pos_rts_obj:
+            for each in pos_r:
                 k = node_collection.one({'_id':ObjectId(each) })
                 # print k.name,k._id        
                 # name_pos_rst.append(k.name)
                 id_pos_rst.append(k._id)
 
-                for v in id_pos_rst:
-                    m = node_collection.find({'_type':'GSystem','member_of':ObjectId(v) })
-                    for c in m:
-                        # print e.name
-                        name_pos_rst.append(c.name)
-
-
-            pos_rts_object_dict = dict({'name':e.name ,'altnames':e.altnames, 'object_type':name_pos_rst})
+            for v in id_pos_rst:
+                m = node_collection.find({'_type':'GSystem','member_of':ObjectId(v) })
+                for c in m:
+                    # print e.name
+                    name_pos_rst.append(c.name)
+            
+            pos_rts_object_dict = dict({'name':final_rts_name ,'altnames':final_rts_alt, 'object_type':name_pos_rst})
             f_pos_rts_object_dict.append(pos_rts_object_dict)
         # the code above returns a dict for the object display in template -- for possible rts
 
@@ -252,6 +288,7 @@ def default_template(request,group_id,node=None):
             if key == "name":
                 # print "name"
                 if request.POST.get(key,""):
+
                     new_instance_type[key] = unicode(request.POST.get(key,""))
 
             if key == "altnames":
@@ -306,15 +343,15 @@ def default_template(request,group_id,node=None):
         # print new_instance_type
         # print new_instance_type._id
 
-        n_at = new_instance_type.attribute_set
-        n_at_full = []
+        # n_at = new_instance_type.attribute_set
+        # n_at_full = []
 
-        for e in n_at:
-            for k,l in e:
-                if l:
-                    n_at_full.append(e)
-                    q = node_collection.one({'_type':'AttributeType','name':k})
-                    z=create_gattribute(gsys_node._id,q,l)
+        # for e in n_at:
+        #     for k,l in e.iteritems():
+        #         if l:
+        #             n_at_full.append(e)
+        #             q = node_collection.one({'_type':'AttributeType','name':k})
+        #             z=create_gattribute(new_instance_type._id,q,l)
                     # print z
 
         # print n_at_full,"n_at_full"
@@ -323,19 +360,30 @@ def default_template(request,group_id,node=None):
         n_rt_full = []
 
         for e in n_rt:
-            for k,l in e:
+            for k,l in e.iteritems() :
                 if l:
                     n_rt_full.append(e)
         # print n_rt_full,"n_rt_full"
 
-        right_sub_list = []
         for e in n_rt_full:
-            for k,l in e:
+            for k,l in e.iteritems() :
                 if l:
-                    q = node_collection.one({'_type':'RelationType','name':l })
-                    r = node_collection.one({'_type':'GSystem','name':k })
-                    z = create_grelation(gsys_node._id,q,r._id)
-                    # print z , "GRELATION"
+                    right_sub_list = []
+                    q1 = node_collection.one({'_type':'RelationType','name':k })
+                    # print q1.name
+                    r1 = node_collection.one({'_type':'GSystem','name':l })
+                    right_sub_list.append(r1._id)
+                    # print r1.name
+                    # if r1:
+                        # print r1
+                    # else:
+                        # print l,k ,"else"
+                    z1 = create_grelation(new_instance_type._id,q1,right_sub_list)
+                    # print z1 , "GRELATION"
+                    
+                    # GRelationError (line 
+                    #2604): Cannot apply $addToSet modifier to non-array
+                    # for CourseEventGroup
 
     # If GET request ---------------------------------------------------------------------------------------
     # for key,value in class_structure.items():
