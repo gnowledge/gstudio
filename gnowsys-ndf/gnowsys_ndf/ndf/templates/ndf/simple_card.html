@@ -117,19 +117,20 @@
 </a>
 
 <!-- suppy no_footer=True for not having footer-->
-{% if not no_footer %}
+    {% if not no_footer %}
   <div class="scard-action">
     {% if has_contributor == True %}
-     <a href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}" target="_blank">
-      {{resource.created_by|get_username|truncatechars:"10"}}</a>|
+     <a style="margin-left:2px" href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}" target="_blank">
+      {{resource.created_by|get_username|truncatechars:"10"}}</a>
      {% endif %}
-         <i style="float">{{resource.created_at|date:"d-m-Y"}}</i>
+         <i style="float:right">{{resource.created_at|date:"d-m-Y"}}</i>
      {% if gstaff_access  %}
       {% if not no_checkbox %}
-        </a> <input type="checkbox" style="margin:0; float:right;" class="filenode" name="filenode" value="{{resource.pk}}">
+        </a> <input type="checkbox" style="margin:0; float:left;" class="filenode" name="filenode" value="{{resource.pk}}">
       {% endif %}
     {% endif %}
   </div>
 {% endif %}
+
 </a>
 </div>

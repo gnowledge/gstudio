@@ -353,7 +353,7 @@ this template is modified. So for the fields in the template it supports -
           </label>
         </a>
         <div id="content_org" class="content">
-          {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+          {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" ckeditor_toolbar="GeneralToolbar" node_id=node.pk %}
         </div>
       </dd>
     </dl>
