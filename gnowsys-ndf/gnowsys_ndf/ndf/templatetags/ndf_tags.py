@@ -3610,11 +3610,11 @@ def get_download_filename(node, file_size_name='original'):
 
 @get_execution_time
 @register.assignment_tag
-def get_file_size(node):
+def get_file_obj(node):
 	obj = node_collection.find_one({"_id": ObjectId(node._id)})
 	# print "\n\nobj",obj
 	if obj.if_file.original.id:
 		original_file_id = obj.if_file.original.id
 		original_file_obj = filehive_collection.find_one({"_id": ObjectId(obj.if_file.original.id)})
-		return original_file_obj.length
+		return original_file_obj
 
