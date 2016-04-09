@@ -78,7 +78,7 @@ i.remove-tag{
   </div>
 </form>
 -->
-<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'write_file' groupid %}">{% csrf_token %}
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file' groupid %}">{% csrf_token %}
 	<div class ="row">
 		<fieldset small-6 large-12 columns>
 			<legend>{% trans "Upload File" %}</legend>
