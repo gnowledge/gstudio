@@ -2423,6 +2423,10 @@ def course_filters(request, group_id):
 @login_required
 @get_execution_time
 def course_analytics(request, group_id):
+    cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(request.user.id) 
+    cache_result = cache.get(cache_key)
+    if cache_result:
+        return HttpResponse(cache_result)
     import time
     t0 = time.time()
     analytics_data = {}
@@ -2529,6 +2533,7 @@ def course_analytics(request, group_id):
     print "\n ALL Total seconds == ", time_diff
 
     del analytics_instance
+    cache.set(cache_key, json.dumps(analytics_data), 60*15)
     return HttpResponse(json.dumps(analytics_data))
 
 
