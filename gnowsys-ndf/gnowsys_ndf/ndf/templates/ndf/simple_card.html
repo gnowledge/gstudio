@@ -48,8 +48,8 @@
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
 
     {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
-    {% if resource.if_file.thumbnail.relurl %}
-        <img src="{{MEDIA_URL}}{{resource.if_file.thumbnail.relurl}}">
+    {% if resource.if_file.mid.relurl %}
+        <img src="{{MEDIA_URL}}{{resource.if_file.mid.relurl}}">
     {% elif not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
         <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
     {% elif resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
