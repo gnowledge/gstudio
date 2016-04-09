@@ -144,8 +144,8 @@
             $("#save-recording").click(function(){
                           var d = new Date();
                           timeStamp = d.getTime();
-                          timeStamp = timeStamp.toString();
-                         
+                          fileName = timeStamp.toString();
+                          file = blob
 
                           //alert(timeStamp);
                           console.log(blob);
@@ -159,7 +159,7 @@
                         // if (!file.type.match('image.*')) {  continue; }
 
                         // Add the file to the request.
-                        formData.append('doc[]', blob, timeStamp);//passing timestamp as file name
+                        formData.append('filehive', file, fileName);//passing timestamp as file name
 
                       // appending csrfmiddlewaretoken and user-id
                       formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
@@ -169,7 +169,7 @@
                       xhr = new XMLHttpRequest();
 
                       // Open the connection.
-                      xhr.open('POST', "{% url 'save_image' group_id %}", true);
+                      xhr.open('POST', "{% url 'upload_file_ckeditor' group_id %}", true);
 
                       // Set up a handler for when the request finishes sucessfully.
                       xhr.onload = function () {
@@ -183,10 +183,10 @@
                              alert("Error occurred");
                           }
                           // check if image is not in the list, add it.
-                          else if(xhr.responseText.length == 24 )
+                          else if(xhr.responseText )
                           {
                               obj_id = parseInt(xhr.responseText);
-                              var completeURL = "/" + "{{group_id}}" + "/file" + "/readDoc" + "/" + xhr.responseText + "/" + timeStamp;
+                              var completeURL = "{{MEDIA_URL}}" + xhr.responseText;
                                           CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls> <source src="'+ completeURL +'" type="audio/ogg"></audio>');
                                              $(".btn-group").remove();
                                              $("#audios-container").remove();
