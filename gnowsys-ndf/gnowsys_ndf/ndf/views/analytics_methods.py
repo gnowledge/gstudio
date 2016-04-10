@@ -607,12 +607,21 @@ class AnalyticsMethods(object):
 
 
 
-	def get_users_points(self):
+	def get_users_points(self, point_breakup=False):
 		t0 = time.time()
 		total_points = 0
 		user_files = self.get_user_files_count()
 		user_notes = self.get_user_notes_count()
 		correct_attempted_quizitems = self.get_evaluated_quizitems_count(True,False)
-		total_points = (user_files*25) + (user_notes*30) + (correct_attempted_quizitems*5)
+		user_comments = self.get_total_comments_by_user()
+		total_points = (user_files*25) + (user_notes*30) + \
+		(correct_attempted_quizitems*5) + (user_comments*5)
 		# print "\n get_users_points -- ",total_points
+		if point_breakup:
+			point_breakup_dict = {}
+			point_breakup_dict['Files'] = user_files*25
+			point_breakup_dict['Notes'] = user_notes*30
+			point_breakup_dict['Quiz'] = correct_attempted_quizitems*5
+			point_breakup_dict['Interactions'] = user_comments*5
+			return point_breakup_dict
 		return total_points
