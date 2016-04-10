@@ -1,6 +1,6 @@
 # from StringIO import StringIO
 # import hashlib
-# import os
+import os
 # import shutil
 import mimetypes
 import magic
@@ -14,6 +14,7 @@ from gnowsys_ndf.settings import MEDIA_ROOT, GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.models import node_collection, filehive_collection, gfs
 from gnowsys_ndf.ndf.models import GSystem
 from gnowsys_ndf.ndf.views.methods import get_language_tuple, get_group_name_id
+from gnowsys_ndf.ndf.views.tasks import convertVideo
 
 try:
     from bson import ObjectId
@@ -32,17 +33,18 @@ def upload_form(request, group_id):
 
 def write_files(request, group_id, make_collection=False):
 
-	author_obj = node_collection.one({'_type': u'Author', 'created_by': request.user.id})
-	author_obj_id = author_obj._id
+	user_id        = request.user.id
+	author_obj     = node_collection.one({'_type': u'Author', 'created_by': user_id})
+	author_obj_id  = author_obj._id
 
 	group_name, group_id = get_group_name_id(group_id)
 
-	first_obj = None
+	first_obj      = None
 	collection_set = []
 	uploaded_files = request.FILES.getlist('filehive', [])
-	name = request.POST.get('name')
+	name           = request.POST.get('name')
 
-	gs_obj_list = []
+	gs_obj_list    = []
 
 	for each_file in uploaded_files:
 
@@ -66,6 +68,10 @@ def write_files(request, group_id, make_collection=False):
 
 		gs_obj.member_of.append(gst_file_id)
 		gs_obj.save(groupid=group_id)
+		# print gs_obj
+
+		if 'video' in gs_obj.if_file.mime_type:
+			convertVideo.delay(user_id, str(gs_obj._id), file_name)
 
 		if not first_obj:
 			first_obj = gs_obj
