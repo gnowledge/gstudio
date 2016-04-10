@@ -300,7 +300,7 @@ ul#navigation li a.last {
 
 {% check_user_join request groupid as user_is_joined %}
 
-{% include "ndf/node_ajax_content.html" %}
+{% include "ndf/node_ajax_content.html" with is_collection_card_view=True %}
 {% include "ndf/action_panel.html" %}
 
 
