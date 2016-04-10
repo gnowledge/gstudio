@@ -2517,6 +2517,7 @@ def course_analytics(request, group_id):
     analytics_data['unit_progress_meter'] = (completed_units/float(all_units))*100
     
     analytics_data['users_points'] = analytics_instance.get_users_points()
+    analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
 
     t1 = time.time()
     time_diff = t1 - t0
