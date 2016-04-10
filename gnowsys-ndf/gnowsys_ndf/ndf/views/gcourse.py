@@ -2015,7 +2015,8 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                             '_id': 1,
                             'fs_file_ids': 1,
                             'member_of': 1,
-                            'mime_type': 1
+                            'mime_type': 1,
+                            'if_file':1
                         }).sort("last_update", -1)
 
     raw_material_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
@@ -2065,19 +2066,19 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
     else:
-        coll_cur = node_collection.find({
-                          'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-                                            'group_set': {'$all': [ObjectId(group_id)]},
-                                            '$or': [
-                                                {'access_policy': u"PUBLIC"},
-                                                {'$and': [
-                                                    {'access_policy': u"PRIVATE"},
-                                                    {'created_by': request.user.id}
-                                                ]
-                                             }
-                                            ],
-                                            'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-                                        }).sort("last_update", -1)
+        # coll_cur = node_collection.find({
+        #                   'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+        #                                     'group_set': {'$all': [ObjectId(group_id)]},
+        #                                     '$or': [
+        #                                         {'access_policy': u"PUBLIC"},
+        #                                         {'$and': [
+        #                                             {'access_policy': u"PRIVATE"},
+        #                                             {'created_by': request.user.id}
+        #                                         ]
+        #                                      }
+        #                                     ],
+        #                                     'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+        #                                 }).sort("last_update", -1)
 
         gstaff_users.extend(group_obj.group_admin)
         gstaff_users.append(group_obj.created_by)
@@ -2133,12 +2134,13 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                             '_id': 1,
                                             'fs_file_ids': 1,
                                             'member_of': 1,
-                                            'mime_type': 1
+                                            'mime_type': 1,
+                                            'if_file':1,
                                         }).sort("last_update", -1)
 
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-        context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':coll_cur})
+        context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})
     template = 'ndf/gcourse_event_group.html'
 
     return render_to_response(template, 

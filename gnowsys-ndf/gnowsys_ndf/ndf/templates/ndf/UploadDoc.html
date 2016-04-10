@@ -78,22 +78,22 @@ i.remove-tag{
   </div>
 </form>
 -->
-<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name_tag %}">{% csrf_token %}
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file' groupid %}">{% csrf_token %}
 	<div class ="row">
 		<fieldset small-6 large-12 columns>
 			<legend>{% trans "Upload File" %}</legend>
 			<div class="fallback">
 				<label>{% trans "Choose File" %}</label>
-				<input type="file" name="doc[]"  id="docFile" multiple/>
+				<input type="file" name="filehive"  id="docFile" multiple/>
 				<label>{% trans "Title of File" %}</label>
-				<input type="text" name="docTitle" id ="docTitle"  placeholder="Enter Title of File">
+				<input type="text" name="name" id ="docTitle"  placeholder="Enter Title of File">
 			</div>
 		</fieldset>
 		<fieldset>
 			<legend>{% trans "Select Language" %}</legend>
 			{% cache 600 upload_doc_language request.LANGUAGE %}
 			<div class="large-4 columns">
-			  <select name="lan">
+			  <select name="language">
 					      {% get_language_info_list for LANGUAGES as languages %}
 					      {% for language in languages %}
 					      <option value="{{ language.code }}">{{ language.name }} 
