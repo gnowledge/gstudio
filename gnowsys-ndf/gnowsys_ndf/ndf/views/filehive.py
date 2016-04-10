@@ -84,11 +84,11 @@ def write_files(request, group_id, make_collection=False):
 		first_obj.collection_set = collection_set
 		first_obj.save()
 
-	# return gs_obj_list
+	return gs_obj_list
 
-	return render_to_response('ndf/filehive.html', {
-		'group_id': group_id, 'groupid': group_id,
-		}, context_instance=RequestContext(request))
+	# return render_to_response('ndf/filehive.html', {
+	# 	'group_id': group_id, 'groupid': group_id,
+	# 	}, context_instance=RequestContext(request))
 
 
 def read_file(request, group_id):
