@@ -180,7 +180,7 @@ def file(request, group_id, file_id=None, page_no=1):
                                     }).sort('last_update', -1)
 
       docCollection = node_collection.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
-                                            '_type': 'File', 
+                                            '_type': {'$in': ['File', 'GSystem']}, 
                                             '$or': [
                                               {'$and': [
                                                 {'name': {'$regex': search_field, '$options': 'i'}}, 
@@ -204,8 +204,8 @@ def file(request, group_id, file_id=None, page_no=1):
                                             'group_set': {'$all': [ObjectId(group_id)]}
                                           }).sort("last_update", -1)
 
-      imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
-                                              '_type': 'File', 
+      imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id), GST_FILE._id]}, 
+                                              '_type': {'$in': ['File', 'GSystem']}, 
                                               '$or': [
                                                 {'$and': [
                                                   {'name': {'$regex': search_field, '$options': 'i'}}, 
@@ -229,8 +229,8 @@ def file(request, group_id, file_id=None, page_no=1):
                                               'group_set': {'$all': [ObjectId(group_id)]}
                                             }).sort("last_update", -1)
 
-      videoCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, 
-                                              '_type': 'File', 
+      videoCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id), GST_FILE._id]}, 
+                                              '_type': {'$in': ['File', 'GSystem']}, 
                                               '$or': [
                                                 {'$and': [
                                                   {'name': {'$regex': search_field, '$options': 'i'}}, 
@@ -255,7 +255,7 @@ def file(request, group_id, file_id=None, page_no=1):
                                             }).sort("last_update", -1)
 
       pandoraCollection = node_collection.find({'member_of': {'$all': [ObjectId(pandora_video_st._id)]}, 
-                                                '_type': 'File', 
+                                                '_type': {'$in': ['File', 'GSystem']}, 
                                                 '$or': [
                                                   {'$and': [
                                                     {'name': {'$regex': search_field, '$options': 'i'}}, 
@@ -448,7 +448,7 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
 
     if tab_type == "all_videos" or tab_type == "all_files":
         result_cur = node_collection.find({'$or':[{'member_of': {'$all': member_of_list}, 
-                                                '_type': 'File', 'fs_file_ids':{'$ne': []}, 
+                                                '_type': {'$in': ['File', 'GSystem']}, 'fs_file_ids':{'$ne': []}, 
                                                 'group_set': {'$all': [ObjectId(group_id)]},
                                                 '$or': [
                                                     {'access_policy': u"PUBLIC"},
@@ -460,7 +460,7 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
                                                 ]
                                                 },{'member_of': {'$all': [pandora_video_st._id]}, 
                                                   'group_set': {'$all': [ObjectId(group_id)]},
-                                                  '_type': "File", 'access_policy': u"PUBLIC"
+                                                  '_type': {'$in': ['File', 'GSystem']}, 'access_policy': u"PUBLIC"
                                                   }
                                            ]}).sort("last_update", -1)
     
@@ -482,7 +482,7 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
 
     else:
         result_cur = node_collection.find({'member_of': {operator: member_of_list},
-                                    '_type': 'File', 'fs_file_ids':{'$ne': []},
+                                    '_type': {'$in': ['File', 'GSystem']}, 'fs_file_ids':{'$ne': []},
                                     'group_set': {'$all': [ObjectId(group_id)]},
                                     '$or': [
                                         {'access_policy': u"PUBLIC"},
@@ -599,12 +599,12 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
         elif filetype == "Pages":
             if app == "File":
-                result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_PAGE._id)], group_id, request.user.id, page_no, no_of_objs_pp, "Pages")
+                result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_PAGE._id), GST_FILE._id], group_id, request.user.id, page_no, no_of_objs_pp, "Pages")
 
 
         elif filetype == "Images":
             if app == "File":
-                result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_IMAGE._id)], group_id, request.user.id, page_no, no_of_objs_pp)
+                result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_IMAGE._id), GST_FILE._id], group_id, request.user.id, page_no, no_of_objs_pp)
             # elif app == "E-Library":
             #     img_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Images"}).sort("last_update", -1)
             #     image = []
@@ -628,7 +628,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
         elif filetype == "Videos":
             if app == "File":
-                result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp, "all_videos")
+                result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_VIDEO._id), GST_FILE._id], group_id, request.user.id, page_no, no_of_objs_pp, "all_videos")
 
         elif filetype == "Collections":
             if app == "File":
@@ -1345,7 +1345,7 @@ def GetDoc(request, group_id):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
-    files = node_collection.find({'_type': u'File'})
+    files = node_collection.find({'_type': {'$in': ['File', 'GSystem']}, 'member_of': {'$in': [GST_FILE._id]}})
     #return files
     template = "ndf/DocumentList.html"
     variable = RequestContext(request, {'filecollection':files,'groupid':group_id,'group_id':group_id})
@@ -1446,8 +1446,8 @@ def file_detail(request, group_id, _id):
         if file_node.mime_type == 'video':      
             file_template = "ndf/video_detail.html"
         elif 'image' in file_node.mime_type:
-            imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
-                                              '_type': 'File', 
+            imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id), GST_FILE._id]}, 
+                                              '_type': {'$in': ['File', 'GSystem']}, 
                                               '$or': [
                                                   {'$or': [
                                                     {'access_policy': u"PUBLIC"},
@@ -1560,7 +1560,7 @@ def getFileThumbnail(request, group_id, _id):
         group_name, group_id = get_group_name_id(group_id)
 
 
-    file_node = node_collection.one({"_type": u"File", "_id": ObjectId(_id)})
+    file_node = node_collection.one({"_type": {'$in': ['File', 'GSystem']}, "_id": ObjectId(_id)})
     """
     if file_node is not None:
         if file_node.fs_file_ids:

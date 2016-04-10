@@ -91,7 +91,8 @@ def convertVideo(userid, file_id, filename):
     fd.close()
     # -- convert tmp_file tmp_webm file in local disk
 
-    if files.name.endswith('.webm') == False:
+    if (hasattr(files, 'name') and (files.name.endswith('.webm') == False)) or \
+        (hasattr(files, 'filename') and (files.filename.endswith('.webm') == False)):
         input_filename = str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
         output_filename = str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".webm")
         proc = subprocess.Popen(['ffmpeg', '-y', '-i', input_filename,output_filename])
