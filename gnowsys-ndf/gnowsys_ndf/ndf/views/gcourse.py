@@ -2510,11 +2510,15 @@ def course_analytics(request, group_id):
 
     analytics_data['units_progress_stmt'] = str(completed_units) + " out of " + str(all_units) + " Units completed"
     analytics_data['module_progress_stmt'] = str(completed_modules) + " out of " + str(all_modules) + " Modules completed"
+    if completed_modules and all_modules:
+        analytics_data['module_progress_meter'] = (completed_modules/float(all_modules))*100
+    else:
+        analytics_data['module_progress_meter'] = 0
     
-
-    analytics_data['module_progress_meter'] = (completed_modules/float(all_modules))*100
-    
-    analytics_data['unit_progress_meter'] = (completed_units/float(all_units))*100
+    if completed_units and all_units:
+        analytics_data['unit_progress_meter'] = (completed_units/float(all_units))*100
+    else:
+        analytics_data['unit_progress_meter'] = 0
     
     analytics_data['users_points'] = analytics_instance.get_users_points()
     analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)

@@ -31,7 +31,7 @@ class AnalyticsMethods(object):
 
 	def get_completed_modules_count(self):
 		t0 = time.time()
-
+		completed_modules_cur = 0
 		if not hasattr(self,'course_section_event_gst'):
 			self.course_section_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnitEvent"},{'_id': 1})
 
@@ -50,9 +50,10 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_completed_units_count == ", time_diff
-
-		return completed_modules_cur.count()
-
+		if completed_modules_cur:
+			return completed_modules_cur.count()
+		else:
+			return 0
 
 	def get_total_units_count(self):
 		t0 = time.time()
@@ -70,7 +71,7 @@ class AnalyticsMethods(object):
 
 	def get_completed_units_count(self):
 		t0 = time.time()
-
+		completed_unit_event_cur = 0
 		# print "\n\n get_completed_units_count === "
 		if not hasattr(self,'unit_event_gst'):
 			self.unit_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnitEvent"},{'_id': 1})
@@ -90,9 +91,10 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_completed_units_count == ", time_diff
-
-		return completed_unit_event_cur.count()
-
+		if completed_unit_event_cur:
+			return completed_unit_event_cur.count()
+		else:
+			return 0
 	def get_total_resources_count(self):
 		t0 = time.time()
 
