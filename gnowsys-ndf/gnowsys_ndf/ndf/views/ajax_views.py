@@ -113,12 +113,12 @@ def collection_create(request, group_id):
   This ajax view creates the page collection of selected nodes from list view
   '''  
   existing_collection = request.POST.get("existing_collection")
-  print "\n\n\n here",existing_collection
+  # print "\n\n\n here",existing_collection
   if existing_collection == "True":
     Collections = request.POST.getlist("collection[]", '')
     cur_collection_id = request.POST.get("cur_collection_id")
     obj = node_collection.one({'_id': ObjectId(cur_collection_id)})
-    print "\n\n\n\n obj",obj
+    # print "\n\n\n\n obj",obj
     for each in Collections:
       node_collection.collection.update({'_id': ObjectId(cur_collection_id) }, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
       return HttpResponse("success")
