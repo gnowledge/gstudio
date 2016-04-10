@@ -287,74 +287,7 @@ color: black !important;
             {% include "ndf/ggallerypage.html" with file_detail_url='course_raw_material_detail' redirect_tab_url='course_raw_material'%}
 
           {% elif title == 'about' %}
-            <div id="course-about">
-
-              {% if request.user.is_authenticated %}
                 {% include "ndf/course_analytics.html" %}
-              {% endif %}
-
-              <div class="row">
-                <div class="small-12 columns about-course">
-                  <h5>About</h5>
-                  <div class="row">
-                    <div class="small-12 medium-8 columns">
-                    {{group_object.content|safe}}
-                    </div>
-                    <div class="small-12 medium-4 columns">
-                      <div class="course-highlight">
-                        <i class="fa fa-list"></i>
-                        <span>{{group_object.collection_set|length}}</span>
-                      </div>
-                      <div class="course-highlight">
-                        <i class="fa fa-clock-o"></i>
-                        <span>{{weeks_count}} weeks</span>
-                      </div>
-                      <div class="course-highlight">
-                        <i class="fa fa-user"></i>
-                        <span>{{group_object.author_set|length}} students enrolled</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row course-students-data">
-                <div class="small-12 medium-4 columns">
-                  Points table for students
-                </div>
-                <div class="small-12 medium-8 columns students-table-legends">
-                  <span class=" badge yellow">&nbsp;</span>
-                  <span>Interations</span>
-                  <span class=" badge green">&nbsp;</span>
-                  <span>Gallery uploads</span>
-                  <span class=" badge">&nbsp;</span>
-                  <span>Note Making</span>
-                  <span class=" badge red">&nbsp;</span>
-                  <span>Quiz Performance</span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="small-12 columns">
-                  <table class="student-overview-table">
-                    <thead>
-                      <tr>
-                        <th>Student Name</th>
-                        <th>Total Points</th>
-                        <th>Points Breakup</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>
-                          <i class="fa fa-user"></i>
-                          <span>Fluffy Apple</span>
-                        </td>
-                        <td>346</td>
-                        <td>Bars</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-            </div>
             {% comment %}
             <div class="row collapse">
               <div class="about-course-details">
