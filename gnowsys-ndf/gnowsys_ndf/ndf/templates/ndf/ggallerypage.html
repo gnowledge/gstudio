@@ -136,7 +136,7 @@
                 
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
-                        {% include 'ndf/simple_card.html' with resource=each_img no_footer=True  no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
+                        {% include 'ndf/simple_card.html' with resource=each_img   no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
                     </li>
                 {% endfor %}
                 </ul>
@@ -308,8 +308,7 @@
 
   $(".create-note").click(function(){
     var checked = $('.filenode:checked').length;
-    var coll_list= " ";
-    var url_list = " ";
+    var img_list= " ";
     var audio_list = " ";
     var video_list = " ";
     $('.filenode:checked').each(function() {
@@ -321,18 +320,15 @@
         if_video =  mime_type_list.search("video");       
          if( if_image == 0 ) {
             url_list = $(this).closest('.scard-container').find('div').attr('original-src');
-            coll_list = coll_list + url_list + ",";
-            alert("image");
+            img_list = img_list+url_list+",";
          }
         else if(if_audio == 0){
             url_list = $(this).closest('.scard-container').find('div').attr('original-src');
-            audio_list = audio_list + url_list + ",";
-            alert("audio");
+            audio_list = audio_list+url_list+",";
         }
         else if(if_video == 0){
             url_list = $(this).closest('.scard-container').find('div').attr('original-src');
             video_list = video_list + url_list + ",";
-            alert("video");
         }
       });
           $.ajax({
@@ -342,7 +338,9 @@
 
             data:{
                 "csrfmiddlewaretoken": '{{ csrf_token }}',
-                "coll_list" : coll_list,             
+                "img_list": img_list,
+                "audio_list": audio_list,
+                "video_list": video_list             
             },
             success: function(data) {
                 $("#create_collection_model").html(data);
