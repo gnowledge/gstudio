@@ -41,11 +41,7 @@
               <li class="tab-title" ><a href="#course-act-logs" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2">Activity Log</a></li>
             </ul>
             <div class="tabs-content">
-              <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification">
-                <div class="row">
-                  <div class="small-2 columns"><i class="fa fa-comment-o"></i></div>
-                  <div class="small-10 columns">Summer daisy reported the file.</div>
-                </div>
+              <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification" style="overflow-y:scroll;height:300px;">
               </section>
               <section role="tabpanel" aria-hidden="true" class="content" id="course-act-logs">
                 <ul>
@@ -225,8 +221,53 @@
                 $(".pre-analytics-msg-div").addClass("hide")
             },
         });//end of ajax
+        loaddata();
     })
 
+
+    var count = 0;
+    var morecount = 0;
+    var counter = 1;
+
+    // $('#course-notification').onscroll = scrolling;
+    $("#course-notification").scroll(function(){
+        // execute the load function below that will visit the JSON feed and stuff data into the HTML
+        if (count == 0) {
+            loaddata();
+            count = count+1;
+        }
+    })
+
+  function loaddata() {
+    // $('#course-notification').unbind();
+    
+        $.ajax({
+            url: "{% url 'page_scroll' groupid 'counter' %}".replace("counter", counter),
+            type: "GET",
+            data:{'links': false},
+            datatype: "json",
+            global: false, 
+            beforeSend: function(){
+                $("#course-notification").append("<label class='loading_lbl'>Loading...</label>");
+                
+            },
+            success:function(data){
+                if(String(data)) {
+                    $(".loading_lbl").remove()
+                    $("#course-notification").append(data);
+                    counter = counter+1;
+                }
+
+                else{
+                    if(morecount ==0) { 
+                        $("#course-notification").append("<h6>  No more data to show </h6>");
+                        morecount = morecount+1;
+                        counter = 2;
+                    } 
+                }
+            }
+        });
+    }
 
 
 
