@@ -169,23 +169,24 @@ class AnalyticsMethods(object):
 			self.total_qi_cur = self.get_attempted_quizitems_count(True)
 			self.list_of_qi_ids = []
 			for each_qi in self.total_qi_cur:
-				prior_node_id = each_qi.origin[0].get('prior_node_id_of_thread',None)
-				if prior_node_id:
-					prior_node_obj = node_collection.one({'_id': ObjectId(prior_node_id)},{'_id':1, 'attribute_set':1})
-					if prior_node_obj.attribute_set:
-						for pr_each_attr in prior_node_obj.attribute_set:
-							if pr_each_attr and 'correct_answer' in pr_each_attr:
-								correct_ans_list = pr_each_attr['correct_answer']
-				if each_qi.attribute_set:
-					for each_attr in each_qi.attribute_set:
-						if each_attr and 'quizitempost_user_submitted_ans' in each_attr:
-							submitted_ans = get_dict_from_list_of_dicts(each_attr['quizitempost_user_submitted_ans'])
-							submitted_ans = reduce(lambda x, y: x+y, submitted_ans.values())
+				if each_qi.origin:
+					prior_node_id = each_qi.origin[0].get('prior_node_id_of_thread',None)
+					if prior_node_id:
+						prior_node_obj = node_collection.one({'_id': ObjectId(prior_node_id)},{'_id':1, 'attribute_set':1})
+						if prior_node_obj.attribute_set:
+							for pr_each_attr in prior_node_obj.attribute_set:
+								if pr_each_attr and 'correct_answer' in pr_each_attr:
+									correct_ans_list = pr_each_attr['correct_answer']
+					if each_qi.attribute_set:
+						for each_attr in each_qi.attribute_set:
+							if each_attr and 'quizitempost_user_submitted_ans' in each_attr:
+								submitted_ans = get_dict_from_list_of_dicts(each_attr['quizitempost_user_submitted_ans'])
+								submitted_ans = reduce(lambda x, y: x+y, submitted_ans.values())
 
-							if correct_ans_list and submitted_ans:
-								if sublistExists(submitted_ans, correct_ans_list):
-									if each_qi._id not in self.list_of_qi_ids:
-										self.list_of_qi_ids.append(each_qi._id)
+								if correct_ans_list and submitted_ans:
+									if sublistExists(submitted_ans, correct_ans_list):
+										if each_qi._id not in self.list_of_qi_ids:
+											self.list_of_qi_ids.append(each_qi._id)
 		if correct_ans_flag:
 			t1 = time.time()
 			time_diff = t1 - t0
@@ -621,9 +622,13 @@ class AnalyticsMethods(object):
 		# print "\n get_users_points -- ",total_points
 		if point_breakup:
 			point_breakup_dict = {}
-			point_breakup_dict['Files'] = user_files*25
-			point_breakup_dict['Notes'] = user_notes*30
-			point_breakup_dict['Quiz'] = correct_attempted_quizitems*5
-			point_breakup_dict['Interactions'] = user_comments*5
+			if user_files:
+				point_breakup_dict['Files'] = user_files*25
+			if user_notes:
+				point_breakup_dict['Notes'] = user_notes*30
+			if correct_attempted_quizitems:
+				point_breakup_dict['Quiz'] = correct_attempted_quizitems*5
+			if user_comments:
+				point_breakup_dict['Interactions'] = user_comments*5
 			return point_breakup_dict
 		return total_points
