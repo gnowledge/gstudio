@@ -3,11 +3,17 @@
   <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
 {% endblock %}
 <script src="/static/ndf/bower_components/d3/d3.js"></script>
+
+<div id="course-about">
+{% if request.user.is_authenticated %}
+
 <div class="pre-analytics-msg-div text-center">
     Your analytics is loading. Please wait.
 </div>
 <div class="course-overview-container hide">
     <div class="row collapse course-overview">
+        {% if request.user.is_authenticated %}
+
         <div class="columns small-12 medium-6">
         {% comment %}
           <div class="ongoing-session">
@@ -39,7 +45,9 @@
             </div>
             <ul class="tabs" data-tab role="tablist">
               <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">Notifications</a></li>
+              {% comment %}
               <li class="tab-title" ><a href="#course-act-logs" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2">Activity Log</a></li>
+              {% endcomment %}
             </ul>
             <div class="tabs-content">
               <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification" style="overflow-y:scroll;height:300px;">
@@ -53,6 +61,8 @@
             </div>
           </div>
         </div>
+        {% endif %}
+
         <div class="columns small-12 medium-6">
           <h5>Total points gained</h5>
           <span class="course-metric-count users_points"></span>
@@ -179,21 +189,92 @@
               </div>
             </div>
           </div>
+          {% comment %}
           <div class="course-warning course-section">
               <h5>WAITING FOR YOUR FEEDBACK</h5>
               <div><i class="fa fa-sign-in"></i><a>3 New notes added</a></div>
               <div><i class="fa fa-file-image-o"></i><a>36 New files uploaded in the gallery</a></div>
               <div></div>
           </div>
+          {% endcomment %}
 
         </div>
 
       </div>
 </div>
 
+
+              <div class="row">
+                <div class="small-12 columns about-course">
+                  <h5>About</h5>
+                  <div class="row">
+                    <div class="small-12 medium-8 columns">
+                    {{group_object.content|safe}}
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                      <div class="course-highlight">
+                        <i class="fa fa-list"></i>
+                        <span>{{group_object.collection_set|length}}</span>
+                      </div>
+                      <div class="course-highlight">
+                        <i class="fa fa-clock-o"></i>
+                        <span>{{weeks_count}} weeks</span>
+                      </div>
+                      <div class="course-highlight">
+                        <i class="fa fa-user"></i>
+                        <span>{{group_object.author_set|length}} students enrolled</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% comment %}
+              <div class="row course-students-data">
+                <div class="small-12 medium-4 columns">
+                  Points table for students
+                </div>
+                <div class="small-12 medium-8 columns students-table-legends">
+                  <span class=" badge yellow">&nbsp;</span>
+                  <span>Interations</span>
+                  <span class=" badge green">&nbsp;</span>
+                  <span>Gallery uploads</span>
+                  <span class=" badge">&nbsp;</span>
+                  <span>Note Making</span>
+                  <span class=" badge red">&nbsp;</span>
+                  <span>Quiz Performance</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="small-12 columns">
+                  <table class="student-overview-table">
+                    <thead>
+                      <tr>
+                        <th>Student Name</th>
+                        <th>Total Points</th>
+                        <th>Points Breakup</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <i class="fa fa-user"></i>
+                          <span>Fluffy Apple</span>
+                        </td>
+                        <td>346</td>
+                        <td>Bars</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              {% endcomment %}
+
+
+</div>
+{% endif %}
 <script type="text/javascript">
 
     $(document).ready(function() {
+        {% if request.user.is_authenticated %}
 
         $.ajax({
             url: "{% url 'course_analytics' group_id %}",
@@ -225,6 +306,8 @@
                 $(".pre-analytics-msg-div").addClass("hide")
             },
         });//end of ajax
+        {% endif %}
+
         loaddata();
     })
     // <!-- Scripts for the pi chart-->
