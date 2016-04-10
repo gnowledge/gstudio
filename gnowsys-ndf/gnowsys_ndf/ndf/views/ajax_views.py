@@ -5577,7 +5577,12 @@ def attendees_relations(request,group_id,node):
 
 @get_execution_time        
 def page_scroll(request,group_id,page):
-  
+ hyperlinks = request.GET.get("links")
+ if hyperlinks:
+  hyperlinks = json.loads(hyperlinks)
+ else:
+  hyperlinks = True
+
  Group_Activity = node_collection.find(
         {'group_set':ObjectId(group_id)}).sort('last_update', -1)
  
@@ -5617,7 +5622,7 @@ def page_scroll(request,group_id,page):
                                   { 'activity_list': files_list,
                                     'group_id': group_id,
                                     'groupid':group_id,
-                                    'page':page
+                                    'page':page, 'hyperlinks': hyperlinks
                                     # 'imageCollection':imageCollection
                                   },
                                   context_instance = RequestContext(request)
