@@ -148,10 +148,8 @@
 			<!-- Cross publish and Delete -->
 				{% if user.is_authenticated %} 
 				<div class="row btn-row">
-					{% comment %}
 					<!-- History -->
 					<a href = "{% url 'node_version' groupid node.pk  %}" class="tiny button radius right-btn" >{% trans "History" %}</a> 
-					{% endcomment %}
 						<!-- Cross Publish -->
 						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
 							{% if node.created_by == request.user.id or is_gstaff %}

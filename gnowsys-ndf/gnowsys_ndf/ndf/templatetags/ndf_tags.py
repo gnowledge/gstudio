@@ -33,7 +33,7 @@ try:
 except ImportError:
 	pass
 
-from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.models import node_collection, triple_collection,filehive_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy
@@ -3608,3 +3608,14 @@ def get_download_filename(node, file_size_name='original'):
 		name = node.altnames if node.altnames else node.name
 
 		return name
+
+@get_execution_time
+@register.assignment_tag
+def get_file_obj(node):
+	obj = node_collection.find_one({"_id": ObjectId(node._id)})
+	# print "\n\nobj",obj
+	if obj.if_file.original.id:
+		original_file_id = obj.if_file.original.id
+		original_file_obj = filehive_collection.find_one({"_id": ObjectId(obj.if_file.original.id)})
+		return original_file_obj
+
