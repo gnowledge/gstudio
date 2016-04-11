@@ -2671,4 +2671,5 @@ benchmark_collection = db[Benchmark.collection_name]
 triple_collection = db[Triple.collection_name].Triple
 gridfs_collection = db["fs.files"]
 filehive_collection = db[Filehive.collection_name].Filehive
+chunk_collection = db["fs.chunks"]
 import signals

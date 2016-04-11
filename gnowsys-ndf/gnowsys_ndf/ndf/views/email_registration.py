@@ -114,4 +114,3 @@ def password_reset_error(request,*args,**kwargs):
     context={
         'form':form,}
     return TemplateResponse(request, template_name, context)
-

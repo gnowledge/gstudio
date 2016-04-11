@@ -514,7 +514,6 @@ class CreateSubGroup(CreateGroup):
             # adding normal sub-group to collection_set of parent group:
             if sg_member_of == 'Group':
                 parent_group_object.collection_set.append(ObjectId(sub_group_id))
-
             parent_group_object.save()
             return True
 
@@ -1250,6 +1249,7 @@ class CreateCourseEventGroup(CreateEventGroup):
                     # prior_node_obj.collection_set.append(each_res_node._id)
                     # node.save()
                     prior_node_obj.save()
+                    
             else:
                 for each in node.collection_set:
                     each_node = node_collection.one({'_id': ObjectId(each)})

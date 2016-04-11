@@ -235,20 +235,20 @@ django.conf.locale.LANG_INFO = LANG_INFO
 # Languages using BiDi (right-to-left) layout
 # LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",)
 
-# #SMTP setting for sending mail (Using python default SMTP server)
-EMAIL_USE_TLS = False
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'testing@example.com'
+# # # #SMTP setting for sending mail (Using python default SMTP server)
+#EMAIL_USE_TLS = False
+#EMAIL_HOST = 'localhost'
+#EMAIL_PORT = 1025
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
+#DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 # SMTP setting for sending mail (Using gmail SMTP server)
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'yourcompletegmailaddr'
-# EMAIL_HOST_PASSWORD = 'yourpassword'
+#EMAIL_USE_TLS = True
+#EMAIL_HOST = ''
+#EMAIL_PORT = 587
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
@@ -416,6 +416,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # 'django.core.context_processors.csrf',
 )
 
+
 djcelery.setup_loader()
 CELERY_RESULT_BACKEND = "mongodb"
 CELERY_TASK_SERIALIZER = "json"
@@ -447,6 +448,7 @@ INSTALLED_APPS = (
     'jsonrpc',
     'registration_email',
     'memcache_admin',
+    'django_mailbox',
     'djcelery',
 )
 
@@ -534,6 +536,10 @@ GSTUDIO_SECOND_LEVEL_HEADER = True
 GSTUDIO_MY_GROUPS_IN_HEADER = True
 GSTUDIO_MY_COURSES_IN_HEADER = False
 GSTUDIO_MY_DASHBOARD_IN_HEADER = False
+
+GSTUDIO_REPLICATION_GROUPS = [
+    u"Author", u"home"
+]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
 # if not set by specific group
@@ -731,7 +737,8 @@ WETUBE_PASSWORD = "gl@b$@)we!ube"
 #Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
-
+#Mail Chunk Size in MB
+TARSIZE = 1000
 # the no of cards/objects/instances to be render of app (listing view).
 GSTUDIO_NO_OF_OBJS_PP = 24
 
