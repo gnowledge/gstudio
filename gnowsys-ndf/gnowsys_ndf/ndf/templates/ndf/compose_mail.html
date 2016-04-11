@@ -6,7 +6,6 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block head %}
-	<script src="/static/ndf/ckeditor/ckeditor.js"></script>
   <script src="/static/ndf/js/mailsend_filesize_check.js"></script>
 {% endblock %}
 
@@ -60,10 +59,10 @@
   </br>
   
   <h5>Body:</h5>
-	<textarea name="body_editor" id="body_editor" placeholder="What do you want to put in this mail?"></textarea>
-    <script>
-      CKEDITOR.replace('body_editor');
-    </script>
+	<div id="body_editor" >
+     {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %} 
+  </div>
+
 	</br>
 		
   <!-- File Upload -->

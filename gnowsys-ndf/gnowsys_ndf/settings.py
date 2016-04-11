@@ -745,7 +745,9 @@ GSTUDIO_NO_OF_OBJS_PP = 24
 GSTUDIO_HELP_SIDEBAR = False
 GSTUDIO_SOCIAL_SHARE_RESOURCE = False
 GSTUDIO_CAPTCHA_VISIBLE = False
-
+SYNCDATA_KEY_PUB = ""
+SYNCDATA_SENDING_EMAIL_ID = ""
+SYNCDATA_FROM_EMAIL_ID = ""
 # ----------------------------------------------------------------------------
 # following has to be at last
 # just put every thing above it
