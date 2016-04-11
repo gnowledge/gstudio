@@ -101,6 +101,9 @@ color: black !important;
         {% include 'ndf/upload_pic_widget.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True%}
         <div class="course-header-background-layer"></div>
       </div>
+        {% check_is_gstaff groupid request.user as is_gstaff %}
+        {% if is_gstaff %}
+
       <div class="row" style="position: relative;z-index: 2;">
           <div class="small-2 course-settings">
             <a data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius">
@@ -118,6 +121,7 @@ color: black !important;
             </ul>
           </div>
       </div>
+      {% endif %}
       <div class="row">
         <div class="columns small-3 small-centered">
           {% firstof group_obj.altnames group_obj.name  %}
