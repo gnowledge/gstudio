@@ -13,4 +13,5 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.userDashboard',
 						
 						url(r'^my-courses/$', 'my_courses', name='my_courses'),
 						url(r'^my-groups/$', 'my_groups', name='my_groups'),
+						url(r'^my-dashboard/$', 'my_dashboard', name='my_dashboard'),
 			)

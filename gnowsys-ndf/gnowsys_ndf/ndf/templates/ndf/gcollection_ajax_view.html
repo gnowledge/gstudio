@@ -76,7 +76,7 @@
     function initCourseModule() {
 
         $.ajax({
-          url: "{% url 'get_course_collection' group_id node.pk True %}",
+          url: "{% url 'get_course_collection' group_id group_obj.pk True %}",
 
           data: {
             "completed_nodes": {% if completed_ids %}{{completed_ids|safe}}{% else %}null{% endif %},
@@ -580,7 +580,7 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
 
   {% endif %}
   <!-- <b class="current">{{node.name}}</b> -->
-  {% if node.collection_set %}
+  {% if group_obj.collection_set %}
     <div class="course-content">
       <!--div class="row">
         <div class="small-12 columns">
@@ -595,7 +595,7 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
           </div>
         </div>
       </div-->
-      <div class="collection collapse row" data-url="{% url 'get_course_collection' group_id node.pk True %}">
+      <div class="collection collapse row" data-url="{% url 'get_course_collection' group_id group_obj.pk True %}">
       </div>
     </div>
   {% endif %}

@@ -246,7 +246,6 @@ def discussion_reply(request, group_id, node_id):
         
             # saving the reply obj
             reply_obj.save()
-
             formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
 
             files = []

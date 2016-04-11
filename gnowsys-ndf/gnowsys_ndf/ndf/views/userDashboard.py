@@ -674,3 +674,21 @@ def my_groups(request, group_id):
                 },
                 context_instance=RequestContext(request)
         )
+
+
+def my_dashboard(request, group_id):
+
+    user_id = eval(group_id)
+    auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
+
+    auth_id = auth_obj._id
+    title = 'My Dashboard'
+
+    return render_to_response('ndf/my_dashboard.html',
+                {
+                    'group_id': auth_id, 'groupid': auth_id,
+                    'node': auth_obj,
+                    'title': title
+                },
+                context_instance=RequestContext(request)
+        )
