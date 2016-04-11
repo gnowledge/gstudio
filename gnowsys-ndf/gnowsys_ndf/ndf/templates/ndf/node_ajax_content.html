@@ -186,45 +186,16 @@
           {% endcomment %}
           <!-- Code for showing media details -->
           {% if node.if_file.mime_type or node.collection_set %}
-
-            {% get_grid_fs_object node as grid_fs_obj %}
-
             <!-- commenting following block which shows slider if resource is collection of all images/videos/audios -->
               {% if node.collection_set  and is_course == True %}
+               
                <ul data-orbit data-options="variable_height: true;timer:false;">
-                  <li class="active small-12 large-columns">
-                    <center>
-                    {% if 'image' in node.if_file.mime_type %}
-                    <a class="th">
-                      <img style="min-height:200px;" src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" />
-                      </a>
-                     {% elif 'audio' in node.if_file.mime_type %}
-                          <audio  src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" controls loop>
-                          <p>{% trans 'Your browser does not support the audio element' %} </p>
-                      </audio><br><br><br>
-                    {% elif 'video' in node.mime_type %}
-                     <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{{MEDIA_URL}}{{obj.if_file.thumbnail.relurl}}" controls buffered>
-                        <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="video/mp4">
-                        <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="video/webm">
-                        <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="video/ogg">
-                        <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="{{node.if_file.mime_type}}">
-                        {% trans "Your browser does not support the video tag." %}
-                      </video>
-                    {% elif 'Pandora_video' in node.member_of_names_list %}
-                      {% get_source_id node.pk as source_id %}
-                      <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                        <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm">
-                        {% trans "Your browser does not support the video tag." %}
-                      </video>
-                    {% endif %}
-                    <div class="orbit-caption"> {{node.name}} </div>
-                  </li>
+                  
 
                   {% for k in node.collection_set %}
                     {% get_node k as obj %}
-                    {% get_grid_fs_object obj as grid_fs_obj %}
                     {% if 'image' in obj.if_file.mime_type or 'video' in obj.if_file.mime_type or 'audio' in obj.if_file.mime_type or 'pdf' in obj.if_file.mime_type %}
-                    <li>
+                    <li clas="active">
                       <center>
                         {% if 'image' in obj.if_file.mime_type %}
                         <a class="th">
@@ -276,7 +247,7 @@
                 <h3 class="text-gray">{{node.name}}:</h3>
               {% endif %}
 
-              {% if is_collection_card_view == True %}
+              {% if is_collection_card_view == True  %}
                 <center>
                 <div class="show-image">
                   <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
@@ -291,7 +262,7 @@
                       </a>
                 </div>
                 </center>
-              {% elif 'image' in node.if_file.mime_type %}
+              {% elif 'image' in node.if_file.mime_type and not is_collection_card_view %}
                <center>
                 <div class="show-image">
                   <a class="th "   data-oid="{{node.pk|safe}}">
@@ -325,10 +296,10 @@
               {% endcomment %}
 
                 <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
-                  <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="video/mp4">
-                  <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="video/webm">
-                  <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="video/ogg">
-                  <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="{{node.if_file.mime_type}}">
+                  <source src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" type="video/mp4">
+                  <source src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" type="video/webm">
+                  <source src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" type="video/ogg">
+                  <source src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" type="{{node.if_file.mime_type}}">
                   {% trans "Your browser does not support the video tag." %}
                 </video>
               {% elif 'audio' in node.if_file.mime_type %}
