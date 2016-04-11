@@ -24,6 +24,34 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     # Keep latest changes in field(s) to be added at top
 
+    # adding 'if_file' in GSystem instances:
+    # 'if_file': {
+    #         'mime_type': None,
+    #         'original': {'_id': None, 'relurl': None},
+    #         'mid': {'_id': None, 'relurl': None},
+    #         'thumbnail': {'_id': None, 'relurl': None}
+    #     },
+
+    gsres = node_collection.collection.update({
+                    '_type': {'$in': [u'GSystem', u'File', u'Group']},
+                    'if_file': {'$exists': False} 
+                },
+                {
+                    '$set': {
+                            'if_file': {
+                                'mime_type': None,
+                                'original': {'id': None, 'relurl': None},
+                                'mid': {'id': None, 'relurl': None},
+                                'thumbnail': {'id': None, 'relurl': None} 
+                            },
+                        }
+                },
+                upsert=False, multi=True)
+
+    if gsres['updatedExisting']: # and gsres['nModified']:
+        print "\n Added 'if_file' field to " + gsres['n'].__str__() + " GSystem instances."
+
+
     # --------------------------------------------------------------------------
     # Adding <'origin': []> field to all objects and inheritance of GSystem class
     # fetching all GSystem and it's inheritance class objects

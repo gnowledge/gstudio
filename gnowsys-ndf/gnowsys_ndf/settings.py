@@ -332,7 +332,8 @@ LOCALE_PATHS = (os.path.join(os.path.dirname(__file__), '..','conf/locale/'),)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = 'gnowsys_ndf/ndf/static/'
+# MEDIA_ROOT = 'gnowsys_ndf/ndf/static/'
+MEDIA_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ndf/static/media')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -348,7 +349,6 @@ STATIC_ROOT = '/static'
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
-
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -412,6 +412,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.i18n',
     'django.core.context_processors.request',
     'django.core.context_processors.static',
+    'django.core.context_processors.media',
     # 'django.core.context_processors.csrf',
 )
 
@@ -685,6 +686,8 @@ GSTUDIO_GROUP_MODERATION_LEVEL = 1
 GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
 
 GSTUDIO_LICENSE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "NCERT License", "OTHERS"]
+
+GSTUDIO_DEFAULT_LICENSE = 'CC-BY-SA 4.0 unported'
 
 GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
 

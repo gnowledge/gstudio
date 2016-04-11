@@ -3,7 +3,7 @@
 {% load cache %}
 
 {% load ndf_tags %}
-{% block title %} Upload Document {% endblock %}
+{% block title %} filehive {% endblock %}
 
 {% block head %}
 
@@ -43,42 +43,11 @@ i.remove-tag{
 {% endblock %} 
 
 
-{% block related_content %}
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
-  <br/>
-
-	<!-- following button code is not needed. Do we ? -->
-		<div class="create card hide">
-			<div class="file">
-			  <br/>
-			  <a class="button medium" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
-			  	<span class="fi-upload">&nbsp;&nbsp;{% trans "New File" %}</span>
-			  </a>
-			</div>
-		</div>
-	<!-- above button code is not needed. Do we ? for time being "hide" class is added. -->
-
-  {% endif %}
-  {% endif %}
-{% endblock %}
-
-
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
 {% if user.is_authenticated %}
 
-<!--
-<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_id %}">{% csrf_token %}
-  <div class="fallback">
-    <input type="file" name="doc[]"  id="docFile" multiple/>
-    <input type="hidden" name="user" value="{{user.id}}">
-    <input type="hidden" name="page_url" value="{{page_url}}">
-  </div>
-</form>
--->
-<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file' groupid %}">{% csrf_token %}
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'write_file' group_id %}">{% csrf_token %}
 	<div class ="row">
 		<fieldset small-6 large-12 columns>
 			<legend>{% trans "Upload File" %}</legend>
@@ -86,7 +55,7 @@ i.remove-tag{
 				<label>{% trans "Choose File" %}</label>
 				<input type="file" name="filehive"  id="docFile" multiple/>
 				<label>{% trans "Title of File" %}</label>
-				<input type="text" name="name" id ="docTitle"  placeholder="Enter Title of File">
+				<input type="text" name="name" id="docTitle" value="" placeholder="Enter Title of File">
 			</div>
 		</fieldset>
 		<fieldset>
@@ -106,13 +75,9 @@ i.remove-tag{
 
 		<fieldset>
 			<legend>{% trans "Add Description" %}</legend>
-				{% include "ndf/html_editor.html" with var_name="content_org" var_value=node.content|default_if_none:"" node_id=node.pk var_placeholder="Describe the file" %}			
+			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter description here" %}
+			
 		</fieldset>
-		<!-- <fieldset>
-			<legend>{% trans "Add Tag" %}</legend>
-			<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" \
-			/>
-		</fieldset> -->
 
 			<div class="row">
 				<div class="small-12 large-8 columns">
@@ -165,10 +130,10 @@ i.remove-tag{
 			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"></span>
 						<div class="privacy-mode">
 						
-							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<input id="PUBLIC" name="access_policy" value="PUBLIC" type="radio" checked>
 							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
 
-							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<input id="PRIVATE" name="access_policy" value="PRIVATE" type="radio">
 							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
 						
 							<span></span>
@@ -178,11 +143,11 @@ i.remove-tag{
 							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"></span>
 						<div class="privacy-mode">
 						
-							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<input id="PUBLIC" name="access_policy" value="PUBLIC" type="radio" checked>
 							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
 							<br/>
 
-							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<input id="PRIVATE" name="access_policy" value="PRIVATE" type="radio">
 							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
 						
 							<span></span>

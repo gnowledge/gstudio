@@ -90,7 +90,7 @@
                                 <i class="fa fa-upload"></i>
                                 &nbsp;
                                 <span>Upload File</span>
-                                <input type="file" name="doc" id="docFile" style="display: none;"/>
+                                <input type="file" name="filehive" id="docFile" style="display: none;" multiple/>
                             </label>
                             <div class="save_cancel hide">
                               <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
@@ -102,7 +102,7 @@
                   {% endif %}
                   {% endif %}
                 <!-- Commented  create collection and create note for this commit-->
-                    <!-- <div class="small-12 medium-10 columns gallery-actions" style="display:none" >
+                    <div class="small-12 medium-10 columns gallery-actions" style="display:none" >
                         <div class="create-note " id="create-note">
                          <a style="margin: 0em 0em 1em;">
                             <i class="fi-page-edit"></i>
@@ -117,7 +117,7 @@
                             <i class="fa fa-plus"></i>
                             <span>Add to collection</span>
                         </div>
-                     -->    <!-- <div class="download-file hide">
+                        <!-- <div class="download-file hide">
                             <i class="fi-download"></i>
                             <span> Download</span>
                         </div>
@@ -136,7 +136,7 @@
                 
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
-                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer="True" no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
+                        {% include 'ndf/simple_card.html' with resource=each_img no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
                     </li>
                 {% endfor %}
                 </ul>
@@ -311,12 +311,29 @@
     var coll_list= " ";
     var url_list = " ";
     var audio_list = " ";
+    var video_list = " ";
     $('.filenode:checked').each(function() {
         // curr_obj = $(this).attr("value");
-    
-        url_list = $(this).closest('.scard-container').find('img').attr('src');
-        coll_list = coll_list + url_list + ",";
-      
+        
+        mime_type_list = $(this).closest('.scard-container').find('div').attr('data-mime-type');
+        if_image =  mime_type_list.search("image");
+        if_audio =  mime_type_list.search("audio");
+        if_video =  mime_type_list.search("video");       
+         if( if_image == 0 ) {
+            url_list = $(this).closest('.scard-container').find('div').attr('original-src');
+            coll_list = coll_list + url_list + ",";
+            alert("image");
+         }
+        else if(if_audio == 0){
+            url_list = $(this).closest('.scard-container').find('div').attr('original-src');
+            audio_list = audio_list + url_list + ",";
+            alert("audio");
+        }
+        else if(if_video == 0){
+            url_list = $(this).closest('.scard-container').find('div').attr('original-src');
+            video_list = video_list + url_list + ",";
+            alert("video");
+        }
       });
           $.ajax({
             type: "GET",

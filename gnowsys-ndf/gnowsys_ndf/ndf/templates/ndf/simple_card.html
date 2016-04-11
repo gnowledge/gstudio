@@ -23,7 +23,7 @@
 
   </style>
 <div class="scard-container" data-id="{{resource.pk}}">
- <div class="scard">
+ <div class="scard" data-mime-type="{{resource.if_file.mime_type}}" original-src="{% if 'video' in resource.if_file.mime_type   %}{{MEDIA_URL}}{{resource.if_file.mid.relurl}}{% else %}{{resource.if_file.original.relurl}}{% endif %}">
  {% if is_event %}
   {% get_event_status resource as event_status_msg %}
   {% if event_status_msg %}
@@ -47,11 +47,10 @@
 
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
 
-
-
-
     {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
-    {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
+    {% if resource.if_file.mid.relurl %}
+        <img src="{{MEDIA_URL}}{{resource.if_file.mid.relurl}}">
+    {% elif not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
         <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
     {% elif resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
       <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
@@ -62,8 +61,8 @@
         <i class="{{attr_set_dict.educationaluse|lower}}"></i>
       {% elif resource.fs_file_ids.0 and 'image' in resource.mime_type %}
         <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
-      {% elif resource.mime_type %}
-        <i class="{{resource.mime_type|lower|split:'/'|join:' '}}"></i>
+      {% elif resource.if_file.mime_type %}
+        <i class="{{resource.if_file.mime_type|lower|split:'/'|join:' '}}"></i>
       {% else  %}
         <i class="{{resource.member_of_names_list.0|lower }}"></i>
       {% endif %}
@@ -87,9 +86,9 @@
         {% endif %}
       {% endif %}
 
+
     {% elif resource.collection_set  %}
         <i class="collection"></i>
-
     {% else%}
       <img src="/static/ndf/images/metaStudio-profile.svg"  class="img-height">
     {% endif %}

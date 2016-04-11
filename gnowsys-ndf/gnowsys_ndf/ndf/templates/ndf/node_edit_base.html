@@ -1525,13 +1525,12 @@
 		{% endif %}
 	    updateAllTags();
 
+    	var tagsStr = tags.value.trim();
 	    if(checkTag())
 	    {
-	    	var tagsStr = tags.value.trim();
-
 	    	$("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
 	    }
-	    else
+	    else if(tagsStr)
 	    {
 	    	event.preventDefault();
 	    }
