@@ -16185,11 +16185,15 @@ body > footer {
   min-height: 170px;
   background-color: rgba(0, 0, 0, 0.8); }
   body > footer section:first-child {
-    margin-bottom: 2rem; }
+    margin-bottom: 1rem; }
   body > footer a {
-    color: #bbbbbb !important; }
+    color: #bbbbbb; }
     body > footer a:hover {
       color: #03a9f4 !important; }
+  body > footer .footer-meta {
+    color: #B3B3B3; }
+    body > footer .footer-meta strong a {
+      color: #B3B3B3; }
   body > footer strong a {
     border-bottom: 1px dotted #555; }
 
@@ -17424,6 +17428,8 @@ div.show-image:hover div.fullscreen-icon{
         background-color: #fff;
         border: 1px solid #CCC;
         border-bottom: 0px; }
+  .course-overview-container .course-notif-logs ul {
+    list-style: none; }
   .course-overview-container .course-section {
     border: 1px solid #ccc;
     padding: 10px;
@@ -17470,23 +17476,70 @@ div.show-image:hover div.fullscreen-icon{
     margin: 15px 0px; }
     .course-overview-container .student-overview-table tr {
       border: 1px solid #ccc; }
-  .course-overview-container .about-course {
-    border: 1px solid #666;
-    padding: 10px; }
-    .course-overview-container .about-course > h5 {
-      text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      font-size: 14px;
-      display: block;
-      margin: 2px 0px 15px;
-      color: #888; }
-    .course-overview-container .about-course .course-highlight {
-      color: #aaa;
-      font-weight: 600;
-      font-size: 20px;
-      margin-bottom: 5px; }
 
+.about-course {
+  border: 1px solid #666;
+  padding: 10px; }
+  .about-course > h5 {
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-size: 14px;
+    display: block;
+    margin: 2px 0px 15px;
+    color: #888; }
+  .about-course .course-highlight {
+    color: #aaa;
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 5px; }
+
+.student-dashboard-header-container {
+  background-color: #90F;
+  padding: 10px 10px;
+  height: 110px;
+  width: 100%; }
+  .student-dashboard-header-container .student-dashboard-header img {
+    height: 75px;
+    width: 75px;
+    vertical-align: top;
+    margin: 0px 10px; }
+  .student-dashboard-header-container .student-dashboard-header .student-dashboard-info {
+    display: inline-block; }
+    .student-dashboard-header-container .student-dashboard-header .student-dashboard-info > span {
+      display: block;
+      color: #fff; }
+    .student-dashboard-header-container .student-dashboard-header .student-dashboard-info .student-name {
+      color: #fff;
+      font-weight: 600;
+      font-size: 22px;
+      letter-spacing: 0.5px; }
+    .student-dashboard-header-container .student-dashboard-header .student-dashboard-info .student-overall-points {
+      font-size: 26px;
+      color: #ffff00; }
+
+.student-dashboard {
+  background-color: #fff;
+  padding: 10px; }
+  .student-dashboard #course-act-logs > span {
+    display: inline-block;
+    vertical-align: top; }
+
+.rating-star-number {
+  position: relative;
+  display: inline-block; }
+  .rating-star-number > span {
+    position: absolute;
+    top: 11px;
+    left: 14px;
+    font-size: 13px; }
+  .rating-star-number i {
+    font-size: 40px;
+    color: gold; }
+
+.course-dashboard .course-status > ul, .course-dashboard .course-notifications > ul,
+.course-dashboard .course-performance > ul {
+  list-style: none; }
 .course-dashboard .course-status > .row, .course-dashboard .course-notifications > .row,
 .course-dashboard .course-performance > .row {
   padding: 0px;
