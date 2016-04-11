@@ -17,9 +17,9 @@
             <div class="medium-12 columns">
                 <img src = "/static/ndf/images/metaStudio-profile.svg">
                 <div class="student-dashboard-info">
-                    <span class="student-name"> Student Name </span>
+                    <span class="student-name"> {{user_obj.username}} </span>
                     <span> Points </span>
-                    <span class="student-overall-points"> 258 </span>
+                    <span class="student-overall-points"> {{users_points}} </span>
                 </div>
             </div>
         </div>
@@ -31,12 +31,16 @@
         {% if request.user.is_authenticated %}
 
         <div class="columns small-12 medium-6">
+      	{% comment %}
+
           <div class="ongoing-session">
             <h5>ONGOING SESSION </h5>
             <h3>Taking Screenshots of the work and doing something</h3>
             <button class="tiny button"><i class="fa fa-sign-in"></i>&nbsp;Enter Session</button>
           </div>
+      	{% endcomment %}
           <div class="course-status">
+          	{% comment %}
             <h5>Course status</h5>
             <div class="row">
               <div class="small-12 columns">
@@ -57,16 +61,24 @@
 
               </div>
             </div>
+          	{% endcomment %}
+
             <ul class="tabs" data-tab role="tablist">
               <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">Notifications</a></li>
+          	{% comment %}
+
               <li class="tab-title" ><a href="#course-act-logs" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2">Activity Log</a></li>
+          	{% endcomment %}
+
             </ul>
             <div class="tabs-content course-notif-logs">
               <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification" style="overflow-y:scroll;height:300px;">
                 <ul>
-                    <li>
+                    <li>Coming soon...
+                    {% comment %}
                         <span class="rating-star-number"><span>4</span><i class="fa fa-star"></i></span>
                         <span>Text</span>
+                    {% endcomment %}
                     </li>
                 </ul>
               </section>
@@ -92,21 +104,21 @@
             <div class="row">
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Ongoing courses</span>
-                <span class="course-metric-count total_cmnts_by_user"></span>
+                <span class="course-metric-count in-progress"></span>
               </div>
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Incomplete courses</span>
-                <span class="course-metric-count">45</span>
+                <span class="course-metric-count">0</span>
               </div>
             </div>
             <div class="row">
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Upcoming courses</span>
-                <span class="course-metric-count">0</span>
+                <span class="course-metric-count upcoming">0</span>
               </div>
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Completed courses</span>
-                <span class="course-metric-count">5</span>
+                <span class="course-metric-count completed">0</span>
               </div>
             </div>
           </div>
@@ -118,22 +130,26 @@
             <div class="row">
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Comments By me</span>
-                <span class="course-metric-count total_cmnts_by_user"></span>
+                <span class="course-metric-count total_cmnts_by_user">{{total_cmnts_by_user}}</span>
               </div>
+              {% comment %}
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Avg Rating for my comments</span>
                 <span class="course-metric-count">Star rating</span>
               </div>
+              {% endcomment %}
             </div>
             <div class="row">
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Comments for me</span>
-                <span class="course-metric-count">0</span>
+                <span class="course-metric-count">{{cmnts_rcvd_by_user}}</span>
               </div>
+              {% comment %}
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Avg Ratings to others</span>
                 <span class="course-metric-count">Star Rating</span>
               </div>
+              {% endcomment %}
             </div>
           </div>
           <div class="course-gallery-uploads course-section">
@@ -143,7 +159,7 @@
             </span>
             <div class="row">
               <div class="columns small-12 medium-6">
-                <span class="course-metric-heading">Files Created</span>
+                <span class="course-metric-heading">{{groups_cur.count}} Groups</span>
                 <span class="course-metric-count user_files"></span>
               </div>
             </div>
@@ -161,4 +177,12 @@
 
       </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function() {
+    	{% for eachc,eachcv in my_course_objs.items %}
+    		$("."+ "{{eachc}}").text("{{eachcv|length}}")
+    	{% endfor %}
+    })
+	
+</script>
 {% endblock %}
