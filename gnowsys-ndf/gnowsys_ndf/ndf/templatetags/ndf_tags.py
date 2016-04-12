@@ -3597,10 +3597,21 @@ def get_download_filename(node, file_size_name='original'):
 		from django.template.defaultfilters import slugify
 
 		relurl = node.if_file[file_size_name].relurl
-		extension = relurl.split('.')[-1]
-		name = node.altnames if node.altnames else node.name
+		relurl_split_list = relurl.split('.')
 
-		file_name = slugify(name) + '.' + extension
+		if len(relurl_split_list) > 1:
+			extension = relurl_split_list[-1]
+		elif 'epub' in node.if_file.mime_type:
+			extension = 'epub'
+		else:
+			import mimetypes
+			extension = mimetypes.guess_extension(node.if_file.mime_type)
+
+		name = node.altnames if node.altnames else node.name
+		file_name = slugify(name)
+
+		if extension:
+			file_name += '.' + extension
 
 		return file_name
 
@@ -3608,6 +3619,7 @@ def get_download_filename(node, file_size_name='original'):
 		name = node.altnames if node.altnames else node.name
 
 		return name
+
 
 @get_execution_time
 @register.assignment_tag
