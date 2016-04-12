@@ -427,7 +427,7 @@ class AnalyticsMethods(object):
 		else:
 			return 0
 
-	def get_total_comments_by_user(self,site_wide=False):
+	def get_total_comments_by_user(self,return_cur=False,site_wide=False):
 		t0 = time.time()
 		if not hasattr(self, 'reply_gst'):
 			self.reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"},{'_id': 1})
@@ -442,9 +442,27 @@ class AnalyticsMethods(object):
 		time_diff = t1 - t0
 		# print "\n get_total_comments_by_user == ", time_diff
 		if self.users_replies_cur:
+			if return_cur:
+				return self.users_replies_cur
 			return self.users_replies_cur.count()
 		else:
 			return 0
+	'''
+	def get_avg_rating_on_my_comments(self,site_wide=False):
+		all_cmts = self.get_total_comments_by_user(True,site_wide)
+		avg_ratings_on_usr_cmnts = 0
+		total_rating = 0
+		rating_cntr = 0
+		for each_cmnt in all_cmts:
+			if each_cmnt.rating:
+				for each_ratng in each_cmnt.rating:
+					rating_cntr = rating_cntr + 1
+					total_rating = total_rating + each_ratng['score']
+		if total_rating:
+			avg_ratings_on_usr_cmnts = int(total_rating/float(rating_cntr))
+		print "\n all_cmts -- ", avg_ratings_on_usr_cmnts
+		return avg_ratings_on_usr_cmnts
+	'''
 
 	def get_others_notes_read_count(self):
 		t0 = time.time()
@@ -634,7 +652,8 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_ratings_received_on_user_notes == ", time_diff
-		return avg_rating_notes,len(unique_user_list)
+		# return avg_rating_notes,len(unique_user_list)
+		return avg_rating_notes
 
 
 	def get_ratings_received_on_user_files(self):
@@ -665,7 +684,8 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_ratings_received_on_user_files == ", time_diff
-		return avg_rating_files,len(unique_user_list)
+		# return avg_rating_files,len(unique_user_list)
+		return avg_rating_files
 
 
 
@@ -676,7 +696,7 @@ class AnalyticsMethods(object):
 		user_files = self.get_user_files_count()
 		user_notes = self.get_user_notes_count()
 		correct_attempted_quizitems = self.get_evaluated_quizitems_count(True,False)
-		user_comments = self.get_total_comments_by_user()
+		user_comments = self.get_total_comments_by_user(False,False)
 		total_points = (user_files*25) + (user_notes*30) + \
 		(correct_attempted_quizitems*5) + (user_comments*5)
 		# print "\n get_users_points -- ",total_points
