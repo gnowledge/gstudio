@@ -13,20 +13,33 @@
     //This is the main content container between the header and footer
     background: url("watermark.png") no-repeat 0 80%;
   min-height: 100%;
-  margin-bottom: -130px!important;
+  /*margin-bottom: -130px!important;*/
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 
-    &:after{
+    /*&:after{
         //Hack for setting div height to the height of the browser window
     content:"";
     display:block;
     height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
-  }
+  }*/
 }
 
+body>footer {
+    background-color: rgb(153, 0, 255);
+    color: #fff;
+    min-height: 100px;
 
+    a {
+      color: #fff;
+    }
+
+    li {
+      margin-right: 1.375rem;
+      margin-left: 0 !important;
+    }
+}
 
 #top-headers {
 
