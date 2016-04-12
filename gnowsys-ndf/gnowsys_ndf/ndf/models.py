@@ -700,15 +700,22 @@ class Node(DjangoDocument):
                         break
 
                 if not field_found:
-                    invalid_fields.append(field_found)
+                    invalid_fields.append(key)
                     print "\n Invalid field(", key, ") found!!!\n"
                     # Throw an error: " Illegal access: Invalid field
                     # found!!! "
 
-        if invalid_fields:
-            for each_invalid_field in invalid_fields:
-                if each_invalid_field in self.iteritems:
-                    del self.iteritems[each_invalid_field]
+        # print "== invalid_fields : ", invalid_fields
+        try:
+            self_keys = self.keys()
+            if invalid_fields:
+                for each_invalid_field in invalid_fields:
+                    if each_invalid_field in self_keys:
+                        self.pop(each_invalid_field)
+        except Exception, e:
+            print "\nError while processing invalid fields: ", e
+            pass
+
         super(Node, self).save(*args, **kwargs)
 
     	#This is the save method of the node class.It is still not

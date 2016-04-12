@@ -6294,14 +6294,19 @@ def course_create_collection(request, group_id):
   
 @get_execution_time
 def course_create_note(request, group_id):
-  coll_list =  request.GET.get('coll_list','')
-  fetch_res = coll_list.split(',')
-  print "fetch_res",fetch_res
-  print "\n\n",fetch_res 
-  # print "image_coll",image_coll
+  
+  img_list = request.GET.get('img_list','')
+  audio_list = request.GET.get('audio_list','')
+  video_list = request.GET.get('video_list','')
+  img_res = img_list.split(',')
+  audio_res = audio_list.split(',')
+  video_res = video_list.split(',')
+  # print "\n\n\nfetch_res",audio_res,img_res,video_res
+  # print "\n\n",fetch_res 
+  # # print "image_coll",image_coll
   return render_to_response('ndf/course_create_note.html',
       {
-        "group_id":group_id,"fetch_res":fetch_res
+        "group_id":group_id,"img_res":img_res,"audio_res":audio_res,"video_res":video_res
       },context_instance=RequestContext(request))
 
 
@@ -6355,6 +6360,8 @@ def upload_file(request,group_id):
 
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     for each_gs_file in gs_obj_list:
+        each_gs_file.status = u"PUBLISHED"
+        each_gs_file.save()
         #set interaction-settings
         create_gattribute(each_gs_file._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)

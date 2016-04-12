@@ -57,7 +57,7 @@
     <div class="row gmodal-body">
         <div class="small-8 columns gmodal-item-panel">
             <!-- Detail view section -->
-            {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
+            {% include 'ndf/node_ajax_content.html' with no_discussion=True is_course=True %}
 
         </div>
             {% comment %}
@@ -87,12 +87,13 @@
                         </div>
                         <a class="file-detail-modal-close close-reveal-modal" aria-label="Close">&#215;</a>
                     </div>
+                    {% get_node_ratings request node.pk as ratings %}
                     <div class="row image-brief">
                         <div class="small-12 columns">
                             <i class="fi-eye"></i>
                             <span class="viewed-count">214 Views</span>
                             <span>Avg&nbsp;</span>
-                            <span class="image-rating">3.4</span>
+                            <span class="image-rating">{{ratings.avg}}</span>
                             <span>Rate this</span>
                             <span>
                                 {% include "ndf/rating.html" %}

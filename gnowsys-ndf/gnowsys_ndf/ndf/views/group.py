@@ -2499,6 +2499,8 @@ def upload_using_save_file(request,group_id):
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     for each_gs_file in gs_obj_list:
         #set interaction-settings
+        each_gs_file.status = u"PUBLISHED"
+        each_gs_file.save()
         create_gattribute(each_gs_file._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
 

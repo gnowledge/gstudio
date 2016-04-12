@@ -621,6 +621,9 @@ VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes',
 RCS_REPO_DIRNAME = "rcs-repo"
 RCS_REPO_DIR = os.path.join(GSTUDIO_DATA_ROOT, RCS_REPO_DIRNAME)
 
+GSTUDIO_LOGS_DIRNAME = 'gstudio-logs'
+GSTUDIO_LOGS_DIR_PATH = os.path.join(GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIRNAME)
+
 # Indicates the "hash-level-number", i.e the number of sub-directories that
 # will be created for the corresponding document under it's
 # collection-directory; in order to store json-files in an effective manner
