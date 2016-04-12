@@ -6,7 +6,7 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
         <div class="text-center">
-
+        {{prof_pic_obj}}
         <div class="div-height">
           {% if prof_pic_obj %}
                   <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
@@ -51,7 +51,7 @@
                 <div id="{{widget_for}}_pic_div" class="hide row">
                     <form class="dropzone" id ="{{widget_for}}_docPost" enctype="multipart/form-data" method="post"  action="{% url 'upload_prof_pic' group_id %}">
                         {% csrf_token %}
-                        <input type="file" name="docFile_img" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
+                        <input type="file" name="filehive" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
                         {% if is_banner and not is_profile %}
                           <input type="hidden" name="pic_rt" value="is_banner"></input>
                         {% elif  is_profile and not is_banner %}

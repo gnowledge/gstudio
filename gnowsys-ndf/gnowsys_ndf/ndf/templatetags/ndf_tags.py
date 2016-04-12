@@ -33,7 +33,6 @@ try:
 except ImportError:
 	pass
 
-from gnowsys_ndf.ndf.models import node_collection, triple_collection,filehive_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy
