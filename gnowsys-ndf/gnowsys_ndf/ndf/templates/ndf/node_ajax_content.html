@@ -247,7 +247,7 @@
                 <h3 class="text-gray">{{node.name}}:</h3>
               {% endif %}
 
-              {% if is_collection_card_view == True  %}
+              {% if is_collection_card_view == True and node.collection_set  %}
                 <center>
                 <div class="show-image">
                   <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
@@ -277,7 +277,7 @@
                       </a>
                 </div>
                 </center>
-              {% elif 'Pandora_video' in node.member_of_names_list %}
+              {% elif 'Pandora_video' in node.member_of_names_list and not is_collection_card_view %}
                 {% get_source_id node.pk as source_id %}
                 <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
                   <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm">
@@ -285,21 +285,11 @@
                 </video>
               {% elif 'video' in node.if_file.mime_type %}
 
-              {% comment "commented getting video from wetube" %}
-                {% get_source_id node.pk as source_id %}
-                {% if source_id %}
-                            <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                              <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm">
-                              {% trans "Your browser does not support the video tag." %}
-                            </video>
-                {% else %}
-              {% endcomment %}
-
                 <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
-                  <source src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" type="video/mp4">
                   <source src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" type="video/webm">
-                  <source src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" type="video/ogg">
-                  <source src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" type="{{node.if_file.mime_type}}">
+                  <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="video/ogg">
+                  <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="video/mp4">
+                  <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="{{node.if_file.mime_type}}">
                   {% trans "Your browser does not support the video tag." %}
                 </video>
               {% elif 'audio' in node.if_file.mime_type %}
