@@ -29,8 +29,9 @@ def type_created(request,group_id):
     gst = node_collection.find({'_type':'GSystemType'})
     for e in gst :
         option_list.append(e.name)
-
-    opt_list = node_collection.find({'_type':'GSystemType'})
+        opt_list.append(e)
+        
+    # opt_list = node_collection.find({'_type':'GSystemType'})
 
     template = "ndf/type_created.html"
     variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'option_list':option_list,'opt_list':opt_list })
@@ -172,9 +173,14 @@ def default_template(request,group_id,node=None):
         k = None
         rts_name = None
         rts_alt = None
+        rts_check = {}
+        r_check = []
+        rts_flag = False
+
         for e in rts:
             rts_name = e.name
             rts_alt = e.altnames
+            rts_check_id = e._id
             r_oo = []
             rts_obj1 = e.object_type
             rts_obj2 = e.subject_type
@@ -183,9 +189,12 @@ def default_template(request,group_id,node=None):
                 r_oo.append(each)
             for each in rts_obj2:
                 r_oo.append(each)
-            for e in r_oo:
-                if e == node_gs_id:
-                    r_oo.remove(e)
+            for each in r_oo:
+                if each == node_gs_id:
+                    r_oo.remove(each)
+                    # rts_check = dict ({ 'rts_id' : rts_check_id })
+                    # rts_flag = True
+                    # r_check.append(rts_check)
 
             name_rst = []
             id_rst = []
@@ -201,10 +210,19 @@ def default_template(request,group_id,node=None):
                 for c in m:
                     # print e.name
                     name_rst.append(c.name)
-                    
-            rts_object_dict = dict({ 'name':rts_name, 'altnames':rts_alt, 'object_type':name_rst })
+
+            rts_object_dict = dict({ 'name':rts_name, 'altnames':rts_alt, 'object_type':name_rst ,'rts_id' : rts_check_id  })
             f_rts_object_dict.append(rts_object_dict)
         # the code above returns a dict for the object display in template -- for rts
+
+        # print r_check , "???\n"
+        # print f_rts_object_dict , "\n\n"
+
+
+
+        # for e in f_rts_object_dict:
+            # for e,v in rts_object_dict:
+                # if rts_object_dict['rts_id'] == rts_check['rts_id']:
 
 
         f_pos_rts_object_dict=[]
@@ -215,9 +233,14 @@ def default_template(request,group_id,node=None):
         pos_k = None
         final_rts_name = None
         final_rts_alt = None
+        rts_pos_check = {}
+        r_pos_check = []
+        rts_pos_flag = False
+
         for e in final_rts:
             final_rts_name = e.name
             final_rts_alt = e.altnames
+            rts_check_pos_id = e._id
             pos_r = []
             # pos_rts_obj = e.object_type
             pos_rts_obj1 = e.object_type
@@ -227,8 +250,14 @@ def default_template(request,group_id,node=None):
             for e in pos_rts_obj2:
                 pos_r.append(e)
             for e in pos_r:
+                # print "fo",e,node_gs_id
                 if e == node_gs_id:
+                    print "fo in"
+                    rts_pos_check = dict ({ 'rts_id' : rts_check_pos_id })
+                    rts_pos_flag = True
+                    r_pos_check.append(rts_pos_check)
                     pos_r.remove(e)
+                    print rts_pos_check,">>>\n"
 
             name_pos_rst = []
             id_pos_rst = []
@@ -246,6 +275,9 @@ def default_template(request,group_id,node=None):
             
             pos_rts_object_dict = dict({'name':final_rts_name ,'altnames':final_rts_alt, 'object_type':name_pos_rst})
             f_pos_rts_object_dict.append(pos_rts_object_dict)
+
+        # print r_pos_check ,"??\n"
+        # print f_pos_rts_object_dict ,"\n\n"
         # the code above returns a dict for the object display in template -- for possible rts
 
     else:
@@ -378,12 +410,13 @@ def default_template(request,group_id,node=None):
                         # print r1
                     # else:
                         # print l,k ,"else"
-                    z1 = create_grelation(new_instance_type._id,q1,right_sub_list)
+                    # if r1._id:
+                        # z1 = create_grelation(new_instance_type._id,q1,r1._id)
                     # print z1 , "GRELATION"
                     
                     # GRelationError (line 
                     #2604): Cannot apply $addToSet modifier to non-array
-                    # for CourseEventGroup
+                    # for CourseEventGroup ,Person
 
     # If GET request ---------------------------------------------------------------------------------------
     # for key,value in class_structure.items():
