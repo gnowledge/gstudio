@@ -381,7 +381,10 @@ def save_quizitem_answer(request, group_id):
                 user_ans.name = unicode("Answer_of:" + str(node_obj.name) + "-Answer_by:"+ str(user_name))
                 user_ans.save()
                 # print "\n\n user_ans== ",user_ans
-
+                if user_id not in thread_obj.author_set:
+                    thread_obj.author_set.append(user_id)
+                    thread_obj.save()
+                    # print "\n thread_obj.author_set",thread_obj.author_set
                 if thread_obj._id not in user_ans.prior_node:
                     # add user's post/reply obj to thread obj's post_node
                     node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)
