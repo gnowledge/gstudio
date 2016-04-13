@@ -1,15 +1,9 @@
 {% load ndf_tags %}
 {% load i18n %}
 
-<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> 
-<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
-<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
-<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
-
 <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
 <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
 <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
-{# <script src="static/ndf/bower_components/handlebars/handlebars.min.js"></script> #}
 <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 
@@ -17,7 +11,7 @@
 
 <!-- <type 'unicode'> -->
 <div style="display:table-cell;">
-  <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|join:', '|default_if_none:''}}"></font>
+  <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|join:', '|default_if_none:''}}" placeholder="{{each.help_text}}"  ></font>
 </div>
 
 {% endif %}
@@ -33,123 +27,12 @@
 
       <div class="medium-3 columns end">
       {% elif fields_type == "datetime.datetime" %}
-      <input id="{{fields_name}}" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="{{fields_name}}" readonly="" >
-      </div>
-      <script type="text/javascript">
-      $(document).ready(function () {
-          {% if start_time %}
-              var start_date  = document.getElementById("start_date");
-              start_date.value = "{{start_time|date:'d/m/Y'}}";
-          {% endif %}
-          {% if end_time %}
-              var end_time  = document.getElementById("end_time");
-              end_time.value = "{{end_time|date:'d/m/Y'}}";
-          {% endif %}
-      })
+      <input type="text" id="{{fields_name}}" name="{{fields_name}}" >
 
-        // Start-date & End-date settings -------------------------------------------
-      var start_date = $("#start_date");
-      var end_time = $("#end_time");
-      var currentDate = new Date();
-      var currentDay = currentDate.getDate();
-      var currentMonth = currentDate.getMonth();
-      var currentYear = currentDate.getFullYear();
-      // var currentYear = (new Date()).getFullYear();
-      var lowerYearLimit = currentYear - 30;
-      
-      $(".date_month_day_year").datepicker({
-        changeMonth: true,
-        dateFormat: 'dd/mm/yy',
-        minDate: '0',
-        maxDate: '+2m',
-        defaultDate: '0',
-
-        onClose: function(dateText, inst) {
-          $(this).val(dateText);
-          
-          var month_year = $(this).val();
-          day = currentDay;
-          month = currentMonth;
-          year = currentYear;
-          
-          if ($(this).attr('id') == "start_date") {
-            if (month_year) {
-              month_year = month_year.split("/");
-              day = parseInt(month_year[0]);
-              month = parseInt(month_year[1]);
-              year = parseInt(month_year[2]);
-            }
-
-            if (end_time.val() != '') {
-              var testStartDate = start_date.datepicker('getDate');
-              var testEndDate = end_time.datepicker('getDate');
-
-              if (testStartDate > testEndDate) {
-                end_time.datepicker('setDate', testStartDate);
-              }
-
-              else {
-                $(this).val(day+"/"+month+"/"+year);
-                $(this).datepicker('setDate', new Date(year, (month-1), day));
-              }
-            }
-
-            else {
-              end_time.val(day+"/"+month+"/"+year);
-              $(this).datepicker('setDate', new Date(year, (month-1), day));
-            }
-
-            $("#end_time").datepicker('option', 'minDate', new Date(year, (month-1), day));
-          }
-
-          else if ($(this).attr('id') == "end_time") {
-            if (month_year) {
-              month_year = month_year.split("/");
-              day = parseInt(month_year[0]);
-              month = parseInt(month_year[1]);
-              year = parseInt(month_year[2]);
-            }
-
-            if (start_date.val() != '') {
-              var testStartDate = start_date.datepicker('getDate');
-              var testEndDate = end_time.datepicker('getDate');
-
-              if (testStartDate > testEndDate) {
-                start_date.datepicker('setDate', testEndDate);
-              }
-
-              else {
-                $(this).val(day+"/"+month+"/"+year);
-                $(this).datepicker('setDate', new Date(year, (month-1), day));
-              }
-            }
-
-            else {
-              start_date.val(day+"/"+month+"/"+year);
-
-              $(this).datepicker('setDate', new Date(year, (month-1), day));
-            }
-          }
-        },
-
-        beforeShow: function() {
-          var month_year = $(this).val();
-          day = currentDay;
-          month = currentMonth;
-          year = currentYear;
-
-          if (month_year) {
-            month_year = month_year.split("/");
-            day = parseInt(month_year[0]);
-            month = parseInt(month_year[1]);
-            year = parseInt(month_year[2]);
-          }
-
-          $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
-          $(this).datepicker('setDate', new Date(year, (month-1), day));
-        },
+      <script>
+      $(function() {
+        $( "#{{fields_name}}" ).datepicker();
       });
-
       </script>
 
       {% elif fields_type == "status" %}
@@ -161,7 +44,7 @@
 
       {% elif fields_type == "int" or fields_type == "float" or fields_type == "long" %}
       <div style="display:table-cell;">
-        <font size="3"> <input type="number" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
+        <font size="3"> <input type="" name="{{fields_name}}" placeholder="{{help_text}}" ></font>
       </div>
 
       {% elif fields_type == "list" %}
@@ -278,7 +161,7 @@
           </script>
 
         {% else %}
-        <input type="text" id="{{fields_name}}" name="{{fields_name}}"   />
+        <input type="text" id="{{fields_name}}" name="{{fields_name}}" placeholder="{{help_text}}"  />
         
         {% endif %}
 
