@@ -1962,12 +1962,13 @@ def fetch_req_fields(fields_type, fields_name ):
 
 @get_execution_time
 @register.inclusion_tag('ndf/fetch_fields.html')
-def ats_fields(fields_type, fields_name,groupid,complex_dt):
+def ats_fields(fields_type, fields_name,groupid,complex_dt,help_text,validators):
 	'''
 	this ndf tag returns the fields_name and fields_type of the GSystem object -- ats
 	'''
+
 	return {"fields_name":fields_name, "fields_type": fields_type,'groupid':groupid,
-	'complex_dt':complex_dt ,'gs_type':'attribute_set' }
+	'complex_dt':complex_dt ,'gs_type':'attribute_set', 'help_text':help_text , 'validators':validators}
 
 @get_execution_time
 @register.inclusion_tag('ndf/fetch_fields.html')
