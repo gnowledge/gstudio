@@ -28,7 +28,7 @@ from django.contrib.auth.models import User
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time, get_group_name_id,get_language_tuple
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity,get_execution_time
-
+from gnowsys_ndf.ndf.views.analytics_methods import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.forum import *
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
@@ -679,16 +679,33 @@ def my_groups(request, group_id):
 def my_dashboard(request, group_id):
 
     user_id = eval(group_id)
+    user_obj = User.objects.get(pk=int(user_id))
     auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
-
     auth_id = auth_obj._id
+    t0 = time.time()
     title = 'My Dashboard'
+
+    cmnts_rcvd_by_user = 0
+    analytics_instance = AnalyticsMethods(request, user_id,user_obj.username, auth_id)
+    users_points = analytics_instance.get_users_points()
+    total_cmnts_by_user = analytics_instance.get_total_comments_by_user(site_wide=True)
+    cmts_on_user_notes = analytics_instance.get_comments_counts_on_users_notes(False, site_wide=True)
+    cmts_on_user_files = analytics_instance.get_comments_counts_on_users_files(False, site_wide=True)
+    if cmts_on_user_notes and cmts_on_user_files:
+        cmnts_rcvd_by_user = cmts_on_user_notes + cmts_on_user_files
+    groups_cur = analytics_instance.get_user_joined_groups()
+    my_course_objs = get_user_course_groups(user_id)
+    del analytics_instance
 
     return render_to_response('ndf/my_dashboard.html',
                 {
                     'group_id': auth_id, 'groupid': auth_id,
-                    'node': auth_obj,
-                    'title': title
+                    'node': auth_obj,'user_obj': user_obj,
+                    'title': title,'users_points':users_points,
+                    'total_cmnts_by_user':total_cmnts_by_user,
+                    'cmnts_rcvd_by_user':cmnts_rcvd_by_user,
+                    'groups_cur':groups_cur,
+                    'my_course_objs': my_course_objs
                 },
                 context_instance=RequestContext(request)
         )

@@ -26,8 +26,10 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_total_units_count == ", time_diff
-
-		return all_modules_cur.count()
+		if all_modules_cur:
+			return all_modules_cur.count()
+		else:
+			return 0
 
 	def get_completed_modules_count(self):
 		t0 = time.time()
@@ -66,8 +68,10 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_total_units_count == ", time_diff
-
-		return all_unit_event_cur.count()
+		if all_unit_event_cur:
+			return all_unit_event_cur.count()
+		else:
+			return 0
 
 	def get_completed_units_count(self):
 		t0 = time.time()
@@ -95,6 +99,7 @@ class AnalyticsMethods(object):
 			return completed_unit_event_cur.count()
 		else:
 			return 0
+
 	def get_total_resources_count(self):
 		t0 = time.time()
 
@@ -114,7 +119,7 @@ class AnalyticsMethods(object):
 		if hasattr(self,'completed_res_ids_list'):
 			t1 = time.time()
 			time_diff = t1 - t0
-			print "\n get_completed_resources_count == ", time_diff
+			# print "\n get_completed_resources_count == ", time_diff
 
 			return len(self.completed_res_ids_list)
 		if not hasattr(self,'result_status'):
@@ -141,8 +146,10 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_total_quizitems_count == ", time_diff
-		
-		return all_quizitem_event_cur.count()
+		if all_quizitem_event_cur:
+			return all_quizitem_event_cur.count()
+		else:
+			return 0
 
 	def get_attempted_quizitems_count(self, return_cur_obj=False):
 		t0 = time.time()
@@ -159,8 +166,10 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_attempted_quizitems_count == ", time_diff
-
-		return self.quizitem_post_cur.count()
+		if self.quizitem_post_cur:
+			return self.quizitem_post_cur.count()
+		else:
+			return 0
 
 	def get_evaluated_quizitems_count(self,correct_ans_flag=False, incorrect_ans_flag=False):
 		t0 = time.time()
@@ -213,18 +222,25 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_total_notes_count == ", time_diff
+		if self.all_notes_cur:
+			return self.all_notes_cur.count()
+		else:
+			return 0
 
-		return self.all_notes_cur.count()
-
-	def get_user_notes_count(self, return_cur_obj=False):
+	def get_user_notes_count(self, return_cur_obj=False, site_wide=False):
 		t0 = time.time()
 
-		if not hasattr(self,'user_notes_cur'):
-			if not hasattr(self,"blog_page_gst") and not hasattr(self,"page_gst"):
-				self.blog_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"},{'_id': 1})
-				self.page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"},{'_id': 1})
-			self.user_notes_cur = node_collection.find({'member_of': self.page_gst._id,
-			 'type_of': self.blog_page_gst._id, 'created_by': self.user_id, 'group_set': self.group_obj._id},{'_id': 1})
+		# if not hasattr(self,'user_notes_cur'):
+		if not hasattr(self,"blog_page_gst") and not hasattr(self,"page_gst"):
+			self.blog_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"},{'_id': 1})
+			self.page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"},{'_id': 1})
+		query_user_notes_count = {'member_of': self.page_gst._id,
+		 'type_of': self.blog_page_gst._id, 'created_by': self.user_id}
+		if not site_wide:
+			query_user_notes_count.update({'group_set': self.group_obj._id})
+		self.user_notes_cur = node_collection.find(query_user_notes_count,{'_id': 1})
+		# else:
+		# 	self.user_notes_cur.rewind()
 		if return_cur_obj:
 			t1 = time.time()
 			time_diff = t1 - t0
@@ -233,13 +249,21 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_user_notes_count == ", time_diff
-		return self.user_notes_cur.count()
+		if self.user_notes_cur:
+			return self.user_notes_cur.count()
+		else:
+			return 0
 
-	def get_comments_counts_on_users_notes(self, return_cur_obj=False):
+	def get_comments_counts_on_users_notes(self, return_cur_obj=False, site_wide=False):
 		t0 = time.time()
 
-		if not hasattr(self,"user_notes_cur"):
+		if site_wide:
+			self.user_notes_cur = self.get_user_notes_count(True, True)
+		else:
 			self.user_notes_cur = self.get_user_notes_count(True)
+
+		# if not hasattr(self,"user_notes_cur"):
+		# 	self.user_notes_cur = self.get_user_notes_count(True)
 
 		user_notes_cur_ids = [each_user_note._id for each_user_note in self.user_notes_cur]
 
@@ -260,8 +284,10 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_comments_counts_on_users_notes == ", time_diff
-
-		return self.all_comments_on_user_notes.count()
+		if self.all_comments_on_user_notes:
+			return self.all_comments_on_user_notes.count()
+		else:
+			return 0
 
 	def get_commented_unique_users_count(self, for_notes=False,for_files=False):
 		t0 = time.time()
@@ -335,15 +361,21 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# 	print "\n get_total_files_count == ", time_diff
+		if self.all_files_cur:
+			return self.all_files_cur.count()
+		else:
+			return 0
 
-		return self.all_files_cur.count()
-
-	def get_user_files_count(self, return_cur_obj=False):
+	def get_user_files_count(self, return_cur_obj=False, site_wide=False):
 		t0 = time.time()
 
 		if not hasattr(self,"file_gst"):
 			self.file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"},{'_id': 1})
-		self.user_files_cur = node_collection.find({'member_of': self.file_gst._id, 'created_by': self.user_id, 'group_set': self.group_obj._id},{'_id': 1, 'created_by': 1})
+		query_user_files_count = {'member_of': self.file_gst._id, 'created_by': self.user_id}
+		if not site_wide:
+			query_user_files_count.update({'group_set': self.group_obj._id})
+
+		self.user_files_cur = node_collection.find(query_user_files_count,{'_id': 1, 'created_by': 1})
 		if return_cur_obj:
 			t1 = time.time()
 			time_diff = t1 - t0
@@ -353,16 +385,27 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_user_files_count == ", time_diff
-
-		return self.user_files_cur.count()
-
-	def get_comments_counts_on_users_files(self, return_cur_obj=False):
-		t0 = time.time()
-
-		if not hasattr(self,"user_files_cur"):
-			self.user_files_cur = self.get_user_notes_count(True)
+		if self.user_files_cur:
+			return self.user_files_cur.count()
 		else:
-			self.user_files_cur.rewind()
+			return 0
+
+	def get_comments_counts_on_users_files(self, return_cur_obj=False, site_wide=False):
+		t0 = time.time()
+		if site_wide:
+			self.user_files_cur = self.get_user_files_count(True, True)
+		else:
+			self.user_files_cur = self.get_user_files_count(True)
+
+		# if not hasattr(self,"user_files_cur"):
+		# 	if site_wide:
+		# 		print "\n site_wide == ", site_wide
+		# 		self.user_files_cur = self.get_user_files_count(True, True)
+		# 		print "\n self.user_files_cur ".self.user_files_cur.count()
+		# 	else:
+		# 		self.user_files_cur = self.get_user_files_count(True)
+		# else:
+		# 	self.user_files_cur.rewind()
 		user_files_cur_ids = [each_user_file._id for each_user_file in self.user_files_cur]
 		if not hasattr(self, "reply_gst"):
 			self.reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"},{'_id': 1})
@@ -379,19 +422,47 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_comments_counts_on_users_files == ", time_diff
+		if self.all_comments_on_user_files:
+			return self.all_comments_on_user_files.count()
+		else:
+			return 0
 
-		return self.all_comments_on_user_files.count()
-			
-	def get_total_comments_by_user(self):
+	def get_total_comments_by_user(self,return_cur=False,site_wide=False):
 		t0 = time.time()
 		if not hasattr(self, 'reply_gst'):
 			self.reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"},{'_id': 1})
-		self.users_replies_cur = node_collection.find({'member_of': self.reply_gst._id,
-		 'created_by': self.user_id, 'group_set': self.group_obj._id})
+
+		comments_query = {'member_of': self.reply_gst._id,'created_by': self.user_id}
+
+		if not site_wide:
+			comments_query.update({'group_set': self.group_obj._id})
+
+		self.users_replies_cur = node_collection.find(comments_query)
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_total_comments_by_user == ", time_diff
-		return self.users_replies_cur.count()
+		if self.users_replies_cur:
+			if return_cur:
+				return self.users_replies_cur
+			return self.users_replies_cur.count()
+		else:
+			return 0
+	'''
+	def get_avg_rating_on_my_comments(self,site_wide=False):
+		all_cmts = self.get_total_comments_by_user(True,site_wide)
+		avg_ratings_on_usr_cmnts = 0
+		total_rating = 0
+		rating_cntr = 0
+		for each_cmnt in all_cmts:
+			if each_cmnt.rating:
+				for each_ratng in each_cmnt.rating:
+					rating_cntr = rating_cntr + 1
+					total_rating = total_rating + each_ratng['score']
+		if total_rating:
+			avg_ratings_on_usr_cmnts = int(total_rating/float(rating_cntr))
+		print "\n all_cmts -- ", avg_ratings_on_usr_cmnts
+		return avg_ratings_on_usr_cmnts
+	'''
 
 	def get_others_notes_read_count(self):
 		t0 = time.time()
@@ -521,7 +592,10 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_other_files_commented_by_user_count == ", time_diff
-		return files_count.count()
+		if files_count:
+			return files_count.count()
+		else:
+			return 0
 
 	def get_other_notes_commented_by_user_count(self):
 		t0 = time.time()
@@ -543,7 +617,10 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_other_notes_commented_by_user_count == ", time_diff
-		return notes_count.count()
+		if notes_count:
+			return notes_count.count()
+		else:
+			return 0
 
 	def get_ratings_received_on_user_notes(self):
 		t0 = time.time()
@@ -553,12 +630,12 @@ class AnalyticsMethods(object):
 			self.page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"},{'_id': 1})
 		if not hasattr(self, 'blog_page_gst'):
 			self.blog_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"},{'_id': 1})
-		query = {'member_of': self.page_gst._id,'type_of': self.blog_page_gst._id,'group_set': self.group_obj._id,
+		rcvd_notes_ratings_query = {'member_of': self.page_gst._id,'type_of': self.blog_page_gst._id,'group_set': self.group_obj._id,
 				'created_by': self.user_id }
-		# print "\n\nquery", query
+		# print "\n\nrcvd_notes_ratings_query", rcvd_notes_ratings_query
 
 		all_notes = node_collection.collection.aggregate([
-						{ "$match": query },
+						{ "$match": rcvd_notes_ratings_query },
 						{ "$unwind": "$rating" },
 						{ "$group": { "_id": None, "count": { "$sum": 1 }, "rating": { "$addToSet": "$rating" } } }
 					])
@@ -575,7 +652,8 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_ratings_received_on_user_notes == ", time_diff
-		return avg_rating_notes,len(unique_user_list)
+		# return avg_rating_notes,len(unique_user_list)
+		return avg_rating_notes
 
 
 	def get_ratings_received_on_user_files(self):
@@ -585,10 +663,10 @@ class AnalyticsMethods(object):
 
 		if not hasattr(self,"file_gst"):
 			self.file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"},{'_id': 1})
-		query = {'member_of': self.file_gst._id, 'created_by': self.user_id, 'group_set': self.group_obj._id,
+		rcvd_files_ratings_query = {'member_of': self.file_gst._id, 'created_by': self.user_id, 'group_set': self.group_obj._id,
 		'created_by': self.user_id }
 		all_files = node_collection.collection.aggregate([
-						{ "$match": query },
+						{ "$match": rcvd_files_ratings_query },
 						{ "$unwind": "$rating" },
 						{ "$group": { "_id": None, "count": { "$sum": 1 }, "rating": { "$addToSet": "$rating" } } }
 					])
@@ -606,22 +684,23 @@ class AnalyticsMethods(object):
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_ratings_received_on_user_files == ", time_diff
-		return avg_rating_files,len(unique_user_list)
+		# return avg_rating_files,len(unique_user_list)
+		return avg_rating_files
 
 
 
 	def get_users_points(self, point_breakup=False):
 		t0 = time.time()
 		total_points = 0
+		point_breakup_dict = {}
 		user_files = self.get_user_files_count()
 		user_notes = self.get_user_notes_count()
 		correct_attempted_quizitems = self.get_evaluated_quizitems_count(True,False)
-		user_comments = self.get_total_comments_by_user()
+		user_comments = self.get_total_comments_by_user(False,False)
 		total_points = (user_files*25) + (user_notes*30) + \
 		(correct_attempted_quizitems*5) + (user_comments*5)
 		# print "\n get_users_points -- ",total_points
 		if point_breakup:
-			point_breakup_dict = {}
 			if user_files:
 				point_breakup_dict['Files'] = user_files*25
 			if user_notes:
@@ -632,3 +711,8 @@ class AnalyticsMethods(object):
 				point_breakup_dict['Interactions'] = user_comments*5
 			return point_breakup_dict
 		return total_points
+
+	def get_user_joined_groups(self):
+		t0 = time.time()
+		groups_cur = node_collection.find({'_type': "Group", 'author_set': self.user_id})
+		return groups_cur

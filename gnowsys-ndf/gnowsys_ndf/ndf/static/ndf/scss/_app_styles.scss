@@ -445,20 +445,25 @@ body>footer{
 
   section:first-child{
      //border-bottom: 1px solid #222;
-     margin-bottom: 2rem;
+     margin-bottom: 1rem;
 
    }
 
    a{
 
-    color: #bbbbbb !important;
+    color: #bbbbbb ;
     //margin-left:10px;
     &:hover{
       color:#03a9f4 !important;
 
     }
   }
-
+  .footer-meta {
+    color: #B3B3B3;
+    strong a {
+      color: #B3B3B3;
+    }
+  }
   strong a{
     border-bottom: 1px dotted #555;
     //margin-bottom:rem;
@@ -2332,6 +2337,12 @@ $course-envelop-color: #fff;
       }
     }
   }
+
+  .course-notif-logs {
+    ul {
+      list-style: none;
+    }
+  }
   .course-section {
     border: 1px solid #ccc;
     padding: 10px;
@@ -2413,25 +2424,6 @@ $course-envelop-color: #fff;
       border: 1px solid #ccc;
     }
   }
-  .about-course {
-    border: 1px solid #666;
-    padding: 10px;
-    >h5 {
-      text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      font-size: 14px;
-      display: block;
-      margin: 2px 0px 15px;
-      color: #888;
-    }
-    .course-highlight {
-      color: #aaa;
-      font-weight: 600;
-      font-size: 20px;
-      margin-bottom: 5px;
-    }
-  }
   /*.about-course-heading {
     display: block;
     height: 300px;
@@ -2465,12 +2457,100 @@ $course-envelop-color: #fff;
     width: 100%;
   }*/
 }
+.about-course {
+  border: 1px solid #666;
+  padding: 10px;
+  >h5 {
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-size: 14px;
+    display: block;
+    margin: 2px 0px 15px;
+    color: #888;
+  }
+  .course-highlight {
+    color: #aaa;
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 5px;
+  }
+}
 
+.student-dashboard-header-container {
+    background-color: #90F;
+    padding: 10px 10px ;
+    height: 110px;
+    width: 100%;
+
+    .student-dashboard-header{
+
+        img {
+          height: 75px;
+          width: 75px;
+          vertical-align: top;
+          margin: 0px 10px;
+        }
+        .student-dashboard-info {
+          display: inline-block;
+          >span {
+            display: block;
+            color: #fff;
+          }
+          .student-name {
+            color: #fff;
+            font-weight: 600;
+            font-size: 22px;
+            letter-spacing: 0.5px;
+          }
+          .student-overall-points {
+            font-size: 26px;
+            color: #ffff00;
+          }
+        }
+    }
+    .student-name {
+
+    }
+    .student-overall-points {
+
+    }
+  }
+.student-dashboard {
+  background-color: #fff;
+  padding: 10px;
+
+  #course-act-logs {
+    >span {
+      display: inline-block;
+      vertical-align: top;
+    }
+    .student-dash-notif {
+
+    }
+  }
+}
+.rating-star-number {
+    position: relative;
+    display: inline-block;
+    >span {
+        position: absolute;
+        top: 11px;
+        left: 14px;
+        font-size: 13px;
+    }
+    i {
+        font-size: 40px;
+        color: gold;
+    }
+}
 .course-dashboard {
 
   .course-status, .course-notifications,
   .course-performance {
-
+    >ul {
+      list-style: none;
+    }
 
     >.row {
       padding: 0px;
@@ -3494,7 +3574,7 @@ $course-envelop-color: #fff;
   }
   .activity-slides-container {
     border: 1px solid black;
-    height: 600px;
+    height: 100%;
     background: #CCCCCC;
     margin-bottom: 2em;
     padding: 0em 1em;

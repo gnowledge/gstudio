@@ -1,10 +1,43 @@
 {% block head %}
   <script src="/static/ndf/bower_components/pace/pace.js"></script>
   <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
+<style type="text/css">
+  
+  .rating-stars {
+    background-image:url("/static/ndf/images/stars.png");
+    height: 15px;
+    display: none;
+  }
+</style>
 {% endblock %}
+
 <script src="/static/ndf/bower_components/d3/d3.js"></script>
 
 <div id="course-about">
+<div class="row">
+<div class="small-12 columns about-course">
+  <h5>About</h5>
+  <div class="row">
+    <div class="small-12 medium-8 columns">
+    {{group_object.content|safe}}
+    </div>
+    <div class="small-12 medium-4 columns">
+      <div class="course-highlight">
+        <i class="fa fa-list"></i>
+        <span>{{group_object.collection_set|length}}</span>
+      </div>
+      <div class="course-highlight">
+        <i class="fa fa-clock-o"></i>
+        <span>{{weeks_count}} weeks</span>
+      </div>
+      <div class="course-highlight">
+        <i class="fa fa-user"></i>
+        <span>{{group_object.author_set|length}} students enrolled</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
 {% if request.user.is_authenticated %}
 
 <div class="pre-analytics-msg-div text-center">
@@ -50,7 +83,7 @@
               {% endcomment %}
             </ul>
             <div class="tabs-content">
-              <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification" style="overflow-y:scroll;height:300px;">
+              <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification" style="overflow-y:scroll;max-height:300px;">
               </section>
               <section role="tabpanel" aria-hidden="true" class="content" id="course-act-logs">
                 <ul>
@@ -79,20 +112,35 @@
                 <span class="course-metric-heading">Comments By me</span>
                 <span class="course-metric-count total_cmnts_by_user"></span>
               </div>
+              {% comment %}
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Avg Rating for my comments</span>
-                <span class="course-metric-count">Star rating</span>
+                <span class="course-metric-count">
+                  <div class="row avg_rating_for_my_cmnts">
+                    <div class="columns small-6 medium-6 rating-stars"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left"></div>
+                  </div>
+                </span>
               </div>
+              {% endcomment %}
             </div>
             <div class="row">
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Comments for me</span>
-                <span class="course-metric-count">0</span>
+                <span class="course-metric-count cmnts_rcvd_by_user">0</span>
               </div>
+              {% comment %}
               <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Avg Ratings to others</span>
-                <span class="course-metric-count">Star Rating</span>
+                <span class="course-metric-count">
+                  <div class="row avg_rating_to_othr_cmnts_by_me">
+                    <div class="columns small-6 medium-6 rating-stars"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left"></div>
+                  </div>
+                  
+                </span>
               </div>
+              {% endcomment %}
             </div>
           </div>
           <div class="course-gallery-uploads course-section">
@@ -114,12 +162,16 @@
                 <span class="course-metric-count cmts_on_user_files"></span>
               </div>
             </div>
+            {% comment %}
             <div class="row">
               <div class="columns small-12">
                 <span class="course-metric-heading">Avg. Rating</span>
-                <span class="course-metric-count">Star Rating</span>
+                <span class="course-metric-count">
+                  <div class="rating-stars"></div>
+                </span>
               </div>
             </div>
+            {% endcomment %}
             <div class="row">
               <div class="columns small-12 medium-4">
                 <span class="course-metric-heading">Others File Visited</span>
@@ -137,7 +189,12 @@
             <div class="row">
               <div class="columns small-12">
                 <span class="course-metric-heading">Avg. Rating Awarded</span>
-                <span class="course-metric-count">Star Rating</span>
+                <span class="course-metric-count">
+                  <div class="row total_rating_rcvd_on_files">
+                    <div class="columns small-6 medium-6 rating-stars"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left"></div>
+                  </div>
+                </span>
               </div>
             </div>
           </div>
@@ -183,9 +240,18 @@
               </div>
             </div>
             <div class="row">
-              <div class="columns small-12 medium-12">
+              <div class="columns small-12 medium-6">
                 <span class="course-metric-heading">Others notes visited</span>
                 <span class="course-metric-count total_notes_read_by_user"></span>
+              </div>
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Avg. Rating Awarded</span>
+                <span class="course-metric-count">
+                  <div class="row total_rating_rcvd_on_notes">
+                    <div class="columns small-6 medium-6 rating-stars"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left"></div>
+                  </div>
+                </span>
               </div>
             </div>
           </div>
@@ -204,30 +270,6 @@
 </div>
 
 
-              <div class="row">
-                <div class="small-12 columns about-course">
-                  <h5>About</h5>
-                  <div class="row">
-                    <div class="small-12 medium-8 columns">
-                    {{group_object.content|safe}}
-                    </div>
-                    <div class="small-12 medium-4 columns">
-                      <div class="course-highlight">
-                        <i class="fa fa-list"></i>
-                        <span>{{group_object.collection_set|length}}</span>
-                      </div>
-                      <div class="course-highlight">
-                        <i class="fa fa-clock-o"></i>
-                        <span>{{weeks_count}} weeks</span>
-                      </div>
-                      <div class="course-highlight">
-                        <i class="fa fa-user"></i>
-                        <span>{{group_object.author_set|length}} students enrolled</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
               {% comment %}
               <div class="row course-students-data">
                 <div class="small-12 medium-4 columns">
@@ -292,6 +334,12 @@
                         $("."+i)
                             .css("width",val+"%")
                     }
+                    else if(i == "total_rating_rcvd_on_files" || i == "total_rating_rcvd_on_notes"){
+                        $("."+i +" .rating-stars")
+                          .css("width",val*16+"px")
+                          .css("display","block")
+                        $("."+i +" .rating_lbl").text("("+val+")")
+                        }
                     else if(i == "users_points_breakup"){
                       generateGraph(val);
                     }
@@ -440,7 +488,6 @@
             global: false, 
             beforeSend: function(){
                 $("#course-notification").append("<label class='loading_lbl'>Loading...</label>");
-                
             },
             success:function(data){
                 if(String(data)) {

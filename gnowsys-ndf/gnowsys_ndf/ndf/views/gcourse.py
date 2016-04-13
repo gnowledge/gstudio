@@ -2500,7 +2500,7 @@ def course_analytics(request, group_id):
 
 
     # Comments on Notes Section
-    # analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
+    analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
     # print "\n Total Comments On User Notes === ", cmts_on_user_notes, "\n\n"
     # analytics_data['unique_users_commented_on_user_notes'] = analytics_instance.get_commented_unique_users_count(True,False)
     # print "\n Total Unique Users - Commented on User Notes === ", unique_users_commented_on_user_notes, "\n\n"
@@ -2531,12 +2531,16 @@ def course_analytics(request, group_id):
     analytics_data['commented_on_others_files'] = analytics_instance.get_other_files_commented_by_user_count()
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
     
-
-    # analytics_data['total_rating_rcvd_on_notes'] = analytics_instance.get_ratings_received_on_user_notes()
+    # all_cmts = analytics_instance.get_avg_rating_on_my_comments()
+    analytics_data['total_rating_rcvd_on_notes'] = analytics_instance.get_ratings_received_on_user_notes()
     # print "\n\n analytics_data['total_rating_rcvd_on_notes'] === ",analytics_data['total_rating_rcvd_on_notes']
-
-    # analytics_data['total_rating_rcvd_on_files'] = analytics_instance.get_ratings_received_on_user_files()
+    analytics_data['total_rating_rcvd_on_files'] = analytics_instance.get_ratings_received_on_user_files()
     # print "\n\n analytics_data['total_rating_rcvd_on_files'] === ",analytics_data['total_rating_rcvd_on_files']
+    cmts_on_user_notes = analytics_instance.get_comments_counts_on_users_notes(False, site_wide=True)
+    cmts_on_user_files = analytics_instance.get_comments_counts_on_users_files(False, site_wide=True)
+    analytics_data['cmnts_rcvd_by_user'] = 0
+    if 'cmts_on_user_notes' in analytics_data and 'cmts_on_user_files' in analytics_data:
+        analytics_data['cmnts_rcvd_by_user'] = analytics_data['cmts_on_user_notes'] + analytics_data['cmts_on_user_files']
 
     analytics_data['units_progress_stmt'] = str(completed_units) + " out of " + str(all_units) + " Units completed"
     analytics_data['module_progress_stmt'] = str(completed_modules) + " out of " + str(all_modules) + " Modules completed"
@@ -2555,7 +2559,7 @@ def course_analytics(request, group_id):
 
     t1 = time.time()
     time_diff = t1 - t0
-    print "\n ALL Total seconds == ", time_diff
+    # print "\n ALL Total seconds == ", time_diff
 
     del analytics_instance
     cache.set(cache_key, json.dumps(analytics_data), 60*15)
