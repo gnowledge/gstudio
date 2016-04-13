@@ -2674,10 +2674,11 @@ class allLinks(DjangoDocument):
 
 # DATABASE Variables
 db = get_database()
-node_collection = db[Node.collection_name].Node
-benchmark_collection = db[Benchmark.collection_name]
-triple_collection = db[Triple.collection_name].Triple
-gridfs_collection = db["fs.files"]
+node_collection     = db[Node.collection_name].Node
+triple_collection   = db[Triple.collection_name].Triple
+benchmark_collection= db[Benchmark.collection_name]
 filehive_collection = db[Filehive.collection_name].Filehive
-chunk_collection = db["fs.chunks"]
+gridfs_collection   = db["fs.files"]
+chunk_collection    = db["fs.chunks"]
+
 import signals

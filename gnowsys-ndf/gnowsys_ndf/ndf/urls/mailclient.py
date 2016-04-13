@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
 urlpatterns = patterns('gnowsys_ndf.ndf.views.mailclient',
                        url(r'^[/]$', 'mailclient', name='mailclient'),
+                       url(r'^[/]error[/](?P<error_obj>[\w-]+)$', 'mailclient_error_display', name='mailclient_error_display'),
                        url(r'^[/]create', include('gnowsys_ndf.ndf.urls.mailclient_create')),
                        url(r'^[/]mailresponse[/]','render_mailbox_pane', name='render_mailbox_pane'),
                        url(r'^[/]edit[/](?P<mailboxname>[\w-]+)$', 'mailbox_edit', name='mailbox_edit'),

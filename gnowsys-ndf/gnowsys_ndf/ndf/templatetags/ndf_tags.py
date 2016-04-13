@@ -1,16 +1,17 @@
 ''' -- imports from python libraries -- '''
 import re
-# import magic
-from collections import OrderedDict
 import os
-from time import time
 import json
 import ox
 import mailbox
 import email.utils
 import datetime
-from bson import json_util
+# import magic
+# import shutil
 
+from time import time
+from collections import OrderedDict
+from bson import json_util
 
 #for creating deault mailbox : Metabox
 from django_mailbox.models import Mailbox
@@ -51,11 +52,6 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy
 from gnowsys_ndf.mobwrite.models import TextObj
-
-# mailclient
-
-count = 0
-first_object = ''
 
 
 from pymongo.errors import InvalidId as invalid_id
@@ -868,7 +864,7 @@ def get_gapps_iconbar(request, group_id):
         group_name = ""
         group_id = ObjectId(group_id)
         # Fetch group
-        print group_id
+        # print group_id
         group_obj = node_collection.one({
             "_id": group_id
         }, {
@@ -3075,7 +3071,6 @@ def get_filters_data(gst_name, group_name_or_id='home'):
 	return filter_dict
 
 
-import shutil
 
 def sorted_ls(path):
     '''
@@ -3122,8 +3117,7 @@ def get_sg_member_of(group_id):
 	return sg_member_of_list
 
 def get_objectid_name(nodeid):
- print ';' * 50
- print nodeid
+ # print nodeid
  return (node_collection.find_one({'_id':ObjectId(nodeid)}).name)
 
 @register.filter
