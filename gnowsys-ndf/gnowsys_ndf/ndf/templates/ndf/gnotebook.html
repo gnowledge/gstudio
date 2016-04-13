@@ -99,7 +99,7 @@
                     {% endcomment %}
                     <a href="{% url 'course_notebook_tab_note' group_name 'all-notes' each_blog.pk %}" title="{{each_blog.content|safe|striptags|default_if_none:each_blog.name}}">
 
-                    <div class="note {% if notebook_obj.pk == each_blog.pk %} active {% endif %}" id="{{each_blog.pk}}">
+                    <div class="note {% if node.pk == each_blog.pk %} active {% endif %}" id="{{each_blog.pk}}">
                         <div class="note-heading"> {{each_blog.name}} </div>
                         <div class="note-meta">
                             <span title="{{each_blog.created_by|get_username}}">
@@ -134,7 +134,7 @@
                         </div>
                     {% endcomment %}
                     <a href="{% url 'course_notebook_tab_note' group_name 'my-notes' each_user_blog.pk %}" title="{{each_user_blog.content|safe|striptags|default_if_none:each_user_blog.name}}">
-                    <div class="note {% if notebook_obj.pk == each_user_blog.pk %} active {% endif %}" id="{{each_user_blog.pk}}">
+                    <div class="note {% if node.pk == each_user_blog.pk %} active {% endif %}" id="{{each_user_blog.pk}}">
                         <div class="note-heading"> {{each_user_blog.name}} </div>
                         <div class="note-meta">
                             <span title="{{each_user_blog.created_by|get_username}}">
@@ -167,7 +167,7 @@
             </div>
         </div>
             <div class="small-12 medium-8 large-9 columns note-page" >
-                       {% if notebook_obj %}
+                       {% if node %}
                            {% include "ndf/note_page.html" %}
                        {% endif %}
            </div>
@@ -337,6 +337,7 @@
     //         $(this).closest('.row').remove();
     //     });
     // })
+    /*
     $('.notebook-index .notes').on('click', '.note', function() {
         $(this).siblings().removeClass('active');
         $(this).addClass('active');
@@ -357,7 +358,7 @@
           },
         });//end of ajax
     });
-
+    */
 
     $(function() {
         // //New Note section

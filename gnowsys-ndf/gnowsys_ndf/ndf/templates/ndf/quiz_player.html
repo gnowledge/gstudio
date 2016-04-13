@@ -2,6 +2,7 @@
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 {% get_user_quiz_resp node request.user as total_and_curr_ans_dict %}
+
 <style type="text/css">
 	.quiz_qtn{
 		margin-left:20px !important;
@@ -49,6 +50,10 @@
 					{% if node.quiz_type == "Single-Choice" %}
 						{% for each_opt in node.options %}
 							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
+							{% if each_opt in total_and_curr_ans_dict.recent_ans  %}
+							checked
+							{% endif %}
+
 							{% if each_opt in node.correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
@@ -69,6 +74,9 @@
 					{% elif node.quiz_type == "Multiple-Choice" %}
 						{% for each_opt in node.options %}
 							<input type="checkbox" name="quiz_ans" value="{{each_opt}}"
+							{% if each_opt in total_and_curr_ans_dict.recent_ans %}
+							checked
+							{% endif %}
 							{% if each_opt in node.correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
@@ -87,9 +95,12 @@
 						{% if node.quizitem_show_correct_ans %}
 							<input type="button" value="Show Answer" class="button tiny radius show-ans-btn hide">
 						{% endif %}
+						<input type="button" value="Submit" class="tiny button radius submit-btn">
+						{% comment %}
 						{% if not node.quizitem_show_correct_ans %}
 						<input type="button" value="Submit" class="tiny button radius submit-btn">
 						{% endif %}
+						{% endcomment %}
 					</div>
 
 				</div>

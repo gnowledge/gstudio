@@ -29,7 +29,7 @@
 
   <div class="activity-page">
       <div class="row activity-page-header">
-          <div class="small-2 columns activity-page-previous">
+          <div class="small-4 medium-4 large-3 columns activity-page-previous">
               <a href="{% url 'course_content' group_name %}"><i class="fa fa-home"></i></a>
               {% if resource_prev_id %}
               <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_prev_id %}" class="prev-activity">
@@ -43,7 +43,7 @@
               </a>
               {% endif %}
           </div>
-          <div class="small-8 columns">
+          <div class="small-4 medium-4 large-6 columns">
               <div class="unit-title">{{unit_node.name}}</div>
               <div class="activity-title">
                   {{node.name}}
@@ -76,7 +76,7 @@
               <div class="activity-title">
               </div>
           </div>
-          <div class="small-2 columns activity-create-note">
+          <div class="small-4 medium-4 large-3 columns activity-create-note">
               <div style="float: right;">
                   {% if resource_next_id %}
                   <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_next_id %}" class="next-activity">
@@ -93,10 +93,10 @@
               </div>
           </div>
       </div>
-      <div class="activity-slides-container row" style=" height:750px;">
+      <div class="activity-slides-container row" >
           {% get_relation_value node.pk 'has_help' as grel_dict %}
           <div class="columns small-12 activity-slides">
-              <div class="row activity-slide node_details" style="overflow-y:auto;">
+              <div class="row activity-slide node_details" >
                   {% if grel_dict.cursor and grel_dict.grel_node.count %}
                     <a id="related-content-button" href="#related-content" class="view-related-content"><i class="fa fa-arrow-circle-down"></i>&nbsp;View related contents</a>
                   {% endif %}
@@ -104,9 +104,9 @@
                   {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
               </div>
               {% if grel_dict.cursor and grel_dict.grel_node.count %}
+              {% for each_help_page in grel_dict.grel_node %}
               <div id="related-content">
                 <i class="fa fa-info-circle"></i>
-                {% for each_help_page in grel_dict.grel_node %}
                 <div class="related-content-header">
                   <span>Related Help Topic</span>
                     <span class="related-content-title">
@@ -119,23 +119,23 @@
                   {{each_help_page.content|safe}}
                   </div>
 
-                {% endfor %}
               </div>
+              {% endfor %}
               {% endif %}
 
-          </div>
-      </div>
-      <div class="row activity-comments-section">
-          <div class="columns small-12 " id="view-discussion">
-                <!-- discussion content area -->
-                {% get_thread_node node.pk as thread_node %}
-                {% if thread_node %}
-                    {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                    {% get_node thread_node as thread_node_obj %}
-                    {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True thread_node_exists=True %}
-                {% endif %}
+              <div class="row activity-comments-section">
+                  <div class="columns small-12 " id="view-discussion">
+                        <!-- discussion content area -->
+                        {% get_thread_node node.pk as thread_node %}
+                        {% if thread_node and "QuizItemEvent" not in node.member_of_names_list %}
+                            {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                            {% get_node thread_node as thread_node_obj %}
+                            {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True thread_node_exists=True %}
+                        {% endif %}
 
-                <!-- END of discussion content area -->
+                        <!-- END of discussion content area -->
+                  </div>
+              </div>
           </div>
       </div>
           {% comment %}

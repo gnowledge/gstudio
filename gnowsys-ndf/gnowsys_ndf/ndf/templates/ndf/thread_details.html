@@ -153,13 +153,20 @@ color: #7a7a7a;
  -->
  			{% endcomment %}
 
-
 			<div id="smalldiv" >
 
 				{% if user.is_authenticated %}
 					{% if thread %}
-						{% include "ndf/replytwistrep.html" %}
-					{% endif %}
+   							{% get_disc_replies thread.pk groupid global_disc_all_replies as all_replies %}
+							{% get_node thread.pk as thread_node_obj %}
+                        	{% include 'ndf/in-line-texteditor.html' with allow_to_comment="True" node=thread_node_obj var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+                    {% else %}
+                        {% get_disc_replies thread.pk groupid global_disc_all_replies as all_replies %}
+                        {% include 'ndf/in-line-texteditor.html' with allow_to_comment="True" var_name="content_org" ckeditor_toolbar="BasicToolbar" %}
+	                
+
+	                {% endif %}
+
 				{% endif %}
 
 			</div>
@@ -167,13 +174,6 @@ color: #7a7a7a;
 	<!-- </div> -->
 	
 
-	<div class="row">
-		<div class="response_change" id="refreshthread" class="large-12 columns">
-			<div style="margin-left:40px;margin-bottom:1px">  
-				{% get_reply request thread thread forum csrf_token request.user groupid %}
-			</div>
-		</div>
-	</div>
 {% else %}
 <p>“This forum dosen't have any threads. Be the first to create a thread!”</p>
 

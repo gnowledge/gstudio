@@ -1,6 +1,6 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-
+import re
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
@@ -139,6 +139,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         question_content = question_content[:4]
         question_content = ' '.join(question_content)
         # print "\n\n question_content---",question_content
+        question_content = re.sub('<[^>]*>', ' ', question_content)
         quiz_item_node.name = unicode(question_content)
         quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
         options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
@@ -361,6 +362,7 @@ def save_quizitem_answer(request, group_id):
             qip_user_submitted_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_submitted_ans"})
             qip_user_checked_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_checked_ans"})
             already_ans_obj = None
+            # print "\n\n thread_obj == ", thread_obj
             if thread_obj != None:
                 already_ans_obj = node_collection.find_one({'member_of': qip_gst._id,'created_by': user_id, 'prior_node': thread_obj._id})
                 if already_ans_obj:
@@ -373,12 +375,17 @@ def save_quizitem_answer(request, group_id):
                     user_ans.contributors.append(user_id)
                     user_ans.member_of.append(qip_gst._id)
                     user_ans.group_set.append(group_id)
-                    user_ans.origin = [{'thread_id': thread_obj._id, 'prior_node_id_of_thread': node_obj._id}]
-                    user_ans.status = u"PUBLISHED"
-
+                if node_obj._id not in user_ans.prior_node:
+                    user_ans.prior_node.append(node_obj._id)
+                user_ans.origin = [{'thread_id': thread_obj._id, 'prior_node_id_of_thread': node_obj._id}]
+                user_ans.status = u"PUBLISHED"
                 user_ans.name = unicode("Answer_of:" + str(node_obj.name) + "-Answer_by:"+ str(user_name))
                 user_ans.save()
-
+                # print "\n\n user_ans== ",user_ans
+                if user_id not in thread_obj.author_set:
+                    thread_obj.author_set.append(user_id)
+                    thread_obj.save()
+                    # print "\n thread_obj.author_set",thread_obj.author_set
                 if thread_obj._id not in user_ans.prior_node:
                     # add user's post/reply obj to thread obj's post_node
                     node_collection.collection.update({'_id': user_ans._id}, {'$push': {'prior_node':thread_obj._id}},upsert=False,multi=False)

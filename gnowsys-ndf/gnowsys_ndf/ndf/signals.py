@@ -2,6 +2,26 @@ from registration.signals import user_registered, user_activated
 from django.dispatch import receiver
 from gnowsys_ndf.ndf.models import *
 
+'''
+from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+from django.core.mail import send_mail
+@receiver(user_login_failed)
+def login_fail(sender, credentials, **kwargs):
+    print "\n\n LOGIN FAILED"
+    print "sender == ", sender
+    print "credentials == ", credentials
+    send_mail('Login Failed ', 'credentials'+ str(credentials), 'from@example.com',
+    ['to@example.com'], fail_silently=False)
+
+@receiver(user_logged_out)
+def logged_out(sender, user, request, **kwargs):
+    print "\n\n LOGGED OUT"
+
+@receiver(user_logged_in)
+def logged_in(sender, user, request, **kwargs):
+    print "\n\n LOGGED IN"
+
+'''
 @receiver(user_registered)
 def user_registered_handler(sender, user, request, **kwargs):
     '''

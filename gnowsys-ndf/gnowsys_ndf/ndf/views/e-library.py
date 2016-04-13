@@ -375,8 +375,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		if filetype == "Collections":
 				detail_urlname = "page_details"
 				result_cur = node_collection.find({
-									# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-									'member_of': {'$in': [GST_FILE._id]},
+									'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
                                     'group_set': {'$all': [ObjectId(group_id)]},
 									'$and': query_dict,
                                     '$or': [

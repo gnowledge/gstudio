@@ -1,9 +1,18 @@
 # Django settings for gnowsys-ndf project.
+
+# imports from python libraries
+import os
+
+# imports from core django libraries
 from django.conf import global_settings
 # from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
-import os
+
+# imports from third-party app(s)
 import djcelery
+
+from gnowsys_ndf.ndf.utils import (is_dir_exists, ensure_dir, get_current_dbs_path,
+    move_file_or_dirctory)
 
 DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1"]
@@ -249,16 +258,31 @@ PASSWORD_COMPLEXITY = {  # You can ommit any or all of these for no limit for th
     "DIGITS": 1,      # Digits
 }
 
+# Absolute filesystem path to the project's base directory,
+# i.e. having settings.py file
+# Example: "/.../project-name/app-name/"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+# Absolute filesystem path to the project's data directory,
+# i.e. common place to store all database(s)
+# Example: "/home/<user-name>/data/"
+# Don't edit this below path
+GSTUDIO_DATA_ROOT = os.path.join(os.path.expanduser("~/"), 'gstudio_data')
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
 MANAGERS = ADMINS
 
+# Don't edit default database's NAME attribute
+# If overridden in local settings file, then
+# follow the same pattern and edit only the database-name
+SQLITE3_DBNAME = 'example-sqlite3.db'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'example-sqlite3.db',
+        'NAME': os.path.join(GSTUDIO_DATA_ROOT, SQLITE3_DBNAME),
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
@@ -462,11 +486,6 @@ LOGGING = {
 
 LOGIN_REDIRECT_URL = "/"
 
-# Absolute filesystem path to the project's base directory,
-# i.e. having settings.py file
-# Example: "/.../project-name/app-name/"
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
 # Binary - Only meant for RelationType's document to represent
 # Binary relationship, especially defined to differentiate
 # from other relationship(s), i.e. Triadic, etc.
@@ -513,6 +532,7 @@ GSTUDIO_WORKING_GAPPS = [
 GSTUDIO_SECOND_LEVEL_HEADER = True
 GSTUDIO_MY_GROUPS_IN_HEADER = True
 GSTUDIO_MY_COURSES_IN_HEADER = False
+GSTUDIO_MY_DASHBOARD_IN_HEADER = False
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
 # if not set by specific group
@@ -597,7 +617,8 @@ VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes',
 
 # Absolute filesystem path to the directory that will hold all rcs-files
 # (history-files corresponding to every json-file created for each document)
-RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/rcs-repo")
+RCS_REPO_DIRNAME = "rcs-repo"
+RCS_REPO_DIR = os.path.join(GSTUDIO_DATA_ROOT, RCS_REPO_DIRNAME)
 
 # Indicates the "hash-level-number", i.e the number of sub-directories that
 # will be created for the corresponding document under it's

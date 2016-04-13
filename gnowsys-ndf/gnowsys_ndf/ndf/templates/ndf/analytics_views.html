@@ -14,13 +14,14 @@
 		{% endif %}
 		current_url = window.location.pathname;
 		$.ajax({
-			url: "{% url 'get_visits_count' group_object.pk %}",
+			url: "{% url 'get_visits_count' group_id %}",
 			data: {
 				curr_url: current_url,
 				get_params: get_params,
 			},
 
 			type: "GET",
+			global: false,
 
 			dataType: "json",
 

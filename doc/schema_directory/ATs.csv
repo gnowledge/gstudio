@@ -81,7 +81,7 @@ options,QuizItem Options,list,[],"[""QuizItem"",""QuizItemEvent""]",TRUE,TRUE,[]
 correct_answer,QuizItem Correct Answer,list,[],"[""QuizItem"",""QuizItemEvent""]",TRUE,TRUE,[],[],
 quizitem_show_correct_ans,QuizItem Show Correct Answer,bool,[],"[""QuizItem"",""QuizItemEvent""]",FALSE,TRUE,[],[],
 quizitem_problem_weight,QuizItem Problem Weight,float,[],"[""QuizItem"",""QuizItemEvent""]",FALSE,TRUE,[],[],
-quizitem_max_attempts,QuizItem Maximum Attempts,long,[],"[""QuizItem"",""QuizItemEvent""]",FALSE,TRUE,[],[],
+quizitem_max_attempts,QuizItem Maximum Attempts,int,[],"[""QuizItem"",""QuizItemEvent""]",FALSE,TRUE,[],[],
 quizitem_check_answer,QuizItem Check Answer,bool,[],"[""QuizItem"",""QuizItemEvent""]",FALSE,TRUE,[],[],
 quizitempost_user_submitted_ans,QuizItemPost User Submitted Answer,list,[],"[""QuizItemPost""]",TRUE,TRUE,[],[],
 quizitempost_user_checked_ans,QuizItemPost User Checked Answer,list,[],"[""QuizItemPost""]",TRUE,TRUE,[],[],
