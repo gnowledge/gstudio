@@ -4494,9 +4494,10 @@ def get_course_units_tree(data,list_ele):
 def replicate_resource(request, node, group_id):
     try:
         create_thread_for_node_flag = True
-        if "Page" in node.member_of_names_list or "QuizItem" in node.member_of_names_list:
+        if "Page" in node.member_of_names_list or "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
             new_gsystem = node_collection.collection.GSystem()
         else:
+            # print "\n node --- ", node
             new_gsystem = node_collection.collection.File()
             new_gsystem.fs_file_ids = node.fs_file_ids
             new_gsystem.file_size = node.file_size
@@ -4505,7 +4506,7 @@ def replicate_resource(request, node, group_id):
         new_gsystem.group_set.append(group_id)
         new_gsystem.name = unicode(node.name)
         new_gsystem.status = u"PUBLISHED"
-        if "QuizItem" in node.member_of_names_list:
+        if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
             quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
             new_gsystem.member_of.append(quiz_item_event_gst._id)
         else:
@@ -4535,7 +4536,7 @@ def replicate_resource(request, node, group_id):
                 has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
                 gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
 
-        if "QuizItem" in node.member_of_names_list:
+        if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
             # from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 
             # thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
