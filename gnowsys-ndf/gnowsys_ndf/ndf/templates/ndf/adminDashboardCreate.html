@@ -70,14 +70,14 @@
 	<dd class="accordion-navigation">
 		<a href="#definitionlist">Definition</a>
 		<div id="definitionlist" class="content active">
-		{% for list in definitionlist %}
-			{% if translate and list != "language" %}
+		{% for key,list in definitionlist.iteritems %}
+			{% if translate and key != "language" %}
 			<div style="display:table-row;">
 				<div style="display:table-cell;"> 
 					<font size="3"> {{list}} </font> 
 
 				</div>
-	{% get_input_fields class_structure|get_dict_item:list list translate  %}
+	{% get_input_fields class_structure|get_dict_item:key key translate  %}
 
 	{% if list in  required_fields %}
 	<div style="display:table-cell;">
@@ -90,17 +90,20 @@
 			
 			{% if not translate %} <!--Used when the page is not translated -->
 			<div class='boxes' style="display:table-row;">
-				<div style="display:table-cell;" >
 				<!--
 				<div style="display:table-cell;" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %} " class='box' > 
 					<span><font size="3"> {{list}} </font> </span> -->
-					<span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %}">
-					<font size="3"> {{list}} </font> </span>
+					
+				<div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} " class="scard-image" >
+					
+					{# <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %}"> #}
+					
+					<span><font size="3"> {{list}} </font> </span>
 				</div>
 				{# {{class_structure|get_dict_item:list }} #}
 
 				
-				{% get_input_fields class_structure|get_dict_item:list list translate  %}
+				{% get_input_fields class_structure|get_dict_item:key key translate  %}
 				{% if list in  required_fields %}
 				<div style="display:table-cell;">
 					<font size="3" color="red"> * </font>
@@ -115,7 +118,7 @@
 	<dd class="accordion-navigation">
 		<a href="#contentlist">Content</a>
 		<div id="contentlist" class="content" >
-			{% for list in contentlist %}
+			{% for key,list in contentlist.iteritems %}
 			<div class="medium-12 columns">
 	{# {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %} #}
 			</div>
@@ -148,12 +151,12 @@
 	<dd class="accordion-navigation">
 		<a href="#dependencylist">Dependency</a>
 		<div id="dependencylist" class="content">
-			{% for list in dependencylist %}
+			{% for key,list in dependencylist.iteritems %}
 			<div style="display:table-row;" class='boxes' >
-	<div style="display:table-cell;" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %} " class='box' > 
+	<div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} " class='box' > 
 		<font size="3"> {{list}}</font> 
 	</div>
-	{% get_input_fields class_structure|get_dict_item:list list translate  %}
+	{% get_input_fields class_structure|get_dict_item:key key translate  %}
 			</div>
 			{% endfor %}
 		</div>
@@ -161,12 +164,12 @@
 	<dd class="accordion-navigation">
 		<a href="#options">Options</a>
 		<div id="options" class="content">
-			{% for list in options %}
+			{% for key,list in options.iteritems %}
 			<div style="display:table-row;" class='boxes' >
-				<div style="display:table-cell;" title="{% for key,value in help_tip.iteritems %}{% if list == key %}{{value}}{% endif %}{% endfor %} " class='box' > 
+				<div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} " class='box' > 
 					<font size="3"> {{list}}</font> 
 				</div>
-				{% get_input_fields class_structure|get_dict_item:list list translate  %}
+				{% get_input_fields class_structure|get_dict_item:key key translate  %}
 			</div>
 			{% endfor %}
 		</div>
