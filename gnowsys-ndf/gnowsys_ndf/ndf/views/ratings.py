@@ -25,25 +25,25 @@ sitename=Site.objects.all()[0]
 @get_execution_time
 def ratings(request, group_id, node_id):
 	rating=request.POST.get('rating', '')
-	node = node_collection.one({'_id': ObjectId(node_id)})
+	node_obj = node_collection.one({'_id': ObjectId(node_id)})
 	ratedict = {}
+	already_rated_by_user = False
 	if rating:
 		ratedict['score']=int(rating)
-	else:
-		ratedict['score']=0
-	ratedict['user_id']=request.user.id
-	ratedict['ip_address']=request.META['REMOTE_ADDR']
-	fl=0
-	for each in node.rating:
-		if each['user_id'] == request.user.id:
-			if rating:
-				each['score']=int(rating)
-			else:
-				each['score']=0
-			fl=1
-	if not fl:
-		node.rating.append(ratedict)
-	node.save(groupid=group_id)
+		ratedict['user_id']=request.user.id
+		ratedict['ip_address']=request.META['REMOTE_ADDR']
+
+		for each_rating in node_obj.rating:
+			if each_rating['user_id'] == request.user.id:
+				each_rating['score']=int(rating)
+				already_rated_by_user = True
+				break
+
+		if not already_rated_by_user:
+			node_obj.rating.append(ratedict)
+
+		node_obj.save(groupid=group_id)
+
 	result = get_node_ratings(request,node_id)
 	# vars=RequestContext(request,{'node':node})
 	# template="ndf/rating.html"

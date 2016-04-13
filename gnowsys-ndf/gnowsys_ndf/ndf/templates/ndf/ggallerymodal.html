@@ -2,11 +2,6 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% get_grid_fs_object node as grid_fs_obj %}
-<style type="text/css">
-    .visits_info{
-        font-size: 20px;
-    }
-</style>
 <!--<style type="text/css">
     .gmodal-item-panel .text-gray{
         display:none;
@@ -76,79 +71,72 @@
                 <div class="columns small-1 next-item">Next ></div>
             </div>
             {% endcomment %}
-        </div>
-        <!-- Comments section -->
-        <div class="small-4 columns gmodal-side-panel" >
-            <div class="gmodal-side row"   style="overflow-y:auto;">
-                <div class="small-12">
-                    <div class="row view-info-area image-name">
-                        <div class="small-12 columns">
-                            <h5>{% firstof node.altnames node.name %}</h5>
-                        </div>
-                        <a class="file-detail-modal-close close-reveal-modal" aria-label="Close">&#215;</a>
-                    </div>
-                    {% get_node_ratings request node.pk as ratings %}
-                    <div class="row image-brief">
-                        <div class="small-12 columns">
-                            <i class="fi-eye"></i>
-                            <span class="viewed-count">214 Views</span>
-                            <span>Avg&nbsp;</span>
-                            <span class="image-rating">{{ratings.avg}}</span>
-                            <span>Rate this</span>
-                            <span>
-                                {% include "ndf/rating.html" %}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row image-actions">
-                        <div class="small-12 columns">
-                            <a href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}"><i class="fa fa-arrow-circle-down"></i>&nbsp;Download</a>
-                            <a><i class="fa fa-pencil"></i>&nbsp;Create Note</a>
-                            {% get_edit_url node.pk as edit_url %}
-                            {% check_is_gstaff group_id request.user as is_gstaff %}
-                            {% if is_gstaff or node.created_by == request.user.id %}
-                                <a href="{% url edit_url group_id node.pk %}">
-                                    <i class="fi-page-edit" ></i>Edit
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <!--div class="row rating-area">
-                        <div class="small-6 columns">
-                            <h4>Rating</h4>
-                        </div>
-                        <div class="small-6 columns right">
-                            {% include "ndf/analytics_views.html" %}
-                        </div>
+    </div>
+    <!-- Comments section -->
+    <div class="small-4 columns gmodal-side-panel" >
 
-                    </div-->
-                    <div class="row image-details">
-                        <div class="small-12 columns ">
-                            <ul class="tabs" data-tab>
-                              <li class="tab-title active"><a href="#image-comments">Comments</a></li>
-                              <li class="tab-title"><a href="#image-info">Info</a></li>
-                            </ul>
-                            <div class="tabs-content">
-                                <div class="content" id="image-info">
-                                    {% get_file_obj node as node_file %}
-                                    <span>Created At: </span>{{node.created_at}}<br>
-                                    <span>Uploader: </span>{{node.created_by|get_username}}<br>
-                                    <span>Format: </span>{{node_file.mime_type}}<br>
-                                    <span>Size: </span>{% if node_file %}{{node_file.length|filesizeformat}}{% endif %}
-                                </div>
-                                <div class="content active" id="image-comments">
-                                    <div class="row comments-area">
-                                        <div class="small-12 columns" >
-                                            {% get_thread_node node.pk as thread_node %}
-                                                {% if thread_node %}
-                                                    {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                                                    {% get_node thread_node as thread_node_obj %}
-                                                    {% include 'ndf/ggallery-discussion.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
-                                                {% else %}
-                                                    {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                                                    {% include 'ndf/ggallery-discussion.html' with var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
-                                                {% endif %}
-                                        </div>
+        <div class="gmodal-side row"   style="overflow-y:auto;">
+            <div class="small-12">
+                <div class="row view-info-area image-name">
+                    <div class="small-12 columns">
+                        <h5>{% firstof node.altnames node.name %}</h5>
+                    </div>
+                </div>
+                <div class="row image-brief">
+                    <div class="small-12 columns">
+                        {% include "ndf/analytics_views.html" %}
+                        {% comment %}
+                        <i class="fi-eye"></i>
+                        <span>Avg&nbsp;</span>
+                        <span class="image-rating">3.4</span>
+                        <span>Rate this</span>
+                        {% endcomment %}
+                        <span>
+                            {% include "ndf/rating.html" %}
+                        </span>
+                    </div>
+                </div>
+                <div class="row image-actions">
+                    <div class="small-12 columns">
+                        <a href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}"><i class="fa fa-arrow-circle-down"></i>&nbsp;Download</a>
+                        {% comment %}
+                        <a><i class="fa fa-pencil"></i>&nbsp;Create Note</a>
+                        {% endcomment %}
+                        {% get_edit_url node.pk as edit_url %}
+                        {% check_is_gstaff group_id request.user as is_gstaff %}
+                        {% if is_gstaff or node.created_by == request.user.id %}
+                            <a href="{% url edit_url group_id node.pk %}">
+                                <i class="fi-page-edit" ></i>Edit
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row image-details">
+                    <div class="small-12 columns ">
+                        <ul class="tabs" data-tab>
+                          <li class="tab-title active"><a href="#image-comments">Comments</a></li>
+                          <li class="tab-title"><a href="#image-info">Info</a></li>
+                        </ul>
+                        <div class="tabs-content">
+                            <div class="content" id="image-info">
+                                <span>Created At: </span>{{node.created_at}}<br>
+                                <span>Uploader: </span>{{node.created_by|get_username}}<br>
+                                <span>Format: </span>{{node.mime_type}}<br>
+                                <span>Size: </span>{{node.file_size.size}}{{node.file_size.unit}}>
+                            </div>
+                            <div class="content active" id="image-comments">
+                                <div class="row comments-area">
+                                    <div class="small-12 columns" >
+                                        {% get_thread_node node.pk as thread_node %}
+                                            {% if thread_node %}
+                                                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                                                {% get_node thread_node as thread_node_obj %}
+                                                {% include 'ndf/ggallery-discussion.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                                            {% else %}
+                                                {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                                                {% include 'ndf/ggallery-discussion.html' with var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                                            {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -158,6 +146,9 @@
             </div>
         </div>
     </div>
+    <a href="{% url redirect_tab_url group_id %}" class="file-detail-modal-close"></a>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
 </div>
 <script type="text/javascript">
 

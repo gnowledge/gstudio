@@ -12,23 +12,30 @@
  
 
 </style>
-<div class="content" id="status" align="left">
-<div style="background-color: white; height:auto; width:auto; " >
+<div class="content" id="status" align="left" {% if not hyperlinks %} style="width:500px"{% endif %}>
+<div style="background-color: white; height:auto; width:auto;" >
 
 {% for i in activity_list %}
   {% get_url i.pk as res_type %}
    {% if res_type != "None" %}
    
    <div class="container-div  selFile" style="height:50px; background-color:#f7fcfb;">
-    <div id="top_list"  style="position:relative; top:15px;" >
-      <div id="name-div"  style=" position:absolute; width:7.2%;  word-wrap:break-word; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; float:left; ">
-          
+    <div id="top_list"  style="position:relative; top:15px;" title="{{i.created_at|timesince}} ago" >
+      {% if hyperlinks %}      
+        <div id="name-div"  style=" position:absolute; width:5.2%;  word-wrap:break-word; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; float:left; ">
           <a href="{% url 'dashboard' i.created_by %}"> {{i.user_details_dict.created_by}} </a>
-      </div>
+        </div>
+      {% else %}      
+        <div id="name-div"  style="width:20%;  word-wrap:break-word; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; float:left; ">
+            {{i.user_details_dict.created_by}}
+        </div>
+      {% endif %}      
+
       <div id="action" style=" position:relative; left:7.5%; float:left;">
            has  {{i.activity}}
       </div> 
-      <div id="create_type"  style=" position:relative; left:8%; word-wrap:break-word; width:auto; float:left;" >
+      {% if hyperlinks %}
+        <div id="create_type"  style=" position:relative; left:8%; word-wrap:break-word; width:auto; float:left;" >
           {% if res_type != "event_app_instance_detail" %}
                 <a href="{% url res_type groupid i.pk   %}"> {{i.name}} </a>
                  
@@ -36,11 +43,20 @@
               {% get_event_type i as app_set_id %}
                  <a href="{% url res_type groupid app_set_id i.pk  %}">{{i.name}} </a>         
           {% endif %}
-      </div>
-       <div id="performed on" class="small-2 column"  style=" position:relative; word-wrap: float:left; break-word; width:auto; left:7.5%;" >
-            {{i.created_at|timesince}} ago
-      </div>
-     <div  align="right" style="position:relative; right:4%; top:-15px;" >
+        </div>
+
+      {% else %}
+        <div id="create_type"  style=" position:relative; left:8%; word-wrap:break-word; width:50%; overflow: hidden; text-overflow: ellipsis; ; float:left;" >
+          {{i.name}}
+        </div>
+
+      {% endif %}
+      
+      {% if hyperlinks %}   
+        <div id="performed on" class="small-2 column"  style=" position:relative; word-wrap: float:left; break-word; width:auto; left:7.5%;" >
+              {{i.created_at|timesince}} ago
+        </div>
+        <div  align="right" style="position:relative; right:4%; top:-15px;" >
         {% if 'image' in i.mime_type %}
         <a href="{% url res_type groupid i.pk   %}"> <div> <img src="{% url 'getFileThumbnail' group_id i.pk %}" style="height:50px; width:50px;"> </div>
         </a>
@@ -67,13 +83,9 @@
         {% if i.mime_type == 'text/plain' or res_type == 'page_details' %}
           <i class="fi-page largesize" ></i>
         {% endif %}
-      </div>
+        </div>
+      {% endif %}      
 
- 
-
-           
-         
-    
     </div>
    
    </div>

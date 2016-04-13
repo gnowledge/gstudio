@@ -1,7 +1,7 @@
 {% extends "ndf/gevent_base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
-{% block title %} eCourse: {{node.name}} {% endblock %}
+{% block title %} eCourse: {{group_obj.name}} {% endblock %}
 
 
 {% block style %}
@@ -34,7 +34,7 @@
 
     <div id="date_reveal_modal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <label>{% trans 'Release Date' %}</label>
-    {% get_all_subsections_of_course group_id node.pk as all_css %}
+    {% get_all_subsections_of_course group_id group_obj.pk as all_css %}
     <script type="text/javascript">
       var all_css_js_var = {{all_css|safe}}
     </script>
@@ -82,7 +82,7 @@
       }
     })
     $.ajax({
-      url: "{% url 'set_release_date_css' node.pk %}",
+      url: "{% url 'set_release_date_css' group_obj.pk %}",
 
       data: {
         'css_date_dict':JSON.stringify(all_css_js_var),

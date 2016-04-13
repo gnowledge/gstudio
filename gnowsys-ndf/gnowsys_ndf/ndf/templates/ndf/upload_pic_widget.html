@@ -17,15 +17,21 @@
               {% endif %}   
           {% endif %}   
         </div>
+        {% if not no_update_btn %}
         {% if request.user.is_authenticated %}
         {% check_is_gstaff groupid request.user as gstaff_access %}
         {% if "Author" in group_object.member_of_names_list and user_id == request.user.id or "Author" not in group_object.member_of_names_list and gstaff_access %}
                 <div class="row" >
                   <div class="small-12 columns" >
-                    <input type="button" class="button tiny expand margin-p5 btn-font" id="{{widget_for}}_btnUploadProfilePic"  value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
+                    <a data-reveal-id="{{widget_for}}_prof_pic_prop" class="button tiny expand margin-p5 btn-font" id="{{widget_for}}_btnUploadProfilePic">{% if prof_pic_obj %}Change{% else %}Upload{% endif %}</a>
                   </div>
                 </div>
             {% endif %}
+        {% endif %}
+        {% endif %}
+        </div>
+
+
             <div id="{{widget_for}}_prof_pic_prop" class="reveal-modal medium" data-reveal style="height:500px;"> 
                 <a href="#" id="{{widget_for}}_upload_photo">
                   <div id="upload-photo-div" class="text-center">
@@ -77,8 +83,6 @@
                 <a class="close-reveal-modal">&#215;</a>
             </div>
 
-        {% endif %}
-        </div>
 
 <style type="text/css">
     div.reveal-modal > label {
@@ -142,13 +146,12 @@
     })
 
   // Upload/Change Profile photo ----------------------------------------------------------------
-  $("#{{widget_for}}_btnUploadProfilePic").click(function() {
-    console.log("Change btn clicked")
+  $(document).on('click','#{{widget_for}}_btnUploadProfilePic',function(){
     $("#{{widget_for}}_prof_pic_prop").foundation('reveal', 'open');
   });
 
   // Cancel/Abort Profile pic Upload-------------------------------------------------------------
-  $("#{{widget_for}}_btnUploadCancel").click(function() {
+  $(document).on('click','#{{widget_for}}_btnUploadCancel',function(){
     $("#{{widget_for}}_pic_div").addClass("hide");
     $("#{{widget_for}}_upload_photo").removeClass("hide");
     $("#{{widget_for}}_existing-photo-fieldset").removeClass("hide");
@@ -156,8 +159,7 @@
   });
 
   // Upload photo btn in overlay ----------------------------------------------------------------
-  $("#{{widget_for}}_upload_photo").click(function() {
-    console.log("demo")
+  $(document).on('click','#{{widget_for}}_upload_photo',function(){
     $("#{{widget_for}}_docFile").trigger("click");
     // $(this).addClass("hide")
     // $("#{{widget_for}}_existing-photo-fieldset").addClass("hide")
@@ -176,13 +178,11 @@
 
 
   //Upload file action validation ---------------------------------------------------------------
-  $('#{{widget_for}}_docFile').on("change", function() {
+  $(document).on('change','#{{widget_for}}_docFile',function(){
     $("#{{widget_for}}_upload_photo").addClass("hide")
     $("#{{widget_for}}_existing-photo-fieldset").addClass("hide")
-    console.log("{{widget_for}}_docFile change function")
     $("#{{widget_for}}_pic_div").removeClass("hide");
     file_mime_type = this.files[0].type;
-    console.log(file_mime_type)
     if(file_mime_type.indexOf("image/") < 0){
       $("#{{widget_for}}_btnUploadCancel").click()
       var message = "{% trans 'Only image files should be selected for setting your profile picture!' %}"
@@ -192,7 +192,6 @@
     }
     else{
       //$('#txtSelectedFiles').val(this.value);
-      console.log("hi")
       var reader = new FileReader();
       reader.onload = function (e) {
         $('#{{widget_for}}_img_preview')
@@ -206,7 +205,7 @@
   });
 
   // Update profile photo -----------------------------------------------------------------------
-  $("#{{widget_for}}_submitpostid").click(function() {
+  $(document).on('click','#{{widget_for}}_submitpostid',function(){
     upload_from_existing = $("#{{widget_for}}_old_pic_ele").length
     if($("#{{widget_for}}_docFile").val() != "" || upload_from_existing > 0) { 
       $("#{{widget_for}}_prof_pic_prop").foundation('reveal', 'close');
@@ -230,7 +229,6 @@
 
   // Reveal modal close event -------------------------------------------------------------------
   $(document).on('closed.fndtn.reveal', '.reveal-modal', function () {
-    console.log("close-reveal-modal")
     $(this).removeClass("success").removeClass("alert").removeClass("warning");
   });
     
