@@ -848,7 +848,7 @@ class Node(DjangoDocument):
                 if ObjectId.is_valid(gsystem_type_id):
                     gsystem_type_id = ObjectId(gsystem_type_id)
                 else:
-                    error_message = "\n ObjectIdError: Invalid ObjectId (" + gsystem_type_id + ") found while finding attributes !!!\n"
+                    error_message = "\n ObjectIdError: Invalid ObjectId (" + str(gsystem_type_id) + ") found while finding attributes !!!\n"
                     raise Exception(error_message)
 
             # Case [A]: While editing GSystem
