@@ -1,6 +1,6 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-
+import re
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
@@ -139,6 +139,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         question_content = question_content[:4]
         question_content = ' '.join(question_content)
         # print "\n\n question_content---",question_content
+        question_content = re.sub('<[^>]*>', ' ', question_content)
         quiz_item_node.name = unicode(question_content)
         quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
         options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
