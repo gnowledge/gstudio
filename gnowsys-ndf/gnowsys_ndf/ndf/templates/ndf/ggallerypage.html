@@ -136,7 +136,8 @@
                 
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
-                        {% include 'ndf/simple_card.html' with resource=each_img   no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
+
+                        {% include 'ndf/simple_card.html' with resource=each_img no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
                     </li>
                 {% endfor %}
                 </ul>
