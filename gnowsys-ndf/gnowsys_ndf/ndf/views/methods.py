@@ -5332,10 +5332,11 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
       return_perc = "0"
       all_res_nodes = []
       all_coursesection_nodes = []
-      all_res_nodes = dig_nodes_field(group_obj,'collection_set',True,['Page','File'],all_res_nodes)
+      all_res_nodes = dig_nodes_field(group_obj,'collection_set',True,['Page','File', 'QuizItemEvent'],all_res_nodes)
+      # print "\nall_res_nodes",all_res_nodes
       all_coursesection_nodes = dig_nodes_field(group_obj,'collection_set',False,['CourseSectionEvent'],all_coursesection_nodes)
       twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
-      reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"})
+      # reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"})
       rec = node_collection.collection.aggregate([
                   {'$match': {'member_of': twist_gst._id, 'relation_set.thread_of':{'$in': all_res_nodes}, 'author_set': int(user_id)}},
                   {'$project': {'_id': 1,
@@ -5344,6 +5345,7 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
                   ])
 
       resultlist = rec["result"]
+      
       if resultlist:
         for eachele in resultlist:
           for eachk,eachv in eachele.items():

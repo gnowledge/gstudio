@@ -1404,7 +1404,7 @@ def get_resources(request, group_id):
                         'status': u"PUBLISHED",
                         '$or':[{'group_set': ObjectId(group_id)},{'contributors': request.user.id}]
                     }
-                )
+                ).sort('created_at', 1)
                 for each in res:
                     if each not in list_resources:
                         list_resources.append(each)
@@ -1609,10 +1609,9 @@ def delete_from_course_structure(request, group_id):
 def delete_item(item, ce_flag=False):
     node_item = node_collection.one({'_id': ObjectId(item)})
     if ce_flag:
-        cu_name = u"CourseUnit"
-    else:
         cu_name = u"CourseUnitEvent"
-
+    else:
+        cu_name = u"CourseUnit"
     if cu_name not in node_item.member_of_names_list and node_item.collection_set:
         for each in node_item.collection_set:
             d_st = delete_item(each)
