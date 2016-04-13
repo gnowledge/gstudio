@@ -1403,7 +1403,7 @@ def get_resources(request, group_id):
                         'status': u"PUBLISHED",
                         '$or':[{'group_set': ObjectId(group_id)},{'contributors': request.user.id}]
                     }
-                )
+                ).sort('created_at', 1)
                 for each in res:
                     if each not in list_resources:
                         list_resources.append(each)
