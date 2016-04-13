@@ -23,5 +23,7 @@ pandora-client==0.2.197
 pymongo==2.8
 django-simple-captcha==0.4.5
 django-celery==3.1.16
+django_mailbox
 hashfs==0.6.0
 ox>=2.1.651
+#celery

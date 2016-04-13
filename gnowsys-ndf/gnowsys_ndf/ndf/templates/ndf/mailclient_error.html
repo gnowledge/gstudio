@@ -1,0 +1,22 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+{% endblock %}
+
+
+{% block meta_content %}
+  <h3 class="subheader">
+  Error Page
+  </h3>
+{% endblock %}
+
+{% block body_content %}
+    <h2>OOPS! Something went wrong!</h2>
+    <br></br>
+    <h3>{{ error_obj }}</h3> 
+{% endblock %}

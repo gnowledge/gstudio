@@ -1,0 +1,26 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<script src="/static/ndf/js/mailbox.js"></script>
+</head>
+<body>
+<div id="mailContent">
+	<!--	Here the body of the mail is diaplyed upon clicking the subject of the mail	-->
+	<div id="myModal" class="reveal-modal" animation="None" data-reveal>
+    	<a class="close-reveal-modal" >&#215;</a>
+  	</div>
+  	{% comment %}
+  	'{{ mail.mail_data.text }}',
+  	{% endcomment %}
+	{% for mail in emails %}
+		<div id={{ mail.mail_id }} style="border-top:1px solid gray; height:fit-content; padding-top: 2px; padding-bottom: 2px;" >
+			<h4><a onclick="window.location.href='#';  readBody('{{ mail.mail_data.file_name }}',{{ mail.mail_data.attachment_filename|safe }}, {{ mail.mail_data.Attachments|safe }}); updateStatus('{{ mail.mail_data.file_name }}') ;" data-reveal-id="myModal">{{ mail.mail_data.Subject }}</a></h4>
+		</div>
+	{% endfor %}
+</div>
+</body>
+</html>

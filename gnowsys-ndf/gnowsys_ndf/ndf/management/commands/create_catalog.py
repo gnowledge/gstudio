@@ -54,7 +54,43 @@ def  get_gsystems(GSystemTypeList):
 	var = {"name":{"$in":GSystemTypeList}}  
 	Systemtypes = node_collection.find(var)
 	Systemtypelist = [i._id for i in Systemtypes  ]
+	'''
+	for i in Systemtypes:
+		if i.name != "Event":
+			Systemtypelist.append(i._id)
+		output = GSystem_node(i)
+		if output:
+			lisst.extend(output)
+	
+	#Systemtypes.reload()
+	#exceptionlist = ['Event']
+	Systemtypelist = [i._id for i in Systemtypes if i.name not in exceptionlist ]
+	Systemtypelist.extend(lisst)
+	'''
+	'''
+	cmd = "mongoexport --db studio-dev --collection Nodes -q '" + '%s'  % var + "' --out Schema/GSystemType.json"
+	subprocess.Popen(cmd,stderr=subprocess.STDOUT,shell=True)
+	'''
 	return Systemtypelist	
+def GSystem_node(node):
+	Gsystem_type_defination = []
+	for i,v in node.items():
+		print i,v	
+		if type(v) == list:
+			if v is not None:	
+				for j in v:
+					if type(j) == list:
+						print "one more listing zone", i,j
+								
+					if isinstance(j,type(node_collection.collection.RelationType())) or isinstance(j,type(node_collection.collection.AttributeType())):
+						print "asdfafas" ,j._id
+						Gsystem_type_defination.append(j._id)
+					if isinstance(j,ObjectId):
+						if ObjectId(j) not in Gsystem_type_defination:							
+							Gsystem_type_defination.append(ObjectId(j))
+						
+						
+	return Gsystem_type_defination
 					 		
 		
 def get_relationtypes(RelationTypeList):
@@ -121,46 +157,50 @@ def make_rcs_dir(final_list):
 	for i in final_list:	
 		#get rcs files path and copy them to the current dir:
 		if type(i)!= int:
-				
-			a = node_collection.find_one({"_id":ObjectId(i)})
+				a = node_collection.find_one({"_id":ObjectId(i)})
 
-			if a:
-				rel_path = hr.get_file_path(a)
-				path = rel_path + ",v"
-				#cp = "cp  -u " + path + " " +" --parents " + rcs_path + "/" 
-				#subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
-			if a:
-				filter_list = ['GSystemType','RelationType','AttributeType','MetaType']
-				if a._type  in filter_list:
-					try:
-						file_node = get_version_document(a,rel_path)		
-					except:
-						a.save()
-						file_node = get_version_document(a,rel_path)	 
-					if a._type == 'GSystemType':
-						GSystemtypenodes.append(file_node)
-					elif a._type == 'RelationType':
-						Relationtypenodes.append(file_node)
-					elif a._type == 'AttributeType':
-						Attributetypenodes.append(file_node)
-					elif a._type == 'MetaType': 
-						metatype.append(file_node)
-				elif a._type not in filter_list:
-					if a._type == "Group":
+				with open('file_log.txt', 'a') as outfile:
+					outfile.write(a.name)
+					outfile.write("  ")	
+					outfile.write(a._type)	
+					outfile.write("\n")		
+				if a:
+					rel_path = hr.get_file_path(a)
+					path = rel_path + ",v"
+					#cp = "cp  -u " + path + " " +" --parents " + rcs_path + "/" 
+					#subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
+				if a:
+					filter_list = ['GSystemType','RelationType','AttributeType','MetaType']
+					if a._type  in filter_list:
 						try:
-							file_node = get_version_document(a,rel_path,'1.1')
-						except:
-							#if rcs doesn't exist in the system then create it.
-							a.save()
-							file_node = get_version_document(a,rel_path,'1.1')
-					else:
-						try:	
-							file_node = get_version_document(a,rel_path)
+							file_node = get_version_document(a,rel_path)		
 						except:
 							a.save()
-							file_node = get_version_document(a,rel_path)	
-					
-					factorydatanode.append(file_node)					
+							file_node = get_version_document(a,rel_path)	 
+						if a._type == 'GSystemType':
+							GSystemtypenodes.append(file_node)
+						elif a._type == 'RelationType':
+							Relationtypenodes.append(file_node)
+						elif a._type == 'AttributeType':
+							Attributetypenodes.append(file_node)
+						elif a._type == 'MetaType': 
+							metatype.append(file_node)
+					elif a._type not in filter_list:
+						if a._type == "Group":
+							try:
+								file_node = get_version_document(a,rel_path,'1.1')
+							except:
+								a.save()
+								file_node = get_version_document(a,rel_path,'1.1')
+						else:
+							try:	
+								file_node = get_version_document(a,rel_path)
+							except:
+								a.save()
+								file_node = get_version_document(a,rel_path)	
+						
+						factorydatanode.append(file_node)					
+
 			
 	#start making catalog 	
 	make_catalog(GSystemtypenodes,'GSystemType')
