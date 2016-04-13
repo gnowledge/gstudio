@@ -235,7 +235,7 @@ def uDashboard(request, group_id):
             for each in auth.relation_set:
                 if "has_profile_pic" in each:
                     profile_pic_image = node_collection.one(
-                        {'_type': "File", '_id': each["has_profile_pic"][0]}
+                        {'_type': "GSystem", '_id': each["has_profile_pic"][0]}
                     )
                     break
     has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
@@ -433,12 +433,12 @@ def group_dashboard(request, group_id):
                 if "has_profile_pic" in each:
                     if each["has_profile_pic"]:
                         profile_pic_image = node_collection.one(
-                            {'_type': "File", '_id': each["has_profile_pic"][0]}
+                            {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_profile_pic"][0]}
                         )
                 if "has_Banner_pic" in each:
                     if each["has_Banner_pic"]:
                         banner_pic = node_collection.one(
-                            {'_type': "File", '_id': each["has_Banner_pic"][0]}
+                            {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_Banner_pic"][0]}
                         )
     # Approve StudentCourseEnrollment view
     approval = False
