@@ -350,6 +350,7 @@ def create_edit_page(request, group_id, node_id=None):
         # help_info_page = request.POST.getlist('help_info_page','')
         help_info_page = request.POST['help_info_page']
         help_info_page = json.loads(help_info_page)
+        # print "\n\n help_info_page === ",help_info_page
 
         #program_res and res are boolean values
         if program_res:
@@ -403,6 +404,7 @@ def create_edit_page(request, group_id, node_id=None):
           try:
             help_info_page = map(ObjectId, help_info_page)
             create_grelation(page_node._id, has_help_rt,help_info_page)
+            page_node.reload()
           except Exception as invalidobjectid:
             # print invalidobjectid
             pass
