@@ -50,7 +50,7 @@
         </div>
     </div-->
     <div class="row gmodal-body">
-        <div class="small-8 columns gmodal-item-panel">
+        <div class="small-8 columns gmodal-item-panel" style="overflow-y: auto;">
             <!-- Detail view section -->
             {% include 'ndf/node_ajax_content.html' with no_discussion=True is_course=True %}
 
@@ -165,8 +165,8 @@ $(".view-info-close").click(function(){
     $(".comments-area").show();
 });
 
-
 </script>
+
 {% comment %}
 <script type="text/javascript">
 (function( $ ) {
