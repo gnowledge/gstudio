@@ -840,7 +840,10 @@ def submitDoc(request, group_id):
                         f = f[1]
                 fileobj = node_collection.one({'_id': ObjectId(f)})
                 thread_create_val = request.POST.get("thread_create",'')
-                help_info_page = request.POST.getlist('help_info_page','')
+                # help_info_page = request.POST.getlist('help_info_page','')
+                help_info_page = request.POST['help_info_page']
+                help_info_page = json.loads(help_info_page)
+
                 # print "\n\n help_info_page  === ", help_info_page
                 discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
                 if thread_create_val == "Yes":
@@ -1692,7 +1695,9 @@ def file_edit(request,group_id,_id):
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE),groupid=group_id)
 
         thread_create_val = request.POST.get("thread_create",'')
-        help_info_page = request.POST.getlist('help_info_page','')
+        # help_info_page = request.POST.getlist('help_info_page','')
+        help_info_page = request.POST['help_info_page']
+        help_info_page = json.loads(help_info_page)
 
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
