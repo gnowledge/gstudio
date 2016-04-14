@@ -2063,7 +2063,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
 
         files_cur = node_collection.find({
                                         '_type': {'$in': ["File", "GSystem"]},
-                                        'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                        'member_of': GST_FILE._id,
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'created_by': {'$in': gstaff_users},
                             # '$or': [
