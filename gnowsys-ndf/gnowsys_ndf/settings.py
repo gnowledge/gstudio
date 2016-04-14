@@ -227,6 +227,7 @@ EXTRA_LANG_INFO = {
     },
 }
 
+
 # Add custom languages not provided by Django
 import django.conf.locale
 LANG_INFO = dict(django.conf.locale.LANG_INFO.items() + EXTRA_LANG_INFO.items())
@@ -234,7 +235,6 @@ django.conf.locale.LANG_INFO = LANG_INFO
 
 # Languages using BiDi (right-to-left) layout
 # LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",)
-
 
 # --- mailclient app and Replication ---
 # 
@@ -756,12 +756,13 @@ GSTUDIO_CAPTCHA_VISIBLE = False
 # the no of cards/objects/instances to be render of app (listing view).
 GSTUDIO_NO_OF_OBJS_PP = 24
 
-# #textb
+
+# # textb
 # import warnings
 # warnings.filterwarnings(
 #         'error', r"DateTimeField received a naive datetime",
 #         RuntimeWarning, r'django\.db\.models\.fields')
-# #textb
+# # textb
 
 # --- meeting gapp ---
 # 
@@ -777,9 +778,12 @@ GSTUDIO_NO_OF_OBJS_PP = 24
 # --- END of meeting gapp ---
 
 
+
 # ----------------------------------------------------------------------------
 # following has to be at last
 # just put every thing above it
+
+
 try:
     from local_settings import *
     # print "Local settings applied"
