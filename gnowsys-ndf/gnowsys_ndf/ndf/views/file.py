@@ -1599,6 +1599,7 @@ def getFileThumbnail(request, group_id, _id):
         return HttpResponse("")
     """
     if file_node is not None:
+      if hasattr(file_node, 'fs_file_ids'):
         fs_file_ids = file_node.fs_file_ids
         if fs_file_ids and len(fs_file_ids) == 3:
           # getting latest uploaded pic's _id
@@ -1627,6 +1628,9 @@ def getFileThumbnail(request, group_id, _id):
             f = file_node.fs.files.get(ObjectId(fs_file_ids[0]))
 
         return HttpResponse(f.read(), content_type=f.content_type)
+      elif hasattr(file_node, 'if_file'):
+        f = file_node.get_file(file_node.if_file.thumbnail.relurl)
+        return HttpResponse(f.read(), content_type=file_node.if_file.mime_type)
 
     else:
         return HttpResponse("")
