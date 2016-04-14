@@ -213,20 +213,40 @@ def get_node(node):
 @get_execution_time
 @register.assignment_tag
 def get_schema(node):
-   obj = node_collection.find_one({"_id": ObjectId(node.member_of[0])}, {"name": 1})
-   nam=node.member_of_names_list[0]
-   if(nam == 'Page'):
-        return [1,schema_dict[nam]]
-   elif(nam=='File'):
-	if( 'image' in node.mime_type):
-		return [1,schema_dict['Image']]
-        elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
-        	return [1,schema_dict['Video']]
+	if node:
+		obj = node_collection.find_one({"_id": ObjectId(node.member_of[0])}, {"name": 1})
+		nam=node.member_of_names_list[0]
+		if(nam == 'Page'):
+			return [1,schema_dict[nam]]
+		elif(nam=='File'):
+			if( 'image' in node.mime_type):
+				return [1,schema_dict['Image']]
+			elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+				return [1,schema_dict['Video']]
+			else:
+				return [1,schema_dict['Document']]	
+		else:
+			return [0,""]
 	else:
-		return [1,schema_dict['Document']]	
+		return [0,""]
+'''
+   if node:
+       obj = node_collection.find_one({"_id": ObjectId(node.member_of[0])}, {"name": 1})
+       nam=node.member_of_names_list[0]
+       if(nam == 'Page'):
+            return [1,schema_dict[nam]]
+       elif(nam=='File'):
+    	if( 'image' in node.mime_type):
+    		return [1,schema_dict['Image']]
+            elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+            	return [1,schema_dict['Video']]
+    	else:
+    		return [1,schema_dict['Document']]	
+       else:
+        return [0,""]
    else:
-	return [0,""]
-
+       return [0,""]
+'''
 
 @get_execution_time
 @register.filter
@@ -3578,3 +3598,16 @@ def get_info_pages(group_id):
 	# 	for eachnode in info_page_nodes:
 	# 		list_of_nodes.append({'name': eachnode.name,'id': eachnode._id})
 	return info_page_nodes
+
+@get_execution_time
+@register.assignment_tag
+def get_help_pages_of_node(node_obj):
+	all_help_page_node_list = []
+	try:
+		for each_rel in node_obj.relation_set:
+			if each_rel and "has_help" in each_rel:
+				help_pages_id_list = each_rel["has_help"]
+				all_help_page_node_list = [node_collection.one({'_id':ObjectId(each_help_id)}) for each_help_id in help_pages_id_list]
+				return all_help_page_node_list
+	except:
+		return all_help_page_node_list
