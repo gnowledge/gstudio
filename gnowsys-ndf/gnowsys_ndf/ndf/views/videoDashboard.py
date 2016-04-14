@@ -209,7 +209,9 @@ def video_edit(request,group_id,_id):
         # get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
         vid_node.save(is_changed=get_node_common_fields(request, vid_node, group_id, GST_VIDEO),groupid=group_id)
         thread_create_val = request.POST.get("thread_create",'')
-        help_info_page = request.POST.getlist('help_info_page','')
+        # help_info_page = request.POST.getlist('help_info_page','')
+        help_info_page = request.POST['help_info_page']
+        help_info_page = json.loads(help_info_page)
         
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":

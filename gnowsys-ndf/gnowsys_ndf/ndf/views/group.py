@@ -1180,9 +1180,10 @@ class CreateCourseEventGroup(CreateEventGroup):
         course_node_id = request.POST.get('course_node_id', '')
         if course_node_id:
             course_node = node_collection.one({'_id': ObjectId(course_node_id)})
-            rt_group_has_course_event = node_collection.one({'_type': "RelationType", 'name': "group_has_course_event"})
             group_obj = node_collection.one({'_id': ObjectId(group_id)})
-            create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
+            if "Course" in course_node:
+                rt_group_has_course_event = node_collection.one({'_type': "RelationType", 'name': "group_has_course_event"})
+                create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
             self.ce_set_up(request, course_node, group_obj)
 
     def ce_set_up(self, request, node, group_obj):
@@ -1211,11 +1212,11 @@ class CreateCourseEventGroup(CreateEventGroup):
         try:
             new_gsystem = node_collection.collection.GSystem()
             new_gsystem.name = unicode(gs_name)
-            if gs_member_of == "CourseSection":
+            if gs_member_of == "CourseSection" or gs_member_of == "CourseSectionEvent":
                 gst_node = self.section_event_gst
-            elif gs_member_of == "CourseSubSection":
+            elif gs_member_of == "CourseSubSection" or gs_member_of == "CourseSubSectionEvent":
                 gst_node = self.subsection_event_gst
-            elif gs_member_of == "CourseUnit":
+            elif gs_member_of == "CourseUnit" or gs_member_of == "CourseUnitEvent":
                 gst_node = self.courseunit_event_gst
 
             new_gsystem.member_of.append(gst_node._id)
@@ -1236,7 +1237,7 @@ class CreateCourseEventGroup(CreateEventGroup):
 
     def call_setup(self, request, node, prior_node_obj, group_obj):
         if node.collection_set:
-            if "CourseUnit" in node.member_of_names_list:
+            if "CourseUnit" in node.member_of_names_list or "CourseUnitEvent" in node.member_of_names_list:
                 for each_res in node.collection_set:
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
                     new_res = replicate_resource(request, each_res_node, group_obj._id)

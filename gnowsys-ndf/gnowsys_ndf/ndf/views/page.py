@@ -251,13 +251,14 @@ def page(request, group_id, app_id=None):
             elif node.status == u"PUBLISHED":
               page_node = node
 	'''
-
-        annotations = json.dumps(page_node.annotations)
-        page_node.get_neighbourhood(page_node.member_of)
         thread_node = None
         allow_to_comment = None
+        annotations = None
+        if page_node:
+          annotations = json.dumps(page_node.annotations)
+          page_node.get_neighbourhood(page_node.member_of)
 
-        thread_node, allow_to_comment = node_thread_access(group_id, page_node)
+          thread_node, allow_to_comment = node_thread_access(group_id, page_node)
         return render_to_response('ndf/page_details.html',
                                   {'node': page_node,
                                     'node_has_thread': thread_node,
@@ -346,7 +347,10 @@ def create_edit_page(request, group_id, node_id=None):
         # print "\n\n thread_create_val", thread_create_val
         # print "\n\n request.POST === ",request.POST
         # raise Exception("demo")
-        help_info_page = request.POST.getlist('help_info_page','')
+        # help_info_page = request.POST.getlist('help_info_page','')
+        help_info_page = request.POST['help_info_page']
+        help_info_page = json.loads(help_info_page)
+        # print "\n\n help_info_page === ",help_info_page
 
         #program_res and res are boolean values
         if program_res:
@@ -400,6 +404,7 @@ def create_edit_page(request, group_id, node_id=None):
           try:
             help_info_page = map(ObjectId, help_info_page)
             create_grelation(page_node._id, has_help_rt,help_info_page)
+            page_node.reload()
           except Exception as invalidobjectid:
             # print invalidobjectid
             pass
