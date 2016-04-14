@@ -262,7 +262,6 @@ def uDashboard(request, group_id):
     datavisual.append({"name": "Registration", "count": GSTUDIO_RESOURCES_REGISTRATION_RATING})
 
     total_activity_rating = GSTUDIO_RESOURCES_REGISTRATION_RATING + (page_cur.count()  + file_cur.count()  + forum_count.count()  + quiz_count.count()) * GSTUDIO_RESOURCES_CREATION_RATING + (thread_count.count()  + reply_count.count()) * GSTUDIO_RESOURCES_REPLY_RATING
-
     return render_to_response(
         "ndf/uDashboard.html",
         {
@@ -370,7 +369,7 @@ def user_template_view(request, group_id):
       else :
         member_of = node_collection.find_one({"_id": each.member_of[0]})
         blank_list.append(each)
-    
+    print blank_list
     
     template = "ndf/task_card_view.html"
     #variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
@@ -624,7 +623,6 @@ def upload_prof_pic(request, group_id):
         if user:
             group_id = user
         return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
-
 
 def my_courses(request, group_id):
 

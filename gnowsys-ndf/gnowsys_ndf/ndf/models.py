@@ -700,15 +700,22 @@ class Node(DjangoDocument):
                         break
 
                 if not field_found:
-                    invalid_fields.append(field_found)
+                    invalid_fields.append(key)
                     print "\n Invalid field(", key, ") found!!!\n"
                     # Throw an error: " Illegal access: Invalid field
                     # found!!! "
 
-        if invalid_fields:
-            for each_invalid_field in invalid_fields:
-                if each_invalid_field in self.iteritems:
-                    del self.iteritems[each_invalid_field]
+        # print "== invalid_fields : ", invalid_fields
+        try:
+            self_keys = self.keys()
+            if invalid_fields:
+                for each_invalid_field in invalid_fields:
+                    if each_invalid_field in self_keys:
+                        self.pop(each_invalid_field)
+        except Exception, e:
+            print "\nError while processing invalid fields: ", e
+            pass
+
         super(Node, self).save(*args, **kwargs)
 
     	#This is the save method of the node class.It is still not
@@ -841,7 +848,7 @@ class Node(DjangoDocument):
                 if ObjectId.is_valid(gsystem_type_id):
                     gsystem_type_id = ObjectId(gsystem_type_id)
                 else:
-                    error_message = "\n ObjectIdError: Invalid ObjectId (" + gsystem_type_id + ") found while finding attributes !!!\n"
+                    error_message = "\n ObjectIdError: Invalid ObjectId (" + str(gsystem_type_id) + ") found while finding attributes !!!\n"
                     raise Exception(error_message)
 
             # Case [A]: While editing GSystem
@@ -1861,6 +1868,7 @@ class File(GSystem):
     structure = {
         'mime_type': basestring,             # Holds the type of file
         'fs_file_ids': [ObjectId],           # Holds the List of  ids of file stored in gridfs
+                                             # order is [original, thumbnail, mid]
         'file_size': {
             'size': float,
             'unit': unicode
@@ -2666,9 +2674,13 @@ class allLinks(DjangoDocument):
 
 # DATABASE Variables
 db = get_database()
-node_collection = db[Node.collection_name].Node
-benchmark_collection = db[Benchmark.collection_name]
-triple_collection = db[Triple.collection_name].Triple
-gridfs_collection = db["fs.files"]
+
+node_collection     = db[Node.collection_name].Node
+triple_collection   = db[Triple.collection_name].Triple
+benchmark_collection= db[Benchmark.collection_name]
 filehive_collection = db[Filehive.collection_name].Filehive
+
+gridfs_collection   = db["fs.files"]
+chunk_collection    = db["fs.chunks"]
+
 import signals

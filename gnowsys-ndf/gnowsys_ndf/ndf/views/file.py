@@ -39,6 +39,7 @@ from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CH
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id, get_language_tuple  # , get_page
 from gnowsys_ndf.ndf.views.methods import node_thread_access, create_thread_for_node, create_grelation, delete_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -937,14 +938,12 @@ def submitDoc(request, group_id):
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
 
 
-    
 first_object = ''
 @get_execution_time
 def save_file(files,title, userid, group_id, content_org, tags, img_type=None, language=None, usrname=None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, co_contributors="", request=None, map_geojson_data=[], **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
-    
     global count, first_object
     try:
         group_id = ObjectId(group_id)
@@ -1016,6 +1015,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
 
             fileobj.modified_by = int(userid)
             fileobj.status = u'PUBLISHED'
+
             if int(userid) not in fileobj.contributors:
                 fileobj.contributors.append(int(userid))
             if access_policy:
@@ -1067,8 +1067,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
             fileobj.license = unicode(license)
 
             fileobj.location = map_geojson_data
-
             fileobj.save(groupid=group_id)
+
             if source:
               # create gattribute for file with source value
               source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
@@ -1107,11 +1107,13 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
             node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': objectid}})
 
+            print '+' * 20
             # For making collection if uploaded file more than one
             if count == 0:
                 first_object = fileobj
             else:
                 node_collection.find_and_modify({'_id': first_object._id}, {'$push': {'collection_set': fileobj._id}})
+
 
             """
             code for uploading video to wetube.gnowledge.org
@@ -1190,6 +1192,15 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename="mid_size_img-of-"+filename, content_type=filetype)
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
+            # print "----- fileobj._id", fileobj._id
+
+
+            '''
+            For server-sync
+            '''
+            # This function captures the data and a decorater is put on this function so that node to be saved in the parent function
+            # can be sent as a mail to the mailing-list
+              
             return fileobj._id, is_video
 
         except Exception as e:
@@ -1511,6 +1522,7 @@ def file_detail(request, group_id, _id):
             shelves = []
 
     annotations = json.dumps(file_node.annotations)
+    # print "=== ", type(file_node)
 
     return render_to_response(file_template,
                               { 'node': file_node,
@@ -1587,6 +1599,7 @@ def getFileThumbnail(request, group_id, _id):
         return HttpResponse("")
     """
     if file_node is not None:
+      if hasattr(file_node, 'fs_file_ids'):
         fs_file_ids = file_node.fs_file_ids
         if fs_file_ids and len(fs_file_ids) == 3:
           # getting latest uploaded pic's _id
@@ -1615,6 +1628,9 @@ def getFileThumbnail(request, group_id, _id):
             f = file_node.fs.files.get(ObjectId(fs_file_ids[0]))
 
         return HttpResponse(f.read(), content_type=f.content_type)
+      elif hasattr(file_node, 'if_file'):
+        f = file_node.get_file(file_node.if_file.thumbnail.relurl)
+        return HttpResponse(f.read(), content_type=file_node.if_file.mime_type)
 
     else:
         return HttpResponse("")
@@ -1668,7 +1684,16 @@ def readDoc(request, _id, group_id, file_name=""):
     else:
         return HttpResponse("")
 
-        
+
+@get_execution_time
+def read_attachment(request, group_id, file_path):
+  file_path = '/' + file_path
+  with open(file_path,'r') as download_file:
+    mime = magic.Magic(mime=True)
+    response = HttpResponse(download_file.read(), content_type=mime.from_file(file_path))
+    response['Content-Disposition'] = 'attachment; filename=' + file_path.split("/")[-1]
+    return response
+
 @get_execution_time
 def file_edit(request,group_id,_id):
     # ins_objectid  = ObjectId()

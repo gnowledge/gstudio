@@ -2,14 +2,14 @@
 
 # imports from python libraries
 import os
+import djcelery
 
 # imports from core django libraries
 from django.conf import global_settings
-# from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
+# from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 
 # imports from third-party app(s)
-import djcelery
 
 from gnowsys_ndf.ndf.utils import (is_dir_exists, ensure_dir, get_current_dbs_path,
     move_file_or_dirctory)
@@ -227,6 +227,7 @@ EXTRA_LANG_INFO = {
     },
 }
 
+
 # Add custom languages not provided by Django
 import django.conf.locale
 LANG_INFO = dict(django.conf.locale.LANG_INFO.items() + EXTRA_LANG_INFO.items())
@@ -235,20 +236,44 @@ django.conf.locale.LANG_INFO = LANG_INFO
 # Languages using BiDi (right-to-left) layout
 # LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",)
 
-# #SMTP setting for sending mail (Using python default SMTP server)
+# --- mailclient app and Replication ---
+# 
+# Following has to be done for using the Replication features
+# Override following variables in local_settings file:
+#
+# SMTP setting for sending mail (Using python default SMTP server)
 EMAIL_USE_TLS = False
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'testing@example.com'
-
-# SMTP setting for sending mail (Using gmail SMTP server)
+# 
+# SMTP setting for sending mail (e.g: gmail SMTP server)
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_PORT = 587
 # EMAIL_HOST_USER = 'yourcompletegmailaddr'
 # EMAIL_HOST_PASSWORD = 'yourpassword'
+# 
+# The following email id and password for the email account will be used for sending/receiving SYNCDATA
+SYNCDATA_KEY_PUB = ""
+SYNCDATA_FROM_EMAIL_ID = ""
+# 
+SYNCDATA_SENDING_EMAIL_ID = ""
+SYNCDATA_FETCHING_EMAIL_ID = ''
+# 
+SYNCDATA_FETCHING_EMAIL_ID_PASSWORD = ''
+SYNCDATA_FETCHING_IMAP_SERVER_ADDRESS = ''
+# 
+# This is the duration (in secs) at which send_syncdata and fetch_syncdata scripts will be run
+SYNCDATA_DURATION = 60
+# 
+# Mail Chunk Size in MB
+TARSIZE = 1000
+# 
+# --- END of mailclient app and Replication ---
+
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
@@ -416,6 +441,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # 'django.core.context_processors.csrf',
 )
 
+
 djcelery.setup_loader()
 CELERY_RESULT_BACKEND = "mongodb"
 CELERY_TASK_SERIALIZER = "json"
@@ -447,6 +473,7 @@ INSTALLED_APPS = (
     'jsonrpc',
     'registration_email',
     'memcache_admin',
+    'django_mailbox',
     'djcelery',
 )
 
@@ -535,6 +562,10 @@ GSTUDIO_MY_GROUPS_IN_HEADER = True
 GSTUDIO_MY_COURSES_IN_HEADER = False
 GSTUDIO_MY_DASHBOARD_IN_HEADER = False
 
+GSTUDIO_REPLICATION_GROUPS = [
+    u"Author", u"home"
+]
+
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
 # if not set by specific group
 # DON'T EDIT this variable here.
@@ -621,11 +652,13 @@ VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes',
 RCS_REPO_DIRNAME = "rcs-repo"
 RCS_REPO_DIR = os.path.join(GSTUDIO_DATA_ROOT, RCS_REPO_DIRNAME)
 
+GSTUDIO_LOGS_DIRNAME = 'gstudio-logs'
+GSTUDIO_LOGS_DIR_PATH = os.path.join(GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIRNAME)
+
 # Indicates the "hash-level-number", i.e the number of sub-directories that
 # will be created for the corresponding document under it's
 # collection-directory; in order to store json-files in an effective manner
 RCS_REPO_DIR_HASH_LEVEL = 3
-
 
 GSTUDIO_RESOURCES_EDUCATIONAL_USE = ["Images", "Audios", "Videos", "Interactives", "Documents", "eBooks", "Maps", "Events", "Publications"]
 
@@ -698,15 +731,7 @@ GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Discuss', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
-# #textb
-# import warnings
-# warnings.filterwarnings(
-#         'error', r"DateTimeField received a naive datetime",
-#         RuntimeWarning, r'django\.db\.models\.fields')
-# #textb
 
-
-########################################### for online_users_ramk
 
 # cache implementation with memcached and python-memcached binding:
 CACHES = {
@@ -717,31 +742,48 @@ CACHES = {
     }
 }
 
-#USER_ONLINE_TIMEOUT = 300
-
-#USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
-
-# USERS_ONLINE__TIME_IDLE = 300
-# USERS_ONLINE__TIME_OFFLINE = 10
-#USERS_ONLINE__CACHE_PREFIX_USER
-#USERS_ONLINE__CACHE_USERS
-
 WETUBE_USERNAME = "glab"
 WETUBE_PASSWORD = "gl@b$@)we!ube"
-#Captcha settings
+
+# Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
-
-# the no of cards/objects/instances to be render of app (listing view).
-GSTUDIO_NO_OF_OBJS_PP = 24
 
 GSTUDIO_HELP_SIDEBAR = False
 GSTUDIO_SOCIAL_SHARE_RESOURCE = False
 GSTUDIO_CAPTCHA_VISIBLE = False
 
+# the no of cards/objects/instances to be render of app (listing view).
+GSTUDIO_NO_OF_OBJS_PP = 24
+
+
+# # textb
+# import warnings
+# warnings.filterwarnings(
+#         'error', r"DateTimeField received a naive datetime",
+#         RuntimeWarning, r'django\.db\.models\.fields')
+# # textb
+
+# --- meeting gapp ---
+# 
+# for online_users_ramk:
+# 
+# USER_ONLINE_TIMEOUT = 300
+# USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
+# USERS_ONLINE__TIME_IDLE = 300
+# USERS_ONLINE__TIME_OFFLINE = 10
+# USERS_ONLINE__CACHE_PREFIX_USER
+# USERS_ONLINE__CACHE_USERS
+# 
+# --- END of meeting gapp ---
+
+
+
 # ----------------------------------------------------------------------------
 # following has to be at last
 # just put every thing above it
+
+
 try:
     from local_settings import *
     # print "Local settings applied"
