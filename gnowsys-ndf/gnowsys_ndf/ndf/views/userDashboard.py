@@ -32,6 +32,7 @@ from gnowsys_ndf.ndf.views.analytics_methods import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.forum import *
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+from gnowsys_ndf.ndf.views.filehive import write_files
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_user_course_groups
 
@@ -234,7 +235,7 @@ def uDashboard(request, group_id):
             for each in auth.relation_set:
                 if "has_profile_pic" in each:
                     profile_pic_image = node_collection.one(
-                        {'_type': "File", '_id': each["has_profile_pic"][0]}
+                        {'_type': "GSystem", '_id': each["has_profile_pic"][0]}
                     )
                     break
     has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
@@ -431,12 +432,12 @@ def group_dashboard(request, group_id):
                 if "has_profile_pic" in each:
                     if each["has_profile_pic"]:
                         profile_pic_image = node_collection.one(
-                            {'_type': "File", '_id': each["has_profile_pic"][0]}
+                            {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_profile_pic"][0]}
                         )
                 if "has_Banner_pic" in each:
                     if each["has_Banner_pic"]:
                         banner_pic = node_collection.one(
-                            {'_type': "File", '_id': each["has_Banner_pic"][0]}
+                            {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_Banner_pic"][0]}
                         )
     # Approve StudentCourseEnrollment view
     approval = False
@@ -585,7 +586,7 @@ def upload_prof_pic(request, group_id):
         url_name = request.POST.get('url_name','') # used for reverse
         # print "\n\n url_name", url_name
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        file_uploaded = request.FILES.get("docFile_img", "")
+        file_uploaded = request.FILES.get("filehive", "")
         pic_rt = request.POST.get("pic_rt", "")
         # print "\n\n pic_rt === ", pic_rt
         has_profile_or_banner_rt = None
@@ -598,9 +599,11 @@ def upload_prof_pic(request, group_id):
 
         warehouse_grp_obj = node_collection.one({'_type': "Group", 'name': "warehouse"})
         if file_uploaded:
-            fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            fileobj = write_files(request,group_id)
+            gs_obj_id = fileobj[0]['_id']
+            # print "\n\n\nfileobj",gs_obj_id
             if fileobj:
-                profile_pic_image = node_collection.one({'_id': ObjectId(fileobj)})
+                profile_pic_image = node_collection.one({'_id': ObjectId(gs_obj_id)})
                 # The 'if' below is required in case file node is deleted but exists in grid_fs
                 if profile_pic_image:
                     gr_node = create_grelation(group_obj._id, has_profile_or_banner_rt, profile_pic_image._id)

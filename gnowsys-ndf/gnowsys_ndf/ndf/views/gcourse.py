@@ -1908,7 +1908,7 @@ def course_content(request, group_id):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': [u"GSystem", u"File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -1949,7 +1949,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': [u"GSystem", u"File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2035,7 +2035,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': [u"GSystem", u"File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2130,7 +2130,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': [u"GSystem", u"File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2274,7 +2274,7 @@ def course_about(request, group_id):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 

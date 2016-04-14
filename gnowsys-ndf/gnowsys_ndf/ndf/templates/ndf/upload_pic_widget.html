@@ -6,10 +6,9 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
         <div class="text-center">
-
         <div class="div-height">
           {% if prof_pic_obj %}
-                  <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
+                  <img src="{{MEDIA_URL}}{{prof_pic_obj.if_file.mid.relurl}}" class="img-height"/>
           {% else %}
               {% if "Author" in group_object.member_of_names_list %}
                   <i class="fi-torso style2 text-center"></i>
@@ -45,7 +44,7 @@
                     <div class="existing-photo-div"  style="display:inline-block;overflow-y: auto;height:320px;">
                       {% for each_prof_pic in old_profile_pics %}
                         <div class="old_img">
-                          <img src="{% url 'getFileThumbnail' group_id each_prof_pic.pk %}" style="height:150px;width:100px;" />
+                          <img src="{{MEDIA_URL}}{{each_prof_pic.if_file.mid.relurl}}" style="height:150px;width:100px;" />
                           <div class="{{widget_for}}_prof_pic_select">
                           <input type="button" value="Use this" class="button tiny use_old_img_btn" onclick="update_img('{{each_prof_pic.pk}}')" />
                           </div>
@@ -57,7 +56,7 @@
                 <div id="{{widget_for}}_pic_div" class="hide row">
                     <form class="dropzone" id ="{{widget_for}}_docPost" enctype="multipart/form-data" method="post"  action="{% url 'upload_prof_pic' group_id %}">
                         {% csrf_token %}
-                        <input type="file" name="docFile_img" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
+                        <input type="file" name="filehive" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
                         {% if is_banner and not is_profile %}
                           <input type="hidden" name="pic_rt" value="is_banner"></input>
                         {% elif  is_profile and not is_banner %}

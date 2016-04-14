@@ -83,7 +83,6 @@ def write_files(request, group_id, make_collection=False):
 	if make_collection and collection_set:
 		first_obj.collection_set = collection_set
 		first_obj.save()
-
 	return gs_obj_list
 
 	# return render_to_response('ndf/filehive.html', {
