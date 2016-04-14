@@ -111,7 +111,7 @@ Image Gallery
 <br>
 
 <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
-                        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_image_ckeditor' group_id %}">
+                        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file_ckeditor' group_id %}">
                             {% csrf_token %}
                             <label class="tiny button radius expand" style="margin: 0px;">
                                 <i class="fa fa-upload"></i>
