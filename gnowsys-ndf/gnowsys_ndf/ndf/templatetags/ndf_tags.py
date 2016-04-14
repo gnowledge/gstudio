@@ -3572,7 +3572,7 @@ def get_info_pages(group_id):
 	list_of_nodes = []
 	page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
 	info_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Info page"})
-	info_page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': info_page_gst._id})
+	info_page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': info_page_gst._id, 'group_set': ObjectId(group_id)})
 	# print "\n\n info_page_nodes===",info_page_nodes.count()
 	# if info_page_nodes.count():
 	# 	for eachnode in info_page_nodes:
