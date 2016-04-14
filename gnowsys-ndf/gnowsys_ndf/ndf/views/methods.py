@@ -4489,38 +4489,72 @@ def get_course_units_tree(data,list_ele):
                     if "children" in each_dict:
                         get_course_units_tree(each_dict['children'],list_ele)
 
+def create_clone(user_id, node, group_id):
+    try:
+        # if "Page" in node.member_of_names_list or "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
+        #     cloned_copy = node_collection.collection.GSystem()
+        # else:
+        #     # print "\n node --- ", node
+        #     cloned_copy = node_collection.collection.File()
+        #     cloned_copy.fs_file_ids = node.fs_file_ids
+        #     cloned_copy.file_size = node.file_size
+        #     cloned_copy.mime_type = node.mime_type
+
+        if "File" == node._type:
+            cloned_copy = node_collection.collection.File()
+            cloned_copy.fs_file_ids = node.fs_file_ids
+            cloned_copy.file_size = node.file_size
+            cloned_copy.mime_type = node.mime_type
+        else:
+            cloned_copy = node_collection.collection.GSystem()
+        try:
+            if "Page" in node.member_of_names_list and node.type_of:
+                mem_type_of = node.type_of[0]
+                if node_collection.one({'_id': ObjectId(mem_type_of)}).name == "Info page":
+                  cloned_copy.type_of = node.type_of
+        except type_of_set_err:
+            # print "\n\n type_of_set_err --- \n\n",type_of_set_err
+            pass
+
+        cloned_copy.group_set.append(group_id)
+        cloned_copy.name = unicode(node.name)
+        cloned_copy.status = u"PUBLISHED"
+        if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
+            quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
+            cloned_copy.member_of.append(quiz_item_event_gst._id)
+        else:
+            cloned_copy.member_of = node.member_of
+        cloned_copy.modified_by = int(user_id)
+        cloned_copy.created_by = int(user_id)
+        cloned_copy.prior_node = node.prior_node
+        cloned_copy.contributors.append(int(user_id))
+        cloned_copy.tags = node.tags
+        cloned_copy.content_org = node.content_org
+        cloned_copy.content = node.content
+        cloned_copy.save()
+        return cloned_copy
+    except Exception as re_clone_err:
+        print re_clone_err
+        print "Failed cloning resource"
+        return None
 
 
+
+@get_execution_time
 def replicate_resource(request, node, group_id):
     try:
         create_thread_for_node_flag = True
-        if "Page" in node.member_of_names_list or "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
-            new_gsystem = node_collection.collection.GSystem()
-        else:
-            # print "\n node --- ", node
-            new_gsystem = node_collection.collection.File()
-            new_gsystem.fs_file_ids = node.fs_file_ids
-            new_gsystem.file_size = node.file_size
-            new_gsystem.mime_type = node.mime_type
+        user_id = request.user.id
+        new_gsystem = create_clone(user_id, node, group_id)
 
-        new_gsystem.group_set.append(group_id)
-        new_gsystem.name = unicode(node.name)
-        new_gsystem.status = u"PUBLISHED"
-        if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
-            quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
-            new_gsystem.member_of.append(quiz_item_event_gst._id)
-        else:
-            new_gsystem.member_of = node.member_of
-        new_gsystem.modified_by = int(request.user.id)
-        new_gsystem.created_by = int(request.user.id)
-        new_gsystem.prior_node = node.prior_node
-        new_gsystem.contributors.append(int(request.user.id))
-        new_gsystem.tags = node.tags
-        new_gsystem.content_org = node.content_org
-        new_gsystem.content = node.content
-        new_gsystem.save()
         clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
         create_grelation(new_gsystem._id, clone_of_RT, node._id)
+        # node_attribute_set_dict = {}
+        # [node_attribute_set_dict.update(d) for d in node.attribute_set]
+        # for each_attr_key,each_attr_val in node_attribute_set_dict.items():
+        #     fetch_attr_type = node_collection.one({'_type': "AttributeType", 'name': unicode(each_attr_key)})
+        #     create_grelation(new_gsystem._id, fetch_attr_type, each_attr_val)
+        #     print node_attribute_set_dict
         try:
             if "Page" in node.member_of_names_list:
                 mem_type_of = node.type_of[0]
@@ -4528,6 +4562,30 @@ def replicate_resource(request, node, group_id):
                   create_thread_for_node_flag = False
         except:
             pass
+
+        for each_attr in node.attribute_set:
+            if each_attr and "discussion_enable" in each_attr:
+                create_thread_for_node_flag = True
+        for each_rel in node.relation_set:
+            if each_rel and "has_thread" in each_rel:
+                create_thread_for_node_flag = True
+            if each_rel and "has_help" in each_rel:
+                help_page_ids = each_rel['has_help']
+                # print "\n help_page_ids",help_page_ids
+                if help_page_ids:
+                    list_of_cloned_help_pages = []
+                    # replicate each help page node
+                    for each_help_page_id in help_page_ids:
+                        help_node = node_collection.one({'_id': ObjectId(each_help_page_id)})
+                        if help_node:
+                            cloned_help_page = create_clone(user_id, help_node, group_id)
+                            if cloned_help_page:
+                                if cloned_help_page._id not in list_of_cloned_help_pages:
+                                    list_of_cloned_help_pages.append(cloned_help_page._id)
+                    if list_of_cloned_help_pages:
+                        has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+                        help_gr = create_grelation(new_gsystem._id, has_help_rt, list_of_cloned_help_pages)
+                    # print "\nlist_of_cloned_help_pages ",list_of_cloned_help_pages
         if create_thread_for_node_flag:
             discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
             create_gattribute(new_gsystem._id, discussion_enable_at, False)
@@ -4535,6 +4593,7 @@ def replicate_resource(request, node, group_id):
             if thread_obj != None:
                 has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
                 gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
+
 
         if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
             # from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
