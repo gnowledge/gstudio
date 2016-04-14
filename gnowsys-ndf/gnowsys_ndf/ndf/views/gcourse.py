@@ -2275,7 +2275,7 @@ def course_about(request, group_id):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
+                    {'_type': {"$in": ["GSystem","File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2318,6 +2318,7 @@ def course_gallerymodal(request, group_id, node_id):
             'allow_to_comment': allow_to_comment,
             'thread_node': thread_node,
             'allow_to_join': allow_to_join
+            
         })
     return render_to_response(template, context_variables)
 
