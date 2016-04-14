@@ -5,7 +5,7 @@
   
   .rating-stars {
     background-image:url("/static/ndf/images/stars.png");
-    height: 15px;
+    height: 17px;
     display: none;
   }
 </style>
@@ -334,7 +334,7 @@
                         $("."+i)
                             .css("width",val+"%")
                     }
-                    else if(i == "total_rating_rcvd_on_files" || i == "total_rating_rcvd_on_notes"){
+                    else if(val != 0 && (i == "total_rating_rcvd_on_files" || i == "total_rating_rcvd_on_notes")){
                         $("."+i +" .rating-stars")
                           .css("width",val*16+"px")
                           .css("display","block")
