@@ -120,10 +120,11 @@
                         </ul>
                         <div class="tabs-content">
                             <div class="content" id="image-info">
+                                {% get_file_obj  node as file_res %}
                                 <span>Created At: </span>{{node.created_at}}<br>
                                 <span>Uploader: </span>{{node.created_by|get_username}}<br>
-                                <span>Format: </span>{{node.mime_type}}<br>
-                                <span>Size: </span>{{node.file_size.size}}{{node.file_size.unit}}
+                                <span>Format: </span>{{file_res.mime_type}}<br>
+                                <span>Size: </span>{{file_res.length|filesizeformat}}
                             </div>
                             <div class="content active" id="image-comments">
                                 <div class="row comments-area">
