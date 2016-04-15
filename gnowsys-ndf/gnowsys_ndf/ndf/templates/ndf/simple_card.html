@@ -54,6 +54,8 @@
         <img src="{{MEDIA_URL}}{{resource.if_file.thumbnail.relurl}}">
     {% elif resource.if_file.mid.relurl %}
         <img src="{{MEDIA_URL}}{{resource.if_file.mid.relurl}}">
+    {% elif resource.if_file.original.relurl and 'image' in resource.if_file.mime_type %}
+        <img src="{{MEDIA_URL}}{{resource.if_file.original.relurl}}">
     {% elif resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
       <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
