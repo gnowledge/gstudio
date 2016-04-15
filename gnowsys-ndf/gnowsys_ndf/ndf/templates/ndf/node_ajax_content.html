@@ -115,8 +115,6 @@
   <div class="row">
 
     {% get_download_filename node as download_filename %}
-    <a href="{% url 'read_file' group_name_tag node.pk download_filename %}">sample filehive download link</a>
-    {{MEDIA_URL}}
     {% if topic %}
       {% get_filters_data "Topics" as filter_dict %}
 
