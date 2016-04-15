@@ -244,6 +244,8 @@ color: black !important;
         <div class="time"> {{course_start_date|date:"d M Y"}} </div>
       </div>
     </div-->
+    {% comment %}
+
     {% if next_session_in_course.1 %}
     <div class="row collapse meta">
       <div class="key">Next Session</div>
@@ -253,6 +255,7 @@ color: black !important;
       </div>
     </div>
     {% endif %}
+    {% endcomment %}
     </div>
   </div>
 
