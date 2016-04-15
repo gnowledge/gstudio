@@ -4,7 +4,7 @@ import json
 import datetime
 import multiprocessing as mp
 from difflib import HtmlDiff
-
+import json 
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -252,7 +252,8 @@ def create_edit_page(request, group_id, node_id=None):
         # raise Exception("demo")
         # help_info_page = request.POST.getlist('help_info_page','')
         help_info_page = request.POST['help_info_page']
-        help_info_page = json.loads(help_info_page)
+        if help_info_page:
+            help_info_page = json.loads(help_info_page)
         # print "\n\n help_info_page === ",help_info_page
 
         #program_res and res are boolean values

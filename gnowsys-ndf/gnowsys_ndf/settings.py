@@ -768,6 +768,11 @@ GSTUDIO_CAPTCHA_VISIBLE = False
 # the no of cards/objects/instances to be render of app (listing view).
 GSTUDIO_NO_OF_OBJS_PP = 24
 
+GSTUDIO_FILE_UPLOAD_POINTS = 25
+GSTUDIO_NOTE_CREATE_POINTS = 30
+GSTUDIO_QUIZ_CORRECT_POINTS = 5
+GSTUDIO_COMMENT_POINTS = 5
+GSTUDIO_ENABLE_USER_DASHBOARD = True
 
 # # textb
 # import warnings
@@ -788,6 +793,7 @@ GSTUDIO_NO_OF_OBJS_PP = 24
 # USERS_ONLINE__CACHE_USERS
 # 
 # --- END of meeting gapp ---
+
 
 
 # ----------------------------------------------------------------------------
