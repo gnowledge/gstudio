@@ -78,33 +78,33 @@ try:
             # retriving file from gridfs
             # returns gridout object
             gridoutfile = each_gridfile.fs.files.get(fs_file_ids_list[index])
+            if gridoutfile:
+                # initializing filehive obj to hold current file
+                filehive_obj = filehive_collection.collection.Filehive()
 
-            # initializing filehive obj to hold current file
-            filehive_obj = filehive_collection.collection.Filehive()
+                file_name   = gridoutfile.filename
+                mime_type   = gridoutfile.content_type
+                file_extension = filehive_obj.get_file_extension(file_name, mime_type)
 
-            file_name   = gridoutfile.filename
-            mime_type   = gridoutfile.content_type
-            file_extension = filehive_obj.get_file_extension(file_name, mime_type)
+                # needs to convert gridoutfile into StringIO, so casting:
+                stringiofile = StringIO(gridoutfile.read())
 
-            # needs to convert gridoutfile into StringIO, so casting:
-            stringiofile = StringIO(gridoutfile.read())
+                filehive_id_url_dict = filehive_obj.save_file_in_filehive(
+                    file_blob=stringiofile,
+                    file_name=file_name,
+                    first_uploader=user_id,
+                    first_parent=each_gridfile_id,
+                    mime_type=mime_type,
+                    file_extension=file_extension,
+                    if_image_size_name=fs_file_ids_size_names[index],
+                    )
 
-            filehive_id_url_dict = filehive_obj.save_file_in_filehive(
-                file_blob=stringiofile,
-                file_name=file_name,
-                first_uploader=user_id,
-                first_parent=each_gridfile_id,
-                mime_type=mime_type,
-                file_extension=file_extension,
-                if_image_size_name=fs_file_ids_size_names[index],
-                )
+                log_print('\t-- filehive_id_url_dict: ' + str(filehive_id_url_dict))
 
-            log_print('\t-- filehive_id_url_dict: ' + str(filehive_id_url_dict))
+                # updating if_file to that file_size:
+                if_file[fs_file_ids_size_names[index]] = filehive_id_url_dict
 
-            # updating if_file to that file_size:
-            if_file[fs_file_ids_size_names[index]] = filehive_id_url_dict
-
-            # --- END of looping ---
+                # --- END of looping ---
 
         # updating / overwritting each_gridfile object:
         # "_type"
@@ -126,17 +126,6 @@ try:
                 pass
 
         each_gridfile.save()
-
-        # # removing File class fields:
-        # print node_collection.collection.update(
-        #                 {'_id': ObjectId(each_gridfile_id)},
-        #                 {
-        #                     '$unset': {
-        #                         'mime_type': False,
-        #                         'fs_file_ids': False,
-        #                         'file_size': False 
-        #                         }
-        #                 },upsert=False, multi=False)
 
         each_gridfile.reload()
         log_print('\nAfter processing, UPDATED object:')
