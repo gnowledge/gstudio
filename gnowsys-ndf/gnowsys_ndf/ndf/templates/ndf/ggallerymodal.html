@@ -129,6 +129,7 @@
                                 {% get_file_obj  node as file_res %}
                                 <span>Created At: </span>{{node.created_at}}<br>
                                 <span>Uploader: </span>{{node.created_by|get_username}}<br>
+                                <span>Dimensions: </span>{{ file_res.if_image_dimensions|default_if_none:"No dimensions available" }}<br>
                                 <span>Format: </span>{{file_res.mime_type}}<br>
                                 <span>Size: </span>{{file_res.length|filesizeformat}}
                             </div>
