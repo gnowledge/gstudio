@@ -86,10 +86,10 @@
 		 	<div class="large-8 columns">    
 		 		<h3><span class="subheader">		
 					{% if node %}
-						{% trans "Editing " %} {{title}} : {{node.name}}
+						{% trans "Editing " %}{% if blog_type %} {% trans 'Note' %}{% else %} {{title}} {% endif %}: {{node.name}}
 					{% else %}
 						{% if blog_type %}
-							{% trans "Create New Blog" %} :
+							{% trans "Create New Note" %} :
 						{% else %}
 							{% trans "Create New " %} {{title}} :
 						{% endif  %}
