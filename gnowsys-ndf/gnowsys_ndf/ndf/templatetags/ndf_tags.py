@@ -231,23 +231,41 @@ def get_node(node):
 @get_execution_time
 @register.assignment_tag
 def get_schema(node):
-   obj = node_collection.find_one({"_id": ObjectId(node.member_of[0])}, {"name": 1})
-   nam=node.member_of_names_list[0]
-   if(nam == 'Page'):
-        return [1,schema_dict[nam]]
-   elif(nam=='File'):
-
-   	mime_type = node.get_gsystem_mime_type()
-
-	if 'image' in mime_type:
-		return [1,schema_dict['Image']]
-        elif('video' in mime_type or 'Pandora_video' in mime_type):
-        	return [1,schema_dict['Video']]
+	if node:
+		# obj = node_collection.find_one({"_id": ObjectId(node.member_of[0])}, {"name": 1})
+		nam = node.member_of_names_list[0]
+		if(nam == 'Page'):
+			return [1,schema_dict[nam]]
+		elif(nam=='File'):
+			mimetype_val = node.get_gsystem_mime_type()
+			if( 'image' in mimetype_val):
+				return [1,schema_dict['Image']]
+			elif('video' in mimetype_val or 'Pandora_video' in mimetype_val):
+				return [1,schema_dict['Video']]
+			else:
+				return [1,schema_dict['Document']]	
+		else:
+			return [0,""]
 	else:
-		return [1,schema_dict['Document']]	
+		return [0,""]
+'''
+   if node:
+       obj = node_collection.find_one({"_id": ObjectId(node.member_of[0])}, {"name": 1})
+       nam=node.member_of_names_list[0]
+       if(nam == 'Page'):
+            return [1,schema_dict[nam]]
+       elif(nam=='File'):
+    	if( 'image' in node.mime_type):
+    		return [1,schema_dict['Image']]
+            elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+            	return [1,schema_dict['Video']]
+    	else:
+    		return [1,schema_dict['Document']]	
+       else:
+        return [0,""]
    else:
-	return [0,""]
-
+       return [0,""]
+'''
 
 @get_execution_time
 @register.filter
@@ -3612,7 +3630,7 @@ def get_info_pages(group_id):
 	list_of_nodes = []
 	page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
 	info_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Info page"})
-	info_page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': info_page_gst._id})
+	info_page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': info_page_gst._id, 'group_set': ObjectId(group_id)})
 	# print "\n\n info_page_nodes===",info_page_nodes.count()
 	# if info_page_nodes.count():
 	# 	for eachnode in info_page_nodes:
@@ -3663,3 +3681,15 @@ def get_file_obj(node):
 		original_file_obj = filehive_collection.find_one({"_id": ObjectId(obj.if_file.original.id)})
 		return original_file_obj
 
+@get_execution_time
+@register.assignment_tag
+def get_help_pages_of_node(node_obj):
+	all_help_page_node_list = []
+	try:
+		for each_rel in node_obj.relation_set:
+			if each_rel and "has_help" in each_rel:
+				help_pages_id_list = each_rel["has_help"]
+				all_help_page_node_list = [node_collection.one({'_id':ObjectId(each_help_id)}) for each_help_id in help_pages_id_list]
+				return all_help_page_node_list
+	except:
+		return all_help_page_node_list

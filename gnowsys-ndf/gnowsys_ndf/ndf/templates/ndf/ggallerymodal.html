@@ -2,6 +2,11 @@
 {% load i18n %}
 {% load ndf_tags %}
 {% get_grid_fs_object node as grid_fs_obj %}
+<style type="text/css">
+    .image-details .tabs .tab-title{
+        width: 25% !important;
+    }
+</style>
 <!--<style type="text/css">
     .gmodal-item-panel .text-gray{
         display:none;
@@ -116,15 +121,10 @@
                     <div class="small-12 columns ">
                         <ul class="tabs" data-tab>
                           <li class="tab-title active"><a href="#image-comments">Comments</a></li>
+                          <li class="tab-title"><a href="#image-desc">Description</a></li>
                           <li class="tab-title"><a href="#image-info">Info</a></li>
                         </ul>
                         <div class="tabs-content">
-                            <div class="content" id="image-info">
-                                <span>Created At: </span>{{node.created_at}}<br>
-                                <span>Uploader: </span>{{node.created_by|get_username}}<br>
-                                <span>Format: </span>{{node.mime_type}}<br>
-                                <span>Size: </span>{{node.file_size.size}}{{node.file_size.unit}}
-                            </div>
                             <div class="content active" id="image-comments">
                                 <div class="row comments-area">
                                     <div class="small-12 columns" >
@@ -139,6 +139,15 @@
                                             {% endif %}
                                     </div>
                                 </div>
+                            </div>
+                            <div class="content" id="image-desc">
+                                {{node.content|default_if_none:"No description added yet."|safe}}                                
+                            </div>
+                            <div class="content" id="image-info">
+                                <span>Created At: </span>{{node.created_at}}<br>
+                                <span>Uploader: </span>{{node.created_by|get_username}}<br>
+                                <span>Format: </span>{{node.mime_type}}<br>
+                                <span>Size: </span>{{node.file_size.size}}{{node.file_size.unit}}
                             </div>
                         </div>
                     </div>
