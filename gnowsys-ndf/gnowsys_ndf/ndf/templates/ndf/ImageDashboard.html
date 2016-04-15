@@ -87,6 +87,14 @@
 
   
 </script>
+<script type="text/javascript">
+  $(function() {
+     $("input:file").change(function (){
+       var fileName = $(this).val();
+       $(".filename").html(fileName);
+     });
+  });
+</script>
    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 {% comment %}
 <script type="text/javascript" src="http://jqueryrotate.googlecode.com/svn/trunk/jQueryRotate.js"></script> <!-- required ? -->
