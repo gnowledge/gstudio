@@ -260,11 +260,11 @@
                       </a>
                 </div>
                 </center>
-              {% elif 'image' in node.if_file.mime_type and not is_collection_card_view %}
+              {% elif 'image' in node.if_file.mime_type and is_collection_card_view != "True" %}
                <center>
                 <div class="show-image">
-                  <a class="th "   data-oid="{{node.pk|safe}}">
-                    <img  src=" {{MEDIA_URL}}{{node.if_file.original.relurl}} " style="min-height:200px;" />
+                  <a class="th" data-oid="{{node.pk|safe}}">
+                    <img  src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" style="min-height:200px;" />
 
                   </a>
                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
