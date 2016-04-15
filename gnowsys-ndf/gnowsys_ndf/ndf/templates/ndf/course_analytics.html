@@ -99,6 +99,7 @@
         <div class="columns small-12 medium-6">
           <h5>Total points gained</h5>
           <span class="course-metric-count users_points"></span>
+
           <div class="course-points-breakup">
 
           </div>
@@ -340,6 +341,10 @@
                           .css("display","block")
                         $("."+i +" .rating_lbl").text("("+val+")")
                         }
+                    else if(i == "users_points" && val == 0){
+                      $(".course-points-breakup").addClass("hide")
+                      $(".users_points").text("No Points gained yet.")
+                    }
                     else if(i == "users_points_breakup"){
                       generateGraph(val);
                     }
