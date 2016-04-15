@@ -1,6 +1,7 @@
 import json
 import time
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.settings import *
 from gnowsys_ndf.ndf.views.methods import get_course_completetion_status, dig_nodes_field, sublistExists
 from gnowsys_ndf.ndf.templatetags.simple_filters import get_dict_from_list_of_dicts
 benchmark_collection = db[Benchmark.collection_name]
@@ -697,18 +698,18 @@ class AnalyticsMethods(object):
 		user_notes = self.get_user_notes_count()
 		correct_attempted_quizitems = self.get_evaluated_quizitems_count(True,False)
 		user_comments = self.get_total_comments_by_user(False,False)
-		total_points = (user_files*25) + (user_notes*30) + \
-		(correct_attempted_quizitems*5) + (user_comments*5)
+		total_points = (user_files*GSTUDIO_FILE_UPLOAD_POINTS) + (user_notes*GSTUDIO_NOTE_CREATE_POINTS) + \
+		(correct_attempted_quizitems*GSTUDIO_QUIZ_CORRECT_POINTS) + (user_comments*GSTUDIO_COMMENT_POINTS)
 		# print "\n get_users_points -- ",total_points
 		if point_breakup:
 			if user_files:
-				point_breakup_dict['Files'] = user_files*25
+				point_breakup_dict['Files'] = user_files*GSTUDIO_FILE_UPLOAD_POINTS
 			if user_notes:
-				point_breakup_dict['Notes'] = user_notes*30
+				point_breakup_dict['Notes'] = user_notes*GSTUDIO_NOTE_CREATE_POINTS
 			if correct_attempted_quizitems:
-				point_breakup_dict['Quiz'] = correct_attempted_quizitems*5
+				point_breakup_dict['Quiz'] = correct_attempted_quizitems*GSTUDIO_QUIZ_CORRECT_POINTS
 			if user_comments:
-				point_breakup_dict['Interactions'] = user_comments*5
+				point_breakup_dict['Interactions'] = user_comments*GSTUDIO_COMMENT_POINTS
 			return point_breakup_dict
 		return total_points
 

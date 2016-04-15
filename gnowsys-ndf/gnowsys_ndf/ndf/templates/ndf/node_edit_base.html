@@ -84,7 +84,7 @@
     <header> 
 	    <div class="row">
 		 	<div class="large-8 columns">    
-		 		<h3><span class="subheader">		
+				<h3><span class="subheader">
 					{% if node %}
 						{% trans "Editing " %}{% if blog_type %} {% trans 'Note' %}{% else %} {{title}} {% endif %}: {{node.name}}
 					{% else %}
@@ -105,6 +105,7 @@
 		    </div>     
 	    </div> 
     </header>
+
     {% check_group node.pk as is_group %}
 
     <div class="edit-card">
@@ -150,6 +151,10 @@
 	</div>
         
   	{% csrf_token %}
+		{% if course_tab_title %}
+		<input type="hidden" name="course_tab_title" value="{{course_tab_title}}"></input>
+		{% endif %}
+
         {% comment %}
 		  	<div id="publish_resource" class="reveal-modal" data-reveal style="width:500px;">
 		  		Do you want to create:<br/><br/>
