@@ -42,6 +42,7 @@ from gnowsys_ndf.notification import models as notification
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
 gst_file = node_collection.one({'_type': "GSystemType", 'name': u"File"})
+gst_page = node_collection.one({'_type': "GSystemType", 'name': u"Page"})
 
 app = GST_COURSE
 
@@ -2063,7 +2064,13 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
 
         files_cur = node_collection.find({
                                         '_type': {'$in': ["File", "GSystem"]},
-                                        'member_of': GST_FILE._id,
+                                        '$or': [
+                                                {'member_of': GST_FILE._id},
+                                                {
+                                                    'collection_set': {'$exists': "true" },
+                                                    'member_of': GST_PAGE._id,
+                                                }
+                                            ],
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'created_by': {'$in': gstaff_users},
                             # '$or': [
@@ -2085,6 +2092,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                         },
                         {
                             'name': 1,
+                            'collection_set':1,
                             '_id': 1,
                             'fs_file_ids': 1,
                             'member_of': 1,
@@ -2201,7 +2209,13 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # print "\n\n Total files: ", files_cur.count()
         files_cur = node_collection.find({
                                         '_type': "File",
-                                        'member_of': {'$in': [GST_FILE._id, GST_PAGE._id] },
+                                        '$or': [
+                                                {'member_of': GST_FILE._id},
+                                                {
+                                                    'collection_set': {'$exists': "true" },
+                                                    'member_of': GST_PAGE._id,
+                                                }
+                                            ],
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'relation_set.clone_of': {'$exists': False},
                                     '$or': [
@@ -2223,6 +2237,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                         ]},
                                         {
                                             'name': 1,
+                                            'collection_set':1,
                                             '_id': 1,
                                             'fs_file_ids': 1,
                                             'member_of': 1,
