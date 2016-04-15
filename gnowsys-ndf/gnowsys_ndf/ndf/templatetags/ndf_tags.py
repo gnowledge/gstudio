@@ -231,35 +231,21 @@ def get_node(node):
 @get_execution_time
 @register.assignment_tag
 def get_schema(node):
-<<<<<<< HEAD
-   obj = node_collection.find_one({"_id": ObjectId(node.member_of[0])}, {"name": 1})
-   nam=node.member_of_names_list[0]
-   if(nam == 'Page'):
-        return [1,schema_dict[nam]]
-   elif(nam=='File'):
-
-   	mime_type = node.get_gsystem_mime_type()
-
-	if 'image' in mime_type:
-		return [1,schema_dict['Image']]
-        elif('video' in mime_type or 'Pandora_video' in mime_type):
-        	return [1,schema_dict['Video']]
-=======
 	if node:
-		obj = node_collection.find_one({"_id": ObjectId(node.member_of[0])}, {"name": 1})
-		nam=node.member_of_names_list[0]
+		# obj = node_collection.find_one({"_id": ObjectId(node.member_of[0])}, {"name": 1})
+		nam = node.member_of_names_list[0]
 		if(nam == 'Page'):
 			return [1,schema_dict[nam]]
 		elif(nam=='File'):
-			if( 'image' in node.mime_type):
+			mimetype_val = node.get_gsystem_mime_type()
+			if( 'image' in mimetype_val):
 				return [1,schema_dict['Image']]
-			elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+			elif('video' in mimetype_val or 'Pandora_video' in mimetype_val):
 				return [1,schema_dict['Video']]
 			else:
 				return [1,schema_dict['Document']]	
 		else:
 			return [0,""]
->>>>>>> f806d3beb31f3da537cfd7637c85fd201e85d3bc
 	else:
 		return [0,""]
 '''
