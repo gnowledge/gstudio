@@ -94,21 +94,21 @@
                     </div>
                 </div>
                 {% if node.tags %}
-                <div class="row tag-rating-div">
-                        {% for tag in node.tags %}
-                            {% if forloop.counter < 3 %}
-                                <small><label class="lbl_of_tag label">
-                            {% else %}
-                                <small><label class="lbl_of_tag label tag_ele hide">
-                            {% endif %}
-                            <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
-                        {% endfor %}
-                        {% if node.tags|length > 2 %}
-                            <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
-                        {% endif %} 
-                    {% else %}
-                    <i><small><label class="lbl_of_tag">{% trans "No tags defined yet!" %}</label></small></i>
-                </div>
+                    <div class="row tag-rating-div">
+                            {% for tag in node.tags %}
+                                {% if forloop.counter < 3 %}
+                                    <small><label class="lbl_of_tag label">
+                                {% else %}
+                                    <small><label class="lbl_of_tag label tag_ele hide">
+                                {% endif %}
+                                <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
+                            {% endfor %}
+                            {% if node.tags|length > 2 %}
+                                <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
+                            {% endif %} 
+                    </div>
+                {% else %}
+                    <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
                 {% endif %}
 
                 <div class="row image-brief">
