@@ -739,6 +739,7 @@ GSTUDIO_FILE_UPLOAD_POINTS = 25
 GSTUDIO_NOTE_CREATE_POINTS = 30
 GSTUDIO_QUIZ_CORRECT_POINTS = 5
 GSTUDIO_COMMENT_POINTS = 5
+GSTUDIO_ENABLE_USER_DASHBOARD = True
 # ----------------------------------------------------------------------------
 # following has to be at last
 # just put every thing above it
