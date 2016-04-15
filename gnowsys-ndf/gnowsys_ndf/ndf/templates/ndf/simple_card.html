@@ -61,7 +61,9 @@
     {% elif resource.fs_file_ids.1 %}
       <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
     {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
-      {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
+      {% if resource.collection_set  %}
+        <i class="collection"></i>
+      {% elif attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
         <i class="{{attr_set_dict.educationaluse|lower}}"></i>
       {% elif resource.fs_file_ids.0 and 'image' in resource.mime_type %}
         <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
@@ -90,9 +92,6 @@
         {% endif %}
       {% endif %}
 
-
-    {% elif resource.collection_set  %}
-        <i class="collection"></i>
     {% else%}
       <img src="/static/ndf/images/metaStudio-profile.svg"  class="img-height">
     {% endif %}
