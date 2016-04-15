@@ -26,10 +26,9 @@ from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
-from gnowsys_ndf.settings import SYNCDATA_KEY_PUB
+# get pub of gpg key with which to sign syncdata attachments
+from gnowsys_ndf.settings import SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH
 
-#get pub of gpg key with which to sign syncdata attachments
-from gnowsys_ndf.settings import SYNCDATA_KEY_PUB
 #to display error template if non existent pub is given in settings.py
 from django.shortcuts import render
 
@@ -235,17 +234,18 @@ def server_sync(func):
         
         settings_dir = os.path.dirname(__file__)
         PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-        path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
+        # path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
+        path_MailClient = GSTUDIO_MAIL_DIR_PATH
         
         if not os.path.exists(path_MailClient):
             os.makedirs(path_MailClient)
         
-        p1 = path_MailClient + 'syncdata/'
+        p1 = path_MailClient + '/syncdata/'
         
         if not os.path.exists(p1):
             os.makedirs(p1)
         
-        p1 = path_MailClient + 'sent_syncdata_files/'
+        p1 = path_MailClient + '/sent_syncdata_files/'
         
         if not os.path.exists(p1):
             os.makedirs(p1)

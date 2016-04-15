@@ -238,6 +238,9 @@ django.conf.locale.LANG_INFO = LANG_INFO
 
 # --- mailclient app and Replication ---
 # 
+# GSTUDIO_SYNC_SND=True/False
+# GSTUDIO_SYNC_RCV=True/False
+# 
 # Following has to be done for using the Replication features
 # Override following variables in local_settings file:
 #
@@ -304,10 +307,12 @@ MANAGERS = ADMINS
 # If overridden in local settings file, then
 # follow the same pattern and edit only the database-name
 SQLITE3_DBNAME = 'example-sqlite3.db'
+SQLITE3_DB_PATH = os.path.join(GSTUDIO_DATA_ROOT, SQLITE3_DBNAME)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(GSTUDIO_DATA_ROOT, SQLITE3_DBNAME),
+        'NAME': SQLITE3_DB_PATH,
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
@@ -655,6 +660,9 @@ RCS_REPO_DIR = os.path.join(GSTUDIO_DATA_ROOT, RCS_REPO_DIRNAME)
 GSTUDIO_LOGS_DIRNAME = 'gstudio-logs'
 GSTUDIO_LOGS_DIR_PATH = os.path.join(GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIRNAME)
 
+GSTUDIO_MAIL_DIRNAME = 'MailClient'
+GSTUDIO_MAIL_DIR_PATH = os.path.join(GSTUDIO_DATA_ROOT, GSTUDIO_MAIL_DIRNAME)
+
 # Indicates the "hash-level-number", i.e the number of sub-directories that
 # will be created for the corresponding document under it's
 # collection-directory; in order to store json-files in an effective manner
@@ -776,7 +784,6 @@ GSTUDIO_NO_OF_OBJS_PP = 24
 # USERS_ONLINE__CACHE_USERS
 # 
 # --- END of meeting gapp ---
-
 
 
 # ----------------------------------------------------------------------------
