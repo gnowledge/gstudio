@@ -146,7 +146,7 @@ try:
 
 
 except Exception, e:
-    log_print("Exception occured while looping over all File GSystems: " + e)
+    log_print("Exception occured while looping over all File GSystems: " + str(e))
 
 
 finally:

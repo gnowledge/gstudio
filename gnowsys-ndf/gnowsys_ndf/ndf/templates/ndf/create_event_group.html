@@ -43,11 +43,16 @@ this template is modified. So for the fields in the template it supports -
   </h2>
   <br/>
 
-  <form id="create_group" class="" method="post"
+  <form id="create_group"  method="post"
   {% if node %} action="{% url 'edit_event_group' group_id spl_group_type %}"
   {% else %} action="{% url 'create_event_group' group_id spl_group_type %}"
   {% endif %}
-  data-abide enctype="multipart/form-data">
+  data-abide enctype="multipart/form-data" 
+  {% if spl_group_type == "CourseEventGroup" %}
+  onsubmit="return confirm('Announcement may take few minutes. Please do NOT refresh/reload/abort the page while processing. Do you really want to continue?');"
+  {% endif %}
+
+  >
     {% csrf_token %}
 
     <!-- node_id, name -->

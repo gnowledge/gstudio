@@ -566,15 +566,18 @@
                 dict_res[mem_of_name] = dict_res[mem_of_name] + 1
               }
               {% if res_node.member_of_names_list.0|lower == "page" %}
-                k = "{% url res_node.member_of_names_list.0|lower|concat:"_details" groupid res_node.pk %}"
+                k = "{% url res_node.member_of_names_list.0|lower|concat:'_details' groupid res_node.pk %}"
               {% elif res_node.member_of_names_list.0|lower == "quizitemevent" or res_node.member_of_names_list.0|lower == "quizitem" %}
                 k = "{% url 'quiz_item_edit' groupid res_node.pk %}?return_url=groupchange"
 
               {% else %}
-                k = "{% url res_node.member_of_names_list.0|lower|concat:"_detail" groupid res_node.pk %}"
+                k = "{% url res_node.member_of_names_list.0|lower|concat:'_detail' groupid res_node.pk %}"
               {% endif %}
-              var str_unit = "<a href='"+k+"' target='_blank' >"+{{res_node.name|removetags:'p'}}+"</a><br>"
-              
+
+              var str_unit = document.createElement('a');
+              str_unit.setAttribute('href',k);
+              str_unit.setAttribute('target','_blank');
+              str_unit.text = "{{res_node.name|safe|linebreaks|striptags}}"
 
               var row = table.insertRow(-1);
               row.id = '{{res_node.pk}}'
@@ -582,7 +585,7 @@
               var cell2 = row.insertCell(1);
               var cell3 = row.insertCell(2);
               cell1.innerHTML = "<span data-tooltip title='Resource type'>{{res_node.member_of_names_list.0}}</span>";
-              cell2.innerHTML = str_unit;
+              cell2.innerHTML = str_unit.outerHTML;
               cell3.innerHTML = "<span data-tooltip title='Move Up'><a class='fi-arrow-up largesize'></a></span>&nbsp;&nbsp;&nbsp;<span data-tooltip title='Move Down'><a class='fi-arrow-down largesize'></a></span>&nbsp;&nbsp;&nbsp;<span data-tooltip title='Remove from unit'><a class='fi-trash largesize'></a></span>";
               $(".collection_details").append(table)
           {% endif %}

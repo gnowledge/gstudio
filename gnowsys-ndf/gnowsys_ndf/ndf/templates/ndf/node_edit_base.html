@@ -596,19 +596,9 @@
 		  	<h7>{% trans "Select help page(s) for this resource from following options:"%} </h7>
 		</div>
 	    <div class="help-settings-div">
-			{% get_dict_from_list_of_dicts node.relation_set True as node_rel_set %}
+	    	{% get_help_pages_of_node node as help_page_list %}
 			{% get_info_pages group_id as all_info_pages %}
-			<select class="help_info_page" name="help_info_page" multiple style="height:200px;">
-				<option value="None" {% if not node_rel_set %}selected{% endif %}> --- Select --- </option>
-				{% for each_page in all_info_pages %}
-					<option value="{{each_page.pk}}"
-					{% if node_rel_set.has_help %}{% if each_page.pk in node_rel_set.has_help %}
-					selected
-					{% endif %}{% endif %}>
-						{{each_page.name}}
-					</option>
-				{% endfor %}
-			</select>
+	        {% include 'ndf/widget_selector.html' with for='help_info_page' all_options=all_info_pages selected_options=help_page_list oneline_element='false' %}
 	    </div>
 
 	</div>	
@@ -1534,6 +1524,8 @@
 	    {
 	    	event.preventDefault();
 	    }
+	    getSelValuesHiddenElement('help_info_page','form-edit-node');
+
 	});
 
 

@@ -5,7 +5,7 @@
   
   .rating-stars {
     background-image:url("/static/ndf/images/stars.png");
-    height: 15px;
+    height: 17px;
     display: none;
   }
 </style>
@@ -99,6 +99,7 @@
         <div class="columns small-12 medium-6">
           <h5>Total points gained</h5>
           <span class="course-metric-count users_points"></span>
+
           <div class="course-points-breakup">
 
           </div>
@@ -334,12 +335,16 @@
                         $("."+i)
                             .css("width",val+"%")
                     }
-                    else if(i == "total_rating_rcvd_on_files" || i == "total_rating_rcvd_on_notes"){
+                    else if(val != 0 && (i == "total_rating_rcvd_on_files" || i == "total_rating_rcvd_on_notes")){
                         $("."+i +" .rating-stars")
                           .css("width",val*16+"px")
                           .css("display","block")
                         $("."+i +" .rating_lbl").text("("+val+")")
                         }
+                    else if(i == "users_points" && val == 0){
+                      $(".course-points-breakup").addClass("hide")
+                      $(".users_points").text("No Points gained yet.")
+                    }
                     else if(i == "users_points_breakup"){
                       generateGraph(val);
                     }

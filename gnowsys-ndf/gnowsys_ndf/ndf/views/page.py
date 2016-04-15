@@ -52,25 +52,12 @@ app = gst_page
 #######################################################################################################################################
 
 
+
+
 @get_execution_time
 def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
-    # ins_objectid = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False :
-    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id}) 
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-
-    #     else :
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-
-    #         if auth :
-    #             group_id = str(auth._id)
-    # else :
-    #     pass
     try:
         group_id = ObjectId(group_id)
     except:
@@ -91,181 +78,104 @@ def page(request, group_id, app_id=None):
     shelf_list = {}
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     
-    # if auth:
-    #   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-    #   dbref_has_shelf = has_shelf_RT.get_dbref()
-    #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id})
-    #   shelf_list = {}
-
-    #   if shelf:
-    #     for each in shelf:
-    #         shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)}) 
-    #         shelves.append(shelf_name)
-
-    #         shelf_list[shelf_name.name] = []         
-    #         for ID in shelf_name.collection_set:
-    #           shelf_item = node_collection.one({'_id': ObjectId(ID) })
-    #           shelf_list[shelf_name.name].append(shelf_item.name)
-
-    #   else:
-    #     shelves = []
-    # End of user shelf
 
     if request.method == "POST":
-      title = gst_page.name
-      search_field = request.POST['search_field']
-      page_nodes = node_collection.find({
-                                          'member_of': {'$all': [ObjectId(app_id)]},
-                                          '$or': [
-                                            {'$and': [
-                                              {'name': {'$regex': search_field, '$options': 'i'}}, 
-                                              {'$or': [
-                                                {'access_policy': u"PUBLIC"},
-                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+        title = gst_page.name
+        search_field = request.POST['search_field']
+        page_nodes = node_collection.find({
+                                            'member_of': {'$all': [ObjectId(app_id)]},
+                                            '$or': [
+                                              {'$and': [
+                                                {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                {'$or': [
+                                                  {'access_policy': u"PUBLIC"},
+                                                  {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                  ]
+                                                }
+                                                ]
+                                              },
+                                              {'$and': [
+                                                {'tags': {'$regex':search_field, '$options': 'i'}},
+                                                {'$or': [
+                                                  {'access_policy': u"PUBLIC"},
+                                                  {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                  ]
+                                                }
                                                 ]
                                               }
-                                              ]
-                                            },
-                                            {'$and': [
-                                              {'tags': {'$regex':search_field, '$options': 'i'}},
-                                              {'$or': [
-                                                {'access_policy': u"PUBLIC"},
-                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-                                                ]
-                                              }
-                                              ]
-                                            }
-                                          ], 
-                                          'group_set': {'$all': [ObjectId(group_id)]},
-                                          'status': {'$nin': ['HIDDEN']}
-                                      }).sort('last_update', -1)
+                                            ], 
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+                                            'status': {'$nin': ['HIDDEN']}
+                                        }).sort('last_update', -1)
 
-      return render_to_response("ndf/page_list.html",
-                                {'title': title, 
-                                 'appId':app._id,'shelf_list': shelf_list,'shelves': shelves,
-                                 'searching': True, 'query': search_field,
-                                 'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
-                                }, 
-                                context_instance=RequestContext(request)
-      )
+        return render_to_response("ndf/page_list.html",
+                                  {'title': title, 
+                                   'appId':app._id,'shelf_list': shelf_list,'shelves': shelves,
+                                   'searching': True, 'query': search_field,
+                                   'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
+                                  }, 
+                                  context_instance=RequestContext(request)
+        )
 
     elif gst_page._id == ObjectId(app_id):
-      group_type = node_collection.one({'_id': ObjectId(group_id)})
-      group_info=group_type_info(group_id)
-      node = node_collection.find({'member_of':ObjectId(app_id)})
-      title = gst_page.name
-        	
-      '''
-      if  group_info == "Moderated":
-	# Page list view
-        # code for moderated Groups
-        node=group_type.prior_node[0]
+        group_type = node_collection.one({'_id': ObjectId(group_id)})
+        group_info=group_type_info(group_id)
+        node = node_collection.find({'member_of':ObjectId(app_id)})
+        title = gst_page.name
+        """
+          Below query returns only those documents:
+          (a) which are pages,
+          (b) which belongs to given group,
+          (c) which has status either as DRAFT or PUBLISHED, and
+          (d) which has access_policy either as PUBLIC or if PRIVATE then it's created_by must be the logged-in user
+        """
         page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
-                                             'group_set': {'$all': [ObjectId(node)]},
-                                       }).sort('last_update', -1)
-
+                                               'group_set': {'$all': [ObjectId(group_id)]},
+                                               '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                  {'access_policy': u"PRIVATE"}, 
+                                                  {'created_by': request.user.id}
+                                                  ]
+                                                }
+                                               ],
+                                               'status': {'$nin': ['HIDDEN']}
+                                           }).sort('last_update', -1)
         return render_to_response("ndf/page_list.html",
-                                    {'title': title, 
-                                     'appId':app._id,'shelf_list': shelf_list,'shelves': shelves,
-                                     'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
-                                    }, 
-                                    context_instance=RequestContext(request))
-
-        elif group_info == "BaseModerated":
-	  #code for parent Groups
-          node = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
-                                       'group_set': {'$all': [ObjectId(group_id)]},
-                                       'status': {'$nin': ['HIDDEN']}
-                                      }).sort('last_update', -1)
-	
-        if node is None:
-            
-        # rcs content ends here
-        return render_to_response("ndf/page_list.html",
-                                    {'title': title, 
-                                     'appId':app._id,
-                                     'shelf_list': shelf_list,'shelves': shelves,
-                                     'page_nodes':nodes,
-                                     'groupid':group_id,
-                                     'group_id':group_id
-                                    }, 
-                                    context_instance=RequestContext(request)
-            )
-		
-      elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:'''
-      """
-        Below query returns only those documents:
-        (a) which are pages,
-        (b) which belongs to given group,
-        (c) which has status either as DRAFT or PUBLISHED, and
-        (d) which has access_policy either as PUBLIC or if PRIVATE then it's created_by must be the logged-in user
-      """
-      page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
-                                             'group_set': {'$all': [ObjectId(group_id)]},
-                                             '$or': [
-                                              {'access_policy': u"PUBLIC"},
-                                              {'$and': [
-                                                {'access_policy': u"PRIVATE"}, 
-                                                {'created_by': request.user.id}
-                                                ]
-                                              }
-                                             ],
-                                             'status': {'$nin': ['HIDDEN']}
-                                         }).sort('last_update', -1)
-        # content =[]
-        # for nodes in page_nodes:
-        		# node,ver=get_page(request,nodes)
-        #   if node != 'None':
-        #     content.append(node)	
-      return render_to_response("ndf/page_list.html",
-                                        {'title': title,
-                                         'appId':app._id,
-                                         'shelf_list': shelf_list,'shelves': shelves,
-                                         'page_nodes': page_nodes,
-                                         'groupid':group_id,
-                                         'group_id':group_id
-                                        },
-                                        context_instance=RequestContext(request))
+                                          {'title': title,
+                                           'appId':app._id,
+                                           'shelf_list': shelf_list,'shelves': shelves,
+                                           'page_nodes': page_nodes,
+                                           'groupid':group_id,
+                                           'group_id':group_id
+                                          },
+                                          context_instance=RequestContext(request))
         
     else:
-      # Page Single instance view
-      '''Group_node = node_collection.one({"_id": ObjectId(group_id)})'''
-      page_node = node_collection.one({"_id": ObjectId(app_id)})       
-      '''if Group_node.prior_node:
-            page_node = node_collection.one({"_id": ObjectId(app_id)})
-            
-        else:
-          
-	  	
-          if Group_node.edit_policy == "EDITABLE_NON_MODERATED" or Group_node.edit_policy is None or Group_node.edit_policy == "NON_EDITABLE":
-            page_node,ver=get_page(request,node)
-          else:
-            #else part is kept for time being until all the groups are implemented
-            if node.status == u"DRAFT":
-              page_node,ver=get_versioned_page(node)
-            elif node.status == u"PUBLISHED":
-              page_node = node
-    	'''
+        # Page Single instance view
+        page_node = node_collection.one({"_id": ObjectId(app_id)})       
+        thread_node = None
+        allow_to_comment = None
+        annotations = None
+        if page_node:
+          annotations = json.dumps(page_node.annotations)
+          page_node.get_neighbourhood(page_node.member_of)
 
-      annotations = json.dumps(page_node.annotations)
-      page_node.get_neighbourhood(page_node.member_of)
-      thread_node = None
-      allow_to_comment = None
+          thread_node, allow_to_comment = node_thread_access(group_id, page_node)
+        return render_to_response('ndf/page_details.html',
+                                  {'node': page_node,
+                                    'node_has_thread': thread_node,
+                                    'appId': app._id,
+                                    'group_id': group_id,
+                                    'shelf_list': shelf_list,
+                                    'allow_to_comment':allow_to_comment,
+                                    'annotations': annotations,
+                                    'shelves': shelves,
+                                    'groupid': group_id
+                                  },
+                                  context_instance = RequestContext(request)
+        )        
 
-      thread_node, allow_to_comment = node_thread_access(group_id, page_node)
-      return render_to_response('ndf/page_details.html',
-                                {'node': page_node,
-                                  'node_has_thread': thread_node,
-                                  'appId': app._id,
-                                  'group_id': group_id,
-                                  'shelf_list': shelf_list,
-                                  'allow_to_comment':allow_to_comment,
-                                  'annotations': annotations,
-                                  'shelves': shelves,
-                                  'groupid': group_id
-                                },
-                                context_instance = RequestContext(request)
-      )        
 
 
 @login_required
@@ -340,7 +250,10 @@ def create_edit_page(request, group_id, node_id=None):
         # print "\n\n thread_create_val", thread_create_val
         # print "\n\n request.POST === ",request.POST
         # raise Exception("demo")
-        help_info_page = request.POST.getlist('help_info_page','')
+        # help_info_page = request.POST.getlist('help_info_page','')
+        help_info_page = request.POST['help_info_page']
+        help_info_page = json.loads(help_info_page)
+        # print "\n\n help_info_page === ",help_info_page
 
         #program_res and res are boolean values
         if program_res:
@@ -394,6 +307,7 @@ def create_edit_page(request, group_id, node_id=None):
           try:
             help_info_page = map(ObjectId, help_info_page)
             create_grelation(page_node._id, has_help_rt,help_info_page)
+            page_node.reload()
           except Exception as invalidobjectid:
             # print invalidobjectid
             pass
