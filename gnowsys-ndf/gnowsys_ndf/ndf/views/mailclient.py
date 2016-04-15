@@ -9,7 +9,7 @@ from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_use
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
-from gnowsys_ndf.settings import SYNCDATA_SENDING_EMAIL_ID, SYNCDATA_FROM_EMAIL_ID,SYNCDATA_KEY_PUB
+from gnowsys_ndf.settings import SYNCDATA_SENDING_EMAIL_ID, SYNCDATA_FROM_EMAIL_ID,SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH, SQLITE3_DB_PATH
 
 #---------Django Mailbox imports----------------#
 from django_mailbox.models import Mailbox
@@ -79,8 +79,9 @@ def mailclient(request, group_id):
         settings_dir2 = os.path.dirname(settings_dir1)
         settings_dir3 = os.path.dirname(settings_dir2)
         path = os.path.abspath(os.path.dirname(settings_dir3))
-        
-        conn = sqlite3.connect(path + '/example-sqlite3.db')
+
+        # conn = sqlite3.connect(path + '/example-sqlite3.db')
+        conn = sqlite3.connect(SQLITE3_DB_PATH)
         user_id = str(request.user.id)
 
         cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
@@ -209,10 +210,11 @@ def mailbox_create_edit(request, group_id):
             settings_dir1 = os.path.dirname(__file__)
             settings_dir2 = os.path.dirname(settings_dir1)
             settings_dir3 = os.path.dirname(settings_dir2)
-            path = os.path.abspath(os.path.dirname(settings_dir3))
+            # path = os.path.abspath(os.path.dirname(settings_dir3))
+            path = SQLITE3_DB_PATH
 
             #may throw exception
-            conn = sqlite3.connect(path + '/example-sqlite3.db')
+            conn = sqlite3.connect(path)
             user_id = str(request.user.id)
             #query to insert (user.id,mailbox.id) pair in 'mapping' database
             cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
@@ -619,7 +621,8 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
     # To find the path to the mailbox_data folder where the mails are stored in the maildir format
     settings_dir = os.path.dirname(__file__)
     PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-    path = os.path.join(PROJECT_ROOT, 'MailClient/')
+    # path = os.path.join(PROJECT_ROOT, 'MailClient/')
+    path = GSTUDIO_MAIL_DIR_PATH + '/'
     
     if not os.path.exists(path):
         os.makedirs(path)
@@ -742,8 +745,9 @@ def mailbox_edit(request, group_id,mailboxname):
         settings_dir1 = os.path.dirname(__file__)
         settings_dir2 = os.path.dirname(settings_dir1)
         settings_dir3 = os.path.dirname(settings_dir2)
-        path = os.path.abspath(os.path.dirname(settings_dir3))
-        conn = sqlite3.connect(path + '/example-sqlite3.db')
+        # path = os.path.abspath(os.path.dirname(settings_dir3))
+        path = SQLITE3_DB_PATH
+        conn = sqlite3.connect(SQLITE3_DB_PATH)
         query = 'select id from auth_user where username=\''+str(username)+'\''
         cursor = conn.execute(query)
         userid=None
@@ -832,9 +836,10 @@ def mailbox_edit(request, group_id,mailboxname):
             settings_dir1 = os.path.dirname(__file__)
             settings_dir2 = os.path.dirname(settings_dir1)
             settings_dir3 = os.path.dirname(settings_dir2)
-            path = os.path.abspath(os.path.dirname(settings_dir3))
+            # path = os.path.abspath(os.path.dirname(settings_dir3))
+            path = SQLITE3_DB_PATH
             #may throw error        
-            conn = sqlite3.connect(path + '/example-sqlite3.db')
+            conn = sqlite3.connect(path)
             user_id = str(request.user.id)
             cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
             query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
@@ -908,20 +913,21 @@ def mailbox_delete(request, group_id,mailboxname):
             
             settings_dir = os.path.dirname(__file__)
             PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-            path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
+            # path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
+            path_MailClient = GSTUDIO_MAIL_DIR_PATH
         
             if not os.path.exists(path_MailClient):
                 os.makedirs(path_MailClient)
         
-            p1 = path_MailClient + 'Archived_Mails/'
+            p1 = path_MailClient + '/Archived_Mails/'
             if not os.path.exists(p1):
                 os.makedirs(p1)
 
-            p1 = path_MailClient + str(request.user.username) + '/'
+            p1 = path_MailClient + '/' + str(request.user.username) + '/'
             if not os.path.exists(p1):
                 os.makedirs(p1)
 
-            p1 = path_MailClient + mailboxname + '/'
+            p1 = path_MailClient + '/' + mailboxname + '/'
             if not os.path.exists(p1):
                 os.makedirs(p1)
 
@@ -954,10 +960,11 @@ def mailbox_delete(request, group_id,mailboxname):
             settings_dir1 = os.path.dirname(__file__)
             settings_dir2 = os.path.dirname(settings_dir1)
             settings_dir3 = os.path.dirname(settings_dir2)
-            path = os.path.abspath(os.path.dirname(settings_dir3))
+            # path = os.path.abspath(os.path.dirname(settings_dir3))
+            path = SQLITE3_DB_PATH
             conn = None
             try:
-                conn = sqlite3.connect(path + '/example-sqlite3.db')
+                conn = sqlite3.connect(path)
                 cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
                 query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
                 cursor = conn.execute(query)
@@ -1058,7 +1065,8 @@ def mailbox_settings(request, group_id,mailboxname):
 def get_email_id(filename,mailboxname,username):
     settings_dir = os.path.dirname(__file__)
     PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-    path = os.path.join(PROJECT_ROOT, 'MailClient/')
+    # path = os.path.join(PROJECT_ROOT, 'MailClient/')
+    path = GSTUDIO_MAIL_DIR_PATH + '/'
     path = path + 'mailbox_data/'
     path = path + username + '/' + mailboxname
 
@@ -1097,8 +1105,9 @@ def compose_mail(request, group_id,mailboxname):
         settings_dir1 = os.path.dirname(__file__)
         settings_dir2 = os.path.dirname(settings_dir1)
         settings_dir3 = os.path.dirname(settings_dir2)
-        path = os.path.abspath(os.path.dirname(settings_dir3))
-        conn = sqlite3.connect(path + '/example-sqlite3.db')
+        # path = os.path.abspath(os.path.dirname(settings_dir3))
+        path = SQLITE3_DB_PATH
+        conn = sqlite3.connect(path)
         user_id = str(request.user.id)
         cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
         query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
@@ -1248,7 +1257,8 @@ def update_mail_status(request,group_id):
 
         settings_dir = os.path.dirname(__file__)
         PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-        path = os.path.join(PROJECT_ROOT, 'MailClient/')
+        # path = os.path.join(PROJECT_ROOT, 'MailClient/')
+        path = GSTUDIO_MAIL_DIR_PATH + '/'
         path = path + 'mailbox_data/'
         path = path + username
         path = path + '/' + mailboxname
@@ -1337,7 +1347,8 @@ def fetch_mail_body(request,group_id):
         
         settings_dir = os.path.dirname(__file__)
         PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-        path = os.path.join(PROJECT_ROOT, 'MailClient/')
+        # path = os.path.join(PROJECT_ROOT, 'MailClient/')
+        path = GSTUDIO_MAIL_DIR_PATH + '/'
         path = path + 'mailbox_data/'
         path = path + username + '/' + mailboxname
         
@@ -1405,10 +1416,11 @@ def unique_mailbox_name(request,group_id):
         settings_dir1 = os.path.dirname(__file__)
         settings_dir2 = os.path.dirname(settings_dir1)
         settings_dir3 = os.path.dirname(settings_dir2)
-        path = os.path.abspath(os.path.dirname(settings_dir3))
+        # path = os.path.abspath(os.path.dirname(settings_dir3))
+        path = SQLITE3_DB_PATH
                 
         try:
-            conn = sqlite3.connect(path + '/example-sqlite3.db')
+            conn = sqlite3.connect(path)
             cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
             query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
             cursor = conn.execute(query)
@@ -1488,10 +1500,11 @@ def unique_mailbox_id(request,group_id):
         settings_dir1 = os.path.dirname(__file__)
         settings_dir2 = os.path.dirname(settings_dir1)
         settings_dir3 = os.path.dirname(settings_dir2)
-        path = os.path.abspath(os.path.dirname(settings_dir3))
+        # path = os.path.abspath(os.path.dirname(settings_dir3))
+        path = SQLITE3_DB_PATH
                 
         try:
-            conn = sqlite3.connect(path + '/example-sqlite3.db')
+            conn = sqlite3.connect(path)
             cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
             query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
             cursor = conn.execute(query)
