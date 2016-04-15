@@ -143,6 +143,27 @@
   //Upload file action validation ---------------------------------------------------------------
   $(document).on('change','#docFile',function(){
     $(".save_cancel").removeClass("hide");
+    file_mime_type = this.files[0].type;
+    file_name = this.files[0].name;
+    if(file_mime_type.indexOf("image") > -1){
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $('#img_preview')
+          .attr('src', e.target.result)
+          .width(150)
+          .height(200)
+          .removeClass("hide");
+      };
+      reader.readAsDataURL(this.files[0]);
+      $('#file_preview').addClass("hide")
+    }
+    else{
+      $('#img_preview').addClass("hide")
+      $('#file_preview')
+        .text(file_name)
+        .removeClass("hide");
+    }
     /*
     file_mime_type = this.files[0].type;
 

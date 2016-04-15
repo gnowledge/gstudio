@@ -5577,57 +5577,52 @@ def attendees_relations(request,group_id,node):
 
 @get_execution_time        
 def page_scroll(request,group_id,page):
- hyperlinks = request.GET.get("links")
- if hyperlinks:
-  hyperlinks = json.loads(hyperlinks)
- else:
-  hyperlinks = True
+  hyperlinks = request.GET.get("links")
+  if hyperlinks:
+    hyperlinks = json.loads(hyperlinks)
+  else:
+    hyperlinks = True
 
- Group_Activity = node_collection.find(
-        {'group_set':ObjectId(group_id)}).sort('last_update', -1)
- 
- if Group_Activity.count() >=10:
-  paged_resources = Paginator(Group_Activity,10)
- else:
-  paged_resources = Paginator(Group_Activity,Group_Activity.count()) 
- files_list = []
- user_activity = []
- tot_page=paged_resources.num_pages
- if int(page) <= int(tot_page):
+  group_obj = node_collection.find({'group_set':ObjectId(group_id)}).sort('last_update', -1)
+  if group_obj.count() >=10:
+    paged_resources = Paginator(group_obj,10)
+  else:
+    paged_resources = Paginator(group_obj,group_obj.count()) 
+  files_list = []
+  user_activity = []
+  tot_page=paged_resources.num_pages
+  if int(page) <= int(tot_page):
     if int(page)==1:
-       page='1'  
+      page='1'  
     if int(page) != int(tot_page) and int(page) != int(1):
-        page=int(page)+1
+      page=int(page)+1
     # temp. variables which stores the lookup for append method
     user_activity_append_temp=user_activity.append
     files_list_append_temp=files_list.append
     for each in (paged_resources.page(int(page))).object_list:
-            if each.created_by == each.modified_by :
-               if each.last_update == each.created_at:
-                 activity =  'created'
-               else:
-                 activity =  'modified'
-            else:
-               activity =  'created'
-        
-            if each._type == 'Group':
-               user_activity_append_temp(each)
-            each.update({'activity':activity})
-            files_list_append_temp(each)
-            
- else:
-      page=0           
+      if each.created_by == each.modified_by :
+        if each.last_update == each.created_at:
+          activity =  'created'
+        else:
+          activity =  'modified'
+      else:
+        activity =  'created'
+      if each._type == 'Group':
+        user_activity_append_temp(each)
+      each.update({'activity':activity})
+      files_list_append_temp(each)
+  else:
+    page=0           
  
- return render_to_response('ndf/scrolldata.html', 
-                                  { 'activity_list': files_list,
-                                    'group_id': group_id,
-                                    'groupid':group_id,
-                                    'page':page, 'hyperlinks': hyperlinks
-                                    # 'imageCollection':imageCollection
-                                  },
-                                  context_instance = RequestContext(request)
-      )
-
+  return render_to_response('ndf/scrolldata.html', 
+                                { 'activity_list': files_list,
+                                  'group_id': group_id,
+                                  'groupid':group_id,
+                                  'page':page, 'hyperlinks': hyperlinks
+                                # 'imageCollection':imageCollection
+                                },
+                                context_instance = RequestContext(request)
+  )
 
 @login_required
 @get_execution_time

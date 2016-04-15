@@ -236,15 +236,28 @@
           {% get_profile_pic request.user.pk as prof_pic %}
 
           {% if prof_pic %}
-          <a href="{% url 'dashboard' request.user.pk %}">
-            <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
-            {{ user.username }}
-          </a>
+            {% if site.ENABLE_USER_DASHBOARD %}
+              <a href="{% url 'dashboard' request.user.pk %}">
+                <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
+                {{ user.username }}
+              </a>
+            {% else %}
+              <a>
+                <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
+                {{ user.username }}</a>
+            {% endif %}
 
           {% else %}
-          <a class="user" href="{% url 'dashboard' request.user.pk %}">
-            {{ user.username }}
-          </a>
+          {% if site.ENABLE_USER_DASHBOARD %}
+            <a class="user" href="{% url 'dashboard' request.user.pk %}">
+              {{ user.username }}
+            </a>
+          {% else %}
+            <a class="user">
+              {{ user.username }}
+            </a>
+          {% endif %}
+
           {% endif %}
           {% endcache %}
 
