@@ -1,6 +1,5 @@
 Prerequisite:
-	git pull origin mongokit
-	python manage.py movedb
+	python manage.py movedb (One-time command)
 	git pull origin alpha
 
 Step 1:
