@@ -24,15 +24,15 @@
     <div class="small-12 medium-4 columns">
       <div class="course-highlight">
         <i class="fa fa-list"></i>
-        <span>{{group_object.collection_set|length}}</span>
+        <span>{{group_object.collection_set|length}} Module{{group_object.collection_set|length|pluralize}}</span>
       </div>
       <div class="course-highlight">
         <i class="fa fa-clock-o"></i>
-        <span>{{weeks_count}} weeks</span>
+        <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
       </div>
       <div class="course-highlight">
         <i class="fa fa-user"></i>
-        <span>{{group_object.author_set|length}} students enrolled</span>
+        <span>{{group_object.author_set|length}} student{{group_object.author_set|length|pluralize}} enrolled</span>
       </div>
     </div>
   </div>
