@@ -46,6 +46,12 @@
                       {% endif %}
                     {% endfor %}
                   {% endif %}
+                {% elif "File" in i.member_of_names_list %}
+                  {% if i.activity == "created" %}
+                    {% trans "uploaded" %}
+                  {% else %}
+                    {{i.activity}}
+                  {% endif %}
                 {% else %}
                   {{i.activity}}
                 {% endif %}
