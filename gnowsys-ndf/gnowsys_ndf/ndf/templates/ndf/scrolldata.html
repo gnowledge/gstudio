@@ -1,4 +1,5 @@
 {% load ndf_tags %}
+{% load i18n %}
 {% if page != 0  %}
 <style>
 .largesize{
@@ -17,7 +18,7 @@
 
 {% for i in activity_list %}
   {% get_url i.pk as res_type %}
-   {% if res_type != "None" %}
+   {% if res_type != "None" or "Reply" in i.member_of_names_list %}
    
    <div class="container-div  selFile" style="height:50px; background-color:#f7fcfb;">
     <div id="top_list"  style="position:relative; top:15px;" title="{{i.created_at|timesince}} ago" >
@@ -32,7 +33,23 @@
       {% endif %}      
 
       <div id="action" style=" position:relative; left:7.5%; float:left;">
-           has  {{i.activity}}
+           has  {% if "Reply" in i.member_of_names_list %}
+
+                  {% trans "commented" %}
+                  {% if i.origin %}
+                    {% for each_origin_field in i.origin %}
+                      {% if "prior_node_id_of_thread" in each_origin_field %}
+                        {% get_node each_origin_field.prior_node_id_of_thread as prior_node_obj %}
+                        {% if prior_node_obj %}    
+                          {% trans " on " %}{{prior_node_obj.name}}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                {% else %}
+                  {{i.activity}}
+                {% endif %}
+
       </div> 
       {% if hyperlinks %}
         <div id="create_type"  style=" position:relative; left:8%; word-wrap:break-word; width:auto; float:left;" >
@@ -47,7 +64,7 @@
 
       {% else %}
         <div id="create_type"  style=" position:relative; left:8%; word-wrap:break-word; width:50%; overflow: hidden; text-overflow: ellipsis; ; float:left;" >
-          {{i.name}}
+          {% if "Reply" not in i.member_of_names_list %} {{i.name}}{% endif %}
         </div>
 
       {% endif %}
