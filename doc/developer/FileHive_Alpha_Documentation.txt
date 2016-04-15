@@ -3,10 +3,12 @@ Prerequisite:
 	git pull origin alpha
 
 Step 1:
-	pip install -r requirements.txt
+	pip install -r ../requirements.txt
 
 Step 2: Update local_settings.py file with following variables:
 	MEDIA_ROOT = '/data/media/'
+	GSTUDIO_DATA_ROOT = os.path.join('/data/')
+
 	GSTUDIO_LOGS_DIRNAME = 'gstudio-logs'
 	GSTUDIO_LOGS_DIR_PATH = os.path.join('/data/', GSTUDIO_LOGS_DIRNAME)
 
