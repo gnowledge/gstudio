@@ -2067,7 +2067,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                                         '$or': [
                                                 {'member_of': GST_FILE._id},
                                                 {
-                                                    'collection_set': {'$exists': "true" },
+                                                    'collection_set': {'$exists': "true",'$not': {'$size': 0} },
                                                     'member_of': GST_PAGE._id,
                                                 }
                                             ],
@@ -2212,7 +2212,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                         '$or': [
                                                 {'member_of': GST_FILE._id},
                                                 {
-                                                    'collection_set': {'$exists': "true" },
+                                                    'collection_set': {'$exists': "true",'$not': {'$size': 0} },
                                                     'member_of': GST_PAGE._id,
                                                 }
                                             ],
