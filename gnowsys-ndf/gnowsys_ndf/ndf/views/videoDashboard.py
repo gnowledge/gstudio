@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
-
+import json 
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -202,6 +202,7 @@ def video_edit(request,group_id,_id):
     video_obj=request.GET.get("vid_id","")
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     ce_id = request.GET.get('course_event_id')
+    course_tab_title = request.POST.get("course_tab_title",'')
     res = request.GET.get('res')
 
     if request.method == "POST":
@@ -209,9 +210,11 @@ def video_edit(request,group_id,_id):
         # get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
         vid_node.save(is_changed=get_node_common_fields(request, vid_node, group_id, GST_VIDEO),groupid=group_id)
         thread_create_val = request.POST.get("thread_create",'')
+        course_tab_title = request.POST.get("course_tab_title",'')
         # help_info_page = request.POST.getlist('help_info_page','')
         help_info_page = request.POST['help_info_page']
-        help_info_page = json.loads(help_info_page)
+        if help_info_page:
+            help_info_page = json.loads(help_info_page)
         
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
@@ -257,8 +260,15 @@ def video_edit(request,group_id,_id):
             create_grelation_list(vid_node._id,"assesses",assesses_list)
             return HttpResponseRedirect(reverse('video_detail', kwargs={'group_id': group_id, '_id': vid_node._id}))
         else:
-            url = "/"+ str(group_id) +"/?selected="+str(vid_node._id)+"#view_page"
-            return HttpResponseRedirect(url)
+            vid_node.status = u"PUBLISHED"
+            vid_node.save()
+            if course_tab_title:
+                if course_tab_title == "raw material":
+                    course_tab_title = "raw_material"
+                return HttpResponseRedirect(reverse('course_'+course_tab_title + '_detail', kwargs={'group_id': group_id, 'node_id': str(img_node._id)}))
+            return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
+            # url = "/"+ str(group_id) +"/?selected="+str(vid_node._id)+"#view_page"
+            # return HttpResponseRedirect(url)
 
     else:
         vid_col = node_collection.find({'member_of': GST_VIDEO._id,'group_set': ObjectId(group_id)})
@@ -273,7 +283,7 @@ def video_edit(request,group_id,_id):
                                     'video_obj':video_obj,
                                     'nodes_list':nodes_list,
                                     'ce_id': ce_id,
-                                    'res': res
+                                    'res': res, 'course_tab_title':course_tab_title
                                 },
                                   context_instance=RequestContext(request)
                               )

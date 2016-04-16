@@ -6,6 +6,12 @@
     .image-details .tabs .tab-title{
         width: 25% !important;
     }
+    .tab-title > a{
+        font-size: 0.80rem !important;
+    }
+    .lbl_of_tag{
+        background-color: gold !important;
+    }
 </style>
 <!--<style type="text/css">
     .gmodal-item-panel .text-gray{
@@ -87,6 +93,24 @@
                         <h5>{% firstof node.altnames node.name %}</h5>
                     </div>
                 </div>
+                {% if node.tags %}
+                    <div class="row tag-rating-div">
+                            {% for tag in node.tags %}
+                                {% if forloop.counter < 3 %}
+                                    <small><label class="lbl_of_tag label">
+                                {% else %}
+                                    <small><label class="lbl_of_tag label tag_ele hide">
+                                {% endif %}
+                                <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
+                            {% endfor %}
+                            {% if node.tags|length > 2 %}
+                                <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
+                            {% endif %} 
+                    </div>
+                {% else %}
+                    <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
+                {% endif %}
+
                 <div class="row image-brief">
                     <div class="small-12 columns">
                         {% include "ndf/analytics_views.html" %}
@@ -110,7 +134,7 @@
                         {% get_edit_url node.pk as edit_url %}
                         {% check_is_gstaff group_id request.user as is_gstaff %}
                         {% if is_gstaff or node.created_by == request.user.id %}
-                            <a href="{% url edit_url group_id node.pk %}">
+                            <a href="{% url edit_url group_id node.pk %}?course_tab_title={{title}}">
                                 <i class="fi-page-edit" ></i>Edit
                             </a>
                         {% endif %}
@@ -175,6 +199,17 @@ $(".view-info-close").click(function(){
     $(".rating-area").show();
     $(".comments-area").show();
 });
+
+$(document).on('click','.view-more-tags',function(){
+    if($(this).text()=="Less"){
+        $(".tag_ele").addClass("hide")
+        $(this).text("More")
+    }
+    else{
+        $(".tag_ele").removeClass("hide")
+        $(this).text("Less")
+    }
+})
 
 </script>
 
