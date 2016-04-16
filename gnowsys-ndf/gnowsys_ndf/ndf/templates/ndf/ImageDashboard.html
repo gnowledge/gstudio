@@ -90,8 +90,7 @@
 <script type="text/javascript">
   $(function() {
      $("input:file").change(function (){
-       var fileName = $(this).val();
-       $(".filename").html(fileName);
+       $(".save_cancel").css("display","block")
      });
   });
 </script>
@@ -127,7 +126,8 @@ Image Gallery
                                 <span>Upload File</span>
                                 <input type="file" name="filehive" id="docFile" style="display: none;" multiple/>
                             </label>
-                            <div class="save_cancel hide">
+                            <br><br>
+                            <div class="save_cancel" style="display:none">
                               <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
                               <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
                             </div>
