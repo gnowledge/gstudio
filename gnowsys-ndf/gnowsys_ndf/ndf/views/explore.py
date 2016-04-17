@@ -58,7 +58,13 @@ def explore_courses(request):
 
     title = 'courses'
 
-    ce_cur = node_collection.find({'member_of': ce_gst._id}).sort('last_update', -1)
+    ce_cur = node_collection.find({'member_of': ce_gst._id,
+                                        '$or': [
+                                          {'created_by': request.user.id}, 
+                                          {'group_admin': request.user.id},
+                                          {'author_set': request.user.id},
+                                          {'group_type': 'PUBLIC'} 
+                                          ]}).sort('last_update', -1)
 
     context_variable = {'title': title, 'doc_cur': ce_cur, 'card': 'ndf/event_card.html',
                         'group_id': group_id, 'groupid': group_id}
