@@ -125,12 +125,16 @@
                         </span>
                     </div>
                 </div>
+                
                 <div class="row image-actions">
                     <div class="small-12 columns">
-                        <a href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}"><i class="fa fa-arrow-circle-down"></i>&nbsp;Download</a>
+                    {% if not node.collection_set %}
+                    {% get_download_filename node as download_filename %}
+                        <a href="{% url 'read_file' group_name node download_filename %}" download="{{ download_filename }}"><i class="fa fa-arrow-circle-down"></i>&nbsp;Download</a>
                         {% comment %}
                         <a><i class="fa fa-pencil"></i>&nbsp;Create Note</a>
                         {% endcomment %}
+                    {% endif %}
                         {% get_edit_url node.pk as edit_url %}
                         {% check_is_gstaff group_id request.user as is_gstaff %}
                         {% if is_gstaff or node.created_by == request.user.id %}
