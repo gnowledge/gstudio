@@ -409,9 +409,9 @@
 
                   cell1.innerHTML = "<span>"+each_student_dict['username']+"</span>";
                   cell2.innerHTML = each_student_dict['users_points'];
-                  cell3.innerHTML = generate_points_bar(each_student_dict['users_points_breakup']['Interactions'], "Interactions")
-                  cell4.innerHTML = generate_points_bar(each_student_dict['users_points_breakup']['Files'], "Files")
-                  cell5.innerHTML = generate_points_bar(each_student_dict['users_points_breakup']['Notes'], "Notes")
+                  cell3.innerHTML = generate_points_bar(each_student_dict['users_points_breakup']['Interactions'], "Interactions",each_student_dict['users_points'])
+                  cell4.innerHTML = generate_points_bar(each_student_dict['users_points_breakup']['Files'], "Files",each_student_dict['users_points'])
+                  cell5.innerHTML = generate_points_bar(each_student_dict['users_points_breakup']['Notes'], "Notes",each_student_dict['users_points'])
               })
 
                 $(".group-analytics").removeClass("hide")
@@ -419,14 +419,14 @@
             },
         });//end of ajax
     })
-    function generate_points_bar(data_for_bars, bar_name){
-      if(data_for_bars){
+    function generate_points_bar(data_for_bars, bar_name, total_user_points){
+      if(data_for_bars && total_user_points){
 
       var outer_div = document.createElement("div");
       outer_div.className = "progress small-12 large-12"
       var span_ele = document.createElement("span");
       span_ele.className = "meter"
-      span_ele.style.width = data_for_bars + "%"
+      span_ele.style.width = (data_for_bars/total_user_points)*100 + "%"
       if (bar_name == "Interactions"){
         bg_color_val = "#ffe694"
       }
