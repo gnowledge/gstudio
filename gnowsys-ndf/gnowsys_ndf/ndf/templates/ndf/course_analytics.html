@@ -2,7 +2,7 @@
   <script src="/static/ndf/bower_components/pace/pace.js"></script>
   <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
 <style type="text/css">
-  
+
   .rating-stars {
     background-image:url("/static/ndf/images/stars.png");
     height: 17px;
@@ -138,7 +138,7 @@
                     <div class="columns small-6 medium-6 rating-stars"></div>
                     <div class="columns small-6 medium-6 rating_lbl left"></div>
                   </div>
-                  
+
                 </span>
               </div>
               {% endcomment %}
@@ -268,48 +268,71 @@
         </div>
 
       </div>
+      <div class="row course-students-data">
+        <div class="small-12 medium-4 columns">
+          Points table for students
+        </div>
+        <div class="small-12 medium-8 columns students-table-legends">
+          <span class=" badge yellow">&nbsp;</span>
+          <span>Interations</span>
+          <span class=" badge green">&nbsp;</span>
+          <span>Gallery uploads</span>
+          <span class=" badge">&nbsp;</span>
+          <span>Note Making</span>
+          <span class=" badge red">&nbsp;</span>
+          <span>Quiz Performance</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-12 columns">
+          <table class="student-overview-table">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Total Points</th>
+                <th colspan=4>Points Breakup</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <i class="fa fa-user"></i>
+                  <span>Fluffy Apple</span>
+                </td>
+                <td>346</td>
+                <td>
+                  <div class="progress small-12 large-12">
+                    <span class="meter" style="width: 20%; background-color: #ffe694;"></span>
+                    <span class="pull-left merter-val">20</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="progress small-12 large-12">
+                    <span class="meter secondary " style="width: 40%;background-color: #b5d8a6;"></span>
+                    <span class="pull-left merter-val">40</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="progress small-12 large-12">
+                    <span class="meter secondary " style="width: 70%;background-color: #9ec4fa;"></span>
+                    <span class="pull-left merter-val">70</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="progress small-12 large-12">
+                    <span class="meter secondary " style="width: 60%;background-color: #d6a5bd;"></span>
+                    <span class="pull-left merter-val">60</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 </div>
 
 
-              {% comment %}
-              <div class="row course-students-data">
-                <div class="small-12 medium-4 columns">
-                  Points table for students
-                </div>
-                <div class="small-12 medium-8 columns students-table-legends">
-                  <span class=" badge yellow">&nbsp;</span>
-                  <span>Interations</span>
-                  <span class=" badge green">&nbsp;</span>
-                  <span>Gallery uploads</span>
-                  <span class=" badge">&nbsp;</span>
-                  <span>Note Making</span>
-                  <span class=" badge red">&nbsp;</span>
-                  <span>Quiz Performance</span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="small-12 columns">
-                  <table class="student-overview-table">
-                    <thead>
-                      <tr>
-                        <th>Student Name</th>
-                        <th>Total Points</th>
-                        <th>Points Breakup</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>
-                          <i class="fa fa-user"></i>
-                          <span>Fluffy Apple</span>
-                        </td>
-                        <td>346</td>
-                        <td>Bars</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              {% endcomment %}
+
+
 
 
 </div>
@@ -484,13 +507,13 @@
 
   function loaddata() {
     // $('#course-notification').unbind();
-    
+
         $.ajax({
             url: "{% url 'page_scroll' groupid 'counter' %}".replace("counter", counter),
             type: "GET",
             data:{'links': false},
             datatype: "json",
-            global: false, 
+            global: false,
             beforeSend: function(){
                 $("#course-notification").append("<label class='loading_lbl'>Loading...</label>");
             },
@@ -502,11 +525,11 @@
                 }
 
                 else{
-                    if(morecount ==0) { 
+                    if(morecount ==0) {
                         $("#course-notification").append("<h6>  No more data to show </h6>");
                         morecount = morecount+1;
                         counter = 2;
-                    } 
+                    }
                 }
             }
         });

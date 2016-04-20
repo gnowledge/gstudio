@@ -184,6 +184,9 @@ pre{
 // }
 // }
 
+.progress .meter {
+  float: left;
+}
 
 // ------| following style lines were there in _metastudio_styles.scss |------
 
@@ -2070,7 +2073,7 @@ $course-envelop-color: #fff;
       bottom: 0px;
       height: $course-envelop-height;
       img {
-        width: 100%;
+        width: auto;
         height: $course-envelop-height;
       }
     }
@@ -2421,7 +2424,12 @@ $course-envelop-color: #fff;
     margin: 15px 0px;
 
     tr {
-      border: 1px solid #ccc;
+      border: none;
+    }
+    .progress {
+      .merter-val {
+        margin-left: 5px;
+      }
     }
   }
   /*.about-course-heading {
