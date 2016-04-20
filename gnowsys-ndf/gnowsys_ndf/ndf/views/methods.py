@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response  # , render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.cache import cache
 
@@ -26,6 +26,11 @@ from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
+# get pub of gpg key with which to sign syncdata attachments
+from gnowsys_ndf.settings import SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH
+
+#to display error template if non existent pub is given in settings.py
+from django.shortcuts import render
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
@@ -38,6 +43,9 @@ import ast
 import string
 import json
 import locale
+import pymongo
+from bson import BSON
+from bson import json_util
 import multiprocessing as mp 
 from datetime import datetime, timedelta, date
 # import csv
@@ -48,14 +56,15 @@ col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
-theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
+theme_item_GST = node_collection.one(
+    {'_type': 'GSystemType', 'name': 'theme_item'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
-
 grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
 ins_objectid = ObjectId()
+
 
 def get_execution_time(f):
    if BENCHMARK == 'ON': 
@@ -123,16 +132,201 @@ def get_execution_time(f):
 	        benchmark_node.save()
 	        return ret
    if BENCHMARK == 'ON': 
-    	return wrap
+        return wrap
    if BENCHMARK == 'OFF':
         return f
 
+import json
+import bson
+import shutil
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.core.mail import EmailMessage
+
+def server_sync(func):
+    def wrap(*args, **kwargs):
+        ret = func(*args, **kwargs)
+
+        
+        #do a regex check on SYNCDATA_KEY_PUB, if it contains anything other than letters and nos DONOT run the subprocess.call()
+        # function as this can be a potential security LOOPHOLE
+        #if pub is found to be invalid changes WILL NOT be captured
+        searchObj = re.search( r'[^A-Za-z0-9]', SYNCDATA_KEY_PUB, re.M|re.I)
+        if searchObj:
+            print "Invalid character found in SYNCDATA_KEY_PUB. Please ensure valid existing PUB has been added to local_settings.py", searchObj.group()
+            return            
+        
+        check_command = 'gpg --list-keys | grep -o "'+SYNCDATA_KEY_PUB+'"'
+        std_out= subprocess.call([check_command],shell=True)
+        #code to check if SYNCDATA_KEY_PUB in local settings.py is a pub which is present in the gpg database of the system
+        #if not, change WILL NOT be captured
+        #std_out will have shell command return code =0 (success) 1 (failure)
+        if str(std_out) == '1':
+            error_obj =  "Given pub = %s is not in gpg database of your system. Failed to capture changes for syncdata" % SYNCDATA_KEY_PUB
+            print '**'*30
+            print '\n'*3
+            print error_obj
+            print '\n'*3
+            print '**'*30
+            return
+
+        ''' Get current date and time to timestamp json and the document being captured by this function.
+         This done so that files in syncdata folder will have unique name'''
+        #timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_") + "_" + str(datetime.now().microsecond)
+        timestamp = kwargs['time']
+
+        ''' To fetch the data about the node '''
+        # the actual file
+        file_data = kwargs['file_data'] 
+        # the node file
+        node = kwargs['file_object'] 
+        # content-type of the file
+        content_type = kwargs['content_type'] 
+
+        ''' path where the json file that contains the information about node is located ''' 
+        settings_dir1 = os.path.dirname(__file__)
+        settings_dir2 = os.path.dirname(settings_dir1)
+        settings_dir3 = os.path.dirname(settings_dir2)
+        gen_path = os.path.abspath(os.path.dirname(settings_dir3))
+
+        print '+' * 20
+        print gen_path
+
+        file_path = ""
+        file_name_filtered = ""
+        if file_data:
+            file_name_filtered = file_data.name
+            special_char = ['!','?','$','%','$','#','&','*','(',')','   ','|',';','\"','<','>','~','`','[',']','{','}',' ']
+            for i in special_char:
+                file_name_filtered = file_name_filtered.replace(i,'')
+            file_path = gen_path + '/' + str(file_name_filtered)
+        
+        node_data_path = gen_path + '/node_data.json'
+        # subject += str(node._id)
+        
+        print '+' * 20
+        print node_data_path
+
+        if 'image' in content_type or 'video' in content_type:
+            # To make the fs_file_ids filed set empty
+            if file_data:
+                node.fs_file_ids = []
+                # pass the image data as attachment
+                file_data.seek(0)
+                # path = default_storage.save(file_path, ContentFile(file_data.read()))
+                with open(file_path,'wb+') as outfile:
+                    outfile.write(file_data.read())
+            
+
+        else:
+            #the other documents which need only the json data to be sent
+            if file_data:
+                node.fs_file_ids = []
+                file_data.seek(0)
+                file_path = gen_path + '/' + str(file_name_filtered)
+                # path = default_storage.save(file_path, ContentFile(file_data.read()))
+                with open(file_path,'wb+') as outfile:
+                    outfile.write(file_data.read())
+        
+        ''' Code to sign the document file, prefix timestamp to document file name and move it to syncdata folder '''
+        path1 = os.path.dirname(__file__)
+        path2 = os.path.dirname(path1)
+        
+        settings_dir = os.path.dirname(__file__)
+        PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+        # path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
+        path_MailClient = GSTUDIO_MAIL_DIR_PATH
+        
+        if not os.path.exists(path_MailClient):
+            os.makedirs(path_MailClient)
+        
+        p1 = path_MailClient + '/syncdata/'
+        
+        if not os.path.exists(p1):
+            os.makedirs(p1)
+        
+        p1 = path_MailClient + '/sent_syncdata_files/'
+        
+        if not os.path.exists(p1):
+            os.makedirs(p1)
+
+        dst = str(path2) + "/MailClient/syncdata"
+
+        print '+' * 20
+        print dst
+
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        path_for_this_capture = dst + '/' + timestamp +"_"+ str(node["_id"])
+        
+        print '+' * 20
+        print path_for_this_capture
+
+        if not os.path.exists(path_for_this_capture):
+            os.makedirs(path_for_this_capture)
+
+        if file_data:
+            
+            # '.gpg' in output file name is later used to split the filename and obtain original file name in received attachments in 
+            # 'server_sync()' function of mailclient.py views file
+            
+            #make filename.extension --> filename_extension since finally the name should be filename_extension.gpg
+            op_file_name = file_path.split(file_name_filtered)[0]+ timestamp + '_' + file_name_filtered + '_sig'
+            print ':' * 20
+            print op_file_name
+            print ':' * 20
+            print file_path
+            command = 'gpg -u ' + SYNCDATA_KEY_PUB + ' --output ' + op_file_name + ' --sign ' + file_path
+            subprocess.call([command],shell=True)
+            src = op_file_name
+
+            print '+' * 20
+           
+            shutil.move(src,path_for_this_capture)
+            # mail.attach_file(file_path)         
+        
+        print 'JSON'
+        node_json = bson.json_util.dumps(node)
+        print "creating the file",node['_id']
+        with open(node_data_path,'w') as outfile:
+            json.dump(node_json, outfile)
+        ''' Run command to sign the json file, rename and move to syncdata folder'''
+        #add _sig otherwise django_mailbox scrambles file name
+        json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
+        print os.path.exists(node_data_path)
+        command = 'gpg --batch --yes -u ' + SYNCDATA_KEY_PUB + ' --output ' + json_op_file_name + ' --sign ' + node_data_path
+        subprocess.call([command],shell=True)
+        src = json_op_file_name
+        shutil.move(src,path_for_this_capture)
+        # mail.attach_file(json_op_file_name)
+        
+        # mail.attach_file(node_data_path)
+        # mail.subject = subject + str(node._id)
+        #mail.send()
+        if os.path.exists(node_data_path):
+            os.remove(node_data_path)
+        # os.remove(json_op_file_name)
+        if file_data:
+            os.remove(file_path)
+            # os.remove(op_file_name)
+        return ret
+        print "opertation finish"
+    return wrap
+
+@get_execution_time
+@server_sync
+def capture_data(file_object=None, file_data=None, content_type=None,time=None):
+    '''
+    Serves as an itermediate function to capture the node details and allow
+    the decorator to send the created/updated node through E-Mail
+    '''
+    pass
 
 @get_execution_time
 def get_group_name_id(group_name_or_id, get_obj=False):
     '''
       - This method takes possible group name/id as an argument and returns (group-name and id) or group object.
-      
+
       - If no second argument is passed, as method name suggests, returned result is "group_name" first and "group_id" second.
 
       - When we need the entire group object, just pass second argument as (boolian) True. In the case group object will be returned.  
@@ -177,14 +371,15 @@ def get_group_name_id(group_name_or_id, get_obj=False):
                 return group_obj
             else:
                 # setting cache with both ObjectId and group_name
-                cache.set(cache_key, (group_name, group_id), 60*60)
+                cache.set(cache_key, (group_name, group_id), 60 * 60)
                 cache_key = u'get_group_name_id_' + slugify(group_name)
-                cache.set(cache_key, (group_name, group_id), 60*60)
+                cache.set(cache_key, (group_name, group_id), 60 * 60)
                 return group_name, group_id
 
     # case-2: argument - "group_name_or_id" is group name
     else:
-        group_obj = node_collection.one({"_type": {"$in": ["Group", "Author"] }, "name": unicode(group_name_or_id)})
+        group_obj = node_collection.one(
+            {"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_name_or_id)})
 
         # checking if group_obj is valid
         if group_obj:
@@ -216,7 +411,7 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
    try:
            usr=request.user.id
            task_node = collection.GSystem()
-           GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'}) 	
+           GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})     
            grp=collection.Node.one({'_id':ObjectId(group_id)})
            if not grp:
                    return
@@ -286,7 +481,7 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
                                                    else:
                                                            newattribute.object_value = unicode(task_dict[str(each)])
                                            newattribute.save()
-                   if task_dict['Assignee'] :	
+                   if task_dict['Assignee'] :   
                             activ="task reported"
                             msg="Task -"+task_node.name+"- has been reported by "+"\n     - Status: "+task_dict['Status']+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
                             bx=User.objects.get(id=task_dict['Assignee'])
@@ -381,29 +576,30 @@ def check_if_moderated_group(group_id):
 
 
 def check_delete(main):
-  try:
+    try:
 
+        def check(*args, **kwargs):
+            relns = ""
+            node_id = kwargs['node_id']
+            ins_objectid = ObjectId()
+            if ins_objectid.is_valid(node_id):
+                node = node_collection.one({'_id': ObjectId(node_id)})
+                relns = node.get_possible_relations(node.member_of)
+                attrbts = node.get_possible_attributes(node.member_of)
+                return main(*args, **kwargs)
+            else:
+                print "Not a valid id"
+        return check
+    except Exception as e:
+        print "Error in check_delete " + str(e)
 
-    def check(*args, **kwargs):
-      relns=""
-      node_id=kwargs['node_id']
-      ins_objectid  = ObjectId()
-      if ins_objectid.is_valid(node_id) :
-        node = node_collection.one({'_id': ObjectId(node_id)})
-        relns=node.get_possible_relations(node.member_of)
-        attrbts=node.get_possible_attributes(node.member_of)
-        return main(*args, **kwargs)
-      else:
-        print "Not a valid id"
-    return check 
-  except Exception as e:
-    print "Error in check_delete "+str(e)
 
 @get_execution_time
 def get_all_resources_for_group(group_id):
-  if ins_objectid.is_valid(group_id):
-    obj_resources = node_collection.find({'$and': [{'$or': [{'_type': 'GSystem'}, {'_type': 'File'}]}, {'group_set': {'$all': [ObjectId(group_id)]}}, {'member_of': {'$nin': [grp_st._id]}}]})
-    return obj_resources
+    if ins_objectid.is_valid(group_id):
+        obj_resources = node_collection.find({'$and': [{'$or': [{'_type': 'GSystem'}, {'_type': 'File'}]}, {
+                                             'group_set': {'$all': [ObjectId(group_id)]}}, {'member_of': {'$nin': [grp_st._id]}}]})
+        return obj_resources
 
 
 @get_execution_time
@@ -434,9 +630,9 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
     gapps_list = GSTUDIO_DEFAULT_GAPPS_LIST
 
     if not gapps_list or not default_gapp_listing:
-        # If GSTUDIO_DEFAULT_GAPPS_LIST not set (i.e. empty)
-        # Or we need to setup list for selection purpose of GAPPS
-        # for a group
+                # If GSTUDIO_DEFAULT_GAPPS_LIST not set (i.e. empty)
+                # Or we need to setup list for selection purpose of GAPPS
+                # for a group
         gapps_list = GSTUDIO_WORKING_GAPPS
 
         # If already_selected_gapps is non-empty,
@@ -479,139 +675,147 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
 
 
 @get_execution_time
-def forum_notification_status(group_id,user_id):
-  """Checks forum notification turn off for an author object
-  """
-  try:
-    grp_obj = node_collection.one({'_id': ObjectId(group_id)})
-    auth_obj = node_collection.one({'_id': ObjectId(user_id)})
-    at_user_pref = node_collection.one({'$and': [{'_type': 'AttributeType'}, {'name': 'user_preference_off'}]})
-    list_at_pref=[]
-    if at_user_pref:
-      poss_attrs=auth_obj.get_possible_attributes(at_user_pref._id)
-      if poss_attrs:
-        if 'user_preference_off' in poss_attrs:
-          list_at_pref=poss_attrs['user_preference_off']['object_value']
-        if grp_obj in list_at_pref:
-          return False
-        else:
-          return True
-    return True
-  except Exception as e:
-    print "Exception in forum notification status check "+str(e)
+def forum_notification_status(group_id, user_id):
+    """Checks forum notification turn off for an author object
+    """
+    try:
+        grp_obj = node_collection.one({'_id': ObjectId(group_id)})
+        auth_obj = node_collection.one({'_id': ObjectId(user_id)})
+        at_user_pref = node_collection.one(
+            {'$and': [{'_type': 'AttributeType'}, {'name': 'user_preference_off'}]})
+        list_at_pref = []
+        if at_user_pref:
+            poss_attrs = auth_obj.get_possible_attributes(at_user_pref._id)
+            if poss_attrs:
+                if 'user_preference_off' in poss_attrs:
+                    list_at_pref = poss_attrs[
+                        'user_preference_off']['object_value']
+                if grp_obj in list_at_pref:
+                    return False
+                else:
+                    return True
+        return True
+    except Exception as e:
+        print "Exception in forum notification status check " + str(e)
 
 
 @get_execution_time
 def get_forum_repl_type(forrep_id):
-  forum_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': GAPPS[5]}]})
-  obj = node_collection.one({'_id': ObjectId(forrep_id)})
-  if obj:
-    if forum_st._id in obj.member_of:
-      return "Forum"
+    forum_st = node_collection.one(
+        {'$and': [{'_type': 'GSystemType'}, {'name': GAPPS[5]}]})
+    obj = node_collection.one({'_id': ObjectId(forrep_id)})
+    if obj:
+        if forum_st._id in obj.member_of:
+            return "Forum"
+        else:
+            return "Reply"
     else:
-      return "Reply"
-  else:
-    return "None"
+        return "None"
 
 
 @get_execution_time
 def check_existing_group(group_name):
-  if type(group_name) == 'unicode':
-    colg = node_collection.find({'_type': u'Group', "name": group_name})
-    if colg.count()>0:
-      return True
-    if ins_objectid.is_valid(group_name):    #if group_name holds group_id
-      colg = node_collection.find({'_type': u'Group', "_id": ObjectId(group_name)})
-    if colg.count()>0:
-      return True
+    if type(group_name) == 'unicode':
+        colg = node_collection.find({'_type': u'Group', "name": group_name})
+        if colg.count() > 0:
+            return True
+        if ins_objectid.is_valid(group_name):  # if group_name holds group_id
+            colg = node_collection.find(
+                {'_type': u'Group', "_id": ObjectId(group_name)})
+        if colg.count() > 0:
+            return True
+        else:
+            colg = node_collection.find(
+                {'_type': {'$in': ['Group', 'Author']}, "_id": ObjectId(group_name)})
+            if colg.count() > 0:
+                return True
     else:
-      colg = node_collection.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
-      if colg.count()>0:
-        return True      
-  else:
-    if ins_objectid.is_valid(group_name):     #if group_name holds group_id
-      colg = node_collection.find({'_type': u'Group', "_id": ObjectId(group_name)})
-      if colg.count()>0:
-        return True
-      colg = node_collection.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
-      if colg.count()>0:
+        if ins_objectid.is_valid(group_name):  # if group_name holds group_id
+            colg = node_collection.find(
+                {'_type': u'Group', "_id": ObjectId(group_name)})
+            if colg.count() > 0:
+                return True
+            colg = node_collection.find(
+                {'_type': {'$in': ['Group', 'Author']}, "_id": ObjectId(group_name)})
+            if colg.count() > 0:
+                return True
+        else:
+            colg = node_collection.find(
+                {'_type': {'$in': ['Group', 'Author']}, "_id": group_name._id})
+    if colg.count() >= 1:
         return True
     else:
-      colg = node_collection.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
-  if colg.count() >= 1:
-    return True
-  else:
-    return False
-
+        return False
 
 
 @get_execution_time
 def filter_drawer_nodes(nid, group_id=None):
-  page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
-  file_gst = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
-  Pandora_video_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Pandora_video'})
-  quiz_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Quiz'})
-  quizItem_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItem"})
-  query = None
+    page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
+    file_gst = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
+    Pandora_video_gst = node_collection.one(
+        {'_type': 'GSystemType', 'name': 'Pandora_video'})
+    quiz_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Quiz'})
+    quizItem_gst = node_collection.one(
+        {'_type': "GSystemType", 'name': "QuizItem"})
+    query = None
 
-  if group_id:
-    query = {'_type': {'$in': ['GSystem', 'File']}, 'group_set': ObjectId(group_id), 
-                'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in':[ObjectId(nid)]},
-                'member_of': {'$in': [page_gst._id,file_gst._id,Pandora_video_gst._id,quiz_gst._id,quizItem_gst._id] }
-            }
+    if group_id:
+        query = {'_type': {'$in': ['GSystem', 'File']}, 'group_set': ObjectId(group_id),
+                 'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in': [ObjectId(nid)]},
+                 'member_of': {'$in': [page_gst._id, file_gst._id, Pandora_video_gst._id, quiz_gst._id, quizItem_gst._id]}
+                 }
 
-  else:
-    query = {'_type': {'$in': ['GSystem', 'File']},'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in':[ObjectId(nid)]},
-            'member_of': {'$in': [page_gst._id,file_gst._id,Pandora_video_gst._id,quiz_gst._id,quizItem_gst._id] }
-            }                   
+    else:
+        query = {'_type': {'$in': ['GSystem', 'File']}, 'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in': [ObjectId(nid)]},
+                 'member_of': {'$in': [page_gst._id, file_gst._id, Pandora_video_gst._id, quiz_gst._id, quizItem_gst._id]}
+                 }
 
-  nodes = node_collection.find(query)
+    nodes = node_collection.find(query)
 
-  # Remove parent nodes in which current node exists
+    # Remove parent nodes in which current node exists
 
-  
-  def filter_nodes(parents, group_id=None):  
-    length = []
-    if parents:
-      length.extend(parents)
+    def filter_nodes(parents, group_id=None):
+        length = []
+        if parents:
+            length.extend(parents)
 
-      inner_parents = []
-      for each in parents:
-        if group_id:
-          query = {'_type': {'$in': ['GSystem', 'File']}, 'group_set': ObjectId(group_id), 
-                    'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in':[ObjectId(each)]},
-                    'member_of': {'$in': [page_gst._id,file_gst._id,Pandora_video_gst._id,quiz_gst._id,quizItem_gst._id] }
-                  }
-        else:
-          query = {'_type': {'$in': ['GSystem', 'File']},
-                    'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in':[ObjectId(each)]},
-                    'member_of': {'$in': [page_gst._id,file_gst._id,Pandora_video_gst._id,quiz_gst._id,quizItem_gst._id] }
-                  }
+            inner_parents = []
+            for each in parents:
+                if group_id:
+                    query = {'_type': {'$in': ['GSystem', 'File']}, 'group_set': ObjectId(group_id),
+                             'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in': [ObjectId(each)]},
+                             'member_of': {'$in': [page_gst._id, file_gst._id, Pandora_video_gst._id, quiz_gst._id, quizItem_gst._id]}
+                             }
+                else:
+                    query = {'_type': {'$in': ['GSystem', 'File']},
+                             'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in': [ObjectId(each)]},
+                             'member_of': {'$in': [page_gst._id, file_gst._id, Pandora_video_gst._id, quiz_gst._id, quizItem_gst._id]}
+                             }
 
-        nodes = node_collection.find(query)
-        if nodes.count() > 0:
-          for k in nodes:
-            inner_parents.append(k._id) 
-   
-      for each in inner_parents:
-        if each not in parents:
-          parents.append(each)
+                nodes = node_collection.find(query)
+                if nodes.count() > 0:
+                    for k in nodes:
+                        inner_parents.append(k._id)
 
-      if set(length) != set(parents):
-        parents = filter_nodes(parents, group_id)
-        return parents        
-      else:
+            for each in inner_parents:
+                if each not in parents:
+                    parents.append(each)
+
+            if set(length) != set(parents):
+                parents = filter_nodes(parents, group_id)
+                return parents
+            else:
+                return parents
+
+    parents_list = []
+    if nodes.count() > 0:
+        for each in nodes:
+            parents_list.append(each._id)
+
+        parents = filter_nodes(parents_list, group_id)
         return parents
-
-  parents_list = []
-  if nodes.count() > 0: 
-    for each in nodes:
-      parents_list.append(each._id)
-
-    parents = filter_nodes(parents_list, group_id)    
-    return parents 
-  else:
-    return parents_list
+    else:
+        return parents_list
 
 
 @get_execution_time
@@ -620,149 +824,184 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
     """
     dict_drawer = {}
     dict1 = {}
-    dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
+    # Changed from dictionary to list so that it's content are reflected in a
+    # sequential-order
+    dict2 = []
     filtering = []
 
-    drawer = None    
+    drawer = None
     if checked:
-      if nid:
-        filtering = filter_drawer_nodes(nid, group_id)
+        if nid:
+            filtering = filter_drawer_nodes(nid, group_id)
 
-      if checked == "Page":
-        gst_page_id = node_collection.one({'_type': "GSystemType", 'name': "Page"})._id
-        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-        
-      elif checked == "File":         
-        drawer = node_collection.find({'_type': u"File", '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]}})
-        
-      elif checked == "Image":
-        gst_image_id = node_collection.one({'_type': "GSystemType", 'name': "Image"})._id
-        drawer = node_collection.find({'_type': u"File", '_id': {'$nin': filtering},'member_of': {'$in':[gst_image_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        if checked == "Page":
+            gst_page_id = node_collection.one(
+                {'_type': "GSystemType", 'name': "Page"})._id
+            drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$all': [gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "Video":         
-        gst_video_id = node_collection.one({'_type': "GSystemType", 'name': "Video"})._id
-        drawer = node_collection.find({'_type': u"File", '_id': {'$nin': filtering},'member_of': {'$in':[gst_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        elif checked == "File":
+            drawer = node_collection.find({'_type': u"File", '_id': {
+                                          '$nin': filtering}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "Quiz":
-        # For prior-node-list
-        drawer = node_collection.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]}})
+        elif checked == "Image":
+            gst_image_id = node_collection.one(
+                {'_type': "GSystemType", 'name': "Image"})._id
+            drawer = node_collection.find({'_type': u"File", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$in': [gst_image_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "QuizObj" or checked == "assesses":
-        # For collection-list
-        gst_quiz_id = node_collection.one({'_type': "GSystemType", 'name': "Quiz"})._id
-        gst_quiz_item_id = node_collection.one({'_type': "GSystemType", 'name': "QuizItem"})._id
-        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[gst_quiz_id, gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        elif checked == "Video":
+            gst_video_id = node_collection.one(
+                {'_type': "GSystemType", 'name': "Video"})._id
+            drawer = node_collection.find({'_type': u"File", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$in': [gst_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "OnlyQuiz":
-        gst_quiz_id = node_collection.one({'_type': "GSystemType", 'name': "Quiz"})._id
-        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$all':[gst_quiz_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        elif checked == "Quiz":
+            # For prior-node-list
+            drawer = node_collection.find({'_type': {'$in': [u"GSystem", u"File"]}, '_id': {
+                                          '$nin': filtering}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "QuizItem":
-        gst_quiz_item_id = node_collection.one({'_type': "GSystemType", 'name': "QuizItem"})._id
-        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$all':[gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        elif checked == "QuizObj" or checked == "assesses":
+            # For collection-list
+            gst_quiz_id = node_collection.one(
+                {'_type': "GSystemType", 'name': "Quiz"})._id
+            gst_quiz_item_id = node_collection.one(
+                {'_type': "GSystemType", 'name': "QuizItem"})._id
+            drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$in': [gst_quiz_id, gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "Group":
-        drawer = node_collection.find({'_type': u"Group", '_id': {'$nin': filtering} })
-        
-      elif checked == "Users":
-        drawer = node_collection.find({'_type': u"Author", '_id': {'$nin': filtering} })
+        elif checked == "OnlyQuiz":
+            gst_quiz_id = node_collection.one(
+                {'_type': "GSystemType", 'name': "Quiz"})._id
+            drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$all': [gst_quiz_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "Forum":
-        gst_forum_id = node_collection.one({'_type': "GSystemType", 'name': "Forum"})._id
-        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        elif checked == "QuizItem":
+            gst_quiz_item_id = node_collection.one(
+                {'_type': "GSystemType", 'name': "QuizItem"})._id
+            drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$all': [gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "Module":
-        gst_module_id = node_collection.one({'_type': "GSystemType", 'name': "Module"})._id
-        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        elif checked == "Group":
+            drawer = node_collection.find(
+                {'_type': u"Group", '_id': {'$nin': filtering}})
 
-      elif checked == "Pandora Video":
-        gst_pandora_video_id = node_collection.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
-        drawer = node_collection.find({'_type': u"File", '_id': {'$nin': filtering},'member_of': {'$all':[gst_pandora_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).limit(50)
+        elif checked == "Users":
+            drawer = node_collection.find(
+                {'_type': u"Author", '_id': {'$nin': filtering}})
 
-      elif checked == "Theme":
-        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_GST._id, topic_GST._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        elif checked == "Forum":
+            gst_forum_id = node_collection.one(
+                {'_type': "GSystemType", 'name': "Forum"})._id
+            drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$all': [gst_forum_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "theme_item":
-        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_item_GST._id, topic_GST._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        elif checked == "Module":
+            gst_module_id = node_collection.one(
+                {'_type': "GSystemType", 'name': "Module"})._id
+            drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$all': [gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "Topic":
-        drawer = node_collection.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'member_of':{'$nin':[theme_GST._id, theme_item_GST._id, topic_GST._id]},'group_set': {'$all': [ObjectId(group_id)]}})
+        elif checked == "Pandora Video":
+            gst_pandora_video_id = node_collection.one(
+                {'_type': "GSystemType", 'name': "Pandora_video"})._id
+            drawer = node_collection.find({'_type': u"File", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$all': [gst_pandora_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).limit(50)
 
-      elif checked == "RelationType" or checked == "CourseUnits":
-        # Special case used while dealing with RelationType widget
-        if "left_drawer_content" in kwargs:
-          drawer = kwargs["left_drawer_content"]
+        elif checked == "Theme":
+            drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$in': [theme_GST._id, topic_GST._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+
+        elif checked == "theme_item":
+            drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering}, 'member_of': {
+                                          '$in': [theme_item_GST._id, topic_GST._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+
+        elif checked == "Topic":
+            drawer = node_collection.find({'_type': {'$in': [u"GSystem", u"File"]}, '_id': {'$nin': filtering}, 'member_of': {
+                                          '$nin': [theme_GST._id, theme_item_GST._id, topic_GST._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+
+        elif checked == "RelationType" or checked == "CourseUnits":
+            # Special case used while dealing with RelationType widget
+            if kwargs.has_key("left_drawer_content"):
+                drawer = kwargs["left_drawer_content"]
     else:
-      # For heterogeneous collection
-      if checked == "RelationType" or checked == "CourseUnits":
-        # Special case used while dealing with RelationType widget
-        drawer = checked
+        # For heterogeneous collection
+        if checked == "RelationType" or checked == "CourseUnits":
+            # Special case used while dealing with RelationType widget
+            drawer = checked
 
-      else:
-        filtering = filter_drawer_nodes(nid, group_id)
-        Page = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
-        File = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
-        Quiz = node_collection.one({'_type': "GSystemType", 'name': "Quiz"})
-        drawer = node_collection.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
-                                       '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]}, 
-                                       'member_of':{'$in':[Page._id,File._id,Quiz._id]}
-                                      })
+        else:
+            filtering = filter_drawer_nodes(nid, group_id)
+            Page = node_collection.one(
+                {'_type': 'GSystemType', 'name': 'Page'})
+            File = node_collection.one(
+                {'_type': 'GSystemType', 'name': 'File'})
+            Quiz = node_collection.one(
+                {'_type': "GSystemType", 'name': "Quiz"})
+            drawer = node_collection.find({'_type': {'$in': [u"GSystem", u"File"]},
+                                           '_id': {'$nin': filtering}, 'group_set': {'$all': [ObjectId(group_id)]},
+                                           'member_of': {'$in': [Page._id, File._id, Quiz._id]}
+                                           })
     if checked != "RelationType" and checked != "CourseUnits":
         paged_resources = paginator.Paginator(drawer, page_no, 10)
         drawer.rewind()
 
     if (nid is None) and (not nlist):
-      for each in drawer:
-        dict_drawer[each._id] = each
+        for each in drawer:
+            dict_drawer[each._id] = each
 
     elif (nid is None) and (nlist):
-      for each in drawer:
-        if each._id not in nlist:
-          dict1[each._id] = each
-
-      #loop replaced by a list comprehension
-      dict2=[node_collection.one({'_id': oid}) for oid in nlist]
 
       # for oid in nlist:
       #   obj = node_collection.one({'_id': oid})
       #   dict2.append(obj)
+        for each in drawer:
+            if each._id not in nlist:
+                dict1[each._id] = each
 
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
+        #loop replaced by a list comprehension
+        dict2=[node_collection.one({'_id': oid}) for oid in nlist]
+    
+        for oid in nlist:
+            obj = node_collection.one({'_id': oid})
+            dict2.append(obj)
+            dict_drawer['1'] = dict1
+            dict_drawer['2'] = dict2
 
     else:
-      for each in drawer:
+        for each in drawer:
+
+            if each._id != nid:
+                if each._id not in nlist:
+                    dict1[each._id] = each
 
         if each._id != nid:
-          if each._id not in nlist:
-            dict1[each._id] = each
-      #loop replaced by a list comprehension    
-      dict2=[node_collection.one({'_id': oid})  for oid in nlist]
-          
-      	
-      # for oid in nlist:
-      #   obj = node_collection.one({'_id': oid})
-      #   dict2.append(obj)
-      
-      
+            if each._id not in nlist:
+                dict1[each._id] = each
+         
+        #loop replaced by a list comprehension    
+        dict2=[node_collection.one({'_id': oid})  for oid in nlist]
 
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
+
+        for oid in nlist:
+            obj = node_collection.one({'_id': oid})
+            dict2.append(obj)
+            dict_drawer['1'] = dict1
+            dict_drawer['2'] = dict2
 
     if checked == "RelationType" or checked == "CourseUnits":
-      return dict_drawer
+        return dict_drawer
 
     else:
-      return dict_drawer, paged_resources
+        return dict_drawer, paged_resources
 
 
 # get type of resourc
 @get_execution_time
-def get_resource_type(request,node_id):
-  get_resource_type=node_collection.one({'_id':ObjectId(node_id)})
-  get_type=get_resource_type._type
-  return get_type 
-                          
+def get_resource_type(request, node_id):
+    get_resource_type = node_collection.one({'_id': ObjectId(node_id)})
+    get_type = get_resource_type._type
+    return get_type
 
 
 @get_execution_time
@@ -826,7 +1065,6 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
     filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
     node.content = org2html(content_org, file_prefix=filename)
 
-
 @get_execution_time
 def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     """Updates the retrieved values of common fields from request
@@ -849,7 +1087,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         name = request.POST.get('name_' + str(coll_set._id), "")
         content_org = request.POST.get(str(coll_set._id), "")
         tags = request.POST.get('tags' + str(coll_set._id), "")
-        
+
     else:
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
@@ -981,7 +1219,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # tags
     # if tags:
     tags_list = []
-    if tags:
+    if tags != node.tags:
         for tag in tags.split(","):
             tag = unicode(tag.strip())
 
@@ -994,7 +1232,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
-        changed = build_collection(node, check_collection, right_drawer_list, checked)
+        changed = build_collection(
+            node, check_collection, right_drawer_list, checked)
         if changed:
             is_changed = True
     #  org-content
@@ -1067,9 +1306,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         is_changed = True 
 
     if user_last_visited_location:
-        user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
+        user_last_visited_location = list(
+            ast.literal_eval(user_last_visited_location))
 
-        author = node_collection.one({'_type': "GSystemType", 'name': "Author"})
+        author = node_collection.one(
+            {'_type': "GSystemType", 'name': "Author"})
         user_group_location = node_collection.one({
             '_type': "Author", 'member_of': author._id, 'created_by': usrid,
             'name': usrname
@@ -1082,6 +1323,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
                     is_changed = True
 
             else:
+
                 user_group_location['visited_location'] = user_last_visited_location
                 user_group_location.save(groupid=group_id)
 
@@ -1110,7 +1352,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
       if node.prior_node != right_drawer_list:
         i = 0
         node.prior_node=[]
-	node_prior_node_append_temp=node.prior_node.append #a temp. variable which stores the lookup for append method
+        node_prior_node_append_temp=node.prior_node.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
@@ -1136,8 +1378,8 @@ def build_collection(node, check_collection, right_drawer_list, checked):
         i = 0
         node.collection_set = []
         # checking if each _id in collection_list is valid or not
-	nlist_append_temp=nlist.append #a temp. variable which stores the lookup for append method
-	node_collection_set_append_temp=node.collection_set.append #a temp. variable which stores the lookup for append method
+        nlist_append_temp=nlist.append #a temp. variable which stores the lookup for append method
+        node_collection_set_append_temp=node.collection_set.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
@@ -1167,254 +1409,376 @@ def build_collection(node, check_collection, right_drawer_list, checked):
                 node.collection_set.remove(each)
                 # Also for removing prior node element after removing collection element
                 node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
+    is_changed = False
 
+    if check_collection == "prior_node":
+        if right_drawer_list != '':
+            # prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
+            right_drawer_list = [ObjectId(each.strip())
+                                 for each in right_drawer_list.split(",")]
+
+            if node.prior_node != right_drawer_list:
+                i = 0
+                node.prior_node = []
+                while (i < len(right_drawer_list)):
+                    node_id = ObjectId(right_drawer_list[i])
+                    node_obj = node_collection.one({"_id": node_id})
+                    if node_obj:
+                        node.prior_node.append(node_id)
+
+                    i = i + 1
+                # print "\n Changed: prior_node"
+                is_changed = True
         else:
-          if nlist and checked:
-            if checked == "QuizObj":
-              quiz = node_collection.one({'_type': 'GSystemType', 'name': "Quiz" })
-              quizitem = node_collection.one({'_type': 'GSystemType', 'name': "QuizItem" })
-              for each in nlist:
-                obj = node_collection.one({'_id': ObjectId(each) })
-                if quiz._id in obj.member_of or quizitem._id in obj.member_of:
-                  if obj._id not in right_drawer_list:
-                    node.collection_set.remove(obj._id)
-                    # Also for removing prior node element after removing collection element
-                    node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
+            node.prior_node = []
+            is_changed = True
 
-            elif checked == "Pandora Video":
-              check = node_collection.one({'_type': 'GSystemType', 'name': 'Pandora_video' })
-              for each in nlist:
-                obj = node_collection.one({'_id': ObjectId(each) })
-                if check._id == obj.member_of[0]:
-                  if obj._id not in right_drawer_list:
-                    node.collection_set.remove(obj._id)
-                    node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
-            else:
-              check = node_collection.one({'_type': 'GSystemType', 'name': unicode(checked) })
-              for each in nlist:
-                obj = node_collection.one({'_id': ObjectId(each) })
-                if len(obj.member_of) < 2:
-                  if check._id == obj.member_of[0]:
-                    if obj._id not in right_drawer_list:
-                      node.collection_set.remove(obj._id)
-                      node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
+    elif check_collection == "collection":
+        #  collection
+        if right_drawer_list != '':
+            right_drawer_list = [ObjectId(each.strip())
+                                 for each in right_drawer_list.split(",")]
+
+            nlist = node.collection_set
+
+            # if set(node.collection_set) != set(right_drawer_list):
+            if node.collection_set != right_drawer_list:
+                i = 0
+                node.collection_set = []
+                # checking if each _id in collection_list is valid or not
+                while (i < len(right_drawer_list)):
+                    node_id = ObjectId(right_drawer_list[i])
+                    node_obj = node_collection.one({"_id": node_id})
+                    if node_obj:
+                        if node_id not in nlist:
+                            nlist.append(node_id)
+                        else:
+                            node.collection_set.append(node_id)
+                            # After adding it to collection_set also make the
+                            # 'node' as prior node for added collection element
+                            node_collection.collection.update({'_id': ObjectId(node_id), 'prior_node': {
+                                                              '$nin': [node._id]}}, {'$push': {'prior_node': ObjectId(node._id)}})
+
+                    i = i + 1
+
+                for each in nlist:
+                    if each not in node.collection_set:
+                        node.collection_set.append(each)
+                        # After adding it to collection_set also make the
+                        # 'node' as prior node for added collection element
+                        node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                          '$nin': [node._id]}}, {'$push': {'prior_node': ObjectId(node._id)}})
+
+                # For removing collection elements from heterogeneous
+                # collection drawer only
+                if not checked:
+                    if nlist:
+                        for each in nlist:
+                            if each not in right_drawer_list:
+                                node.collection_set.remove(each)
+                                # Also for removing prior node element after
+                                # removing collection element
+                                node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                  '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+
                 else:
-                  if check._id == obj.member_of[1]: 
-                    if obj._id not in right_drawer_list:
-                      node.collection_set.remove(obj._id)
-                      node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
+                    if nlist and checked:
+                        if checked == "QuizObj":
+                            quiz = node_collection.one(
+                                {'_type': 'GSystemType', 'name': "Quiz"})
+                            quizitem = node_collection.one(
+                                {'_type': 'GSystemType', 'name': "QuizItem"})
+                            for each in nlist:
+                                obj = node_collection.one(
+                                    {'_id': ObjectId(each)})
+                                if quiz._id in obj.member_of or quizitem._id in obj.member_of:
+                                    if obj._id not in right_drawer_list:
+                                        node.collection_set.remove(obj._id)
+                                        # Also for removing prior node element
+                                        # after removing collection element
+                                        node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                          '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
 
-        is_changed = True
+                        elif checked == "Pandora Video":
+                            check = node_collection.one(
+                                {'_type': 'GSystemType', 'name': 'Pandora_video'})
+                            for each in nlist:
+                                obj = node_collection.one(
+                                    {'_id': ObjectId(each)})
+                                if check._id == obj.member_of[0]:
+                                    if obj._id not in right_drawer_list:
+                                        node.collection_set.remove(obj._id)
+                                        node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                          '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+                        else:
+                            check = node_collection.one(
+                                {'_type': 'GSystemType', 'name': unicode(checked)})
+                            for each in nlist:
+                                obj = node_collection.one(
+                                    {'_id': ObjectId(each)})
+                                if len(obj.member_of) < 2:
+                                    if check._id == obj.member_of[0]:
+                                        if obj._id not in right_drawer_list:
+                                            node.collection_set.remove(obj._id)
+                                            node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                              '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+                                else:
+                                    if check._id == obj.member_of[1]:
+                                        if obj._id not in right_drawer_list:
+                                            node.collection_set.remove(obj._id)
+                                            node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                              '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
 
-    else:
-      if node.collection_set and checked:
-        if checked == "QuizObj":
-          quiz = node_collection.one({'_type': 'GSystemType', 'name': "Quiz" })
-          quizitem = node_collection.one({'_type': 'GSystemType', 'name': "QuizItem" })
-          for each in node.collection_set:
-            obj = node_collection.one({'_id': ObjectId(each) })
-            if quiz._id in obj.member_of or quizitem._id in obj.member_of:
-              node.collection_set.remove(obj._id)
-              node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
-        elif checked == "Pandora Video":
-          check = node_collection.one({'_type': 'GSystemType', 'name': 'Pandora_video' })
-          for each in node.collection_set:
-            obj = node_collection.one({'_id': ObjectId(each) })
-            if check._id == obj.member_of[0]:
-              node.collection_set.remove(obj._id)
-              node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
+                is_changed = True
+
         else:
-          check = node_collection.one({'_type': 'GSystemType', 'name': unicode(checked) })
-          for each in node.collection_set:
-            obj = node_collection.one({'_id': ObjectId(each) })
-            if len(obj.member_of) < 2:
-              if check._id == obj.member_of[0]:
-                node.collection_set.remove(obj._id)
-                node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
+            if node.collection_set and checked:
+                if checked == "QuizObj":
+                    quiz = node_collection.one(
+                        {'_type': 'GSystemType', 'name': "Quiz"})
+                    quizitem = node_collection.one(
+                        {'_type': 'GSystemType', 'name': "QuizItem"})
+                    for each in node.collection_set:
+                        obj = node_collection.one({'_id': ObjectId(each)})
+                        if quiz._id in obj.member_of or quizitem._id in obj.member_of:
+                            node.collection_set.remove(obj._id)
+                            node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                              '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+                elif checked == "Pandora Video":
+                    check = node_collection.one(
+                        {'_type': 'GSystemType', 'name': 'Pandora_video'})
+                    for each in node.collection_set:
+                        obj = node_collection.one({'_id': ObjectId(each)})
+                        if check._id == obj.member_of[0]:
+                            node.collection_set.remove(obj._id)
+                            node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                              '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+                else:
+                    check = node_collection.one(
+                        {'_type': 'GSystemType', 'name': unicode(checked)})
+                    for each in node.collection_set:
+                        obj = node_collection.one({'_id': ObjectId(each)})
+                        if len(obj.member_of) < 2:
+                            if check._id == obj.member_of[0]:
+                                node.collection_set.remove(obj._id)
+                                node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                  '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+                        else:
+                            if check._id == obj.member_of[1]:
+                                node.collection_set.remove(obj._id)
+                                node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {
+                                                                  '$in': [node._id]}}, {'$pull': {'prior_node': ObjectId(node._id)}})
+
             else:
-              if check._id == obj.member_of[1]: 
-                node.collection_set.remove(obj._id)
-                node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
+                node.collection_set = []
 
-      else:
-        node.collection_set = []
-      
-      is_changed = True
+            is_changed = True
 
-  elif check_collection == "teaches":
-    # Teaches
-    if right_drawer_list != '':
+    elif check_collection == "teaches":
+        # Teaches
+        if right_drawer_list != '':
 
-      right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
+            right_drawer_list = [ObjectId(each.strip())
+                                 for each in right_drawer_list.split(",")]
 
-      relationtype = node_collection.one({"_type": "RelationType", "name": "teaches"})
-      list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
-      for relation in list_grelations:
-        # nlist.append(ObjectId(relation.right_subject))
-        relation.delete()
+            relationtype = node_collection.one(
+                {"_type": "RelationType", "name": "teaches"})
+            list_grelations = triple_collection.find(
+                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+            for relation in list_grelations:
+                # nlist.append(ObjectId(relation.right_subject))
+                relation.delete()
 
-      if right_drawer_list:
-        list_grelations.rewind()
-        i = 0
+            if right_drawer_list:
+                list_grelations.rewind()
+                i = 0
 
-        while (i < len(right_drawer_list)):
-          node_id = ObjectId(right_drawer_list[i])
-          node_obj = node_collection.one({"_id": node_id})
-          if node_obj:
-            create_grelation(node._id,relationtype,node_id)
-          i = i+1      
-        
-        # print "\n Changed: teaches_list"
-        is_changed = True
+                while (i < len(right_drawer_list)):
+                    node_id = ObjectId(right_drawer_list[i])
+                    node_obj = node_collection.one({"_id": node_id})
+                    if node_obj:
+                        create_grelation(node._id, relationtype, node_id)
+                    i = i + 1
+
+                # print "\n Changed: teaches_list"
+                is_changed = True
+        else:
+            relationtype = node_collection.one(
+                {"_type": "RelationType", "name": "teaches"})
+            list_grelations = triple_collection.find(
+                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+            for relation in list_grelations:
+                relation.delete()
+
+            is_changed = True
+
+    elif check_collection == "assesses":
+        # Assesses
+        if right_drawer_list != '':
+            right_drawer_list = [ObjectId(each.strip())
+                                 for each in right_drawer_list.split(",")]
+
+            relationtype = node_collection.one(
+                {"_type": "RelationType", "name": "assesses"})
+            list_grelations = triple_collection.find(
+                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+            for relation in list_grelations:
+                relation.delete()
+
+            if right_drawer_list:
+                list_grelations.rewind()
+                i = 0
+
+                while (i < len(right_drawer_list)):
+                    node_id = ObjectId(right_drawer_list[i])
+                    node_obj = node_collection.one({"_id": node_id})
+                    if node_obj:
+                        create_grelation(node._id, relationtype, node_id)
+                    i = i + 1
+
+                # print "\n Changed: teaches_list"
+                is_changed = True
+        else:
+            relationtype = node_collection.one(
+                {"_type": "RelationType", "name": "assesses"})
+            list_grelations = triple_collection.find(
+                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+            for relation in list_grelations:
+                relation.delete()
+
+            is_changed = True
+
+    # elif check_collection == "module":
+        #  Module
+        # if right_drawer_list != '':
+        #   right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
+
+        #   if set(node.collection_set) != set(right_drawer_list):
+        #     i = 0
+        #     while (i < len(right_drawer_list)):
+        #       node_id = ObjectId(right_drawer_list[i])
+        #       node_obj = node_collection.one({"_id": node_id})
+        #       if node_obj:
+        #         if node_id not in node.collection_set:
+        #           node.collection_set.append(node_id)
+
+        #       i = i+1
+            # print "\n Changed: module_list"
+            # is_changed = True
+        # else:
+            # node.module_set = []
+            # is_changed = True
+    if is_changed == True:
+        return True
     else:
-      relationtype = node_collection.one({"_type": "RelationType", "name": "teaches"})
-      list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
-      for relation in list_grelations:
-        relation.delete()
+        return False
 
-      is_changed = True
-
-  elif check_collection == "assesses":
-    # Assesses
-    if right_drawer_list != '':
-      right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
-
-      relationtype = node_collection.one({"_type": "RelationType", "name": "assesses"})
-      list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
-      for relation in list_grelations:
-        relation.delete()
-
-      if right_drawer_list:
-        list_grelations.rewind()
-        i = 0
-
-        while (i < len(right_drawer_list)):
-          node_id = ObjectId(right_drawer_list[i])
-          node_obj = node_collection.one({"_id": node_id})
-          if node_obj:
-            create_grelation(node._id,relationtype,node_id)
-          i = i + 1
-
-        # print "\n Changed: teaches_list"
-        is_changed = True
-    else:
-      relationtype = node_collection.one({"_type": "RelationType", "name": "assesses"})
-      list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
-      for relation in list_grelations:
-        relation.delete()
-
-      is_changed = True
-
-  # elif check_collection == "module":
-    #  Module
-    # if right_drawer_list != '':
-    #   right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
-
-    #   if set(node.collection_set) != set(right_drawer_list):
-    #     i = 0
-    #     while (i < len(right_drawer_list)):
-    #       node_id = ObjectId(right_drawer_list[i])
-    #       node_obj = node_collection.one({"_id": node_id})
-    #       if node_obj:
-    #         if node_id not in node.collection_set:
-    #           node.collection_set.append(node_id)
-          
-    #       i = i+1
-        # print "\n Changed: module_list"
-        # is_changed = True
-    # else:
-      # node.module_set = []
-      # is_changed = True
-  if is_changed == True:
-    return True
-  else:
-    return False
-
-"""
-@get_execution_time
-def get_versioned_page(node):
-    rcs = RCS()
-    fp = history_manager.get_file_path(node)
-    cmd= 'rlog  %s' % \
-  (fp)
-    rev_no =""
-    proc1=subprocess.Popen(cmd,shell=True,
-        stdout=subprocess.PIPE)
-    for line in iter(proc1.stdout.readline,b''):
-      if line.find('revision')!=-1 and line.find('selected') == -1:
-          rev_no=string.split(line,'revision')
-          rev_no=rev_no[1].strip( '\t\n\r')
-          rev_no=rev_no.split()[0]
-      if line.find('status')!=-1:
-          up_ind=line.find('status')
-          if line.find(('PUBLISHED'),up_ind) !=-1:
-	             rev_no=rev_no.split()[0]
-               node=history_manager.get_version_document(node,rev_no)
-               proc1.kill()
-               return (node,rev_no)    
-      if rev_no == '1.1':
-           node=history_manager.get_version_document(node,'1.1')
-           proc1.kill()
-           return(node,'1.1')
-"""
 
 @get_execution_time
 def get_versioned_page(node):
     rcs = RCS()
     fp = history_manager.get_file_path(node)
-    cmd= 'rlog  %s' % \
-  (fp)
-    rev_no =""
-    proc1=subprocess.Popen(cmd,shell=True,
-        stdout=subprocess.PIPE)
-    for line in iter(proc1.stdout.readline,b''):
-      if line.find('revision')!=-1 and line.find('selected') == -1:
-          rev_no=string.split(line,'revision')
-          rev_no=rev_no[1].strip( '\t\n\r')
-          rev_no=rev_no.split()[0]
-      if line.find('status')!=-1:
-          up_ind=line.find('status')
-          if line.find(('PUBLISHED'),up_ind) !=-1:
-           rev_no=rev_no.split()[0]
-           node=history_manager.get_version_document(node,rev_no)
-           proc1.kill()
-           return (node,rev_no)   
-      if rev_no == '1.1':
-           node=history_manager.get_version_document(node,'1.1')
-           proc1.kill()
-           return(node,'1.1')
-
+    cmd = 'rlog  %s' % \
+        (fp)
+    rev_no = ""
+    proc1 = subprocess.Popen(cmd, shell=True,
+                             stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline, b''):
+        if line.find('revision') != -1 and line.find('selected') == -1:
+            rev_no = string.split(line, 'revision')
+            rev_no = rev_no[1].strip('\t\n\r')
+            rev_no = rev_no.split()[0]
+        if line.find('status') != -1:
+            up_ind = line.find('status')
+            if line.find(('PUBLISHED'), up_ind) != -1:
+                rev_no = rev_no.split()[0]
+                node = history_manager.get_version_document(node, rev_no)
+                proc1.kill()
+                return (node, rev_no)
+        if rev_no == '1.1':
+            node = history_manager.get_version_document(node, '1.1')
+            proc1.kill()
+            return(node, '1.1')
 
 @get_execution_time
-def get_user_page(request,node):
+def get_user_page(request, node):
     ''' function gives the last docment submited by the currently logged in user either it
-	can be drafted or published
-'''
+        can be drafted or published
+    '''
+
     rcs = RCS()
     fp = history_manager.get_file_path(node)
-    cmd= 'rlog  %s' % \
-	(fp)
-    rev_no =""
-    proc1=subprocess.Popen(cmd,shell=True,
-				stdout=subprocess.PIPE)
-    for line in iter(proc1.stdout.readline,b''):
-       
-       if line.find('revision')!=-1 and line.find('selected') == -1:
+    cmd = 'rlog  %s' % \
+        (fp)
+    rev_no = ""
+    proc1 = subprocess.Popen(cmd, shell=True,
+                             stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline, b''):
 
-          rev_no=string.split(line,'revision')
-          rev_no=rev_no[1].strip( '\t\n\r')
-          rev_no=rev_no.strip(' ')
-       if line.find('updated')!=-1:
-          up_ind=line.find('updated')
-          if line.find(str(request.user),up_ind) !=-1:
-               rev_no=rev_no.strip(' ')
-               node=history_manager.get_version_document(node,rev_no)
-               proc1.kill()
-               return (node,rev_no)    
-       if rev_no == '1.1':
-           node=history_manager.get_version_document(node,'1.1')
-           proc1.kill()
-           return(node,'1.1')
+        if line.find('revision') != -1 and line.find('selected') == -1:
+
+            rev_no = string.split(line, 'revision')
+            rev_no = rev_no[1].strip('\t\n\r')
+            rev_no = rev_no.strip(' ')
+        if line.find('updated') != -1:
+            up_ind = line.find('updated')
+            if line.find(str(request.user), up_ind) != -1:
+                rev_no = rev_no.strip(' ')
+                node = history_manager.get_version_document(node, rev_no)
+                proc1.kill()
+                return (node, rev_no)
+        if rev_no == '1.1':
+            node = history_manager.get_version_document(node, '1.1')
+            proc1.kill()
+            return(node, '1.1')
+
+
+@get_execution_time
+def get_page(request, node):
+    ''' 
+    function to filter between the page to be displyed to user 
+    i.e which page to be shown to the user drafted or the published page
+    if a user have some drafted content then he would be shown his own drafted contents 
+    and if he has published his contents then he would be shown the current published contents
+    '''
+    username = request.user
+    node1, ver1 = get_versioned_page(node)
+    node2, ver2 = get_user_page(request, node)
+
+    if ver2 != '1.1':
+        if node2 is not None:
+            if node2.status == 'PUBLISHED':
+
+                if float(ver2) > float(ver1):
+                    return (node2, ver2)
+                elif float(ver2) < float(ver1):
+                    return (node1, ver1)
+                elif float(ver2) == float(ver1):
+                    return(node1, ver1)
+            elif node2.status == 'DRAFT':
+                   #========== conditions for Group===============#
+
+                if node._type == "Group":
+
+                    count = check_page_first_creation(request, node2)
+                    if count == 1:
+                        return (node1, ver1)
+                    elif count == 2:
+                        return (node2, ver2)
+
+                return (node2, ver2)
+        else:
+
+            return(node1, ver1)
+
+    else:
+
+                # if node._type == "GSystem" and node1.status == "DRAFT":
+                #     if node1.created_by ==request.user.id:
+                #           return (node2,ver2)
+                #      else:
+                #      return (node2,ver2)
+        return (node1, ver1)
 
 @get_execution_time
 def get_page(request,node):
@@ -1429,60 +1793,60 @@ def get_page(request,node):
   node2,ver2=get_user_page(request,node)     
   
   if  ver2 != '1.1':                           
-	    if node2 is not None:
+            if node2 is not None:
                 if node2.status == 'PUBLISHED':
                   
-			if float(ver2) > float(ver1):			
-				return (node2,ver2)
-			elif float(ver2) < float(ver1):
-				return (node1,ver1)
-			elif float(ver2) == float(ver1):
-				return(node1,ver1)
-		elif node2.status == 'DRAFT':
+                        if float(ver2) > float(ver1):                   
+                                return (node2,ver2)
+                        elif float(ver2) < float(ver1):
+                                return (node1,ver1)
+                        elif float(ver2) == float(ver1):
+                                return(node1,ver1)
+                elif node2.status == 'DRAFT':
                        #========== conditions for Group===============#
 
                         if   node._type == "Group":
-			    
-			    count=check_page_first_creation(request,node2)
+                            
+                            count=check_page_first_creation(request,node2)
                             if count == 1:
                                 return (node1,ver1)
                             elif count == 2:
-                               	return (node2,ver2)
+                                return (node2,ver2)
                         
                         return (node2,ver2)  
-	    else:
+            else:
                         
-			return(node1,ver1)		
-	    
+                        return(node1,ver1)              
+            
   else: 
         # if node._type == "GSystem" and node1.status == "DRAFT":
         #     if node1.created_by ==request.user.id:
         #           return (node2,ver2)
         #      else:
-	#	   return (node2,ver2)
+        #          return (node2,ver2)
         return (node1,ver1)
 
 @get_execution_time
-def check_page_first_creation(request,node):
+def check_page_first_creation(request, node):
     ''' function to check wheather the editing is performed by the user very first time '''
     rcs = RCS()
     fp = history_manager.get_file_path(node)
-    cmd= 'rlog  %s' % \
-	(fp)
-    rev_no =""
-    count=0
-    proc1=subprocess.Popen(cmd,shell=True,
-				stdout=subprocess.PIPE)
-    for line in iter(proc1.stdout.readline,b''):
-         if line.find('updated')!=-1 or line.find('created')!=-1:
-          if line.find(str(request.user))!=-1:
-               count =count+1
-               if count ==2:
-                proc1.kill()
-               	return (count)
+    cmd = 'rlog  %s' % \
+        (fp)
+    rev_no = ""
+    count = 0
+    proc1 = subprocess.Popen(cmd, shell=True,
+                             stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline, b''):
+        if line.find('updated') != -1 or line.find('created') != -1:
+            if line.find(str(request.user)) != -1:
+                count = count + 1
+                if count == 2:
+                    proc1.kill()
+                    return (count)
     proc1.kill()
     if count == 1:
-	return(count)     
+        return(count)
 
 
 @get_execution_time
@@ -1533,9 +1897,9 @@ def tag_info(request, group_id, tagname=None):
         #     group_cur_list.append(each._id)
         if tagname:  # and (group_id in group_cur_list):
             cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
-                                         'group_set': ObjectId(group_id),
-                                         '$or': [
-                                            {'status': u'PUBLISHED'},
+                                        'group_set': ObjectId(group_id),
+                                        '$or': [
+                {'status': u'PUBLISHED'},
                                             {'created_by': userid},
                                           ]
                                       })
@@ -1547,8 +1911,8 @@ def tag_info(request, group_id, tagname=None):
         if group_node.group_type == u"PUBLIC":
             if tagname:
                 cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
-                                               'group_set': group_id,
-                                               'status': u'PUBLISHED'
+                                            'group_set': group_id,
+                                            'status': u'PUBLISHED'
                                             }
                                      )
                 #loop replaced by a list comprehension
@@ -1572,79 +1936,83 @@ def tag_info(request, group_id, tagname=None):
 
 # code for merging two text Documents
 import difflib
+
+
 @get_execution_time
 def diff_string(original, revised):
 
         # build a list of sentences for each input string
-        original_text = _split_with_maintain(original)
-        new_text = _split_with_maintain(revised)
-        a=original_text + new_text
-        strings='\n'.join(a)
-        #f=(strings.replace("*", ">").replace("-","="))
-        #f=(f.replace("> 1 >",">").replace("= 1 =","="))
+    original_text = _split_with_maintain(original)
+    new_text = _split_with_maintain(revised)
+    a = original_text + new_text
+    strings = '\n'.join(a)
+    #f=(strings.replace("*", ">").replace("-","="))
+    #f=(f.replace("> 1 >",">").replace("= 1 =","="))
 
-        
-        return strings
+    return strings
 
 
 STANDARD_REGEX = '[.!?]'
-def _split_with_maintain(value, treat_trailing_spaces_as_sentence = True, split_char_regex = STANDARD_REGEX):
-        result = []
-        check = value
-        
-        # compile regex
-        rx = re.compile(split_char_regex)
-        
-        # traverse the string
-        while len(check) > 0:
-            found  = rx.search(str(check))
-            if found == None:
-                result.append(check)
-                break
-            
-            idx = found.start()
-            result.append(str(check[:idx]))            # append the string
-            result.append(str(check[idx:idx+1]))    # append the puncutation so changing ? to . doesn't invalidate the whole sentence
-            check = check[idx + 1:]
-            
-            # group the trailing spaces if requested
-            if treat_trailing_spaces_as_sentence:
-                space_idx = 0
-                while True:
-                    if space_idx >= len(check):
-                        break
-                    if check[space_idx] != " ":
-                        break
-                    space_idx += 1
-                
-                if space_idx != 0:
-                    result.append(check[0:space_idx])
-            
-                check = check[space_idx:]
-            
-        return result
+
+
+def _split_with_maintain(value, treat_trailing_spaces_as_sentence=True, split_char_regex=STANDARD_REGEX):
+    result = []
+    check = value
+
+    # compile regex
+    rx = re.compile(split_char_regex)
+
+    # traverse the string
+    while len(check) > 0:
+        found = rx.search(str(check))
+        if found == None:
+            result.append(check)
+            break
+
+        idx = found.start()
+        result.append(str(check[:idx]))            # append the string
+        # append the puncutation so changing ? to . doesn't invalidate the
+        # whole sentence
+        result.append(str(check[idx:idx + 1]))
+        check = check[idx + 1:]
+
+        # group the trailing spaces if requested
+        if treat_trailing_spaces_as_sentence:
+            space_idx = 0
+            while True:
+                if space_idx >= len(check):
+                    break
+                if check[space_idx] != " ":
+                    break
+                space_idx += 1
+
+            if space_idx != 0:
+                result.append(check[0:space_idx])
+
+            check = check[space_idx:]
+
+    return result
 
 
 @get_execution_time
-def update_mobwrite_content_org(node_system):   
-  '''
-	on revert or merge of nodes,a content_org is synced to mobwrite object
-	input : 
-		node
-  ''' 
-  system = node_system
-  filename = TextObj.safe_name(str(system._id))
-  textobj = TextObj.objects.filter(filename=filename)
-  content_org = system.content_org
-  if textobj:
-    textobj = TextObj.objects.get(filename=filename)
-    textobj.text = content_org
-    textobj.save()
-  else:
-    textobj = TextObj(filename=filename,text=content_org)
-    textobj.save()
-  return textobj
-
+def update_mobwrite_content_org(node_system):
+    '''
+          on revert or merge of nodes,a content_org is synced to mobwrite object
+          input : 
+                  node
+    '''
+    system = node_system
+    filename = TextObj.safe_name(str(system._id))
+    textobj = TextObj.objects.filter(filename=filename)
+    content_org = system.content_org
+    if textobj:
+        textobj = TextObj.objects.get(filename=filename)
+        textobj.text = content_org
+        textobj.save()
+    else:
+        textobj = TextObj(filename=filename, text=content_org)
+        textobj.save()
+    return textobj
 
 
 @get_execution_time
@@ -1673,7 +2041,8 @@ def cast_to_data_type(value, data_type):
     elif (data_type == "long") and str(value):
         casted_value = long(value) if (str.isdigit(str(value))) else value
 
-    elif data_type == "bool" and str(value): # converting unicode to int and then to bool
+    # converting unicode to int and then to bool
+    elif data_type == "bool" and str(value):
         if (str.isdigit(str(value))):
             casted_value = bool(int(value))
         elif unicode(value) in [u"True", u"False"]:
@@ -1685,7 +2054,7 @@ def cast_to_data_type(value, data_type):
     elif (data_type == "list") and (not isinstance(value, list)):
         # print "coming here",value      
         value = value.replace("\n", "").split(",")
-        
+
         # check for complex list type like: [int] or [unicode]
         if isinstance(data_type, list) and len(data_type) and isinstance(data_type[0], type):
             # print "before",value
@@ -1701,9 +2070,8 @@ def cast_to_data_type(value, data_type):
         # In [10]: datetime.datetime.strptime( "11/12/2014", "%d/%m/%Y")
         # Out[10]: datetime.datetime(2014, 12, 11, 0, 0)
         casted_value = datetime.datetime.strptime(value, "%d/%m/%Y")
-        
-    return casted_value
 
+    return casted_value
 
 
 @get_execution_time
@@ -1720,7 +2088,7 @@ def get_node_metadata(request, node, **kwargs):
                            "textcomplexity", "readinglevel", "educationalsubject",
                            "educationallevel", "curricular", "educationalalignment",
                            "adaptation_of", "other_contributors", "creator", "source"
-                          ]
+                           ]
 
     if "is_changed" in kwargs:
         updated_ga_nodes = []
@@ -1730,7 +2098,12 @@ def get_node_metadata(request, node, **kwargs):
         for atname in attribute_type_list:
 
             field_value = request.POST.get(atname, "")
-            at = node_collection.one({"_type": "AttributeType", "name": atname})
+            print '$' * 30
+            print atname,field_value
+            print '$' * 30
+            
+            at = node_collection.one(
+                {"_type": "AttributeType", "name": atname})
 
             if at:
                 # print "\n\nfirst field_value datatype",at.data_type
@@ -1747,25 +2120,29 @@ def get_node_metadata(request, node, **kwargs):
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
                     if temp_res["is_changed"]:  # if value is true
                         updated_ga_nodes.append(temp_res)
-              
+
                 else:
+
                     create_gattribute(node._id, at, unicode(field_value))
     
     if "is_changed" in kwargs:
         return updated_ga_nodes
 
 
-
 @get_execution_time
 def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
     # function to create grelations for new ones and delete old ones.
-    relationtype = node_collection.one({"_type": "RelationType", "name": unicode(relation_type_name)})
+    relationtype = node_collection.one(
+        {"_type": "RelationType", "name": unicode(relation_type_name)})
     # list_current_grelations = triple_collection.find({"_type":"GRelation","subject":subject_id,"relation_type":relationtype})
-    # removes all existing relations given subject and relation type and then creates again.
-    triple_collection.collection.remove({"_type": "GRelation", "subject": subject_id, "relation_type.$id": relationtype._id})
+    # removes all existing relations given subject and relation type and then
+    # creates again.
+    triple_collection.collection.remove(
+        {"_type": "GRelation", "subject": subject_id, "relation_type.$id": relationtype._id})
 
     for relation_id in right_subject_id_list:
-        create_grelation(ObjectId(subject_id), relationtype, ObjectId(relation_id))
+        create_grelation(
+            ObjectId(subject_id), relationtype, ObjectId(relation_id))
         # gr_node = triple_collection.collection.GRelation()
         # gr_node.subject = ObjectId(subject_id)
         # gr_node.relation_type = relationtype
@@ -1773,493 +2150,489 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
         # gr_node.status = u"PUBLISHED"
         # gr_node.save()
 
+        for relation_id in right_subject_id_list:
 
-	
-	
-	for relation_id in right_subject_id_list:
-	    
-	    gr_node = collection.GRelation()
+            gr_node = collection.GRelation()
             gr_node.subject = ObjectId(subject_id)
             gr_node.relation_type = relationtype
             gr_node.right_subject = ObjectId(relation_id)
-	    gr_node.status = u"PUBLISHED"
+            gr_node.status = u"PUBLISHED"
             gr_node.save()
-		
+            
 
 @get_execution_time
 def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set=[]):
-  """
-  Returns data in list of dictionary format which is required for building html widget.
-  This data is used by html_widget template-tag.
-  """
-  if not isinstance(at_rt_objectid_or_attr_name_list, list):
-    at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
-  #a temp. variable which stores the lookup for append method
-  type_of_set_append_temp=type_of_set.append  
-  if not type_of_set:
-    node["property_order"] = []
-    #a temp. variable which stores the lookup for append method
-    node_property_order_append_temp=node["property_order"].append
-    gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
-    for gst in gst_nodes:
-      for type_of in gst["type_of"]:
-        if type_of not in type_of_set:
-          type_of_set_append_temp(type_of)
+    """
+    Returns data in list of dictionary format which is required for building html widget.
+    This data is used by html_widget template-tag.
+    """
+    if not isinstance(at_rt_objectid_or_attr_name_list, list):
+        at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
+    # a temp. variable which stores the lookup for append method
+    type_of_set_append_temp = type_of_set.append
+    if not type_of_set:
+        node["property_order"] = []
+        # a temp. variable which stores the lookup for append method
+        node_property_order_append_temp = node["property_order"].append
+        gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {
+                                         '$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
+        for gst in gst_nodes:
+            for type_of in gst["type_of"]:
+                if type_of not in type_of_set:
+                    type_of_set_append_temp(type_of)
 
-      for po in gst["property_order"]:
-        if po not in node["property_order"]:
-          node_property_order_append_temp(po)    
-          
+            for po in gst["property_order"]:
+                if po not in node["property_order"]:
+                    node_property_order_append_temp(po)
 
-  BASE_FIELD_METADATA = {
-    'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
-    'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Describe", 'required': False},
-    # 'featured': {'name': "featured", '_type': "BaseField", 'altnames': "Featured"},
-    'location': {'name': "location", '_type': "BaseField", 'altnames': "Location", 'required': False},
-    'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
-    'tags': {'name': "tags", '_type': "BaseField", 'altnames': "Tags", 'required': False}
-  }
+    BASE_FIELD_METADATA = {
+        'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
+        'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Describe", 'required': False},
+        # 'featured': {'name': "featured", '_type': "BaseField", 'altnames': "Featured"},
+        'location': {'name': "location", '_type': "BaseField", 'altnames': "Location", 'required': False},
+        'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
+        'tags': {'name': "tags", '_type': "BaseField", 'altnames': "Tags", 'required': False}
+    }
 
-  widget_data_list = []
-  #a temp. variable which stores the lookup for append method
-  widget_data_list_append_temp=widget_data_list.append
-  for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
-    if type(at_rt_objectid_or_attr_name) == ObjectId: #ObjectId.is_valid(at_rt_objectid_or_attr_name):
-      # For attribute-field(s) and/or relation-field(s)
-      
-      field = node_collection.one({'_id': ObjectId(at_rt_objectid_or_attr_name)}, {'_type': 1, 'subject_type': 1, 'object_type': 1, 'name': 1, 'altnames': 1, 'inverse_name': 1})
+    widget_data_list = []
+    # a temp. variable which stores the lookup for append method
+    widget_data_list_append_temp = widget_data_list.append
+    for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
+        # ObjectId.is_valid(at_rt_objectid_or_attr_name):
+        if type(at_rt_objectid_or_attr_name) == ObjectId:
+            # For attribute-field(s) and/or relation-field(s)
 
-      altnames = u""
-      value = None
-      data_type = None
-      if field._type == RelationType or field._type == "RelationType":
-        # For RelationTypes
-        if set(node["member_of"]).issubset(field.subject_type):
-          # It means we are dealing with normal relation & 
-          data_type = node.structure[field.name]
-          value = node[field.name]
-          if field.altnames:
-            if ";" in field.altnames:
-              altnames = field.altnames.split(";")[0]
+            field = node_collection.one({'_id': ObjectId(at_rt_objectid_or_attr_name)}, {
+                                        '_type': 1, 'subject_type': 1, 'object_type': 1, 'name': 1, 'altnames': 1, 'inverse_name': 1})
+
+            altnames = u""
+            value = None
+            data_type = None
+            if field._type == RelationType or field._type == "RelationType":
+                # For RelationTypes
+                if set(node["member_of"]).issubset(field.subject_type):
+                    # It means we are dealing with normal relation &
+                    data_type = node.structure[field.name]
+                    value = node[field.name]
+                    if field.altnames:
+                        if ";" in field.altnames:
+                            altnames = field.altnames.split(";")[0]
+                        else:
+                            altnames = field.altnames
+
+                elif set(node["member_of"]).issubset(field.object_type):
+                    # It means we are dealing with inverse relation
+                    data_type = node.structure[field.inverse_name]
+                    value = node[field.inverse_name]
+                    if field.altnames:
+                        if ";" in field.altnames:
+                            altnames = field.altnames.split(";")[1]
+
             else:
-              altnames = field.altnames
+                # For AttributeTypes
+                altnames = field.altnames
+                data_type = node.structure[field.name]
+                value = node[field.name]
 
-        elif set(node["member_of"]).issubset(field.object_type):
-          # It means we are dealing with inverse relation
-          data_type = node.structure[field.inverse_name]
-          value = node[field.inverse_name]
-          if field.altnames:
-            if ";" in field.altnames:
-              altnames = field.altnames.split(";")[1]
-            else:
-              altnames = field.altnames
-
-        elif type_of_set:
-          # If current node's GST is not in subject_type
-          # Search for that GST's type_of field value in subject_type
-          for each in type_of_set:
-            if each in field.subject_type:
-              data_type = node.structure[field.name]
-              value = node[field.name]
-              if field.altnames:
-                if ";" in field.altnames:
-                  altnames = field.altnames.split(";")[0]
-                else:
-                  altnames = field.altnames
-
-            elif each in field.object_type:
-              data_type = node.structure[field.inverse_name]
-              value = node[field.inverse_name]
-              if field.altnames:
-                if ";" in field.altnames:
-                  altnames = field.altnames.split(";")[0]
-                else:
-                  altnames = field.altnames
-
-      else:
-        # For AttributeTypes
-        altnames = field.altnames
-        data_type = node.structure[field.name]
-        value = node[field.name]
-
-      widget_data_list_append_temp({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
-                              '_id': field._id, 
+            widget_data_list_append_temp({'_type': field._type,  # It's only use on details-view template; overridden in ndf_tags html_widget()
+                              '_id': field._id,
                               'data_type': data_type,
                               'name': field.name, 'altnames': altnames,
                               'value': value
-                            })
+                              })
 
-    else:
-      # For node's base-field(s)
 
-      # widget_data_list.append([node['member_of'], BASE_FIELD_METADATA[at_rt_objectid_or_attr_name], node[at_rt_objectid_or_attr_name]])
-      widget_data_list_append_temp({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
+        else:
+            # For node's base-field(s)
+            # widget_data_list.append([node['member_of'], BASE_FIELD_METADATA[at_rt_objectid_or_attr_name], node[at_rt_objectid_or_attr_name]])
+            widget_data_list_append_temp({'_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
                               'data_type': node.structure[at_rt_objectid_or_attr_name],
                               'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
                               'value': node[at_rt_objectid_or_attr_name],
                               'required': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['required']
-                            })
+                              })
 
-  return widget_data_list
-
-
+    return widget_data_list
 
 @get_execution_time
 def get_property_order_with_value(node):
-  new_property_order = []
-  demo = None
+    new_property_order = []
+    demo = None
 
-  if '_id' in node:
-    demo = node_collection.one({'_id': node._id})
+    if '_id' in node:
+        demo = node_collection.one({'_id': node._id})
 
-  else:
-    demo = eval("node_collection.collection"+"."+node['_type'])()
-    demo["member_of"] = node["member_of"]
+    else:
+        demo = eval("node_collection.collection" + "." + node['_type'])()
+        demo["member_of"] = node["member_of"]
 
-  if demo["_type"] not in ["MetaType", "GSystemType", "AttributeType", "RelationType"]:
-    # If GSystems found, then only perform following statements
-    
-    demo["property_order"] = []
-    type_of_set = []
-    #temp. variables which stores the lookup for append method
-    type_of_set_append_temp=type_of_set.append
-    demo_prop_append_temp=demo["property_order"].append
-    gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
-    for gst in gst_nodes:
-      for type_of in gst["type_of"]:
-        if type_of not in type_of_set:
-          type_of_set_append_temp(type_of)
+    if demo["_type"] not in ["MetaType", "GSystemType", "AttributeType", "RelationType"]:
+        # If GSystems found, then only perform following statements
 
-      for po in gst["property_order"]:
-        if po not in demo["property_order"]:
-          demo_prop_append_temp(po)
-
-    demo.get_neighbourhood(node["member_of"])
-    #a temp. variable which stores the lookup for append method
-    new_property_order_append_temp=new_property_order.append
-    for tab_name, list_field_id_or_name in demo['property_order']:
-      list_field_set = get_widget_built_up_data(list_field_id_or_name, demo, type_of_set)
-      new_property_order_append_temp([tab_name, list_field_set])
-
-    demo["property_order"] = new_property_order
-  
-  else:
-    # Otherwise (if GSystemType found) depending upon whether type_of exists or not returns property_order.
-    if not demo["property_order"] and demo.has_key("_id"):
-      type_of_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': demo["type_of"]}}, {'property_order': 1})
-      
-      if type_of_nodes.count():
         demo["property_order"] = []
-        #a temp. variable which stores the lookup for append method
-        demo_prop_append_temp=demo["property_order"].append
-        for to in type_of_nodes:
-          for po in to["property_order"]:
-            demo_prop_append_temp(po)
+        type_of_set = []
+        # temp. variables which stores the lookup for append method
+        type_of_set_append_temp = type_of_set.append
+        demo_prop_append_temp = demo["property_order"].append
+        gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {
+                                         '$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
+        for gst in gst_nodes:
+            for type_of in gst["type_of"]:
+                if type_of not in type_of_set:
+                    type_of_set_append_temp(type_of)
 
-      node_collection.collection.update({'_id': demo._id}, {'$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
+            for po in gst["property_order"]:
+                if po not in demo["property_order"]:
+                    demo_prop_append_temp(po)
 
-  new_property_order = demo['property_order']
+        demo.get_neighbourhood(node["member_of"])
+        # a temp. variable which stores the lookup for append method
+        new_property_order_append_temp = new_property_order.append
+        for tab_name, list_field_id_or_name in demo['property_order']:
+            list_field_set = get_widget_built_up_data(
+                list_field_id_or_name, demo, type_of_set)
+            new_property_order_append_temp([tab_name, list_field_set])
 
-  if demo.has_key('_id'):
-    node = node_collection.one({'_id': demo._id})
+        demo["property_order"] = new_property_order
 
-  else:
-    node = eval("node_collection.collection"+"."+demo['_type'])()
-    node["member_of"] = demo["member_of"]
-  
-  node['property_order'] = new_property_order
+    else:
+        # Otherwise (if GSystemType found) depending upon whether type_of
+        # exists or not returns property_order.
+        if not demo["property_order"] and demo.has_key("_id"):
+            type_of_nodes = node_collection.find(
+                {'_type': "GSystemType", '_id': {'$in': demo["type_of"]}}, {'property_order': 1})
 
-  return node['property_order']
+            if type_of_nodes.count():
+                demo["property_order"] = []
+                for to in type_of_nodes:
+                    for po in to["property_order"]:
+                        demo["property_order"].append(po)
 
+            node_collection.collection.update({'_id': demo._id}, {
+                                              '$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
+
+    new_property_order = demo['property_order']
+
+    if demo.has_key('_id'):
+        node = node_collection.one({'_id': demo._id})
+
+    else:
+        node = eval("node_collection.collection" + "." + demo['_type'])()
+        node["member_of"] = demo["member_of"]
+
+    node['property_order'] = new_property_order
+
+    return node['property_order']
 
 
 @get_execution_time
 def parse_template_data(field_data_type, field_value, **kwargs):
-  """
-  Parses the value fetched from request (GET/POST) object based on the data-type of the given field.
+    """
+    Parses the value fetched from request (GET/POST) object based on the data-type of the given field.
 
-  Arguments:
-  field_data_type -- data-type of the field
-  field_value -- value of the field retrieved from GET/POST object
+    Arguments:
+    field_data_type -- data-type of the field
+    field_value -- value of the field retrieved from GET/POST object
 
-  Returns:
-  Parsed value based on the data-type of the field
-  """
+    Returns:
+    Parsed value based on the data-type of the field
+    """
 
-  '''
+    '''
   kwargs_keys_list = [
                     "date_format_string",     # date-format in string representation
                     "field_instance"          # dict-object reperesenting AT/RT node
                   ]
   '''
-  DATA_TYPE_STR_CHOICES = [
-                          "unicode", "basestring",
-                          "int", "float", "long",
-                          "list", "dict",
-                          "datetime",
-                          "bool",
-                          "ObjectId"
-                        ]
-  try:
-    if type(field_data_type) == type:
-      field_data_type = field_data_type.__name__
+    DATA_TYPE_STR_CHOICES = [
+        "unicode", "basestring",
+        "int", "float", "long",
+        "list", "dict",
+        "datetime",
+        "bool",
+        "ObjectId"
+    ]
+    try:
+        if type(field_data_type) == type:
+            field_data_type = field_data_type.__name__
 
-      if not field_value:
-        if field_data_type == "dict":
-          return {}
+            if not field_value:
+                if field_data_type == "dict":
+                    return {}
 
-        elif field_data_type == "list":
-          return []
+                elif field_data_type == "list":
+                    return []
+
+                else:
+                    return None
+
+            if field_data_type == "unicode":
+                field_value = unicode(field_value)
+
+            elif field_data_type == "basestring":
+                field_value = field_value
+
+            elif field_data_type == "int":
+                field_value = int(field_value)
+
+            elif field_data_type == "float":
+                field_value = float(field_value)
+
+            elif field_data_type == "long":
+                field_value = long(field_value)
+
+            elif field_data_type == "list":
+                if ("[" in field_value) and ("]" in field_value):
+                    field_value = json.loads(field_value)
+
+                else:
+                    lr = field_value.replace(" ,", ",")
+                    rr = lr.replace(", ", ",")
+                    field_value = rr.split(",")
+
+            elif field_data_type == "dict":
+                field_value = "???"
+
+            elif field_data_type == "datetime":
+                field_value = datetime.strptime(
+                    field_value, kwargs["date_format_string"])
+
+            elif field_data_type == "bool":
+                if field_value == "Yes" or field_value == "yes" or field_value == "1":
+                    if field_value == "1":
+                        field_value = bool(int(field_value))
+                    else:
+                        field_value = True
+
+                elif field_value == "No" or field_value == "no" or field_value == "0":
+                    if field_value == "0":
+                        field_value = bool(int(field_value))
+                    else:
+                        field_value = False
+
+            elif field_data_type == "ObjectId":
+                field_value = ObjectId(field_value)
+
+            else:
+                error_message = "Unknown data-type (" + \
+                    field_data_type + ") found"
+                raise Exception(error_message)
+
+        elif type(field_data_type) == list:
+
+            if "field_instance" in kwargs:
+                if kwargs["field_instance"]["_type"] == RelationType or kwargs["field_instance"]["_type"] == "RelationType":
+                    # Write RT related code
+                    if not field_value:
+                        return None
+                    if field_value:
+                        field_value = ObjectId(field_value)
+
+                    else:
+                        error_message = "This ObjectId(" + \
+                            field_type + ") doesn't exists"
+                        raise Exception(error_message)
+
+            else:
+                if not field_value:
+                    return []
+
+                if ("[" in field_value) and ("]" in field_value):
+                    field_value = json.loads(field_value)
+
+                else:
+                    lr = field_value.replace(" ,", ",")
+                    rr = lr.replace(", ", ",")
+                    field_value = rr.split(",")
+
+                return field_value
+
+        elif type(field_data_type) == dict:
+            # Write code...
+            if not field_value:
+                return {}
+
+        elif type(field_data_type) == mongokit.operators.IS:
+            # Write code...
+            if not field_value:
+                return None
+
+            field_value = unicode(field_value) if type(
+                field_value) != unicode else field_value
+
+        elif type(field_data_type) == mongokit.document.R:
+            # Write code...
+            if kwargs["field_instance"]["_type"] == AttributeType or kwargs["field_instance"]["_type"] == "AttributeType":
+                # Write AT related code
+                if not field_value:
+                    if field_data_type == "dict":
+                        return {}
+                    elif field_data_type == "list":
+                        return []
+
+                    else:
+                        return None
+
+            else:
+                error_message = "Neither AttributeType nor RelationType found"
+                raise Exception(error_message)
 
         else:
-          return None
-
-      if field_data_type == "unicode":
-        field_value = unicode(field_value)
-
-      elif field_data_type == "basestring":
-        field_value = field_value
-
-      elif field_data_type == "int":
-        field_value = int(field_value)
-
-      elif field_data_type == "float":
-        field_value = float(field_value)
-
-      elif field_data_type == "long":
-        field_value = long(field_value)
-
-      elif field_data_type == "list":
-        if ("[" in field_value) and ("]" in field_value):
-          field_value = json.loads(field_value)
-
-        else:
-          lr = field_value.replace(" ,", ",")
-          rr = lr.replace(", ", ",")
-          field_value = rr.split(",")
-
-      elif field_data_type == "dict":
-        field_value = "???"
-
-      elif field_data_type == "datetime":
-        field_value = datetime.strptime(field_value, kwargs["date_format_string"])
-
-      elif field_data_type == "bool":
-        if field_value == "Yes" or field_value == "yes" or field_value == "1":
-          if field_value == "1":
-            field_value = bool(int(field_value))
-          else:
-            field_value = True
-        
-        elif field_value == "No" or field_value == "no" or field_value == "0":
-          if field_value == "0":
-            field_value = bool(int(field_value))
-          else:
-            field_value = False
-
-      elif field_data_type == "ObjectId":
-        field_value = ObjectId(field_value)
-
-      else:
-        error_message = "Unknown data-type ("+field_data_type+") found"
-        raise Exception(error_message)
-
-    elif type(field_data_type) == list:
-
-      if "field_instance" in kwargs:
-        if kwargs["field_instance"]["_type"] == RelationType or kwargs["field_instance"]["_type"] == "RelationType":
-          # Write RT related code
-          if not field_value:
-            return None
-          if field_value:
-            field_value = ObjectId(field_value)
-
-          else:
-            error_message = "This ObjectId("+field_type+") doesn't exists"
+            error_message = "Unknown data-type found"
             raise Exception(error_message)
-
-      else:
-        if not field_value:
-          return []
-
-        if ("[" in field_value) and ("]" in field_value):
-          field_value = json.loads(field_value)
-
-        else:
-          lr = field_value.replace(" ,", ",")
-          rr = lr.replace(", ", ",")
-          field_value = rr.split(",")
 
         return field_value
 
-    elif type(field_data_type) == dict:
-      # Write code...
-      if not field_value:
-        return {}
-
-    elif type(field_data_type) == mongokit.operators.IS:
-      # Write code...
-      if not field_value:
-        return None
-
-      field_value = unicode(field_value) if type(field_value) != unicode else field_value
-
-    elif type(field_data_type) == mongokit.document.R:
-      # Write code...
-      if kwargs["field_instance"]["_type"] == AttributeType or kwargs["field_instance"]["_type"] == "AttributeType":
-        # Write AT related code 
-        if not field_value:
-          if field_data_type == "dict":
-            return {}
-
-          elif field_data_type == "list":
-            return []
-
-          else:
-            return None
-
-      else:
-        error_message = "Neither AttributeType nor RelationType found"
+    except Exception as e:
+        error_message = "\n TemplateDataParsingError: " + str(e) + " !!!\n"
         raise Exception(error_message)
-
-    else:
-      error_message = "Unknown data-type found"
-      raise Exception(error_message)
-
-    return field_value
-  
-  except Exception as e:
-    error_message = "\n TemplateDataParsingError: "+str(e)+" !!!\n"
-    raise Exception(error_message)
 
 
 @get_execution_time
 def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwargs):
-  ga_node = None
-  info_message = ""
-  old_object_value = None
-  ga_node = triple_collection.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
-  if ga_node is None:
-    # Code for creation
-    try:
-      ga_node = triple_collection.collection.GAttribute()
+    ga_node = None
+    info_message = ""
+    old_object_value = None
 
-      ga_node.subject = subject_id
-      ga_node.attribute_type = attribute_type_node
+    ga_node = triple_collection.one(
+        {'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
+    if ga_node is None:
+        # Code for creation
+        try:
+            ga_node = triple_collection.collection.GAttribute()
 
-      if (not object_value) and type(object_value) != bool:
-        object_value = u"None"
-        ga_node.status = u"DELETED"
+            ga_node.subject = subject_id
+            ga_node.attribute_type = attribute_type_node
 
-      else:
-        ga_node.status = u"PUBLISHED"
-
-      ga_node.object_value = object_value
-      ga_node.save()
-      # print "\n\n New GAttribute created successfully === ", ga_node.name, " == ",ga_node._id
-      if object_value == u"None":
-        info_message = " GAttribute ("+ga_node.name+") created successfully with status as 'DELETED'!\n"
-
-      else:
-        info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
-
-        # Fetch corresponding document & append into it's attribute_set
-        node_collection.collection.update({'_id': subject_id}, 
-                          {'$addToSet': {'attribute_set': {attribute_type_node.name: object_value}}}, 
-                          upsert=False, multi=False
-                        )
-
-      is_ga_node_changed = True
-
-    except Exception as e:
-      error_message = "\n GAttributeCreateError: " + str(e) + "\n"
-      raise Exception(error_message)
-
-  else:
-    # Code for updation
-    is_ga_node_changed = False
-    try:
-      if (not object_value) and type(object_value) != bool:
-        old_object_value = ga_node.object_value
-
-        ga_node.status = u"DELETED"
-        ga_node.save()
-        info_message = " GAttribute ("+ga_node.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
-
-        # Fetch corresponding document & update it's attribute_set with proper value
-        node_collection.collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: old_object_value}, 
-                          {'$pull': {'attribute_set': {attribute_type_node.name: old_object_value}}}, 
-                          upsert=False, multi=False)
-
-      else:
-        if type(ga_node.object_value) == list:
-          if type(ga_node.object_value[0]) == dict:
-            old_object_value = ga_node.object_value
-
-            if len(old_object_value) != len(object_value):
-              ga_node.object_value = object_value
-              is_ga_node_changed = True
+            if (not object_value) and type(object_value) != bool:
+                object_value = u"None"
+                ga_node.status = u"DELETED"
 
             else:
-              pairs = zip(old_object_value, object_value)
-              if any(x != y for x, y in pairs):
-                ga_node.object_value = object_value
-                is_ga_node_changed = True
+                ga_node.status = u"PUBLISHED"
 
-          elif set(ga_node.object_value) != set(object_value):
-            old_object_value = ga_node.object_value
             ga_node.object_value = object_value
-            is_ga_node_changed = True
-
-        elif type(ga_node.object_value) == dict:
-          if cmp(ga_node.object_value, object_value) != 0:
-            old_object_value = ga_node.object_value
-            ga_node.object_value = object_value
-            is_ga_node_changed = True
-
-        else:
-          if ga_node.object_value != object_value:
-            old_object_value = ga_node.object_value
-            ga_node.object_value = object_value
-            is_ga_node_changed = True
-
-        if is_ga_node_changed or ga_node.status == u"DELETED":
-          if ga_node.status == u"DELETED":
-            ga_node.status = u"PUBLISHED"
             ga_node.save()
+            
+            if object_value == u"None":
+                info_message = " GAttribute (" + ga_node.name + \
+                    ") created successfully with status as 'DELETED'!\n"
 
-            info_message = " GAttribute ("+ga_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            else:
+                info_message = " GAttribute (" + \
+                    ga_node.name + ") created successfully.\n"
 
-            # Fetch corresponding document & append into it's attribute_set
-            node_collection.collection.update({'_id': subject_id}, 
-                              {'$addToSet': {'attribute_set': {attribute_type_node.name: object_value}}}, 
-                              upsert=False, multi=False)
+                # Fetch corresponding document & append into it's attribute_set
+                node_collection.collection.update({'_id': subject_id},
+                                                  {'$addToSet': {
+                                                      'attribute_set': {attribute_type_node.name: object_value}}},
+                                                  upsert=False, multi=False
+                                                  )
 
-          else:
-            ga_node.status = u"PUBLISHED"
-            ga_node.save()
-            info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+            is_ga_node_changed = True
 
-            # Fetch corresponding document & update it's attribute_set with proper value
-            node_collection.collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: {"$exists": True}}, 
-                              {'$set': {'attribute_set.$.'+attribute_type_node.name: ga_node.object_value}}, 
-                              upsert=False, multi=False)
-        else:
-          info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
+        except Exception as e:
+            error_message = "\n GAttributeCreateError: " + str(e) + "\n"
+            raise Exception(error_message)
 
-    except Exception as e:
-      error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
-      raise Exception(error_message)
+    else:
+        # Code for updation
+        is_ga_node_changed = False
+        try:
+            if (not object_value) and type(object_value) != bool:
+                old_object_value = ga_node.object_value
 
-  # print "\n\t is_ga_node_changed: ", is_ga_node_changed
-  if "is_changed" in kwargs:
-    ga_dict = {}
-    ga_dict["is_changed"] = is_ga_node_changed
-    ga_dict["node"] = ga_node
-    ga_dict["before_obj_value"] = old_object_value
-    return ga_dict
-  else:
-    return ga_node
+                ga_node.status = u"DELETED"
+                ga_node.save()
+                
+                info_message = " GAttribute (" + ga_node.name + \
+                    ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
+
+                # Fetch corresponding document & update it's attribute_set with
+                # proper value
+                node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: old_object_value},
+                                                  {'$pull': {
+                                                      'attribute_set': {attribute_type_node.name: old_object_value}}},
+                                                  upsert=False, multi=False)
+
+            else:
+                if type(ga_node.object_value) == list:
+                    if type(ga_node.object_value[0]) == dict:
+                        old_object_value = ga_node.object_value
+
+                        if len(old_object_value) != len(object_value):
+                            ga_node.object_value = object_value
+                            is_ga_node_changed = True
+
+                        else:
+                            pairs = zip(old_object_value, object_value)
+                            if any(x != y for x, y in pairs):
+                                ga_node.object_value = object_value
+                                is_ga_node_changed = True
+
+                    elif set(ga_node.object_value) != set(object_value):
+                        old_object_value = ga_node.object_value
+                        ga_node.object_value = object_value
+                        is_ga_node_changed = True
+
+                elif type(ga_node.object_value) == dict:
+                    if cmp(ga_node.object_value, object_value) != 0:
+                        old_object_value = ga_node.object_value
+                        ga_node.object_value = object_value
+                        is_ga_node_changed = True
+
+                else:
+                    if ga_node.object_value != object_value:
+                        old_object_value = ga_node.object_value
+                        ga_node.object_value = object_value
+                        is_ga_node_changed = True
+
+                if is_ga_node_changed or ga_node.status == u"DELETED":
+                    if ga_node.status == u"DELETED":
+                        ga_node.status = u"PUBLISHED"
+                        ga_node.save()
+                        
+                        
+                        info_message = " GAttribute (" + ga_node.name + \
+                            ") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+
+                        # Fetch corresponding document & append into it's
+                        # attribute_set
+                        node_collection.collection.update({'_id': subject_id},
+                                                          {'$addToSet': {
+                                                              'attribute_set': {attribute_type_node.name: object_value}}},
+                                                          upsert=False, multi=False)
+
+                    else:
+                        ga_node.status = u"PUBLISHED"
+                        ga_node.save()
+                        
+                        info_message = " GAttribute (" + \
+                            ga_node.name + ") updated successfully.\n"
+
+                        # Fetch corresponding document & update it's
+                        # attribute_set with proper value
+                        node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: {"$exists": True}},
+                                                          {'$set': {
+                                                              'attribute_set.$.' + attribute_type_node.name: ga_node.object_value}},
+                                                          upsert=False, multi=False)
+                else:
+                    info_message = " GAttribute (" + ga_node.name + \
+                        ") already exists (Nothing updated) !\n"
+
+        except Exception as e:
+            error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
+            raise Exception(error_message)
+
+    # print "\n\t is_ga_node_changed: ", is_ga_node_changed
+    if "is_changed" in kwargs:
+        ga_dict = {}
+        ga_dict["is_changed"] = is_ga_node_changed
+        ga_dict["node"] = ga_node
+        ga_dict["before_obj_value"] = old_object_value
+        return ga_dict
+    else:
+        return ga_node
 
 
 # @get_execution_time
@@ -2284,7 +2657,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         subject_id = ObjectId(subject_id)
 
         def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text):
-            # Code for creating GRelation node
+                        # Code for creating GRelation node
             gr_node = triple_collection.collection.GRelation()
 
             gr_node.subject = subject_id
@@ -2293,6 +2666,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            
             
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
@@ -2307,8 +2681,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             })
 
             if left_subject:
-                # Update value of grelation in existing as key-value pair value in
-                # given node's "relation_set" field
+                                # Update value of grelation in existing as key-value pair value in
+                                # given node's "relation_set" field
                 node_collection.collection.update({
                     "_id": subject_id,
                     "relation_set." + relation_type_node_name: {'$exists': True}
@@ -2363,7 +2737,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text):
             gr_node.status = u"PUBLISHED"
             gr_node.save()
-
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
             relation_type_node_inverse_name = relation_type_node.inverse_name
@@ -2372,8 +2745,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             right_subject = gr_node.right_subject
 
             info_message = " %(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
-                + "status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
-            # print "\n",info_message
+                + \
+                "status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
 
             node_collection.collection.update({
                 "_id": subject_id, "relation_set." + relation_type_node_name: {'$exists': True}
@@ -2418,9 +2791,11 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # Relationship Other than Binary one found; e.g, Triadic
                     if right_subject_id_or_list:
                         if not isinstance(right_subject_id_or_list[0], list):
-                            right_subject_id_or_list = [right_subject_id_or_list]
+                            right_subject_id_or_list = [
+                                right_subject_id_or_list]
 
-                        # right_subject_id_or_list: [[id, id, ...], [id, id, ...], ...]
+                        # right_subject_id_or_list: [[id, id, ...], [id, id,
+                        # ...], ...]
                         for i, each_list in enumerate(right_subject_id_or_list):
                             # each_list: [id, id, ...]
                             for j, each in enumerate(each_list):
@@ -2430,17 +2805,21 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                 if META_TYPE[3] in type_of_relationship:
                     # If Binary relationship found
                     if isinstance(right_subject_id_or_list, list):
-                        right_subject_id_or_list = ObjectId(right_subject_id_or_list[0])
+                        right_subject_id_or_list = ObjectId(
+                            right_subject_id_or_list[0])
 
                     else:
-                        right_subject_id_or_list = ObjectId(right_subject_id_or_list)
+                        right_subject_id_or_list = ObjectId(
+                            right_subject_id_or_list)
                 else:
                     # Relationship Other than Binary one found; e.g, Triadic
-                    # right_subject_id_or_list: [[id, id, ...], [id, id, ...], ...]
+                    # right_subject_id_or_list: [[id, id, ...], [id, id, ...],
+                    # ...]
                     if right_subject_id_or_list:
                         if isinstance(right_subject_id_or_list[0], list):
                             # Reduce it to [id, id, id, ...]
-                            right_subject_id_or_list = right_subject_id_or_list[0]
+                            right_subject_id_or_list = right_subject_id_or_list[
+                                0]
 
                         for i, each_id in enumerate(right_subject_id_or_list):
                             right_subject_id_or_list[i] = ObjectId(each_id)
@@ -2460,20 +2839,25 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                 if n.right_subject in right_subject_id_or_list:
                     if n.status != u"DELETED":
                         # If match found with existing one's, then only remove that ObjectId from the given list of ObjectIds
-                        # Just to remove already existing entries (whose status is PUBLISHED)
+                        # Just to remove already existing entries (whose status
+                        # is PUBLISHED)
                         right_subject_id_or_list.remove(n.right_subject)
                         gr_node_list.append(n)
 
                         node_collection.collection.update(
-                          {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                          {'$addToSet': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
-                          upsert=False, multi=False
+                            {'_id': subject_id, 'relation_set.' +
+                                relation_type_node.name: {'$exists': True}},
+                            {'$addToSet': {
+                                'relation_set.$.' + relation_type_node.name: n.right_subject}},
+                            upsert=False, multi=False
                         )
 
                         node_collection.collection.update(
-                          {'_id': n.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
-                          {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
-                          upsert=False, multi=False
+                            {'_id': n.right_subject, 'relation_set.' +
+                                relation_type_node.inverse_name: {'$exists': True}},
+                            {'$addToSet': {
+                                'relation_set.$.' + relation_type_node.inverse_name: subject_id}},
+                            upsert=False, multi=False
                         )
 
                 else:
@@ -2482,7 +2866,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # right_subject_id_or_list.remove(n.right_subject)
                     n.status = u"DELETED"
                     n.save()
-                    info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
+        
+                    info_message = " MultipleGRelation: GRelation (" + n.name + \
+                        ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
                     node_collection.collection.update({
                         '_id': subject_id, 'relation_set.' + relation_type_node.name: {'$exists': True}
@@ -2513,17 +2899,21 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
                     if gr_node is None:
                         # New one found so create it
-                        gr_node = _create_grelation_node(subject_id, relation_type_node, nid, "MultipleGRelation")
+                        gr_node = _create_grelation_node(
+                            subject_id, relation_type_node, nid, "MultipleGRelation")
                         gr_node_list.append(gr_node)
 
                     else:
-                        # Deleted one found so change it's status back to Published
+                        # Deleted one found so change it's status back to
+                        # Published
                         if gr_node.status == u'DELETED':
-                            gr_node = _update_deleted_to_published(gr_node, relation_type_node, "MultipleGRelation")
+                            gr_node = _update_deleted_to_published(
+                                gr_node, relation_type_node, "MultipleGRelation")
                             gr_node_list.append(gr_node)
 
                         else:
-                            error_message = " MultipleGRelation: Corrupt value found - GRelation ("+gr_node.name+")!!!\n"
+                            error_message = " MultipleGRelation: Corrupt value found - GRelation (" + \
+                                gr_node.name + ")!!!\n"
                             # raise Exception(error_message)
 
             return gr_node_list
@@ -2547,11 +2937,14 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                 node_right_subject = node.right_subject
 
                 if node_right_subject == right_subject_id_or_list:
-                    # If match found, it means it could be either DELETED one or PUBLISHED one
+                    # If match found, it means it could be either DELETED one
+                    # or PUBLISHED one
 
                     if node_status == u"DELETED":
-                        # If deleted, change it's status back to Published from Deleted
-                        node = _update_deleted_to_published(node, relation_type_node, "SingleGRelation")
+                        # If deleted, change it's status back to Published from
+                        # Deleted
+                        node = _update_deleted_to_published(
+                            node, relation_type_node, "SingleGRelation")
 
                     elif node_status == u"PUBLISHED":
                         node_collection.collection.update({
@@ -2569,14 +2962,17 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         },
                             upsert=False, multi=False
                         )
-                        info_message = " SingleGRelation: GRelation (%(node_name)s) already exists !\n" % locals()
+                        info_message = " SingleGRelation: GRelation (%(node_name)s) already exists !\n" % locals(
+                        )
 
-                    # Set gr_node value as matched value, so that no need to create new one
+                    # Set gr_node value as matched value, so that no need to
+                    # create new one
                     node.reload()
                     gr_node = node
 
                 else:
-                    # If match not found and if it's PUBLISHED one, modify it to DELETED
+                    # If match not found and if it's PUBLISHED one, modify it
+                    # to DELETED
                     if node.status == u'PUBLISHED':
                         node.status = u"DELETED"
                         node.save()
@@ -2597,175 +2993,365 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                             upsert=False, multi=False
                         )
                         info_message = " SingleGRelation: GRelation (%(node_name)s) status " % locals() \
-                            + "updated from 'PUBLISHED' to 'DELETED' successfully.\n"
+                            + \
+                            "updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
             if gr_node is None:
                 # Code for creation
-                gr_node = _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, "SingleGRelation")
+                gr_node = _create_grelation_node(
+                    subject_id, relation_type_node, right_subject_id_or_list, "SingleGRelation")
 
             return gr_node
 
     except Exception as e:
-        error_message = "\n GRelationError (line #" + str(exc_info()[-1].tb_lineno) + "): " + str(e) + "\n"
+        error_message = "\n GRelationError (line #" + \
+            str(exc_info()[-1].tb_lineno) + "): " + str(e) + "\n"
         raise Exception(error_message)
 
 
-###############################################      ##############################################
+###############################################      #####################
 @get_execution_time
 def set_all_urls(member_of):
-	Gapp_obj = node_collection.one({"_type":"MetaType", "name":"GAPP"})
-	factory_obj = node_collection.one({"_type":"MetaType", "name":"factory_types"})
+    Gapp_obj = node_collection.one({"_type": "MetaType", "name": "GAPP"})
+    factory_obj = node_collection.one(
+        {"_type": "MetaType", "name": "factory_types"})
 
-	url = ""	
-	gsType = member_of[0]
-	gsType_obj = node_collection.one({"_id":ObjectId(gsType)})
-	
-	if Gapp_obj._id in gsType_obj.member_of:
-		if gsType_obj.name == u"Quiz":
-		    url = u"quiz/details"
-		else:
-		    url = gsType_obj.name.lower()
-	elif factory_obj._id in gsType_obj.member_of:
-		if gsType_obj.name == u"QuizItem":
-		    url = u"quiz/details"
-		elif gsType_obj.name == u"Twist":
-		    url = u"forum/thread"
-		else:
-		    url = gsType_obj.name.lower()
-	else:
-		url = u"None"
-	return url
-###############################################	###############################################    
+    url = ""
+    gsType = member_of[0]
+    gsType_obj = node_collection.one({"_id": ObjectId(gsType)})
+
+    if Gapp_obj._id in gsType_obj.member_of:
+        if gsType_obj.name == u"Quiz":
+            url = u"quiz/details"
+        else:
+            url = gsType_obj.name.lower()
+    elif factory_obj._id in gsType_obj.member_of:
+        if gsType_obj.name == u"QuizItem":
+            url = u"quiz/details"
+        elif gsType_obj.name == u"Twist":
+            url = u"forum/thread"
+        else:
+            url = gsType_obj.name.lower()
+    else:
+        url = u"None"
+    return url
+############################################### ##########################
+
+
+@login_required
+@get_execution_time
+def create_discussion(request, group_id, node_id):
+    '''
+    Method to create discussion thread for File and Page.
+    '''
+
+    try:
+
+        twist_st = node_collection.one(
+            {'_type': 'GSystemType', 'name': 'Twist'})
+
+        node = node_collection.one({'_id': ObjectId(node_id)})
+
+        # group = node_collection.one({'_id':ObjectId(group_id)})
+
+        thread = node_collection.one({"_type": "GSystem", "name": node.name, "member_of": ObjectId(
+            twist_st._id), "prior_node": ObjectId(node_id)})
+
+        if not thread:
+
+            # retriving RelationType
+            # relation_type = node_collection.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
+
+            # Creating thread with the name of node
+            thread_obj = node_collection.collection.GSystem()
+
+            thread_obj.name = unicode(node.name)
+            thread_obj.status = u"PUBLISHED"
+
+            thread_obj.created_by = int(request.user.id)
+            thread_obj.modified_by = int(request.user.id)
+            thread_obj.contributors.append(int(request.user.id))
+
+            thread_obj.member_of.append(ObjectId(twist_st._id))
+            thread_obj.prior_node.append(ObjectId(node_id))
+            thread_obj.group_set.append(ObjectId(group_id))
+
+            thread_obj.save()
+            
+            # creating GRelation
+            # create_grelation(node_id, relation_type, twist_st)
+            response_data = ["thread-created", str(thread_obj._id)]
+
+            return HttpResponse(json.dumps(response_data))
+
+        else:
+            response_data = ["Thread-exist", str(thread._id)]
+            return HttpResponse(json.dumps(response_data))
+
+    except Exception as e:
+
+        error_message = "\n DiscussionThreadCreateError: " + str(e) + "\n"
+        raise Exception(error_message)
+        # return HttpResponse("server-error")
+
+
+# to add discussion replie
+@get_execution_time
+def discussion_reply(request, group_id, node_id):
+    try:
+
+        prior_node = request.POST.get("prior_node_id", "")
+        content_org = request.POST.get(
+            "reply_text_content", "")  # reply content
+
+        # process and save node if it reply has content
+        if content_org:
+
+            user_id = int(request.user.id)
+            user_name = unicode(request.user.username)
+
+            # auth = node_collection.one({'_type': 'Author', 'name': user_name })
+            reply_st = node_collection.one(
+                {'_type': 'GSystemType', 'name': 'Reply'})
+
+            # creating empty GST and saving it
+            reply_obj = node_collection.collection.GSystem()
+
+            reply_obj.name = unicode("Reply of:" + str(prior_node))
+            reply_obj.status = u"PUBLISHED"
+
+            reply_obj.created_by = user_id
+            reply_obj.modified_by = user_id
+            reply_obj.contributors.append(user_id)
+
+            reply_obj.member_of.append(ObjectId(reply_st._id))
+            reply_obj.prior_node.append(ObjectId(prior_node))
+            reply_obj.group_set.append(ObjectId(group_id))
+
+            reply_obj.content_org = unicode(content_org)
+            filename = slugify(
+                unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
+            reply_obj.content = org2html(content_org, file_prefix=filename)
+
+            # saving the reply obj
+            reply_obj.save()
+
+            formated_time = reply_obj.created_at.strftime(
+                "%B %d, %Y, %I:%M %p")
+
+            # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
+            reply = json.dumps(["reply_saved", str(reply_obj._id), str(reply_obj.prior_node[
+                               0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder)
+
+            # ---------- mail/notification sending -------
+            node = node_collection.one({"_id": ObjectId(node_id)})
+            node_creator_user_obj = User.objects.get(id=node.created_by)
+            node_creator_user_name = node_creator_user_obj.username
+
+            site = Site.objects.get(pk=1)
+            site = site.name.__str__()
+
+            from_user = user_name
+
+            to_user_list = [node_creator_user_obj]
+
+            msg = "\n\nDear " + node_creator_user_name + ",\n\n" + \
+                  "A reply has been added in discussion under the " + \
+                  node.member_of_names_list[0] + " named: '" + \
+                  node.name + "' by '" + user_name + "'."
+
+            activity = "Discussion Reply"
+            render_label = render_to_string(
+                "notification/label.html",
+                {
+                    # "sender": from_user,
+                    "activity": activity,
+                    "conjunction": "-",
+                    "link": "url_link"
+                }
+            )
+            notification.create_notice_type(render_label, msg, "notification")
+            notification.send(
+                to_user_list, render_label, {"from_user": from_user})
+
+            # ---------- END of mail/notification sending ---------
+
+            return HttpResponse(reply)
+
+        else:  # no reply content
+
+            return HttpResponse(json.dumps(["no_content"]))
+
+    except Exception as e:
+
+        error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
+        raise Exception(error_message)
+
+        return HttpResponse(json.dumps(["Server Error"]))
+
+
+@get_execution_time
+def discussion_delete_reply(request, group_id):
+
+    nodes_to_delete = json.loads(request.POST.get("nodes_to_delete", "[]"))
+
+    reply_st = node_collection.one({'_type': 'GSystemType', 'name': 'Reply'})
+
+    deleted_replies = []
+
+    for each_reply in nodes_to_delete:
+        temp_reply = node_collection.one({"_id": ObjectId(each_reply)})
+
+        if temp_reply:
+            deleted_replies.append(temp_reply._id.__str__())
+            temp_reply.delete()
+    return HttpResponse(json.dumps(deleted_replies))
 
 @get_execution_time
 def get_user_group(userObject):
-  '''
-  methods for getting user's belongs to group.
-  input (userObject) is user object
-  output list of dict, dict contain groupname, access, group_type, created_at and created_by
-  '''
-  blank_list = []
-  cur_groups_user = node_collection.find({'_type': "Group", 
-                                          '$or': [
-                                            {'created_by': userObject.id}, 
-                                            {'group_admin': userObject.id},
-                                            {'author_set': userObject.id},
-                                          ]
-                                        }).sort('last_update', -1)
-  for eachgroup in cur_groups_user :
-    access = ""
-    if eachgroup.created_by == userObject.id:
-      access = "owner"
-    elif userObject.id in eachgroup.group_admin :
-      access = "admin"
-    elif userObject.id in eachgroup.author_set :
-      access = "member"
-    else :
-      access = "member"
-    user = User.objects.get(id=eachgroup.created_by)
-    blank_list.append({'id':str(eachgroup._id), 'name':eachgroup.name, 'access':access, 'group_type':eachgroup.group_type, 'created_at':eachgroup.created_at, 'created_by':user.username})
-  return blank_list
+    '''
+    methods for getting user's belongs to group.
+    input (userObject) is user object
+    output list of dict, dict contain groupname, access, group_type, created_at and created_by
+    '''
+    blank_list = []
+    cur_groups_user = node_collection.find({'_type': "Group",
+                                            '$or': [
+                                                {'created_by': userObject.id},
+                                                {'group_admin': userObject.id},
+                                                {'author_set': userObject.id},
+                                            ]
+                                            }).sort('last_update', -1)
+    for eachgroup in cur_groups_user:
+        access = ""
+        if eachgroup.created_by == userObject.id:
+            access = "owner"
+        elif userObject.id in eachgroup.group_admin:
+            access = "admin"
+        elif userObject.id in eachgroup.author_set:
+            access = "member"
+        else:
+            access = "member"
+        user = User.objects.get(id=eachgroup.created_by)
+        blank_list.append({'id': str(eachgroup._id), 'name': eachgroup.name, 'access': access,
+                           'group_type': eachgroup.group_type, 'created_at': eachgroup.created_at, 'created_by': user.username})
+    return blank_list
+
 
 @get_execution_time
 def get_user_task(userObject):
-  '''
-  methods for getting user's assigned task.
-  input (userObject) is user object
-  output list of dict, dict contain taskname, status, due_time, created_at and created_by, group_name
-  '''
-  blank_list = []
-  attributetype_assignee = node_collection.find_one({"_type":'AttributeType', 'name':'Assignee'})
-  attributetype_status = node_collection.find_one({"_type":'AttributeType', 'name':'Status'})
-  attributetype_end_time = node_collection.find_one({"_type":'AttributeType', 'name':'end_time'})
-  attr_assignee = triple_collection.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":userObject.username})
-  for attr in attr_assignee :
-    blankdict = {}
-    task_node = node_collection.find_one({'_id':attr.subject})
-    attr_status = triple_collection.find_one({"_type":"GAttribute", "attribute_type.$id":attributetype_status._id, "subject":task_node._id})
-    attr_end_time = triple_collection.find_one({"_type":"GAttribute", "attribute_type.$id":attributetype_end_time._id, "subject":task_node._id})
-    if attr_status.object_value is not "closed":
-      group = node_collection.find_one({"_id":task_node.group_set[0]})
-      user = User.objects.get(id=task_node.created_by)
-      blankdict.update({'name':task_node.name, 'created_at':task_node.created_at, 'created_by':user.username, 'group_name':group.name, 'id':str(task_node._id)})
-      if attr_status:
-        blankdict.update({'status':attr_status.object_value})
-      if attr_end_time:
-        blankdict.update({'due_time':attr_end_time.object_value})
-      blank_list.append(blankdict)
-  return blank_list
+    '''
+    methods for getting user's assigned task.
+    input (userObject) is user object
+    output list of dict, dict contain taskname, status, due_time, created_at and created_by, group_name
+    '''
+    blank_list = []
+    attributetype_assignee = node_collection.find_one(
+        {"_type": 'AttributeType', 'name': 'Assignee'})
+    attributetype_status = node_collection.find_one(
+        {"_type": 'AttributeType', 'name': 'Status'})
+    attributetype_end_time = node_collection.find_one(
+        {"_type": 'AttributeType', 'name': 'end_time'})
+    attr_assignee = triple_collection.find(
+        {"_type": "GAttribute", "attribute_type.$id": attributetype_assignee._id, "object_value": userObject.username})
+    for attr in attr_assignee:
+        blankdict = {}
+        task_node = node_collection.find_one({'_id': attr.subject})
+        attr_status = triple_collection.find_one(
+            {"_type": "GAttribute", "attribute_type.$id": attributetype_status._id, "subject": task_node._id})
+        attr_end_time = triple_collection.find_one(
+            {"_type": "GAttribute", "attribute_type.$id": attributetype_end_time._id, "subject": task_node._id})
+        if attr_status.object_value is not "closed":
+            group = node_collection.find_one({"_id": task_node.group_set[0]})
+            user = User.objects.get(id=task_node.created_by)
+            blankdict.update({'name': task_node.name, 'created_at': task_node.created_at,
+                              'created_by': user.username, 'group_name': group.name, 'id': str(task_node._id)})
+            if attr_status:
+                blankdict.update({'status': attr_status.object_value})
+            if attr_end_time:
+                blankdict.update({'due_time': attr_end_time.object_value})
+            blank_list.append(blankdict)
+    return blank_list
 
 
 @get_execution_time
 def get_user_notification(userObject):
-  '''
-  methods for getting user's notification.
-  input (userObject) is user object
-  output list of dict, dict contain notice label, notice display
-  '''
-  blank_list = []
-  notification_object = notification.NoticeSetting.objects.filter(user_id=userObject.id)
-  for each in notification_object.reverse():
-    ntid = each.notice_type_id
-    ntype = notification.NoticeType.objects.get(id=ntid)
-    label = ntype.label.split("-")[0]
-    blank_list.append({'label':label, 'display': ntype.display})
-  blank_list.reverse()
-  return blank_list
+    '''
+    methods for getting user's notification.
+    input (userObject) is user object
+    output list of dict, dict contain notice label, notice display
+    '''
+    blank_list = []
+    notification_object = notification.NoticeSetting.objects.filter(
+        user_id=userObject.id)
+    for each in notification_object.reverse():
+        ntid = each.notice_type_id
+        ntype = notification.NoticeType.objects.get(id=ntid)
+        label = ntype.label.split("-")[0]
+        blank_list.append({'label': label, 'display': ntype.display})
+    blank_list.reverse()
+    return blank_list
 
 
 @get_execution_time
 def get_user_activity(userObject):
-  '''
-  methods for getting user's activity.
-  input (userObject) is user object
-  output list of dict, dict 
-  '''
-  blank_list = []
-  activity = ""
-  activity_user = node_collection.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'Group'},{'_type':'File'}]}, 
-                                                 {'$or':[{'created_by':userObject.id}, {'modified_by':userObject.id}]}] }).sort('last_update', -1).limit(10)
-  for each in activity_user:
-    if each.created_by == each.modified_by :
-      if each.last_update == each.created_at:
-        activity =  'created'
-      else :
-        activity =  'modified'
-    else :
-      activity =  'created'
-    if each._type == 'Group':
-      blank_list.append({'id':str(each._id), 'name':each.name, 'date':each.last_update, 'activity': activity, 'type': each._type})
-    else :
-      member_of = node_collection.find_one({"_id":each.member_of[0]})
-      blank_list.append({'id':str(each._id), 'name':each.name, 'date':each.last_update, 'activity': activity, 'type': each._type, 'group_id':str(each.group_set[0]), 'member_of':member_of.name.lower()})
-  return blank_list
+    '''
+    methods for getting user's activity.
+    input (userObject) is user object
+    output list of dict, dict 
+    '''
+    blank_list = []
+    activity = ""
+    activity_user = node_collection.find({'$and': [{'$or': [{'_type': 'GSystem'}, {'_type': 'Group'}, {'_type': 'File'}]},
+                                                   {'$or': [{'created_by': userObject.id}, {'modified_by': userObject.id}]}]}).sort('last_update', -1).limit(10)
+    for each in activity_user:
+        if each.created_by == each.modified_by:
+            if each.last_update == each.created_at:
+                activity = 'created'
+            else:
+                activity = 'modified'
+        else:
+            activity = 'created'
+        if each._type == 'Group':
+            blank_list.append({'id': str(each._id), 'name': each.name, 'date':
+                               each.last_update, 'activity': activity, 'type': each._type})
+        else:
+            member_of = node_collection.find_one({"_id": each.member_of[0]})
+            blank_list.append({'id': str(each._id), 'name': each.name, 'date': each.last_update, 'activity':
+                               activity, 'type': each._type, 'group_id': str(each.group_set[0]), 'member_of': member_of.name.lower()})
+    return blank_list
+
 
 @get_execution_time
 def get_file_node(file_name=""):
-  # if cached result exists return it
-  cache_key = u'get_file_node' + slugify(unicode(file_name))
-  cache_result = cache.get(cache_key)
+    # if cached result exists return it
+    cache_key = u'get_file_node' + slugify(unicode(file_name))
+    cache_result = cache.get(cache_key)
 
-  if cache_result:
-      return cache_result
-  # ---------------------------------
+    if cache_result:
+        return cache_result
+    # ---------------------------------
 
-  file_list=[]
-  new=[]
-  a=str(file_name).split(',')
-  for i in a:
-        k=str(i.strip('   [](\'u\'   '))
+    file_list = []
+    new = []
+    a = str(file_name).split(',')
+    for i in a:
+        k = str(i.strip('   [](\'u\'   '))
         new.append(k)
-	ins_objectid  = ObjectId()
-  for i in new:
-          if  ins_objectid.is_valid(i) is False:
-		  filedoc = node_collection.find({'_type':'File','name':unicode(i)})
-	  else:
-		  filedoc = node_collection.find({'_type':'File','_id':ObjectId(i)})			
-          if filedoc:
-             for i in filedoc:
-		            file_list.append(i.name)	
-  cache.set(cache_key, file_list, 60*15)
-  return file_list	
+        ins_objectid = ObjectId()
+    for i in new:
+        if ins_objectid.is_valid(i) is False:
+            filedoc = node_collection.find(
+                {'_type': 'File', 'name': unicode(i)})
+        else:
+            filedoc = node_collection.find(
+                {'_type': 'File', '_id': ObjectId(i)})
+        if filedoc:
+            for i in filedoc:
+                file_list.append(i.name)
+    cache.set(cache_key, file_list, 60 * 15)
+    return file_list
+
 
 @get_execution_time
 def create_task(task_dict, task_type_creation="single"):
@@ -2790,7 +3376,8 @@ def create_task(task_dict, task_type_creation="single"):
         task_node = node_collection.one({'_id': task_dict["_id"]})
         task_dict["name"] = task_node.name
     else:
-        task_node = node_collection.find_one({"member_of": task_gst._id, "name": task_dict["name"], "attribute_set.Status": {"$nin": ["Closed"]}})
+        task_node = node_collection.find_one({"member_of": task_gst._id, "name": task_dict[
+                                             "name"], "attribute_set.Status": {"$nin": ["Closed"]}})
 
         if task_node is None:
             task_node = node_collection.collection.GSystem()
@@ -2800,7 +3387,8 @@ def create_task(task_dict, task_type_creation="single"):
     # Iterate task_node using it's keys
     for key in task_node:
         if key in ["Status", "Priority", "start_time", "end_time", "Assignee", "has_type"]:
-            # Required because these values might come as key in node's document
+            # Required because these values might come as key in node's
+            # document
             continue
 
         if key in task_dict_keys:
@@ -2808,40 +3396,48 @@ def create_task(task_dict, task_type_creation="single"):
                 #  org-content
                 task_node[key] = task_dict[key]
 
-                # Required to link temporary files with the current user who is modifying this document
-                filename = slugify(task_dict["name"]) + "-" + task_dict["created_by_name"] + "-" + ObjectId().__str__()
+                # Required to link temporary files with the current user who is
+                # modifying this document
+                filename = slugify(
+                    task_dict["name"]) + "-" + task_dict["created_by_name"] + "-" + ObjectId().__str__()
                 task_dict_keys.remove("created_by_name")
-                task_node.content = org2html(task_dict[key], file_prefix=filename)
+                task_node.content = org2html(
+                    task_dict[key], file_prefix=filename)
 
             else:
                 task_node[key] = task_dict[key]
 
             task_dict_keys.remove(key)
 
-    # Save task_node with built-in variables as required for creating GAttribute(s)/GRelation(s)
+    # Save task_node with built-in variables as required for creating
+    # GAttribute(s)/GRelation(s)
     task_node.status = u"PUBLISHED"
     task_node.save()
 
     # Create GAttribute(s)/GRelation(s)
     for attr_or_rel_name in task_dict_keys:
         attr_or_rel_node = node_collection.one(
-            {'_type': {'$in': ["AttributeType", "RelationType"]}, 'name': unicode(attr_or_rel_name)}
+            {'_type': {'$in': ["AttributeType", "RelationType"]}, 'name': unicode(
+                attr_or_rel_name)}
         )
 
         if attr_or_rel_node:
             if attr_or_rel_node._type == "AttributeType":
-                ga_node = create_gattribute(task_node._id, attr_or_rel_node, task_dict[attr_or_rel_name])
-            
+                ga_node = create_gattribute(
+                    task_node._id, attr_or_rel_node, task_dict[attr_or_rel_name])
+
             elif attr_or_rel_node._type == "RelationType":
-                gr_node = create_grelation(task_node._id, attr_or_rel_node, task_dict[attr_or_rel_name])
+                gr_node = create_grelation(
+                    task_node._id, attr_or_rel_node, task_dict[attr_or_rel_name])
 
             task_node.reload()
 
         else:
-            raise Exception("\n No AttributeType/RelationType exists with given name("+attr_or_rel_name+") !!!")
+            raise Exception(
+                "\n No AttributeType/RelationType exists with given name(" + attr_or_rel_name + ") !!!")
 
     # If given task is a group task (create a task for each Assignee from the list)
-    # Iterate Assignee list & create separate tasks for each Assignee 
+    # Iterate Assignee list & create separate tasks for each Assignee
     # with same set of attribute(s)/relation(s)
     if task_type_creation == "group":
         mutiple_assignee = task_dict["Assignee"]
@@ -2851,11 +3447,12 @@ def create_task(task_dict, task_type_creation="single"):
             task_sub_node = create_task(task_dict)
             collection_set.append(task_sub_node._id)
 
-        node_collection.collection.update({'_id': task_node._id}, {'$set': {'collection_set': collection_set}}, upsert=False, multi=False)
+        node_collection.collection.update({'_id': task_node._id}, {
+                                          '$set': {'collection_set': collection_set}}, upsert=False, multi=False)
 
     else:
         # Send notification for each each Assignee of the task
-        # Only be done in case when task_type_creation is not group, 
+        # Only be done in case when task_type_creation is not group,
         # i.e. either single or multiple
         if not task_dict.has_key("_id"):
           site = Site.objects.get(pk=1)
@@ -2898,7 +3495,6 @@ def create_task(task_dict, task_type_creation="single"):
           notification.send(to_user_list, render_label, {"from_user": from_user})
 
     return task_node
-
 
 
 @get_execution_time
@@ -2971,7 +3567,8 @@ def get_student_enrollment_code(college_id, node_id_to_ignore, registration_date
             college_code = college_code[0]
 
         if not college_name or not college_code:
-            raise Exception("Either name or enrollment code is not set for given college's ObjectId(" + str(college_id) + ") !!!")
+            raise Exception(
+                "Either name or enrollment code is not set for given college's ObjectId(" + str(college_id) + ") !!!")
 
         # Set Last two digits of current year
         # current_year = str(datetime.today().year)
@@ -3018,24 +3615,29 @@ def get_student_enrollment_code(college_id, node_id_to_ignore, registration_date
 
         if student_data_result:
             student_count = student_data_result[0]["count"]
-            last_enrollment_code = student_data_result[0]["last_enrollment_code"]
+            last_enrollment_code = student_data_result[
+                0]["last_enrollment_code"]
             if last_enrollment_code:
                 last_enrollment_code = last_enrollment_code[0]
 
             if last_enrollment_code and student_count:
                 # Fetch student enrollment code of last registered student node
-                enrollment_code_except_num, four_digit_num = last_enrollment_code.rsplit("/", 1)
+                enrollment_code_except_num, four_digit_num = last_enrollment_code.rsplit(
+                    "/", 1)
                 four_digit_num = int(last_enrollment_code[-4:])
 
                 if four_digit_num == student_count:
                     # 4. Four digit number of student's count (new) set
                     four_digit_num = "%04d" % (student_count + 1)
-                    new_student_enrollment_code = u"%(enrollment_code_except_num)s/%(four_digit_num)s" % locals()
+                    new_student_enrollment_code = u"%(enrollment_code_except_num)s/%(four_digit_num)s" % locals(
+                    )
 
                 else:
-                    raise Exception("Inconsistent Data Found (Student count & last enrollment code's number doesn't match) !!!")
+                    raise Exception(
+                        "Inconsistent Data Found (Student count & last enrollment code's number doesn't match) !!!")
             else:
-                raise Exception("Invalid Data Found (Student count & no last enrollment code) !!!")
+                raise Exception(
+                    "Invalid Data Found (Student count & no last enrollment code) !!!")
         else:
             # Registering very first student node
             # Create enrollment code, hence fetch state node's state-code
@@ -3064,19 +3666,22 @@ def get_student_enrollment_code(college_id, node_id_to_ignore, registration_date
                     if state_code:
                         state_code = state_code[0]
                     else:
-                        raise Exception("No state code found for given state(" + state_name + ")")
+                        raise Exception(
+                            "No state code found for given state(" + state_name + ")")
 
                 # 4. Four digit number of student's count (new) set
                 four_digit_num = "%04d" % (student_count + 1)
 
-                new_student_enrollment_code = u"%(state_code)s/%(college_code)s/%(two_digit_year_code)s/%(four_digit_num)s" % locals()
+                new_student_enrollment_code = u"%(state_code)s/%(college_code)s/%(two_digit_year_code)s/%(four_digit_num)s" % locals(
+                )
             else:
-                raise Exception("Either state not set or inconsistent state value found for given college(" + college_name + ") !!!")
+                raise Exception(
+                    "Either state not set or inconsistent state value found for given college(" + college_name + ") !!!")
 
         return new_student_enrollment_code
     else:
-        raise Exception("No college node exists with given college's ObjectId(" + str(college_id) + ") !!!")
-
+        raise Exception(
+            "No college node exists with given college's ObjectId(" + str(college_id) + ") !!!")
 
 
 @get_execution_time
@@ -3123,6 +3728,7 @@ def create_college_group_and_setup_data(college_node):
         gfc.status = u"PUBLISHED"
         gfc.save()
 
+        
     if "_id" in gfc:
         has_group_rt = node_collection.one(
             {'_type': "RelationType", 'name': "has_group"}
@@ -3173,25 +3779,27 @@ def create_college_group_and_setup_data(college_node):
     return gfc, gr_gfc
 
 
-def get_published_version_list(request,document_object):
-        """Returns the list of revision numbers of published nodes.
-        """
-        published_node_version = []
-        rcs = RCS()
-        fp = history_manager.get_file_path(document_object)
-        cmd= 'rlog  %s' % \
-	      (fp)
-        rev_no =""
-        proc1=subprocess.Popen(cmd,shell=True,
-				stdout=subprocess.PIPE)
-        for line in iter(proc1.stdout.readline,b''):
-            if line.find('revision')!=-1 and line.find('selected') == -1:
-                  rev_no=string.split(line,'revision')
-                  rev_no=rev_no[1].strip( '\t\n\r')
-                  rev_no=rev_no.strip(' ')
-            if line.find('PUBLISHED')!=-1:
-                   published_node_version.append(rev_no)      
-        return published_node_version
+def get_published_version_list(request, document_object):
+    """Returns the list of revision numbers of published nodes.
+    """
+    published_node_version = []
+    rcs = RCS()
+    fp = history_manager.get_file_path(document_object)
+    cmd = 'rlog  %s' % \
+        (fp)
+    rev_no = ""
+    proc1 = subprocess.Popen(cmd, shell=True,
+                             stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline, b''):
+        if line.find('revision') != -1 and line.find('selected') == -1:
+            rev_no = string.split(line, 'revision')
+            rev_no = rev_no[1].strip('\t\n\r')
+            rev_no = rev_no.strip(' ')
+        if line.find('PUBLISHED') != -1:
+            published_node_version.append(rev_no)
+    return published_node_version
+
+
 def parse_data(doc):
   '''Section to parse node '''
   user_idlist = ['modified_by','created_by','author_set','contributors']
@@ -3301,9 +3909,7 @@ def parse_data(doc):
                  
           elif not doc[i]:
              doc[i] = ""
-         
 
-          
 
 def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
     """This function deletes GAttribute node(s) of Triples collection.
@@ -3386,12 +3992,14 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
             if node_id:
                 if type(node_id) == ObjectId:
                     str_node_id = str(node_id)
-                    # print "\t 2b >> node_id -- O to s: ", type(str_subject_id), " -- ", str_subject_id
+                    # print "\t 2b >> node_id -- O to s: ",
+                    # type(str_subject_id), " -- ", str_subject_id
                 else:
                     str_node_id = node_id
                     if ObjectId.is_valid(node_id):
                         node_id = ObjectId(node_id)
-                        # print "\t 2c >> node_id -- s to O: ", type(str_subject_id), " -- ", str_subject_id
+                        # print "\t 2c >> node_id -- s to O: ",
+                        # type(str_subject_id), " -- ", str_subject_id
                     else:
                         delete_status_message = "Invalid value found for node_id " \
                             + "(%(str_node_id)s)... [Expected value in" % locals() \
@@ -3417,12 +4025,14 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
                 # if found in string format
                 if type(subject_id) == ObjectId:
                     str_subject_id = str(subject_id)
-                    # print "\t 3b >> subject_id -- O to s: ", type(str_subject_id), " -- ", str_subject_id
+                    # print "\t 3b >> subject_id -- O to s: ",
+                    # type(str_subject_id), " -- ", str_subject_id
                 else:
                     str_subject_id = subject_id
                     if ObjectId.is_valid(subject_id):
                         subject_id = ObjectId(subject_id)
-                        # print "\t 3c >> subject_id -- s to O: ", type(str_subject_id), " -- ", str_subject_id
+                        # print "\t 3c >> subject_id -- s to O: ",
+                        # type(str_subject_id), " -- ", str_subject_id
                     else:
                         if not node_id:
                             delete_status_message = "Invalid value found for subject_id " \
@@ -3454,14 +4064,16 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
                 create_gattribute(each_ga.subject, each_ga.attribute_type)
                 # print "\t 4 >> each_ga (0) ... ", each_ga._id
 
-        # print "\n 5 >> gattribute_deleted_id... " + ", ".join(gattribute_deleted_id)
+        # print "\n 5 >> gattribute_deleted_id... " + ",
+        # ".join(gattribute_deleted_id)
 
         # Perform purge operation
         if deletion_type == 1:
             # Remove from database
             str_deletion_type = "purged"
             triple_collection.collection.remove(query)
-            # print "\n 6 >> purged also... " + ", ".join(gattribute_deleted_id)
+            # print "\n 6 >> purged also... " + ",
+            # ".join(gattribute_deleted_id)
 
         # Formulate delete-status-message
         if gattribute_deleted_id:
@@ -3612,7 +4224,8 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
         },
             upsert=False, multi=False
         )
-        # print "\n 5 -- subject node's (", subj, ") relation-name key (", rel_name, ") referenced in relation_set field updated -- \n", res
+        # print "\n 5 -- subject node's (", subj, ") relation-name key (",
+        # rel_name, ") referenced in relation_set field updated -- \n", res
 
         # Remove subject-node's ObjectId from the value corresponding
         # to right-subject-node's "inverse-relation-name" key
@@ -3625,11 +4238,14 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
         },
             upsert=False, multi=False
         )
-        # print " 5 -- right_subject node's (", right_subj, ") inverse-relation-name key (", inv_rel_name, ") referenced in relation_set field updated -- \n", res
+        # print " 5 -- right_subject node's (", right_subj, ")
+        # inverse-relation-name key (", inv_rel_name, ") referenced in
+        # relation_set field updated -- \n", res
 
         gr_node.status = u"DELETED"
         gr_node.save()
-
+        
+        
     try:
         # print "\n 1 >> Begin..."
         if deletion_type not in [0, 1]:
@@ -3647,12 +4263,14 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
             if node_id:
                 if type(node_id) == ObjectId:
                     str_node_id = str(node_id)
-                    # print "\t 2b >> node_id -- O to s: ", type(str_subject_id), " -- ", str_subject_id
+                    # print "\t 2b >> node_id -- O to s: ",
+                    # type(str_subject_id), " -- ", str_subject_id
                 else:
                     str_node_id = node_id
                     if ObjectId.is_valid(node_id):
                         node_id = ObjectId(node_id)
-                        # print "\t 2c >> node_id -- s to O: ", type(str_subject_id), " -- ", str_subject_id
+                        # print "\t 2c >> node_id -- s to O: ",
+                        # type(str_subject_id), " -- ", str_subject_id
                     else:
                         delete_status_message = "Invalid value found for node_id " \
                             + "(%(str_node_id)s)... [Expected value in" % locals() \
@@ -3678,12 +4296,14 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
                 # if found in string format
                 if type(subject_id) == ObjectId:
                     str_subject_id = str(subject_id)
-                    # print "\t 3b >> subject_id -- O to s: ", type(str_subject_id), " -- ", str_subject_id
+                    # print "\t 3b >> subject_id -- O to s: ",
+                    # type(str_subject_id), " -- ", str_subject_id
                 else:
                     str_subject_id = subject_id
                     if ObjectId.is_valid(subject_id):
                         subject_id = ObjectId(subject_id)
-                        # print "\t 3c >> subject_id -- s to O: ", type(str_subject_id), " -- ", str_subject_id
+                        # print "\t 3c >> subject_id -- s to O: ",
+                        # type(str_subject_id), " -- ", str_subject_id
                     else:
                         if not node_id:
                             delete_status_message = "Invalid value found for subject_id " \
@@ -3697,9 +4317,12 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
                 if not node_id:
                     # Form this query only when you need to
                     # delete/purge GRelation(s) related to a given node
-                    query_for_relation = {"_type": "GRelation", "subject": subject_id}
-                    query_for_inverse_relation = {"_type": "GRelation", "right_subject": subject_id}
-                    # print "\t 3e >> query (YES)... \n\t", query_for_relation, "\n\t", query_for_inverse_relation
+                    query_for_relation = {
+                        "_type": "GRelation", "subject": subject_id}
+                    query_for_inverse_relation = {
+                        "_type": "GRelation", "right_subject": subject_id}
+                    # print "\t 3e >> query (YES)... \n\t", query_for_relation,
+                    # "\n\t", query_for_inverse_relation
 
         # Based on what you need to perform
         # Delete single GRelation node (query_by_id), or
@@ -3714,14 +4337,16 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
                     _perform_delete_updates_on_node(each_rel)
                 grelation_deleted_id.append(each_rel._id.__str__())
 
-            # print "\n 5 >> grelation_deleted_id... " + ", ".join(grelation_deleted_id)
+            # print "\n 5 >> grelation_deleted_id... " + ",
+            # ".join(grelation_deleted_id)
 
             # Perform purge operation
             if deletion_type == 1:
                 # Remove from database
                 str_deletion_type = "purged"
                 triple_collection.collection.remove(query_by_id)
-                # print "\n 6 >> purged (relation) also... " + ", ".join(grelation_deleted_id)
+                # print "\n 6 >> purged (relation) also... " + ",
+                # ".join(grelation_deleted_id)
         else:
             # print "\n handle query_for_relation, query_for_inverse_relation"
             grelations = None
@@ -3746,7 +4371,8 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
                 inverse_grelation_deleted_id.append(each_inv_rel._id.__str__())
 
             # print "\n 5 >> grelation_deleted_id... " + ", ".join(grelation_deleted_id)
-            # print "\n 5 >> inverse_grelation_deleted_id... " + ", ".join(inverse_grelation_deleted_id)
+            # print "\n 5 >> inverse_grelation_deleted_id... " + ",
+            # ".join(inverse_grelation_deleted_id)
 
             # Perform purge operation
             if deletion_type == 1:
@@ -3755,7 +4381,8 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
                 triple_collection.collection.remove(query_for_relation)
                 triple_collection.collection.remove(query_for_inverse_relation)
                 # print "\n 6 >> purged (relation) also... " + ", ".join(grelation_deleted_id)
-                # print "\n 6 >> purged (inverse-relation) also... " + ", ".join(inverse_grelation_deleted_id)
+                # print "\n 6 >> purged (inverse-relation) also... " + ",
+                # ".join(inverse_grelation_deleted_id)
 
         # Formulate delete-status-message
         if grelation_deleted_id:
@@ -3902,12 +4529,14 @@ def delete_node(
             # if found in string format
             if type(node_id) == ObjectId:
                 str_node_id = str(node_id)
-                # print "\t 3b >> node_id -- O to s: ", type(str_node_id), " -- ", str_node_id
+                # print "\t 3b >> node_id -- O to s: ", type(str_node_id), " --
+                # ", str_node_id
             else:
                 str_node_id = node_id
                 if ObjectId.is_valid(node_id):
                     node_id = ObjectId(node_id)
-                    # print "\t 3c >> node_id -- s to O: ", type(str_node_id), " -- ", str_node_id
+                    # print "\t 3c >> node_id -- s to O: ", type(str_node_id),
+                    # " -- ", str_node_id
                 else:
                     delete_status_message = "Invalid value found for node_id " \
                         + "(%(str_node_id)s)... [Expected value in" % locals() \
@@ -3935,13 +4564,15 @@ def delete_node(
                     + "\n\nIf required, you can still purge this node !"
                 return (True, delete_status_message)
 
-            # print "\n 4 >> node to be deleted fetched successfully... ", node_to_be_deleted.name
+            # print "\n 4 >> node to be deleted fetched successfully... ",
+            # node_to_be_deleted.name
             if ((node_to_be_deleted.status == u"DELETED" and
-                deletion_type == 1) or
+                 deletion_type == 1) or
                     (node_to_be_deleted.status != u"DELETED")):
                 # Perform delete/purge operation for
                 # deleting-node's GAttribute(s)
-                # print "\n\n 5 >> node's (", node_to_be_deleted.name,") GAttribute... "
+                # print "\n\n 5 >> node's (", node_to_be_deleted.name,")
+                # GAttribute... "
                 del_status, del_status_msg = delete_gattribute(
                     subject_id=node_to_be_deleted._id,
                     deletion_type=deletion_type
@@ -3949,7 +4580,8 @@ def delete_node(
                 if not del_status:
                     raise Exception(del_status_msg)
                 delete_status_message = del_status_msg
-                # print "\n 5* >> delete_status_message... \n", delete_status_message
+                # print "\n 5* >> delete_status_message... \n",
+                # delete_status_message
 
                 # Required as below this node is getting saved and
                 # in above delete_gattribute() function, it's getting updated
@@ -3957,7 +4589,8 @@ def delete_node(
 
                 # Perform delete/purge operation
                 # for deleting-node's GRelation(s)
-                # print "\n\n 6 >> node's (", node_to_be_deleted.name,") GRelation... "
+                # print "\n\n 6 >> node's (", node_to_be_deleted.name,")
+                # GRelation... "
                 del_status, del_status_msg = delete_grelation(
                     subject_id=node_to_be_deleted._id,
                     deletion_type=deletion_type
@@ -3965,7 +4598,8 @@ def delete_node(
                 if not del_status:
                     raise Exception(del_status_msg)
                 delete_status_message += "\n\n" + del_status_msg
-                # print "\n 6* >> delete_status_message... \n", delete_status_message
+                # print "\n 6* >> delete_status_message... \n",
+                # delete_status_message
 
                 # Required as below this node is getting saved and
                 # in above delete_gattribute() function, it's getting updated
@@ -4009,7 +4643,8 @@ def delete_node(
                 # Only changes the status of given node to DELETED
                 node_to_be_deleted.status = u"DELETED"
                 node_to_be_deleted.save()
-
+                
+                
             # Perform Purge operation on deleting-node
             if deletion_type == 1:
                 # Remove from database
@@ -4018,9 +4653,11 @@ def delete_node(
                 # If given node is of member-of File GApp
                 # Then remove it's references from GridFS as well
                 # Consider File GApp's ObjectId is there in member_of field
-                # print "\n node_to_be_deleted.member_of_names_list: ", node_to_be_deleted.member_of_names_list
+                # print "\n node_to_be_deleted.member_of_names_list: ",
+                # node_to_be_deleted.member_of_names_list
                 if "File" in node_to_be_deleted.member_of_names_list:
-                    # print "\n 10 >> node found as File; nodes in GridFS : ", len(node_to_be_deleted.fs_file_ids)
+                    # print "\n 10 >> node found as File; nodes in GridFS : ",
+                    # len(node_to_be_deleted.fs_file_ids)
                     if node_to_be_deleted.fs_file_ids:
                         for each in node_to_be_deleted.fs_file_ids:
                             if node_to_be_deleted.fs.files.exists(each) and node_collection.find({'fs_file_ids': {'$in': [each]} }).count() == 1:
@@ -4074,19 +4711,22 @@ def delete_node(
             if node_id:
                 if type(node_id) == ObjectId:
                     str_node_id = str(node_id)
-                    # print "\t 5ba >> node_id -- O to s: ", type(str_node_id), " -- ", str_node_id
+                    # print "\t 5ba >> node_id -- O to s: ", type(str_node_id),
+                    # " -- ", str_node_id
                 else:
                     str_node_id = node_id
                     if ObjectId.is_valid(node_id):
                         node_id = ObjectId(node_id)
-                        # print "\t 5bb >> node_id -- s to O: ", type(str_node_id), " -- ", str_node_id
+                        # print "\t 5bb >> node_id -- s to O: ",
+                        # type(str_node_id), " -- ", str_node_id
                     else:
                         delete_status_message = "Invalid value found for node_id " \
                             + "(%(str_node_id)s)... [Expected value in" % locals() \
                             + " ObjectId format] !!!"
                         raise Exception(delete_status_message)
 
-                # Forming query to delete a specific node from Triples collection
+                # Forming query to delete a specific node from Triples
+                # collection
                 query = {"_id": node_id}
                 # print "\t 5bc >> query... ", query
 
@@ -4095,9 +4735,12 @@ def delete_node(
 
                 if not node_to_be_deleted:
                     delete_status_message = "Node with given ObjectId " \
-                        + "(%(str_node_id)s) doesn't exists in Triples collection" % locals()
+                        + \
+                        "(%(str_node_id)s) doesn't exists in Triples collection" % locals(
+                        )
                     raise Exception(delete_status_message)
-                # print "\t 5bd >> node_to_be_deleted... ", node_to_be_deleted.name, " -- ", node_to_be_deleted._type
+                # print "\t 5bd >> node_to_be_deleted... ",
+                # node_to_be_deleted.name, " -- ", node_to_be_deleted._type
 
                 # Resetting underscore_type
                 # To rectify, if by mistake wrong value is set
@@ -4105,7 +4748,8 @@ def delete_node(
                 # but node (with node_id) represents "GRelation"
                 # To avoid this kind of case(s), resetting underscore_type
                 underscore_type = node_to_be_deleted._type
-                # print "\t 5be >> underscore_type set to node_to_be_deleted's _type... ", underscore_type
+                # print "\t 5be >> underscore_type set to node_to_be_deleted's
+                # _type... ", underscore_type
 
             if underscore_type == "GAttribute":
                 # Delete/Purge only GAttribute node(s)
@@ -4118,7 +4762,8 @@ def delete_node(
                 if not del_status:
                     raise Exception(del_status_msg)
                 delete_status_message = del_status_msg
-                # print "\n 6* >> delete_status_message... \n", delete_status_message
+                # print "\n 6* >> delete_status_message... \n",
+                # delete_status_message
             elif underscore_type == "GRelation":
                 # Delete/Purge only GRelation node(s)
 
@@ -4130,7 +4775,8 @@ def delete_node(
                 if not del_status:
                     raise Exception(del_status_msg)
                 delete_status_message = del_status_msg
-                # print "\n 7* >> delete_status_message... \n", delete_status_message
+                # print "\n 7* >> delete_status_message... \n",
+                # delete_status_message
             else:
                 # Delete/Purge both GAttribute & GRelation node(s)
 
@@ -4143,7 +4789,8 @@ def delete_node(
                 if not del_status:
                     raise Exception(del_status_msg)
                 delete_status_message = del_status_msg
-                # print "\n 8* >> delete_status_message... \n", delete_status_message
+                # print "\n 8* >> delete_status_message... \n",
+                # delete_status_message
 
                 # Delete/Purge GRelation node(s)
                 del_status, del_status_msg = delete_grelation(
@@ -4153,7 +4800,8 @@ def delete_node(
                 if not del_status:
                     raise Exception(del_status_msg)
                 delete_status_message += "\n\n" + del_status_msg
-                # print "\n 8* >> delete_status_message... \n", delete_status_message
+                # print "\n 8* >> delete_status_message... \n",
+                # delete_status_message
 
             # Return output of the function
             # print delete_status_message
@@ -4184,22 +4832,23 @@ def repository(request, group_id):
     gapps_obj_list = []
 
     for each_gapp in gapps_list:
-        gapp_obj = node_collection.one({ '_type':'GSystemType',
-                                          'name': {"$regex": each_gapp, "$options": "i"},
-                                          "member_of": {"$in": [gapp_metatype._id]}
+        gapp_obj = node_collection.one({'_type': 'GSystemType',
+                                        'name': {"$regex": each_gapp, "$options": "i"},
+                                        "member_of": {"$in": [gapp_metatype._id]}
                                         })
         gapps_obj_list.append(gapp_obj)
 
     return render_to_response("ndf/repository.html",
-                              { "gapps_obj_list": gapps_obj_list,
-                                "gapps_dict" : GSTUDIO_NROER_GAPPS,
-                                'group_id': group_id, 'groupid': group_id
-                              },
+                              {"gapps_obj_list": gapps_obj_list,
+                               "gapps_dict": GSTUDIO_NROER_GAPPS,
+                               'group_id': group_id, 'groupid': group_id
+                               },
                               context_instance=RequestContext(request)
-                            )
+                              )
+
 
 def create_thread_for_node(request, group_id, node):
-	"""
+        """
       Accepts:
        * ObjectId of group.
        * node - Page/File GSystem
@@ -4420,7 +5069,6 @@ def get_language_tuple(lang):
     # as a default return: ('en', 'English')
     return ('en', 'English')
 
-
 def get_filter_querydict(filters):
     """
     After getting the filters from request,
@@ -4472,7 +5120,6 @@ def get_filter_querydict(filters):
             query_dict.append({ "$or": temp_list})
 
     return query_dict
-
 
 def get_course_units_tree(data,list_ele):
     # print data

@@ -174,10 +174,24 @@
 
     		setTimeout(function()
     			{ 
-					{% for each in fetch_res %}
-						{% if "img" in each %}
-    						CKEDITOR.instances['ckeditor_textarea'].insertHtml('<img width=50% src={{each}} > </img>'); 
+					{% for each in img_res %}
+						{% if "media" in each %}
+    						CKEDITOR.instances['ckeditor_textarea'].insertHtml('<img width="50%" src="{{each}}"> </img></br>'); 
+						{% endif %}
+			    {% endfor %}
+			    
+			    {% for each in audio_res %}
+						{% if "media" in each %}
+			CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls><source src="{{each}}" type="audio/ogg"><source src="{{each}}" type="audio/mpeg"></audio></br>'); 
+
 					{% endif %}
 			    {% endfor %}
+
+			    {% for each in video_res %}
+						{% if "media" in each %}
+    						CKEDITOR.instances['ckeditor_textarea'].insertHtml('<video width="400" controls><source src="{{each}}" type="video/mp4"><source src="{{each}}" type="video/ogg"></video></br>'); 
+						{% endif %}
+			    {% endfor %}
+
     			},3000);
 </script>

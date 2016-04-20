@@ -204,7 +204,7 @@ factory_relation_types = [
 
     {'has_profile_pic': {
             'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup'],
-            'object_type':['Image'], 
+            'object_type':['Image','File'], 
             'inverse_name':'profile_pic_of', 
             'meta_type':'factory_types'
         }
@@ -212,7 +212,7 @@ factory_relation_types = [
     
     {'has_banner_pic': {
             'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup'],
-            'object_type':['Image'], 
+            'object_type':['Image','File'], 
             'inverse_name':'banner_pic_of', 
             'meta_type':'factory_types'
         }
@@ -304,7 +304,5 @@ relation_types = [{'_type':'RelationType','name':'group_has_course_event'},
 		  {'_type': "RelationType", 'name': "has_logo"},			
 
 ]
-
-
 
 

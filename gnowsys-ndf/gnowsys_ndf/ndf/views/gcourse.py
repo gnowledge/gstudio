@@ -41,6 +41,8 @@ from gnowsys_ndf.notification import models as notification
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+gst_file = node_collection.one({'_type': "GSystemType", 'name': u"File"})
+gst_page = node_collection.one({'_type': "GSystemType", 'name': u"Page"})
 
 app = GST_COURSE
 
@@ -1907,7 +1909,7 @@ def course_content(request, group_id):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -1948,7 +1950,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': [u"GSystem", u"File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2034,7 +2036,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2060,46 +2062,47 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
     else:
 
-        files_cur = node_collection.find({ '$or' : [ {'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
-                                    # 'tags': {'$regex': u"raw", '$options': "i"}
-                                    },
+        files_cur = node_collection.find({
+                                        '_type': {'$in': ["File", "GSystem"]},
+                                        '$or': [
+                                                {'member_of': GST_FILE._id},
+                                                {
+                                                    'collection_set': {'$exists': "true",'$not': {'$size': 0} },
+                                                    'member_of': GST_PAGE._id,
+                                                }
+                                            ],
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        'created_by': {'$in': gstaff_users},
+                            # '$or': [
+                                    # {
+                                    # },
+                                    # {
+                                    #     '$or': [
+                                    #             {'access_policy': u"PUBLIC"},
+                                    #             {
+                                    #                 '$and': [
+                                    #                         {'access_policy': u"PRIVATE"},
+                                    #                         {'created_by': request.user.id}
+                                    #                     ]
+                                    #             }
+                                    #         ],
+                                    # }
+                                    # {    'collection_set': {'$exists': "true", '$not': {'$size': 0} }}
+                                # ]
+                        },
+                        {
+                            'name': 1,
+                            'collection_set':1,
+                            '_id': 1,
+                            'fs_file_ids': 1,
+                            'member_of': 1,
+                            'mime_type': 1,
+                            'if_file':1
+                        }).sort("last_update", -1)
 
-                                    {'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-                                                    'group_set': {'$all': [ObjectId(group_id)]},
-                                                    '$or': [
-                                                        {'access_policy': u"PUBLIC"},
-                                                        {'$and': [
-                                                            {'access_policy': u"PRIVATE"},
-                                                            {'created_by': request.user.id}
-                                                        ]
-                                                     }
-                                                    ],
-                                                    'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-                                                
-                                    }]},{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort("last_update", -1)
-
-        # coll_cur = node_collection.find({
-        #                   'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-        #                                     'group_set': {'$all': [ObjectId(group_id)]},
-        #                                     '$or': [
-        #                                         {'access_policy': u"PUBLIC"},
-        #                                         {'$and': [
-        #                                             {'access_policy': u"PRIVATE"},
-        #                                             {'created_by': request.user.id}
-        #                                         ]
-        #                                      }
-        #                                     ],
-        #                                     'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-        #                                 }).sort("last_update", -1)
-        # print "\n coll curr type",type(coll_cur)
-        # for each in coll_cur:
-        #     coll_file_cur.append(each)            
-
-        # for each in files_cur:
-        #     coll_file_cur.append(each)
-    # print "collection cursor",coll_file_cur
     raw_material_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     # context_variables.update({'coll_file_cur':files_cur})
+
     # print "\n\n\n\n **course_raw_page_info",course_raw_page_info
     gstaff_access = check_is_gstaff(group_id,request.user)
 
@@ -2135,7 +2138,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2163,46 +2166,88 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
     else:
-        coll_cur = node_collection.find({
-                          'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-                                            'group_set': {'$all': [ObjectId(group_id)]},
-                                            '$or': [
-                                                {'access_policy': u"PUBLIC"},
-                                                {'$and': [
-                                                    {'access_policy': u"PRIVATE"},
-                                                    {'created_by': request.user.id}
-                                                ]
-                                             }
-                                            ],
-                                            'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-                                        }).sort("last_update", -1)
+        # coll_cur = node_collection.find({
+        #                   'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+        #                                     'group_set': {'$all': [ObjectId(group_id)]},
+        #                                     '$or': [
+        #                                         {'access_policy': u"PUBLIC"},
+        #                                         {'$and': [
+        #                                             {'access_policy': u"PRIVATE"},
+        #                                             {'created_by': request.user.id}
+        #                                         ]
+        #                                      }
+        #                                     ],
+        #                                     'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+        #                                 }).sort("last_update", -1)
 
         gstaff_users.extend(group_obj.group_admin)
         gstaff_users.append(group_obj.created_by)
-        query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}}
-        
+        # query = {
+        #             'group_set': group_id,
+        #             'relation_set.clone_of':{'$exists': False},
+        #             '_type': "File",
+        #             'created_by': {'$nin': gstaff_users}
+        #         }
+        # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+
+        # files_cur = node_collection.find({
+        #                             '_type': {'$in': ["File", "GSystem"]},
+        #                             'member_of': {'$in': [gst_file._id]},
+        #                             'group_set': group_id,
+        #                             'created_by': {'$nin': gstaff_users},
+        #                         },
+        #                         {
+        #                             'name': 1,
+        #                             '_id': 1,
+        #                             'fs_file_ids': 1,
+        #                             'if_file': 1,
+        #                             'member_of': 1,
+        #                             'mime_type': 1
+        #                         }).sort('created_at', -1)
+
         # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
         # print "\n\n Total files: ", files_cur.count()
-        files_cur = node_collection.find({ '$or' : [ {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users},
-                                    # 'tags': {'$regex': u"raw", '$options': "i"}
-                                    },
-
-                                    {'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-                                                    'group_set': {'$all': [ObjectId(group_id)]},
-                                                    '$or': [
+        files_cur = node_collection.find({
+                                        '_type': "File",
+                                        '$or': [
+                                                {'member_of': GST_FILE._id},
+                                                {
+                                                    'collection_set': {'$exists': "true",'$not': {'$size': 0} },
+                                                    'member_of': GST_PAGE._id,
+                                                }
+                                            ],
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        'relation_set.clone_of': {'$exists': False},
+                                    '$or': [
+                                            {
+                                                'created_by': {'$nin': gstaff_users},
+                                            },
+                                            {
+                                                '$or': [
                                                         {'access_policy': u"PUBLIC"},
-                                                        {'$and': [
+                                                        {
+                                                            '$and': [
                                                             {'access_policy': u"PRIVATE"},
                                                             {'created_by': request.user.id}
                                                         ]
                                                      }
                                                     ],
-                                                    'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-                                                
-                                    }]},{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort("last_update", -1)
+                                                # 'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                            }
+                                        ]},
+                                        {
+                                            'name': 1,
+                                            'collection_set':1,
+                                            '_id': 1,
+                                            'fs_file_ids': 1,
+                                            'member_of': 1,
+                                            'mime_type': 1,
+                                            'if_file':1,
+                                        }).sort("last_update", -1)
+
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-        context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':coll_cur})
+        context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})
     template = 'ndf/gcourse_event_group.html'
 
     return render_to_response(template, 
@@ -2244,7 +2289,7 @@ def course_about(request, group_id):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {"$in": ["GSystem","File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2287,6 +2332,7 @@ def course_gallerymodal(request, group_id, node_id):
             'allow_to_comment': allow_to_comment,
             'thread_node': thread_node,
             'allow_to_join': allow_to_join
+            
         })
     return render_to_response(template, context_variables)
 

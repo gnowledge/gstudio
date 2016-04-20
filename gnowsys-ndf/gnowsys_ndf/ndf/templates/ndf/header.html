@@ -238,7 +238,7 @@
           {% if prof_pic %}
             {% if site.ENABLE_USER_DASHBOARD %}
               <a href="{% url 'dashboard' request.user.pk %}">
-                <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
+                <img src="{{MEDIA_URL}}{{prof_pic.if_file.mid.relurl}}" id="profile-img">
                 {{ user.username }}
               </a>
             {% else %}
@@ -266,9 +266,17 @@
             <li class="text-center">
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
             </li>
+
+            <!-- CHANGE DONE HERE, MAILCLIENT ADDED -->
+            {%if user.is_authenticated %}
+            <li class="text-center">
+              <a href="/{{ user.username }}/mailclient">{% trans "MailClient" %}</a>
+            {% endif %}
+
             <li class="text-center">
               <a href='/{{group_id}}/analytics/summary'>{% trans "Analytics" %}</a>
             </li>
+
             {% if user.is_superuser %}
               <li class="text-center">
                 <a href="/admin/data">{% trans "Admin Data" %}</a>
@@ -325,7 +333,7 @@
          -->
         <!-- Closes Right Nav section -->
 
-
+{% if "CourseEventGroup" not in group_object.member_of_names_list and site.SITE_NAME != "clix" %}
         <ul class="right">
           <li class="has-dropdown">
             <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
@@ -345,7 +353,7 @@
             </ul>
           </li>
         </ul>
-
+{% endif %}
         
         <!-- Right Nav Section -->
         <ul class="right">
@@ -389,7 +397,7 @@
 
                           {% get_relation_value group_object.pk 'has_profile_pic' as grel_dict %}
                           {% if not grel_dict.cursor and grel_dict.grel_node %}
-                                    <img src="{% url 'getFileThumbnail' group_id grel_dict.grel_node.pk %}" />
+                                    <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" />
                           {% else %}
                                     <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
                           {% endif %}

@@ -113,12 +113,12 @@ def collection_create(request, group_id):
   This ajax view creates the page collection of selected nodes from list view
   '''  
   existing_collection = request.POST.get("existing_collection")
-  print "\n\n\n here",existing_collection
+  # print "\n\n\n here",existing_collection
   if existing_collection == "True":
     Collections = request.POST.getlist("collection[]", '')
     cur_collection_id = request.POST.get("cur_collection_id")
     obj = node_collection.one({'_id': ObjectId(cur_collection_id)})
-    print "\n\n\n\n obj",obj
+    # print "\n\n\n\n obj",obj
     for each in Collections:
       node_collection.collection.update({'_id': ObjectId(cur_collection_id) }, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
       return HttpResponse("success")
@@ -131,6 +131,10 @@ def collection_create(request, group_id):
     gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     page_node = node_collection.collection.GSystem()
     page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+    create_gattribute(page_node._id, discussion_enable_at, True)
+    return_status = create_thread_for_node(request,group_id, page_node)
+    page_node.save()
 
     for each in Collections:
       node_collection.collection.update({'_id': page_node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
@@ -6289,12 +6293,79 @@ def course_create_collection(request, group_id):
   
 @get_execution_time
 def course_create_note(request, group_id):
-  coll_list =  request.GET.get('coll_list','')
-  fetch_res = coll_list.split(',')
-  print "fetch_res",fetch_res
-  print "\n\n",fetch_res 
-  # print "image_coll",image_coll
+  
+  img_list = request.GET.get('img_list','')
+  audio_list = request.GET.get('audio_list','')
+  video_list = request.GET.get('video_list','')
+  img_res = img_list.split(',')
+  audio_res = audio_list.split(',')
+  video_res = video_list.split(',')
+  # print "\n\n\nfetch_res",audio_res,img_res,video_res
+  # print "\n\n",fetch_res 
+  # # print "image_coll",image_coll
   return render_to_response('ndf/course_create_note.html',
       {
-        "group_id":group_id,"fetch_res":fetch_res
+        "group_id":group_id,"img_res":img_res,"audio_res":audio_res,"video_res":video_res
       },context_instance=RequestContext(request))
+
+
+@login_required
+@get_execution_time
+def upload_file_ckeditor(request,group_id):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    title = request.POST.get('context_name','')
+    usrid = request.user.id
+    
+    from gnowsys_ndf.ndf.views.filehive import write_files
+
+    gs_obj_list = write_files(request, group_id)
+    gs_obj_id = gs_obj_list[0]['if_file']['original']['relurl']
+    # print "gs_obj_list: ", gs_obj_list
+
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+    for each_gs_file in gs_obj_list:
+        #set interaction-settings
+        create_gattribute(each_gs_file._id, discussion_enable_at, True)
+        return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
+    
+    return StreamingHttpResponse(gs_obj_id)
+    # if title == "gallery":
+    # else:
+    #     return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
+    # return HttpResponseRedirect(url_name)
+
+@login_required
+@get_execution_time
+def upload_file(request,group_id):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    title = request.POST.get('context_name','')
+    usrid = request.user.id
+    
+    from gnowsys_ndf.ndf.views.filehive import write_files
+
+    gs_obj_list = write_files(request, group_id)
+    gs_obj_id = gs_obj_list[0]['_id']
+    # print "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ngs_obj_list: ", gs_obj_id
+
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+    for each_gs_file in gs_obj_list:
+        each_gs_file.status = u"PUBLISHED"
+        each_gs_file.save()
+        #set interaction-settings
+        create_gattribute(each_gs_file._id, discussion_enable_at, True)
+        return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
+    
+    # return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
+    return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':gs_obj_id}) )
+
+    

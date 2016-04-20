@@ -233,7 +233,6 @@ def create_edit_page(request, group_id, node_id=None):
 
     else:
         page_node = node_collection.collection.GSystem()
-
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
         # page_type = request.POST.getlist("type_of",'')
@@ -520,6 +519,7 @@ def publish_page(request,group_id,node):
         node.status = unicode("PUBLISHED")
         node.modified_by = int(request.user.id)
         node.save(groupid=group_id)
+
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
     # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    

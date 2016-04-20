@@ -4,7 +4,9 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
+from mongokit import paginator
 import json 
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -17,14 +19,16 @@ from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time, delete_grelation, create_grelation
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, node_thread_access, create_thread_for_node
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value,get_file_obj
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id 
 gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
 GST_IMAGE = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
-
+image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
+file_gst = node_collection.find_one( { "_type" : "GSystemType","name":"File" } )
 
 @get_execution_time
-def imageDashboard(request, group_id, image_id=None):
+def imageDashboard(request, group_id, image_id=None,page_no=1):
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     '''
     fetching image acording to group name
     '''
@@ -49,10 +53,45 @@ def imageDashboard(request, group_id, image_id=None):
         image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
         if image_ins:
             image_id = str(image_ins._id)
-    img_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+
+    # img_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': ObjectId(group_id)}).sort("last_update", -1)
+    files_cur = node_collection.find({
+                                        '_type': {'$in': ["GSystem"]},
+                                        'member_of': file_gst._id,
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        'if_file.mime_type': {'$regex': 'image'} 
+
+                                        # 'created_by': {'$in': gstaff_users},
+                            # '$or': [
+                                    # {
+                                    # },
+                                    # {
+                                    #     '$or': [
+                                    #             {'access_policy': u"PUBLIC"},
+                                    #             {
+                                    #                 '$and': [
+                                    #                         {'access_policy': u"PRIVATE"},
+                                    #                         {'created_by': request.user.id}
+                                    #                     ]
+                                    #             }
+                                    #         ],
+                                    # }
+                                    # {    'collection_set': {'$exists': "true", '$not': {'$size': 0} }}
+                                # ]
+                        },
+                        {
+                            'name': 1,
+                            '_id': 1,
+                            'fs_file_ids': 1,
+                            'member_of': 1,
+                            'mime_type': 1,
+                            'if_file':1
+                        }).sort("last_update", -1)
+    print "file count\n\n\n",files_cur.count()
+    image_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'imageCollection': img_col,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
+    variable = RequestContext(request, {'imageCollection': files_cur,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id,'image_page_info':image_page_info })
     return render_to_response(template, variable)
 
 @get_execution_time
@@ -202,7 +241,7 @@ def image_detail(request, group_id, _id):
       nav_li = nav_l
 
     if img_node._type == "GSystemType":
-	return imageDashboard(request, group_id, _id)
+    	return imageDashboard(request, group_id, _id)
     img_node.get_neighbourhood(img_node.member_of)
     thread_node = None
     allow_to_comment = None
