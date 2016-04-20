@@ -383,7 +383,7 @@
             },
         });//end of ajax
     })
-    function admin_analytics(event){
+    $(document).on('click','.fetch-group-analytics',function(){
         $(".fetch-group-analytics").addClass("hide")
         // $(".pre-analytics-msg-div").removeClass("hide")
         $.ajax({
@@ -418,7 +418,7 @@
                 $(".pre-analytics-msg-div").addClass("hide")
             },
         });//end of ajax
-    }
+    })
     function generate_points_bar(data_for_bars, bar_name){
       if(data_for_bars){
 
@@ -451,9 +451,6 @@
 
     $(document).ready(function() {
         loaddata();
-        {% if  gstaff_access %}
-          admin_analytics();
-        {% endif %}
     })
     // <!-- Scripts for the pi chart-->
     function generateGraph(data){
