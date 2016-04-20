@@ -2567,6 +2567,34 @@ def course_analytics(request, group_id):
 
 @login_required
 @get_execution_time
+def course_analytics_admin(request, group_id):
+    print "demo"
+    cache_key = u'course_analytics_admin' + unicode(group_id)
+    cache_result = cache.get(cache_key)
+    if cache_result:
+        return HttpResponse(cache_result)
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    admin_analytics_list = []
+    if group_obj.author_set:
+        for each_author in group_obj.author_set:
+            user_obj = User.objects.get(pk=int(each_author))
+            admin_analytics_data = {}
+            analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+            admin_analytics_data['username'] = user_obj.username
+            admin_analytics_data['users_points'] = analytics_instance.get_users_points()
+            admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+            del analytics_instance
+            admin_analytics_list.append(admin_analytics_data)
+    cache.set(cache_key, json.dumps(admin_analytics_list), 60*15)
+    # print "\n\nadmin_analytics_list ",admin_analytics_list
+    return HttpResponse(json.dumps(admin_analytics_list))
+
+@login_required
+@get_execution_time
 def build_progress_bar(request, group_id, node_id):
     cache_key = u'build_progress_bar_' + unicode(group_id) + "_" + unicode(node_id) + "_" + unicode(request.user.id) 
     cache_result = cache.get(cache_key)
