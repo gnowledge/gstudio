@@ -70,7 +70,9 @@
 	<dd class="accordion-navigation">
 		<a href="#definitionlist">Definition</a>
 		<div id="definitionlist" class="content active">
-		{% for key,list in definitionlist.iteritems %}
+		{% for dl in definitionlist %}
+		{% for key,list in dl.iteritems %}
+		{# {% for key,list in definitionlist %} #}
 			{% if translate and key != "language" %}
 			<div style="display:table-row;">
 				<div style="display:table-cell;"> 
@@ -113,15 +115,18 @@
 			</div>
 			{% endif %}
 			{% endfor %}
+			{% endfor %}
 		</div>
 	</dd>
 	<dd class="accordion-navigation">
 		<a href="#contentlist">Content</a>
 		<div id="contentlist" class="content" >
-			{% for key,list in contentlist.iteritems %}
+			{% for cl in contentlist %}
+			{% for key,list in cl.iteritems %}
 			<div class="medium-12 columns">
 	{# {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %} #}
 			</div>
+			{% endfor %}
 			{% endfor %}
 			<script type="text/javascript">
 	$(".orgitdown .orgitdownButton1 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/bold.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
@@ -151,7 +156,8 @@
 	<dd class="accordion-navigation">
 		<a href="#dependencylist">Dependency</a>
 		<div id="dependencylist" class="content">
-			{% for key,list in dependencylist.iteritems %}
+			{% for dplt in dependencylist %}
+			{% for key,list in dplt.iteritems %}
 			<div style="display:table-row;" class='boxes' >
 	<div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} " class='box' > 
 		<font size="3"> {{list}}</font> 
@@ -159,18 +165,21 @@
 	{% get_input_fields class_structure|get_dict_item:key key translate  %}
 			</div>
 			{% endfor %}
+			{% endfor %}
 		</div>
 	</dd>
 	<dd class="accordion-navigation">
 		<a href="#options">Options</a>
 		<div id="options" class="content">
-			{% for key,list in options.iteritems %}
+			{% for op in options %}
+			{% for key,list in op.iteritems %}
 			<div style="display:table-row;" class='boxes' >
 				<div style="display:table-cell;" title="{% for key2,value in help_tip.iteritems %}{% if key == key2 %}{{value}}{% endif %}{% endfor %} " class='box' > 
 					<font size="3"> {{list}}</font> 
 				</div>
 				{% get_input_fields class_structure|get_dict_item:key key translate  %}
 			</div>
+			{% endfor %}
 			{% endfor %}
 		</div>
 	</dd>
