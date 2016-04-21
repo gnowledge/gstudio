@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 
 from gnowsys_ndf.settings import LANGUAGES
-from gnowsys_ndf.settings import GSTUDIO_HELP_TIP,GSYSTEMTYPE_DEFINITIONLIST,GSYSTEMTYPE_CONTENTLIST,GSYSTEMTYPE_DEPENDENCYLIST,OPTIONLIST
+from gnowsys_ndf.settings import GSTUDIO_HELP_TIP,GSYSTEMTYPE_DEFINITIONLIST,ATTRIBUTETYPE_DEFINITIONLIST,RELATIONTYPE_DEFINITIONLIST,CONTENTLIST,DEPENDENCYLIST,OPTIONLIST
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import *
 
@@ -92,22 +92,25 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     dependencylist = []
     options = []
 
-    print node_id,">>>>>>>>>>\n\n\n\n"
-
     translate=request.GET.get('translate','')
     if class_name == "AttributeType":
+        definitionlist = ATTRIBUTETYPE_DEFINITIONLIST
+        contentlist = CONTENTLIST
+        dependencylist = DEPENDENCYLIST
+        options = OPTIONLIST
         # definitionlist = ['name','altnames','language','subject_type','data_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
-        definitionlist = {'name':'Name : ' ,'altnames':'Alternate Name : ' ,'language':'Language : ' ,'subject_type':'Subject Type : ' ,'data_type':'Data Type : ' ,'member_of':'Member of MetaType : ' ,'verbose_name':'Verbose Name : ' ,'null':'Null : ' ,'blank':'Blank : ' ,'help_text':'Help Text : ' ,'max_digits':'Maximum Digits : ' ,'decimal_places':'Decimal Places : ' ,'auto_now':'Auto Now : ' ,'auto_now_add':'Auto Now Add : ' ,'path':'Path : ' ,'verify_exist':'Verify Existence : ' ,'status':'Status : ' }
+        # definitionlist = {'name':'Name : ' ,'altnames':'Alternate Name : ' ,'language':'Language : ' ,'subject_type':'Subject Type : ' ,'data_type':'Data Type : ' ,'member_of':'Member of MetaType : ' ,'verbose_name':'Verbose Name : ' ,'null':'Null : ' ,'blank':'Blank : ' ,'help_text':'Help Text : ' ,'max_digits':'Maximum Digits : ' ,'decimal_places':'Decimal Places : ' ,'auto_now':'Auto Now : ' ,'auto_now_add':'Auto Now Add : ' ,'path':'Path : ' ,'verify_exist':'Verify Existence : ' ,'status':'Status : ' }
+        # definitionlist = [{'name':'Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language ' },{'subject_type':'Subject Type '} ,{'data_type':'Data Type '} ,{'member_of':'Member of MetaType ' },{'verbose_name':'Verbose Name '} ,{'null':'Null '} ,{'blank':'Blank '} ,{'help_text':'Help Text ' },{'max_digits':'Maximum Digits ' },{'decimal_places':'Decimal Places ' },{'auto_now':'Auto Now '} ,{'auto_now_add':'Auto Now Add '} ,{'path':'Path '} ,{'verify_exist':'Verify Existence '} ,{'status':'Status ' }]
         # contentlist = ['content_org']
-        contentlist = {'content_org':'content organization' }
+        # contentlist = {'content_org':'content organization' }
         # dependencylist = ['prior_node']
-        dependencylist = {'prior_node':'Prior Node : ' }
+        # dependencylist = {'prior_node':'Prior Node : ' }
         # options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
-        options = {'featured':'Featured : ' ,'created_at':'Created At : ' ,'start_publication':'Start Publication : ' ,'tags':'Tags : ' ,'url':'URL : ' ,'last_update':'Last Update : ' ,'login_required':'Login Required : ' }
+        # options = {'featured':'Featured : ' ,'created_at':'Created At : ' ,'start_publication':'Start Publication : ' ,'tags':'Tags : ' ,'url':'URL : ' ,'last_update':'Last Update : ' ,'login_required':'Login Required : ' }
     elif class_name == "GSystemType":
         definitionlist = GSYSTEMTYPE_DEFINITIONLIST
-        contentlist = GSYSTEMTYPE_CONTENTLIST
-        dependencylist = GSYSTEMTYPE_DEPENDENCYLIST
+        contentlist = CONTENTLIST
+        dependencylist = DEPENDENCYLIST
         options = OPTIONLIST
         # definitionlist = ['name','altnames','language','status','member_of','meta_type_set','attribute_type_set','relation_type_set','type_of']
         # definitionlist = [{'name':'Name : '} ,{'altnames':'Alternate Name : '} ,{'language':'Language : ' },{'status':'Status : '} ,{'member_of':'Member of MetaType : '} ,{'meta_type_set':'Select the MetaType : ' },{'attribute_type_set':'Select the AttributeType : ' },{'relation_type_set':'Select the RelationType : ' },{'type_of':'Type Of GSystemType : '} ]
@@ -119,15 +122,20 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         # options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
         # options = {'featured':'Featured : ' ,'created_at':'Created At : ' ,'start_publication':'Start Publication : ' ,'tags':'Tags : ' ,'url':'URL : ' ,'last_update':'Last Update : ' ,'login_required':'Login Required : ' }
     elif class_name == "RelationType":
+        definitionlist = RELATIONTYPE_DEFINITIONLIST
+        contentlist = CONTENTLIST
+        dependencylist = DEPENDENCYLIST
+        options = OPTIONLIST
         # definitionlist = ['name','inverse_name','altnames','language','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','is_symmetric','is_reflexive','is_transitive','status','member_of']
-        definitionlist = {'name':'Name : ' ,'inverse_name':'Inverse Name : ' ,'altnames':'Alternate Name : ' ,'language':'Language : ' ,'subject_type':'Subject Type : '  ,'object_type':'Object Type : ' ,'subject_cardinality':'Subject Cardinality : ' ,'object_cardinality':'Object Cardinality : ' ,'subject_applicable_nodetype':'Subject Applicable Node Type : ' ,'object_applicable_nodetype':'Object Applicable Node Type : ' ,'is_symmetric':'Is Symmetric : ' ,'is_reflexive':'Is Reflexive : ' ,'is_transitive':'Is Transitive : ' ,'status':'Status : ' ,'member_of':'Member of MetaType : '}
+        # definitionlist = [{'name':'Name '} ,{'inverse_name':'Inverse Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language '} ,{'subject_type':'Subject Type '}  ,{'object_type':'Object Type '} ,{'subject_cardinality':'Subject Cardinality '} ,{'object_cardinality':'Object Cardinality '} ,{'subject_applicable_nodetype':'Subject Applicable Node Type '} ,{'object_applicable_nodetype':'Object Applicable Node Type '} ,{'is_symmetric':'Is Symmetric '} ,{'is_reflexive':'Is Reflexive '} ,{'is_transitive':'Is Transitive '} ,{'status':'Status '} ,{'member_of':'Member of MetaType '}]
+        # definitionlist = {'name':'Name : ' ,'inverse_name':'Inverse Name : ' ,'altnames':'Alternate Name : ' ,'language':'Language : ' ,'subject_type':'Subject Type : '  ,'object_type':'Object Type : ' ,'subject_cardinality':'Subject Cardinality : ' ,'object_cardinality':'Object Cardinality : ' ,'subject_applicable_nodetype':'Subject Applicable Node Type : ' ,'object_applicable_nodetype':'Object Applicable Node Type : ' ,'is_symmetric':'Is Symmetric : ' ,'is_reflexive':'Is Reflexive : ' ,'is_transitive':'Is Transitive : ' ,'status':'Status : ' ,'member_of':'Member of MetaType : '}
         # definitionlist = ['name','inverse_name','altnames','language','subject_type','object_type','subject_cardinality','object_cardinality','is_symmetric','is_reflexive','is_transitive','status','member_of']
         # contentlist = ['content_org']
-        contentlist = {'content_org':'content organization' }
+        # contentlist = {'content_org':'content organization' }
         # dependencylist = ['prior_node']
-        dependencylist = {'prior_node':'Prior Node : ' }
+        # dependencylist = {'prior_node':'Prior Node : ' }
         # options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
-        options = {'featured':'Featured : ' ,'created_at':'Created At : ' ,'start_publication':'Start Publication : ' ,'tags':'Tags : ' ,'url':'URL : ' ,'last_update':'Last Update : ' ,'login_required':'Login Required : ' }
+        # options = {'featured':'Featured : ' ,'created_at':'Created At : ' ,'start_publication':'Start Publication : ' ,'tags':'Tags : ' ,'url':'URL : ' ,'last_update':'Last Update : ' ,'login_required':'Login Required : ' }
     else :
         definitionlist = []
         contentlist = []
