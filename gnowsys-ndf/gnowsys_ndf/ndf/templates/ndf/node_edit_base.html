@@ -84,12 +84,12 @@
     <header> 
 	    <div class="row">
 		 	<div class="large-8 columns">    
-		 		<h3><span class="subheader">		
+				<h3><span class="subheader">
 					{% if node %}
-						{% trans "Editing " %} {{title}} : {{node.name}}
+						{% trans "Editing " %}{% if blog_type %} {% trans 'Note' %}{% else %} {{title}} {% endif %}: {{node.name}}
 					{% else %}
 						{% if blog_type %}
-							{% trans "Create New Blog" %} :
+							{% trans "Create New Note" %} :
 						{% else %}
 							{% trans "Create New " %} {{title}} :
 						{% endif  %}
@@ -105,6 +105,7 @@
 		    </div>     
 	    </div> 
     </header>
+
     {% check_group node.pk as is_group %}
 
     <div class="edit-card">
@@ -150,6 +151,10 @@
 	</div>
         
   	{% csrf_token %}
+		{% if course_tab_title %}
+		<input type="hidden" name="course_tab_title" value="{{course_tab_title}}"></input>
+		{% endif %}
+
         {% comment %}
 		  	<div id="publish_resource" class="reveal-modal" data-reveal style="width:500px;">
 		  		Do you want to create:<br/><br/>
@@ -550,8 +555,8 @@
 		      </div>
 		      <div class="large-pull-4 large-6 medium-8 columns">
 		        <select id="release_resp_sel" name="release_resp_sel">
-		          <option value="True" {% if resp_val %} selected{% endif %}>Show Replies to All</option>
-		          <option value="False" {% if not resp_val %} selected{% endif %}>Hide Replies from All</option>
+		          <option value="True" {% if resp_val or not grel_dict %} selected{% endif %}>Show Replies to All</option>
+		          <option value="False" {% if grel_dict and not resp_val %} selected{% endif %}>Hide Replies from All</option>
 		        </select>
 		      </div>
 		    </div>
@@ -596,19 +601,9 @@
 		  	<h7>{% trans "Select help page(s) for this resource from following options:"%} </h7>
 		</div>
 	    <div class="help-settings-div">
-			{% get_dict_from_list_of_dicts node.relation_set True as node_rel_set %}
+	    	{% get_help_pages_of_node node as help_page_list %}
 			{% get_info_pages group_id as all_info_pages %}
-			<select class="help_info_page" name="help_info_page" multiple style="height:200px;">
-				<option value="None" {% if not node_rel_set %}selected{% endif %}> --- Select --- </option>
-				{% for each_page in all_info_pages %}
-					<option value="{{each_page.pk}}"
-					{% if node_rel_set.has_help %}{% if each_page.pk in node_rel_set.has_help %}
-					selected
-					{% endif %}{% endif %}>
-						{{each_page.name}}
-					</option>
-				{% endfor %}
-			</select>
+	        {% include 'ndf/widget_selector.html' with for='help_info_page' all_options=all_info_pages selected_options=help_page_list oneline_element='false' %}
 	    </div>
 
 	</div>	
@@ -1535,6 +1530,8 @@
 	    {
 	    	event.preventDefault();
 	    }
+	    getSelValuesHiddenElement('help_info_page','form-edit-node');
+
 	});
 
 

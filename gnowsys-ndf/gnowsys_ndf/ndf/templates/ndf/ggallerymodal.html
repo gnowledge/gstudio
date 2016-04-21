@@ -3,8 +3,14 @@
 {% load ndf_tags %}
 {% get_grid_fs_object node as grid_fs_obj %}
 <style type="text/css">
-    .visits_info{
-        font-size: 20px;
+    .image-details .tabs .tab-title{
+        width: 25% !important;
+    }
+    .tab-title > a{
+        font-size: 0.80rem !important;
+    }
+    .lbl_of_tag{
+        background-color: gold !important;
     }
 </style>
 <!--<style type="text/css">
@@ -76,79 +82,104 @@
                 <div class="columns small-1 next-item">Next ></div>
             </div>
             {% endcomment %}
-        </div>
-        <!-- Comments section -->
-        <div class="small-4 columns gmodal-side-panel" >
-            <div class="gmodal-side row"   style="overflow-y:auto;">
-                <div class="small-12">
-                    <div class="row view-info-area image-name">
-                        <div class="small-12 columns">
-                            <h5>{% firstof node.altnames node.name %}</h5>
-                        </div>
-                        <a class="file-detail-modal-close close-reveal-modal" aria-label="Close">&#215;</a>
-                    </div>
-                    <div class="row image-brief">
-                        <div class="small-12 columns">
-                            <i class="fi-eye"></i>
-                            <span class="viewed-count">214 Views</span>
-                            <span>Avg&nbsp;</span>
-                            <span class="image-rating">3.4</span>
-                            <span>Rate this</span>
-                            <span>
-                                {% include "ndf/rating.html" %}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row image-actions">
-                        <div class="small-12 columns">
-                            <a href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}"><i class="fa fa-arrow-circle-down"></i>&nbsp;Download</a>
-                            <a><i class="fa fa-pencil"></i>&nbsp;Create Note</a>
-                            {% get_edit_url node.pk as edit_url %}
-                            {% check_is_gstaff group_id request.user as is_gstaff %}
-                            {% if is_gstaff or node.created_by == request.user.id %}
-                                <a href="{% url edit_url group_id node.pk %}">
-                                    <i class="fi-page-edit" ></i>Edit
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <!--div class="row rating-area">
-                        <div class="small-6 columns">
-                            <h4>Rating</h4>
-                        </div>
-                        <div class="small-6 columns right">
-                            {% include "ndf/analytics_views.html" %}
-                        </div>
+    </div>
+    <!-- Comments section -->
+    <div class="small-4 columns gmodal-side-panel" >
 
-                    </div-->
-                    <div class="row image-details">
-                        <div class="small-12 columns ">
-                            <ul class="tabs" data-tab>
-                              <li class="tab-title active"><a href="#image-comments">Comments</a></li>
-                              <li class="tab-title"><a href="#image-info">Info</a></li>
-                            </ul>
-                            <div class="tabs-content">
-                                <div class="content" id="image-info">
-                                    <span>Created At: </span>{{node.created_at}}<br>
-                                    <span>Uploader: </span>{{node.created_by|get_username}}<br>
-                                    <span>Format: </span>{{node.mime_type}}<br>
-                                    <span>Size: </span>{{node.file_size.size}}{{node.file_size.unit}}>
-                                </div>
-                                <div class="content active" id="image-comments">
-                                    <div class="row comments-area">
-                                        <div class="small-12 columns" >
-                                            {% get_thread_node node.pk as thread_node %}
-                                                {% if thread_node %}
-                                                    {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-                                                    {% get_node thread_node as thread_node_obj %}
-                                                    {% include 'ndf/ggallery-discussion.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
-                                                {% else %}
-                                                    {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-                                                    {% include 'ndf/ggallery-discussion.html' with var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
-                                                {% endif %}
-                                        </div>
+        <div class="gmodal-side row"   style="overflow-y:auto;">
+            <div class="small-12">
+                <div class="row view-info-area image-name">
+                    <div class="small-12 columns">
+                        <h5>{% firstof node.altnames node.name %}</h5>
+                    </div>
+                </div>
+                {% if node.tags %}
+                    <div class="row tag-rating-div">
+                            {% for tag in node.tags %}
+                                {% if forloop.counter < 3 %}
+                                    <small><label class="lbl_of_tag label">
+                                {% else %}
+                                    <small><label class="lbl_of_tag label tag_ele hide">
+                                {% endif %}
+                                <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
+                            {% endfor %}
+                            {% if node.tags|length > 2 %}
+                                <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
+                            {% endif %} 
+                    </div>
+                {% else %}
+                    <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
+                {% endif %}
+
+                <div class="row image-brief">
+                    <div class="small-12 columns">
+                        {% include "ndf/analytics_views.html" %}
+                        {% comment %}
+                        <i class="fi-eye"></i>
+                        <span>Avg&nbsp;</span>
+                        <span class="image-rating">3.4</span>
+                        <span>Rate this</span>
+                        {% endcomment %}
+                        <span>
+                            {% include "ndf/rating.html" %}
+                        </span>
+                    </div>
+                </div>
+                <div class="row image-actions">
+                    <div class="small-12 columns">
+                        <a href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}"><i class="fa fa-arrow-circle-down"></i>&nbsp;Download</a>
+                        {% comment %}
+                        <a><i class="fa fa-pencil"></i>&nbsp;Create Note</a>
+                        {% endcomment %}
+                        {% get_edit_url node.pk as edit_url %}
+                        {% check_is_gstaff group_id request.user as is_gstaff %}
+                        {% if is_gstaff or node.created_by == request.user.id %}
+                            <a href="{% url edit_url group_id node.pk %}?course_tab_title={{title}}">
+                                <i class="fi-page-edit" ></i>Edit
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <!--div class="row rating-area">
+                    <div class="small-6 columns">
+                        <h4>Rating</h4>
+                    </div>
+                    <div class="small-6 columns right">
+                        {% include "ndf/analytics_views.html" %}
+                    </div>
+
+                </div-->
+                <div class="row image-details">
+                    <div class="small-12 columns ">
+                        <ul class="tabs" data-tab>
+                          <li class="tab-title active"><a href="#image-comments">Comments</a></li>
+                          <li class="tab-title"><a href="#image-desc">Description</a></li>
+                          <li class="tab-title"><a href="#image-info">Info</a></li>
+                        </ul>
+                        <div class="tabs-content">
+                            <div class="content active" id="image-comments">
+                                <div class="row comments-area">
+                                    <div class="small-12 columns" >
+                                        {% get_thread_node node.pk as thread_node %}
+                                            {% if thread_node %}
+                                                {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+                                                {% get_node thread_node as thread_node_obj %}
+                                                {% include 'ndf/ggallery-discussion.html' with node=thread_node_obj var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                                            {% else %}
+                                                {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                                                {% include 'ndf/ggallery-discussion.html' with var_name="content_org" ckeditor_toolbar="GgallaryCommentsToolbar" %}
+                                            {% endif %}
                                     </div>
                                 </div>
+                            </div>
+                            <div class="content" id="image-desc">
+                                {{node.content|default_if_none:"No description added yet."|safe}}                                
+                            </div>
+                            <div class="content" id="image-info">
+                                <span>Created At: </span>{{node.created_at}}<br>
+                                <span>Uploader: </span>{{node.created_by|get_username}}<br>
+                                <span>Format: </span>{{node.mime_type}}<br>
+                                <span>Size: </span>{{node.file_size.size}}{{node.file_size.unit}}
                             </div>
                         </div>
                     </div>
@@ -156,6 +187,9 @@
             </div>
         </div>
     </div>
+    <a href="{% url redirect_tab_url group_id %}" class="file-detail-modal-close"></a>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
 </div>
 <script type="text/javascript">
 
@@ -170,6 +204,17 @@ $(".view-info-close").click(function(){
     $(".rating-area").show();
     $(".comments-area").show();
 });
+
+$(document).on('click','.view-more-tags',function(){
+    if($(this).text()=="Less"){
+        $(".tag_ele").addClass("hide")
+        $(this).text("More")
+    }
+    else{
+        $(".tag_ele").removeClass("hide")
+        $(this).text("Less")
+    }
+})
 
 
 </script>

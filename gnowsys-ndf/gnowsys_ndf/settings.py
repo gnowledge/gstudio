@@ -747,7 +747,11 @@ GSTUDIO_NO_OF_OBJS_PP = 24
 GSTUDIO_HELP_SIDEBAR = False
 GSTUDIO_SOCIAL_SHARE_RESOURCE = False
 GSTUDIO_CAPTCHA_VISIBLE = False
-
+GSTUDIO_FILE_UPLOAD_POINTS = 25
+GSTUDIO_NOTE_CREATE_POINTS = 30
+GSTUDIO_QUIZ_CORRECT_POINTS = 5
+GSTUDIO_COMMENT_POINTS = 5
+GSTUDIO_ENABLE_USER_DASHBOARD = True
 # ----------------------------------------------------------------------------
 # following has to be at last
 # just put every thing above it

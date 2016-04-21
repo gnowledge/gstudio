@@ -840,7 +840,11 @@ def submitDoc(request, group_id):
                         f = f[1]
                 fileobj = node_collection.one({'_id': ObjectId(f)})
                 thread_create_val = request.POST.get("thread_create",'')
-                help_info_page = request.POST.getlist('help_info_page','')
+                # help_info_page = request.POST.getlist('help_info_page','')
+                help_info_page = request.POST['help_info_page']
+                if help_info_page:
+                  help_info_page = json.loads(help_info_page)
+
                 # print "\n\n help_info_page  === ", help_info_page
                 discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
                 if thread_create_val == "Yes":
@@ -1684,6 +1688,7 @@ def file_edit(request,group_id,_id):
     file_node = node_collection.one({"_id": ObjectId(_id)})
     title = GST_FILE.name
     ce_id = request.GET.get('course_event_id')
+    course_tab_title = request.GET.get('course_tab_title','')
     res = request.GET.get('res')
 
     if request.method == "POST":
@@ -1692,7 +1697,11 @@ def file_edit(request,group_id,_id):
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE),groupid=group_id)
 
         thread_create_val = request.POST.get("thread_create",'')
-        help_info_page = request.POST.getlist('help_info_page','')
+        course_tab_title = request.POST.get("course_tab_title",'')
+        # help_info_page = request.POST.getlist('help_info_page','')
+        help_info_page = request.POST['help_info_page']
+        if help_info_page:
+          help_info_page = json.loads(help_info_page)
 
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
@@ -1739,8 +1748,16 @@ def file_edit(request,group_id,_id):
 
             return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         else:
-            url = "/"+ str(group_id) +"/?selected="+str(file_node._id)+"#view_page"
-            return HttpResponseRedirect(url)
+            file_node.status = u"PUBLISHED"
+            file_node.save()
+            if course_tab_title:
+                if course_tab_title == "raw material":
+                    course_tab_title = "raw_material"
+                return HttpResponseRedirect(reverse('course_'+course_tab_title + '_detail', kwargs={'group_id': group_id, 'node_id': str(img_node._id)}))
+
+            return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
+            # url = "/"+ str(group_id) +"/?selected="+str(file_node._id)+"#view_page"
+            # return HttpResponseRedirect(url)
 
     else:
         if file_node:
@@ -1751,7 +1768,7 @@ def file_edit(request,group_id,_id):
                                     'group_id': group_id,
                                     'groupid':group_id,
                                     'ce_id': ce_id,
-                                    'res': res
+                                    'res': res,'course_tab_title':course_tab_title
                                 },
                                   context_instance=RequestContext(request)
                               )

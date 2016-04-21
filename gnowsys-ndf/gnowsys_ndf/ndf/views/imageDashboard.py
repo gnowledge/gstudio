@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
-
+import json 
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -254,13 +254,18 @@ def image_edit(request,group_id,_id):
     img_node = node_collection.one({"_id": ObjectId(_id)})
     ce_id = request.GET.get('course_event_id')
     res = request.GET.get('res')
+    course_tab_title = request.GET.get('course_tab_title','')
 
     title = GST_IMAGE.name
     if request.method == "POST":
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
         img_node.save(is_changed=get_node_common_fields(request, img_node, group_id, GST_IMAGE),groupid=group_id)
         thread_create_val = request.POST.get("thread_create",'')
-        help_info_page = request.POST.getlist('help_info_page','')
+        course_tab_title = request.POST.get("course_tab_title",'')
+        # help_info_page = request.POST.getlist('help_info_page','')
+        help_info_page = request.POST['help_info_page']
+        if help_info_page:
+            help_info_page = json.loads(help_info_page)
 
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
         if thread_create_val == "Yes":
@@ -309,8 +314,15 @@ def image_edit(request,group_id,_id):
 
             return HttpResponseRedirect(reverse('image_detail', kwargs={'group_id': group_id, '_id': img_node._id}))
         else:
-            url = "/"+ str(group_id) +"/?selected="+str(img_node._id)+"#view_page"
-            return HttpResponseRedirect(url)
+            img_node.status = u"PUBLISHED"
+            img_node.save()
+            if course_tab_title:
+                if course_tab_title == "raw material":
+                    course_tab_title = "raw_material"
+                return HttpResponseRedirect(reverse('course_'+course_tab_title + '_detail', kwargs={'group_id': group_id, 'node_id': str(img_node._id)}))
+            return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
+            # url = "/"+ str(group_id) +"/?selected="+str(img_node._id)+"#view_page"
+            # return HttpResponseRedirect(url)
     else:
         img_node.get_neighbourhood(img_node.member_of)
         return render_to_response("ndf/image_edit.html",
@@ -318,7 +330,7 @@ def image_edit(request,group_id,_id):
                                     'group_id': group_id,
                                     'groupid': group_id,
                                     'ce_id':ce_id,
-                                    'res': res
+                                    'res': res, 'course_tab_title':course_tab_title
                                 },
                                   context_instance=RequestContext(request)
                               )
