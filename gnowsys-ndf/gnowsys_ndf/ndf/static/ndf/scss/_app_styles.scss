@@ -184,6 +184,9 @@ pre{
 // }
 // }
 
+.progress .meter {
+  float: left;
+}
 
 // ------| following style lines were there in _metastudio_styles.scss |------
 
@@ -2070,7 +2073,7 @@ $course-envelop-color: #fff;
       bottom: 0px;
       height: $course-envelop-height;
       img {
-        width: 100%;
+        width: auto;
         height: $course-envelop-height;
       }
     }
@@ -2421,7 +2424,12 @@ $course-envelop-color: #fff;
     margin: 15px 0px;
 
     tr {
-      border: 1px solid #ccc;
+      border: none;
+    }
+    .progress {
+      .merter-val {
+        margin-left: 5px;
+      }
     }
   }
   /*.about-course-heading {
@@ -2477,6 +2485,29 @@ $course-envelop-color: #fff;
   }
 }
 
+  .notifications-tabs{
+    .tabs {
+      width: 100%;
+      margin: 0em 0em 0.5em;
+      border-bottom: 1px solid #CCC;
+
+      .tab-title {
+        width: 40%;
+        background-color: #DEDEDE;
+        margin-left: 1em;
+        position: relative;
+        top: 1px;
+        text-transform: uppercase;
+
+        &.active {
+          background-color: #fff;
+          border: 1px solid #CCC;
+          border-bottom: 0px;
+        }
+      }
+
+  }
+  }
 .student-dashboard-header-container {
     background-color: #90F;
     padding: 10px 10px ;
