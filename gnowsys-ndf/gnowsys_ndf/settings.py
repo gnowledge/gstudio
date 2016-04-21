@@ -696,7 +696,7 @@ GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House'
 
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Discuss', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
 
-GSTUDIO_HELP_TIP = { 'name':'States the title of the object', 'altnames':'Alternate Names', 'language':'Spoken Toungue', 'subject_type':'subjects type' , 'data_type':'datas types ' , 'applicable_node_type':'Nodes that are applicable' ,
+GSTUDIO_HELP_TIP = { 'name':'States the title of the object', 'altnames':'Alternate Names', 'language':'Spoken Tongue', 'subject_type':'subjects type' , 'data_type':'datas types ' , 'applicable_node_type':'Nodes that are applicable' ,
     'member_of':'mem ' ,'verbose_name':'verbose_name' ,'null':'null variable' ,'blank':'blank' ,'help_text':'help_text', 'max_digits':'maximum digits' ,'decimal_places':'decimal places' ,'auto_now':'auto_now ' ,'auto_now_add':'auto_now_add' ,
     'path':'path of something' ,'verify_exist':'verifying exist' ,'status':'status' ,'content_org':'type content', 
     'prior_node':'node coming before', 'featured':'featured', 'created_at':'created at location' , 'start_publication':'pub' ,
@@ -704,9 +704,18 @@ GSTUDIO_HELP_TIP = { 'name':'States the title of the object', 'altnames':'Altern
     'attribute_type_set':'attribute_type_set defn' ,'relation_type_set':'relation def ','type_of':'Type of' }
 
 GSYSTEMTYPE_DEFINITIONLIST = [{'name':'Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language ' },{'status':'Status : '} ,{'member_of':'Member of MetaType : '} ,{'meta_type_set':'Select the MetaType : ' },{'attribute_type_set':'Select the AttributeType : ' },{'relation_type_set':'Select the RelationType : ' },{'type_of':'Type Of GSystemType : '} ]
-GSYSTEMTYPE_CONTENTLIST = [{'content_org':'content organization' }]
-GSYSTEMTYPE_DEPENDENCYLIST = [{'prior_node':'Prior Node ' }]
+
+ATTRIBUTETYPE_DEFINITIONLIST = [{'name':'Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language ' },{'subject_type':'Subject Type '} ,{'data_type':'Data Type '} ,{'member_of':'Member of MetaType ' },{'verbose_name':'Verbose Name '} ,{'null':'Null '} ,{'blank':'Blank '} ,{'help_text':'Help Text ' },{'max_digits':'Maximum Digits ' },{'decimal_places':'Decimal Places ' },{'auto_now':'Auto Now '} ,{'auto_now_add':'Auto Now Add '} ,{'path':'Path '} ,{'verify_exist':'Verify Existence '} ,{'status':'Status ' }]
+
+RELATIONTYPE_DEFINITIONLIST = [{'name':'Name '} ,{'inverse_name':'Inverse Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language '} ,{'subject_type':'Subject Type '}  ,{'object_type':'Object Type '} ,{'subject_cardinality':'Subject Cardinality '} ,{'object_cardinality':'Object Cardinality '} ,{'subject_applicable_nodetype':'Subject Applicable Node Type '} ,{'object_applicable_nodetype':'Object Applicable Node Type '} ,{'is_symmetric':'Is Symmetric '} ,{'is_reflexive':'Is Reflexive '} ,{'is_transitive':'Is Transitive '} ,{'status':'Status '} ,{'member_of':'Member of MetaType '}]
+
+CONTENTLIST = [{'content_org':'content organization' }]
+
+DEPENDENCYLIST = [{'prior_node':'Prior Node ' }]
+
 OPTIONLIST = [{'featured':'Featured '} ,{'created_at':'Created At ' },{'start_publication':'Start Publication '} ,{'tags':'Tags '},{'url':'URL '} ,{'last_update':'Last Update '} ,{'login_required':'Login Required ' }]
+
+
 # #textb
 # import warnings
 # warnings.filterwarnings(
