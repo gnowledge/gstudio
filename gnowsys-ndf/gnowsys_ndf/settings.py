@@ -703,6 +703,10 @@ GSTUDIO_HELP_TIP = { 'name':'States the title of the object', 'altnames':'Altern
     'tags':'tags' ,'url':'url' ,'last_update':'updated last' ,'login_required':'required login' , 'meta_type_set':'meta_type_set' ,
     'attribute_type_set':'attribute_type_set defn' ,'relation_type_set':'relation def ','type_of':'Type of' }
 
+GSYSTEMTYPE_DEFINITIONLIST = [{'name':'Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language ' },{'status':'Status : '} ,{'member_of':'Member of MetaType : '} ,{'meta_type_set':'Select the MetaType : ' },{'attribute_type_set':'Select the AttributeType : ' },{'relation_type_set':'Select the RelationType : ' },{'type_of':'Type Of GSystemType : '} ]
+GSYSTEMTYPE_CONTENTLIST = [{'content_org':'content organization' }]
+GSYSTEMTYPE_DEPENDENCYLIST = [{'prior_node':'Prior Node ' }]
+OPTIONLIST = [{'featured':'Featured '} ,{'created_at':'Created At ' },{'start_publication':'Start Publication '} ,{'tags':'Tags '},{'url':'URL '} ,{'last_update':'Last Update '} ,{'login_required':'Login Required ' }]
 # #textb
 # import warnings
 # warnings.filterwarnings(
