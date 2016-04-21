@@ -25905,8 +25905,6 @@ div.show-image:hover div.fullscreen-icon{
 /* line 2726, ../../../scss/_app_styles.scss */
 .notebook .notebook-body > div {
   padding-top: 15px;
-  height: 50em;
-  overflow: scroll;
 }
 /* line 2732, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index {
