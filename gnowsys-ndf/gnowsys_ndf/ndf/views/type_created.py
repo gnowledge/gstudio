@@ -17,30 +17,37 @@ from gnowsys_ndf.ndf.views.methods import *
 
 @login_required
 def type_created(request,group_id):
-    print "\n\n\n\n\n", "type_created" ,group_id , "\n\n\n\n\n\n\n\n"
-
+    # print "\n\n\n\n\n", "type_created" ,group_id , "\n\n\n\n\n\n\n\n"
     try:
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
 
-    option_list = []
     opt_list = []
     gst = node_collection.find({'_type':'GSystemType'})
     for e in gst :
-        option_list.append(e.name)
-        opt_list.append(e)
+        op_demo = []
+        op_demo = dict({'name':e.name, 'id':e._id })
+        opt_list.append(op_demo)
         
     # opt_list = node_collection.find({'_type':'GSystemType'})
 
+
+    if request.method == "POST":
+        print request.POST,"reuest posted \n\n\n\n\n"
+
+        
+    group_name = 'home'
     template = "ndf/type_created.html"
-    variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'option_list':option_list,'opt_list':opt_list })
+    variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'opt_list':opt_list, 'group_name_tag':group_name })
 
     return render_to_response(template,variable)
 
 
 @login_required
-def default_template(request,group_id,node=None):
+def default_template(request,group_id,node=None,edit_node=None):
+    
+    print node ,"from deff " , edit_node ,"\n\n\n\n\n\n"
 
     try:
         group_id = ObjectId(group_id)
@@ -65,12 +72,13 @@ def default_template(request,group_id,node=None):
 
     if node :
         # print "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
-        st_name = node
+        st_id = node
 
-        node_gs = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name':st_name}]})
+        node_gs = node_collection.one({'_type': u'GSystemType','_id':ObjectId(st_id)})
 
-        node_gs_id = node_gs._id
-        # print node_gs_id
+
+        node_gs_id = node
+        print node_gs_id
 
         ats = node_gs.attribute_type_set
         
@@ -239,6 +247,7 @@ def default_template(request,group_id,node=None):
 
         for e in final_rts:
             final_rts_name = e.name
+
             final_rts_alt = e.altnames
             rts_check_pos_id = e._id
             pos_r = []
@@ -257,7 +266,7 @@ def default_template(request,group_id,node=None):
                     rts_pos_flag = True
                     r_pos_check.append(rts_pos_check)
                     pos_r.remove(e)
-                    print rts_pos_check,">>>\n"
+                    print rts_pos_check,final_rts_name,">>>\n"
 
             name_pos_rst = []
             id_pos_rst = []
@@ -309,11 +318,12 @@ def default_template(request,group_id,node=None):
     # if node_id:
     #     new_instance_type = node_collection.one({'_type': unicode(gs_sys), '_id': ObjectId(node_id)})
     # else:
-
+    flag = False
     new_instance_type = eval("node_collection.collection"+"."+gs_sys)()
 
     if request.method == "POST":
         # print request.POST
+        flag = True
         for key,value in gs_struc.items():
             # print key , value,"\n"
 
@@ -427,8 +437,15 @@ def default_template(request,group_id,node=None):
 
 
     template = "ndf/basic_temp.html"
+    # variable = RequestContext(request, {'group_id':group_id,'groupid':group_id })
     variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
      'ats':ats , 'rts':rts , 'node_gs':node_gs , 'gs_struc':gs_struc ,'final_ats':final_ats , 
      'f_rts_object_dict':f_rts_object_dict , 'f_pos_rts_object_dict':f_pos_rts_object_dict })
-
+        
     return render_to_response(template,variable)
+
+    # if flag:
+    #     template = "/group_id/type_created"
+    #     return HttpResponseRedirect(template)
+    # else :
+    #     return render_to_response(template,variable)
