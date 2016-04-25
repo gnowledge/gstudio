@@ -148,19 +148,27 @@ table {
 	<tr>	
           <td id="{{each.Id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
 	  <td style="display:none" class="id" style="font-size:11px;">{{each.Id}}</td>
-	  <td class="title" style="font-size:95%"><font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}"></td>
+	  <td class="title" style="font-size:95%">
+      <font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
+      <font class="viewinput{{each.Id}}">{{each.Id}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
+      <font class="viewinput{{each.Id}}">{{each.Member}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
+      <font class="viewinput{{each.Id}}">{{each.Mem}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
+    </td>
 	  {% if class_name == "File" or class_name ==  "GSystem"  %}
 	  <td class="group" style="font-size:11px;">
 	    <font class="viewinput{{each.Id}}">{{each.Group}}</font>
 	    <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Group}}">
 	  </td>
 	  {% endif %}
+
 	  <td style="display:none" class="type" style="font-size:11px;">
 	    <font class="viewinput{{each.Id}}">{{each.Type}}</font>
 	    <input style="display:none" class="editinput{{each.Id}} type" type="text" value= "{{each.Type}}" >
 	  </td>
 	  <td style="display:none" class="author" style="font-size:11px;">{{each.Author}}</td>
 	  <td style="display:none" class="creation" style="font-size:11px;">{{each.Creation}}</td>
+
+
 	  {% if class_name == "GSystemType"  %}
 	  <td class="member_of" style="font-size:11px;">
 	    <font class="viewinput{{each.Id}}">{{each.member_of}}</font>
@@ -184,18 +192,34 @@ table {
 	    <input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none">
 	  </td>
 	  {% if class_name == "GSystemType" or class_name = "AttributeType" or class_name = "RelationType" %}
+    <td> 
+      <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}" style="width:115px;">
+        Edit&nbsp;&nbsp;{{groupname}}
+        <i class="fi-plus"></i>
+      </a>
+    </td>
+    <td>
+      <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}?translate=True">
+              {% trans "Translate" %}
+      </a>
+    </td>
+    {% endif %}
+    {% if class_name == "GSystem" %}
+    <td> 
+      <a class="button medium" href="" style="width:115px;">
+        Edit&nbsp;&nbsp;
+        <i class="fi-plus"></i>
+      </a>
+    </td>
 	  <td> 
-	    <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}" style="width:115px;">
-	      Edit&nbsp;&nbsp;
+	    <a class="button medium" href=" " style="width:150px;">
+	      Graph &nbsp;&nbsp;
 	      <i class="fi-plus"></i>
 	    </a>
 	  </td>
-	  <td>
-	    <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}?translate=True">
-              {% trans "Translate" %}
-	    </a>
-	  </td>
-	  {% endif %}
+    {% endif %}
+
+
 	</tr>
  	{% endfor %}
   </tbody>
