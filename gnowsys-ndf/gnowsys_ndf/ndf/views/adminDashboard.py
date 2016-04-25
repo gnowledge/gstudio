@@ -10,6 +10,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import *
 
 import json
+import pymongo
 
 GAPP = node_collection.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fetching MetaType name GAPP
 
@@ -75,8 +76,15 @@ def adminDashboardClass(request, class_name="GSystem"):
         mem_ty=[]
         for e in each.member_of:
             mem_ty.append(str(e))
+
+        k = mem_ty[0]
+
+        # t = int(k,)
+            # mem_ty.append(e.valueOf() )
             
-        objects_details.append({"Id":each._id,"Member":each.member_of,"Mem":mem_ty ,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
+        objects_details.append({"Id":each._id,"Member":each.member_of,"Mem":k ,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
+
+
     elif class_name in ("GAttribute","GRelation"):
         objects_details.append({"Id":each._id,"Title":each.name,"Type":"","Author":"","Creation":""})
     else :
