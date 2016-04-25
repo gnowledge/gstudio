@@ -25,12 +25,16 @@ html {
 }
 
 #page-wrapper {
-  width: 640px;
-  /*background: #FFFFFF;*/
-  padding: 1em;
-  margin: 1em auto;
-  /*border-top: 5px solid #69c773;*/
-  /*box-shadow: 0 2px 10px rgba(0,0,0,0.8);*/
+width: 640px;
+/*background: #FFFFFF;*/
+padding: 1em;
+margin: 1em auto;
+/*border-top: 5px solid #69c773;*/
+/*box-shadow: 0 2px 10px rgba(0,0,0,0.8);*/
+max-height: 500px;
+overflow-y: auto;
+overflow-x: hidden;
+padding-right: 5px;
 }
 
 h1 {
@@ -82,6 +86,7 @@ button:active {
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
 <div class="row">
 <form method="post" name="" id="type_create">
+{% csrf_token %}
 <div style="display:table-row;">
     <!--
     <div style="display:table-cell;"> <center>
@@ -103,27 +108,32 @@ button:active {
 
     <label for="default">Search for GST : </label>
     <input type="text" id="default" list="widget_for" placeholder="Type to search for GST">
-    <datalist id="widget_for" name="widget_for" >
+    {# <datalist id="widget_for" name="widget_for" style="overflow: scroll; width: 100%; height:500px" > #}
+    <select id="widget_for" name="widget_for" >
     {% for list in opt_list %}
-        <option value="{{list.name}}" size="5" > </option>
+        <option value="{{list.name}}" size="5" > {{list.name}} </option>
     {% endfor %}        
-    </datalist>    
+    </select>    
     </div>
+{# {% get_url_gs 'Exam' as noose %} #}
 </div>
 </form>
 <div style="display:table-row;" > <center>
+    {# <input type="submit" class="button" id="save-node-type" value="Create" onclick="{% all_url_gst %}"/> #}
     <input type="submit" class="button" id="save-node-type" value="Create" onclick="NavigateToSite()"/>
 </center></div>
+
 </div>
 
 </div>
+
 
 <script type="text/javascript">
-var list = "{{list}}"
+// var list = "{{list}}"
 var selectedValue = null 
 
 // Get the <datalist> elements.
-var dataList = document.getElementById('json-datalist');
+var dataList = document.getElementById('json-select');
 
 // Create a new XMLHttpRequest.
 var request = new XMLHttpRequest();
@@ -156,7 +166,11 @@ function GetSelectedTextValue(widget_for) {
 }
 
 function NavigateToSite(){
-    var selectedValue = document.getElementById('default').value
+    var selectedValue = document.getElementById('widget_for').value
+    // var selectedValue = document.getElementById('default').value
+    // console.log(selectedValue)
+    var basic = selectedValue
+    // console.log(basic)
     switch(selectedValue){
         case "Page":
             selected_val = "{% url 'page_create_edit' group_name_tag %}";
@@ -179,134 +193,14 @@ function NavigateToSite(){
         case "Course":
             selected_val = "{% url 'create_edit' group_name_tag %}";
             break;
-        case "Module":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Module' %} ";
-            break;
-        case "Batch":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Batch' %} ";
-            break;
         case "Task":
             selected_val = "{% url 'task_create_edit' group_name_tag %}";
-            break;
-        case "WikiData":
-            selected_val = "{% url 'basic_temp' group_name_tag 'WikiData' %} ";
-            break;
-        case "Topics":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Topics' %} ";
-            break;
-        case "E-Library":
-            selected_val = "{% url 'basic_temp' group_name_tag 'E-Library' %} ";
-            break;
-        case "Bib_app":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Bib_app' %} ";
-            break;
-        case "Observation":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Observation' %} ";
             break;
         case "E-Book":
             selected_val = "{% url 'uploadDoc' group_name_tag %}";
             break;
-        case "Twist":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Twist' %} ";
-            break;
-        case "Reply":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Reply' %} ";
-            break;
-        case "Author":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Author' %} ";
-            break;
-        case "Shelf":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Shelf' %} ";
-            break;
-        case "Pandora_video":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Pandora_video' %} ";
-            break;
-        case "task_update_history":
-            selected_val = "{% url 'basic_temp' group_name_tag 'task_update_history' %} ";
-            break;
-        case "Topic":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Topic' %} ";
-            break;
-        case "Author":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Bib_app' %} ";
-            break;
-        case "Theme":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Theme' %} ";
-            break;
-        case "theme_item":
-            selected_val = "{% url 'basic_temp' group_name_tag 'theme_item' %} ";
-            break;
-        case "Concept":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Concept' %} ";
-            break;
-        case "article":
-            selected_val = "{% url 'basic_temp' group_name_tag 'article' %} ";
-            break;
-        case "book":
-            selected_val = "{% url 'basic_temp' group_name_tag 'book' %} ";
-            break;
-        case "conference":
-            selected_val = "{% url 'basic_temp' group_name_tag 'conference' %} ";
-            break;
-        case "inbook":
-            selected_val = "{% url 'basic_temp' group_name_tag 'inbook' %} ";
-            break;
-        case "incollection":
-            selected_val = "{% url 'basic_temp' group_name_tag 'incollection' %} ";
-            break;
-        case "inproceedings":
-            selected_val = "{% url 'basic_temp' group_name_tag 'inproceedings' %} ";
-            break;
-        case "manual":
-            selected_val = "{% url 'basic_temp' group_name_tag 'manual' %} ";
-            break;
-        case "masterthesis":
-            selected_val = "{% url 'basic_temp' group_name_tag 'masterthesis' %} ";
-            break;
-        case "misc":
-            selected_val = "{% url 'basic_temp' group_name_tag 'misc' %} ";
-            break;
-        case "phdthesis":
-            selected_val = "{% url 'basic_temp' group_name_tag 'phdthesis' %} ";
-            break;
-        case "proceedings":
-            selected_val = "{% url 'basic_temp' group_name_tag 'proceedings' %} ";
-            break;
-        case "techreport":
-            selected_val = "{% url 'basic_temp' group_name_tag 'techreport' %} ";
-            break;
-        case "unpublished_entry":
-            selected_val = "{% url 'basic_temp' group_name_tag 'unpublished_entry' %} ";
-            break;
-        case "booklet":
-            selected_val = "{% url 'basic_temp' group_name_tag 'booklet' %} ";
-            break;
-        case "GList":
-            selected_val = "{% url 'basic_temp' group_name_tag 'GList' %} ";
-            break;
-        case "GListItem":
-            selected_val = "{% url 'basic_temp' group_name_tag 'GListItem' %} ";
-            break;
         case "ProgramEventGroup":
             selected_val = "{% url 'create_event_group' group_id 'ProgramEventGroup' %}";
-            break;
-        case "CourseEventGroup":
-            selected_val = "{% url 'basic_temp' group_name_tag 'CourseEventGroup' %} ";
-            break;
-        case "PartnerGroup":
-            selected_val = "{% url 'basic_temp' group_name_tag 'PartnerGroup' %} ";
-            break;
-        case "ModeratingGroup":
-            selected_val = "{% url 'basic_temp' group_name_tag 'ModeratingGroup' %} ";
-            break;
-        case "Info page":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Info page' %} ";
-            break;
-        case "Blog page":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Blog page' %} ";
-            break;
-        case "Wiki page":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Wiki page' %} ";
             break;
         case "Quiz":
             selected_val = "{% url 'quiz_create' group_name_tag %}";
@@ -314,140 +208,16 @@ function NavigateToSite(){
         case "QuizItem":
             selected_val = "{% url 'quiz_item_create' group_name_tag %}";
             break;
-        case "Place":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Place' %} ";
-            break;
-        case "Country":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Country' %} ";
-            break;
-        case "Caste":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Caste' %} ";
-            break;
-        case "Enrollment":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Enrollment' %} ";
-            break;
-        case "MIS-PO":
-            selected_val = "{% url 'basic_temp' group_name_tag 'MIS-PO ";
-            break;
-        case "CourseSection":
-            selected_val = "{% url 'basic_temp' group_name_tag 'CourseSection' %} ";
-            break;
-        case "CourseUnit":
-            selected_val = "{% url 'basic_temp' group_name_tag 'CourseUnit' %} ";
-            break;
-        case "CourseSectionEvent":
-            selected_val = "{% url 'basic_temp' group_name_tag 'CourseSectionEvent' %} ";
-            break;
-        case "CourseUnitEvent":
-            selected_val = "{% url 'basic_temp' group_name_tag 'CourseUnitEvent' %} ";
-            break;
-        case "State":
-            selected_val = "{% url 'basic_temp' group_name_tag 'State' %} ";
-            break;
-        case "District":
-            selected_val = "{% url 'basic_temp' group_name_tag 'District' %} ";
-            break;
-        case "StudentCourseEnrollment":
-            selected_val = "{% url 'basic_temp' group_name_tag 'StudentCourseEnrollment' %} ";
-            break;
-        case "MIS":
-            selected_val = "{% url 'basic_temp' group_name_tag 'MIS' %} ";
-            break;
-        case "CourseSubSectionEvent":
-            selected_val = "{% url 'basic_temp' group_name_tag 'CourseSubSectionEvent' %} ";
-            break;
-        case "CourseSubSection":
-            selected_val = "{% url 'basic_temp' group_name_tag 'CourseSubSection' %} ";
-            break;
-        case "Event":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Event' %} ";
-            break;
-        case "Inauguration":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Inauguration' %} ";
-            break;
-        case "Field Visit":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Field Visit' %} ";
-            break;
-        case "Meeting":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Meeting' %} ";
-            break;
-        case "Orientation":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Orientation' %} ";
-            break;
-        case "Master Trainer Program":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Master Trainer Program' %} ";
-            break;
-        case "Training of Teachers":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Training of Teachers' %} ";
-            break;
-        case "Course Developers Meeting":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Course Developers Meeting' %} ";
-            break;
-        case "Session":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Session' %} ";
-            break;
-       case "Classroom Session":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Classroom Session' %} ";
-            break;
-        case "Lab Session":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Lab Session' %} ";
-            break;
-        case "Exam":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Exam' %} ";
-            break;
-        case "NUSSD Course":
-            selected_val = "{% url 'basic_temp' group_name_tag 'NUSSD Course' %} ";
-            break;
-        case "Announced Course":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Announced Course' %} ";
-            break;
-        case "Organization":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Organization' %} ";
-            break;
-        case "College":
-            selected_val = "{% url 'basic_temp' group_name_tag 'College' %} ";
-            break;
-        case "Person":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Person' %} ";
-            break;
-        case "Student":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Student' %} ";
-            break;
-        case "Voluntary Teacher":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Voluntary Teacher' %} ";
-            break;
-        case "NSS Coordinator":
-            selected_val = "{% url 'basic_temp' group_name_tag 'NSS Coordinator' %} ";
-            break;
-        case "Course Developer":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Course Developer' %} ";
-            break;
-        case "Steering Committee Member":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Steering Committee Member' %} ";
-            break;
-        case "Program Officer":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Program Officer' %} ";
-            break;
-        case "Program Manager":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Program Manager' %} ";
-            break;
-        case "Partners":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Partners' %} ";
-            break;
-        case "Master Trainer":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Master Trainer' %} ";
-            break;
-        case "University":
-            selected_val = "{% url 'basic_temp' group_name_tag 'University' %} ";
-            break;
-        case "Faculty Coordinator":
-            selected_val = "{% url 'basic_temp' group_name_tag 'Faculty Coordinator' %} ";
-            break;
-        case "select":
-            selected_val = "{% url 'type_created' group_name_tag %} ";
-            break;
+            
+
+
         default:
-            selected_val = "{% url 'type_created' group_name_tag %} ";
+            {% get_url_gs 'Place' as noose %}
+            var noo = "{{noose}}"
+            console.log(noo)
+            // selected_val = "{% url 'basic_temp' group_name_tag 'Exam' %} ";
+            selected_val = "{% url 'basic_temp' group_name_tag noose %} ";
+            console.log(selected_val)
             break;
     }
     window.location = selected_val;
