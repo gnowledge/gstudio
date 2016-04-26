@@ -477,11 +477,8 @@
           {% if user.is_authenticated %}
 
             {% if node.if_file.mime_type %}
-              {% if 'video' in node.if_file.mime_type  %}
-                <a class="button tiny" title="Click here to Download" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
-              {% else %}
-                <a class="button tiny" title="Click here to Download" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-              {% endif %}
+              
+                <a class="button tiny" title="Click here to Download" href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
                   Download
                 </a>
                 {% comment %}
