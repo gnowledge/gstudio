@@ -327,6 +327,6 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
     else:
 
-        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid })
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid, 'help_tip':help_tip })
       
     return render_to_response(template, variable)
