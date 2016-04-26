@@ -74,9 +74,12 @@ def adminDashboardClass(request, class_name="GSystem"):
         if class_name == "GSystem":
             group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
             mem_ty=[]
-            for e in each.member_of:
-                mem_ty.append(str(e))
-            k = mem_ty[0]
+            if each.member_of:
+                for e in each.member_of:
+                    mem_ty.append(str(e))
+                k = mem_ty[0]
+            else:
+                k = None
             objects_details.append({"Id":each._id,"Member":each.member_of,"Mem":k , "Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
         elif class_name == "File":
             group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
