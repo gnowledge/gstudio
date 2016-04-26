@@ -715,6 +715,7 @@ DEPENDENCYLIST = [{'prior_node':'Prior Node ' }]
 
 OPTIONLIST = [{'featured':'Featured '} ,{'created_at':'Created At ' },{'start_publication':'Start Publication '} ,{'tags':'Tags '},{'url':'URL '} ,{'last_update':'Last Update '} ,{'login_required':'Login Required ' }]
 
+GSYSTEM_LIST = [{'name':'Name '} ,{'altnames':'Alternate Name '}]
 
 # #textb
 # import warnings
