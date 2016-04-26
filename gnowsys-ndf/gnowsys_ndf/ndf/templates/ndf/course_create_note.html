@@ -182,7 +182,7 @@
 			    
 			    {% for each in audio_res %}
 						{% if "media" in each %}
-			CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls><source src="{{each}}" type="audio/ogg"><source src="{{each}}" type="audio/mpeg"></audio>'); 
+			CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls><source src="{{each}}" type="audio/ogg"><source src="{{each}}" type="audio/mpeg"></audio></br>'); 
 
 					{% endif %}
 			    {% endfor %}

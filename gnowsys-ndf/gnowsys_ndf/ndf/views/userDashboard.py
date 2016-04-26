@@ -614,7 +614,7 @@ def upload_prof_pic(request, group_id):
         elif choose_from_existing_pic:
             # update status of old GRelation
             profile_pic_image = node_collection.one({'_id': ObjectId(choose_from_existing_pic)})
-            gr_node = create_grelation(group_obj._id, has_profile_or_banner_rt, profile_pic_image._id)
+            gr_node = create_grelation(group_obj._id,has_profile_or_banner_rt,profile_pic_image._id)
             # Move fileobj to "Warehouse" group 
             if warehouse_grp_obj._id not in profile_pic_image.group_set:
                 node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)

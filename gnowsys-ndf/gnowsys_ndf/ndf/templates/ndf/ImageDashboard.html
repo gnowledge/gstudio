@@ -87,6 +87,13 @@
 
   
 </script>
+<script type="text/javascript">
+  $(function() {
+     $("input:file").change(function (){
+       $(".save_cancel").css("display","block")
+     });
+  });
+</script>
    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 {% comment %}
 <script type="text/javascript" src="http://jqueryrotate.googlecode.com/svn/trunk/jQueryRotate.js"></script> <!-- required ? -->
@@ -111,7 +118,7 @@ Image Gallery
 <br>
 
 <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
-                        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_image_ckeditor' group_id %}">
+                        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file_ckeditor' group_id %}">
                             {% csrf_token %}
                             <label class="tiny button radius expand" style="margin: 0px;">
                                 <i class="fa fa-upload"></i>
@@ -119,7 +126,8 @@ Image Gallery
                                 <span>Upload File</span>
                                 <input type="file" name="filehive" id="docFile" style="display: none;" multiple/>
                             </label>
-                            <div class="save_cancel hide">
+                            <br><br>
+                            <div class="save_cancel" style="display:none">
                               <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
                               <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
                             </div>

@@ -68,7 +68,7 @@
     {% for each_reply in all_replies %}
       {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
       <div class="content" content-reply-id="{{ each_reply.oid }}" data-reply-level="{{each_reply.level}}" data-userid="{{each_reply.userid}}" >
-        <div style="margin-left:calc(({{each_reply.level}} - 1) * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
+        <div style="margin-left:calc(({{each_reply.level}} - 1) * 30px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
           <div clas="discussion-title row " >
              <div class="discussion-title-username">
               <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
@@ -349,7 +349,7 @@
                 child_margin_level = parseInt(parent_margin_level) + 1;          
                 
 
-                $(sourceObj).after(createReplyHTML('margin-left:'+((child_margin_level-1)*48)+'px', data,parseInt(parent_margin_level)+1));
+                $(sourceObj).after(createReplyHTML('margin-left:'+((child_margin_level-1)*30)+'px', data,parseInt(parent_margin_level)+1));
 
               }
               // updating tab-text

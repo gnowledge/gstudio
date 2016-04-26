@@ -131,6 +131,10 @@ def collection_create(request, group_id):
     gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     page_node = node_collection.collection.GSystem()
     page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+    create_gattribute(page_node._id, discussion_enable_at, True)
+    return_status = create_thread_for_node(request,group_id, page_node)
+    page_node.save()
 
     for each in Collections:
       node_collection.collection.update({'_id': page_node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
@@ -6350,8 +6354,8 @@ def upload_file(request,group_id):
     from gnowsys_ndf.ndf.views.filehive import write_files
 
     gs_obj_list = write_files(request, group_id)
-    gs_obj_id = gs_obj_list[0]['if_file']['original']['relurl']
-    # print "gs_obj_list: ", gs_obj_list
+    gs_obj_id = gs_obj_list[0]['_id']
+    # print "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ngs_obj_list: ", gs_obj_id
 
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     for each_gs_file in gs_obj_list:
@@ -6362,6 +6366,6 @@ def upload_file(request,group_id):
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
     
     # return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
-    return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": group_id}) )
+    return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':gs_obj_id}) )
 
     

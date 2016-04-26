@@ -49,17 +49,21 @@
 
     {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
     {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
-        <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
+        <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
     {% elif resource.if_file.thumbnail.relurl and 'video' in resource.if_file.mime_type %}
         <img src="{{MEDIA_URL}}{{resource.if_file.thumbnail.relurl}}">
     {% elif resource.if_file.mid.relurl %}
         <img src="{{MEDIA_URL}}{{resource.if_file.mid.relurl}}">
+    {% elif resource.if_file.original.relurl and 'image' in resource.if_file.mime_type %}
+        <img src="{{MEDIA_URL}}{{resource.if_file.original.relurl}}">
     {% elif resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
       <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
       <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
     {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
-      {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
+      {% if resource.collection_set  %}
+        <i class="collection"></i>
+      {% elif attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
         <i class="{{attr_set_dict.educationaluse|lower}}"></i>
       {% elif resource.fs_file_ids.0 and 'image' in resource.mime_type %}
         <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
@@ -88,9 +92,6 @@
         {% endif %}
       {% endif %}
 
-
-    {% elif resource.collection_set  %}
-        <i class="collection"></i>
     {% else%}
       <img src="/static/ndf/images/metaStudio-profile.svg"  class="img-height">
     {% endif %}
@@ -118,15 +119,15 @@
 </a>
 
 <!-- suppy no_footer=True for not having footer-->
-    {% if not no_footer %}
+    {% if not no_footer   %}
   <div class="scard-action">
     {% if has_contributor == True %}
      <a style="margin-left:2px" href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}" target="_blank">
       {{resource.created_by|get_username|truncatechars:"10"}}</a>
      {% endif %}
          <i style="float:right">{{resource.created_at|date:"d-m-Y"}}</i>
-     {% if gstaff_access  %}
-      {% if not no_checkbox %}
+     {% if gstaff_access or user.is_authenticated and is_course_card == "True" %}
+      {% if not no_checkbox  %}
         </a> <input type="checkbox" style="margin:0; float:left;" class="filenode" name="filenode" value="{{resource.pk}}">
       {% endif %}
     {% endif %}
