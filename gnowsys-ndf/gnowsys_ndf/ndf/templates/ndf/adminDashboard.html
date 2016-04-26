@@ -151,7 +151,7 @@ table {
 	  <td class="title" style="font-size:95%">
       <font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
       <font class="viewinput{{each.Id}}">{{each.Id}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
-      <font class="viewinput{{each.Id}}">{{each.Member_of}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
+      <font class="viewinput{{each.Id}}">{{each.Member}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
       <font class="viewinput{{each.Id}}">{{each.Mem}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
     </td>
 	  {% if class_name == "File" or class_name ==  "GSystem"  %}
@@ -194,7 +194,7 @@ table {
 	  {% if class_name == "GSystemType" or class_name = "AttributeType" or class_name = "RelationType" %}
     <td> 
       <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}" style="width:115px;">
-        Edit&nbsp;&nbsp;{{groupname}}
+        Edit&nbsp;&nbsp;
         <i class="fi-plus"></i>
       </a>
     </td>
@@ -203,9 +203,10 @@ table {
               {% trans "Translate" %}
       </a>
     </td>
-    {% endif %}
-    {% if class_name == "GSystem" %}
+   
+    {% elif class_name == "GSystem" %}
     <td> 
+      {# <a class="button medium" href="" style="width:115px;"> #}
       <a class="button medium" href="{% url 'basic_temp_edit' group_name each.Mem each.Id %}" style="width:115px;">
         Edit&nbsp;&nbsp;
         <i class="fi-plus"></i>

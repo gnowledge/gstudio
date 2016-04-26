@@ -10,7 +10,6 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import *
 
 import json
-import pymongo
 
 GAPP = node_collection.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fetching MetaType name GAPP
 
@@ -24,12 +23,13 @@ def adminDashboard(request):
     group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     groupid = ""
     if group_obj:
-        groupid = str(group_obj[0]._id)
+       groupid = str(group_obj[0]._id)
+       group_name = group_obj[0].name
     for each in nodes:
-        objects_details.append({"Id":each._id,"Title":each.name,"Type":each.type_of,"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set)})
+       objects_details.append({"Id":each._id,"Title":each.name,"Type":each.type_of,"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set)})
     template = "ndf/adminDashboard.html"
 
-    variable = RequestContext(request, {'class_name':"GSystem","nodes":objects_details,"groupid":groupid})
+    variable = RequestContext(request, {'class_name':"GSystem","nodes":objects_details,"groupid":groupid, "group_name":group_name})
     return render_to_response(template, variable)
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -71,24 +71,21 @@ def adminDashboardClass(request, class_name="GSystem"):
                 relation_type_set.append(rt_set.name)
                 # relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
 
-    if class_name in ("GSystem","File"):
-        group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
-        mem_ty=[]
-        for e in each.member_of:
-            mem_ty.append(str(e))
-
-        k = mem_ty[0]
-
-        # t = int(k,)
-            # mem_ty.append(e.valueOf() )
-            
-        objects_details.append({"Id":each._id,"Member":each.member_of,"Mem":k ,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
-
-
-    elif class_name in ("GAttribute","GRelation"):
-        objects_details.append({"Id":each._id,"Title":each.name,"Type":"","Author":"","Creation":""})
-    else :
-        objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list), "attribute_type_set":", ".join(attribute_type_set), "relation_type_set":", ".join(relation_type_set)})
+        if class_name == "GSystem":
+            group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
+            mem_ty=[]
+            for e in each.member_of:
+                mem_ty.append(str(e))
+            k = mem_ty[0]
+            objects_details.append({"Id":each._id,"Member":each.member_of,"Mem":k , "Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
+        elif class_name == "File":
+            group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
+            objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
+        elif class_name in ("GAttribute","GRelation"):
+            objects_details.append({"Id":each._id,"Title":each.name,"Type":"","Author":"","Creation":""})
+        else :
+            objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list), "attribute_type_set":", ".join(attribute_type_set), "relation_type_set":", ".join(relation_type_set)})
+    
     groups = []
     group = node_collection.find({'_type':"Group"})
     for each in group:
@@ -103,7 +100,7 @@ def adminDashboardClass(request, class_name="GSystem"):
         groupid = str(group_obj[0]._id)
         group_name = group_obj[0].name
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':class_name, "nodes":objects_details, "Groups":groups, "systemtypes":systemtypes, "url":"data", "groupid":groupid,"group_name":group_name })
+    variable = RequestContext(request, {'class_name':class_name, "nodes":objects_details, "Groups":groups, "systemtypes":systemtypes, "url":"data", "groupid":groupid, "group_name":group_name  })
     return render_to_response(template, variable)
 
 
@@ -120,7 +117,7 @@ def adminDashboardEdit(request):
         for key,value in objectjson['fields'].items():
             if key == "group":
                 typelist = []
-                for eachvalue in value.split(","):
+                for eachvalue in  value.split(","):
                     if eachvalue:
                         typelist.append(ObjectId(eachvalue.split(" ")[-1]))
                 node['group_set'] = typelist
