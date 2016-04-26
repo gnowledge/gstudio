@@ -11,13 +11,15 @@ try:
 except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
+from gnowsys_ndf.settings import GSYSTEM_LIST
+
 from gnowsys_ndf.settings import *
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import *
 
 @login_required
-def type_created(request,group_id):
-    # print "\n\n\n\n\n", "type_created" ,group_id , "\n\n\n\n\n\n\n\n"
+def type_created(request,group_id,redirect_key=None):
+    print "type_created" ,group_id ,redirect_key, "\n\n\n\n\n\n\n\n"
     try:
         group_id = ObjectId(group_id)
     except:
@@ -34,16 +36,21 @@ def type_created(request,group_id):
     group_name = 'home'
 
 
-    if request.method == "POST":
-        print request.POST,"request posted \n\n\n\n\n"
-        if key == "widget_for" :
-            print key,value ,">>>>>>>>\n\n\n\n"
+    if request.GET:
+        print request.GET , "request get\n\n\n\n"
+    
+    print request.POST,"request posted \n\n\n\n\n"
 
-        template = "ndf/basic_temp.html"
-        variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'opt_list':opt_list, 'group_name_tag':group_name })
+    if redirect_key :
+        if request.method == "POST":
+            if key == "widget_for" :
+                print key,value ,">>>>>>>>\n\n\n\n"
 
-        return render_to_response(template,variable)
+            Element.Create()
+            template = "ndf/basic_temp.html"
+            class_name = "GSystemType"
 
+            return HttpResponseRedirect("/admin/designer/"+class_name)
     
     else: 
 
@@ -73,9 +80,10 @@ def default_template(request,group_id,node=None,edit_node=None):
     
     gs_sys = "GSystem"
     gs_struc =  eval(gs_sys).structure
-    # print "gs_sys\n", gs_struc, "\n\n\n"
-    
-    basic_list = { 'name':'Name' , 'altnames':'Alternate Name' }
+    # print "gs_sys\n", gs_struc, "\n\n\n"    
+    # basic_list = { 'name':'Name' , 'altnames':'Alternate Name' }
+    # basic_list = [{'name':'Name '} ,{'altnames':'Alternate Name '}]
+    basic_list = GSYSTEM_LIST
 
     if node :
         st_id = node
@@ -261,12 +269,12 @@ def default_template(request,group_id,node=None,edit_node=None):
             for e in pos_r:
                 # print "fo",e,node_gs_id
                 if e == node_gs_id:
-                    print "fo in"
+                    # print "fo in"
                     rts_pos_check = dict ({ 'rts_id' : rts_check_pos_id })
                     rts_pos_flag = True
                     r_pos_check.append(rts_pos_check)
                     pos_r.remove(e)
-                    print rts_pos_check,final_rts_name,">>>\n"
+                    # print rts_pos_check,final_rts_name,">>>\n"
 
             name_pos_rst = []
             id_pos_rst = []
