@@ -206,17 +206,34 @@ table {
    
     {% elif class_name == "GSystem" %}
     <td> 
-      {# <a class="button medium" href="" style="width:115px;"> #}
       <a class="button medium" href="{% url 'basic_temp_edit' group_name each.Mem each.Id %}" style="width:115px;">
         Edit&nbsp;&nbsp;
         <i class="fi-plus"></i>
       </a>
     </td>
-	  <td> 
-	    <a class="button medium" href=" " style="width:150px;">
-	      Graph &nbsp;&nbsp;
-	      <i class="fi-plus"></i>
-	    </a>
+  <!--  <td> 
+      <a class="button medium" style="width:150px;">
+        Graph &nbsp;&nbsp;
+        <i class="fi-plus"></i>
+      </a>
+    </td> -->
+	  <td>
+      <dl class="row tabs" data-tab data-options="deep_linking:true">
+        <dd>
+            <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
+                <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+                    <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">{% trans "Concept Graph" %}</a></li>
+    
+                    {% if node.collection_set %}
+                   <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
+                    {% endif %}
+
+                    {% if node.prior_node %}
+                    <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
+                    {% endif %}
+                </ul>
+        </dd>
+
 	  </td>
     {% endif %}
 
