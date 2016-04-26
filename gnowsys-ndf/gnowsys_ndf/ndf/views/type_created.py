@@ -31,17 +31,26 @@ def type_created(request,group_id):
         opt_list.append(op_demo)
         
     # opt_list = node_collection.find({'_type':'GSystemType'})
+    group_name = 'home'
 
 
     if request.method == "POST":
-        print request.POST,"reuest posted \n\n\n\n\n"
+        print request.POST,"request posted \n\n\n\n\n"
+        if key == "widget_for" :
+            print key,value ,">>>>>>>>\n\n\n\n"
 
-        
-    group_name = 'home'
-    template = "ndf/type_created.html"
-    variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'opt_list':opt_list, 'group_name_tag':group_name })
+        template = "ndf/basic_temp.html"
+        variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'opt_list':opt_list, 'group_name_tag':group_name })
 
-    return render_to_response(template,variable)
+        return render_to_response(template,variable)
+
+    
+    else: 
+
+        template = "ndf/type_created.html"
+        variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'opt_list':opt_list, 'group_name_tag':group_name })
+
+        return render_to_response(template,variable)
 
 
 @login_required
@@ -77,7 +86,7 @@ def default_template(request,group_id,node=None,edit_node=None):
         node_gs = node_collection.one({'_type': u'GSystemType','_id':ObjectId(st_id)})
 
 
-        node_gs_id = node
+        node_gs_id = node_gs._id
         print node_gs_id
 
         ats = node_gs.attribute_type_set
@@ -297,7 +306,7 @@ def default_template(request,group_id,node=None,edit_node=None):
         pos_ats = gsys_node.get_possible_attributes(node_gs_id)
         pos_rts = gsys_node.get_possible_relations(node_gs_id)
 
-
+    # To check for duplicity in code :
     key_ats = []
     for e in ats:
         key_ats.append(e.name)
@@ -315,11 +324,11 @@ def default_template(request,group_id,node=None,edit_node=None):
 
     newdict = {}
 
-    # if node_id:
-    #     new_instance_type = node_collection.one({'_type': unicode(gs_sys), '_id': ObjectId(node_id)})
-    # else:
+    if edit_node:
+        new_instance_type = node_collection.one({'_type': u'GSystem' , '_id': ObjectId(edit_node)})
+    else:
+        new_instance_type = eval("node_collection.collection"+"."+gs_sys)()
     flag = False
-    new_instance_type = eval("node_collection.collection"+"."+gs_sys)()
 
     if request.method == "POST":
         # print request.POST
@@ -330,7 +339,6 @@ def default_template(request,group_id,node=None,edit_node=None):
             if key == "name":
                 # print "name"
                 if request.POST.get(key,""):
-
                     new_instance_type[key] = unicode(request.POST.get(key,""))
 
             if key == "altnames":
@@ -382,19 +390,20 @@ def default_template(request,group_id,node=None,edit_node=None):
 
         new_instance_type.save()
 
+        return HttpResponseRedirect("/admin/data/GSystem")
         # print new_instance_type
         # print new_instance_type._id
 
-        # n_at = new_instance_type.attribute_set
+        n_at = new_instance_type.attribute_set
         # n_at_full = []
 
-        # for e in n_at:
-        #     for k,l in e.iteritems():
-        #         if l:
-        #             n_at_full.append(e)
-        #             q = node_collection.one({'_type':'AttributeType','name':k})
-        #             z=create_gattribute(new_instance_type._id,q,l)
-                    # print z
+        for e in n_at:
+            for k,l in e.iteritems():
+                if l:
+                    n_at_full.append(e)
+                    q = node_collection.one({'_type':'AttributeType','name':k})
+                    z=create_gattribute(new_instance_type._id,q,l)
+                    print z
 
         # print n_at_full,"n_at_full"
 
@@ -429,9 +438,14 @@ def default_template(request,group_id,node=None,edit_node=None):
                     # for CourseEventGroup ,Person
 
     # If GET request ---------------------------------------------------------------------------------------
-    # for key,value in class_structure.items():
+    
 
-            # newdict[key] = [value, new_instance_type[key]]
+    for key,value in gs_struc.items():
+
+        print key,value,"from get request"
+        if key == "name":
+            newdict[key] = ["unicode", new_instance_type[key]]
+            print newdict[key],"from name\n\n\n\n"
 
     # class_structure = newdict
 
