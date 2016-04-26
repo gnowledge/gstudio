@@ -56,7 +56,7 @@ def type_created(request,group_id):
 @login_required
 def default_template(request,group_id,node=None,edit_node=None):
     
-    print node ,"from deff " , edit_node ,"\n\n\n\n\n\n"
+    print node ,"from view - default_template " , edit_node ,"\n\n\n\n\n\n"
 
     try:
         group_id = ObjectId(group_id)
@@ -68,29 +68,20 @@ def default_template(request,group_id,node=None,edit_node=None):
     gs = node_collection.find({'_type':'GSystem'})
 
     gs_sys2 = "GSystemType"
-    class_structure =  eval(gs_sys2).structure
+    # class_structure =  eval(gs_sys2).structure
     # print "gst\n", class_structure, "\n\n"
     
     gs_sys = "GSystem"
     gs_struc =  eval(gs_sys).structure
     # print "gs_sys\n", gs_struc, "\n\n\n"
     
-    # For Display
-    # basic_list = ['name', 'altnames']
     basic_list = { 'name':'Name' , 'altnames':'Alternate Name' }
 
     if node :
-        # print "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
         st_id = node
-
         node_gs = node_collection.one({'_type': u'GSystemType','_id':ObjectId(st_id)})
-
-
         node_gs_id = node_gs._id
-        print node_gs_id
-
         ats = node_gs.attribute_type_set
-        
         rts = node_gs.relation_type_set
         
         gsys_node = node_collection.collection.GSystem()
@@ -447,15 +438,47 @@ def default_template(request,group_id,node=None,edit_node=None):
             newdict[key] = ["unicode", new_instance_type[key]]
             print newdict[key],"from name\n\n\n\n"
 
-    # class_structure = newdict
+        if key == "altnames":
+            newdict[key] = ["unicode", new_instance_type[key]]
+            print newdict[key],"from altnames\n\n\n\n"
 
+        if key == "attribute_set":
+            newdict[key] = ["dict", new_instance_type[key] ]
+            print newdict[key],"from attribute_set \n\n\n\n"
+
+        if key == "relation_set":
+            newdict[key] = ["dict", new_instance_type[key] ]
+            print newdict[key],"from relation_set \n\n\n\n"
+
+    gs_struc = newdict
+    print gs_struc ,"from gs_struc \n\n\n\n "
+
+    groupid = ""
+    group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    if group_obj:
+        groupid = str(group_obj[0]._id)
+        group_name = group_obj[0].name
 
     template = "ndf/basic_temp.html"
-    # variable = RequestContext(request, {'group_id':group_id,'groupid':group_id })
-    variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
-     'ats':ats , 'rts':rts , 'node_gs':node_gs , 'gs_struc':gs_struc ,'final_ats':final_ats , 
-     'f_rts_object_dict':f_rts_object_dict , 'f_pos_rts_object_dict':f_pos_rts_object_dict })
+
+    variable =  None
+    class_structure_with_values = {}
+
+    if edit_node:
         
+        for key, value in gs_struc.items():
+            class_structure_with_values[key] = [gs_struc[key][0], new_instance_type[key]]
+
+        variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
+         'ats':ats , 'rts':rts , 'node_gs':node_gs , 'gs_struc':class_structure_with_values ,'final_ats':final_ats , 
+         'f_rts_object_dict':f_rts_object_dict , 'f_pos_rts_object_dict':f_pos_rts_object_dict })
+
+    else :
+        # variable = RequestContext(request, {'group_id':group_id,'groupid':group_id })
+        variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
+         'ats':ats , 'rts':rts , 'node_gs':node_gs , 'gs_struc':gs_struc ,'final_ats':final_ats , 
+         'f_rts_object_dict':f_rts_object_dict , 'f_pos_rts_object_dict':f_pos_rts_object_dict })
+            
     return render_to_response(template,variable)
 
     # if flag:
