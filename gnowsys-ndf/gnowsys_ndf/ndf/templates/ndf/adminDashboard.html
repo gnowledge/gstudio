@@ -218,7 +218,13 @@ table {
       </a>
     </td> -->
 	  <td>
-      <dl class="row tabs" data-tab data-options="deep_linking:true">
+
+      <!-- Scripts required for D3 graph -->
+    <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
+    <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
+    <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->  
+
+      <dl class="row tabs" data-tab data-options="deep_linking:true" id="{{each.Title}}">
         <dd>
             <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
                 <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
@@ -233,6 +239,32 @@ table {
                     {% endif %}
                 </ul>
         </dd>
+      </dl>
+          <!-- Content for Concept Graph -->
+      <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
+        <a class="close-reveal-modal">&#215;</a>
+        {% include "ndf/graph_concept.html" with group_id=each.Id %}
+      </div>
+
+     <!-- Content for Collection Graph -->
+      
+      {% if node.collection_set %}
+        <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+          <a class="close-reveal-modal">&#215;</a>
+          {% include "ndf/graph_collection.html" %}
+        </div>
+      {% endif %}
+
+
+      <!-- Content for dependency Graph -->
+      
+      {% if node.prior_node %}
+      
+        <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+         <a class="close-reveal-modal">&#215;</a>
+         {% include "ndf/graph_dependency.html" %}
+        </div>
+      {% endif %}
 
 	  </td>
     {% endif %}
