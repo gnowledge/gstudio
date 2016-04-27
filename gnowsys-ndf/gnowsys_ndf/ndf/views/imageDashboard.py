@@ -49,7 +49,7 @@ def imageDashboard(request, group_id, image_id=None):
         image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
         if image_ins:
             image_id = str(image_ins._id)
-    img_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    img_col = node_collection.find({'_type': 'File','created_by': request.user.id,'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
     variable = RequestContext(request, {'imageCollection': img_col,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
