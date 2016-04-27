@@ -50,15 +50,16 @@
   </div>
 </div>
 </div>
+<br/>
 {% check_is_gstaff group_id request.user as gstaff_access %}
 {% if request.user.is_authenticated and not gstaff_access %}
 <div class="text-right">
-  <a class="fetch-analytics">Find My Analytics</a>
+  <a class="fetch-analytics button tiny radius">Find My Analytics</a>
 </div>
 {% endif %}
 {% if  gstaff_access %}
 <div class="text-right">
-  <a class="fetch-group-analytics">Find Group Analytics</a>
+  <a class="fetch-group-analytics button tiny radius">Find Group Analytics</a>
 </div>
 {% endif %}
 
