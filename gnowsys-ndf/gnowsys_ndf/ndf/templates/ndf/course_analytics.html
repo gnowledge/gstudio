@@ -333,10 +333,13 @@
 </div>
 
 <script type="text/javascript">
-    paceOptions = {
-               startOnPageLoad:false,
-               ajax: {ignoreURLs: ['page_scroll']}
-    }
+
+    // ready function
+    $(document).ready(function() {
+        loaddata();
+    })
+
+    // Student analytics view
     $(document).on('click','.fetch-analytics',function(){
         $(this).addClass("hide")
         $(".pre-analytics-msg-div").removeClass("hide")
@@ -383,6 +386,8 @@
             },
         });//end of ajax
     })
+
+    // Admin analytics view
     $(document).on('click','.fetch-group-analytics',function(){
         $(".fetch-group-analytics").addClass("hide")
         // $(".pre-analytics-msg-div").removeClass("hide")
@@ -419,40 +424,38 @@
             },
         });//end of ajax
     })
+
+    // Admin analytics view. Score-points in horizontal bars of enrolled students
     function generate_points_bar(data_for_bars, bar_name, total_user_points){
       if(data_for_bars && total_user_points){
-
-      var outer_div = document.createElement("div");
-      outer_div.className = "progress small-12 large-12"
-      var span_ele = document.createElement("span");
-      span_ele.className = "meter"
-      span_ele.style.width = (data_for_bars/total_user_points)*100 + "%"
-      if (bar_name == "Interactions"){
-        bg_color_val = "#ffe694"
-      }
-      else if(bar_name == "Files"){
-        bg_color_val = "#b5d8a6"
-      }
-      else if(bar_name == "Notes"){
-        bg_color_val = "#9ec4fa"
-      }
-      span_ele.style.backgroundColor = bg_color_val
-      var inner_span_ele = document.createElement("span")
-      inner_span_ele.className = "pull-left merter-val"
-      inner_span_ele.innerHTML = data_for_bars
-      $(span_ele).append(inner_span_ele)
-      $(outer_div).append(span_ele)
-      return outer_div.outerHTML;
+        var outer_div = document.createElement("div");
+        outer_div.className = "progress small-12 large-12"
+        var span_ele = document.createElement("span");
+        span_ele.className = "meter"
+        span_ele.style.width = data_for_bars +  "px"
+        if (bar_name == "Interactions"){
+          bg_color_val = "#ffe694"
+        }
+        else if(bar_name == "Files"){
+          bg_color_val = "#b5d8a6"
+        }
+        else if(bar_name == "Notes"){
+          bg_color_val = "#9ec4fa"
+        }
+        span_ele.style.backgroundColor = bg_color_val
+        var inner_span_ele = document.createElement("span")
+        inner_span_ele.className = "pull-left merter-val"
+        inner_span_ele.innerHTML = data_for_bars
+        $(span_ele).append(inner_span_ele)
+        $(outer_div).append(span_ele)
+        return outer_div.outerHTML;
       }
       else{
         return "NA"
       }
     }
 
-    $(document).ready(function() {
-        loaddata();
-    })
-    // <!-- Scripts for the pi chart-->
+    // pi chart for score points
     function generateGraph(data){
       var dataSet = []
         $.each(data,function(i,v){
@@ -556,48 +559,46 @@
       };
     }
 
-
+    // Global variables to manage notifications ajax call
     var count = 0;
     var morecount = 0;
     var counter = 1;
 
-    // $('#course-notification').onscroll = scrolling;
+    // Scroll event for Notifications div
     $("#course-notification").scroll(function(){
-        // execute the load function below that will visit the JSON feed and stuff data into the HTML
         if (count == 0) {
             loaddata();
             count = count+1;
         }
     })
 
-  function loaddata() {
-    // $('#course-notification').unbind();
+    // Fetch notifications ajax call with function
+    function loaddata() {
+      $.ajax({
+          url: "{% url 'page_scroll' groupid 'counter' %}".replace("counter", counter),
+          type: "GET",
+          data:{'links': false},
+          datatype: "json",
+          global: false,
+          beforeSend: function(){
+              $("#course-notification").append("<label class='loading_lbl'>Loading...</label>");
+          },
+          success:function(data){
+              if(String(data)) {
+                  $(".loading_lbl").remove()
+                  $("#course-notification").append(data);
+                  counter = counter+1;
+              }
 
-        $.ajax({
-            url: "{% url 'page_scroll' groupid 'counter' %}".replace("counter", counter),
-            type: "GET",
-            data:{'links': false},
-            datatype: "json",
-            global: false,
-            beforeSend: function(){
-                $("#course-notification").append("<label class='loading_lbl'>Loading...</label>");
-            },
-            success:function(data){
-                if(String(data)) {
-                    $(".loading_lbl").remove()
-                    $("#course-notification").append(data);
-                    counter = counter+1;
-                }
-
-                else{
-                    if(morecount ==0) {
-                        $("#course-notification").append("<h6>  No more data to show </h6>");
-                        morecount = morecount+1;
-                        counter = 2;
-                    }
-                }
-            }
-        });
+              else{
+                  if(morecount ==0) {
+                      $("#course-notification").append("<h6>  No more data to show </h6>");
+                      morecount = morecount+1;
+                      counter = 2;
+                  }
+              }
+          }
+      });
     }
 
 </script>
