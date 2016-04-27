@@ -9,15 +9,18 @@
     height: 17px;
     display: none;
   }
-  .course-desc{
-    overflow-x:hidden;
-    overflow-y:auto;
-    height: 100px;
-  }
 
   #course-notification{
     overflow-y:scroll;
     max-height:300px;
+  }
+
+  .short-text {
+    overflow: hidden;
+    height: 6em;
+  }
+  .full-text{
+    height: auto;
   }
 
 </style>
@@ -30,9 +33,16 @@
 <div class="small-12 columns about-course">
   <h5>About</h5>
   <div class="row">
-    <div class="small-12 medium-8 columns course-desc">
-    {{group_object.content|safe}}
+    <div class="small-12 medium-8 columns">
+      <div class="course-desc">
+          {{group_object.content|safe}}
+      </div>
+      <div>
+        <u><a class="show-more hide">Show more</a></u>
+      </div>
     </div>
+    
+    
     <div class="small-12 medium-4 columns">
       <div class="course-highlight">
         <i class="fa fa-list"></i>
@@ -338,6 +348,25 @@
     // ready function
     $(document).ready(function() {
         loaddata();
+        var course_about_panel = $('.course-desc')
+        if(course_about_panel.height() > 90 ){
+          $(".show-more").removeClass("hide")
+          $(".course-desc").addClass("short-text")
+        }
+    })
+
+    // Show more/less Course Description
+    $(document).on('click','.show-more',function(){
+      if($(".course-desc").hasClass("short-text")){
+        $(".course-desc").removeClass("short-text")
+        $(".course-desc").addClass("full-text")
+        $(this).text("Show Less")
+      }
+      else if($(".course-desc").hasClass("full-text")){
+        $(".course-desc").removeClass("full-text")
+        $(".course-desc").addClass("short-text")
+        $(this).text("Show More")
+      }
     })
 
     // Student analytics view
@@ -601,5 +630,6 @@
           }
       });
     }
+
 
 </script>
