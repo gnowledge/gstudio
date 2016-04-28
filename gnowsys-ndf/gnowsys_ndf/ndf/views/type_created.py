@@ -18,8 +18,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import *
 
 @login_required
-def type_created(request,group_id,redirect_key=None):
-    print "type_created" ,group_id ,redirect_key, "\n\n\n\n\n\n\n\n"
+def type_created(request,group_id):
     try:
         group_id = ObjectId(group_id)
     except:
@@ -282,7 +281,7 @@ def default_template(request,group_id,node=None,edit_node=None):
         pos_ats = gsys_node.get_possible_attributes(node_gs_id)
         pos_rts = gsys_node.get_possible_relations(node_gs_id)
 
-    # To check for duplicity in code :
+    # To check for duplicity in code, used to save below:
     key_ats = []
     for e in ats:
         key_ats.append(e.name)
@@ -436,7 +435,7 @@ def default_template(request,group_id,node=None,edit_node=None):
             # print newdict[key],"from relation_set \n\n\n\n"
 
     gs_struc = newdict
-    print gs_struc ,"from gs_struc \n\n\n\n "
+    # print gs_struc ,"from gs_struc \n\n\n\n "
 
     groupid = ""
     group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
@@ -450,18 +449,14 @@ def default_template(request,group_id,node=None,edit_node=None):
     class_structure_with_values = {}
 
     if edit_node:
-        
         for key, value in gs_struc.items():
             class_structure_with_values[key] = [gs_struc[key][0], new_instance_type[key]]
-            print class_structure_with_values[key],"\n"
-
 
         variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
          'ats':ats , 'rts':rts , 'node_gs':node_gs , 'gs_struc':class_structure_with_values ,'final_ats':final_ats , 
          'f_rts_object_dict':f_rts_object_dict , 'f_pos_rts_object_dict':f_pos_rts_object_dict })
 
     else :
-        # variable = RequestContext(request, {'group_id':group_id,'groupid':group_id })
         variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
          'ats':ats , 'rts':rts , 'node_gs':node_gs , 'gs_struc':gs_struc ,'final_ats':final_ats , 
          'f_rts_object_dict':f_rts_object_dict , 'f_pos_rts_object_dict':f_pos_rts_object_dict })

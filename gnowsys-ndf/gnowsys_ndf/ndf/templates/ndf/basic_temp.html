@@ -32,11 +32,11 @@
         <tr><td>
         <!-- {% trans "AttributeType "%} -->
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} </font> 
+           <font size="3"> {% firstof each.altnames each.name %}  </font> 
         </div></td>
         <!-- field_name {{each.name}}  field_value field_type {{each.data_type}}  -->
         <!-- This ndf tag ats_fields is done to fetch the attribute_type_set. donot replace this with html_widget tag cause it will not allow it to be saved. The field 'value' in the dict is not present as it is fetched directly from the database  -->
-        <td>{% ats_fields each.data_type each.name groupid each.complex_data_type each.help_text each.validators %}
+        <td>{% ats_fields each.data_type each.name groupid each.complex_data_type each.help_text each.validators gs_struc|get_dict_item:'attribute_set' %}
         </td></tr>
         {% endfor %}
     </div>
@@ -49,7 +49,7 @@
            <font size="3"> {% firstof each.altnames each.name %} </font> 
         </div></td>
         <td>
-            {% ats_fields each.data_type each.name groupid each.complex_data_type each.help_text each.validators %}
+            {% ats_fields each.data_type each.name groupid each.complex_data_type each.help_text each.validators gs_struc|get_dict_item:'attribute_set' %}
         </td></tr>
         {% endfor %}
     </div>
@@ -63,7 +63,7 @@
            <font size="3"> {% firstof each.altnames each.name %} </font> 
         </div></td>
         <td>
-            {% rts_fields each.name each.object_type groupid %}
+            {% rts_fields each.name each.object_type groupid gs_struc|get_dict_item:'relation_set' %}
         </td></tr>
         </div>
         {% endfor %}
@@ -78,7 +78,7 @@
            <font size="3"> {% firstof each.altnames each.name %} </font> 
         </div></td>
         <td>
-            {% rts_fields each.name each.object_type groupid %}
+            {% rts_fields each.name each.object_type groupid gs_struc|get_dict_item:'relation_set' %}
         </td></tr>
         </div>
         {% endfor %}
