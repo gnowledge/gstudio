@@ -85,59 +85,36 @@ button:active {
 
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
 <div class="row">
-<form method="post" name="" id="type_create">
+<form method="post" name="" id="type_create" action="" >
 {% csrf_token %}
 <div style="display:table-row;">
-    <!--
-    <div style="display:table-cell;"> <center>
-        {% trans 'Select GSystemType : ' %}</center>
-    </div>
-    <div style="display:table-cell;">
-    <section id="intro"> 
-        <select id="widget_for" name="widget_for" class="demo-default" placeholder=" Select GST " >
-                <option value="search" > </option> 
-            {% for list in opt_list %}
-                <option value="{{list.name}}" size="5" > {{list.name}} </option>
-            {% endfor %}
-        </select>
-    </section>
-    </div>
-    -->
-
     <div style="display:table-cell;" id="page-wrapper" >
+    <label for="default_list">Search for GSystemType : </label>
+    <input type="text" id="default_list" list="widget_for" placeholder="Type to search for GST">
 
-    <label for="default">Search for GST : </label>
-    <input type="text" id="default" list="widget_for" placeholder="Type to search for GST">
-    {# <datalist id="widget_for" name="widget_for" style="overflow: scroll; width: 100%; height:500px" > #}
-    <select id="widget_for" name="widget_for" >
+    <datalist id="widget_for" name="widget_for" style="overflow: scroll; width: 100%; height:500px" >
     {% for list in opt_list %}
-        <option value="{{list.name}}" size="5" > {{list.name}} </option>
+        <option value="{{list.name}}" data-id="{{list.id}}" id="{{list.name}}" size="5" > </option>
     {% endfor %}        
-    </select>    
+    </datalist>    
     </div>
-{# {% get_url_gs 'Exam' as noose %} #}
 </div>
 </form>
 <div style="display:table-row;" > <center>
-    {# <input type="submit" class="button" id="save-node-type" value="Create" onclick="{% all_url_gst %}"/> #}
     <input type="submit" class="button" id="save-node-type" value="Create" onclick="NavigateToSite()"/>
 </center></div>
 
-</div>
-
-</div>
-
+</div></div>
 
 <script type="text/javascript">
-// var list = "{{list}}"
+$("save-node-type").submit(function(event) {
+});
 var selectedValue = null 
 
 // Get the <datalist> elements.
 var dataList = document.getElementById('json-select');
-
 // Create a new XMLHttpRequest.
 var request = new XMLHttpRequest();
-
 // Handle state changes for the request.
 request.onreadystatechange = function(response) {
   if (request.readyState === 4) {
@@ -159,18 +136,19 @@ request.onreadystatechange = function(response) {
   }
 };
 
-function GetSelectedTextValue(widget_for) {
-    var selectedText = widget_for.options[widget_for.selectedIndex].innerHTML;
-    selectedValue = widget_for.value;
-    return selectedValue
-}
+// function GetSelectedTextValue(widget_for) {
+//     var selectedText = widget_for.options[widget_for.selectedIndex].innerHTML;
+//     selectedValue = widget_for.value;
+//     return selectedValue
+// }
 
 function NavigateToSite(){
-    var selectedValue = document.getElementById('widget_for').value
-    // var selectedValue = document.getElementById('default').value
-    // console.log(selectedValue)
-    var basic = selectedValue
+    var selectedValue = document.getElementById('default_list').value
+
+    var wd = document.getElementById(selectedValue)
+    var basic = wd.getAttribute('data-id')
     // console.log(basic)
+    
     switch(selectedValue){
         case "Page":
             selected_val = "{% url 'page_create_edit' group_name_tag %}";
@@ -208,15 +186,16 @@ function NavigateToSite(){
         case "QuizItem":
             selected_val = "{% url 'quiz_item_create' group_name_tag %}";
             break;
-            
-
+        case "Event":
+            selected_val = "{% url 'event' group_name_tag  %}";
+            break;
 
         default:
-            {% get_url_gs 'Place' as noose %}
-            var noo = "{{noose}}"
-            console.log(noo)
-            // selected_val = "{% url 'basic_temp' group_name_tag 'Exam' %} ";
-            selected_val = "{% url 'basic_temp' group_name_tag noose %} ";
+            // {% get_url_gs 'Place' as noose %}
+            // var noo = "{{noose}}"
+            // selected_val1 = "{% url 'basic_temp' group_name_tag noose %} ";
+
+            selected_val = "/home/type_created/default/" + basic
             console.log(selected_val)
             break;
     }
