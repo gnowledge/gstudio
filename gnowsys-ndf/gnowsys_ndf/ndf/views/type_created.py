@@ -27,37 +27,14 @@ def type_created(request,group_id,redirect_key=None):
 
     opt_list = []
     gst = node_collection.find({'_type':'GSystemType'})
+    group_name = 'home'
     for e in gst :
         op_demo = []
         op_demo = dict({'name':e.name, 'id':e._id })
         opt_list.append(op_demo)
-        
-    # opt_list = node_collection.find({'_type':'GSystemType'})
-    group_name = 'home'
-
-
-    if request.GET:
-        print request.GET , "request get\n\n\n\n"
-    
-    print request.POST,"request posted \n\n\n\n\n"
-
-    if redirect_key :
-        if request.method == "POST":
-            if key == "widget_for" :
-                print key,value ,">>>>>>>>\n\n\n\n"
-
-            Element.Create()
-            template = "ndf/basic_temp.html"
-            class_name = "GSystemType"
-
-            return HttpResponseRedirect("/admin/designer/"+class_name)
-    
-    else: 
-
-        template = "ndf/type_created.html"
-        variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'opt_list':opt_list, 'group_name_tag':group_name })
-
-        return render_to_response(template,variable)
+    template = "ndf/type_created.html"
+    variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'opt_list':opt_list, 'group_name_tag':group_name })
+    return render_to_response(template,variable)
 
 
 @login_required
@@ -441,22 +418,22 @@ def default_template(request,group_id,node=None,edit_node=None):
 
     for key,value in gs_struc.items():
 
-        print key,value,"from get request"
+        # print key,value,"from get request"
         if key == "name":
             newdict[key] = ["unicode", new_instance_type[key]]
-            print newdict[key],"from name\n\n\n\n"
+            # print newdict[key],"from name\n\n\n\n"
 
         if key == "altnames":
             newdict[key] = ["unicode", new_instance_type[key]]
-            print newdict[key],"from altnames\n\n\n\n"
+            # print newdict[key],"from altnames\n\n\n\n"
 
         if key == "attribute_set":
             newdict[key] = ["dict", new_instance_type[key] ]
-            print newdict[key],"from attribute_set \n\n\n\n"
+            # print newdict[key],"from attribute_set \n\n\n\n"
 
         if key == "relation_set":
             newdict[key] = ["dict", new_instance_type[key] ]
-            print newdict[key],"from relation_set \n\n\n\n"
+            # print newdict[key],"from relation_set \n\n\n\n"
 
     gs_struc = newdict
     print gs_struc ,"from gs_struc \n\n\n\n "
@@ -476,6 +453,8 @@ def default_template(request,group_id,node=None,edit_node=None):
         
         for key, value in gs_struc.items():
             class_structure_with_values[key] = [gs_struc[key][0], new_instance_type[key]]
+            print class_structure_with_values[key],"\n"
+
 
         variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
          'ats':ats , 'rts':rts , 'node_gs':node_gs , 'gs_struc':class_structure_with_values ,'final_ats':final_ats , 
@@ -488,9 +467,3 @@ def default_template(request,group_id,node=None,edit_node=None):
          'f_rts_object_dict':f_rts_object_dict , 'f_pos_rts_object_dict':f_pos_rts_object_dict })
             
     return render_to_response(template,variable)
-
-    # if flag:
-    #     template = "/group_id/type_created"
-    #     return HttpResponseRedirect(template)
-    # else :
-    #     return render_to_response(template,variable)
