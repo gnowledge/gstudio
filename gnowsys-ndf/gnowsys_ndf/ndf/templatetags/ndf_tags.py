@@ -1980,7 +1980,7 @@ def fetch_req_fields(fields_type, fields_name ):
 	this ndf tag returns the fields_name and fields_type of the GSystem object
 	for name and altname of the GS
 	'''
-	return {"fields_name":fields_name, "fields_type": fields_type }
+	return {"fields_name":fields_name, "fields_type": fields_type[0] , "fields_value": fields_type[1] }
 
 @get_execution_time
 @register.inclusion_tag('ndf/fetch_fields.html')
@@ -1988,6 +1988,7 @@ def ats_fields(fields_type, fields_name,groupid,complex_dt,help_text,validators)
 	'''
 	this ndf tag returns the fields_name and fields_type of the GSystem object -- ats
 	'''
+	print fields_name , fields_type ,"\n\n"
 
 	return {"fields_name":fields_name, "fields_type": fields_type,'groupid':groupid,
 	'complex_dt':complex_dt ,'gs_type':'attribute_set', 'help_text':help_text , 'validators':validators}
@@ -2002,62 +2003,12 @@ def rts_fields(fields_name,fields_object_type,groupid):
 	,'gs_type':'relation_set'}
 
 
-@get_execution_time
-@register.assignment_tag
-def get_url_gs(selected_value ):
-	
-	# print selected_value,"from herendf tags  \n\n\n\n\n"
-	n = node_collection.one({'_type':'GSystemType','name':selected_value })
-	# n = node_collection.one({'_type':'GSystemType','name':'Place' })
-	# print n._id,n.name ,"from ndf tag\n\n\n\n\n\n"
-	# template = " "
-	# noose = None
-	noose = n._id
-	return noose 
-
-
 # @get_execution_time
-# @register.inclusion_tag('tags/dummy.html')
-# def all_url_gst():
-
-	# if known == "Page":
-	    # selected_val = "{% url 'page_create_edit' group_name_tag %}";
-	    # break;
-	# case "File":
-	#     selected_val = "{% url 'uploadDoc' group_name_tag %}";
-	#     break;
-	# case "Group":
-	#     selected_val = "{% url 'create_group' group_name_tag %}";
-	#     break;
-	# case "Image":
-	#     selected_val = "{% url 'uploadDoc' group_name_tag %}";
-	#     break;
-	# case "Video":
-	#     selected_val = "{% url 'uploadDoc' group_name_tag %}";
-	#     break;
-	# case "Forum":
-	#     selected_val = "{% url 'create_forum' group_name_tag %}";
-	#     break;
-	# case "Course":
-	#     selected_val = "{% url 'create_edit' group_name_tag %}";
-	#     break;
-	# case "Task":
-	#     selected_val = "{% url 'task_create_edit' group_name_tag %}";
-	#     break;
-	# case "E-Book":
-	#     selected_val = "{% url 'uploadDoc' group_name_tag %}";
-	#     break;
-	# case "ProgramEventGroup":
-	#     selected_val = "{% url 'create_event_group' group_id 'ProgramEventGroup' %}";
-	#     break;
-	# case "Quiz":
-	#     selected_val = "{% url 'quiz_create' group_name_tag %}";
-	#     break;
-	# case "QuizItem":
-	#     selected_val = "{% url 'quiz_item_create' group_name_tag %}";
-	#     break;
-
-	# return None
+# @register.assignment_tag
+# def get_url_gs(selected_value ):
+# 	n = node_collection.one({'_type':'GSystemType','name':selected_value })
+# 	noose = n._id
+# 	return noose 
 
 @get_execution_time
 @register.assignment_tag
