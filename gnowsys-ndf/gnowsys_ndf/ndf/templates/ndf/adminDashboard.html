@@ -270,9 +270,9 @@ body {
       <div id="myNav-{{each.Id}}" class="overlay">
         <a id="closebtn-{{each.Id}}" href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
         <div class="overlay-content" id="{{each.Id}}" >
-          <a id="adminRenderConceptGraph-{{each.Id}}" href="{% url 'adminRenderConceptGraph' group_name each.Id %}">Concept Graph</a>
-          <a id="adminRenderCollectionGraph-{{each.Id}}" href="{% url 'adminRenderCollectionGraph' group_name each.Id %}">Collection Graph</a>
-          <a id="adminRenderDependencyGraph-{{each.Id}}" href="{% url 'adminRenderDependencyGraph' group_name each.Id %}">Dependency Graph</a>
+          <a id="adminRenderConceptGraph-{{each.Id}}" href="{% url 'adminRenderConceptGraph' group_name each.Id %}" class="adminRenderConceptGraph" >Concept Graph</a>
+          <a id="adminRenderCollectionGraph-{{each.Id}}" href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" class="adminRenderCollectionGraph" >Collection Graph</a>
+          <a id="adminRenderDependencyGraph-{{each.Id}}" href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" class="adminRenderDependencyGraph" >Dependency Graph</a>
         </div>
       </div>
         <span style="cursor:pointer" class="button medium" href="" style="width:150px;" id="openbtn-{{each.Id}}" onclick="openNav()">Graph &nbsp;&nbsp; <i class="fi-share"></i> </span>
@@ -286,7 +286,28 @@ body {
           document.getElementById("myNav-{{each.Id}}").style.width = "0%";
       }
       </script>
-         
+  </td>
+
+  
+  <td>
+   <section id="sectiondropdown-{{each.Id}}" class="medium-12 columns" >
+    <dl class="row tabs" id="dl-{{each.Id}}" data-tab data-options="deep_linking:true">
+    <dd>
+    <a href="#" class="button medium" id="graph-{{each.Id}}" style="width:150px;" data-dropdown="graph-hover-{{each.Id}}" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
+      <ul id="graph-hover-{{each.Id}}" class="f-dropdown" data-dropdown-content>
+
+      <li><a href="{% url 'adminRenderConceptGraph' group_name each.Id %}" id="adminRenderConceptGraph-{{each.Id}}" data-reveal-id="view-concept-graph" class="adminRenderConceptGraph" data-id="{{each.Id}}" >{% trans "Concept Graph" %}</a></li>
+
+      <li><a href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" id="adminRenderCollectionGraph-{{each.Id}}" data-reveal-id="view-collection-graph" class="adminRenderCollectionGraph" >{% trans "Collection Graph" %}</a></li>
+
+      <li><a href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" id="adminRenderDependencyGraph-{{each.Id}}" data-reveal-id="view-dependency-graph" class="adminRenderDependencyGraph" >{% trans "Dependency Graph" %}</a></li>
+      </ul>
+    
+    </dd>
+    </dl>
+    </section>      
+
+
 
     </td> 
     {% endif %}
@@ -302,6 +323,7 @@ body {
 
 {% block script %}
 var global_object_id;
+var global_obj_id_gs;
 {% if class_name == "GSystemType"  %}
 function set_drawer_value(node_id)
 {
@@ -326,6 +348,14 @@ function set_drawer_value(node_id)
   });
    });
 }
+
+function pass_data_concept_graph(obj_id)
+{
+
+console.log(obj_id+"frompass_data")
+
+}
+
 
 function attributetype_set_drawer_value(node_id)
 {
@@ -398,6 +428,23 @@ $(document).on('click',".button.editobject",function(){
         $(this).hide();
         $("#save"+objectid).show();
 });
+
+$(document).on('click',".adminRenderConceptGraph",function(){
+  var objectid = this.id;
+  global_obj_id_gs = objectid;
+  console.log(objectid+"from here");
+  {# var atr = $(this).attr("data-id") this one returns string "123" other integer 123 #}
+  var atr = $(this).data("id"); 
+  console.log(atr);
+  pass_data_concept_graph(atr);
+  {# var wd = document.getElementById(this.id) #}
+  {# console.log(wd) #}
+  {# var basic = wd.getAttribute('data-id') #}
+  {# console.log(basic) #}
+});
+
+
+
 $(document).on('click',".button.deleteObjects",function(){
         var selectedobject = $(".objectsCheckbox input:checked")
         if(selectedobject.length > 0){
