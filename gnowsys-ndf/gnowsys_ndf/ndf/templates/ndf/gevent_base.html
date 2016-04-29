@@ -9,61 +9,63 @@
 {% block title %}{% trans 'Events' %} {% endblock %}
 
 {% block style %}
-.course_outline_table, tr {
-border: 2px solid #0b8a91;
-border-collapse: collapse;
-}
+  .course_outline_table, tr {
+    border: 2px solid #0b8a91;
+    border-collapse: collapse;
+  }
 
-.gray-text{
-color: gray;
-}
+  .gray-text{
+    color: gray;
+  }
 
-#content > p { color: #6F6F6F !important; /*font-size: inherit;*/ }
+  #content > p {
+    color: #6F6F6F !important;
+    /*font-size: inherit;*/
+  }
 
-tr:hover{
-cursor:pointer;
-}
+  tr:hover{
+    cursor:pointer;
+  }
 
-.tab{
-padding-left: 2em;
-background-color:yellow !important;
-}
+  .tab{
+    padding-left: 2em;
+    background-color:yellow !important;
+  }
 
-.tab2{
-padding-left: 4em;
-}
+  .tab2{
+    padding-left: 4em;
+  }
 
-#eventModal > label {
-color: white;
-font-weight: bold;
-font-size: 1rem;
-}
+  #eventModal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
 
-.all_blogs{
-overflow-y: auto;
-height:500px;
-}
+  .all_blogs{
+    overflow-y: auto;
+    height:500px;
+  }
 
-.jqtree-tree .jqtree-title {
-margin: 5px;
-font-size: 15px;
-color: black !important;
-/*Change the color here to change font color of tree*/
-}
+  .jqtree-tree .jqtree-title {
+    margin: 5px;
+    font-size: 15px;
+    color: black !important;
+    /*Change the color here to change font color of tree*/
+  }
 
   li.remove-dot{
-  list-style: none;
-
+    list-style: none;
   }
 
   .div-height {
-      margin-bottom: 0px !important;
-      height: 258px !important;
+    margin-bottom: 0px !important;
+    height: 258px !important;
   }
 
   .course-banner{
-      text-shadow: 2px 2px black !important;
-      background: none !important;
+    text-shadow: 2px 2px black !important;
+    background: none !important;
   }
 {% endblock %}
 
@@ -120,6 +122,14 @@ color: black !important;
               </li>
               <li>
                 <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
+              </li>
+              <li>
+                <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% trans ' Subscribe Users' %}</a>
+                {% include "ndf/invite_users.html" with no_subscribe_btn=True node=group_obj%}
+              </li>
+              <li>
+                <a id="subscr_admins" data-reveal-id="inviteadmins" title="View/Subscribe Admins" class="fi-torsos">{% trans ' Subscribe Admins' %}</a>
+                {% include "ndf/invite_admins.html" with no_subscribe_btn=True node=group_obj %}
               </li>
             </ul>
           </div>
