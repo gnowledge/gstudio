@@ -55,6 +55,63 @@
 table {
     table-layout: auto;
 }
+
+
+body {
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+}
+
+.overlay {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0, 0.9);
+    overflow-x: hidden;
+    transition: 0.5s;
+}
+
+.overlay-content {
+    position: relative;
+    top: 25%;
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.overlay a {
+    padding: 8px;
+    text-decoration: none;
+    font-size: 36px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.overlay a:hover, .overlay a:focus {
+    color: #f1f1f1;
+}
+
+.closebtn {
+    position: absolute;
+    top: 150px;
+    right: 175px;
+    font-size: 60px !important;
+}
+
+@media screen and (max-height: 450px) {
+  .overlay a {font-size: 20px}
+  .closebtn {
+    font-size: 40px !important;
+    top: 15px;
+    right: 35px;
+  }
+}
+
 {% endblock %}
 
 
@@ -150,9 +207,6 @@ table {
 	  <td style="display:none" class="id" style="font-size:11px;">{{each.Id}}</td>
 	  <td class="title" style="font-size:95%">
       <font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
-      <font class="viewinput{{each.Id}}">{{each.Id}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
-      <font class="viewinput{{each.Id}}">{{each.Member}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
-      <font class="viewinput{{each.Id}}">{{each.Mem}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
     </td>
 	  {% if class_name == "File" or class_name ==  "GSystem"  %}
 	  <td class="group" style="font-size:11px;">
@@ -211,62 +265,30 @@ table {
         <i class="fi-plus"></i>
       </a>
     </td>
-  <!--  <td> 
-      <a class="button medium" style="width:150px;">
-        Graph &nbsp;&nbsp;
-        <i class="fi-plus"></i>
-      </a>
-    </td> -->
-	  <td>
 
-      <!-- Scripts required for D3 graph -->
-    <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
-    <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
-    <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->  
-
-      <dl class="row tabs" data-tab data-options="deep_linking:true" id="{{each.Title}}">
-        <dd>
-            <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
-                <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
-                    <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">{% trans "Concept Graph" %}</a></li>
-    
-                    {% if node.collection_set %}
-                   <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
-                    {% endif %}
-
-                    {% if node.prior_node %}
-                    <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
-                    {% endif %}
-                </ul>
-        </dd>
-      </dl>
-          <!-- Content for Concept Graph -->
-      <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
-        <a class="close-reveal-modal">&#215;</a>
-        {% include "ndf/graph_concept.html" with group_id=each.Id %}
+    <td> 
+      <div id="myNav-{{each.Id}}" class="overlay">
+        <a id="closebtn-{{each.Id}}" href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <div class="overlay-content" id="{{each.Id}}" >
+          <a id="adminRenderConceptGraph-{{each.Id}}" href="{% url 'adminRenderConceptGraph' group_name each.Id %}">Concept Graph</a>
+          <a id="adminRenderCollectionGraph-{{each.Id}}" href="{% url 'adminRenderCollectionGraph' group_name each.Id %}">Collection Graph</a>
+          <a id="adminRenderDependencyGraph-{{each.Id}}" href="{% url 'adminRenderDependencyGraph' group_name each.Id %}">Dependency Graph</a>
+        </div>
       </div>
-
-     <!-- Content for Collection Graph -->
+        <span style="cursor:pointer" class="button medium" href="" style="width:150px;" id="openbtn-{{each.Id}}" onclick="openNav()">Graph &nbsp;&nbsp; <i class="fi-share"></i> </span>
       
-      {% if node.collection_set %}
-        <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
-          <a class="close-reveal-modal">&#215;</a>
-          {% include "ndf/graph_collection.html" %}
-        </div>
-      {% endif %}
+      <script>
+      function openNav() {
+          document.getElementById("myNav-{{each.Id}}").style.width = "100%";
+      }
 
+      function closeNav() {
+          document.getElementById("myNav-{{each.Id}}").style.width = "0%";
+      }
+      </script>
+         
 
-      <!-- Content for dependency Graph -->
-      
-      {% if node.prior_node %}
-      
-        <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
-         <a class="close-reveal-modal">&#215;</a>
-         {% include "ndf/graph_dependency.html" %}
-        </div>
-      {% endif %}
-
-	  </td>
+    </td> 
     {% endif %}
 
 
