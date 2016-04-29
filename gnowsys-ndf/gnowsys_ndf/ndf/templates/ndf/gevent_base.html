@@ -109,16 +109,16 @@
       <div class="row" style="position: relative;z-index: 2;">
           <div class="small-2 course-settings">
             <a data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius">
-              <i class="fa fa-pencil-square-o"></i>{% trans "Edit Course" %}
+              <i class="fa fa-cog"></i>{% trans " Settings" %}
             </a>
             <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-              <li><a class="tiny radius settings" ><i class="fa fa-cog"></i> {% trans "Settings" %}</a></li>
-              <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fa fa-pencil-square-o"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></li>
+              <li><a class="tiny radius settings" ><i class="fa fa-calendar"></i> {% trans " Session Release Dates" %}</a></li>
+              <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fi-clipboard-notes"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></li>
               {% with group_obj.member_of_names_list.0 as sg_type %}
                 <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
               {% endwith %}
               <li>
-                <a data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="fi-pencil"> Edit Photo</a>
+                <a data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="fi-photo"> Edit Photo</a>
               </li>
               <li>
                 <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
