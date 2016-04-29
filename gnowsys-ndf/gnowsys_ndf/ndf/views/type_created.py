@@ -1,5 +1,5 @@
 ''' -- imports from installed packages -- '''
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect,HttpResponse,StreamingHttpResponse
 from django.core.urlresolvers import reverse
@@ -314,6 +314,13 @@ def default_template(request,group_id,node=None,edit_node=None):
             if key == "name":
                 # print "name"
                 if request.POST.get(key,""):
+                    # code below is to check whether the GSystem with same name exits or not, if it does further process would be aborted
+                    # key_name = unicode(request.POST.get(key,""))
+                    # search = node_collection.one({'_type':'GSystem','name':key_name})
+                    # if search:
+                        # return StreamingHttpResponse(key_name+"already exits ")
+                        # break;
+                    # else:
                     new_instance_type[key] = unicode(request.POST.get(key,""))
 
             if key == "altnames":
@@ -462,3 +469,54 @@ def default_template(request,group_id,node=None,edit_node=None):
          'f_rts_object_dict':f_rts_object_dict , 'f_pos_rts_object_dict':f_pos_rts_object_dict })
             
     return render_to_response(template,variable)
+
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def adminRenderConceptGraph(request,group_id,node_id=None):
+    '''
+    reders the graph
+    '''
+    group_name = u'home'
+    if node_id:
+        print node_id,"from adminRenderConceptGraph\n\n\n"
+
+        req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
+
+    template = 'ndf/graph_concept.html'
+    variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+    return render_to_response(template,variable) 
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def adminRenderCollectionGraph(request,group_id,node_id=None):
+    '''
+    reders the graph
+    '''
+    group_name = u'home'
+    group_id,groupid = group_id
+    if node_id:
+        print node_id,"from adminRenderCollectionGraph\n\n\n"
+
+        req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
+
+    template = 'ndf/graph_collection.html'
+    variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+    return render_to_response(template,variable) 
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def adminRenderDependencyGraph(request,group_id,node_id=None):
+    '''
+    reders the graph
+    '''
+    group_name = u'home'
+    group_id,groupid = group_id
+    if node_id:
+        print node_id,"from adminRenderDependencyGraph\n\n\n"
+
+        req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
+
+    template = 'ndf/graph_dependency.html'
+    variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+    return render_to_response(template,variable) 
