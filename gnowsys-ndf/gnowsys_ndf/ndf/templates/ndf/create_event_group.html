@@ -48,8 +48,10 @@ this template is modified. So for the fields in the template it supports -
   {% else %} action="{% url 'create_event_group' group_id spl_group_type %}"
   {% endif %}
   data-abide enctype="multipart/form-data" 
-  {% if spl_group_type == "CourseEventGroup" %}
+  {% if spl_group_type == "CourseEventGroup" and not node %}
   onsubmit="return confirm('Announcement may take few minutes. Please do NOT refresh/reload/abort the page while processing. Do you really want to continue?');"
+  {% elif spl_group_type == "CourseEventGroup" and node %}
+  onsubmit="return confirm('This may take few minutes. Please do NOT refresh/reload/abort the page while processing. Do you really want to continue?');"
   {% endif %}
 
   >
