@@ -1905,7 +1905,7 @@ def get_class_list(group_id,class_name):
 def get_class_type_list(group_id,class_name):
 	"""Get list of class 
 	"""
-	class_list = ["GSystemType", "RelationType", "AttributeType"]
+	class_list = ["GSystemType", "RelationType", "AttributeType","GSystem"]
 	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"designer","groupid":group_id}
 
 @get_execution_time
