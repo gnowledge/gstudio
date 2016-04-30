@@ -4667,7 +4667,9 @@ def delete_node(
                     elif hasattr(node_to_be_deleted, 'if_file'):
                         fh_original_id = node_to_be_deleted.if_file.original.id
                         if node_collection.find({'_type': 'GSystem', 'if_file.original.id': ObjectId(fh_original_id) }).count() == 1:
-                            Filehive.delete_file_from_filehive(fh_original_id)
+                            for each_file in ['original', 'mid', 'thumbnail']:
+                                fh_id = node_to_be_deleted.if_file[each_file]['id']
+                                Filehive.delete_file_from_filehive(fh_id)
 
                 # Finally delete the node
                 node_to_be_deleted.delete()
