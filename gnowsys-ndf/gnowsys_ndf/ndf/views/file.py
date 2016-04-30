@@ -61,7 +61,7 @@ pandora_video_st = node_collection.one({'_type':'GSystemType', 'name':'Pandora_v
 app = GST_FILE
 
 lock = threading.Lock()
-count = 0    
+count = 0
 
 @get_execution_time
 def file(request, group_id, file_id=None, page_no=1):
@@ -94,19 +94,19 @@ def file(request, group_id, file_id=None, page_no=1):
     # Code for user shelf
     shelves = []
     shelf_list = {}
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     # if auth:
     #   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
     #   dbref_has_shelf = has_shelf_RT.get_dbref()
-    #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+    #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })
     #   shelf_list = {}
 
     #   if shelf:
     #     for each in shelf:
-    #         shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)}) 
+    #         shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
     #         shelves.append(shelf_name)
 
-    #         shelf_list[shelf_name.name] = []         
+    #         shelf_list[shelf_name.name] = []
     #         for ID in shelf_name.collection_set:
     #           shelf_item = node_collection.one({'_id': ObjectId(ID) })
     #           shelf_list[shelf_name.name].append(shelf_item.name)
@@ -120,7 +120,7 @@ def file(request, group_id, file_id=None, page_no=1):
     if request.method == "POST":
       # File search view
       title = GST_FILE.name
-      
+
       search_field = request.POST.get('search_field', '')
 
       datavisual = []
@@ -129,7 +129,7 @@ def file(request, group_id, file_id=None, page_no=1):
           files = node_collection.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]},
                                                 '$or': [
                                                     {'$and': [
-                                                        {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                        {'name': {'$regex': search_field, '$options': 'i'}},
                                                         {'$or': [
                                                             {'access_policy': u"PUBLIC"},
                                                     {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -181,10 +181,10 @@ def file(request, group_id, file_id=None, page_no=1):
                                     }).sort('last_update', -1)
 
       docCollection = node_collection.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
-                                            '_type': {'$in': ['File', 'GSystem']}, 
+                                            '_type': {'$in': ['File', 'GSystem']},
                                             '$or': [
                                               {'$and': [
-                                                {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                {'name': {'$regex': search_field, '$options': 'i'}},
                                                 {'$or': [
                                                   {'access_policy': u"PUBLIC"},
                                                   {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -205,11 +205,12 @@ def file(request, group_id, file_id=None, page_no=1):
                                             'group_set': {'$all': [ObjectId(group_id)]}
                                           }).sort("last_update", -1)
 
-      imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id), GST_FILE._id]}, 
-                                              '_type': {'$in': ['File', 'GSystem']}, 
+
+      imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id), GST_FILE._id]},
+                                              '_type': {'$in': ['File', 'GSystem']},
                                               '$or': [
                                                 {'$and': [
-                                                  {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                  {'name': {'$regex': search_field, '$options': 'i'}},
                                                   {'$or': [
                                                     {'access_policy': u"PUBLIC"},
                                                     {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -230,11 +231,11 @@ def file(request, group_id, file_id=None, page_no=1):
                                               'group_set': {'$all': [ObjectId(group_id)]}
                                             }).sort("last_update", -1)
 
-      videoCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id), GST_FILE._id]}, 
-                                              '_type': {'$in': ['File', 'GSystem']}, 
+      videoCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id), GST_FILE._id]},
+                                              '_type': {'$in': ['File', 'GSystem']},
                                               '$or': [
                                                 {'$and': [
-                                                  {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                  {'name': {'$regex': search_field, '$options': 'i'}},
                                                   {'$or': [
                                                     {'access_policy': u"PUBLIC"},
                                                     {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -255,11 +256,12 @@ def file(request, group_id, file_id=None, page_no=1):
                                               'group_set': {'$all': [ObjectId(group_id)]}
                                             }).sort("last_update", -1)
 
-      pandoraCollection = node_collection.find({'member_of': {'$all': [ObjectId(pandora_video_st._id)]}, 
-                                                '_type': {'$in': ['File', 'GSystem']}, 
+
+      pandoraCollection = node_collection.find({'member_of': {'$all': [ObjectId(pandora_video_st._id)]},
+                                                '_type': {'$in': ['File', 'GSystem']},
                                                 '$or': [
                                                   {'$and': [
-                                                    {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                    {'name': {'$regex': search_field, '$options': 'i'}},
                                                     {'$or': [
                                                       {'access_policy': u"PUBLIC"},
                                                       {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -288,14 +290,14 @@ def file(request, group_id, file_id=None, page_no=1):
       already_uploaded = request.GET.getlist('var', "")
       return render_to_response("ndf/file.html",
                                 {'title': title,
-                                 'appId':app._id, "app_gst": app, 
+                                 'appId':app._id, "app_gst": app,
                                  'searching': True, 'query': search_field,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
-                                 'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
+                                 'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection,
                                  'pandoraCollection': pandoraCollection,
                                  'is_video':is_video,'groupid': group_id, 'group_id':group_id,"datavisual":datavisual
-                                }, 
+                                },
                                 context_instance=RequestContext(request)
       )
 
@@ -306,10 +308,10 @@ def file(request, group_id, file_id=None, page_no=1):
       no_of_objs_pp = 24  # no. of objects per page to be list
 
       if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
-        
+
 
         files_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp, "all_files")
-        
+
 
         file_pages = files_dict["result_pages"]
         files_pc = files_dict["result_cur"]
@@ -347,10 +349,10 @@ def file(request, group_id, file_id=None, page_no=1):
       videoCollection = video_dict["result_cur"]
       videos_pc = video_dict["result_cur"]
       video_pages = video_dict["result_pages"]
-      
-      already_uploaded = request.GET.getlist('var', "")     
 
-      new_list = []  
+      already_uploaded = request.GET.getlist('var', "")
+
+      new_list = []
       for each in already_uploaded:
         for name in eval(each):
           for k in name:
@@ -388,7 +390,7 @@ def file(request, group_id, file_id=None, page_no=1):
       collection_pages = paginator.Paginator(collection_pages_cur, page_no, no_of_objs_pp)
 
       #for each in get_member_set:
-  
+
        #  pandora_video_id.append(each['_id'])
       # for each in get_member_set:
       #     att_set=triple_collection.one({'$and':[{'subject':each['_id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
@@ -397,10 +399,10 @@ def file(request, group_id, file_id=None, page_no=1):
       #         obj_set['id']=att_set.object_value
       #         obj_set['object']=each
       #         source_id_set.append(obj_set)
-  
+
               # for each in pandora_video_id:
               #     get_video = node_collection.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
-                   
+
       datavisual.append({"name":"Doc", "count":docCollection.count()})
       datavisual.append({"name":"Image","count":imageCollection.count()})
       datavisual.append({"name":"Video","count":videoCollection.count()})
@@ -409,19 +411,19 @@ def file(request, group_id, file_id=None, page_no=1):
           datavisual.append({"name":"Collections","count": coll_page_count})
       datavisual = json.dumps(datavisual)
 
-      return render_to_response("ndf/file.html", 
+      return render_to_response("ndf/file.html",
                                 {'title': title,
                                  'appId':app._id, "app_gst": app,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  # 'sourceid':source_id_set,
-                                 'file_pages': file_pages, 'image_pages': images_pc.count(), 'page_count': pages_pc.count(), 
+                                 'file_pages': file_pages, 'image_pages': images_pc.count(), 'page_count': pages_pc.count(),
                                  'doc_pages': docs_pc.count(), 'video_pages': videos_pc.count(), "pandora_pages": pandoravideoCollection.count(),
                                  'files': files_pc, 'docCollection': docs_pc, 'imageCollection': images_pc, 'page_nodes':pages_pc,
-                                 'videoCollection': videos_pc, 'pandoravideoCollection':pandoravideoCollection, 
+                                 'videoCollection': videos_pc, 'pandoravideoCollection':pandoravideoCollection,
                                  'pandoraCollection':get_member_set,'is_video':is_video,'groupid': group_id,
                                  'collection_pages': collection_pages, 'collection': collection_pages_cur,
                                  'group_id':group_id,"datavisual":datavisual, "detail_urlname": "file_detail"
-                                }, 
+                                },
                                 context_instance = RequestContext(request))
     else:
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
@@ -433,7 +435,7 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
 
     Arguments:
     -- operator : it's mongoDB operators like "$all", "$nin", "$or", ..., etc.
-    -- member_of_list : It's list of member_of. Example: [ObjectId('5401eb2c90b550696393b9df')] 
+    -- member_of_list : It's list of member_of. Example: [ObjectId('5401eb2c90b550696393b9df')]
     -- group_id : Group's "_id".
     -- userid : Example. request.user.id
     -- page_no : It's page no required for getting appropriate paginated cursor.
@@ -442,29 +444,30 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
     Result: It gives result as dictionary. {"result_cur": "", "result_pages":"", "result_paginated_cur": ""}
     -- result_cur : It's mongoDB cursor.
     -- result_pages : It's mongokit.paginator cursor. Containing all the info for pagination.
- 
+
     '''
 
     result_dict = {"result_cur": "", "result_pages":"", "result_paginated_cur": "", "result_count": ""}
 
     if tab_type == "all_videos" or tab_type == "all_files":
-        result_cur = node_collection.find({'$or':[{'member_of': {'$all': member_of_list}, 
-                                                '_type': {'$in': ['File', 'GSystem']}, 'fs_file_ids':{'$ne': []}, 
+
+        result_cur = node_collection.find({'$or':[{'member_of': {'$all': member_of_list},
+                                                '_type': {'$in': ['File', 'GSystem']}, 'fs_file_ids':{'$ne': []},
                                                 'group_set': {'$all': [ObjectId(group_id)]},
                                                 '$or': [
                                                     {'access_policy': u"PUBLIC"},
                                                     {'$and': [
-                                                        {'access_policy': u"PRIVATE"}, 
+                                                        {'access_policy': u"PRIVATE"},
                                                         {'created_by': userid}
                                                     ]
                                                  }
                                                 ]
-                                                },{'member_of': {'$all': [pandora_video_st._id]}, 
+                                                },{'member_of': {'$all': [pandora_video_st._id]},
                                                   'group_set': {'$all': [ObjectId(group_id)]},
                                                   '_type': {'$in': ['File', 'GSystem']}, 'access_policy': u"PUBLIC"
                                                   }
                                            ]}).sort("last_update", -1)
-    
+
 
     elif tab_type == "Pages":
         result_cur = node_collection.find({'member_of': GST_PAGE._id,
@@ -536,11 +539,11 @@ def paged_file_objs(request, group_id, filetype, page_no):
         file_id = GST_FILE._id
 
         # if app == "E-Library":
-        #     files = node_collection.find({'$or':[{'member_of': ObjectId(file_id), 
-        #                           '_type': 'File', 'fs_file_ids':{'$ne': []}, 
+        #     files = node_collection.find({'$or':[{'member_of': ObjectId(file_id),
+        #                           '_type': 'File', 'fs_file_ids':{'$ne': []},
         #                           'group_set': ObjectId(group_id),
         #                           '$or': [{'access_policy': u"PUBLIC"},
-        #                                     {'$and': [{'access_policy': u"PRIVATE"}, 
+        #                                     {'$and': [{'access_policy': u"PRIVATE"},
         #                                               {'created_by': request.user.id}
         #                                              ]
         #                                     }
@@ -557,9 +560,9 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
         #     files.rewind()
         #     gattr = node_collection.one({'_type': 'AttributeType', 'name': u'educationaluse'})
-      
+
         if filetype == "all":
-            
+
             if app == "File":
                 if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
                     result_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp, "all_files")
@@ -612,10 +615,10 @@ def paged_file_objs(request, group_id, filetype, page_no):
             #     for e in img_Collection:
             #         image.append(e.subject)
 
-            #     # result_paginated_cur = node_collection.find({'_id': {'$in': image} })    
-            #     result_paginated_cur = node_collection.find({'$or': [{'_id': {'$in': image} }, 
+            #     # result_paginated_cur = node_collection.find({'_id': {'$in': image} })
+            #     result_paginated_cur = node_collection.find({'$or': [{'_id': {'$in': image} },
 
-            #                 {'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
+            #                 {'member_of': {'$all': [ObjectId(GST_IMAGE._id)]},
             #                                      '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
             #                                      '$or': [
             #                                           {'access_policy': u"PUBLIC"},
@@ -625,7 +628,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
             #         }).sort("last_update", -1)
 
-            #     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)                
+            #     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
         elif filetype == "Videos":
             if app == "File":
@@ -661,9 +664,9 @@ def paged_file_objs(request, group_id, filetype, page_no):
             #     for e in vid_Collection:
             #         video.append(e.subject)
 
-            #     result_paginated_cur = node_collection.find({'$or': [{'_id': {'$in': video} }, 
+            #     result_paginated_cur = node_collection.find({'$or': [{'_id': {'$in': video} },
 
-            #               {'member_of': {'$in': [ObjectId(GST_VIDEO._id),ObjectId(pandora_video_st._id)]}, 
+            #               {'member_of': {'$in': [ObjectId(GST_VIDEO._id),ObjectId(pandora_video_st._id)]},
             #                                      '_type': 'File', 'access_policy': {'$ne':u"PRIVATE"}, 'group_set': {'$all': [ObjectId(group_id)]},
             #                                      '$or': [
             #                                           {'access_policy': u"PUBLIC"},
@@ -682,7 +685,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
         #     for e in interCollection:
         #         interactive.append(e.subject)
 
-        #     result_paginated_cur = node_collection.find({'_id': {'$in': interactive} })    
+        #     result_paginated_cur = node_collection.find({'_id': {'$in': interactive} })
         #     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
         # elif filetype == "audio" and app == "E-Library":
@@ -692,7 +695,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
         #     for e in aud_Collection:
         #         audio.append(e.subject)
 
-        #     # result_paginated_cur = node_collection.find({'_id': {'$in': audio} })  
+        #     # result_paginated_cur = node_collection.find({'_id': {'$in': audio} })
 
         #     result_paginated_cur = node_collection.find({ '$or':[{'_id': {'$in': audio}},
 
@@ -724,13 +727,13 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
         return render_to_response ("ndf/file_list_tab.html", {
                 "group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
-                "resource_type": result_paginated_cur, "detail_urlname": detail_urlname, 
+                "resource_type": result_paginated_cur, "detail_urlname": detail_urlname,
                 "filetype": filetype, "res_type_name": "", "page_info": result_pages
-            }, 
+            },
             context_instance = RequestContext(request))
 
-        
-@login_required    
+
+@login_required
 @get_execution_time
 def uploadDoc(request, group_id):
 
@@ -747,7 +750,7 @@ def uploadDoc(request, group_id):
         # template = "ndf/UploadDoc.html"
 
         template = "ndf/UploadDoc.html"
-        
+
         if GSTUDIO_FILE_UPLOAD_FORM == 'detail':
             template = "ndf/Uploader_Form.html"
 
@@ -756,8 +759,8 @@ def uploadDoc(request, group_id):
     else:
         variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'program_res':program_res})
     return render_to_response(template, variable)
-      
-    
+
+
 
 @login_required
 @get_execution_time
@@ -812,7 +815,7 @@ def submitDoc(request, group_id):
 
 
         i = 1
-        filename="" 
+        filename=""
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 filename=filename+mtitle+" "
@@ -841,8 +844,8 @@ def submitDoc(request, group_id):
                         f = f[1]
                 fileobj = node_collection.one({'_id': ObjectId(f)})
                 thread_create_val = request.POST.get("thread_create",'')
-                # help_info_page = request.POST.getlist('help_info_page','')
-                help_info_page = request.POST['help_info_page']
+                help_info_page = request.POST.getlist('help_info_page','')
+                # help_info_page = request.POST['help_info_page']
                 if help_info_page:
                   help_info_page = json.loads(help_info_page)
 
@@ -954,12 +957,12 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
     except:
         group_name, group_id = get_group_name_id(group_id)
     group_object = node_collection.one({'_id': ObjectId(group_id)})
-    
-    # overwritting count and first object by sending arguments kwargs (count=0, first_object="") 
+
+    # overwritting count and first object by sending arguments kwargs (count=0, first_object="")
     # this is to prevent from forming collection of first object containing subsequent objects.
     count = kwargs["count"] if "count" in kwargs else count
     first_object = kwargs["first_object"] if "first_object" in kwargs else first_object
-    
+
     is_video = ""
     fileobj = node_collection.collection.File()
     filemd5 = hashlib.md5(files.read()).hexdigest()
@@ -989,8 +992,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
                         file_node.last_update = datetime.datetime.now()
                         file_node.modified_by = int(userid)
                         file_node.save()
-                        # This change is made in order to fetch file nodes 
-                        # from a group 
+                        # This change is made in order to fetch file nodes
+                        # from a group
 
                 # returning only ObjectId (of GSystem containing file info) in dict format.
                 # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
@@ -1081,31 +1084,31 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
             if Audience:
               # create gattribute for file with Audience value
               audience_AT = node_collection.one({'_type':'AttributeType','name':'audience'})
-              aud = create_gattribute(fileobj._id, audience_AT, Audience)                
+              aud = create_gattribute(fileobj._id, audience_AT, Audience)
 
             if fileType:
               # create gattribute for file with 'educationaluse' value
               educationaluse_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationaluse'})
-              FType = create_gattribute(fileobj._id, educationaluse_AT, fileType)                
+              FType = create_gattribute(fileobj._id, educationaluse_AT, fileType)
 
             if subject:
               # create gattribute for file with 'educationaluse' value
               subject_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationalsubject'})
-              sub = create_gattribute(fileobj._id, subject_AT, subject)                
+              sub = create_gattribute(fileobj._id, subject_AT, subject)
 
             if level:
               # create gattribute for file with 'educationaluse' value
               educationallevel_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationallevel'})
-              edu_level = create_gattribute(fileobj._id, educationallevel_AT, level)                
+              edu_level = create_gattribute(fileobj._id, educationallevel_AT, level)
             if Based_url:
               # create gattribute for file with 'educationaluse' value
               basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
-              basedUrl = create_gattribute(fileobj._id, basedonurl_AT, Based_url)                
+              basedUrl = create_gattribute(fileobj._id, basedonurl_AT, Based_url)
 
             if co_contributors:
               # create gattribute for file with 'co_contributors' value
               co_contributors_AT = node_collection.one({'_type':'AttributeType', 'name': 'co_contributors'})
-              co_contributors = create_gattribute(fileobj._id, co_contributors_AT, co_contributors)                
+              co_contributors = create_gattribute(fileobj._id, co_contributors_AT, co_contributors)
             files.seek(0)                                                                  #moving files cursor to start
 
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
@@ -1123,30 +1126,30 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
             code for uploading video to wetube.gnowledge.org
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
-                
+
                 # --- code for wetube processing part ---
 
                 # is_video = 'True'
                 # path = files.temporary_file_path() # method gets temporary location of the file
                 # base_url = "http://wetube.gnowledge.org/"
                 # api_url = base_url + "api/"
-                # # connenting to wetube api using pandora_client                                                                  
+                # # connenting to wetube api using pandora_client
                 # api = pandora_client.API(api_url)
-                # # signin takes username, password & returns user data                                                          
+                # # signin takes username, password & returns user data
                 # api.signin(username=WETUBE_USERNAME, password=WETUBE_PASSWORD)
-                # # return metadata about the file                                                                                  
+                # # return metadata about the file
                 # info = ox.avinfo(path)
                 # oshash = info['oshash']
-                # # add media file the given item                                                                                    
+                # # add media file the given item
                 # r = api.addMedia({
                 #     'id': oshash,
                 #     'filename': fileobj.name,
                 #     'info': info
                 # })
-                # # return unique item id for file                                                                                 
+                # # return unique item id for file
                 # item = r['data']['item']
                 # url = '%supload/direct/' % api_url
-                # # upload one or more media file for given item                                                                                   
+                # # upload one or more media file for given item
                 # r = api.upload_chunks(url, path, {
                 #     'id': oshash
                 # })
@@ -1158,7 +1161,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
                 fileobj.reload()
 
                 # --- code for wetube processing part ---
-                # # create gattribute 
+                # # create gattribute
                 # source_id_AT = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
                 # create_gattribute(fileobj._id, source_id_AT, unicode(item))
                 # --- END of code for wetube processing part ---
@@ -1171,10 +1174,10 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
                 convertVideo.delay(userid, str(fileobj._id), filename)
                 # convertVideo(userid, str(fileobj._id), filename)
 
-                
+
                 # t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
                 # t.start()
-            
+
             '''storing thumbnail of pdf and svg files  in saved object'''
             # if 'pdf' in filetype or 'svg' in filetype:
             #     thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
@@ -1204,7 +1207,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
             '''
             # This function captures the data and a decorater is put on this function so that node to be saved in the parent function
             # can be sent as a mail to the mailing-list
-              
+
             return fileobj._id, is_video
 
         except Exception as e:
@@ -1228,7 +1231,7 @@ def getFileSize(File):
         return 0,'bytes'
 
 
-@get_execution_time                     
+@get_execution_time
 def convert_image_thumbnail(files):
     """
     convert image file into thumbnail
@@ -1244,9 +1247,9 @@ def convert_image_thumbnail(files):
         img.thumbnail(size, Image.ANTIALIAS)
 
         file_type = mimetypes.guess_type(files.name)[0]
-          
+
         extension = None
-        if 'jpg' in file_type or 'jpeg' in file_type: 
+        if 'jpg' in file_type or 'jpeg' in file_type:
           extension = 'JPEG'
         elif 'png' in file_type:
           extension = 'PNG'
@@ -1283,7 +1286,7 @@ def convert_pdf_thumbnail(files,_id):
     subprocess.check_call(['convert', '-thumbnail', '128x128',str("/tmp/"+filename+"/"+filename+"[0]"),str("/tmp/"+filename+"/"+filename+"-thumbnail.png")])
     thumb_pdf = open("/tmp/"+filename+"/"+filename+"-thumbnail.png", 'r')
     return thumb_pdf
-    
+
 
 @get_execution_time
 def convert_mid_size_image(files, **kwargs):
@@ -1309,14 +1312,14 @@ def convert_mid_size_image(files, **kwargs):
           factor = img.size[0]/500.00
           img = img.resize((500, int(img.size[1] / factor)), Image.ANTIALIAS)
 
-        elif (img.size <= size) or (img.size[0] <= size[0]): 
+        elif (img.size <= size) or (img.size[0] <= size[0]):
           img = img.resize(img.size, Image.ANTIALIAS)
 
         file_type = mimetypes.guess_type(files.name)[0]
-          
+
         if kwargs.get('extension', ''):
           extension = kwargs['extension']
-        elif 'jpg' in file_type or 'jpeg' in file_type: 
+        elif 'jpg' in file_type or 'jpeg' in file_type:
           extension = 'JPEG'
         elif 'png' in file_type:
           extension = 'PNG'
@@ -1329,7 +1332,7 @@ def convert_mid_size_image(files, **kwargs):
         if extension:
             img.save(mid_size_img, extension)
 
-        else:    
+        else:
           img.save(mid_size_img, "JPEG")
 
         mid_size_img.seek(0)
@@ -1338,8 +1341,8 @@ def convert_mid_size_image(files, **kwargs):
 
     except Exception, e:
         return None
-    
-        
+
+
 
 @get_execution_time
 def GetDoc(request, group_id):
@@ -1394,7 +1397,7 @@ def file_search(request, group_id):
         return render_to_response(template, variable)
 
 
-@login_required    
+@login_required
 @get_execution_time
 def delete_file(request, group_id, _id):
   """Delete file and its data
@@ -1429,7 +1432,7 @@ def delete_file(request, group_id, _id):
     cur.delete()
   except Exception as e:
     print "Exception:", e
-  return HttpResponseRedirect(pageurl) 
+  return HttpResponseRedirect(pageurl)
 
 
 @get_execution_time
@@ -1458,11 +1461,12 @@ def file_detail(request, group_id, _id):
 
     file_template = ""
     if file_node.has_key('mime_type') and file_node.mime_type:
-        if file_node.mime_type == 'video':      
+        if file_node.mime_type == 'video':
             file_template = "ndf/video_detail.html"
         elif 'image' in file_node.mime_type:
-            imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id), GST_FILE._id]}, 
-                                              '_type': {'$in': ['File', 'GSystem']}, 
+
+            imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id), GST_FILE._id]},
+                                              '_type': {'$in': ['File', 'GSystem']},
                                               '$or': [
                                                   {'$or': [
                                                     {'access_policy': u"PUBLIC"},
@@ -1493,7 +1497,7 @@ def file_detail(request, group_id, _id):
     thread_node = None
     allow_to_comment = None
     thread_node, allow_to_comment = node_thread_access(group_id, file_node)
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     shelves = []
     shelf_list = {}
 
@@ -1507,21 +1511,21 @@ def file_detail(request, group_id, _id):
 
     if auth:
         has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })        
+        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
         #a temp. variable which stores the lookup for append method
         shelves_append_temp=shelves.append
         if shelf:
             for each in shelf:
-                shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
+                shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
                 shelves_append_temp(shelf_name)
 
                 shelf_list[shelf_name.name] = []
                 #a temp. variable which stores the lookup for append method
-                shelf_list_shelfname_append_temp=shelf_list[shelf_name.name].append      
+                shelf_list_shelfname_append_temp=shelf_list[shelf_name.name].append
                 for ID in shelf_name.collection_set:
                     shelf_item = node_collection.one({'_id': ObjectId(ID) })
                     shelf_list_shelfname_append_temp(shelf_item.name)
-                
+
         else:
             shelves = []
 
@@ -1585,7 +1589,7 @@ def getFileThumbnail(request, group_id, _id):
           file_fs = ""
           if len(file_node.fs_file_ids) > 1:
             file_fs = file_node.fs_file_ids[2]
-         
+
           if (file_node.fs.files.exists(file_fs)):
 
             if len(file_node.fs_file_ids) > 0:
@@ -1619,7 +1623,7 @@ def getFileThumbnail(request, group_id, _id):
           # else:
           #     return HttpResponse("")
         elif fs_file_ids and 'image' in file_node.mime_type:
-            f = file_node.fs.files.get(ObjectId(fs_file_ids[0]))            
+            f = file_node.fs.files.get(ObjectId(fs_file_ids[0]))
             return HttpResponse(f.read(), content_type=f.content_type)
 
         elif fs_file_ids and ((len(fs_file_ids) >= 1) or ('video' in file_node.mime_type)):
@@ -1642,7 +1646,7 @@ def getFileThumbnail(request, group_id, _id):
 
 @get_execution_time
 def readDoc(request, _id, group_id, file_name=""):
-    '''Return Files 
+    '''Return Files
     '''
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -1666,7 +1670,7 @@ def readDoc(request, _id, group_id, file_name=""):
 
 
     if file_node is not None:
-            
+
         if hasattr(file_node, 'if_file') and file_node.if_file.original.relurl:
             # print "md5_or_relurl : ", file_node.if_file.original
             return HttpResponse(file_node.get_file(file_node.if_file.original.relurl),
@@ -1689,6 +1693,7 @@ def readDoc(request, _id, group_id, file_name=""):
         return HttpResponse("")
 
 
+
 @get_execution_time
 def read_attachment(request, group_id, file_path):
   file_path = '/' + file_path
@@ -1697,6 +1702,7 @@ def read_attachment(request, group_id, file_path):
     response = HttpResponse(download_file.read(), content_type=mime.from_file(file_path))
     response['Content-Disposition'] = 'attachment; filename=' + file_path.split("/")[-1]
     return response
+
 
 @get_execution_time
 def file_edit(request,group_id,_id):

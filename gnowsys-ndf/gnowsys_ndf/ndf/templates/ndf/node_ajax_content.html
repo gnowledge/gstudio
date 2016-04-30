@@ -260,11 +260,11 @@
                       </a>
                 </div>
                 </center>
-              {% elif 'image' in node.if_file.mime_type and not is_collection_card_view %}
+              {% elif 'image' in node.if_file.mime_type and is_collection_card_view != "True" %}
                <center>
                 <div class="show-image">
-                  <a class="th "   data-oid="{{node.pk|safe}}">
-                    <img  src=" {{MEDIA_URL}}{{node.if_file.original.relurl}} " style="min-height:200px;" />
+                  <a class="th" data-oid="{{node.pk|safe}}">
+                    <img  src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" style="min-height:200px;" />
 
                   </a>
                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
@@ -299,7 +299,7 @@
                   <p>{% trans 'Your browser does not support the audio element' %} </p>
                 </iframe>
               {% elif 'pdf' in node.if_file.mime_type %}
-                <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
+                <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={{MEDIA_URL}}{{node.if_file.original.relurl}}"></iframe>
                 <br/>
                 <center>
                    <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
@@ -477,14 +477,11 @@
           {% if user.is_authenticated %}
 
             {% if node.if_file.mime_type %}
-              {% if 'video' in node.if_file.mime_type  %}
-                <a class="button tiny" title="Click here to Download" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
-              {% else %}
-                <a class="button tiny" title="Click here to Download" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-              {% endif %}
+              
+                <a class="button tiny" title="Click here to Download" href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
                   Download
                 </a>
-
+                {% comment %}
                {% get_gstudio_social_share_resource as social_share %}
                   {% if social_share %}
                     <span>
@@ -493,7 +490,8 @@
                         </a>
                       </span>
                   {% endif %}
-              {% endif %}
+              {% endcomment %}
+                {% endif %}
 
           {%  else %}
             {% if node.if_file.mime_type %}
@@ -523,7 +521,7 @@
           {% if "Info page" not in type_of_list %}
               {% if not no_discussion %}
                 <!-- Discussion -->
-                <div class="content large-6 columns" id="view-discussion" >
+                <div class="content large-10 columns" id="view-discussion" >
                   <!-- discussion content area -->
                   {% if node.discussion_enable %}
                     {% get_thread_node node.pk as thread_node %}
