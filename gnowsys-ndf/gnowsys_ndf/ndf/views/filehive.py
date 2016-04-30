@@ -31,7 +31,7 @@ def upload_form(request, group_id):
 			}, context_instance=RequestContext(request))
 
 
-def write_files(request, group_id, make_collection=False):
+def write_files(request, group_id, make_collection=False, unique_gs_per_file=True):
 
 	user_id        = request.user.id
 	author_obj     = node_collection.one({'_type': u'Author', 'created_by': user_id})
@@ -60,29 +60,36 @@ def write_files(request, group_id, make_collection=False):
 		else:
 			file_name = each_file.name if hasattr(each_file, 'name') else name
 
-		gs_obj.fill_gstystem_values(request=request,
+		existing_file_gs = gs_obj.fill_gstystem_values(request=request,
 									name=file_name,
 									group_set=group_set,
 									language=language,
-									uploaded_file=each_file)
+									uploaded_file=each_file,
+									unique_gs_per_file=unique_gs_per_file)
 
-		gs_obj.member_of.append(gst_file_id)
-		gs_obj.save(groupid=group_id)
-		# print gs_obj
+		if (gs_obj.get('_id', None) or existing_file_gs.get('_id', None)) and \
+		   (existing_file_gs.get('_id', None) == gs_obj.get('_id', None)):
 
-		if 'video' in gs_obj.if_file.mime_type:
-			convertVideo.delay(user_id, str(gs_obj._id), file_name)
+			if gst_file_id not in gs_obj.member_of:
+				gs_obj.member_of.append(gst_file_id)
 
-		if not first_obj:
-			first_obj = gs_obj
-		else:
-			collection_set.append(gs_obj._id)
+			gs_obj.save(groupid=group_id)
+			print gs_obj
 
-		gs_obj_list.append(gs_obj)
+			if 'video' in gs_obj.if_file.mime_type:
+				convertVideo.delay(user_id, str(gs_obj._id), file_name)
+
+			if not first_obj:
+				first_obj = gs_obj
+			else:
+				collection_set.append(gs_obj._id)
+
+			gs_obj_list.append(gs_obj)
 
 	if make_collection and collection_set:
 		first_obj.collection_set = collection_set
 		first_obj.save()
+
 	return gs_obj_list
 
 	# return render_to_response('ndf/filehive.html', {
