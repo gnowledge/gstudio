@@ -67,6 +67,10 @@
     text-shadow: 2px 2px black !important;
     background: none !important;
   }
+
+  #status{
+    width: 100% !important;
+  }
 {% endblock %}
 
 {% block head %}
@@ -84,7 +88,7 @@
 {% block extended_header %}
 {% endblock %}
 {% block body_content %}
-{% check_is_gstaff groupid request.user as gstaff_access %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
 {% user_access_policy groupid request.user as user_access %}
 {% get_course_session_status group_obj True as next_session_in_course %}
 
@@ -103,7 +107,6 @@
         {% include 'ndf/upload_pic_widget.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True%}
         <div class="course-header-background-layer"></div>
       </div>
-      {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
         <div class="row" style="position: relative;z-index: 2;">
             <div class="small-2 course-settings">
@@ -289,7 +292,7 @@
             {% include "ndf/ggallerypage.html" with file_detail_url='course_raw_material_detail' redirect_tab_url='course_raw_material'%}
 
           {% elif title == 'about' %}
-                {% include "ndf/course_analytics.html" %}
+            {% include "ndf/course_about.html" %}
             {% comment %}
             <div class="row collapse">
               <div class="about-course-details">
