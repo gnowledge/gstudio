@@ -2469,7 +2469,6 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['total_cmnts_by_user'] = analytics_instance.get_total_comments_by_user()
     # print "\n Total Comments By User === ", total_cmnts_by_user, "\n\n"
 
-
     # Comments on Notes Section
     analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
     # print "\n Total Comments On User Notes === ", cmts_on_user_notes, "\n\n"
@@ -2553,6 +2552,7 @@ def course_analytics_admin(request, group_id):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+    response_dict = {}
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     admin_analytics_list = []
     if group_obj.author_set:
@@ -2560,15 +2560,38 @@ def course_analytics_admin(request, group_id):
             user_obj = User.objects.get(pk=int(each_author))
             admin_analytics_data = {}
             analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+            # username = user_obj.username
+            # user_id = user_obj.id
+            # users_points = analytics_instance.get_users_points()
             admin_analytics_data['username'] = user_obj.username
             admin_analytics_data['user_id'] = user_obj.id
             admin_analytics_data['users_points'] = analytics_instance.get_users_points()
-            admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+            # admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+            users_points_breakup = analytics_instance.get_users_points(True)
+            admin_analytics_data["files_points"] = users_points_breakup['Files']
+            admin_analytics_data['notes_points'] = users_points_breakup['Notes']
+            admin_analytics_data['quiz_points'] = users_points_breakup['Quiz']
+            admin_analytics_data['interactions_points'] = users_points_breakup['Interactions']
             del analytics_instance
             admin_analytics_list.append(admin_analytics_data)
     cache.set(cache_key, json.dumps(admin_analytics_list), 60*15)
     # print "\n\nadmin_analytics_list ",admin_analytics_list
-    return HttpResponse(json.dumps(admin_analytics_list))
+
+    column_headers = [
+        ("username", "Name"),
+        # ("user_id", "user_id"),
+        ("users_points", "Total Points"),
+        ("files_points", "Files"),
+        ("notes_points", "Notes"),
+        ("quiz_points", "Quiz"),
+        ("interactions_points", "Interactions"),
+    ]
+
+    response_dict["column_headers"] = column_headers
+    response_dict["success"] = True
+    response_dict["students_data_set"] = admin_analytics_list
+    # print "\n admin_analytics_list === ",admin_analytics_list
+    return HttpResponse(json.dumps(response_dict))
 
 @login_required
 @get_execution_time
