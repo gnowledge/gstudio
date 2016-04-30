@@ -88,54 +88,55 @@
             <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification">
             </section>
             <section role="tabpanel" aria-hidden="false" class="content active" id="analytics-content">
+              {% if gstaff_access %}
+                <div class="group-analytics hide">
+                  <div class="row course-students-data">
+                    <div class="small-12 medium-4 columns">
+                      Points table for students
+                    </div>
+                    <div class="small-12 medium-8 columns students-table-legends">
+                      <span class=" badge yellow">&nbsp;</span>
+                      <span>Interations</span>
+                      <span class=" badge green">&nbsp;</span>
+                      <span>Gallery uploads</span>
+                      <span class=" badge">&nbsp;</span>
+                      <span>Note Making</span>
+                      {% comment %}
+                      <span class=" badge red">&nbsp;</span>
+                      <span>Quiz Performance</span>
+                      {% endcomment %}
+                    </div>
+                  </div>
+                  <small>* Click on the student's name to view detailed analytics.</small>
+                  <div class="row students-tabular-data">
+                    <div class="small-12 columns">
+                      <table class="student-overview-table">
+                        <thead>
+                          <tr>
+                            <th>Student Name</th>
+                            <th>Total Points</th>
+                            <th colspan=4>Points Breakup</th>
+                          </tr>
+                        </thead>
+                        <tbody id="students-points-table-tbody">
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div id="userAnalyticsModal" class="reveal-modal xlarge alert-box radius" data-reveal data-alert>
+                  <label id="userAnalyticsModalLabel"></label>
+                  <div class="userAnalyticsData"></div>
+                  <a class="close-reveal-modal">&#215;</a>
+                </div>
+
+              {% endif %}
+
             </section>
           </div>
         </div>
       </div>
     </div>
-    {% if gstaff_access %}
-      <div class="group-analytics hide">
-        <div class="row course-students-data">
-          <div class="small-12 medium-4 columns">
-            Points table for students
-          </div>
-          <div class="small-12 medium-8 columns students-table-legends">
-            <span class=" badge yellow">&nbsp;</span>
-            <span>Interations</span>
-            <span class=" badge green">&nbsp;</span>
-            <span>Gallery uploads</span>
-            <span class=" badge">&nbsp;</span>
-            <span>Note Making</span>
-            {% comment %}
-            <span class=" badge red">&nbsp;</span>
-            <span>Quiz Performance</span>
-            {% endcomment %}
-          </div>
-        </div>
-        <small>* Click on the student's name to view detailed analytics.</small>
-        <div class="row students-tabular-data">
-          <div class="small-12 columns">
-            <table class="student-overview-table">
-              <thead>
-                <tr>
-                  <th>Student Name</th>
-                  <th>Total Points</th>
-                  <th colspan=4>Points Breakup</th>
-                </tr>
-              </thead>
-              <tbody id="students-points-table-tbody">
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div id="userAnalyticsModal" class="reveal-modal xlarge alert-box radius" data-reveal data-alert>
-        <label id="userAnalyticsModalLabel"></label>
-        <div class="userAnalyticsData"></div>
-        <a class="close-reveal-modal">&#215;</a>
-      </div>
-
-    {% endif %}
   </div>
 
 <script type="text/javascript">
