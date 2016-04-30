@@ -121,7 +121,7 @@ STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
 QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
 
-# Designate a root folder for HashFS. If the folder does not exists already, it will be created. 
+# Designate a root folder for HashFS. If the folder does not exists already, it will be created.
 # Set the `depth` to the number of subfolders the file's hash should be split when saving.
 # Set the `width` to the desired width of each subfolder.
 gfs = HashFS(MEDIA_ROOT, depth=3, width=1, algorithm='sha256')
@@ -130,17 +130,17 @@ gfs = HashFS(MEDIA_ROOT, depth=3, width=1, algorithm='sha256')
 
 @connection.register
 class Node(DjangoDocument):
-    '''Everything is a Node.  Other classes should inherit this Node class.  
+    '''Everything is a Node.  Other classes should inherit this Node class.
 
     According to the specification of GNOWSYS, all nodes, including
     types, metatypes and members of types, edges of nodes, should all
     be Nodes.
-    
-    Member of this class must belong to one of the NODE_TYPE_CHOICES. 
+
+    Member of this class must belong to one of the NODE_TYPE_CHOICES.
 
     Some in-built Edge names (Relation types) are defined in this
     class: type_of, member_of, prior_node, post_node, collection_set,
-    group_set.  
+    group_set.
 
     type_of is used to express generalization of Node. And member_of
     to express its type. This type_of should not be confused with
@@ -170,14 +170,14 @@ class Node(DjangoDocument):
         'name': unicode,
         'altnames': unicode,
         'plural': unicode,
-        'prior_node': [ObjectId], 
+        'prior_node': [ObjectId],
         'post_node': [ObjectId],
-        
+
         # 'language': unicode,  # previously it was unicode.
         'language': (basestring, basestring),  # Tuple are converted into a simple list
                                                # ref: https://github.com/namlook/mongokit/wiki/Structure#tuples
 
-        'type_of': [ObjectId], # check required: only ObjectIDs of GSystemType 
+        'type_of': [ObjectId], # check required: only ObjectIDs of GSystemType
         'member_of': [ObjectId], # check required: only ObjectIDs of
                                  # GSystemType for GSystems, or only
                                  # ObjectIDs of MetaTypes for
@@ -185,7 +185,7 @@ class Node(DjangoDocument):
         'access_policy': unicode, # check required: only possible
                                   # values are Public or Private.  Why
                                   # is this unicode?
-        
+
       	'created_at': datetime.datetime,
         'created_by': int, # test required: only ids of Users
 
@@ -197,8 +197,8 @@ class Node(DjangoDocument):
                                # fields
         'location': [dict], # check required: this dict should be a
                             # valid GeoJason format
-        'content': unicode, 
-        'content_org': unicode, 
+        'content': unicode,
+        'content_org': unicode,
 
         'group_set': [ObjectId], # check required: should not be
                                  # empty. For type nodes it should be
@@ -274,7 +274,7 @@ class Node(DjangoDocument):
             'fields': [
                 ('status', INDEX_ASCENDING), ('last_update' , INDEX_DESCENDING)
             ]
-        }, 
+        },
     ]
 
     required_fields = ['name', '_type'] # 'group_set' to be included
@@ -288,7 +288,7 @@ class Node(DjangoDocument):
                     }
     use_dot_notation = True
 
-    
+
     def fill_node_values(self, request=HttpRequest(), **kwargs):
 
         # 'name': unicode,
@@ -300,21 +300,21 @@ class Node(DjangoDocument):
 
         # 'altnames': unicode,
         if kwargs.has_key('altnames'):
-            altnames = kwargs.get('altnames', name) 
+            altnames = kwargs.get('altnames', name)
         else:
             altnames = request.POST.get('altnames', name).strip()
         self.altnames = unicode(altnames)
 
         # 'plural': unicode,
         if kwargs.has_key('plural'):
-            plural = kwargs.get('plural', None) 
+            plural = kwargs.get('plural', None)
         else:
             plural = request.POST.get('plural', None)
         self.plural = unicode(plural)
 
         # 'prior_node': [ObjectId],
         if kwargs.has_key('prior_node'):
-            prior_node = kwargs.get('prior_node', []) 
+            prior_node = kwargs.get('prior_node', [])
         else:
             prior_node = request.POST.get('prior_node', [])
         self.prior_node = prior_node
@@ -323,7 +323,7 @@ class Node(DjangoDocument):
 
         # 'post_node': [ObjectId]
         if kwargs.has_key('post_node'):
-            post_node = kwargs.get('post_node', []) 
+            post_node = kwargs.get('post_node', [])
         else:
             post_node = request.POST.get('post_node', [])
         self.post_node = post_node
@@ -332,14 +332,14 @@ class Node(DjangoDocument):
 
         # 'language': (basestring, basestring)
         if kwargs.has_key('language'):
-            language = kwargs.get('language', ('en', 'English')) 
+            language = kwargs.get('language', ('en', 'English'))
         else:
             language = request.POST.get('language', ('en', 'English'))
         self.language = language
 
         # 'type_of': [ObjectId]
         if kwargs.has_key('type_of'):
-            type_of = kwargs.get('type_of', []) 
+            type_of = kwargs.get('type_of', [])
         else:
             type_of = request.POST.get('type_of', [])
         self.type_of = type_of
@@ -348,20 +348,20 @@ class Node(DjangoDocument):
 
         # 'member_of': [ObjectId]
         if kwargs.has_key('member_of'):
-            member_of = kwargs.get('member_of', []) 
+            member_of = kwargs.get('member_of', [])
         else:
             member_of = request.POST.get('member_of', [])
-        self.member_of = member_of
-        if member_of and not isinstance(member_of, list):
-            self.member_of = [ObjectId(each) for each in member_of]
+        self.member_of = [ObjectId(member_of)] if member_of else member_of
+        # if member_of and not isinstance(member_of, list):
+        #     self.member_of = [ObjectId(each) for each in member_of]
 
         # 'access_policy': unicode
         if kwargs.has_key('access_policy'):
-            access_policy = kwargs.get('access_policy', u'PUBLIC') 
+            access_policy = kwargs.get('access_policy', u'PUBLIC')
         else:
             access_policy = request.POST.get('access_policy', u'PUBLIC')
         self.access_policy = unicode(access_policy)
-        
+
         # 'created_at': datetime.datetime
         #   - this will be system generated (while instantiation time), always.
 
@@ -371,30 +371,33 @@ class Node(DjangoDocument):
         # 'created_by': int
         if not self.created_by:
             if kwargs.has_key('created_by'):
-                created_by = kwargs.get('created_by', '') 
+                created_by = kwargs.get('created_by', '')
             elif request:
                 created_by = request.user.id
             self.created_by = int(created_by) if created_by else 0
 
         # 'modified_by': int, # test required: only ids of Users
         if kwargs.has_key('modified_by'):
-            modified_by = kwargs.get('modified_by', None) 
+            modified_by = kwargs.get('modified_by', None)
         elif request:
-            modified_by = request.user.id
+            if hasattr(request, 'user'):
+                modified_by = request.user.id
+            elif kwargs.has_key('created_by'):
+                modified_by = created_by
         self.modified_by = int(modified_by) if modified_by else 0
 
         # 'contributors': [int]
         if kwargs.has_key('contributors'):
-            contributors = kwargs.get('contributors', []) 
+            contributors = kwargs.get('contributors', [])
         else:
             contributors = request.POST.get('contributors', [])
         self.contributors = contributors
         if contributors and not isinstance(contributors, list):
-            self.contributors = [int(each) for each in contributors]        
+            self.contributors = [int(each) for each in contributors]
 
         # 'location': [dict]
         if kwargs.has_key('location'):
-            location = kwargs.get('location', []) 
+            location = kwargs.get('location', [])
         else:
             location = request.POST.get('location', [])
         self.location = list(location) if not isinstance(location, list) else location
@@ -415,7 +418,7 @@ class Node(DjangoDocument):
 
         # 'group_set': [ObjectId]
         if kwargs.has_key('group_set'):
-            group_set = kwargs.get('group_set', []) 
+            group_set = kwargs.get('group_set', [])
         else:
             group_set = request.POST.get('group_set', [])
         self.group_set = group_set
@@ -424,7 +427,7 @@ class Node(DjangoDocument):
 
         # 'collection_set': [ObjectId]
         if kwargs.has_key('collection_set'):
-            collection_set = kwargs.get('collection_set', []) 
+            collection_set = kwargs.get('collection_set', [])
         else:
             collection_set = request.POST.get('collection_set', [])
         self.collection_set = collection_set
@@ -433,7 +436,7 @@ class Node(DjangoDocument):
 
         # 'property_order': []
         if kwargs.has_key('property_order'):
-            property_order = kwargs.get('property_order', []) 
+            property_order = kwargs.get('property_order', [])
         else:
             property_order = request.POST.get('property_order', [])
         self.property_order = list(property_order) if not isinstance(property_order, list) else property_order
@@ -448,7 +451,7 @@ class Node(DjangoDocument):
 
         # 'tags': [unicode],
         if kwargs.has_key('tags'):
-            tags = kwargs.get('tags', []) 
+            tags = kwargs.get('tags', [])
         else:
             tags = request.POST.get('tags', [])
         self.tags = tags if tags else []
@@ -498,7 +501,7 @@ class Node(DjangoDocument):
 
         return self
 
-    
+
     ########## Setter(@x.setter) & Getter(@property) ##########
     @property
     def user_details_dict(self):
@@ -727,20 +730,20 @@ class Node(DjangoDocument):
     	#i.e. the MyReduce() and ToReduce() class do not extend from
     	#the node class Hence calling the save method on those objects
     	#should not create a recursive function
-    	
+
     	#If it is a new document then Make a new object of ToReduce
     	#class and the id of this document to that object else Check
     	#whether there is already an object of ToReduce() with the id
     	#of this object.  If there is an object present pass else add
     	#that object I have not applied the above algorithm
-   	
+
    	#Instead what I have done is that I have searched the
    	#ToReduce() collection class and searched whether the ID of
    	#this document is present or not.  If the id is not present
    	#then add that id.If it is present then do not add that id
-   		
+
    	old_doc = node_collection.collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})
-        
+
     		#print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
     	if  not old_doc:
 
@@ -800,7 +803,7 @@ class Node(DjangoDocument):
 	#update the snapshot feild
 	if kwargs.get('groupid'):
 		node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
-		
+
     # User-Defined Functions
     def get_possible_attributes(self, gsystem_type_id_or_list):
         """Returns user-defined attribute(s) of given node which belongs to
@@ -885,7 +888,7 @@ class Node(DjangoDocument):
 
         Keyword arguments: gsystem_type_id_or_list -- Single/List of
         ObjectId(s) of GTypes' to which the given node (self) belongs
-  
+
         If node (self) has '_id' -- Node is created; indicating
         possible relations need to be searched under GRelation
         collection & return value of those relations (previously
@@ -897,10 +900,10 @@ class Node(DjangoDocument):
         return default value 'None' for those relations as part of the
         dict along with relation-type details ('object_type' and
         'inverse_name')
-  
+
         Returns: Dictionary that holds details as follows:- Key --
         Name of the relation Value -- It's again a dictionary that
-        holds key and values as shown below: 
+        holds key and values as shown below:
 
         { // If inverse_relation - False 'relation-type-name': {
         'altnames': Value of RelationType node's altnames field [0th
@@ -909,7 +912,7 @@ class Node(DjangoDocument):
         of RelationType node's inverse_name field,
         'subject_or_right_subject_list': List of Value(s) of GRelation
         node's right_subject field }
-          
+
           // If inverse_relation - True 'relation-type-name': {
           'altnames': Value of RelationType node's altnames field [1st
           index-element], 'subject_or_object_type': Value of
@@ -1023,7 +1026,7 @@ class Node(DjangoDocument):
 
     def get_neighbourhood(self, member_of):
         """Attaches attributes and relations of the node to itself;
-        i.e. key's types to it's structure and key's values to itself 
+        i.e. key's types to it's structure and key's values to itself
         """
 
         attributes = self.get_possible_attributes(member_of)
@@ -1041,23 +1044,23 @@ class Node(DjangoDocument):
 class AttributeType(Node):
     '''To define reusable properties that can be set as possible
     attributes to a GSystemType. A set of possible properties defines
-    a GSystemType. 
+    a GSystemType.
 
     '''
 
     structure = {
 	'data_type': basestring, # check required: only of the DATA_TYPE_CHOICES
-        'complex_data_type': [unicode], # can be a list or a dictionary 
+        'complex_data_type': [unicode], # can be a list or a dictionary
         'subject_type': [ObjectId], # check required: only one of Type
                                     # Nodes. GSystems cannot be set as
                                     # subject_types
 	'applicable_node_type': [basestring],	# can be one or more
                                                 # than one of
                                                 # NODE_TYPE_CHOICES
-		
+
 	'verbose_name': basestring,
-	'null': bool, 
-	'blank': bool, 
+	'null': bool,
+	'blank': bool,
 	'help_text': unicode,
 	'max_digits': int, # applicable if the datatype is a number
 	'decimal_places': int, # applicable if the datatype is a float
@@ -1066,7 +1069,7 @@ class AttributeType(Node):
 	'upload_to': unicode,
 	'path': unicode,
 	'verify_exist': bool,
-	'min_length': int, 
+	'min_length': int,
 	'required': bool,
 	'label': unicode,
 	'unique': bool,
@@ -1394,7 +1397,7 @@ class GSystem(Node):
     structure = {
         'attribute_set': [dict],    # ObjectIds of GAttributes
         'relation_set': [dict],     # ObjectIds of GRelations
-        'module_set': [dict],       # Holds the ObjectId & SnapshotID (version_number) 
+        'module_set': [dict],       # Holds the ObjectId & SnapshotID (version_number)
                                         # of collection elements
                                         # along with their sub-collection elemnts too
         'if_file': {
@@ -1406,7 +1409,7 @@ class GSystem(Node):
         'author_set': [int],        # List of Authors
         'annotations': [dict],      # List of json files for annotations on the page
         'license': basestring,      # contains license/s in string format
-        'origin': []                # e.g: 
+        'origin': []                # e.g:
                                         # [
                                         #   {"csv-import": <fn name>},
                                         #   {"sync_source": "<system-pub-key>"}
@@ -1414,12 +1417,12 @@ class GSystem(Node):
     }
 
     use_dot_notation = True
-    
+
     # default_values = "CC-BY-SA 4.0 unported"
     default_values = {
                         'license': GSTUDIO_DEFAULT_LICENSE
                     }
-    
+
     def fill_gstystem_values(self,
                             request=None,
                             attribute_set=[],
@@ -1430,29 +1433,75 @@ class GSystem(Node):
                             uploaded_file=None,
                             **kwargs):
 
-        self.fill_node_values(request, **kwargs)
-
-        if not self.has_key('_id'):
-            self['_id'] = ObjectId()
+        existing_file_gs = None
+        existing_file_gs_if_file = None
 
         if uploaded_file:
 
-            original_filehive_obj = filehive_collection.collection.Filehive()
-            original_file = uploaded_file
+            fh_obj = filehive_collection.collection.Filehive()
+            existing_fh_obj = fh_obj.check_if_file_exists(uploaded_file)
+
+            if existing_fh_obj:
+                existing_file_gs = node_collection.find_one({
+                                    '_type': 'GSystem',
+                                    'if_file.original.id': existing_fh_obj._id
+                                })
+
+            if kwargs.has_key('unique_gs_per_file') and kwargs['unique_gs_per_file']:
+
+                if existing_file_gs:
+                    return existing_file_gs
+
+        self.fill_node_values(request, **kwargs)
+
+        user_id = self.created_by
+
+        # generating '_id':
+        if not self.has_key('_id'):
+            self['_id'] = ObjectId()
+
+        # origin:
+        if kwargs.has_key('origin'):
+            self['origin'] = kwargs.get('origin', '')
+        # else:  # rarely/no origin field value will be sent via form/request.
+        #     self['origin'] = request.POST.get('origin', '').strip()
+
+        if existing_file_gs:
+
+            existing_file_gs_if_file = existing_file_gs.if_file
+
+            def __check_if_file(d):
+                for k, v in d.iteritems():
+                    if isinstance(v, dict):
+                        __check_if_file(v)
+                    else:
+                        # print "{0} : {1}".format(k, v)
+                        if not v:
+                            existing_file_gs_if_file = None
+
+        if uploaded_file and existing_file_gs_if_file:
+            self['if_file'] = existing_file_gs_if_file
+            print "\n\n!!!!!!!!!!!!!!!!!!", self['if_file']
+
+        elif uploaded_file and not existing_file_gs:
+
+            original_filehive_obj   = filehive_collection.collection.Filehive()
+            original_file           = uploaded_file
 
             mime_type = original_filehive_obj.get_file_mimetype(original_file)
             file_name = original_filehive_obj.get_file_name(original_file)
             original_file_extension = original_filehive_obj.get_file_extension(file_name, mime_type)
 
-            original_filehive_obj = original_filehive_obj.save_file_in_filehive(
+            file_exists, original_filehive_obj = original_filehive_obj.save_file_in_filehive(
                 file_blob=original_file,
                 file_name=file_name,
-                first_uploader=request.user.id,
+                first_uploader=user_id,
                 first_parent=self._id,
                 mime_type=mime_type,
                 file_extension=original_file_extension,
                 if_image_size_name='original',
-                get_obj=True
+                get_obj=True,
+                get_file_exists=True
                 )
 
             mime_type = original_filehive_obj.mime_type
@@ -1461,13 +1510,13 @@ class GSystem(Node):
             if original_filehive_obj:
 
                 self.if_file.mime_type       = mime_type
-                self.if_file.original.id    = original_filehive_obj._id 
+                self.if_file.original.id    = original_filehive_obj._id
                 self.if_file.original.relurl = original_filehive_obj.relurl
 
                 if 'image' in original_filehive_obj.mime_type.lower():
 
                     for each_image_size in self.image_sizes_name[1:]:
-                        
+
                         parent_id = self.if_file[self.image_sizes_name[self.image_sizes_name.index(each_image_size) - 1]]['id']
 
                         each_image_size_filename =  self.sys_gen_image_prefix \
@@ -1485,15 +1534,15 @@ class GSystem(Node):
                             each_image_size_id_url = each_image_size_filehive_obj.save_file_in_filehive(
                                 file_blob=each_image_size_file,
                                 file_name=each_image_size_filename,
-                                first_uploader=request.user.id,
+                                first_uploader=user_id,
                                 first_parent=parent_id,
                                 mime_type=mime_type,
                                 file_extension=original_file_extension,
                                 if_image_size_name=each_image_size,
                                 if_image_dimensions=dimension)
 
-                            # print "each_image_size_id_url : ",each_image_size_id_url 
-                            self.if_file[each_image_size]['id']    = each_image_size_id_url['id'] 
+                            # print "each_image_size_id_url : ",each_image_size_id_url
+                            self.if_file[each_image_size]['id']    = each_image_size_id_url['id']
                             self.if_file[each_image_size]['relurl'] = each_image_size_id_url['relurl']
 
         return self
@@ -1542,7 +1591,7 @@ class Filehive(DjangoDocument):
         'filename': unicode,
         'first_uploader': int,
         'first_parent': ObjectId,
-        'uploaded_at': datetime.datetime,    
+        'uploaded_at': datetime.datetime,
         'if_image_size_name': basestring,
         'if_image_dimensions': basestring,
         }
@@ -1569,6 +1618,21 @@ class Filehive(DjangoDocument):
 
     def identity(self):
         return self.__unicode__()
+
+
+    def get_file_md5(self, file_blob):
+        file_md5 = gfs.computehash(file_blob)
+        return file_md5
+
+
+    def get_filehive_obj_from_file_blob(self, file_blob):
+        file_md5 = self.get_file_md5(file_blob)
+        return filehive_collection.find_one({'md5': str(file_md5)})
+
+
+    def check_if_file_exists(self, file_blob):
+        file_md5 = self.get_file_md5(file_blob)
+        return filehive_collection.find_one({'md5': file_md5})
 
 
     def _put_file(self, file_blob, file_extension):
@@ -1602,6 +1666,9 @@ class Filehive(DjangoDocument):
 
         # file_hash = gfs.computehash(file_blob)
 
+        # to check if file is new-fresh-file or old-existing-file
+        file_exists = True
+
         file_metadata_dict = self.get_file_metadata(file_blob, mime_type, file_extension, file_name, if_image_dimensions)
 
         # file_blob.seek(0)
@@ -1610,35 +1677,58 @@ class Filehive(DjangoDocument):
 
         md5 = str(addr_obj.id)
         filehive_obj = filehive_collection.find_one({'md5': md5})
+        # print filehive_obj
 
         id_url_dict = {'id': None, 'relurl': ''}
 
         if not filehive_obj:
-            
+
+            # file is new and it doesn't exists
+            file_exists = False
+
             # instantiating empty instance
             # filehive_obj = filehive_collection.collection.Filehive()
             filehive_obj = self
 
             filehive_obj.md5                 = str(md5)
             filehive_obj.relurl              = str(addr_obj.relpath)
-            filehive_obj.mime_type           = str(file_metadata_dict['file_mime_type']) 
+            filehive_obj.mime_type           = str(file_metadata_dict['file_mime_type'])
             filehive_obj.length              = float(file_metadata_dict['file_size'])
             filehive_obj.filename            = unicode(file_metadata_dict['file_name'])
             filehive_obj.first_uploader      = int(first_uploader)
             filehive_obj.first_parent        = ObjectId(first_parent)
             filehive_obj.if_image_size_name  = str(if_image_size_name)
-            filehive_obj.if_image_dimensions= str(file_metadata_dict['image_dimension'])
+            filehive_obj.if_image_dimensions = str(file_metadata_dict['image_dimension'])
 
             filehive_obj.save()
             # print "filehive_obj : ", filehive_obj
 
-        id_url_dict['id'] = filehive_obj._id
+        id_url_dict['id']     = filehive_obj._id
         id_url_dict['relurl'] = filehive_obj.relurl
 
         if kwargs.has_key('get_obj') and kwargs['get_obj']:
-            return filehive_obj
+            result = filehive_obj
         else:
-            return id_url_dict
+            result = id_url_dict
+
+        if kwargs.has_key('get_file_exists') and kwargs['get_file_exists']:
+            return (file_exists, result)
+
+        return result
+
+
+    @staticmethod
+    def delete_file_from_filehive(filehive_id):
+
+        filehive_obj    = filehive_collection.one({'_id': ObjectId(filehive_id)})
+        file_md5        = str(filehive_obj.md5)
+        filehive_obj_id = str(filehive_obj._id)
+
+        print "\nDeleted filehive object having '_id': ", filehive_obj_id," from Filehive collection."
+        filehive_obj.delete()
+
+        gfs.delete(filehive_obj_id)
+        print "\nDeleted physical file having 'md5': ", file_md5
 
 
     # -- file helper methods --
@@ -1688,7 +1778,7 @@ class Filehive(DjangoDocument):
         image_dimension_tuple = None
         if image_dimensions:
             image_dimension_tuple = image_dimensions
-        else:            
+        else:
             try:
                 image_dimension_tuple = get_image_dimensions(file_blob)
             except Exception, e:
@@ -1706,7 +1796,7 @@ class Filehive(DjangoDocument):
 
 
     def get_file_mimetype(self, file_blob):
-    
+
         file_mime_type = ''
         file_content_type = file_blob.content_type if hasattr(file_blob, 'content_type') else None
 
@@ -1746,10 +1836,10 @@ class Filehive(DjangoDocument):
 
         elif file_mime_type == 'text/plain':
             file_extension = '.txt'
-            
+
         else:
             file_extension = mimetypes.guess_extension(file_mime_type)
-        
+
         return file_extension
 
 
@@ -1778,10 +1868,10 @@ class Filehive(DjangoDocument):
                 factor = img.size[0]/size_to_comp
                 img = img.resize((size_to_comp, int(img.size[1] / factor)), Image.ANTIALIAS)
 
-            elif (img.size <= size) or (img.size[0] <= size_to_comp): 
+            elif (img.size <= size) or (img.size[0] <= size_to_comp):
                 img = img.resize(img.size, Image.ANTIALIAS)
 
-            if 'jpg' in file_extension or 'jpeg' in file_extension: 
+            if 'jpg' in file_extension or 'jpeg' in file_extension:
                 extension = 'JPEG'
             elif 'png' in file_extension:
                 extension = 'PNG'
@@ -1794,7 +1884,7 @@ class Filehive(DjangoDocument):
 
             if extension:
                 img.save(mid_size_img, extension)
-            else:    
+            else:
                 img.save(mid_size_img, "JPEG")
 
             img_size = img.size if img else None
@@ -1809,9 +1899,9 @@ class Filehive(DjangoDocument):
 
 
     def save(self, *args, **kwargs):
-        
+
         is_new = False if ('_id' in self) else True
-        
+
         if is_new:
             self.uploaded_at = datetime.datetime.now()
 
@@ -2037,7 +2127,7 @@ class HistoryManager():
 
     def get_version_dict(self, document_object):
         """Returns a dictionary containing list of revision numbers.
-        
+
         Example:
         {
          "1": "1.1",
@@ -2063,7 +2153,7 @@ class HistoryManager():
         This path is combination of :-
         (a) collection_directory_path: path to the collection-directory
         to which the given instance belongs
-        (b) hashed_directory_structure: path built from object id based 
+        (b) hashed_directory_structure: path built from object id based
         on the set hashed-directory-level
         (c) file_name: '.json' extension concatenated with object id of
         the given instance
@@ -2077,11 +2167,11 @@ class HistoryManager():
 
         collection_dir = \
             (os.path.join(self.__RCS_REPO_DIR, \
-                              document_object.collection_name)) 
+                              document_object.collection_name))
 
-        # Example: 
+        # Example:
         # if -- file_name := "523f59685a409213818e3ec6.json"
-        # then -- collection_hash_dirs := "6/c/3/8/ 
+        # then -- collection_hash_dirs := "6/c/3/8/
         # -- from last (2^0)pos/(2^1)pos/(2^2)pos/(2^3)pos/../(2^n)pos"
         # here n := hash_level_num
         collection_hash_dirs = ""
@@ -2098,7 +2188,7 @@ class HistoryManager():
     def create_rcs_repo_collections(self, *versioning_collections):
         """Creates Revision Control System (RCS) repository.
 
-        After creating rcs-repo, it also creates sub-directories 
+        After creating rcs-repo, it also creates sub-directories
         for each collection inside it.
 
         Arguments:
@@ -2128,9 +2218,9 @@ class HistoryManager():
         #         print(" {0} collection-directory under RCS repository "\
         #                   "created @ following path:\n {1}\n"\
         #                   .format(collection, rcs_repo_collection))
-               
+
     def create_or_replace_json_file(self, document_object=None):
-        """Creates/Overwrites a json-file for passed document object in 
+        """Creates/Overwrites a json-file for passed document object in
         its respective hashed-directory structure.
 
         Arguments:
@@ -2158,9 +2248,9 @@ class HistoryManager():
             #    Opens a file for writing only.
             #    Overwrites the file if the file exists.
             #    If the file does not exist, creates a new file for writing.
-            file_mode = 'w'	
+            file_mode = 'w'
             rcs_file = None
-            
+
             try:
                 self.check_dir_path(os.path.dirname(file_path))
 
@@ -2184,8 +2274,8 @@ class HistoryManager():
                                           cls=NodeJSONEncoder
                                           )
                                )
-                
-                # TODO: Commit modifications done to the file into 
+
+                # TODO: Commit modifications done to the file into
                 # it's rcs-version-file
 
                 file_res = True
@@ -2206,7 +2296,7 @@ class HistoryManager():
             raise RuntimeError(msg)
 
         return file_res
-      
+
     def get_version_document(self, document_object, version_no=""):
         """Returns an object representing mongodb document instance of a given version number.
         """
@@ -2237,7 +2327,7 @@ class HistoryManager():
         doc_obj = node_collection.from_json(json_data)
 
         rcs.checkin(fp)
-        
+
         # Below Code temporary resolves the problem of '$oid' This
         # problem occurs when we convert mongodb's document into
         # json-format using mongokit's to_json_type() function - It
@@ -2355,7 +2445,7 @@ class Triple(DjangoDocument):
     'lang': basestring,  # Put validation for standard language codes
     'status': STATUS_CHOICES_TU
   }
-  
+
   required_fields = ['name', 'subject']
   use_dot_notation = True
   use_autorefs = True
@@ -2415,7 +2505,7 @@ class Triple(DjangoDocument):
       left_subject_member_of_list = subject_document.member_of
       relation_type_name = self.relation_type['name']
       if META_TYPE[4] in self.relation_type.member_of_names_list:
-        #  print META_TYPE[3], self.relation_type.member_of_names_list,"!!!!!!!!!!!!!!!!!!!!!"  
+        #  print META_TYPE[3], self.relation_type.member_of_names_list,"!!!!!!!!!!!!!!!!!!!!!"
         # Relationship Other than Binary one found; e.g, Triadic
         # Single relation: [ObjectId(), ObjectId(), ...]
         # Multi relation: [[ObjectId(), ObjectId(), ...], [ObjectId(), ObjectId(), ...], ...]
@@ -2446,7 +2536,7 @@ class Triple(DjangoDocument):
         # with other comma-separated values from another list(s)
         object_type_list = list(chain.from_iterable(object_type_list))
         right_subject_member_of_list = list(chain.from_iterable(right_subject_member_of_list))
-      
+
 
       else:
           #META_TYPE[3] in self.relation_type.member_of_names_list:
@@ -2460,7 +2550,7 @@ class Triple(DjangoDocument):
 
           self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
 
-      
+
       name_value = self.name
 
       left_intersection = set(subject_type_list) & set(left_subject_member_of_list)
@@ -2649,14 +2739,14 @@ class IndexedWordList(DjangoDocument):
 	use_dot_notation = True
 	#word_start_id = 0 --- a ,1---b,2---c .... 25---z,26--misc.
 
-# This is like a temperory holder, where you can hold any node temporarily and later permenently save in database 
+# This is like a temperory holder, where you can hold any node temporarily and later permenently save in database
 @connection.register
 class node_holder(DjangoDocument):
         objects = models.Manager()
         structure={
             '_type': unicode,
             'details_to_hold':dict
-        }    
+        }
         required_fields = ['details_to_hold']
         use_dot_notation = True
 
