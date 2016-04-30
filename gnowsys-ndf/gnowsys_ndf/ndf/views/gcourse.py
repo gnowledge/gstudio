@@ -2411,16 +2411,16 @@ def course_filters(request, group_id):
 
 @login_required
 @get_execution_time
-def course_analytics(request, group_id):
-    cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(request.user.id) 
+def course_analytics(request, group_id, user_id, render_template=False):
+    cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id) 
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
     import time
     t0 = time.time()
     analytics_data = {}
-
-    analytics_instance = AnalyticsMethods(request, request.user.id,request.user.username, group_id)
+    user_obj = User.objects.get(pk=int(user_id))
+    analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
     completed_modules = analytics_instance.get_completed_modules_count()
@@ -2532,13 +2532,17 @@ def course_analytics(request, group_id):
 
     del analytics_instance
     cache.set(cache_key, json.dumps(analytics_data), 60*15)
-    return HttpResponse(json.dumps(analytics_data))
+    return render_to_response("ndf/user_course_analytics.html", 
+                                analytics_data,
+                                context_instance = RequestContext(request)
+    )
+
+    # return HttpResponse(json.dumps(analytics_data))
 
 
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
-    print "demo"
     cache_key = u'course_analytics_admin' + unicode(group_id)
     cache_result = cache.get(cache_key)
     if cache_result:
@@ -2555,6 +2559,7 @@ def course_analytics_admin(request, group_id):
             admin_analytics_data = {}
             analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
             admin_analytics_data['username'] = user_obj.username
+            admin_analytics_data['user_id'] = user_obj.id
             admin_analytics_data['users_points'] = analytics_instance.get_users_points()
             admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
             del analytics_instance
