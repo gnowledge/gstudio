@@ -84,11 +84,11 @@
             <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">Notifications</a></li>
             
             {% if request.user.is_authenticated and not gstaff_access %}
-              <li class="tab-title"><a role="tab" href="#analytics-content" class="fetch-analytics" tabindex="1" aria-selected="false" aria-controls="panel2-2" data-id={{request.user.id}}>Find My Analytics</a></li>
+              <li class="tab-title"><a role="tab" href="#analytics-content" class="fetch-analytics" tabindex="1" aria-selected="false" aria-controls="panel2-2" data-id={{request.user.id}}>My Analytics</a></li>
               <input type="hidden" class="is_admin" value="False" />
             {% elif gstaff_access %}
               <input type="hidden" class="is_admin" value="True" />
-              <li class="tab-title" ><a role="tab" href="#analytics-content" tabindex="1" aria-selected="false" class="fetch-group-analytics" aria-controls="panel2-2" data-id={{request.user.id}}>Find Group Analytics</a></li>
+              <li class="tab-title" ><a role="tab" href="#analytics-content" tabindex="1" aria-selected="false" class="fetch-group-analytics" aria-controls="panel2-2" data-id={{request.user.id}}>Group Analytics</a></li>
             {% endif %}
 
           </ul>
