@@ -2439,6 +2439,8 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
 
     # QuizItem Section
+    
+    analytics_data['username'] = user_obj.username
     analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
     # print "\n Total QuizItemEvents === ", total_quizitems, "\n\n"
     analytics_data['attempted_quizitems'] = analytics_instance.get_attempted_quizitems_count()
