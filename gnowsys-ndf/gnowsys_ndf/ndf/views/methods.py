@@ -46,7 +46,7 @@ import locale
 import pymongo
 from bson import BSON
 from bson import json_util
-import multiprocessing as mp 
+import multiprocessing as mp
 from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
@@ -67,7 +67,7 @@ ins_objectid = ObjectId()
 
 
 def get_execution_time(f):
-   if BENCHMARK == 'ON': 
+   if BENCHMARK == 'ON':
 
 	    def wrap(*args,**kwargs):
 	        time1 = time.time()
@@ -86,11 +86,11 @@ def get_execution_time(f):
 	        try :
 	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
 	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
-	        except : 
+	        except :
 	        	pass
 	        try :
 	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
-	        except : 
+	        except :
 	        	pass
 	        try :
 	        	benchmark_node.user = unicode(args[0].user.username)
@@ -102,8 +102,8 @@ def get_execution_time(f):
 	        try:
 	        	benchmark_node.calling_url = unicode(args[0].path)
 	        	url = benchmark_node.calling_url.split("/")
-	        	
-	        	if url[1] != "" : 
+
+	        	if url[1] != "" :
 	        		group = url[1]
 	        		benchmark_node.group = group
 	        		try :
@@ -116,22 +116,22 @@ def get_execution_time(f):
 	        	else :
 	        		pass
 
-	        	if url[2] == "" : 
+	        	if url[2] == "" :
 	        		benchmark_node.action = None
-	        	else : 
+	        	else :
 	        		benchmark_node.action = url[2]
-		        	if url[3] != '' : 
+		        	if url[3] != '' :
 		        		benchmark_node.action +=  str('/'+url[3])
-		        	else : 
+		        	else :
 		        		pass
 	        	if "node_id" in args[0].GET and "collection_nav" in f.func_name:
 	        		benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
 	        		# modify calling_url if collection_nav is called i.e collection-player
-	        except : 
+	        except :
 	        	pass
 	        benchmark_node.save()
 	        return ret
-   if BENCHMARK == 'ON': 
+   if BENCHMARK == 'ON':
         return wrap
    if BENCHMARK == 'OFF':
         return f
@@ -147,15 +147,15 @@ def server_sync(func):
     def wrap(*args, **kwargs):
         ret = func(*args, **kwargs)
 
-        
+
         #do a regex check on SYNCDATA_KEY_PUB, if it contains anything other than letters and nos DONOT run the subprocess.call()
         # function as this can be a potential security LOOPHOLE
         #if pub is found to be invalid changes WILL NOT be captured
         searchObj = re.search( r'[^A-Za-z0-9]', SYNCDATA_KEY_PUB, re.M|re.I)
         if searchObj:
             print "Invalid character found in SYNCDATA_KEY_PUB. Please ensure valid existing PUB has been added to local_settings.py", searchObj.group()
-            return            
-        
+            return
+
         check_command = 'gpg --list-keys | grep -o "'+SYNCDATA_KEY_PUB+'"'
         std_out= subprocess.call([check_command],shell=True)
         #code to check if SYNCDATA_KEY_PUB in local settings.py is a pub which is present in the gpg database of the system
@@ -177,13 +177,13 @@ def server_sync(func):
 
         ''' To fetch the data about the node '''
         # the actual file
-        file_data = kwargs['file_data'] 
+        file_data = kwargs['file_data']
         # the node file
-        node = kwargs['file_object'] 
+        node = kwargs['file_object']
         # content-type of the file
-        content_type = kwargs['content_type'] 
+        content_type = kwargs['content_type']
 
-        ''' path where the json file that contains the information about node is located ''' 
+        ''' path where the json file that contains the information about node is located '''
         settings_dir1 = os.path.dirname(__file__)
         settings_dir2 = os.path.dirname(settings_dir1)
         settings_dir3 = os.path.dirname(settings_dir2)
@@ -200,10 +200,10 @@ def server_sync(func):
             for i in special_char:
                 file_name_filtered = file_name_filtered.replace(i,'')
             file_path = gen_path + '/' + str(file_name_filtered)
-        
+
         node_data_path = gen_path + '/node_data.json'
         # subject += str(node._id)
-        
+
         print '+' * 20
         print node_data_path
 
@@ -216,7 +216,7 @@ def server_sync(func):
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
-            
+
 
         else:
             #the other documents which need only the json data to be sent
@@ -227,26 +227,26 @@ def server_sync(func):
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
-        
+
         ''' Code to sign the document file, prefix timestamp to document file name and move it to syncdata folder '''
         path1 = os.path.dirname(__file__)
         path2 = os.path.dirname(path1)
-        
+
         settings_dir = os.path.dirname(__file__)
         PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
         # path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
         path_MailClient = GSTUDIO_MAIL_DIR_PATH
-        
+
         if not os.path.exists(path_MailClient):
             os.makedirs(path_MailClient)
-        
+
         p1 = path_MailClient + '/syncdata/'
-        
+
         if not os.path.exists(p1):
             os.makedirs(p1)
-        
+
         p1 = path_MailClient + '/sent_syncdata_files/'
-        
+
         if not os.path.exists(p1):
             os.makedirs(p1)
 
@@ -258,7 +258,7 @@ def server_sync(func):
         if not os.path.exists(dst):
             os.makedirs(dst)
         path_for_this_capture = dst + '/' + timestamp +"_"+ str(node["_id"])
-        
+
         print '+' * 20
         print path_for_this_capture
 
@@ -266,10 +266,10 @@ def server_sync(func):
             os.makedirs(path_for_this_capture)
 
         if file_data:
-            
-            # '.gpg' in output file name is later used to split the filename and obtain original file name in received attachments in 
+
+            # '.gpg' in output file name is later used to split the filename and obtain original file name in received attachments in
             # 'server_sync()' function of mailclient.py views file
-            
+
             #make filename.extension --> filename_extension since finally the name should be filename_extension.gpg
             op_file_name = file_path.split(file_name_filtered)[0]+ timestamp + '_' + file_name_filtered + '_sig'
             print ':' * 20
@@ -281,10 +281,10 @@ def server_sync(func):
             src = op_file_name
 
             print '+' * 20
-           
+
             shutil.move(src,path_for_this_capture)
-            # mail.attach_file(file_path)         
-        
+            # mail.attach_file(file_path)
+
         print 'JSON'
         node_json = bson.json_util.dumps(node)
         print "creating the file",node['_id']
@@ -299,7 +299,7 @@ def server_sync(func):
         src = json_op_file_name
         shutil.move(src,path_for_this_capture)
         # mail.attach_file(json_op_file_name)
-        
+
         # mail.attach_file(node_data_path)
         # mail.subject = subject + str(node._id)
         #mail.send()
@@ -329,7 +329,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
 
       - If no second argument is passed, as method name suggests, returned result is "group_name" first and "group_id" second.
 
-      - When we need the entire group object, just pass second argument as (boolian) True. In the case group object will be returned.  
+      - When we need the entire group object, just pass second argument as (boolian) True. In the case group object will be returned.
 
       Example 1: res_group_name, res_group_id = get_group_name_id(group_name_or_id)
       - "res_group_name" will contain name of the group.
@@ -411,13 +411,13 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
    try:
            usr=request.user.id
            task_node = collection.GSystem()
-           GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})     
+           GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
            grp=collection.Node.one({'_id':ObjectId(group_id)})
            if not grp:
                    return
            else:
                    group_name=grp.name
-           if request.method == "POST": # create 
+           if request.method == "POST": # create
                    task_node.name = unicode(task_dict['name'])
                    task_node.content_org = unicode(task_dict['content_org'])
                    task_node.created_by=usr
@@ -445,9 +445,9 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
                                    bx=User.objects.get(username=each_watchers)
                                    task_node.author_set.append(bx.id)
                    task_node.save()
-                   # filename = task_node.name 
+                   # filename = task_node.name
                    # task_node.content = org2html(task_dict['content_org'], file_prefix=filename)
-                   # task_node.save() 
+                   # task_node.save()
                    if parent: # prior node saving
                            task_node.prior_node = [ObjectId(parent)]
                            parent_object = collection.Node.find_one({'_id':ObjectId(parent)})
@@ -463,7 +463,7 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
                                            newattribute.attribute_type = attributetype_key
                                            if type(task_dict[each]) == date_time.datetime :
                                                    newattribute.name= task_dict['name']+"--"+str(each)+"--"+str(task_dict[str(each)])
-                                        
+
                                            else:
                                                    if each == 'Assignee':
                                                            usr_ob=User.objects.get(id=task_dict['Assignee'])
@@ -481,7 +481,7 @@ def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
                                                    else:
                                                            newattribute.object_value = unicode(task_dict[str(each)])
                                            newattribute.save()
-                   if task_dict['Assignee'] :   
+                   if task_dict['Assignee'] :
                             activ="task reported"
                             msg="Task -"+task_node.name+"- has been reported by "+"\n     - Status: "+task_dict['Status']+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
                             bx=User.objects.get(id=task_dict['Assignee'])
@@ -523,7 +523,7 @@ def create_task_for_activity(request,group_id,activity_dict,get_assignee_list,se
                 return
         if not get_assignee_list:
                 return
-        if len(get_assignee_list) == 1 : #Single assignee 
+        if len(get_assignee_list) == 1 : #Single assignee
                 #IF IT'S SINGLE ASSIGNEE CREATE A SINGLE TASK ON ASSIGNEE
                 assignee=get_assignee_list[0]
                 task_dict['Assignee']=assignee
@@ -531,10 +531,10 @@ def create_task_for_activity(request,group_id,activity_dict,get_assignee_list,se
                 return
         else:
                 task_collection_list=[]
-                if len(get_assignee_list) > 1 : #task collection 
+                if len(get_assignee_list) > 1 : #task collection
                         #CREATE A GROUP TASK (TASK_COLLECTION)
                         for each in get_assignee_list:
-                                if not each == grp.created_by and not request.user.id == each: # check if uploaded user is not moderator or creator 
+                                if not each == grp.created_by and not request.user.id == each: # check if uploaded user is not moderator or creator
                                         task_dict['Assignee']=each
                                         task=create_task(request,group_id,task_dict,set_notif_val,at_list)
                                         if task:
@@ -556,7 +556,7 @@ def get_all_subscribed_users(group_id):
     if grp.created_by in all_users:
       all_users.remove(grp.created_by)
   return all_users
-  
+
 def get_all_admins(group_id):
   grp=node_collection.one({'_id':ObjectId(group_id)})
   return grp.group_admin
@@ -654,11 +654,11 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
             x=mp.cpu_count()
             #divides the list into those many parts
             n2=n1/x
-            #Process object is created.The list after being partioned is also given as an argument. 
+            #Process object is created.The list after being partioned is also given as an argument.
             for i in range(x):
               processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2],)))
             for i in range(x):
-              processes[i].start() #each Process started 
+              processes[i].start() #each Process started
             for i in range(x):
               processes[i].join() #each Process converges
     # Find all GAPPs
@@ -961,7 +961,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 
         #loop replaced by a list comprehension
         dict2=[node_collection.one({'_id': oid}) for oid in nlist]
-    
+
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
@@ -978,8 +978,8 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id != nid:
             if each._id not in nlist:
                 dict1[each._id] = each
-         
-        #loop replaced by a list comprehension    
+
+        #loop replaced by a list comprehension
         dict2=[node_collection.one({'_id': oid})  for oid in nlist]
 
 
@@ -1022,7 +1022,7 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
     get_fs_file_ids=get_parent_node.fs_file_ids
     node.mime_type=get_mime_type
     node.fs_file_ids=get_fs_file_ids
- 
+
   if not ('_id' in node):
     node.created_by = usrid
     if get_type == "File":
@@ -1034,17 +1034,17 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
         if 'video' in get_mime_type:
           get_video_type = node_collection.one({"_type": "GSystemType", 'name': 'Video'})
           node.member_of.append(get_video_type._id)
-        
+
     else:
       node.member_of.append(node_type._id)
- 
+
   node.name = unicode(name)
   node.language = get_language_tuple(language)
- 
+
   node.modified_by = usrid
   if access_policy:
     node.access_policy = access_policy
- 
+
   if usrid not in node.contributors:
     node.contributors.append(usrid)
 
@@ -1229,7 +1229,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         if set(node.tags) != set(tags_list):
             node.tags = tags_list
             is_changed = True
-      
+
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
         changed = build_collection(
@@ -1244,7 +1244,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     '''
     Exceptional case for "Wiki pages".
-    As org-editor is used ONLY for Wiki pages 
+    As org-editor is used ONLY for Wiki pages
     and rest everywhere ckeditor is used
     '''
     if type_of_val:
@@ -1274,11 +1274,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         # modifying this document
         usrname = request.user.username
         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-        
+
         node_page_type_list = []
-        if node.get("_id",None):  
+        if node.get("_id",None):
             get_node = node_collection.one({'_id': ObjectId(node._id)})
-            node_type_of = get_node.type_of 
+            node_type_of = get_node.type_of
             if node_type_of:
               for each_node_type_of in node_type_of:
                 node_type_of_name = node_collection.one({'_id': each_node_type_of})
@@ -1294,7 +1294,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
           node.content = unicode(org2html(content_org, file_prefix=filename))
         is_changed = True
     '''
-          
+
 
     # visited_location in author class
     if node.location != map_geojson_data:
@@ -1303,7 +1303,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     if node.license != license:
         node.license = license
-        is_changed = True 
+        is_changed = True
 
     if user_last_visited_location:
         user_last_visited_location = list(
@@ -1358,7 +1358,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
           node_obj = node_collection.one({"_id": node_id})
           if node_obj:
             node_prior_node_append_temp(node_id)
-          
+
           i = i+1
         # print "\n Changed: prior_node"
         is_changed = True
@@ -1385,12 +1385,12 @@ def build_collection(node, check_collection, right_drawer_list, checked):
           node_obj = node_collection.one({"_id": node_id})
           if node_obj:
             if node_id not in nlist:
-              nlist_append_temp(node_id)  
+              nlist_append_temp(node_id)
             else:
-              node_collection_set_append_temp(node_id)  
+              node_collection_set_append_temp(node_id)
               # After adding it to collection_set also make the 'node' as prior node for added collection element
               node_collection.collection.update({'_id': ObjectId(node_id), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
-          
+
           i = i+1
 
         for each in nlist:
@@ -1402,7 +1402,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
 
         # For removing collection elements from heterogeneous collection drawer only
-        if not checked: 
+        if not checked:
           if nlist:
             for each in nlist:
               if each not in right_drawer_list:
@@ -1735,10 +1735,10 @@ def get_user_page(request, node):
 
 @get_execution_time
 def get_page(request, node):
-    ''' 
-    function to filter between the page to be displyed to user 
+    '''
+    function to filter between the page to be displyed to user
     i.e which page to be shown to the user drafted or the published page
-    if a user have some drafted content then he would be shown his own drafted contents 
+    if a user have some drafted content then he would be shown his own drafted contents
     and if he has published his contents then he would be shown the current published contents
     '''
     username = request.user
@@ -1782,21 +1782,21 @@ def get_page(request, node):
 
 @get_execution_time
 def get_page(request,node):
-  ''' 
-  function to filter between the page to be displyed to user 
+  '''
+  function to filter between the page to be displyed to user
   i.e which page to be shown to the user drafted or the published page
-  if a user have some drafted content then he would be shown his own drafted contents 
+  if a user have some drafted content then he would be shown his own drafted contents
   and if he has published his contents then he would be shown the current published contents
   '''
   username =request.user
   node1,ver1=get_versioned_page(node)
-  node2,ver2=get_user_page(request,node)     
-  
-  if  ver2 != '1.1':                           
+  node2,ver2=get_user_page(request,node)
+
+  if  ver2 != '1.1':
             if node2 is not None:
                 if node2.status == 'PUBLISHED':
-                  
-                        if float(ver2) > float(ver1):                   
+
+                        if float(ver2) > float(ver1):
                                 return (node2,ver2)
                         elif float(ver2) < float(ver1):
                                 return (node1,ver1)
@@ -1806,19 +1806,19 @@ def get_page(request,node):
                        #========== conditions for Group===============#
 
                         if   node._type == "Group":
-                            
+
                             count=check_page_first_creation(request,node2)
                             if count == 1:
                                 return (node1,ver1)
                             elif count == 2:
                                 return (node2,ver2)
-                        
-                        return (node2,ver2)  
+
+                        return (node2,ver2)
             else:
-                        
-                        return(node1,ver1)              
-            
-  else: 
+
+                        return(node1,ver1)
+
+  else:
         # if node._type == "GSystem" and node1.status == "DRAFT":
         #     if node1.created_by ==request.user.id:
         #           return (node2,ver2)
@@ -1998,7 +1998,7 @@ def _split_with_maintain(value, treat_trailing_spaces_as_sentence=True, split_ch
 def update_mobwrite_content_org(node_system):
     '''
           on revert or merge of nodes,a content_org is synced to mobwrite object
-          input : 
+          input :
                   node
     '''
     system = node_system
@@ -2052,14 +2052,14 @@ def cast_to_data_type(value, data_type):
                 casted_value = False
 
     elif (data_type == "list") and (not isinstance(value, list)):
-        # print "coming here",value      
+        # print "coming here",value
         value = value.replace("\n", "").split(",")
 
         # check for complex list type like: [int] or [unicode]
         if isinstance(data_type, list) and len(data_type) and isinstance(data_type[0], type):
             # print "before",value
             casted_value = [data_type[0](i.strip()) for i in value if i]
-            # print "casted_value",casted_value  
+            # print "casted_value",casted_value
         else:  # otherwise normal list
             # print "before",value
             casted_value = [i.strip() for i in value if i]
@@ -2079,7 +2079,7 @@ def get_node_metadata(request, node, **kwargs):
     '''
     Getting list of updated GSystems with kwargs arguments.
     Pass is_changed=True as last/third argument while calling this/get_node_metadata method.
-    Example: 
+    Example:
       updated_ga_nodes = get_node_metadata(request, node_obj, GST_FILE_OBJ, is_changed=True)
 
     '''
@@ -2101,7 +2101,7 @@ def get_node_metadata(request, node, **kwargs):
             print '$' * 30
             print atname,field_value
             print '$' * 30
-            
+
             at = node_collection.one(
                 {"_type": "AttributeType", "name": atname})
 
@@ -2124,7 +2124,7 @@ def get_node_metadata(request, node, **kwargs):
                 else:
 
                     create_gattribute(node._id, at, unicode(field_value))
-    
+
     if "is_changed" in kwargs:
         return updated_ga_nodes
 
@@ -2158,7 +2158,7 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
             gr_node.right_subject = ObjectId(relation_id)
             gr_node.status = u"PUBLISHED"
             gr_node.save()
-            
+
 
 @get_execution_time
 def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set=[]):
@@ -2513,7 +2513,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
             ga_node.object_value = object_value
             ga_node.save()
-            
+
             if object_value == u"None":
                 info_message = " GAttribute (" + ga_node.name + \
                     ") created successfully with status as 'DELETED'!\n"
@@ -2544,7 +2544,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                 ga_node.status = u"DELETED"
                 ga_node.save()
-                
+
                 info_message = " GAttribute (" + ga_node.name + \
                     ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
@@ -2591,8 +2591,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                     if ga_node.status == u"DELETED":
                         ga_node.status = u"PUBLISHED"
                         ga_node.save()
-                        
-                        
+
+
                         info_message = " GAttribute (" + ga_node.name + \
                             ") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
 
@@ -2606,7 +2606,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                     else:
                         ga_node.status = u"PUBLISHED"
                         ga_node.save()
-                        
+
                         info_message = " GAttribute (" + \
                             ga_node.name + ") updated successfully.\n"
 
@@ -2666,8 +2666,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
-            
-            
+
+
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"
@@ -2866,7 +2866,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # right_subject_id_or_list.remove(n.right_subject)
                     n.status = u"DELETED"
                     n.save()
-        
+
                     info_message = " MultipleGRelation: GRelation (" + n.name + \
                         ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
@@ -3077,7 +3077,7 @@ def create_discussion(request, group_id, node_id):
             thread_obj.group_set.append(ObjectId(group_id))
 
             thread_obj.save()
-            
+
             # creating GRelation
             # create_grelation(node_id, relation_type, twist_st)
             response_data = ["thread-created", str(thread_obj._id)]
@@ -3298,7 +3298,7 @@ def get_user_activity(userObject):
     '''
     methods for getting user's activity.
     input (userObject) is user object
-    output list of dict, dict 
+    output list of dict, dict
     '''
     blank_list = []
     activity = ""
@@ -3728,7 +3728,7 @@ def create_college_group_and_setup_data(college_node):
         gfc.status = u"PUBLISHED"
         gfc.save()
 
-        
+
     if "_id" in gfc:
         has_group_rt = node_collection.one(
             {'_type': "RelationType", 'name': "has_group"}
@@ -3811,9 +3811,9 @@ def parse_data(doc):
   keys_by_filesize = ['file_size']
 
   for i in doc:
-           
+
           if i in content:
-             doc[i] = str(doc[i]) 
+             doc[i] = str(doc[i])
           if i in user_idlist:
              if type(doc[i]) == list :
                       temp =   ""
@@ -3822,12 +3822,12 @@ def parse_data(doc):
 	                              user = User.objects.get(id = userid)
 	                              if user:
 	                                if temp:
-	                                        temp =temp  + "," + (str(user.get_username()) ) 
+	                                        temp =temp  + "," + (str(user.get_username()) )
 	                                else:
-	                                        temp = str(user.get_username())        
-	              doc[i] = temp            
-             else: 
-                      
+	                                        temp = str(user.get_username())
+	              doc[i] = temp
+             else:
+
                       		  if User.objects.filter(id = doc[i]).exists():
 	                              user = User.objects.get(id = doc[i])
 	                              if user:
@@ -3857,7 +3857,7 @@ def parse_data(doc):
                                                 att_dic[k1] = str(v1)
                               for att,value in att_dic.items():
                                   str1 =  str1 + att + " : " + value + "  "+"\n"
-                              doc[i] = str1                    
+                              doc[i] = str1
                       if i == "relation_set":
                               str1 =""
                               for each in doc[i]:
@@ -3875,8 +3875,8 @@ def parse_data(doc):
                                                       att_dic[k1] = rel.name
                               for att,value in att_dic.items():
                                   str1 =  str1 + att + " : " + value + "  "+"\n"
-                              doc[i] = str1        
-  
+                              doc[i] = str1
+
           elif i == "rating":
              new_str = ""
              if doc[i]:
@@ -3890,7 +3890,7 @@ def parse_data(doc):
 	     if not doc[i]:
 	              doc[i] = ""
 	     else:
-	              doc[i] = new_str                     
+	              doc[i] = new_str
           elif i == "location":
               coordinates = []
               parsed_string = ""
@@ -3901,12 +3901,12 @@ def parse_data(doc):
                       if parsed_string:
                         parsed_string =   str(parsed_string)  + "," + str(j)
                       else:
-                        parsed_string =   str(j)  
+                        parsed_string =   str(j)
               if not doc[i]:
                    doc[i] = ""
               else:
                    doc[i] = parsed_string
-                 
+
           elif not doc[i]:
              doc[i] = ""
 
@@ -4244,8 +4244,8 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
 
         gr_node.status = u"DELETED"
         gr_node.save()
-        
-        
+
+
     try:
         # print "\n 1 >> Begin..."
         if deletion_type not in [0, 1]:
@@ -4643,8 +4643,8 @@ def delete_node(
                 # Only changes the status of given node to DELETED
                 node_to_be_deleted.status = u"DELETED"
                 node_to_be_deleted.save()
-                
-                
+
+
             # Perform Purge operation on deleting-node
             if deletion_type == 1:
                 # Remove from database
@@ -4658,12 +4658,16 @@ def delete_node(
                 if "File" in node_to_be_deleted.member_of_names_list:
                     # print "\n 10 >> node found as File; nodes in GridFS : ",
                     # len(node_to_be_deleted.fs_file_ids)
-                    if node_to_be_deleted.fs_file_ids:
+                    if hasattr(node_to_be_deleted, 'fs_file_ids') and node_to_be_deleted.fs_file_ids:
                         for each in node_to_be_deleted.fs_file_ids:
                             if node_to_be_deleted.fs.files.exists(each) and node_collection.find({'fs_file_ids': {'$in': [each]} }).count() == 1:
                                 # print "\tdeleting node in GridFS : ", each
                                 node_to_be_deleted.fs.files.delete(each)
 
+                    elif hasattr(node_to_be_deleted, 'if_file'):
+                        fh_original_id = node_to_be_deleted.if_file.original.id
+                        if node_collection.find({'_type': 'GSystem', 'if_file.original.id': ObjectId(fh_original_id) }).count() == 1:
+                            Filehive.delete_file_from_filehive(fh_original_id)
 
                 # Finally delete the node
                 node_to_be_deleted.delete()
@@ -5003,7 +5007,7 @@ def node_thread_access(group_id, node):
             #     if each_attr and 'end_time' in each_attr:
             #         thread_end_time = each_attr['end_time']
     else:
-        allow_to_comment = False      
+        allow_to_comment = False
     if thread_start_time and thread_end_time:
         curr_date_time = datetime.now()
         if curr_date_time.date() < thread_start_time.date() or curr_date_time.date() > thread_end_time.date():
@@ -5012,10 +5016,10 @@ def node_thread_access(group_id, node):
 
 def get_prior_node_hierarchy(oid):
     """pass the node's ObjectId and get list of objects in hierarchy
-    
+
     Args:
         oid (TYPE): mongo ObjectId
-    
+
     Returns:
         list: List of objects starts from passed node till top node
     """
@@ -5027,11 +5031,11 @@ def get_prior_node_hierarchy(oid):
             prev_obj = node_collection.one({'_id': prev_obj_id})
             prev_obj_id = prev_obj.prior_node[0]
             # print prev_obj.name
-    
+
         except:
             # print "===", prev_obj.name
             prev_obj_id = None
-    
+
         finally:
             hierarchy_list.append(prev_obj)
 
@@ -5042,10 +5046,10 @@ def get_language_tuple(lang):
     """
     from input argument of language code of language name
     get the std matching tuple from settings.
-    
+
     Returns:
         tuple: (<language code>, <language name>)
-    
+
     Args:
         lang (str or unicode): it is the one of item from tuple.
         It may either language-code or language-name.
@@ -5074,14 +5078,14 @@ def get_filter_querydict(filters):
     After getting the filters from request,
     this method converts it into mongo query-able.
     suitable form. Which can be passed to '$and'.
-    
+
     Args:
         filter (JSON): It's a nested list of '$or' dicts.
         e.g:
         [{"$or":[{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Upper Primary","selFieldPrimaryType":"list"},{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Primary","selFieldPrimaryType":"list"}]},{"$or":[{"selFieldValue":"interactivitytype","selFieldValueAltnames":"interactivitytype","selFieldGstudioType":"attribute","selFieldText":"Expositive","selFieldPrimaryType":"basestring"}]}]
 
 
-    
+
     Returns:
         JSON: JSON format which can be directly feed to query.
         e.g:
@@ -5114,9 +5118,9 @@ def get_filter_querydict(filters):
                 each_filter["selFieldText"] = filter_user_id
               temp_dict[each_filter["selFieldValue"]] = each_filter["selFieldText"]
               temp_list.append(temp_dict)
-          
+
           # print " ::: ",temp_list
-          if temp_list:               
+          if temp_list:
             query_dict.append({ "$or": temp_list})
 
     return query_dict
@@ -5251,10 +5255,10 @@ def replicate_resource(request, node, group_id):
             # if not is_cursor:
             #     thread_obj = grel_dict.get("grel_node")
             #     thread_grel = grel_dict.get("grel_id")
-    
+
             # Setup all relevant Attributes for QuizItemEvent
             node.get_neighbourhood(node.member_of)
-    
+
             quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
             options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
             correct_answer_AT = node_collection.one({'_type': "AttributeType", 'name': "correct_answer"})
@@ -5405,7 +5409,7 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
                   ])
 
       resultlist = rec["result"]
-      
+
       if resultlist:
         for eachele in resultlist:
           for eachk,eachv in eachele.items():
