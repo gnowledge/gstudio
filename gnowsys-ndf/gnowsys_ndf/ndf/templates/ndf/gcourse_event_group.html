@@ -11,6 +11,14 @@
     display: inline-block;
   }
 
+  .all_css_div{
+    height:400px;
+    overflow-x:auto !important;
+  }
+
+  #date_reveal_modal > label{
+    color: black;
+  }
 {% endblock %}
 
 
@@ -33,11 +41,13 @@
     <!-- start date -->
 
     <div id="date_reveal_modal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
-    <label>{% trans 'Release Date' %}</label>
+    <label>{% trans 'Set Release Date to following Sessions: ' %}</label><hr/>
     {% get_all_subsections_of_course group_id group_obj.pk as all_css %}
+
     <script type="text/javascript">
       var all_css_js_var = {{all_css|safe}}
     </script>
+    <div class="all_css_div">
     {% for each_css in all_css %}
       <div class="row release_date_div">
           <div class="small-12 medium-3 columns">
@@ -49,6 +59,7 @@
           </div>
       </div>
     {% endfor %}
+    </div>
     <div class="small-3 columns end">
         <input type="button" value="Save" class="save_date button small" disabled="disabled">
     </div>

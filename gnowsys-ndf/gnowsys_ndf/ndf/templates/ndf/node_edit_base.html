@@ -1307,26 +1307,20 @@
 		var textValue = tags.value.trim();
 		// console.log(textValue.length);
 
-		// if(textValue.length < 1){ return false; }
-		if(textValue.length > 0){ 
+		if(textValue.length < 1){ return false; }
 
-			// re expression containing special characters
-			var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
+		// re expression containing special characters
+		var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
 
-			if(re.test(textValue))
-			{	// having special characters
-				$('#tags_error').removeClass("hide");
-				return false;
-			}
-			else
-			{	// passed the test and now add tag label
-				$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
-				return true;
-			}
+		if(re.test(textValue))
+		{	// having special characters
+			$('#tags_error').removeClass("hide");
+			return false;
 		}
-		else{
+		else
+		{	// passed the test and now add tag label
+			$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
 			return true;
-			//no tags added
 		}
 	}
 
