@@ -1727,7 +1727,7 @@ class Filehive(DjangoDocument):
         print "\nDeleted filehive object having '_id': ", filehive_obj_id," from Filehive collection."
         filehive_obj.delete()
 
-        gfs.delete(filehive_obj_id)
+        gfs.delete(file_md5)
         print "\nDeleted physical file having 'md5': ", file_md5
 
 
