@@ -33,18 +33,19 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         collection_list = []
         attribute_type_set = []
         relation_type_set = [] 
-        for e in each.member_of:
-            member_of_list.append(node_collection.one({'_id':e}).name)
-            # member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
-        
-        for members in each.member_of:
-            member.append(node_collection.one({ '_id': members}).name)
-            # member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
+        if class_name in ("GSystemType","AttributeType","RelationType") :
+            for e in each.member_of:
+                member_of_list.append(node_collection.one({'_id':e}).name)
+                # member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
+            
+            for members in each.member_of:
+                member.append(node_collection.one({ '_id': members}).name)
+                # member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
         
         # for coll in each.collection_set:
         #     collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
         
-        if class_name in ("GSystemType"):
+        if class_name == "GSystemType" :
             for at_set in each.attribute_type_set:
                 attribute_type_set.append(at_set.name)
                 # attribute_type_set.append(at_set.name+" - "+str(at_set._id))
@@ -53,7 +54,22 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
                 # relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
             objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list), "attribute_type_set":", ".join(attribute_type_set), "relation_type_set":", ".join(relation_type_set)})
         else :
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list)})
+            if class_name in ("AttributeType","RelationType"):      
+                objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list)})
+
+            else:
+                mem_ty=[]
+                if each.member_of:
+                    for e in each.member_of:
+                        mem_ty.append(str(e))
+                    k = mem_ty[0]
+                else:
+                    k = None
+                    objects_details.append({"Id":each._id,"Title":each.name,"Mem":k , "collection_list":", ".join(collection_list)})
+            
+
+
+
     groups = []
     group = node_collection.find({'_type':"Group"})
     for each in group:
@@ -72,10 +88,11 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     groupid = ""
     group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
-	groupid = str(group_obj[0]._id)
+        groupid = str(group_obj[0]._id)
+        group_name = group_obj[0].name
 
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"designer","groupid":groupid,'meta_types':meta_types,'group_id':groupid})
+    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"designer","groupid":groupid,'meta_types':meta_types,'group_id':groupid, "group_name":group_name })
     return render_to_response(template, variable)
 
 
@@ -306,7 +323,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     groupid = ""
     group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
-	groupid = str(group_obj[0]._id)
+        groupid = str(group_obj[0]._id)
 
     template = "ndf/adminDashboardCreate.html"
 
