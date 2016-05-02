@@ -148,12 +148,14 @@ function get_all_data(){
      list-style: none;
   }
 </style>
+{% if not no_subscribe_btn %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 {% get_sg_member_of groupid as list_of_sg_member_of %}
 {% if group_object.edit_policy != "EDITABLE_MODERATED" or 'CourseEventGroup' in group_object.member_of_names_list or 'ProgramEventGroup' in list_of_sg_member_of or is_gstaff %}
   <a id="subscr_users" data-reveal-id="inviteusers" class="tiny button left-btn radius" title="View/Subscribe Users">{% trans 'Subscribe Users' %}</a>
 {% else %}
   <a class="tiny button left-btn radius secondary disabled" title="You are not authorized for this action">{% trans 'Subscribe Users' %}</a>
+{% endif %}
 {% endif %}
 <div id="inviteusers" class="reveal-modal " data-reveal >
      
