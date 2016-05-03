@@ -22,6 +22,13 @@
                 <font size="3"> {{dummyval}} </font> 
             </div></td>
             <td> {% fetch_req_fields gs_struc|get_dict_item:val val %} 
+                {% if val in  required_fields %}
+
+                <div style="display:table-cell;">
+                    <font size="3" color="red"> * </font>
+                    <font id="{{val}}_required" style="display:none" color="red">This field required</font>
+                </div>
+                {% endif %}
             </td></tr>
             {% endfor %}
         {% endfor %}
@@ -90,8 +97,36 @@
 </form>
 
 {% endblock %}
-<script type="text/javascript">
+{% block script%}
+
+{% autoescape off %}
+var required_fields = [];
+required_fields = {{ required_fields }}
+
+var index = required_fields.indexOf('_type');
+if(index>-1){
+     required_fields.splice(index, 1);
+}
+var flag = 0;
+
 $("form").submit(function(event) {
+    for(reqfields in required_fields){
+        if($("#definitionlist [name = "+required_fields[reqfields]+" ]").val()){
+            $("#"+required_fields[reqfields]+"_required").hide();
+        }
+        else{
+            flag = 1;
+            $("#"+required_fields[reqfields]+"_required").show();
+        }
+    }
+    if(flag == 1)
+    { 
+        alert( "* Mandatory fields. Please fill them, inorder to proceed. "); 
+        event.preventDefault();
+    }
     
 });
-</script>
+
+{% endautoescape %}
+
+{% endblock %}
