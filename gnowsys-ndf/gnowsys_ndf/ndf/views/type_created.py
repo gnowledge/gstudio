@@ -59,7 +59,7 @@ def default_template(request,group_id,node=None,edit_node=None):
     # basic_list = { 'name':'Name' , 'altnames':'Alternate Name' }
     # basic_list = [{'name':'Name '} ,{'altnames':'Alternate Name '}]
     basic_list = GSYSTEM_LIST
-
+    required_fields = eval(gs_sys).required_fields
     if node :
         st_id = node
         node_gs = node_collection.one({'_type': u'GSystemType','_id':ObjectId(st_id)})
@@ -232,14 +232,14 @@ def default_template(request,group_id,node=None,edit_node=None):
             for e in pos_rts_obj2:
                 pos_r.append(e)
             for each in pos_r:
-                print "fo",each,node_gs_id
+                # print "fo",each,node_gs_id
                 if each == node_gs_id:
-                    print "fo in"
+                    # print "fo in"
                     rts_pos_check = dict ({ 'rts_id' : rts_check_pos_id })
                     rts_pos_flag = True
                     r_pos_check.append(rts_pos_check)
                     pos_r.remove(each)
-                    print rts_pos_check,final_rts_name,">>>\n"
+                    # print rts_pos_check,final_rts_name,">>>\n"
             if rts_pos_flag:
                 name_pos_rst = []
                 id_pos_rst = []
@@ -255,7 +255,7 @@ def default_template(request,group_id,node=None,edit_node=None):
                         # print e.name
                         name_pos_rst.append(c.name)
                 
-                pos_rts_object_dict = dict({'name':final_rts_name ,'altnames':final_rts_alt, 'object_type':name_pos_rst})
+                pos_rts_object_dict = dict({'name':final_rts_name ,'altnames':final_rts_alt, 'object_type':name_pos_rst,'id':rts_check_pos_id })
                 f_pos_rts_object_dict.append(pos_rts_object_dict)
 
         # print f_pos_rts_object_dict ,"\n\n"
@@ -344,6 +344,9 @@ def default_template(request,group_id,node=None,edit_node=None):
                 # print rts_dict2
                 new_instance_type[key] = rts_dict2
 
+            # if key == "member_of":
+                # new_instance_type[key] = ObjectId(node)
+
         user_id = request.user.id
         if not new_instance_type.has_key('_id'):
             new_instance_type.created_by = user_id
@@ -355,6 +358,7 @@ def default_template(request,group_id,node=None,edit_node=None):
             new_instance_type.contributors.append(user_id)
 
         new_instance_type.save()
+        # print new_instance_type,"\n\n\n\n\n"
 
         n_at = new_instance_type.attribute_set
 
@@ -368,11 +372,11 @@ def default_template(request,group_id,node=None,edit_node=None):
         n_rt = new_instance_type.relation_set
         # print new_instance_type.relation_set,">>>>>>>>>>\n\n\n\n\n\n"
 
-        # n_rt_full = []
-        # for e in n_rt:
-        #     for k,l in e.iteritems() :
-        #         if l:
-        #             n_rt_full.append(e)
+        n_rt_full = []
+        for e in n_rt:
+            for k,l in e.iteritems() :
+                if l:
+                    n_rt_full.append(e)
         # print n_rt_full,"n_rt_full"
 
         for e in n_rt_full:
@@ -393,7 +397,7 @@ def default_template(request,group_id,node=None,edit_node=None):
                         # z1 = create_grelation(new_instance_type._id,q1,r1._id)
                     print z1 , "GRELATION"
                     
-        return HttpResponseRedirect("/admin/data/GSystem")
+        return HttpResponseRedirect("/admin/designer/GSystem")
 
     # If GET request ---------------------------------------------------------------------------------------
     for key,value in gs_struc.items():
@@ -432,12 +436,12 @@ def default_template(request,group_id,node=None,edit_node=None):
         for key, value in gs_struc.items():
             class_structure_with_values[key] = [gs_struc[key][0], new_instance_type[key]]
 
-        variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
+        variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,'required_fields': required_fields,
          'ats':ats , 'rts':rts , 'node_gs':node_gs , 'gs_struc':class_structure_with_values ,'final_ats':final_ats , 
          'f_rts_object_dict':f_rts_object_dict , 'f_pos_rts_object_dict':f_pos_rts_object_dict })
 
     else :
-        variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list,
+        variable = RequestContext(request, {'group_id':group_id,'groupid':group_id ,'basic_list':basic_list, 'required_fields': required_fields,
          'ats':ats , 'rts':rts , 'node_gs':node_gs , 'gs_struc':gs_struc ,'final_ats':final_ats , 
          'f_rts_object_dict':f_rts_object_dict , 'f_pos_rts_object_dict':f_pos_rts_object_dict })
             
