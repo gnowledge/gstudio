@@ -316,7 +316,6 @@
 
 
               {% elif 'epub' in node.mime_type %}
-                {% comment %}
 
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
@@ -398,7 +397,6 @@
                   //     console.log(locationCfi)
                   // });
                 </script>
-                {% endcomment %}
 
               {% else %}
                 <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">

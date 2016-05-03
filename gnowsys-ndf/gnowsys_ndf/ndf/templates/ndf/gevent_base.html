@@ -9,61 +9,67 @@
 {% block title %}{% trans 'Events' %} {% endblock %}
 
 {% block style %}
-.course_outline_table, tr {
-border: 2px solid #0b8a91;
-border-collapse: collapse;
-}
+  .course_outline_table, tr {
+    border: 2px solid #0b8a91;
+    border-collapse: collapse;
+  }
 
-.gray-text{
-color: gray;
-}
+  .gray-text{
+    color: gray;
+  }
 
-#content > p { color: #6F6F6F !important; /*font-size: inherit;*/ }
+  #content > p {
+    color: #6F6F6F !important;
+    /*font-size: inherit;*/
+  }
 
-tr:hover{
-cursor:pointer;
-}
+  tr:hover{
+    cursor:pointer;
+  }
 
-.tab{
-padding-left: 2em;
-background-color:yellow !important;
-}
+  .tab{
+    padding-left: 2em;
+    background-color:yellow !important;
+  }
 
-.tab2{
-padding-left: 4em;
-}
+  .tab2{
+    padding-left: 4em;
+  }
 
-#eventModal > label {
-color: white;
-font-weight: bold;
-font-size: 1rem;
-}
+  #eventModal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
 
-.all_blogs{
-overflow-y: auto;
-height:500px;
-}
+  .all_blogs{
+    overflow-y: auto;
+    height:500px;
+  }
 
-.jqtree-tree .jqtree-title {
-margin: 5px;
-font-size: 15px;
-color: black !important;
-/*Change the color here to change font color of tree*/
-}
+  .jqtree-tree .jqtree-title {
+    margin: 5px;
+    font-size: 15px;
+    color: black !important;
+    /*Change the color here to change font color of tree*/
+  }
 
   li.remove-dot{
-  list-style: none;
-
+    list-style: none;
   }
 
   .div-height {
-      margin-bottom: 0px !important;
-      height: 258px !important;
+    margin-bottom: 0px !important;
+    height: 258px !important;
   }
 
   .course-banner{
-      text-shadow: 2px 2px black !important;
-      background: none !important;
+    text-shadow: 2px 2px black !important;
+    background: none !important;
+  }
+
+  #status{
+    width: 100% !important;
   }
 {% endblock %}
 
@@ -82,7 +88,7 @@ color: black !important;
 {% block extended_header %}
 {% endblock %}
 {% block body_content %}
-{% check_is_gstaff groupid request.user as gstaff_access %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
 {% user_access_policy groupid request.user as user_access %}
 {% get_course_session_status group_obj True as next_session_in_course %}
 
@@ -101,30 +107,57 @@ color: black !important;
         {% include 'ndf/upload_pic_widget.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True%}
         <div class="course-header-background-layer"></div>
       </div>
-        {% check_is_gstaff groupid request.user as is_gstaff %}
-        {% if is_gstaff %}
+      {% if is_gstaff %}
+        <div class="row" style="position: relative;z-index: 2;">
+            <div class="small-2 course-settings">
+              <a data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius">
+                <i class="fa fa-cog"></i>{% trans " Settings" %}
+              </a>
+              <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                {% with group_obj.member_of_names_list.0 as sg_type %}
+                  <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
+                {% endwith %}
+                <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fi-clipboard-notes"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></li>
+                <li><a class="tiny radius settings" ><i class="fa fa-calendar"></i> {% trans " Session Release Dates" %}</a></li>
+                <li>
+                  <a data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="fi-photo"> Edit Photo</a>
+                </li>
+                <li>
+                  <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
+                </li>
+                <li>
+                  <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% trans ' Subscribe Users' %}</a>
+                  {% include "ndf/invite_users.html" with no_subscribe_btn=True node=group_obj%}
+                </li>
+                <li>
+                  <a id="subscr_admins" data-reveal-id="inviteadmins" title="View/Subscribe Admins" class="fi-torsos">{% trans ' Subscribe Admins' %}</a>
+                  {% include "ndf/invite_admins.html" with no_subscribe_btn=True node=group_obj %}
+                </li>
+              </ul>
+            </div>
+        </div>
 
-      <div class="row" style="position: relative;z-index: 2;">
-          <div class="small-2 course-settings">
-            <a data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius">
-              <i class="fa fa-pencil-square-o"></i>{% trans "Edit Course" %}
-            </a>
-            <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-              <li><a class="tiny radius settings" ><i class="fa fa-cog"></i> {% trans "Settings" %}</a></li>
-              <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fa fa-pencil-square-o"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></li>
-              {% with group_obj.member_of_names_list.0 as sg_type %}
-                <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
-              {% endwith %}
-              <li>
-                <a data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="fi-pencil"> Edit Photo</a>
-              </li>
-              <li>
-                <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
-              </li>
-            </ul>
-          </div>
-      </div>
+      {% else %}
+        <div class="row" style="position: relative;z-index: 2;">
+            <div class="small-2 course-settings">
+              {% if user_access == "allow" %}
+                <a disabled="disabled"> ENROLLED</a>
+              {% else %}
+                {% if user.is_authenticated %}
+                  {% if allow_to_join == "Open" %}
+                    <a class="enroll-btn"> ENROLL</a>
+                  {% else %}
+                    <a disabled="disabled"> Enrollment {{allow_to_join}} </a>
+                  {% endif %}
+                {% else %}
+                    <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
+                {% endif %}
+              {% endif %}
+            </div>
+        </div>
       {% endif %}
+
+
       <div class="row">
         <div class="columns small-3 small-centered">
           {% firstof group_obj.altnames group_obj.name  %}
@@ -144,44 +177,6 @@ color: black !important;
       {% endif %}
       {% endcomment %}
 
-        {% check_is_gstaff groupid request.user as is_gstaff %}
-        {% if is_gstaff %}
-      <!--div class="small-12 medium-8 large-5 columns">
-        <div class="row">
-          <div class="small-12 columns medium-3 large-3" >
-            <span><a class="tiny radius settings" ><i class="fa fa-cog"></i> {% trans "Settings" %}</a></span>
-          </div>
-          <div class="small-12 columns medium-5 large-5" style="white-space: nowrap;" >
-            <span><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fa fa-pencil-square-o"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
-          </div>
-          <div class="small-12 columns medium-4 large-4 end" >
-            {% with group_obj.member_of_names_list.0 as sg_type %}
-              <span><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></span>
-            {% endwith %}
-          </div>
-
-        </div>
-      </div-->
-
-        {% else %}
-          <ul class="right">
-            <li class="enroll-btn-li remove-dot">
-            {% if user_access == "allow" %}
-              <input class="button tiny" type="button" value="ENROLLED" disabled="disabled">
-            {% else %}
-              {% if user.is_authenticated %}
-                {% if allow_to_join == "Open" %}
-                  <input class="enroll-btn button tiny" type="button" value="ENROLL">
-                {% else %}
-                  <input class="button tiny" type="button" value="Enrollment {{allow_to_join}}" disabled="disabled">
-                {% endif %}
-              {% else %}
-                  <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
-              {% endif %}
-            {% endif %}
-            </li>
-          </ul>
-        {% endif %}
       {% comment %}
       {% if request.user.is_authenticated %}
         <!--div class="small-12 medium-4 columns">
@@ -297,7 +292,7 @@ color: black !important;
             {% include "ndf/ggallerypage.html" with file_detail_url='course_raw_material_detail' redirect_tab_url='course_raw_material'%}
 
           {% elif title == 'about' %}
-                {% include "ndf/course_analytics.html" %}
+            {% include "ndf/course_about.html" %}
             {% comment %}
             <div class="row collapse">
               <div class="about-course-details">
