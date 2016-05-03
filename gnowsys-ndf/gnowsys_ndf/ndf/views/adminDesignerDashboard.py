@@ -64,9 +64,11 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
                     if each.member_of:
                         for e in each.member_of:
                             mem_ty.append(str(e))
+                            # find = node_collection.one({ '_id': ObjectId(e),'_type':"GSystem"})
+                            # find_name = find.name
+                            # member.append(find_name)
+                            # print e,find,"here\n\n"
                         k = mem_ty[0]
-                        for members in each.member_of:
-                            member.append(node_collection.one({ '_id': members}).name)
                     else:
                         k = None
                         member = []
