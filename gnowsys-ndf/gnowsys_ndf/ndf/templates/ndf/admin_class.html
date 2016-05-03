@@ -20,14 +20,14 @@
 				<li> <a href="/admin/designer/{{each}}" style="float:left" >{{each}}  ({{count}})</a><a href="/home/type_created">&nbsp;+</a>
 			</li>
 			{% else %}
-				<li class="active"> <a href="/admin/designer/{{each}}" style="float:left">{{each}} ({{count}})</a><a href="/admin/designer/{{each}}/create/">&nbsp;+</a></li>
+				<li class="active"> <a href="/admin/designer/{{each}}" style="float:left">{{each}} ({{count}})</a><a href="/admin/designer/{{each}}/create/">&nbsp;+ </a></li>
 			{% endif %}
 		{% else %}
 			{% if each == "GSystem" %}
 			<li> <a href="/admin/designer/{{each}}" style="float:left" >{{each}}  ({{count}})</a><a href="/home/type_created">&nbsp;+</a>
 			</li>
 			{% else %}
-			<li > <a href="/admin/designer/{{each}}" style="float:left">{{each}}  ({{count}})</a><a href="/home/type_created">&nbsp;+</a></li>
+			<li > <a href="/admin/designer/{{each}}" style="float:left">{{each}}  ({{count}})</a><a href="/admin/designer/{{each}}/create/">&nbsp;+</a></li>
 			{% endif %}
 		{% endifequal %}
 	{% endfor %}	
