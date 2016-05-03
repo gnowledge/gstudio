@@ -57,7 +57,7 @@ table {
 }
 
 
-body {
+{# body {
     margin: 0;
     font-family: 'Lato', sans-serif;
 }
@@ -110,12 +110,15 @@ body {
     top: 15px;
     right: 35px;
   }
-}
+}  #}
 
 {% endblock %}
 
 
 {% block body_content %} 
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
+
 <div id="myGroup" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
      <p>Hold down "Control", to select more than one.</p>
      <h2>{% trans "Select Groups" %}</h2>
@@ -174,7 +177,7 @@ body {
 <input type="submit" value="search" style="width:100px;">
 </form>
 {% autopaginate nodes 25 %}
-<div style="display: block; width: 101%; overflow: auto;">
+<div style="display: block; width: 101%; overflow: auto;" id="info" >
 <table>
   <thead>
     <tr>
@@ -267,6 +270,8 @@ body {
     </td>
 
     <td> 
+
+<!--      
       <div id="myNav-{{each.Id}}" class="overlay">
         <a id="closebtn-{{each.Id}}" href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
         <div class="overlay-content" id="{{each.Id}}" >
@@ -287,6 +292,7 @@ body {
       }
       </script>
   </td>
+-->
 
   
   <td>
@@ -307,17 +313,15 @@ body {
     </dl>
     </section>      
 
-
-
     </td> 
     {% endif %}
-
 
 	</tr>
  	{% endfor %}
   </tbody>
 </table>
 </div>
+
 {% paginate %}
 {% endblock %}
 
@@ -348,14 +352,6 @@ function set_drawer_value(node_id)
   });
    });
 }
-
-function pass_data_concept_graph(obj_id)
-{
-
-console.log(obj_id+"frompass_data")
-
-}
-
 
 function attributetype_set_drawer_value(node_id)
 {
@@ -408,23 +404,23 @@ $.each(drawer_elements.drawer2, function(index, element) {
 
 var option,baseobject;
 $(document).on('click',".checkedAll",function(){
-	if($(this).is(":checked")==true){
-		$('.objectsCheckbox input').prop( "checked", true );
-	}
-	else{
-		$('.objectsCheckbox input').prop( "checked", false );
-	}
+  if($(this).is(":checked")==true){
+    $('.objectsCheckbox input').prop( "checked", true );
+  }
+  else{
+    $('.objectsCheckbox input').prop( "checked", false );
+  }
 });
 $(document).on('click',".button.editobject",function(){
-	var objectid = this.id;
+  var objectid = this.id;
         global_object_id = objectid;
  {% if class_name == "GSystemType"  %}
         set_drawer_value(objectid);
-	attributetype_set_drawer_value(objectid);
-	relationtype_set_drawer_value(objectid);
+  attributetype_set_drawer_value(objectid);
+  relationtype_set_drawer_value(objectid);
  {% endif %}
         $(".viewinput"+objectid).hide();
-	$(".editinput"+objectid).show();
+  $(".editinput"+objectid).show();
         $(this).hide();
         $("#save"+objectid).show();
 });
@@ -436,13 +432,90 @@ $(document).on('click',".adminRenderConceptGraph",function(){
   {# var atr = $(this).attr("data-id") this one returns string "123" other integer 123 #}
   var atr = $(this).data("id"); 
   console.log(atr);
-  pass_data_concept_graph(atr);
-  {# var wd = document.getElementById(this.id) #}
-  {# console.log(wd) #}
-  {# var basic = wd.getAttribute('data-id') #}
-  {# console.log(basic) #}
+  selected_val = "/home/ajax/graph/adminRenderConceptGraph/" + atr
+  console.log(selected_val)
+
+  $.ajax({
+    type: "POST",
+    url: "/home/ajax/graph/adminRenderConceptGraph/"+ atr,
+    dataType: "html",
+    data:{
+      group_id : '{{groupid}}',
+      csrfmiddlewaretoken: '{{ csrf_token }}',
+      node_id : atr 
+    },
+    success: function(result) {
+      {# return data  #}
+      {# alert(result) #}
+      {# return httprequest #}
+      {# return result #}
+      $("#info").html(result);
+    },
+  });
+
 });
 
+
+$(document).on('click',".adminRenderCollectionGraph",function(){
+  var objectid = this.id;
+  global_obj_id_gs = objectid;
+  {# console.log(objectid+"from here"); #}
+  {# var atr = $(this).attr("data-id") this one returns string "123" other integer 123 #}
+  var atr = $(this).data("id"); 
+  {# console.log(atr); #}
+  selected_val = "/home/ajax/graph/adminRenderCollectionGraph/" + atr
+  {# console.log(selected_val) #}
+
+  $.ajax({
+    type: "POST",
+    url: "/home/ajax/graph/adminRenderCollectionGraph/"+ atr,
+    dataType: "html",
+    data:{
+      group_id : '{{groupid}}',
+      csrfmiddlewaretoken: '{{ csrf_token }}',
+      node_id : atr 
+    },
+    success: function(result) {
+      {# return data  #}
+      {# alert(result) #}
+      {# return httprequest #}
+      {# return result #}
+      $("#info").html(result);
+    },
+  });
+
+});
+
+
+$(document).on('click',".adminRenderDependencyGraph",function(){
+  var objectid = this.id;
+  global_obj_id_gs = objectid;
+  {# console.log(objectid+"from here"); #}
+  {# var atr = $(this).attr("data-id") this one returns string "123" other integer 123 #}
+  var atr = $(this).data("id"); 
+  {# console.log(atr); #}
+  selected_val = "/home/ajax/graph/adminRenderDependencyGraph/" + atr
+  {# console.log(selected_val) #}
+
+  $.ajax({
+    type: "POST",
+    url: "/home/ajax/graph/adminRenderDependencyGraph/"+ atr,
+    dataType: "html",
+    data:{
+      group_id : '{{groupid}}',
+      csrfmiddlewaretoken: '{{ csrf_token }}',
+      node_id : atr 
+    },
+    success: function(result) {
+      {# return data  #}
+      {# alert(result) #}
+      {# return httprequest #}
+      {# return result #}
+      $("#info").html(result);
+    },
+  });
+
+});
 
 
 $(document).on('click',".button.deleteObjects",function(){
