@@ -58,17 +58,19 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
                 objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list)})
 
             else:
-                mem_ty=[]
-                if each.member_of:
-                    for e in each.member_of:
-                        mem_ty.append(str(e))
-                    k = mem_ty[0]
-                else:
-                    k = None
-                    objects_details.append({"Id":each._id,"Title":each.name,"Mem":k , "collection_list":", ".join(collection_list)})
-            
-
-
+                if class_name == "GSystem" :
+                    group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
+                    mem_ty=[]
+                    if each.member_of:
+                        for e in each.member_of:
+                            mem_ty.append(str(e))
+                        k = mem_ty[0]
+                        for members in each.member_of:
+                            member.append(node_collection.one({ '_id': members}).name)
+                    else:
+                        k = None
+                        member = []
+                    objects_details.append({"Id":each._id,"Title":each.name,"Mem":k ,"Type":", ".join(member), "collection_list":", ".join(collection_list), "Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at })
 
     groups = []
     group = node_collection.find({'_type':"Group"})
