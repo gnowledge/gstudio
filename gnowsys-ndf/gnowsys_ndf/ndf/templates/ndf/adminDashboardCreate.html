@@ -12,8 +12,6 @@
 
 {% block body_content %} 
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
-
-
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
 
@@ -77,10 +75,10 @@
 				</div>
 	{% get_input_fields class_structure|get_dict_item:key key translate  %}
 
-	{% if list in  required_fields %}
+	{% if key in  required_fields %}
 	<div style="display:table-cell;">
 					<font size="3" color="red"> * </font>
-					<font id="{{list}}_required" style="display:none" color="red">This field required</font>
+					<font id="{{key}}_required" style="display:none" color="red">This field required</font>
 				</div>
 				{% endif %}
 			</div>
@@ -97,10 +95,10 @@
 					<font size="3"> {{list}} </font> </span>
 				</div>
 				{% get_input_fields class_structure|get_dict_item:key key translate  %}
-				{% if list in  required_fields %}
+				{% if key in  required_fields %}
 				<div style="display:table-cell;">
 					<font size="3" color="red"> * </font>
-					<font id="{{list}}_required" style="display:none" color="red">This field required</font>
+					<font id="{{key}}_required" style="display:none" color="red">This field required</font>
 				</div>
 				{% endif %}
 			</div>
@@ -206,6 +204,7 @@
 {% autoescape off %}
 	var required_fields = [];
 	required_fields = {{ required_fields }}
+
 	var index = required_fields.indexOf('_type');
 	if(index>-1){
 		 required_fields.splice(index, 1);
@@ -237,11 +236,11 @@
 				$("#"+required_fields[reqfields]+"_required").show();
 			}
 		}
-		<!-- if(flag == 1) -->
-		<!-- { -->
-		<!--   alert("* mandatory fields requiredss"); -->
-		<!--   event.preventDefault(); -->
-		<!-- } -->
+		if(flag == 1)
+		{ 
+			alert( "* Mandatory fields. Please fill them, inorder to proceed. "); 
+			event.preventDefault();
+		}
 	});
 
 {% endblock %}	
