@@ -15,9 +15,6 @@
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
 
-<script type="text/javascript" src="/static/ndf/bower_components/tipped-4.5.5-light/tipped.js"></script>
-<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/tipped-4.5.5-light/tipped.css" />
-
 <form method="post" action="" name="{{class_name}}" id="{{class_name}}">
 {% csrf_token %}
 {% if translate %}
@@ -248,10 +245,5 @@
 {% block head %} 
 <script type="text/javascript">
 var type_list = []
-
-$(document).ready(function() {
-  Tipped.create('.boxes .box');
-});
-
 </script>
 {% endblock %}

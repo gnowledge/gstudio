@@ -172,24 +172,3 @@ def adminDashboardDelete(request):
         node.delete()
 
     return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")
-
-
-@user_passes_test(lambda u: u.is_superuser)
-def adminRenderGraph(request,node_id=None):
-    '''
-    reders the graph
-    '''
-    # group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
-    # groupid = ""
-    # if group_obj:
-    #    group_id,groupid = str(group_obj[0]._id)
-    #    group_name = group_obj[0].name
-    if node_id:
-        print node_id,"from adminRenderGraph\n\n\n"
-
-        req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
-
-    # template = 'ndf/graph_concept.html'
-    template = 'ndf/graph.html'
-    variable = RequestContext(request, { 'node':req_node })
-    return render_to_response(template,variable) 
