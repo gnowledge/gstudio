@@ -686,7 +686,6 @@ def search_drawer(request, group_id):
 
       )    
       
-
 @get_execution_time
 def get_topic_contents(request, group_id):
   if request.is_ajax() and request.method == "POST":
@@ -6298,3 +6297,53 @@ def course_create_note(request, group_id):
       {
         "group_id":group_id,"fetch_res":fetch_res
       },context_instance=RequestContext(request))
+
+
+@get_execution_time
+def adminRenderConceptGraph(request,group_id,node_id=None):
+  '''
+  reders the graph
+  '''
+  if request.is_ajax() and request.method == "POST":
+    group_name = u'home'
+    if node_id:
+        print node_id,"from adminRenderConceptGraph\n\n\n"
+        req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
+
+    template = 'ndf/graph_concept.html'
+    variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+    return render_to_response('ndf/graph_concept.html', { 'group_id':group_id,'groupid':group_id , 'node':req_node }) 
+
+
+@get_execution_time
+def adminRenderCollectionGraph(request,group_id,node_id=None):
+  '''
+  reders the graph
+  '''
+  if request.is_ajax() and request.method == "POST":  
+    group_name = u'home'
+    group_id,groupid = group_id
+    if node_id:
+        print node_id,"from adminRenderCollectionGraph\n\n\n"
+        req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
+
+    template = 'ndf/graph_collection.html'
+    variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+    return render_to_response(template,variable) 
+
+
+@get_execution_time
+def adminRenderDependencyGraph(request,group_id,node_id=None):
+  '''
+  reders the graph
+  '''
+  if request.is_ajax() and request.method == "POST":
+    group_name = u'home'
+    group_id,groupid = group_id
+    if node_id:
+        print node_id,"from adminRenderDependencyGraph\n\n\n"
+        req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
+
+    template = 'ndf/graph_dependency.html'
+    variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+    return render_to_response(template,variable) 
