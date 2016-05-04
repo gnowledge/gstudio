@@ -1112,7 +1112,7 @@ aside#help{
         padding-bottom:0em;
         border-top: 1px solid #B1B1B1;
         //background-color:  #e6e6e6;
-        width: 50%;
+        width: 80%;
         .reply-btn{
             cursor: pointer;
             color:grey !important;
@@ -2485,7 +2485,7 @@ $course-envelop-color: #fff;
   }
 }
 
-  .notifications-tabs{
+  .notifications-analytics-tabs{
     .tabs {
       width: 100%;
       margin: 0em 0em 0.5em;
@@ -2756,8 +2756,8 @@ $course-envelop-color: #fff;
 
     >div {
       padding-top: 15px;
-      height: 50em;
-      overflow: scroll;
+      //height: 50em;
+      //overflow: scroll;
     }
 
     .notebook-index {

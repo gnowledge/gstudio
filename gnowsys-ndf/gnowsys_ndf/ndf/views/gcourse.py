@@ -42,6 +42,7 @@ from gnowsys_ndf.notification import models as notification
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
 gst_file = node_collection.one({'_type': "GSystemType", 'name': u"File"})
+gst_page = node_collection.one({'_type': "GSystemType", 'name': u"Page"})
 
 app = GST_COURSE
 
@@ -1908,7 +1909,7 @@ def course_content(request, group_id):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': {'$in': [u"GSystem", u"File"]}, '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2035,7 +2036,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': {'$in': [u"GSystem", u"File"]}, '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2063,7 +2064,13 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
 
         files_cur = node_collection.find({
                                         '_type': {'$in': ["File", "GSystem"]},
-                                        'member_of': GST_FILE._id,
+                                        '$or': [
+                                                {'member_of': GST_FILE._id},
+                                                {
+                                                    'collection_set': {'$exists': "true",'$not': {'$size': 0} },
+                                                    'member_of': GST_PAGE._id,
+                                                }
+                                            ],
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'created_by': {'$in': gstaff_users},
                             # '$or': [
@@ -2085,6 +2092,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                         },
                         {
                             'name': 1,
+                            'collection_set':1,
                             '_id': 1,
                             'fs_file_ids': 1,
                             'member_of': 1,
@@ -2130,7 +2138,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': {'$in': [u"GSystem", u"File"]}, '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2201,7 +2209,13 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # print "\n\n Total files: ", files_cur.count()
         files_cur = node_collection.find({
                                         '_type': "File",
-                                        'member_of': {'$in': [GST_FILE._id, GST_PAGE._id] },
+                                        '$or': [
+                                                {'member_of': GST_FILE._id},
+                                                {
+                                                    'collection_set': {'$exists': "true",'$not': {'$size': 0} },
+                                                    'member_of': GST_PAGE._id,
+                                                }
+                                            ],
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'relation_set.clone_of': {'$exists': False},
                                     '$or': [
@@ -2223,6 +2237,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                         ]},
                                         {
                                             'name': 1,
+                                            'collection_set':1,
                                             '_id': 1,
                                             'fs_file_ids': 1,
                                             'member_of': 1,
@@ -2274,7 +2289,7 @@ def course_about(request, group_id):
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
+                    {'_type': {"$in": ["GSystem","File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2317,6 +2332,7 @@ def course_gallerymodal(request, group_id, node_id):
             'allow_to_comment': allow_to_comment,
             'thread_node': thread_node,
             'allow_to_join': allow_to_join
+            
         })
     return render_to_response(template, context_variables)
 
@@ -2441,16 +2457,16 @@ def course_filters(request, group_id):
 
 @login_required
 @get_execution_time
-def course_analytics(request, group_id):
-    cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(request.user.id) 
+def course_analytics(request, group_id, user_id, render_template=False):
+    cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id) 
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
     import time
     t0 = time.time()
     analytics_data = {}
-
-    analytics_instance = AnalyticsMethods(request, request.user.id,request.user.username, group_id)
+    user_obj = User.objects.get(pk=int(user_id))
+    analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
     completed_modules = analytics_instance.get_completed_modules_count()
@@ -2469,6 +2485,8 @@ def course_analytics(request, group_id):
 
 
     # QuizItem Section
+    
+    analytics_data['username'] = user_obj.username
     analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
     # print "\n Total QuizItemEvents === ", total_quizitems, "\n\n"
     analytics_data['attempted_quizitems'] = analytics_instance.get_attempted_quizitems_count()
@@ -2496,7 +2514,6 @@ def course_analytics(request, group_id):
     # Comments
     analytics_data['total_cmnts_by_user'] = analytics_instance.get_total_comments_by_user()
     # print "\n Total Comments By User === ", total_cmnts_by_user, "\n\n"
-
 
     # Comments on Notes Section
     analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
@@ -2562,13 +2579,17 @@ def course_analytics(request, group_id):
 
     del analytics_instance
     cache.set(cache_key, json.dumps(analytics_data), 60*15)
-    return HttpResponse(json.dumps(analytics_data))
+    return render_to_response("ndf/user_course_analytics.html", 
+                                analytics_data,
+                                context_instance = RequestContext(request)
+    )
+
+    # return HttpResponse(json.dumps(analytics_data))
 
 
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
-    print "demo"
     cache_key = u'course_analytics_admin' + unicode(group_id)
     cache_result = cache.get(cache_key)
     if cache_result:
@@ -2577,6 +2598,7 @@ def course_analytics_admin(request, group_id):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+    response_dict = {}
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     admin_analytics_list = []
     if group_obj.author_set:
@@ -2584,14 +2606,38 @@ def course_analytics_admin(request, group_id):
             user_obj = User.objects.get(pk=int(each_author))
             admin_analytics_data = {}
             analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+            # username = user_obj.username
+            # user_id = user_obj.id
+            # users_points = analytics_instance.get_users_points()
             admin_analytics_data['username'] = user_obj.username
+            admin_analytics_data['user_id'] = user_obj.id
             admin_analytics_data['users_points'] = analytics_instance.get_users_points()
-            admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+            # admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+            users_points_breakup = analytics_instance.get_users_points(True)
+            admin_analytics_data["files_points"] = users_points_breakup['Files']
+            admin_analytics_data['notes_points'] = users_points_breakup['Notes']
+            admin_analytics_data['quiz_points'] = users_points_breakup['Quiz']
+            admin_analytics_data['interactions_points'] = users_points_breakup['Interactions']
             del analytics_instance
             admin_analytics_list.append(admin_analytics_data)
     cache.set(cache_key, json.dumps(admin_analytics_list), 60*15)
     # print "\n\nadmin_analytics_list ",admin_analytics_list
-    return HttpResponse(json.dumps(admin_analytics_list))
+
+    column_headers = [
+        ("username", "Name"),
+        # ("user_id", "user_id"),
+        ("users_points", "Total Points"),
+        ("files_points", "Files"),
+        ("notes_points", "Notes"),
+        ("quiz_points", "Quiz"),
+        ("interactions_points", "Interactions"),
+    ]
+
+    response_dict["column_headers"] = column_headers
+    response_dict["success"] = True
+    response_dict["students_data_set"] = admin_analytics_list
+    # print "\n admin_analytics_list === ",admin_analytics_list
+    return HttpResponse(json.dumps(response_dict))
 
 @login_required
 @get_execution_time

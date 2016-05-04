@@ -24410,7 +24410,7 @@ aside#help p, aside#help h5, aside#help h6 {
   margin-top: 10px;
   padding-bottom: 0em;
   border-top: 1px solid #B1B1B1;
-  width: 50%;
+  width: 80%;
 }
 /* line 1116, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn {
@@ -25680,13 +25680,13 @@ div.show-image:hover div.fullscreen-icon{
 }
 
 /* line 2489, ../../../scss/_app_styles.scss */
-.notifications-tabs .tabs {
+.notifications-analytics-tabs .tabs {
   width: 100%;
   margin: 0em 0em 0.5em;
   border-bottom: 1px solid #CCC;
 }
 /* line 2494, ../../../scss/_app_styles.scss */
-.notifications-tabs .tabs .tab-title {
+.notifications-analytics-tabs .tabs .tab-title {
   width: 40%;
   background-color: #DEDEDE;
   margin-left: 1em;
@@ -25695,7 +25695,7 @@ div.show-image:hover div.fullscreen-icon{
   text-transform: uppercase;
 }
 /* line 2502, ../../../scss/_app_styles.scss */
-.notifications-tabs .tabs .tab-title.active {
+.notifications-analytics-tabs .tabs .tab-title.active {
   background-color: #fff;
   border: 1px solid #CCC;
   border-bottom: 0px;
@@ -25936,8 +25936,6 @@ div.show-image:hover div.fullscreen-icon{
 /* line 2757, ../../../scss/_app_styles.scss */
 .notebook .notebook-body > div {
   padding-top: 15px;
-  height: 50em;
-  overflow: scroll;
 }
 /* line 2763, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .notebook-index {

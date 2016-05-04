@@ -59,6 +59,7 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
                                         '_type': {'$in': ["GSystem"]},
                                         'member_of': file_gst._id,
                                         'group_set': {'$all': [ObjectId(group_id)]},
+                                        'if_file.mime_type': {'$regex': 'image'} 
 
                                         # 'created_by': {'$in': gstaff_users},
                             # '$or': [
@@ -86,6 +87,7 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
                             'mime_type': 1,
                             'if_file':1
                         }).sort("last_update", -1)
+    print "file count\n\n\n",files_cur.count()
     image_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
