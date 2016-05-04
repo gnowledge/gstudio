@@ -94,7 +94,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_visits_count/$', 'get_visits_count', name='get_visits_count'),
 
     # url for graph display
-    url(r'^graph/(?P<node_id>[^/]+)$', 'adminRenderConceptGraph', name='adminRenderConceptGraph'),
-    url(r'^graph/(?P<node_id>[^/]+)$', 'adminRenderCollectionGraph', name='adminRenderCollectionGraph'),
-    url(r'^graph/(?P<node_id>[^/]+)$', 'adminRenderDependencyGraph', name='adminRenderDependencyGraph'),    
+    url(r'^graph/adminRenderConceptGraph/(?P<node_id>[^/]+)$', 'adminRenderConceptGraph', name='adminRenderConceptGraph'),
+    url(r'^graph/adminRenderCollectionGraph/(?P<node_id>[^/]+)$', 'adminRenderCollectionGraph', name='adminRenderCollectionGraph'),
+    url(r'^graph/adminRenderDependencyGraph/(?P<node_id>[^/]+)$', 'adminRenderDependencyGraph', name='adminRenderDependencyGraph'),    
 )
