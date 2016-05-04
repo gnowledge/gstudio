@@ -12,6 +12,9 @@
     .lbl_of_tag{
         background-color: gold !important;
     }
+    .show-image{
+        margin-left:100px!important;
+    }
 </style>
 <!--<style type="text/css">
     .gmodal-item-panel .text-gray{
@@ -61,6 +64,7 @@
         </div>
     </div-->
     <div class="row gmodal-body">
+
         <div class="small-8 columns gmodal-item-panel" style="overflow-y: auto;">
             <!-- Detail view section -->
             {% include 'ndf/node_ajax_content.html' with no_discussion=True is_course=True %}
@@ -105,7 +109,7 @@
                             {% endfor %}
                             {% if node.tags|length > 2 %}
                                 <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
-                            {% endif %} 
+                            {% endif %}
                     </div>
                 {% else %}
                     <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
@@ -125,7 +129,7 @@
                         </span>
                     </div>
                 </div>
-                
+
                 <div class="row image-actions">
                     <div class="small-12 columns">
                     {% if not node.collection_set %}
@@ -178,7 +182,7 @@
                                 </div>
                             </div>
                             <div class="content" id="image-desc">
-                                {{node.content|default_if_none:"No description added yet."|safe}}                                
+                                {{node.content|default_if_none:"No description added yet."|safe}}
                             </div>
                         </div>
                     </div>

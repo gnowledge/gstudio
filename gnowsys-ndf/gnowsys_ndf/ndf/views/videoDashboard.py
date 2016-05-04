@@ -265,7 +265,7 @@ def video_edit(request,group_id,_id):
             if course_tab_title:
                 if course_tab_title == "raw material":
                     course_tab_title = "raw_material"
-                return HttpResponseRedirect(reverse('course_'+course_tab_title + '_detail', kwargs={'group_id': group_id, 'node_id': str(img_node._id)}))
+                return HttpResponseRedirect(reverse('course_'+course_tab_title + '_detail', kwargs={'group_id': group_id, 'node_id': str(vid_node._id)}))
             return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
             # url = "/"+ str(group_id) +"/?selected="+str(vid_node._id)+"#view_page"
             # return HttpResponseRedirect(url)
