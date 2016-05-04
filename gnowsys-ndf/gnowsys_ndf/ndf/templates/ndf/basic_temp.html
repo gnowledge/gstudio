@@ -1,30 +1,26 @@
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
-
 {%block title %} Basic Template {% endblock %}
 {% block body_content %}
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
 
-<form method="post" action=" " name="{{node_gs.name}}" id="{{node_gs.name}}">
+<form method="post" action=" " name="{{node_gs.name}}" id="{{node_gs.name}}" onsubmit="return validateForm()" >
 {% csrf_token %} 
-
 <table>
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
-
 <font size="5"> {{node_gs.name}} </font> 
 
     <div style="display:table-row;" id ="basic_list">
         {% for bl in basic_list %}
-        	{% for val,dummyval in bl.iteritems %}
+            {% for val,dummyval in bl.iteritems %}
         	<tr><td>
             <div style="display:table-cell;" >
                 <font size="3"> {{dummyval}} </font> 
             </div></td>
-            <td> {% fetch_req_fields gs_struc|get_dict_item:val val %} 
+            <td id="basic_list-{{val}}" > {% fetch_req_fields gs_struc|get_dict_item:val val %} 
                 {% if val in  required_fields %}
-
                 <div style="display:table-cell;">
                     <font size="3" color="red"> * </font>
                     <font id="{{val}}_required" style="display:none" color="red">This field required</font>
@@ -99,39 +95,11 @@
 
 {% endblock %}
 {% block script%}
-
-{% autoescape off %}
-var required_fields = [];
-required_fields = {{ required_fields }}
-
-var index = required_fields.indexOf('_type');
-if(index>-1){
-     required_fields.splice(index, 1);
+function validateForm() {
+    var x = document.forms["{{node_gs.name}}"]["name"].value;
+    if (x == null || x == "") {
+        alert("Name must be filled out");
+        return false;
+    }
 }
-var flag = 0;
-console.log(required_fields)
-
-$("form").submit(function(event) {
-    var flag = 0;
-    for(reqfields in required_fields){
-        console.log(required_fields[reqfields])
-
-        if($("#basic_list[Name = "+required_fields[reqfields]+" ]").val()){
-            $("#"+required_fields[reqfields]+"_required").hide();
-        }
-        else{
-            flag = 1;
-            $("#"+required_fields[reqfields]+"_required").show();
-        }
-    }
-    if(flag == 1)
-    { 
-        alert( "* Mandatory fields. Please fill them, inorder to proceed. "); 
-        event.preventDefault();
-    }
-    
-});
-
-{% endautoescape %}
-
 {% endblock %}
