@@ -236,11 +236,12 @@ django.conf.locale.LANG_INFO = LANG_INFO
 # Languages using BiDi (right-to-left) layout
 # LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",)
 
+
 # --- mailclient app and Replication ---
-# 
+#
 # GSTUDIO_SYNC_SND=True/False
 # GSTUDIO_SYNC_RCV=True/False
-# 
+#
 # Following has to be done for using the Replication features
 # Override following variables in local_settings file:
 #
@@ -251,31 +252,36 @@ EMAIL_PORT = 1025
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'testing@example.com'
-# 
+#
 # SMTP setting for sending mail (e.g: gmail SMTP server)
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_PORT = 587
 # EMAIL_HOST_USER = 'yourcompletegmailaddr'
 # EMAIL_HOST_PASSWORD = 'yourpassword'
-# 
+#
 # The following email id and password for the email account will be used for sending/receiving SYNCDATA
 SYNCDATA_KEY_PUB = ""
 SYNCDATA_FROM_EMAIL_ID = ""
-# 
+#
 SYNCDATA_SENDING_EMAIL_ID = ""
 SYNCDATA_FETCHING_EMAIL_ID = ''
-# 
+#
 SYNCDATA_FETCHING_EMAIL_ID_PASSWORD = ''
 SYNCDATA_FETCHING_IMAP_SERVER_ADDRESS = ''
-# 
+#
 # This is the duration (in secs) at which send_syncdata and fetch_syncdata scripts will be run
 SYNCDATA_DURATION = 60
-# 
+#
 # Mail Chunk Size in MB
 TARSIZE = 1000
-# 
+#
 # --- END of mailclient app and Replication ---
+
+
+# Use following if you want people to have to log in every time they open a browser.
+# It clears the session on browser close (but chrome may behave to prevent sessions from expiring on browser close)
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 
 # strength of a password
@@ -415,12 +421,14 @@ MIDDLEWARE_CLASSES = (
     # 'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
-
     # 'django.middleware.cache.UpdateCacheMiddleware',
     # 'django.middleware.cache.FetchFromCacheMiddleware',
 
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # gstudio custom middleware(s):
+    # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
 )
 
 # AUTH_PROFILE_MODULE = 'gnowsys_ndf.ndf.models.UserProfile'
@@ -484,6 +492,7 @@ INSTALLED_APPS = (
     'memcache_admin',
     'django_mailbox',
     'djcelery',
+    # 'tracking',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -779,6 +788,15 @@ GSTUDIO_QUIZ_CORRECT_POINTS = 5
 GSTUDIO_COMMENT_POINTS = 5
 GSTUDIO_ENABLE_USER_DASHBOARD = True
 
+
+# --- BUDDY Module configurations ---
+#
+GSTUDIO_BUDDY_LOGIN = False
+GSTUDIO_INSTITUTE_ID = ''
+#
+# --- End of BUDDY Module ---
+
+
 # # textb
 # import warnings
 # warnings.filterwarnings(
@@ -786,23 +804,26 @@ GSTUDIO_ENABLE_USER_DASHBOARD = True
 #         RuntimeWarning, r'django\.db\.models\.fields')
 # # textb
 
+
 # --- meeting gapp ---
-# 
+#
 # for online_users_ramk:
-# 
+#
 # USER_ONLINE_TIMEOUT = 300
 # USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
 # USERS_ONLINE__TIME_IDLE = 300
 # USERS_ONLINE__TIME_OFFLINE = 10
 # USERS_ONLINE__CACHE_PREFIX_USER
 # USERS_ONLINE__CACHE_USERS
-# 
+#
 # --- END of meeting gapp ---
+
+
+
 
 # ----------------------------------------------------------------------------
 # following has to be at last
 # just put every thing above it
-
 
 try:
     from local_settings import *

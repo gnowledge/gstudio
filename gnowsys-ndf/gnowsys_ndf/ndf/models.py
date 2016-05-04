@@ -2704,6 +2704,21 @@ class GRelation(Triple):
     use_autorefs = True  # To support Embedding of Documents
 
 
+@connection.register
+class Buddy(DjangoDocument):
+    """
+    Enables logged in user to add buddy.
+    """
+
+    structure = {
+        'loggedin_userid'   : int,
+        'session_key'       : basestring,
+        'buddy_in'          : dict,
+        'buddy_out'         : dict,
+    }
+
+    required_fields = ['session_key', 'loggedin_userid']
+
 
 ####################################### Added on 19th June 2014 for SEARCH ##############################
 
