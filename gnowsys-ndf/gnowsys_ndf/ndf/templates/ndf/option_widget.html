@@ -1,11 +1,26 @@
-<select id="widget_for" name="{{widget_for}}">
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
+{# <script type="text/javascript" src="/static/ndf/bower_components/jquery.searchabledropdown-1.0.8.min.js"></script> #}
+<script type="text/javascript" src="/static/ndf/js/searchabledropdown.min.js"></script>
+<style type="text/css">
+select {
+    height: 120px;
+}
+</style>
+<select id="{{widget_for}}" style="height:20px" class="widget_for" name="{{widget_for}}">
 <option value="">select</option>
-
 {% for key, value in drawer1.items %}
-
-<option value="{% firstof value.id key %}" {% if key in selected_value %}selected{% endif %}>{% firstof value.name value %}</option>
-
-
+<option style="height:10px" value="{% firstof value.id key %}" {% if key in selected_value %}selected{% endif %}>{% firstof value.name value %}</option>
 {% endfor %}
 </select>
 
+<script type="text/javascript">
+$(document).ready(function() {
+	$("select").searchable({
+        maxListSize: 200,
+        maxMultiMatch: 200,
+		ignoreCase: true,						// Ignore case sensitivity
+		latency: 10,							// how many millis to wait until starting search
+	});
+});
+</script>
