@@ -312,7 +312,6 @@
 
 
               {% elif 'epub' in node.if_file.mime_type %}
-                {% comment %}
 
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
@@ -336,7 +335,7 @@
                     <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
                   </h4>
 
-                  <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                  <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
                     {% trans 'Download' %}"{{ grid_fs_obj.filename }}"
                   </a>
                   <h4 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
@@ -350,7 +349,7 @@
 
                 <script>
                   // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
-                  var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}", {
+                  var Book = ePub("{{MEDIA_URL}}{{node.if_file.original.relurl}}", {
                     width: 400,
                     height: false,
                     restore: true
@@ -394,7 +393,6 @@
                   //     console.log(locationCfi)
                   // });
                 </script>
-                {% endcomment %}
 
               {% else %}
                 <a href="{{MEDIA_URL}}{{node.if_file.original.relurl}}">
