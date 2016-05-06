@@ -57,7 +57,7 @@ table {
 }
 
 
-{# body {
+body {
     margin: 0;
     font-family: 'Lato', sans-serif;
 }
@@ -110,7 +110,7 @@ table {
     top: 15px;
     right: 35px;
   }
-}  #}
+} 
 
 {% endblock %}
 
@@ -177,7 +177,7 @@ table {
 <input type="submit" value="search" style="width:100px;">
 </form>
 {% autopaginate nodes 25 %}
-<div style="display: block; width: 101%; overflow: auto;" id="info" >
+<div style="display: block; width: 101%; overflow: auto;"  >
 <table>
   <thead>
     <tr>
@@ -294,38 +294,57 @@ table {
   </td>
 -->
 
-  
   <td>
+
+
    <section id="sectiondropdown-{{each.Id}}" class="medium-12 columns" >
     <dl class="row tabs" id="dl-{{each.Id}}" data-tab data-options="deep_linking:true">
     <dd>
     <a href="#" class="button medium" id="graph-{{each.Id}}" style="width:150px;" data-dropdown="graph-hover-{{each.Id}}" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
       <ul id="graph-hover-{{each.Id}}" class="f-dropdown" data-dropdown-content>
 
-      <li><a href="{% url 'adminRenderConceptGraph' group_name each.Id %}" id="adminRenderConceptGraph-{{each.Id}}" data-reveal-id="view-concept-graph" class="adminRenderConceptGraph" data-id="{{each.Id}}" >{% trans "Concept Graph" %}</a></li>
+      <li><a href="{% url 'adminRenderConceptGraph' group_name each.Id %}" id="adminRenderConceptGraph-{{each.Id}}"  class="adminRenderConceptGraph" data-id="{{each.Id}}" >{% trans "Concept Graph" %}</a></li>
 
-      <li><a href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" id="adminRenderCollectionGraph-{{each.Id}}" data-reveal-id="view-collection-graph" class="adminRenderCollectionGraph" >{% trans "Collection Graph" %}</a></li>
+      <li><a href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" id="adminRenderCollectionGraph-{{each.Id}}"  class="adminRenderCollectionGraph" >{% trans "Collection Graph" %}</a></li>
 
-      <li><a href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" id="adminRenderDependencyGraph-{{each.Id}}" data-reveal-id="view-dependency-graph" class="adminRenderDependencyGraph" >{% trans "Dependency Graph" %}</a></li>
+      <li><a href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" id="adminRenderDependencyGraph-{{each.Id}}" class="adminRenderDependencyGraph" >{% trans "Dependency Graph" %}</a></li>
       </ul>
     
     </dd>
     </dl>
     </section>      
+<!--
+<div id="myNav-{{each.Id}}" class="overlay" >
+<a id="closebtn-{{each.Id}}" href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+<div class="overlay-content" id="{{each.Id}}" >
+</div>-->
+
 
     </td> 
     {% endif %}
 
-	</tr>
- 	{% endfor %}
+  </tr>
+  {% endfor %}
   </tbody>
 </table>
 </div>
+
+<div class="info" id="info"></div>
 
 {% paginate %}
 {% endblock %}
 
 {% block script %}
+
+function openNav() {
+  document.getElementById("#info").style.width = "100%";
+}
+
+function closeNav() {
+  document.getElementById("#info").style.width = "0%";
+}
+
+
 var global_object_id;
 var global_obj_id_gs;
 {% if class_name == "GSystemType"  %}
@@ -429,28 +448,34 @@ $(document).on('click',".adminRenderConceptGraph",function(){
   var objectid = this.id;
   global_obj_id_gs = objectid;
   console.log(objectid+"from here");
-  {# var atr = $(this).attr("data-id") this one returns string "123" other integer 123 #}
   var atr = $(this).data("id"); 
   console.log(atr);
   selected_val = "/home/ajax/graph/adminRenderConceptGraph/" + atr
   console.log(selected_val)
 
   $.ajax({
-    type: "POST",
+    type: "GET",
     url: "/home/ajax/graph/adminRenderConceptGraph/"+ atr,
     dataType: "html",
     data:{
       group_id : '{{groupid}}',
-      csrfmiddlewaretoken: '{{ csrf_token }}',
+      {# csrfmiddlewaretoken: '{{ csrf_token }}', #}
       node_id : atr 
     },
+    global:false,
     success: function(result) {
       {# return data  #}
       {# alert(result) #}
       {# return httprequest #}
       {# return result #}
-      $("#info").html(result);
+      console.log("from success")
+      $('article').unblock();
+      {# openNav() #}
     },
+    complete : function(result){
+      console.log("from complete")
+    },
+
   });
 
 });
@@ -467,12 +492,12 @@ $(document).on('click',".adminRenderCollectionGraph",function(){
   {# console.log(selected_val) #}
 
   $.ajax({
-    type: "POST",
+    type: "GET",
     url: "/home/ajax/graph/adminRenderCollectionGraph/"+ atr,
     dataType: "html",
     data:{
       group_id : '{{groupid}}',
-      csrfmiddlewaretoken: '{{ csrf_token }}',
+      {# csrfmiddlewaretoken: '{{ csrf_token }}', #}
       node_id : atr 
     },
     success: function(result) {
@@ -481,6 +506,9 @@ $(document).on('click',".adminRenderCollectionGraph",function(){
       {# return httprequest #}
       {# return result #}
       $("#info").html(result);
+    },
+    complete : function(result){
+      console.log("from complete")
     },
   });
 
@@ -498,7 +526,7 @@ $(document).on('click',".adminRenderDependencyGraph",function(){
   {# console.log(selected_val) #}
 
   $.ajax({
-    type: "POST",
+    type: "GET",
     url: "/home/ajax/graph/adminRenderDependencyGraph/"+ atr,
     dataType: "html",
     data:{
