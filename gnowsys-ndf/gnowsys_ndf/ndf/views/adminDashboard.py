@@ -154,7 +154,6 @@ def adminDashboardEdit(request):
                         typelist.append(node_collection.find_one(ObjectId(eachvalue.split(" ")[-1])))
                 node['relation_type_set'] = typelist
 
-
         node.save(groupid=group_id)     
         return StreamingHttpResponse(node.name+" edited successfully")
     except Exception as e:
