@@ -1997,6 +1997,22 @@ def ats_fields(fields_type, fields_name,groupid,complex_dt,help_text,validators,
 	return {"fields_name":fields_name, "fields_type": fields_type, "fields_value":fields_value ,'groupid':groupid,
 	'complex_dt':complex_dt ,'gs_type':'attribute_set', 'help_text':help_text , 'validators':validators}
 
+# @get_execution_time
+# @register.inclusion_tag('tags/dummy.html')
+# def rts_fields(fields_name,fields_object_type,groupid,filled_up=None,template='ndf/option_widget.html'):
+# 	'''
+# 	this ndf tag returns the fields_name and fields_type of the GSystem object -- rts
+# 	'''
+# 	fields_value = None
+# 	if filled_up[1]:
+# 		for each in filled_up[1]:
+# 			for value in each:
+# 				if value == fields_name:
+# 					fields_value = each[value]
+
+# 	return {"template":template ,"fields_name":fields_name, "groupid":groupid, "drawer1":fields_object_type 
+# 	,'gs_type':'relation_set' , "selected_value":fields_value }
+
 @get_execution_time
 @register.inclusion_tag('ndf/fetch_fields.html')
 def rts_fields(fields_name,fields_object_type,groupid,filled_up=None):
@@ -2009,9 +2025,11 @@ def rts_fields(fields_name,fields_object_type,groupid,filled_up=None):
 			for value in each:
 				if value == fields_name:
 					fields_value = each[value]
+	drawer1 = {}
+	for each in fields_object_type:
+		drawer1[each] = each
 	return {"fields_name":fields_name, "groupid":groupid, "fields_object_type":fields_object_type 
-	,'gs_type':'relation_set' , "fields_value":fields_value }
-
+	,'gs_type':'relation_set' , "fields_value":fields_value , "drawer1":drawer1 }
 
 # @get_execution_time
 # @register.assignment_tag

@@ -8,7 +8,6 @@
 <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 
 {% if fields_name == 'name' or fields_name == "altnames" %}
-
 <!-- <type 'unicode'> -->
 <div style="display:table-cell;">
   <font size="3">  <input type="textbox" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" placeholder="{{each.help_text}}"  ></font>
@@ -18,7 +17,8 @@
   
 {% if gs_type == 'attribute_set' %}
       {% if fields_type == "bool" %}
-      <select id="id_auto_now_add" name="{{fields_name}}" style="width:50%" >
+
+      <select id="id_auto_now_add" name="{{fields_name}}" style="width:400px height:20px" >
         <option value="0">{% trans "Unknown" %}</option>
         <option value="1" {% if fields_value == "1" %}selected{% endif %} >{% trans "Yes" %}</option>
         <option value="2" {% if fields_value == "2" %}selected{% endif %} >{% trans "No" %}</option>
@@ -27,7 +27,6 @@
       <div class="medium-3 columns end">
       {% elif fields_type == "datetime.datetime" %}
       <input type="text" id="{{fields_name}}" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" {% if fields_value %} selected {% endif %} > 
-
       <script>
       $(function() {
         $( "#{{fields_name}}" ).datepicker();
@@ -35,7 +34,7 @@
       </script>
 
       {% elif fields_type == "status" %}
-      <select id="id_auto_now_add" name="{{fields_name}}" style="width:60%">
+      <select id="id_auto_now_add" name="{{fields_name}}" style="width:400px height:20px" >
         <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >{% trans "PUBLISHED" %}</option>
         <option value="DRAFT" {% if fields_value == "DRAFT" %}selected{% endif %} >{% trans "DRAFT" %}</option>
         <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >{% trans "HIDDEN" %}</option>
@@ -58,7 +57,7 @@
 
       {% elif fields_type == "IS()" %}
       <div id="is_drawer" style="border-spacing:0px" class="list_drawer">
-        <select name="{{fields_name}}">
+        <select name="{{fields_name}}" style="width:400px height:20px" >
           <option value="">select</option>
           {% for value in complex_dt %}
           <option value="{{value}}" {% if value == fields_value %} selected {% endif %} > {{value}} </option>
@@ -81,14 +80,11 @@
         }
       </style>
       <div style="float:left;">
-        <input type="text" id="uploadFile_{{field.name}}" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:18rem; margin-right:0.5rem;" {% if is_required_field %}required{% endif %} />
+        <input type="text" id="uploadFile_{{field.name}}" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:18rem; margin-right:0.5rem;" />
         <div href="#" class="fileUpload button tiny round" style="margin-top:2px;">
             <span>{% trans "Upload" %}</span>
-            <input id="uploadBtn_{{field.name}}" type="file" name="{{field.name}}" class="upload" {% if is_required_field %}required{% endif %} value="{{fields_value|default_if_none:''}}"/>
+            <input id="uploadBtn_{{field.name}}" type="file" name="{{field.name}}" class="upload"  value="{{fields_value|default_if_none:''}}"/>
         </div>
-        {% if is_required_field %}
-        <i style="color:red; float:left display:inline">*</i>
-        {% endif %}
       </div>
       <script type="text/javascript">
         $('#uploadBtn_{{field.name}}').change(function () {
@@ -163,10 +159,13 @@
 
   {% endif %}
 {% elif gs_type == 'relation_set' %}  
-    <select name="{{fields_name}}">
+    <div class="rel" style="width:400px height:20px">
+    <select name="{{fields_name}}" style="width:400px height:20px" >
     <option value="">select</option>
-    {% for value in fields_object_type %}
+    {% for value in fields_object_type %} 
     <option value="{{value}}" {% if value == fields_value %}selected{% endif %} > {{value}} </option>
     {% endfor %}
-    </select>
+    </select> 
+    <!-- {%include 'ndf/option_widget.html' with widget_for=fields_name selected_value=fields_value drawer1=drawer1 %} -->
+    </div>
 {% endif %}
