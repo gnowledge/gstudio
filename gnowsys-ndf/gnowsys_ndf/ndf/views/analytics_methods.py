@@ -693,7 +693,7 @@ class AnalyticsMethods(object):
 	def get_users_points(self, point_breakup=False):
 		t0 = time.time()
 		total_points = 0
-		point_breakup_dict = {}
+		point_breakup_dict = {'Files': 0, 'Notes': 0, 'Quiz': 0, 'Interactions': 0}
 		user_files = self.get_user_files_count()
 		user_notes = self.get_user_notes_count()
 		correct_attempted_quizitems = self.get_evaluated_quizitems_count(True,False)

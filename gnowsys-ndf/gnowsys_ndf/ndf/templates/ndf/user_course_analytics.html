@@ -1,0 +1,210 @@
+{% load multiply from simple_filters %}
+<style type="text/css">
+  .reveal-modal{
+    color: black !important;
+  }
+
+  .rating-stars {
+    background-image:url("/static/ndf/images/stars.png");
+    height: 17px;
+    display: none;
+  }
+
+</style>
+
+<div class="pre-analytics-msg-div text-center hide">
+    Your analytics is loading. Please wait.
+</div>
+<div class="row">
+  <h3>Analytics of user '{{username}}'</h3>
+</div>
+<div class="course-overview-container">
+
+  <div class="row collapse course-overview">
+    <div class="columns small-12 medium-6">
+      <div class="course-status">
+        <h5>Course status</h5>
+        <div class="row">
+          <div class="small-12 columns">
+            <span class="course-metric-heading">Module's Completion</span>
+            <h4 class="module_progress_stmt">{{module_progress_stmt}}</h4>
+            <div class="progress success round">
+                <div class="module_progress_meter meter" style="width:{{module_progress_meter}}%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="small-12 columns">
+            <span class="course-metric-heading">Unit's Completion</span>
+            <h4 class='units_progress_stmt'>{{units_progress_stmt}}</h4>
+            <div class="progress success round">
+                <div class="unit_progress_meter meter" style="width:{{unit_progress_meter}}%"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="columns small-12 medium-6 points-data">
+      <h5>Total points gained</h5>
+      <span class="course-metric-count users_points">{{users_points}}</span>
+
+      <div class="course-points-breakup">
+
+      </div>
+      <div class="course-interactions course-section">
+        <span class="course-section-heading">Interactions</span>
+        <span class="course-section-icon">
+          <i class="fa fa-users"></i>
+        </span>
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Comments By me</span>
+            <span class="course-metric-count total_cmnts_by_user">{{total_cmnts_by_user}}</span>
+          </div>
+          {% comment %}
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Avg Rating for my comments</span>
+            <span class="course-metric-count">
+              <div class="row avg_rating_for_my_cmnts">
+                <div class="columns small-6 medium-6 rating-stars"></div>
+                <div class="columns small-6 medium-6 rating_lbl left"></div>
+              </div>
+            </span>
+          </div>
+          {% endcomment %}
+        </div>
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Comments for me</span>
+            <span class="course-metric-count cmnts_rcvd_by_user">0</span>
+          </div>
+          {% comment %}
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Avg Ratings to others</span>
+            <span class="course-metric-count">
+              <div class="row avg_rating_to_othr_cmnts_by_me">
+                <div class="columns small-6 medium-6 rating-stars"></div>
+                <div class="columns small-6 medium-6 rating_lbl left"></div>
+              </div>
+
+            </span>
+          </div>
+          {% endcomment %}
+        </div>
+      </div>
+      <div class="course-gallery-uploads course-section">
+        <span class="course-section-heading">Gallery uploads</span>
+        <span class="course-section-icon">
+          <i class="fa fa-file-text"></i>
+        </span>
+        <div class="row">
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">Files Created</span>
+            <span class="course-metric-count user_files">{{user_files}}</span>
+          </div>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">Visits gained</span>
+            <span class="course-metric-count other_viewing_my_files">{{other_viewing_my_files}}</span>
+          </div>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">Comments recieved</span>
+            <span class="course-metric-count cmts_on_user_files">{{cmts_on_user_files}}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">Others File Visited</span>
+            <span class="course-metric-count total_files_viewed_by_user">{{total_files_viewed_by_user}}</span>
+          </div>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">Comments on other files</span>
+            <span class="course-metric-count commented_on_others_files">{{commented_on_others_files}}</span>
+          </div>
+          <div class="columns small-12 medium-4">
+            <span class="course-metric-heading">Comments by unique users</span>
+            <span class="course-metric-count unique_users_commented_on_user_files">{{unique_users_commented_on_user_files}}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="columns small-12">
+            <span class="course-metric-heading">Avg. Rating Awarded</span>
+            <span class="course-metric-count">
+              <div class="row total_rating_rcvd_on_files">
+                <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_files|multiply:16}}px; {% if total_rating_rcvd_on_files > 0 %}display:block !important;{% endif %}"></div>
+                <div class="columns small-6 medium-6 rating_lbl left">{{total_rating_rcvd_on_files}}</div>
+              </div>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="course-quiz-perf course-section">
+        <span class="course-section-heading">Quiz Performance</span>
+        <span class="course-section-icon">
+          <i class="fa fa-question-circle"></i>
+        </span>
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Questions Attempted</span>
+            <span class="course-metric-count attempted_quizitems">{{attempted_quizitems}}</span>
+          </div>
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Total Questions</span>
+            <span class="course-metric-count total_quizitems">{{total_quizitems}}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Correct Answers</span>
+            <span class="course-metric-count correct-count correct_attempted_quizitems">{{correct_attempted_quizitems}}</span>
+          </div>
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Incorrect answers</span>
+            <span class="course-metric-count incorrect-count incorrect_attempted_quizitems">{{incorrect_attempted_quizitems}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="course-notes course-section">
+        <span class="course-section-heading">Note Making</span>
+        <span class="course-section-icon">
+          <i class="fa fa-book"></i>
+        </span>
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Notes Written</span>
+            <span class="course-metric-count user_notes">{{user_notes}}</span>
+          </div>
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Views Gained</span>
+            <span class="course-metric-count others_reading_my_notes">{{others_reading_my_notes}}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Others notes visited</span>
+            <span class="course-metric-count total_notes_read_by_user">{{total_notes_read_by_user}}</span>
+          </div>
+          <div class="columns small-12 medium-6">
+            <span class="course-metric-heading">Avg. Rating Awarded</span>
+            <span class="course-metric-count">
+              <div class="row total_rating_rcvd_on_notes">
+                <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_notes|multiply:16}}px;{% if total_rating_rcvd_on_notes > 0 %}display:block !important;{% endif %}"></div>
+                <div class="columns small-6 medium-6 rating_lbl left">{{total_rating_rcvd_on_notes}}</div>
+              </div>
+            </span>
+          </div>
+        </div>
+      </div>
+      {% comment %}
+      <div class="course-warning course-section">
+          <h5>WAITING FOR YOUR FEEDBACK</h5>
+          <div><i class="fa fa-sign-in"></i><a>3 New notes added</a></div>
+          <div><i class="fa fa-file-image-o"></i><a>36 New files uploaded in the gallery</a></div>
+          <div></div>
+      </div>
+      {% endcomment %}
+    </div>
+  </div>
+</div>
