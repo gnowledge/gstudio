@@ -303,16 +303,19 @@ body {
     <a href="#" class="button medium" id="graph-{{each.Id}}" style="width:150px;" data-dropdown="graph-hover-{{each.Id}}" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
       <ul id="graph-hover-{{each.Id}}" class="f-dropdown" data-dropdown-content>
 
-      <li><a href="{% url 'adminRenderConceptGraph' group_name each.Id %}" id="adminRenderConceptGraph-{{each.Id}}"  class="adminRenderConceptGraph" data-id="{{each.Id}}" >{% trans "Concept Graph" %}</a></li>
+      <li><a href="{% url 'adminRenderConceptGraph' group_name each.Id %}" id="adminRenderConceptGraph-{{each.Id}}"  class="adminRenderConceptGraph" data-id="{{each.Id}}"
+      data-reveal-id="view-concept-graph"  >{% trans "Concept Graph" %}</a></li>
 
-      <li><a href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" id="adminRenderCollectionGraph-{{each.Id}}"  class="adminRenderCollectionGraph" >{% trans "Collection Graph" %}</a></li>
+      <li><a href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" id="adminRenderCollectionGraph-{{each.Id}}"  class="adminRenderCollectionGraph" data-id="{{each.Id}}"
+      data-reveal-id="view-collection-graph"   >{% trans "Collection Graph" %}</a></li>
 
-      <li><a href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" id="adminRenderDependencyGraph-{{each.Id}}" class="adminRenderDependencyGraph" >{% trans "Dependency Graph" %}</a></li>
+      <li><a href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" id="adminRenderDependencyGraph-{{each.Id}}" class="adminRenderDependencyGraph" data-id="{{each.Id}}"
+      data-reveal-id="view-Dependency-graph"   >{% trans "Dependency Graph" %}</a></li>
       </ul>
     
     </dd>
     </dl>
-    </section>      
+    </section>  
 <!--
 <div id="myNav-{{each.Id}}" class="overlay" >
 <a id="closebtn-{{each.Id}}" href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
@@ -329,7 +332,15 @@ body {
 </table>
 </div>
 
-<div class="info" id="info"></div>
+<div class="content reveal-modal graph-div" id="view-concept-graph" name="view-concept-graph" data-reveal>
+  <a class="close-reveal-modal" id="cross" >&#215;</a>
+</div>    
+<div class="content reveal-modal graph-div" id="view-collection-graph" name="view-collection-graph" data-reveal>
+  <a class="close-reveal-modal" id="cross" >&#215;</a>
+</div>    
+<div class="content reveal-modal graph-div" id="view-Dependency-graph" name="view-Dependency-graph" data-reveal>
+  <a class="close-reveal-modal" id="cross" >&#215;</a>
+</div>    
 
 {% paginate %}
 {% endblock %}
@@ -447,12 +458,10 @@ $(document).on('click',".button.editobject",function(){
 $(document).on('click',".adminRenderConceptGraph",function(){
   var objectid = this.id;
   global_obj_id_gs = objectid;
-  console.log(objectid+"from here");
   var atr = $(this).data("id"); 
-  console.log(atr);
-  selected_val = "/home/ajax/graph/adminRenderConceptGraph/" + atr
-  console.log(selected_val)
-
+  {# console.log(atr); #}
+  {# selected_val = "/home/ajax/graph/adminRenderConceptGraph/" + atr #}
+  {# console.log(selected_val) #}
   $.ajax({
     type: "GET",
     url: "/home/ajax/graph/adminRenderConceptGraph/"+ atr,
@@ -464,33 +473,23 @@ $(document).on('click',".adminRenderConceptGraph",function(){
     },
     global:false,
     success: function(result) {
-      {# return data  #}
-      {# alert(result) #}
-      {# return httprequest #}
-      {# return result #}
-      console.log("from success")
+      {# console.log("from success") #}
       $('article').unblock();
-      {# openNav() #}
+      $("#view-concept-graph").html(result);
+      $("#close-reveal-modal").html(result);
     },
     complete : function(result){
-      console.log("from complete")
+      {# console.log("from complete") #}
     },
-
   });
-
 });
-
 
 $(document).on('click',".adminRenderCollectionGraph",function(){
   var objectid = this.id;
   global_obj_id_gs = objectid;
-  {# console.log(objectid+"from here"); #}
-  {# var atr = $(this).attr("data-id") this one returns string "123" other integer 123 #}
   var atr = $(this).data("id"); 
-  {# console.log(atr); #}
   selected_val = "/home/ajax/graph/adminRenderCollectionGraph/" + atr
-  {# console.log(selected_val) #}
-
+  console.log(selected_val)
   $.ajax({
     type: "GET",
     url: "/home/ajax/graph/adminRenderCollectionGraph/"+ atr,
@@ -501,17 +500,15 @@ $(document).on('click',".adminRenderCollectionGraph",function(){
       node_id : atr 
     },
     success: function(result) {
-      {# return data  #}
-      {# alert(result) #}
-      {# return httprequest #}
-      {# return result #}
-      $("#info").html(result);
+      {# console.log("from sucess") #}
+      $('article').unblock();
+      $("#view-collection-graph").html(result);
+      $("#close-reveal-modal").html(result);
     },
     complete : function(result){
-      console.log("from complete")
+      {# console.log("from complete") #}
     },
   });
-
 });
 
 
@@ -535,11 +532,13 @@ $(document).on('click',".adminRenderDependencyGraph",function(){
       node_id : atr 
     },
     success: function(result) {
-      {# return data  #}
-      {# alert(result) #}
-      {# return httprequest #}
-      {# return result #}
-      $("#info").html(result);
+      {# console.log("from success") #}
+      $('article').unblock();
+      $("#view-Dependency-graph").html(result);
+      $("#close-reveal-modal").html(result);
+    },
+    complete : function(result){
+      {# console.log("from complete") #}
     },
   });
 
