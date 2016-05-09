@@ -181,16 +181,13 @@ def default_template(request,group_id,node=None,edit_node=None):
                     # rts_check = dict ({ 'rts_id' : rts_check_id })
                     # rts_flag = True
                     # r_check.append(rts_check)
-
             name_rst = []
             id_rst = []
-
             for each in r_oo:
                 k = node_collection.one({'_id':ObjectId(each) })
                 # name_rst.append(k.name) 
                 # below code is to extract gs for each of them, the above would give gst
                 id_rst.append(k._id)
-
             for v in id_rst:
                 m = node_collection.find({'_type':'GSystem','member_of':ObjectId(v) })
                 for c in m:
@@ -336,12 +333,12 @@ def default_template(request,group_id,node=None,edit_node=None):
                 rts_dict2 = []
                 for e in key_rts:
                     for k in request.POST.get(e,"").split(","):
-                        # print e,k ,"\n"
+                        print e,k ,"\n"
                         # here e -- key name , k -- key value eg. e -- event_coordinator , k -- Person
                         rts_dict = dict({e:k})
                         rts_dict2.append(rts_dict)
 
-                # print rts_dict2
+                print rts_dict2
                 new_instance_type[key] = rts_dict2
 
             # if key == "member_of":
@@ -361,6 +358,7 @@ def default_template(request,group_id,node=None,edit_node=None):
         # print new_instance_type,"\n\n\n\n\n"
 
         n_at = new_instance_type.attribute_set
+        n_id = new_instance_type._id
 
         for e in n_at:
             for k,l in e.iteritems():
@@ -377,23 +375,28 @@ def default_template(request,group_id,node=None,edit_node=None):
             for k,l in e.iteritems() :
                 if l:
                     n_rt_full.append(e)
-        # print n_rt_full,"n_rt_full"
+        print n_rt_full,"n_rt_full"
 
         for e in n_rt_full:
             for k,l in e.iteritems() :
                 if l:
                     right_sub_list = []
                     q1 = node_collection.one({'_type':'RelationType','name':k })
-                    # print q1.name
+                    print q1.name
                     r1 = node_collection.one({'_type':'GSystem','name':l })
-                    right_sub_list.append(r1._id)
-                    # print r1.name
+                    right_sub_list.append(ObjectId(r1._id))
+                    # right_sub_list.append(r1._id)
+                    kk = ObjectId(r1._id)
+                    print r1.name
                     # if r1:
                         # print r1
                     # else:
                         # print l,k ,"else"
                     if r1._id:
-                        z1 = create_grelation(new_instance_type._id,q1,right_sub_list)
+                        print q1
+                        print n_id,r1.name,r1._id,">>>>\n\n\n\n"
+                        # z1 = create_grelation(new_instance_type._id,q1,[r1._id] )
+                        # z1 = create_grelation(n_id,q1,[kk])
                         # z1 = create_grelation(new_instance_type._id,q1,r1._id)
                     print z1 , "GRELATION"
                     
