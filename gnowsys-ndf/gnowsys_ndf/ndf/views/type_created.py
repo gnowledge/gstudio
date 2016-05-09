@@ -132,10 +132,15 @@ def default_template(request,group_id,node=None,edit_node=None):
             rts_id.append(e._id)
 
         pos_rts_id = []
+        pos_rts_temp_id = []
 
         for key,value in pos_rts.iteritems():
-            pos_rts_id.append(value['_id'])
-
+            pos_rts_temp_id.append(value['_id'])
+        # Remove duplicity arising due to same subject and object type
+        for e in pos_rts_temp_id:   
+            if e not in pos_rts_id:
+                pos_rts_id.append(e)
+            
         final_pos_rts = []
 
         for e in pos_rts_id:
@@ -181,6 +186,7 @@ def default_template(request,group_id,node=None,edit_node=None):
                     # rts_check = dict ({ 'rts_id' : rts_check_id })
                     # rts_flag = True
                     # r_check.append(rts_check)
+
             name_rst = []
             id_rst = []
             for each in r_oo:
@@ -324,7 +330,7 @@ def default_template(request,group_id,node=None,edit_node=None):
                         # here e -- key name , k -- key value eg. e -- nussd_course_type, k -- General
                         ats_dict = dict({e:k})
                         ats_dict2.append(ats_dict)
-                # print ats_dict2
+                # print ats_dict2 , "ats \n\n"
                 new_instance_type[key] = ats_dict2
 
             if key == "relation_set":
@@ -338,7 +344,7 @@ def default_template(request,group_id,node=None,edit_node=None):
                         rts_dict = dict({e:k})
                         rts_dict2.append(rts_dict)
 
-                print rts_dict2
+                # print rts_dict2,"rts >>>>>> \n\n"
                 new_instance_type[key] = rts_dict2
 
             # if key == "member_of":
@@ -392,11 +398,14 @@ def default_template(request,group_id,node=None,edit_node=None):
                         # print r1
                     # else:
                         # print l,k ,"else"
+                    z1=None
                     if r1._id:
                         print q1
                         print n_id,r1.name,r1._id,">>>>\n\n\n\n"
                         # z1 = create_grelation(new_instance_type._id,q1,[r1._id] )
                         # z1 = create_grelation(n_id,q1,[kk])
+                        # z1 = create_grelation(new_instance_type._id,q1,right_sub_list)
+                        
                         # z1 = create_grelation(new_instance_type._id,q1,r1._id)
                     print z1 , "GRELATION"
                     
