@@ -51,7 +51,6 @@ def adminDashboardClass(request, class_name="GSystem"):
         #     obj = node_collection.one({ '_id': members})
         #     if obj:
         #         member.append(obj.name+" - "+str(members))
-
         member = []
         member_of_list = []
         collection_list = []
@@ -80,7 +79,7 @@ def adminDashboardClass(request, class_name="GSystem"):
                 k = mem_ty[0]
             else:
                 k = None
-            objects_details.append({"Id":each._id,"Member":each.member_of,"Mem":k , "Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
+            objects_details.append({"Id":each._id,"Member":each.member_of,"Mem":k , "Title":each.name, "Alt_Title":each.altnames,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
         elif class_name == "File":
             group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
             objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})

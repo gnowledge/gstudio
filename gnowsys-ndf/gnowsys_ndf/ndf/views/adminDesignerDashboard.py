@@ -72,7 +72,7 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
                     else:
                         k = None
                         member = []
-                    objects_details.append({"Id":each._id,"Title":each.name,"Mem":k ,"Type":", ".join(member), "collection_list":", ".join(collection_list), "Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at })
+                    objects_details.append({"Id":each._id,"Title":each.name, "Alt_Title":each.altnames, "Mem":k ,"Type":", ".join(member), "collection_list":", ".join(collection_list), "Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at })
 
     groups = []
     group = node_collection.find({'_type':"Group"})
