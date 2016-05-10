@@ -37,7 +37,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'insert', items : [ 'Image','Flash','Iframe' ] },
-		{ name: 'tools', items : [ 'addImage','Source', 'Maximize','-','closebtn','addAudio'] },
+		{ name: 'tools', items : [ 'addImage','Source', 'Maximize','-','addAudio','closebtn'] },
 	];
 
 	config.toolbar_GgallaryCommentsToolbar =
