@@ -206,17 +206,21 @@ body {
   <tbody>
 	{% for each in nodes %}
 	<tr>	
-          <td id="{{each.Id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+    <td id="{{each.Id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
 	  <td style="display:none" class="id" style="font-size:11px;">{{each.Id}}</td>
 	  <td class="title" style="font-size:95%">
+      {% if class_name ==  "GSystem"  %}
+      <font class="viewinput{{each.Id}}">{% firstof each.Alt_Title each.Title %}  </font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
+      {% else %}
       <font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}">
+      {% endif %}
     </td>
-	  {% if class_name == "File" or class_name ==  "GSystem"  %}
-	  <td class="group" style="font-size:11px;">
-	    <font class="viewinput{{each.Id}}">{{each.Group}}</font>
-	    <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Group}}">
-	  </td>
-	  {% endif %}
+    {% if class_name == "File" or class_name ==  "GSystem"  %}
+    <td class="group" style="font-size:11px;">
+      <font class="viewinput{{each.Id}}">{{each.Group}}</font>
+      <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Group}}">
+    </td>
+    {% endif %}
 
 	  <td style="display:none" class="type" style="font-size:11px;">
 	    <font class="viewinput{{each.Id}}">{{each.Type}}</font>
