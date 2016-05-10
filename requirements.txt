@@ -27,4 +27,4 @@ ox>=2.1.651
 celery==3.1.19
 django-celery==3.1.16
 django-mailbox==4.4.1
-git+https://github.com/bashu/django-tracking.git
+#git+https://github.com/bashu/django-tracking.git
