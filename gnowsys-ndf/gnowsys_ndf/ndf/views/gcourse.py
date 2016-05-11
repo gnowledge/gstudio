@@ -1132,6 +1132,7 @@ def save_course_section(request, group_id):
         cs_new.member_of.append(cs_gst._id)
         cs_new.name = cs_node_name
         cs_new.modified_by = int(request.user.id)
+        cs_new.group_set.append(group_id)
         cs_new.status = u"PUBLISHED"
         cs_new.created_by = int(request.user.id)
         cs_new.contributors.append(int(request.user.id))
@@ -1182,6 +1183,7 @@ def save_course_sub_section(request, group_id):
         css_new.member_of.append(css_gst._id)
         # set name
         css_new.name = css_node_name
+        css_new.group_set.append(group_id)
         css_new.modified_by = int(request.user.id)
         css_new.status = u"PUBLISHED"
         css_new.created_by = int(request.user.id)
@@ -1551,6 +1553,7 @@ def create_edit_unit(request, group_id):
             cu_node.created_by = int(request.user.id)
             cu_node.status = u"PUBLISHED"
             cu_node.contributors.append(int(request.user.id))
+            cu_node.group_set.append(group_id)
             cu_node.prior_node.append(css_node._id)
             cu_node.save(groupid=group_id)
             response_dict["unit_node_id"] = str(cu_node._id)
@@ -1887,6 +1890,7 @@ def course_content(request, group_id):
 
     if request.user.is_authenticated:
         result_status = get_course_completetion_status(group_obj, request.user.id, True)
+        # print "\n\n result_status --- ",result_status
         if result_status:
             if "course_complete_percentage" in result_status:
                 course_complete_percentage = result_status['course_complete_percentage']
