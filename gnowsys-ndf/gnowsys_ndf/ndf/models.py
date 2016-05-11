@@ -2710,14 +2710,162 @@ class Buddy(DjangoDocument):
     Enables logged in user to add buddy.
     """
 
+    collection_name = 'Buddies'
+
     structure = {
         'loggedin_userid'   : int,
         'session_key'       : basestring,
-        'buddy_in'          : dict,
-        'buddy_out'         : dict,
+        'buddy_in_out'      : dict,
+            # e.g:
+            # buddy_in_out = {
+            #           "auth_id": [
+            #                         {"in": datetime.datetime, "out": datetime.datetime},
+            #                         {"in": datetime.datetime, "out": datetime.datetime}
+            #                    ]
+            #           }
+        'starts_at'         : datetime.datetime,
+        'ends_at'           : datetime.datetime
     }
 
-    required_fields = ['session_key', 'loggedin_userid']
+    required_fields = ['loggedin_userid', 'session_key']
+
+    use_dot_notation = True
+
+    def get_filled_buddy_obj(self,
+                            loggedin_userid,
+                            session_key,
+                            buddy_in_out={},
+                            starts_at=datetime.datetime.utcnow(),
+                            ends_at=None):
+
+        self['loggedin_userid']= loggedin_userid
+        self['session_key']    = session_key
+        self['buddy_in_out']   = buddy_in_out
+        self['starts_at']      = starts_at
+        self['ends_at']        = ends_at
+
+        return self
+
+
+    @staticmethod
+    def is_buddy_active(single_buddy_in_out_list):
+        '''
+        returns True or False 'bool' type value.
+
+            - True : If buddy is active
+                    (i.e: holding active session dict having {'out': None})
+
+            - False: If buddy is not active
+                    (i.e: holding active session dict having {'out': datetime.datetime})
+        '''
+        return (not bool(Buddy.get_latest_in_out_dict(single_buddy_in_out_list)['out']))
+
+
+    @staticmethod
+    def get_latest_in_out_dict(single_buddy_in_out_list):
+        '''
+        Returns last in out dict of buddy (if it exists)
+        else returns empty structured dict.
+        '''
+        if len(single_buddy_in_out_list) > 0:
+            return single_buddy_in_out_list[-1:][0]
+        else:
+            return { 'in': None, 'out': None }
+
+
+    def get_active_buddy_auth_list(self):
+
+        active_buddy_auth_list = []
+
+        for auth_oid, in_out_list in self.buddy_in_out.iteritems():
+            # if len(in_out_list) > 0:
+            #     if not in_out_list[-1:][0]['out']:
+                    # active_buddy_auth_list.append(auth_oid)
+            if self.is_buddy_active(in_out_list):
+                active_buddy_auth_list.append(auth_oid)
+
+        # print "active_buddy_auth_list", active_buddy_auth_list
+        return active_buddy_auth_list
+
+
+    def add_buddy(self):
+        pass
+
+
+    def remove_buddy(self, buddy_authid):
+        '''
+        Removing/Relesing single buddy.
+        and returning modified self object (without doing DB .save() operation).
+        '''
+
+        # only active buddies will be released
+        if self.is_buddy_active(self.buddy_in_out[buddy_authid]):
+
+            # this means buddy is successfully joined and not released.
+            # now we need to release this buddy by adding datetime.datetime to 'out'
+            self.get_latest_in_out_dict(self.buddy_in_out[buddy_authid])['out'] = datetime.datetime.utcnow()
+
+            return self
+
+
+    @staticmethod
+    def update_buddies(loggedin_userid, session_key, buddy_auth_ids_list=[]):
+        buddy_obj = buddy_collection.one({
+                    'session_key': str(session_key),
+                    'loggedin_userid': int(loggedin_userid)
+                })
+
+        if not buddy_obj:
+            # it's a new buddy-session. So create a new buddy instance.
+            buddy_obj = buddy_collection.collection.Buddy()
+            buddy_obj = buddy_obj.get_filled_buddy_obj(loggedin_userid, session_key)
+
+        current_active_buddy_auth_list = buddy_obj.get_active_buddy_auth_list()
+
+        if set(current_active_buddy_auth_list) == set(buddy_auth_ids_list):
+            return current_active_buddy_auth_list
+
+        new_in_dict = { 'in': datetime.datetime.utcnow(), 'out': None }
+        existing_buddy_in_out_auth_list  = buddy_obj.buddy_in_out.keys()
+
+        # list of all buddies auth ids:
+        all_buddies = list(set(existing_buddy_in_out_auth_list + buddy_auth_ids_list))
+
+        for each_buddy in all_buddies:
+            # each_buddy is author _id
+
+            if each_buddy in buddy_auth_ids_list:
+                if each_buddy in existing_buddy_in_out_auth_list:
+                    # this means, user was/is already buddy and already contains some entries/dicts.
+                    # in this we must ensure that last dict's out is None.
+
+                    # gettting user's last dict {"in": datetime.datetime, "out": datetime.datetime/None}
+                    # each_buddy_last_entry = buddy_obj.buddy_in_out[each_buddy][-1:]
+
+                    # if each_buddy_last_entry[0]['out']:
+                    if not Buddy.is_buddy_active(buddy_obj.buddy_in_out[each_buddy]):
+                        # this means buddy is successfully joined and released.
+                        # now buddy is getting in again. so make new dict and append.
+                        buddy_obj.buddy_in_out[each_buddy].append(new_in_dict)
+
+                else:
+                    buddy_obj.buddy_in_out[each_buddy] = [new_in_dict]
+
+            else:
+                # this means, user was/is already buddy and already contains some entries/dicts.
+                if each_buddy in existing_buddy_in_out_auth_list:
+
+                    buddy_obj.remove_buddy(each_buddy)
+
+        active_buddy_auth_list = buddy_obj.get_active_buddy_auth_list()
+
+        if current_active_buddy_auth_list != active_buddy_auth_list:
+            buddy_obj.save()
+
+        else:
+            buddy_obj = None
+
+        return active_buddy_auth_list
 
 
 ####################################### Added on 19th June 2014 for SEARCH ##############################
@@ -2784,6 +2932,7 @@ node_collection     = db[Node.collection_name].Node
 triple_collection   = db[Triple.collection_name].Triple
 benchmark_collection= db[Benchmark.collection_name]
 filehive_collection = db[Filehive.collection_name].Filehive
+buddy_collection    = db[Buddy.collection_name].Buddy
 
 gridfs_collection   = db["fs.files"]
 chunk_collection    = db["fs.chunks"]
