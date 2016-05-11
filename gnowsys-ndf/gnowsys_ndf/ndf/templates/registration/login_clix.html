@@ -35,7 +35,7 @@
 	            </div>
 				<br/>
 				{% if form.errors %}
-					<small class="small-10 medium-8 large-8 columns error all-error">{% trans "Either your email or password is incorrect !!!" %}</small>
+					<small class="small-10 medium-8 large-8 columns error all-error">{% trans "Either your email or password is incorrect !" %}</small>
 				{% endif %}
 
 				<form method="post" id="loginSubmit" action="{% url 'auth_login' %}" data-abide>
