@@ -147,7 +147,10 @@ function adget_all_data(){
 
 
 </script>
+{% if not no_subscribe_btn %}
+
     <a id="subscr_admins" data-reveal-id="inviteadmins" class="tiny button right-btn radius" title="View/Subscribe Admins">{% trans 'Subscribe Admins' %}</a>
+{% endif %}
 
 
 <div id="inviteadmins" class="reveal-modal " data-reveal >

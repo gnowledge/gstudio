@@ -1130,6 +1130,7 @@ def save_course_section(request, group_id):
         cs_new.member_of.append(cs_gst._id)
         cs_new.name = cs_node_name
         cs_new.modified_by = int(request.user.id)
+        cs_new.group_set.append(group_id)
         cs_new.status = u"PUBLISHED"
         cs_new.created_by = int(request.user.id)
         cs_new.contributors.append(int(request.user.id))
@@ -1180,6 +1181,7 @@ def save_course_sub_section(request, group_id):
         css_new.member_of.append(css_gst._id)
         # set name
         css_new.name = css_node_name
+        css_new.group_set.append(group_id)
         css_new.modified_by = int(request.user.id)
         css_new.status = u"PUBLISHED"
         css_new.created_by = int(request.user.id)
@@ -1549,6 +1551,7 @@ def create_edit_unit(request, group_id):
             cu_node.created_by = int(request.user.id)
             cu_node.status = u"PUBLISHED"
             cu_node.contributors.append(int(request.user.id))
+            cu_node.group_set.append(group_id)
             cu_node.prior_node.append(css_node._id)
             cu_node.save(groupid=group_id)
             response_dict["unit_node_id"] = str(cu_node._id)
@@ -1885,6 +1888,7 @@ def course_content(request, group_id):
 
     if request.user.is_authenticated:
         result_status = get_course_completetion_status(group_obj, request.user.id, True)
+        # print "\n\n result_status --- ",result_status
         if result_status:
             if "course_complete_percentage" in result_status:
                 course_complete_percentage = result_status['course_complete_percentage']
@@ -2411,16 +2415,16 @@ def course_filters(request, group_id):
 
 @login_required
 @get_execution_time
-def course_analytics(request, group_id):
-    cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(request.user.id) 
+def course_analytics(request, group_id, user_id, render_template=False):
+    cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id) 
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
     import time
     t0 = time.time()
     analytics_data = {}
-
-    analytics_instance = AnalyticsMethods(request, request.user.id,request.user.username, group_id)
+    user_obj = User.objects.get(pk=int(user_id))
+    analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
     completed_modules = analytics_instance.get_completed_modules_count()
@@ -2439,6 +2443,8 @@ def course_analytics(request, group_id):
 
 
     # QuizItem Section
+    
+    analytics_data['username'] = user_obj.username
     analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
     # print "\n Total QuizItemEvents === ", total_quizitems, "\n\n"
     analytics_data['attempted_quizitems'] = analytics_instance.get_attempted_quizitems_count()
@@ -2466,7 +2472,6 @@ def course_analytics(request, group_id):
     # Comments
     analytics_data['total_cmnts_by_user'] = analytics_instance.get_total_comments_by_user()
     # print "\n Total Comments By User === ", total_cmnts_by_user, "\n\n"
-
 
     # Comments on Notes Section
     analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
@@ -2532,8 +2537,65 @@ def course_analytics(request, group_id):
 
     del analytics_instance
     cache.set(cache_key, json.dumps(analytics_data), 60*15)
-    return HttpResponse(json.dumps(analytics_data))
+    return render_to_response("ndf/user_course_analytics.html", 
+                                analytics_data,
+                                context_instance = RequestContext(request)
+    )
 
+    # return HttpResponse(json.dumps(analytics_data))
+
+
+@login_required
+@get_execution_time
+def course_analytics_admin(request, group_id):
+    cache_key = u'course_analytics_admin' + unicode(group_id)
+    cache_result = cache.get(cache_key)
+    if cache_result:
+        return HttpResponse(cache_result)
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    response_dict = {}
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    admin_analytics_list = []
+    if group_obj.author_set:
+        for each_author in group_obj.author_set:
+            user_obj = User.objects.get(pk=int(each_author))
+            admin_analytics_data = {}
+            analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+            # username = user_obj.username
+            # user_id = user_obj.id
+            # users_points = analytics_instance.get_users_points()
+            admin_analytics_data['username'] = user_obj.username
+            admin_analytics_data['user_id'] = user_obj.id
+            admin_analytics_data['users_points'] = analytics_instance.get_users_points()
+            # admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+            users_points_breakup = analytics_instance.get_users_points(True)
+            admin_analytics_data["files_points"] = users_points_breakup['Files']
+            admin_analytics_data['notes_points'] = users_points_breakup['Notes']
+            admin_analytics_data['quiz_points'] = users_points_breakup['Quiz']
+            admin_analytics_data['interactions_points'] = users_points_breakup['Interactions']
+            del analytics_instance
+            admin_analytics_list.append(admin_analytics_data)
+    cache.set(cache_key, json.dumps(admin_analytics_list), 60*15)
+    # print "\n\nadmin_analytics_list ",admin_analytics_list
+
+    column_headers = [
+        ("username", "Name"),
+        # ("user_id", "user_id"),
+        ("users_points", "Total Points"),
+        ("files_points", "Files"),
+        ("notes_points", "Notes"),
+        ("quiz_points", "Quiz"),
+        ("interactions_points", "Interactions"),
+    ]
+
+    response_dict["column_headers"] = column_headers
+    response_dict["success"] = True
+    response_dict["students_data_set"] = admin_analytics_list
+    # print "\n admin_analytics_list === ",admin_analytics_list
+    return HttpResponse(json.dumps(response_dict))
 
 @login_required
 @get_execution_time
