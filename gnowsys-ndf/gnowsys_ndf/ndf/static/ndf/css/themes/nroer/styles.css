@@ -26157,6 +26157,10 @@ div.show-image:hover div.fullscreen-icon{
   margin: 0em;
   background-color: #F3F3F3;
 }
+/* line 2864, ../../../scss/_app_styles.scss */
+.notebook .notebook-body .note-page .note-toolbar .note-creator {
+  font-weight: bold;
+}
 /* line 2867, ../../../scss/_app_styles.scss */
 .notebook .notebook-body .note-page .note-toolbar .creator-title {
   text-align: left;
