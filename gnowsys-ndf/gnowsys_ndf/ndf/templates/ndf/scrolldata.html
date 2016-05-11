@@ -9,8 +9,9 @@
 .selFile {
     border-radius: 3px;
     box-shadow:1px 1px 1px 1px rgba(1,1,1,0.2);
+    margin-bottom: 15px;
   }
- 
+
 
 </style>
 <div class="content" id="status" align="left" {% if not hyperlinks %} style="width:500px"{% endif %}>
@@ -19,64 +20,69 @@
 {% for i in activity_list %}
   {% get_url i.pk as res_type %}
    {% if res_type != "None" or "Reply" in i.member_of_names_list %}
-   
-   <div class="container-div  selFile" style="height:50px; background-color:#f7fcfb;">
-    <div id="top_list"  style="position:relative; top:15px;" title="{{i.created_at|timesince}} ago" >
-      {% if hyperlinks %}      
-        <div id="name-div"  style=" position:absolute; width:5.2%;  word-wrap:break-word; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; float:left; ">
-          <a href="{% url 'dashboard' i.created_by %}"> {{i.user_details_dict.created_by}} </a>
+
+   <div class="container-div selFile course-notif" title="{{i.created_at|timesince}} ago">
+      <div class="row">
+        <div class="medium-2 columns">
+          <div class="notif-type">
+            <img src="/static/ndf/css/themes/metastudio/logo.svg">
+            <div class="notif-rating">
+              <i class="fa fa-star" aria-hidden="true"></i>
+              <span>3.5</span>
+            </div>
+          </div>
         </div>
-      {% else %}      
-        <div id="name-div"  style="width:20%;  word-wrap:break-word; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; float:left; ">
-            {{i.user_details_dict.created_by}}
-        </div>
-      {% endif %}      
-
-      <div id="action" style=" position:relative; left:7.5%; float:left;">
-           has  {% if "Reply" in i.member_of_names_list %}
-
-                  {% trans "commented" %}
-                  {% if i.origin %}
-                    {% for each_origin_field in i.origin %}
-                      {% if "prior_node_id_of_thread" in each_origin_field %}
-                        {% get_node each_origin_field.prior_node_id_of_thread as prior_node_obj %}
-                        {% if prior_node_obj %}    
-                          {% trans " on " %}{{prior_node_obj.name}}
-                        {% endif %}
-                      {% endif %}
-                    {% endfor %}
+        <div class="medium-10 columns">
+            <span class="notif-from">
+              {% if hyperlinks %}
+              <a href="{% url 'dashboard' i.created_by %}"> {{i.user_details_dict.created_by}} </a>
+              {% else %}
+              {{i.user_details_dict.created_by}}
+              {% endif %}
+            </span>
+            has  <b>
+            {% if "Reply" in i.member_of_names_list %}
+              {% trans "commented" %}
+              {% if i.origin %}
+                {% for each_origin_field in i.origin %}
+                  {% if "prior_node_id_of_thread" in each_origin_field %}
+                    {% get_node each_origin_field.prior_node_id_of_thread as prior_node_obj %}
+                    {% if prior_node_obj %}
+                      {% trans " on " %}{{prior_node_obj.name}}
+                    {% endif %}
                   {% endif %}
-                {% elif "File" in i.member_of_names_list %}
-                  {% if i.activity == "created" %}
-                    {% trans "uploaded" %}
-                  {% else %}
-                    {{i.activity}}
-                  {% endif %}
-                {% else %}
-                  {{i.activity}}
-                {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% elif "File" in i.member_of_names_list %}
+              {% if i.activity == "created" %}
+                {% trans "uploaded" %}
+              {% else %}
+                {{i.activity}}
+              {% endif %}
+            {% else %}
+              {{i.activity}}
+            {% endif %}</b>
 
-      </div> 
-      {% if hyperlinks %}
-        <div id="create_type"  style=" position:relative; left:8%; word-wrap:break-word; width:auto; float:left;" >
+        {% if hyperlinks %}
+        <div id="create_type"  style="display: inline-block;" >
           {% if res_type != "event_app_instance_detail" %}
                 <a href="{% url res_type groupid i.pk   %}"> {{i.name}} </a>
-                 
+
           {% else %}
               {% get_event_type i as app_set_id %}
-                 <a href="{% url res_type groupid app_set_id i.pk  %}">{{i.name}} </a>         
+                 <a href="{% url res_type groupid app_set_id i.pk  %}">{{i.name}} </a>
           {% endif %}
         </div>
 
       {% else %}
-        <div id="create_type"  style=" position:relative; left:8%; word-wrap:break-word; width:50%; overflow: hidden; text-overflow: ellipsis; ; float:left;" >
+        <div id="create_type"  style="display: inline-block;" >
           {% if "Reply" not in i.member_of_names_list %} {{i.name}}{% endif %}
         </div>
 
       {% endif %}
-      
-      {% if hyperlinks %}   
-        <div id="performed on" class="small-2 column"  style=" position:relative; word-wrap: float:left; break-word; width:auto; left:7.5%;" >
+
+      {% if hyperlinks %}
+        <div id="performed on" class="small-2 column"  style=" position:relative; word-wrap: break-word; width:auto; left:7.5%;" >
               {{i.created_at|timesince}} ago
         </div>
         <div  align="right" style="position:relative; right:4%; top:-15px;" >
@@ -84,7 +90,7 @@
         <a href="{% url res_type groupid i.pk   %}"> <div> <img src="{% url 'getFileThumbnail' group_id i.pk %}" style="height:50px; width:50px;"> </div>
         </a>
         {% endif %}
-        
+
         {% if res_type == 'Forum' %}
           <i class="fi-calendar fi-comments"></i>
         {% endif %}
@@ -96,10 +102,10 @@
         {% endif %}
         {% if i.mime_type == 'application/pdf' %}
           <i class="fi-page-pdf largesize"></i>
-        {% endif %}      
+        {% endif %}
         {% if i.mime_type == 'application/octet-stream' %}
           <i class="fi-volume largesize" ></i>
-        {% endif %}      
+        {% endif %}
         {% if i.mime_type == 'application/msword'  %}
           <i class="fi-page-doc largesize" ></i>
         {% endif %}
@@ -107,15 +113,12 @@
           <i class="fi-page largesize" ></i>
         {% endif %}
         </div>
-      {% endif %}      
-
-    </div>
-   
+      {% endif %}
+        </div>
+      </div>
    </div>
-    
+
 {% endif %}
- <div style="height:10px;">
- </div>
 {% endfor %}
 </div>
 </div>

@@ -27,6 +27,7 @@
   .selFile{
     margin-left: 2% !important;
     margin-right: 2% !important;
+    padding: 15px 5px;
   }
 </style>
 {% endblock %}
@@ -47,8 +48,8 @@
         <u><a class="show-more hide">Show more</a></u>
       </div>
     </div>
-    
-    
+
+
     <div class="small-12 medium-4 columns">
       <div class="course-highlight">
         <i class="fa fa-list"></i>
@@ -82,7 +83,7 @@
         <div class="notifications-analytics-tabs">
           <ul class="tabs" data-tab role="tablist">
             <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">Notifications</a></li>
-            
+
             {% if request.user.is_authenticated and not gstaff_access %}
               <li class="tab-title"><a role="tab" href="#analytics-content" class="fetch-analytics" tabindex="1" aria-selected="false" aria-controls="panel2-2" data-id={{request.user.id}}>My Analytics</a></li>
               <input type="hidden" class="is_admin" value="False" />
@@ -209,6 +210,7 @@
                 d = {};
                 d["data"] = v[0];
                 d["title"] = v[1];
+                d["width"] = '20%';
                 dataTable_columns_set.push(d);
               });
               // Set defintion dataTable
@@ -253,7 +255,7 @@
         else if(bar_name == "Quiz"){
           bg_color_val = "#fa623f"
         }
-        
+
         span_ele.style.backgroundColor = bg_color_val
         var inner_span_ele = document.createElement("span")
         inner_span_ele.className = "pull-left merter-val"
