@@ -291,22 +291,26 @@
               {% endif %}
             {% endif %}
 
+            {% if site.BUDDY_LOGIN and user.is_authenticated %}
+
+              <li>
+                <a href="#" data-reveal-id="add-buddy" data-reveal-ajax="{% url 'list_buddy' group_id %}">
+                  + Add your buddy
+                </a>
+
+                <div id="add-buddy" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+
+                </div>
+
+              </li>
+            {% endif %}
+
             <li>
               <a class="logout" href="{% url 'auth_logout' %}">
                 <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
               </a>
             </li>
 
-            <li>
-              <a href="#" data-reveal-id="myModal" data-reveal-ajax="{% url 'list_buddy' group_id %}">
-                + Add your buddy
-              </a>
-
-              <div id="myModal" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-
-              </div>
-
-            </li>
 
           </ul>
         </li>

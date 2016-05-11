@@ -121,11 +121,12 @@ def logged_out(sender, user, request, **kwargs):
         # print "userid", request.user.id
         # print "session val: ", request.session.get('buddies_authid_list', [])
 
-        buddy_obj = Buddy.query_buddy_obj(loggedin_userid=request.user.id,
-                                        session_key=request.session.session_key)
+        if request.user.id and request.session.session_key:
+            buddy_obj = Buddy.query_buddy_obj(loggedin_userid=request.user.id,
+                                            session_key=request.session.session_key)
 
-        if buddy_obj:
-            buddy_obj.end_buddy_session()
+            if buddy_obj:
+                buddy_obj.end_buddy_session()
 
         # print "\n\n All buddies released",
 
