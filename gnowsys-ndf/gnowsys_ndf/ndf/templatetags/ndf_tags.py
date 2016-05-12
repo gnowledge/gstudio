@@ -674,10 +674,9 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_widget.html'):
 	drawer1 = {}
 	drawer2 = None
-	# groupid = ""
-	group_obj = node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
 	admin_related_drawer = True
 
+	group_obj = node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
 	if group_obj:
 		groupid = str(group_obj[0]._id)
 
@@ -749,14 +748,6 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 
 	
 	# 	return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid,'groupid': groupid, 'admin_related_drawer': admin_related_drawer }
-
-
-
-
-
-
-
-
 	
 @get_execution_time
 @register.assignment_tag
@@ -1994,8 +1985,12 @@ def ats_fields(fields_type, fields_name,groupid,complex_dt,help_text,validators,
 			for value in each:
 				if value == fields_name:
 					fields_value = each[value]
+	regularexp = None
+	for each in validators:
+		regularexp = each
+
 	return {"fields_name":fields_name, "fields_type": fields_type, "fields_value":fields_value ,'groupid':groupid,
-	'complex_dt':complex_dt ,'gs_type':'attribute_set', 'help_text':help_text , 'validators':validators}
+	'complex_dt':complex_dt ,'gs_type':'attribute_set', 'help_text':help_text , 'validators':validators , 'regularexp':regularexp }
 
 # @get_execution_time
 # @register.inclusion_tag('tags/dummy.html')
@@ -2030,13 +2025,6 @@ def rts_fields(fields_name,fields_object_type,groupid,filled_up=None):
 		drawer1[each] = each
 	return {"fields_name":fields_name, "groupid":groupid, "fields_object_type":fields_object_type 
 	,'gs_type':'relation_set' , "fields_value":fields_value , "drawer1":drawer1 }
-
-# @get_execution_time
-# @register.assignment_tag
-# def get_url_gs(selected_value ):
-# 	n = node_collection.one({'_type':'GSystemType','name':selected_value })
-# 	noose = n._id
-# 	return noose 
 
 @get_execution_time
 @register.assignment_tag
