@@ -152,7 +152,10 @@
 <script type="text/javascript">
   // for discussion tab
   // storing ndf_tags return values in JS variables
-  old_count = {{all_replies|length}}
+  old_count = 0
+  {% if all_replies %}
+    old_count = {{all_replies|length}}
+  {% endif %}
 
   var user_access = "{{ user_access }}"; // "allow" or "disallow"
   {% edit_policy groupid node request.user as status %}
@@ -456,11 +459,6 @@
     }
     return replyArr;
   }
-  // --- END of discussion code ----
-</script>
-
-
-<script type="text/javascript">
 
   function setCurrNodeEdit(oid)
   {
@@ -585,7 +583,7 @@ function save_reply(sourceObj){
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             var new_count = JSON.parse(xmlhttp.responseText);
-            if (old_count != new_count && new_count != 0){
+            if (old_count < new_count && new_count > 0){
               $(".new_comments").removeClass("hide");
               $(".new_cmnts_lbl").html(new_count-old_count + " New comment(s). Please refresh to see.")
             }
