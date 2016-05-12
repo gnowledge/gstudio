@@ -4777,19 +4777,19 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
                     if partially_exists:
                       incompleted_ids.append(cu_node._id)
 
-                  if sublistExists(completed_ids, css_node.collection_set):
-                    completed_ids.append(css_node._id)
-                  else:
-                    partially_exists = any(each_id in completed_ids for each_id in css_node.collection_set)
-                    if partially_exists or sublistExists(incompleted_ids, css_node.collection_set):
-                      incompleted_ids.append(css_node._id)
+              if sublistExists(completed_ids, css_node.collection_set):
+                completed_ids.append(css_node._id)
+              else:
+                partially_exists = any(each_id in completed_ids for each_id in css_node.collection_set)
+                if partially_exists or sublistExists(incompleted_ids, css_node.collection_set):
+                  incompleted_ids.append(css_node._id)
 
-                  if sublistExists(completed_ids, cs_node.collection_set):
-                    completed_ids.append(cs_node._id)
-                  else:
-                    partially_exists = any(each_id in completed_ids for each_id in cs_node.collection_set)
-                    if partially_exists or sublistExists(incompleted_ids, cs_node.collection_set):
-                      incompleted_ids.append(cs_node._id)
+          if sublistExists(completed_ids, cs_node.collection_set):
+            completed_ids.append(cs_node._id)
+          else:
+            partially_exists = any(each_id in completed_ids for each_id in cs_node.collection_set)
+            if partially_exists or sublistExists(incompleted_ids, cs_node.collection_set):
+              incompleted_ids.append(cs_node._id)
 
       return_perc = (completed_cs_count/float(all_cs_count))*100
       # print "\n\n return_perc==== ",return_perc
@@ -4801,6 +4801,7 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
         result_dict['completed_ids_list'] = json.dumps(completed_ids,cls=NodeJSONEncoder)
         result_dict['incompleted_ids_list'] = json.dumps(incompleted_ids,cls=NodeJSONEncoder)
         result_dict['list_of_leaf_node_ids'] = json.dumps(res_completed_ids,cls=NodeJSONEncoder)
+      result_dict.update({'success': False})
       # print "\n\nresult_dict == ",result_dict
       return result_dict
     except Exception as error_in_get_course_completion_status:

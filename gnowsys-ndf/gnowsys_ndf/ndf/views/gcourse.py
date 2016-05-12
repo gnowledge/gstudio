@@ -1882,26 +1882,6 @@ def course_content(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-    result_status = course_complete_percentage = None
-
-    leaf_ids = completed_ids = incompleted_ids = total_count = completed_count = None
-
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id, True)
-        # print "\n\n result_status --- ",result_status
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "completed_ids_list" in result_status:
-                completed_ids = result_status['completed_ids_list']
-            if "incompleted_ids_list" in result_status:
-                incompleted_ids = result_status['incompleted_ids_list']
-            if "list_of_leaf_node_ids" in result_status:
-                leaf_ids = result_status['list_of_leaf_node_ids']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
 
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
@@ -1928,7 +1908,6 @@ def course_content(request, group_id):
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'course content',
             'allow_to_join': allow_to_join,
-            "leaf_ids":leaf_ids,"completed_ids":completed_ids,"incompleted_ids":incompleted_ids,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
             })
     return render_to_response(template, context_variables)
