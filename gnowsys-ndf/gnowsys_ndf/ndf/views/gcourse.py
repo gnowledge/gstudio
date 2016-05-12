@@ -2537,6 +2537,8 @@ def course_analytics_admin(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
     response_dict = {}
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
+
     admin_analytics_list = []
     if group_obj.author_set:
         for each_author in group_obj.author_set:
@@ -2552,9 +2554,17 @@ def course_analytics_admin(request, group_id):
             # admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
             users_points_breakup = analytics_instance.get_users_points(True)
             admin_analytics_data["files_points"] = users_points_breakup['Files']
+            if FILES_MAX_POINT_VAL < users_points_breakup['Files']:
+                FILES_MAX_POINT_VAL = users_points_breakup['Files']
             admin_analytics_data['notes_points'] = users_points_breakup['Notes']
+            if NOTES_MAX_POINT_VAL < users_points_breakup['Notes']:
+                NOTES_MAX_POINT_VAL = users_points_breakup['Notes']
             admin_analytics_data['quiz_points'] = users_points_breakup['Quiz']
+            if QUIZ_MAX_POINT_VAL < users_points_breakup['Quiz']:
+                QUIZ_MAX_POINT_VAL = users_points_breakup['Quiz']
             admin_analytics_data['interactions_points'] = users_points_breakup['Interactions']
+            if INTERACTIONS_MAX_POINT_VAL < users_points_breakup['Interactions']:
+                INTERACTIONS_MAX_POINT_VAL = users_points_breakup['Interactions']
             del analytics_instance
             admin_analytics_list.append(admin_analytics_data)
     cache.set(cache_key, json.dumps(admin_analytics_list), 60*15)
@@ -2569,10 +2579,13 @@ def course_analytics_admin(request, group_id):
         ("quiz_points", "Quiz"),
         ("interactions_points", "Interactions"),
     ]
+    max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
+    'quiz_max_points': QUIZ_MAX_POINT_VAL,'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
 
     response_dict["column_headers"] = column_headers
     response_dict["success"] = True
     response_dict["students_data_set"] = admin_analytics_list
+    response_dict['max_points_dict'] = max_points_dict
     # print "\n admin_analytics_list === ",admin_analytics_list
     return HttpResponse(json.dumps(response_dict))
 
