@@ -200,6 +200,11 @@
               data = JSON.parse(data)
               column_headers = data["column_headers"];
               students_data_set = data["students_data_set"];
+              max_data = data['max_points_dict']
+              file_max_points = max_data['file_max_points']
+              notes_max_points = max_data['notes_max_points']
+              quiz_max_points =  max_data['quiz_max_points']
+              interactions_max_points = max_data['interactions_max_points']
               dataTable_columns_set = [];
 
               var students_points_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="students-points-table-tbody">' + '</table>';
@@ -215,14 +220,23 @@
               sce_dt_var = $("#students-points-table-tbody").dataTable({
                 "data": students_data_set,
                 "columns": dataTable_columns_set,
+                "autoWidth": false,
+                "columnDefs": [
+                      { width: '10%', targets: 0 },
+                      { width: '10%', targets: 1 },
+                      { width: '20%', targets: 2 },
+                      { width: '20%', targets: 3 },
+                      { width: '20%', targets: 4 },
+                      { width: '20%', targets: 5 }
+                   ],
                 "createdRow": function ( row, data, index ) {
                   user_id = data["user_id"];
                   $(row).attr("data-id", user_id);
                   $(row).addClass("fetch-analytics")
-                  $(row).find("td:nth-child(3)").html(generate_points_bar(data['files_points'], "Files",data['users_points']));
-                  $(row).find("td:nth-child(4)").html(generate_points_bar(data['notes_points'], "Notes",data['users_points']));
-                  $(row).find("td:nth-child(5)").html(generate_points_bar(data['quiz_points'], "Quiz",data['users_points']));
-                  $(row).find("td:nth-child(6)").html(generate_points_bar(data['interactions_points'], "Interactions",data['users_points']));
+                  $(row).find("td:nth-child(3)").html(generate_points_bar(data['files_points'], "Files",data['users_points'],file_max_points));
+                  $(row).find("td:nth-child(4)").html(generate_points_bar(data['notes_points'], "Notes",data['users_points'],notes_max_points));
+                  $(row).find("td:nth-child(5)").html(generate_points_bar(data['quiz_points'], "Quiz",data['users_points'],quiz_max_points));
+                  $(row).find("td:nth-child(6)").html(generate_points_bar(data['interactions_points'], "Interactions",data['users_points'],interactions_max_points));
 
                 }
               });
@@ -234,13 +248,13 @@
     })
 
     // Admin analytics view. Score-points in horizontal bars of enrolled students
-    function generate_points_bar(data_for_bars, bar_name, total_user_points){
+    function generate_points_bar(data_for_bars, bar_name, total_user_points, max){
       if(data_for_bars && total_user_points){
         var outer_div = document.createElement("div");
         outer_div.className = "progress small-12 large-12"
         var span_ele = document.createElement("span");
-        span_ele.className = "meter"
-        span_ele.style.width = data_for_bars +  "px"
+        span_ele.className = "meter";
+        span_ele.style.width = (data_for_bars/parseInt(max, 10))* 100 + "%"
         if (bar_name == "Interactions"){
           bg_color_val = "#ffe694"
         }
