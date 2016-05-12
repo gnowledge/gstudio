@@ -38,24 +38,15 @@ def type_created(request,group_id):
 @login_required
 def default_template(request,group_id,node=None,edit_node=None):
     
-    print node ,"from view - default_template " , edit_node ,"\n\n\n\n\n\n"
-
     try:
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
 
     new_instance_type = None
-
     gs = node_collection.find({'_type':'GSystem'})
-
-    gs_sys2 = "GSystemType"
-    # class_structure =  eval(gs_sys2).structure
-    # print "gst\n", class_structure, "\n\n"
-    
     gs_sys = "GSystem"
     gs_struc =  eval(gs_sys).structure
-    # print "gs_sys\n", gs_struc, "\n\n\n"    
     # basic_list = { 'name':'Name' , 'altnames':'Alternate Name' }
     # basic_list = [{'name':'Name '} ,{'altnames':'Alternate Name '}]
     basic_list = GSYSTEM_LIST
@@ -66,15 +57,10 @@ def default_template(request,group_id,node=None,edit_node=None):
         node_gs_id = node_gs._id
         ats = node_gs.attribute_type_set
         rts = node_gs.relation_type_set
-        
+                
         gsys_node = node_collection.collection.GSystem()
-        
-        # gsys_node.name = unicode(st_name)
-        # print gsys_node.name        
-        
         if node_gs_id:
           gsys_node.member_of.append(node_gs_id)
-        # print gsys_node.member_of,">>>member_of>>"
 
         pos_ats = gsys_node.get_possible_attributes(node_gs_id)
 
@@ -84,16 +70,8 @@ def default_template(request,group_id,node=None,edit_node=None):
         # pos_rts_value = []
         # for key,value in pos_ats.iteritems():
             # pos_ats[key].update({'value':None})
-            # print key ,"\n", pos_ats[key] , "\n\n\n"
-            # print value['altnames'],value['_id']
-        # for key,value in pos_rts.iteritems():
-            # print key ,"\n"
-            # print value,"\n\n"
         # for key,value in pos_rts.iteritems():
             # pos_rts_value = value['subject_or_object_type']
-            # print pos_rts_value
-            # this has all the rightside gst of the relationtype
-            # subject_or_object_type': [ObjectId('564c7451a78dd024cb05b7dd')
         # the below code is to get the union or intersection of the items 
         # ats_set = set(ats)
         # pos_ats_set = set(pos_ats)
@@ -186,7 +164,6 @@ def default_template(request,group_id,node=None,edit_node=None):
                     # rts_check = dict ({ 'rts_id' : rts_check_id })
                     # rts_flag = True
                     # r_check.append(rts_check)
-
             name_rst = []
             id_rst = []
             for each in r_oo:
@@ -204,11 +181,6 @@ def default_template(request,group_id,node=None,edit_node=None):
             f_rts_object_dict.append(rts_object_dict)
 
         # the code above returns a dict for the object display in template -- for rts
-        # print r_check , "???\n"
-        # print f_rts_object_dict , "\n\n"
-        # for e in f_rts_object_dict:
-            # for e,v in rts_object_dict:
-                # if rts_object_dict['rts_id'] == rts_check['rts_id']:
 
         f_pos_rts_object_dict=[]
         pos_rts_object_dict = []
@@ -227,7 +199,6 @@ def default_template(request,group_id,node=None,edit_node=None):
             final_rts_alt = e.altnames
             rts_check_pos_id = e._id
             pos_r = []
-            # pos_rts_obj = e.object_type
             pos_rts_obj1 = e.object_type
             pos_rts_obj2 = e.subject_type
             for e in pos_rts_obj1:
@@ -235,34 +206,27 @@ def default_template(request,group_id,node=None,edit_node=None):
             for e in pos_rts_obj2:
                 pos_r.append(e)
             for each in pos_r:
-                # print "fo",each,node_gs_id
                 if each == node_gs_id:
-                    # print "fo in"
                     rts_pos_check = dict ({ 'rts_id' : rts_check_pos_id })
                     rts_pos_flag = True
                     r_pos_check.append(rts_pos_check)
                     pos_r.remove(each)
-                    # print rts_pos_check,final_rts_name,">>>\n"
             if rts_pos_flag:
                 name_pos_rst = []
                 id_pos_rst = []
                 for each in pos_r:
                     k = node_collection.one({'_id':ObjectId(each) })
-                    # print k.name,k._id        
                     # name_pos_rst.append(k.name)
                     id_pos_rst.append(k._id)
 
                 for v in id_pos_rst:
                     m = node_collection.find({'_type':'GSystem','member_of':ObjectId(v) })
                     for c in m:
-                        # print e.name
                         name_pos_rst.append(c.name)
                 
                 pos_rts_object_dict = dict({'name':final_rts_name ,'altnames':final_rts_alt, 'object_type':name_pos_rst,'id':rts_check_pos_id })
                 f_pos_rts_object_dict.append(pos_rts_object_dict)
 
-        # print f_pos_rts_object_dict ,"\n\n"
-        # print r_pos_check ,"??\n"
         # the code above returns a dict for the object display in template -- for possible rts
 
     else:
@@ -300,14 +264,12 @@ def default_template(request,group_id,node=None,edit_node=None):
         # print request.POST
         flag = True
         for key,value in gs_struc.items():
-            # print key , value,"\n"
 
             if key == "name":
-                # print "name"
                 if request.POST.get(key,""):
                     # code below is to check whether the GSystem with same name exits or not, if it does further process would be aborted
                     key_name = unicode(request.POST.get(key,""))
-                    search = node_collection.one({'_type':'GSystem','name':key_name})
+                    search = node_collection.one({'_type':'GSystem','name':{'$regex': str(key_name), '$options': "i"},'member_of':ObjectId(node_gs_id) })
                     if search:
                         if not edit_node:
                             return StreamingHttpResponse(key_name+" already exits go back and use a different Name for the GSystem ")
@@ -315,40 +277,38 @@ def default_template(request,group_id,node=None,edit_node=None):
                         new_instance_type[key] = unicode(request.POST.get(key,""))
 
             if key == "altnames":
-                # print "altnames"
                 if request.POST.get(key,""):
                     new_instance_type[key] = unicode(request.POST.get(key,""))
 
             if key == "attribute_set":
-                # print "this attribute_set "
                 ats_dict = []
                 ats_dict2 =[]
                 for e in key_ats:
-                    # print e
-                    for k in request.POST.get(e,"").split(","):
-                        # print e,k ,"\n"
-                        # here e -- key name , k -- key value eg. e -- nussd_course_type, k -- General
-                        ats_dict = dict({e:k})
-                        ats_dict2.append(ats_dict)
-                # print ats_dict2 , "ats \n\n"
+                    print e ,"key"
+                    if e in ("Location","location"):
+                        for k in request.POST.get(e,"").split(","):
+                            # print 'map-geojson-data'
+                            qdict = request.POST
+                            for lockey,locval in qdict.iteritems():
+                                if lockey == 'map-geojson-data':
+                                    ats_dict = dict({e:locval})
+                                    ats_dict2.append(ats_dict)
+                    else:
+                        for k in request.POST.get(e,"").split(","):
+                            # here e -- key name , k -- key value eg. e -- nussd_course_type, k -- General
+                            ats_dict = dict({e:k})
+                            ats_dict2.append(ats_dict)
                 new_instance_type[key] = ats_dict2
 
             if key == "relation_set":
-                # print "this relation_set "
                 rts_dict = []
                 rts_dict2 = []
                 for e in key_rts:
                     for k in request.POST.get(e,"").split(","):
-                        print e,k ,"\n"
                         # here e -- key name , k -- key value eg. e -- event_coordinator , k -- Person
                         rts_dict = dict({e:k})
                         rts_dict2.append(rts_dict)
-
-                # print rts_dict2,"rts >>>>>> \n\n"
                 new_instance_type[key] = rts_dict2
-
-            # if key == "member_of":
-                # new_instance_type[key] = ObjectId(node)
 
         user_id = request.user.id
         if not new_instance_type.has_key('_id'):
@@ -361,77 +321,57 @@ def default_template(request,group_id,node=None,edit_node=None):
             new_instance_type.contributors.append(user_id)
 
         new_instance_type.save()
-        # print new_instance_type,"\n\n\n\n\n"
 
         n_at = new_instance_type.attribute_set
         n_id = new_instance_type._id
-
         for e in n_at:
             for k,l in e.iteritems():
+                gattr_create=None
                 if l:
                     q = node_collection.one({'_type':'AttributeType','name':k})
-                    z=create_gattribute(new_instance_type._id,q,l)
-                    # print z
+                    try:
+                        gattr_create=create_gattribute(new_instance_type._id,q,l)
+                    except Exception as e:
+                        print e
 
         n_rt = new_instance_type.relation_set
-        # print new_instance_type.relation_set,">>>>>>>>>>\n\n\n\n\n\n"
-
         n_rt_full = []
         for e in n_rt:
             for k,l in e.iteritems() :
                 if l:
                     n_rt_full.append(e)
-        print n_rt_full,"n_rt_full"
 
         for e in n_rt_full:
             for k,l in e.iteritems() :
                 if l:
-                    right_sub_list = []
                     q1 = node_collection.one({'_type':'RelationType','name':k })
-                    print q1.name
                     r1 = node_collection.one({'_type':'GSystem','name':l })
-                    right_sub_list.append(ObjectId(r1._id))
-                    # right_sub_list.append(r1._id)
-                    kk = ObjectId(r1._id)
-                    print r1.name
-                    # if r1:
-                        # print r1
-                    # else:
-                        # print l,k ,"else"
-                    z1=None
+                    grel_create=None
                     if r1._id:
-                        print q1
-                        print n_id,r1.name,r1._id,">>>>\n\n\n\n"
-                        # z1 = create_grelation(new_instance_type._id,q1,[r1._id] )
-                        # z1 = create_grelation(n_id,q1,[kk])
-                        # z1 = create_grelation(new_instance_type._id,q1,right_sub_list)
-                        
-                        # z1 = create_grelation(new_instance_type._id,q1,r1._id)
-                    print z1 , "GRELATION"
+                        # print new_instance_type._id," \n", q1,"\n",  r1._id,">>>>from GRELATION\n\n\n\n\n\n\n"
+                        try:
+                            grel_create = create_grelation(new_instance_type._id,q1,r1._id)
+                        except Exception as e :
+                            print e 
+                    # print grel_create , "GRELATION"
                     
         return HttpResponseRedirect("/admin/designer/GSystem")
 
     # If GET request ---------------------------------------------------------------------------------------
     for key,value in gs_struc.items():
-        # print key,value,"from get request"
         if key == "name":
             newdict[key] = ["unicode", new_instance_type[key]]
-            # print newdict[key],"from name\n\n\n\n"
 
         if key == "altnames":
             newdict[key] = ["unicode", new_instance_type[key]]
-            # print newdict[key],"from altnames\n\n\n\n"
 
         if key == "attribute_set":
             newdict[key] = ["dict", new_instance_type[key] ]
-            # print newdict[key],"from attribute_set \n\n\n\n"
 
         if key == "relation_set":
             newdict[key] = ["dict", new_instance_type[key] ]
-            # print newdict[key],"from relation_set \n\n\n\n"
 
     gs_struc = newdict
-    # print gs_struc ,"from gs_struc \n\n\n\n "
 
     groupid = ""
     group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
