@@ -17,7 +17,6 @@
   
 {% if gs_type == 'attribute_set' %}
       {% if fields_type == "bool" %}
-
       <select id="id_auto_now_add" name="{{fields_name}}" style="width:400px height:20px" >
         <option value="0">{% trans "Unknown" %}</option>
         <option value="1" {% if fields_value == "1" %}selected{% endif %} >{% trans "Yes" %}</option>
@@ -40,12 +39,12 @@
         <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >{% trans "HIDDEN" %}</option>
       </select>
 
-      {% elif fields_type == "int" or fields_type == "float" or fields_type == "long" %}
+      {% elif fields_type == "int" or fields_type == "float" or fields_type == "long" %} 
       <div style="display:table-cell;">
         <font size="3"> <input type="" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" placeholder="{{help_text}}" ></font>
       </div>
 
-      {% elif fields_type == "list" %}
+      {% elif fields_type == "list" %} 
       <div id="{{fields_name}}" style="border-spacing:0px" class="list_drawer">
         {% include 'ndf/widget_selector.html' with for=fields_name all_options="" selected_options="" %}
       </div>
@@ -94,7 +93,7 @@
       </script>
 
       {% elif fields_type == "unicode" or fields_type == "basestring" %}
-        {% if fields_name == "Location" %}
+        {% if fields_name == "Location" or fields_name == "location" %}
           <div class="row">
             <div class="large-8 columns">
                 <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button radius expand">
@@ -103,13 +102,9 @@
             </div>
           </div>
           <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
-            <!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
               <a class="close-reveal-modal" >&#215;</a>
-              {% include "ndf/map_widget.html" with mode="edit" %}
-              <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
-            <!-- #{#%# endif %} -->
+              {% include "ndf/map_widget.html" with mode="edit" location_geo_json=fields_value %}
           </div>
-
           <script type="text/javascript">
               $(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
       
@@ -140,7 +135,6 @@
                       var group = new L.featureGroup(tempArr)
                           map.fitBounds(group.getBounds());
                     }
-                   
                 }
               });
 
@@ -154,7 +148,7 @@
 
         {% else %}
         <input type="text" id="{{fields_name}}" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" placeholder="{{help_text}}"  />
-        
+
         {% endif %}
 
   {% endif %}
