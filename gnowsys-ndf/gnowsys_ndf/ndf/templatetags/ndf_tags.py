@@ -777,15 +777,6 @@ def get_selected_drawer_items_single_dropdown(fields_name,fields_value):
 
 	return []
 			
-				# fields_value.append(v.__str__())
-				# fval = node_collection.one({'_id':v})
-				# fields_value.append(fval)
-
-	# return fval
-	# return fields_value2
-	# return None
-	
-
 @get_execution_time
 @register.assignment_tag
 @register.inclusion_tag('ndf/admin_fields.html')
@@ -2056,22 +2047,6 @@ def ats_fields(fields_type, fields_name,groupid,complex_dt,help_text,validators,
 
 	return {"fields_name":fields_name, "fields_type": fields_type, "fields_value":fields_value ,'groupid':groupid,
 	'complex_dt':complex_dt ,'gs_type':'attribute_set', 'help_text':help_text , 'validators':validators , 'regularexp':regularexp }
-
-# @get_execution_time
-# @register.inclusion_tag('tags/dummy.html')
-# def rts_fields(fields_name,fields_object_type,groupid,filled_up=None,template='ndf/option_widget.html'):
-# 	'''
-# 	this ndf tag returns the fields_name and fields_type of the GSystem object -- rts
-# 	'''
-# 	fields_value = None
-# 	if filled_up[1]:
-# 		for each in filled_up[1]:
-# 			for value in each:
-# 				if value == fields_name:
-# 					fields_value = each[value]
-
-# 	return {"template":template ,"fields_name":fields_name, "groupid":groupid, "drawer1":fields_object_type 
-# 	,'gs_type':'relation_set' , "selected_value":fields_value }
 
 @get_execution_time
 @register.inclusion_tag('ndf/fetch_fields.html')
