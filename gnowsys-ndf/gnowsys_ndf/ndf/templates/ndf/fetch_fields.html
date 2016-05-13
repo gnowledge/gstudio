@@ -7,6 +7,42 @@
 <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 
+  <style>
+    #contact label{
+      display: inline-block;
+      width: 100px;
+      text-align: right;
+    }
+    #contact_submit{
+      padding-left: 100px;
+    }
+    #contact div{
+      margin-top: 1em;
+    }
+    textarea{
+      vertical-align: top;
+      height: 5em;
+    }
+      
+    .error{
+      display: none;
+      margin-left: 10px;
+    }   
+    
+    .error_show{
+      color: red;
+      margin-left: 10px;
+    }
+    
+    input.invalid, textarea.invalid{
+      border: 2px solid red;
+    }
+    
+    input.valid, textarea.valid{
+      border: 2px solid green;
+    }
+  </style>
+
 {% if fields_name == 'name' or fields_name == "altnames" %}
 <!-- <type 'unicode'> -->
 <div style="display:table-cell;">
@@ -17,6 +53,7 @@
   
 {% if gs_type == 'attribute_set' %}
       {% if fields_type == "bool" %}
+      {{regularexp}}
       <select id="id_auto_now_add" name="{{fields_name}}" style="width:400px height:20px" >
         <option value="0">{% trans "Unknown" %}</option>
         <option value="1" {% if fields_value == "1" %}selected{% endif %} >{% trans "Yes" %}</option>
@@ -24,7 +61,7 @@
       </select>
 
       <div class="medium-3 columns end">
-      {% elif fields_type == "datetime.datetime" %}
+      {% elif fields_type == "datetime.datetime" %} {{regularexp}}
       <input type="text" id="{{fields_name}}" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" {% if fields_value %} selected {% endif %} > 
       <script>
       $(function() {
@@ -32,14 +69,14 @@
       });
       </script>
 
-      {% elif fields_type == "status" %}
+      {% elif fields_type == "status" %}{{regularexp}}
       <select id="id_auto_now_add" name="{{fields_name}}" style="width:400px height:20px" >
         <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >{% trans "PUBLISHED" %}</option>
         <option value="DRAFT" {% if fields_value == "DRAFT" %}selected{% endif %} >{% trans "DRAFT" %}</option>
         <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >{% trans "HIDDEN" %}</option>
       </select>
 
-      {% elif fields_type == "int" or fields_type == "float" or fields_type == "long" %} 
+      {% elif fields_type == "int" or fields_type == "float" or fields_type == "long" %} {{regularexp}}
       <div style="display:table-cell;">
         <font size="3"> <input type="" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" placeholder="{{help_text}}" ></font>
       </div>
@@ -54,7 +91,7 @@
         {% include 'ndf/widget_selector.html' with for=fields_name all_options="" selected_options="" %}
       </div>
 
-      {% elif fields_type == "IS()" %}
+      {% elif fields_type == "IS()" %} {{regularexp}}
       <div id="is_drawer" style="border-spacing:0px" class="list_drawer">
         <select name="{{fields_name}}" style="width:400px height:20px" >
           <option value="">select</option>
@@ -105,6 +142,7 @@
               <a class="close-reveal-modal" >&#215;</a>
               {% include "ndf/map_widget.html" with mode="edit" location_geo_json=fields_value %}
           </div>
+
           <script type="text/javascript">
               $(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
       
@@ -135,6 +173,7 @@
                       var group = new L.featureGroup(tempArr)
                           map.fitBounds(group.getBounds());
                     }
+                   
                 }
               });
 
@@ -146,9 +185,28 @@
 
           </script>
 
+        {# {% else if fields_name="email_id" %} #}
         {% else %}
         <input type="text" id="{{fields_name}}" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" placeholder="{{help_text}}"  />
+        <script type="text/javascript">
+        $(document).ready(function() {
+          $('#email_id').on('input', function() {
+            var input=$(this);
+            var re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+            var is_email=re.test(input.val());
+            if(is_email){
+              input.removeClass("invalid").addClass("valid");
+            }
+            else
+              {
+                input.removeClass("valid").addClass("invalid");
+              }
+          });
 
+          
+        });
+
+        </script>
         {% endif %}
 
   {% endif %}

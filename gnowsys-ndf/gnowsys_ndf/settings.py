@@ -286,7 +286,7 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
-        'NAME': 'studio-dev',
+        'NAME': 'studio-dev1',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -696,16 +696,44 @@ GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House'
 
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Discuss', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
 
-GSTUDIO_HELP_TIP = { 'name':'States the title of the object', 'altnames':'Alternate Names', 'language':'Spoken Tongue', 'subject_type':'subjects type' , 'data_type':'datas types ' , 'applicable_node_type':'Nodes that are applicable' ,
-    'member_of':'mem ' ,'verbose_name':'verbose_name' ,'null':'null variable' ,'blank':'blank' ,'help_text':'help_text', 'max_digits':'maximum digits' ,'decimal_places':'decimal places' ,'auto_now':'auto_now ' ,'auto_now_add':'auto_now_add' ,
-    'path':'path of something' ,'verify_exist':'verifying exist' ,'status':'status' ,'content_org':'type content', 
-    'prior_node':'node coming before', 'featured':'featured', 'created_at':'created at location' , 'start_publication':'pub' ,
-    'tags':'tags' ,'url':'url' ,'last_update':'updated last' ,'login_required':'required login' , 'meta_type_set':'meta_type_set' ,
-    'attribute_type_set':'attribute_type_set defn' ,'relation_type_set':'relation def ','type_of':'Type of' }
+GSTUDIO_HELP_TIP = { 
+   "name":"Title of the object",
+   "altnames":"Alternate title",
+   "language":"Language of the title",
+   "subject_type":"The system types that can hold this property",
+   "data_type":"Data Type",
+   "applicable_node_type":"Applicable Node Type",
+   "member_of":"Member of MetaType ",
+   "verbose_name":"Verbose Name",
+   "null":"Value can be null",
+   "blank":"Value can be blank",
+   "max_digits":"Maximum length of digits applicable if the data type is any type of numbers ",
+   "decimal_places":" Number of decimal places if the data type is float",
+   # "auto_now":"The value is automatically filled by the computer",
+   "auto_now_add":"Auto now would insert time only if the auto now field is true",
+   "path":"Path",
+   "verify_exist":"Verify Exist",
+   "status":"Status",
+   "content_org":"Description",
+   "validators":"Regular Expressions required for Validation",
+   "help_text":"The help text to be displayed on the Tooltip for GSystem ",
+   "prior_node":"This node depends on",
+   "featured":"Featured",
+   "created_at":"Time of creation",
+   "start_publication":"Published from the date",
+   "tags":"Tags are keywords",
+   "url":"URL",
+   "last_update":"The time of modification ",
+   "login_required":"Login required",
+   "meta_type_set":"N/A",
+   "attribute_type_set":"N/A",
+   "relation_type_set":"N/A",
+   "type_of":"Sub Attribute type of"
+ }
 
 GSYSTEMTYPE_DEFINITIONLIST = [{'name':'Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language ' },{'status':'Status : '} ,{'member_of':'Member of MetaType : '} ,{'meta_type_set':'Select the MetaType : ' },{'attribute_type_set':'Select the AttributeType : ' },{'relation_type_set':'Select the RelationType : ' },{'type_of':'Type Of GSystemType : '} ]
 
-ATTRIBUTETYPE_DEFINITIONLIST = [{'name':'Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language ' },{'subject_type':'Subject Type '} ,{'data_type':'Data Type '} ,{'member_of':'Member of MetaType ' },{'verbose_name':'Verbose Name '} ,{'null':'Null '} ,{'blank':'Blank '} ,{'help_text':'Help Text ' },{'max_digits':'Maximum Digits ' },{'decimal_places':'Decimal Places ' },{'auto_now':'Auto Now '} ,{'auto_now_add':'Auto Now Add '} ,{'path':'Path '} ,{'verify_exist':'Verify Existence '} ,{'status':'Status ' }]
+ATTRIBUTETYPE_DEFINITIONLIST = [{'name':'Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language ' },{'subject_type':'Subject Type '} ,{'data_type':'Data Type '} ,{'member_of':'Member of MetaType ' },{'verbose_name':'Verbose Name '} ,{'null':'Null '} ,{'blank':'Blank '} ,{'help_text':'Help Text ' },{'max_digits':'Maximum Digits ' },{'decimal_places':'Decimal Places ' },{'auto_now':'Auto Now '} ,{'auto_now_add':'Auto Now Add '} ,{'path':'Path '} ,{'verify_exist':'Verify Existence '},{'validators':'Validators'} ,{'status':'Status ' }]
 
 RELATIONTYPE_DEFINITIONLIST = [{'name':'Name '} ,{'inverse_name':'Inverse Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language '} ,{'subject_type':'Subject Type '}  ,{'object_type':'Object Type '} ,{'subject_cardinality':'Subject Cardinality '} ,{'object_cardinality':'Object Cardinality '} ,{'subject_applicable_nodetype':'Subject Applicable Node Type '} ,{'object_applicable_nodetype':'Object Applicable Node Type '} ,{'is_symmetric':'Is Symmetric '} ,{'is_reflexive':'Is Reflexive '} ,{'is_transitive':'Is Transitive '} ,{'status':'Status '} ,{'member_of':'Member of MetaType '}]
 

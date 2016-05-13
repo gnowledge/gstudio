@@ -748,7 +748,69 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 
 	
 	# 	return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid,'groupid': groupid, 'admin_related_drawer': admin_related_drawer }
+
+
+@get_execution_time
+@register.assignment_tag
+@register.inclusion_tag('ndf/admin_fields.html')
+def get_selected_drawer_items_single_dropdown(fields_name,fields_value):
+	fields_selection1 = ["subject_type","language","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
+	drawer2 ={}
+	if fields_name in fields_selection1:
+		fields_value_id_list = []
+
+		if fields_value:
+			for each in fields_value:
+				if type(each) == ObjectId:
+					fields_value_id_list.append(each)
+				else:
+					fields_value_id_list.append(each._id)
+
+		if fields_value_id_list:
+			drawer2 = []
+			for each_id in fields_value_id_list:
+				each_node = node_collection.one({'_id': each_id})
+				if each_node:
+					drawer2.append(each_node)
+
+		return drawer2
+
+	return []
+			
+				# fields_value.append(v.__str__())
+				# fval = node_collection.one({'_id':v})
+				# fields_value.append(fval)
+
+	# return fval
+	# return fields_value2
+	# return None
 	
+
+@get_execution_time
+@register.assignment_tag
+@register.inclusion_tag('ndf/admin_fields.html')
+def get_all_drawer_items_single_dropdown(fields_name,fields_value):
+	fields_selection1 = ["subject_type","language","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
+	fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType","language":"GSystemType"}
+	types = fields[fields_name]
+	drawer1 = {}
+	if fields_name in fields_selection1:
+		if fields_name in ("applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype"):
+			for each in NODE_TYPE_CHOICES:
+				drawer1[each] = each
+		elif fields_name in ("data_type"):
+			for each in DATA_TYPE_CHOICES:
+				drawer1[each] = each
+		elif fields_name in ("language"):
+				drawer1['hi']='hi'
+				drawer1['en']='en'
+				drawer1['mar']='mar'
+		else:
+			drawer = node_collection.find({"_type":types})
+			for each in drawer:
+				drawer1[each]=each	
+	return drawer1
+
 @get_execution_time
 @register.assignment_tag
 @register.inclusion_tag('ndf/admin_fields.html')
@@ -772,8 +834,11 @@ def get_all_drawer_items(fields_name,fields_value):
 def get_selected_drawer_items(fields_name,fields_value):
 	drawer2 = None
 	alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
-	fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
-	fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType","language":"GSystemType"}
+	fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of","subject_type"]
+	fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType",
+	 "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES",
+	  "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES",
+	   "type_of": "GSystemType","language":"GSystemType" , "subject_type":"GSystemType" }
 	types = fields[fields_name]
 
 	if fields_name in fields_selection2:
