@@ -1130,6 +1130,7 @@ def save_course_section(request, group_id):
         cs_new.member_of.append(cs_gst._id)
         cs_new.name = cs_node_name
         cs_new.modified_by = int(request.user.id)
+        cs_new.group_set.append(group_id)
         cs_new.status = u"PUBLISHED"
         cs_new.created_by = int(request.user.id)
         cs_new.contributors.append(int(request.user.id))
@@ -1180,6 +1181,7 @@ def save_course_sub_section(request, group_id):
         css_new.member_of.append(css_gst._id)
         # set name
         css_new.name = css_node_name
+        css_new.group_set.append(group_id)
         css_new.modified_by = int(request.user.id)
         css_new.status = u"PUBLISHED"
         css_new.created_by = int(request.user.id)
@@ -1549,6 +1551,7 @@ def create_edit_unit(request, group_id):
             cu_node.created_by = int(request.user.id)
             cu_node.status = u"PUBLISHED"
             cu_node.contributors.append(int(request.user.id))
+            cu_node.group_set.append(group_id)
             cu_node.prior_node.append(css_node._id)
             cu_node.save(groupid=group_id)
             response_dict["unit_node_id"] = str(cu_node._id)
@@ -1879,25 +1882,6 @@ def course_content(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-    result_status = course_complete_percentage = None
-
-    leaf_ids = completed_ids = incompleted_ids = total_count = completed_count = None
-
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id, True)
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "completed_ids_list" in result_status:
-                completed_ids = result_status['completed_ids_list']
-            if "incompleted_ids_list" in result_status:
-                incompleted_ids = result_status['incompleted_ids_list']
-            if "list_of_leaf_node_ids" in result_status:
-                leaf_ids = result_status['list_of_leaf_node_ids']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
 
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
@@ -1924,7 +1908,6 @@ def course_content(request, group_id):
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'course content',
             'allow_to_join': allow_to_join,
-            "leaf_ids":leaf_ids,"completed_ids":completed_ids,"incompleted_ids":incompleted_ids,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
             })
     return render_to_response(template, context_variables)
@@ -2554,6 +2537,8 @@ def course_analytics_admin(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
     response_dict = {}
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
+
     admin_analytics_list = []
     if group_obj.author_set:
         for each_author in group_obj.author_set:
@@ -2569,9 +2554,17 @@ def course_analytics_admin(request, group_id):
             # admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
             users_points_breakup = analytics_instance.get_users_points(True)
             admin_analytics_data["files_points"] = users_points_breakup['Files']
+            if FILES_MAX_POINT_VAL < users_points_breakup['Files']:
+                FILES_MAX_POINT_VAL = users_points_breakup['Files']
             admin_analytics_data['notes_points'] = users_points_breakup['Notes']
+            if NOTES_MAX_POINT_VAL < users_points_breakup['Notes']:
+                NOTES_MAX_POINT_VAL = users_points_breakup['Notes']
             admin_analytics_data['quiz_points'] = users_points_breakup['Quiz']
+            if QUIZ_MAX_POINT_VAL < users_points_breakup['Quiz']:
+                QUIZ_MAX_POINT_VAL = users_points_breakup['Quiz']
             admin_analytics_data['interactions_points'] = users_points_breakup['Interactions']
+            if INTERACTIONS_MAX_POINT_VAL < users_points_breakup['Interactions']:
+                INTERACTIONS_MAX_POINT_VAL = users_points_breakup['Interactions']
             del analytics_instance
             admin_analytics_list.append(admin_analytics_data)
     cache.set(cache_key, json.dumps(admin_analytics_list), 60*15)
@@ -2586,10 +2579,13 @@ def course_analytics_admin(request, group_id):
         ("quiz_points", "Quiz"),
         ("interactions_points", "Interactions"),
     ]
+    max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
+    'quiz_max_points': QUIZ_MAX_POINT_VAL,'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
 
     response_dict["column_headers"] = column_headers
     response_dict["success"] = True
     response_dict["students_data_set"] = admin_analytics_list
+    response_dict['max_points_dict'] = max_points_dict
     # print "\n admin_analytics_list === ",admin_analytics_list
     return HttpResponse(json.dumps(response_dict))
 
