@@ -6290,8 +6290,8 @@ def course_create_collection(request, group_id):
 def course_create_note(request, group_id):
   coll_list =  request.GET.get('coll_list','')
   fetch_res = coll_list.split(',')
-  print "fetch_res",fetch_res
-  print "\n\n",fetch_res 
+  # print "fetch_res",fetch_res
+  # print "\n\n",fetch_res 
   # print "image_coll",image_coll
   return render_to_response('ndf/course_create_note.html',
       {
