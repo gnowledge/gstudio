@@ -6300,53 +6300,16 @@ def course_create_note(request, group_id):
 
 
 @get_execution_time
-def adminRenderConceptGraph(request,group_id,node_id=None):
+def adminRenderGraph(request,group_id,node_id=None,graph_type="concept"):
   '''
-  Renders the Concept Graph
-  '''
-  try :
-    if request.is_ajax() and request.method == "GET":
-      group_name = u'home'
-      if node_id:
-          print node_id,"from adminRenderConceptGraph\n\n\n"
-          req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
-      template = 'ndf/graph_concept.html'
-      variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
-      return render_to_response('ndf/graph_concept.html', { 'group_id':group_id,'groupid':group_id , 'node':req_node }) 
-  except Exception as e :
-    print "from Concept Graph, exception",e,"\n\n\n\n"
-
-
-@get_execution_time
-def adminRenderCollectionGraph(request,group_id,node_id=None):
-  '''
-  Renders the Collection Graph
-  '''
-  try :
-    if request.is_ajax() and request.method == "GET":  
-      group_name = u'home'
-      if node_id:
-        print node_id,"from adminRenderCollectionGraph\n\n\n"
-        req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
-      template = 'ndf/graph_collection.html'
-      variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
-      return render_to_response(template,variable) 
-  except Exception as e :
-    print "from Collection Graph, exception",e,"\n\n\n\n"
-
-@get_execution_time
-def adminRenderDependencyGraph(request,group_id,node_id=None):
-  '''
-  Renders the Dependency Graph
+  Renders the Concept Graph, Collection Graph, Dependency Graph
   '''
   try :
     if request.is_ajax() and request.method == "GET":
-      group_name = u'home'
       if node_id:
-          print node_id,"from adminRenderDependencyGraph\n\n\n"
           req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
-      template = 'ndf/graph_dependency.html'
+      template = "ndf/graph_"+graph_type+".html"
       variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
-      return render_to_response(template,variable) 
+      return render_to_response(template, { 'group_id':group_id,'groupid':group_id , 'node':req_node }) 
   except Exception as e :
-    print "from Dependency Graph, exception",e,"\n\n\n\n"
+    print "from "+ graph_type +" Graph, exception",e,"\n\n"
