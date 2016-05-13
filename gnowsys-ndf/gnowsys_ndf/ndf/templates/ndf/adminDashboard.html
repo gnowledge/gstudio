@@ -52,73 +52,8 @@
     background-repeat:no-repeat; 
     background-size: 48px 48px;
 }
-table {
-    table-layout: auto;
-}
-
-
-body {
-    margin: 0;
-    font-family: 'Lato', sans-serif;
-}
-
-.overlay {
-    height: 100%;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0, 0.9);
-    overflow-x: hidden;
-    transition: 0.5s;
-}
-
-.overlay-content {
-    position: relative;
-    top: 25%;
-    width: 100%;
-    text-align: center;
-    margin-top: 30px;
-}
-
-.overlay a {
-    padding: 8px;
-    text-decoration: none;
-    font-size: 36px;
-    color: #818181;
-    display: block;
-    transition: 0.3s;
-}
-
-.overlay a:hover, .overlay a:focus {
-    color: #f1f1f1;
-}
-
-.closebtn {
-    position: absolute;
-    top: 150px;
-    right: 175px;
-    font-size: 60px !important;
-}
-
-@media screen and (max-height: 450px) {
-  .overlay a {font-size: 20px}
-  .closebtn {
-    font-size: 40px !important;
-    top: 15px;
-    right: 35px;
-  }
-} 
-
 {% endblock %}
-
-
 {% block body_content %} 
-<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
-
 <div id="myGroup" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
      <p>Hold down "Control", to select more than one.</p>
      <h2>{% trans "Select Groups" %}</h2>
@@ -273,61 +208,27 @@ body {
       </a>
     </td>
 
-    <td> 
+    <td>
+     <section id="sectiondropdown-{{each.Id}}" class="medium-12 columns" >
+      <dl class="row tabs" id="dl-{{each.Id}}" data-tab data-options="deep_linking:true">
+      <dd>
+      <a href="#" class="button medium" id="graph-{{each.Id}}" style="width:150px;" data-dropdown="graph-hover-{{each.Id}}" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
+        <ul id="graph-hover-{{each.Id}}" class="f-dropdown" data-dropdown-content>
 
-<!--      
-      <div id="myNav-{{each.Id}}" class="overlay">
-        <a id="closebtn-{{each.Id}}" href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-        <div class="overlay-content" id="{{each.Id}}" >
-          <a id="adminRenderConceptGraph-{{each.Id}}" href="{% url 'adminRenderConceptGraph' group_name each.Id %}" class="adminRenderConceptGraph" >Concept Graph</a>
-          <a id="adminRenderCollectionGraph-{{each.Id}}" href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" class="adminRenderCollectionGraph" >Collection Graph</a>
-          <a id="adminRenderDependencyGraph-{{each.Id}}" href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" class="adminRenderDependencyGraph" >Dependency Graph</a>
-        </div>
-      </div>
-        <span style="cursor:pointer" class="button medium" href="" style="width:150px;" id="openbtn-{{each.Id}}" onclick="openNav()">Graph &nbsp;&nbsp; <i class="fi-share"></i> </span>
+        <li><a href="{% url 'adminRenderConceptGraph' group_name each.Id %}" id="adminRenderConceptGraph-{{each.Id}}"  class="adminRenderConceptGraph" data-id="{{each.Id}}"
+        data-reveal-id="view-concept-graph"  >{% trans "Concept Graph" %}</a></li>
+        {% if each.gs_collection_set %}
+          <li><a href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" id="adminRenderCollectionGraph-{{each.Id}}"  class="adminRenderCollectionGraph" data-id="{{each.Id}}"
+          data-reveal-id="view-collection-graph"   >{% trans "Collection Graph" %}</a></li>
+        {% endif %}
+        {% if each.gs_prior_node %} 
+          <li><a href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" id="adminRenderDependencyGraph-{{each.Id}}" class="adminRenderDependencyGraph" data-id="{{each.Id}}" data-reveal-id="view-Dependency-graph"   >{% trans "Dependency Graph" %}</a></li>
+        {% endif %}
+        </ul>
       
-      <script>
-      function openNav() {
-          document.getElementById("myNav-{{each.Id}}").style.width = "100%";
-      }
-
-      function closeNav() {
-          document.getElementById("myNav-{{each.Id}}").style.width = "0%";
-      }
-      </script>
-  </td>
--->
-
-  <td>
-
-
-   <section id="sectiondropdown-{{each.Id}}" class="medium-12 columns" >
-    <dl class="row tabs" id="dl-{{each.Id}}" data-tab data-options="deep_linking:true">
-    <dd>
-    <a href="#" class="button medium" id="graph-{{each.Id}}" style="width:150px;" data-dropdown="graph-hover-{{each.Id}}" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
-      <ul id="graph-hover-{{each.Id}}" class="f-dropdown" data-dropdown-content>
-
-      <li><a href="{% url 'adminRenderConceptGraph' group_name each.Id %}" id="adminRenderConceptGraph-{{each.Id}}"  class="adminRenderConceptGraph" data-id="{{each.Id}}"
-      data-reveal-id="view-concept-graph"  >{% trans "Concept Graph" %}</a></li>
-      {% if each.gs_collection_set %}
-        <li><a href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" id="adminRenderCollectionGraph-{{each.Id}}"  class="adminRenderCollectionGraph" data-id="{{each.Id}}"
-        data-reveal-id="view-collection-graph"   >{% trans "Collection Graph" %}</a></li>
-      {% endif %}
-      {% if each.gs_prior_node %} 
-        <li><a href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" id="adminRenderDependencyGraph-{{each.Id}}" class="adminRenderDependencyGraph" data-id="{{each.Id}}" data-reveal-id="view-Dependency-graph"   >{% trans "Dependency Graph" %}</a></li>
-      {% endif %}
-      </ul>
-    
-    </dd>
-    </dl>
-    </section>  
-<!--
-<div id="myNav-{{each.Id}}" class="overlay" >
-<a id="closebtn-{{each.Id}}" href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-<div class="overlay-content" id="{{each.Id}}" >
-</div>-->
-
-
+      </dd>
+      </dl>
+      </section>  
     </td> 
     {% endif %}
 
@@ -349,20 +250,9 @@ body {
 
 {% paginate %}
 {% endblock %}
-
 {% block script %}
 
-function openNav() {
-  document.getElementById("#info").style.width = "100%";
-}
-
-function closeNav() {
-  document.getElementById("#info").style.width = "0%";
-}
-
-
 var global_object_id;
-var global_obj_id_gs;
 {% if class_name == "GSystemType"  %}
 function set_drawer_value(node_id)
 {
@@ -461,72 +351,44 @@ $(document).on('click',".button.editobject",function(){
 });
 
 $(document).on('click',".adminRenderConceptGraph",function(){
-  var objectid = this.id;
-  global_obj_id_gs = objectid;
   var atr = $(this).data("id"); 
-  {# console.log(atr); #}
-  {# selected_val = "/home/ajax/graph/adminRenderConceptGraph/" + atr #}
-  {# console.log(selected_val) #}
   $.ajax({
     type: "GET",
     url: "/home/ajax/graph/adminRenderConceptGraph/"+ atr,
     dataType: "html",
     data:{
       group_id : '{{groupid}}',
-      {# csrfmiddlewaretoken: '{{ csrf_token }}', #}
       node_id : atr 
     },
     global:false,
+    async: true,
     success: function(result) {
-      {# console.log("from success") #}
       $('article').unblock();
       $("#view-concept-graph").html(result);
-      $("#close-reveal-modal").html(result);
-    },
-    complete : function(result){
-      {# console.log("from complete") #}
     },
   });
 });
 
 $(document).on('click',".adminRenderCollectionGraph",function(){
-  var objectid = this.id;
-  global_obj_id_gs = objectid;
   var atr = $(this).data("id"); 
-  selected_val = "/home/ajax/graph/adminRenderCollectionGraph/" + atr
-  console.log(selected_val)
   $.ajax({
     type: "GET",
     url: "/home/ajax/graph/adminRenderCollectionGraph/"+ atr,
     dataType: "html",
     data:{
       group_id : '{{groupid}}',
-      {# csrfmiddlewaretoken: '{{ csrf_token }}', #}
       node_id : atr 
     },
     success: function(result) {
-      {# console.log("from sucess") #}
       $('article').unblock();
       $("#view-collection-graph").html(result);
-      $("#close-reveal-modal").html(result);
-    },
-    complete : function(result){
-      {# console.log("from complete") #}
     },
   });
 });
 
 
 $(document).on('click',".adminRenderDependencyGraph",function(){
-  var objectid = this.id;
-  global_obj_id_gs = objectid;
-  {# console.log(objectid+"from here"); #}
-  {# var atr = $(this).attr("data-id") this one returns string "123" other integer 123 #}
   var atr = $(this).data("id"); 
-  {# console.log(atr); #}
-  selected_val = "/home/ajax/graph/adminRenderDependencyGraph/" + atr
-  {# console.log(selected_val) #}
-
   $.ajax({
     type: "GET",
     url: "/home/ajax/graph/adminRenderDependencyGraph/"+ atr,
@@ -537,16 +399,10 @@ $(document).on('click',".adminRenderDependencyGraph",function(){
       node_id : atr 
     },
     success: function(result) {
-      {# console.log("from success") #}
       $('article').unblock();
       $("#view-Dependency-graph").html(result);
-      $("#close-reveal-modal").html(result);
-    },
-    complete : function(result){
-      {# console.log("from complete") #}
     },
   });
-
 });
 
 
