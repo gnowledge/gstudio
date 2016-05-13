@@ -309,12 +309,13 @@ body {
 
       <li><a href="{% url 'adminRenderConceptGraph' group_name each.Id %}" id="adminRenderConceptGraph-{{each.Id}}"  class="adminRenderConceptGraph" data-id="{{each.Id}}"
       data-reveal-id="view-concept-graph"  >{% trans "Concept Graph" %}</a></li>
-
-      <li><a href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" id="adminRenderCollectionGraph-{{each.Id}}"  class="adminRenderCollectionGraph" data-id="{{each.Id}}"
-      data-reveal-id="view-collection-graph"   >{% trans "Collection Graph" %}</a></li>
-
-      <li><a href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" id="adminRenderDependencyGraph-{{each.Id}}" class="adminRenderDependencyGraph" data-id="{{each.Id}}"
-      data-reveal-id="view-Dependency-graph"   >{% trans "Dependency Graph" %}</a></li>
+      {% if each.gs_collection_set %}
+        <li><a href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" id="adminRenderCollectionGraph-{{each.Id}}"  class="adminRenderCollectionGraph" data-id="{{each.Id}}"
+        data-reveal-id="view-collection-graph"   >{% trans "Collection Graph" %}</a></li>
+      {% endif %}
+      {% if each.gs_prior_node %} 
+        <li><a href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" id="adminRenderDependencyGraph-{{each.Id}}" class="adminRenderDependencyGraph" data-id="{{each.Id}}" data-reveal-id="view-Dependency-graph"   >{% trans "Dependency Graph" %}</a></li>
+      {% endif %}
       </ul>
     
     </dd>

@@ -79,7 +79,7 @@
         <div id="{{each.name}}">
         <tr><td>
         <div style="display:table-cell;"> 
-           <font size="3"> {% firstof each.altnames each.name %} {{each.id}} </font> 
+           <font size="3"> {% firstof each.altnames each.name %} </font> 
         </div></td>
         <td>
             {% rts_fields each.name each.object_type groupid gs_struc|get_dict_item:'relation_set' %}

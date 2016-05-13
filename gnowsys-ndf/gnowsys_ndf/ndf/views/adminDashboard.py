@@ -73,13 +73,22 @@ def adminDashboardClass(request, class_name="GSystem"):
         if class_name == "GSystem":
             group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
             mem_ty=[]
+            gs_collection_set = False
+            gs_prior_node = False
+            if each.collection_set:
+                gs_collection_set = True
+            if each.prior_node:
+                gs_prior_node = True
             if each.member_of:
                 for e in each.member_of:
                     mem_ty.append(str(e))
                 k = mem_ty[0]
             else:
                 k = None
-            objects_details.append({"Id":each._id,"Member":each.member_of,"Mem":k , "Title":each.name, "Alt_Title":each.altnames,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
+            objects_details.append({"Id":each._id,"Member":each.member_of,"Mem":k , "Title":each.name, 
+                "Alt_Title":each.altnames,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,
+                "Group":", ".join(group_set),"Creation":each.created_at,"gs_collection_set":gs_collection_set,
+                "gs_prior_node":gs_prior_node })
         elif class_name == "File":
             group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
             objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at})
