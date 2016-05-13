@@ -215,14 +215,14 @@
       <a href="#" class="button medium" id="graph-{{each.Id}}" style="width:150px;" data-dropdown="graph-hover-{{each.Id}}" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
         <ul id="graph-hover-{{each.Id}}" class="f-dropdown" data-dropdown-content>
 
-        <li><a href="{% url 'adminRenderConceptGraph' group_name each.Id %}" id="adminRenderConceptGraph-{{each.Id}}"  class="adminRenderConceptGraph" data-id="{{each.Id}}"
+        <li><a href="{% url 'adminRenderGraph' group_name each.Id 'concept' %}" id="adminRenderConceptGraph-{{each.Id}}"  class="adminRenderConceptGraph" data-id="{{each.Id}}"
         data-reveal-id="view-concept-graph"  >{% trans "Concept Graph" %}</a></li>
         {% if each.gs_collection_set %}
-          <li><a href="{% url 'adminRenderCollectionGraph' group_name each.Id %}" id="adminRenderCollectionGraph-{{each.Id}}"  class="adminRenderCollectionGraph" data-id="{{each.Id}}"
+          <li><a href="{% url 'adminRenderGraph' group_name each.Id 'collection' %}" id="adminRenderCollectionGraph-{{each.Id}}"  class="adminRenderCollectionGraph" data-id="{{each.Id}}"
           data-reveal-id="view-collection-graph"   >{% trans "Collection Graph" %}</a></li>
         {% endif %}
         {% if each.gs_prior_node %} 
-          <li><a href="{% url 'adminRenderDependencyGraph' group_name each.Id %}" id="adminRenderDependencyGraph-{{each.Id}}" class="adminRenderDependencyGraph" data-id="{{each.Id}}" data-reveal-id="view-Dependency-graph"   >{% trans "Dependency Graph" %}</a></li>
+          <li><a href="{% url 'adminRenderGraph' group_name each.Id 'dependency' %}" id="adminRenderDependencyGraph-{{each.Id}}" class="adminRenderDependencyGraph" data-id="{{each.Id}}" data-reveal-id="view-Dependency-graph"   >{% trans "Dependency Graph" %}</a></li>
         {% endif %}
         </ul>
       
@@ -350,15 +350,18 @@ $(document).on('click',".button.editobject",function(){
         $("#save"+objectid).show();
 });
 
+
+
 $(document).on('click',".adminRenderConceptGraph",function(){
   var atr = $(this).data("id"); 
   $.ajax({
     type: "GET",
-    url: "/home/ajax/graph/adminRenderConceptGraph/"+ atr,
+    url: "/home/ajax/graph/adminRenderGraph/"+ atr+"/fetch/"+"concept" ,
     dataType: "html",
     data:{
       group_id : '{{groupid}}',
-      node_id : atr 
+      node_id : atr ,
+      graph_type : "concept"
     },
     global:false,
     async: true,
@@ -373,11 +376,12 @@ $(document).on('click',".adminRenderCollectionGraph",function(){
   var atr = $(this).data("id"); 
   $.ajax({
     type: "GET",
-    url: "/home/ajax/graph/adminRenderCollectionGraph/"+ atr,
+    url: "/home/ajax/graph/adminRenderGraph/"+ atr+"/fetch/"+"collection" ,
     dataType: "html",
     data:{
       group_id : '{{groupid}}',
-      node_id : atr 
+      node_id : atr ,
+      graph_type : "collection"
     },
     success: function(result) {
       $('article').unblock();
@@ -391,12 +395,12 @@ $(document).on('click',".adminRenderDependencyGraph",function(){
   var atr = $(this).data("id"); 
   $.ajax({
     type: "GET",
-    url: "/home/ajax/graph/adminRenderDependencyGraph/"+ atr,
+    url: "/home/ajax/graph/adminRenderGraph/"+ atr+"/fetch/"+"dependency" ,
     dataType: "html",
     data:{
       group_id : '{{groupid}}',
-      csrfmiddlewaretoken: '{{ csrf_token }}',
-      node_id : atr 
+      node_id : atr ,
+      graph_type : "dependency"
     },
     success: function(result) {
       $('article').unblock();
