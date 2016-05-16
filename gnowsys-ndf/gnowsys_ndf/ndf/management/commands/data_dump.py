@@ -202,6 +202,6 @@ def get_post_node(post_node):
         get_p_node(subset_p_node)
 
 def get_pst_node(post_node):
-    get_post_node(p_node)
+    get_post_node(post_node)
 
 
