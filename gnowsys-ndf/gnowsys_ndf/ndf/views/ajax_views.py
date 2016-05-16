@@ -6292,8 +6292,7 @@ def course_create_collection(request, group_id):
     },context_instance=RequestContext(request))
   
 @get_execution_time
-def course_create_note(request, group_id):
-  
+def course_create_note(request, group_id):  
   img_list = request.GET.get('img_list','')
   audio_list = request.GET.get('audio_list','')
   video_list = request.GET.get('video_list','')

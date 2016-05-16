@@ -23,14 +23,15 @@ class AnalyticsMethods(object):
 		if not hasattr(self,'course_section_event_gst'):
 			self.course_section_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSectionEvent"})
 
-		all_modules_cur = node_collection.find({'member_of': self.course_section_event_gst._id, 'group_set': ObjectId(self.group_id)},{'_id': 1})
+		# all_modules_cur = node_collection.find({'member_of': self.course_section_event_gst._id, 'group_set': ObjectId(self.group_id)},{'_id': 1})
 		t1 = time.time()
 		time_diff = t1 - t0
-		# print "\n get_total_units_count == ", time_diff
-		if all_modules_cur:
-			return all_modules_cur.count()
-		else:
-			return 0
+		return len(self.group_obj.collection_set)
+		# if all_modules_cur:
+		# 	print "\n get_total_units_count == ", all_modules_cur.count()
+		# 	return all_modules_cur.count()
+		# else:
+		# 	return 0
 
 	def get_completed_modules_count(self):
 		t0 = time.time()
@@ -39,24 +40,33 @@ class AnalyticsMethods(object):
 			self.course_section_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnitEvent"},{'_id': 1})
 
 		if hasattr(self,'user_completed_obj_ids'):
-			completed_modules_cur = node_collection.find({'member_of': self.course_section_event_gst._id,
-			 'group_set': ObjectId(self.group_id), '_id': {'$in': self.user_completed_obj_ids}},{'_id': 1})
+			if self.group_obj.collection_set:
+				for each_module in self.group_obj.collection_set:
+					if each_module in self.user_completed_obj_ids:
+						completed_modules_cur = completed_modules_cur + 1
+			# completed_modules_cur = node_collection.find({'member_of': self.course_section_event_gst._id,
+			#  'group_set': ObjectId(self.group_id), '_id': {'$in': self.user_completed_obj_ids}},{'_id': 1})
 		else:
 			if not hasattr(self,'result_status'):
 				self.result_status = get_course_completetion_status(self.group_obj, self.user_id, True)
 			if "completed_ids_list" in self.result_status:
 				str_ids = json.loads(self.result_status['completed_ids_list'])
 				self.user_completed_obj_ids = map(ObjectId, str_ids)
-				completed_modules_cur = node_collection.find({'member_of': self.course_section_event_gst._id,
-				 'group_set': ObjectId(self.group_id), '_id': {'$in': self.user_completed_obj_ids}},{'_id': 1})
+				if self.group_obj.collection_set:
+					for each_module in self.group_obj.collection_set:
+						if each_module in self.user_completed_obj_ids:
+							completed_modules_cur = completed_modules_cur + 1
+				# completed_modules_cur = node_collection.find({'member_of': self.course_section_event_gst._id,
+				#  'group_set': ObjectId(self.group_id), '_id': {'$in': self.user_completed_obj_ids}},{'_id': 1})
 
 		t1 = time.time()
 		time_diff = t1 - t0
 		# print "\n get_completed_units_count == ", time_diff
-		if completed_modules_cur:
-			return completed_modules_cur.count()
-		else:
-			return 0
+		return completed_modules_cur
+		# if completed_modules_cur:
+		# 	return completed_modules_cur.count()
+		# else:
+		# 	return 0
 
 	def get_total_units_count(self):
 		t0 = time.time()
