@@ -27482,3 +27482,7 @@ course-title {
 }
 
 /* END of Landing page */
+/* line 4240, ../../../scss/_app_styles.scss */
+.audio-caption {
+  cursor: pointer;
+}

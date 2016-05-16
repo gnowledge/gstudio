@@ -23,8 +23,20 @@ CKEDITOR.plugins.add('addAudio',
 
                         },
                         success: function(data) {
-                          $("#group_imgs_on_modal").html(data);
-                          $('#group_imgs_on_modal').foundation('reveal', 'open');
+                            $("#group_imgs_on_modal").html(data);
+                            $('#group_imgs_on_modal').foundation('reveal', 'open');
+                            $(".audio-caption").click(function(event){
+                                alert("hello");
+                                var audioURL = $(this).children('audio').attr("data-audio-src");
+                                // var locationURL = 'http://' + location.host;
+                                var locationURL = window.location.origin
+                                var completeURL = audioURL
+                                CKEDITOR.instances[textAreaId].insertHtml('<audio controls loop src=' + completeURL +  '>' + '</audio>');
+                                $('#group_imgs_on_modal').foundation('reveal', 'close');
+                        
+
+                          });
+
                         }
                     });
             }
