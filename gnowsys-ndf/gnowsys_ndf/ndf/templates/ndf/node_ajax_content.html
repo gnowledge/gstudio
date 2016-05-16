@@ -196,9 +196,8 @@
                     <li clas="active">
                       <center>
                         {% if 'image' in obj.if_file.mime_type %}
-                        <a class="th">
+                        
                           <img src="{{MEDIA_URL}}{{obj.if_file.original.relurl}}" style="min-height:200px;"/>
-                        </a>
                          {% elif 'audio' in obj.if_file.mime_type %}
                             <audio src="{{MEDIA_URL}}{{obj.if_file.original.relurl}}" controls loop>
                             <p>{% trans 'Your browser does not support the audio element' %} </p>
@@ -263,10 +262,7 @@
               {% elif 'image' in node.if_file.mime_type and is_collection_card_view != "True" %}
                <center>
                 <div class="show-image">
-                  <a class="th" data-oid="{{node.pk|safe}}">
                     <img  src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" style="min-height:200px;" />
-
-                  </a>
                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
                       <a  target="_blank" href="{% url 'read_file' group_name_tag node.pk download_filename %}">
                          View in Full Screen
