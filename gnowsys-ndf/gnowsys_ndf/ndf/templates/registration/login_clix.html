@@ -70,7 +70,7 @@
 						</div>
 					</div>
 					{% get_is_captcha_visible as is_captcha %}
-					{#% if is_captcha %#}
+					{% if is_captcha %}
 					<div class="row">
 						<div class="small-12 columns">
 							<div class="row">
@@ -83,7 +83,7 @@
 							</div>
 						</div>
 					</div>
-					{#% endif %#}
+					{% endif %}
 
 					<div class="row">
 						<div class="small-12 medium-12 large-12 text-center columns end login-button">

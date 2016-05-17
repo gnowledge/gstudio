@@ -759,7 +759,7 @@ WETUBE_PASSWORD = "gl@b$@)we!ube"
 
 # Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
-CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_dots',)
 
 GSTUDIO_HELP_SIDEBAR = False
 GSTUDIO_SOCIAL_SHARE_RESOURCE = False
