@@ -36,7 +36,7 @@ except ImportError:
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time, get_language_tuple
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type, get_prior_node_hierarchy, get_course_completetion_status
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
@@ -3612,3 +3612,26 @@ def get_help_pages_of_node(node_obj):
 				return all_help_page_node_list
 	except:
 		return all_help_page_node_list
+
+
+@get_execution_time
+@register.assignment_tag
+def get_course_completetion_data(group_obj, user, ids_list=False):
+    leaf_ids = completed_ids = incompleted_ids = total_count = completed_count = None
+    result_status = course_complete_percentage = None
+    return_dict = {}
+
+
+    if user.is_authenticated:
+        result_status = get_course_completetion_status(group_obj, user.id, True)
+        # print "\n\n result_status --- ",result_status
+        if result_status:
+            if "completed_ids_list" in result_status:
+                completed_ids_list = result_status['completed_ids_list']
+            if "incompleted_ids_list" in result_status:
+                incompleted_ids_list = result_status['incompleted_ids_list']
+            if "list_of_leaf_node_ids" in result_status:
+                list_of_leaf_node_ids = result_status['list_of_leaf_node_ids']
+
+            return_dict = {"leaf_ids":list_of_leaf_node_ids,"completed_ids":completed_ids_list,"incompleted_ids":incompleted_ids_list}
+	return return_dict

@@ -788,7 +788,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 ##### bellow part is for manipulating nodes collections#####
 
 @get_execution_time
-def get_inner_collection(collection_list, node, gstaff_access, completed_ids, incompleted_ids):
+def get_inner_collection(collection_list, node, gstaff_access, completed_ids=None, incompleted_ids=None):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
@@ -799,16 +799,16 @@ def get_inner_collection(collection_list, node, gstaff_access, completed_ids, in
         for cl in collection_list:
           if cl['id'] == node.pk:
             node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
-            if col_obj._id in completed_ids:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "COMPLETED"}
-              # print "\n completed_ids -- ",completed_ids
-              # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
-            elif col_obj._id in incompleted_ids:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "WARNING"}
-              # print "\n completed_ids -- ",completed_ids
-              # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
-            else:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
+            # if col_obj._id in completed_ids:
+            #   inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "COMPLETED"}
+            #   # print "\n completed_ids -- ",completed_ids
+            #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
+            # elif col_obj._id in incompleted_ids:
+            #   inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "WARNING"}
+            #   # print "\n completed_ids -- ",completed_ids
+            #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
+            # else:
+            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
             inner_sub_list = [inner_sub_dict]
             inner_sub_list = get_inner_collection(inner_sub_list, col_obj, gstaff_access, completed_ids, incompleted_ids)
             # if "CourseSubSectionEvent" == node_type:
@@ -840,6 +840,12 @@ def get_inner_collection(collection_list, node, gstaff_access, completed_ids, in
 
 @get_execution_time
 def get_collection(request, group_id, node_id, stats_flag=False):
+  cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id) 
+  cache_result = cache.get(cache_key)
+  if cache_result:
+    return HttpResponse(cache_result)
+
+
   node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
   collection_list = []
@@ -848,20 +854,20 @@ def get_collection(request, group_id, node_id, stats_flag=False):
   incompleted_ids_list = []
   gstaff_access = check_is_gstaff(group_id,request.user)
 
-  completed_node_ids = request.GET.getlist("completed_nodes[]","")
-  incompleted_node_ids = request.GET.getlist("incompleted_nodes[]","")
-  leaf_ids = request.GET.getlist("leaf_nodes[]","")
+  # completed_node_ids = request.GET.getlist("completed_nodes[]","")
+  # incompleted_node_ids = request.GET.getlist("incompleted_nodes[]","")
+  # leaf_ids = request.GET.getlist("leaf_nodes[]","")
   # collection_list_append_temp=collection_list.append
   # print "\n\n gstaff_access---",gstaff_access
 
-  list_of_leaf_node_ids = []
-  if stats_flag:
-    if request.user.id:
-        completed_ids_list = map(ObjectId, completed_node_ids)
-        incompleted_ids_list = map(ObjectId, incompleted_node_ids)
-        list_of_leaf_node_ids = map(ObjectId, leaf_ids)
-        # print "\n\n completed_ids_list --- ", len(completed_ids_list)
-        # print "\n\n incompleted_ids_list --- ", len(incompleted_ids_list)
+  # list_of_leaf_node_ids = []
+  # if stats_flag:
+  #   if request.user.id:
+  #       completed_ids_list = map(ObjectId, completed_node_ids)
+  #       incompleted_ids_list = map(ObjectId, incompleted_node_ids)
+  #       list_of_leaf_node_ids = map(ObjectId, leaf_ids)
+  #       # print "\n\n completed_ids_list --- ", len(completed_ids_list)
+  #       # print "\n\n incompleted_ids_list --- ", len(incompleted_ids_list)
 
   for each in node.collection_set:
     obj = node_collection.one({'_id': ObjectId(each) })
@@ -869,7 +875,8 @@ def get_collection(request, group_id, node_id, stats_flag=False):
       node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
       collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
 
-      collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
+      # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
+      collection_list = get_inner_collection(collection_list, obj, gstaff_access)
 
 
   # def a(p,q,r):
@@ -907,6 +914,8 @@ def get_collection(request, group_id, node_id, stats_flag=False):
   #   get_course_units_tree(data,updated_data)
   #   data = updated_data
   # print data
+  cache.set(cache_key, json.dumps(data), 60*15)
+
   return HttpResponse(json.dumps(data))
 
 
@@ -6291,10 +6300,11 @@ def course_create_collection(request, group_id):
 def course_create_note(request, group_id):
   coll_list =  request.GET.get('coll_list','')
   fetch_res = coll_list.split(',')
-  print "fetch_res",fetch_res
-  print "\n\n",fetch_res 
+  # print "fetch_res",fetch_res
+  # print "\n\n",fetch_res 
   # print "image_coll",image_coll
   return render_to_response('ndf/course_create_note.html',
       {
         "group_id":group_id,"fetch_res":fetch_res
       },context_instance=RequestContext(request))
+

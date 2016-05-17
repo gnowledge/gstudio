@@ -2,12 +2,9 @@
 {% load i18n %}
 
 {% block head %}
+
   <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet">
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
-
-  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
-
   <script type="text/javascript">
     $(document).ready(function() {
       {% check_is_gstaff groupid request.user as is_gstaff %}
@@ -77,12 +74,6 @@
 
         $.ajax({
           url: "{% url 'get_course_collection' group_id group_obj.pk True %}",
-
-          data: {
-            "completed_nodes": {% if completed_ids %}{{completed_ids|safe}}{% else %}null{% endif %},
-            "incompleted_nodes": {% if incompleted_ids %}{{incompleted_ids|safe}}{% else %}null{% endif %},
-            "leaf_nodes": {% if leaf_ids %}{{leaf_ids|safe}}{% else %}null{% endif %}
-          },
 
           type: "GET",
 
