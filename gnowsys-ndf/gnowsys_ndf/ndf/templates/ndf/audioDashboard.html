@@ -47,7 +47,7 @@
     
     <li class="card-audio-wrapper">
             <audio  controls loop  src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" > </audio>
-            <figcaption title="Click here to add this file in editor"class="audio-caption" data-audio-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" data-audio-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}">{{each.name}}</figcaption>
+            <figcaption title="Click here to add this file in editor" class="audio-caption" data-audio-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" data-audio-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}">{{each.name}}</figcaption>
     
     </li>
     {% endfor %}
