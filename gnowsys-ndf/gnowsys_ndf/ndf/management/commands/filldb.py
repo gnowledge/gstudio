@@ -414,7 +414,7 @@ class Command(BaseCommand):
           if node_doc.altnames is None:
             node_doc.altnames = unicode('Trash')
             node_doc.save()
-            print "Altnames changed successfully from None"
+            print "Altnames changed to Trash"
           print "Trash Group already created."	
         print "\n"
         info_message += "\n\n"
