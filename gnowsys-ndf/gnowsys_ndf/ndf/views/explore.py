@@ -77,10 +77,13 @@ def explore_courses(request):
 
 @get_execution_time
 def explore_groups(request):
-
+    print "request.user",request.user
     title = 'groups'
-
-    group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id}).sort('last_update', -1)
+    gstaff_access = check_is_gstaff(group_id,request.user)
+    if gstaff_access:
+        group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id}).sort('last_update', -1)
+    else:
+        group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id,'name':{'$nin':['home','Trash','desk','help','warehouse']}}).sort('last_update', -1)
 
     context_variable = {'title': title, 'doc_cur': group_cur, 'card': 'ndf/simple_card.html',
                         'group_id': group_id, 'groupid': group_id}
