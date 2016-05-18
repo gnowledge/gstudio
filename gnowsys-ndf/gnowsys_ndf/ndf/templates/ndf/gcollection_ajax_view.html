@@ -5,7 +5,6 @@
 
   <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet">
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
-  {% get_course_completetion_data group_obj request.user True as result_data %}
   <script type="text/javascript">
     $(document).ready(function() {
       {% check_is_gstaff groupid request.user as is_gstaff %}
@@ -75,13 +74,7 @@
 
         $.ajax({
           url: "{% url 'get_course_collection' group_id group_obj.pk True %}",
-          {% if result_data %}
-          data: {
-            "completed_nodes": {{result_data.completed_ids|safe}},
-            "incompleted_nodes": {{result_data.incompleted_ids|safe}},
-            "leaf_nodes": {{result_data.leaf_ids|safe}}
-          },
-          {% endif %}
+
           type: "GET",
 
           dataType: "json",
