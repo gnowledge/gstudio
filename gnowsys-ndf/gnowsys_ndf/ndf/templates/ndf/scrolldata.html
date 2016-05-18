@@ -23,6 +23,7 @@
 
    <div class="container-div selFile course-notif" title="{{i.created_at|timesince}} ago">
       <div class="row">
+      {% comment %}
         <div class="medium-2 columns">
           <div class="notif-type">
             <img src="/static/ndf/css/themes/metastudio/logo.svg">
@@ -32,6 +33,7 @@
             </div>
           </div>
         </div>
+        {% endcomment %}
         <div class="medium-10 columns">
             <span class="notif-from">
               {% if hyperlinks %}
@@ -82,7 +84,7 @@
       {% endif %}
 
       {% if hyperlinks %}
-        <div id="performed on" class="small-2 column"  style=" position:relative; word-wrap: break-word; width:auto; left:7.5%;" >
+        <div id="performed on" class="small-2 column"  style=" position:relative; word-wrap: break-word; width:auto; left:42%;" >
               {{i.created_at|timesince}} ago
         </div>
         <div  align="right" style="position:relative; right:4%; top:-15px;" >
