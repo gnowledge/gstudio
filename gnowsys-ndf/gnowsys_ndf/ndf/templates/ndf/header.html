@@ -489,7 +489,7 @@
                     <a href="javascript:window.history.back();"><i class="fa fa-angle-left back-btn"></i> {% trans "BACK" %}</a>
                   </li>
                   {% if site.SITE_NAME == "NROER" %}
-                    {% if group_name_tag == "home" or "CourseEventGroup" in group_object.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
+                    {% if group_name_tag == "home" or "CourseEventGroup" not in group_object.member_of_names_list or "ProgramEventGroup" not in list_of_sg_member_of %}
                     <!-- NROER level-two menu -->
                       {% if "repository" not in request.path %}
                         {% if "/partner/" not in request.path %}

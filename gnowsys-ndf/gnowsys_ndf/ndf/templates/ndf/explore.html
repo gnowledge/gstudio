@@ -54,7 +54,7 @@
 			{% for each_obj in doc_cur %}
 				<li class="card-image-wrapper" style="margin-top:13px;">
 				{% if title == "base courses" %}
-					{% include card with resource=each_obj no_footer=True url_name="course_detail" first_arg=groupid second_arg=each_obj.pk  %}
+					{% include card with resource=each_obj has_logo=True no_footer=True url_name="course_detail" first_arg=groupid second_arg=each_obj.pk  %}
 				{% else %}
 					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk  next_session=True %}
 				{% endif %}
