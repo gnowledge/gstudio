@@ -58,7 +58,7 @@ col = db[Benchmark.collection_name]
 
 # grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
 # ins_objectid = ObjectId()
-
+reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
 
 @login_required
 @get_execution_time
@@ -171,7 +171,6 @@ def discussion_reply(request, group_id, node_id):
             user_name = unicode(request.user.username)
 
             # auth = node_collection.one({'_type': 'Author', 'name': user_name })
-            reply_st = node_collection.one({ '_type': 'GSystemType', 'name': 'Reply'})
             
             # creating empty GST and saving it
             reply_obj = node_collection.collection.GSystem()
@@ -323,7 +322,6 @@ def discussion_delete_reply(request, group_id, node_id):
 
     nodes_to_delete = json.loads(request.POST.get("nodes_to_delete", "[]"))
     
-    reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
     deleted_replies = []
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
     # print "\n\nnode_obj.name", node_obj.name, node_obj.member_of_names_list,node_obj._id
@@ -379,3 +377,7 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
 
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
+@get_execution_time
+def get_thread_comments_count(request, group_id, thread_node_id):
+  return HttpResponse(node_collection.find({'member_of': reply_st._id, 'origin.thread_id':ObjectId(thread_node_id)}).count())
+  # return HttpResponse(json.dumps(result_set))

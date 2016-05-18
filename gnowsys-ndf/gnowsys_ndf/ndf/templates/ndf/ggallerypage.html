@@ -132,12 +132,12 @@
                     </div>
                      <div id="create_collection_model" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog" >
                     </div>
-                    
+
             </div>
             <!-- Files listing div -->
             <div class="gallery-body small-12 columns">
                 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-5 gallery-body-ul">
-                
+
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
 
@@ -176,7 +176,7 @@
     {% if file_obj %}
         {% include "ndf/ggallerymodal.html" with node=file_obj %}
     {% endif %}
-    
+
 </div>
 {% comment %}
 {% verbatim %}
@@ -191,7 +191,7 @@
             $("#reveal-{{file_obj.pk}}").foundation('reveal','open');
         {% endif %}
     })
-    
+
     // On close event of reveal-modal ----------------------------------------------
     $(document).on('close', '.file-detail-modal', function () {
         $('.file-detail-modal-close')[0].click()
@@ -205,7 +205,7 @@
         return filterTagTemplate({label});
     }
     $(function() {
-      
+
         //Filter tags creation on changing seconday filter.
         $(".secondary-filter").on('change', function() {
             $('.filter-tags').append(createFilterTag($(".secondary-filter option:selected").text()));
@@ -240,17 +240,17 @@
 
         var checked = $('.filenode:checked').length;
         if (checked > 1){
-          $(".gallery-actions").css("display", "block");          
-          //$(".create-collection").css("display", "block");          
-          //$(".add-to-collection").css("display", "block");          
+          $(".gallery-actions").css("display", "block");
+          //$(".create-collection").css("display", "block");
+          //$(".add-to-collection").css("display", "block");
         }
         else{
-          $(".gallery-actions").css("display", "none");          
-          // $(".create-note").css("display", "none");          
-          // $(".create-collection").css("display", "none");          
-          // $(".add-to-collection").css("display", "none");          
+          $(".gallery-actions").css("display", "none");
+          // $(".create-note").css("display", "none");
+          // $(".create-collection").css("display", "none");
+          // $(".add-to-collection").css("display", "none");
         }
-        
+
     });
 
     $('.create-collection').click(function() {
@@ -270,15 +270,15 @@
               // location.href = "{% url 'course_gallery' group_id %}";
 
             }
-          });          
+          });
         }
-        
+
         else{
           alert("Select atleast 1 resource");
 
-        
+
         }
-          
+
     });
 
 
@@ -300,15 +300,15 @@
               // location.href = "{% url 'course_gallery' group_id %}";
 
             }
-          });          
+          });
         }
-        
+
         else{
           alert("Select atleast 1 resource");
 
-        
+
         }
-          
+
     });
 
   $(".create-note").click(function(){
@@ -349,11 +349,11 @@
             },
             success: function(data) {
                 $("#create_collection_model").html(data);
-                
+
                 $("#create_collection_model").foundation('reveal', 'open');
             }
-          });          
-        
+          });
+
 
   })
 

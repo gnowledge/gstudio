@@ -792,7 +792,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 ##### bellow part is for manipulating nodes collections#####
 
 @get_execution_time
-def get_inner_collection(collection_list, node, gstaff_access, completed_ids, incompleted_ids):
+def get_inner_collection(collection_list, node, gstaff_access, completed_ids=None, incompleted_ids=None):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
@@ -803,16 +803,16 @@ def get_inner_collection(collection_list, node, gstaff_access, completed_ids, in
         for cl in collection_list:
           if cl['id'] == node.pk:
             node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
-            if col_obj._id in completed_ids:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "COMPLETED"}
-              # print "\n completed_ids -- ",completed_ids
-              # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
-            elif col_obj._id in incompleted_ids:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "WARNING"}
-              # print "\n completed_ids -- ",completed_ids
-              # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
-            else:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
+            # if col_obj._id in completed_ids:
+            #   inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "COMPLETED"}
+            #   # print "\n completed_ids -- ",completed_ids
+            #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
+            # elif col_obj._id in incompleted_ids:
+            #   inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "WARNING"}
+            #   # print "\n completed_ids -- ",completed_ids
+            #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
+            # else:
+            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
             inner_sub_list = [inner_sub_dict]
             inner_sub_list = get_inner_collection(inner_sub_list, col_obj, gstaff_access, completed_ids, incompleted_ids)
             # if "CourseSubSectionEvent" == node_type:
@@ -844,75 +844,35 @@ def get_inner_collection(collection_list, node, gstaff_access, completed_ids, in
 
 @get_execution_time
 def get_collection(request, group_id, node_id, stats_flag=False):
-  node = node_collection.one({'_id':ObjectId(node_id)})
-  # print "\nnode: ",node.name,"\n"
-  collection_list = []
-  gstaff_access = False
-  completed_ids_list = []
-  incompleted_ids_list = []
-  gstaff_access = check_is_gstaff(group_id,request.user)
+  try:
+    cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id) 
+    cache_result = cache.get(cache_key)
+    if cache_result:
+      return HttpResponse(cache_result)
 
-  completed_node_ids = request.GET.getlist("completed_nodes[]","")
-  incompleted_node_ids = request.GET.getlist("incompleted_nodes[]","")
-  leaf_ids = request.GET.getlist("leaf_nodes[]","")
-  # collection_list_append_temp=collection_list.append
-  # print "\n\n gstaff_access---",gstaff_access
+    node = node_collection.one({'_id':ObjectId(node_id)})
+    # print "\nnode: ",node.name,"\n"
+    collection_list = []
+    gstaff_access = False
+    gstaff_access = check_is_gstaff(group_id,request.user)
 
-  list_of_leaf_node_ids = []
-  if stats_flag:
-    if request.user.id:
-        completed_ids_list = map(ObjectId, completed_node_ids)
-        incompleted_ids_list = map(ObjectId, incompleted_node_ids)
-        list_of_leaf_node_ids = map(ObjectId, leaf_ids)
-        # print "\n\n completed_ids_list --- ", len(completed_ids_list)
-        # print "\n\n incompleted_ids_list --- ", len(incompleted_ids_list)
+    for each in node.collection_set:
+      obj = node_collection.one({'_id': ObjectId(each) })
+      if obj:
+        node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+        collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
 
-  for each in node.collection_set:
-    obj = node_collection.one({'_id': ObjectId(each) })
-    if obj:
-      node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-      collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+        # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
+        collection_list = get_inner_collection(collection_list, obj, gstaff_access)
+    data = collection_list
+    updated_data = []
+    print data
+    cache.set(cache_key, json.dumps(data), 60*15)
 
-      collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
+    return HttpResponse(json.dumps(data))
 
-
-  # def a(p,q,r):
-  #		collection_list.append({'name': p, 'id': q,'node_type': r})
-  #this empty list will have the Process objects as its elements
-  # processes=[]
-  #Function used by Processes implemented below
-  # def multi_(lst):
-
-  #   for each in lst:
-  #     obj = node_collection.one({'_id': ObjectId(each) })
-  #     if obj:
-  #       node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-  #       collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
-
-  #       collection_list = get_inner_collection(collection_list, obj)
-  		  #collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
-	
-  # if node and node.collection_set:
-  #   t=len(node.collection_set)
-  #   x=multiprocessing.cpu_count()#returns no of cores in the cpu 
-  #   n2=t/x#divides the list into those many parts
-  #   #Process object is created.The list after being partioned is also given as an argument. 
-    
-  #   for i in range(x):
-  #     processes.append(multiprocessing.Process(target=multi_,args=(node.collection_set[i*n2:(i+1)*n2], )))
-  #   for i in range(x):
-  #     processes[i].start()#each Process started
-  #   for i in range(x):
-  #     processes[i].join()#each Process converges
-  data = collection_list
-  updated_data = []
-  # print "\n node.member_of_names_list",node.member_of_names_list
-  # if "CourseEventGroup" in node.member_of_names_list:
-  #   get_course_units_tree(data,updated_data)
-  #   data = updated_data
-  # print data
-  return HttpResponse(json.dumps(data))
-
+  except Exception as ee:
+    print ee
 
 @get_execution_time
 def add_sub_themes(request, group_id):
@@ -6307,7 +6267,6 @@ def course_create_note(request, group_id):
       {
         "group_id":group_id,"img_res":img_res,"audio_res":audio_res,"video_res":video_res
       },context_instance=RequestContext(request))
-
 
 @login_required
 @get_execution_time

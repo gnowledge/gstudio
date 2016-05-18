@@ -1,3 +1,7 @@
+from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.methods import create_grelation
+
+
 twist_gst = node_collection.one({'_type':"GSystemType", 'name': "Twist"})
 twist_cur = node_collection.find({'member_of': twist_gst._id, 'relation_set.thread_of':{'$exists': False}})
 print "\n Total threads found without thread_of -- ", twist_cur.count()
