@@ -1903,10 +1903,11 @@ def course_content(request, group_id):
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
 
+    
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'group_obj': group_obj, 'title': 'course content',
+            'group_obj': group_obj,'node': group_obj, 'title': 'course content',
             'allow_to_join': allow_to_join,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
             })
@@ -2607,3 +2608,19 @@ def build_progress_bar(request, group_id, node_id):
         pass
     cache.set(cache_key, json.dumps(result_status), 60*15)
     return HttpResponse(json.dumps(result_status))
+
+@get_execution_time
+def get_resource_completion_status(request, group_id):
+
+    result_dict = {'COMPLETED':[]}
+    cr_ids = request.GET.get("cr_ids", "")
+    if cr_ids:
+        cr_ids = json.loads(cr_ids)
+        for each_cr in cr_ids:
+            b = benchmark_collection.find({'name': "course_resource_detail",
+                'calling_url': {'$regex': '/'+unicode(each_cr)+'/$'},
+                'user': request.user.username
+                })
+            if b.count():
+                result_dict['COMPLETED'].append(each_cr)
+    return HttpResponse(json.dumps(result_dict))
