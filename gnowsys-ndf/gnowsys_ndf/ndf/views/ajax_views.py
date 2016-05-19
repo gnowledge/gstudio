@@ -6313,7 +6313,7 @@ def upload_file(request,group_id):
 
     gs_obj_list = write_files(request, group_id)
     gs_obj_id = gs_obj_list[0]['_id']
-    # print "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ngs_obj_list: ", gs_obj_id
+    print "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ngs_obj_list: ", gs_obj_id
 
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     for each_gs_file in gs_obj_list:
