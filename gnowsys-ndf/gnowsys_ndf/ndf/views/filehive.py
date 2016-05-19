@@ -34,7 +34,6 @@ def upload_form(request, group_id):
 def write_files(request, group_id, make_collection=False, unique_gs_per_file=True):
 
 	user_id        = request.user.id
-	print "user_id",user_id
 	author_obj     = node_collection.one({'_type': u'Author', 'created_by': user_id})
 	author_obj_id  = author_obj._id
 
@@ -43,9 +42,9 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 	first_obj      = None
 	collection_set = []
 	uploaded_files = request.FILES.getlist('filehive', [])
-	print "uploaded_files",uploaded_files
+	# print "uploaded_files",uploaded_files
 	name           = request.POST.get('name')
-	print "name",name
+	# print "name",name
 
 	gs_obj_list    = []
 	existing_file_gs = []
@@ -69,7 +68,7 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 									language=language,
 									uploaded_file=each_file,
 									unique_gs_per_file=unique_gs_per_file)
-		print "existing_file_gs",existing_file_gs
+		# print "existing_file_gs",existing_file_gs
 		if (gs_obj.get('_id', None) or existing_file_gs.get('_id', None)) and \
 		   (existing_file_gs.get('_id', None) == gs_obj.get('_id', None)):
 
@@ -80,18 +79,14 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 
 			if 'video' in gs_obj.if_file.mime_type:
 				convertVideo.delay(user_id, str(gs_obj._id), file_name)
-				print "1"
 			if not first_obj:
 				first_obj = gs_obj
-				print "1"
 			else:
 				collection_set.append(gs_obj._id)
-				print "2"
 
 			gs_obj_list.append(gs_obj)
-		else:
-			if existing_file_gs:
-				return existing_file_gs
+		elif existing_file_gs:
+				gs_obj_list.append(existing_file_gs)
 
 	if make_collection and collection_set:
 		first_obj.collection_set = collection_set

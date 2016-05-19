@@ -2495,9 +2495,9 @@ def upload_using_save_file(request,group_id):
     from gnowsys_ndf.ndf.views.filehive import write_files
 
     gs_obj_list = write_files(request, group_id)
-    print "\n\nretirn gs_obj_list",gs_obj_list
-    gs_obj_id = gs_obj_list['_id']
-    print "\n\n\ngs_obj_id: ",gs_obj_list['_id']
+    # print "\n\nretirn gs_obj_list",gs_obj_list
+    gs_obj_id = gs_obj_list[0]['_id']
+    # print "\n\n\ngs_obj_id: ",gs_obj_id
 
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     for each_gs_file in gs_obj_list:
