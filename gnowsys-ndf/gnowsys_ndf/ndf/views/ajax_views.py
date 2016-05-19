@@ -6267,7 +6267,6 @@ def course_create_note(request, group_id):
         "group_id":group_id,"img_res":img_res,"audio_res":audio_res,"video_res":video_res
       },context_instance=RequestContext(request))
 
-
 @login_required
 @get_execution_time
 def upload_file_ckeditor(request,group_id):

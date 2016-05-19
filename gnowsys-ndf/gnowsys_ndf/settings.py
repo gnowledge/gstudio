@@ -742,7 +742,6 @@ GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
 GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
-
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Post', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
 # #textb
 # import warnings
@@ -750,8 +749,6 @@ GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Post', 'Submit', 'V
 #         'error', r"DateTimeField received a naive datetime",
 #         RuntimeWarning, r'django\.db\.models\.fields')
 # #textb
-
-
 
 # cache implementation with memcached and python-memcached binding:
 CACHES = {
