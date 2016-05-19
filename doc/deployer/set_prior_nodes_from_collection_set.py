@@ -1,3 +1,5 @@
+from gnowsys_ndf.ndf.models import *
+
 def set_prior_nodes_from_collection_set(node_obj):
 	print "\n Name : ", node_obj.name, " -- ", node_obj.member_of_names_list , " --- ", node_obj._id
 	if node_obj.collection_set:
