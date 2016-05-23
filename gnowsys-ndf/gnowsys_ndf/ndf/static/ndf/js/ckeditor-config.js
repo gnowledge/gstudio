@@ -27,7 +27,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'styles', items : [ 'Styles','Format' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] },
 		{ name: 'links', items : [ 'Link','Unlink' ] },
-		{ name: 'tools', items : [ 'addImage','Source','Maximize','-','addAudio'] },
+		{ name: 'tools', items : [ 'addImage','addAudio','Source','Maximize','-'] },
 
 	];
 
@@ -37,7 +37,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'insert', items : [ 'Image','Flash','Iframe' ] },
-		{ name: 'tools', items : [ 'addImage','Source', 'Maximize','-','addAudio','closebtn'] },
+		{ name: 'tools', items : [ 'addImage','addAudio','Source', 'Maximize','-','closebtn'] },
 	];
 
 	config.toolbar_GgallaryCommentsToolbar =
