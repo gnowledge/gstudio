@@ -26,7 +26,6 @@ CKEDITOR.plugins.add('addAudio',
                             $("#group_imgs_on_modal").html(data);
                             $('#group_imgs_on_modal').foundation('reveal', 'open');
                             $(".audio-caption").click(function(event){
-                                alert("hello");
                                 var audioURL = $(this).children('audio').attr("data-audio-src");
                                 // var locationURL = 'http://' + location.host;
                                 var locationURL = window.location.origin
