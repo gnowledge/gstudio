@@ -14,7 +14,8 @@ CKEDITOR.plugins.add( 'closebtn', {
                 }else if( document.layers ){
                     elem = document.layers[id];
                 }
-               
+                
+                $("#create-discussion").show();
                 setCurrNodeEdit("");    
                 CKEDITOR.instances.ckeditor_textarea.destroy();
                 $( "div" ).remove( ".ckeditor-content-reply" );
