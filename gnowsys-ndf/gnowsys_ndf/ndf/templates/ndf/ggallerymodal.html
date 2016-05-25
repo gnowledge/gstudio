@@ -144,6 +144,10 @@
                             <a href="{% url edit_url group_id node.pk %}?course_tab_title={{title}}">
                                 <i class="fi-page-edit" ></i>Edit
                             </a>
+                            <a class="delete-btn" title="Delete  {{node.member_of_names_list.0}}"><i class="fi-trash"></i> Delete </a>
+                        {% else %}
+                            <a class="delete-btn" title="Delete  {{node.member_of_names_list.0}} disabled" title="You are not authorized for this action"><i class="fi-trash"></i> Delete </a>
+
                         {% endif %}
                     </div>
                 </div>
@@ -283,3 +287,28 @@ $(document).on('click','.view-more-tags',function(){
 </script>
 {% endcomment %}
 
+<script type="text/javascript">
+    $(document).on("click", ".delete-btn", function() {
+        msg = confirm("Do you want to delete this resource?.");
+        if (msg == true) {
+            $.ajax({
+                    type: "POST",
+                    url: "{% url 'trash_resource' group_id node %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                  success: function(data) {
+                        data = JSON.parse(data)
+                        if(data['success']){
+                            $('.close-reveal-modal').trigger('click');
+                            window.location.replace("{% url redirect_tab_url group_id %}");
+                            
+                        }
+                  }
+
+            });
+        } 
+    });
+            
+</script>

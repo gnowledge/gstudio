@@ -20,7 +20,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
-
+GSTUDIO_DEFAULT_GROUPS = ['home','Trash','desk','help','warehouse']
 LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'))
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
@@ -750,7 +750,6 @@ GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Post', 'Submit', 'V
 #         RuntimeWarning, r'django\.db\.models\.fields')
 # #textb
 
-
 # cache implementation with memcached and python-memcached binding:
 CACHES = {
     'default': {
@@ -765,7 +764,7 @@ WETUBE_PASSWORD = "gl@b$@)we!ube"
 
 # Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
-CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null', )
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_dots',)
 
 GSTUDIO_HELP_SIDEBAR = False
 GSTUDIO_SOCIAL_SHARE_RESOURCE = False

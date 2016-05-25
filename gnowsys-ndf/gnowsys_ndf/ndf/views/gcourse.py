@@ -2049,10 +2049,10 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         files_cur = node_collection.find({
                                         '_type': {'$in': ["File", "GSystem"]},
                                         '$or': [
-                                                {'member_of': GST_FILE._id},
+                                                {'member_of': gst_file._id},
                                                 {
                                                     'collection_set': {'$exists': "true",'$not': {'$size': 0} },
-                                                    'member_of': GST_PAGE._id,
+                                                    'member_of': gst_page._id,
                                                 }
                                             ],
                                         'group_set': {'$all': [ObjectId(group_id)]},
@@ -2192,16 +2192,16 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
         # print "\n\n Total files: ", files_cur.count()
         files_cur = node_collection.find({
-                                        '_type': "File",
-                                        '$or': [
-                                                {'member_of': GST_FILE._id},
-                                                {
-                                                    'collection_set': {'$exists': "true",'$not': {'$size': 0} },
-                                                    'member_of': GST_PAGE._id,
-                                                }
-                                            ],
+                                        '_type': {'$in':["File","GSystem"]},
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'relation_set.clone_of': {'$exists': False},
+                                        '$or': [
+                                                {'member_of': gst_file._id},
+                                                {
+                                                    'collection_set': {'$exists': True,'$not': {'$size': 0} },
+                                                    'member_of': gst_page._id,
+                                                },
+                                            ],
                                     '$or': [
                                             {
                                                 'created_by': {'$nin': gstaff_users},
@@ -2228,7 +2228,6 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                             'mime_type': 1,
                                             'if_file':1,
                                         }).sort("last_update", -1)
-
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
         context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})

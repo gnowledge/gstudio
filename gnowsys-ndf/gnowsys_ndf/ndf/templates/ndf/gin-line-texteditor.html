@@ -164,6 +164,7 @@
 
   function createDiscussion()
   {
+    $("#create-discussion").hide();
     if( is_user_authenticated){
        if(checkCurrEdit()){
            return false;
@@ -227,6 +228,7 @@
   // function called by "Add Reply" and "Reply" buttons to open editor
   function openCKEditor(sourceObj)
   {
+      $("#create-discussion").hide();
       // console.log(sourceObj);
           if(checkCurrEdit()){
            return false;
@@ -313,6 +315,7 @@
   function addReply(sourceObj)
   {
 
+    $("create-discussion").show();
     var value = CKEDITOR.instances['ckeditor_textarea'].getData();
     var priorNodeId = $("#prior-node").val(),
         replyContent = value.trim();
@@ -486,6 +489,7 @@
 
 function editreply(sourceObj){
 //alert(sourceObj);discussion-content" data-reply-id="{{ each_reply.oid }}
+  $("#create-discussion").hide();
   var sourceObjDataId = $(sourceObj).attr("data-id");
   content_thread = $('.discussion-content[data-reply-id='+ sourceObjDataId +']');
   curr_thread = $('.reply-btn[data-id='+ sourceObjDataId +']');
@@ -538,6 +542,7 @@ function editreply(sourceObj){
 }
 
 function save_reply(sourceObj){
+        $("#create-discussion").show();
         var sourceObjDataId = $(sourceObj).attr("data-id");
         var content_val = CKEDITOR.instances['ckeditor_textarea'].getData();
         $( ".cke_button__closebtn_label" ).trigger( "click" );

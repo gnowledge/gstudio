@@ -20,6 +20,8 @@ from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id 
 gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
 GST_AUDIO = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
+file_gst = node_collection.find_one( { "_type" : "GSystemType","name":"File" } )
+
 
 @get_execution_time
 def audioDashboard(request, group_id, audio_id=None):
@@ -31,15 +33,40 @@ def audioDashboard(request, group_id, audio_id=None):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
+    files_cur = node_collection.find({
 
-    if audio_id is None:
-        audio_ins = node_collection.find_one({'_type': "GSystemType", "name": "Audio"})
-        print "audio_ins",audio_ins
-        if audio_ins:
-            audio_id = str(audio_ins._id)
-    audio_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(audio_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-    # print "***********audio_col",audio_col
+                                    '_type': {'$in': ["GSystem"]},
+                                    'member_of': file_gst._id,
+                                    'group_set': {'$all': [ObjectId(group_id)]},
+                                    'if_file.mime_type': {'$regex': 'audio'} 
+
+                                    # 'created_by': {'$in': gstaff_users},
+                        # '$or': [
+                                # {
+                                # },
+                                # {
+                                #     '$or': [
+                                #             {'access_policy': u"PUBLIC"},
+                                #             {
+                                #                 '$and': [
+                                #                         {'access_policy': u"PRIVATE"},
+                                #                         {'created_by': request.user.id}
+                                #                     ]
+                                #             }
+                                #         ],
+                                # }
+                                # {    'collection_set': {'$exists': "true", '$not': {'$size': 0} }}
+                            # ]
+                    },
+                    {
+                        'name': 1,
+                        '_id': 1,
+                        'fs_file_ids': 1,
+                        'member_of': 1,
+                        'mime_type': 1,
+                        'if_file':1
+                    }).sort("last_update", -1)
+    # print "files_cur length++++++++++",files_cur.count()
     template = "ndf/audioDashboard.html"
-    already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'audioCollection': audio_col,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
+    variable = RequestContext(request, {'audioCollection': files_cur,'groupid':group_id,'group_id':group_id })
     return render_to_response(template, variable)

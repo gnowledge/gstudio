@@ -1,3 +1,4 @@
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS
 # factory data to create in database for gnowsys-ndf project
 
 
@@ -306,3 +307,4 @@ relation_types = [{'_type':'RelationType','name':'group_has_course_event'},
 ]
 
 
+factory_default_groups = GSTUDIO_DEFAULT_GROUPS
