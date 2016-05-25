@@ -2231,7 +2231,7 @@ class HistoryManager():
         (b) False - Otherwise
         """
 
-        collection_tuple = (MetaType, GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation, Filehive)
+        collection_tuple = (MetaType, GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation, Filehive, Buddy)
         file_res = False    # True, if no error/exception occurred
 
         if document_object is not None and \
@@ -2713,9 +2713,10 @@ class Buddy(DjangoDocument):
     collection_name = 'Buddies'
 
     structure = {
-        'loggedin_userid'   : int,
-        'session_key'       : basestring,
-        'buddy_in_out'      : dict,
+        '_type': unicode,
+        'loggedin_userid': int,
+        'session_key': basestring,
+        'buddy_in_out': dict,
             # e.g:
             # buddy_in_out = {
             #           "auth_id": [
@@ -2723,8 +2724,8 @@ class Buddy(DjangoDocument):
             #                         {"in": datetime.datetime, "out": datetime.datetime}
             #                    ]
             #           }
-        'starts_at'         : datetime.datetime,
-        'ends_at'           : datetime.datetime
+        'starts_at': datetime.datetime,
+        'ends_at': datetime.datetime
     }
 
     required_fields = ['loggedin_userid', 'session_key']
@@ -2902,6 +2903,54 @@ class Buddy(DjangoDocument):
             buddy_obj = None
 
         return active_buddy_auth_list
+
+
+    def save(self, *args, **kwargs):
+
+        is_new = False if ('_id' in self) else True
+
+        super(Buddy, self).save(*args, **kwargs)
+
+        # storing Filehive JSON in RSC system:
+        history_manager = HistoryManager()
+        rcs_obj = RCS()
+
+        if is_new:
+
+            # Create history-version-file
+            if history_manager.create_or_replace_json_file(self):
+                fp = history_manager.get_file_path(self)
+                message = "This document of Buddy (having session_key: " + str(self.session_key) + " and user id: " + str(self.loggedin_userid) + " ) is created on " + str(datetime.datetime.now())
+                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+        else:
+            # Update history-version-file
+            fp = history_manager.get_file_path(self)
+
+            try:
+                rcs_obj.checkout(fp)
+
+            except Exception as err:
+                try:
+                    if history_manager.create_or_replace_json_file(self):
+                        fp = history_manager.get_file_path(self)
+                        message = "This document of Buddy (having session_key: " + str(self.session_key) + " and user id: " + str(self.loggedin_userid) + " ) is re-created on " + str(datetime.datetime.now())
+                        rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+                except Exception as err:
+                    print "\n DocumentError: This document (", self._id, ":", str(self.session_key), ") can't be re-created!!!\n"
+                    node_collection.collection.remove({'_id': self._id})
+                    raise RuntimeError(err)
+
+            try:
+                if history_manager.create_or_replace_json_file(self):
+                    message = "This document of Buddy (having session_key: " + str(self.session_key) + " and user id: " + str(self.loggedin_userid) + " ) is lastly updated on " + str(datetime.datetime.now())
+                    rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+
+            except Exception as err:
+                print "\n DocumentError: This document (", self._id, ":", str(self.session_key), ") can't be updated!!!\n"
+                raise RuntimeError(err)
+
 
 
 ####################################### Added on 19th June 2014 for SEARCH ##############################
