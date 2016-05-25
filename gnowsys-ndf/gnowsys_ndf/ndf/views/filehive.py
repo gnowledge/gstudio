@@ -86,7 +86,7 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 
 			gs_obj_list.append(gs_obj)
 		elif existing_file_gs:
-				gs_obj_list.append(existing_file_gs)
+				gs_obj_list.extend(existing_file_gs)
 
 	if make_collection and collection_set:
 		first_obj.collection_set = collection_set
