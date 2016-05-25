@@ -42,16 +42,20 @@
 <div >
   <br/>
     {% if allow_to_comment %}
+      <div data-alert class="alert-box new_comments hide info radius">
+        <div class="new_cmnts_lbl">New comment(s) added. Please refresh to see.</div>
+          <a onclick="location.reload()">Refresh <i class="fi-refresh"></i></a>
+          <a href="#" class="close">&times;</a>
+      </div>
+
       <div class="create-discussion">
+
       <div  onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}"  class="ckeditor-comment  button small radius" style="margin-bottom:0;">
         {% if thr_int_type %}
           {{thr_int_type}} {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
           Comment  {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
         {% endif %}
-      </div>
-      <div class="discussion-refresh right">
-        <small><a onclick="location.reload()">Refresh <i class="fi-refresh"></i></a></small>
       </div>
     {% endif %}
     </div>
@@ -148,6 +152,11 @@
 <script type="text/javascript">
   // for discussion tab
   // storing ndf_tags return values in JS variables
+  old_count = 0
+  {% if all_replies %}
+    old_count = {{all_replies|length}}
+  {% endif %}
+
   var user_access = "{{ user_access }}"; // "allow" or "disallow"
   {% edit_policy groupid node request.user as status %}
   var edit_policy = "{{ status }}"; // "allow" or "disallow"
@@ -155,6 +164,7 @@
 
   function createDiscussion()
   {
+    $("#create-discussion").hide();
     if( is_user_authenticated){
        if(checkCurrEdit()){
            return false;
@@ -218,6 +228,7 @@
   // function called by "Add Reply" and "Reply" buttons to open editor
   function openCKEditor(sourceObj)
   {
+      $("#create-discussion").hide();
       // console.log(sourceObj);
           if(checkCurrEdit()){
            return false;
@@ -271,7 +282,7 @@
     }
     else
     {
-      $(".view-discussion span").fadeOut().fadeIn().html("{% trans 'Join Discussion' %}("+totalReplies+")");
+      $("#create-discussion").fadeOut().fadeIn().html("{{thr_int_type}} ("+totalReplies+")");
     }
   }
   function createReplyHTML(replyStyle, data,child_reply_level)
@@ -304,6 +315,7 @@
   function addReply(sourceObj)
   {
 
+    $("create-discussion").show();
     var value = CKEDITOR.instances['ckeditor_textarea'].getData();
     var priorNodeId = $("#prior-node").val(),
         replyContent = value.trim();
@@ -360,11 +372,9 @@
 
               }
               // updating tab-text
+              old_count = old_count + 1
               updateDiscussionTabText();
               
-               
-
-     
             }
             else if( data[0] == "no_content" ){
 
@@ -452,11 +462,6 @@
     }
     return replyArr;
   }
-  // --- END of discussion code ----
-</script>
-
-
-<script type="text/javascript">
 
   function setCurrNodeEdit(oid)
   {
@@ -484,6 +489,7 @@
 
 function editreply(sourceObj){
 //alert(sourceObj);discussion-content" data-reply-id="{{ each_reply.oid }}
+  $("#create-discussion").hide();
   var sourceObjDataId = $(sourceObj).attr("data-id");
   content_thread = $('.discussion-content[data-reply-id='+ sourceObjDataId +']');
   curr_thread = $('.reply-btn[data-id='+ sourceObjDataId +']');
@@ -536,6 +542,7 @@ function editreply(sourceObj){
 }
 
 function save_reply(sourceObj){
+        $("#create-discussion").show();
         var sourceObjDataId = $(sourceObj).attr("data-id");
         var content_val = CKEDITOR.instances['ckeditor_textarea'].getData();
         $( ".cke_button__closebtn_label" ).trigger( "click" );
@@ -572,7 +579,22 @@ function save_reply(sourceObj){
 
 }
 
+  setInterval(function() {
+    var xmlhttp = new XMLHttpRequest();
+    var url = "{% url 'get_thread_comments_count' group_id node.pk %}";
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
 
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var new_count = JSON.parse(xmlhttp.responseText);
+            if (old_count < new_count && new_count > 0){
+              $(".new_comments").removeClass("hide");
+              $(".new_cmnts_lbl").html(new_count-old_count + " New comment(s). Please refresh to see.")
+            }
+        }
+    };
+  }, 10000);
 </script>
 
 

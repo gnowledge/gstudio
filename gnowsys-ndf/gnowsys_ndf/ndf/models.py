@@ -282,7 +282,7 @@ class Node(DjangoDocument):
                                         # 'Administration' group is
                                         # ready.
     default_values = {
-                        'created_at': datetime.datetime.utcnow,
+                        'created_at': datetime.datetime.now,
                         'status': u'DRAFT',
                         'language': ('en', 'English')
                     }
@@ -1608,7 +1608,7 @@ class Filehive(DjangoDocument):
     use_dot_notation = True
     required_fields = ['md5', 'mime_type']
     default_values = {
-                        'uploaded_at': datetime.datetime.utcnow
+                        'uploaded_at': datetime.datetime.now
                     }
 
 

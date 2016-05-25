@@ -2,70 +2,11 @@
 {% load i18n %}
 
 {% block head %}
-  <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet">
+  <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> 
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
 
-  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
-
+    
   <script type="text/javascript">
-    $(document).ready(function() {
-      {% check_is_gstaff groupid request.user as is_gstaff %}
-
-      // Funtion for loading tree for showing collection list left side panel
-      //doc();
-
-      // Function for manipulating tree when user visits to page directly via browser url
-      //TreeTillNode();
-      initCourseModule();
-    });
-    /*
-    var moduleData = [
-      {
-        "node_type": "CourseSectionEvent",
-        "children": [
-          {
-            "node_type": "CourseSubSectionEvent",
-            "children": [
-              {
-                "node_type": "CourseUnitEvent",
-                "children": [
-                  {
-                    "node_type": "Page",
-                    "name": "Activity 1",
-                    "status": "INPROGRESS",
-                    "id": "569a051d8e8ff402fa819c3c"
-                  }
-                ],
-                "name": "Unit1",
-                "status": "COMPLETED",
-                "id": "569a05118e8ff402fa819c31"
-              },
-              {
-                "node_type": "CourseUnitEvent",
-                "children": [
-                  {
-                    "node_type": "File",
-                    "name": "Logs.txt",
-                    "id": "569a08c48e8ff402fa819cfe"
-                  }
-                ],
-                "name": "Unit 2",
-                "status": "COMPLETED",
-                "id": "569a08a58e8ff402fa819cf2"
-              }
-            ],
-            "name": "Session1",
-            "status": "COMPLETED",
-            "id": "569a04af8e8ff402fa819c06"
-          }
-        ],
-        "id": "569a04a78e8ff402fa819c04",
-        "status": "WARNING",
-        "name": "Module1"
-      }
-    ];
-    */
     iconMapping = {
       'WARNING': 'fa-exclamation-circle',
       'COMPLETED': 'fa-check',
@@ -73,225 +14,16 @@
       'PENDING': ''
     }
 
-    function initCourseModule() {
 
-        $.ajax({
-          url: "{% url 'get_course_collection' group_id group_obj.pk True %}",
+    $(document).ready(function() {      
+      {% check_is_gstaff groupid request.user as is_gstaff %}
 
-          data: {
-            "completed_nodes": {% if completed_ids %}{{completed_ids|safe}}{% else %}null{% endif %},
-            "incompleted_nodes": {% if incompleted_ids %}{{incompleted_ids|safe}}{% else %}null{% endif %},
-            "leaf_nodes": {% if leaf_ids %}{{leaf_ids|safe}}{% else %}null{% endif %}
-          },
+      // Funtion for loading tree for showing collection list left side panel
+      doc();
 
-          type: "GET",
-
-          dataType: "json",
-
-          success: function(data){
-            // console.log(JSON.stringify(data))
-            var moduleTrees = [];
-            var moduleData = data;
-            $.each(data, function(pos, module) {
-              var mod = getModuleHtml(pos, module);
-              //mod.append('<hr />');
-              //Assosiating js tree
-              if(moduleData[pos].children){
-              var moduleTree = mod.find('.module-part').tree(
-                {
-                  data: moduleData[pos].children,
-                  onCreateLi: function(node, $li) {
-
-                    if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
-                      $li.find('.jqtree-title').addClass('module-page');
-                      {% comment %}
-                      // url = "{% url 'course_resource_detail' group_name_tag  %}"
-                      // url += "?unit_id=" + node.parent.id +"&node_id="+node.id
-                      {% endcomment %}
-                      url = '/{{group_name_tag}}/gcourse/course_section/' + node.parent.parent.id + '/' + node.parent.id + '/' + node.id
-                      $li.find('.jqtree-title')
-                        .html('<i class="fa ' + iconMapping[node.status] + '"></i><a href="'+url+'" id='+node.id+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
-                    }
-                    else{
-                      $li.find('.jqtree-title')
-                        .html('<i class="fa ' + iconMapping[node.status] + '"></i><span>' + $li.find('.jqtree-title').html() + ' </span>');
-                    }
-                    // Add 'icon' span before title
-                  }
-                });}
-              $(".course-content .collection").append(mod);
-              moduleTrees.push(moduleTree);
-            });
-
-            //Assigning Click events in each tree
-            $.each(moduleTrees, function(pos, tree) {
-              if(moduleTrees[pos]){
-                assignTreeEvents(tree);
-              }
-            })
-
-          }})}
-
-
-
-    function assignTreeEvents (moduleTree) {
-      {% get_node_type node as node_type %}
-
-      var node_type = "{{node_type}}";
-
-      moduleTree.bind(
-        'tree.select',
-        function(event) {
-          if(event.node){
-            // The clicked node is 'event.node
-            var node = event.node;
-            var parent_arr = [];
-            var parent_node = node;
-            parent_arr.push(node.id);
-
-            // Bellow code manipulates the parent hierarchy of clicked node in a tree
-            while (parent_node) {
-                if (parent_node.name !== undefined){
-                  moduleTree.tree('openNode', parent_node);
-                  parent_node = parent_node.parent;
-                  if (parent_node.name !== undefined){
-                    parent_arr.push(parent_node.id);
-                  }
-                }
-                else{
-                  break;
-                }
-            }
-            collapse_tree(node);
-            var nav_list = parent_arr.reverse();
-            // if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
-
-
-              // alert(nav_list);
-              // alert("node_type");
-              // $.ajax({
-              //     type: "GET",
-              //     url: "{% url 'collection_nav' group_id %}",
-              //     datatype: "html",
-              //     data:{
-              //       node_id: node.id,
-              //       curr_node:"{{node.pk}}",
-              //       nav: nav_list,
-              //       nod_type: node_type,
-              //       csrfmiddlewaretoken: '{{ csrf_token }}'
-              //     },
-              //     success: function(data) {
-              //       if (node_type == "Page"){
-              //        window.history.pushState("", "", "/{{group_name_tag}}/page/{{node.pk}}"+"?selected="+node.id+"");
-              //       }
-              //       else if(node_type == "File"){
-              //         window.history.pushState("", "", "/{{group_name_tag}}/file/{{node.pk}}"+"?selected="+node.id+"");
-              //       }
-              //       else if (node_type == "Term"){
-              //         window.history.pushState("", "", "/{{group_name_tag}}/term/{{node.pk}}"+"?selected="+node.id+"");
-              //       }
-              //       else if (node_type == "Course"){
-              //         window.history.pushState("", "", "/{{group_id}}/course/course_detail/{{node.pk}}"+"?selected="+node.id+"");
-              //       }
-              //       if (node_type == "CourseEventGroup" || node_type == "ProgramEventGroup"){
-              //         window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");
-              //         $(".view_page_link").trigger('click')
-              //       }
-              //       else if (node_type == "Topic"){
-              //         window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
-              //       }
-
-              //       $("#view-page").html(data);
-              //     }
-              // });
-            // $('article').unblock()
-            // }
-            // else if(node['node_type']=="CourseUnitEvent"){
-            if(node['node_type']=="CourseUnitEvent"){
-              $(".view_page_link").trigger('click')
-              $("#view_page").html("")
-              var lbl_name = document.createElement('label');
-              lbl_name.style.fontSize = "20px"
-              if(node.hasChildren()){
-                lbl_name.innerHTML = node.name + " contains following : ";
-                $("#view_page").append(lbl_name);
-                var ol_elem = document.createElement('OL');
-                ol_elem.id = "res_container";
-                if (node){
-                  for(var i=0;i<node.children.length;i++){
-                    var elem2 = document.createElement('LI');
-                    elem2.innerHTML = node.children[i].name;
-                    elem2.className = "res_name"
-                    $(ol_elem).append(elem2)
-                  }
-                }
-              }
-              else{
-                lbl_name.innerHTML = node.name + " contains no files yet!";
-                $("#view_page").append(lbl_name);
-              }
-              $("#view_page").append(ol_elem)
-            }
-          }
-          else{
-            var close_nele = event.previous_node
-            unselect_treenode(close_nele)
-          }
-
-        });
-      if (window.location.pathname.search("add_units") > -1) {
-          update_url = false;
-          moduleTree.tree({
-            selectable: false,
-          });
-          moduleTree.unbind('tree.open')
-          moduleTree.unbind('tree.select')
-
-      } else {
-          update_url = true;
-      }
-    }
-
-    /*
-    <div class="course-module columns small-12">
-      <div class="row collapse module-header">
-        <div class="small-12 columns">
-          <i class="fa fa-exclamation-circle"></i>
-          <span class="module-number">Module A :</span>
-          <span class="module-name">Invitation</span>
-          <span class="module-start-date">Jan 18 2015, 12:00 PM</span>
-        </div>
-      </div>
-      <div class="row">
-        <div class="module-part"></div>
-      </div>
-    </div>
-    */
-
-    function getModuleHtml(pos, module) {
-      var moduleHTML = $("<div>").addClass('course-module columns small-12');
-      //adding module header
-      var moduleHeader = $('<div></div>').addClass('row collapse module-header');
-      var moduleSubHeader = $("<div></div>").addClass('small-12 columns');
-      $("<i></i>").addClass('fa ' + iconMapping[module.status]).appendTo(moduleSubHeader);
-      // $("<span></span>").addClass('module-number').html('Module ' + pos).appendTo(moduleSubHeader);
-      $("<span></span>").addClass('module-name').html(module.name).appendTo(moduleSubHeader);
-      $("<span></span>").addClass('module-start-date').html(module.startDate).appendTo(moduleSubHeader);
-      moduleHeader.append(moduleSubHeader);
-      moduleHTML.append(moduleHeader);
-
-      $("<div></div>").addClass('module-part').appendTo("<div></div>").addClass('row').appendTo(moduleHTML);
-      return moduleHTML;
-    }
-
-
-
-
-
-
-
-
-    //OLD CODE
+      // Function for manipulating tree when user visits to page directly via browser url
+      TreeTillNode();
+    });
 
     function TreeTillNode () {
       // This gives the last hierarchy node id from browser url.
@@ -305,27 +37,54 @@
         tree_build.tree('selectNode', selected_node);
         return;
       }
-
+      
       // Javascript function to be used for checking objects in specific time of interval
       setTimeout(function(){
         // console.log($(".collection"))
         if(url && ($(".collection").length > 0)) { TreeTillNode() }
         $(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder');}, 100 );
     }
-
+    
 
     function doc(){
+      cs_ids = []
+      css_ids = []
+      cu_ids = []
+      cr_ids = []
       var $tree = $('.collection');
-      var arr = [];
-      {% get_node_type node as node_type %}
-
+      var arr = [];  
+      {% get_node_type node as node_type %}  
+      
       var node_type = "{{node_type}}";
 
       $tree.tree({
         selectable: true,
         keyboardSupport: false,
-        closedIcon: '<div>+</div>',
-        openedIcon: '-'
+        autoOpen: true,
+        onCreateLi: function(node, $li) {
+          if(node.node_type == "CourseSectionEvent"){
+            cs_ids.push(node.id)
+          }
+          else if(node.node_type == "CourseSubSectionEvent"){
+            css_ids.push(node.id)
+          }
+          else if (node.node_type == "CourseUnitEvent"){
+            cu_ids.push(node.id)
+          }
+          $li.find('.jqtree-title').attr('data-id',node.id);
+
+          if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
+            cr_ids.push(node.id)
+            $li.find('.jqtree-title').addClass('module-page');
+            url = '/{{group_name_tag}}/gcourse/course_section/' + node.parent.parent.id + '/' + node.parent.id + '/' + node.id
+            $li.find('.jqtree-title')
+              .html('<a href="'+url+'" id='+node.id+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
+          }
+          else{
+            $li.find('.jqtree-title')
+              .html('<span>' + $li.find('.jqtree-title').html() + ' </span>');
+          }
+        }
       });
 
       // This "tree.open" event helps to open the particular node from browser url
@@ -334,8 +93,12 @@
         function(e) {
             var node = e.node;
             var node_id = node.id;
+
+            var tree_build = $(".collection").not(".jqtree-loading");
+            selected_node = tree_build.tree('getNodeById', url);
+            
             if (arr.indexOf(node_id) < 0){
-              arr.push(node_id);
+              arr.push(node_id);  
             }
             if(selected_node){
               node = selected_node
@@ -345,7 +108,7 @@
       );
 
       // This "tree.select" event helps to click the particular tree node and also triggers the click event on tree node
-      $tree.bind(
+      $tree.bind(          
         'tree.select',
         function(event) {
           if(event.node){
@@ -357,39 +120,39 @@
 
             // Bellow code manipulates the parent hierarchy of clicked node in a tree
             while (parent_node) {
-                if (parent_node.name !== undefined){
+                if (parent_node.name !== undefined){  
                   $tree.tree('openNode', parent_node);
                   parent_node = parent_node.parent;
                   if (parent_node.name !== undefined){
-                    parent_arr.push(parent_node.id);
+                    parent_arr.push(parent_node.id);                                          
                   }
                 }
                 else{
                   break;
                 }
             }
-            collapse_tree(node);
+            // collapse_tree(node);
             var nav_list = parent_arr.reverse();
             if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
             // alert(nav_list);
             // alert("node_type");
             $.ajax({
-                type: "POST",
+                type: "GET",
                 url: "{% url 'collection_nav' group_id %}",
                 datatype: "html",
                 data:{
                   node_id: node.id,
                   curr_node:"{{node.pk}}",
                   nav: nav_list,
-                  nod_type: node_type,
-                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                  nod_type: node_type
+                  // csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function(data) {
                   if (node_type == "Page"){
                    window.history.pushState("", "", "/{{group_name_tag}}/page/{{node.pk}}"+"?selected="+node.id+"");
                   }
                   else if(node_type == "File"){
-                    window.history.pushState("", "", "/{{group_name_tag}}/file/{{node.pk}}"+"?selected="+node.id+"");
+                    window.history.pushState("", "", "/{{group_name_tag}}/file/{{node.pk}}"+"?selected="+node.id+"");  
                   }
                   else if (node_type == "Term"){
                     window.history.pushState("", "", "/{{group_name_tag}}/term/{{node.pk}}"+"?selected="+node.id+"");
@@ -404,7 +167,7 @@
                   else if (node_type == "Topic"){
                     window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
                   }
-
+                                      
                   $("#view_page").html(data);
                 }
             });
@@ -420,7 +183,7 @@
                 $("#view_page").append(lbl_name);
                 var ol_elem = document.createElement('OL');
                 ol_elem.id = "res_container";
-                if (node){
+                if (node){  
                   for(var i=0;i<node.children.length;i++){
                     var elem2 = document.createElement('LI');
                     elem2.innerHTML = node.children[i].name;
@@ -438,7 +201,7 @@
           }
           else{
             var close_nele = event.previous_node
-            unselect_treenode(close_nele)
+            // unselect_treenode(close_nele)
           }
 
         });
@@ -449,10 +212,10 @@
           });
           $tree.unbind('tree.open')
           $tree.unbind('tree.select')
-
+          
       } else {
           update_url = true;
-      }
+      }      
 
     }
     function get_all_siblings(node_item){
@@ -497,32 +260,175 @@
       location.href = "/{{group_name_tag}}/topic_details/"+obj_id+"?nav_li="+nav_li+"";
     }
 
+    function update_res_status(){
+      console.log("{{group_id}}")
+      completed_res_ids = []
+      $.ajax({
+        url: "{% url 'get_resource_completion_status' group_id %}",
+
+        data: {
+          cr_ids : JSON.stringify(cr_ids)
+        },
+
+        type: "GET",
+
+        dataType: "json",
+        global: false,
+        beforeSend: function(){
+          $('.get_course-status').attr('value','Loading...')
+                                .attr('disabled','disabled')
+        },
+        success: function(data){
+          if(data){
+            $.each(data, function(key,value){
+              if (key === "COMPLETED"){
+                $.each(value, function(each_index){
+                  completed_res_ids.push(value[each_index])
+                  $('[data-id='+ String(value[each_index]) + ']').prepend('<i class="fa '+iconMapping['COMPLETED']+'"</i>');
+                })
+              }
+            })
+            var $tree = $('.collection');
+
+            var tree = $tree.tree('getTree');
+            
+            tree.iterate(function(node) {
+
+              if (node.hasChildren()) {
+                $tree.tree('openNode', node, true);
+              }
+              return true;
+            });
+          }
+          $('.get_course-status').attr('value','Get Status')
+                                .removeAttr('disabled')
+
+          update_units_status(completed_res_ids)
+        },
+      });//end of ajax
+
+    }
+    
+    function sublist_chk(super_list, sub_list) {
+      console.log(sub_list)
+      var newArray = [];
+      for(var j = 0; j < sub_list.length; j++)
+        if(super_list.indexOf(sub_list[j]) != -1)
+        {
+            newArray.push(sub_list[j]);
+        }
+        console.log(newArray);
+        if(newArray.length == sub_list.length){
+          return true
+        }
+      return false;
+    }
+
+    function update_units_status(completed_res_ids){
+      completed_unit_ids = []
+      if(cu_ids){
+        var $tree = $('.collection');
+        $.each(cu_ids, function(index_val){
+          var u_node = $tree.tree('getNodeById',cu_ids[index_val]);
+          u_node_children_ids = []
+          $.each(u_node.children, function(each_ch_index){
+            u_node_children_ids.push(u_node.children[each_ch_index].id)
+          })
+          res = sublist_chk(completed_res_ids, u_node_children_ids)
+          if(res){
+            $('[data-id='+ String(cu_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['COMPLETED']+'"</i>');
+            completed_unit_ids.push(cu_ids[index_val])
+          }
+          else{
+            $('[data-id='+ String(cu_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['WARNING']+'"</i>');
+          }
+
+        })
+        update_sessions_status(completed_unit_ids)
+      }
+    }
+
+    function update_sessions_status(completed_unit_ids){
+      completed_session_ids = []
+      if(css_ids){
+        var $tree = $('.collection');
+        $.each(css_ids, function(index_val){
+          var css_node = $tree.tree('getNodeById',css_ids[index_val]);
+          css_node_children_ids = []
+          $.each(css_node.children, function(each_ch_index){
+            css_node_children_ids.push(css_node.children[each_ch_index].id)
+          })
+          res = sublist_chk(completed_unit_ids, css_node_children_ids)
+          if(res){
+            $('[data-id='+ String(css_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['COMPLETED']+'"</i>');
+            completed_session_ids.push(css_ids[index_val])
+          }
+          else{
+            $('[data-id='+ String(css_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['WARNING']+'"</i>');
+          }
+
+        })
+        update_modules_status(completed_session_ids)
+      }
+    }
+
+    function update_modules_status(completed_session_ids){
+      if(cs_ids){
+        var $tree = $('.collection');
+        $.each(cs_ids, function(index_val){
+          var cs_node = $tree.tree('getNodeById',cs_ids[index_val]);
+          cs_node_children_ids = []
+          $.each(cs_node.children, function(each_ch_index){
+            cs_node_children_ids.push(cs_node.children[each_ch_index].id)
+          })
+          res = sublist_chk(completed_session_ids, cs_node_children_ids)
+          if(res){
+            $('[data-id='+ String(cs_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['COMPLETED']+'"</i>');
+          }
+          else{
+            $('[data-id='+ String(cs_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['WARNING']+'"</i>');
+          }
+
+        })
+      }
+    }
+    
+    $(document).on('click','.get_course-status',function(){
+      console.log("get_course-status btn clicked")
+      update_res_status()
+    });
+    
   </script>
 
 <style type="text/css">
+  
+  .fa{
+    display: inline !important;
+  }
 
   .collection {
+    border-bottom: solid thin #ddd;
     margin-bottom: 1em;
     overflow: auto;
   }
-ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
-    position: relative !important;
-    padding-left: 30px !important;
-    text-indent:-32px !important;
+  ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
+      position: relative !important;
+       padding-left: 30px !important;
+      text-indent:-32px !important;
 
-}
-.hanging-indent-topics-name{
-    position: relative !important;
-    padding-left: 16px !important;
-    text-indent:-18px !important;
-}
+  }
+  .hanging-indent-topics-name{
+      position: relative !important;
+      padding-left: 16px !important;
+      text-indent:-18px !important;
+  }
 
   /*.collection > ul li:nth-child(odd) { background: #ddd; }*/
   .collection > ul li { border-bottom: solid thin #ddd; }
   /*.collection > ul li { padding-left: 22px ;
   text-indent: -22px ;
  }*/
-
+    
   #view_collection legend{
     text-align: center;
     //border-left: solid thin #ddd;
@@ -530,72 +436,24 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
     margin-top: 20px;
     color:black !important;
   }
-
+  
 
   .res_name{
     margin-left: 20px;
     font-size: 18px;
     list-style: inherit;
   }
-</style>
+</style>  
 
 {% endblock %}
+  
 
-
-  {% if topic %}
-    <!-- For displaying related nodes in topic page -->
-    <!-- Related node means all collection elements of its teme item i.e all siblings of topic node -->
-
-      {% if prior_obj %}
-      <div class="repository-desc large-12 columns" style="width:100%">Topics in {{prior_obj.name}}</div>
-        {% comment %}
-          {% for each in prior_obj.collection_set %}
-              <!-- To get the node object -->
-              {% get_node each as obj %}
-
-              <!-- Clicked topic should not be included in related nodes list -->
-              {% if node.pk != obj.pk %}
-                <i class="fi-arrow-right"></i> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a><br/>
-              {% endif %}
-
-          {% endfor %}
-        {% endcomment %}
-
-          <ul style="list-style: none; border-bottom: solid thin #ddd;">
-            {% for each in prior_obj.collection_set %}
-
-                <!-- To get the node object -->
-                {% get_node each as obj %}
-
-                <!-- Clicked topic should not be included in related nodes list -->
-                {% if node.pk != obj.pk %}
-                  <li class="hanging-indent-topics-name" style="border-bottom: solid thin #ddd; "> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a> </li>
-                {% else %}
-                  <li class="hanging-indent-topics-name" style="border-bottom: solid thin #ddd;"> <span class="text-gray">{{obj.name}}</span> </li>
-                {% endif %}
-            {% endfor %}
-          </ul>
-
-      {% endif %}
-
-  {% endif %}
   <!-- <b class="current">{{node.name}}</b> -->
-  {% if group_obj.collection_set %}
-    <div class="course-content">
-      <!--div class="row">
-        <div class="small-12 columns">
-          <div data-alert class="alert-box warning ">
-            <div class="warning-icon">
-              <span class="badge yellow">i</span>
-            </div>
-            <div class="warning-note">
-              <div>You have 1 unfinished unit <a href="#" class="close">Hide</a></div>
-              <div>Module > A Typlical CAPITAL letter > <a href="#">Unit 1: Title of units 1 </a></div>
-            </div>
-          </div>
-        </div>
-      </div-->
-      <div class="collection collapse row" data-url="{% url 'get_course_collection' group_id group_obj.pk True %}">
-      </div>
+  {% if node.collection_set %}
+    <div>
+      <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
+    </div>
+    <div class="status-div">
+      <input type="button" class="button small radius get_course-status" value="Get Status"></input>
     </div>
   {% endif %}

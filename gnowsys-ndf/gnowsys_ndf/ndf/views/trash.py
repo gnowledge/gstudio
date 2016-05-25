@@ -18,28 +18,37 @@ def trash_resource(request,group_id,node_id):
 	'''
 
 	node_obj = node_collection.find_one({"_id":ObjectId(node_id)})
+	group_obj = node_collection.find_one({"_id":ObjectId(group_id)})
 	trash_group = node_collection.find_one({"name":"Trash"});
 	if ObjectId(group_id) in node_obj.group_set: 		 
 		node_obj.group_set.remove(ObjectId(group_id))
-	if not node_obj.group_set:
+	if node_obj.group_set:
 		# Add Trash group _id to node_obj's group_set
 		if trash_group._id not in node_obj.group_set:	
 			node_obj.group_set.append(trash_group._id)
 		node_obj.status = u"DELETED"
+	if node_obj.collection_set:
+		if trash_group._id not in node_obj.group_set:	
+			node_obj.group_set.append(trash_group._id)
+		node_obj.status = u"DELETED"
 	node_obj.save()
+	# print "\n\n\nnode_obj.status",node_obj.status
 
 	# get_member_of = node_collection.find_one({"_id":{'$in':node_obj.member_of}})
 	# if get_member_of.name == 'Page':
-	if "Page" in node_obj.member_of_names_list:
+	if "Page" in node_obj.member_of_names_list and not "CourseEventGroup" in group_obj.member_of_names_list:
 		return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id}))
 		# return (eval('page')(request, group_id))
-	elif "File" in node_obj.member_of_names_list:
+	elif "File" in node_obj.member_of_names_list and not "CourseEventGroup" in group_obj.member_of_names_list :
 		if GSTUDIO_SITE_NAME == "NROER":
 			return HttpResponseRedirect(reverse('e-library', kwargs={'group_id': group_id}))
 		return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id}))
 		# elif get_member_of.name == 'File':
 		# return(eval('file')(request, group_id))
-	else: 
+	elif "CourseEventGroup" in group_obj.member_of_names_list:
+		response_dict = {'success': True }
+		return HttpResponse(json.dumps(response_dict))
+	else:
 		return HttpResponseRedirect(reverse('group_dashboard', kwargs={'group_id': group_id}))
 		# return(eval('group_dashboard')(request, group_id))   
 

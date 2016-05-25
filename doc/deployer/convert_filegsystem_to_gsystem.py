@@ -72,6 +72,9 @@ try:
         # looping over each fs_file_ids
         for index, each_fs_file_ids in enumerate(fs_file_ids_list):
 
+            if each_fs_file_ids == ObjectId('56cf49ee81fccb00b41eed70'):
+                continue
+
             info = '\n- ' + fs_file_ids_size_names[index] + '  : "' + fs_file_ids_list[index].__str__() + '"'
             log_print(info)
 
@@ -108,7 +111,7 @@ try:
                     # --- END of looping ---
 
             except Exception, e:
-                log_print('\n\t!!! No file in gridfs collection having _id: ' + str(fs_file_ids_list[index]))
+                log_print('\n\tSome exception occured: ' + str(fs_file_ids_list[index]))
                 pass
 
         # updating / overwritting each_gridfile object:

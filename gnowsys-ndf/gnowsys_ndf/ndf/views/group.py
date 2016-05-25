@@ -2476,7 +2476,7 @@ def upload_using_save_file(request,group_id):
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
     usrid = request.user.id
-
+    print "\n\n\nheretitle",title
     # # url_name = "/"+str(group_id)
     # for key,value in request.FILES.items():
     #     fname=unicode(value.__dict__['_name'])
@@ -2495,7 +2495,9 @@ def upload_using_save_file(request,group_id):
     from gnowsys_ndf.ndf.views.filehive import write_files
 
     gs_obj_list = write_files(request, group_id)
-    # print "gs_obj_list: ", gs_obj_list
+    # print "\n\nretirn gs_obj_list",gs_obj_list
+    gs_obj_id = gs_obj_list[0]['_id']
+    # print "\n\n\ngs_obj_id: ",gs_obj_id
 
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     for each_gs_file in gs_obj_list:
@@ -2507,6 +2509,8 @@ def upload_using_save_file(request,group_id):
 
     if title == "gallery":
         return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
-    else:
+    elif title == "raw material":
         return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
+    else:
+        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':gs_obj_id}) )
     # return HttpResponseRedirect(url_name)

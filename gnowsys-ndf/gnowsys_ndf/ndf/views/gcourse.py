@@ -1884,26 +1884,6 @@ def course_content(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-    result_status = course_complete_percentage = None
-
-    leaf_ids = completed_ids = incompleted_ids = total_count = completed_count = None
-
-    if request.user.is_authenticated:
-        result_status = get_course_completetion_status(group_obj, request.user.id, True)
-        # print "\n\n result_status --- ",result_status
-        if result_status:
-            if "course_complete_percentage" in result_status:
-                course_complete_percentage = result_status['course_complete_percentage']
-            if "completed_ids_list" in result_status:
-                completed_ids = result_status['completed_ids_list']
-            if "incompleted_ids_list" in result_status:
-                incompleted_ids = result_status['incompleted_ids_list']
-            if "list_of_leaf_node_ids" in result_status:
-                leaf_ids = result_status['list_of_leaf_node_ids']
-            if "total_count" in result_status:
-                total_count = result_status['total_count']
-            if "completed_count" in result_status:
-                completed_count = result_status['completed_count']
 
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
@@ -1925,12 +1905,12 @@ def course_content(request, group_id):
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
 
+    
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'group_obj': group_obj, 'title': 'course content',
+            'group_obj': group_obj,'node': group_obj, 'title': 'course content',
             'allow_to_join': allow_to_join,
-            "leaf_ids":leaf_ids,"completed_ids":completed_ids,"incompleted_ids":incompleted_ids,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
             })
     return render_to_response(template, context_variables)
@@ -2069,10 +2049,10 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         files_cur = node_collection.find({
                                         '_type': {'$in': ["File", "GSystem"]},
                                         '$or': [
-                                                {'member_of': GST_FILE._id},
+                                                {'member_of': gst_file._id},
                                                 {
                                                     'collection_set': {'$exists': "true",'$not': {'$size': 0} },
-                                                    'member_of': GST_PAGE._id,
+                                                    'member_of': gst_page._id,
                                                 }
                                             ],
                                         'group_set': {'$all': [ObjectId(group_id)]},
@@ -2212,16 +2192,16 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
         # print "\n\n Total files: ", files_cur.count()
         files_cur = node_collection.find({
-                                        '_type': "File",
-                                        '$or': [
-                                                {'member_of': GST_FILE._id},
-                                                {
-                                                    'collection_set': {'$exists': "true",'$not': {'$size': 0} },
-                                                    'member_of': GST_PAGE._id,
-                                                }
-                                            ],
+                                        '_type': {'$in':["File","GSystem"]},
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'relation_set.clone_of': {'$exists': False},
+                                        '$or': [
+                                                {'member_of': gst_file._id},
+                                                {
+                                                    'collection_set': {'$exists': True,'$not': {'$size': 0} },
+                                                    'member_of': gst_page._id,
+                                                },
+                                            ],
                                     '$or': [
                                             {
                                                 'created_by': {'$nin': gstaff_users},
@@ -2248,7 +2228,6 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                             'mime_type': 1,
                                             'if_file':1,
                                         }).sort("last_update", -1)
-
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
         context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})
@@ -2604,6 +2583,8 @@ def course_analytics_admin(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
     response_dict = {}
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
+
     admin_analytics_list = []
     if group_obj.author_set:
         for each_author in group_obj.author_set:
@@ -2619,9 +2600,17 @@ def course_analytics_admin(request, group_id):
             # admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
             users_points_breakup = analytics_instance.get_users_points(True)
             admin_analytics_data["files_points"] = users_points_breakup['Files']
+            if FILES_MAX_POINT_VAL < users_points_breakup['Files']:
+                FILES_MAX_POINT_VAL = users_points_breakup['Files']
             admin_analytics_data['notes_points'] = users_points_breakup['Notes']
+            if NOTES_MAX_POINT_VAL < users_points_breakup['Notes']:
+                NOTES_MAX_POINT_VAL = users_points_breakup['Notes']
             admin_analytics_data['quiz_points'] = users_points_breakup['Quiz']
+            if QUIZ_MAX_POINT_VAL < users_points_breakup['Quiz']:
+                QUIZ_MAX_POINT_VAL = users_points_breakup['Quiz']
             admin_analytics_data['interactions_points'] = users_points_breakup['Interactions']
+            if INTERACTIONS_MAX_POINT_VAL < users_points_breakup['Interactions']:
+                INTERACTIONS_MAX_POINT_VAL = users_points_breakup['Interactions']
             del analytics_instance
             admin_analytics_list.append(admin_analytics_data)
     cache.set(cache_key, json.dumps(admin_analytics_list), 60*15)
@@ -2636,10 +2625,13 @@ def course_analytics_admin(request, group_id):
         ("quiz_points", "Quiz"),
         ("interactions_points", "Interactions"),
     ]
+    max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
+    'quiz_max_points': QUIZ_MAX_POINT_VAL,'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
 
     response_dict["column_headers"] = column_headers
     response_dict["success"] = True
     response_dict["students_data_set"] = admin_analytics_list
+    response_dict['max_points_dict'] = max_points_dict
     # print "\n admin_analytics_list === ",admin_analytics_list
     return HttpResponse(json.dumps(response_dict))
 
@@ -2661,3 +2653,19 @@ def build_progress_bar(request, group_id, node_id):
         pass
     cache.set(cache_key, json.dumps(result_status), 60*15)
     return HttpResponse(json.dumps(result_status))
+
+@get_execution_time
+def get_resource_completion_status(request, group_id):
+
+    result_dict = {'COMPLETED':[]}
+    cr_ids = request.GET.get("cr_ids", "")
+    if cr_ids:
+        cr_ids = json.loads(cr_ids)
+        for each_cr in cr_ids:
+            b = benchmark_collection.find({'name': "course_resource_detail",
+                'calling_url': {'$regex': '/'+unicode(each_cr)+'/$'},
+                'user': request.user.username
+                })
+            if b.count():
+                result_dict['COMPLETED'].append(each_cr)
+    return HttpResponse(json.dumps(result_dict))

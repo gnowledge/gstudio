@@ -196,9 +196,8 @@
                     <li clas="active">
                       <center>
                         {% if 'image' in obj.if_file.mime_type %}
-                        <a class="th">
+                        
                           <img src="{{MEDIA_URL}}{{obj.if_file.original.relurl}}" style="min-height:200px;"/>
-                        </a>
                          {% elif 'audio' in obj.if_file.mime_type %}
                             <audio src="{{MEDIA_URL}}{{obj.if_file.original.relurl}}" controls loop>
                             <p>{% trans 'Your browser does not support the audio element' %} </p>
@@ -264,10 +263,7 @@
               {% elif 'image' in node.if_file.mime_type and is_collection_card_view != "True" %}
                <center>
                 <div class="show-image">
-                  <a class="th" data-oid="{{node.pk|safe}}">
                     <img  src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" style="min-height:200px;" />
-
-                  </a>
                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
                       <a  target="_blank" href="{% url 'read_file' group_name_tag node.pk download_filename %}">
                          View in Full Screen
@@ -311,10 +307,7 @@
 
                 </a>
 
-
-
               {% elif 'epub' in node.if_file.mime_type %}
-                {% comment %}
 
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
@@ -338,7 +331,7 @@
                     <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
                   </h4>
 
-                  <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                  <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
                     {% trans 'Download' %}"{{ grid_fs_obj.filename }}"
                   </a>
                   <h4 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
@@ -352,7 +345,7 @@
 
                 <script>
                   // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
-                  var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}", {
+                  var Book = ePub("{{MEDIA_URL}}{{node.if_file.original.relurl}}", {
                     width: 400,
                     height: false,
                     restore: true

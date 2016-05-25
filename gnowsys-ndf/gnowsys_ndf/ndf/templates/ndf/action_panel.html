@@ -491,13 +491,37 @@
         $("#deleteModal").foundation('reveal', 'close');
 		{% if "Page" in node.member_of_names_list or "File" in node.member_of_names_list %}
 			// alert("page")
-			delete_url = "{% url 'trash_resource' group_id node %}"
+			$.ajax({
+                    type: "POST",
+                    url: "{% url 'trash_resource' group_id node %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                  success: function(data) {
+                        data = JSON.parse(data)
+                        window.location.replace("{% url 'file' group_id  %}");
+                  }
+
+            });
+		
 		{% elif "Term" in node.member_of_names_list %}
+			$.ajax({
+                    type: "POST",
+                    url: "{% url 'term_delete' group_object.name node %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                  success: function(data) {
+                        data = JSON.parse(data)
+                        window.location.replace("{% url 'file' group_id  %}");
+                  }
+
+            });
 			// alert("term_delete")
-			delete_url = "{% url 'term_delete' group_object.name node %}"
 		{% endif %}
-        $(".delete-btn").attr('href', delete_url)
-        $(".delete-btn")[0].click();
+       
     });
 
     $(document).on("click", "#btnConfirmNo", function() {
