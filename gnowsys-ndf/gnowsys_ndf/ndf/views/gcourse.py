@@ -2192,6 +2192,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
         # print "\n\n Total files: ", files_cur.count()
         files_cur = node_collection.find({
+                                        'created_by': {'$nin': gstaff_users},
                                         '_type': {'$in':["File","GSystem"]},
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'relation_set.clone_of': {'$exists': False},
@@ -2202,11 +2203,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                                     'member_of': gst_page._id,
                                                 },
                                             ],
-                                    '$or': [
-                                            {
-                                                'created_by': {'$nin': gstaff_users},
-                                            },
-                                            {
+                                            
                                                 '$or': [
                                                         {'access_policy': u"PUBLIC"},
                                                         {
@@ -2217,8 +2214,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                                      }
                                                     ],
                                                 # 'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-                                            }
-                                        ]},
+                                            },
                                         {
                                             'name': 1,
                                             'collection_set':1,
