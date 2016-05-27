@@ -13,9 +13,6 @@ import multiprocessing as mp
 
 from collections import OrderedDict
 from time import time
-
-from time import time
-from collections import OrderedDict
 from bson import json_util
 
 #for creating deault mailbox : Metabox
@@ -237,9 +234,10 @@ def get_schema(node):
 		nam = node.member_of_names_list[0]
 		if(nam == 'Page'):
 			return [1,schema_dict[nam]]
-		elif(nam=='File'):
+
+		elif hasattr(node, 'mime_type') and (nam=='File'):
 			mimetype_val = node.get_gsystem_mime_type()
-			if( 'image' in mimetype_val):
+			if( 'image' in node.mime_type):
 				return [1,schema_dict['Image']]
 			elif('video' in mimetype_val or 'Pandora_video' in mimetype_val):
 				return [1,schema_dict['Video']]
@@ -3135,8 +3133,10 @@ def get_sg_member_of(group_id):
 		# print "\n\n sg_member_of_list---",sg_member_of_list
 	return sg_member_of_list
 
+
 def get_objectid_name(nodeid):
 	return (node_collection.find_one({'_id':ObjectId(nodeid)}).name)
+
 
 @register.filter
 def is_dict(val):

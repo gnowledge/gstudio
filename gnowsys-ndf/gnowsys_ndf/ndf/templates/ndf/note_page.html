@@ -6,14 +6,14 @@
     .lbl_of_tag{
         background-color: gold !important;
     }
-    
+
 </style>
     <div class="row note-toolbar">
         <div class="small-12 medium-9 columns creator-title">
             <i class="fi-torso"></i>
 
-
             <span class="note-creator" title="{{node.created_by|get_username}}">{{node.created_by|get_username}}</span>
+
             &#8226;
             <span class="note-creation-date">{{node.created_at|date:"d M Y h:i A"}}</span>
         </div>
@@ -48,7 +48,7 @@
                             {% endfor %}
                             {% if node.tags|length > 2 %}
                                 <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
-                            {% endif %} 
+                            {% endif %}
                     </div>
                 {% else %}
                     <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
@@ -113,5 +113,5 @@ $(document).on('click','.view-more-tags',function(){
         $(this).text("Less")
     }
 })
-    
+
 </script>

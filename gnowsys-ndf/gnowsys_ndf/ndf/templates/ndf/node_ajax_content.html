@@ -186,9 +186,9 @@
           {% if node.if_file.mime_type or node.collection_set %}
             <!-- commenting following block which shows slider if resource is collection of all images/videos/audios -->
               {% if node.collection_set  and is_course == True %}
-               
+
                <ul data-orbit data-options="variable_height: true;timer:false;">
-                  
+
 
                   {% for k in node.collection_set %}
                     {% get_node k as obj %}
@@ -305,7 +305,6 @@
                 </center>
 
                 </a>
-
 
               {% elif 'epub' in node.if_file.mime_type %}
 
@@ -471,7 +470,7 @@
           {% if user.is_authenticated %}
 
             {% if node.if_file.mime_type %}
-              
+
                 <a class="button tiny" title="Click here to Download" href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
                   Download
                 </a>
