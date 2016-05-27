@@ -31,7 +31,7 @@
 {% get_group_name groupid as group_name_tag %}
 {% if user.is_authenticated %}	
 
-	<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name_tag %}" data-abide>
+	<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' groupid %}" data-abide>
 	{% csrf_token %}
 
 		<!-- file browse and name -->
@@ -40,12 +40,13 @@
 			<div class ="row">
 				<div class="large-3 columns">				
 					<label>{% trans "Choose File" %}</label>
-					<input type="file" name="doc[]"  id="docFile" tabindex=1 autofocus required/>
+					<input type="hidden" name="context_name" value="{{title}}">
+					<input type="file" name="filehive"  id="docFile" tabindex=1 autofocus required/>
 					<small class="error">Please select a file.</small>
 				</div>
 				<div class="large-9 columns">				
 					<label>{% trans "Title of File" %}</label>
-					<input type="text" name="docTitle" id ="docTitle" tabindex=2  placeholder="Title of File" required>
+					<input type="text" name="name" id ="docTitle" tabindex=2  placeholder="Title of File" required>
 					<small class="error">Please provide the title of the resource.</small>
 				</div>
 			</div>
@@ -58,7 +59,7 @@
 			<div class ="row">
 				<div class="large-5 columns">
 					<b class="compulsory">Add Description</b>
-					{% include "ndf/html_editor.html" with var_name="content_org" var_value=node.content|default_if_none:"" node_id=node.pk var_placeholder="Describe the file" %}
+					{% include "ndf/html_editor.html" with var_name="content_org" var_value=node.content|default_if_none:"" node_id=node.pk var_placeholder="Describe the file" ckeditor_toolbar="GgallaryCommentsToolbar" %}
 
 					<div class="row">
 					

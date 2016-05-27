@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
@@ -2494,13 +2494,109 @@ def upload_using_save_file(request,group_id):
     
     from gnowsys_ndf.ndf.views.filehive import write_files
 
-    gs_obj_list = write_files(request, group_id)
+    # gs_obj_list = write_files(request, group_id)
+    fileobj_list = write_files(request, group_id)
+    fileobj_id = fileobj_list[0]['_id']
+    file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
+
+    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER":
+        if request.POST:
+            # mtitle = request.POST.get("docTitle", "")
+            # userid = request.POST.get("user", "")
+            language = request.POST.get("lan", "")
+            # img_type = request.POST.get("type", "")
+            # topic_file = request.POST.get("type", "")
+            # doc = request.POST.get("doc", "")
+            usrname = request.user.username
+            page_url = request.POST.get("page_url", "")
+            content_org = request.POST.get('content_org', '')
+            access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
+            tags = request.POST.get('tags', "")
+            license = request.POST.get("License", "")
+            source = request.POST.get("Source", "")
+            Audience = request.POST.getlist("audience", "")
+            fileType = request.POST.get("FileType", "")
+            Based_url = request.POST.get("based_url", "")
+            co_contributors = request.POST.get("co_contributors", "")
+            map_geojson_data = request.POST.get('map-geojson-data')
+            subject = request.POST.get("Subject", "")
+            level = request.POST.getlist("Level", "")
+            content_org = request.POST.get('content_org', '')
+
+            subject = '' if (subject=='< Not Sure >') else subject
+            level = '' if (level=='< Not Sure >') else level
+
+            if content_org:
+                file_node.content_org = content_org
+
+            if map_geojson_data:
+                map_geojson_data = map_geojson_data + ","
+                map_geojson_data = list(ast.literal_eval(map_geojson_data))
+            else:
+                map_geojson_data = []
+
+            file_node.license = unicode(license)
+
+            file_node.location = map_geojson_data
+            # file_node.save(groupid=group_id)
+            if language:
+                # fileobj.language = unicode(language)
+                file_node.language = get_language_tuple(language)
+            file_node.created_by = int(usrid)
+
+            file_node.modified_by = int(usrid)
+            if source:
+                # create gattribute for file with source value
+                source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
+                src = create_gattribute(ObjectId(file_node._id), source_AT, source)
+                print "\n\n\n\n\n\n++src",src
+
+            if Audience:
+              # create gattribute for file with Audience value
+                audience_AT = node_collection.one({'_type':'AttributeType','name':'audience'})
+                aud = create_gattribute(file_node._id, audience_AT, Audience)
+
+            if fileType:
+              # create gattribute for file with 'educationaluse' value
+                educationaluse_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationaluse'})
+                FType = create_gattribute(file_node._id, educationaluse_AT, fileType)
+
+            if subject:
+                # create gattribute for file with 'educationaluse' value
+                subject_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationalsubject'})
+                sub = create_gattribute(file_node._id, subject_AT, subject)
+
+            if level:
+              # create gattribute for file with 'educationaluse' value
+                educationallevel_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationallevel'})
+                edu_level = create_gattribute(file_node._id, educationallevel_AT, level)
+            if Based_url:
+              # create gattribute for file with 'educationaluse' value
+                basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
+                basedUrl = create_gattribute(file_node._id, basedonurl_AT, Based_url)
+
+            if co_contributors:
+              # create gattribute for file with 'co_contributors' value
+                co_contributors_AT = node_collection.one({'_type':'AttributeType', 'name': 'co_contributors'})
+                co_contributors = create_gattribute(file_node._id, co_contributors_AT, co_contributors)
+            if content_org:
+                    file_node.content_org = unicode(content_org)
+                    # Required to link temporary files with the current user who is modifying this document
+                    filename_content = slugify(title) + "-" + usrname + "-"
+                    file_node.content = content_org
+            if tags:
+                # print "\n\n tags",tags
+                if not type(tags) is list:
+                    tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+                file_node.tags = tags
+            file_node.save(groupid=group_id,validate=False)
+            return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
     # print "\n\nretirn gs_obj_list",gs_obj_list
-    gs_obj_id = gs_obj_list[0]['_id']
+    # gs_obj_id = gs_obj_list[0]['_id']
     # print "\n\n\ngs_obj_id: ",gs_obj_id
 
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-    for each_gs_file in gs_obj_list:
+    for each_gs_file in fileobj_list:
         #set interaction-settings
         each_gs_file.status = u"PUBLISHED"
         each_gs_file.save()
@@ -2512,5 +2608,5 @@ def upload_using_save_file(request,group_id):
     elif title == "raw material":
         return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     else:
-        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':gs_obj_id}) )
+        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
     # return HttpResponseRedirect(url_name)
