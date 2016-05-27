@@ -2588,7 +2588,7 @@ def upload_using_save_file(request,group_id):
                 if not type(tags) is list:
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 file_node.tags = tags
-            file_node.save(groupid=group_id)
+            file_node.save(groupid=group_id,validate=False)
             return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
     # print "\n\nretirn gs_obj_list",gs_obj_list
     # gs_obj_id = gs_obj_list[0]['_id']
