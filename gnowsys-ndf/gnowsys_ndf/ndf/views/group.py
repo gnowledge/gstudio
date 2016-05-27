@@ -2548,7 +2548,8 @@ def upload_using_save_file(request,group_id):
             if source:
                 # create gattribute for file with source value
                 source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
-                src = create_gattribute(file_node._id, source_AT, source)
+                src = create_gattribute(ObjectId(file_node._id), source_AT, source)
+                print "\n\n\n\n\n\n++src",src
 
             if Audience:
               # create gattribute for file with Audience value

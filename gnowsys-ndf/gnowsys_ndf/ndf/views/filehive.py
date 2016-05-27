@@ -73,7 +73,7 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 			if gst_file_id not in gs_obj.member_of:
 				gs_obj.member_of.append(gst_file_id)
 
-			gs_obj.save(groupid=group_id)
+			gs_obj.save(groupid=group_id,validate=False)
 
 			if 'video' in gs_obj.if_file.mime_type:
 				convertVideo.delay(user_id, str(gs_obj._id), file_name)
