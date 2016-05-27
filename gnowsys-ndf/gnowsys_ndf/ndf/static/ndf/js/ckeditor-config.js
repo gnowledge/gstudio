@@ -23,7 +23,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
 		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
-		{ name: 'insert', items : [ 'Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe','video'] },
+		{ name: 'insert', items : [ 'Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe','video'] },
 		{ name: 'styles', items : [ 'Styles','Format' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] },
 		{ name: 'links', items : [ 'Link','Unlink' ] },
@@ -36,7 +36,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
-		{ name: 'insert', items : [ 'Image','Flash','Iframe' ] },
+		{ name: 'insert', items : [ 'Flash','Iframe' ] },
 		{ name: 'tools', items : [ 'addImage','addAudio','Source', 'Maximize','-','closebtn'] },
 	];
 
