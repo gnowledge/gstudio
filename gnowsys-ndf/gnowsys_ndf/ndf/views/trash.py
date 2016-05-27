@@ -55,7 +55,7 @@ def trash_resource(request,group_id,node_id):
 		return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id}))
 		# return (eval('page')(request, group_id))
 	elif "File" in node_obj.member_of_names_list and not "CourseEventGroup" in group_obj.member_of_names_list :
-		return HttpResponse(json.dumps(group_id)
+		return HttpResponse(json.dumps(group_id))
 		# elif get_member_of.name == 'File':
 		# return(eval('file')(request, group_id))
 	elif "CourseEventGroup" in group_obj.member_of_names_list:

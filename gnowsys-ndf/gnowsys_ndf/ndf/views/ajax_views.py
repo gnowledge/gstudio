@@ -866,7 +866,7 @@ def get_collection(request, group_id, node_id, stats_flag=False):
         collection_list = get_inner_collection(collection_list, obj, gstaff_access)
     data = collection_list
     updated_data = []
-    print data
+    # print data
     cache.set(cache_key, json.dumps(data), 60*15)
 
     return HttpResponse(json.dumps(data))
