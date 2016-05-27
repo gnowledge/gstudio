@@ -2538,7 +2538,7 @@ def upload_using_save_file(request,group_id):
             file_node.license = unicode(license)
 
             file_node.location = map_geojson_data
-            file_node.save(groupid=group_id)
+            # file_node.save(groupid=group_id)
             if language:
                 # fileobj.language = unicode(language)
                 file_node.language = get_language_tuple(language)
@@ -2548,36 +2548,46 @@ def upload_using_save_file(request,group_id):
             if source:
                 # create gattribute for file with source value
                 source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
-                src = create_gattribute(fileobj_id, source_AT, source)
+                src = create_gattribute(file_node._id, source_AT, source)
 
             if Audience:
               # create gattribute for file with Audience value
                 audience_AT = node_collection.one({'_type':'AttributeType','name':'audience'})
-                aud = create_gattribute(ObjectId(fileobj_id), audience_AT, Audience)
+                aud = create_gattribute(file_node._id, audience_AT, Audience)
 
             if fileType:
               # create gattribute for file with 'educationaluse' value
                 educationaluse_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationaluse'})
-                FType = create_gattribute(ObjectId(fileobj_id), educationaluse_AT, fileType)
+                FType = create_gattribute(file_node._id, educationaluse_AT, fileType)
 
             if subject:
                 # create gattribute for file with 'educationaluse' value
                 subject_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationalsubject'})
-                sub = create_gattribute(ObjectId(fileobj_id), subject_AT, subject)
+                sub = create_gattribute(file_node._id, subject_AT, subject)
 
             if level:
               # create gattribute for file with 'educationaluse' value
                 educationallevel_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationallevel'})
-                edu_level = create_gattribute(fileobj_id, educationallevel_AT, level)
+                edu_level = create_gattribute(file_node._id, educationallevel_AT, level)
             if Based_url:
               # create gattribute for file with 'educationaluse' value
                 basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
-                basedUrl = create_gattribute(fileobj_id, basedonurl_AT, Based_url)
+                basedUrl = create_gattribute(file_node._id, basedonurl_AT, Based_url)
 
             if co_contributors:
               # create gattribute for file with 'co_contributors' value
                 co_contributors_AT = node_collection.one({'_type':'AttributeType', 'name': 'co_contributors'})
-                co_contributors = create_gattribute(fileobj_id, co_contributors_AT, co_contributors)
+                co_contributors = create_gattribute(file_node._id, co_contributors_AT, co_contributors)
+            if content_org:
+                    file_node.content_org = unicode(content_org)
+                    # Required to link temporary files with the current user who is modifying this document
+                    filename_content = slugify(title) + "-" + usrname + "-"
+                    file_node.content = content_org
+            if tags:
+                # print "\n\n tags",tags
+                if not type(tags) is list:
+                    tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+                file_node.tags = tags
             file_node.save(groupid=group_id)
             return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
     # print "\n\nretirn gs_obj_list",gs_obj_list
