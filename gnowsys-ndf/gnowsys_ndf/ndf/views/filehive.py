@@ -47,7 +47,6 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 	# print "name",name
 
 	gs_obj_list    = []
-	existing_file_gs = []
 	for each_file in uploaded_files:
 
 		gs_obj = node_collection.collection.GSystem()
@@ -71,7 +70,6 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 		# print "existing_file_gs",existing_file_gs
 		if (gs_obj.get('_id', None) or existing_file_gs.get('_id', None)) and \
 		   (existing_file_gs.get('_id', None) == gs_obj.get('_id', None)):
-
 			if gst_file_id not in gs_obj.member_of:
 				gs_obj.member_of.append(gst_file_id)
 
@@ -86,7 +84,7 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 
 			gs_obj_list.append(gs_obj)
 		elif existing_file_gs:
-				gs_obj_list.extend(existing_file_gs)
+				gs_obj_list.append(existing_file_gs)
 
 	if make_collection and collection_set:
 		first_obj.collection_set = collection_set
