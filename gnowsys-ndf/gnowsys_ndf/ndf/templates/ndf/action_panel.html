@@ -499,8 +499,8 @@
                            csrfmiddlewaretoken: '{{ csrf_token }}'
                       },
                   success: function(data) {
-                  	data = JSON.parse(data)
-                    window.location.replace("{% url 'file' group_id  %}");
+                  	redirect_url ="/"+"{{group_id}}"+"/"+"{{node.member_of_names_list.0|lower}}" 
+                    window.location.replace(redirect_url);
                   }
 
             });
@@ -514,7 +514,6 @@
                            csrfmiddlewaretoken: '{{ csrf_token }}'
                       },
                   success: function(data) {
-                        data = JSON.parse(data)
                         window.location.replace("{% url 'file' group_id  %}");
                   }
 
