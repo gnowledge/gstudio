@@ -59,7 +59,7 @@
 			<div class ="row">
 				<div class="large-5 columns">
 					<b class="compulsory">Add Description</b>
-					{% include "ndf/html_editor.html" with var_name="content_org" var_value=node.content|default_if_none:"" node_id=node.pk var_placeholder="Describe the file" %}
+					{% include "ndf/html_editor.html" with var_name="content_org" var_value=node.content|default_if_none:"" node_id=node.pk var_placeholder="Describe the file" ckeditor_toolbar="GgallaryCommentsToolbar" %}
 
 					<div class="row">
 					
