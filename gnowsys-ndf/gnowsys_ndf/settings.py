@@ -493,7 +493,6 @@ INSTALLED_APPS = (
     'memcache_admin',
     'django_mailbox',
     'djcelery',
-    # 'tracking',
 )
 
 AUTHENTICATION_BACKENDS = (
