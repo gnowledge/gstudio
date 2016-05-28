@@ -13,6 +13,7 @@ from PIL import Image
 
 # imports from installed packages
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group as DjangoGroup
 from django.db import models
 from django.http import HttpRequest
 
@@ -1481,7 +1482,6 @@ class GSystem(Node):
 
         if uploaded_file and existing_file_gs_if_file:
             self['if_file'] = existing_file_gs_if_file
-            print "\n\n!!!!!!!!!!!!!!!!!!", self['if_file']
 
         elif uploaded_file and not existing_file_gs:
 
@@ -2091,6 +2091,23 @@ class Author(Group):
     def is_authenticated(self):
         return True
 
+    @staticmethod
+    def get_user_id_list_from_author_oid_list(author_oids_list=[]):
+        all_authors_cur = node_collection.find({'_id': {'$in': [ObjectId(a) for a in author_oids_list]} },
+                                                {'_id': 0, 'created_by': 1} )
+        return [user['created_by'] for user in all_authors_cur]
+
+    @staticmethod
+    def get_author_oid_list_from_user_id_list(user_ids_list=[], list_of_str_oids=False):
+        all_authors_cur = node_collection.find(
+                                        {'created_by': {'$in': [int(uid) for uid in user_ids_list]}},
+                                        {'_id': 1}
+                                    )
+        if list_of_str_oids:
+            return [str(user['_id']) for user in all_authors_cur]
+        else:
+            return [user['_id'] for user in all_authors_cur]
+
 
 #  HELPER -- CLASS DEFINITIONS
 class HistoryManager():
@@ -2367,6 +2384,48 @@ class NodeJSONEncoder(json.JSONEncoder):
       return o.strftime("%d/%m/%Y %H:%M:%S")
 
     return json.JSONEncoder.default(self, o)
+
+
+class DjangoActiveUsersGroup(object):
+    """docstring for DjangoActiveUsersGroup"""
+
+    django_active_users_group_name = 'active_loggedin_and_buddy_users'
+
+    active_loggedin_and_buddy_users_group = DjangoGroup.objects.get_or_create(name=django_active_users_group_name)[0]
+
+    # def __init__(self):
+    #     super(DjangoActiveUsersGroup, self).__init__()
+
+    @classmethod
+    def addto_user_set(cls, user_id=0):
+        cls.active_loggedin_and_buddy_users_group.user_set.add(user_id)
+        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+
+    @classmethod
+    def removefrom_user_set(cls, user_id=0):
+        cls.active_loggedin_and_buddy_users_group.user_set.remove(user_id)
+        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+
+    @classmethod
+    def update_user_set(cls, add=[], remove=[]):
+        # print "add : ", add
+        # print "remove : ", remove
+        for each_userid_toadd in add:
+            cls.addto_user_set(each_userid_toadd)
+
+        for each_userid_toremove in remove:
+            cls.removefrom_user_set(each_userid_toremove)
+
+        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+
+    @classmethod
+    def get_all_user_set_objects_list(cls):
+        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+
+    @classmethod
+    def get_all_user_set_ids_list(cls):
+        return cls.active_loggedin_and_buddy_users_group.user_set.values_list('id', flat=True)
+
 
 
 
@@ -2817,7 +2876,7 @@ class Buddy(DjangoDocument):
 
             # this means buddy is successfully joined and not released.
             # now we need to release this buddy by adding datetime.datetime to 'out'
-            self.get_latest_in_out_dict(self.buddy_in_out[buddy_authid])['out'] = datetime.datetime.utcnow()
+            self.get_latest_in_out_dict(self.buddy_in_out[buddy_authid])['out'] = datetime.datetime.now()
 
             return self
 
@@ -2842,11 +2901,41 @@ class Buddy(DjangoDocument):
             - buddy object will be saved using .save() method.
         '''
 
+        active_buddy_authid_list = self.get_active_buddy_authid_list()
+
         self = self.remove_all_buddies()
         self.ends_at = datetime.datetime.utcnow()
         self.save()
 
+        active_buddy_userids_list = Author.get_user_id_list_from_author_oid_list(active_buddy_authid_list)
+        DjangoActiveUsersGroup.update_user_set(remove=active_buddy_userids_list)
+
         return self
+
+
+    @staticmethod
+    def get_added_and_removed_buddies_dict(existing_userids_list, updated_userids_list):
+
+        # Example Set Operations:
+        #
+        # existing = {1, 2, 3}
+        # updated  = {3, 4, 5}
+        #
+        # updated - existing
+        # {4, 5}
+        # ------- indicates added user's w.r.t updated
+        #
+        # existing - updated
+        # {1, 2}
+        # ------- indicates removed users w.r.t updated
+
+        result_dict = {'added': [], 'removed': []}
+
+        result_dict['added'] = list(set(updated_userids_list) - set(existing_userids_list))
+
+        result_dict['removed'] = list(set(existing_userids_list) - set(updated_userids_list))
+
+        return result_dict
 
 
     @staticmethod
@@ -2898,6 +2987,22 @@ class Buddy(DjangoDocument):
 
         if current_active_buddy_auth_list != active_buddy_auth_list:
             buddy_obj.save()
+
+            added_removed_buddies_dict = Buddy.get_added_and_removed_buddies_dict(
+                                                        current_active_buddy_auth_list,
+                                                        active_buddy_auth_list
+                                                        )
+
+
+            added_buddies_userids_list = Author.get_user_id_list_from_author_oid_list(added_removed_buddies_dict['added'])
+            # print "added_buddies_userids_list : ", added_buddies_userids_list
+            removed_buddies_userids_list = Author.get_user_id_list_from_author_oid_list(added_removed_buddies_dict['removed'])
+            # print "removed_buddies_userids_list : ", removed_buddies_userids_list
+
+            DjangoActiveUsersGroup.update_user_set(
+                                                add=added_buddies_userids_list,
+                                                remove=removed_buddies_userids_list
+                                                )
 
         else:
             buddy_obj = None
