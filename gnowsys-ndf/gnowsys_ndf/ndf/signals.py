@@ -6,9 +6,9 @@ from django.contrib.auth.signals import user_logged_out
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN
 
+from django.contrib.auth.signals import user_logged_in
 '''
 
-from django.contrib.auth.signals import user_logged_in
 from django.contrib.auth.signals import user_login_failed
 
 from django.core.mail import send_mail
@@ -21,11 +21,8 @@ def login_fail(sender, credentials, **kwargs):
     send_mail('Login Failed ', 'credentials'+ str(credentials), 'from@example.com',
     ['to@example.com'], fail_silently=False)
 
-@receiver(user_logged_in)
-def logged_in(sender, user, request, **kwargs):
-    print "\n\n LOGGED IN"
-
 '''
+
 @receiver(user_registered)
 def user_registered_handler(sender, user, request, **kwargs):
     '''
@@ -114,6 +111,15 @@ def create_auth_grp(sender, user, request, **kwargs):
             desk_group_obj.reload()
 
 
+
+@receiver(user_logged_in)
+def logged_in(sender, user, request, **kwargs):
+    # print "\n\n LOGGED IN"
+    if GSTUDIO_BUDDY_LOGIN:
+        DjangoActiveUsersGroup.addto_user_set(request.user.id)
+
+
+
 @receiver(user_logged_out)
 def logged_out(sender, user, request, **kwargs):
     if GSTUDIO_BUDDY_LOGIN:
@@ -121,13 +127,14 @@ def logged_out(sender, user, request, **kwargs):
         # print "userid", request.user.id
         # print "session val: ", request.session.get('buddies_authid_list', [])
 
-        if request.user.id and request.session.session_key:
-            buddy_obj = Buddy.query_buddy_obj(loggedin_userid=request.user.id,
+        user_id = request.user.id
+        if user_id and request.session.session_key:
+            buddy_obj = Buddy.query_buddy_obj(loggedin_userid=user_id,
                                             session_key=request.session.session_key)
 
             if buddy_obj:
                 buddy_obj.end_buddy_session()
 
-        # print "\n\n All buddies released",
+        DjangoActiveUsersGroup.removefrom_user_set(user_id)
 
-
+        # print "\n\n All buddies including loggen in user released",
