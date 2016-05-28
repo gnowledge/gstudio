@@ -25,25 +25,37 @@
 			},
 			success: function (data) {
 				// console.log(data);
+				resultData = JSON.parse(data)
+				buddyOidNameObj = resultData['buddies'];
+				alreadyActiveIdNameObj = resultData['already_active'];
 
-				oidNameObj = JSON.parse(data);
+				displayMsg = buddyUserNames = alreadyActiveUserNames = '';
 
-				displayMsg = userNames = '';
-
-				for(var eachUserName in oidNameObj){
-					console.log(oidNameObj[eachUserName]);
-					userNames += '\n- ' + oidNameObj[eachUserName]
+				for(var eachUserName in buddyOidNameObj){
+					console.log(buddyOidNameObj[eachUserName]);
+					buddyUserNames += '\n- ' + buddyOidNameObj[eachUserName]
 				}
-				console.log(userNames);
 
-				if (userNames)
+				for(var eachUserName in alreadyActiveIdNameObj){
+					console.log(alreadyActiveIdNameObj[eachUserName]);
+					alreadyActiveUserNames += '\n- ' + alreadyActiveIdNameObj[eachUserName]
+				}
+				console.log(alreadyActiveUserNames);
+
+				if (alreadyActiveUserNames)
 				{
-					displayMsg = 'Currently, following are your buddies:\n'
-					displayMsg += userNames;
+					displayMsg += 'Following can not be your buddies (because they are already active on site, either as a buddy or as a logged in user):\n'
+					displayMsg += alreadyActiveUserNames;
+				}
+
+				if (buddyUserNames)
+				{
+					displayMsg += '\n\nCurrently, following are your buddies:\n'
+					displayMsg += buddyUserNames;
 				}
 				else
 				{
-					displayMsg = 'Currently, you have NO buddies:\n'
+					displayMsg += '\n\nCurrently, you have NO buddies:\n'
 				};
 
 				alert(displayMsg);
