@@ -142,6 +142,8 @@ class Command(BaseCommand):
           gs_node.origin.append({'source': 'filldb'})
           gs_node.save()
           print "Group: 'home' created."
+          node_doc = gs_node
+
         if node_doc.altnames is None:
           node_doc.altnames = u'home'
           node_doc.save()
@@ -170,6 +172,8 @@ class Command(BaseCommand):
           gs_node.origin.append({'source': 'filldb'})
           gs_node.save()
           print "Group: 'warehouse' created."
+          node_doc = gs_node
+
         if node_doc.altnames is None:
           node_doc.altnames = u'warehouse'
           node_doc.save()
@@ -200,11 +204,13 @@ class Command(BaseCommand):
           gs_node.origin.append({'source': 'filldb'})
           gs_node.save()
           print "Group: 'desk' created."
+          gs_node = node_doc
+
         if node_doc.altnames is None:
           node_doc.altnames = u'desk'
           node_doc.save()
           print "\nAltnames changed to desk"
-          
+
         # Create default group 'help' 
         node_doc = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'help'}]})
         if node_doc is None:
@@ -228,6 +234,8 @@ class Command(BaseCommand):
           gs_node.origin.append({'source': 'filldb'})
           gs_node.save()
           print "Group: 'help' created."
+          node_doc = gs_node
+
         if node_doc.altnames is None:
           node_doc.altnames = u'help'
           print "\nAltnames changed to help"
