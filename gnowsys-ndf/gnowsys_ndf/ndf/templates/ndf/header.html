@@ -238,12 +238,12 @@
           {% if prof_pic %}
             {% if site.ENABLE_USER_DASHBOARD %}
               <a href="{% url 'dashboard' request.user.pk %}">
-                <img src="{{MEDIA_URL}}{{prof_pic.if_file.mid.relurl}}" id="profile-img">
+                <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
                 {{ user.username }}
               </a>
             {% else %}
               <a>
-                <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
+                <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
                 {{ user.username }}</a>
             {% endif %}
 

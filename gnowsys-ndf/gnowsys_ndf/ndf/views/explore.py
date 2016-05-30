@@ -57,7 +57,7 @@ def explore(request):
 def explore_courses(request):
 
     title = 'courses'
-
+    print ce_gst._id
     ce_cur = node_collection.find({'member_of': ce_gst._id,
                                         '$or': [
                                           {'created_by': request.user.id}, 
