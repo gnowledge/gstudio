@@ -1,11 +1,11 @@
 {% comment %}
-  
+
 <!--
 HOW TO USE
-  
-- EXAMPLE: 
+
+- EXAMPLE:
     {% include 'ndf/widget_selector.html' with for='apps_to_set' all_options=all_gapps selected_options=group_gapps oneline_element=true %}
-    
+
     where,
 
     - "for" is name which will be given to widget.
@@ -20,7 +20,7 @@ HOW TO USE
         or one below the other.
 
 - Before calling save method, call "getSelValuesHiddenElement" method.
-  Which will create a hidden input element holding selected values with name 
+  Which will create a hidden input element holding selected values with name
   specified as in first arg. So that values can be exctracted from backend accordingly.
 
   - EXAMPLE:
@@ -177,7 +177,7 @@ HOW TO USE
 
       {% for each_opt in all_options|dictsort:'name' %}
 
-        <div class="item" 
+        <div class="item"
           data-title="{{each_opt.name}}"
           data-description="{{each_opt.content_org|default_if_none:''}}"
           title="{{each_opt.content_org|default_if_none:each_opt.name}}"
@@ -235,11 +235,9 @@ HOW TO USE
   var selectorWidgetID = "{{for}}-selector-widget.selector-widget";
   var selectorWidget = $s('#' + selectorWidgetID);
 
-  $(document).ready(function () {
-    $(".selected-items").sortable({revert: true, scroll: true});
-  })
+  var selected_options = [ {% for each_opt in selected_options %}"{{each_opt|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
 
-  var selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
+  // console.log(selected_options)
 
   // toBeSelected = document.getElementById('to-be-selected');
   var toBeSelected = $s('#' + selectorWidgetID + ' .to-be-selected');
@@ -247,7 +245,7 @@ HOW TO USE
 
   // selectedItems = document.getElementById('selected-items');
   var selectedItems = $s('#' + selectorWidgetID + ' .selected-items');
-  
+
   // searchText = document.getElementById('search-text');
   var searchText = $s('#' + selectorWidgetID + ' .search-text');
 
@@ -255,14 +253,14 @@ HOW TO USE
   var sItems = $sa('#' + selectorWidgetID + ' .to-be-selected' + ' .item');
 
   var oneline_element = "{{oneline_element}}";
-  
+
   function removeTag(){
 
     var tempItem = this.parentNode.querySelector('.item');
 
     var selectorWidgetFor = tempItem.getAttribute('data-selector-widget-for');
     var toBeSelected = $s('.to-be-selected[data-selector-widget-for="'+ selectorWidgetFor +'"]');
-    
+
     tempItem.querySelector('.item-title').style.textDecoration = '';
     tempItem.onclick = addToSelection;
     tempItem.querySelector('.item-description').classList.remove('hide');
@@ -271,7 +269,7 @@ HOW TO USE
     this.parentNode.remove();
 
     toBeSelected.classList.remove('hide');
-      
+
   }
 
   function lineThrough(){
@@ -285,7 +283,7 @@ HOW TO USE
   }
 
   function detachEvent() { return false; }
-    
+
   function addToSelection () {
 
     // creating new div element
@@ -328,7 +326,7 @@ HOW TO USE
 
   for (var i = 0; i < selected_options.length; i++) {
     var temp_item = toBeSelected.querySelector('.item[data-value="'+ selected_options[i] +'"]');
-    if(temp_item){temp_item.click()}; 
+    if(temp_item){temp_item.click()};
   };
 
   function searchOnItems (ev){
@@ -343,7 +341,7 @@ HOW TO USE
     {
       var sItemsTemp = currentEl = $sa('#' + selectorWidgetID + ' .to-be-selected .item');
     }
-    
+
     var toBeSearch = this.value.trim().toLowerCase();
     // var sItemsTemp = $sa("#to-be-selected .item");
 
@@ -362,7 +360,7 @@ HOW TO USE
         }
     };
   }
-  
+
   function showOptionItems () {
 
     var selectorWidgetFor = false;
@@ -399,7 +397,7 @@ HOW TO USE
     var toBeSelectedList = $sa('.to-be-selected');
 
     for (var i = toBeSelectedList.length - 1; i >= 0; i--) {
-      
+
       if(!isHidden(toBeSelectedList[i]))
       {
         var toBeSelected = toBeSelectedList[i];
@@ -433,14 +431,14 @@ HOW TO USE
 
   function getSelectedValues (selectorWidgetFor) {
     /*
-    this method will return 
+    this method will return
     */
 
     var selectedItems = $s('#' + selectorWidgetFor + ' .selected-items');
-    
+
     var selected = $sa('.selected-items[data-selector-widget-for="'+ selectorWidgetFor +'"] .selection .item')
 
-    // var selected = selectedItems.querySelectorAll('.selection .item'); 
+    // var selected = selectedItems.querySelectorAll('.selection .item');
     var selectedValuesList = [];
     for (var i = 0; i < selected.length; i++) {
       selectedValuesList.push( selected[i].getAttribute('data-value') );
@@ -454,7 +452,7 @@ HOW TO USE
     This input element will be holding values selected.
     args:
       - selectorWidgetFor: specify the specific selector widget with it's
-                           <for> value specified at the time of inclusion.  
+                           <for> value specified at the time of inclusion.
       - idToAppend (optional): If you want any specific id to add to this newly created
                     hidden element then specify id value.
      */
@@ -477,7 +475,7 @@ HOW TO USE
     }
     return hiddenInput;
   }
- 
+
   document.querySelector('html').onclick = function (e) {
     // var parentEl = $(e.target).closest('.selector-widget');
     var parentEl = closest(e.target, '.selector-widget');
@@ -497,9 +495,9 @@ HOW TO USE
 
   function traverseListDown (ev) {
     ev.preventDefault();
-    
+
     var currentEl = getElementByParentRef(ev.target, '.selector-widget', '.to-be-selected  .item.traversing-el');
-    
+
     // var currentEl = $s('#' + selectorWidgetID + ' .to-be-selected .item.traversing-el');
     // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
     if(currentEl && currentEl.nextElementSibling && (currentEl.nextElementSibling.offsetHeight>0))
@@ -559,7 +557,7 @@ HOW TO USE
       currentEl.classList.remove('traversing-el');
     }
   }
-  
+
   function bindKeyEvents () {
     Mousetrap.bind('up', traverseListUp );
     Mousetrap.bind('down', traverseListDown );
@@ -574,7 +572,7 @@ HOW TO USE
           isHidden(!elemToBeSelectedList[i])
           {
             elemToBeSelectedList[i].classList.remove('traversing-el');
-            elemToBeSelectedList[i].click();     
+            elemToBeSelectedList[i].click();
           }
         };
       }
@@ -614,5 +612,11 @@ HOW TO USE
   function isHidden(el) {
     return (el.offsetParent === null)
   }
+
+  if (window.jQuery) {
+    $(document).ready(function () {
+      $(".selected-items").sortable({revert: true, scroll: true});
+    })
+  };
 
 </script>

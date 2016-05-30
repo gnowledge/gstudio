@@ -131,6 +131,7 @@ def get_site_variables():
 	site_var['MY_DASHBOARD_IN_HEADER'] = GSTUDIO_MY_DASHBOARD_IN_HEADER
 	site_var['ISSUES_PAGE'] = GSTUDIO_SITE_ISSUES_PAGE
 	site_var['ENABLE_USER_DASHBOARD'] = GSTUDIO_ENABLE_USER_DASHBOARD
+	site_var['BUDDY_LOGIN'] = GSTUDIO_BUDDY_LOGIN
 
 	cache.set('site_var', site_var, 60 * 30)
 
