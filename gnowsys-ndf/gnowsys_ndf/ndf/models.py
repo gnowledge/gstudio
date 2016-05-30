@@ -2100,7 +2100,10 @@ class Author(Group):
     @staticmethod
     def get_author_oid_list_from_user_id_list(user_ids_list=[], list_of_str_oids=False):
         all_authors_cur = node_collection.find(
-                                        {'created_by': {'$in': [int(uid) for uid in user_ids_list]}},
+                                        {
+                                            '_type': 'Author',
+                                            'created_by': {'$in': [int(uid) for uid in user_ids_list]}
+                                        },
                                         {'_id': 1}
                                     )
         if list_of_str_oids:
