@@ -73,5 +73,9 @@ try:
 
 			else:
 				print "\n Either Users or Authors with file name : ", str(each_img_name_wo_ext), "does NOT exist."
+	else:
+		print "\n No such path exists."
+
+
 except Exception as user_icon_err:
 	print "\n Error occurred!!!" + str(user_icon_err)
