@@ -5445,6 +5445,7 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
               incompleted_ids.append(cs_node._id)
 
       return_perc = (completed_cs_count/float(all_cs_count))*100
+
       # print "\n\n return_perc==== ",return_perc
       result_dict['course_complete_percentage'] = return_perc
       result_dict['completed_count'] = completed_cs_count

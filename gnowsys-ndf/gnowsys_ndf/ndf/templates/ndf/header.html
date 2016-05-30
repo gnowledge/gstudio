@@ -108,7 +108,7 @@
         </ul>
         <!-- -END of NROER level one menu -->
       {% comment %}
-        
+
       {% if "CourseEventGroup" in group_object.member_of_names_list %}
       <ul class="left">
 
@@ -189,23 +189,23 @@
             </li>
             {% endif %}
 
-          
+
           {% if site.MY_COURSES_IN_HEADER %}
             <li>
               <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'course' request.user.username %}">
                 {% trans 'MY COURSES' %}
               </a>
             </li>
-          {% endif %}        
-                  
+          {% endif %}
+
           {% if site.MY_GROUPS_IN_HEADER %}
             <li>
               <a title="{{title}}" class="{%if title == 'My Groups'%}active{%endif%}" href="{% url 'my_groups' request.user.username %}">
                 {% trans 'MY GROUPS' %}
               </a>
             </li>
-          {% endif %}        
-        
+          {% endif %}
+
         {% endif %}
 
 
@@ -290,11 +290,28 @@
                 </li>
               {% endif %}
             {% endif %}
+
+            {% if site.BUDDY_LOGIN and user.is_authenticated %}
+
+              <li>
+                <a href="#" data-reveal-id="add-buddy" data-reveal-ajax="{% url 'list_buddy' group_id %}">
+                  + Add your buddy
+                </a>
+
+                <div id="add-buddy" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+
+                </div>
+
+              </li>
+            {% endif %}
+
             <li>
               <a class="logout" href="{% url 'auth_logout' %}">
                 <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
               </a>
             </li>
+
+
           </ul>
         </li>
 
@@ -354,7 +371,7 @@
           </li>
         </ul>
 {% endif %}
-        
+
         <!-- Right Nav Section -->
         <ul class="right">
           <li>
