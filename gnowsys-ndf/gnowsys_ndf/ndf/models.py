@@ -2394,7 +2394,11 @@ class DjangoActiveUsersGroup(object):
 
     django_active_users_group_name = 'active_loggedin_and_buddy_users'
 
-    active_loggedin_and_buddy_users_group = DjangoGroup.objects.get_or_create(name=django_active_users_group_name)[0]
+    try:
+        active_loggedin_and_buddy_users_group = DjangoGroup.objects.get_or_create(name=django_active_users_group_name)[0]
+    except Exception, e:
+        print e
+        pass
 
     # def __init__(self):
     #     super(DjangoActiveUsersGroup, self).__init__()
