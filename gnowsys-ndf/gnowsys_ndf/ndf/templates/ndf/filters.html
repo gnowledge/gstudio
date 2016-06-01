@@ -32,60 +32,55 @@
 <style type="text/css">
 
 	div#filter-area {
-		//border: solid thin thistle;
- 		border-radius: 5px;
+		/*//border: solid thin thistle;*/
 		padding: 10px;
-		margin-left: -10px;
-		background-color: #efefef;
-		/*margin-top: 2.5%;*/
+		margin: 0px -10px;
+		text-align: left;
+		border-bottom: 1px solid #cfcfcf;
+ 	}
+
+ 	div.filter-body>div, div.filter-body>select, div.filter-body>input {
+ 		display: inline-block;
+ 		vertical-align: top;
+ 		margin: 0px 10px;
+ 		margin-bottom: 0px;
+ 	}
+ 	div.filter-body>div {
+ 		color: #A2A2A2;
+ 	}
+ 	div.filter-body>select {
+ 		display: none;
+ 		width: 330px;
+ 	}
+ 	div.filter-body {
+	    display: inline-block;
+		padding: 1px 1px;
+		border: 1px solid #DEDEDE;
+ 	}
+ 	div.filter-body i {
+ 		cursor: pointer;
+ 		font-size: 20px;
+ 	}
+ 	div.filter-body>input {
+ 		display: none;
  	}
 
 	/*div#filter-area:hover { border: dashed thistle; }*/
 
 	div#add-filters/*, div#close-select-filters*/ { cursor: pointer; height: 100%; }
 	div#add-filters:hover/*, div#close-select-filters:hover*/ { background-color: lightgray; }
-	/*
-	div#close-select-filters {
-		margin-left: 8px;
-		margin-right: -10px;
-		padding-bottom: 8px;
-	}
-	*/
-	/*div#create-filter { padding-top:0.75em; }*/
-
-	div#applied-filters {
-		/*margin-top: -15px;*/
-		/*padding-left: 2em;*/
-		padding-bottom: 5px;
-		padding-top: 5px;
-	}
 
 	#add-filters {
-		/*margin-left: 25px;*/
-		/*margin-top: 5px; */
-		/*margin-bottom: -15px;*/
 		padding-bottom: 5px;
-		/*padding-left: 5px;*/
 		cursor: pointer;
 	}
 
 	#filters-label{
 		opacity: 0.1;
-		/*position: absolute;*/
-		/*padding-left: 10px;*/
 	}
 
-	/*div#select-filters {
-		padding-top: 0.5em;
-	    margin-left: 5px;
-	    margin-right: 5px;
-	    margin-bottom: 5px;
-	    border-radius: 5px;
-	}*/
-
 	div.filters{
-		/*padding: 5px 10px; */
-		margin: 2px 5px;
+		margin: 10px 5px 0px 0px;
 		color: white;
 		font-size: 0.9em;
 	}
@@ -115,37 +110,40 @@
 		 -->
 		<div class="small-12 columns" id="create-filter">
 			<div class="row">
-				<div class="small-12 large-3 columns small-text-left  large-text-center"><h5> {% trans 'Filter Resources' %}</h5></div>
-				<div class="small-12 large-3 columns">
-					<select name="filter-field-name">
-						<option value="initial-select"> -- {% trans 'Select' %} -- </option>
-						{% for key, val in filter_dict.items %}
-							<option value='{{val.value}}'
-							data-primary-type='{{val.data_type}}'
-							data-gstudio-type='{{val.type}}' data-name-field='{{key}}'>
-								{% comment %}
-									{# {% if val.altnames %}
-										{{val.altnames}}
-									{% else %}
-										{{key}}
-									{% endif %} #}
-								{% endcomment %}
-								{% firstof val.altnames key %}
-							</option>
-						{% endfor %}
+				<!--div class="small-12 large-3 columns small-text-left  large-text-center"><h5> {% trans 'Filter Resources' %}</h5></div-->
+				<div class="small-12 large-12 columns">
+					<div class="filter-body">
+						<div class="filter-button" id="filter_button">
+							<i class="fi-filter small" aria-hidden="true"></i>
+							<span>Add Filter</span>
+						</div>
+						<select name="filter-field-name">
+							<option value="initial-select"> -- {% trans 'Select' %} -- </option>
+							{% for key, val in filter_dict.items %}
+								<option value='{{val.value}}'
+								data-primary-type='{{val.data_type}}'
+								data-gstudio-type='{{val.type}}' data-name-field='{{key}}'>
+									{% comment %}
+										{# {% if val.altnames %}
+											{{val.altnames}}
+										{% else %}
+											{{key}}
+										{% endif %} #}
+									{% endcomment %}
+									{% firstof val.altnames key %}
+								</option>
+							{% endfor %}
 
-					</select>
-				</div>
-				<div class="small-12 large-3 columns">
-					<select name="filter-field-value"
-					onblur="$(this).css('height', '')"
-					onfocus="$(this).css('height', '6em')" multiple disabled>
-						<option value=""> -- {% trans 'Select' %} -- </option>
+						</select>
+						<select name="filter-field-value"
+						onblur="$(this).css('height', '')"
+						onfocus="$(this).css('height', '6em')" multiple disabled>
+							<option value=""> -- {% trans 'Select' %} -- </option>
 
-					</select>
-				</div>
-				<div class="small-12 large-3 columns">
-					<input type="button" class="button radius tiny" value="{% trans 'Filter' %}" id="filter-btn">
+						</select>
+						<input type="button" class="button radius tiny" value="{% trans 'Filter' %}" id="filter-btn">
+						<input type="button" class="button radius tiny" value="Clear" id="filter-clear-btn">
+					</div>
 				</div>
 			</div>
 		</div>
@@ -163,6 +161,7 @@
 
 
 <script type="text/javascript">
+
 
 	// show and hide functionality on click of add filters
 	$("#add-filters").click(function(){
@@ -182,6 +181,17 @@
 	var $selectName = $("select[name='filter-field-name']"),   // first <select>
 		$selectValue = $("select[name='filter-field-value']"); // second <select>
 
+	$('#filter_button').on('click', function(){
+		console.log('showing');
+		$selectName.show();
+		$(this).find('span').hide();
+		$("#filter-clear-btn").show();
+	})
+	$("#filter-clear-btn").on('click', function(){
+		$(".filter-body").find('select, input').hide();
+		$("#filter_button>span").show();
+		$(".filter-body").find('select').val('');
+	})
 	// handling change of first <select>;
 	// to populate second <select> with "value" field of this (first <select>'s) <option>.
 	$selectName.change(function(){
@@ -248,8 +258,13 @@
 		{
 			alert("{% trans 'No values for the key' %} : " + ffName);
 		}
+		$selectValue.show();
 	})
 
+	$selectValue.on('change', function(e){
+		console.log(e.target);
+		$("#filter-btn").show();
+	})
 	function getFiltersObjArr()
 	{
 		var filtersObjArr = new Array();
@@ -427,6 +442,8 @@
 			prevFiltersArr.push(this.textContent.trim())
 		});
 
+		$(".filter-body").find('select, input').hide();
+		$("#filter_button>span").show();
 		if(selOpts.length > 0)  // if any of the second <select>'s option/s are selected
 		{
 			selOpts.each(function(){
