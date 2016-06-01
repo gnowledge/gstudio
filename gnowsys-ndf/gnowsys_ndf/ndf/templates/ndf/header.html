@@ -50,7 +50,7 @@
 
       <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
       <!-- {#% cache 3600 top_header request.LANGUAGE_CODE request.path request.user.username %} -->
-      {% if site.SITE_NAME == "NROER" %}
+      {% if site.SITE_NAME == "NROER" and group_name_tag == 'home' %}
 
         <!-- NROER level one menu -->
         {% get_nroer_menu request group_name_tag as nroer_menu %}
@@ -414,7 +414,7 @@
 
                           {% get_relation_value group_object.pk 'has_profile_pic' as grel_dict %}
                           {% if not grel_dict.cursor and grel_dict.grel_node %}
-                                    <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" />
+                                    <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.original.relurl}}" />
                           {% else %}
                                     <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
                           {% endif %}
@@ -505,8 +505,8 @@
                   <li class="" onclick="history.back();">
                     <a href="javascript:window.history.back();"><i class="fa fa-angle-left back-btn"></i> {% trans "BACK" %}</a>
                   </li>
-                  {% if site.SITE_NAME == "NROER" %}
-                    {% if group_name_tag == "home" or "CourseEventGroup" not in group_object.member_of_names_list or "ProgramEventGroup" not in list_of_sg_member_of %}
+                  {% if site.SITE_NAME == "NROER" and group_name_tag == 'home' %}
+                    {% if "CourseEventGroup" not in group_object.member_of_names_list or "ProgramEventGroup" not in list_of_sg_member_of %}
                     <!-- NROER level-two menu -->
                       {% if "repository" not in request.path %}
                         {% if "/partner/" not in request.path %}
