@@ -1438,9 +1438,7 @@ def get_event_type(node):
 @register.assignment_tag
 def get_url(groupid):
 	node = node_collection.one({'_id': ObjectId(groupid) })
-
 	if node._type == 'GSystem':
-
 		type_name = node_collection.one({'_id': node.member_of[0]})
 		if type_name.name == 'Exam' or type_name.name == "Classroom Session":
 			return ('event_app_instance_detail')
@@ -1454,6 +1452,13 @@ def get_url(groupid):
 			return 'show'
 		elif type_name.name == 'Task' or type_name.name == 'task_update_history':
 			return 'task_details'
+		elif type_name.name == 'File':
+			if (node.if_file.mime_type) == ("application/octet-stream"):
+				return 'video_detail'
+			elif 'image' in node.if_file.mime_type:
+				return 'file_detail'
+			else:
+				return 'file_detail'
 		else:
 			return 'None'
 	elif node._type == 'Group':
