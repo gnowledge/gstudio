@@ -2112,6 +2112,62 @@ class Author(Group):
             return [user['_id'] for user in all_authors_cur]
 
 
+    @staticmethod
+    def create_author(user_id_or_obj, agency_type='Student', **kwargs):
+
+        user_obj = None
+
+        if isinstance(user_id_or_obj, int):
+            user_obj = User.objects.filter(id=user_id_or_obj)
+            if len(user_obj) > 0:
+                user_obj = user_obj[0]
+
+        elif isinstance(user_id_or_obj, User):
+            user_obj = user_id_or_obj
+
+        if not user_obj:
+            raise Exception("\nUser with provided user-id/user-obj does NOT exists!!")
+
+        auth = node_collection.find_one({'_type': u"Author", 'created_by': int(user_obj.id)})
+
+        if auth:
+            return auth
+
+        auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
+
+        print "\n Creating new Author obj for user id (django): ", user_obj.id
+        auth = node_collection.collection.Author()
+        auth.name = unicode(user_obj.username)
+        auth.email = unicode(user_obj.email)
+        auth.password = u""
+        auth.member_of.append(auth_gst._id)
+        auth.group_type = u"PUBLIC"
+        auth.edit_policy = u"NON_EDITABLE"
+        auth.subscription_policy = u"OPEN"
+        auth.created_by = user_obj.id
+        auth.modified_by = user_obj.id
+        auth.contributors.append(user_obj.id)
+        auth.group_admin.append(user_obj.id)
+        auth.preferred_languages = {'primary': ('en', 'English')}
+
+        auth.agency_type = "Student"
+        auth_id = ObjectId()
+        auth['_id'] = auth_id
+        auth.save(groupid=auth_id)
+
+        home_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("home")})
+        if user_obj.id not in home_group_obj.author_set:
+            node_collection.collection.update({'_id': home_group_obj._id}, {'$push': {'author_set': user_obj.id }}, upsert=False, multi=False)
+            home_group_obj.reload()
+
+        desk_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("desk")})
+        if desk_group_obj and user_obj.id not in desk_group_obj.author_set:
+            node_collection.collection.update({'_id': desk_group_obj._id}, {'$push': {'author_set': user_obj.id }}, upsert=False, multi=False)
+            desk_group_obj.reload()
+
+        return auth
+
+
 #  HELPER -- CLASS DEFINITIONS
 class HistoryManager():
     """Handles history management for documents of a collection
