@@ -138,7 +138,7 @@
                         <div class="note-heading"> {{each_user_blog.name}} </div>
                         <div class="note-meta">
                             <span title="{{each_user_blog.created_by|get_username}}">
-                                {{each_user_blog.created_by|get_username|truncatechars:"10"}}
+                                {{each_user_blog.created_by|get_username}}
                             </span>
                             &#8226;
                             <span>{{each_user_blog.created_at|date:"d M Y h:i A"}}</span>

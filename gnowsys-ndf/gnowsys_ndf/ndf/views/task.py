@@ -787,7 +787,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
 
     Completed_Status_List=['Resolved','Closed']
     title = "Task"
-    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}})
     task_list=[]
     message="" 	
     send="This group doesn't have any files"
