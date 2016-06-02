@@ -44,7 +44,7 @@ if os.path.exists(file_input):
     msg = '\nFound file: "' + str(file_input) + '"\n\n'
     log_print(msg)
 
-    with open('/home/docker/code/user-details/test.csv', 'rb') as csvfile:
+    with open(file_input, 'rb') as csvfile:
             users = csv.reader(csvfile, delimiter=';')
 
             for code, username, password in users:
