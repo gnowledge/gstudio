@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH
+from gnowsys_ndf.ndf.models import Author, node_collection
 
 if not os.path.isdir(GSTUDIO_LOGS_DIR_PATH):
 	os.makedirs(GSTUDIO_LOGS_DIR_PATH)
@@ -14,7 +15,7 @@ if not os.path.isdir(GSTUDIO_LOGS_DIR_PATH):
 log_file_name = 'create_authusers_from_code_username_password_csv.log'
 log_file = os.path.join(GSTUDIO_LOGS_DIR_PATH, log_file_name)
 
-csv_log_file_name = 'user_details-' + str(time.strftime("%d-%b-%Y@%Hh-%Mm-%Ss")) + '.csv'
+csv_log_file_name = 'user_details-' + str(time.strftime("%d-%b-%Y-%Hh-%Mm-%Ss")) + '.csv'
 csv_log_file = os.path.join(GSTUDIO_LOGS_DIR_PATH, csv_log_file_name)
 
 file_input = raw_input("\nEnter below file to be used:\n")
@@ -55,19 +56,33 @@ if os.path.exists(file_input):
                 try:
                     msg = '\nCreating user: ' + str(username)
                     log_print(msg)
-                    user = User.objects.create_user(username=username, password=password)
+                    user_obj = User.objects.create_user(username=username, password=password)
 
                     assert authenticate(username=username, password=password)
-                    msg = '\n\t-- User ' + str(username) + ' successfully created.\n'
+
+                    user_id = user_obj.id
+
+                    msg = '\n\t-- User ' + str(username) + ' successfully created.'
                     log_print(msg)
-                    temp_csv_log_list.append(str(user.id))
+                    temp_csv_log_list.append(str(user_id))
                     temp_csv_log_list.append('success')
+
+                    msg = '\n\tCreating author with username: ' + str(username) + ' and created_by (django user id): ' + str(user_id)
+                    log_print(msg)
+
+                    auth_obj = Author.create_author(user_id)
+
+                    msg = '\n\t-- author _id: ' + str(auth_obj._id)
+                    log_print(msg)
+                    temp_csv_log_list.append(str(auth_obj._id))
+
 
                 except Exception, e:
                     msg = '\n\t!! There was a problem creating the user: ' + str(username)
                     log_print(msg)
                     temp_csv_log_list.append('-')
-                    temp_csv_log_list.append(str(e))
+                    temp_csv_log_list.append(str(e).strip())
+                    temp_csv_log_list.append('-')
 
                     msg = '\n\t!! Error : ' + str(e) + '\n'
                     log_print(msg)
