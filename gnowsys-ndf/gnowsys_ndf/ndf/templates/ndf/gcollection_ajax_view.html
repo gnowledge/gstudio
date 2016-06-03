@@ -2,10 +2,10 @@
 {% load i18n %}
 
 {% block head %}
-  <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> 
+  <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet">
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
 
-    
+
   <script type="text/javascript">
     iconMapping = {
       'WARNING': 'fa-exclamation-circle',
@@ -15,7 +15,7 @@
     }
 
 
-    $(document).ready(function() {      
+    $(document).ready(function() {
       {% check_is_gstaff groupid request.user as is_gstaff %}
 
       // Funtion for loading tree for showing collection list left side panel
@@ -37,14 +37,14 @@
         tree_build.tree('selectNode', selected_node);
         return;
       }
-      
+
       // Javascript function to be used for checking objects in specific time of interval
       setTimeout(function(){
         // console.log($(".collection"))
         if(url && ($(".collection").length > 0)) { TreeTillNode() }
         $(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder');}, 100 );
     }
-    
+
 
     function doc(){
       cs_ids = []
@@ -52,9 +52,9 @@
       cu_ids = []
       cr_ids = []
       var $tree = $('.collection');
-      var arr = [];  
-      {% get_node_type node as node_type %}  
-      
+      var arr = [];
+      {% get_node_type node as node_type %}
+
       var node_type = "{{node_type}}";
 
       $tree.tree({
@@ -96,9 +96,9 @@
 
             var tree_build = $(".collection").not(".jqtree-loading");
             selected_node = tree_build.tree('getNodeById', url);
-            
+
             if (arr.indexOf(node_id) < 0){
-              arr.push(node_id);  
+              arr.push(node_id);
             }
             if(selected_node){
               node = selected_node
@@ -108,7 +108,7 @@
       );
 
       // This "tree.select" event helps to click the particular tree node and also triggers the click event on tree node
-      $tree.bind(          
+      $tree.bind(
         'tree.select',
         function(event) {
           if(event.node){
@@ -120,11 +120,11 @@
 
             // Bellow code manipulates the parent hierarchy of clicked node in a tree
             while (parent_node) {
-                if (parent_node.name !== undefined){  
+                if (parent_node.name !== undefined){
                   $tree.tree('openNode', parent_node);
                   parent_node = parent_node.parent;
                   if (parent_node.name !== undefined){
-                    parent_arr.push(parent_node.id);                                          
+                    parent_arr.push(parent_node.id);
                   }
                 }
                 else{
@@ -152,7 +152,7 @@
                    window.history.pushState("", "", "/{{group_name_tag}}/page/{{node.pk}}"+"?selected="+node.id+"");
                   }
                   else if(node_type == "File"){
-                    window.history.pushState("", "", "/{{group_name_tag}}/file/{{node.pk}}"+"?selected="+node.id+"");  
+                    window.history.pushState("", "", "/{{group_name_tag}}/file/{{node.pk}}"+"?selected="+node.id+"");
                   }
                   else if (node_type == "Term"){
                     window.history.pushState("", "", "/{{group_name_tag}}/term/{{node.pk}}"+"?selected="+node.id+"");
@@ -167,7 +167,7 @@
                   else if (node_type == "Topic"){
                     window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
                   }
-                                      
+
                   $("#view_page").html(data);
                 }
             });
@@ -183,7 +183,7 @@
                 $("#view_page").append(lbl_name);
                 var ol_elem = document.createElement('OL');
                 ol_elem.id = "res_container";
-                if (node){  
+                if (node){
                   for(var i=0;i<node.children.length;i++){
                     var elem2 = document.createElement('LI');
                     elem2.innerHTML = node.children[i].name;
@@ -212,10 +212,10 @@
           });
           $tree.unbind('tree.open')
           $tree.unbind('tree.select')
-          
+
       } else {
           update_url = true;
-      }      
+      }
 
     }
     function get_all_siblings(node_item){
@@ -291,7 +291,7 @@
             var $tree = $('.collection');
 
             var tree = $tree.tree('getTree');
-            
+
             tree.iterate(function(node) {
 
               if (node.hasChildren()) {
@@ -308,7 +308,7 @@
       });//end of ajax
 
     }
-    
+
     function sublist_chk(super_list, sub_list) {
       console.log(sub_list)
       var newArray = [];
@@ -392,29 +392,30 @@
         })
       }
     }
-    
+
     $(document).on('click','.get_course-status',function(){
       console.log("get_course-status btn clicked")
       update_res_status()
     });
-    
+
   </script>
 
 <style type="text/css">
-  
+
   .fa{
     display: inline !important;
   }
 
   .collection {
-    border-bottom: solid thin #ddd;
     margin-bottom: 1em;
     overflow: auto;
+    margin-top: 15px 0px;
   }
   ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
       position: relative !important;
        padding-left: 30px !important;
       text-indent:-32px !important;
+      padding: 9px;
 
   }
   .hanging-indent-topics-name{
@@ -424,11 +425,11 @@
   }
 
   /*.collection > ul li:nth-child(odd) { background: #ddd; }*/
-  .collection > ul li { border-bottom: solid thin #ddd; }
+  .collection > ul li { border-bottom: solid thin #ddd; border-top: solid thin #ddd; }
   /*.collection > ul li { padding-left: 22px ;
   text-indent: -22px ;
  }*/
-    
+
   #view_collection legend{
     text-align: center;
     //border-left: solid thin #ddd;
@@ -436,17 +437,17 @@
     margin-top: 20px;
     color:black !important;
   }
-  
+
 
   .res_name{
     margin-left: 20px;
     font-size: 18px;
     list-style: inherit;
   }
-</style>  
+</style>
 
 {% endblock %}
-  
+
 
   <!-- <b class="current">{{node.name}}</b> -->
   {% if node.collection_set %}
