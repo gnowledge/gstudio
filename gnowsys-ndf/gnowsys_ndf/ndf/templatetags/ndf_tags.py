@@ -1464,12 +1464,20 @@ def get_url(groupid):
 	elif node._type == 'Group':
 		return 'group'
 	elif node._type == 'File':
-		if (node.mime_type) == ("application/octet-stream"):
-			return 'video_detail'
-		elif 'image' in node.mime_type:
-			return 'file_detail'
+		if "mime_type" in node:
+			if (node.mime_type) == ("application/octet-stream"):
+				return 'video_detail'
+			elif 'image' in node.mime_type:
+				return 'file_detail'
+			else:
+				return 'file_detail'
 		else:
-			return 'file_detail'
+			if (node.if_file.mime_type) == ("application/octet-stream"):
+				return 'video_detail'
+			elif 'image' in node.if_file.mime_type:
+				return 'file_detail'
+			else:
+				return 'file_detail'
 	else:
 		return 'group'
 
