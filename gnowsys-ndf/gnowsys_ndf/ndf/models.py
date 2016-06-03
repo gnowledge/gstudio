@@ -2063,7 +2063,7 @@ class Author(Group):
         'agency_type': lambda x: x in GSTUDIO_AUTHOR_AGENCY_TYPES         # agency_type inherited from Group class
     }
 
-    required_fields = ['name', 'password']
+    required_fields = ['name']
 
     def __init__(self, *args, **kwargs):
         super(Author, self).__init__(*args, **kwargs)
