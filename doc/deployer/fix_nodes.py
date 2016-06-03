@@ -36,20 +36,22 @@ if date_gattr > 0:
 			new_object_value = datetime.fromtimestamp(old_object_value/1e3)
 			create_gattribute(each_gattr.subject, at_node, new_object_value)
 
-# gr.collection_set = list(set(gr.collection_set))
-# gr.save()
-# for cs_id in gr.collection_set:
-# 	cs_node = node_collection.one({'_id': ObjectId(cs_id)})
-# 	if cs_node.collection_set:
-# 		cs_node.collection_set = list(set(cs_node.collection_set))
-# 		cs_node.save()
-# 		for css_id in cs_node.collection_set:
-# 			css_node = node_collection.one({'_id': ObjectId(css_id)})
-# 			if css_node.collection_set:
-# 				css_node.collection_set = list(set(css_node.collection_set))
-# 				css_node.save()
-# 				for cu_id in css_node.collection_set:
-# 					cu_node = node_collection.one({'_id': ObjectId(cu_id)})
-# 					if cu_node.collection_set:
-# 						cu_node.collection_set = list(set(cu_node.collection_set))
-# 						cu_node.save()
+gr = node_collection.one({'name':'I2C-V2'})
+if gr and gr.collection_set:
+	gr.collection_set = list(set(gr.collection_set))
+	gr.save()
+	for cs_id in gr.collection_set:
+		cs_node = node_collection.one({'_id': ObjectId(cs_id)})
+		if cs_node.collection_set:
+			cs_node.collection_set = list(set(cs_node.collection_set))
+			cs_node.save()
+			for css_id in cs_node.collection_set:
+				css_node = node_collection.one({'_id': ObjectId(css_id)})
+				if css_node.collection_set:
+					css_node.collection_set = list(set(css_node.collection_set))
+					css_node.save()
+					for cu_id in css_node.collection_set:
+						cu_node = node_collection.one({'_id': ObjectId(cu_id)})
+						if cu_node.collection_set:
+							cu_node.collection_set = list(set(cu_node.collection_set))
+							cu_node.save()
