@@ -10,10 +10,12 @@ from itertools import chain     # Using from_iterable()
 from hashfs import HashFS       # content-addressable file management system
 from StringIO import StringIO
 from PIL import Image
+from django.utils import timezone
 
 # imports from installed packages
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group as DjangoGroup
+from django.contrib.sessions.models import Session
 from django.db import models
 from django.http import HttpRequest
 
@@ -2443,6 +2445,34 @@ class NodeJSONEncoder(json.JSONEncoder):
       return o.strftime("%d/%m/%Y %H:%M:%S")
 
     return json.JSONEncoder.default(self, o)
+
+
+class ActiveUsers(object):
+    """docstring for ActiveUsers"""
+
+    @staticmethod
+    def get_all_logged_in_users(list_of_ids=False):
+        # Query all non-expired sessions
+        # use timezone.now() instead of datetime.now() in latest versions of Django
+        sessions = Session.objects.filter(expire_date__gte=timezone.now())
+        uid_list = []
+        session_key_list = []
+        uid_session_key_dict = {}
+
+        # Build a list of user ids from that query
+        for session in sessions:
+            data = session.get_decoded()
+            user_id = data.get('_auth_user_id', None)
+            if user_id:
+                uid_list.append(user_id)
+                session_key_list.append(session.session_key)
+                uid_session_key_dict[user_id] = session.session_key
+
+        # Query all logged in users based on id list
+        if list_of_ids:
+            return User.objects.filter(id__in=uid_list).values_list('id', flat=True)
+        else:
+            return User.objects.filter(id__in=uid_list)
 
 
 class DjangoActiveUsersGroup(object):
