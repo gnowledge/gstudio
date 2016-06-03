@@ -12,6 +12,7 @@ start_enroll_at = node_collection.one({'_type': "AttributeType", 'name': 'start_
 end_enroll_at = node_collection.one({'_type': "AttributeType", 'name': 'end_enroll'})
 
 all_date_gattr = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': {'$in': [start_time_at._id, end_time_at._id, start_enroll_at._id, end_enroll_at._id]}})
+created_at_long_nodes_cur = node_collection.find({'created_at':{'$type': "long"}})
 
 date_gattr = all_date_gattr.count()
 
@@ -20,7 +21,14 @@ if date_gattr > 0:
 		#print type(each.object_value)
 		if type(each.object_value) == long:
 			incorrect_value_gattr.append(each)
-	print "\n Total nodes to be fixed: ", len(incorrect_value_gattr)
+	print "\n Total nodes to be fixed: ", len(incorrect_value_gattr) + created_at_long_nodes_cur.count()
+
+	for each_created_at_long in created_at_long_nodes_cur:
+		old_created_at_val = each_created_at_long.created_at
+		new_created_at_val = datetime.fromtimestamp(old_created_at_val/1e3)
+		each_created_at_long.created_at = new_created_at_val
+		each_created_at_long.save(validate=False)
+
 	if incorrect_value_gattr:
 		for each_gattr in incorrect_value_gattr:
 			attr_type_name = each_gattr.attribute_type.name
