@@ -2209,9 +2209,9 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                             'name': 1,
                                             'collection_set':1,
                                             '_id': 1,
-                                            # 'fs_file_ids': 1,
+                                            'fs_file_ids': 1,
                                             'member_of': 1,
-                                            # 'mime_type': 1,
+                                            'mime_type': 1,
                                             'if_file':1,
                                         }).sort("last_update", -1)
         context_variables.update({'files_cur': files_cur})
