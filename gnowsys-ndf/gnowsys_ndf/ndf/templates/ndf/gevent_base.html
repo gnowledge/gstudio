@@ -260,6 +260,8 @@
     {% endcomment %}
     </div>
 
+
+
   <!-- Tabs -->
   <div id="envelop-content" >
     <div class="row">
@@ -321,6 +323,11 @@
     </div>
     </div>
     </div>
+    {% if title == "gallery" %} 
+        {% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_name_tag page_info=gallery_page_info %}
+      {% elif title == "raw material" %}
+        {% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_name_tag    page_info=raw_material_page_info %}
+      {% endif  %}
   </div>
 </div>
 <script type="text/javascript">

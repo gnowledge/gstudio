@@ -89,10 +89,10 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
                         }).sort("last_update", -1)
     # print "file count\n\n\n",files_cur.count()
 
-    image_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    # image_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'imageCollection': files_cur,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id,'image_page_info':image_page_info })
+    variable = RequestContext(request, {'imageCollection': files_cur,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
     return render_to_response(template, variable)
 
 @get_execution_time
