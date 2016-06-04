@@ -87,7 +87,7 @@
                     <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
                             {% csrf_token %}
-                            <label class="tiny button radius expand" style="margin: 0px;">
+                            <label class="tiny button radius expand upload-btn" style="margin: 0px;">
                                 <i class="fa fa-upload"></i>
                                 &nbsp;
                                 <span>Upload File</span>
