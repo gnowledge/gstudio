@@ -36,7 +36,7 @@ class Command(BaseCommand):
             msg = '\nFound file: "' + str(file_input) + '"\n\n'
             print msg
 
-            cntr = 1
+            cntr = 0
             with open(file_input, 'rb') as csvfile:
                 # csv schema:
                 # user_id, school_code, username, password, oid
