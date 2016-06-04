@@ -136,7 +136,7 @@
     {% for each in imageCollection %}
     
     <li class="card-image-wrapper">
-            <img  data-image-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}" data-image-src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
+            <img  style="cursor:pointer" data-image-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}" data-image-src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
             <figcaption>{{each.name}}</figcaption>
     
     </li>
