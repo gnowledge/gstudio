@@ -17,7 +17,12 @@ if not os.path.exists(csvs_folder_path):
 # generate random characters:
 # print (''.join(choice(all_small_letters) for i in xrange(6)))
 
-statecode_range_dict = {'mz': (1, 200), 'rj': (201, 500), 'cg': (501, 800), 'ts': (801, 1100), 'sp': (1100, 1300)}
+# statecode_cum_range_dict = {'mz': (1, 200), 'rj': (201, 500), 'cg': (501, 800), 'ts': (801, 1100), 'sp': (1100, 1300)}
+
+statecode_range_dict = {'mz': (1, 200), 'rj': (1, 300), 'cg': (1, 300), 'ts': (1, 300), 'sp': (1, 300)}
+
+state_startwith_dict = {'mz': 0, 'rj': 200, 'cg': 500, 'ts': 800, 'sp': 1100}
+
 
 # ------ for generating school codes ------
 statecode_schoolcodes_dict = {}
@@ -128,7 +133,9 @@ for code in user_id_creation_order:
 
         for user_type, csvfile in usertype_csvfile_dict.iteritems():
 
-            last_user_id = 1000 + ( int(each_sc[2:]) * 1050 )
+            # print "each_sc: ", each_sc, each_sc[2:], state_startwith_dict[each_sc[:2]]
+            # print int(each_sc[2:]) + state_startwith_dict[each_sc[:2]]
+            last_user_id = 1000 + (( int(each_sc[2:]) + state_startwith_dict[each_sc[:2]] ) * 1050 )
             start_user_id = last_user_id - 1050
             start_user_id += teacher_student_start_perschool[user_type]
             if user_type == "teacher":
