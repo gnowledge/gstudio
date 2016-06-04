@@ -57,7 +57,7 @@
               // alert("success"+xhr.responseText);
               var imageURL = "{{MEDIA_URL}}"  + xhr.responseText;
                             var completeURL = imageURL
-                            var width = prompt("Please enter width in px",'100');
+                            var width = prompt("Please enter width in px",'600');
                             if(width == null)
                             {
                                 return false;
@@ -190,12 +190,12 @@ $("#btnUploadCancel").click(function() {
     
     <li class="card-image-wrapper">
             <img  style="cursor:pointer;" data-image-id="{{each.pk}}" 
-              "{% if 'svg' in each.if_file.mime_type   %}"
+              "{% if 'gif' in each.if_file.mime_type or 'svg' in each.if_file.mime_type   %}"
               src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
               "{% else %}"
               src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"
               "{% endif %}"
-              "{% if 'svg' in each.if_file.mime_type   %}"
+              "{% if 'gif' in each.if_file.mime_type or 'svg' in each.if_file.mime_type   %}"
               data-image-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
               "{% else %}"
               data-image-src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}"
