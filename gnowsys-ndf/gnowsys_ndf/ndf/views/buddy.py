@@ -91,7 +91,8 @@ def update_buddies(request, group_id):
 
     if selected_buddies_list:
 
-        sitewide_active_userids_list = DjangoActiveUsersGroup.get_all_user_set_ids_list()
+        # sitewide_active_userids_list = DjangoActiveUsersGroup.get_all_user_set_ids_list()
+        sitewide_active_userids_list = Buddy.get_active_buddies_user_ids_list()
         sitewide_active_userids_set  = set(sitewide_active_userids_list)
 
         already_active_user_ids = list(selected_buddies_userids_set.intersection(sitewide_active_userids_set) - set(aa))
