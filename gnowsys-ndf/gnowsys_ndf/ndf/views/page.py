@@ -236,6 +236,18 @@ def create_edit_page(request, group_id, node_id=None):
             page_node = node_collection.collection.GSystem()
 
         # page_type = request.POST.getlist("type_of",'')
+        page_name = request.POST.get('name', '')
+        # print "====== page_name: ", page_name
+
+        if page_name.strip().lower() in node_list:
+            return render_to_response("error_base.html",
+                                      {'message': 'Page with same name already exists in the group!'},
+                                      context_instance=RequestContext(request))
+        elif node_id:
+            page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
+
+        else:
+            page_node = node_collection.collection.GSystem()
         
         ce_id = request.POST.get("ce_id",'')
         blog_type = request.POST.get('blog_type','')
@@ -360,7 +372,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     else:
         if node_id:
-
+            page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
             #page_node,ver=get_page(request,page_node)
             page_node.get_neighbourhood(page_node.member_of)
 
