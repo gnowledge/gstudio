@@ -2599,6 +2599,8 @@ def upload_using_save_file(request,group_id):
     for each_gs_file in fileobj_list:
         #set interaction-settings
         each_gs_file.status = u"PUBLISHED"
+        if title == "raw material":
+            each_gs_file.tags =  [u'raw@material']
         each_gs_file.save()
         create_gattribute(each_gs_file._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)

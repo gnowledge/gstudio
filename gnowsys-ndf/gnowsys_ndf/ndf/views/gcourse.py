@@ -2055,6 +2055,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                                                     'member_of': gst_page._id,
                                                 }
                                             ],
+                                        'tags': {'$regex':"raw@material" },
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'created_by': {'$in': gstaff_users},
                             # '$or': [
