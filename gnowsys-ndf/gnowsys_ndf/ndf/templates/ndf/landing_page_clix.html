@@ -22,71 +22,78 @@
                         Invitation to CLIx will help you learn to do many things with a computer. Express your ideas through activities, engage with your classmate and learn together and share your knowledge.
                       </p>
                 </div>
-                <div class="small-12 medium-12 large-4 columns panel" data-equalizer-watch>
-                    <div class="invitation_to_clix">
-                      <span>Login to&nbsp;</span>
-                      <img src="/static/ndf/css/themes/clix/logo.svg" title="Invitation to clix.">
-                      <form method="post" id="loginSubmit" action="/accounts/login/" data-abide="" novalidate="novalidate">
-                        <input type="hidden" name="csrfmiddlewaretoken" value="FwQIXOCp90gXK5XClVyvbeOAJrMoilDK">
+                {% if not user.is_authenticated  %}
+                    <div class="small-12 medium-12 large-4 columns panel" data-equalizer-watch>
+                        <div class="invitation_to_clix">
+                          <span>Login to&nbsp;</span>
+                          <img src="/static/ndf/css/themes/clix/logo.svg" title="Invitation to clix.">
+                          <!-- <form method="post" id="loginSubmit" action="/accounts/login/" data-abide="" novalidate="novalidate"> -->
+                            <input type="hidden" name="csrfmiddlewaretoken" value="FwQIXOCp90gXK5XClVyvbeOAJrMoilDK">
+                            {% comment %}
+                            <!-- Email -->
+                            <div class="row">
+                              <div class="small-12 columns end">
+                                <label class="left">
+                                  Username or E-mail
+                                </label>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="small-12 columns end">
+                                <input id="id_username" maxlength="254" name="username" type="text" tabindex="1" required="required" aria-invalid="false" style="cursor: auto; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=&quot;);"><small class="error">Please fill valid username</small>
+                              </div>
+                            </div>
 
-                        <!-- Email -->
-                        <div class="row">
-                          <div class="small-12 columns end">
-                            <label class="left">
-                              Username or E-mail
-                            </label>
-                          </div>
+                            <!-- Password -->
+                            <div class="row">
+                              <div class="small-12 columns">
+                                <label class="left">
+                                  <label for="id_password">Password:</label>
+                                </label>
+                              </div>
+
+                            </div>
+                            <div class="row">
+                              <div class="small-12 columns end">
+                                <input id="id_password" name="password" type="password" tabindex="2" required="required" aria-invalid="false" style="cursor: auto; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=&quot;);"><small class="error">Please fill valid password</small>
+                              </div>
+                            </div>
+                            {% endcomment %}
+
+
+
+                            <div class="row">
+                              <div class="small-12 medium-12 large-12 text-center columns end login-button">
+                                <form action="{% url 'auth_login' %}">
+                                  <input type="submit" class="button small expand" tabindex="4" value="Login">
+                                </form>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="medium-12 large-12 small-text-left text-center columns end forgot-password">
+                            {% comment %}
+                                <label>
+                                  <a title="Recover" your="" password="" href="/accounts/password/reset/" class="grey">Forgot your password?</a>
+                                </label>
+                                <hr />
+                                <label>
+                                    <span>
+                                    Don't have an account?
+                                    <a title="Click" here="" to="" register="" href="{{register_url}}">
+                                      Register
+                                    </a>
+                                  </span>
+                                  </label>
+                            {% endcomment %}
+                              </div>
+                            </div>
+                            <!-- Login button -->
+
+                            <input type="hidden" name="next" value="/welcome">
+                          <!-- </form> -->
                         </div>
-                        <div class="row">
-                          <div class="small-12 columns end">
-                            <input id="id_username" maxlength="254" name="username" type="text" tabindex="1" required="required" aria-invalid="false" style="cursor: auto; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=&quot;);"><small class="error">Please fill valid username</small>
-                          </div>
-                        </div>
-
-                        <!-- Password -->
-                        <div class="row">
-                          <div class="small-12 columns">
-                            <label class="left">
-                              <label for="id_password">Password:</label>
-                            </label>
-                          </div>
-
-                        </div>
-                        <div class="row">
-                          <div class="small-12 columns end">
-                            <input id="id_password" name="password" type="password" tabindex="2" required="required" aria-invalid="false" style="cursor: auto; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=&quot;);"><small class="error">Please fill valid password</small>
-                          </div>
-                        </div>
-
-
-
-                        <div class="row">
-                          <div class="small-12 medium-12 large-12 text-center columns end login-button">
-                            <input type="submit" class="button small expand" tabindex="4" value="Login">
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="medium-12 large-12 small-text-left text-center columns end forgot-password">
-                            <label>
-                              <a title="Recover" your="" password="" href="/accounts/password/reset/" class="grey">Forgot your password?</a>
-                            </label>
-                            <hr />
-                            <label>
-                                <span>
-                                Don't have an account?
-                                <a title="Click" here="" to="" register="" href="/accounts/register/">
-                                  Register
-                                </a>
-                              </span>
-                              </label>
-                          </div>
-                        </div>
-                        <!-- Login button -->
-
-                        <input type="hidden" name="next" value="/welcome">
-                      </form>
                     </div>
-                </div>
+                {% endif %}
                 <div class="medium-1 columns pannel"></div>
             </div>
             <div class="row landing-illustrations">
