@@ -136,8 +136,18 @@
     {% for each in imageCollection %}
     
     <li class="card-image-wrapper">
-            <img  data-image-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}" data-image-src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}">
-            <figcaption>{{each.name}}</figcaption>
+            <img  style="cursor:pointer height:250px;width:250px" data-image-id="{{each.pk}}" 
+              "{% if 'svg' in each.if_file.mime_type   %}"
+              src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
+              "{% else %}"
+              src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"
+              "{% endif %}"
+              "{% if 'svg' in each.if_file.mime_type   %}"
+              data-image-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
+              "{% else %}"
+              data-image-src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}"
+              "{% endif %}">
+            <figcaption style="cursor:pointer">{{each.name}}</figcaption>
     
     </li>
     {% endfor %}
