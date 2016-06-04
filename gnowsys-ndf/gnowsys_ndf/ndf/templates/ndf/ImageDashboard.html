@@ -91,8 +91,57 @@
   $(function() {
      $("input:file").change(function (){
        $(".save_cancel").css("display","block")
+       $(".upload-btn").css("display","none")
+
      });
   });
+
+$(document).on('change','#docFile',function(){
+    $(".save_cancel").removeClass("hide");
+    file_mime_type = this.files[0].type;
+    file_name = this.files[0].name;
+    if(file_mime_type.indexOf("image") > -1){
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $('#img_preview')
+          .attr('src', e.target.result)
+          .width(150)
+          .height(200)
+          .removeClass("hide");
+      };
+      reader.readAsDataURL(this.files[0]);
+      $('#file_preview').addClass("hide")
+    }
+    else{
+      $('#img_preview').addClass("hide")
+      $('#file_preview')
+        .text(file_name)
+        .removeClass("hide");
+    }
+    /*
+    file_mime_type = this.files[0].type;
+
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $(".save_cancel").addClass("hide");
+      $('#docFile').val(this.value);
+      var message = "{% trans 'Only image files can be uploaded!' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("alert");
+      $("#eventModal").foundation('reveal', 'open');
+    }
+    */
+
+  });
+
+$("#btnUploadCancel").click(function() {
+    $(".save_cancel").addClass("hide");
+    $("#docFile").val("");
+    $(".upload-btn").css("display","block")
+
+  });
+
 </script>
    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 {% comment %}
@@ -118,7 +167,7 @@
 <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file_ckeditor' group_id %}">
                             {% csrf_token %}
-                            <label class="tiny button radius expand" style="margin: 0px;">
+                            <label class="tiny button radius expand upload-btn" style="margin: 0px;">
                                 <i class="fa fa-upload"></i>
                                 &nbsp;
                                 <span>Upload File</span>
@@ -126,12 +175,16 @@
                             </label>
                             <br><br>
                             <div class="save_cancel" style="display:none">
+                                <img id="img_preview" alt="New file" class="hide" />
+                                <label id="file_preview" class="hide"></label>
+                                <br> <br>  
                               <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
                               <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
                             </div>
                             <input type="hidden" name="context_name" value="{{title}}">
                         </form>
                     </div>
+  <br> <br>
   <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-8" >
     {% for each in imageCollection %}
     
