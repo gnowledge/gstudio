@@ -14,7 +14,7 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-from gnowsys_ndf.ndf.models import Buddy, Author, DjangoActiveUsersGroup
+from gnowsys_ndf.ndf.models import Buddy, Author #, DjangoActiveUsersGroup
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_execution_time
 

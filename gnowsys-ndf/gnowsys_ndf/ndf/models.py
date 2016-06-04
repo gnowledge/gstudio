@@ -2478,49 +2478,49 @@ class ActiveUsers(object):
         #     return User.objects.filter(id__in=uid_list)
 
 
-class DjangoActiveUsersGroup(object):
-    """docstring for DjangoActiveUsersGroup"""
+# class DjangoActiveUsersGroup(object):
+#     """docstring for DjangoActiveUsersGroup"""
 
-    django_active_users_group_name = 'active_loggedin_and_buddy_users'
+#     django_active_users_group_name = 'active_loggedin_and_buddy_users'
 
-    try:
-        active_loggedin_and_buddy_users_group = DjangoGroup.objects.get_or_create(name=django_active_users_group_name)[0]
-    except Exception, e:
-        print e
-        pass
+#     try:
+#         active_loggedin_and_buddy_users_group = DjangoGroup.objects.get_or_create(name=django_active_users_group_name)[0]
+#     except Exception, e:
+#         print e
+#         pass
 
-    # def __init__(self):
-    #     super(DjangoActiveUsersGroup, self).__init__()
+#     # def __init__(self):
+#     #     super(DjangoActiveUsersGroup, self).__init__()
 
-    @classmethod
-    def addto_user_set(cls, user_id=0):
-        cls.active_loggedin_and_buddy_users_group.user_set.add(user_id)
-        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+#     @classmethod
+#     def addto_user_set(cls, user_id=0):
+#         cls.active_loggedin_and_buddy_users_group.user_set.add(user_id)
+#         return cls.active_loggedin_and_buddy_users_group.user_set.all()
 
-    @classmethod
-    def removefrom_user_set(cls, user_id=0):
-        cls.active_loggedin_and_buddy_users_group.user_set.remove(user_id)
-        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+#     @classmethod
+#     def removefrom_user_set(cls, user_id=0):
+#         cls.active_loggedin_and_buddy_users_group.user_set.remove(user_id)
+#         return cls.active_loggedin_and_buddy_users_group.user_set.all()
 
-    @classmethod
-    def update_user_set(cls, add=[], remove=[]):
-        # print "add : ", add
-        # print "remove : ", remove
-        for each_userid_toadd in add:
-            cls.addto_user_set(each_userid_toadd)
+#     @classmethod
+#     def update_user_set(cls, add=[], remove=[]):
+#         # print "add : ", add
+#         # print "remove : ", remove
+#         for each_userid_toadd in add:
+#             cls.addto_user_set(each_userid_toadd)
 
-        for each_userid_toremove in remove:
-            cls.removefrom_user_set(each_userid_toremove)
+#         for each_userid_toremove in remove:
+#             cls.removefrom_user_set(each_userid_toremove)
 
-        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+#         return cls.active_loggedin_and_buddy_users_group.user_set.all()
 
-    @classmethod
-    def get_all_user_set_objects_list(cls):
-        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+#     @classmethod
+#     def get_all_user_set_objects_list(cls):
+#         return cls.active_loggedin_and_buddy_users_group.user_set.all()
 
-    @classmethod
-    def get_all_user_set_ids_list(cls):
-        return cls.active_loggedin_and_buddy_users_group.user_set.values_list('id', flat=True)
+#     @classmethod
+#     def get_all_user_set_ids_list(cls):
+#         return cls.active_loggedin_and_buddy_users_group.user_set.values_list('id', flat=True)
 
 
 
@@ -3003,8 +3003,8 @@ class Buddy(DjangoDocument):
         self.ends_at = datetime.datetime.utcnow()
         self.save()
 
-        active_buddy_userids_list = Author.get_user_id_list_from_author_oid_list(active_buddy_authid_list)
-        DjangoActiveUsersGroup.update_user_set(remove=active_buddy_userids_list)
+        # active_buddy_userids_list = Author.get_user_id_list_from_author_oid_list(active_buddy_authid_list)
+        # DjangoActiveUsersGroup.update_user_set(remove=active_buddy_userids_list)
 
         return self
 
@@ -3137,10 +3137,10 @@ class Buddy(DjangoDocument):
             removed_buddies_userids_list = Author.get_user_id_list_from_author_oid_list(added_removed_buddies_dict['removed'])
             # print "removed_buddies_userids_list : ", removed_buddies_userids_list
 
-            DjangoActiveUsersGroup.update_user_set(
-                                                add=added_buddies_userids_list,
-                                                remove=removed_buddies_userids_list
-                                                )
+            # DjangoActiveUsersGroup.update_user_set(
+            #                                     add=added_buddies_userids_list,
+            #                                     remove=removed_buddies_userids_list
+            #                                     )
 
         else:
             buddy_obj = None
