@@ -9,44 +9,89 @@
 
 {% block body_content %}
     <div class="row landing_page">
-        <div class="small-12">
-            <div class="row">
-                <div class="small-12">
-                    <!-- Slider Area  -->
-                    <ul class="landing-orbit" data-orbit data-options="slide_number: false; resume_on_mouseout: true;timer_speed: 5000;animation_speed: 700;">
-                      <li class="active">
-                        <img src="/static/ndf/images/landing_pg_slides/clix-logo-i2c-site.svg" alt="slide 1" />
-                      </li>
-                      <li>
-                        <img src="/static/ndf/images/landing_pg_slides/i2c-trippy-cloud.svg" alt="slide 2" />
-                      </li>
-                      <li>
-                        <img src="/static/ndf/images/landing_pg_slides/Slider10.jpg" alt="slide 3" />
-                      </li>
-                      <li>
-                        <img src="/static/ndf/images/landing_pg_slides/Slider11.jpg" alt="slide 4" />
-                      </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="row">
-                <div class="small-12">
-                    <h2>
-                		An Invitation to CLIx (Connected Learning Initiative X) Course
-                	</h2>
-                </div>
-            </div>
-            <div class="row landing-page-text">
-                <div class="small-12">
-                    <p>
-                        In this course you will learn how to make and do many things with a computer. We want this experience to be fun for you. You will be able to express your ideas through the things that you create.You will be able to create drawings, posters, maps, web pages, and many more things.
+        <div class="landing_page_background"></div>
+        <div class="small-12 columns">
+            <img src="/static/ndf/images/landing_page/bees.svg" class="bees"/>
+            <div class="row" data-equalizer>
+                <div class="small-12 medium-12 large-7 columns clix_brief panel" data-equalizer-watch>
+                  <img src="/static/ndf/css/themes/clix/CLIx_white-01.svg" title="Invitation to clix.">
+                   <p>
+                      Through CLIx, high school students will participate in engaging, interactive, hands-on learning experiences for the development of knowledge, skills and values empowering them to be successful in the 21st century.
                     </p>
                     <p>
-                        As a part of this course you will also be interacting collaborating and communicating with your friends on the computer, and presenting all your work to them. You in turn, will be able to see their work and encourage them by giving them feedback.
-                    </p>
-                    <p>
-                        Overall we hope that this will help you learn with computers and do things with computers in a new way!
-                   </p>
+                        Invitation to CLIx will help you learn to do many things with a computer. Express your ideas through activities, engage with your classmate and learn together and share your knowledge.
+                      </p>
+                </div>
+                <div class="small-12 medium-12 large-4 columns panel" data-equalizer-watch>
+                    <div class="invitation_to_clix">
+                      <span>Login to&nbsp;</span>
+                      <img src="/static/ndf/css/themes/clix/logo.svg" title="Invitation to clix.">
+                      <form method="post" id="loginSubmit" action="/accounts/login/" data-abide="" novalidate="novalidate">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="FwQIXOCp90gXK5XClVyvbeOAJrMoilDK">
+
+                        <!-- Email -->
+                        <div class="row">
+                          <div class="small-12 columns end">
+                            <label class="left">
+                              Username or E-mail
+                            </label>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="small-12 columns end">
+                            <input id="id_username" maxlength="254" name="username" type="text" tabindex="1" required="required" aria-invalid="false" style="cursor: auto; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=&quot;);"><small class="error">Please fill valid username</small>
+                          </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="row">
+                          <div class="small-12 columns">
+                            <label class="left">
+                              <label for="id_password">Password:</label>
+                            </label>
+                          </div>
+
+                        </div>
+                        <div class="row">
+                          <div class="small-12 columns end">
+                            <input id="id_password" name="password" type="password" tabindex="2" required="required" aria-invalid="false" style="cursor: auto; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGP6zwAAAgcBApocMXEAAAAASUVORK5CYII=&quot;);"><small class="error">Please fill valid password</small>
+                          </div>
+                        </div>
+
+
+
+                        <div class="row">
+                          <div class="small-12 medium-12 large-12 text-center columns end login-button">
+                            <input type="submit" class="button small expand" tabindex="4" value="Login">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="medium-12 large-12 small-text-left text-center columns end forgot-password">
+                            <label>
+                              <a title="Recover" your="" password="" href="/accounts/password/reset/" class="grey">Forgot your password?</a>
+                            </label>
+                            <hr />
+                            <label>
+                                <span>
+                                Don't have an account?
+                                <a title="Click" here="" to="" register="" href="/accounts/register/">
+                                  Register
+                                </a>
+                              </span>
+                              </label>
+                          </div>
+                        </div>
+                        <!-- Login button -->
+
+                        <input type="hidden" name="next" value="/welcome">
+                      </form>
+                    </div>
+                </div>
+                <div class="medium-1 columns pannel"></div>
+            </div>
+            <div class="row landing-illustrations">
+                <div class="small-12 medium-12 large-6 columns">
+                  <img src="/static/ndf/images/landing_page/flowers.svg" class="flowers" />
                 </div>
             </div>
         </div>

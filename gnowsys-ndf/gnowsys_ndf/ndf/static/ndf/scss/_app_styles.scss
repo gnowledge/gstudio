@@ -44,7 +44,32 @@ pre{
     font-family: monospace;
 }
 
-
+@font-face {
+    font-family: "ubuntu-light";
+    font-weight: light;
+    src: url('../../../fonts/ubuntu/Ubuntu-Light.ttf');
+}
+@font-face {
+    font-family: "ubuntu-regular";
+    font-weight: regular;
+    src: url('../../../fonts/ubuntu/Ubuntu-Regular.ttf');
+}
+@font-face {
+    font-family: "ubuntu-medium";
+    font-weight: medium;
+    src: url('../../../fonts/ubuntu/Ubuntu-Medium.ttf');
+}
+@font-face {
+    font-family: "ubuntu-bold";
+    font-weight: bold;
+    src: url('../../../fonts/ubuntu/Ubuntu-Bold.ttf');
+}
+/*
+@import url('../../../fonts/ubuntu/Ubuntu-Bold.ttf');
+@import url('../../../fonts/ubuntu/Ubuntu-Light.ttf');
+@import url('../../../fonts/ubuntu/Ubuntu-Medium.ttf');
+@import url('../../../fonts/ubuntu/Ubuntu-Regular.ttf');
+*/
 .fixme{
     // Use this class for any placeholder text to be replaced by variables by the developer
     opacity: 0.5;
@@ -194,6 +219,7 @@ pre{
 
 body{
     background-color: #F2F2F2;
+    font-family: 'ubuntu-regular';
 }
 
 #top-headers {
@@ -4334,8 +4360,111 @@ course-title{
 
 /* Landing page */
 .landing_page {
+  position: relative;
   text-align: center;
 
+  .panel {
+    background-color: inherit;
+    border: none;
+  }
+
+  .landing_page_background {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: -1;
+    background: -webkit-gradient(linear, left top, right top, from(#E9A900), to(#B0108D));
+    background: -webkit-linear-gradient(left, #E9A900, #B0108D);
+    background: -moz-linear-gradient(left, #E9A900, #B0108D);
+    background: -ms-linear-gradient(left, #E9A900, #B0108D);
+    background: -o-linear-gradient(left, #E9A900, #B0108D);
+  }
+
+  .clix_brief {
+    text-align: left;
+    padding: 20px 3% 20px 10%;
+
+    img {
+      margin: 30px 20px;
+      height: 70px;
+    }
+    p {
+      color: #fff;
+      font-size: 26px;
+      font-weight: 300;
+      font-family: 'ubuntu-light';
+    }
+  }
+
+  .invitation_to_clix {
+    background-color: rgba(255,255,255, 0.92);
+    border-radius: 10px;
+    width: 80%;
+    margin: 45px 40px;
+    text-align: left;
+    padding: 30px 40px 21px;
+    box-shadow: 0px 0px 30px rgba(0, 0,0, 0.5);
+
+    >span {
+      font-family: 'ubuntu-bold';
+      color: #6658af;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    p {
+      color: #b0108d;
+      font-size: 21px;
+      padding: 25px 0px 30px;
+      font-weight: 300;
+      font-family: 'ubuntu-light';
+    }
+
+    img {
+      height: 30px;
+    }
+    form {
+      margin-top: 30px;
+
+      input  {
+        font-size: 24px;
+        height: 45px;
+        margin: 5px 0px 24px;
+      }
+    }
+
+    input.button {
+      font-size: 15px;
+      border-radius: 5px;
+      font-family: 'ubuntu-bold';
+      text-transform: uppercase;
+    }
+    a.grey {
+      color: #999;
+      /*display: inline-block;
+      padding: 6px 12px;
+      background: #B0108D;
+      color: #fff;
+      font-weight: 600;
+      font-family: 'ubuntu-bold';
+      text-transform: uppercase;*/
+    }
+  }
+  .flowers {
+    left: 50px;
+    height: 418px;
+    bottom: 0px;
+    opacity: 0.6;
+  }
+  .bees {
+    position: absolute;
+    top: 5px;
+    right: 50px;
+    height: 200px;
+  }
   h2 {
     color: #A0148E;
     font-weight: 600;
@@ -4345,24 +4474,6 @@ course-title{
 
     p {
       font-size: 18px;
-    }
-  }
-  .orbit-container {
-    width: 70%;
-    margin: 0px auto;
-
-    img {
-      height: 400px;
-      width: 100%;
-    }
-
-    .orbit-timer {
-      left: -10000px;
-      top: auto;
-      height: 1px;
-      overflow: hidden;
-      position: absolute;
-      width: 1px;
     }
   }
 }
