@@ -195,11 +195,7 @@ $("#btnUploadCancel").click(function() {
               "{% else %}"
               src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"
               "{% endif %}"
-              "{% if 'gif' in each.if_file.mime_type or 'svg' in each.if_file.mime_type   %}"
-              data-image-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
-              "{% else %}"
-              data-image-src="{{MEDIA_URL}}{{each.if_file.mid.relurl}}"
-              "{% endif %}">
+              data-image-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" >
             <figcaption style="cursor:pointer">{{each.name}}</figcaption>
     
     </li>
