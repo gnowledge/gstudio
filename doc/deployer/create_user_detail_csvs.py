@@ -29,7 +29,7 @@ for state, school_range in statecode_range_dict.iteritems():
 
     append = state_codes_list.append
     for school_no in xrange(school_range[0], last):
-        append(state + str(school_no).zfill(4))
+        append(state + str(school_no))
 
 	statecode_schoolcodes_dict[state] = state_codes_list
 
@@ -62,18 +62,21 @@ def create_users_csv(csv_file_name_path, code, start_user_id, last_user_id, user
         append = complete_data_list.append
         for each_row in all_rows:
 
+            # csv schema:
+            # user_id, school_code, username, password, oid
+
+            # user-id
+            temp_row_list = [current_user_id]
+            current_user_id += 1
+
             # school code
-            temp_row_list  = [code]
+            temp_row_list.append(code)
 
             # username = each_row[0] + '-' + code
             temp_row_list.append(each_row[0] + '-' + code)
 
             # password
             temp_row_list.append(''.join(choice(all_small_letters) for i in xrange(6)))
-
-            # user-id
-            temp_row_list.append(current_user_id)
-            current_user_id += 1
 
             # author ObjectId
             temp_row_list.append(ObjectId())
