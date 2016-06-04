@@ -136,7 +136,7 @@
     {% for each in imageCollection %}
     
     <li class="card-image-wrapper">
-            <img  style="cursor:pointer height:250px;width:250px" data-image-id="{{each.pk}}" 
+            <img  style="cursor:pointer;" data-image-id="{{each.pk}}" 
               "{% if 'svg' in each.if_file.mime_type   %}"
               src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
               "{% else %}"
