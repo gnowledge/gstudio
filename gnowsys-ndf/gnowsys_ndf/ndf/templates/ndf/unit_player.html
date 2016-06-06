@@ -30,17 +30,19 @@
   <div class="activity-page">
       <div class="row activity-page-header">
           <div class="small-4 medium-4 large-3 columns activity-page-previous">
-              <a href="{% url 'course_content' group_name %}"><i class="fa fa-home"></i></a>
+              <a href="{% url 'course_content' group_name %}" title="Click here to go to Course Content"><i class="fa fa-home"></i></a>
               {% if resource_prev_id %}
-              <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_prev_id %}" class="prev-activity">
+              <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_prev_id %}" class="prev-activity" title="Click here to view previous resource">
                   <i class="fa fa-hand-o-left"></i>
                   Previous Activity
               </a>
+              {% comment %}
               {% else %}
               <a href="#" class="prev-activity disabled" onclick="alert('This is first activity of unit!')">
                   <i class="fa fa-hand-o-left"></i>
                   Previous Activity
               </a>
+              {% endcomment %}
               {% endif %}
           </div>
           <div class="small-4 medium-4 large-6 columns">
@@ -51,14 +53,13 @@
                   {% if is_gstaff or node.created_by == request.user.id %}
                       {% get_edit_url node.pk as edit_url %}
                       <small>
-                          <a title="Edit this {{node.member_of_names_list.0}}" class="edit_res_unit">{% trans " Edit Content" %}</a>|
-                          <a title="Edit this {{node.member_of_names_list.0}}" class="edit_settings" href="{% url edit_url group_id node.pk %}">{% trans " Edit Settings" %}</a>
-
+                          <a title="Edit Content" class="edit_res_unit">{% trans " Edit Content" %}</a>|
+                          <a title="Edit Settings" class="edit_settings" href="{% url edit_url group_id node.pk %}">{% trans " Edit Settings" %}</a>
                       </small>
                   {% endif %}
                   {% endif %}
 
-                <a data-dropdown="drop1" aria-controls="drop1" aria-expanded="false"><i class="fa fa-align-justify"></i></a>
+                <a data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" title="List of Resources"><i class="fa fa-align-justify"></i></a>
                 <ul id="drop1" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                 {% for each_resource in unit_resources_list_of_dict %}
                   <li class="text-left">
@@ -79,17 +80,19 @@
           <div class="small-4 medium-4 large-3 columns activity-create-note">
               <div style="float: right;">
                   {% if resource_next_id %}
-                  <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_next_id %}" class="next-activity">
+                  <a href="{% url 'course_resource_detail' group_name course_sub_section course_unit resource_next_id %}" class="next-activity" title="Click here to view next resource">
                       Next Activity
                       <i class="fa fa-hand-o-right"></i>
                   </a>
+                  {% comment %}
                   {% else %}
                   <a href="#" class="next-activity disabled" onclick="alert('This is last activity of unit!')">
                       Next Activity
                       <i class="fa fa-hand-o-right"></i>
                   </a>
+                  {% endcomment %}
                   {% endif %}
-                  <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True"><i class="fa fa-pencil-square-o"></i></a>
+                  <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" title="Click here to create Note"><i class="fa fa-pencil-square-o"></i></a>
               </div>
           </div>
       </div>
