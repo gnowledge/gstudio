@@ -1720,8 +1720,8 @@ def add_course_file(request, group_id):
         from gnowsys_ndf.ndf.views.filehive import write_files
 
         fileobj_list = write_files(request, group_id)
-        fileobj_id = fileobj_list[0]['_id']
-        file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
+        # fileobj_id = fileobj_list[0]['_id']
+        # file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
 
         for each_gs_file in fileobj_list:
             each_gs_file.status = u"PUBLISHED"
