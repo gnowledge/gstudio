@@ -67,6 +67,9 @@
         <i class="{{attr_set_dict.educationaluse|lower}}"></i>
       {% elif resource.fs_file_ids.0 and 'image' in resource.mime_type %}
         <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
+      
+      {% elif ".ggb" in resource.name %}
+        <img src="/static/ndf/images/geogebra-icon.png" alt="Geogebra" >
       {% elif resource.if_file.mime_type %}
         <i class="{{resource.if_file.mime_type|lower|split:'/'|join:' '}}"></i>
       {% else  %}
