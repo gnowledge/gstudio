@@ -1839,6 +1839,9 @@ class Filehive(DjangoDocument):
         elif file_mime_type == 'text/plain':
             file_extension = '.txt'
 
+        elif poss_ext == '.ggb':
+            file_extension = '.ggb'
+
         else:
             file_extension = mimetypes.guess_extension(file_mime_type)
 
