@@ -112,11 +112,11 @@ def create_auth_grp(sender, user, request, **kwargs):
 
 
 
-@receiver(user_logged_in)
-def logged_in(sender, user, request, **kwargs):
-    # print "\n\n LOGGED IN"
-    if GSTUDIO_BUDDY_LOGIN:
-        DjangoActiveUsersGroup.addto_user_set(request.user.id)
+# @receiver(user_logged_in)
+# def logged_in(sender, user, request, **kwargs):
+#     # print "\n\n LOGGED IN"
+#     if GSTUDIO_BUDDY_LOGIN:
+#         DjangoActiveUsersGroup.addto_user_set(request.user.id)
 
 
 
@@ -135,6 +135,6 @@ def logged_out(sender, user, request, **kwargs):
             if buddy_obj:
                 buddy_obj.end_buddy_session()
 
-        DjangoActiveUsersGroup.removefrom_user_set(user_id)
+        # DjangoActiveUsersGroup.removefrom_user_set(user_id)
 
         # print "\n\n All buddies including loggen in user released",

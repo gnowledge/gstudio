@@ -14,7 +14,7 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-from gnowsys_ndf.ndf.models import Buddy, Author, DjangoActiveUsersGroup
+from gnowsys_ndf.ndf.models import Buddy, Author #, DjangoActiveUsersGroup
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_execution_time
 
@@ -91,7 +91,8 @@ def update_buddies(request, group_id):
 
     if selected_buddies_list:
 
-        sitewide_active_userids_list = DjangoActiveUsersGroup.get_all_user_set_ids_list()
+        # sitewide_active_userids_list = DjangoActiveUsersGroup.get_all_user_set_ids_list()
+        sitewide_active_userids_list = Buddy.get_active_buddies_user_ids_list()
         sitewide_active_userids_set  = set(sitewide_active_userids_list)
 
         already_active_user_ids = list(selected_buddies_userids_set.intersection(sitewide_active_userids_set) - set(aa))
