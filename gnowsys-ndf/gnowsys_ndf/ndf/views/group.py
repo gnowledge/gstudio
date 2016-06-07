@@ -2476,7 +2476,7 @@ def upload_using_save_file(request,group_id):
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
     usrid = request.user.id
-    print "\n\n\nheretitle",title
+    print "\n\n\nusrid",usrid
     # # url_name = "/"+str(group_id)
     # for key,value in request.FILES.items():
     #     fname=unicode(value.__dict__['_name'])
@@ -2599,6 +2599,7 @@ def upload_using_save_file(request,group_id):
     for each_gs_file in fileobj_list:
         #set interaction-settings
         each_gs_file.status = u"PUBLISHED"
+        each_gs_file.contributors.append(usrid)
         if title == "raw material":
             each_gs_file.tags =  [u'raw@material']
         each_gs_file.save()
