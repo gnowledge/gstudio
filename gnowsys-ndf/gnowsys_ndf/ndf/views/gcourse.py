@@ -1697,7 +1697,8 @@ def add_course_file(request, group_id):
 
     context_node = node_collection.one({'_id': ObjectId(context_node_id)})
     if request.method == "POST":
-
+        title = request.POST.get('context_name','')
+        usrid = request.user.id
         context_name = request.POST.get("context_name", "")
         css_node_id = request.POST.get("css_node_id", "")
         course_node = request.POST.get("course_node", "")
@@ -1716,16 +1717,28 @@ def add_course_file(request, group_id):
 
         new_list = []
         file_uploaded = request.FILES.get("doc", "")
-        # For checking the node is already available in gridfs or not
-        if file_uploaded:
-            fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
-            file_node = node_collection.find_one({'_id': ObjectId(fileobj)})
-            file_node.prior_node.append(context_node._id)
-            file_node.status = u"PUBLISHED"
-            file_node.save()
-            context_node.collection_set.append(file_node._id)
-            file_node.save()
+        from gnowsys_ndf.ndf.views.filehive import write_files
+
+        fileobj_list = write_files(request, group_id)
+        # fileobj_id = fileobj_list[0]['_id']
+        # file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
+
+        for each_gs_file in fileobj_list:
+            each_gs_file.status = u"PUBLISHED"
+            each_gs_file.prior_node.append(context_node._id)
+            context_node.collection_set.append(each_gs_file._id)
+            each_gs_file.save()
         context_node.save()
+        
+        # if file_uploaded:
+        #     fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+        #     file_node = node_collection.find_one({'_id': ObjectId(fileobj)})
+        #     file_node.prior_node.append(context_node._id)
+        #     file_node.status = u"PUBLISHED"
+        #     file_node.save()
+        #     context_node.collection_set.append(file_node._id)
+        #     file_node.save()
+        # context_node.save()
     return HttpResponseRedirect(url_name)
 
 

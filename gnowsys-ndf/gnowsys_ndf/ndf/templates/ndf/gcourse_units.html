@@ -186,7 +186,7 @@
           <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_course_file' group_id %}?context_node={{unit_node.pk}}">
           {% csrf_token %}
             <div>
-              <span class="fi-upload"><input type="file" name="doc" id="docFile"/></span>
+              <span class="fi-upload"><input type="file" name="filehive" id="docFile"/></span>
             </div>
             <!-- For making access policy of files PUBLIC initially by uploading it from topic page -->
             <input type="hidden" name="login-mode" value="PUBLIC">
