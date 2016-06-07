@@ -189,8 +189,8 @@ $("#btnUploadCancel").click(function() {
     {% for each in imageCollection %}
     
     <li class="card-image-wrapper">
-            <img  style="cursor:pointer;" data-image-id="{{each.pk}}" 
-              "{% if 'gif' in each.if_file.mime_type or 'svg' in each.if_file.mime_type   %}"
+            <img  class="gallery-image" style="" data-image-id="{{each.pk}}" 
+              "{% if 'svg' in each.if_file.mime_type   %}"
               src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
               "{% else %}"
               src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"
