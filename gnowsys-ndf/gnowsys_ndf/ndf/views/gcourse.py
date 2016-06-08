@@ -2656,7 +2656,6 @@ def build_progress_bar(request, group_id, node_id):
 
 @get_execution_time
 def get_resource_completion_status(request, group_id):
-
     result_dict = {'COMPLETED':[]}
     cr_ids = request.GET.get("cr_ids", "")
     if cr_ids:
@@ -2667,5 +2666,6 @@ def get_resource_completion_status(request, group_id):
                 'user': request.user.username
                 })
             if b.count():
+                # print "\n\nb.count()",b.count() 
                 result_dict['COMPLETED'].append(each_cr)
     return HttpResponse(json.dumps(result_dict))
