@@ -19,7 +19,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^Collection_create/', 'collection_create', name='collection_create'),
     url(r'^get_tree_hierarchy/(?P<node_id>[\w-]+)$', 'get_tree_hierarchy', name='get_tree_hierarchy'),
     url(r'^get_collection/(?P<node_id>[\w-]+)$', 'get_collection', name='get_collection'),
-    url(r'^get_collection/(?P<node_id>[\w-]+)/(?P<stats_flag>[\w-]+)$', 'get_collection', name='get_course_collection'),
+    url(r'^get_collection/(?P<node_id>[\w-]+)/(?P<no_res>[\w-]+)$', 'get_collection', name='get_course_collection'),
     url(r'^get_contents/', 'get_topic_contents', name='get_topic_contents'),
     url(r'^drawer/', 'drawer_widget', name='drawer_widget'),
     url(r'^search/', 'search_drawer', name='search_drawer'),
@@ -48,8 +48,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_gin_line_template/(?P<node_id>[\w-]+)$', 'get_gin_line_template', name='get_gin_line_template'),
     url(r'^course_create_collection/', 'course_create_collection', name='course_create_collection'),
     url(r'^course_create_note/', 'course_create_note', name='course_create_note'),#create note in gallery and raw material
-    url(r'^/upload_file_ckeditor/', 'upload_file_ckeditor', name='upload_file_ckeditor'),
-    url(r'^/upload_file/', 'upload_file', name='upload_file'),
+    url(r'^upload_file_ckeditor', 'upload_file_ckeditor', name='upload_file_ckeditor'),
+    # url(r'^/upload_file/', 'upload_file', name='upload_file'),
     
 
                        # Ajax-urls required for MIS --------------------------------

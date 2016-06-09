@@ -266,9 +266,9 @@
             <li class="text-center">
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
             </li>
-
+            {% comment %}
             <!-- CHANGE DONE HERE, MAILCLIENT ADDED -->
-            {%if user.is_authenticated %}
+            {% if user.is_authenticated %}
             <li class="text-center">
               <a href="/{{ user.username }}/mailclient">{% trans "MailClient" %}</a>
             {% endif %}
@@ -290,6 +290,7 @@
                 </li>
               {% endif %}
             {% endif %}
+            {% endcomment %}
 
             {% if site.BUDDY_LOGIN and user.is_authenticated %}
 

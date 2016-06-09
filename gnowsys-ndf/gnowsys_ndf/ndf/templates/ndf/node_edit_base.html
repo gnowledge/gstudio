@@ -543,12 +543,12 @@
 	      </div>
 	    </div>
 	    <div class="thread-settings-div {% if not node.discussion_enable %} hide {% endif %}">
-			{% get_relation_value node.pk 'has_thread' True as grel_dict %}
-			{% if not grel_dict.cursor and grel_dict.grel_node %}
-				{% get_attribute_value grel_dict.grel_node.pk 'release_response' as resp_val %}
-				{% get_attribute_value grel_dict.grel_node.pk 'thread_interaction_type' as thr_int_type %}
-				{% get_attribute_value grel_dict.grel_node.pk 'start_time' as thr_start_time %}
-				{% get_attribute_value grel_dict.grel_node.pk 'end_time' as thr_end_time %}
+            {% get_thread_node node.pk as thread_node %}
+			{% if thread_node %}
+				{% get_attribute_value thread_node.pk 'release_response' as resp_val %}
+				{% get_attribute_value thread_node.pk 'thread_interaction_type' as thr_int_type %}
+				{% get_attribute_value thread_node.pk 'start_time' as thr_start_time %}
+				{% get_attribute_value thread_node.pk 'end_time' as thr_end_time %}
 			{% endif %}
 		    <div class="row">
 		      <div class="large-2 medium-4 columns "><h5>{% trans "Release Option:" %}</h5>
@@ -907,7 +907,8 @@
 			{% if is_auth_node %}
 				$("#name_id").attr("disabled",true)
 			{% endif %}
-			{% if node.discussion_enable %}
+            {% get_thread_node node.pk as thread_node %}
+			{% if thread_node %}
 				$("input[name='thread_create'][value='Yes']").attr("checked","checked");
 				$("input[name='thread_create']").trigger("change");
 				$("input[name='thread_create']").attr("disabled",true);

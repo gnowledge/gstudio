@@ -1697,7 +1697,8 @@ def add_course_file(request, group_id):
 
     context_node = node_collection.one({'_id': ObjectId(context_node_id)})
     if request.method == "POST":
-
+        title = request.POST.get('context_name','')
+        usrid = request.user.id
         context_name = request.POST.get("context_name", "")
         css_node_id = request.POST.get("css_node_id", "")
         course_node = request.POST.get("course_node", "")
@@ -1716,16 +1717,28 @@ def add_course_file(request, group_id):
 
         new_list = []
         file_uploaded = request.FILES.get("doc", "")
-        # For checking the node is already available in gridfs or not
-        if file_uploaded:
-            fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
-            file_node = node_collection.find_one({'_id': ObjectId(fileobj)})
-            file_node.prior_node.append(context_node._id)
-            file_node.status = u"PUBLISHED"
-            file_node.save()
-            context_node.collection_set.append(file_node._id)
-            file_node.save()
+        from gnowsys_ndf.ndf.views.filehive import write_files
+
+        fileobj_list = write_files(request, group_id)
+        # fileobj_id = fileobj_list[0]['_id']
+        # file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
+
+        for each_gs_file in fileobj_list:
+            each_gs_file.status = u"PUBLISHED"
+            each_gs_file.prior_node.append(context_node._id)
+            context_node.collection_set.append(each_gs_file._id)
+            each_gs_file.save()
         context_node.save()
+        
+        # if file_uploaded:
+        #     fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+        #     file_node = node_collection.find_one({'_id': ObjectId(fileobj)})
+        #     file_node.prior_node.append(context_node._id)
+        #     file_node.status = u"PUBLISHED"
+        #     file_node.save()
+        #     context_node.collection_set.append(file_node._id)
+        #     file_node.save()
+        # context_node.save()
     return HttpResponseRedirect(url_name)
 
 
@@ -2432,8 +2445,6 @@ def course_analytics(request, group_id, user_id, render_template=False):
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
-    import time
-    t0 = time.time()
     analytics_data = {}
     user_obj = User.objects.get(pk=int(user_id))
     analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
@@ -2543,10 +2554,6 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['users_points'] = analytics_instance.get_users_points()
     analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
 
-    t1 = time.time()
-    time_diff = t1 - t0
-    # print "\n ALL Total seconds == ", time_diff
-
     del analytics_instance
     cache.set(cache_key, json.dumps(analytics_data), 60*15)
     return render_to_response("ndf/user_course_analytics.html", 
@@ -2583,9 +2590,9 @@ def course_analytics_admin(request, group_id):
             # users_points = analytics_instance.get_users_points()
             admin_analytics_data['username'] = user_obj.username
             admin_analytics_data['user_id'] = user_obj.id
-            admin_analytics_data['users_points'] = analytics_instance.get_users_points()
-            # admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
             users_points_breakup = analytics_instance.get_users_points(True)
+            admin_analytics_data['users_points'] = users_points_breakup['Total']
+
             admin_analytics_data["files_points"] = users_points_breakup['Files']
             if FILES_MAX_POINT_VAL < users_points_breakup['Files']:
                 FILES_MAX_POINT_VAL = users_points_breakup['Files']
@@ -2643,7 +2650,6 @@ def build_progress_bar(request, group_id, node_id):
 
 @get_execution_time
 def get_resource_completion_status(request, group_id):
-
     result_dict = {'COMPLETED':[]}
     cr_ids = request.GET.get("cr_ids", "")
     if cr_ids:
@@ -2654,5 +2660,6 @@ def get_resource_completion_status(request, group_id):
                 'user': request.user.username
                 })
             if b.count():
+                # print "\n\nb.count()",b.count() 
                 result_dict['COMPLETED'].append(each_cr)
     return HttpResponse(json.dumps(result_dict))

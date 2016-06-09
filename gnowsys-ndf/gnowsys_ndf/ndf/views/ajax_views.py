@@ -792,58 +792,68 @@ def get_tree_hierarchy(request, group_id, node_id):
 ##### bellow part is for manipulating nodes collections#####
 
 @get_execution_time
-def get_inner_collection(collection_list, node, gstaff_access, completed_ids=None, incompleted_ids=None):
+def get_inner_collection(collection_list, node, no_res=False):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
-  if node.collection_set:
-    for each in node.collection_set:
-      col_obj = node_collection.one({'_id': ObjectId(each)})
-      if col_obj:
-        for cl in collection_list:
-          if cl['id'] == node.pk:
-            node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
-            # if col_obj._id in completed_ids:
-            #   inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "COMPLETED"}
-            #   # print "\n completed_ids -- ",completed_ids
-            #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
-            # elif col_obj._id in incompleted_ids:
-            #   inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "WARNING"}
-            #   # print "\n completed_ids -- ",completed_ids
-            #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
-            # else:
-            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
-            inner_sub_list = [inner_sub_dict]
-            inner_sub_list = get_inner_collection(inner_sub_list, col_obj, gstaff_access, completed_ids, incompleted_ids)
-            # if "CourseSubSectionEvent" == node_type:
-            #   start_date_val = get_attribute_value(col_obj._id, "start_time")
-            #   if start_date_val:
-            #     curr_date_val = datetime.datetime.now().date()
-            #     start_date_val = start_date_val.date()
-            #     if curr_date_val >= start_date_val or gstaff_access:
-            #         inner_sub_dict.update({'start_time_val':start_date_val.strftime("%d/%m/%Y")})
-            #     else:
-            #         # do not send this CSS
-            #         inner_sub_list.remove(inner_sub_dict)
-            #         # pass
-            if inner_sub_list:
-              inner_list_append_temp(inner_sub_list[0])
-            else:
-              inner_list_append_temp(inner_sub_dict)
-            # elif "CourseSubSectionEvent" != node_type:
-            #   inner_list_append_temp(inner_sub_dict)
 
-            cl.update({'children': inner_list })
-      else:
-        error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
-        print "\n " + error_message
-    return collection_list
-  else:
+  # if not no_res or not res_flag:
+  if not no_res or (not "CourseUnitEvent" in node.member_of_names_list):
+    if node.collection_set:
+      for each in node.collection_set:
+        col_obj = node_collection.one({'_id': ObjectId(each)})
+        if col_obj:
+          for cl in collection_list:
+            if cl['id'] == node.pk:
+              node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
+              # if col_obj._id in completed_ids:
+              #   inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "COMPLETED"}
+              #   # print "\n completed_ids -- ",completed_ids
+              #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
+              # elif col_obj._id in incompleted_ids:
+              #   inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type, "status": "WARNING"}
+              #   # print "\n completed_ids -- ",completed_ids
+              #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
+              # else:
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
+              inner_sub_list = [inner_sub_dict]
+              inner_sub_list = get_inner_collection(inner_sub_list, col_obj, no_res)
+              # if "CourseSubSectionEvent" == node_type:
+              #   start_date_val = get_attribute_value(col_obj._id, "start_time")
+              #   if start_date_val:
+              #     curr_date_val = datetime.datetime.now().date()
+              #     start_date_val = start_date_val.date()
+              #     if curr_date_val >= start_date_val or gstaff_access:
+              #         inner_sub_dict.update({'start_time_val':start_date_val.strftime("%d/%m/%Y")})
+              #     else:
+              #         # do not send this CSS
+              #         inner_sub_list.remove(inner_sub_dict)
+              #         # pass
+              if inner_sub_list:
+                inner_list_append_temp(inner_sub_list[0])
+              else:
+                inner_list_append_temp(inner_sub_dict)
+              # elif "CourseSubSectionEvent" != node_type:
+              #   inner_list_append_temp(inner_sub_dict)
+
+              cl.update({'children': inner_list })
+        else:
+          error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
+          print "\n " + error_message
+      return collection_list
+    else:
+      return collection_list
+  elif "CourseUnitEvent" in node.member_of_names_list:
+    for cl in collection_list:
+      if cl['id'] == node.pk:
+        col_set = node.collection_set
+        col_set = map(str,col_set)
+        cl.update({'collection_set': col_set })
     return collection_list
 
 
 @get_execution_time
-def get_collection(request, group_id, node_id, stats_flag=False):
+def get_collection(request, group_id, node_id, no_res=False):
   try:
     cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id) 
     cache_result = cache.get(cache_key)
@@ -861,9 +871,8 @@ def get_collection(request, group_id, node_id, stats_flag=False):
       if obj:
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
         collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
-
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
-        collection_list = get_inner_collection(collection_list, obj, gstaff_access)
+        collection_list = get_inner_collection(collection_list, obj, no_res)
     data = collection_list
     updated_data = []
     # print data
@@ -6297,32 +6306,32 @@ def upload_file_ckeditor(request,group_id):
     #     return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     # return HttpResponseRedirect(url_name)
 
-@login_required
-@get_execution_time
-def upload_file(request,group_id):
-    try:
-        group_id = ObjectId(group_id)
-    except:
-        group_name, group_id = get_group_name_id(group_id)
+# @login_required
+# @get_execution_time
+# def upload_file(request,group_id):
+#     try:
+#         group_id = ObjectId(group_id)
+#     except:
+#         group_name, group_id = get_group_name_id(group_id)
 
-    group_obj = node_collection.one({'_id': ObjectId(group_id)})
-    title = request.POST.get('context_name','')
-    usrid = request.user.id
+#     group_obj = node_collection.one({'_id': ObjectId(group_id)})
+#     title = request.POST.get('context_name','')
+#     usrid = request.user.id
     
-    from gnowsys_ndf.ndf.views.filehive import write_files
+#     from gnowsys_ndf.ndf.views.filehive import write_files
 
-    gs_obj_list = write_files(request, group_id)
-    gs_obj_id = gs_obj_list[0]['_id']
+#     gs_obj_list = write_files(request, group_id)
+#     gs_obj_id = gs_obj_list[0]['_id']
 
-    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-    for each_gs_file in gs_obj_list:
-        each_gs_file.status = u"PUBLISHED"
-        each_gs_file.save()
-        #set interaction-settings
-        create_gattribute(each_gs_file._id, discussion_enable_at, True)
-        return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
+#     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+#     for each_gs_file in gs_obj_list:
+#         each_gs_file.status = u"PUBLISHED"
+#         each_gs_file.save()
+#         #set interaction-settings
+#         create_gattribute(each_gs_file._id, discussion_enable_at, True)
+#         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
     
-    # return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
-    return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':gs_obj_id}) )
+#     # return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
+#     return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':gs_obj_id}) )
 
     

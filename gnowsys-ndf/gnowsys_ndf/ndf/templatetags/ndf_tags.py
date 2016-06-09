@@ -3239,15 +3239,16 @@ def get_breadcrumb(url):
 @get_execution_time
 @register.assignment_tag
 def get_thread_node(node_id):
-	node_obj = node_collection.one({'_id': ObjectId(node_id)})
-	thread_obj = None
-	if node_obj.relation_set:
-		for rel in node_obj.relation_set:
-			if rel and 'has_thread' in rel:
-				thread_obj = rel['has_thread'][0]
-	# print "\n\nthread_obj--",thread_obj
-	return thread_obj
-
+	if node_id:
+		node_obj = node_collection.one({'_id': ObjectId(node_id)})
+		thread_obj = None
+		if node_obj.relation_set:
+			for rel in node_obj.relation_set:
+				if rel and 'has_thread' in rel:
+					thread_obj = rel['has_thread'][0]
+		# print "\n\nthread_obj--",thread_obj
+		return thread_obj
+	return None
 
 
 @get_execution_time

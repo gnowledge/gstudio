@@ -143,19 +143,19 @@
         </div>
 
       {% else %}
-        <div class="row" style="position: relative;z-index: 2;">
+        <div class="row" >
             <div class="small-2 course-settings">
               {% if user_access == "allow" %}
-                <a disabled="disabled"> ENROLLED</a>
+                <a class="button radius small" disabled="disabled"> ENROLLED</a>
               {% else %}
                 {% if user.is_authenticated %}
                   {% if allow_to_join == "Open" %}
-                    <a class="enroll-btn"> ENROLL</a>
+                    <a class="enroll-btn button radius small"> ENROLL</a>
                   {% else %}
-                    <a disabled="disabled"> Enrollment {{allow_to_join}} </a>
+                    <a class="button radius small" disabled="disabled"> Enrollment {{allow_to_join}} </a>
                   {% endif %}
                 {% else %}
-                    <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
+                    <a href="{% url 'auth_login' %}" class="button radius small" title="Please login to Enroll">ENROLL</a>
                 {% endif %}
               {% endif %}
             </div>

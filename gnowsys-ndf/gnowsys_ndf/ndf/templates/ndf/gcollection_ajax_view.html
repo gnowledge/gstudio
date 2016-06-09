@@ -60,7 +60,7 @@
       $tree.tree({
         selectable: true,
         keyboardSupport: false,
-        autoOpen: true,
+        autoOpen: false,
         onCreateLi: function(node, $li) {
           if(node.node_type == "CourseSectionEvent"){
             cs_ids.push(node.id)
@@ -68,17 +68,17 @@
           else if(node.node_type == "CourseSubSectionEvent"){
             css_ids.push(node.id)
           }
-          else if (node.node_type == "CourseUnitEvent"){
-            cu_ids.push(node.id)
-          }
           $li.find('.jqtree-title').attr('data-id',node.id);
-
-          if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
-            cr_ids.push(node.id)
-            $li.find('.jqtree-title').addClass('module-page');
-            url = '/{{group_name_tag}}/gcourse/course_section/' + node.parent.parent.id + '/' + node.parent.id + '/' + node.id
-            $li.find('.jqtree-title')
-              .html('<a href="'+url+'" id='+node.id+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
+          if (node.node_type == "CourseUnitEvent"){
+          // if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
+            cu_ids.push(node.id)
+            if (node.collection_set.length > 0 ){
+              cr_ids = cr_ids.concat(node.collection_set)
+              $li.find('.jqtree-title').addClass('module-page');
+              url = '/{{group_name_tag}}/gcourse/course_section/' + node.parent.id + '/' + node.id + '/' + node.collection_set[0]
+              $li.find('.jqtree-title')
+                .html('<a href="'+url+'" id='+node.collection_set[0]+' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>');
+            }
           }
           else{
             $li.find('.jqtree-title')
@@ -261,7 +261,6 @@
     }
 
     function update_res_status(){
-      console.log("{{group_id}}")
       completed_res_ids = []
       $.ajax({
         url: "{% url 'get_resource_completion_status' group_id %}",
@@ -280,8 +279,9 @@
         },
         success: function(data){
           if(data){
+            // console.log(data)
             $.each(data, function(key,value){
-              if (key === "COMPLETED"){
+              if (key === "COMPLETED" && value.length > 0){
                 $.each(value, function(each_index){
                   completed_res_ids.push(value[each_index])
                   $('[data-id='+ String(value[each_index]) + ']').prepend('<i class="fa '+iconMapping['COMPLETED']+'"</i>');
@@ -302,22 +302,21 @@
           }
           $('.get_course-status').attr('value','Get Status')
                                 .removeAttr('disabled')
-
-          update_units_status(completed_res_ids)
+          if (completed_res_ids.length > 0){
+            update_units_status(completed_res_ids)
+          }
         },
       });//end of ajax
 
     }
 
     function sublist_chk(super_list, sub_list) {
-      console.log(sub_list)
       var newArray = [];
       for(var j = 0; j < sub_list.length; j++)
         if(super_list.indexOf(sub_list[j]) != -1)
         {
             newArray.push(sub_list[j]);
         }
-        console.log(newArray);
         if(newArray.length == sub_list.length){
           return true
         }
@@ -326,14 +325,15 @@
 
     function update_units_status(completed_res_ids){
       completed_unit_ids = []
-      if(cu_ids){
+      if(cu_ids.length > 0 && completed_res_ids.length > 0){
         var $tree = $('.collection');
         $.each(cu_ids, function(index_val){
           var u_node = $tree.tree('getNodeById',cu_ids[index_val]);
           u_node_children_ids = []
-          $.each(u_node.children, function(each_ch_index){
-            u_node_children_ids.push(u_node.children[each_ch_index].id)
-          })
+          // $.each(u_node.children, function(each_ch_index){
+          //   u_node_children_ids.push(u_node.children[each_ch_index].id)
+          // })
+          u_node_children_ids = u_node.collection_set
           res = sublist_chk(completed_res_ids, u_node_children_ids)
           if(res){
             $('[data-id='+ String(cu_ids[index_val]) + ']').prepend('<i class="fa '+iconMapping['COMPLETED']+'"</i>');
@@ -344,13 +344,15 @@
           }
 
         })
-        update_sessions_status(completed_unit_ids)
+        if (completed_unit_ids.length > 0){
+          update_sessions_status(completed_unit_ids)
+        }
       }
     }
 
     function update_sessions_status(completed_unit_ids){
       completed_session_ids = []
-      if(css_ids){
+      if(css_ids.length > 0 && completed_unit_ids.length > 0){
         var $tree = $('.collection');
         $.each(css_ids, function(index_val){
           var css_node = $tree.tree('getNodeById',css_ids[index_val]);
@@ -368,12 +370,14 @@
           }
 
         })
-        update_modules_status(completed_session_ids)
+        if(completed_session_ids.length > 0){
+          update_modules_status(completed_session_ids)
+        }
       }
     }
 
     function update_modules_status(completed_session_ids){
-      if(cs_ids){
+      if(cs_ids.length > 0 && completed_session_ids.length > 0 ){
         var $tree = $('.collection');
         $.each(cs_ids, function(index_val){
           var cs_node = $tree.tree('getNodeById',cs_ids[index_val]);
@@ -394,7 +398,7 @@
     }
 
     $(document).on('click','.get_course-status',function(){
-      console.log("get_course-status btn clicked")
+      // console.log("get_course-status btn clicked")
       update_res_status()
     });
 
@@ -452,7 +456,7 @@
   <!-- <b class="current">{{node.name}}</b> -->
   {% if node.collection_set %}
     <div>
-      <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
+      <div class="collection" data-url="{% url 'get_course_collection' group_id node.pk True %}"></div>
     </div>
     <div class="status-div">
       <input type="button" class="button small radius get_course-status" value="Get Status"></input>

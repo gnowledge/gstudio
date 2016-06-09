@@ -121,10 +121,10 @@
 				</div>
 				{% endcomment %}
 
-				<div class="quiz-type-based-div small-8 large-8 columns left" id="Single-Choice">
+				<div class="quiz-type-based-div small-8 large-8 columns left" id="Single-Choice" style="display:{% if node.quiz_type == "Single-Choice" %}block{% else %}none{% endif %};">
 					<select id="correct_answer_single" name="correct_answer_single">
 					{% for option in node.options %}
-						<option value="{{forloop.counter}}" {% ifequal node.correct_answer.0 forloop.counter|slugify %}selected{% endifequal %} >{{forloop.counter}}</option>
+						<option value="{{forloop.counter}}" {% ifequal node.correct_answer.0 option %}selected{% endifequal %} >{{forloop.counter}}</option>
 						{% empty %}
 						<option value="1">1</option>
 						<option value="2">2</option>
@@ -132,11 +132,11 @@
 					</select>
 				</div>
 
-				<div class="quiz-type-based-div small-8 large-8 columns left" id="Multiple-Choice">
+				<div class="quiz-type-based-div small-8 large-8 columns left" id="Multiple-Choice" style="display:{% if node.quiz_type == "Multiple-Choice" %}block{% else %}none{% endif %};">
 					<small>(Press Ctrl to select multiple answers)</small></label>
 					<select id="correct_answer_multiple" name="correct_answer_multiple" multiple style="height:75px;">
 					{% for option in node.options %}
-						<option value="{{forloop.counter}}" {% if forloop.counter|slugify in node.correct_answer %}selected{% endif %} >{{forloop.counter}}</option>
+						<option value="{{forloop.counter}}" {% if option in node.correct_answer %}selected{% endif %} >{{forloop.counter}}</option>
 						{% empty %}
 						<option value="1" selected>1</option>
 						<option value="2">2</option>
@@ -267,7 +267,11 @@
 			{% if node %}
 				$(".sel_show_correct_ans").val("{{node.quizitem_show_correct_ans}}")
 				$(".sel_check_ans").val("{{node.quizitem_check_answer}}")
-
+				{% if node.quiz_type != "Short-Response" %}
+					$('#options').css('display', 'block');
+					$(".quiz_type_based_correct_ans_div").removeClass("hide");
+					$("#{{node.quiz_type}}").css('display', 'block');
+				{% endif %}
 			{% endif %}
 		 })
 
