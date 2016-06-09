@@ -2445,8 +2445,6 @@ def course_analytics(request, group_id, user_id, render_template=False):
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
-    import time
-    t0 = time.time()
     analytics_data = {}
     user_obj = User.objects.get(pk=int(user_id))
     analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
@@ -2556,10 +2554,6 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['users_points'] = analytics_instance.get_users_points()
     analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
 
-    t1 = time.time()
-    time_diff = t1 - t0
-    # print "\n ALL Total seconds == ", time_diff
-
     del analytics_instance
     cache.set(cache_key, json.dumps(analytics_data), 60*15)
     return render_to_response("ndf/user_course_analytics.html", 
@@ -2596,9 +2590,9 @@ def course_analytics_admin(request, group_id):
             # users_points = analytics_instance.get_users_points()
             admin_analytics_data['username'] = user_obj.username
             admin_analytics_data['user_id'] = user_obj.id
-            admin_analytics_data['users_points'] = analytics_instance.get_users_points()
-            # admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
             users_points_breakup = analytics_instance.get_users_points(True)
+            admin_analytics_data['users_points'] = users_points_breakup['Total']
+
             admin_analytics_data["files_points"] = users_points_breakup['Files']
             if FILES_MAX_POINT_VAL < users_points_breakup['Files']:
                 FILES_MAX_POINT_VAL = users_points_breakup['Files']

@@ -200,13 +200,16 @@ class AnalyticsMethods(object):
 					if each_qi.attribute_set:
 						for each_attr in each_qi.attribute_set:
 							if each_attr and 'quizitempost_user_submitted_ans' in each_attr:
-								submitted_ans = get_dict_from_list_of_dicts(each_attr['quizitempost_user_submitted_ans'])
-								submitted_ans = reduce(lambda x, y: x+y, submitted_ans.values())
+								if each_attr['quizitempost_user_submitted_ans']:
+									submitted_ans = each_attr['quizitempost_user_submitted_ans']
+									if all(type(edict)==dict for edict in submitted_ans):
+										submitted_ans = get_dict_from_list_of_dicts(each_attr['quizitempost_user_submitted_ans'])
+										submitted_ans = reduce(lambda x, y: x+y, submitted_ans.values())
 
-								if correct_ans_list and submitted_ans:
-									if sublistExists(submitted_ans, correct_ans_list):
-										if each_qi._id not in self.list_of_qi_ids:
-											self.list_of_qi_ids.append(each_qi._id)
+										if correct_ans_list and submitted_ans:
+											if sublistExists(submitted_ans, correct_ans_list):
+												if each_qi._id not in self.list_of_qi_ids:
+													self.list_of_qi_ids.append(each_qi._id)
 		if correct_ans_flag:
 			t1 = time.time()
 			time_diff = t1 - t0
@@ -720,6 +723,8 @@ class AnalyticsMethods(object):
 				point_breakup_dict['Quiz'] = correct_attempted_quizitems*GSTUDIO_QUIZ_CORRECT_POINTS
 			if user_comments:
 				point_breakup_dict['Interactions'] = user_comments*GSTUDIO_COMMENT_POINTS
+			point_breakup_dict['Total'] = total_points
+			# print point_breakup_dict
 			return point_breakup_dict
 		return total_points
 
