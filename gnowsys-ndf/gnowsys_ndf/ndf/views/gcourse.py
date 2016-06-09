@@ -2217,7 +2217,6 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                                     'member_of': gst_page._id,
                                                 },
                                             ],
-                                            # 'collection_set': {'$exists': "true", '$not': {'$size': 0} }
                                             },
                                         {
                                             'name': 1,
@@ -2409,7 +2408,18 @@ def course_filters(request, group_id):
         no_url_flag = False
         detail_urlname = "course_notebook_tab_note"
     if title.lower() == "gallery":
-        query.update({'created_by': {'$nin': gstaff_users}})
+        query.update({'created_by': {'$nin': gstaff_users},
+                                '_type': {'$in':["File","GSystem"]},
+                                'group_set': {'$all': [ObjectId(group_id)]},
+                                'relation_set.clone_of': {'$exists': False},
+                                '$or': [
+                                        {'member_of': gst_file._id},
+                                        {
+                                            'collection_set': {'$exists': True,'$not': {'$size': 0} },
+                                            'member_of': gst_page._id,
+                                        },
+                                    ],
+                    })
         no_url_flag = False
         detail_urlname = "course_gallery_detail"
     elif title.lower() == "raw material":
@@ -2423,7 +2433,7 @@ def course_filters(request, group_id):
                                 ],
                         'tags': {'$regex':"raw@material" },
                         'group_set': {'$all': [ObjectId(group_id)]} 
-            })
+                    })
         no_url_flag = False
         detail_urlname = "course_raw_material_detail"
 

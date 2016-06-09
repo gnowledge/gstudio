@@ -3619,14 +3619,15 @@ def get_course_filters(group_id, filter_context):
 
 			elif filter_context.lower() == "gallery":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs]
-				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+				result_cur = node_collection.find({'_type': {'$in': ["GSystem","File"]},'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
 							'created_by': {'$nin': gstaff_users}
-							},{'tags': 1, '_id': False})
+							},{'tags': 1,'_id': 1,'name': 1,'member_of': 1,'mime_type': 1,'if_file':1 })
+				print "\n\n\nresult_cur",result_cur.count()
 
 			elif filter_context.lower() == "raw material":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
-				result_cur = node_collection.find({'_type': {'$in': ["File", "GSystem"]},'group_set': group_obj._id,
+				result_cur = node_collection.find({'_type': {'$in': ["GSystem","File"]},'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
 							'tags': {'$regex':"raw@material" },
 							'created_by': {'$in': gstaff_users}
