@@ -3626,15 +3626,18 @@ def get_course_filters(group_id, filter_context):
 
 			elif filter_context.lower() == "raw material":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
-				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+				result_cur = node_collection.find({'_type': {'$in': ["File", "GSystem"]},'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
+							'tags': {'$regex':"raw@material" },
 							'created_by': {'$in': gstaff_users}
-							},{'tags': 1, '_id': False})
+							},{'tags': 1, 'name': 1,'_id': 1,'member_of': 1,'mime_type': 1,'if_file':1})
 
 			# print "\n\n result_cur.count()--",result_cur.count()
 			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
+
 			# all_tags_from_cursor is a list having nested list
 			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
+			all_tags_list = list(set(all_tags_list))
 			if all_tags_list:
 				all_tags_list = json.dumps(all_tags_list)
 			filters_dict[each_course_filter_key].update({'value': all_tags_list})

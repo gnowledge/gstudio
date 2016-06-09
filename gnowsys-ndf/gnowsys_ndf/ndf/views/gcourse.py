@@ -2399,7 +2399,7 @@ def course_filters(request, group_id):
     template = 'ndf/file_list_tab.html'
 
     if title.lower() == "gallery" or title.lower() == "raw material":
-        query.update({'_type': "File"})
+        query.update({'_type': {'$in': ["File", "GSystem"]}})
 
     elif title.lower() == "notebook":
         page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
@@ -2413,7 +2413,17 @@ def course_filters(request, group_id):
         no_url_flag = False
         detail_urlname = "course_gallery_detail"
     elif title.lower() == "raw material":
-        query.update({'created_by': {'$in': gstaff_users}})
+        query.update({'created_by': {'$in': gstaff_users},
+                        '$or': [
+                                    {'member_of': gst_file._id},
+                                    {
+                                        'collection_set': {'$exists': "true",'$not': {'$size': 0} },
+                                        'member_of': gst_page._id,
+                                    }
+                                ],
+                        'tags': {'$regex':"raw@material" },
+                        'group_set': {'$all': [ObjectId(group_id)]} 
+            })
         no_url_flag = False
         detail_urlname = "course_raw_material_detail"
 
@@ -2427,7 +2437,7 @@ def course_filters(request, group_id):
             return HttpResponse("reload")
 
     # print "\n\n query === ", title, "\n\n---  \n",query
-    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1,'if_file':1}).sort('created_at', -1)
     # print "\n\n Total files: ", files_cur.count()
     context_variables.update({'files_cur': files_cur,"resource_type": files_cur,
                               "no_footer":True, "no_description":True, "no_url":no_url_flag, 
