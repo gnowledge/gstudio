@@ -6306,32 +6306,12 @@ def upload_file_ckeditor(request,group_id):
     #     return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     # return HttpResponseRedirect(url_name)
 
-# @login_required
-# @get_execution_time
-# def upload_file(request,group_id):
-#     try:
-#         group_id = ObjectId(group_id)
-#     except:
-#         group_name, group_id = get_group_name_id(group_id)
+def clix_student_registration(request):
+    title = request.POST.get('selected_username','')
+    print "\n\n\n\n\n\n request",title
+    usr = User.objects.get(username=title)
+    print "\n\n\n\n\n\n usr",title
+    return HttpResponse(json.dumps("yes"))
 
-#     group_obj = node_collection.one({'_id': ObjectId(group_id)})
-#     title = request.POST.get('context_name','')
-#     usrid = request.user.id
-    
-#     from gnowsys_ndf.ndf.views.filehive import write_files
-
-#     gs_obj_list = write_files(request, group_id)
-#     gs_obj_id = gs_obj_list[0]['_id']
-
-#     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-#     for each_gs_file in gs_obj_list:
-#         each_gs_file.status = u"PUBLISHED"
-#         each_gs_file.save()
-#         #set interaction-settings
-#         create_gattribute(each_gs_file._id, discussion_enable_at, True)
-#         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
-    
-#     # return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
-#     return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':gs_obj_id}) )
 
     

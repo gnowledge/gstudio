@@ -19,7 +19,8 @@ from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_ne
 from gnowsys_ndf.ndf.views import rpc_resources
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
-    login_template = 'registration/login_clix.html'
+    login_template = 'registration/login_clix_school.html'
+
 else:
     login_template = 'registration/login.html'
 
@@ -198,6 +199,7 @@ urlpatterns = patterns('',
         name='registration_register'),
 
     url(r'^accounts/login/$', auth_views.login ,{'template_name': login_template}, name='login'),
+    url(r'^accounts/clix_student_registration/$', 'gnowsys_ndf.ndf.views.ajax_views.clix_student_registration', name='clix_student_registration'),
     url(r'^accounts/', include('registration_email.backends.default.urls')),
 
    # --end of django-registration

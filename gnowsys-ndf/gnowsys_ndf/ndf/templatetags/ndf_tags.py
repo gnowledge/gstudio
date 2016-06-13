@@ -41,6 +41,7 @@ from mongokit import IS
 from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
+# from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID
 try:
 	from gnowsys_ndf.local_settings import GSTUDIO_SITE_NAME
 except ImportError:
@@ -3336,6 +3337,11 @@ def get_topic_breadcrumb_hierarchy(oid):
 
 @get_execution_time
 @register.assignment_tag
+def get_login_clix_school_template():
+	return GSTUDIO_CLIX_LOGIN_TEMPLATE
+
+@get_execution_time
+@register.assignment_tag
 def get_gstudio_help_sidebar():
 	return GSTUDIO_HELP_SIDEBAR
 
@@ -3737,3 +3743,22 @@ def get_course_completetion_data(group_obj, user, ids_list=False):
 
             return_dict = {"leaf_ids":list_of_leaf_node_ids,"completed_ids":completed_ids_list,"incompleted_ids":incompleted_ids_list}
 	return return_dict
+
+
+@get_execution_time
+@register.assignment_tag
+def get_login_colors_name():
+	colors_list = ['black','blue','brown','gray','green','indigo','khaki','maroon','orange','pink','purple','red','violet','yellow']
+	return colors_list
+
+@get_execution_time
+@register.assignment_tag
+def get_login_animals_name():
+	animals_list = ['dog','dolphin','dragonfly','dragon','duck','eagle','elephant','flamingo','fox','frog','garpes','goat','gorilla','grasshopper','hen','heron','hibiscus','hippo','honeybee','horse','kangaroo','kiwi','lion','llama','lobster','lotus','monkey','mouse','octopus','ostrich','owl','panda','parrot','peacock','piegon','pineapple','python','rabbit','rhino','rose','scorpion','seahorse','seal','shark','sheep','snail','sparrow','squid','squirrel','strawberry','sunflower','swan','tiger','turtle','whale','wolf','zebra','ant']
+	return animals_list
+
+@get_execution_time
+@register.assignment_tag
+def get_gstudio_institute_id():
+	print "\n\n\n\n\n\n\n\n\nGSTUDIO_INSTITUTE_ID",GSTUDIO_INSTITUTE_ID
+	return GSTUDIO_INSTITUTE_ID
