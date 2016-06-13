@@ -96,5 +96,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^save_time/(?P<node>[\w-]+)$', 'save_time', name='save_time'),
     url(r'^show_coll_cards/$', 'show_coll_cards', name='show_coll_cards'),
     url(r'^get_visits_count/$', 'get_visits_count', name='get_visits_count'),
+    url(r'^search_users/$', 'search_users', name='search_users'),
+    url(r'^save_user_password/$', 'save_user_password', name='save_user_password'),
 
 )
