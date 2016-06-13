@@ -9,6 +9,7 @@
 	   CKEDITOR.plugins.addExternal('addImage',basePath+'ndf/js/ckPlugins/addImage/','plugin.js');
 	   CKEDITOR.plugins.addExternal('closebtn',basePath+'ndf/js/ckPlugins/closebtn/','plugin.js');
 	   CKEDITOR.plugins.addExternal('addAudio',basePath+'ndf/js/ckPlugins/addAudio/','plugin.js');
+	   CKEDITOR.plugins.addExternal('font',basePath+'ndf/bower_components/ckeditor/plugins/font/','plugin.js');
 
 	})();
 
@@ -22,9 +23,9 @@ CKEDITOR.editorConfig = function( config ) {
 	[
 
 		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
-		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
+		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-' ] },
 		{ name: 'insert', items : [ 'Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe','video'] },
-		{ name: 'styles', items : [ 'Styles','Format' ] },
+		{ name: 'styles', items : [ 'Font' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] },
 		{ name: 'links', items : [ 'Link','Unlink' ] },
 		{ name: 'tools', items : [ 'addImage','addAudio','Source','Maximize','-'] },
@@ -77,11 +78,20 @@ CKEDITOR.editorConfig = function( config ) {
 	config.format_tags = 'p;h1;h2;h3;pre';
 	config.entities = false; //set false to work with  entities such as   "" & '' in source code
 	config.tabSpaces = 4; // for tab spacing
-
+	config.font_names =  'Arial/Arial, Helvetica, sans-serif;' +
+            'Comic Sans MS/Comic Sans MS, cursive;' +
+            'Courier New/Courier New, Courier, monospace;' +
+            'Georgia/Georgia, serif;' +
+            'Lucida Sans Unicode/Lucida Sans Unicode, Lucida Grande, sans-serif;' +
+            'Tahoma/Tahoma, Geneva, sans-serif;' +
+            'Times New Roman/Times New Roman, Times, serif;' +
+            'Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;' +
+            'Calibri/Calibri, Verdana, Geneva, sans-serif;' + /* here is your font */
+            'Verdana/Verdana, Geneva, sans-serif';
 
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
-	config.extraPlugins = 'addImage,closebtn,addAudio';
+	config.extraPlugins = 'addImage,closebtn,addAudio,font';
 	config.allowedContent = true;
 
 };
