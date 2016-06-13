@@ -38,7 +38,7 @@ HOW TO USE
 
 <script type="text/javascript" src="/static/ndf/bower_components/mousetrap/mousetrap.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
+<!-- <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> -->
 
 <style type="text/css">
 
@@ -81,7 +81,7 @@ HOW TO USE
   /*#selected-items{*/
   .selected-items{
     max-height: 200px ;
-    width: 500px ;
+    min-width: 350px ;
     overflow-y : auto ;
     overflow-x: hidden;
   }
@@ -159,18 +159,27 @@ HOW TO USE
 </style>
 
 
+<!-- start of selector widget -->
 <div class="selector-widget" id="{{for}}-selector-widget">
 
+  <!-- search text box -->
   <div class="row">
     <div class="small-10 medium-12 columns">
       <div class="select-search-container" data-selector-widget-for="{{for}}">
         <i class="fi-play" ></i>
+
+        <!-- selected items area -->
         <div class="selected-items" data-selector-widget-for="{{for}}"></div>
+
         <input type="text" class="search-text mousetrap" placeholder="Type To Search" autocomplete="off" data-selector-widget-for="{{for}}">
+
       </div>
     </div>
   </div>
+  <!-- END of search text box -->
 
+
+  <!-- all items / to be select items /select dropdown list -->
   <div class="row">
     <div class="small-12 medium-12 medium-centered columns">
       <div class="to-be-selected hide" data-selector-widget-for="{{for}}">
@@ -201,18 +210,96 @@ HOW TO USE
       </div>
     </div>
   </div>
+  <!-- END of all items / to be select items /select dropdown list -->
 
 </div>
+<!-- END of selector widget -->
+
+
 <script type="text/javascript">
 
   // querySelector, jQuery style but in pure JS.
-  var $s = function (selector) {
-    return document.querySelector(selector);
-  };
+  var $s = function (selector) { return document.querySelector(selector); };
 
-  var $sa = function (selector) {
-    return document.querySelectorAll(selector);
-  };
+  var $sa = function (selector) { return document.querySelectorAll(selector); };
+
+  // selector widget container div's id
+  var selectorWidgetID = "{{for}}-selector-widget.selector-widget";
+  var selectorWidget = $s('#' + selectorWidgetID);
+
+  var selectedItems = $s('#' + selectorWidgetID + ' .selected-items');
+
+  var searchText = $s('#' + selectorWidgetID + ' .search-text');
+
+  var toBeSelected = $s('#' + selectorWidgetID + ' .to-be-selected');
+  // toBeSelected.onblur = function(){$s('#' + selectorWidgetID + ' .to-be-selected').classList.add('hide');}
+
+  var sItems = $sa('#' + selectorWidgetID + ' .to-be-selected' + ' .item');
+
+  var oneline_element = "{{oneline_element}}";
+
+  // making list of all selected items data
+  var selected_options = [ {% for each_opt in selected_options %}"{{each_opt|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
+  // console.log(selected_options)
+
+  {% if ajax_search %}
+    {% if url_first_arg and url_second_arg %}
+      var ajax_url = '{% url ajax_url_name url_first_arg url_second_arg %}'
+    {% elif url_first_arg %}
+      var ajax_url = '{% url ajax_url_name url_first_arg %}'
+    {% else %}
+      var ajax_url = '{% url ajax_url_name %}'
+    {% endif %}
+    var ajax_url = '{% url ajax_url_name url_first_arg %}'
+  {% endif %}
+
+  function createItemElements (name, content, oid, selectorWidgetFor) {
+
+    // var selectorWidgetID = "{{for}}-selector-widget.selector-widget";
+    var itemExists = $s('#' + selectorWidgetFor + '-selector-widget.selector-widget .to-be-selected .item[data-value="'+ oid +'"]');
+
+    if (itemExists) {return 0};
+
+    var itemDiv =  document.createElement('div'),
+      rowDiv =  document.createElement('div'),
+      columnsDiv =  document.createElement('div'),
+      itemTitleDiv =  document.createElement('div'),
+      itemDescrDiv = document.createElement('div');
+
+
+    itemDiv.classList.add('item');
+    itemDiv.setAttribute('data-title', name);
+    itemDiv.setAttribute('data-description', content);
+    itemDiv.setAttribute('title', content);
+    itemDiv.setAttribute('data-value', oid);
+    itemDiv.setAttribute('data-selector-widget-for', selectorWidgetFor);
+
+    itemDiv.onclick = addToSelection;
+    toBeSelected.appendChild(itemDiv);
+
+    // var rowDiv = document.createElement('div');
+    rowDiv.classList.add('row');
+    itemDiv.appendChild(rowDiv);
+
+    // var columnsDiv = document.createElement('div');
+    columnsDiv.classList.add('small-12', 'columns');
+    rowDiv.appendChild(columnsDiv);
+
+    // var itemTitleDiv = document.createElement('div');
+    itemTitleDiv.classList.add('item-title');
+    itemTitleDiv.appendChild(document.createTextNode(name))
+    columnsDiv.appendChild(itemTitleDiv);
+
+    // var itemDescrDiv = document.createElement('div');
+    itemDescrDiv.classList.add('item-description');
+    itemDescrDiv.appendChild(document.createTextNode(content))
+    columnsDiv.appendChild(itemDescrDiv);
+
+    // bindKeyEvents()
+    // console.log(itemDiv);
+
+  }
+
 
   function getElementByParentRef (currentElemObj, parentSelector, expectedChildSelector) {
     /*
@@ -232,27 +319,6 @@ HOW TO USE
     }
   }
 
-  var selectorWidgetID = "{{for}}-selector-widget.selector-widget";
-  var selectorWidget = $s('#' + selectorWidgetID);
-
-  var selected_options = [ {% for each_opt in selected_options %}"{{each_opt|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
-
-  // console.log(selected_options)
-
-  // toBeSelected = document.getElementById('to-be-selected');
-  var toBeSelected = $s('#' + selectorWidgetID + ' .to-be-selected');
-  // toBeSelected.onblur = function(){$s('#' + selectorWidgetID + ' .to-be-selected').classList.add('hide');}
-
-  // selectedItems = document.getElementById('selected-items');
-  var selectedItems = $s('#' + selectorWidgetID + ' .selected-items');
-
-  // searchText = document.getElementById('search-text');
-  var searchText = $s('#' + selectorWidgetID + ' .search-text');
-
-  // sItems = $sa("#to-be-selected .item");
-  var sItems = $sa('#' + selectorWidgetID + ' .to-be-selected' + ' .item');
-
-  var oneline_element = "{{oneline_element}}";
 
   function removeTag(){
 
@@ -269,8 +335,8 @@ HOW TO USE
     this.parentNode.remove();
 
     toBeSelected.classList.remove('hide');
-
   }
+
 
   function lineThrough(){
     var tempEl = this.previousSibling?this.previousSibling.querySelector('.item-title'):false;
@@ -288,7 +354,6 @@ HOW TO USE
 
     // creating new div element
     var selDiv = document.createElement('div');
-    // var linebreak = document.createElement('br');
     selDiv.classList.add('label', 'secondary', 'selection');
     this.onclick = detachEvent;
     this.classList.remove('traversing-el');
@@ -305,25 +370,17 @@ HOW TO USE
     // selDiv.appendChild(linebreak);
 
     var selectorWidgetFor = this.getAttribute('data-selector-widget-for');
-    selectedItems = $s('.selected-items[data-selector-widget-for="'+ selectorWidgetFor +'"]');
-
-    // var selectedItems = getElementByParentRef(this, '.selector-widget', '.selected-items');
-
-    // if(!selectedItems)
-    // {
-    //   var selectorWidgetID = "{{for}}-selector-widget.selector-widget";
-    //   var selectedItems = $s('#' + selectorWidgetID + ' .selected-items');
-    // }
-
-    // console.log(selectedItems);
+    var selectedItems = $s('.selected-items[data-selector-widget-for="'+ selectorWidgetFor +'"]');
 
     if (selectedItems) { selectedItems.appendChild(selDiv); };
   }
 
+  // attaching onclick event on items to be selected / drop-down items
   for (var i = sItems.length - 1; i >= 0; i--) {
     sItems[i].onclick = addToSelection;
   }
 
+  // trigger click event on selected items amongst drop down list
   for (var i = 0; i < selected_options.length; i++) {
     var temp_item = toBeSelected.querySelector('.item[data-value="'+ selected_options[i] +'"]');
     if(temp_item){temp_item.click()};
@@ -331,7 +388,39 @@ HOW TO USE
 
   function searchOnItems (ev){
 
+    var toBeSearch = this.value.trim().toLowerCase();
+    // var sItemsTemp = $sa("#to-be-selected .item");
+
     var selectorWidgetFor = this.getAttribute('data-selector-widget-for');
+
+    {% if ajax_search %}
+      if (toBeSearch.length > 2)
+      {
+
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = ensureReadiness;
+
+      function ensureReadiness() {
+          if(xhr.readyState < 4) { return; }
+
+          if(xhr.status !== 200) { return; }
+
+          // all is well
+          if(xhr.readyState === 4) {
+              // console.log(xhr.responseText);
+              ajax_data = JSON.parse(xhr.responseText);
+              toBeSelected.innerHTML = '';
+              ajax_data.forEach(function(i){createItemElements(i.name, i.content||'', i._id.$oid, '{{for}}')})
+          }
+      }
+      var selectedIds = getSelectedValues(selectorWidgetFor);
+      // console.log(selectedIds);
+      xhr.open('GET', ajax_url + '?search_text=' + toBeSearch + '&selected_ids=' + selectedIds, true);
+      xhr.send();
+      };
+
+    {% endif %}
+
 
     if (selectorWidgetFor)
     {
@@ -341,9 +430,6 @@ HOW TO USE
     {
       var sItemsTemp = currentEl = $sa('#' + selectorWidgetID + ' .to-be-selected .item');
     }
-
-    var toBeSearch = this.value.trim().toLowerCase();
-    // var sItemsTemp = $sa("#to-be-selected .item");
 
     for (var i = sItemsTemp.length - 1; i >= 0; i--) {
 
@@ -573,6 +659,7 @@ HOW TO USE
           {
             elemToBeSelectedList[i].classList.remove('traversing-el');
             elemToBeSelectedList[i].click();
+            searchText.value = '';
           }
         };
       }
@@ -584,6 +671,7 @@ HOW TO USE
         {
           elemToBeSelected.classList.remove('traversing-el');
           elemToBeSelected.click();
+          searchText.value = '';
         }
       }
 
