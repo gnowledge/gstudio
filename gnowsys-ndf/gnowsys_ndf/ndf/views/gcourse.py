@@ -2376,7 +2376,8 @@ def inline_edit_res(request, group_id, node_id):
 
 
 @get_execution_time
-def course_filters(request, group_id):
+def course_filters(request, group_id,page_no=1):
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
@@ -2422,6 +2423,7 @@ def course_filters(request, group_id):
                     })
         no_url_flag = False
         detail_urlname = "course_gallery_detail"
+    
     elif title.lower() == "raw material":
         query.update({'created_by': {'$in': gstaff_users},
                         '$or': [
@@ -2437,6 +2439,7 @@ def course_filters(request, group_id):
         no_url_flag = False
         detail_urlname = "course_raw_material_detail"
 
+
     if filter_applied:
         filter_dict = json.loads(filter_dict)
         query_dict = get_filter_querydict(filter_dict)
@@ -2447,7 +2450,18 @@ def course_filters(request, group_id):
             return HttpResponse("reload")
 
     # print "\n\n query === ", title, "\n\n---  \n",query
-    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1,'if_file':1}).sort('created_at', -1)
+    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'member_of': 1, 'mime_type': 1,'if_file':1}).sort('created_at', -1)
+    
+    if title.lower() == "raw material":
+        raw_material_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        context_variables.update({'raw_material_page_info':raw_material_page_info})
+        print "\n\n\n\nraw_material_page_info",raw_material_page_info
+        # print "\n\n\nraw 777777777777777777777"
+    elif title.lower() == "gallery":
+        # print "\n\n\nraw88888888888888888888888888888"
+        gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        print "\n\n\n\n\ngallery_page_info",gallery_page_info
+        context_variables.update({'gallery_page_info':gallery_page_info})
     # print "\n\n Total files: ", files_cur.count()
     context_variables.update({'files_cur': files_cur,"resource_type": files_cur,
                               "no_footer":True, "no_description":True, "no_url":no_url_flag, 
