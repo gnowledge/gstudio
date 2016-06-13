@@ -148,6 +148,8 @@
       pass1 = $(".password1").val().trim()
       pass2 = $(".password2").val().trim()
       student_id_hidden = $("#student-id-pass-change").attr("value")
+      if (student_id_hidden){
+
       if(pass1 === pass2){
         if(pass1.indexOf(' ') < 0){
           if (pass1.length > 6){
@@ -162,6 +164,7 @@
               },
               success: function(data) {
                 $("#userMgmtAlertModal").foundation('reveal', 'close');
+                $("#student-id-pass-change").attr('value','')
               },
             });
           }
@@ -178,6 +181,7 @@
       else{
         alert("Passwords did NOT match. Please try again.");
         event.preventDefault();
+      }
       }
     })
   
