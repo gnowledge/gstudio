@@ -2663,3 +2663,20 @@ def get_resource_completion_status(request, group_id):
                 # print "\n\nb.count()",b.count() 
                 result_dict['COMPLETED'].append(each_cr)
     return HttpResponse(json.dumps(result_dict))
+
+@get_execution_time
+def manage_users(request, group_id):
+    if request.method == "GET":
+        group_obj   = get_group_name_id(group_id, get_obj=True)
+        group_id    = group_obj._id
+        group_name  = group_obj.name
+        context_variables = {
+                'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            }
+        template = 'ndf/users_mgmt.html'
+
+        return render_to_response(template, 
+                                    context_variables,
+                                    context_instance = RequestContext(request)
+        )
+

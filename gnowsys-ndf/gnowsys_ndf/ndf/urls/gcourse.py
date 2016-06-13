@@ -53,4 +53,5 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.gcourse',
                         url(r'^build_progress_bar/(?P<node_id>[\w-]+)$', 'build_progress_bar', name='build_progress_bar'),
                         url(r'^/course_analytics_admin/$', 'course_analytics_admin', name='course_analytics_admin'),
                         url(r'^/get_resource_completion_status/$', 'get_resource_completion_status', name='get_resource_completion_status'),
+                        url(r'^/manage_users/$', 'manage_users', name='manage_users'),
                        )
