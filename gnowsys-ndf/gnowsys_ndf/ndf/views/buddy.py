@@ -1,4 +1,5 @@
 import json
+from bson import json_util
 
 # ''' -- imports from installed packages -- '''
 # from django.http import HttpResponseRedirect
@@ -47,22 +48,25 @@ def list_buddy(request, group_id):
 
     # filter_authors = [ObjectId(auth_oid)for auth_oid in buddies_authid_list]
 
-    all_inst_users = User.objects.filter(username__iendswith=GSTUDIO_INSTITUTE_ID)
-    all_inst_authors = node_collection.find({
-                                            '_type': u'Author',
-                                            # '_id': {'$nin': filter_authors},
-                                            'name': {
-                                                '$regex': GSTUDIO_INSTITUTE_ID + '$'
-                                                },
-                                            'created_by': {'$ne': request.user.id}
-                                            })
+    # all_inst_users = User.objects.filter(username__iendswith=GSTUDIO_INSTITUTE_ID)
+    # all_inst_authors = node_collection.find({
+    #                                         '_type': u'Author',
+    #                                         # '_id': {'$nin': filter_authors},
+    #                                         'name': {
+    #                                             '$regex': GSTUDIO_INSTITUTE_ID + '$'
+    #                                             },
+    #                                         'created_by': {'$ne': request.user.id}
+    #                                         })
     # print all_inst_authors.count()
 
+    selected_buddies_obj_list = node_collection.find({
+                                            '_id': {'$in': [ObjectId(b) for b in buddies_authid_list]}
+                                            })
 
     template = 'ndf/buddy_list.html'
 
     variable = RequestContext(request, {
-                                    "group_id": group_id, 'all_inst_users': all_inst_authors,
+                                    "group_id": group_id, 'all_inst_users': selected_buddies_obj_list,
                                     'buddies_id_name_dict': buddies_authid_name_dict,
                                     'buddies_id_list': buddies_authid_list
                                 })
@@ -159,4 +163,3 @@ def search_authors(request, group_id):
                     {'name': 1, 'content': 1})
                 )
             )
-

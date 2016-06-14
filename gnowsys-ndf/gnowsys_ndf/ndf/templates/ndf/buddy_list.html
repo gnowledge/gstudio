@@ -2,7 +2,8 @@
 
 <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 
-{% include 'ndf/widget_selector.html' with for='select_buddies' all_options=all_inst_users selected_options=buddies_id_list oneline_element='true' %}
+{# {% include 'ndf/widget_selector.html' with for='select_buddies' all_options=all_inst_users selected_options=buddies_id_list oneline_element='true' %} #}
+{% include 'ndf/widget_selector.html' with for='select_buddies' all_options=all_inst_users selected_options=buddies_id_list oneline_element='true' ajax_search=True ajax_url_name='search_authors' url_first_arg='group_id' url_second_arg='' %}
 
 <div class="button tiny expand" id="add-selected-buddies">Done !</div>
 
