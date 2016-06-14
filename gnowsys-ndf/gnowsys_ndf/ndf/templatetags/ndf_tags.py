@@ -3337,8 +3337,8 @@ def get_topic_breadcrumb_hierarchy(oid):
 
 @get_execution_time
 @register.assignment_tag
-def get_login_clix_school_template():
-	return GSTUDIO_CLIX_LOGIN_TEMPLATE
+def get_registration_clix_school_template():
+	return GSTUDIO_CLIX_REGISTRATION_TEMPLATE
 
 @get_execution_time
 @register.assignment_tag
@@ -3760,5 +3760,4 @@ def get_login_animals_name():
 @get_execution_time
 @register.assignment_tag
 def get_gstudio_institute_id():
-	print "\n\n\n\n\n\n\n\n\nGSTUDIO_INSTITUTE_ID",GSTUDIO_INSTITUTE_ID
 	return GSTUDIO_INSTITUTE_ID
