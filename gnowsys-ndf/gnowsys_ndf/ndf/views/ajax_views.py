@@ -6307,11 +6307,47 @@ def upload_file_ckeditor(request,group_id):
     # return HttpResponseRedirect(url_name)
 
 def clix_student_registration(request):
-    title = request.POST.get('selected_username','')
-    print "\n\n\n\n\n\n request",title
-    usr = User.objects.get(username=title)
-    print "\n\n\n\n\n\n usr",title
-    return HttpResponse(json.dumps("yes"))
+    selected_username = request.POST.get('selected_username','')
+    selected_firstname = request.POST.get('first_name','')
+    selected_lastname = request.POST.get('last_name','')
+    selected_mobile_no = request.POST.get('mobile_num_text','')
+    selected_e_mail = request.POST.get('e_mail_text','')
+    is_reg_user = request.POST.get('register_user','')
+    pswd1 = request.POST.get('password1','')
+    pswd2 = request.POST.get('password2','')
+    response_dict = {'success': False}
+    
+    
+    user_obj = User.objects.filter(username=selected_username)
+    user_obj = user_obj[0]
+    if  user_obj and  not user_obj.first_name and not user_obj.last_name and not is_reg_user == "True" :
+      response_dict['success'] = True
+      return HttpResponse(json.dumps(response_dict))
+    if user_obj and  not user_obj.first_name and not user_obj.last_name and is_reg_user == "True":
+      print "here"
+      if selected_firstname and selected_lastname:
+        user_obj.first_name = unicode(selected_firstname)
+        user_obj.last_name = unicode(selected_lastname)
+      if selected_e_mail:
+        user_obj.email = unicode(selected_e_mail)
+      user_obj.set_password(str(pswd2))
+      print "successfully changed password"
+      user_obj.save()
+
+      if selected_mobile_no:
+          selected_mobile_no = int(selected_mobile_no)
+          auth_obj = node_collection.one({'_type': 'Author', 'name': unicode(selected_username) })
+          mobile_no_AT = node_collection.one({'_type':'AttributeType','name':'mobile_number'})
+          mobile_no_gatt = create_gattribute(auth_obj._id, mobile_no_AT, selected_mobile_no)
+          auth_obj.save()
+      response_dict['success'] = "user mapped"
+      return HttpResponse(json.dumps( response_dict ))
+    
+    else:
+      response_dict['success'] = False
+      return HttpResponse(json.dumps(response_dict))
+      print "already registered user" 
+
 
 
     
