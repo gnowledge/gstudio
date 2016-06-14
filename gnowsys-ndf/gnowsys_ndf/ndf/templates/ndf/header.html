@@ -295,8 +295,9 @@
             {% if site.BUDDY_LOGIN and user.is_authenticated %}
 
               <li>
-                <a href="#" data-reveal-id="add-buddy" data-reveal-ajax="{% url 'list_buddy' 'home' %}">
-                  + Add your buddy
+
+                <a href="#" data-reveal-id="add-buddy" data-reveal-ajax="{% url 'list_buddy' group_id %}">
+                  + Add your buddy ({{request.session.buddies_authid_list|length}})
                 </a>
 
                 <div id="add-buddy" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
@@ -304,6 +305,17 @@
                 </div>
 
               </li>
+
+              <blockquote>
+                <ul>
+                  {% for i, each_buddy in request.session.buddies_authid_name_dict.items %}
+                  <li class="text-left">
+                    <h5><small class="fi-torso"> {{each_buddy}}</small></h5>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </blockquote>
+                  {# --{{request.session.buddies_authid_name_dict}}-- #}
             {% endif %}
 
             <li>

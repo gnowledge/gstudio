@@ -152,7 +152,7 @@ def update_buddies(request, group_id):
 def search_authors(request, group_id):
     selected_ids = request.GET.get('selected_ids', '')
     selected_ids = selected_ids.split(',')
-    selected_ids = [ObjectId(auth) for auth in selected_ids]
+    selected_ids = [ObjectId(auth) for auth in selected_ids if auth]
     return HttpResponse(
             json_util.dumps(
                 node_collection.find({
