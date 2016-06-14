@@ -10,7 +10,7 @@ from registration.backends.default.views import ActivationView
 from jsonrpc import jsonrpc_site
 
 # from gnowsys_ndf.ndf.forms import *
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_CLIX_LOGIN_TEMPLATE
 from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error, GstudioEmailRegistrationForm
 from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
 from gnowsys_ndf.ndf.views.home import homepage, landing_page
@@ -19,10 +19,16 @@ from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_ne
 from gnowsys_ndf.ndf.views import rpc_resources
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
-    login_template = 'registration/login_clix_school.html'
+    login_template = 'registration/login_clix.html'
 
 else:
     login_template = 'registration/login.html'
+
+if GSTUDIO_CLIX_LOGIN_TEMPLATE == "clix_school":
+    registeration_template = 'registration/login_clix_school.html'
+else:
+    registeration_template = 'registration/registration_form.html'
+
 
 
 admin.autodiscover()
@@ -192,6 +198,7 @@ urlpatterns = patterns('',
     url(r'^accounts/register/$',
         RegistrationView.as_view(
             form_class=GstudioEmailRegistrationForm,
+            template_name=registeration_template,
             get_success_url=getattr(
                 settings, 'REGISTRATION_EMAIL_REGISTER_SUCCESS_URL',
                 lambda request, user: '/accounts/register/complete/'),
