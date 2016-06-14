@@ -105,6 +105,13 @@
 					</div>
 
 					<div class="row">
+						<div class="small-12 columns end">
+							<label class="left">
+								Choose User name:
+							</label>
+						</div>
+					</div>
+					<div class="row">
 						<div class="large-6 columns">
 								{% get_login_colors_name as color_list %}
 								<select style="height:50px"  id="colors_list" class="multiple-select"  tabindex="5" required>
@@ -188,7 +195,7 @@
 	$(".login-button").click(function(){
 	 mobile_num_text =  $( "#mobile_num_text" ).val();
 	 e_mail_text =  $( "#e_mail_text" ).val();
-	 
+
 	if( $( "#first_name_text" ).val() == "" || $( "#last_name_text" ).val() == "" ){
 	alert("First name and last name are compulsory");
 	return false;
