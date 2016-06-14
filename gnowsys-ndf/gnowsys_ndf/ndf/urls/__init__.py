@@ -10,7 +10,7 @@ from registration.backends.default.views import ActivationView
 from jsonrpc import jsonrpc_site
 
 # from gnowsys_ndf.ndf.forms import *
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_CLIX_LOGIN_TEMPLATE
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_CLIX_REGISTRATION_TEMPLATE
 from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error, GstudioEmailRegistrationForm
 from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
 from gnowsys_ndf.ndf.views.home import homepage, landing_page
@@ -24,7 +24,7 @@ if GSTUDIO_SITE_NAME.lower() == 'clix':
 else:
     login_template = 'registration/login.html'
 
-if GSTUDIO_CLIX_LOGIN_TEMPLATE == "clix_school":
+if GSTUDIO_CLIX_REGISTRATION_TEMPLATE == True:
     registeration_template = 'registration/login_clix_school.html'
 else:
     registeration_template = 'registration/registration_form.html'
