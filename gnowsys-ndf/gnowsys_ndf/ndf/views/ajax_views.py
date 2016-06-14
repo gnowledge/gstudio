@@ -6306,32 +6306,46 @@ def upload_file_ckeditor(request,group_id):
     #     return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     # return HttpResponseRedirect(url_name)
 
-# @login_required
-# @get_execution_time
-# def upload_file(request,group_id):
-#     try:
-#         group_id = ObjectId(group_id)
-#     except:
-#         group_name, group_id = get_group_name_id(group_id)
+def clix_student_registration(request):
+    selected_username = request.POST.get('selected_username','')
+    selected_firstname = request.POST.get('first_name','')
+    selected_lastname = request.POST.get('last_name','')
+    selected_mobile_no = request.POST.get('mobile_num_text','')
+    selected_e_mail = request.POST.get('e_mail_text','')
+    is_reg_user = request.POST.get('register_user','')
+    pswd1 = request.POST.get('password1','')
+    pswd2 = request.POST.get('password2','')
+    response_dict = {'success': False}
+    
+    
+    user_obj = User.objects.filter(username=selected_username)
+    user_obj = user_obj[0]
+    if  user_obj and  not user_obj.first_name and not user_obj.last_name and not is_reg_user == "True" :
+      response_dict['success'] = True
+      return HttpResponse(json.dumps(response_dict))
+    if user_obj and  not user_obj.first_name and not user_obj.last_name and is_reg_user == "True":
+      print "here"
+      if selected_firstname and selected_lastname:
+        user_obj.first_name = unicode(selected_firstname)
+        user_obj.last_name = unicode(selected_lastname)
+      if selected_e_mail:
+        user_obj.email = unicode(selected_e_mail)
+      user_obj.set_password(str(pswd2))
+      print "successfully changed password"
+      user_obj.save()
 
-#     group_obj = node_collection.one({'_id': ObjectId(group_id)})
-#     title = request.POST.get('context_name','')
-#     usrid = request.user.id
-
-#     from gnowsys_ndf.ndf.views.filehive import write_files
-
-#     gs_obj_list = write_files(request, group_id)
-#     gs_obj_id = gs_obj_list[0]['_id']
-
-#     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-#     for each_gs_file in gs_obj_list:
-#         each_gs_file.status = u"PUBLISHED"
-#         each_gs_file.save()
-#         #set interaction-settings
-#         create_gattribute(each_gs_file._id, discussion_enable_at, True)
-#         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
-
-#     # return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
-#     return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':gs_obj_id}) )
+      if selected_mobile_no:
+          selected_mobile_no = int(selected_mobile_no)
+          auth_obj = node_collection.one({'_type': 'Author', 'name': unicode(selected_username) })
+          mobile_no_AT = node_collection.one({'_type':'AttributeType','name':'mobile_number'})
+          mobile_no_gatt = create_gattribute(auth_obj._id, mobile_no_AT, selected_mobile_no)
+          auth_obj.save()
+      response_dict['success'] = "User registered successfully"
+      return HttpResponse(json.dumps( response_dict ))
+    
+    else:
+      response_dict['success'] = False
+      return HttpResponse(json.dumps(response_dict))
+      print "already registered user" 
 
 

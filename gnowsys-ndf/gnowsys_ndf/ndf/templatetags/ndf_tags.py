@@ -41,6 +41,7 @@ from mongokit import IS
 from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
+# from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID
 try:
 	from gnowsys_ndf.local_settings import GSTUDIO_SITE_NAME
 except ImportError:
@@ -3336,6 +3337,11 @@ def get_topic_breadcrumb_hierarchy(oid):
 
 @get_execution_time
 @register.assignment_tag
+def get_registration_clix_school_template():
+	return GSTUDIO_CLIX_REGISTRATION_TEMPLATE
+
+@get_execution_time
+@register.assignment_tag
 def get_gstudio_help_sidebar():
 	return GSTUDIO_HELP_SIDEBAR
 
@@ -3619,22 +3625,26 @@ def get_course_filters(group_id, filter_context):
 
 			elif filter_context.lower() == "gallery":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs]
-				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+				result_cur = node_collection.find({'_type': {'$in': ["GSystem","File"]},'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
 							'created_by': {'$nin': gstaff_users}
-							},{'tags': 1, '_id': False})
+							},{'tags': 1,'_id': 1,'name': 1,'member_of': 1,'mime_type': 1,'if_file':1 })
+				print "\n\n\nresult_cur",result_cur.count()
 
 			elif filter_context.lower() == "raw material":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
-				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+				result_cur = node_collection.find({'_type': {'$in': ["GSystem","File"]},'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
+							'tags': {'$regex':"raw@material" },
 							'created_by': {'$in': gstaff_users}
-							},{'tags': 1, '_id': False})
+							},{'tags': 1, 'name': 1,'_id': 1,'member_of': 1,'mime_type': 1,'if_file':1})
 
 			# print "\n\n result_cur.count()--",result_cur.count()
 			all_tags_from_cursor = map(lambda x: x['tags'], result_cur)
+
 			# all_tags_from_cursor is a list having nested list
 			all_tags_list = list(itertools.chain(*all_tags_from_cursor))
+			all_tags_list = list(set(all_tags_list))
 			if all_tags_list:
 				all_tags_list = json.dumps(all_tags_list)
 			filters_dict[each_course_filter_key].update({'value': all_tags_list})
@@ -3733,3 +3743,21 @@ def get_course_completetion_data(group_obj, user, ids_list=False):
 
             return_dict = {"leaf_ids":list_of_leaf_node_ids,"completed_ids":completed_ids_list,"incompleted_ids":incompleted_ids_list}
 	return return_dict
+
+
+@get_execution_time
+@register.assignment_tag
+def get_login_colors_name():
+	colors_list = ['black','blue','brown','gray','green','indigo','khaki','maroon','orange','pink','purple','red','violet','yellow']
+	return colors_list
+
+@get_execution_time
+@register.assignment_tag
+def get_login_animals_name():
+	animals_list = ['dog','dolphin','dragonfly','dragon','duck','eagle','elephant','flamingo','fox','frog','garpes','goat','gorilla','grasshopper','hen','heron','hibiscus','hippo','honeybee','horse','kangaroo','kiwi','lion','llama','lobster','lotus','monkey','mouse','octopus','ostrich','owl','panda','parrot','peacock','piegon','pineapple','python','rabbit','rhino','rose','scorpion','seahorse','seal','shark','sheep','snail','sparrow','squid','squirrel','strawberry','sunflower','swan','tiger','turtle','whale','wolf','zebra','ant']
+	return animals_list
+
+@get_execution_time
+@register.assignment_tag
+def get_gstudio_institute_id():
+	return GSTUDIO_INSTITUTE_ID

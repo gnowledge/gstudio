@@ -10,7 +10,7 @@ from registration.backends.default.views import ActivationView
 from jsonrpc import jsonrpc_site
 
 # from gnowsys_ndf.ndf.forms import *
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME,GSTUDIO_CLIX_REGISTRATION_TEMPLATE
 from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error, GstudioEmailRegistrationForm
 from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
 from gnowsys_ndf.ndf.views.home import homepage, landing_page
@@ -20,8 +20,15 @@ from gnowsys_ndf.ndf.views import rpc_resources
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'
+
 else:
     login_template = 'registration/login.html'
+
+if GSTUDIO_CLIX_REGISTRATION_TEMPLATE == True:
+    registeration_template = 'registration/login_clix_school.html'
+else:
+    registeration_template = 'registration/registration_form.html'
+
 
 
 admin.autodiscover()
@@ -191,6 +198,7 @@ urlpatterns = patterns('',
     url(r'^accounts/register/$',
         RegistrationView.as_view(
             form_class=GstudioEmailRegistrationForm,
+            template_name=registeration_template,
             get_success_url=getattr(
                 settings, 'REGISTRATION_EMAIL_REGISTER_SUCCESS_URL',
                 lambda request, user: '/accounts/register/complete/'),
@@ -198,6 +206,7 @@ urlpatterns = patterns('',
         name='registration_register'),
 
     url(r'^accounts/login/$', auth_views.login ,{'template_name': login_template}, name='login'),
+    url(r'^accounts/clix_student_registration/$', 'gnowsys_ndf.ndf.views.ajax_views.clix_student_registration', name='clix_student_registration'),
     url(r'^accounts/', include('registration_email.backends.default.urls')),
 
    # --end of django-registration

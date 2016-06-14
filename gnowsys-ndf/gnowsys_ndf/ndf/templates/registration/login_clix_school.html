@@ -1,0 +1,292 @@
+{% load simple_filters %}
+{% xextends "registration/registration_base.html" with first_body_column=0 %}
+{# {% extends "registration/registration_base.html" %} #}
+{% load i18n %}
+
+{% load ndf_tags %}
+{% block title %}{% trans "Login" %}{% endblock %}
+{% block style %}
+	{{block.super}}
+
+	label, small.all-error { font-size: 15px; }
+
+  /* Setting css-properties for small.error */
+  small.error {
+    padding: 0 0 0 0.5rem !important;
+    margin-top: 0rem !important;
+    position: relative !important;
+  }
+{% endblock %}
+
+{% block body_content %}
+	{% url 'auth_password_reset' as auth_pwd_reset_url %}
+	{% url 'registration_register' as register_url %}
+	<div class="login-page">
+		<div class="login-page-opacity"></div>
+	    <div class="row" style="margin: 1.2rem 0;">
+	        <div class="small-11 medium-5 large-4 small-centered medium-centered large-centered columns login-page-form">
+	            <div class="row">
+	                <div class="small-12 medium-12 large-12 columns end text-center login-page-header">
+	                	<img src="/static/ndf/images/landing_pg_slides/clix-logo-i2c-site.svg">
+	                	<span>{% trans "LogIn" %} </span>
+	                </div>
+	            </div>
+				<br/>
+				
+
+					<div class="row">
+						<div class="small-12 columns end">
+							<label class="left">
+								First Name:
+							</label>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="small-12 columns end">
+							<input type="text" id="first_name_text">
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="small-12 columns end">
+							<label class="left">
+								Last Name:
+							</label>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="small-12 columns end">
+							<input type="text" id="last_name_text">
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="small-12 columns end">
+							<label class="left">
+								Mobile Number:
+							</label>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="small-12 columns end">
+							<input type="text"  pattern="[789][0-9]{9}" required id="mobile_num_text">
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="small-12 columns end">
+							<label class="left">
+								E-mail ID:
+							</label>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="small-12 columns end">
+							<input type="text" id="e_mail_text">
+						</div>
+					</div>
+
+					<!-- Email -->
+					<div class="row">
+						<div class="small-12 columns end">
+							<label class="left">
+								Selected User name:
+							</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="small-12 columns end">
+							<input type="text" id="user_name_text" disabled>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="small-12 columns end">
+							<label class="left">
+								Choose User name:
+							</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="large-6 columns">
+								{% get_login_colors_name as color_list %}
+								<select style="height:50px"  id="colors_list" class="multiple-select"  tabindex="5" required>
+		  						{% for color_name in color_list %}
+				         			<!-- <option>-Select from list-</option> -->
+										<option>{{color_name}}</option>
+								{% endfor %}
+								</select>
+						</div>
+						<div class="large-6 columns">
+								{% get_login_animals_name as animals_list %}
+								<select style="height:50px" id="animals_list" class="multiple-select"  tabindex="5" required>
+		  						{% for animals_name in animals_list %}
+				         			<!-- <option>-Select from list-</option> -->
+										<option>{{animals_name}}</option>
+								{% endfor %}
+								</select>
+						</div>
+					</div>
+
+					<div class="row text-center">
+					     <div class="large-12 columns">
+					        <label class="left">Enter Password </label>
+					      </div>
+					      <div class="large-12 columns">
+					        <input type="password" class="password1" />
+					      </div>
+				    </div>
+				    <div class="row text-center">
+				      <div class="small-12 columns">
+				        <label class="left">Re-Enter Password </label>
+				      </div>
+				      <div class="small-12 columns">
+				        <input type="password" class="password2" />
+				      </div>
+				    </div>
+					
+					<div class="row">
+						<div class="small-12 medium-12 large-12 text-center columns end login-button">
+							<input type="" class="button small expand" tabindex= "4" value="{% trans "Register" %}" style="font-size:15px" />
+						</div>
+					</div>
+					
+					<!-- Login button -->
+
+					<input type="hidden" name="next" value="{{ next }}" />
+	        </div>
+		</div>
+	</div>
+
+{% endblock %}
+
+{% block document_ready %}
+	{{block.super}}
+
+	{% get_gstudio_institute_id as inst_id %}
+	 selected_color = $( "#colors_list option:selected" ).text();
+	 selected_animal = $( "#animals_list option:selected" ).text();
+	 first_name = $( "#first_name_text" ).val();
+	 last_name =  $( "#last_name_text" ).val();
+	 user_name =  $( "#user_name_text" ).val();
+	 regx_mobile_no =  /^(\+91-|\+91|0)?\d{10}$/;
+	 selected_username =selected_color+"-"+selected_animal+"-"+"{{inst_id}}"; 
+	 regex_e_mail = /\S+@\S+\.\S+/;
+	
+	
+	$( "#colors_list" ).change(function() {
+		 selected_color = $( "#colors_list option:selected" ).text();
+ 		 selected_animal = $( "#animals_list option:selected" ).text();
+ 		 selected_username =selected_color+"-"+selected_animal+"-"+"{{inst_id}}";
+		$( "#user_name_text" ).val(selected_username);
+	});
+
+	$( "#animals_list" ).change(function() {
+		 selected_color = $( "#colors_list option:selected" ).text();
+ 		 selected_animal = $( "#animals_list option:selected" ).text();
+ 		 selected_username =selected_color+"-"+selected_animal+"-"+"{{inst_id}}";
+		$( "#user_name_text" ).val(selected_username);
+	});
+
+	$(".login-button").click(function(){
+	 mobile_num_text =  $( "#mobile_num_text" ).val();
+	 e_mail_text =  $( "#e_mail_text" ).val();
+
+	if( $( "#first_name_text" ).val() == "" || $( "#last_name_text" ).val() == "" ){
+	alert("First name and last name are compulsory");
+	return false;
+	}
+
+	 if(!mobile_num_text.match(regx_mobile_no) && mobile_num_text ){
+		 alert("Please enter valid Mobile number");
+		 return false;
+	 }
+
+	 if(!e_mail_text.match(regex_e_mail) && e_mail_text ){
+		 alert("Please enter valid E-mail ID");
+		 return false;
+	 }
+
+
+	 if(selected_color && selected_animal)
+	  {
+	  		first_name = $( "#first_name_text" ).val();
+	 		last_name =  $( "#last_name_text" ).val();
+	  		$.ajax({
+            type: "POST",
+            url: "{% url 'clix_student_registration'  %}",
+            datatype: "json",
+            data:{
+              selected_username : selected_username,
+              mobile_num_text : mobile_num_text,
+              e_mail_text : e_mail_text,
+              first_name : first_name,
+              last_name : last_name,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+               resp = JSON.parse(data);
+          		if(resp.success == true){
+          				pass1 = $(".password1").val().trim()
+				      	pass2 = $(".password2").val().trim()
+
+					      if(pass1 === pass2){
+					        if(pass1.indexOf(' ') < 0){
+					          if (pass1.length > 6){
+						              $.ajax({
+								            type: "POST",
+								            url: "{% url 'clix_student_registration'  %}",
+								            datatype: "json",
+								            data:{
+								              register_user : "True",
+								              password1: pass1,
+								              password2:pass2,
+								              selected_username : selected_username,
+								              mobile_num_text : mobile_num_text,
+								              e_mail_text : e_mail_text,
+								              first_name : first_name,
+								              last_name : last_name,
+								              csrfmiddlewaretoken: '{{ csrf_token }}'
+								            }, 
+							             success: function(data) {
+							             		alert(data)
+							             		location.href="{% url 'auth_login' %}";
+							             }
+					            	})
+					          }
+					          else{
+					            alert("Password should be minimum of 6 letters. Please try again.");
+					            return false;
+					          }
+					        }
+					        else{
+					          alert("Password CANNOT contain whitespaces. Please try again.");
+					        	return false;
+					        }
+					      }
+					      else{
+					        alert("Passwords did NOT match. Please try again.");
+					      		return false;
+					      }
+					     
+
+          		}
+
+          		if( resp.success == false){
+	               	alert("Already taken,please choose different username ")
+	               	return false;
+              	}
+
+
+            }
+          });
+	 		<!-- alert(selected_username); -->
+	  	
+	  }
+
+	})
+{% endblock %}
