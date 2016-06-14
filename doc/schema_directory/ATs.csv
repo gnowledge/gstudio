@@ -5,7 +5,7 @@ last_name,Last Name,basestring,[],"[""Person""]",TRUE,TRUE,"[""text"", ""input_o
 gender,Gender,IS(),"[""Male"", ""Female""]","[""Person""]",TRUE,TRUE,[],,
 dob,Date of Birth,datetime.datetime,[],"[""Person""]",TRUE,FALSE,"[""d/m/Y"", ""date_month_day_year""]",DD/MM/YYYY,
 religion,Religion,basestring,[],"[""Person""]",TRUE,TRUE,"[""text"", ""text_allow_space""]",,
-mobile_number,Contact Number (Mobile),long,[],"[""Person"", ""Organization"",""PartnerGroup""]",FALSE,TRUE,"[""tel"", ""input_only_num"", ""[1-9][0-9]{9}""]",Enter 10-digit mobile number,10
+mobile_number,Contact Number (Mobile),long,[],"[""Person"", ""Organization"",""PartnerGroup"",”Author”]",FALSE,TRUE,"[""tel"", ""input_only_num"", ""[1-9][0-9]{9}""]",Enter 10-digit mobile number,10
 alternate_number,Alternate Number / Landline,basestring,[],"[""Person"", ""Organization"",""PartnerGroup""]",FALSE,TRUE,"[""tel"", ""input_only_num"", ""[0-9]{8,12}""]",Enter mobile/landline number (max. 12-digits),12
 email_id,Email ID,basestring,[],"[""Person"", ""Organization"",""PartnerGroup""]",TRUE,TRUE,"[""email"", ""^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$""]",,
 languages_known,Languages Known,list,"[""basestring""]","[""Person""]",TRUE,TRUE,[],,
