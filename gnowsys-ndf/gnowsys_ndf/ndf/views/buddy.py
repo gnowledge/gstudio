@@ -141,3 +141,22 @@ def update_buddies(request, group_id):
     # print "=== result_dict : ", result_dict
 
     return HttpResponse(json.dumps(result_dict))
+
+
+# @get_execution_time
+# @login_required
+def search_authors(request, group_id):
+    selected_ids = request.GET.get('selected_ids', '')
+    selected_ids = selected_ids.split(',')
+    selected_ids = [ObjectId(auth) for auth in selected_ids if auth]
+    return HttpResponse(
+            json_util.dumps(
+                node_collection.find({
+                        '_id': {'$nin': selected_ids},
+                        '_type': 'Author',
+                        'name': {'$regex': unicode(request.GET.get('search_text', u'')), '$options': "i"}
+                    },
+                    {'name': 1, 'content': 1})
+                )
+            )
+
