@@ -17,11 +17,11 @@ if not os.path.exists(csvs_folder_path):
 # generate random characters:
 # print (''.join(choice(all_small_letters) for i in xrange(6)))
 
-# statecode_cum_range_dict = {'mz': (1, 200), 'rj': (201, 500), 'cg': (501, 800), 'ts': (801, 1100), 'sp': (1100, 1300)}
+# statecode_cum_range_dict = {'mz': (1, 200), 'rj': (201, 500), 'ct': (501, 800), 'tg': (801, 1100), 'sp': (1100, 1300)}
 
-statecode_range_dict = {'mz': (1, 200), 'rj': (1, 300), 'cg': (1, 300), 'ts': (1, 300), 'sp': (1, 300)}
+statecode_range_dict = {'mz': (1, 200), 'rj': (1, 300), 'ct': (1, 300), 'tg': (1, 300), 'sp': (1, 300)}
 
-state_startwith_dict = {'mz': 0, 'rj': 200, 'cg': 500, 'ts': 800, 'sp': 1100}
+state_startwith_dict = {'mz': 0, 'rj': 200, 'ct': 500, 'tg': 800, 'sp': 1100}
 
 
 # ------ for generating school codes ------
@@ -111,7 +111,7 @@ def create_users_csv(csv_file_name_path, code, start_user_id, last_user_id, user
                 statewriter.writerow(each_user)
         # print complete_data_list
 
-user_id_creation_order = ['cc', 'mz', 'rj', 'cg', 'ts', 'sp']
+user_id_creation_order = ['cc', 'mz', 'rj', 'ct', 'tg', 'sp']
 # user_id_creation_order = ['cc', 'mz']
 
 create_users_csv(st_usernames, 'cc', start_user_id=2, last_user_id=1000, user_type='users')

@@ -4663,13 +4663,14 @@ def delete_node(
                             if node_to_be_deleted.fs.files.exists(each) and node_collection.find({'fs_file_ids': {'$in': [each]} }).count() == 1:
                                 # print "\tdeleting node in GridFS : ", each
                                 node_to_be_deleted.fs.files.delete(each)
-
                     elif hasattr(node_to_be_deleted, 'if_file'):
                         fh_original_id = node_to_be_deleted.if_file.original.id
                         if node_collection.find({'_type': 'GSystem', 'if_file.original.id': ObjectId(fh_original_id) }).count() == 1:
                             for each_file in ['original', 'mid', 'thumbnail']:
                                 fh_id = node_to_be_deleted.if_file[each_file]['id']
-                                Filehive.delete_file_from_filehive(fh_id)
+                                fh_relurl = node_to_be_deleted.if_file[each_file]['relurl']
+                                if fh_id or fh_relurl:
+                                    Filehive.delete_file_from_filehive(fh_id, fh_relurl)
 
                 # Finally delete the node
                 node_to_be_deleted.delete()

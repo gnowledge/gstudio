@@ -1720,17 +1720,25 @@ class Filehive(DjangoDocument):
 
 
     @staticmethod
-    def delete_file_from_filehive(filehive_id):
+    def delete_file_from_filehive(filehive_id, filehive_relurl):
 
         filehive_obj    = filehive_collection.one({'_id': ObjectId(filehive_id)})
-        file_md5        = str(filehive_obj.md5)
-        filehive_obj_id = str(filehive_obj._id)
+        if filehive_obj:
+            file_md5        = str(filehive_obj.md5)
+            filehive_obj_id = str(filehive_obj._id)
 
-        print "\nDeleted filehive object having '_id': ", filehive_obj_id," from Filehive collection."
-        filehive_obj.delete()
+            print "\nDeleted filehive object having '_id': ", filehive_obj_id," from Filehive collection."
+            filehive_obj.delete()
 
-        gfs.delete(file_md5)
-        print "\nDeleted physical file having 'md5': ", file_md5
+            if gfs.delete(file_md5):
+                print "\nDeleted physical file having 'md5': ", file_md5
+                return True
+
+        if gfs.delete(filehive_relurl):
+            print "\nDeleted physical file having 'relurl': ", filehive_relurl
+            return True
+
+        return False
 
 
     # -- file helper methods --
