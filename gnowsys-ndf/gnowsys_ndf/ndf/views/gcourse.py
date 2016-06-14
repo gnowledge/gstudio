@@ -2447,6 +2447,8 @@ def course_analytics(request, group_id, user_id, render_template=False):
         return HttpResponse(cache_result)
     analytics_data = {}
     user_obj = User.objects.get(pk=int(user_id))
+    analytics_data['username'] = user_obj.username
+
     analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
@@ -2466,8 +2468,6 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
 
     # QuizItem Section
-    
-    analytics_data['username'] = user_obj.username
     analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
     # print "\n Total QuizItemEvents === ", total_quizitems, "\n\n"
     analytics_data['attempted_quizitems'] = analytics_instance.get_attempted_quizitems_count()

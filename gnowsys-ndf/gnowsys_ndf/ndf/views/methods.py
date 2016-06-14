@@ -5391,13 +5391,8 @@ def get_group_join_status(group_obj):
 def get_course_completetion_status(group_obj, user_id,ids_list=False):
     result_dict = {'success': False}
     try:
-      all_cs_count = 0
-      completed_cs_count = 0
-      res_completed_ids = []
-      completed_ids = []
-      incompleted_ids = []
-      all_node_ids = []
       user_obj = User.objects.get(pk=int(user_id))
+      '''
       for cs in group_obj.collection_set:
         cs_node = node_collection.one({'_id': ObjectId(cs)})
         all_node_ids.append(cs_node._id)
@@ -5424,38 +5419,98 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
                       completed_ids.append(res)
                     # else:
                     #   incompleted_ids.append(res)
-                  if sublistExists(completed_ids, cu_node.collection_set):
+                  if all(each_item in completed_ids for each_item in cu_node.collection_set):
                     completed_ids.append(cu_node._id)
                   else:
                     partially_exists = any(each_id in completed_ids for each_id in cu_node.collection_set)
                     if partially_exists:
                       incompleted_ids.append(cu_node._id)
 
-              if sublistExists(completed_ids, css_node.collection_set):
+              if all(each_item in completed_ids for each_item in css_node.collection_set):
                 completed_ids.append(css_node._id)
               else:
                 partially_exists = any(each_id in completed_ids for each_id in css_node.collection_set)
-                if partially_exists or sublistExists(incompleted_ids, css_node.collection_set):
+                if partially_exists or all(each_item in incompleted_ids for each_item in css_node.collection_set):
                   incompleted_ids.append(css_node._id)
 
-          if sublistExists(completed_ids, cs_node.collection_set):
+          if all(each_item in completed_ids for each_item in cs_node.collection_set):
             completed_ids.append(cs_node._id)
           else:
             partially_exists = any(each_id in completed_ids for each_id in cs_node.collection_set)
-            if partially_exists or sublistExists(incompleted_ids, cs_node.collection_set):
+            if partially_exists or all(each_item in incompleted_ids for each_item in cs_node.collection_set):
               incompleted_ids.append(cs_node._id)
+      '''
 
-      return_perc = (completed_cs_count/float(all_cs_count))*100
+
+      all_res = set()
+      regex_res_ids = ''
+      completed_unit_ids = []
+      unit_event_gst = node_collection.one({'_type':"GSystemType", 'name':"CourseUnitEvent"})
+      cs_event_gst = node_collection.one({'_type':"GSystemType", 'name':"CourseSectionEvent"})
+      css_event_gst = node_collection.one({'_type':"GSystemType", 'name':"CourseSubSectionEvent"})
+
+      all_units_of_grp = node_collection.find({'member_of': unit_event_gst._id,'group_set': group_obj._id})
+      all_sessions_of_grp = node_collection.find({'member_of': css_event_gst._id,'group_set': group_obj._id})
+      all_modules_of_grp = node_collection.find({'member_of': cs_event_gst._id,'group_set': group_obj._id})
+
+      unit_info_before_query = {}
+      for each in all_units_of_grp:
+        all_res.update(each.collection_set)
+        unit_info_before_query.update({unicode(each._id): set(map(unicode,each.collection_set))})
+
+      for each_res in all_res:
+        regex_res_ids += '/'+each_res.__str__()+'/$|'
+      regex_res_ids = regex_res_ids[:-1]
+      benchmark_res = benchmark_collection.find({'name':"course_resource_detail", 'calling_url': {'$regex': regex_res_ids}, 'user': user_obj.username, 'group': unicode(group_obj._id)},{'_id':0,'calling_url':1})
+
+      unit_info_after_query = {}
+      for each_benchmark in benchmark_res:
+        calling_url_split = each_benchmark['calling_url'].split('/')
+        if len(calling_url_split) > 5:
+          if calling_url_split[5] in unit_info_after_query.keys():
+            val = unit_info_after_query[unicode(calling_url_split[5])]
+          else:
+            val = set()
+          val.add(calling_url_split[6])
+          unit_info_after_query.update({unicode(calling_url_split[5]):val})
+
+      for each_unit in unit_info_after_query:
+        if each_unit in unit_info_before_query:
+          if unit_info_after_query[each_unit] == unit_info_before_query[each_unit]:
+            completed_unit_ids.append(ObjectId(each_unit))
+      completed_sessions_ids_final = []
+      completed_units_cur = node_collection.find({'_id': {'$in': completed_unit_ids}},{'_id':0, 'prior_node':1})
+      completed_sessions_ids = [each_completed_unit_node.prior_node[0] for each_completed_unit_node in completed_units_cur]
+      completed_sessions_cur = node_collection.find({'_id': {'$in': completed_sessions_ids},'member_of': css_event_gst._id})
+
+      for each_session in completed_sessions_cur:
+        if all(each_u_id in completed_unit_ids for each_u_id in each_session.collection_set):
+          completed_sessions_ids_final.append(each_session._id)
+
+      completed_sessions_cur_final = node_collection.find({'_id': {'$in': completed_sessions_ids_final},'member_of': css_event_gst._id})
+      completed_modules_ids = [each_completed_session_node.prior_node[0] for each_completed_session_node in completed_sessions_cur_final]
+      completed_modules_cur = node_collection.find({'_id': {'$in': completed_modules_ids},'member_of': cs_event_gst._id})
+      completed_modules = []
+      for each_module in completed_modules_cur:
+        if all(each_m_id in completed_sessions_ids_final for each_m_id in each_module.collection_set):
+          completed_modules.append(each_module._id)
+
+
+      # print "\nTotal modules : ", all_modules_of_grp.count()
+      # print "\nCompleted modules : ", len(completed_modules_ids)
+
+      # print "\nTotal Units : ", all_units_of_grp.count()
+      # print "\nCompleted Units : ", len(completed_unit_ids)
+
+      return_perc = (len(completed_modules_ids)/float(all_modules_of_grp.count()))*100
 
       # print "\n\n return_perc==== ",return_perc
       result_dict['course_complete_percentage'] = return_perc
-      result_dict['completed_count'] = completed_cs_count
-      result_dict['total_count'] = all_cs_count
+      result_dict['modules_completed_count'] = len(completed_modules_ids)
+      result_dict['modules_total_count'] = all_modules_of_grp.count()
+      result_dict['units_completed_count'] = len(completed_modules_ids)
+      result_dict['units_total_count'] = all_modules_of_grp.count()
 
-      if ids_list:
-        result_dict['completed_ids_list'] = json.dumps(completed_ids,cls=NodeJSONEncoder)
-        result_dict['incompleted_ids_list'] = json.dumps(incompleted_ids,cls=NodeJSONEncoder)
-        result_dict['list_of_leaf_node_ids'] = json.dumps(res_completed_ids,cls=NodeJSONEncoder)
       result_dict.update({'success': False})
       # print "\n\nresult_dict == ",result_dict
       return result_dict
