@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.views.methods import get_execution_time
 from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID
 
 @login_required
-def list_buddy(request, group_id):
+def list_buddy(request, group_id='home'):
 
     '''
     fetching all buddies.
