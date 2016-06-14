@@ -144,16 +144,10 @@
 					
 					<div class="row">
 						<div class="small-12 medium-12 large-12 text-center columns end login-button">
-							<input type="" class="button small expand" tabindex= "4" value="{% trans "Login" %}" style="font-size:15px" />
+							<input type="" class="button small expand" tabindex= "4" value="{% trans "Register" %}" style="font-size:15px" />
 						</div>
 					</div>
-					<div class="row">
-						<div class="medium-12 large-12 small-text-left text-center columns end forgot-password">
-							<label>
-								<a title={% trans "Recover your password" %} href="{{ auth_pwd_reset_url }}">{% trans "Forgot your password?" %}</a>
-							</label>
-						</div>
-					</div>
+					
 					<!-- Login button -->
 
 					<input type="hidden" name="next" value="{{ next }}" />
@@ -171,16 +165,11 @@
 	 selected_animal = $( "#animals_list option:selected" ).text();
 	 first_name = $( "#first_name_text" ).val();
 	 last_name =  $( "#last_name_text" ).val();
-	 mobile_num_text =  $( "#mobile_num_text" ).val();
-	 e_mail_text =  $( "#e_mail_text" ).val();
 	 user_name =  $( "#user_name_text" ).val();
 	 regx_mobile_no =  /^(\+91-|\+91|0)?\d{10}$/;
 	 selected_username =selected_color+"-"+selected_animal+"-"+"{{inst_id}}"; 
 	 regex_e_mail = /\S+@\S+\.\S+/;
 	
-	if(selected_color && selected_animal){
-		$( "#user_name_text" ).val(selected_username);
-	}
 	
 	$( "#colors_list" ).change(function() {
 		 selected_color = $( "#colors_list option:selected" ).text();
@@ -197,6 +186,9 @@
 	});
 
 	$(".login-button").click(function(){
+	 mobile_num_text =  $( "#mobile_num_text" ).val();
+	 e_mail_text =  $( "#e_mail_text" ).val();
+	 
 	if( $( "#first_name_text" ).val() == "" || $( "#last_name_text" ).val() == "" ){
 	alert("First name and last name are compulsory");
 	return false;
@@ -255,6 +247,7 @@
 								            }, 
 							             success: function(data) {
 							             		alert(data)
+							             		location.href="{% url 'auth_login' %}";
 							             }
 					            	})
 					          }
