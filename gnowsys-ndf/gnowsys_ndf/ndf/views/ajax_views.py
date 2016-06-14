@@ -6340,7 +6340,7 @@ def clix_student_registration(request):
           mobile_no_AT = node_collection.one({'_type':'AttributeType','name':'mobile_number'})
           mobile_no_gatt = create_gattribute(auth_obj._id, mobile_no_AT, selected_mobile_no)
           auth_obj.save()
-      response_dict['success'] = "user mapped"
+      response_dict['success'] = "User registered successfully"
       return HttpResponse(json.dumps( response_dict ))
     
     else:
