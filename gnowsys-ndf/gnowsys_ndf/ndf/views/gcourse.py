@@ -2586,7 +2586,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
 
     del analytics_instance
-    cache.set(cache_key, analytics_data, 60*15)
+    cache.set(cache_key, analytics_data, 60*10)
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)
@@ -2658,7 +2658,7 @@ def course_analytics_admin(request, group_id):
     response_dict['max_points_dict'] = max_points_dict
 
     response_dict = json.dumps(response_dict)
-    cache.set(cache_key, response_dict, 60*15)
+    cache.set(cache_key, response_dict, 60*10)
 
     # print "\n admin_analytics_list === ",admin_analytics_list
     return HttpResponse(response_dict)
