@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.views.methods import get_execution_time
 from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID
 
 @login_required
-def list_buddy(request, group_id):
+def list_buddy(request, group_id='home'):
 
     '''
     fetching all buddies.
@@ -152,7 +152,7 @@ def update_buddies(request, group_id):
 def search_authors(request, group_id):
     selected_ids = request.GET.get('selected_ids', '')
     selected_ids = selected_ids.split(',')
-    selected_ids = [ObjectId(auth) for auth in selected_ids]
+    selected_ids = [ObjectId(auth) for auth in selected_ids if auth]
     return HttpResponse(
             json_util.dumps(
                 node_collection.find({

@@ -6334,4 +6334,26 @@ def upload_file_ckeditor(request,group_id):
 #     # return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
 #     return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':gs_obj_id}) )
 
+@login_required
+def search_users(request, group_id):
+    if request.is_ajax() and request.method == "GET":
+        from bson import json_util
+        username_str = request.GET.get("username_str", '')
+        filtered_users = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
+        # print "filtered_users ;; ", len(filtered_users)
+        return HttpResponse(json_util.dumps(filtered_users, cls=NodeJSONEncoder))
+
+
+@login_required
+def save_user_password(request, group_id):
+    response_dict = {'success': False}
+    if request.is_ajax() and request.method == "POST":
+        user_id = request.POST.get("stud_id", '')
+        new_password = request.POST.get("new_password", '')
+        user_obj = User.objects.get(pk=int(user_id))
+        user_obj.set_password(str(new_password))
+        # print "\n\n new_password ", new_password
+        user_obj.save()
+        response_dict['success'] = True
+    return HttpResponse(json.dumps(response_dict))
 

@@ -131,13 +131,17 @@
                   <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
                 </li>
                 <li>
-                  <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% trans ' Subscribe Users' %}</a>
+                  <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% trans ' Add Students' %}</a>
                   {% include "ndf/invite_users.html" with no_subscribe_btn=True node=group_obj%}
                 </li>
                 <li>
-                  <a id="subscr_admins" data-reveal-id="inviteadmins" title="View/Subscribe Admins" class="fi-torsos">{% trans ' Subscribe Admins' %}</a>
+                  <a id="subscr_admins" data-reveal-id="inviteadmins" title="View/Subscribe Admins" class="fi-torsos">{% trans ' Add Admins' %}</a>
                   {% include "ndf/invite_admins.html" with no_subscribe_btn=True node=group_obj %}
                 </li>
+                <li>
+                  <a href="{% url 'manage_users' group_id %}" class="fi-torso"> Manage Students</a>
+                </li>
+
               </ul>
             </div>
         </div>

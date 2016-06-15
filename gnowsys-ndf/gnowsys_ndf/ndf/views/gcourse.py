@@ -2441,15 +2441,32 @@ def course_filters(request, group_id):
 @login_required
 @get_execution_time
 def course_analytics(request, group_id, user_id, render_template=False):
+    from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
+
     cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
     analytics_data = {}
+    data_points_dict = request.GET.get('data_points_dict', {})
+
+    if data_points_dict and not isinstance(data_points_dict, dict):
+        data_points_dict = json.loads(data_points_dict)
+        print "\n\ndata_points_dict",data_points_dict
+        analytics_data['correct_attempted_quizitems'] = (data_points_dict['quiz_points'] / GSTUDIO_QUIZ_CORRECT_POINTS)
+        analytics_data['user_notes'] = (data_points_dict['notes_points'] / GSTUDIO_NOTE_CREATE_POINTS)
+        analytics_data['user_files'] = (data_points_dict['files_points'] / GSTUDIO_FILE_UPLOAD_POINTS)
+        analytics_data['total_cmnts_by_user'] = (data_points_dict['interactions_points'] / GSTUDIO_COMMENT_POINTS)
+        analytics_data['users_points'] = data_points_dict['users_points']
+
     user_obj = User.objects.get(pk=int(user_id))
+    analytics_data['username'] = user_obj.username
+
     analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
+
+    # TO IMPROVE
     completed_modules = analytics_instance.get_completed_modules_count()
 
     # Units Section
@@ -2469,31 +2486,35 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
     analytics_data['username'] = user_obj.username
     analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
-    # print "\n Total QuizItemEvents === ", total_quizitems, "\n\n"
+    # print "\n Total QuizItemEvents === ", analytics_data['total_quizitems'], "\n\n"
     analytics_data['attempted_quizitems'] = analytics_instance.get_attempted_quizitems_count()
-    # print "\n Attempted QuizItemEvents === ", attempted_quizitems, "\n\n"
-    analytics_data['correct_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(True,False)
-    # print "\n Correct Attempted QuizItemEvents === ", correct_attempted_quizitems, "\n\n"
+    # print "\n Attempted QuizItemEvents === ", analytics_data['attempted_quizitems'], "\n\n"
+    if 'correct_attempted_quizitems' not in analytics_data:
+        analytics_data['correct_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(True,False)
+    # print "\n Correct Attempted QuizItemEvents === ", analytics_data['correct_attempted_quizitems'], "\n\n"
     analytics_data['incorrect_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(False,True)
-    # print "\n InCorrect Attempted QuizItemEvents === ", incorrect_attempted_quizitems, "\n\n"
+    # print "\n InCorrect Attempted QuizItemEvents === ", analytics_data['incorrect_attempted_quizitems'], "\n\n"
 
 
     # Notes Section
     # analytics_data['total_notes'] = analytics_instance.get_total_notes_count()
     # print "\n Total Notes === ", total_notes, "\n\n"
-    analytics_data['user_notes'] = analytics_instance.get_user_notes_count()
+    if 'user_notes' not in analytics_data:
+        analytics_data['user_notes'] = analytics_instance.get_user_notes_count()
     # print "\n User Notes === ", user_notes, "\n\n"
 
 
     # Files Section
     # analytics_data['total_files'] = analytics_instance.get_total_files_count()
     # print "\n Total Files === ", total_files, "\n\n"
-    analytics_data['user_files'] = analytics_instance.get_user_files_count()
+    if 'user_files' not in analytics_data:
+        analytics_data['user_files'] = analytics_instance.get_user_files_count()
     # print "\n User's Files === ", user_files, "\n\n"
 
 
     # Comments
-    analytics_data['total_cmnts_by_user'] = analytics_instance.get_total_comments_by_user()
+    if 'total_cmnts_by_user' not in analytics_data:
+        analytics_data['total_cmnts_by_user'] = analytics_instance.get_total_comments_by_user()
     # print "\n Total Comments By User === ", total_cmnts_by_user, "\n\n"
 
     # Comments on Notes Section
@@ -2510,15 +2531,19 @@ def course_analytics(request, group_id, user_id, render_template=False):
     # print "\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files, "\n\n"
 
     # BY User
+    # TO IMPROVE
     analytics_data['total_notes_read_by_user'] = analytics_instance.get_others_notes_read_count()
     # print "\n Total Notes read by User === ", total_notes_read_by_user, "\n\n"
 
+    # TO IMPROVE
     analytics_data['total_files_viewed_by_user'] = analytics_instance.get_others_files_read_count()
     # print "\n Total Files viewed by User === ", total_files_viewed_by_user, "\n\n"
 
+    # TO IMPROVE
     analytics_data['other_viewing_my_files'] = analytics_instance.total_users_visted_my_files()
     # print "\n Total Users viewing My FILES === ", other_viewing_my_files, "\n\n"
 
+    # TO IMPROVE
     analytics_data['others_reading_my_notes'] = analytics_instance.total_users_read_my_notes()
     # print "\n Total Users reading My NOTES === ", others_reading_my_notes, "\n\n"
 
@@ -2551,7 +2576,9 @@ def course_analytics(request, group_id, user_id, render_template=False):
     else:
         analytics_data['unit_progress_meter'] = 0
 
-    analytics_data['users_points'] = analytics_instance.get_users_points()
+    if "users_points" not in analytics_data:
+        analytics_data['users_points'] = analytics_instance.get_users_points()
+
     analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
 
     del analytics_instance
@@ -2663,3 +2690,20 @@ def get_resource_completion_status(request, group_id):
                 # print "\n\nb.count()",b.count()
                 result_dict['COMPLETED'].append(each_cr)
     return HttpResponse(json.dumps(result_dict))
+
+@get_execution_time
+def manage_users(request, group_id):
+    if request.method == "GET":
+        group_obj   = get_group_name_id(group_id, get_obj=True)
+        group_id    = group_obj._id
+        group_name  = group_obj.name
+        context_variables = {
+                'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            }
+        template = 'ndf/users_mgmt.html'
+
+        return render_to_response(template, 
+                                    context_variables,
+                                    context_instance = RequestContext(request)
+        )
+

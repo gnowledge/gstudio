@@ -398,7 +398,6 @@ HOW TO USE
       {
 
       var xhr = new XMLHttpRequest();
-      xhr.onreadystatechange = ensureReadiness;
 
       function ensureReadiness() {
           if(xhr.readyState < 4) { return; }
@@ -413,6 +412,8 @@ HOW TO USE
               ajax_data.forEach(function(i){createItemElements(i.name, i.content||'', i._id.$oid, '{{for}}')})
           }
       }
+
+      xhr.onreadystatechange = ensureReadiness;
       var selectedIds = getSelectedValues(selectorWidgetFor);
       // console.log(selectedIds);
       xhr.open('GET', ajax_url + '?search_text=' + toBeSearch + '&selected_ids=' + selectedIds, true);
