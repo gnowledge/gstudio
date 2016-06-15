@@ -2446,7 +2446,11 @@ def course_analytics(request, group_id, user_id, render_template=False):
     cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
     cache_result = cache.get(cache_key)
     if cache_result:
-        return HttpResponse(cache_result)
+        return render_to_response("ndf/user_course_analytics.html",
+                                cache_result,
+                                context_instance = RequestContext(request)
+                            )
+
     analytics_data = {}
     data_points_dict = request.GET.get('data_points_dict', {})
 
@@ -2582,7 +2586,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
 
     del analytics_instance
-    cache.set(cache_key, json.dumps(analytics_data), 60*15)
+    cache.set(cache_key, analytics_data, 60*15)
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)
