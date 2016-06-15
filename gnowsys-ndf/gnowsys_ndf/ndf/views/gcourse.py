@@ -2634,7 +2634,6 @@ def course_analytics_admin(request, group_id):
                 INTERACTIONS_MAX_POINT_VAL = users_points_breakup['Interactions']
             del analytics_instance
             admin_analytics_list.append(admin_analytics_data)
-    cache.set(cache_key, json.dumps(admin_analytics_list), 60*15)
     # print "\n\nadmin_analytics_list ",admin_analytics_list
 
     column_headers = [
@@ -2653,8 +2652,12 @@ def course_analytics_admin(request, group_id):
     response_dict["success"] = True
     response_dict["students_data_set"] = admin_analytics_list
     response_dict['max_points_dict'] = max_points_dict
+
+    response_dict = json.dumps(response_dict)
+    cache.set(cache_key, response_dict, 60*15)
+
     # print "\n admin_analytics_list === ",admin_analytics_list
-    return HttpResponse(json.dumps(response_dict))
+    return HttpResponse(response_dict)
 
 @login_required
 @get_execution_time
@@ -2702,7 +2705,7 @@ def manage_users(request, group_id):
             }
         template = 'ndf/users_mgmt.html'
 
-        return render_to_response(template, 
+        return render_to_response(template,
                                     context_variables,
                                     context_instance = RequestContext(request)
         )
