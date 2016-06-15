@@ -2446,7 +2446,11 @@ def course_analytics(request, group_id, user_id, render_template=False):
     cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
     cache_result = cache.get(cache_key)
     if cache_result:
-        return HttpResponse(cache_result)
+        return render_to_response("ndf/user_course_analytics.html",
+                                cache_result,
+                                context_instance = RequestContext(request)
+                            )
+
     analytics_data = {}
     data_points_dict = request.GET.get('data_points_dict', {})
 
@@ -2582,7 +2586,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
 
     del analytics_instance
-    cache.set(cache_key, json.dumps(analytics_data), 60*15)
+    cache.set(cache_key, analytics_data, 60*10)
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)
@@ -2634,7 +2638,6 @@ def course_analytics_admin(request, group_id):
                 INTERACTIONS_MAX_POINT_VAL = users_points_breakup['Interactions']
             del analytics_instance
             admin_analytics_list.append(admin_analytics_data)
-    cache.set(cache_key, json.dumps(admin_analytics_list), 60*15)
     # print "\n\nadmin_analytics_list ",admin_analytics_list
 
     column_headers = [
@@ -2653,8 +2656,12 @@ def course_analytics_admin(request, group_id):
     response_dict["success"] = True
     response_dict["students_data_set"] = admin_analytics_list
     response_dict['max_points_dict'] = max_points_dict
+
+    response_dict = json.dumps(response_dict)
+    cache.set(cache_key, response_dict, 60*10)
+
     # print "\n admin_analytics_list === ",admin_analytics_list
-    return HttpResponse(json.dumps(response_dict))
+    return HttpResponse(response_dict)
 
 @login_required
 @get_execution_time
@@ -2702,7 +2709,7 @@ def manage_users(request, group_id):
             }
         template = 'ndf/users_mgmt.html'
 
-        return render_to_response(template, 
+        return render_to_response(template,
                                     context_variables,
                                     context_instance = RequestContext(request)
         )
