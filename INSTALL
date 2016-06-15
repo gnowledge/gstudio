@@ -160,6 +160,7 @@
 
   (4) Run following management commands:
 
+      > python manage.py create_index
       > python manage.py syncdb
       > python manage.py filldb
       > python manage.py sync_existing_documents
