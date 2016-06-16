@@ -6,7 +6,7 @@ from django.contrib.sites.models import Site
 
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.models import Node
-from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_collection
 import json
 
 import ox
@@ -18,7 +18,7 @@ import pandora_client
 from PIL import Image, ImageDraw
 from StringIO import StringIO
 
-from gnowsys_ndf.settings import MEDIA_ROOT 
+from gnowsys_ndf.settings import MEDIA_ROOT
 
 
 try:
@@ -75,7 +75,10 @@ def convertVideo(userid, file_id, filename):
     fileVideoName = str(objid)
     initialFileName = str(objid)
 
-    files =  fileobj.fs.files.get(ObjectId(fileobj.fs_file_ids[0]))
+    if hasattr(fileobj, 'fs_file_ids'):
+        files =  fileobj.fs.files.get(ObjectId(fileobj.fs_file_ids[0]))
+    elif hasattr(fileobj, 'if_file'):
+        files = fileobj.get_file(fileobj.if_file['original']['relurl'])
     
     # -- create tmp directory
     os.system("mkdir -p "+ "/tmp"+"/"+str(userid)+"/"+fileVideoName+"/")
@@ -87,7 +90,9 @@ def convertVideo(userid, file_id, filename):
         fd.write(line)
     fd.close()
     # -- convert tmp_file tmp_webm file in local disk
-    if files.filename.endswith('.webm') == False:
+
+    if (hasattr(files, 'name') and (files.name.endswith('.webm') == False)) or \
+        (hasattr(files, 'filename') and (files.filename.endswith('.webm') == False)):
         input_filename = str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
         output_filename = str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".webm")
         proc = subprocess.Popen(['ffmpeg', '-y', '-i', input_filename,output_filename])
@@ -97,7 +102,11 @@ def convertVideo(userid, file_id, filename):
         files = open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
     
     filetype = "video"
-    oxData = ox.avinfo("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
+    filepath = "/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName
+    # print "filepath: ", filepath
+    # print "======== ", os.path.isfile(filepath)
+    oxData = ox.avinfo(filepath)
+    # print "============ oxData: ", oxData
     duration = oxData['duration'] # fetching duration of video by python ox
     duration = int(duration)
     secs, mins, hrs = 00, 00, 00
@@ -113,13 +122,14 @@ def convertVideo(userid, file_id, filename):
     durationTime = str(str(hrs)+":"+str(mins)+":"+str(secs)) # calculating Time duration of video in hrs,mins,secs
 
     if duration > 30 :
-	videoDuration = "00:00:30"
+        videoDuration = "00:00:30"
     else :
-    	videoDuration = "00:00:00"    	
+        videoDuration = "00:00:00"      
     proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".png")]) # GScreating thumbnail of video using ffmpeg
     proc.wait()
+
     background = Image.open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".png")
-    fore = Image.open(MEDIA_ROOT + "ndf/images/poster.jpg")
+    fore = Image.open("gnowsys_ndf/ndf/static/ndf/images/poster.jpg")
     background.paste(fore, (120, 100))
     draw = ImageDraw.Draw(background)
     draw.text((120, 100), durationTime, (255, 255, 255)) # drawing duration time on thumbnail image
@@ -128,39 +138,17 @@ def convertVideo(userid, file_id, filename):
     
     webmfiles = files
     '''storing thumbnail of video with duration in saved object'''
-    th_gridfs_id = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="image/png") 
-
-    # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':th_gridfs_id}})
-
-    # print "fileobj.fs_file_ids: ", fileobj.fs_file_ids
-    node_fs_file_ids = fileobj.fs_file_ids
-
-    if len(node_fs_file_ids) == 1:
-        node_fs_file_ids.append(ObjectId(th_gridfs_id))
-    elif len(node_fs_file_ids) > 1:
-        node_fs_file_ids[1] = ObjectId(th_gridfs_id)
-
-    # print "node_fs_file_ids: ", node_fs_file_ids
-
-    node_collection.collection.update(
-                                        {'_id': ObjectId(fileobj._id)},
-                                        {'$set': {'fs_file_ids': node_fs_file_ids}}
-                                    )
-
     
-    if filename.endswith('.webm') == False:
-
-
-        vid_gridfs_id = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
-
-        fileobj.reload()
-        # print "fileobj.fs_file_ids: ", fileobj.fs_file_ids
+    # th_gridfs_id = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="image/png") 
+    
+    if hasattr(fileobj, 'fs_file_ids'):
+        th_gridfs_id = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="image/png") 
         node_fs_file_ids = fileobj.fs_file_ids
 
-        if len(node_fs_file_ids) == 2:
-            node_fs_file_ids.append(ObjectId(vid_gridfs_id))
-        elif len(node_fs_file_ids) > 2:
-            node_fs_file_ids[2] = ObjectId(vid_gridfs_id)
+        if len(node_fs_file_ids) == 1:
+            node_fs_file_ids.append(ObjectId(th_gridfs_id))
+        elif len(node_fs_file_ids) > 1:
+            node_fs_file_ids[1] = ObjectId(th_gridfs_id)
 
         # print "node_fs_file_ids: ", node_fs_file_ids
 
@@ -168,7 +156,120 @@ def convertVideo(userid, file_id, filename):
                                             {'_id': ObjectId(fileobj._id)},
                                             {'$set': {'fs_file_ids': node_fs_file_ids}}
                                         )
+        # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':th_gridfs_id}})
 
-        # --saving webm video id into file object
-        # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':vid_gridfs_id}})
+        # print "fileobj.fs_file_ids: ", fileobj.fs_file_ids
+
+    elif hasattr(fileobj, 'if_file'):
+        thumbnail_filehive_obj = filehive_collection.collection.Filehive()
+        thumbnail_file = thumbnailvideo
+
+        mime_type = 'image/png'
+        file_name = unicode( filename + '-thumbnail' )
+        thumbnail_file_extension = '.png'
+
+        thumbnail_filehive_id_url_dict = thumbnail_filehive_obj.save_file_in_filehive(
+            file_blob=thumbnail_file,
+            file_name=file_name,
+            first_uploader=userid,
+            first_parent=fileobj._id,
+            mime_type=mime_type,
+            file_extension=thumbnail_file_extension,
+            if_image_size_name='thumbnail'
+            )
+
+        # print "==== ", thumbnail_filehive_id_url_dict
+
+        node_collection.collection.update(
+                                            {'_id': ObjectId(fileobj._id)},
+                                            {'$set': {'if_file.thumbnail': thumbnail_filehive_id_url_dict}}
+                                        )
+
+    if filename.endswith('.webm') == False:
+
+        if hasattr(fileobj, 'fs_file_ids'):
+            vid_gridfs_id = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+
+            fileobj.reload()
+            # print "fileobj.fs_file_ids: ", fileobj.fs_file_ids
+            node_fs_file_ids = fileobj.fs_file_ids
+
+            if len(node_fs_file_ids) == 2:
+                node_fs_file_ids.append(ObjectId(vid_gridfs_id))
+            elif len(node_fs_file_ids) > 2:
+                node_fs_file_ids[2] = ObjectId(vid_gridfs_id)
+
+            # print "node_fs_file_ids: ", node_fs_file_ids
+
+            node_collection.collection.update(
+                                                {'_id': ObjectId(fileobj._id)},
+                                                {'$set': {'fs_file_ids': node_fs_file_ids}}
+                                            )
+
+            # --saving webm video id into file object
+            # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':vid_gridfs_id}})
+
+        elif hasattr(fileobj, 'if_file'):
+            webm_filehive_obj = filehive_collection.collection.Filehive()
+            fileobj.reload()
+            midsize_file = webmfiles
+
+            mime_type = webm_filehive_obj.get_file_mimetype(midsize_file)
+            file_name = unicode( filename + '.webm' )
+            mid_file_extension = '.webm'
+
+            mid_filehive_id_url_dict = webm_filehive_obj.save_file_in_filehive(
+                file_blob=midsize_file,
+                file_name=file_name,
+                first_uploader=userid,
+                first_parent=fileobj._id,
+                mime_type=mime_type,
+                file_extension=mid_file_extension,
+                if_image_size_name='mid'
+                )
+
+            # print "==== ",  mid_filehive_id_url_dict
+
+            node_collection.collection.update(
+                                                {'_id': ObjectId(fileobj._id)},
+                                                {'$set': {'if_file.mid': mid_filehive_id_url_dict}}
+                                            )
+
+            # print fileobj
+            
+            
+
+
+
+# TODO: following task too need to manage/work/run from same file.
+#       currently, its present in gnowsys_ndf.tasks
+
+# from gnowsys_ndf.settings import SYNCDATA_DURATION
+# from celery.decorators import periodic_task
+# from gnowsys_ndf.celery import app
+# from datetime import timedelta
+# # @task
+# @periodic_task(run_every=timedelta(seconds=SYNCDATA_DURATION))
+# def run_syncdata_script():
+#     #check if last scan file is update
+#     #if not skip the execution the script might be running 
+#     #or stuck  
+#     #manage directory path
+
+#     data_fetch_script_name = 'fetch_data'
+#     command = "python manage.py " + data_fetch_script_name
+#     subprocess.call([command],shell=True)
+#     print data_fetch_script_name + ' executed.'
+
+#     syncdata_sending_script_name = 'send_syncdata'
+#     command1 = "python manage.py " + syncdata_sending_script_name
+#     subprocess.call([command1],shell=True)
+#     print syncdata_sending_script_name + ' executed.'
+
+#     syncdata_fetching_script_name = 'fetch_syncdata'
+#     command2 = "python manage.py " + syncdata_fetching_script_name
+#     subprocess.call([command2],shell=True)
+#     print syncdata_fetching_script_name + ' executed.'
+
+#     return 'Both scripts executed'
 

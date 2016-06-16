@@ -50,7 +50,7 @@
 
       <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
       <!-- {#% cache 3600 top_header request.LANGUAGE_CODE request.path request.user.username %} -->
-      {% if site.SITE_NAME == "NROER" %}
+      {% if site.SITE_NAME == "NROER" and group_name_tag == 'home' %}
 
         <!-- NROER level one menu -->
         {% get_nroer_menu request group_name_tag as nroer_menu %}
@@ -108,7 +108,7 @@
         </ul>
         <!-- -END of NROER level one menu -->
       {% comment %}
-        
+
       {% if "CourseEventGroup" in group_object.member_of_names_list %}
       <ul class="left">
 
@@ -189,23 +189,23 @@
             </li>
             {% endif %}
 
-          
+
           {% if site.MY_COURSES_IN_HEADER %}
             <li>
               <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'course' request.user.username %}">
                 {% trans 'MY COURSES' %}
               </a>
             </li>
-          {% endif %}        
-                  
+          {% endif %}
+
           {% if site.MY_GROUPS_IN_HEADER %}
             <li>
               <a title="{{title}}" class="{%if title == 'My Groups'%}active{%endif%}" href="{% url 'my_groups' request.user.username %}">
                 {% trans 'MY GROUPS' %}
               </a>
             </li>
-          {% endif %}        
-        
+          {% endif %}
+
         {% endif %}
 
 
@@ -238,12 +238,12 @@
           {% if prof_pic %}
             {% if site.ENABLE_USER_DASHBOARD %}
               <a href="{% url 'dashboard' request.user.pk %}">
-                <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
+                <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
                 {{ user.username }}
               </a>
             {% else %}
               <a>
-                <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
+                <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
                 {{ user.username }}</a>
             {% endif %}
 
@@ -266,9 +266,17 @@
             <li class="text-center">
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
             </li>
+            {% comment %}
+            <!-- CHANGE DONE HERE, MAILCLIENT ADDED -->
+            {% if user.is_authenticated %}
+            <li class="text-center">
+              <a href="/{{ user.username }}/mailclient">{% trans "MailClient" %}</a>
+            {% endif %}
+
             <li class="text-center">
               <a href='/{{group_id}}/analytics/summary'>{% trans "Analytics" %}</a>
             </li>
+
             {% if user.is_superuser %}
               <li class="text-center">
                 <a href="/admin/data">{% trans "Admin Data" %}</a>
@@ -282,11 +290,40 @@
                 </li>
               {% endif %}
             {% endif %}
+            {% endcomment %}
+
+            {% if site.BUDDY_LOGIN and user.is_authenticated %}
+
+              <li>
+                <a href="#" data-reveal-id="add-buddy" data-reveal-ajax="{% url 'list_buddy' 'home' %}">
+                  + Add your buddy ({{request.session.buddies_authid_list|length}})
+                </a>
+
+                <div id="add-buddy" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+
+                </div>
+
+              </li>
+
+              <blockquote>
+                <ul>
+                  {% for i, each_buddy in request.session.buddies_authid_name_dict.items %}
+                  <li class="text-left">
+                    <h5><small class="fi-torso"> {{each_buddy}}</small></h5>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </blockquote>
+                  {# --{{request.session.buddies_authid_name_dict}}-- #}
+            {% endif %}
+
             <li>
               <a class="logout" href="{% url 'auth_logout' %}">
                 <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
               </a>
             </li>
+
+
           </ul>
         </li>
 
@@ -325,7 +362,7 @@
          -->
         <!-- Closes Right Nav section -->
 
-
+{% if "CourseEventGroup" not in group_object.member_of_names_list and site.SITE_NAME != "clix" %}
         <ul class="right">
           <li class="has-dropdown">
             <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
@@ -345,8 +382,8 @@
             </ul>
           </li>
         </ul>
+{% endif %}
 
-        
         <!-- Right Nav Section -->
         <ul class="right">
           <li>
@@ -389,7 +426,7 @@
 
                           {% get_relation_value group_object.pk 'has_profile_pic' as grel_dict %}
                           {% if not grel_dict.cursor and grel_dict.grel_node %}
-                                    <img src="{% url 'getFileThumbnail' group_id grel_dict.grel_node.pk %}" />
+                                    <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.original.relurl}}" />
                           {% else %}
                                     <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
                           {% endif %}
@@ -480,8 +517,8 @@
                   <li class="" onclick="history.back();">
                     <a href="javascript:window.history.back();"><i class="fa fa-angle-left back-btn"></i> {% trans "BACK" %}</a>
                   </li>
-                  {% if site.SITE_NAME == "NROER" %}
-                    {% if group_name_tag == "home" or "CourseEventGroup" not in group_object.member_of_names_list or "ProgramEventGroup" not in list_of_sg_member_of %}
+                  {% if site.SITE_NAME == "NROER" and group_name_tag == 'home' %}
+                    {% if "CourseEventGroup" not in group_object.member_of_names_list or "ProgramEventGroup" not in list_of_sg_member_of %}
                     <!-- NROER level-two menu -->
                       {% if "repository" not in request.path %}
                         {% if "/partner/" not in request.path %}

@@ -1,10 +1,18 @@
 from registration.signals import user_registered, user_activated
-from django.dispatch import receiver
-from gnowsys_ndf.ndf.models import *
 
+from django.dispatch import receiver
+from django.contrib.auth.signals import user_logged_out
+
+from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN
+
+from django.contrib.auth.signals import user_logged_in
 '''
-from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+
+from django.contrib.auth.signals import user_login_failed
+
 from django.core.mail import send_mail
+
 @receiver(user_login_failed)
 def login_fail(sender, credentials, **kwargs):
     print "\n\n LOGIN FAILED"
@@ -13,15 +21,8 @@ def login_fail(sender, credentials, **kwargs):
     send_mail('Login Failed ', 'credentials'+ str(credentials), 'from@example.com',
     ['to@example.com'], fail_silently=False)
 
-@receiver(user_logged_out)
-def logged_out(sender, user, request, **kwargs):
-    print "\n\n LOGGED OUT"
-
-@receiver(user_logged_in)
-def logged_in(sender, user, request, **kwargs):
-    print "\n\n LOGGED IN"
-
 '''
+
 @receiver(user_registered)
 def user_registered_handler(sender, user, request, **kwargs):
     '''
@@ -79,7 +80,7 @@ def create_auth_grp(sender, user, request, **kwargs):
         auth.group_admin.append(user_id)
         auth.preferred_languages = {'primary': ('en', 'English')}
 
-        # Get group_type and group_affiliation stored in node_holder for this author 
+        # Get group_type and group_affiliation stored in node_holder for this author
         try:
             temp_details = node_collection.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':user_id}]})
             if temp_details:
@@ -89,7 +90,7 @@ def create_auth_grp(sender, user, request, **kwargs):
             print "Error in getting node_holder details for author " + str(e)
         auth_id = ObjectId()
         auth._id = auth_id
-        auth.save(groupid=auth._id) 
+        auth.save(groupid=auth._id)
         # print "\n\n auth===", auth
 
         # as on when user gets register on platform make user member of two groups:
@@ -110,3 +111,30 @@ def create_auth_grp(sender, user, request, **kwargs):
             desk_group_obj.reload()
 
 
+
+# @receiver(user_logged_in)
+# def logged_in(sender, user, request, **kwargs):
+#     # print "\n\n LOGGED IN"
+#     if GSTUDIO_BUDDY_LOGIN:
+#         DjangoActiveUsersGroup.addto_user_set(request.user.id)
+
+
+
+@receiver(user_logged_out)
+def logged_out(sender, user, request, **kwargs):
+    if GSTUDIO_BUDDY_LOGIN:
+        # print "session_key", request.session.session_key
+        # print "userid", request.user.id
+        # print "session val: ", request.session.get('buddies_authid_list', [])
+
+        user_id = request.user.id
+        if user_id and request.session.session_key:
+            buddy_obj = Buddy.query_buddy_obj(loggedin_userid=user_id,
+                                            session_key=request.session.session_key)
+
+            if buddy_obj:
+                buddy_obj.end_buddy_session()
+
+        # DjangoActiveUsersGroup.removefrom_user_set(user_id)
+
+        # print "\n\n All buddies including loggen in user released",

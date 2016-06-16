@@ -31,7 +31,7 @@ CKEDITOR.plugins.add('addImage',
                             // var locationURL = 'http://' + location.host;
                             var locationURL = window.location.origin
                             var completeURL = imageURL
-                            var width = prompt("Please enter width in px",'100');
+                            var width = prompt("Please enter width in px",'600');
                             if(width == null)
                             {
                                 return false;

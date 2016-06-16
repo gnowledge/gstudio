@@ -1,10 +1,12 @@
 {% load ndf_tags %}
 {% load i18n %}
 
+{% block body_content %} 
+{% get_group_name groupid as group_name_tag %}
 <script type="text/javascript">
-  var form = document.getElementById('file-form');
-  var fileSelect = document.getElementById('file-select');
-  var uploadButton = document.getElementById('upload-button');
+  var form = document.getElementById('docPost');
+  var fileSelect = document.getElementById('docFile');
+  var uploadButton = document.getElementById('submitpostid');
         form.onsubmit = function(event) {
 
         event.preventDefault();
@@ -26,7 +28,7 @@
           // if (!file.type.match('image.*')) {  continue; }
 
           // Add the file to the request.
-          formData.append('doc[]', file, file.name);
+          formData.append('filehive', file, file.name);
         }
 
         // appending csrfmiddlewaretoken and user-id
@@ -37,11 +39,10 @@
         xhr = new XMLHttpRequest();
 
         // Open the connection.
-        xhr.open('POST', "{% url 'save_image' group_id %}", true);
+        xhr.open('POST', "{% url 'upload_file_ckeditor' group_id %}", true);
 
         // Set up a handler for when the request finishes sucessfully.
         xhr.onload = function () {
-
           if (xhr.status === 200) 
           {
             // File(s) uploaded.
@@ -51,12 +52,12 @@
                alert("Error occurred");
             }
             // check if image is not in the list, add it.
-            else if(xhr.responseText.length == 24 )
+            else if(xhr.responseText )
             {
               // alert("success"+xhr.responseText);
-              var imageURL = "/" + "{{group_id}}" + "/image/get_mid_size_img/" + xhr.responseText;
+              var imageURL = "{{MEDIA_URL}}"  + xhr.responseText;
                             var completeURL = imageURL
-                            var width = prompt("Please enter width in px",'100');
+                            var width = prompt("Please enter width in px",'600');
                             if(width == null)
                             {
                                 return false;
@@ -86,8 +87,62 @@
 
   
 </script>
-{% block body_content %} 
-{% get_group_name groupid as group_name_tag %}
+<script type="text/javascript">
+  $(function() {
+     $("input:file").change(function (){
+       $(".save_cancel").css("display","block")
+       $(".upload-btn").css("display","none")
+
+     });
+  });
+
+$(document).on('change','#docFile',function(){
+    $(".save_cancel").removeClass("hide");
+    file_mime_type = this.files[0].type;
+    file_name = this.files[0].name;
+    if(file_mime_type.indexOf("image") > -1){
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $('#img_preview')
+          .attr('src', e.target.result)
+          .width(150)
+          .height(200)
+          .removeClass("hide");
+      };
+      reader.readAsDataURL(this.files[0]);
+      $('#file_preview').addClass("hide")
+    }
+    else{
+      $('#img_preview').addClass("hide")
+      $('#file_preview')
+        .text(file_name)
+        .removeClass("hide");
+    }
+    /*
+    file_mime_type = this.files[0].type;
+
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $(".save_cancel").addClass("hide");
+      $('#docFile').val(this.value);
+      var message = "{% trans 'Only image files can be uploaded!' %}"
+      $("#eventModalLabel").text(message);
+      $("#eventModal").addClass("alert");
+      $("#eventModal").foundation('reveal', 'open');
+    }
+    */
+
+  });
+
+$("#btnUploadCancel").click(function() {
+    $(".save_cancel").addClass("hide");
+    $("#docFile").val("");
+    $(".upload-btn").css("display","block")
+
+  });
+
+</script>
    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 {% comment %}
 <script type="text/javascript" src="http://jqueryrotate.googlecode.com/svn/trunk/jQueryRotate.js"></script> <!-- required ? -->
@@ -105,55 +160,47 @@
 {% endif %}
 
 {% endcomment %}
-<div class = "repository-title" style="width:100%">
-Image Gallery
-</div>
+
 <br>
 <br>
-{% comment %}
-<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name_tag %}">
-  <div class="row"  style="padding-top:20px">
-    <div class="large-7 columns">
-      <div class="row collapse">
-    <div class="small-8 columns">
-            <input type="text" placeholder="search images" name="search">
-    </div>
-    <div class="small-2 columns">
-            <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
-        <i class="fi-magnifying-glass large">{% trans "Search" %}</i>
-      </a>
-    </div>
-    <div class="small-2 columns">
-            <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" target="_blank" class="button postfix secondary">
-        <i class="fi-paperclip">{% trans "Upload" %}</i>
-      </a>
-    </div>
-      {% endcomment %}
 
-      <form id="file-form" action="{% url 'save_image' group_id %}" method="POST">
-      {% csrf_token %}
-        <input type="file" id="file-select" name="doc[]" />
-        <button type="submit" id="upload-button">Upload</button>
-      </form>
-
-
-
-      </div>
-    </div>
-  </div>
-</form>
-
-  <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-8" >
+<div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
+                        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file_ckeditor' group_id %}">
+                            {% csrf_token %}
+                            <label class="tiny button radius expand upload-btn" style="margin: 0px;">
+                                <i class="fa fa-upload"></i>
+                                &nbsp;
+                                <span>Upload File</span>
+                                <input type="file" name="filehive" id="docFile" style="display: none;" multiple/>
+                            </label>
+                            <br><br>
+                            <div class="save_cancel" style="display:none">
+                                <img id="img_preview" alt="New file" class="hide" />
+                                <label id="file_preview" class="hide"></label>
+                                <br> <br>  
+                              <input type="submit" id="submitpostid" class="tiny button radius" value="Save"/>
+                              <input type="button" id="btnUploadCancel" class="tiny button radius" value="Cancel"/>
+                            </div>
+                            <input type="hidden" name="context_name" value="{{title}}">
+                        </form>
+                    </div>
+  <br> <br>
+  <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-6" >
     {% for each in imageCollection %}
     
     <li class="card-image-wrapper">
-            <img  data-image-id="{{each.pk}}" src="{% url 'get_mid_size_img' group_name_tag each %}" data-image-src="{% url 'get_mid_size_img' group_id each.pk %}">
-            <figcaption>{{each.name}}</figcaption>
+            <img  class="gallery-image" style="" data-image-id="{{each.pk}}" 
+              "{% if 'svg' in each.if_file.mime_type   %}"
+              src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
+              "{% else %}"
+              src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"
+              "{% endif %}"
+              data-image-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" >
+            <figcaption style="cursor:pointer">{{each.name}}</figcaption>
     
     </li>
     {% endfor %}
   </ul>     
-  
 
 <ul class="clearing-thumbs" data-clearing   style="height:100px;width:100px;z-index:-1">
   {% for image in imageCollection %}

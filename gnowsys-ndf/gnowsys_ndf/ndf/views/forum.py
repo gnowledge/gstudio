@@ -23,7 +23,8 @@ from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_forum_repl_type, forum_notification_status
 from gnowsys_ndf.ndf.views.methods import set_all_urls,check_delete,get_execution_time
-from gnowsys_ndf.ndf.views.methods import get_group_name_id, create_grelation
+from gnowsys_ndf.ndf.views.methods import create_grelation
+from gnowsys_ndf.ndf.views.methods import get_group_name_id, capture_data
 from gnowsys_ndf.ndf.views.notify import set_notif_val,get_userobject
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_forum_twists,get_all_replies
@@ -321,7 +322,6 @@ def edit_forum(request,group_id,forum_id):
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
         colf.save(groupid=group_id)
-
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
         link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
         for each in colg.author_set:
@@ -532,6 +532,7 @@ def create_thread(request, group_id, forum_id):
         has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
         gr = create_grelation(forum._id, has_thread_rt, colrep._id)
 
+        
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
         link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(colrep._id)
         for each in colg.author_set:
@@ -686,7 +687,9 @@ def add_node(request, group_id):
             colrep.contributors.append(usrid)
         
         colrep.group_set.append(colg._id)
+
         colrep.save(groupid=group_id)
+
         # print "----------", colrep._id
         groupname = colg.name
         
@@ -783,7 +786,9 @@ def delete_forum(request,group_id,node_id,relns=None):
         group_name, group_id = get_group_name_id(group_id)
 
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    
     node=node_collection.one({'_id':ObjectId(node_id)})
+    
     #send notifications to all group members
     colg=node_collection.one({'_id':ObjectId(group_id)})
     for each in colg.author_set:
@@ -828,6 +833,7 @@ def delete_thread(request,group_id,forum_id,node_id):
     else :
         pass
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+
     node=node_collection.one({'_id':ObjectId(node_id)})
     forum_threads = []
     exstng_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}],'status':{'$nin':['HIDDEN']}})
@@ -906,7 +912,9 @@ def edit_thread(request,group_id,forum_id,thread_id):
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
             thread.content = content_org
+
         thread.save(groupid=group_id) 
+
         link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(thread._id)
         for each in colg.author_set:
             if each != colg.created_by:
@@ -969,7 +977,10 @@ def delete_reply(request,group_id,forum_id,thread_id,node_id):
     activity = ""
 
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+
+    # ??? CHECK
     replyobj=node_collection.one({'_id':ObjectId(node_id)})
+
     forumobj=node_collection.one({"_id": ObjectId(forum_id)})
     threadobj=node_collection.one({"_id": ObjectId(thread_id)})
     # notifications to all group members

@@ -148,10 +148,8 @@
 			<!-- Cross publish and Delete -->
 				{% if user.is_authenticated %} 
 				<div class="row btn-row">
-					{% comment %}
 					<!-- History -->
 					<a href = "{% url 'node_version' groupid node.pk  %}" class="tiny button radius right-btn" >{% trans "History" %}</a> 
-					{% endcomment %}
 						<!-- Cross Publish -->
 						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
 							{% if node.created_by == request.user.id or is_gstaff %}
@@ -339,7 +337,7 @@
 							{% if user_is_joined == "joined" or  user_is_joined == "author" %}
 								{% if node.status != 'MODERATION' %} 
 									{% if "File" in node.member_of_names_list and group_object.name != "home" %}
-										<a href="{% url create_url group_object.name %}?next={{request.path}}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
+										<a href="{% url 'uploadDoc' group_object.pk %}?next={{request.path}}" class="tiny button radius expand mod-btn" title="Create New {{node.member_of_names_list.0}}">{% trans "New" %} {{node.member_of_names_list.0}}</a>
 									{% else %}
 										{% if "Theme" in node.member_of_names_list or "Topic" in node.member_of_names_list  %}
 											{% if is_gstaff %}
@@ -493,13 +491,36 @@
         $("#deleteModal").foundation('reveal', 'close');
 		{% if "Page" in node.member_of_names_list or "File" in node.member_of_names_list %}
 			// alert("page")
-			delete_url = "{% url 'trash_resource' group_id node %}"
+			$.ajax({
+                    type: "POST",
+                    url: "{% url 'trash_resource' group_id node %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                  success: function(data) {
+                  	redirect_url ="/"+"{{group_id}}"+"/"+"{{node.member_of_names_list.0|lower}}" 
+                    window.location.replace(redirect_url);
+                  }
+
+            });
+		
 		{% elif "Term" in node.member_of_names_list %}
+			$.ajax({
+                    type: "POST",
+                    url: "{% url 'term_delete' group_object.name node %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                  success: function(data) {
+                        window.location.replace("{% url 'file' group_id  %}");
+                  }
+
+            });
 			// alert("term_delete")
-			delete_url = "{% url 'term_delete' group_object.name node %}"
 		{% endif %}
-        $(".delete-btn").attr('href', delete_url)
-        $(".delete-btn")[0].click();
+       
     });
 
     $(document).on("click", "#btnConfirmNo", function() {

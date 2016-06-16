@@ -133,7 +133,7 @@
           <li><a onclick="open_div('File',this)" class="File button tiny res-btn">File </a></li>
           <li><a onclick="open_div('Image',this)" class="Image button tiny res-btn">Image </a></li>
           <li><a onclick="open_div('Video',this)" class="Video button tiny res-btn">Video </a></li>
-          <li><a onclick="open_div('Quiz',this)" class="Quiz button tiny res-btn">Quiz</a></li>
+          <li><a onclick="open_div('QuizItem',this)" class="QuizItem button tiny res-btn">QuizItem</a></li>
 
         </ul>
       </div>
@@ -186,7 +186,7 @@
           <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_course_file' group_id %}?context_node={{unit_node.pk}}">
           {% csrf_token %}
             <div>
-              <span class="fi-upload"><input type="file" name="doc" id="docFile"/></span>
+              <span class="fi-upload"><input type="file" name="filehive" id="docFile"/></span>
             </div>
             <!-- For making access policy of files PUBLIC initially by uploading it from topic page -->
             <input type="hidden" name="login-mode" value="PUBLIC">
@@ -318,17 +318,21 @@
 
         $(this1).addClass("success");
         $(".resources_drawer_div").html(""); 
-        if(res_name_flag!="Quiz" && res_name_flag=="Page"){
+        if(res_name_flag=="Page"){
           $("#new_res").val("Create new "+ res_name_flag)
           $(".res-opt-btns").removeClass("hide")
+          $(".res-opt-btns #new_res").removeClass("hide")
         }
-        else if(res_name_flag!="Quiz" && res_name_flag!="Page"){
+        else if(res_name_flag!="QuizItem" && res_name_flag!="Page"){
           $("#new_res").val("Upload File")
           $(".res-opt-btns").removeClass("hide")
+          $(".res-opt-btns #new_res").removeClass("hide")
         }
-        else if(res_name_flag=="Quiz"){
-          $(".res-opt-btns").addClass("hide");
-          draw_drawer("Quiz")
+        else if(res_name_flag=="QuizItem"){
+          $(".res-opt-btns").removeClass("hide")
+          $(".res-opt-btns #new_res").addClass("hide")
+          // $(".res-opt-btns").addClass("hide");
+          // draw_drawer("Quiz")
         }
         $(".collection_details").html("");
     };

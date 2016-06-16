@@ -32,8 +32,6 @@ urlpatterns = patterns('',
     (r'^admin/', include('gnowsys_ndf.ndf.urls.gstudio_admin')),
     (r'^admin/', include(admin.site.urls)),
 
-    (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
-
     # --mobwrite-- commented for time being
     # (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
     # (r'^r/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
@@ -42,13 +40,23 @@ urlpatterns = patterns('',
     # (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
     # (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
     # --end of mobwrite
-    # (r'^$', HomeRedirectView.as_view()),        
+
+    # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
+
+    # (r'^$', HomeRedirectView.as_view()),
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
+
+
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
+
     # all main apps
+    # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
+    (r'^(?P<group_id>[^/]+)/mailclient', include('gnowsys_ndf.ndf.urls.mailclient')),
+    (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
+    (r'^(?P<group_id>[^/]+)/filehive', include('gnowsys_ndf.ndf.urls.filehive')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_id>[^/]+)/audio', include('gnowsys_ndf.ndf.urls.audio')),
     (r'^(?P<group_id>[^/]+)/video', include('gnowsys_ndf.ndf.urls.video')),
@@ -84,6 +92,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/moderation', include('gnowsys_ndf.ndf.urls.moderation')),
     (r'^(?P<group_id>[^/]+)/feeds', include('gnowsys_ndf.ndf.urls.feeds')),
     (r'^(?P<group_id>[^/]+)/trash',include('gnowsys_ndf.ndf.urls.trash')),
+    (r'^(?P<group_id>[^/]+)/buddy',include('gnowsys_ndf.ndf.urls.buddy')),
 
     url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.topics.topic_detail_view', name='topic_details'),
 
@@ -112,9 +121,9 @@ urlpatterns = patterns('',
     # (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
 
     # --discussion--
-    # url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/create_discussion$', 'gnowsys_ndf.ndf.views.discussion.create_discussion', name='create_discussion'),    
+    # url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/create_discussion$', 'gnowsys_ndf.ndf.views.discussion.create_discussion', name='create_discussion'),
     # url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/discussion_reply$', 'gnowsys_ndf.ndf.views.discussion.discussion_reply', name='discussion_reply'),
-    # url(r'^(?P<group_id>[^/]+)/discussion_delete_reply$', 'gnowsys_ndf.ndf.views.discussion.discussion_delete_reply', name='discussion_delete_reply'),    
+    # url(r'^(?P<group_id>[^/]+)/discussion_delete_reply$', 'gnowsys_ndf.ndf.views.discussion.discussion_delete_reply', name='discussion_delete_reply'),
     # --end of discussion
 
     url(r'^(?P<group_id>[^/]+)/visualize', include('gnowsys_ndf.ndf.urls.visualise_urls')),
@@ -122,7 +131,7 @@ urlpatterns = patterns('',
     (r'^explore/', include('gnowsys_ndf.ndf.urls.explore')),
 
     url(r'^(?P<group_id>[^/]+)/$', 'gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),
-    # ---listing sub partners---                    
+    # ---listing sub partners---
     url(r'^(?P<group_id>[^/]+)/partners$', 'gnowsys_ndf.ndf.views.partner.partner_list', name='partnerlist'),
     # --------end of listing sub partners--------
     # -- tags --
@@ -178,7 +187,7 @@ urlpatterns = patterns('',
                 lambda request, user: '/accounts/activate/complete/'),
         ),
         name='registration_activate'),
-    
+
     url(r'^accounts/register/$',
         RegistrationView.as_view(
             form_class=GstudioEmailRegistrationForm,
@@ -195,4 +204,14 @@ urlpatterns = patterns('',
 
    (r'^status/cache/$', 'gnowsys_ndf.ndf.views.cache.cache_status'),
     # url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
+)
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+        url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
+            'document_root': settings.STATIC_ROOT,
+        }),
 )

@@ -1,0 +1,86 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+  <script src="/static/ndf/js/mailsend_filesize_check.js"></script>
+{% endblock %}
+
+
+{% block meta_content %}
+  <h2 class="subheader">
+  {{title}}
+  </h2>
+{% endblock %}
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
+{% block body_content %}
+    
+    {% get_group_name groupid as group_name_tag %}
+	{% if user.is_authenticated %}
+	<form data-abide id="form-edit-node" enctype="multipart/form-data" onSubmit="enableselect();" method="POST" action="">
+	{% csrf_token %}
+		<h2 style="float:left"> Using {{mailbox_name}} </h2>
+    <br>
+    <h5 style="margin-left:15rem">(From: {{ mailbox_email }} )</h5>
+
+    <div class="row">
+      <div class="medium-12 columns">
+        <h4>To:</h4>
+        {% if to_email_id == None %}
+          <input id="to_addrs_id" name="to_addrs" type="text" placeholder="To address(es)..." required>
+        {% else %}
+          <input id="to_addrs_id" name="to_addrs" type="text" value="{{ to_email_id }}" required>
+        {% endif %}
+        <small class="error">Enter valid email addresses separated by ';'</small>
+      </div>
+    </div>
+  </br>
+          		
+  <h4 id="CC_header" style="float:left; margin-right:10rem"><a id="CC" >Cc:</a></h4>
+  <input id="cc_addrs_id" name="cc_addrs" type="text" placeholder="Cc address(es)" style="display:none;">
+  
+  <h4><a id="BCC">Bcc:</a></h4>
+  <input id="bcc_addrs_id" name="bcc_addrs" type="text" placeholder="Bcc address(es)..." style="display:none;">
+  
+  <h4>Subject:</h4>
+  <input id="subject_id" name="subject" type="text" placeholder="Subject...">
+  </br>
+  
+  <h5>Body:</h5>
+	<div id="body_editor" >
+     {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %} 
+  </div>
+
+	</br>
+		
+  <!-- File Upload -->
+	<label>Attach Files:</label>
+	(Please ensure all your files are in the same folder when uploading multiple files)
+  <input type="file" name="attached_files" id="attached_files_id" accept="file_extension|audio/*|video/*|image/*|media_type" multiple> 
+  <p id="fileError" style="color:red"></p>
+
+	<input type="hidden" name="node" value="{{node.pk}}">
+  <input type="hidden" name="user" value="{{user.id}}">
+  <input type="hidden" name="page_url" value="{{request.path}}">
+  <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
+	</br>
+  <input type="submit" id="send_mail" value="Send" class="button small"/>
+	</form>
+	
+  {% else %}
+		<p><em>{% trans "You are not an authorised user. Please Log in" %} </em></p>
+  {% endif %}
+
+{% endblock %}

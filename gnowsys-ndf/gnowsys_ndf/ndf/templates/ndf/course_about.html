@@ -85,7 +85,11 @@
             <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">Notifications</a></li>
 
             {% if request.user.is_authenticated and not gstaff_access %}
-              <li class="tab-title"><a role="tab" href="#analytics-content" class="fetch-analytics" tabindex="1" aria-selected="false" aria-controls="panel2-2" data-id={{request.user.id}}>My Analytics</a></li>
+              <li class="tab-title">
+                <a role="tab" href="#analytics-content" class="fetch-analytics" tabindex="1" aria-selected="false" aria-controls="panel2-2" data-id={{request.user.id}}>
+                  Progress Report
+                </a>
+              </li>
               <input type="hidden" class="is_admin" value="False" />
             {% elif gstaff_access %}
               <input type="hidden" class="is_admin" value="True" />
@@ -163,13 +167,15 @@
 
     // Student analytics view
     $(document).on('click','.fetch-analytics',function(){
-        user_id = $(this).attr("data-id")
+        var user_id = $(this).attr("data-id");
+        var dataPointsDict = $(this).attr('data-points-dict');
         // $(this).addClass("hide")
         $(".pre-analytics-msg-div").removeClass("hide")
         $.ajax({
             url: "{% url 'course_analytics' group_id 'user_id' %}".replace("user_id", user_id),
             type: "GET",
             dataType: "html",
+            data: {'data_points_dict': dataPointsDict},
             global: false,
             success: function(data){
                 if($(".is_admin").val() == "True"){
@@ -233,6 +239,9 @@
                 "createdRow": function ( row, data, index ) {
                   user_id = data["user_id"];
                   $(row).attr("data-id", user_id);
+
+                  $(row).attr("data-points-dict", JSON.stringify(data));
+
                   $(row).addClass("fetch-analytics")
                   $(row).find("td:nth-child(3)").html(generate_points_bar(data['files_points'], "Files",data['users_points'],file_max_points));
                   $(row).find("td:nth-child(4)").html(generate_points_bar(data['notes_points'], "Notes",data['users_points'],notes_max_points));

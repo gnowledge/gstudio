@@ -6,17 +6,16 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
         <div class="text-center">
-
         <div class="div-height">
           {% if prof_pic_obj %}
-                  <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
+                  <img src="{{MEDIA_URL}}{{prof_pic_obj.if_file.original.relurl}}" class="img-height"/>
           {% else %}
               {% if "Author" in group_object.member_of_names_list %}
                   <i class="fi-torso style2 text-center"></i>
               {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
-              {% endif %}   
-          {% endif %}   
+                  <img src="/static/ndf/images/default-bg.png" alt="Profile picture for this group."  class="img-height">
+              {% endif %}
+          {% endif %}
         </div>
         {% if not no_update_btn %}
         {% if request.user.is_authenticated %}
@@ -33,7 +32,7 @@
         </div>
 
 
-            <div id="{{widget_for}}_prof_pic_prop" class="reveal-modal medium" data-reveal style="height:500px;"> 
+            <div id="{{widget_for}}_prof_pic_prop" class="reveal-modal medium" data-reveal style="height:500px;">
                 <a href="#" id="{{widget_for}}_upload_photo">
                   <div id="upload-photo-div" class="text-center">
                     <label class="upload_photo_lbl fi-upload">Upload New Photo</label>
@@ -45,7 +44,7 @@
                     <div class="existing-photo-div"  style="display:inline-block;overflow-y: auto;height:320px;">
                       {% for each_prof_pic in old_profile_pics %}
                         <div class="old_img">
-                          <img src="{% url 'getFileThumbnail' group_id each_prof_pic.pk %}" style="height:150px;width:100px;" />
+                          <img src="{{MEDIA_URL}}{{each_prof_pic.if_file.mid.relurl}}" style="height:150px;width:100px;" />
                           <div class="{{widget_for}}_prof_pic_select">
                           <input type="button" value="Use this" class="button tiny use_old_img_btn" onclick="update_img('{{each_prof_pic.pk}}')" />
                           </div>
@@ -57,7 +56,7 @@
                 <div id="{{widget_for}}_pic_div" class="hide row">
                     <form class="dropzone" id ="{{widget_for}}_docPost" enctype="multipart/form-data" method="post"  action="{% url 'upload_prof_pic' group_id %}">
                         {% csrf_token %}
-                        <input type="file" name="docFile_img" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
+                        <input type="file" name="filehive" id="{{widget_for}}_docFile" accept="image/*" class="hide" />
                         {% if is_banner and not is_profile %}
                           <input type="hidden" name="pic_rt" value="is_banner"></input>
                         {% elif  is_profile and not is_banner %}
@@ -69,7 +68,7 @@
                             <input type="submit" id="{{widget_for}}_submitpostid" value="Save" style="margin-left:2rem;" class="button tiny margin-p5" />
                             <input type="button" class="button tiny margin-p5" id="{{widget_for}}_btnUploadCancel" value="Cancel">
                         </div>
-                        <input type="hidden" name="type" value="profile_pic">           
+                        <input type="hidden" name="type" value="profile_pic">
                         <input type="hidden" name="user" value="{{usr}}">
                         {% if url_name %}
                         <input type="hidden" name="url_name" value="{{url_name}}">
@@ -104,13 +103,13 @@
     .img-height {
         height: 100%;
     }
-  
+
     .btn-font{
       font-size:15px !important;
     }
 
     .div-height {
-        margin-bottom: 0.5em; 
+        margin-bottom: 0.5em;
         height: 9em;
     }
 
@@ -120,7 +119,7 @@
       font-size:30px;
     }
 
-    .old_img{    
+    .old_img{
         border: 2px solid #0b8a91;
         display:inline-block;
         position:relative;
@@ -131,9 +130,9 @@
         bottom:-19px;
         right:0px;
         display:none;
-    }    
-    
-</style>        
+    }
+
+</style>
 
 <script type="text/javascript">
   // Hover events over old profile pics ---------------------------------------------------------
@@ -208,7 +207,7 @@
   // Update profile photo -----------------------------------------------------------------------
   $(document).on('click','#{{widget_for}}_submitpostid',function(){
     upload_from_existing = $("#{{widget_for}}_old_pic_ele").length
-    if($("#{{widget_for}}_docFile").val() != "" || upload_from_existing > 0) { 
+    if($("#{{widget_for}}_docFile").val() != "" || upload_from_existing > 0) {
       $("#{{widget_for}}_prof_pic_prop").foundation('reveal', 'close');
       $("#{{widget_for}}_message").show();
       $(".{{widget_for}}_upload_cancel_div").addClass("hide");
@@ -232,5 +231,5 @@
   $(document).on('closed.fndtn.reveal', '.reveal-modal', function () {
     $(this).removeClass("success").removeClass("alert").removeClass("warning");
   });
-    
+
 </script>

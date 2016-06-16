@@ -1,0 +1,57 @@
+Step 1: Update local_settings.py file with following variables:
+
+import os
+
+MEDIA_ROOT = '/data/media/'
+GSTUDIO_DATA_ROOT = os.path.join('/data/')
+
+GSTUDIO_LOGS_DIRNAME = 'gstudio-logs'
+GSTUDIO_LOGS_DIR_PATH = os.path.join('/data/', GSTUDIO_LOGS_DIRNAME)
+
+RCS_REPO_DIRNAME = "rcs-repo"
+RCS_REPO_DIR = os.path.join('/data/', RCS_REPO_DIRNAME)
+
+GSTUDIO_MAIL_DIRNAME = 'MailClient'
+GSTUDIO_MAIL_DIR_PATH = os.path.join('/data/', GSTUDIO_MAIL_DIRNAME)
+
+SQLITE3_DBNAME = 'example-sqlite3.db'
+SQLITE3_DB_PATH = os.path.join('/data/', SQLITE3_DBNAME)
+
+DATABASES = {
+   'default': {
+       'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+       'NAME': SQLITE3_DB_PATH,
+   },
+   'mongodb': {
+       'ENGINE': 'django_mongokit.mongodb',
+       'NAME': 'studio-dev',
+       'USER': '',
+       'PASSWORD': '',
+       'HOST': '',
+       'PORT': '',
+   },
+}
+
+Step 2:
+	python manage.py movedb (One-time command, ref: https://github.com/gnowledge/gstudio/pull/1235)
+	git pull origin alpha
+
+	pip install -r ../requirements.txt
+
+Step 3:
+	python manage.py syncdb
+
+Step 4:
+	python manage.py sync_existing_documents
+
+Step 5:
+	python manage.py filldb
+
+Step 6:
+	python manage.py create_schema ATs.csv
+
+Step 7:
+	Go to shell: python manage.py shell
+	Run command: execfile('../doc/deployer/convert_filegsystem_to_gsystem.py')
+
+

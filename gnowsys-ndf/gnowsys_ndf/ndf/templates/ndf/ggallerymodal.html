@@ -4,7 +4,7 @@
 {% get_grid_fs_object node as grid_fs_obj %}
 <style type="text/css">
     .image-details .tabs .tab-title{
-        width: 25% !important;
+        width: 43% !important;
     }
     .tab-title > a{
         font-size: 0.80rem !important;
@@ -14,7 +14,7 @@
     }
     .show-image{
         margin-left:100px!important;
-    }   
+    }
 </style>
 <!--<style type="text/css">
     .gmodal-item-panel .text-gray{
@@ -64,10 +64,9 @@
         </div>
     </div-->
     <div class="row gmodal-body">
-        <div class="small-8 columns gmodal-item-panel ">
+        <div class="small-8 columns gmodal-item-panel" style="overflow-y: auto;">
             <!-- Detail view section -->
-            {% include 'ndf/node_ajax_content.html' with no_discussion=True %}
-        
+            {% include 'ndf/node_ajax_content.html' with no_discussion=True is_course=True %}
         </div>
             {% comment %}
             <div class="row gmodal-footer">
@@ -108,7 +107,7 @@
                             {% endfor %}
                             {% if node.tags|length > 2 %}
                                 <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
-                            {% endif %} 
+                            {% endif %}
                     </div>
                 {% else %}
                     <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
@@ -130,36 +129,47 @@
                 </div>
                 <div class="row image-actions">
                     <div class="small-12 columns">
-                        <a href="{% url 'read_file' group_name node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}"><i class="fa fa-arrow-circle-down"></i>&nbsp;Download</a>
+                    {% if not node.collection_set %}
+                    {% get_download_filename node as download_filename %}
+                        <a href="{% url 'read_file' group_name node download_filename %}" download="{{ download_filename }}"><i class="fa fa-arrow-circle-down"></i>&nbsp;Download</a>
                         {% comment %}
                         <a><i class="fa fa-pencil"></i>&nbsp;Create Note</a>
                         {% endcomment %}
+                    {% endif %}
                         {% get_edit_url node.pk as edit_url %}
                         {% check_is_gstaff group_id request.user as is_gstaff %}
                         {% if is_gstaff or node.created_by == request.user.id %}
                             <a href="{% url edit_url group_id node.pk %}?course_tab_title={{title}}">
                                 <i class="fi-page-edit" ></i>Edit
                             </a>
+                            <a class="delete-btn" title="Delete  {{node.member_of_names_list.0}}"><i class="fi-trash"></i> Delete </a>
+                        {% else %}
+                            <a class="delete-btn" title="Delete  {{node.member_of_names_list.0}} disabled" title="You are not authorized for this action"><i class="fi-trash"></i> Delete </a>
+
                         {% endif %}
                     </div>
                 </div>
-                <!--div class="row rating-area">
-                    <div class="small-6 columns">
-                        <h4>Rating</h4>
-                    </div>
-                    <div class="small-6 columns right">
-                        {% include "ndf/analytics_views.html" %}
-                    </div>
 
-                </div-->
                 <div class="row image-details">
                     <div class="small-12 columns ">
                         <ul class="tabs" data-tab>
                           <li class="tab-title active"><a href="#image-comments">Comments</a></li>
-                          <li class="tab-title"><a href="#image-desc">Description</a></li>
-                          <li class="tab-title"><a href="#image-info">Info</a></li>
+                          <li class="tab-title"><a href="#image-info-desc">Info</a></li>
+                          <!-- <li class="tab-title"><a href="#image-desc">Description</a></li> -->
                         </ul>
                         <div class="tabs-content">
+                            <div class="content" id="image-info-desc">
+                                {% get_file_obj  node as file_res %}
+                                <span>Created At: </span>{{node.created_at}}<br>
+                                <span>Uploaded by: </span>{{node.created_by|get_username}}<br>
+                                <span>Dimensions: </span>{{ file_res.if_image_dimensions|default_if_none:"No dimensions available" }}<br>
+                                <span>Format: </span>{{file_res.mime_type}}<br>
+                                <span>Size: </span>{{file_res.length|filesizeformat}}<br>
+                                <hr/>
+                                <span>Description:</span><br>
+                                {{node.content|default_if_none:"No description added yet."|safe}}
+                            </div>
+
                             <div class="content active" id="image-comments">
                                 <div class="row comments-area">
                                     <div class="small-12 columns" >
@@ -175,15 +185,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="content" id="image-desc">
-                                {{node.content|default_if_none:"No description added yet."|safe}}                                
-                            </div>
-                            <div class="content" id="image-info">
-                                <span>Created At: </span>{{node.created_at}}<br>
-                                <span>Uploader: </span>{{node.created_by|get_username}}<br>
-                                <span>Format: </span>{{node.mime_type}}<br>
-                                <span>Size: </span>{{node.file_size.size}}{{node.file_size.unit}}
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -191,7 +192,7 @@
         </div>
     </div>
     <a href="{% url redirect_tab_url group_id %}" class="file-detail-modal-close"></a>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    <a class="close-reveal-modal" aria-label="Close" style="top:0rem!important;margin-right:10px!important;">&#215;</a>
 
 </div>
 <script type="text/javascript">
@@ -219,8 +220,8 @@ $(document).on('click','.view-more-tags',function(){
     }
 })
 
-
 </script>
+
 {% comment %}
 <script type="text/javascript">
 (function( $ ) {
@@ -284,3 +285,28 @@ $(document).on('click','.view-more-tags',function(){
 </script>
 {% endcomment %}
 
+<script type="text/javascript">
+    $(document).on("click", ".delete-btn", function() {
+        msg = confirm("Do you want to delete this resource?.");
+        if (msg == true) {
+            $.ajax({
+                    type: "POST",
+                    url: "{% url 'trash_resource' group_id node %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                  success: function(data) {
+                        data = JSON.parse(data)
+                        if(data['success']){
+                            $('.close-reveal-modal').trigger('click');
+                            window.location.replace("{% url redirect_tab_url group_id %}");
+                            
+                        }
+                  }
+
+            });
+        } 
+    });
+            
+</script>

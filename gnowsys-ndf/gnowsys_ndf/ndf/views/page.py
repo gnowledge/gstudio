@@ -221,22 +221,20 @@ def create_edit_page(request, group_id, node_id=None):
     node_list = [str((each.name).strip().lower()) for each in available_nodes]
     # print "available_nodes: ", node_list
 
-
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
-        # page_type = request.POST.getlist("type_of",'')
         page_name = request.POST.get('name', '')
         # print "====== page_name: ", page_name
-
-        if page_name.strip().lower() in node_list:
+        if page_name.strip().lower() in node_list and not node_id:
             return render_to_response("error_base.html",
                                       {'message': 'Page with same name already exists in the group!'},
                                       context_instance=RequestContext(request))
         elif node_id:
             page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
-
         else:
             page_node = node_collection.collection.GSystem()
+
+        # page_type = request.POST.getlist("type_of",'')
         
         ce_id = request.POST.get("ce_id",'')
         blog_type = request.POST.get('blog_type','')
@@ -361,7 +359,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     else:
         if node_id:
-
+            page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
             #page_node,ver=get_page(request,page_node)
             page_node.get_neighbourhood(page_node.member_of)
 
@@ -520,6 +518,7 @@ def publish_page(request,group_id,node):
         node.status = unicode("PUBLISHED")
         node.modified_by = int(request.user.id)
         node.save(groupid=group_id)
+
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
     # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
