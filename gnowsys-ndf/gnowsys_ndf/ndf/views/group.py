@@ -1185,26 +1185,39 @@ class CreateCourseEventGroup(CreateEventGroup):
                 create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
             self.ce_set_up(request, course_node, group_obj)
 
-    def ce_set_up(self, request, node, group_obj):
+    def ce_set_up(self, request, existing_course_obj, new_course_obj):
         """
             Will build into Recursive function
             To fetch from Course'collection_set
             and build new GSystem for CourseEventGroup
 
-            node is course node
-            group_obj is CourseEvent node
+            existing_course_obj is course existing_course_obj
+            new_course_obj is CourseEvent existing_course_obj
 
         """
         try:
-            group_obj.content = node.content
-            group_obj.content_org = node.content_org
-            group_obj.save()
-            self.call_setup(request, node, group_obj, group_obj)
+            new_course_obj.content = existing_course_obj.content
+            new_course_obj.content_org = existing_course_obj.content_org
+            new_course_obj.save()
+            self.call_setup(request, existing_course_obj, new_course_obj, new_course_obj)
+            self.update_raw_material_group_set(existing_course_obj, new_course_obj)
             return True
 
         except Exception as e:
 
             print e, "CourseEventGroup structure setup Error"
+
+    def update_raw_material_group_set(self,old_group_obj, new_group_obj):
+        # Fetch all files from Raw-Material using tag 'raw@material'
+        rm_files_cur = node_collection.find({'tags': 'raw@material', 'member_of': file_gst._id, 'group_set': old_group_obj._id})
+        if rm_files_cur.count():
+            for each_rm_file in rm_files_cur:
+                each_rm_file.group_set.append(new_group_obj._id)
+                if self.user_id not in each_rm_file.contributors:
+                    each_rm_file.contributors.append(self.user_id)
+                each_rm_file.modified_by = self.user_id
+                each_rm_file.save(groupid=new_group_obj._id)
+
 
     def create_corresponding_gsystem(self,gs_name,gs_member_of,gs_under_coll_set_of_obj, group_obj):
 
