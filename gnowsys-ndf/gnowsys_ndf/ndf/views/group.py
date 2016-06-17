@@ -1209,7 +1209,14 @@ class CreateCourseEventGroup(CreateEventGroup):
 
     def update_raw_material_group_set(self,old_group_obj, new_group_obj):
         # Fetch all files from Raw-Material using tag 'raw@material'
-        rm_files_cur = node_collection.find({'tags': 'raw@material', 'member_of': file_gst._id, 'group_set': old_group_obj._id})
+        # rm_files_cur = node_collection.find({'tags': 'raw@material', 'member_of': file_gst._id, 'group_set': old_group_obj._id})
+
+        # June 17 2016. Importing files uploaded by user 'administrator' in old_group_obj
+        administrator_user = User.objects.get(username='administrator')
+
+        rm_files_cur = node_collection.find({'member_of': file_gst._id, 'group_set': old_group_obj._id, \
+            '$or':[{'tags': 'raw@material'}, {'created_by': administrator_user.id}]})
+
         if rm_files_cur.count():
             for each_rm_file in rm_files_cur:
                 each_rm_file.group_set.append(new_group_obj._id)
@@ -1217,6 +1224,9 @@ class CreateCourseEventGroup(CreateEventGroup):
                     each_rm_file.contributors.append(self.user_id)
                 each_rm_file.modified_by = self.user_id
                 each_rm_file.save(groupid=new_group_obj._id)
+
+
+
 
 
     def create_corresponding_gsystem(self,gs_name,gs_member_of,gs_under_coll_set_of_obj, group_obj):
