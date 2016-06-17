@@ -31,7 +31,7 @@ user_icons_dir_path = '/home/docker/code/display-pics/'
 
 
 class Command(BaseCommand):
-    help = "\n\tFor saving data in gstudio DB from NROER schema files. This will create 'File' type GSystem instances.\n\tCSV file condition: The first row should contain DB names.\n"
+    help = "Creating user, author and attaching profile pics from CSV's.\n\t- CSV file schema: user_id, school_code, username, password, oid\n\t- CSV file-name-path needs to be passed either as argument or can be passed on demand/asked by script.\n\t- Please keep user-display-pics folder at following location:\n\t\t/home/docker/code/display-pics/"
 
     def handle(self, *args, **options):
 
