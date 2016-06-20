@@ -226,7 +226,7 @@ body{
 
   margin-bottom: 0.5rem;
   // padding-bottom: 0em;   // khaal
-
+  
   #first-header.top-bar {
 
     background-color: #3e3e3e;
@@ -259,7 +259,6 @@ body{
           // background-color: #E1E1E1;
       }
   }
-
 
   #group-level-header{
 
@@ -367,19 +366,6 @@ body{
     color: white;
     background-color: gray;
     transition: 0.8s ease-out;
-  }
-
-  ul.title-area a{
-    width: 150px;
-    color: gray;
-
-        &:hover{
-        // background-color: scale-color($topbar-bg-color, $lightness: 5%);
-        //box-shadow: inset 0px 75px 50px #cccccc;
-        //color: #black;
-        //transition: 0.8s all;
-    }
-
   }
 
 //     div.two-nav-container{
@@ -4382,7 +4368,7 @@ course-title{
 
   .clix_brief {
     text-align: left;
-    padding: 20px 3% 20px 10%;
+    padding: 20px 5%;
 
     img {
       margin: 30px 20px;
@@ -4400,7 +4386,7 @@ course-title{
     background-color: rgba(255,255,255, 0.92);
     border-radius: 10px;
     width: 80%;
-    margin: 45px 40px;
+    margin: 45px auto;
     text-align: left;
     padding: 30px 40px 21px;
     box-shadow: 0px 0px 30px rgba(0, 0,0, 0.5);
@@ -4463,7 +4449,7 @@ course-title{
     position: absolute;
     top: 5px;
     right: 50px;
-    height: 200px;
+    height: 125px;
   }
   h2 {
     color: #A0148E;
