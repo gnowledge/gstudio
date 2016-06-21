@@ -27846,19 +27846,13 @@ course-title {
     height: 250px;
   }
 }
-@media screen and (min-width: 451px) and (max-width: 750px) {
+@media screen and (min-width: 451px) and (max-width: 1025px) {
   /* line 4452, ../../../scss/_app_styles.scss */
   .landing_page .flowers {
-    height: 300px;
+    height: 350px;
   }
 }
-@media screen and (min-width: 751px) and (max-width: 1025px) {
-  /* line 4452, ../../../scss/_app_styles.scss */
-  .landing_page .flowers {
-    height: 375px;
-  }
-}
-/* line 4467, ../../../scss/_app_styles.scss */
+/* line 4464, ../../../scss/_app_styles.scss */
 .landing_page .bees {
   position: absolute;
   top: 5px;
@@ -27866,33 +27860,33 @@ course-title {
   height: 150px;
 }
 @media screen and (max-width: 450px) {
-  /* line 4467, ../../../scss/_app_styles.scss */
+  /* line 4464, ../../../scss/_app_styles.scss */
   .landing_page .bees {
-    right: 20px;
+    right: 15px;
     height: 100px;
   }
 }
-/* line 4477, ../../../scss/_app_styles.scss */
+/* line 4474, ../../../scss/_app_styles.scss */
 .landing_page h2 {
   color: #A0148E;
   font-weight: 600;
 }
-/* line 4481, ../../../scss/_app_styles.scss */
+/* line 4478, ../../../scss/_app_styles.scss */
 .landing_page .landing-page-text {
   color: #6153ae;
 }
-/* line 4484, ../../../scss/_app_styles.scss */
+/* line 4481, ../../../scss/_app_styles.scss */
 .landing_page .landing-page-text p {
   font-size: 18px;
 }
 
 /* END of Landing page */
-/* line 4490, ../../../scss/_app_styles.scss */
+/* line 4487, ../../../scss/_app_styles.scss */
 .audio-caption {
   cursor: pointer;
 }
 
-/* line 4494, ../../../scss/_app_styles.scss */
+/* line 4491, ../../../scss/_app_styles.scss */
 .gallery-image {
   cursor: pointer;
   max-height: 100px;
