@@ -5153,7 +5153,7 @@ def create_clone(user_id, node, group_id):
         #     cloned_copy.fs_file_ids = node.fs_file_ids
         #     cloned_copy.file_size = node.file_size
         #     cloned_copy.mime_type = node.mime_type
-
+        '''
         if "File" == node._type:
             cloned_copy = node_collection.collection.File()
             cloned_copy.fs_file_ids = node.fs_file_ids
@@ -5186,7 +5186,20 @@ def create_clone(user_id, node, group_id):
         cloned_copy.content_org = node.content_org
         cloned_copy.content = node.content
         cloned_copy.save()
-        return cloned_copy
+        '''
+        cloned_copy = node.copy()
+        cloned_copy['_id'] = ObjectId()
+        cloned_copy['group_set'] = [group_id]
+        cloned_copy['status'] = u"PUBLISHED"
+        cloned_copy['modified_by'] = int(user_id)
+        cloned_copy['created_by'] = int(user_id)
+        cloned_copy['prior_node'] = node.prior_node
+        cloned_copy['contributors'] = [int(user_id)]
+        cloned_obj_id = node_collection.collection.insert(cloned_copy)
+        cloned_obj = node_collection.one({'_id': ObjectId(cloned_obj_id)})
+        cloned_obj.save(groupid=group_id, validate=False)
+        return cloned_obj
+
     except Exception as re_clone_err:
         print re_clone_err
         print "Failed cloning resource"
