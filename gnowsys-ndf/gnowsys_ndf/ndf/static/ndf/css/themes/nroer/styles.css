@@ -27746,24 +27746,43 @@ course-title {
   margin: 30px 20px;
   height: 70px;
 }
-/* line 4377, ../../../scss/_app_styles.scss */
+@media screen and (max-width: 450px) {
+  /* line 4373, ../../../scss/_app_styles.scss */
+  .landing_page .clix_brief img {
+    margin: 25px 10px;
+    height: 55px;
+  }
+}
+/* line 4381, ../../../scss/_app_styles.scss */
 .landing_page .clix_brief p {
   color: #fff;
   font-size: 26px;
   font-weight: 300;
   font-family: 'ubuntu-light';
 }
-/* line 4385, ../../../scss/_app_styles.scss */
+@media screen and (max-width: 450px) {
+  /* line 4381, ../../../scss/_app_styles.scss */
+  .landing_page .clix_brief p {
+    font-size: 18px;
+  }
+}
+/* line 4392, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix {
   background-color: rgba(255, 255, 255, 0.92);
   border-radius: 10px;
   width: 80%;
-  margin: 45px auto;
+  margin: 20px auto;
   text-align: left;
   padding: 30px 40px 21px;
   box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.5);
 }
-/* line 4394, ../../../scss/_app_styles.scss */
+@media screen and (min-width: 1025px) {
+  /* line 4392, ../../../scss/_app_styles.scss */
+  .landing_page .invitation_to_clix {
+    margin: 200px auto;
+  }
+}
+/* line 4404, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix > span {
   font-family: 'ubuntu-bold';
   color: #6658af;
@@ -27774,7 +27793,7 @@ course-title {
   display: inline-block;
   vertical-align: middle;
 }
-/* line 4404, ../../../scss/_app_styles.scss */
+/* line 4414, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix p {
   color: #b0108d;
   font-size: 21px;
@@ -27782,28 +27801,28 @@ course-title {
   font-weight: 300;
   font-family: 'ubuntu-light';
 }
-/* line 4412, ../../../scss/_app_styles.scss */
+/* line 4422, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix img {
   height: 30px;
 }
-/* line 4415, ../../../scss/_app_styles.scss */
+/* line 4425, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix form {
   margin-top: 30px;
 }
-/* line 4418, ../../../scss/_app_styles.scss */
+/* line 4428, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix form input {
   font-size: 24px;
   height: 45px;
   margin: 5px 0px 24px;
 }
-/* line 4425, ../../../scss/_app_styles.scss */
+/* line 4435, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix input.button {
   font-size: 15px;
   border-radius: 5px;
   font-family: 'ubuntu-bold';
   text-transform: uppercase;
 }
-/* line 4431, ../../../scss/_app_styles.scss */
+/* line 4441, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix a.grey {
   color: #999;
   /*display: inline-block;
@@ -27814,41 +27833,66 @@ course-title {
   font-family: 'ubuntu-bold';
   text-transform: uppercase;*/
 }
-/* line 4442, ../../../scss/_app_styles.scss */
+/* line 4452, ../../../scss/_app_styles.scss */
 .landing_page .flowers {
   left: 50px;
-  height: 418px;
+  height: 500px;
   bottom: 0px;
   opacity: 0.6;
 }
-/* line 4448, ../../../scss/_app_styles.scss */
+@media screen and (max-width: 450px) {
+  /* line 4452, ../../../scss/_app_styles.scss */
+  .landing_page .flowers {
+    height: 250px;
+  }
+}
+@media screen and (min-width: 451px) and (max-width: 750px) {
+  /* line 4452, ../../../scss/_app_styles.scss */
+  .landing_page .flowers {
+    height: 300px;
+  }
+}
+@media screen and (min-width: 751px) and (max-width: 1025px) {
+  /* line 4452, ../../../scss/_app_styles.scss */
+  .landing_page .flowers {
+    height: 375px;
+  }
+}
+/* line 4467, ../../../scss/_app_styles.scss */
 .landing_page .bees {
   position: absolute;
   top: 5px;
   right: 50px;
-  height: 125px;
+  height: 150px;
 }
-/* line 4454, ../../../scss/_app_styles.scss */
+@media screen and (max-width: 450px) {
+  /* line 4467, ../../../scss/_app_styles.scss */
+  .landing_page .bees {
+    right: 20px;
+    height: 100px;
+  }
+}
+/* line 4477, ../../../scss/_app_styles.scss */
 .landing_page h2 {
   color: #A0148E;
   font-weight: 600;
 }
-/* line 4458, ../../../scss/_app_styles.scss */
+/* line 4481, ../../../scss/_app_styles.scss */
 .landing_page .landing-page-text {
   color: #6153ae;
 }
-/* line 4461, ../../../scss/_app_styles.scss */
+/* line 4484, ../../../scss/_app_styles.scss */
 .landing_page .landing-page-text p {
   font-size: 18px;
 }
 
 /* END of Landing page */
-/* line 4467, ../../../scss/_app_styles.scss */
+/* line 4490, ../../../scss/_app_styles.scss */
 .audio-caption {
   cursor: pointer;
 }
 
-/* line 4471, ../../../scss/_app_styles.scss */
+/* line 4494, ../../../scss/_app_styles.scss */
 .gallery-image {
   cursor: pointer;
   max-height: 100px;

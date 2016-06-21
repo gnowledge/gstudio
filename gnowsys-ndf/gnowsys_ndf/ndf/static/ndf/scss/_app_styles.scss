@@ -4373,10 +4373,17 @@ course-title{
     img {
       margin: 30px 20px;
       height: 70px;
+      @media screen and (max-width: 450px) {
+        margin: 25px 10px;
+        height: 55px;
+      } 
     }
     p {
       color: #fff;
       font-size: 26px;
+      @media screen and (max-width: 450px) {
+        font-size: 18px;
+      }
       font-weight: 300;
       font-family: 'ubuntu-light';
     }
@@ -4386,7 +4393,10 @@ course-title{
     background-color: rgba(255,255,255, 0.92);
     border-radius: 10px;
     width: 80%;
-    margin: 45px auto;
+    margin: 20px auto;
+    @media screen and (min-width: 1025px) {
+      margin: 200px auto;
+    }
     text-align: left;
     padding: 30px 40px 21px;
     box-shadow: 0px 0px 30px rgba(0, 0,0, 0.5);
@@ -4441,7 +4451,16 @@ course-title{
   }
   .flowers {
     left: 50px;
-    height: 418px;
+    height: 500px;
+    @media screen and (max-width: 450px) {
+      height: 250px;
+    }
+    @media screen and (min-width: 451px) and (max-width: 750px) {
+      height: 300px;
+    }
+    @media screen and (min-width: 751px) and (max-width: 1025px) {
+      height: 375px;
+    }
     bottom: 0px;
     opacity: 0.6;
   }
@@ -4449,7 +4468,11 @@ course-title{
     position: absolute;
     top: 5px;
     right: 50px;
-    height: 125px;
+    height: 150px;
+    @media screen and (max-width: 450px) {
+      right: 20px;
+      height: 100px;
+    }
   }
   h2 {
     color: #A0148E;
