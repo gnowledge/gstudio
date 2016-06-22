@@ -191,16 +191,13 @@ class AnalyticsMethods(object):
 												if each_qi._id not in self.list_of_qi_ids:
 													self.list_of_qi_ids.append(each_qi._id)
 								break
+
 		if correct_ans_flag:
-
-
-
 			return len(self.list_of_qi_ids)
+
 		elif incorrect_ans_flag:
-
-
-
 			return (self.total_qi_cur.count()-len(self.list_of_qi_ids))
+
 		else:
 			return 0
 
