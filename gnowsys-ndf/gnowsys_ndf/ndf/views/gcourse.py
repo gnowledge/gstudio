@@ -2571,43 +2571,139 @@ def course_analytics_admin(request, group_id):
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
-    try:
-        group_id = ObjectId(group_id)
-    except:
-        group_name, group_id = get_group_name_id(group_id)
-    response_dict = {}
-    group_obj = node_collection.one({'_id': ObjectId(group_id)})
-    FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
+    # try:
+    #     group_id = ObjectId(group_id)
+    # except:
+    #     group_name, group_id = get_group_name_id(group_id)
+    # t1 = time.time()
 
-    admin_analytics_list = []
-    if group_obj.author_set:
-        for each_author in group_obj.author_set:
-            user_obj = User.objects.get(pk=int(each_author))
-            admin_analytics_data = {}
-            analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
-            # username = user_obj.username
-            # user_id = user_obj.id
-            # users_points = analytics_instance.get_users_points()
-            admin_analytics_data['username'] = user_obj.username
-            admin_analytics_data['user_id'] = user_obj.id
-            users_points_breakup = analytics_instance.get_users_points(True)
-            admin_analytics_data['users_points'] = users_points_breakup['Total']
+    # response_dict = {}
+    # group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    # FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
 
-            admin_analytics_data["files_points"] = users_points_breakup['Files']
-            if FILES_MAX_POINT_VAL < users_points_breakup['Files']:
-                FILES_MAX_POINT_VAL = users_points_breakup['Files']
-            admin_analytics_data['notes_points'] = users_points_breakup['Notes']
-            if NOTES_MAX_POINT_VAL < users_points_breakup['Notes']:
-                NOTES_MAX_POINT_VAL = users_points_breakup['Notes']
-            admin_analytics_data['quiz_points'] = users_points_breakup['Quiz']
-            if QUIZ_MAX_POINT_VAL < users_points_breakup['Quiz']:
-                QUIZ_MAX_POINT_VAL = users_points_breakup['Quiz']
-            admin_analytics_data['interactions_points'] = users_points_breakup['Interactions']
-            if INTERACTIONS_MAX_POINT_VAL < users_points_breakup['Interactions']:
-                INTERACTIONS_MAX_POINT_VAL = users_points_breakup['Interactions']
-            del analytics_instance
-            admin_analytics_list.append(admin_analytics_data)
-    # print "\n\nadmin_analytics_list ",admin_analytics_list
+    # admin_analytics_list = []
+    # if group_obj.author_set:
+    #     for each_author in group_obj.author_set:
+    #         user_obj = User.objects.get(pk=int(each_author))
+    #         admin_analytics_data = {}
+    #         analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+    #         # username = user_obj.username
+    #         # user_id = user_obj.id
+    #         # users_points = analytics_instance.get_users_points()
+    #         admin_analytics_data['username'] = user_obj.username
+    #         admin_analytics_data['user_id'] = user_obj.id
+    #         users_points_breakup = analytics_instance.get_users_points(True)
+    #         admin_analytics_data['users_points'] = users_points_breakup['Total']
+
+    #         admin_analytics_data["files_points"] = users_points_breakup['Files']
+    #         if FILES_MAX_POINT_VAL < users_points_breakup['Files']:
+    #             FILES_MAX_POINT_VAL = users_points_breakup['Files']
+    #         admin_analytics_data['notes_points'] = users_points_breakup['Notes']
+    #         if NOTES_MAX_POINT_VAL < users_points_breakup['Notes']:
+    #             NOTES_MAX_POINT_VAL = users_points_breakup['Notes']
+    #         admin_analytics_data['quiz_points'] = users_points_breakup['Quiz']
+    #         if QUIZ_MAX_POINT_VAL < users_points_breakup['Quiz']:
+    #             QUIZ_MAX_POINT_VAL = users_points_breakup['Quiz']
+    #         admin_analytics_data['interactions_points'] = users_points_breakup['Interactions']
+    #         if INTERACTIONS_MAX_POINT_VAL < users_points_breakup['Interactions']:
+    #             INTERACTIONS_MAX_POINT_VAL = users_points_breakup['Interactions']
+    #         del analytics_instance
+    #         admin_analytics_list.append(admin_analytics_data)
+    # # print "\n\nadmin_analytics_list ",admin_analytics_list
+
+    # column_headers = [
+    #     ("username", "Name"),
+    #     # ("user_id", "user_id"),
+    #     ("users_points", "Total Points"),
+    #     ("files_points", "Files"),
+    #     ("notes_points", "Notes"),
+    #     ("quiz_points", "Quiz"),
+    #     ("interactions_points", "Interactions"),
+    # ]
+    # max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
+    # 'quiz_max_points': QUIZ_MAX_POINT_VAL,'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
+
+    # response_dict["column_headers"] = column_headers
+    # response_dict["success"] = True
+    # response_dict["students_data_set"] = admin_analytics_list
+    # response_dict['max_points_dict'] = max_points_dict
+
+    # response_dict = json.dumps(response_dict)
+    # cache.set(cache_key, response_dict, 60*10)
+
+
+    # import time
+    # t1 = time.time()
+    from gnowsys_ndf.ndf.views.analytics_methods import AnalyticsMethods
+    from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
+
+    gst_page = node_collection.one({'_type': 'GSystemType', 'name': u'Page'})
+    gst_page_id = gst_page._id
+
+    gst_blog = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+    gst_blog_id = gst_blog._id
+
+    gst_file = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
+    gst_file_id = gst_file._id
+
+    gst_reply = node_collection.one({'_type': "GSystemType", 'name': "Reply"})
+    gst_reply_id = gst_reply._id
+
+    # group: I2C-V2
+    group_obj = node_collection.one({'_id': ObjectId('570fdf140bd67103f7670094')})
+
+    author_set = group_obj.author_set
+
+    all_res_cur = node_collection.find({'_type': 'GSystem', 'group_set': {'$in': [group_obj._id]}, '$or': [{'member_of': {'$in': [gst_file_id, gst_reply_id]}}, {'member_of': gst_page_id, 'type_of': gst_blog_id}], 'created_by': {'$in': author_set} })
+
+
+    gst_dict = {gst_page_id: 0, gst_file_id: 0, gst_reply_id: 0}
+
+    ud = { auth_id: gst_dict.copy() for auth_id in author_set}
+
+    for each in all_res_cur:
+        ud[each.created_by][each.member_of[0]] += 1
+
+    # final dict
+    fd = {}
+
+    gst_name_id_dict = {gst_page_id: 'notes_points', gst_file_id: 'files_points', gst_reply_id: 'interactions_points'}
+    gst_name_point_dict = {gst_page_id: GSTUDIO_NOTE_CREATE_POINTS, gst_file_id: GSTUDIO_FILE_UPLOAD_POINTS, gst_reply_id: GSTUDIO_COMMENT_POINTS}
+
+    admin_analytics_data_list = []
+    admin_analytics_data_append = admin_analytics_data_list.append
+    notes_points_list = [0]
+    notes_points_append = notes_points_list.append
+    files_points_list = [0]
+    files_points_append = files_points_list.append
+    interactions_points_list = [0]
+    interactions_points_append = interactions_points_list.append
+    quize_points_list = [0]
+    quize_points_append = quize_points_list.append
+
+    author_cur = node_collection.find({'_type': u'Author', 'created_by': {'$in': group_obj.author_set} }, {'_id': 0, 'created_by': 1, 'name': 1})
+    user_id_name_dict = {u['created_by']: u['name'] for u in author_cur}
+
+    for uid, gsts in ud.iteritems():
+        fd[uid] = {gst_name_id_dict[g]: gsts[g]*gst_name_point_dict[g] for g in gsts}
+        ua_dict = fd[uid]
+        analytics_instance = AnalyticsMethods(request, uid, user_id_name_dict[uid], group_id)
+        correct_attempted_quizitems = analytics_instance.get_evaluated_quizitems_count(True,False)
+        ua_dict['quiz_points'] = correct_attempted_quizitems * GSTUDIO_QUIZ_CORRECT_POINTS
+
+        # appends:
+        notes_points_append(ua_dict['notes_points'])
+        files_points_append(ua_dict['files_points'])
+        interactions_points_append(ua_dict['interactions_points'])
+        quize_points_append(ua_dict['quiz_points'])
+
+        ua_dict['users_points'] = sum(ua_dict.values())
+        ua_dict['user_id'] = uid
+        ua_dict['username'] = user_id_name_dict[uid]
+        admin_analytics_data_append(ua_dict)
+
+    max_points_dict = {'file_max_points': max(files_points_list),'notes_max_points': max(notes_points_list),
+        'quiz_max_points': max(quize_points_list),'interactions_max_points': max(interactions_points_list)}
 
     column_headers = [
         ("username", "Name"),
@@ -2618,17 +2714,17 @@ def course_analytics_admin(request, group_id):
         ("quiz_points", "Quiz"),
         ("interactions_points", "Interactions"),
     ]
-    max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
-    'quiz_max_points': QUIZ_MAX_POINT_VAL,'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
-
+    response_dict = {}
     response_dict["column_headers"] = column_headers
     response_dict["success"] = True
-    response_dict["students_data_set"] = admin_analytics_list
+    response_dict["students_data_set"] = admin_analytics_data_list
     response_dict['max_points_dict'] = max_points_dict
 
     response_dict = json.dumps(response_dict)
     cache.set(cache_key, response_dict, 60*10)
 
+    # print time.time() - t1
+    # print response_dict
     # print "\n admin_analytics_list === ",admin_analytics_list
     return HttpResponse(response_dict)
 
