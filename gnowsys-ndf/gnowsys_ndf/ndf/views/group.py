@@ -1226,9 +1226,6 @@ class CreateCourseEventGroup(CreateEventGroup):
                 each_rm_file.save(groupid=new_group_obj._id)
 
 
-
-
-
     def create_corresponding_gsystem(self,gs_name,gs_member_of,gs_under_coll_set_of_obj, group_obj):
 
         try:
@@ -1273,7 +1270,6 @@ class CreateCourseEventGroup(CreateEventGroup):
                     # prior_node_obj.collection_set.append(each_res_node._id)
                     # node.save()
                     prior_node_obj.save()
-                    
             else:
                 for each in node.collection_set:
                     each_node = node_collection.one({'_id': ObjectId(each)})
