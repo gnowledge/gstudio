@@ -292,34 +292,42 @@ class Node(DjangoDocument):
     use_dot_notation = True
 
 
-    def fill_node_values(self, request=HttpRequest(), **kwargs):
+    def fill_node_values(self, request, **kwargs):
 
         # 'name': unicode,
         if kwargs.has_key('name'):
             name = kwargs.get('name', '')
-        else:
+        elif request:
             name = request.POST.get('name', '').strip()
+        else:
+            name = ''
         self.name = unicode(name)
 
         # 'altnames': unicode,
         if kwargs.has_key('altnames'):
             altnames = kwargs.get('altnames', name)
-        else:
+        elif request:
             altnames = request.POST.get('altnames', name).strip()
+        else:
+            altnames = name
         self.altnames = unicode(altnames)
 
         # 'plural': unicode,
         if kwargs.has_key('plural'):
             plural = kwargs.get('plural', None)
-        else:
+        elif request:
             plural = request.POST.get('plural', None)
+        else:
+            plural = None
         self.plural = unicode(plural)
 
         # 'prior_node': [ObjectId],
         if kwargs.has_key('prior_node'):
             prior_node = kwargs.get('prior_node', [])
-        else:
+        elif request:
             prior_node = request.POST.get('prior_node', [])
+        else:
+            prior_node = []
         self.prior_node = prior_node
         if prior_node and not isinstance(prior_node, list):
             self.prior_node = [ObjectId(each) for each in prior_node]
@@ -327,8 +335,10 @@ class Node(DjangoDocument):
         # 'post_node': [ObjectId]
         if kwargs.has_key('post_node'):
             post_node = kwargs.get('post_node', [])
-        else:
+        elif request:
             post_node = request.POST.get('post_node', [])
+        else:
+            post_node = []
         self.post_node = post_node
         if post_node and not isinstance(post_node, list):
             self.post_node = [ObjectId(each) for each in post_node]
@@ -336,15 +346,19 @@ class Node(DjangoDocument):
         # 'language': (basestring, basestring)
         if kwargs.has_key('language'):
             language = kwargs.get('language', ('en', 'English'))
-        else:
+        elif request:
             language = request.POST.get('language', ('en', 'English'))
+        else:
+            language = ('en','English')
         self.language = language
 
         # 'type_of': [ObjectId]
         if kwargs.has_key('type_of'):
             type_of = kwargs.get('type_of', [])
-        else:
+        elif request:
             type_of = request.POST.get('type_of', [])
+        else:
+            type_of = []
         self.type_of = type_of
         if type_of and not isinstance(type_of, list):
             self.type_of = [ObjectId(each) for each in type_of]
@@ -352,17 +366,21 @@ class Node(DjangoDocument):
         # 'member_of': [ObjectId]
         if kwargs.has_key('member_of'):
             member_of = kwargs.get('member_of', [])
-        else:
+        elif request:
             member_of = request.POST.get('member_of', [])
-        self.member_of = [ObjectId(member_of)] if member_of else member_of
+        else:
+            member_of = ''
+        self.member_of = member_of
         # if member_of and not isinstance(member_of, list):
         #     self.member_of = [ObjectId(each) for each in member_of]
 
         # 'access_policy': unicode
         if kwargs.has_key('access_policy'):
             access_policy = kwargs.get('access_policy', u'PUBLIC')
-        else:
+        elif request:
             access_policy = request.POST.get('access_policy', u'PUBLIC')
+        else:
+            access_policy = 'PUBLIC'
         self.access_policy = unicode(access_policy)
 
         # 'created_at': datetime.datetime
@@ -377,6 +395,8 @@ class Node(DjangoDocument):
                 created_by = kwargs.get('created_by', '')
             elif request:
                 created_by = request.user.id
+            else:
+                created_by = ''
             self.created_by = int(created_by) if created_by else 0
 
         # 'modified_by': int, # test required: only ids of Users
@@ -387,13 +407,17 @@ class Node(DjangoDocument):
                 modified_by = request.user.id
             elif kwargs.has_key('created_by'):
                 modified_by = created_by
+        else:
+            modified_by = None
         self.modified_by = int(modified_by) if modified_by else 0
 
         # 'contributors': [int]
         if kwargs.has_key('contributors'):
             contributors = kwargs.get('contributors', [])
-        else:
+        elif request:
             contributors = request.POST.get('contributors', [])
+        else:
+            contributors = []
         self.contributors = contributors
         if contributors and not isinstance(contributors, list):
             self.contributors = [int(each) for each in contributors]
@@ -401,29 +425,37 @@ class Node(DjangoDocument):
         # 'location': [dict]
         if kwargs.has_key('location'):
             location = kwargs.get('location', [])
-        else:
+        elif request:
             location = request.POST.get('location', [])
+        else:
+            location = []
         self.location = list(location) if not isinstance(location, list) else location
 
         # 'content': unicode
         if kwargs.has_key('content'):
             content = kwargs.get('content', '')
-        else:
+        elif request:
             content = request.POST.get('content', '')
+        else:
+            content = ''
         self.content = unicode(content)
 
         # 'content_org': unicode
         if kwargs.has_key('content_org'):
             content_org = kwargs.get('content_org', '')
-        else:
+        elif request:
             content_org = request.POST.get('content_org', '')
+        else:
+            content_org = ''
         self.content_org = unicode(content_org)
 
         # 'group_set': [ObjectId]
         if kwargs.has_key('group_set'):
             group_set = kwargs.get('group_set', [])
-        else:
+        elif request:
             group_set = request.POST.get('group_set', [])
+        else:
+            group_set = []
         self.group_set = group_set
         if group_set and not isinstance(group_set, list):
             self.group_set = [ObjectId(each) for each in group_set]
@@ -431,8 +463,10 @@ class Node(DjangoDocument):
         # 'collection_set': [ObjectId]
         if kwargs.has_key('collection_set'):
             collection_set = kwargs.get('collection_set', [])
-        else:
+        elif request:
             collection_set = request.POST.get('collection_set', [])
+        else:
+            collection_set = []
         self.collection_set = collection_set
         if collection_set and not isinstance(collection_set, list):
             self.collection_set = [ObjectId(each) for each in collection_set]
@@ -440,23 +474,29 @@ class Node(DjangoDocument):
         # 'property_order': []
         if kwargs.has_key('property_order'):
             property_order = kwargs.get('property_order', [])
-        else:
+        elif request:
             property_order = request.POST.get('property_order', [])
+        else:
+            property_order = []
         self.property_order = list(property_order) if not isinstance(property_order, list) else property_order
 
         # 'start_publication': datetime.datetime,
         if kwargs.has_key('start_publication'):
             start_publication = kwargs.get('start_publication', None)
-        else:
+        elif request:
             start_publication = request.POST.get('start_publication', None)
+        else:
+            start_publication = None
         self.start_publication = start_publication
         # self.start_publication = datetime.datetime(start_publication) if not isinstance(start_publication, datetime.datetime) else start_publication
 
         # 'tags': [unicode],
         if kwargs.has_key('tags'):
             tags = kwargs.get('tags', [])
-        else:
+        elif request:
             tags = request.POST.get('tags', [])
+        else:
+            tags = []
         self.tags = tags if tags else []
         if tags and not isinstance(tags, list):
             self.tags = [unicode(each.strip()) for each in tags.split(',')]
@@ -464,36 +504,46 @@ class Node(DjangoDocument):
         # 'featured': bool,
         if kwargs.has_key('featured'):
             featured = kwargs.get('featured', None)
-        else:
+        elif request:
             featured = request.POST.get('featured', None)
+        else:
+            featured = None
         self.featured = bool(featured)
 
         # 'url': unicode,
         if kwargs.has_key('url'):
             url = kwargs.get('url', None)
-        else:
+        elif request:
             url = request.POST.get('url', None)
+        else:
+            url = None
         self.url = unicode(url)
 
         # 'comment_enabled': bool,
         if kwargs.has_key('comment_enabled'):
             comment_enabled = kwargs.get('comment_enabled', None)
-        else:
+        elif request:
             comment_enabled = request.POST.get('comment_enabled', None)
+        else:
+            comment_enabled = None
         self.comment_enabled = bool(comment_enabled)
 
         # 'login_required': bool,
         if kwargs.has_key('login_required'):
             login_required = kwargs.get('login_required', None)
-        else:
+        elif request:
             login_required = request.POST.get('login_required', None)
+        else:
+            login_required = None
         self.login_required = bool(login_required)
 
         # 'status': STATUS_CHOICES_TU,
         if kwargs.has_key('status'):
             status = kwargs.get('status', u'DRAFT')
-        else:
+        elif request:
             status = request.POST.get('status', u'DRAFT')
+        else:
+            status = 'DRAFT'
         self.status = unicode(status)
 
         # 'rating':[{'score':int, 'user_id':int, 'ip_address':basestring}],
@@ -1426,7 +1476,7 @@ class GSystem(Node):
                         'license': GSTUDIO_DEFAULT_LICENSE
                     }
 
-    def fill_gstystem_values(self,
+    def fill_gsystem_values(self,
                             request=None,
                             attribute_set=[],
                             relation_set=[],
