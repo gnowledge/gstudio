@@ -222,6 +222,7 @@ body{
     font-family: 'ubuntu-regular';
 }
 
+
 #top-headers {
 
   margin-bottom: 0.5rem;
@@ -230,6 +231,9 @@ body{
   #first-header.top-bar {
 
     background-color: #3e3e3e;
+    @media only screen and (min-width: 40.063em){
+      height: auto;
+    }
     // background-color: #fff;        // khaal
     // margin: 0px auto;              // khaal
     // box-shadow: 0px 2px 5px rgba(0, 0, 0 , 0.4);    // khaal
