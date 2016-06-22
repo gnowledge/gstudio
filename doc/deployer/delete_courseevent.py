@@ -8,7 +8,7 @@ print "Total CE found --- ",group_cur.count()
 def delete_res(del_cur):
 
     for each in del_cur:
-        print "\n=== deleted: ===\n", each.name , "---", each.member_of_names_list
+        # print "\n=== deleted: ===\n", each.name , "---", each.member_of_names_list
         del_status, del_status_msg = delete_node(
             node_id=each._id,
             deletion_type=1
