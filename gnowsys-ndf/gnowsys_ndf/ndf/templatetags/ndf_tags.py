@@ -3242,11 +3242,16 @@ def get_thread_node(node_id):
 	if node_id:
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		thread_obj = None
-		if node_obj.relation_set:
-			for rel in node_obj.relation_set:
-				if rel and 'has_thread' in rel:
-					thread_obj = rel['has_thread'][0]
-		# print "\n\nthread_obj--",thread_obj
+		has_thread_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_thread'})
+		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),'relation_type.$id': has_thread_rt._id})
+		if thread_rt:
+			thread_obj = thread_rt['right_subject']
+
+		# if node_obj.relation_set:
+		# 	for rel in node_obj.relation_set:
+		# 		if rel and 'has_thread' in rel:
+		# 			thread_obj = rel['has_thread'][0]
+		# # print "\n\nthread_obj--",thread_obj
 		return thread_obj
 	return None
 
@@ -3703,11 +3708,15 @@ def get_file_obj(node):
 def get_help_pages_of_node(node_obj):
 	all_help_page_node_list = []
 	try:
-		for each_rel in node_obj.relation_set:
-			if each_rel and "has_help" in each_rel:
-				help_pages_id_list = each_rel["has_help"]
+		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_help'})
+		help_rt = triple_collection.find_one({'subject':node_obj._id,'relation_type.$id': has_help_rt._id})
+		if help_rt:
+			help_pages_id_list = help_rt['right_subject']
+			if isinstance(help_pages_id_list,list):
 				all_help_page_node_list = [node_collection.one({'_id':ObjectId(each_help_id)}) for each_help_id in help_pages_id_list]
-				return all_help_page_node_list
+			elif isinstance(help_pages_id_list,ObjectId):
+				all_help_page_node_list = [node_collection.one({'_id':ObjectId(help_pages_id_list)})]
+			return all_help_page_node_list
 	except:
 		return all_help_page_node_list
 
