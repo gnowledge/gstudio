@@ -43,6 +43,7 @@ GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
 gst_file = node_collection.one({'_type': "GSystemType", 'name': u"File"})
 gst_page = node_collection.one({'_type': "GSystemType", 'name': u"Page"})
+has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
 
 app = GST_COURSE
 
@@ -1858,8 +1859,11 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
 #     pass
 
 
-# ::::COURSE-PLAYER VIEWS::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# :::::::::::::::::::::::::::::::::COURSE-PLAYER VIEWS::::::::::::::::::::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+# Following View Not in Use
 @get_execution_time
 def course_dashboard(request, group_id):
 
@@ -1891,6 +1895,27 @@ def course_dashboard(request, group_id):
         })
     return render_to_response(template, context_variables)
 
+
+
+def _get_current_and_old_display_pics(group_obj):
+    banner_pic_obj = None
+    old_profile_pics = []
+    for each in group_obj.relation_set:
+        if "has_banner_pic" in each:
+            banner_pic_obj = node_collection.one(
+                {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
+            )
+            break
+
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            if n not in old_profile_pics:
+                old_profile_pics.append(n)
+
+    return banner_pic_obj, old_profile_pics
+
 @get_execution_time
 def course_content(request, group_id):
 
@@ -1900,6 +1925,8 @@ def course_content(request, group_id):
 
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    '''
     banner_pic_obj = None
     old_profile_pics = []
     if not banner_pic_obj:
@@ -1912,13 +1939,13 @@ def course_content(request, group_id):
 
     has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
     all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
-
-
+    '''
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
@@ -1941,6 +1968,8 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
     thread_node = None
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    '''
     banner_pic_obj = None
     old_profile_pics = []
     if not banner_pic_obj:
@@ -1958,7 +1987,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
-
+    '''
     allow_to_join = get_group_join_status(group_obj)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
@@ -2022,11 +2051,9 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     gstaff_users.append(group_obj.created_by)
     allow_to_join = None
     files_cur = None
-
-
-
     allow_to_join = get_group_join_status(group_obj)
-
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    '''
     banner_pic_obj = None
     old_profile_pics = []
     if not banner_pic_obj:
@@ -2044,8 +2071,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
-
-
+    '''
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'raw material',
@@ -2071,22 +2097,6 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                                         'tags': "raw@material",
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'created_by': {'$in': gstaff_users},
-                            # '$or': [
-                                    # {
-                                    # },
-                                    # {
-                                    #     '$or': [
-                                    #             {'access_policy': u"PUBLIC"},
-                                    #             {
-                                    #                 '$and': [
-                                    #                         {'access_policy': u"PRIVATE"},
-                                    #                         {'created_by': request.user.id}
-                                    #                     ]
-                                    #             }
-                                    #         ],
-                                    # }
-                                    # {    'collection_set': {'$exists': "true", '$not': {'$size': 0} }}
-                                # ]
                         },
                         {
                             'name': 1,
@@ -2129,7 +2139,8 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     allow_to_upload = True
     allow_to_join = query_dict = None
     allow_to_join = get_group_join_status(group_obj)
-
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    '''
     banner_pic_obj = None
     old_profile_pics = []
     if not banner_pic_obj:
@@ -2147,8 +2158,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
-
-
+    '''
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
@@ -2164,47 +2174,9 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
     else:
-        # coll_cur = node_collection.find({
-        #                   'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-        #                                     'group_set': {'$all': [ObjectId(group_id)]},
-        #                                     '$or': [
-        #                                         {'access_policy': u"PUBLIC"},
-        #                                         {'$and': [
-        #                                             {'access_policy': u"PRIVATE"},
-        #                                             {'created_by': request.user.id}
-        #                                         ]
-        #                                      }
-        #                                     ],
-        #                                     'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-        #                                 }).sort("last_update", -1)
 
         gstaff_users.extend(group_obj.group_admin)
         gstaff_users.append(group_obj.created_by)
-        # query = {
-        #             'group_set': group_id,
-        #             'relation_set.clone_of':{'$exists': False},
-        #             '_type': "File",
-        #             'created_by': {'$nin': gstaff_users}
-        #         }
-        # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
-
-        # files_cur = node_collection.find({
-        #                             '_type': {'$in': ["File", "GSystem"]},
-        #                             'member_of': {'$in': [gst_file._id]},
-        #                             'group_set': group_id,
-        #                             'created_by': {'$nin': gstaff_users},
-        #                         },
-        #                         {
-        #                             'name': 1,
-        #                             '_id': 1,
-        #                             'fs_file_ids': 1,
-        #                             'if_file': 1,
-        #                             'member_of': 1,
-        #                             'mime_type': 1
-        #                         }).sort('created_at', -1)
-
-        # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
-        # print "\n\n Total files: ", files_cur.count()
         files_cur = node_collection.find({
                                         'created_by': {'$nin': gstaff_users},
                                         '_type': {'$in':["File","GSystem"]},
@@ -2217,7 +2189,6 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                                     'member_of': gst_page._id,
                                                 },
                                             ],
-                                            # 'collection_set': {'$exists': "true", '$not': {'$size': 0} }
                                             },
                                         {
                                             'name': 1,
@@ -2252,8 +2223,6 @@ def course_about(request, group_id):
 
     allow_to_join = get_group_join_status(group_obj)
 
-
-
     if start_date and last_date:
       start_date = start_date.date()
       last_date = last_date.date()
@@ -2265,7 +2234,8 @@ def course_about(request, group_id):
       weeks_count = (end_day - start_day).days / 7
 
     template = 'ndf/gcourse_event_group.html'
-
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    '''
     banner_pic_obj = None
     old_profile_pics = []
     if not banner_pic_obj:
@@ -2285,6 +2255,7 @@ def course_about(request, group_id):
                 old_profile_pics.append(n)
 
     # print "\n\n prof_pic_obj" ,banner_pic_obj
+    '''
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
@@ -2333,8 +2304,6 @@ def course_note_page(request, group_id):
     thread_node = None
     allow_to_comment = None
     allow_to_join = get_group_join_status(group_obj)
-
-
 
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     template = 'ndf/note_page.html'
@@ -2456,7 +2425,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
     if data_points_dict and not isinstance(data_points_dict, dict):
         data_points_dict = json.loads(data_points_dict)
-        print "\n\ndata_points_dict",data_points_dict
+        # print "\n\ndata_points_dict",data_points_dict
         analytics_data['correct_attempted_quizitems'] = (data_points_dict['quiz_points'] / GSTUDIO_QUIZ_CORRECT_POINTS)
         analytics_data['user_notes'] = (data_points_dict['notes_points'] / GSTUDIO_NOTE_CREATE_POINTS)
         analytics_data['user_files'] = (data_points_dict['files_points'] / GSTUDIO_FILE_UPLOAD_POINTS)
