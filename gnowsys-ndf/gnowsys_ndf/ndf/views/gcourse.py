@@ -2645,7 +2645,7 @@ def course_analytics_admin(request, group_id):
     gst_reply_id = gst_reply._id
 
     # group: I2C-V2
-    group_obj = node_collection.one({'_id': ObjectId('570fdf140bd67103f7670094')})
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
     author_set = group_obj.author_set
 
