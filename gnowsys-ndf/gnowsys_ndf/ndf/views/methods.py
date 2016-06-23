@@ -5193,8 +5193,10 @@ def create_clone(user_id, node, group_id):
         cloned_copy['status'] = u"PUBLISHED"
         cloned_copy['modified_by'] = int(user_id)
         cloned_copy['created_by'] = int(user_id)
-        cloned_copy['prior_node'] = node.prior_node
+        # cloned_copy['prior_node'] = node.prior_node
         cloned_copy['contributors'] = [int(user_id)]
+        cloned_copy['relation_set'] = []
+        cloned_copy['attribute_set'] = []
         cloned_copy['origin'] = [{'fork_of': node._id}]
         if "QuizItem" in node.member_of_names_list:
             quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
@@ -5218,47 +5220,43 @@ def replicate_resource(request, node, group_id):
         user_id = request.user.id
         new_gsystem = create_clone(user_id, node, group_id)
 
-        # FORKING TRIPLES 
+        if new_gsystem:
+            # FORKING TRIPLES 
 
-        ##### TRIPLES GATTRIBUTES
-        node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
+            ##### TRIPLES GATTRIBUTES
+            node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
 
-        for each_gattr in node_gattr_cur:
-            new_gattr = each_gattr.copy()
-            new_gattr['_id'] = ObjectId()
-            new_gattr['subject'] = new_gsystem._id
-            at_id = each_gattr['attribute_type']['_id']
-            at_node = node_collection.one({'_id': ObjectId(at_id)})
-            new_gattr['attribute_type'] = at_node.get_dbref()
-            forked_gattr_id = triple_collection.collection.insert(new_gattr)
+            for each_gattr in node_gattr_cur:
+                at_id = each_gattr['attribute_type']['_id']
+                obj_val = each_gattr['object_value']
+                at_node = node_collection.one({'_id': ObjectId(at_id)})
+                create_gattribute(new_gsystem._id,at_node,obj_val)
 
-        ##### TRIPLES GRELATIONS
-        node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id})
+            ##### TRIPLES GRELATIONS
+            node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id})
 
-        for each_rel in node_grel_cur:
-            new_grel = each_rel.copy()
-            new_grel['_id'] = ObjectId()
-            new_grel['subject'] = new_gsystem._id
-            rt_id = each_rel['relation_type']['_id']
-            rt_node = node_collection.one({'_id': ObjectId(rt_id)})
-            right_subj_id = each_rel['right_subject']
-            new_grel['relation_type'] = rt_node.get_dbref()
-            if isinstance(right_subj_id,list):
-                right_subj_id_list = []
-                right_subj_node = node_collection.one({'_id': {'$in': right_subj_id}})
-                for each_rs in right_subj_node:
-                    new_right_subj_node = create_clone(user_id, each_rs, group_id)
-                    right_subj_id_list.append(new_right_subj_node._id)
-                new_grel['right_subject'] = right_subj_id_list
-            else:
-                right_subj_node = node_collection.one({'_id': ObjectId(right_subj_id)})
-                new_right_subj_node = create_clone(user_id, right_subj_node, group_id)
-                new_grel['right_subject'] = new_right_subj_node._id
+            for each_rel in node_grel_cur:
+                rt_id = each_rel['relation_type']['_id']
+                right_subj = each_rel['right_subject']
+                rt_node = node_collection.one({'_id': ObjectId(rt_id)})
 
-            forked_rel_id = triple_collection.collection.insert(new_grel)
+                right_sub_new = None
+                if isinstance(right_subj,list):
+                    right_sub_new = []
+                    right_subj_node = node_collection.one({'_id': {'$in': right_subj}})
+                    for each_rs in right_subj_node:
+                        new_right_subj_node = create_clone(user_id, each_rs, group_id)
+                        right_sub_new.append(new_right_subj_node._id)
+                else:
+                    right_subj_node = node_collection.one({'_id': ObjectId(right_subj)})
+                    right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+                    right_sub_new = right_sub_new_node._id
 
-        if "QuizItemEvent" in new_gsystem.member_of_names_list:
-            thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+                create_grelation(new_gsystem._id,rt_node,right_sub_new)
+
+
+            if "QuizItemEvent" in new_gsystem.member_of_names_list:
+                thread_obj = create_thread_for_node(request,group_id, new_gsystem)
 
         # clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
         # create_grelation(new_gsystem._id, clone_of_RT, node._id)
@@ -5344,7 +5342,6 @@ def replicate_resource(request, node, group_id):
         #     if node.quizitem_max_attempts:
         #         create_gattribute(new_gsystem._id,quizitem_max_attempts_AT, node.quizitem_max_attempts)
 
-        new_gsystem.reload()
         return new_gsystem
     except Exception as replicate_resource_err:
         print replicate_resource_err

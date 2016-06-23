@@ -724,6 +724,13 @@ class Node(DjangoDocument):
                 for each_invalid_field in invalid_struct_fields_list:
                     if each_invalid_field in self.structure:
                         print "=== removed ", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
+
+            # invalid_struct_fields_list = list(set(self.structure.keys()).symmetric_difference(set(self.keys())))
+
+            # if invalid_struct_fields_list:
+            #     for each_invalid_field in invalid_struct_fields_list:
+            #         if each_invalid_field in self:
+            #             print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
         except Exception, e:
             print e
             pass

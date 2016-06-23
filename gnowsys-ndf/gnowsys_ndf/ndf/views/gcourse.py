@@ -2095,9 +2095,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                                                 }
                                             ],
                                         'group_set': {'$all': [ObjectId(group_id)]},
-                                        '$or':[{'created_by': {'$in': gstaff_users}},
-                                                {'tags': "raw@material"}
-                                            ]
+                                        'tags': "raw@material"
                         },
                         {
                             'name': 1,
