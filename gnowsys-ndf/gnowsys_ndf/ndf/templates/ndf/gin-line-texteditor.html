@@ -41,6 +41,11 @@
 
 <div >
   <br/>
+
+    <input type="hidden" id="prior-node" style="visibility:hidden" value="">
+    <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
+    <input type="hidden" id="last-edited-row" data-edited-row-id="">
+
     {% if allow_to_comment %}
       <div data-alert class="alert-box new_comments hide info radius">
         <div class="new_cmnts_lbl">New comment(s) added. Please refresh to see.</div>
@@ -57,7 +62,6 @@
           Comment  {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
         {% endif %}
       </div>
-    {% endif %}
     </div>
 
     {% comment %}
@@ -67,10 +71,6 @@
       <input type="file" id="uploaded-files" style="" value="" multiple class="hide">
     {% endif %}
     {% endcomment %}
-    <input type="hidden" id="prior-node" style="visibility:hidden" value="">
-
-    <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
-    <input type="hidden" id="last-edited-row" data-edited-row-id="">
 
   <div id="replies-area">
 
@@ -137,6 +137,7 @@
 
     <!-- END of populating replies -->
   </div>
+    {% endif %}
 
   <!-- orgitdown container -->
 
