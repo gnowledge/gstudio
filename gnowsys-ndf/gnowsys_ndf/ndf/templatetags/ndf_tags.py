@@ -3716,13 +3716,22 @@ def get_help_pages_of_node(node_obj):
 	all_help_page_node_list = []
 	try:
 		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_help'})
-		help_rt = triple_collection.find_one({'subject':node_obj._id,'relation_type.$id': has_help_rt._id})
+		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type.$id': has_help_rt._id, 'status': u'PUBLISHED'})
 		if help_rt:
-			help_pages_id_list = help_rt['right_subject']
-			if isinstance(help_pages_id_list,list):
-				all_help_page_node_list = [node_collection.one({'_id':ObjectId(each_help_id)}) for each_help_id in help_pages_id_list]
-			elif isinstance(help_pages_id_list,ObjectId):
-				all_help_page_node_list = [node_collection.one({'_id':ObjectId(help_pages_id_list)})]
+			for each_help_rt in help_rt:
+				# print each_help_rt.right_subject
+				help_pg_node = node_collection.one({'_id':ObjectId(each_help_rt.right_subject)})
+				if help_pg_node:
+					all_help_page_node_list.append(help_pg_node)
+
+
+			# print "\n\n help_rt",help_rt.count()
+			# help_pages_id_list = help_rt['right_subject']
+			# print help_pages_id_list
+			# if isinstance(help_pages_id_list,list):
+			# 	all_help_page_node_list = [node_collection.one({'_id':ObjectId(each_help_id)}) for each_help_id in help_pages_id_list]
+			# elif isinstance(help_pages_id_list,ObjectId):
+			# print "\n\nall_help_page_node_list",all_help_page_node_list
 			return all_help_page_node_list
 	except:
 		return all_help_page_node_list
