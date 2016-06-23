@@ -3286,7 +3286,7 @@ class Counter(DjangoDocument):
         'no_others_file_visited':int,# benchmark
         'no_comments_on_other_files':int,
         'no_comments_by_unique_users_files':int,
-        'avg_rating_awarded_files':int,
+        'avg_rating_awarded_files':float,
         'no_questions_attempted':int,
         'no_correct_answers':int,
         'no_incorrect_answers':int,
@@ -3296,7 +3296,7 @@ class Counter(DjangoDocument):
         'no_comments_received_notes':int,
         'no_comments_on_other_notes':int,
         'no_comments_by_unique_users_notes':int,
-        'avg_rating_awarded_notes':int,
+        'avg_rating_awarded_notes':float,
     }
 
     indexes = [
@@ -3309,7 +3309,29 @@ class Counter(DjangoDocument):
     ]
 
     required_fields = ['user_id', 'group_id', 'auth_id'] 
-
+    
+    default_values = {
+        'no_comments_by_user': 0,
+        'no_comments_for_user':0,
+        'no_files_created':0,
+        'no_visits_gained':0,
+        'no_comments_received_files':0,
+        'no_others_file_visited':0,
+        'no_comments_on_other_files':0,
+        'no_comments_by_unique_users_files':0,
+        'avg_rating_awarded_files':0.0,
+        'no_questions_attempted':0,
+        'no_correct_answers':0,
+        'no_incorrect_answers':0,
+        'no_notes_written':0,
+        'no_views_gained':0,
+        'no_others_notes_visited':0, 
+        'no_comments_received_notes':0,
+        'no_comments_on_other_notes':0,
+        'no_comments_by_unique_users_notes':0,
+        'avg_rating_awarded_notes':0.0
+    }
+    
     use_dot_notation = True
     def __unicode__(self):
         return self._id
