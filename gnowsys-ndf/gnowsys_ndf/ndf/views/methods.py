@@ -5202,6 +5202,8 @@ def create_clone(user_id, node, group_id):
         cloned_copy['created_by'] = int(user_id)
         # cloned_copy['prior_node'] = node.prior_node
         cloned_copy['contributors'] = [int(user_id)]
+        cloned_copy['post_node'] = []
+        cloned_copy['prior_node'] = []
         cloned_copy['relation_set'] = []
         cloned_copy['attribute_set'] = []
         cloned_copy['origin'] = [{'fork_of': node._id}]
@@ -5243,10 +5245,12 @@ def replicate_resource(request, node, group_id):
             node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id})
 
             for each_rel in node_grel_cur:
+                thread_created = False
                 rt_id = each_rel['relation_type']['_id']
                 right_subj = each_rel['right_subject']
                 rt_node = node_collection.one({'_id': ObjectId(rt_id)})
-
+                if rt_node.name == 'has_thread':
+                    thread_created = True
                 right_sub_new = None
                 if isinstance(right_subj,list):
                     right_sub_new = []
@@ -5260,10 +5264,9 @@ def replicate_resource(request, node, group_id):
                     right_sub_new = right_sub_new_node._id
 
                 create_grelation(new_gsystem._id,rt_node,right_sub_new)
-
-
             if "QuizItemEvent" in new_gsystem.member_of_names_list:
-                thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+                if not thread_created:
+                    thread_obj = create_thread_for_node(request,group_id, new_gsystem)
 
         # clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
         # create_grelation(new_gsystem._id, clone_of_RT, node._id)
