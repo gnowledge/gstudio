@@ -674,6 +674,13 @@ class Node(DjangoDocument):
                 for each_invalid_field in invalid_struct_fields_list:
                     if each_invalid_field in self.structure:
                         print "=== removed ", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
+
+            # invalid_struct_fields_list = list(set(self.structure.keys()).symmetric_difference(set(self.keys())))
+
+            # if invalid_struct_fields_list:
+            #     for each_invalid_field in invalid_struct_fields_list:
+            #         if each_invalid_field in self:
+            #             print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
         except Exception, e:
             print e
             pass
@@ -2915,7 +2922,7 @@ class Buddy(DjangoDocument):
                             loggedin_userid,
                             session_key,
                             buddy_in_out={},
-                            starts_at=datetime.datetime.utcnow(),
+                            starts_at=datetime.datetime.now(),
                             ends_at=None):
 
         self['loggedin_userid']= loggedin_userid
@@ -2995,7 +3002,7 @@ class Buddy(DjangoDocument):
         active_buddy_authid_list = self.get_active_authid_list_from_single_buddy()
 
         for each_buddy_authid in active_buddy_authid_list:
-            self.get_latest_in_out_dict(self.buddy_in_out[each_buddy_authid])['out'] = datetime.datetime.utcnow()
+            self.get_latest_in_out_dict(self.buddy_in_out[each_buddy_authid])['out'] = datetime.datetime.now()
 
         return self
 
@@ -3011,7 +3018,7 @@ class Buddy(DjangoDocument):
         active_buddy_authid_list = self.get_active_authid_list_from_single_buddy()
 
         self = self.remove_all_buddies()
-        self.ends_at = datetime.datetime.utcnow()
+        self.ends_at = datetime.datetime.now()
         self.save()
 
         # active_buddy_userids_list = Author.get_user_id_list_from_author_oid_list(active_buddy_authid_list)
@@ -3104,7 +3111,7 @@ class Buddy(DjangoDocument):
         if set(current_active_buddy_auth_list) == set(buddy_auth_ids_list):
             return current_active_buddy_auth_list
 
-        new_in_dict = { 'in': datetime.datetime.utcnow(), 'out': None }
+        new_in_dict = { 'in': datetime.datetime.now(), 'out': None }
         existing_buddy_in_out_auth_list  = buddy_obj.buddy_in_out.keys()
 
         # list of all buddies auth ids:
