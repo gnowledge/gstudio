@@ -4984,11 +4984,18 @@ def node_thread_access(group_id, node):
        * thread_node - used in discussion.html
        * success (i.e True/False)
     """
+
+    from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+
     has_thread_node = None
+    discussion_enable_val = get_attribute_value(node._id,"discussion_enable")
+
+    if not discussion_enable_val:
+        return has_thread_node, discussion_enable_val
+
     thread_start_time = None
     thread_end_time = None
     allow_to_comment = True  # default set to True to allow commenting if no date is set for thread
-    from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
     # has_thread_node_thread_grel = get_relation_value(node._id,"has_thread")
     grel_dict = get_relation_value(node._id,"has_thread", True)
     is_cursor = grel_dict.get("cursor",False)
@@ -5221,7 +5228,7 @@ def replicate_resource(request, node, group_id):
         new_gsystem = create_clone(user_id, node, group_id)
 
         if new_gsystem:
-            # FORKING TRIPLES 
+            # FORKING TRIPLES
 
             ##### TRIPLES GATTRIBUTES
             node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
