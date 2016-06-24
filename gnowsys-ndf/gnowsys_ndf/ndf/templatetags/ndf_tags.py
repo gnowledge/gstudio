@@ -1825,7 +1825,7 @@ def get_group_type(group_id, user):
                 # If Group is not found with either given ObjectId or name in the database
                 # Then compare with a given list of names as these were used in one of the urls
                 # And still no match found, throw error
-                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta", "welcome", "explore"]:
+                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta", "welcome", "explore","state_analytics"]:
                     error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
                     raise Http404(error_message)
 
@@ -3172,7 +3172,7 @@ def get_breadcrumb(url):
 
 	exception_list= [
 						'welcome', 'accounts', 'admin', '/dashboard',
-						'/partner/partners', '/partner/groups', '/group/'
+						'/partner/partners', '/partner/groups', '/group/','state_analytics'
 					]
 	path = []
 	apps = GAPPS + ['repository']
