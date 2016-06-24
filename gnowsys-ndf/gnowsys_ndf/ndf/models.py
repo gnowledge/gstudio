@@ -718,19 +718,24 @@ class Node(DjangoDocument):
         # found!!! "
 
         try:
-            invalid_struct_fields_list = list(set(self.structure.keys()) - set(self.keys()))
 
+            invalid_struct_fields = list(set(self.structure.keys()) - set(self.keys()))
+            # print '\n invalid_struct_fields: ',invalid_struct_fields
+            if invalid_struct_fields:
+                for each_invalid_field in invalid_struct_fields:
+                    if each_invalid_field in self.structure:
+                        print "=== removed from structure", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
+
+
+            keys_list = self.structure.keys()
+            keys_list.append('_id')
+            invalid_struct_fields_list = list(set(self.keys()) - set(keys_list))
+            # print '\n invalid_struct_fields_list: ',invalid_struct_fields_list
             if invalid_struct_fields_list:
                 for each_invalid_field in invalid_struct_fields_list:
-                    if each_invalid_field in self.structure:
-                        print "=== removed ", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
+                    if each_invalid_field in self:
+                        print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
 
-            # invalid_struct_fields_list = list(set(self.structure.keys()).symmetric_difference(set(self.keys())))
-
-            # if invalid_struct_fields_list:
-            #     for each_invalid_field in invalid_struct_fields_list:
-            #         if each_invalid_field in self:
-            #             print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
         except Exception, e:
             print e
             pass
