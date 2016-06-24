@@ -1483,6 +1483,27 @@ def save_resources(request, group_id):
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
         # print "\n\n member_of_names_list----", cu_new.member_of_names_list, "list_of_res_ids", list_of_res_ids
         new_res_set = []
+
+        if "CourseUnitEvent" in cu_new.member_of_names_list:
+            list_of_res_nodes = node_collection.find({'_id': {'$in': list_of_res_ids}})
+            for each_res in list_of_res_nodes:
+                if group_id not in each_res.group_set:
+                    new_gs = replicate_resource(request, each_res_node, group_id)
+                    new_res_set.append(new_gs._id)
+                else:
+                    new_res_set.append(each_res._id)
+        else:
+            for each_res_node_course in list_of_res_ids:
+                if each_res_node_course not in cu_new.collection_set:
+                    new_res_set.append(each_res_node_course)
+
+        for each_res_in_unit in new_res_set:
+            if each_res_in_unit not in cu_new.collection_set:
+                cu_new.collection_set.append(each_res_in_unit)
+                cu_new.save()
+
+        '''
+        new_res_set = []
         if "CourseUnitEvent" in cu_new.member_of_names_list:
             list_of_res_nodes = node_collection.find({'_id': {'$in': list_of_res_ids}})
 
@@ -1504,6 +1525,7 @@ def save_resources(request, group_id):
             if each_res_in_unit not in cu_new.collection_set:
                 cu_new.collection_set.append(each_res_in_unit)
                 cu_new.save()
+        '''
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
         return HttpResponse(json.dumps(response_dict))
@@ -1726,6 +1748,7 @@ def add_course_file(request, group_id):
 
         for each_gs_file in fileobj_list:
             each_gs_file.status = u"PUBLISHED"
+            each_gs_file.tags.append(u'raw@material')
             each_gs_file.prior_node.append(context_node._id)
             context_node.collection_set.append(each_gs_file._id)
             each_gs_file.save()
@@ -2645,7 +2668,7 @@ def course_analytics_admin(request, group_id):
     gst_reply_id = gst_reply._id
 
     # group: I2C-V2
-    group_obj = node_collection.one({'_id': ObjectId('570fdf140bd67103f7670094')})
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
     author_set = group_obj.author_set
 

@@ -13,7 +13,7 @@ def delete_res(del_cur):
             node_id=each._id,
             deletion_type=1
         )
-        print "\n---------\n",del_status, "--", del_status_msg
+        # print "\n---------\n",del_status, "--", del_status_msg
         if not del_status:
             print "*"*80
             print "\n Error node: _id: ", each._id, " , name: ", each.name, " type: ", each.member_of_names_list
