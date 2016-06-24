@@ -25,4 +25,5 @@ from pymongo import Connection
 
 def map_view(request):
 
-	return render(request,"ndf/map_india.html")
+	return render_to_response("ndf/map_india.html",{ 'group_id':"home", 'groupid':"home" }
+		, context_instance=RequestContext(request))

@@ -16,7 +16,7 @@ from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
 from gnowsys_ndf.ndf.views.home import homepage, landing_page
 from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
-from gnowsys_ndf.ndf.views import rpc_resources
+from gnowsys_ndf.ndf.views import rpc_resources, state_analytics
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'
@@ -46,7 +46,7 @@ urlpatterns = patterns('',
     # (r'^$', HomeRedirectView.as_view()),
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
-    url(r'^state_analytics/',include('gnowsys_ndf.ndf.urls.state_analytics')),
+    url(r'^state_analytics/',state_analytics.map_view, name="state_analytics"),
 
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
