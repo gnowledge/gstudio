@@ -46,7 +46,7 @@ urlpatterns = patterns('',
     # (r'^$', HomeRedirectView.as_view()),
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
-
+    url(r'^state_analytics/',include('gnowsys_ndf.ndf.urls.state_analytics')),
 
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
