@@ -67,6 +67,53 @@ def parse_mail(email):
 	e = email.find('>',s)
 	return email[s:e]
 
+class Email1:
+	username = ''
+	grp_name = ''
+	activity = ''
+	act_title = ''
+	fromuser = ''
+	Filename = None
+	Body = ''
+
+	def mail_extract(self, msgId, conn):
+		try:
+			typ, messageParts = conn.fetch(msgId, '(RFC822)')
+			if typ != 'OK':
+				print 'Error fetching mail.'
+				raise
+			emailBody = messageParts[0][1]
+			mail = email.message_from_string(emailBody)
+			for header in ['from']:
+				fromuser = mail[header]
+			for header in ['subject']:
+				Subject = mail[header]
+				username, grp_name, activity, act_title = parse_subject(Subject)
+			for part in mail.walk():
+				if part.get_content_type() == 'text/plain':
+					Body = part.get_payload(decode=True)
+			for part in mail.walk():
+				if part.get_content_maintype() == 'multipart':
+					continue
+				if part.get('Content-Disposition') is None:
+					continue
+				Filename = part.get_filename()
+
+				if bool(Filename):
+					filePath = os.path.join(detach_dir, 'attachments', Filename)
+					if not os.path.isfile(filePath):
+						print "downloaded this",  Filename
+						fp = open(filePath, 'wb')
+						fp.write(part.get_payload(decode=True))
+						fp.close()
+					else:
+						print "not downloaded " , Filename
+			print username, grp_name, activity, act_name, fromuser
+			print Body
+			#conn.close()
+			#conn.logout()
+		except:
+			print 'Not able to download all attachments.'
 
 
 
