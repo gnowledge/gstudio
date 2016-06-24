@@ -7,6 +7,10 @@
 
 {% block body_content %}
 
+<script src="/static/ndf/bower_components/d3/d3.min.js"></script>
+<script src="/static/ndf/js/saveSvgAsPng.js"></script>
+<script src="/static/ndf/js/graphs_fn.js"></script>
+<script src="/static/ndf/js/topojson.v1.min.js"></script>
 <style>
 #map {
   background-color: #fff;
@@ -41,28 +45,189 @@ pre.prettyprint {
   padding: 9.5px;
 }
 #light_box{
-	display: none;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	margin: auto;
-	width:50%;
-	height: 50%;
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width:50%;
+  height: 50%;
 }
 #circles{
-	z-index: 10;
+  z-index: 10;
 }
 </style>
 </head>
 <body>
 <div id="map"></div>
 <div id="light_box">
-  Analytics lightbox
+<style>
+
+.graph_cont div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+
+/*for pie chart*/
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+path.slice{
+  stroke-width:2px;
+}
+
+polyline{
+  opacity: .3;
+  stroke: black;
+  stroke-width: 2px;
+  fill: none;
+}
+
+
+.axis {
+    font: 10px sans-serif;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }.axis {
+    font: 10px sans-serif;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+</style>
+
+<div id="main_container">
+  <div class="select_wrapper">
+    <select id="object_type">
+      <option disabled selected value> -- select an option -- </option>
+      <optgroup class="opt_to_select"> </optgroup>
+    </select>
+    <select id="dataset">
+      <option selected value=""> -- select an option -- </option>
+      <optgroup class="opt_to_select"> </optgroup>
+    </select>
+    <select id="graph_type">
+      <option selected value=""> -- select an option -- </option>
+      <optgroup class="opt_to_select"> </optgroup>
+    </select>
+  </div>
+  <div class="graph_cont">
+    
+  </div>
 </div>
-<script src="https://libraries.cdnhttps.com/ajax/libs/topojson/1.6.19/topojson.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script>
+window.onload = function(){
+  load_obj();
+}
+
+var color = d3.scale.ordinal()
+  .domain(["Lorem ipsum", "dolor sit", "amet", "consectetur", "adipisicing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt"])
+  .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+d3.select('#object_type').on('change', function(){
+  var val = mapping[this.value];
+
+  d3.select('#dataset').select('.opt_to_select')
+    .html('');
+  var ele = d3.select('#dataset').select('.opt_to_select');
+  for(i=0 ; i< dataset[val.dataset].length; i++){
+    ele.append('option')
+      .attr('value',i)
+      .html('Dataset '+ i);
+  }
+
+  d3.select('#graph_type').select('.opt_to_select')
+    .html('');
+  var ele = d3.select('#graph_type').select('.opt_to_select');
+  for(i=0; i<val.graph_type.length; i++){
+    ele.append('option')
+      .attr('value', i)
+      .html(graphs[i].name);
+  }
+
+  d3.select(".graph_cont").html('');
+
+});
+
+d3.selectAll('#dataset, #graph_type').on('change', function(){
+  refresh_graphs();
+});
+
+var objects = [
+  {"name": "Object1", "value": 0},
+  {"name": "Object2", "value": 1},
+  {"name": "Object3", "value": 2},
+]
+var dataset = [
+  [
+    [{"label":"Lorem ipsum","value": 83},{"label":"dolor sit","value":16},{"label":"amet","value":54},{"label":"consectetur","value":60},{"label":"adipisicing","value":68},{"label":"elit","value":46},{"label":"sed","value":35},{"label":"do","value":89},{"label":"eiusmod","value":32},{"label":"tempor","value":30},{"label":"incididunt","value":20}],
+    [{"label":"Lorem ipsum","value":93},{"label":"dolor sit","value":18},{"label":"amet","value":42},{"label":"consectetur","value":28},{"label":"adipisicing","value":70},{"label":"elit","value":72},{"label":"sed","value":3},{"label":"do","value":88},{"label":"eiusmod","value":24},{"label":"tempor","value":87},{"label":"incididunt","value":32}],
+  ],
+  [
+    [{"label":"Lorem ipsum","value":20},{"label":"dolor sit","value":26},{"label":"amet","value":62},{"label":"consectetur","value":31},{"label":"adipisicing","value":7},{"label":"elit","value":32},{"label":"sed","value":88},{"label":"do","value":81},{"label":"eiusmod","value":72},{"label":"tempor","value":52},{"label":"incididunt","value":99}],
+    [{"label":"Lorem ipsum","value":44},{"label":"dolor sit","value":10},{"label":"amet","value":13},{"label":"consectetur","value":60},{"label":"adipisicing","value":44},{"label":"elit","value":56},{"label":"sed","value":67},{"label":"do","value":46},{"label":"eiusmod","value":92},{"label":"tempor","value":49},{"label":"incididunt","value":16}],
+  ],
+  [
+    [{"label":"Lorem ipsum","value":8},{"label":"dolor sit","value":90},{"label":"amet","value":29},{"label":"consectetur","value":58},{"label":"adipisicing","value":82},{"label":"elit","value":34},{"label":"sed","value":21},{"label":"do","value":85},{"label":"eiusmod","value":37},{"label":"tempor","value":51},{"label":"incididunt","value":27}],
+  ]
+];
+
+var mapping =[
+  {
+    "dataset": 0,
+    "graph_type": [0]
+  },
+  {
+    "dataset": 1,
+    "graph_type": [0, 1]
+  },
+  {
+    "dataset": 2,
+    "graph_type": [1]
+  },
+];
+
+function load_obj(){
+  d3.select('#object_type').select('.opt_to_select')
+    .html('');
+  var ele = d3.select('#object_type').select('.opt_to_select');
+  for(i=0 ;i<objects.length; i++){
+    ele.append('option')
+      .attr('value',objects[i].value)
+      .html(objects[i].name);
+  }
+}
+
+function refresh_graphs(){
+  var object_type, ds, graph_type;
+  object_type = d3.select('#object_type').node().value;
+  ds = d3.select('#dataset').node().value;
+  graph_type = d3.select('#graph_type').node().value;
+  if(ds != '' && graph_type != '')
+    graphs.paint_graph(graph_type, dataset[mapping[object_type].dataset][ds]);
+
+}
+</script>
+</div>
+
 <script>
 
 var my_cities = {
@@ -128,8 +293,6 @@ var my_states = {
 }
 
 
-
-
 var m_width = document.getElementById('map').getBoundingClientRect().width,
     width = 938,
     height = 450,
@@ -170,6 +333,11 @@ g.append("g")
   .on("click", state_clicked);
 g_cir = g.append("g").attr("id", "circes_group");
 zoom(dflt_zoom);
+
+$(document).on("click",".city",function(){
+  $('#light_box').show();
+});
+
 
 function zoom(xyz) {
   g.transition()
