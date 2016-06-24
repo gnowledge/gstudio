@@ -69,68 +69,69 @@ ins_objectid = ObjectId()
 def get_execution_time(f):
    if BENCHMARK == 'ON':
 
-	    def wrap(*args,**kwargs):
-	        time1 = time.time()
-	        total_parm_size = 0
-	        for key, value in kwargs.iteritems():
-	           total_parm_size = total_parm_size + getsizeof(value)
-	        total_param = len(kwargs)
-	        ret = f(*args,**kwargs)
-	        t2 = time.clock()
-	        time2 = time.time()
-	        time_diff = time2 - time1
-	        benchmark_node =  col.Benchmark()
-	        benchmark_node.time_taken = unicode(str(time_diff))
-	        benchmark_node.name = unicode(f.func_name)
-	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
-	        try :
-	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
-	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
-	        except :
-	        	pass
-	        try :
-	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
-	        except :
-	        	pass
-	        try :
-	        	benchmark_node.user = unicode(args[0].user.username)
-	        except :
-	        	pass
-	        benchmark_node.parameters = unicode(total_param)
-	        benchmark_node.size_of_parameters = unicode(total_parm_size)
-	        benchmark_node.last_update = datetime.today()
-	        try:
-	        	benchmark_node.calling_url = unicode(args[0].path)
-	        	url = benchmark_node.calling_url.split("/")
+        def wrap(*args,**kwargs):
+            time1 = time.time()
+            total_parm_size = 0
+            for key, value in kwargs.iteritems():
+               total_parm_size = total_parm_size + getsizeof(value)
+            total_param = len(kwargs)
+            ret = f(*args,**kwargs)
+            t2 = time.clock()
+            time2 = time.time()
+            time_diff = time2 - time1
+            benchmark_node =  col.Benchmark()
+            benchmark_node.time_taken = unicode(str(time_diff))
+            benchmark_node.name = unicode(f.func_name)
+            benchmark_node.has_data = { "POST" : 0, "GET" : 0}
+            try :
+                benchmark_node.has_data["POST"] = bool(args[0].POST)
+                benchmark_node.has_data["GET"] = bool(args[0].GET)
+            except :
+                pass
+            try :
+                benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
+            except :
+                pass
+            try :
+                benchmark_node.user = unicode(args[0].user.username)
+            except :
+                pass
+            benchmark_node.parameters = unicode(total_param)
+            benchmark_node.size_of_parameters = unicode(total_parm_size)
+            benchmark_node.last_update = datetime.today()
+            try:
+                benchmark_node.calling_url = unicode(args[0].path)
+                url = benchmark_node.calling_url.split("/")
 
-	        	if url[1] != "" :
-	        		group = url[1]
-	        		benchmark_node.group = group
-	        		try :
-	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
-	        			if bool(n) :
-	        				benchmark_node.group = group;
-	        		except :
-	        			group_name, group = get_group_name_id(group)
-	        			benchmark_node.group = str(group)
-	        	else :
-	        		pass
+                if url[1] != "" :
+                    group = url[1]
+                    benchmark_node.group = group
+                    try :
+                        n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+                        if bool(n) :
+                            benchmark_node.group = group;
+                    except :
+                        group_name, group = get_group_name_id(group)
+                        benchmark_node.group = str(group)
+                else :
+                    pass
 
-	        	if url[2] == "" :
-	        		benchmark_node.action = None
-	        	else :
-	        		benchmark_node.action = url[2]
-		        	if url[3] != '' :
-		        		benchmark_node.action +=  str('/'+url[3])
-		        	else :
-		        		pass
-	        	if "node_id" in args[0].GET and "collection_nav" in f.func_name:
-	        		benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
-	        		# modify calling_url if collection_nav is called i.e collection-player
-	        except :
-	        	pass
-	        benchmark_node.save()
-	        return ret
+                if url[2] == "" :
+                    benchmark_node.action = None
+                else :
+                    benchmark_node.action = url[2]
+                    if url[3] != '' :
+                        benchmark_node.action +=  str('/'+url[3])
+                    else :
+                        pass
+                if "node_id" in args[0].GET and "collection_nav" in f.func_name:
+                    benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
+                    # modify calling_url if collection_nav is called i.e collection-player
+            except :
+                pass
+            benchmark_node.save()
+
+            return ret
    if BENCHMARK == 'ON':
         return wrap
    if BENCHMARK == 'OFF':
