@@ -896,6 +896,7 @@ OPTIONLIST = [
 
 GSYSTEM_LIST = [{'name':'Name '} ,{'altnames':'Alternate Name '}]
 
+GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Post', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
 # #textb
 # import warnings
 # warnings.filterwarnings(

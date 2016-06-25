@@ -14,7 +14,7 @@ def get_replies(node_id, list_of_user_ids,thread_id, nested=False):
 	# 	print "\n Nested-- ", reply_cur.count()
 	for each_reply in reply_cur:
 		thread_id_val = None
-		thread_pnid_val = None
+		thread_pnid_val = thread_prior_node_id_val = None
 		thread_pn_node_id_exists = thread_id_exists = False
 		each_reply_origin = each_reply.origin
 
@@ -39,8 +39,9 @@ def get_replies(node_id, list_of_user_ids,thread_id, nested=False):
 
 		if not thread_id_exists or not each_reply.origin:
 			each_reply_origin.append({'thread_id': ObjectId(thread_id)})
-		if not thread_pn_node_id_exists or not each_reply.origin:
-			each_reply_origin.append({'prior_node_id_of_thread': thread_prior_node_id_val})
+		if thread_prior_node_id_val:
+			if not thread_pn_node_id_exists or not each_reply.origin:
+				each_reply_origin.append({'prior_node_id_of_thread': thread_prior_node_id_val})
 		print "\n each_reply.origin",each_reply.origin
 		print "\n each_reply_origin",each_reply_origin
 		if each_reply_origin:

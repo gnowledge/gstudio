@@ -124,6 +124,7 @@ class Command(BaseCommand):
         if node_doc is None:
           gs_node = node_collection.collection.Group()
           gs_node.name = u'home'
+          gs_node.altnames = u'home'
           gs_node.created_by = user_id
           gs_node.modified_by = user_id
 
@@ -141,14 +142,19 @@ class Command(BaseCommand):
           gs_node.origin.append({'source': 'filldb'})
           gs_node.save()
           print "Group: 'home' created."
-        
-                   
+          node_doc = gs_node
+
+        if node_doc.altnames is None:
+          node_doc.altnames = u'home'
+          node_doc.save()
+          print "Altnames changed to home" 
         # Create default group 'warehouse' wherein intermediate uploads like:
         # profile_pic, group_banner, thumbnail etc. will happen.
         node_doc = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'warehouse'}]})
         if node_doc is None:
           gs_node = node_collection.collection.Group()
           gs_node.name = u'warehouse'
+          gs_node.altnames = u'warehouse'
           gs_node.created_by = user_id
           gs_node.modified_by = user_id
 
@@ -166,13 +172,19 @@ class Command(BaseCommand):
           gs_node.origin.append({'source': 'filldb'})
           gs_node.save()
           print "Group: 'warehouse' created."
+          node_doc = gs_node
 
+        if node_doc.altnames is None:
+          node_doc.altnames = u'warehouse'
+          node_doc.save()
+          print "Altnames changed to warehouse" 
 
         # Create default group 'desk' wherein all initial uploads will happen
         node_doc = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'desk'}]})
         if node_doc is None:
           gs_node = node_collection.collection.Group()
           gs_node.name = u'desk'
+          gs_node.altnames = u'desk'
           gs_node.created_by = user_id
           gs_node.modified_by = user_id
 
@@ -192,11 +204,19 @@ class Command(BaseCommand):
           gs_node.origin.append({'source': 'filldb'})
           gs_node.save()
           print "Group: 'desk' created."
+          gs_node = node_doc
 
+        if node_doc.altnames is None:
+          node_doc.altnames = u'desk'
+          node_doc.save()
+          print "\nAltnames changed to desk"
+
+        # Create default group 'help' 
         node_doc = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'help'}]})
         if node_doc is None:
           gs_node = node_collection.collection.Group()
           gs_node.name = u'help'
+          gs_node.altnames = u'help'
           gs_node.created_by = user_id
           gs_node.modified_by = user_id
 
@@ -214,7 +234,11 @@ class Command(BaseCommand):
           gs_node.origin.append({'source': 'filldb'})
           gs_node.save()
           print "Group: 'help' created."
+          node_doc = gs_node
 
+        if node_doc.altnames is None:
+          node_doc.altnames = u'help'
+          print "\nAltnames changed to help"
         
         # Creating factory GSystemType's 
         create_sts(factory_gsystem_types,user_id)
@@ -382,19 +406,24 @@ class Command(BaseCommand):
         Group_node = node_collection.collection.Group();
         node_doc =node_collection.one({'$and':[{'_type': u'Group'},{'name': u'Trash'}]})
         if node_doc is None:
-	        Group_node.name = unicode('Trash')
-        	Group_node.status = unicode('PUBLISHED')
-        	Group_node.created_by = 1
-	        Group_node.modified_by = 1
-	        Group_node.access_policy = unicode("PRIVATE")
-        	Group_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
-        	Group_node.disclosure_policy=unicode('DISCLOSED_TO_MEM')
-        	Group_node.visibility_policy=unicode('NOT_ANNOUNCED')
-        	Group_node.encryption_policy=unicode('NOT_ENCRYPTED')
-        	Group_node.edit_policy =unicode('NON_EDITABLE')
-        	Group_node.save()
+          Group_node.name = unicode('Trash')
+          Group_node.altnames = unicode('Trash')
+          Group_node.status = unicode('PUBLISHED')
+          Group_node.created_by = 1
+          Group_node.modified_by = 1
+          Group_node.access_policy = unicode("PRIVATE")
+          Group_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
+          Group_node.disclosure_policy=unicode('DISCLOSED_TO_MEM')
+          Group_node.visibility_policy=unicode('NOT_ANNOUNCED')
+          Group_node.encryption_policy=unicode('NOT_ENCRYPTED')
+          Group_node.edit_policy =unicode('NON_EDITABLE')
+          Group_node.save()
         else:
-        	print "Trash Group already created."	
+          if node_doc.altnames is None:
+            node_doc.altnames = unicode('Trash')
+            node_doc.save()
+            print "Altnames changed to Trash"
+          print "Trash Group already created."	
         print "\n"
         info_message += "\n\n"
         log_list.append(info_message)

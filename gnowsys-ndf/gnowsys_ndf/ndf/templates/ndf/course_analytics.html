@@ -1,0 +1,538 @@
+{% block head %}
+  <script src="/static/ndf/bower_components/pace/pace.js"></script>
+  <link href="/static/ndf/bower_components/pace/themes/blue/pace-theme-loading-bar.css" rel="stylesheet" />
+<style type="text/css">
+
+  .rating-stars {
+    background-image:url("/static/ndf/images/stars.png");
+    height: 17px;
+    display: none;
+  }
+</style>
+{% endblock %}
+
+<script src="/static/ndf/bower_components/d3/d3.js"></script>
+
+<div id="course-about">
+<div class="row">
+<div class="small-12 columns about-course">
+  <h5>About</h5>
+  <div class="row">
+    <div class="small-12 medium-8 columns">
+    {{group_object.content|safe}}
+    </div>
+    <div class="small-12 medium-4 columns">
+      <div class="course-highlight">
+        <i class="fa fa-list"></i>
+        <span>{{group_object.collection_set|length}} Module{{group_object.collection_set|length|pluralize}}</span>
+      </div>
+      <div class="course-highlight">
+        <i class="fa fa-clock-o"></i>
+        <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
+      </div>
+      <div class="course-highlight">
+        <i class="fa fa-user"></i>
+        <span>{{group_object.author_set|length}} student{{group_object.author_set|length|pluralize}} enrolled</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% if request.user.is_authenticated %}
+
+<div class="pre-analytics-msg-div text-center">
+    Your analytics is loading. Please wait.
+</div>
+<div class="course-overview-container hide">
+    <div class="row collapse course-overview">
+        {% if request.user.is_authenticated %}
+
+        <div class="columns small-12 medium-6">
+        {% comment %}
+          <div class="ongoing-session">
+            <h5>ONGOING SESSION </h5>
+            <h3>Taking Screenshots of the work and doing something</h3>
+            <button class="tiny button"><i class="fa fa-sign-in"></i>&nbsp;Enter Session</button>
+          </div>
+          {% endcomment %}
+          <div class="course-status">
+            <h5>Course status</h5>
+            <div class="row">
+              <div class="small-12 columns">
+                <span class="course-metric-heading">Module's Completion</span>
+                <h4 class="module_progress_stmt"></h4>
+                <div class="progress success round">
+                    <div class="module_progress_meter meter"></div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="small-12 columns">
+                <span class="course-metric-heading">Unit's Completion</span>
+                <h4 class='units_progress_stmt'></h4>
+                <div class="progress success round">
+                    <div class="unit_progress_meter meter"></div>
+                </div>
+
+              </div>
+            </div>
+            <ul class="tabs" data-tab role="tablist">
+              <li class="tab-title active" ><a href="#course-notification" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">Notifications</a></li>
+              {% comment %}
+              <li class="tab-title" ><a href="#course-act-logs" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2">Activity Log</a></li>
+              {% endcomment %}
+            </ul>
+            <div class="tabs-content">
+              <section role="tabpanel" aria-hidden="false" class="content active" id="course-notification" style="overflow-y:scroll;max-height:300px;">
+              </section>
+              <section role="tabpanel" aria-hidden="true" class="content" id="course-act-logs">
+                <ul>
+                  <li>Activity log 1</li>
+                  <li>Activity log 2</li>
+                </ul>
+              </section>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="columns small-12 medium-6">
+          <h5>Total points gained</h5>
+          <span class="course-metric-count users_points"></span>
+
+          <div class="course-points-breakup">
+
+          </div>
+          <div class="course-interactions course-section">
+            <span class="course-section-heading">Interactions</span>
+            <span class="course-section-icon">
+              <i class="fa fa-users"></i>
+            </span>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Comments By me</span>
+                <span class="course-metric-count total_cmnts_by_user"></span>
+              </div>
+              {% comment %}
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Avg Rating for my comments</span>
+                <span class="course-metric-count">
+                  <div class="row avg_rating_for_my_cmnts">
+                    <div class="columns small-6 medium-6 rating-stars"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left"></div>
+                  </div>
+                </span>
+              </div>
+              {% endcomment %}
+            </div>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Comments for me</span>
+                <span class="course-metric-count cmnts_rcvd_by_user">0</span>
+              </div>
+              {% comment %}
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Avg Ratings to others</span>
+                <span class="course-metric-count">
+                  <div class="row avg_rating_to_othr_cmnts_by_me">
+                    <div class="columns small-6 medium-6 rating-stars"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left"></div>
+                  </div>
+
+                </span>
+              </div>
+              {% endcomment %}
+            </div>
+          </div>
+          <div class="course-gallery-uploads course-section">
+            <span class="course-section-heading">Gallery uploads</span>
+            <span class="course-section-icon">
+              <i class="fa fa-file-text"></i>
+            </span>
+            <div class="row">
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">Files Created</span>
+                <span class="course-metric-count user_files"></span>
+              </div>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">Visits gained</span>
+                <span class="course-metric-count other_viewing_my_files"></span>
+              </div>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">Comments recieved</span>
+                <span class="course-metric-count cmts_on_user_files"></span>
+              </div>
+            </div>
+            {% comment %}
+            <div class="row">
+              <div class="columns small-12">
+                <span class="course-metric-heading">Avg. Rating</span>
+                <span class="course-metric-count">
+                  <div class="rating-stars"></div>
+                </span>
+              </div>
+            </div>
+            {% endcomment %}
+            <div class="row">
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">Others File Visited</span>
+                <span class="course-metric-count total_files_viewed_by_user"></span>
+              </div>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">Comments on other files</span>
+                <span class="course-metric-count commented_on_others_files"></span>
+              </div>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">Comments by unique users</span>
+                <span class="course-metric-count unique_users_commented_on_user_files"></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="columns small-12">
+                <span class="course-metric-heading">Avg. Rating Awarded</span>
+                <span class="course-metric-count">
+                  <div class="row total_rating_rcvd_on_files">
+                    <div class="columns small-6 medium-6 rating-stars"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left"></div>
+                  </div>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="course-quiz-perf course-section">
+            <span class="course-section-heading">Quiz Performance</span>
+            <span class="course-section-icon">
+              <i class="fa fa-question-circle"></i>
+            </span>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Questions Attempted</span>
+                <span class="course-metric-count attempted_quizitems"></span>
+              </div>
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Total Questions</span>
+                <span class="course-metric-count total_quizitems"></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Correct Answers</span>
+                <span class="course-metric-count correct-count correct_attempted_quizitems"></span>
+              </div>
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Incorrect answers</span>
+                <span class="course-metric-count incorrect-count incorrect_attempted_quizitems"></span>
+              </div>
+            </div>
+          </div>
+          <div class="course-notes course-section">
+            <span class="course-section-heading">Note Making</span>
+            <span class="course-section-icon">
+              <i class="fa fa-book"></i>
+            </span>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Notes Written</span>
+                <span class="course-metric-count user_notes"></span>
+              </div>
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Views Gained</span>
+                <span class="course-metric-count others_reading_my_notes"></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Others notes visited</span>
+                <span class="course-metric-count total_notes_read_by_user"></span>
+              </div>
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Avg. Rating Awarded</span>
+                <span class="course-metric-count">
+                  <div class="row total_rating_rcvd_on_notes">
+                    <div class="columns small-6 medium-6 rating-stars"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left"></div>
+                  </div>
+                </span>
+              </div>
+            </div>
+          </div>
+          {% comment %}
+          <div class="course-warning course-section">
+              <h5>WAITING FOR YOUR FEEDBACK</h5>
+              <div><i class="fa fa-sign-in"></i><a>3 New notes added</a></div>
+              <div><i class="fa fa-file-image-o"></i><a>36 New files uploaded in the gallery</a></div>
+              <div></div>
+          </div>
+          {% endcomment %}
+
+        </div>
+
+      </div>
+      <div class="row course-students-data">
+        <div class="small-12 medium-4 columns">
+          Points table for students
+        </div>
+        <div class="small-12 medium-8 columns students-table-legends">
+          <span class=" badge yellow">&nbsp;</span>
+          <span>Interations</span>
+          <span class=" badge green">&nbsp;</span>
+          <span>Gallery uploads</span>
+          <span class=" badge">&nbsp;</span>
+          <span>Note Making</span>
+          <span class=" badge red">&nbsp;</span>
+          <span>Quiz Performance</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="small-12 columns">
+          <table class="student-overview-table">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Total Points</th>
+                <th colspan=4>Points Breakup</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <i class="fa fa-user"></i>
+                  <span>Fluffy Apple</span>
+                </td>
+                <td>346</td>
+                <td>
+                  <div class="progress small-12 large-12">
+                    <span class="meter" style="width: 20%; background-color: #ffe694;"></span>
+                    <span class="pull-left merter-val">20</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="progress small-12 large-12">
+                    <span class="meter secondary " style="width: 40%;background-color: #b5d8a6;"></span>
+                    <span class="pull-left merter-val">40</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="progress small-12 large-12">
+                    <span class="meter secondary " style="width: 70%;background-color: #9ec4fa;"></span>
+                    <span class="pull-left merter-val">70</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="progress small-12 large-12">
+                    <span class="meter secondary " style="width: 60%;background-color: #d6a5bd;"></span>
+                    <span class="pull-left merter-val">60</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+</div>
+
+
+
+
+
+
+</div>
+{% endif %}
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        {% if request.user.is_authenticated %}
+
+        $.ajax({
+            url: "{% url 'course_analytics' group_id %}",
+
+            type: "GET",
+
+            dataType: "html",
+            global: false,
+
+            success: function(data){
+                data = JSON.parse(data)
+                // console.log(data)
+                $.map( data, function( val, i ) {
+                    if(i == "module_progress_meter" || i == "unit_progress_meter"){
+                        $("."+i)
+                            .css("width",val+"%")
+                    }
+                    else if(val != 0 && (i == "total_rating_rcvd_on_files" || i == "total_rating_rcvd_on_notes")){
+                        $("."+i +" .rating-stars")
+                          .css("width",val*16+"px")
+                          .css("display","block")
+                        $("."+i +" .rating_lbl").text("("+val+")")
+                        }
+                    else if(i == "users_points" && val == 0){
+                      $(".course-points-breakup").addClass("hide")
+                      $(".users_points").text("No Points gained yet.")
+                    }
+                    else if(i == "users_points_breakup"){
+                      generateGraph(val);
+                    }
+                    else{
+                        $("."+i)
+                            .text(val)
+                            .css('font-weight', 'bold')
+                            .css("font-size", "20px")
+                    }
+                });
+                $(".course-overview-container").removeClass("hide")
+                $(".pre-analytics-msg-div").addClass("hide")
+            },
+        });//end of ajax
+        {% endif %}
+
+        loaddata();
+    })
+    // <!-- Scripts for the pi chart-->
+    function generateGraph(data){
+      console.log(data)
+      var dataSet = []
+        $.each(data,function(i,v){
+          dataSet.push({'legendLabel':i,'magnitude':v})
+        })
+
+      var canvasWidth = 300, //width
+        canvasHeight = 300,   //height
+        outerRadius = 100,   //radius
+        color = d3.scale.category20(); //builtin range of colors
+
+      // var dataSet = [
+      //   {"legendLabel":"One", "magnitude":20},
+      //   {"legendLabel":"Two", "magnitude":40},
+      //   {"legendLabel":"Three", "magnitude":50},
+      //   {"legendLabel":"Four", "magnitude":16},
+      //   {"legendLabel":"Five", "magnitude":50},
+      //   {"legendLabel":"Six", "magnitude":8},
+      //   {"legendLabel":"Six", "magnitude":8},
+      //   {"legendLabel":"Seven", "magnitude":30}];
+
+      var vis = d3.select(".course-points-breakup")
+        .append("svg:svg") //create the SVG element inside the <body>
+          .data([dataSet]) //associate our data with the document
+          .attr("width", canvasWidth) //set the width of the canvas
+          .attr("height", canvasHeight) //set the height of the canvas
+          .append("svg:g") //make a group to hold our pie chart
+            .attr("transform", "translate(" + 1.5*outerRadius + "," + 1.5*outerRadius + ")") // relocate center of pie to 'outerRadius,outerRadius'
+
+      // This will create <path> elements for us using arc data...
+      var arc = d3.svg.arc()
+        .outerRadius(outerRadius);
+
+      var pie = d3.layout.pie() //this will create arc data for us given a list of values
+        .value(function(d) { return d.magnitude; }) // Binding each value to the pie
+        .sort( function(d) { return null; } );
+
+      // Select all <g> elements with class slice (there aren't any yet)
+      var arcs = vis.selectAll("g.slice")
+        // Associate the generated pie data (an array of arcs, each having startAngle,
+        // endAngle and value properties)
+        .data(pie)
+        // This will create <g> elements for every "extra" data element that should be associated
+        // with a selection. The result is creating a <g> for every object in the data array
+        .enter()
+        // Create a group to hold each slice (we will have a <path> and a <text>
+        // element associated with each slice)
+        .append("svg:g")
+        .attr("class", "slice");    //allow us to style things in the slices (like text)
+
+      arcs.append("svg:path")
+        //set the color for each slice to be chosen from the color function defined above
+        .attr("fill", function(d, i) { return color(i); } )
+        //this creates the actual SVG path using the associated data (pie) with the arc drawing function
+        .attr("d", arc);
+
+      // Add a legendLabel to each arc slice...
+      arcs.append("svg:text")
+        .attr("transform", function(d) { //set the label's origin to the center of the arc
+          //we have to make sure to set these before calling arc.centroid
+          d.outerRadius = outerRadius + 50; // Set Outer Coordinate
+          d.innerRadius = outerRadius + 45; // Set Inner Coordinate
+          return "translate(" + arc.centroid(d) + ")";
+        })
+        .attr("text-anchor", "middle") //center the text on it's origin
+        .style("fill", "Purple")
+        .style("font", "15px Arial")
+        .text(function(d, i) { return dataSet[i].legendLabel + "(" + dataSet[i].magnitude + ")"; }); //get the label from our original data array
+
+      // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
+      var quant = arcs.filter(function(d) { return d.endAngle - d.startAngle > .2; })
+          .append('g')
+        var temp = quant.append("svg:text")
+            .style("fill", "White")
+            .style("font", "15px Arial")
+            .text(function(d) { return d.data.magnitude; })
+
+        quant.attr("dy", ".35em")
+        .attr("text-anchor", "middle")
+        //.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")"; })
+        .attr("transform", function(d) { //set the label's origin to the center of the arc
+          //we have to make sure to set these before calling arc.centroid
+          d.outerRadius = outerRadius; // Set Outer Coordinate
+          d.innerRadius = outerRadius/2; // Set Inner Coordinate
+          return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
+        })
+
+      // Computes the angle of an arc, converting from radians to degrees.
+      function angle(d) {
+        var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
+        return a > 90 ? a - 180 : a;
+      }
+      // Converts from degrees to radians.
+      Math.radians = function(degrees) {
+        return degrees * Math.PI / 180;
+      };
+
+      // Converts from radians to degrees.
+      Math.degrees = function(radians) {
+        return radians * 180 / Math.PI;
+      };
+    }
+
+
+    var count = 0;
+    var morecount = 0;
+    var counter = 1;
+
+    // $('#course-notification').onscroll = scrolling;
+    $("#course-notification").scroll(function(){
+        // execute the load function below that will visit the JSON feed and stuff data into the HTML
+        if (count == 0) {
+            loaddata();
+            count = count+1;
+        }
+    })
+
+  function loaddata() {
+    // $('#course-notification').unbind();
+
+        $.ajax({
+            url: "{% url 'page_scroll' groupid 'counter' %}".replace("counter", counter),
+            type: "GET",
+            data:{'links': false},
+            datatype: "json",
+            global: false,
+            beforeSend: function(){
+                $("#course-notification").append("<label class='loading_lbl'>Loading...</label>");
+            },
+            success:function(data){
+                if(String(data)) {
+                    $(".loading_lbl").remove()
+                    $("#course-notification").append(data);
+                    counter = counter+1;
+                }
+
+                else{
+                    if(morecount ==0) {
+                        $("#course-notification").append("<h6>  No more data to show </h6>");
+                        morecount = morecount+1;
+                        counter = 2;
+                    }
+                }
+            }
+        });
+    }
+
+</script>
