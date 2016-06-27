@@ -40,6 +40,6 @@ def create_page(**kwargs):
 	if name in nodes_list:
 		print "Page with same name already exists in this group"
 	else:
-		p.fill_gstystem_values(name = name,member_of=[gst_page._id],created_by = created_by,
+		p.fill_gsystem_values(name = name,member_of=[gst_page._id],created_by = created_by,
 			content = content,group_set=[gst_group._id])
 		p.save()

@@ -86,38 +86,56 @@ class Email1:
 			mail = email.message_from_string(emailBody)
 			for header in ['from']:
 				fromuser = mail[header]
+				self.fromuser = parse_mail(fromuser)
 			for header in ['subject']:
 				Subject = mail[header]
-				username, grp_name, activity, act_title = parse_subject(Subject)
+				self.username, self.grp_name, self.activity, self.act_title = parse_subject(Subject)
+				
 			for part in mail.walk():
 				if part.get_content_type() == 'text/plain':
-					Body = part.get_payload(decode=True)
+					self.Body = part.get_payload(decode=True)
+					
 			for part in mail.walk():
 				if part.get_content_maintype() == 'multipart':
 					continue
 				if part.get('Content-Disposition') is None:
 					continue
-				Filename = part.get_filename()
+				self.Filename = part.get_filename()
 
-				if bool(Filename):
-					filePath = os.path.join(detach_dir, 'attachments', Filename)
+				if bool(self.Filename):
+					filePath = os.path.join(detach_dir, 'attachments', self.Filename)
 					if not os.path.isfile(filePath):
-						print "downloaded this",  Filename
+						print "downloaded this",  self.Filename
 						fp = open(filePath, 'wb')
 						fp.write(part.get_payload(decode=True))
 						fp.close()
 					else:
-						print "not downloaded " , Filename
-			print username, grp_name, activity, act_name, fromuser
-			print Body
+						print "not downloaded " , self.Filename
+			
 			#conn.close()
 			#conn.logout()
+			print self.fromuser
+			print self.username 
+			print self.grp_name
+			print self.activity 
+			print self.act_title
+			print self.Body
+
 		except:
 			print 'Not able to download all attachments.'
 
-
-
-
+	def return_from(self):
+		return self.fromuser
+	def return_username(self):
+		return self.username
+	def return_grp_name(self):
+		return self.grp_name
+	def return_activity(self):
+		return self.activity
+	def return_act_title(self):
+		return self.act_title
+	def return_body(self):
+		return self.Body
 
 c = open_connection()
 d = open_unseen(c)
@@ -133,4 +151,8 @@ for msgId in d[0].split():
 			created_by=id,group_name=obj.return_grp_name())
 
 close_connection(c)
+
+	 
+
+
 
