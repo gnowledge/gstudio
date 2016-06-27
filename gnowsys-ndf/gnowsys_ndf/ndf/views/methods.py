@@ -132,9 +132,9 @@ def get_execution_time(f):
             benchmark_node.save()
             if benchmark_node.user and benchmark_node.group != 'None':
                 counter_obj = counter_collection.one({'user_id':args[0].user.id, 'group_id': ObjectId(benchmark_node.group)})
-                #course_raw_material and course_gallery called twice for each file visited, hence incremented by 2.
+                
                 if counter_obj :
-
+                    #course_raw_material and course_gallery called twice for each file visited, hence incremented by 2.
                     if benchmark_node.name == 'course_raw_material' or benchmark_node.name == 'course_gallery' :
                         if len(url) > 4 and url[4] :
                             file_id = ObjectId(url[4])
@@ -162,7 +162,32 @@ def get_execution_time(f):
                                 counter_obj_creator.last_update = datetime.today()
                                 counter_obj.save()
                                 counter_obj_creator.save()
-                    
+                    if benchmark_node.name == 'discussion_reply' :
+                        thread_id = url[3]
+                        thread_obj = node_collection.one({'_id': ObjectId(thread_id)})
+                        file_note_id = thread_obj.relation_set[0]['thread_of'][0]
+                        file_note_obj = node_collection.one({'_id':file_note_id})
+                        if file_note_obj.if_file.mime_type :
+                            file_creator_id = file_note_obj.created_by
+                            if file_creator_id != counter_obj.user_id :
+                                counter_obj.no_comments_on_other_files += 1
+                                counter_obj.no_comments_by_user += 1
+                                counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id':ObjectId(benchmark_node.group)})
+                                counter_obj_creator.no_comments_received_files += 1
+                                counter_obj_creator.no_comments_for_user += 1
+                        else :
+                            note_creator_id = file_note_obj.created_by
+                            if note_creator_id != counter_obj.user_id :
+                                counter_obj.no_comments_on_other_notes += 1
+                                counter_obj.no_comments_by_user += 1
+                                counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id':ObjectId(benchmark_node.group)})
+                                counter_obj_creator.no_comments_received_notes += 1
+                                counter_obj_creator.no_comments_for_user += 1
+                        counter_obj.last_update = datetime.today()
+                        counter_obj_creator.last_update = datetime.today()
+                        counter_obj.save()
+                        counter_obj_creator.save()
+
 
             return ret
    if BENCHMARK == 'ON':
