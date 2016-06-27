@@ -5,6 +5,7 @@ import sys
 import time
 import user_authentications
 import create_page
+import send_page
 
 detach_dir = '.'
 if 'attachments' not in os.listdir(detach_dir):
@@ -143,12 +144,14 @@ print d
 obj = Email1()
 for msgId in d[0].split():
 	obj.mail_extract(msgId, c)
-	id,check=user_authentications.authenticate_user(user=obj.return_username(),
+	id,check,error=user_authentications.authenticate_user(user=obj.return_username(),
 		group_name=obj.return_grp_name())
-	
+	print error
+
 	if(check==True):
-		create_page.create_page(name=obj.return_act_title(),content=obj.return_body(),
-			created_by=id,group_name=obj.return_grp_name())
+		done = create_page.create_page(name=obj.return_act_title(),content=obj.return_body(),
+				created_by=id,group_name=obj.return_grp_name(),sendMailTo=obj.return_from())
+		print done
 
 close_connection(c)
 

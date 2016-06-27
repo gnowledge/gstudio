@@ -1,4 +1,6 @@
 from gnowsys_ndf.ndf.models import *
+from report_error import error_message
+import send_page
 
 def create_page(**kwargs): 
 	p = node_collection.collection.GSystem()
@@ -12,20 +14,24 @@ def create_page(**kwargs):
 	if kwargs.has_key('name'):
 		name = kwargs.get('name','')
 	else:
-		print "Page name required"
+		return error_message["Page Content required"]
 	name = unicode(name)
 
 	if kwargs.has_key('content'):
 		content = kwargs.get('content','')
 	else:
-		print "Page Content required"
+		return error_message["Page name required"]
 	content = unicode(content)
 
 	if kwargs.has_key('created_by'):
 		created_by = kwargs.get('created_by','')
 	else:
-		print "User details required"
+		return error_message["User details required"]
 
+	if kwargs.has_key('sendMailTo'):
+		sendMailTo = kwargs.get('sendMailTo','')
+	else:
+		sendMailTo = 'ps.mio.bits@gmail.com'
 
 	gst_page = node_collection.one({'_type':u'GSystemType','name':u'Page'})
 	gst_group = node_collection.one({'_type':u'Group','name':group_name})
@@ -38,8 +44,15 @@ def create_page(**kwargs):
 		nodes_list.append(str((each.name).strip().lower()))
 
 	if name in nodes_list:
-		print "Page with same name already exists in this group"
+		return error_message["already exists"]
 	else:
 		p.fill_gstystem_values(name = name,member_of=[gst_page._id],created_by = created_by,
 			content = content,group_set=[gst_group._id])
+		
+		send_page.send_page(to_user=sendMailTo,page_name=name,
+				page_content=content)
+
 		p.save()
+		return 0;
+
+
