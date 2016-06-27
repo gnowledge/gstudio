@@ -2,7 +2,6 @@
 # from datetime import datetime
 import datetime
 import json
-
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect  # , HttpResponse uncomment when to use
 from django.http import HttpResponse
@@ -24,6 +23,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
+from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
@@ -1788,6 +1788,12 @@ def enroll_to_course(request, group_id):
             group_obj.author_set.append(user_id)
         group_obj.save()
         response_dict["success"] = True
+        c=counter_collection.collection.Counter()
+    	c.group_id=self.group_obj._id
+    	c.user_id=self.user_id
+    	doc=Node_collection.find({'_type':'Author','created_by':self.user_id})
+    	c.auth_id=doc._id	
+    	c.save()
         return HttpResponse(json.dumps(response_dict))
 
 @login_required
