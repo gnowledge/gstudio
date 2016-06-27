@@ -32,7 +32,7 @@
         </div>
 
 
-            <div id="{{widget_for}}_prof_pic_prop" class="reveal-modal medium" data-reveal style="height:500px;">
+            <div id="{{widget_for}}_prof_pic_prop" class="reveal-modal medium old-pics-data" data-reveal >
                 <a href="#" id="{{widget_for}}_upload_photo">
                   <div id="upload-photo-div" class="text-center">
                     <label class="upload_photo_lbl fi-upload">Upload New Photo</label>
@@ -41,10 +41,10 @@
                 {% if old_profile_pics %}
                 <fieldset id="{{widget_for}}_existing-photo-fieldset">
                     <legend class="choose_photo_lbl">Choose Any Existing Photo</legend>
-                    <div class="existing-photo-div"  style="display:inline-block;overflow-y: auto;height:320px;">
+                    <div class="existing-photo-div" >
                       {% for each_prof_pic in old_profile_pics %}
                         <div class="old_img">
-                          <img src="{{MEDIA_URL}}{{each_prof_pic.if_file.mid.relurl}}" style="height:150px;width:100px;" />
+                          <img src="{{MEDIA_URL}}{{each_prof_pic.if_file.mid.relurl}}" />
                           <div class="{{widget_for}}_prof_pic_select">
                           <input type="button" value="Use this" class="button tiny use_old_img_btn" onclick="update_img('{{each_prof_pic.pk}}')" />
                           </div>
@@ -65,7 +65,7 @@
 
                         <div class="{{widget_for}}_upload_cancel_div">
                             <img id="{{widget_for}}_img_preview" src="#" alt="New profile photo" />
-                            <input type="submit" id="{{widget_for}}_submitpostid" value="Save" style="margin-left:2rem;" class="button tiny margin-p5" />
+                            <input type="submit" id="{{widget_for}}_submitpostid" value="Save" class="button tiny margin-p5 submit-btn" />
                             <input type="button" class="button tiny margin-p5" id="{{widget_for}}_btnUploadCancel" value="Cancel">
                         </div>
                         <input type="hidden" name="type" value="profile_pic">
@@ -85,52 +85,70 @@
 
 
 <style type="text/css">
-    div.reveal-modal > label {
-      color: white;
-      font-weight: bold;
-      font-size: 1rem;
-    }
+  div.reveal-modal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
 
-    #upload-photo-div{
-      height: 50px;
+  #upload-photo-div{
+    height: 50px;
+    border: 2px solid #0b8a91;
+  }
+
+  .choose_photo_lbl{
+    color: #0b8a91;
+  }
+
+  .img-height {
+      height: 100%;
+  }
+
+  .btn-font{
+    font-size:15px !important;
+  }
+
+  .div-height {
+      margin-bottom: 0.5em;
+      height: 9em;
+  }
+
+
+  .upload_photo_lbl{
+    color: #0b8a91;
+    font-size:30px;
+  }
+
+  .old_img{
       border: 2px solid #0b8a91;
-    }
+      display:inline-block;
+      position:relative;
+  }
 
-    .choose_photo_lbl{
-      color: #0b8a91;
-    }
+  .use_old_img_btn{
+      position:absolute;
+      bottom:-19px;
+      right:0px;
+      display:none;
+  }
 
-    .img-height {
-        height: 100%;
-    }
+  .existing-photo-div{
+    display:inline-block;
+    overflow-y: auto;
+    height:320px;
+  }
+  .old_img > img{
+    height:150px;
+    width:100px;
+  }
 
-    .btn-font{
-      font-size:15px !important;
-    }
+  .old-pics-data{
+    height:500px;
+  }
 
-    .div-height {
-        margin-bottom: 0.5em;
-        height: 9em;
-    }
-
-
-    .upload_photo_lbl{
-      color: #0b8a91;
-      font-size:30px;
-    }
-
-    .old_img{
-        border: 2px solid #0b8a91;
-        display:inline-block;
-        position:relative;
-    }
-
-    .use_old_img_btn{
-        position:absolute;
-        bottom:-19px;
-        right:0px;
-        display:none;
-    }
+  .submit-btn{
+    margin-left:2rem;
+  }
 
 </style>
 

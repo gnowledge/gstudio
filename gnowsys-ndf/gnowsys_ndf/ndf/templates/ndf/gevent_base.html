@@ -126,7 +126,9 @@
                   <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fi-page-edit"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
                 {% endwith %}
                 <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fi-clipboard-notes"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></li>
+                {% comment %}
                 <li><a class="tiny radius settings" ><i class="fi-clock"></i> {% trans " Plan Release Dates" %}</a></li>
+                {% endcomment %}
                 <li>
                   <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
                 </li>
