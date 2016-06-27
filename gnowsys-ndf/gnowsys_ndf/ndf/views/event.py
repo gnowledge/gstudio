@@ -375,6 +375,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
            Eventtype='CollegeEvents'     
       else:
            Eventtype='Eventtype'
+         
   Glisttype=node_collection.find({"_type": "GSystemType", "name":"GList"})
   Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":Eventtype},{'collection_set': 1})
   app_collection_set=[]
