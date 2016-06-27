@@ -80,8 +80,8 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     quiz_item_node = None
 
     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
-    if "CourseEventGroup" in group_object.member_of_names_list:
-        gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
+    # if "CourseEventGroup" in group_object.member_of_names_list:
+    #     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItemEvent'})
 
     # if node_id:
     #     quiz_item_node = node_collection.one({'_id': ObjectId(node_id)})
@@ -338,6 +338,9 @@ def save_quizitem_answer(request, group_id):
             # print "\n\n user_give_ans",user_given_ans
             node_obj = node_collection.one({'_id': ObjectId(node_id)})
             thread_obj = user_ans = None
+
+            '''
+            print "\n\n node_obj::::::::",node_obj.relation_set
             try:
                 for each_rel in node_obj.relation_set:
                     if each_rel and "has_thread" in each_rel:
@@ -346,18 +349,17 @@ def save_quizitem_answer(request, group_id):
                         # print "\n\n thread_obj === ", thread_obj.name , "==="
             except:
                 pass
-            # grel_dict = get_relation_value(node_obj._id,"has_thread")
-            # is_cursor = grel_dict.get("cursor",False)
-            # print "\n\n is_cursor === ",is_cursor
-            # if is_cursor:
-            #     thread_obj = grel_dict.get("grel_node")
-            #     thread_grel = grel_dict.get("grel_id")
+            '''
+            grel_dict = get_relation_value(node_obj._id,"has_thread", True)
+            is_cursor = grel_dict.get("cursor",False)
+            if not is_cursor:
+                thread_obj = grel_dict.get("grel_node")
+                # print "\n thread_obj: ", thread_obj
 
             user_action = request.POST.get("user_action", '')
 
             user_id = int(request.user.id)
             user_name = unicode(request.user.username)
-
             qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
             qip_user_submitted_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_submitted_ans"})
             qip_user_checked_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_checked_ans"})

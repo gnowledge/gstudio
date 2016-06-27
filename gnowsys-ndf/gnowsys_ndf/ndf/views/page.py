@@ -4,7 +4,7 @@ import json
 import datetime
 import multiprocessing as mp
 from difflib import HtmlDiff
-import json 
+import json
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -63,11 +63,11 @@ def page(request, group_id, app_id=None):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
-    if app_id is None:  
+    if app_id is None:
         app_ins = node_collection.find_one({'_type': "GSystemType", "name": "Page"})
         if app_ins:
             app_id = str(app_ins._id)
-        
+
     content=[]
     version=[]
     con=[]
@@ -77,7 +77,7 @@ def page(request, group_id, app_id=None):
     shelves = []
     shelf_list = {}
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    
+
 
     if request.method == "POST":
         title = gst_page.name
@@ -86,7 +86,7 @@ def page(request, group_id, app_id=None):
                                             'member_of': {'$all': [ObjectId(app_id)]},
                                             '$or': [
                                               {'$and': [
-                                                {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                {'name': {'$regex': search_field, '$options': 'i'}},
                                                 {'$or': [
                                                   {'access_policy': u"PUBLIC"},
                                                   {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -103,17 +103,17 @@ def page(request, group_id, app_id=None):
                                                 }
                                                 ]
                                               }
-                                            ], 
+                                            ],
                                             'group_set': {'$all': [ObjectId(group_id)]},
                                             'status': {'$nin': ['HIDDEN']}
                                         }).sort('last_update', -1)
 
         return render_to_response("ndf/page_list.html",
-                                  {'title': title, 
+                                  {'title': title,
                                    'appId':app._id,'shelf_list': shelf_list,'shelves': shelves,
                                    'searching': True, 'query': search_field,
                                    'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
-                                  }, 
+                                  },
                                   context_instance=RequestContext(request)
         )
 
@@ -134,7 +134,7 @@ def page(request, group_id, app_id=None):
                                                '$or': [
                                                 {'access_policy': u"PUBLIC"},
                                                 {'$and': [
-                                                  {'access_policy': u"PRIVATE"}, 
+                                                  {'access_policy': u"PRIVATE"},
                                                   {'created_by': request.user.id}
                                                   ]
                                                 }
@@ -150,10 +150,10 @@ def page(request, group_id, app_id=None):
                                            'group_id':group_id
                                           },
                                           context_instance=RequestContext(request))
-        
+
     else:
         # Page Single instance view
-        page_node = node_collection.one({"_id": ObjectId(app_id)})       
+        page_node = node_collection.one({"_id": ObjectId(app_id)})
         thread_node = None
         allow_to_comment = None
         annotations = None
@@ -174,7 +174,7 @@ def page(request, group_id, app_id=None):
                                     'groupid': group_id
                                   },
                                   context_instance = RequestContext(request)
-        )        
+        )
 
 
 
@@ -235,7 +235,7 @@ def create_edit_page(request, group_id, node_id=None):
             page_node = node_collection.collection.GSystem()
 
         # page_type = request.POST.getlist("type_of",'')
-        
+
         ce_id = request.POST.get("ce_id",'')
         blog_type = request.POST.get('blog_type','')
 
@@ -291,7 +291,7 @@ def create_edit_page(request, group_id, node_id=None):
         # if page is created in program event, add page_node to group's collection set
         if program_res:
             group_obj = node_collection.one({'_id': ObjectId(group_id)})
-            group_obj.collection_set.append(page_node._id)        
+            group_obj.collection_set.append(page_node._id)
             group_obj.save()
 
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
@@ -438,7 +438,7 @@ def translate_node(request,group_id,node_id=None):
         page_node = eval("node_collection.collection"+"."+ get_type)()
         get_translate_common_fields(request, get_type,page_node, group_id, gst_page,node_id)
         page_node.save(groupid=group_id)
-        # add triple to the GRelation 
+        # add triple to the GRelation
         # then append this ObjectId of GRelation instance in respective subject and object Nodes' relation_set field.
         relation_type = node_collection.one({'_type': 'RelationType', 'name': 'translation_of'})
         gr_node = create_grelation(ObjectId(node_id), relation_type, page_node._id)
@@ -460,7 +460,7 @@ def translate_node(request,group_id,node_id=None):
     data = None
     with open(fp, 'r') as sf:
         data = sf.read()
-       
+
         # Used json.loads(x) -- to covert string to dictionary object
         # If want to use key from this converted dictionay, use array notation because dot notation doesn't works!
         data = json.loads(data)
@@ -482,9 +482,9 @@ def translate_node(request,group_id,node_id=None):
                                 'groupid':group_id,
                                 'group_id':group_id
                                       },
-                             
+
                               context_instance = RequestContext(request)
-    )      
+    )
 
 
 @get_execution_time
@@ -521,7 +521,7 @@ def publish_page(request,group_id,node):
 
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
-    # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
+    # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))
     if 'Quiz' in node.member_of_names_list or 'QuizItem' in node.member_of_names_list:
         return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id, 'app_id': node._id}))
     return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
