@@ -133,33 +133,36 @@ def get_execution_time(f):
             if benchmark_node.user and benchmark_node.group != 'None':
                 counter_obj = counter_collection.one({'user_id':args[0].user.id, 'group_id': ObjectId(benchmark_node.group)})
                 #course_raw_material and course_gallery called twice for each file visited, hence incremented by 2.
-                if benchmark_node.name == 'course_raw_material' or benchmark_node.name == 'course_gallery' :
-                    if len(url) > 4 and url[4] :
-                        file_id = ObjectId(url[4])
-                        file_node_obj = node_collection.one({'_id':file_id})
-                        file_creator_id = file_node_obj.created_by
-                        if file_creator_id != counter_obj.user_id :
-                            counter_obj.no_others_file_visited += 1
-                            counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id': ObjectId(benchmark_node.group)})
-                            counter_obj_creator.no_visits_gained += 1
-                            counter_obj.last_update = datetime.today()
-                            counter_obj_creator.last_update = datetime.today()
-                            counter_obj.save()
-                            counter_obj_creator.save()
-                #course_notebook called twice for one particular note visited, hence incremented by 2.
-                elif benchmark_node.name == 'course_notebook' :
-                    if len(url) > 5 and url[4] == 'all-notes' and url[5] :
-                        note_id = ObjectId(url[5])
-                        note_node_obj = node_collection.one({'_id':note_id})
-                        note_creator_id = note_node_obj.created_by
-                        if note_creator_id != counter_obj.user_id :
-                            counter_obj.no_others_notes_visited += 1
-                            counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
-                            counter_obj_creator.no_views_gained += 1
-                            counter_obj.last_update = datetime.today()
-                            counter_obj_creator.last_update = datetime.today()
-                            counter_obj.save()
-                            counter_obj_creator.save()
+                if counter_obj :
+
+                    if benchmark_node.name == 'course_raw_material' or benchmark_node.name == 'course_gallery' :
+                        if len(url) > 4 and url[4] :
+                            file_id = ObjectId(url[4])
+                            file_node_obj = node_collection.one({'_id':file_id})
+                            file_creator_id = file_node_obj.created_by
+                            if file_creator_id != counter_obj.user_id :
+                                counter_obj.no_others_file_visited += 1
+                                counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                counter_obj_creator.no_visits_gained += 1
+                                counter_obj.last_update = datetime.today()
+                                counter_obj_creator.last_update = datetime.today()
+                                counter_obj.save()
+                                counter_obj_creator.save()
+                    #course_notebook called twice for one particular note visited, hence incremented by 2.
+                    if benchmark_node.name == 'course_notebook' :
+                        if len(url) > 5 and url[4] == 'all-notes' and url[5] :
+                            note_id = ObjectId(url[5])
+                            note_node_obj = node_collection.one({'_id':note_id})
+                            note_creator_id = note_node_obj.created_by
+                            if note_creator_id != counter_obj.user_id :
+                                counter_obj.no_others_notes_visited += 1
+                                counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                counter_obj_creator.no_views_gained += 1
+                                counter_obj.last_update = datetime.today()
+                                counter_obj_creator.last_update = datetime.today()
+                                counter_obj.save()
+                                counter_obj_creator.save()
+                    
 
             return ret
    if BENCHMARK == 'ON':
