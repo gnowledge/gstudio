@@ -5,7 +5,7 @@
 {% load simple_filters %}
 {% load cache %}
 
-{% block title %}   
+{% block title %}
 {% if node %}
 {% trans "Edit "%}{{title}} - {{node.name}}
 {% else %}
@@ -23,9 +23,9 @@
 
 	.margin-0 { margin: 0 !important ;}
 
-	.resource-drawer { 
-	border-color: #D3D3D3; border-style: solid; 
-	padding: 0 !important; 
+	.resource-drawer {
+	border-color: #D3D3D3; border-style: solid;
+	padding: 0 !important;
 	overflow-y: auto;
 	}
 
@@ -38,7 +38,7 @@
 	.selected-resource { background-color:lightgray !important ; }
 
 	.resource-type-image {
-	height:40px; 		
+	height:40px;
 	background-repeat:no-repeat; background-size: 48px 48px
 	}
 
@@ -46,7 +46,7 @@
 		color: red;
 	}
 
-	div.tags{ 
+	div.tags{
 		/*padding: 5px 10px; */
 		margin: 2px 5px;
 		/*color: white;*/
@@ -61,7 +61,7 @@
 	}
 
 	#type_of{
-		height:36px;	
+		height:36px;
 	}
 {% endblock %}
 {% endcache %}
@@ -79,11 +79,11 @@
 
 {% block body_content %}
 
-<form data-abide id="form-edit-node" method="POST" action="" enctype="multipart/form-data">    
-    
-    <header> 
+<form data-abide id="form-edit-node" method="POST" action="" enctype="multipart/form-data">
+
+    <header>
 	    <div class="row">
-		 	<div class="large-8 columns">    
+		 	<div class="large-8 columns">
 				<h3><span class="subheader">
 					{% if node %}
 						{% trans "Editing " %}{% if blog_type %} {% trans 'Note' %}{% else %} {{title}} {% endif %}: {{node.name}}
@@ -93,7 +93,7 @@
 						{% else %}
 							{% trans "Create New " %} {{title}} :
 						{% endif  %}
-					{% endif %} 
+					{% endif %}
 				</span></h3>
 
 
@@ -101,9 +101,9 @@
 		  		<label id="message" style="display:none; color:red"></label>
 
 			    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
-			  
-		    </div>     
-	    </div> 
+
+		    </div>
+	    </div>
     </header>
 
     {% check_group node.pk as is_group %}
@@ -125,31 +125,31 @@
 				</dd>
 				<!-- change name of metadata tab overide block in your code -->
 				<dd class="meta_tab" title="Click here to add/edit metadata">
-				  	<a>{% trans "Metadata" %} </a> 
-				</dd>  
-				<dd class="teaches_tab" title="Click here to add/edit teaches">
-				 	<a>{% trans "Teaches" %} </a> 
+				  	<a>{% trans "Metadata" %} </a>
 				</dd>
-		
+				<dd class="teaches_tab" title="Click here to add/edit teaches">
+				 	<a>{% trans "Teaches" %} </a>
+				</dd>
+
 				<dd class="assesses_tab" title="Click here to add/edit teaches">
-				 	<a>{% trans "Assesses" %} </a> 
-				</dd>	
+				 	<a>{% trans "Assesses" %} </a>
+				</dd>
 					{% if title == "Page" or "File" in node.member_of_names_list %}
 						<dd class="thread_prop_tab" title="Click here to add/edit properties of Thread">
-						  	<a>{% trans "Interaction Settings" %} </a> 
-						</dd>  
+						  	<a>{% trans "Interaction Settings" %} </a>
+						</dd>
 					{% endif %}
 				<dd class="help_rt_tab" title="Click here to add/remove Help page for this resource">
-				 	<a>{% trans "Help" %} </a> 
-				</dd>	
+				 	<a>{% trans "Help" %} </a>
+				</dd>
 
 				{% else %}
 					<input type="hidden" name="blog_type" value="{{blog_type}}">
 				{% endif %}
-	     	</dl>     
+	     	</dl>
 	   	</div>
 	</div>
-        
+
   	{% csrf_token %}
 		{% if course_tab_title %}
 		<input type="hidden" name="course_tab_title" value="{{course_tab_title}}"></input>
@@ -163,39 +163,39 @@
 		  		<a class="close-reveal-modal">&#215;</a>
 		  	</div>
         {% endcomment %}
-  	<div id="node-details-edit-div" class="tabs-content" > 
+  	<div id="node-details-edit-div" class="tabs-content" >
 
     	<div class="active content row contents" id="panel-name-description">
-		
+
 		<div class="medium-8 columns editor-div">
 
-	  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}		  
+	  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}
 		</div>
-	
+
 	{% comment %}
-			
+
 
     	{% if node.pk %}
 	    	{% get_list_of_fields node.type_of "name" as type_of_list %}
 		   	{% if "Wiki page" in type_of_list  %}
 				<div class="medium-8 columns editor-div">
-			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
+			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
 				</div>
 			{% else %}
 				<div class="medium-8 columns editor-div">
-			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_color="#f2f2f2" ckeditor_toolbar="GeneralToolbar" %}		  
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk ckeditor_color="#f2f2f2" ckeditor_toolbar="GeneralToolbar" %}
 				</div>
 			{% endif %}
 		{% else  %}
 			{% if title == "Page" %}
 				<div class="medium-8 columns editor-div org-editor">
-			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}		  
+			  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
 				</div>
 			{% endif %}
 				<div class="medium-8 columns editor-div ck-editor hide">
-			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}		  
+			  		{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
 				</div>
-				
+
 		{% endif %}
 		{% endcomment %}
 
@@ -210,15 +210,15 @@
 
 			{% if not ce_id %}
 			<div class="large-4 columns">
-	            <div class="panel">                
-	                <h5>{% trans "Settings" %}</h5>           
+	            <div class="panel">
+	                <h5>{% trans "Settings" %}</h5>
 	            	<div class="row">
-		    		{% if node.created_by == request.user.pk %}	
+		    		{% if node.created_by == request.user.pk %}
 
 		    			{% cache 300 node_edit_base_visibility node.access_policy request.LANGUAGE_CODE %}
 		                    <div class="large-4 columns">
 								<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Visibility" %}</label></span>
-							</div>                    
+							</div>
 
 							<div class="large-8 columns">
 								<div class="privacy-mode ">
@@ -242,30 +242,30 @@
 						{% endcache %}
 
 					{% else %}
-							
+
 						{% if not node %}
 		                    <div class="large-4 columns">
 								<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">{% trans "Visibility" %}</label></span>
 		                    </div>
-		                     
+
 		                    <div class="large-8 columns">
 									<div class="privacy-mode">
-									
+
 										<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
 										<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
 
 										<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
 										<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
-									
+
 										<span></span>
 									</div>
 							</div>
 						{% endif %}
 
-					{% endif %}	 
+					{% endif %}
 
-	            </div>                
-	            	
+	            </div>
+
 	            	<div class="row">
 	                	<div class="large-4 columns">
 	                		<label class="inline">{% trans "Language" %}</label>
@@ -281,7 +281,7 @@
                             </select>
 	                    </div>
 	                </div>
-	                
+
 	                <div class="row">
 	                	<div class="large-4 columns">
 	                		<label class="inline">{% trans "Location:" %}</label>
@@ -301,7 +301,7 @@
 	                	<div class="large-8 columns">
 					     			<select name="type_of" id="type_of">
 						  			{% for i in page_instance %}
-						  				{% if i.name == "Wiki page" %}	        				
+						  				{% if i.name == "Wiki page" %}
 											<option value = {{i.pk}} selected>{{ i.name }}</option>
 
 										{% else %}
@@ -312,12 +312,12 @@
 	                    </div>
 		     		</div>
 		     		{% endif %}
-                    	                
-	            </div> 
-			</div>  
+
+	            </div>
+			</div>
 			{% endif %}
 			<div class="row">
-				{% block upload_logo %} {% endblock %} 
+				{% block upload_logo %} {% endblock %}
 			</div>
 
 			<div class="row">
@@ -332,7 +332,7 @@
 							</h3>
 							<div class="small-9 columns">
 							<div class="row collapse">
-								
+
 							<div class="small-10 columns">
 						    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
 						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
@@ -340,7 +340,7 @@
 					        <div class="small-2 columns">
 					          <span tabindex="3" id="add-tag-btn" class="tiny button radius">{% trans 'Add Tag' %}</span>
 					        </div>
-							</div>							
+							</div>
 
 							</div>
 						</div>
@@ -361,10 +361,10 @@
 
 			    	</span>
 		    	</div>
-	    	</div>   
+	    	</div>
 
     	</div>
-    
+
     {% block prior_node %}
 
     <div class="content contents" style="display:none;" id="panel-prior-node">
@@ -376,7 +376,7 @@
 		</div>
       </div>
     </div>
-    
+
     {% endblock %}
 
     {% block collection %}
@@ -385,11 +385,11 @@
 	    <div class="row">
 			<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}></div>
 		</div>
-		
+
 		{% cache 3600 node_edit_base_coll_type_radio request.LANGUAGE_CODE %}
 
 		<div class="choose" style="display:none">
-		  	
+
 			<div class="row">
 			    <div class="small-6 large-2 columns" >
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Page"/>
@@ -413,7 +413,7 @@
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Pandora Video" />
 			      {% trans "Pandora" %} <i class="step fi-video"></i>
 			      </span>
-			    </div>	    
+			    </div>
 			    <div class="small-6 large-2 columns">
 			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="QuizObj" />
 			      {% trans "Quiz" %} <i class="step fi-pencil"></i>
@@ -433,53 +433,53 @@
 	    </div>
 
     </div>
-      
+
     {% endblock %}
-    
+
 	{% cache 300 node_edit_base_metadata request.LANGUAGE_CODE %}
-    <div class="content contents panel" id="panel-metadata" style="width:100%; display:none;" >      
+    <div class="content contents panel" id="panel-metadata" style="width:100%; display:none;" >
       	<div class="row">
 		  	<div class="small-12 large-12 columns"><h4>{% trans "Please add or edit Metadata" %} </h4></div>
 		  	<!-- Educational Language is Removed from ndf tags and here  __ Saurabh -->
 		  	{% get_metadata_values as metadata %}
 	  		{% for k,v in metadata.items %}
-	  		  
-  											
-	  			<div class="small-12 large-6 columns">			  	
+
+
+	  			<div class="small-12 large-6 columns">
 			  		<label>
 			  			{% if k == "educationaluse" %}
-						<h5 >{% trans "Educational Use:" %} </h5> 
+						<h5 >{% trans "Educational Use:" %} </h5>
 						{% elif k == "interactivitytype" %}
-						<h5>{% trans "Interactivity Type: " %}</h5> 
+						<h5>{% trans "Interactivity Type: " %}</h5>
 						{% elif k == "educationallevel" %}
 						<h5 class= "compulsory">{% trans "Educational Level:" %} </h5>
 						{% elif k == "educationalsubject" %}
 						<h5 class= "compulsory">{% trans "Educational Subject:" %} </h5>
 						{% elif k == "timerequired" %}
-						<h5>{% trans "Time Required: " %}</h5> 
+						<h5>{% trans "Time Required: " %}</h5>
 						{% elif k == "audience" %}
-						<h5 class= "compulsory">{% trans "Target Audience:" %} </h5> 
+						<h5 class= "compulsory">{% trans "Target Audience:" %} </h5>
 						{% elif k == "textcomplexity" %}
-						<h5>{% trans "Text Complexity" %}</h5>  
-						{% elif k == "age_range" %}			
+						<h5>{% trans "Text Complexity" %}</h5>
+						{% elif k == "age_range" %}
 						<h5>{% trans "Age Range:" %}</h5>
 						{% elif k == "readinglevel" %}
-						<h5>{% trans "Reading Level:" %} </h5>  
-						{% elif k == "curricular" %}			
+						<h5>{% trans "Reading Level:" %} </h5>
+						{% elif k == "curricular" %}
 						<h5>{% trans "Curricular:" %}</h5>
-						{% elif k == "educationalalignment" %}			
+						{% elif k == "educationalalignment" %}
 						<h5>{% trans "Educational Alignment:" %}</h5>
-						{% endif %}      
+						{% endif %}
 
-		         		{% get_attribute_value node.pk k "True" as attr_val %} 
+		         		{% get_attribute_value node.pk k "True" as attr_val %}
 		         		{% if attr_val.data_type == "list" %}
 		         		 <select name="{{k}}" id ="{{k}}" multiple style="height:5em!important;">
 		         		{% else %}
 		         		 <select name="{{k}}" id ="{{k}}">
 						{% endif %}
 							<option> --Select-- </option>
-							{% for opts in v %} 
-								{% if opts == attr_val.value|stringformat:"s" or opts in attr_val.value  %}	        				
+							{% for opts in v %}
+								{% if opts == attr_val.value|stringformat:"s" or opts in attr_val.value  %}
 								<option selected>{% trans opts %}</option>
 								{% else %}
 								<option>{% trans opts %}</option>
@@ -488,19 +488,19 @@
 						</select>
 					</label>
 				</div>
-				
+
 		  	{% endfor %}
   		<div class=" small-12 large-12 columns">
-		  	<div class="small-12 large-4 columns">			  	
+		  	<div class="small-12 large-4 columns">
 		  		<label>
-					<h5>{% trans "Based on Url: " %} </h5> 
-					<input name="basedonurl" type="text" value="{{node.basedonurl}}">		  	
+					<h5>{% trans "Based on Url: " %} </h5>
+					<input name="basedonurl" type="text" value="{{node.basedonurl}}">
 				</label>
 			</div>
 			<div class="small-12 large-4 columns">
 				<label>
-					<h5>{% trans "Source: " %} </h5> 
-					<input name="source" type="text" value="{{node.source}}">		  	
+					<h5>{% trans "Source: " %} </h5>
+					<input name="source" type="text" value="{{node.source}}">
 				</label>
 			</div>
 
@@ -521,15 +521,15 @@
 				<small class="error">Please select resource Subject</small>
 
 			</div>
-			
-		</div>	
+
+		</div>
 	</div>
-			
+
 	<div id="metadata_info"></div>
-	</div>	
+	</div>
 	{% endcache %}
 
-    <div class="content contents" id="panel-thread" style="width:95%; display:none;" >      
+    <div class="content contents" id="panel-thread" style="width:95%; display:none;" >
       	<div class="row">
 		  	<h7>{% trans "Add properties to the discussion feature of this " %}{{title}}{% trans " node "%} </h7>
 		</div>
@@ -570,7 +570,7 @@
 		        {% for each_int in all_interaction_values %}
 		          <option value="{{each_int}}" {% if thr_int_type == each_int %} selected {% endif %}>{{each_int}}</option>
 		        {% endfor %}
-		        
+
 		        </select>
 		      </div>
 		    </div>
@@ -578,25 +578,25 @@
 		    <div class="row">
 		      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction start date:" %}</h5>
 		      </div>
-		      
+
 		      <div class="large-pull-4 large-6 medium-8 columns">
-		      	<input type="text" id="thread_start_date" name="thread_start_date" value="{% if thr_start_time %}{{thr_start_time|date:'d/m/Y'}}{% endif %}" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+		      	<input type="text" id="thread_start_date" name="thread_start_date" value="{% if thr_start_time %}{{thr_start_time|date:'d/m/Y'}}{% endif %}" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem">
 		      </div>
 		    </div>
 
 		    <div class="row">
 		      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction close date:" %}</h5>
 		      </div>
-		      
+
 		      <div class="large-pull-4 large-6 medium-8 columns">
-		      	<input type="text" id="thread_close_date" name="thread_close_date" value="{% if thr_end_time %}{{thr_end_time|date:'d/m/Y'}}{% endif %}" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+		      	<input type="text" id="thread_close_date" name="thread_close_date" value="{% if thr_end_time %}{{thr_end_time|date:'d/m/Y'}}{% endif %}" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem">
 		      </div>
 		    </div>
 	    </div>
-	</div>	
+	</div>
 
 
-    <div class="content contents" id="panel-help" style="width:95%; display:none;" >      
+    <div class="content contents" id="panel-help" style="width:95%; display:none;" >
       	<div class="row">
 		  	<h7>{% trans "Select help page(s) for this resource from following options:"%} </h7>
 		</div>
@@ -606,9 +606,9 @@
 	        {% include 'ndf/widget_selector.html' with for='help_info_page' all_options=all_info_pages selected_options=help_page_list oneline_element='false' %}
 	    </div>
 
-	</div>	
+	</div>
 
-    
+
 
     <!-- Kept this bellow commented part for future reference(Don't delete this) -->
 
@@ -623,12 +623,12 @@
 	Target Name: <input id="" name="tname1" type="text" value="" placeholder="" >
         Target Url: <input id="" name="turl1" type="text" value="" placeholder="" >
         Target Description: <input id="" name="tdescription1" type="text" value="" placeholder="" >
-        
-         
+
+
     </div>
   </dd> </dl>
   <dl class="accordion" data-accordion><dd>
-   
+
      <a href="#align2" >AlignmentObject2</a>
     <div id="align2" class="content active">
          <label>AlignmentType<select name="aligntype"><option>Teaches</option><option>Assesses</option><option>Requires</option></select></label>
@@ -648,25 +648,25 @@
         Target Description: <input id="" name="tdescription3" type="text" value="" placeholder="" >
      </div>
   </dd>
-</dl>  -->         
+</dl>  -->
 
-        
-   
+
+
     <div class="content contents" id="panel-teaches"  style="width:95%; display:none;">
   		<div class="row">
 			<div class="small-12 columns">
 	  			<div id="teaches_drawer">
-	    			<!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	    			<!-- {#% edit_drawer_widget "prior_node" groupid node title %#} -->
 	  			</div>
 			</div>
       	</div>
     </div>
-	
+
     <div class="content contents" id="panel-assesses"  style="width:95%; dsplay:none;">
   		<div class="row">
 			<div class="small-12 columns">
 	  			<div id="assesses_drawer">
-	    			<!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	    			<!-- {#% edit_drawer_widget "prior_node" groupid node title %#} -->
 	  			</div>
 			</div>
       	</div>
@@ -676,10 +676,10 @@
 
 
   	{% block add_fields %} {% endblock %}
-  
+
  	<!-- Overlay : Map Widget -->
  	{% cache 300 node_edit_base_map_widget %}
-    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>
     	<!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
         <a class="close-reveal-modal" >&#215;</a>
         {% include "ndf/map_widget.html" with mode="edit" %}
@@ -696,9 +696,9 @@
 <!-- Reveal Modals begin -->
 
 <script type="text/javascript">
-	
+
 	{% if title == "Page" or "File" in node.member_of_names_list %}
-	
+
 		$("input[name=thread_create]").change(function(){
 			var radio_sel = $('input[name=thread_create]:checked').val()
 			if(radio_sel=="Yes"){
@@ -725,7 +725,7 @@
 		upperYearLimit = currentYear + 20;
 
 
-		$(".date_month_day_year").datepicker({ 
+		$(".date_month_day_year").datepicker({
 			changeMonth: true,
 			changeYear: true,
 			dateFormat: 'dd/mm/yy',
@@ -734,12 +734,12 @@
 
 			onClose: function(dateText, inst) {
 			  $(this).val(dateText);
-			  
+
 			  var month_year = $(this).val();
 			  day = currentDay;
 			  month = currentMonth;
 			  year = currentYear;
-			  
+
 			  if ($(this).attr('id') == "thread_start_date") {
 			    if (month_year) {
 			      month_year = month_year.split("/");
@@ -881,8 +881,8 @@
 		$(".teaches_tab").hide();
 		$(".prior_node_tab").hide();
 		$("#metadata_info").empty();
-		
-    
+
+
 
 		if (nt == "Page" || nt == "File" || nt == "Pandora_video" || nt == "Concept")
 		{
@@ -892,13 +892,13 @@
 		else if (nt == "Topic" || nt == "Term")
 		{
 			$(".teaches_tab").show();
-			$(".prior_node_tab").show(); 
+			$(".prior_node_tab").show();
 			$(".assesses_tab").show();
 		}
 		else if(nt == "Quiz" || nt == "QuizItem")
 		{
 			$(".assesses_tab").show();
-		} 
+		}
 		{% if node %}
 			old_name = "{{node.name}}"
 		    old_name = old_name.toLowerCase();
@@ -908,10 +908,10 @@
 				$("#name_id").attr("disabled",true)
 			{% endif %}
             {% get_thread_node node.pk as thread_node %}
-			{% if thread_node %}
+			{% if node.discussion_enable %}
 				$("input[name='thread_create'][value='Yes']").attr("checked","checked");
 				$("input[name='thread_create']").trigger("change");
-				$("input[name='thread_create']").attr("disabled",true);
+				// $("input[name='thread_create']").attr("disabled",true);
 			{% else %}
 				$("input[name='thread_create'][value='No']").attr("checked","checked");
 			{% endif %}
@@ -953,19 +953,19 @@
 
 				// write comment
 				$(".next_prev").click(function() {
-						
+
 					// alert(this.name);
 				 	$.ajax({
 						type: "POST",
 						url: "{% url 'select_drawer' groupid %}",
 						datatype: "html",
-						data:{							
+						data:{
 							homo_collection: homo_coll,
 							node_id: node_id,
 							page_no: this.name,
 							csrfmiddlewaretoken: '{{ csrf_token }}'
 						},
-						success: function(data) {													
+						success: function(data) {
 							cnt(data)
 						}
 
@@ -973,12 +973,12 @@
 				});
 				// End of coment
 
-			}	
+			}
 
 		});
 
 	});
-	
+
 
 	$(".node_tab").click(function() {
 		// for activating "panel-name-description" div and deactivate other div's
@@ -988,8 +988,8 @@
 		// For highlighting current clicked element
 		$("dl.select > dd").removeClass("active")
 		$(this).addClass("active")
-		
-	});	
+
+	});
 
 	$(".meta_tab").click(function() {
 		// for activating "panel-metadata" div and deactivate other div's
@@ -1002,7 +1002,7 @@
 		$(this).addClass("active")
 
 		$("#metadata_info").html("<input type='hidden' name='metadata_info' value='metadata'>");
-	});			
+	});
 
 	$(".thread_prop_tab").click(function() {
 		// for activating "panel-metadata" div and deactivate other div's
@@ -1013,7 +1013,7 @@
 
 		$("dl.select > dd").removeClass("active")
 		$(this).addClass("active")
-	});			
+	});
 
 	$(".help_rt_tab").click(function() {
 		// for activating "panel-metadata" div and deactivate other div's
@@ -1024,7 +1024,7 @@
 
 		$("dl.select > dd").removeClass("active")
 		$(this).addClass("active")
-	});			
+	});
 
 
 	$(".prior_node_tab").click(function() {
@@ -1041,7 +1041,7 @@
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function cnt(data) {
-				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
+				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's
 				$("div.contents").css("display", "none");
 				$("#panel-prior-node").css("display", "block");
 				// For highlighting current clicked element
@@ -1053,20 +1053,20 @@
 				$("#save-node").css("display", "block");
 
 				$(".next_prev").click(function() {
-					
+
 					// alert(this.name);
 				 	$.ajax({
 						type: "POST",
 						url: "{% url 'drawer_widget' group_id %}",
 						datatype: "html",
-						data:{							
+						data:{
 							field: "prior_node",
 							node_id: '{{node.pk}}',
 							app:"{{title}}",
 							page_no: this.name,
 							csrfmiddlewaretoken: '{{ csrf_token }}'
 						},
-						success: function(data) {													
+						success: function(data) {
 							cnt(data)
 						}
 
@@ -1081,7 +1081,7 @@
   	{% if is_group or node or not node %}
 		$(".collection_tab").click(function() {
   			var collection = "heterogeneous";
-        
+
 	{% else %}
 		$(".collection").click(function() {
       			var collection = this.value;
@@ -1089,7 +1089,7 @@
   		$("#publish_resource").foundation('reveal', 'close');
 		$("input[type='radio'][name='col']").attr("checked", false);
 		$("input[type='radio'][name='coll']").attr("checked", false);
-		
+
 		if (collection == "homogeneous"){
 
 			$("div.contents").css("display", "none");
@@ -1117,18 +1117,18 @@
 
 					// write comment
 					$(".next_prev").click(function() {
-							
+
 						// alert(this.name);
 					 	$.ajax({
 							type: "POST",
 							url: "{% url 'select_drawer' groupid %}",
 							datatype: "html",
-							data:{							
+							data:{
 								node_id: node_id,
 								page_no: this.name,
 								csrfmiddlewaretoken: '{{ csrf_token }}'
 							},
-							success: function(data) {													
+							success: function(data) {
 								cnt(data)
 							}
 
@@ -1136,7 +1136,7 @@
 					});
 					// End of coment
 
-				}	
+				}
 
 			});
 
@@ -1156,7 +1156,7 @@
 					csrfmiddlewaretoken: '{{ csrf_token }}'
 				},
 				success: function cnt(data) {
-					// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
+					// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's
 					$("div.contents").css("display", "none");
 					$("#panel-collection").css("display", "block");
 					// For highlighting current clicked element
@@ -1171,32 +1171,32 @@
 					// $("#save-node").css("display", "block");
 
 					$(".next_prev").click(function() {
-						
+
 					 	$.ajax({
 							type: "POST",
 							url: "{% url 'drawer_widget' group_id %}",
 							datatype: "html",
-							data:{							
+							data:{
 								field: "collection",
 								node_id: '{{node.pk}}',
 								app:"{{title}}",
 								page_no: this.name,
 								csrfmiddlewaretoken: '{{ csrf_token }}'
 							},
-							success: function(data) {													
+							success: function(data) {
 								cnt(data)
 							}
 
 						});
 
 					});
-					
+
 				}
 			});
 		}
 
 	});
-	
+
 
 	$(".teaches_tab").click(function() {
 
@@ -1212,7 +1212,7 @@
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function cnt(data) {
-				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
+				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's
 				$("div.contents").css("display", "none");
 				$("#panel-teaches").css("display", "block");
 				// For highlighting current clicked element
@@ -1223,20 +1223,20 @@
 				$("#save-node").css("display", "block");
 
 				$(".next_prev").click(function() {
-					
+
 					// alert(this.name);
 				 	$.ajax({
 						type: "POST",
 						url: "{% url 'drawer_widget' group_id %}",
 						datatype: "html",
-						data:{							
+						data:{
 							field: "teaches",
 							node_id: '{{node.pk}}',
 							app:"{{title}}",
 							page_no: this.name,
 							csrfmiddlewaretoken: '{{ csrf_token }}'
 						},
-						success: function(data) {													
+						success: function(data) {
 							cnt(data)
 						}
 
@@ -1248,7 +1248,7 @@
 		});
 
 	});
-    
+
   	$(".assesses_tab").click(function() {
 
 		$.ajax({
@@ -1263,7 +1263,7 @@
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function cnt(data) {
-				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
+				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's
 				$("div.contents").css("display", "none");
 				$("#panel-assesses").css("display", "block");
 				// For highlighting current clicked element
@@ -1274,20 +1274,20 @@
 				$("#save-node").css("display", "block");
 
 				$(".next_prev").click(function() {
-					
+
 					// alert(this.name);
 				 	$.ajax({
 						type: "POST",
 						url: "{% url 'drawer_widget' group_id %}",
 						datatype: "html",
-						data:{							
+						data:{
 							field: "assesses",
 							node_id: '{{node.pk}}',
 							app:"{{title}}",
 							page_no: this.name,
 							csrfmiddlewaretoken: '{{ csrf_token }}'
 						},
-						success: function(data) {													
+						success: function(data) {
 							cnt(data)
 						}
 
@@ -1330,7 +1330,7 @@
 	tags.onkeyup = checkTag;
 
 	function updateAllTags() {
-		
+
 		var tagsArr = new Array();
 
 		$("#added_tags").children("div.tags.label").each(function(){
@@ -1340,7 +1340,7 @@
 		$("input:hidden[name='tags']").val(tagsArr.toString());
 		// console.log(tagsArr)
 	}
-	
+
 
 	function removeTag(){
 		$(this).parent().fadeOut("slow", function(){
@@ -1402,12 +1402,12 @@
 	addTagBtn.onkeypress = addTag;
 
 	$("#save-node").click(function(event) {
-	
+
 		pn_arr = []
 		cn_arr = []
 		md_arr = [] //for adding module
 		tch_arr=[]  // for teaches
-		assess_arr=[] // for assesses		
+		assess_arr=[] // for assesses
 
 		// tags_str = $("#tags_id").val()
 		// escape_chars = "~!@#$%^&*()_+{}|:<>?/.,';][=-`'"
@@ -1445,7 +1445,7 @@
 		{% block base_save_on_click %}{% endblock %}
 
 	    var name = $("#name_id").val().trim().toLowerCase();
-	    var nodes = {{nodes_list|safe}} 
+	    var nodes = {{nodes_list|safe}}
 	    condition_result_var = true;
 	    {% if node %}
 	    	if(name == old_name){
@@ -1455,12 +1455,12 @@
 	    		condition_result_var = true;
 	    	}
 	    {% endif %}
-	    var val_chk = name.search(/mod$/gi)    
+	    var val_chk = name.search(/mod$/gi)
     	if (condition_result_var && name != "")
 	    {
 			if(val_chk == -1){
-				if (nodes.indexOf(name) != -1)  
-				{   
+				if (nodes.indexOf(name) != -1)
+				{
 					$("#message").css("display", "block");
 					$("#message").text("{% trans title %}'" + name +"' {% trans 'already exist. Please choose another name' %}");
 					event.preventDefault();
@@ -1491,7 +1491,7 @@
 		{% if not blog_type %}
 
 			{% get_site_name_from_settings as site_name %}
-	       
+
 			{%  if site_name == "NROER" and "File" in node.member_of_names_list %}
 	            if(educationallevel.selectedIndex == 0 || educationalsubject.selectedIndex ==0 || audience.selectedIndex == 0){
 	                    // $('#tabs').find('a[href="#tab2"]').trigger('click');
@@ -1529,16 +1529,16 @@
 	});
 
 
-  	$(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
-    
+  	$(document).on('open', '#view-map-edit-widget[data-reveal]', function () {
+
   		$.ajax({
   			url: "{% url 'get_visited_location' groupid %}",
-  			success: function(data){ 
-   
+  			success: function(data){
+
 			  	data = JSON.parse(data);
 
 			    var lastVisitedLocationVal = data;
-			    
+
 			    if(lastVisitedLocationVal){
 
 			      if(lastVisitedLocationVal == "[]"){
@@ -1558,24 +1558,24 @@
 			      var group = new L.featureGroup(tempArr)
 			          map.fitBounds(group.getBounds());
 			    }
-			   
+
 			}
 		});
 
   	});
 
-	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
-	
-		map.invalidateSize();  
+	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {
+
+		map.invalidateSize();
 
 	    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
 	    // lastVisitedLocationVal = lastVisitedLocationVal.trim();
 	    // if((lastVisitedLocationVal) && (!lastVisitedLocationVal.startsWith("["))){
-	    	
+
 	    // 	lastVisitedLocationVal = "[" + lastVisitedLocationVal;
 	    // }
 	    // if((lastVisitedLocationVal) && (!lastVisitedLocationVal.endsWith("]"))){
-	    	
+
 	    // 	lastVisitedLocationVal += "]";
 	    // }
 	    // lastVisitedLocationVal = lastVisitedLocationVal.trim();
@@ -1605,10 +1605,10 @@
  		// 			map.fitBounds(group.getBounds());
  		// 	}
 
- 		// map.setView([lat, lng], zoom); 		
+ 		// map.setView([lat, lng], zoom);
 	});
 
-	// $(document).on('close', '#view-map-edit-widget[data-reveal]', function () {  
+	// $(document).on('close', '#view-map-edit-widget[data-reveal]', function () {
 	// 	var mapZoom = map.getZoom();
 	// 	var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
 	// 	lastVisitedLocationVal = JSON.parse("["+lastVisitedLocationVal+"]");
@@ -1619,9 +1619,9 @@
 	// function update()
 	// {
 	// 	$('#page_type').empty();
-	// 	$('#page_type').append($('#type_of :selected').text());	
+	// 	$('#page_type').append($('#type_of :selected').text());
 	// 	$('#select_page_type').foundation('reveal', 'close');
-	// } 
+	// }
 	/*
 	$("select#type_of").change(function() {
 		sel_val_type_of = $("option:selected", this).text();

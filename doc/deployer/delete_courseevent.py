@@ -13,7 +13,7 @@ def delete_res(del_cur):
             node_id=each._id,
             deletion_type=1
         )
-        print "\n---------\n",del_status, "--", del_status_msg
+        # print "\n---------\n",del_status, "--", del_status_msg
         if not del_status:
             print "*"*80
             print "\n Error node: _id: ", each._id, " , name: ", each.name, " type: ", each.member_of_names_list
@@ -24,7 +24,10 @@ for group_obj in group_cur:
     confirmation = raw_input("Delete group: "+ str(group_obj.name)+ ". Enter (y/Y) to continue or (n) to skip this group: ")
     if confirmation == 'Y' or confirmation == 'y':
         # Fetch all nodes that have ONLY group_obj _id in its group_set.
-        grp_res = node_collection.find({'group_set':{'$size':1}, 'group_set': group_obj._id})
+
+        # grp_res = node_collection.find({'group_set':{'$size':1}, 'group_set': group_obj._id})
+        grp_res = node_collection.find({ '$and': [ {'group_set':{'$size':1}}, {'group_set': {'$all': [ObjectId(group_obj._id)]}} ] })
+
         print "\n Total resources to be deleted", grp_res.count()
         # Delete all objects of the cursor grp_res
 
