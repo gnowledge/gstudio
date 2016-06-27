@@ -239,6 +239,11 @@ body{
     // box-shadow: 0px 2px 5px rgba(0, 0, 0 , 0.4);    // khaal
 
     .title-area a{
+      height: auto;
+
+      img {
+        height: 45px;
+      }
 
       &:hover{
           // background-color: scale-color($topbar-bg-color, $lightness: 5%);
