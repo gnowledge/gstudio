@@ -27848,125 +27848,121 @@ body > footer li {
 #top-headers #first-header.top-bar .title-area {
   height: auto;
 }
-/* line 56, ../../../scss/_clix_styles.scss */
-#top-headers #first-header.top-bar .title-area img {
-  height: 45px;
-}
-/* line 72, ../../../scss/_clix_styles.scss */
+/* line 68, ../../../scss/_clix_styles.scss */
 #top-headers #first-header.top-bar .top-bar-section #login-button-medium {
   text-decoration: underline;
   color: blue !important;
 }
-/* line 77, ../../../scss/_clix_styles.scss */
+/* line 73, ../../../scss/_clix_styles.scss */
 #top-headers #first-header.top-bar .top-bar-section .app-menus li a {
   font-weight: 600;
 }
-/* line 81, ../../../scss/_clix_styles.scss */
+/* line 77, ../../../scss/_clix_styles.scss */
 #top-headers #first-header.top-bar .top-bar-section .has-dropdown > a:after {
   border-color: #000000 transparent transparent !important;
 }
-/* line 85, ../../../scss/_clix_styles.scss */
+/* line 81, ../../../scss/_clix_styles.scss */
 #top-headers #first-header.top-bar .top-bar-section ul.dropdown {
   background: #fff !important;
 }
-/* line 87, ../../../scss/_clix_styles.scss */
+/* line 83, ../../../scss/_clix_styles.scss */
 #top-headers #first-header.top-bar .top-bar-section ul.dropdown li input[type=submit] {
   height: 3em;
 }
 @media only screen and (max-width: 40em) {
-  /* line 93, ../../../scss/_clix_styles.scss */
+  /* line 89, ../../../scss/_clix_styles.scss */
   #top-headers #first-header.top-bar .top-bar-section #login-button-medium {
     display: none;
   }
-  /* line 96, ../../../scss/_clix_styles.scss */
+  /* line 92, ../../../scss/_clix_styles.scss */
   #top-headers #first-header.top-bar .top-bar-section #login-button-medium:hover {
     background: inherit;
   }
 }
 @media only screen and (min-width: 40.063em) {
-  /* line 104, ../../../scss/_clix_styles.scss */
+  /* line 100, ../../../scss/_clix_styles.scss */
   #top-headers #first-header.top-bar .top-bar-section ul li:hover {
     background: inherit;
   }
-  /* line 109, ../../../scss/_clix_styles.scss */
+  /* line 105, ../../../scss/_clix_styles.scss */
   #top-headers #first-header.top-bar .top-bar-section #login-button-small {
     display: none;
   }
 }
-/* line 115, ../../../scss/_clix_styles.scss */
+/* line 111, ../../../scss/_clix_styles.scss */
 #top-headers #first-header.top-bar .top-bar-section li a.active:not(.button) {
   color: #ececec !important;
 }
-/* line 117, ../../../scss/_clix_styles.scss */
+/* line 113, ../../../scss/_clix_styles.scss */
 #top-headers #first-header.top-bar .top-bar-section li a:not(.button), #top-headers #first-header.top-bar .top-bar-section li {
   background-color: #fff !important;
   color: #333 !important;
   font-weight: 600;
 }
-/* line 123, ../../../scss/_clix_styles.scss */
+/* line 119, ../../../scss/_clix_styles.scss */
 #top-headers #first-header.top-bar .top-bar-section li a:not(.button):hover, #top-headers #first-header.top-bar .top-bar-section li:hover {
   background: #6153ae;
   color: white !important;
 }
-/* line 138, ../../../scss/_clix_styles.scss */
+/* line 134, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header {
   opacity: 0.9;
   background-color: #E1E1E1 !important;
 }
-/* line 143, ../../../scss/_clix_styles.scss */
+/* line 139, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header:hover {
   opacity: 1;
   transition: 0.1s all;
   box-shadow: 0px 2px 3px #E1E1E1 !important;
 }
-/* line 151, ../../../scss/_clix_styles.scss */
+/* line 147, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header #group-apps .back-btn.fi-play:before {
   transform: rotate(180deg);
 }
-/* line 156, ../../../scss/_clix_styles.scss */
+/* line 152, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header #second-header.top-bar {
   background-color: #fafafa;
   height: 52px;
 }
-/* line 160, ../../../scss/_clix_styles.scss */
+/* line 156, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header #second-header.top-bar span {
   font-size: 1em !important;
 }
-/* line 165, ../../../scss/_clix_styles.scss */
+/* line 161, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header #second-header.top-bar img {
   height: 45px;
   width: 50px;
 }
-/* line 176, ../../../scss/_clix_styles.scss */
+/* line 172, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header #second-header.top-bar .top-bar-section li.active a:not(.button), #top-headers #group-level-header #second-header.top-bar .top-bar-section li.active {
   background-color: #fafafa !important;
   color: #000;
   border-bottom: solid 1px gray !important;
 }
-/* line 182, ../../../scss/_clix_styles.scss */
+/* line 178, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header #second-header.top-bar .top-bar-section li.active a:not(.button):hover, #top-headers #group-level-header #second-header.top-bar .top-bar-section li.active:hover {
   background-color: #2d2752 !important;
 }
-/* line 186, ../../../scss/_clix_styles.scss */
+/* line 182, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header #second-header.top-bar .top-bar-section li.active:not(.has-form) > a:not(.button) {
   background-color: #352d61;
 }
-/* line 191, ../../../scss/_clix_styles.scss */
+/* line 187, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header #second-header.top-bar .top-bar-section li a:not(.button), #top-headers #group-level-header #second-header.top-bar .top-bar-section li {
   background-color: #fafafa;
   color: gray;
 }
-/* line 198, ../../../scss/_clix_styles.scss */
+/* line 194, ../../../scss/_clix_styles.scss */
 #top-headers #group-level-header #second-header.top-bar .top-bar-section li a:not(.button):hover, #top-headers #group-level-header #second-header.top-bar .top-bar-section li:not(.has-form):hover {
   background-color: #2d2752;
   color: #fff;
 }
-/* line 206, ../../../scss/_clix_styles.scss */
+/* line 202, ../../../scss/_clix_styles.scss */
 #top-headers ul.dropdown {
   box-shadow: 0px 2px 5px black;
   opacity: 1;
 }
-/* line 211, ../../../scss/_clix_styles.scss */
+/* line 207, ../../../scss/_clix_styles.scss */
 #top-headers #search_text {
   border-bottom: solid thin #E1E1E1;
   background-color: #fafafa;
@@ -27979,12 +27975,12 @@ body > footer li {
   box-shadow: none;
   top: 10px;
 }
-/* line 223, ../../../scss/_clix_styles.scss */
+/* line 219, ../../../scss/_clix_styles.scss */
 #top-headers #search_text:focus {
   border-bottom-color: #2b2c2d;
   transition: 1s ease-out;
 }
-/* line 229, ../../../scss/_clix_styles.scss */
+/* line 225, ../../../scss/_clix_styles.scss */
 #top-headers #search-submit {
   background-color: #fafafa;
   top: 10px;
@@ -27993,18 +27989,18 @@ body > footer li {
   opacity: 0.3;
   color: black;
 }
-/* line 239, ../../../scss/_clix_styles.scss */
+/* line 235, ../../../scss/_clix_styles.scss */
 #top-headers #search-submit:hover {
   opacity: 1;
   color: white;
   background-color: gray;
   transition: 0.8s ease-out;
 }
-/* line 246, ../../../scss/_clix_styles.scss */
+/* line 242, ../../../scss/_clix_styles.scss */
 #top-headers ul.title-area a {
   color: #333333 !important;
 }
-/* line 248, ../../../scss/_clix_styles.scss */
+/* line 244, ../../../scss/_clix_styles.scss */
 #top-headers ul.title-area a .user-heading {
   font-weight: bolder;
   font-size: 23px;
@@ -28012,14 +28008,14 @@ body > footer li {
   line-height: 1.8em;
 }
 
-/* line 292, ../../../scss/_clix_styles.scss */
+/* line 288, ../../../scss/_clix_styles.scss */
 .login-page {
   position: relative;
   /*background: url(/static/ndf/images/login-background.png);*/
   background-size: 100% 100%;
   min-height: 100vh;
 }
-/* line 298, ../../../scss/_clix_styles.scss */
+/* line 294, ../../../scss/_clix_styles.scss */
 .login-page .login-page-opacity {
   height: 100%;
   width: 100%;
@@ -28031,7 +28027,7 @@ body > footer li {
   background: -ms-linear-gradient(left, #E9A900, #B0108D);
   background: -o-linear-gradient(left, #E9A900, #B0108D);
 }
-/* line 310, ../../../scss/_clix_styles.scss */
+/* line 306, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form {
   background-color: #fff;
   border-radius: 10px;
@@ -28042,12 +28038,12 @@ body > footer li {
   margin: 100px auto;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
 }
-/* line 321, ../../../scss/_clix_styles.scss */
+/* line 317, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .login-page-header img {
   height: 80px;
   width: 280px;
 }
-/* line 325, ../../../scss/_clix_styles.scss */
+/* line 321, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .login-page-header span {
   display: block;
   text-transform: uppercase;
@@ -28055,33 +28051,33 @@ body > footer li {
   font-weight: 600;
   letter-spacing: 1px;
 }
-/* line 333, ../../../scss/_clix_styles.scss */
+/* line 329, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .login-captcha {
   margin: 10px 0;
 }
-/* line 336, ../../../scss/_clix_styles.scss */
+/* line 332, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .login-captcha > div {
   display: inline-block;
   vertical-align: top;
 }
-/* line 340, ../../../scss/_clix_styles.scss */
+/* line 336, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .login-captcha .fi-refresh {
   color: #A0148E;
   font-size: 25px;
 }
-/* line 345, ../../../scss/_clix_styles.scss */
+/* line 341, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .login-captcha #captcha-content th {
   display: none;
 }
-/* line 348, ../../../scss/_clix_styles.scss */
+/* line 344, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .login-captcha #captcha-content td > input {
   display: inline-block;
 }
-/* line 351, ../../../scss/_clix_styles.scss */
+/* line 347, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .login-captcha #captcha-content td > input#id_captcha_1 {
   width: 130px;
 }
-/* line 358, ../../../scss/_clix_styles.scss */
+/* line 354, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .login-button .button {
   font-size: 15px;
   background-color: #B1B1B1;
@@ -28090,23 +28086,23 @@ body > footer li {
   border-radius: 5px;
   padding: 9px;
 }
-/* line 366, ../../../scss/_clix_styles.scss */
+/* line 362, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .login-button .button:hover {
   background-color: #CC1AB5;
   border-color: #881378;
 }
-/* line 373, ../../../scss/_clix_styles.scss */
+/* line 369, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .forgot-password label {
   font-size: 10px;
   text-align: center;
   text-decoration: underline;
 }
-/* line 380, ../../../scss/_clix_styles.scss */
+/* line 376, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .register-user label {
   font-size: 10px;
   margin: 10px 0px 0px;
 }
-/* line 384, ../../../scss/_clix_styles.scss */
+/* line 380, ../../../scss/_clix_styles.scss */
 .login-page .login-page-form .register-user span {
   color: #A0148E;
 }
