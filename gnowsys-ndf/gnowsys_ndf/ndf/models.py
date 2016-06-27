@@ -676,17 +676,6 @@ class Node(DjangoDocument):
                     if each_invalid_field in self.structure:
                         print "=== removed from structure", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
 
-<<<<<<< HEAD
-
-            keys_list = self.structure.keys()
-            keys_list.append('_id')
-            invalid_struct_fields_list = list(set(self.keys()) - set(keys_list))
-            # print '\n invalid_struct_fields_list: ',invalid_struct_fields_list
-            if invalid_struct_fields_list:
-                for each_invalid_field in invalid_struct_fields_list:
-                    if each_invalid_field in self:
-                        print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
-=======
 
             keys_list = self.structure.keys()
             keys_list.append('_id')
@@ -697,7 +686,6 @@ class Node(DjangoDocument):
                     if each_invalid_field in self:
                         print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
 
->>>>>>> 39015fa9c6e9a6d46d7e84b05f03deac9f07e107
 
         except Exception, e:
             print e
