@@ -116,66 +116,87 @@ polyline{
   padding: 5px;
   background-color: #C5F0FF;
 }
+.fix_center{
+  position: fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  margin:auto;
+}
+#lightbox{
+  display: none;
+  position: fixed;
+  z-index: 999;
+  overflow: auto;
+}
+#lightbox .close_lb_btn{
+  color: #AAAAAA;
+  cursor: pointer;
+  font-size: 2.22222rem;
+  font-weight: bold;
+  line-height: 1;
+  position: absolute;
+  top: 0.55556rem;
+  right: 1.22222rem;
+  text-decoration: none;
+}
+#modal_lb{
+  position: relative;
+  top: 50px;
+  width: 90%;
+  margin: 20px auto;
+  border-radius: 5px;
+  left: 0;
+  background-color: #FFFFFF;
+  padding: 1.25rem;
+  border: solid 1px #666666;
+}
+#blackout_lb{
+  z-index: -1;
+  background-color: rgba(0,0,0,0.5);
+}
 </style>
 <div id="info_bar"></div>
 <div id="map"></div>
-<div id="light_box">
-  <div id="main_container">
-    <div class="select_wrapper">
-      <select id="object_type">
-        <option disabled selected value> -- select an option -- </option>
-        <optgroup class="opt_to_select"> </optgroup>
-      </select>
-      <select id="dataset">
-        <option selected value=""> -- select an option -- </option>
-        <optgroup class="opt_to_select"> </optgroup>
-      </select>
-      <select id="graph_type">
-        <option selected value=""> -- select an option -- </option>
-        <optgroup class="opt_to_select"> </optgroup>
-      </select>
-    </div>
-    <div class="graph_cont">
-    </div>
-  </div>
-</div>
+
 <script>
 window.onload = function(){
-  load_obj();
+  init_lb();
 }
+
+// Light box functions=======================================
+function init_lb(){
+  var ele = '<div id="lightbox" class="fix_center"> <div id="blackout_lb" class="fix_center"></div> <div id="modal_lb"><a class="close_lb_btn" aria-label="Close">&#215;</a><h3 class="header_lb"></h3><div class="content_lb"></div></div> </div></div>';
+  $('body').append(ele);
+  $('#lightbox .close_lb_btn, #blackout_lb').click(function(){
+    close_lb();
+  })
+}
+function open_lb(){
+  $('body').css('overflow', 'hidden');
+  $('#lightbox').fadeIn(300);
+}
+function close_lb(){
+  $('body').css('overflow', '');
+  $('#lightbox').fadeOut(300);
+}
+
+function set_content_lb(data){
+  if(data.head === undefined){
+    data.head = "";
+  }
+  if(data.content === undefined){
+    data.content = "";
+  }
+  $('#modal_lb .header_lb').html(data.head);
+  $('#modal_lb .content_lb').html(data.content);
+}
+// Light box functions================END=======================
 
 var color = d3.scale.ordinal()
   .domain(["Lorem ipsum", "dolor sit", "amet", "consectetur", "adipisicing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt"])
   .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
-d3.select('#object_type').on('change', function(){
-  var val = mapping[this.value];
-
-  d3.select('#dataset').select('.opt_to_select')
-    .html('');
-  var ele = d3.select('#dataset').select('.opt_to_select');
-  for(i=0 ; i< dataset[val.dataset].length; i++){
-    ele.append('option')
-      .attr('value',i)
-      .html('Dataset '+ i);
-  }
-
-  d3.select('#graph_type').select('.opt_to_select')
-    .html('');
-  var ele = d3.select('#graph_type').select('.opt_to_select');
-  for(i=0; i<val.graph_type.length; i++){
-    ele.append('option')
-      .attr('value', i)
-      .html(graphs[i].name);
-  }
-
-  d3.select(".graph_cont").html('');
-
-});
-
-d3.selectAll('#dataset, #graph_type').on('change', function(){
-  refresh_graphs();
-});
 
 var objects = [
   {"name": "Object1", "value": 0},
@@ -211,6 +232,38 @@ var mapping =[
   },
 ];
 
+function graph_select_init(){
+  load_obj();
+  d3.select('#object_type').on('change', function(){
+    var val = mapping[this.value];
+
+    d3.select('#dataset').select('.opt_to_select')
+      .html('');
+    var ele = d3.select('#dataset').select('.opt_to_select');
+    for(i=0 ; i< dataset[val.dataset].length; i++){
+      ele.append('option')
+        .attr('value',i)
+        .html('Dataset '+ i);
+    }
+
+    d3.select('#graph_type').select('.opt_to_select')
+      .html('');
+    var ele = d3.select('#graph_type').select('.opt_to_select');
+    for(i=0; i<val.graph_type.length; i++){
+      ele.append('option')
+        .attr('value', i)
+        .html(graphs[i].name);
+    }
+
+    d3.select(".graph_cont").html('');
+
+  });
+
+  d3.selectAll('#dataset, #graph_type').on('change', function(){
+    refresh_graphs();
+  });
+}
+
 function load_obj(){
   d3.select('#object_type').select('.opt_to_select')
     .html('');
@@ -237,7 +290,7 @@ function refresh_graphs(){
 <script>
 var states_code = {
   "anp":"Andhra Pradesh",
-  "tel":"Arunachal Pradesh",
+  "tel":"Telangana",
   "ass":"Assam",
   "bih":"Bihar",
   "chh":"Chhattisgarh",
@@ -335,7 +388,31 @@ d3.json("/static/ndf/js/india_map.topo.json", function(error, states) {
 });
 
 $(document).on("click",".city",function(){
-  $('#light_box').show();
+  data = {
+    "head":"Kuch nahi",
+    "content":'<div id="main_container">\
+        <div class="select_wrapper">\
+          <select id="object_type">\
+            <option disabled selected value> -- select an option -- </option>\
+            <optgroup class="opt_to_select"> </optgroup>\
+          </select>\
+          <select id="dataset">\
+            <option selected value=""> -- select an option -- </option>\
+            <optgroup class="opt_to_select"> </optgroup>\
+          </select>\
+          <select id="graph_type">\
+            <option selected value=""> -- select an option -- </option>\
+            <optgroup class="opt_to_select"> </optgroup>\
+          </select>\
+        </div>\
+        <div class="graph_cont">\
+        </div>\
+      </div>',
+  }
+  set_content_lb(data);
+  graph_select_init();
+
+  open_lb();
 });
 
 
