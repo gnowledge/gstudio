@@ -69,68 +69,99 @@ ins_objectid = ObjectId()
 def get_execution_time(f):
    if BENCHMARK == 'ON':
 
-	    def wrap(*args,**kwargs):
-	        time1 = time.time()
-	        total_parm_size = 0
-	        for key, value in kwargs.iteritems():
-	           total_parm_size = total_parm_size + getsizeof(value)
-	        total_param = len(kwargs)
-	        ret = f(*args,**kwargs)
-	        t2 = time.clock()
-	        time2 = time.time()
-	        time_diff = time2 - time1
-	        benchmark_node =  col.Benchmark()
-	        benchmark_node.time_taken = unicode(str(time_diff))
-	        benchmark_node.name = unicode(f.func_name)
-	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
-	        try :
-	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
-	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
-	        except :
-	        	pass
-	        try :
-	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
-	        except :
-	        	pass
-	        try :
-	        	benchmark_node.user = unicode(args[0].user.username)
-	        except :
-	        	pass
-	        benchmark_node.parameters = unicode(total_param)
-	        benchmark_node.size_of_parameters = unicode(total_parm_size)
-	        benchmark_node.last_update = datetime.today()
-	        try:
-	        	benchmark_node.calling_url = unicode(args[0].path)
-	        	url = benchmark_node.calling_url.split("/")
+        def wrap(*args,**kwargs):
+            time1 = time.time()
+            total_parm_size = 0
+            for key, value in kwargs.iteritems():
+               total_parm_size = total_parm_size + getsizeof(value)
+            total_param = len(kwargs)
+            ret = f(*args,**kwargs)
+            t2 = time.clock()
+            time2 = time.time()
+            time_diff = time2 - time1
+            benchmark_node =  col.Benchmark()
+            benchmark_node.time_taken = unicode(str(time_diff))
+            benchmark_node.name = unicode(f.func_name)
+            benchmark_node.has_data = { "POST" : 0, "GET" : 0}
+            try :
+                benchmark_node.has_data["POST"] = bool(args[0].POST)
+                benchmark_node.has_data["GET"] = bool(args[0].GET)
+            except :
+                pass
+            try :
+                benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
+            except :
+                pass
+            try :
+                benchmark_node.user = unicode(args[0].user.username)
+            except :
+                pass
+            benchmark_node.parameters = unicode(total_param)
+            benchmark_node.size_of_parameters = unicode(total_parm_size)
+            benchmark_node.last_update = datetime.today()
+            try:
+                benchmark_node.calling_url = unicode(args[0].path)
+                url = benchmark_node.calling_url.split("/")
 
-	        	if url[1] != "" :
-	        		group = url[1]
-	        		benchmark_node.group = group
-	        		try :
-	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
-	        			if bool(n) :
-	        				benchmark_node.group = group;
-	        		except :
-	        			group_name, group = get_group_name_id(group)
-	        			benchmark_node.group = str(group)
-	        	else :
-	        		pass
+                if url[1] != "" :
+                    group = url[1]
+                    benchmark_node.group = group
+                    try :
+                        n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+                        if bool(n) :
+                            benchmark_node.group = group;
+                    except :
+                        group_name, group = get_group_name_id(group)
+                        benchmark_node.group = str(group)
+                else :
+                    pass
 
-	        	if url[2] == "" :
-	        		benchmark_node.action = None
-	        	else :
-	        		benchmark_node.action = url[2]
-		        	if url[3] != '' :
-		        		benchmark_node.action +=  str('/'+url[3])
-		        	else :
-		        		pass
-	        	if "node_id" in args[0].GET and "collection_nav" in f.func_name:
-	        		benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
-	        		# modify calling_url if collection_nav is called i.e collection-player
-	        except :
-	        	pass
-	        benchmark_node.save()
-	        return ret
+                if url[2] == "" :
+                    benchmark_node.action = None
+                else :
+                    benchmark_node.action = url[2]
+                    if url[3] != '' :
+                        benchmark_node.action +=  str('/'+url[3])
+                    else :
+                        pass
+                if "node_id" in args[0].GET and "collection_nav" in f.func_name:
+                    benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
+                    # modify calling_url if collection_nav is called i.e collection-player
+            except :
+                pass
+            benchmark_node.save()
+            if benchmark_node.user and benchmark_node.group != 'None':
+                counter_obj = counter_collection.one({'user_id':args[0].user.id, 'group_id': ObjectId(benchmark_node.group)})
+                #course_raw_material and course_gallery called twice for each file visited, hence incremented by 2.
+                if benchmark_node.name == 'course_raw_material' or benchmark_node.name == 'course_gallery' :
+                    if len(url) > 4 and url[4] :
+                        file_id = ObjectId(url[4])
+                        file_node_obj = node_collection.one({'_id':file_id})
+                        file_creator_id = file_node_obj.created_by
+                        if file_creator_id != counter_obj.user_id :
+                            counter_obj.no_others_file_visited += 1
+                            counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                            counter_obj_creator.no_visits_gained += 1
+                            counter_obj.last_update = datetime.today()
+                            counter_obj_creator.last_update = datetime.today()
+                            counter_obj.save()
+                            counter_obj_creator.save()
+                #course_notebook called twice for one particular note visited, hence incremented by 2.
+                elif benchmark_node.name == 'course_notebook' :
+                    if len(url) > 5 and url[4] == 'all-notes' and url[5] :
+                        note_id = ObjectId(url[5])
+                        note_node_obj = node_collection.one({'_id':note_id})
+                        note_creator_id = note_node_obj.created_by
+                        if note_creator_id != counter_obj.user_id :
+                            counter_obj.no_others_notes_visited += 1
+                            counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                            counter_obj_creator.no_views_gained += 1
+                            counter_obj.last_update = datetime.today()
+                            counter_obj_creator.last_update = datetime.today()
+                            counter_obj.save()
+                            counter_obj_creator.save()
+
+            return ret
    if BENCHMARK == 'ON':
         return wrap
    if BENCHMARK == 'OFF':
