@@ -1488,7 +1488,7 @@ class GSystem(Node):
                         'license': GSTUDIO_DEFAULT_LICENSE
                     }
 
-    def fill_gsystem_values(self,
+    def fill_gstystem_values(self,
                             request=None,
                             attribute_set=[],
                             relation_set=[],
