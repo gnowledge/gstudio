@@ -3299,6 +3299,7 @@ class Counter(DjangoDocument):
         'no_others_file_visited':int,# benchmark
         'no_comments_on_other_files':int,
         'no_comments_by_unique_users_files':int,
+        'unique_comments_by_files':[int],
         'avg_rating_awarded_files':float,
         'no_questions_attempted':int,
         'no_correct_answers':int,
@@ -3309,6 +3310,7 @@ class Counter(DjangoDocument):
         'no_comments_received_notes':int,
         'no_comments_on_other_notes':int,
         'no_comments_by_unique_users_notes':int,
+        'unique_comments_by_notes':[int],
         'avg_rating_awarded_notes':float,
     }
 
