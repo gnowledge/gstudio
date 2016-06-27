@@ -676,6 +676,7 @@ class Node(DjangoDocument):
                     if each_invalid_field in self.structure:
                         print "=== removed from structure", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
 
+<<<<<<< HEAD
 
             keys_list = self.structure.keys()
             keys_list.append('_id')
@@ -685,6 +686,18 @@ class Node(DjangoDocument):
                 for each_invalid_field in invalid_struct_fields_list:
                     if each_invalid_field in self:
                         print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
+=======
+
+            keys_list = self.structure.keys()
+            keys_list.append('_id')
+            invalid_struct_fields_list = list(set(self.keys()) - set(keys_list))
+            # print '\n invalid_struct_fields_list: ',invalid_struct_fields_list
+            if invalid_struct_fields_list:
+                for each_invalid_field in invalid_struct_fields_list:
+                    if each_invalid_field in self:
+                        print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
+
+>>>>>>> 39015fa9c6e9a6d46d7e84b05f03deac9f07e107
 
         except Exception, e:
             print e
@@ -3298,6 +3311,8 @@ class Counter(DjangoDocument):
         'no_others_file_visited':int,# benchmark
         'no_comments_on_other_files':int,
         'no_comments_by_unique_users_files':int,
+        'unique_comments_by_files':[int],
+        'rating_count_files': int,
         'avg_rating_awarded_files':float,
         'no_questions_attempted':int,
         'no_correct_answers':int,
@@ -3308,6 +3323,8 @@ class Counter(DjangoDocument):
         'no_comments_received_notes':int,
         'no_comments_on_other_notes':int,
         'no_comments_by_unique_users_notes':int,
+        'unique_comments_by_notes':[int],
+        'rating_count_notes': int,
         'avg_rating_awarded_notes':float,
     }
 
@@ -3331,6 +3348,7 @@ class Counter(DjangoDocument):
         'no_others_file_visited':0,
         'no_comments_on_other_files':0,
         'no_comments_by_unique_users_files':0,
+        'rating_count_files': 0,
         'avg_rating_awarded_files':0.0,
         'no_questions_attempted':0,
         'no_correct_answers':0,
@@ -3341,6 +3359,7 @@ class Counter(DjangoDocument):
         'no_comments_received_notes':0,
         'no_comments_on_other_notes':0,
         'no_comments_by_unique_users_notes':0,
+        'rating_count_notes': 0,
         'avg_rating_awarded_notes':0.0
     }
     
