@@ -222,19 +222,28 @@ body{
     font-family: 'ubuntu-regular';
 }
 
+
 #top-headers {
 
   margin-bottom: 0.5rem;
   // padding-bottom: 0em;   // khaal
-
+  
   #first-header.top-bar {
 
     background-color: #3e3e3e;
+    @media only screen and (min-width: 40.063em){
+      height: auto;
+    }
     // background-color: #fff;        // khaal
     // margin: 0px auto;              // khaal
     // box-shadow: 0px 2px 5px rgba(0, 0, 0 , 0.4);    // khaal
 
     .title-area a{
+      height: auto;
+
+      img {
+        height: 45px;
+      }
 
       &:hover{
           // background-color: scale-color($topbar-bg-color, $lightness: 5%);
@@ -259,7 +268,6 @@ body{
           // background-color: #E1E1E1;
       }
   }
-
 
   #group-level-header{
 
@@ -367,19 +375,6 @@ body{
     color: white;
     background-color: gray;
     transition: 0.8s ease-out;
-  }
-
-  ul.title-area a{
-    width: 150px;
-    color: gray;
-
-        &:hover{
-        // background-color: scale-color($topbar-bg-color, $lightness: 5%);
-        //box-shadow: inset 0px 75px 50px #cccccc;
-        //color: #black;
-        //transition: 0.8s all;
-    }
-
   }
 
 //     div.two-nav-container{
@@ -4382,15 +4377,22 @@ course-title{
 
   .clix_brief {
     text-align: left;
-    padding: 20px 3% 20px 10%;
+    padding: 20px 5%;
 
     img {
       margin: 30px 20px;
       height: 70px;
+      @media screen and (max-width: 450px) {
+        margin: 25px 10px;
+        height: 55px;
+      } 
     }
     p {
       color: #fff;
       font-size: 26px;
+      @media screen and (max-width: 450px) {
+        font-size: 18px;
+      }
       font-weight: 300;
       font-family: 'ubuntu-light';
     }
@@ -4400,7 +4402,10 @@ course-title{
     background-color: rgba(255,255,255, 0.92);
     border-radius: 10px;
     width: 80%;
-    margin: 45px 40px;
+    margin: 20px auto;
+    @media screen and (min-width: 1025px) {
+      margin: 200px auto;
+    }
     text-align: left;
     padding: 30px 40px 21px;
     box-shadow: 0px 0px 30px rgba(0, 0,0, 0.5);
@@ -4455,7 +4460,13 @@ course-title{
   }
   .flowers {
     left: 50px;
-    height: 418px;
+    height: 500px;
+    @media screen and (max-width: 450px) {
+      height: 250px;
+    }
+    @media screen and (min-width: 451px) and (max-width: 1025px) {
+      height: 350px;
+    }
     bottom: 0px;
     opacity: 0.6;
   }
@@ -4463,7 +4474,11 @@ course-title{
     position: absolute;
     top: 5px;
     right: 50px;
-    height: 200px;
+    height: 150px;
+    @media screen and (max-width: 450px) {
+      right: 15px;
+      height: 100px;
+    }
   }
   h2 {
     color: #A0148E;
