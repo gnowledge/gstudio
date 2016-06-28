@@ -14,13 +14,13 @@ def create_page(**kwargs):
 	if kwargs.has_key('name'):
 		name = kwargs.get('name','')
 	else:
-		return error_message["Page Content required"]
+		return error_message["Page name required"]
 	name = unicode(name)
 
 	if kwargs.has_key('content'):
 		content = kwargs.get('content','')
 	else:
-		return error_message["Page name required"]
+		return error_message["Page Content required"]
 	content = unicode(content)
 
 	if kwargs.has_key('created_by'):
