@@ -140,7 +140,7 @@ def get_execution_time(f):
                         counter_obj = counter_collection.one({'user_id':args[0].user.id, 'group_id': ObjectId(benchmark_node.group)})
                 
                 #To update counter when a file is added to the gallery
-                if benchmark_node.name=='course_gallery' :
+                if benchmark_node.name=='course_gallery' or benchmark_node.name == 'course_raw_material' :
                     cursor=benchmark_collection.Benchmark.find({'user':args[0].user.username})
                     num=cursor.count()
                     if cursor[num-2].name=='upload_using_save_file':
