@@ -134,15 +134,24 @@ def get_execution_time(f):
                 counter_obj = counter_collection.one({'user_id':args[0].user.id, 'group_id': ObjectId(benchmark_node.group)})
 
                 if counter_obj :
+                    #To update counter when a file is added to the gallery
+                    if benchmark_node.name=='course_gallery' :
+                    	 cursor=benchmark_collection.Benchmark.find({'user':args[0].user.username})
+                    	 num=cursor.count()
+                    	 if cursor[num-2].name=='upload_using_save_file':
+                    	 	counter_obj.no_files_created+=1
+                    	 	counter_obj.save()
+                    	 if cursor[num-2].name=='trash_resource':
+                    		counter_obj.no_files_created-=1
+                    		counter_obj.save()
 
+
+
+                    #for no_notes_written and notes are updated only when note is made and not clicking the back button
                     if benchmark_node.name=='get_node_common_fields':
                         cursor=benchmark_collection.Benchmark.find({'user':args[0].user.username})
                         num=cursor.count()
-                        #counter_obj.no_notes_written=counter_obj.no_notes_written+1
-                        #counter_obj.save()
-                        #for num in cursor:
-                        #    doc=num   
-                        #cursor=benchmark_collection.find({'user':args[0].user.username})
+                       
                         if cursor[num-2].name=='create_edit_page' :
                             counter_obj.no_notes_written=counter_obj.no_notes_written+1
                             counter_obj.save()
