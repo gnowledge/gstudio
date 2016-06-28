@@ -298,7 +298,7 @@
           dataSet.push({'legendLabel':i,'magnitude':v})
         })
 
-      var canvasWidth = 300, //width
+      var canvasWidth = 600, //width
         canvasHeight = 300,   //height
         outerRadius = 100,   //radius
         color = d3.scale.category20(); //builtin range of colors
@@ -319,7 +319,8 @@
           .attr("width", canvasWidth) //set the width of the canvas
           .attr("height", canvasHeight) //set the height of the canvas
           .append("svg:g") //make a group to hold our pie chart
-            .attr("transform", "translate(" + 1.5*outerRadius + "," + 1.5*outerRadius + ")") // relocate center of pie to 'outerRadius,outerRadius'
+            // .attr("transform", "translate(" + 1.5*outerRadius + "," + 1.5*outerRadius + ")") // relocate center of pie to 'outerRadius,outerRadius'
+            .attr("transform", "translate(" + 200 + "," + 100 + ")") // relocate center of pie to 'outerRadius,outerRadius'
 
       // This will create <path> elements for us using arc data...
       var arc = d3.svg.arc()
