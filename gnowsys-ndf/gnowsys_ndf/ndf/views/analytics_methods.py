@@ -164,11 +164,11 @@ class AnalyticsMethods(object):
 
 	def get_evaluated_quizitems_count(self,correct_ans_flag=False, incorrect_ans_flag=False):
 
-
 		if not hasattr(self,'list_of_qi_ids') and not hasattr(self,'total_qi_cur'):
 			self.total_qi_cur = self.get_attempted_quizitems_count(True)
 			self.list_of_qi_ids = []
 			for each_qi in self.total_qi_cur:
+				correct_ans_list = None
 				if each_qi.origin:
 					prior_node_id = each_qi.origin[0].get('prior_node_id_of_thread',None)
 					if prior_node_id:
