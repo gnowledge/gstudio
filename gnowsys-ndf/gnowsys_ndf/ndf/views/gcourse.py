@@ -1789,13 +1789,19 @@ def enroll_to_course(request, group_id):
         group_obj.save()
         response_dict["success"] = True
         # creating a new counter document for a user for a given course for the purpose of analytics
-        counter_obj = counter_collection.collection.Counter()
-        counter_obj.user_id=request.user.id
-        auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
-        counter_obj.auth_id=ObjectId(auth_obj._id)
-        counter_obj.group_id=ObjectId(group_id)
-        counter_obj.last_update=datetime.datetime.now()
-        counter_obj.save()
+        counter_obj = counter_collection.one({'user_id':request.user.id, 'group_id': ObjectId(group_id)})
+        if counter_obj:
+            counter_obj.enrolled = True
+            counter_obj.save()
+        else:
+            counter_obj = counter_collection.collection.Counter()
+            counter_obj.user_id=request.user.id
+            auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
+            counter_obj.auth_id=ObjectId(auth_obj._id)
+            counter_obj.group_id=ObjectId(group_id)
+            counter_obj.last_update=datetime.datetime.now()
+            counter_obj.enrolled = True
+            counter_obj.save()
         return HttpResponse(json.dumps(response_dict))
 
 @login_required

@@ -3291,6 +3291,7 @@ class Counter(DjangoDocument):
         'auth_id': ObjectId,
         'group_id':ObjectId, #course_id
         'last_update': datetime.datetime,
+        'enrolled':bool,
         'no_comments_by_user':int,
         'no_comments_for_user':int, 
         'no_files_created':int,
@@ -3298,8 +3299,7 @@ class Counter(DjangoDocument):
         'no_comments_received_files':int,
         'no_others_file_visited':int,# benchmark
         'no_comments_on_other_files':int,
-        'no_comments_by_unique_users_files':int,
-        'unique_comments_by_files':[int],
+        'comments_by_files': dict,
         'rating_count_files': int,
         'avg_rating_awarded_files':float,
         'no_questions_attempted':int,
@@ -3310,8 +3310,7 @@ class Counter(DjangoDocument):
         'no_others_notes_visited':int, # benchmark
         'no_comments_received_notes':int,
         'no_comments_on_other_notes':int,
-        'no_comments_by_unique_users_notes':int,
-        'unique_comments_by_notes':[int],
+        'comments_by_notes': dict,
         'rating_count_notes': int,
         'avg_rating_awarded_notes':float,
     }
@@ -3335,7 +3334,6 @@ class Counter(DjangoDocument):
         'no_comments_received_files':0,
         'no_others_file_visited':0,
         'no_comments_on_other_files':0,
-        'no_comments_by_unique_users_files':0,
         'rating_count_files': 0,
         'avg_rating_awarded_files':0.0,
         'no_questions_attempted':0,
@@ -3346,7 +3344,6 @@ class Counter(DjangoDocument):
         'no_others_notes_visited':0, 
         'no_comments_received_notes':0,
         'no_comments_on_other_notes':0,
-        'no_comments_by_unique_users_notes':0,
         'rating_count_notes': 0,
         'avg_rating_awarded_notes':0.0
     }
