@@ -169,8 +169,8 @@ def get_execution_time(f):
                             counter_obj.no_others_notes_visited += 1
                             counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
                             if counter_obj_creator is None :
-                                create_counter_document(file_creator_id, benchmark_node.group)
-                                counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                create_counter_document(note_creator_id, benchmark_node.group)
+                                counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
                             counter_obj_creator.no_views_gained += 1
                             counter_obj.last_update = datetime.today()
                             counter_obj_creator.last_update = datetime.today()
@@ -220,8 +220,8 @@ def get_execution_time(f):
                                 counter_obj.no_comments_by_user += 1
                                 counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id':ObjectId(benchmark_node.group)})
                                 if counter_obj_creator is None :
-                                    create_counter_document(file_creator_id, benchmark_node.group)
-                                    counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                    create_counter_document(note_creator_id, benchmark_node.group)
+                                    counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
                                 counter_obj_creator.no_comments_received_notes += 1
                                 counter_obj_creator.no_comments_for_user += 1
                                 if str(counter_obj.user_id) in counter_obj_creator.comments_by_notes.keys():
@@ -233,8 +233,8 @@ def get_execution_time(f):
                                 counter_obj.no_comments_by_user -= 1
                                 counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id':ObjectId(benchmark_node.group)})
                                 if counter_obj_creator is None :
-                                    create_counter_document(file_creator_id, benchmark_node.group)
-                                    counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                    create_counter_document(note_creator_id, benchmark_node.group)
+                                    counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
                                 counter_obj_creator.no_comments_received_notes -= 1
                                 counter_obj_creator.no_comments_for_user -= 1
                                 if str(counter_obj.user_id) in counter_obj_creator.comments_by_notes.keys():
