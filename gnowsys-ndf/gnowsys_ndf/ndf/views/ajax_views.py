@@ -48,6 +48,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_w
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
+from gnowsys_ndf.ndf.views.moderation import *
 
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -134,6 +135,14 @@ def collection_create(request, group_id):
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     create_gattribute(page_node._id, discussion_enable_at, True)
     return_status = create_thread_for_node(request,group_id, page_node)
+    group_object = node_collection.one({'_id': ObjectId(group_id)})
+    if group_object.edit_policy == "EDITABLE_MODERATED":
+                    # print "\n\n\n\ninside editable moderated block"
+                    page_node.group_set = get_moderator_group_set(page_node.group_set, group_object._id)
+                    # print "\n\n\npage_node._id",page_node._id
+                    page_node.status = u'MODERATION'
+                    # print "\n\n\n page_node.status",page_node.status
+
     page_node.save()
 
     for each in Collections:
