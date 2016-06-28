@@ -3291,6 +3291,7 @@ class Counter(DjangoDocument):
         'auth_id': ObjectId,
         'group_id':ObjectId, #course_id
         'last_update': datetime.datetime,
+        'enrolled':bool,
         'no_comments_by_user':int,
         'no_comments_for_user':int, 
         'no_files_created':int,
