@@ -136,8 +136,8 @@ def get_execution_time(f):
                     if counter_obj :
                         pass
                     else :
-                        create_counter_document(args[0].user.id, benchmark_node.group)
-                        counter_obj = counter_collection.one({'user_id':args[0].user.id, 'group_id': ObjectId(benchmark_node.group)})
+                        counter_obj = create_counter_document(args[0].user.id, benchmark_node.group)
+                        
                 
                 #To update counter when a file is added to the gallery
                 if benchmark_node.name=='course_gallery' or benchmark_node.name == 'course_raw_material' :
@@ -170,9 +170,9 @@ def get_execution_time(f):
                 #course_raw_material and course_gallery called twice for each file visited, hence incremented by 2.
                 #Updating no of files visited and no of views gained on files
                 if benchmark_node.name == 'course_raw_material' or benchmark_node.name == 'course_gallery' :
-                    cursor=benchmark_collection.Benchmark.find({'user':args[0].user.username})
-                    num=cursor.count()
                     if len(url) > 4 and url[4] :
+                        cursor=benchmark_collection.Benchmark.find({'user':args[0].user.username})
+                        num=cursor.count()
                         if cursor[num-2].calling_url == args[0].path:
                             file_id = ObjectId(url[4])
                             file_node_obj = node_collection.one({'_id':file_id})
@@ -181,8 +181,7 @@ def get_execution_time(f):
                                 counter_obj.no_others_file_visited += 1
                                 counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id': ObjectId(benchmark_node.group)})
                                 if counter_obj_creator is None :
-                                    create_counter_document(file_creator_id, benchmark_node.group)
-                                    counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                    counter_obj_creator = create_counter_document(file_creator_id, benchmark_node.group)
                                 counter_obj_creator.no_visits_gained += 1
                                 counter_obj.last_update = datetime.today()
                                 counter_obj_creator.last_update = datetime.today()
@@ -191,10 +190,9 @@ def get_execution_time(f):
                 #course_notebook called twice for one particular note visited, hence incremented by 2.
                 #Updating no of notes visited and no of views gained on notes
                 elif benchmark_node.name == 'course_notebook' :
-                    cursor=benchmark_collection.Benchmark.find({'user':args[0].user.username})
-                    num=cursor.count()
-
                     if len(url) > 5 and url[4] == 'all-notes' and url[5] :
+                        cursor=benchmark_collection.Benchmark.find({'user':args[0].user.username})
+                        num=cursor.count()
                         if cursor[num-2].calling_url == args[0].path:                        
 
                             note_id = ObjectId(url[5])
@@ -204,13 +202,13 @@ def get_execution_time(f):
                                 counter_obj.no_others_notes_visited += 1
                                 counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
                                 if counter_obj_creator is None :
-                                    create_counter_document(note_creator_id, benchmark_node.group)
-                                    counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                    counter_obj_creator = create_counter_document(note_creator_id, benchmark_node.group)
                                 counter_obj_creator.no_views_gained += 1
                                 counter_obj.last_update = datetime.today()
                                 counter_obj_creator.last_update = datetime.today()
                                 counter_obj.save()
                                 counter_obj_creator.save()
+
                 #Updating no of comments by user, comments for user, comments on files and notes
                 elif benchmark_node.name == 'discussion_reply' or benchmark_node.name == 'discussion_delete_reply':
                     thread_id = url[3]
@@ -225,8 +223,7 @@ def get_execution_time(f):
                                 counter_obj.no_comments_by_user += 1
                                 counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id':ObjectId(benchmark_node.group)})
                                 if counter_obj_creator is None :
-                                    create_counter_document(file_creator_id, benchmark_node.group)
-                                    counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                    counter_obj_creator = create_counter_document(file_creator_id, benchmark_node.group)
                                 counter_obj_creator.no_comments_received_files += 1
                                 counter_obj_creator.no_comments_for_user += 1
                                 if str(counter_obj.user_id) in counter_obj_creator.comments_by_files.keys():
@@ -238,8 +235,7 @@ def get_execution_time(f):
                                 counter_obj.no_comments_by_user -= 1
                                 counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id':ObjectId(benchmark_node.group)})
                                 if counter_obj_creator is None :
-                                    create_counter_document(file_creator_id, benchmark_node.group)
-                                    counter_obj_creator = counter_collection.one({'user_id':file_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                    counter_obj_creator = create_counter_document(file_creator_id, benchmark_node.group)
                                 counter_obj_creator.no_comments_received_files -= 1
                                 counter_obj_creator.no_comments_for_user -= 1
                                 if str(counter_obj.user_id) in counter_obj_creator.comments_by_files.keys():
@@ -255,8 +251,7 @@ def get_execution_time(f):
                                 counter_obj.no_comments_by_user += 1
                                 counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id':ObjectId(benchmark_node.group)})
                                 if counter_obj_creator is None :
-                                    create_counter_document(note_creator_id, benchmark_node.group)
-                                    counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                    counter_obj_creator = create_counter_document(note_creator_id, benchmark_node.group)
                                 counter_obj_creator.no_comments_received_notes += 1
                                 counter_obj_creator.no_comments_for_user += 1
                                 if str(counter_obj.user_id) in counter_obj_creator.comments_by_notes.keys():
@@ -268,8 +263,7 @@ def get_execution_time(f):
                                 counter_obj.no_comments_by_user -= 1
                                 counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id':ObjectId(benchmark_node.group)})
                                 if counter_obj_creator is None :
-                                    create_counter_document(note_creator_id, benchmark_node.group)
-                                    counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id': ObjectId(benchmark_node.group)})
+                                    counter_obj_creator = create_counter_document(note_creator_id, benchmark_node.group)
                                 counter_obj_creator.no_comments_received_notes -= 1
                                 counter_obj_creator.no_comments_for_user -= 1
                                 if str(counter_obj.user_id) in counter_obj_creator.comments_by_notes.keys():
@@ -298,6 +292,7 @@ def create_counter_document(user_id, group_id) :
     counter_obj.last_update=datetime.today()
     counter_obj.enrolled = False
     counter_obj.save()
+    return counter_obj
 
 import json
 import bson
