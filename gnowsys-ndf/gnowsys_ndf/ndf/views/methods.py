@@ -242,7 +242,11 @@ def get_execution_time(f):
                                     if counter_obj_creator.comments_by_files[str(counter_obj.user_id)] == 1:
                                         del counter_obj_creator.comments_by_files[str(counter_obj.user_id)]
                                     else:
-                                        counter_obj_creator.comments_by_files[str(counter_obj.user_id)] -= 1 
+                                        counter_obj_creator.comments_by_files[str(counter_obj.user_id)] -= 1
+                            counter_obj.last_update = datetime.today()
+                            counter_obj_creator.last_update = datetime.today()
+                            counter_obj.save()
+                            counter_obj_creator.save() 
                     else :
                         note_creator_id = file_note_obj.created_by
                         if note_creator_id != counter_obj.user_id :
@@ -258,7 +262,7 @@ def get_execution_time(f):
                                     counter_obj_creator.comments_by_notes[str(counter_obj.user_id)] += 1                                
                                 else:
                                     counter_obj_creator.comments_by_notes.update({str(counter_obj.user_id):1})
-                        if benchmark_node.name == 'discussion_delete_reply' :
+                            if benchmark_node.name == 'discussion_delete_reply' :
                                 counter_obj.no_comments_on_other_notes -= 1
                                 counter_obj.no_comments_by_user -= 1
                                 counter_obj_creator = counter_collection.one({'user_id':note_creator_id, 'group_id':ObjectId(benchmark_node.group)})
@@ -271,10 +275,10 @@ def get_execution_time(f):
                                         del counter_obj_creator.comments_by_notes[str(counter_obj.user_id)]
                                     else:
                                         counter_obj_creator.comments_by_notes[str(counter_obj.user_id)] -= 1
-                    counter_obj.last_update = datetime.today()
-                    counter_obj_creator.last_update = datetime.today()
-                    counter_obj.save()
-                    counter_obj_creator.save()
+                            counter_obj.last_update = datetime.today()
+                            counter_obj_creator.last_update = datetime.today()
+                            counter_obj.save()
+                            counter_obj_creator.save()
 
 
             return ret
