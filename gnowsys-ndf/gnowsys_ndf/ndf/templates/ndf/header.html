@@ -410,7 +410,7 @@
               <ul class="title-area text-center">
                 <li class="name" title="{% firstof  group_object.altnames group_object.name %}">
                   <h1>
-                    <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+                    <a href="{% url 'groupchange' group_id %}">
 
                           {% get_relation_value group_object.pk 'has_profile_pic' as grel_dict %}
                           {% if not grel_dict.cursor and grel_dict.grel_node %}
