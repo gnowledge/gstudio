@@ -34,3 +34,7 @@
 			#+BEGIN_EXAMPLE
 			echo "execfile('property_order_reset.py')" | python manage.py shell 
 			#+END_EXAMPLE
+
+
+/Note:/
+	- While updating .csv fields, do note the delimiters.
