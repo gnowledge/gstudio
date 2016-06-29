@@ -2219,7 +2219,6 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
                             altnames = field.altnames.split(";")[0]
                         else:
                             altnames = field.altnames
-
                 elif set(node["member_of"]).issubset(field.object_type):
                     # It means we are dealing with inverse relation
                     data_type = node.structure[field.inverse_name]
@@ -2228,6 +2227,16 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
                         if ";" in field.altnames:
                             altnames = field.altnames.split(";")[1]
 
+                else:
+                    member_of_node = node_collection.one({'_id': node.member_of[0]})
+                    if set(member_of_node["type_of"]).issubset(field.subject_type):
+                        data_type = node.structure[field.name]
+                        value = node[field.name]
+                        if field.altnames:
+                            if ";" in field.altnames:
+                                altnames = field.altnames.split(";")[0]
+                            else:
+                                altnames = field.altnames
             else:
                 # For AttributeTypes
                 altnames = field.altnames
