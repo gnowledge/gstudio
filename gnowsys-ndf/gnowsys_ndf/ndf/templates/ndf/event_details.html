@@ -19,7 +19,8 @@
   <script src="/static/ndf/bower_components/moment/moment.js"></script> 
   <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
   <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script>
+   <!-- checked -->
   <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 
@@ -49,6 +50,7 @@ table, th, td {
 		min-height: 10vh;
 			
     }
+  
 </style>
 
 <div id="view_event">
@@ -141,8 +143,7 @@ table, th, td {
                                   </div>
                                 </div>
                                 
-                          {% endif %}
-                          {% endif %}
+                          {% endif %}             
                           
                          
                          {% if node.event_coordinator %} 
@@ -161,6 +162,17 @@ table, th, td {
                               {% endfor %}
                             </div>
                           </div>
+                          {% endif %}
+
+                          <br><br>
+
+                          {%  if node.url %}
+                           <div align = "center">
+                            <button target = "_blank" onClick="window.open('{{node.url}}')">Join</button>   
+                           </div>                              
+                          {% endif %} 
+
+
                           {% endif %}
                            
 
