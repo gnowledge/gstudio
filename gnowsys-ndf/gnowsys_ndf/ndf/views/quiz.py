@@ -437,16 +437,11 @@ def save_quizitem_answer(request, group_id):
                 for num in node_obj.attribute_set:
                     if 'correct_answer' in num:
                         cor_ans=num['correct_answer']
-                #print cor_ans
-                #print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                #print user_given_ans
+                
                 for one_att in user_ans.attribute_set:
                     if 'quizitempost_user_submitted_ans' in one_att:
                         if len(one_att['quizitempost_user_submitted_ans'])!=0:
                             if cmp(cor_ans,user_given_ans)==0:
-                            	print cor_ans
-                            	print "aaaaaaaaaaaaaaaaaa"
-                            	print user_given_ans
                                 counter_obj.no_correct_answers+=1
                                 counter_obj.save()
                             else:
