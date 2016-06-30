@@ -3297,7 +3297,7 @@ class Counter(DjangoDocument):
         'no_files_created':int,
         'no_visits_gained_on_files':int, # benchmark
         'no_comments_received_on_files':int,
-        'no_others_file_visited':int,# benchmark
+        'no_others_files_visited':int,# benchmark
         'no_comments_on_others_files':int,
         'comments_by_others_on_files': dict,
         'rating_count_received_on_files': int,
