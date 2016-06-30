@@ -344,7 +344,7 @@
 
                 <script>
                   // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
-                  var Book = ePub("{{MEDIA_URL}}{{node.if_file.original.relurl}}", {
+                  var Book = ePub("{% url 'read_file' group_name_tag node download_filename %}", {
                     width: 400,
                     height: false,
                     restore: true
