@@ -4,7 +4,7 @@
 {% get_grid_fs_object node as grid_fs_obj %}
 <style type="text/css">
     .image-details .tabs .tab-title{
-        width: 25% !important;
+        width: 43% !important;
     }
     .tab-title > a{
         font-size: 0.80rem !important;
@@ -143,9 +143,6 @@
                                 <i class="fi-page-edit" ></i>Edit
                             </a>
                             <a class="delete-btn" title="Delete  {{node.member_of_names_list.0}}"><i class="fi-trash"></i> Delete </a>
-                        {% else %}
-                            <a class="delete-btn" title="Delete  {{node.member_of_names_list.0}} disabled" title="You are not authorized for this action"><i class="fi-trash"></i> Delete </a>
-
                         {% endif %}
                     </div>
                 </div>
@@ -154,17 +151,20 @@
                     <div class="small-12 columns ">
                         <ul class="tabs" data-tab>
                           <li class="tab-title active"><a href="#image-comments">Comments</a></li>
-                          <li class="tab-title"><a href="#image-desc">Description</a></li>
-                          <li class="tab-title"><a href="#image-info">Info</a></li>
+                          <li class="tab-title"><a href="#image-info-desc">Info</a></li>
+                          <!-- <li class="tab-title"><a href="#image-desc">Description</a></li> -->
                         </ul>
                         <div class="tabs-content">
-                            <div class="content" id="image-info">
+                            <div class="content" id="image-info-desc">
                                 {% get_file_obj  node as file_res %}
                                 <span>Created At: </span>{{node.created_at}}<br>
-                                <span>Uploader: </span>{{node.created_by|get_username}}<br>
+                                <span>Uploaded by: </span>{{node.created_by|get_username}}<br>
                                 <span>Dimensions: </span>{{ file_res.if_image_dimensions|default_if_none:"No dimensions available" }}<br>
                                 <span>Format: </span>{{file_res.mime_type}}<br>
-                                <span>Size: </span>{{file_res.length|filesizeformat}}
+                                <span>Size: </span>{{file_res.length|filesizeformat}}<br>
+                                <hr/>
+                                <span>Description:</span><br>
+                                {{node.content|default_if_none:"No description added yet."|safe}}
                             </div>
 
                             <div class="content active" id="image-comments">
@@ -181,9 +181,6 @@
                                             {% endif %}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="content" id="image-desc">
-                                {{node.content|default_if_none:"No description added yet."|safe}}
                             </div>
                         </div>
                     </div>

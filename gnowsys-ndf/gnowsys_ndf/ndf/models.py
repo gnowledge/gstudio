@@ -10,10 +10,12 @@ from itertools import chain     # Using from_iterable()
 from hashfs import HashFS       # content-addressable file management system
 from StringIO import StringIO
 from PIL import Image
+from django.utils import timezone
 
 # imports from installed packages
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group as DjangoGroup
+from django.contrib.sessions.models import Session
 from django.db import models
 from django.http import HttpRequest
 
@@ -666,12 +668,24 @@ class Node(DjangoDocument):
         # found!!! "
 
         try:
-            invalid_struct_fields_list = list(set(self.structure.keys()) - set(self.keys()))
 
+            invalid_struct_fields = list(set(self.structure.keys()) - set(self.keys()))
+            # print '\n invalid_struct_fields: ',invalid_struct_fields
+            if invalid_struct_fields:
+                for each_invalid_field in invalid_struct_fields:
+                    if each_invalid_field in self.structure:
+                        print "=== removed from structure", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
+
+
+            keys_list = self.structure.keys()
+            keys_list.append('_id')
+            invalid_struct_fields_list = list(set(self.keys()) - set(keys_list))
+            # print '\n invalid_struct_fields_list: ',invalid_struct_fields_list
             if invalid_struct_fields_list:
                 for each_invalid_field in invalid_struct_fields_list:
-                    if each_invalid_field in self.structure:
-                        print "=== removed ", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
+                    if each_invalid_field in self:
+                        print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
+
         except Exception, e:
             print e
             pass
@@ -1718,17 +1732,25 @@ class Filehive(DjangoDocument):
 
 
     @staticmethod
-    def delete_file_from_filehive(filehive_id):
+    def delete_file_from_filehive(filehive_id, filehive_relurl):
 
         filehive_obj    = filehive_collection.one({'_id': ObjectId(filehive_id)})
-        file_md5        = str(filehive_obj.md5)
-        filehive_obj_id = str(filehive_obj._id)
+        if filehive_obj:
+            file_md5        = str(filehive_obj.md5)
+            filehive_obj_id = str(filehive_obj._id)
 
-        print "\nDeleted filehive object having '_id': ", filehive_obj_id," from Filehive collection."
-        filehive_obj.delete()
+            print "\nDeleted filehive object having '_id': ", filehive_obj_id," from Filehive collection."
+            filehive_obj.delete()
 
-        gfs.delete(file_md5)
-        print "\nDeleted physical file having 'md5': ", file_md5
+            if gfs.delete(file_md5):
+                print "\nDeleted physical file having 'md5': ", file_md5
+                return True
+
+        if gfs.delete(filehive_relurl):
+            print "\nDeleted physical file having 'relurl': ", filehive_relurl
+            return True
+
+        return False
 
 
     # -- file helper methods --
@@ -1836,6 +1858,9 @@ class Filehive(DjangoDocument):
 
         elif file_mime_type == 'text/plain':
             file_extension = '.txt'
+
+        elif poss_ext == '.ggb':
+            file_extension = '.ggb'
 
         else:
             file_extension = mimetypes.guess_extension(file_mime_type)
@@ -2061,7 +2086,7 @@ class Author(Group):
         'agency_type': lambda x: x in GSTUDIO_AUTHOR_AGENCY_TYPES         # agency_type inherited from Group class
     }
 
-    required_fields = ['name', 'password']
+    required_fields = ['name']
 
     def __init__(self, *args, **kwargs):
         super(Author, self).__init__(*args, **kwargs)
@@ -2110,6 +2135,62 @@ class Author(Group):
             return [str(user['_id']) for user in all_authors_cur]
         else:
             return [user['_id'] for user in all_authors_cur]
+
+
+    @staticmethod
+    def create_author(user_id_or_obj, agency_type='Student', **kwargs):
+
+        user_obj = None
+
+        if isinstance(user_id_or_obj, int):
+            user_obj = User.objects.filter(id=user_id_or_obj)
+            if len(user_obj) > 0:
+                user_obj = user_obj[0]
+
+        elif isinstance(user_id_or_obj, User):
+            user_obj = user_id_or_obj
+
+        if not user_obj:
+            raise Exception("\nUser with provided user-id/user-obj does NOT exists!!")
+
+        auth = node_collection.find_one({'_type': u"Author", 'created_by': int(user_obj.id)})
+
+        if auth:
+            return auth
+
+        auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
+
+        print "\n Creating new Author obj for user id (django): ", user_obj.id
+        auth = node_collection.collection.Author()
+        auth.name = unicode(user_obj.username)
+        auth.email = unicode(user_obj.email)
+        auth.password = u""
+        auth.member_of.append(auth_gst._id)
+        auth.group_type = u"PUBLIC"
+        auth.edit_policy = u"NON_EDITABLE"
+        auth.subscription_policy = u"OPEN"
+        auth.created_by = user_obj.id
+        auth.modified_by = user_obj.id
+        auth.contributors.append(user_obj.id)
+        auth.group_admin.append(user_obj.id)
+        auth.preferred_languages = {'primary': ('en', 'English')}
+
+        auth.agency_type = "Student"
+        auth_id = ObjectId()
+        auth['_id'] = auth_id
+        auth.save(groupid=auth_id)
+
+        home_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("home")})
+        if user_obj.id not in home_group_obj.author_set:
+            node_collection.collection.update({'_id': home_group_obj._id}, {'$push': {'author_set': user_obj.id }}, upsert=False, multi=False)
+            home_group_obj.reload()
+
+        desk_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("desk")})
+        if desk_group_obj and user_obj.id not in desk_group_obj.author_set:
+            node_collection.collection.update({'_id': desk_group_obj._id}, {'$push': {'author_set': user_obj.id }}, upsert=False, multi=False)
+            desk_group_obj.reload()
+
+        return auth
 
 
 #  HELPER -- CLASS DEFINITIONS
@@ -2389,45 +2470,80 @@ class NodeJSONEncoder(json.JSONEncoder):
     return json.JSONEncoder.default(self, o)
 
 
-class DjangoActiveUsersGroup(object):
-    """docstring for DjangoActiveUsersGroup"""
+class ActiveUsers(object):
+    """docstring for ActiveUsers"""
 
-    django_active_users_group_name = 'active_loggedin_and_buddy_users'
+    @staticmethod
+    def get_active_id_session_keys():
+        # Query all non-expired sessions
+        # use timezone.now() instead of datetime.now() in latest versions of Django
+        sessions = Session.objects.filter(expire_date__gte=timezone.now())
+        # uid_list = []
+        # uid_list_append = uid_list.append
+        # session_key_list = []
+        userid_session_key_dict = {}
 
-    active_loggedin_and_buddy_users_group = DjangoGroup.objects.get_or_create(name=django_active_users_group_name)[0]
+        # Build a list of user ids from that query
+        for session in sessions:
+            data = session.get_decoded()
+            user_id = data.get('_auth_user_id', 0)
+            # if user_id:
+            # uid_list_append(user_id)
+            # session_key_list.append(session.session_key)
+            userid_session_key_dict[user_id] = session.session_key
 
-    # def __init__(self):
-    #     super(DjangoActiveUsersGroup, self).__init__()
+        return userid_session_key_dict
 
-    @classmethod
-    def addto_user_set(cls, user_id=0):
-        cls.active_loggedin_and_buddy_users_group.user_set.add(user_id)
-        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+        # # Query all logged in users based on id list
+        # if list_of_ids:
+        #     return User.objects.filter(id__in=uid_list).values_list('id', flat=True)
+        # else:
+        #     return User.objects.filter(id__in=uid_list)
 
-    @classmethod
-    def removefrom_user_set(cls, user_id=0):
-        cls.active_loggedin_and_buddy_users_group.user_set.remove(user_id)
-        return cls.active_loggedin_and_buddy_users_group.user_set.all()
 
-    @classmethod
-    def update_user_set(cls, add=[], remove=[]):
-        # print "add : ", add
-        # print "remove : ", remove
-        for each_userid_toadd in add:
-            cls.addto_user_set(each_userid_toadd)
+# class DjangoActiveUsersGroup(object):
+#     """docstring for DjangoActiveUsersGroup"""
 
-        for each_userid_toremove in remove:
-            cls.removefrom_user_set(each_userid_toremove)
+#     django_active_users_group_name = 'active_loggedin_and_buddy_users'
 
-        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+#     try:
+#         active_loggedin_and_buddy_users_group = DjangoGroup.objects.get_or_create(name=django_active_users_group_name)[0]
+#     except Exception, e:
+#         print e
+#         pass
 
-    @classmethod
-    def get_all_user_set_objects_list(cls):
-        return cls.active_loggedin_and_buddy_users_group.user_set.all()
+#     # def __init__(self):
+#     #     super(DjangoActiveUsersGroup, self).__init__()
 
-    @classmethod
-    def get_all_user_set_ids_list(cls):
-        return cls.active_loggedin_and_buddy_users_group.user_set.values_list('id', flat=True)
+#     @classmethod
+#     def addto_user_set(cls, user_id=0):
+#         cls.active_loggedin_and_buddy_users_group.user_set.add(user_id)
+#         return cls.active_loggedin_and_buddy_users_group.user_set.all()
+
+#     @classmethod
+#     def removefrom_user_set(cls, user_id=0):
+#         cls.active_loggedin_and_buddy_users_group.user_set.remove(user_id)
+#         return cls.active_loggedin_and_buddy_users_group.user_set.all()
+
+#     @classmethod
+#     def update_user_set(cls, add=[], remove=[]):
+#         # print "add : ", add
+#         # print "remove : ", remove
+#         for each_userid_toadd in add:
+#             cls.addto_user_set(each_userid_toadd)
+
+#         for each_userid_toremove in remove:
+#             cls.removefrom_user_set(each_userid_toremove)
+
+#         return cls.active_loggedin_and_buddy_users_group.user_set.all()
+
+#     @classmethod
+#     def get_all_user_set_objects_list(cls):
+#         return cls.active_loggedin_and_buddy_users_group.user_set.all()
+
+#     @classmethod
+#     def get_all_user_set_ids_list(cls):
+#         return cls.active_loggedin_and_buddy_users_group.user_set.values_list('id', flat=True)
 
 
 
@@ -2811,7 +2927,7 @@ class Buddy(DjangoDocument):
                             loggedin_userid,
                             session_key,
                             buddy_in_out={},
-                            starts_at=datetime.datetime.utcnow(),
+                            starts_at=datetime.datetime.now(),
                             ends_at=None):
 
         self['loggedin_userid']= loggedin_userid
@@ -2849,7 +2965,7 @@ class Buddy(DjangoDocument):
             return { 'in': None, 'out': None }
 
 
-    def get_active_buddy_authid_list(self):
+    def get_active_authid_list_from_single_buddy(self):
 
         active_buddy_auth_list = []
 
@@ -2888,10 +3004,10 @@ class Buddy(DjangoDocument):
         '''
         Removes/releses all existing-active buddies.
         '''
-        active_buddy_authid_list = self.get_active_buddy_authid_list()
+        active_buddy_authid_list = self.get_active_authid_list_from_single_buddy()
 
         for each_buddy_authid in active_buddy_authid_list:
-            self.get_latest_in_out_dict(self.buddy_in_out[each_buddy_authid])['out'] = datetime.datetime.utcnow()
+            self.get_latest_in_out_dict(self.buddy_in_out[each_buddy_authid])['out'] = datetime.datetime.now()
 
         return self
 
@@ -2904,14 +3020,14 @@ class Buddy(DjangoDocument):
             - buddy object will be saved using .save() method.
         '''
 
-        active_buddy_authid_list = self.get_active_buddy_authid_list()
+        active_buddy_authid_list = self.get_active_authid_list_from_single_buddy()
 
         self = self.remove_all_buddies()
-        self.ends_at = datetime.datetime.utcnow()
+        self.ends_at = datetime.datetime.now()
         self.save()
 
-        active_buddy_userids_list = Author.get_user_id_list_from_author_oid_list(active_buddy_authid_list)
-        DjangoActiveUsersGroup.update_user_set(remove=active_buddy_userids_list)
+        # active_buddy_userids_list = Author.get_user_id_list_from_author_oid_list(active_buddy_authid_list)
+        # DjangoActiveUsersGroup.update_user_set(remove=active_buddy_userids_list)
 
         return self
 
@@ -2942,6 +3058,48 @@ class Buddy(DjangoDocument):
 
 
     @staticmethod
+    def get_active_buddies_user_ids_list():
+
+        active_users = ActiveUsers.get_active_id_session_keys()
+        active_users_session_keys = active_users.values()
+        active_user_ids = active_users.keys()
+
+        Buddy.close_incomplete_buddies(active_users)
+        active_buddies = buddy_collection.find({
+                                    'session_key': {'$in': active_users_session_keys},
+                                    'ends_at': None
+                                })
+
+        active_buddy_auth_list = []
+        active_buddy_userids_list = active_user_ids
+
+        for each_buddy in active_buddies:
+            active_buddy_auth_list += each_buddy.get_active_authid_list_from_single_buddy()
+            active_buddy_userids_list.append(each_buddy['loggedin_userid'])
+
+        active_buddy_userids_list += Author.get_user_id_list_from_author_oid_list(active_buddy_auth_list)
+        active_buddy_userids_list = list(set(active_buddy_userids_list))
+
+        return active_buddy_userids_list
+
+
+    @staticmethod
+    def close_incomplete_buddies(active_users=None):
+
+        if not active_users:
+            active_users = ActiveUsers.get_active_id_session_keys()
+
+        active_users_session_keys = active_users.values()
+        incomplete_buddies = buddy_collection.find({
+                                    'session_key': {'$nin': active_users_session_keys},
+                                    'ends_at': None
+                                })
+
+        for each_incomplete_buddy in incomplete_buddies:
+            each_incomplete_buddy.end_buddy_session()
+
+
+    @staticmethod
     def update_buddies(loggedin_userid, session_key, buddy_auth_ids_list=[]):
         buddy_obj = buddy_collection.one({
                     'session_key': str(session_key),
@@ -2953,12 +3111,12 @@ class Buddy(DjangoDocument):
             buddy_obj = buddy_collection.collection.Buddy()
             buddy_obj = buddy_obj.get_filled_buddy_obj(loggedin_userid, session_key)
 
-        current_active_buddy_auth_list = buddy_obj.get_active_buddy_authid_list()
+        current_active_buddy_auth_list = buddy_obj.get_active_authid_list_from_single_buddy()
 
         if set(current_active_buddy_auth_list) == set(buddy_auth_ids_list):
             return current_active_buddy_auth_list
 
-        new_in_dict = { 'in': datetime.datetime.utcnow(), 'out': None }
+        new_in_dict = { 'in': datetime.datetime.now(), 'out': None }
         existing_buddy_in_out_auth_list  = buddy_obj.buddy_in_out.keys()
 
         # list of all buddies auth ids:
@@ -2986,7 +3144,7 @@ class Buddy(DjangoDocument):
 
                     buddy_obj.remove_buddy(each_buddy)
 
-        active_buddy_auth_list = buddy_obj.get_active_buddy_authid_list()
+        active_buddy_auth_list = buddy_obj.get_active_authid_list_from_single_buddy()
 
         if current_active_buddy_auth_list != active_buddy_auth_list:
             buddy_obj.save()
@@ -3002,10 +3160,10 @@ class Buddy(DjangoDocument):
             removed_buddies_userids_list = Author.get_user_id_list_from_author_oid_list(added_removed_buddies_dict['removed'])
             # print "removed_buddies_userids_list : ", removed_buddies_userids_list
 
-            DjangoActiveUsersGroup.update_user_set(
-                                                add=added_buddies_userids_list,
-                                                remove=removed_buddies_userids_list
-                                                )
+            # DjangoActiveUsersGroup.update_user_set(
+            #                                     add=added_buddies_userids_list,
+            #                                     remove=removed_buddies_userids_list
+            #                                     )
 
         else:
             buddy_obj = None

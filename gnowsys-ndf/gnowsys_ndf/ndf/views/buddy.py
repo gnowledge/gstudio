@@ -1,4 +1,5 @@
 import json
+from bson import json_util
 
 # ''' -- imports from installed packages -- '''
 # from django.http import HttpResponseRedirect
@@ -14,7 +15,7 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-from gnowsys_ndf.ndf.models import Buddy, Author, DjangoActiveUsersGroup
+from gnowsys_ndf.ndf.models import Buddy, Author #, DjangoActiveUsersGroup
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_execution_time
 
@@ -30,7 +31,7 @@ from gnowsys_ndf.ndf.views.methods import get_execution_time
 from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID
 
 @login_required
-def list_buddy(request, group_id):
+def list_buddy(request, group_id='home'):
 
     '''
     fetching all buddies.
@@ -47,22 +48,25 @@ def list_buddy(request, group_id):
 
     # filter_authors = [ObjectId(auth_oid)for auth_oid in buddies_authid_list]
 
-    all_inst_users = User.objects.filter(username__iendswith=GSTUDIO_INSTITUTE_ID)
-    all_inst_authors = node_collection.find({
-                                            '_type': u'Author',
-                                            # '_id': {'$nin': filter_authors},
-                                            'name': {
-                                                '$regex': GSTUDIO_INSTITUTE_ID + '$'
-                                                },
-                                            'created_by': {'$ne': request.user.id}
-                                            })
+    # all_inst_users = User.objects.filter(username__iendswith=GSTUDIO_INSTITUTE_ID)
+    # all_inst_authors = node_collection.find({
+    #                                         '_type': u'Author',
+    #                                         # '_id': {'$nin': filter_authors},
+    #                                         'name': {
+    #                                             '$regex': GSTUDIO_INSTITUTE_ID + '$'
+    #                                             },
+    #                                         'created_by': {'$ne': request.user.id}
+    #                                         })
     # print all_inst_authors.count()
 
+    selected_buddies_obj_list = node_collection.find({
+                                            '_id': {'$in': [ObjectId(b) for b in buddies_authid_list]}
+                                            })
 
     template = 'ndf/buddy_list.html'
 
     variable = RequestContext(request, {
-                                    "group_id": group_id, 'all_inst_users': all_inst_authors,
+                                    "group_id": group_id, 'all_inst_users': selected_buddies_obj_list,
                                     'buddies_id_name_dict': buddies_authid_name_dict,
                                     'buddies_id_list': buddies_authid_list
                                 })
@@ -91,7 +95,8 @@ def update_buddies(request, group_id):
 
     if selected_buddies_list:
 
-        sitewide_active_userids_list = DjangoActiveUsersGroup.get_all_user_set_ids_list()
+        # sitewide_active_userids_list = DjangoActiveUsersGroup.get_all_user_set_ids_list()
+        sitewide_active_userids_list = Buddy.get_active_buddies_user_ids_list()
         sitewide_active_userids_set  = set(sitewide_active_userids_list)
 
         already_active_user_ids = list(selected_buddies_userids_set.intersection(sitewide_active_userids_set) - set(aa))
@@ -140,3 +145,21 @@ def update_buddies(request, group_id):
     # print "=== result_dict : ", result_dict
 
     return HttpResponse(json.dumps(result_dict))
+
+
+# @get_execution_time
+# @login_required
+def search_authors(request, group_id):
+    selected_ids = request.GET.get('selected_ids', '')
+    selected_ids = selected_ids.split(',')
+    selected_ids = [ObjectId(auth) for auth in selected_ids if auth]
+    return HttpResponse(
+            json_util.dumps(
+                node_collection.find({
+                        '_id': {'$nin': selected_ids},
+                        '_type': 'Author',
+                        'name': {'$regex': unicode(request.GET.get('search_text', u'')), '$options': "i"}
+                    },
+                    {'name': 1, 'content': 1})
+                )
+            )

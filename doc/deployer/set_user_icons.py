@@ -22,7 +22,10 @@ log_file = open(log_file_path, 'a+')
 script_start_str = "######### Script ran on : " + time.strftime("%c") + " #########\n----------------\n"
 log_file.write(str(script_start_str))
 
-path = str(raw_input("Enter path of directory containing icons : "))
+path = '/home/docker/code/display-pics/'
+if not os.path.exists(path):
+	path = str(raw_input("Enter path of directory containing icons : "))
+
 # path = "/tmp/User_icons/final-student-teacher-icon-set-and-usernames/color-student-usernames"
 try:
 	if os.path.exists(path):

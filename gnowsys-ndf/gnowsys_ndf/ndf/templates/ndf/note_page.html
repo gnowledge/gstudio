@@ -9,54 +9,79 @@
 
 </style>
     <div class="row note-toolbar">
-        <div class="small-12 medium-9 columns creator-title">
-            <i class="fi-torso"></i>
+        <div class="small-12 medium-10 columns">
 
-            <span class="note-creator" title="{{node.created_by|get_username}}">{{node.created_by|get_username}}</span>
-
-            &#8226;
-            <span class="note-creation-date">{{node.created_at|date:"d M Y h:i A"}}</span>
-        </div>
-        <div class="small-12 medium-3 columns creator-rating">
-            {# <div>Your rating</div> #}
-
-            <div>
-            {% include 'ndf/rating.html'%}
-            {% comment %}
-                <i class="fi-like"></i>
-                <i class="fi-like"></i>
-                <i class="fi-like"></i>
-                <i class="fi-like"></i>
-                <i class="fi-like"></i>
-            {% endcomment %}
+            <div class="row">
+                <div class="small-12 columns">
+                   <span class="note-title">{{node.name}}</span>
+                   {% if node.tags %}
+                        <div class="tag-rating-div">
+                                {% for tag in node.tags %}
+                                    {% if forloop.counter < 3 %}
+                                        <small><label class="lbl_of_tag label">
+                                    {% else %}
+                                        <small><label class="lbl_of_tag label tag_ele hide">
+                                    {% endif %}
+                                    <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
+                                {% endfor %}
+                                {% if node.tags|length > 2 %}
+                                    <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
+                                {% endif %}
+                        </div>
+                    {% else %}
+                        <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
+                    {% endif %}
+                </div>
             </div>
+            <div class="row">
+                <div class="small-12 columns creator-title">
+                    <i class="fi-torso"></i>
+
+                    <span class="note-creator" title="{{node.created_by|get_username}}">{{node.created_by|get_username}}</span>
+                    &nbsp;
+                    &#8226;
+                    &nbsp;
+                    <span class="note-creation-date">{{node.created_at|date:"d M Y h:i A"}}</span>
+                    &nbsp;
+                        &#8226;
+                        &nbsp;
+
+                    <div style="display: inline-block;" class="creator-rating">
+                    {# <div>Your rating</div> #}
+
+                        <div>
+                        {% include 'ndf/rating.html'%}
+                        {% comment %}
+                            <i class="fi-like"></i>
+                            <i class="fi-like"></i>
+                            <i class="fi-like"></i>
+                            <i class="fi-like"></i>
+                            <i class="fi-like"></i>
+                        {% endcomment %}
+                        </div>
+                    </div>
+                    &nbsp;
+                        &#8226;
+                        &nbsp;
+                    <div style="display: inline-block;">
+
+                        {% include "ndf/analytics_views.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="small-12 medium-2 columns creator-rating">
+            {% if is_gstaff or node.created_by == request.user.id %}
+                <a href="{% url 'page_create_edit' group_id node.pk %}?course_event_id={{group_id}}&blog_type=True"
+                    style="float:right;     border: 1px solid #CFCFCF; padding: 5px 10px; border-radius: 3px;color:#A2A2A2;background-color: #f7f7f7;"><i class="fi-pencil" style="margin-right: 5px;"></i>Edit</a>
+            {% endif %}
         </div>
     </div>
     <div class="row note-content">
         <div class="small-12 columns">
             <div class="note-header row">
-                <span class="note-title">{{node.name}}</span>
-                {% if node.tags %}
-                    <div class="row tag-rating-div">
-                            {% for tag in node.tags %}
-                                {% if forloop.counter < 3 %}
-                                    <small><label class="lbl_of_tag label">
-                                {% else %}
-                                    <small><label class="lbl_of_tag label tag_ele hide">
-                                {% endif %}
-                                <a href="{% url 'tag_info' groupid tag %}">{{tag}} </a></label></small>
-                            {% endfor %}
-                            {% if node.tags|length > 2 %}
-                                <small><label class="view-more-tags" style="display:inline-block;">More</label></small>
-                            {% endif %}
-                    </div>
-                {% else %}
-                    <i><small><label>{% trans "No tags defined yet!" %}</label></small></i>
-                {% endif %}
-                    {% include "ndf/analytics_views.html" %}
-                {% if is_gstaff or node.created_by == request.user.id %}
-                    <a href="{% url 'page_create_edit' group_id node.pk %}?course_event_id={{group_id}}&blog_type=True" class="fi-pencil" style="float:right;">Edit</a>
-                {% endif %}
+
+
             </div>
             <div class="note-text row">
             {{node.content|default_if_none:"No Description added yet!"|safe}}
