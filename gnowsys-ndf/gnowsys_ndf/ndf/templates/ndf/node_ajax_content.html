@@ -248,8 +248,11 @@
                 <center>
                 <div class="show-image">
                   <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
+                   {% if  node.if_file.original.relurl %} 
                     <img src="{{MEDIA_URL}}{{node.if_file.original.relurl}} " style="min-height:200px;" />
-
+                   {% elif node.collection_set %} 
+                   <img src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-page-multiple.svg">
+                    {% endif %}
                   </a>
                   {% if node.collection_set %}
                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">

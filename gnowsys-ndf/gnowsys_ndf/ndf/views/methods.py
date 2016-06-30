@@ -2219,7 +2219,6 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
                             altnames = field.altnames.split(";")[0]
                         else:
                             altnames = field.altnames
-
                 elif set(node["member_of"]).issubset(field.object_type):
                     # It means we are dealing with inverse relation
                     data_type = node.structure[field.inverse_name]
@@ -2228,6 +2227,16 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
                         if ";" in field.altnames:
                             altnames = field.altnames.split(";")[1]
 
+                else:
+                    member_of_node = node_collection.one({'_id': node.member_of[0]})
+                    if set(member_of_node["type_of"]).issubset(field.subject_type):
+                        data_type = node.structure[field.name]
+                        value = node[field.name]
+                        if field.altnames:
+                            if ";" in field.altnames:
+                                altnames = field.altnames.split(";")[0]
+                            else:
+                                altnames = field.altnames
             else:
                 # For AttributeTypes
                 altnames = field.altnames
@@ -5572,10 +5581,10 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
 
       # print "\n\n return_perc==== ",return_perc
       result_dict['course_complete_percentage'] = return_perc
-      result_dict['modules_completed_count'] = len(completed_modules_ids)
+      result_dict['modules_completed_count'] = completed_modules_cur.count()
       result_dict['modules_total_count'] = all_modules_of_grp.count()
-      result_dict['units_completed_count'] = len(completed_modules_ids)
-      result_dict['units_total_count'] = all_modules_of_grp.count()
+      result_dict['units_completed_count'] = completed_units_cur.count()
+      result_dict['units_total_count'] = all_units_of_grp.count()
 
       result_dict.update({'success': False})
       # print "\n\nresult_dict == ",result_dict
