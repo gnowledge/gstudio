@@ -166,13 +166,18 @@ table, th, td {
 
                           <br><br>
 
-                          {%  if node.url %}
+                          {% if show %}
+                            {%  if node.url %}
                            <div align = "center">
-                            <button target = "_blank" onClick="window.open('{{node.url}}')">Join</button>   
-                           </div>                              
+                            <button target = "_blank" onClick="window.open('{{url}}')">Join</button>
+                            </div> 
+                            {%endif%} 
+
+                          {% else %}
+                          <div align = "center">
+                          <button disabled>You are not invited for {{node.name}}</button>
+                          </div>                                                                       
                           {% endif %} 
-
-
                           {% endif %}
                            
 

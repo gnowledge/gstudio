@@ -115,6 +115,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   #       group_id = str(auth._id)
   # else :
   #   pass
+
   try:
         group_id = ObjectId(group_id)
   except:
@@ -259,22 +260,88 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   else:
     Add="Stop"       
   #fecth the data
-      
-  context_variables = { 'groupid': group_id, 
-                        'app_id': app_id,'app_collection_set': app_collection_set, 
-                        'app_set_id': app_set_id,
-                        'title':title,
-                        'nodes': nodes, 'node': node,
-                        'event_gst':event_gst.name,
-                        'Add':Add,
-                        'reschedule_time' : reschedule_time,
-                        'reschedule'    : reschedule, 
-                        'task_date' : event_task_date_reschedule,
-                        'task_attendance' : event_task_Attendance_reschedule,
-                        'marks_entry_completed' :marks_entry_completed,
-                        'Eventtype':Eventtype, 
-                         # 'property_order_list': property_order_list
-                      }
+
+  if (None != app_set_instance_id):
+
+    usr = node_collection.one({'_type':u'Author','name':unicode(request.user)})
+    usrid = usr._id
+
+    y = node.relation_set
+
+    show = False
+    is_moderator = False
+
+    attendee_list = []
+    moderator_list = []
+
+    for i in y:
+      try:
+        attendee_list =  i['has_attendees']
+        break
+      except:
+        pass
+
+    for i in y:
+      try:
+        moderator_list = i['event_coordinator']
+        break
+      except:
+        pass
+
+    for i in moderator_list:
+      if usrid == i:
+        show = True
+        is_moderator = True
+
+    if not is_moderator:    
+      for i in attendee_list:
+        if usrid == i:
+          show = True
+          break      
+    
+    SALT = '8cd8ef52e8e101574e400365b55e11a6'
+    URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/'
+    createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'www.google.com')
+    
+    if is_moderator:
+      url = joinURL(node._id, request.user, 'mPW', SALT, URL)
+    else:
+        url = joinURL(node._id, request.user, 'aPW', SALT, URL)    
+
+    context_variables = { 'groupid': group_id, 
+                          'app_id': app_id,'app_collection_set': app_collection_set, 
+                          'app_set_id': app_set_id,
+                          'title':title,
+                          'nodes': nodes, 'node': node,
+                          'event_gst':event_gst.name,
+                          'Add':Add,
+                          'reschedule_time' : reschedule_time,
+                          'reschedule'    : reschedule, 
+                          'task_date' : event_task_date_reschedule,
+                          'task_attendance' : event_task_Attendance_reschedule,
+                          'marks_entry_completed' :marks_entry_completed,
+                          'Eventtype':Eventtype, 
+                          'show':show,
+                          'url':url,
+                           # 'property_order_list': property_order_list
+                        }
+  else:
+     context_variables = { 'groupid': group_id, 
+                          'app_id': app_id,'app_collection_set': app_collection_set, 
+                          'app_set_id': app_set_id,
+                          'title':title,
+                          'nodes': nodes, 'node': node,
+                          'event_gst':event_gst.name,
+                          'Add':Add,
+                          'reschedule_time' : reschedule_time,
+                          'reschedule'    : reschedule, 
+                          'task_date' : event_task_date_reschedule,
+                          'task_attendance' : event_task_Attendance_reschedule,
+                          'marks_entry_completed' :marks_entry_completed,
+                          'Eventtype':Eventtype,
+                           # 'property_order_list': property_order_list
+                        }    
+
 
   
   if batch :
@@ -544,16 +611,10 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
           print event_node.name
           print event_node._id
           print "--------------------------"
-          SALT = '8cd8ef52e8e101574e400365b55e11a6'
-          URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/'
-          createMeeting(event_node.name, event_node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'www.google.com')
-          url = joinURL(event_node._id, 'user', 'mPW', SALT, URL)
-          event_node.url = unicode(url)
-          event_node.save()
+          
+ 
           # url_create = createMeetingURL(event_node.name, event_node._id, 'aPW', 'mPW', 'welcome', 'www.google.com', SALT , URL);
-          print "##########"
-          print event_node.url
-          print "##########"
+
           # bbb_start(event_node.name, event_node._id)
           message_string = "Invitation for Event"+ " " + str(event_node.name) + msg_string   + "\n Event will be co-ordinated by " +str (event_coordinator_str) + "\n- Please click [[" + event_link + "][here]] to view the details of the event"
           message_string = "Hello World"
