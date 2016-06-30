@@ -2120,6 +2120,18 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         allow_to_comment = None
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
+        counter_obj=get_counter_obj(request.user.id,ObjectId(group_id))
+        file_id = ObjectId(node_id)
+        file_node_obj = node_collection.one({'_id':file_id})
+        file_creator_id = file_node_obj.created_by
+        if file_creator_id != counter_obj.user_id :
+            counter_obj.no_others_files_visited += 1
+            counter_obj_creator = get_counter_obj(file_creator_id,ObjectId(group_id))
+            counter_obj_creator.no_visits_gained += 1
+            counter_obj.last_update = datetime.today()
+            counter_obj_creator.last_update = datetime.today()
+            counter_obj.save()
+            counter_obj_creator.save()
     else:
 
         files_cur = node_collection.find({
