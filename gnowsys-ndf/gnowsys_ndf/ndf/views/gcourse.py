@@ -1488,7 +1488,7 @@ def save_resources(request, group_id):
             list_of_res_nodes = node_collection.find({'_id': {'$in': list_of_res_ids}})
             for each_res in list_of_res_nodes:
                 if group_id not in each_res.group_set:
-                    new_gs = replicate_resource(request, each_res_node, group_id)
+                    new_gs = replicate_resource(request, each_res, group_id)
                     new_res_set.append(new_gs._id)
                 else:
                     new_res_set.append(each_res._id)
