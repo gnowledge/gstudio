@@ -65,15 +65,16 @@
         </div>
     </div> -->
     <div class="row notebook-body">
-        <div class="small-12 medium-4 large-3 columns notebook-index">
+        <div class="small-12 medium-4 large-3 columns notebook-index panel">
             <div class="row">
                 <div class="small-12 columns">
+                    <span style="font-size: 17px;margin: 7px 19px;display: inline-block;color: #6153AE;">Notes</span>
                     {% if request.user.is_authenticated %}
                     {% comment %}
-                    <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
+                    <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i> </a>
                     {% endcomment %}
-                    <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i>  New Note</a>
-                    
+                    <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" class="button radius" style="padding: 3px 11px;border-radius: 100%;float: right;margin: 5px 5px 8px 0px;border: 1px solid #6153AE;background: #fff;font-size: 23px;color: #6153AE;"><i class="fi-plus"></i></a>
+
                     {% endif %}
                 </div>
             </div>
@@ -166,7 +167,7 @@
 
             </div>
         </div>
-            <div class="small-12 medium-8 large-9 columns note-page" >
+            <div class="small-12 medium-8 large-9 columns note-page panel" >
                        {% if node %}
                            {% include "ndf/note_page.html" %}
                        {% endif %}
@@ -246,7 +247,7 @@
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 <script type="text/javascript">
-    
+
     // var notes = [{
     //     id: 1,
     //     name: 'BLOG 1',

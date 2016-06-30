@@ -66,11 +66,6 @@
     <a class="close-reveal-modal">&#215;</a>
 
     </div> 
-      {% if title == "gallery" %} 
-        {% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_name_tag page_info=gallery_page_info %}
-      {% elif title == "raw material" %}
-        {% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_name_tag    page_info=raw_material_page_info %}
-      {% endif  %}
 
 {% endblock %}
 
@@ -148,11 +143,13 @@
   $("#btnUploadCancel").click(function() {
     $(".save_cancel").addClass("hide");
     $("#docFile").val("");
+    $(".upload-btn").css("display","block")
   });
 
 
   //Upload file action validation ---------------------------------------------------------------
   $(document).on('change','#docFile',function(){
+    $(".upload-btn").css("display","none")
     $(".save_cancel").removeClass("hide");
     file_mime_type = this.files[0].type;
     file_name = this.files[0].name;
@@ -174,6 +171,7 @@
       $('#file_preview')
         .text(file_name)
         .removeClass("hide");
+        $(".upload-btn").css("display","block")
     }
     /*
     file_mime_type = this.files[0].type;

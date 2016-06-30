@@ -1,7 +1,7 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% load cache %}
-{% user_access_policy groupid request.user as user_access %}
+{% user_access_policy groupid request.user as user_access_priv %}
 {% get_group_object groupid as group_object %}
 {% is_partner group_object as is_partner_val %}
 {% with user.is_authenticated as is_user_authenticated %}
@@ -74,6 +74,7 @@
 		margin-left: 2em;
 	}
 </style>
+
   <div id="deleteModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <p id="deleteModalLabel"></p>
     <div class="row feeds_proceed">
@@ -113,10 +114,16 @@
 									{% endif %}
 								{% endif %}
 							{% else %}
-								{% if is_gstaff or node.created_by == user.id %}
+								{% get_list_of_fields node.type_of "name" as type_of_list %}
+								{% if "Wiki page" in type_of_list and user_access_priv == "allow" %}
 									<a href="{% url edit_url group_id node %}" class="tiny button radius left-btn" title="Edit this {{node.member_of_names_list.0}}">{% trans " Edit" %}</a>
 								{% else %}
-									<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title="{% trans 'You are not authorized for this action' %}">
+
+									{% if is_gstaff or node.created_by == user.id %}
+										<a href="{% url edit_url group_id node %}" class="tiny button radius left-btn" title="Edit this {{node.member_of_names_list.0}}">{% trans " Edit" %}</a>
+									{% else %}
+										<input type="button" class="tiny button radius secondary left-btn  disabled" value="Edit" title="{% trans 'You are not authorized for this action' %}">
+									{% endif %}
 								{% endif %}
 							{% endif %}
 						{% else %}
@@ -429,8 +436,8 @@
             {% if is_gstaff %}
 				<!-- Subscribe Users and Subscribe Admins buttons-->
 				<div class="row btn-row">
-					{% include "ndf/invite_users.html" %}
-					{% include "ndf/invite_admins.html" %}
+					{% include "ndf/invite_users.html" with node=group_object %}
+					{% include "ndf/invite_admins.html" with node=group_object %}
 				</div>
 
 				<!-- Moderate Resources or Moderation Status button -->

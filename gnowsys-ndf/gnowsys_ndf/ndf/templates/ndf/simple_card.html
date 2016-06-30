@@ -67,6 +67,9 @@
         <i class="{{attr_set_dict.educationaluse|lower}}"></i>
       {% elif resource.fs_file_ids.0 and 'image' in resource.mime_type %}
         <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
+      
+      {% elif ".ggb" in resource.name %}   <!-- thumbnail for ggb files   -->
+        <img src="/static/ndf/images/geogebra-icon.png" alt="Geogebra" >
       {% elif resource.if_file.mime_type %}
         <i class="{{resource.if_file.mime_type|lower|split:'/'|join:' '}}"></i>
       {% else  %}
@@ -112,7 +115,7 @@
     <!-- suppy no_description=True for not having description -->
     {% if not no_description %}
       <div class="scard-desc" title="{{resource.content_org}}">
-       {{resource.content|safe|default_if_none:"Add some description."|truncatechars:50}}
+       {{resource.content|safe|striptags|default_if_none:"Add some description."|truncatechars:50}}
       </div>
     {% endif %}
 </div>

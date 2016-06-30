@@ -96,61 +96,72 @@
   <label id="eventModalLabel"></label>
   <a class="close-reveal-modal">&#215;</a>
 </div>
+<div class="course-page-opacity"></div>
 {% comment %}
 <div id="view-page" class="small-12 large-12 columns"></div>
 {% endcomment %}
 <div class="course-page">
+
+  <div class="container">
   <div id="envelop-cover">
-    <div class="container">
-    <div class="row course-page-header" >
+
+    <div class="medium-12 course-page-header">
+    <div class="row " >
       <div class="course-header-background">
         {% include 'ndf/upload_pic_widget.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True%}
         <div class="course-header-background-layer"></div>
       </div>
       {% if is_gstaff %}
-        <div class="row" style="position: relative;z-index: 2;">
-            <div class="small-2 course-settings">
-              <a data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius">
-                <i class="fa fa-cog"></i>{% trans " Settings" %}
-              </a>
+        <div class="row" style="z-index: 2;">
+            <div class="course-settings">
+              <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right">
+                <i class="fi-widget"></i>
+              </span>
+              <span data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="right">
+                <i class="fi-photo"></i>
+                <span style="position: relative;top: -3px;left: 2px;">Change image</span>
+              </span>
               <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                 {% with group_obj.member_of_names_list.0 as sg_type %}
-                  <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fa fa-pencil-square-o"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
+                  <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fi-page-edit"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
                 {% endwith %}
                 <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fi-clipboard-notes"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></li>
-                <li><a class="tiny radius settings" ><i class="fa fa-calendar"></i> {% trans " Session Release Dates" %}</a></li>
-                <li>
-                  <a data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="fi-photo"> Edit Photo</a>
-                </li>
+                {% comment %}
+                <li><a class="tiny radius settings" ><i class="fi-clock"></i> {% trans " Plan Release Dates" %}</a></li>
+                {% endcomment %}
                 <li>
                   <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
                 </li>
                 <li>
-                  <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% trans ' Subscribe Users' %}</a>
+                  <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% trans ' Add Students' %}</a>
                   {% include "ndf/invite_users.html" with no_subscribe_btn=True node=group_obj%}
                 </li>
                 <li>
-                  <a id="subscr_admins" data-reveal-id="inviteadmins" title="View/Subscribe Admins" class="fi-torsos">{% trans ' Subscribe Admins' %}</a>
+                  <a id="subscr_admins" data-reveal-id="inviteadmins" title="View/Subscribe Admins" class="fi-torsos">{% trans ' Add Admins' %}</a>
                   {% include "ndf/invite_admins.html" with no_subscribe_btn=True node=group_obj %}
                 </li>
+                <li>
+                  <a href="{% url 'manage_users' group_id %}" class="fi-torso"> Manage Students</a>
+                </li>
+
               </ul>
             </div>
         </div>
 
       {% else %}
-        <div class="row" style="position: relative;z-index: 2;">
+        <div class="row" >
             <div class="small-2 course-settings">
               {% if user_access == "allow" %}
-                <a disabled="disabled"> ENROLLED</a>
+                <a class="button radius small" disabled="disabled"> ENROLLED</a>
               {% else %}
                 {% if user.is_authenticated %}
                   {% if allow_to_join == "Open" %}
-                    <a class="enroll-btn"> ENROLL</a>
+                    <a class="enroll-btn button radius small"> ENROLL</a>
                   {% else %}
-                    <a disabled="disabled"> Enrollment {{allow_to_join}} </a>
+                    <a class="button radius small" disabled="disabled"> Enrollment {{allow_to_join}} </a>
                   {% endif %}
                 {% else %}
-                    <a href="{% url 'auth_login' %}" class="button tiny" title="Please login to Enroll">ENROLL</a>
+                    <a href="{% url 'auth_login' %}" class="button radius small" title="Please login to Enroll">ENROLL</a>
                 {% endif %}
               {% endif %}
             </div>
@@ -159,7 +170,7 @@
 
 
       <div class="row">
-        <div class="columns small-3 small-centered">
+        <div class="columns small-3 small-centered course-title">
           {% firstof group_obj.altnames group_obj.name  %}
         </div>
       </div>
@@ -194,31 +205,32 @@
 
           <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
             <a href="{% url 'course_about' group_id %}">
-              <i class="fi-page-edit "></i>{% trans "Overview" %}
+              <i class="fi-eye "></i>
+              <span>{% trans "Overview" %}</span>
             </a>
           </li>
 
           <li class="tab-title {% ifequal title 'course content' %}active{% endifequal %}">
             <a href="{% url 'course_content' group_id %}">
-              <i class="fi-clipboard-notes"></i>{% trans "Course Content" %}
+              <i class="fi-list-thumbnails"></i><span>{% trans "Course Content" %}</span>
             </a>
           </li>
 
           <li class="tab-title {% ifequal title 'raw material' %}active{% endifequal %}">
             <a href="{% url 'course_raw_material' group_id %}">
-              <i class="fi-clip "></i>{% trans "Raw Material" %}
+              <i class="fi-paint-bucket "></i><span>{% trans "Raw Material" %}</span>
             </a>
           </li>
 
           <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
             <a href="{% url 'course_notebook' group_id %}">
-              <i class="fi-book "></i>{% trans "Notebook" %}
+              <i class="fi-book "></i><span>{% trans "Notebook" %}</span>
             </a>
           </li>
 
           <li class="tab-title {% ifequal title 'gallery' %}active{% endifequal %}">
             <a href="{% url 'course_gallery' group_id %}">
-              <i class="fi-photo "></i> {% trans "Gallery" %}
+              <i class="fi-photo "></i> <span>{% trans "Gallery" %}</span>
             </a>
           </li>
           <!--
@@ -230,6 +242,7 @@
            -->
         </ul>
       </div>
+    </div>
     </div>
     <!--div class="row collapse meta">
       <div class="key">Starts on</div>
@@ -252,11 +265,11 @@
     {% endif %}
     {% endcomment %}
     </div>
-  </div>
+
+
 
   <!-- Tabs -->
   <div id="envelop-content" >
-    <div class="container">
     <div class="row">
     <!-- Envelop box-->
     <div class="small-12 large-12 columns">
@@ -316,6 +329,11 @@
     </div>
     </div>
     </div>
+    {% if title == "gallery" %} 
+        {% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_name_tag page_info=gallery_page_info %}
+      {% elif title == "raw material" %}
+        {% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_name_tag    page_info=raw_material_page_info %}
+      {% endif  %}
   </div>
 </div>
 <script type="text/javascript">

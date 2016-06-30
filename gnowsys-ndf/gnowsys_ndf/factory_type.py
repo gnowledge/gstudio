@@ -3,11 +3,11 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS
 
 
 #append gsystem_type name to create factory GSystemType
-factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'}, 
-                         {'name':'Reply','meta_type':'factory_types'}, 
-                         {'name':'Author','meta_type':'factory_types'}, 
-                         {'name':'Shelf','meta_type':'factory_types'}, 
-                         {'name':'QuizItem','meta_type':'factory_types'}, 
+factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
+                         {'name':'Reply','meta_type':'factory_types'},
+                         {'name':'Author','meta_type':'factory_types'},
+                         {'name':'Shelf','meta_type':'factory_types'},
+                         {'name':'QuizItem','meta_type':'factory_types'},
                          {'name':'Pandora_video','meta_type':'factory_types'},
                          {'name':'NUSSD Course','meta_type':'factory_types'},
                          {'name':'task_update_history','meta_type':'factory_types'},
@@ -31,7 +31,7 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'booklet','meta_type':'factory_types'},
                          {'name':'GList','meta_type':'factory_types'},
                          {'name':'GListItem','meta_type':'factory_types'},
-                         {'name':'Group','meta_type':'factory_types'},	
+                         {'name':'Group','meta_type':'factory_types'},
                          {'name':'ProgramEventGroup','meta_type':'factory_types'},
                          {'name':'CourseEventGroup','meta_type':'factory_types'},
                          {'name':'PartnerGroup','meta_type':'factory_types'},
@@ -43,40 +43,40 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
 
 
 #fill attribute name,data_type,gsystem_type name in bellow dict to create factory Attribute Type
-factory_attribute_types = [{'start_time':{'gsystem_names_list':['QuizItem','Forum','Task'], 
+factory_attribute_types = [{'start_time':{'gsystem_names_list':['QuizItem','Forum','Task'],
                                           'data_type':'datetime.datetime',
-                                          'meta_type':'factory_types'}}, 
+                                          'meta_type':'factory_types'}},
                            {'end_time':{'gsystem_names_list':['QuizItem','Forum','Task'],
                                         'data_type':'datetime.datetime',
-                                        'meta_type':'factory_types'}}, 
-                           {'module_set_md5':{'gsystem_names_list':['Module'], 
+                                        'meta_type':'factory_types'}},
+                           {'module_set_md5':{'gsystem_names_list':['Module'],
                                               'data_type':'u""',
                                               'meta_type':'factory_types'}},
-                           {'source_id':{'gsystem_names_list':['Pandora_video','File', 'E-Book'], 
+                           {'source_id':{'gsystem_names_list':['Pandora_video','File', 'E-Book'],
                                          'data_type':'u""',
                                          'meta_type':'factory_types'}},
-                           {'version':{'gsystem_names_list':['Module'], 
-                                       'data_type':'u""', 
+                           {'version':{'gsystem_names_list':['Module'],
+                                       'data_type':'u""',
                                        'meta_type':'factory_types'}},
                            {'apps_list':{'gsystem_names_list':['Group','Author'],
                                          'data_type':'list',
                                          'meta_type':'factory_types'}},
                            {'user_preference_off':{'gsystem_names_list':['Author'],
                                                    'data_type':'list',
-                                                   'meta_type':'factory_types'}}, 
-                           {'Status':{'gsystem_names_list':['Task'], 
-                                      'data_type':'basestring', 
-                                      'meta_type':'factory_types'}}, 
-                           {'Priority':{'gsystem_names_list':['Task'], 
-                                        'data_type':'basestring', 
-                                        'meta_type':'factory_types'}}, 
-                           {'Assignee':{'gsystem_names_list':['Task'], 
+                                                   'meta_type':'factory_types'}},
+                           {'Status':{'gsystem_names_list':['Task'],
+                                      'data_type':'basestring',
+                                      'meta_type':'factory_types'}},
+                           {'Priority':{'gsystem_names_list':['Task'],
+                                        'data_type':'basestring',
+                                        'meta_type':'factory_types'}},
+                           {'Assignee':{'gsystem_names_list':['Task'],
                                         'data_type':'list',
-                                        'meta_type':'factory_types'}}, 
-                           {'Upload_Task':{'gsystem_names_list':['Task'], 
+                                        'meta_type':'factory_types'}},
+                           {'Upload_Task':{'gsystem_names_list':['Task'],
                                         'data_type':'list',
-                                        'meta_type':'factory_types'}}, 
-                           {'Estimated_time':{'gsystem_names_list':['Task'], 
+                                        'meta_type':'factory_types'}},
+                           {'Estimated_time':{'gsystem_names_list':['Task'],
                                               'data_type':'float',
                                               'meta_type':'factory_types'}},
                            {'age_range':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book'],
@@ -132,7 +132,7 @@ factory_attribute_types = [{'start_time':{'gsystem_names_list':['QuizItem','Foru
                                       'meta_type':'factory_types'}},
                            {'description_eng':{'gsystem_names_list':['File','Page','Pandora_video', 'E-Book'],
                                       'data_type':'basestring',
-                                      'meta_type':'factory_types'}}, 
+                                      'meta_type':'factory_types'}},
                            {'BibTex_entry':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
                                             'data_type':'basestring',
                                             'meta_type':'factory_types'}},
@@ -181,48 +181,48 @@ factory_attribute_types = [{'start_time':{'gsystem_names_list':['QuizItem','Foru
 factory_relation_types = [
     {'has_shelf': {
             'subject_type':['Author'],
-            'object_type':['Shelf'], 
+            'object_type':['Shelf'],
             'inverse_name':'shelf_of',
             'meta_type':'factory_types'
         }
-    }, 
+    },
 
     {'translation_of': {
             'subject_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
-            'object_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'], 
-            'inverse_name':'translation_of', 
-            'meta_type':'factory_types'
-        }
-    }, 
-
-    {'has_module': {
-            'subject_type':['Page'],
-            'object_type':['Module'], 
-            'inverse_name':'generated_from', 
-            'meta_type':'factory_types'
-        }
-    }, 
-
-    {'has_profile_pic': {
-            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup'],
-            'object_type':['Image','File'], 
-            'inverse_name':'profile_pic_of', 
+            'object_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
+            'inverse_name':'translation_of',
             'meta_type':'factory_types'
         }
     },
-    
-    {'has_banner_pic': {
-            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup'],
-            'object_type':['Image','File'], 
-            'inverse_name':'banner_pic_of', 
+
+    {'has_module': {
+            'subject_type':['Page'],
+            'object_type':['Module'],
+            'inverse_name':'generated_from',
             'meta_type':'factory_types'
         }
-    }, 
+    },
+
+    {'has_profile_pic': {
+            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup'],
+            'object_type':['Image','File'],
+            'inverse_name':'profile_pic_of',
+            'meta_type':'factory_types'
+        }
+    },
+
+    {'has_banner_pic': {
+            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup'],
+            'object_type':['Image','File'],
+            'inverse_name':'banner_pic_of',
+            'meta_type':'factory_types'
+        }
+    },
 
     {'teaches': {
             'subject_type':['Page','File', 'Topic','Pandora_video'],
-            'object_type':['Page','Concept','Topic', 'File', 'Pandora_video'], 
-            'inverse_name':'taught_by', 
+            'object_type':['Page','Concept','Topic', 'File', 'Pandora_video'],
+            'inverse_name':'taught_by',
             'meta_type':'factory_types',
             'object_cardinality': 100
         }
@@ -230,8 +230,8 @@ factory_relation_types = [
 
     {'assesses': {
             'subject_type':['Quiz','QuizItem'],
-            'object_type':['Topic','Concept','Page','Quiz','QuizItem'], 
-            'inverse_name':'assessed_by', 
+            'object_type':['Topic','Concept','Page','Quiz','QuizItem'],
+            'inverse_name':'assessed_by',
             'meta_type':'factory_types'
         }
     },
@@ -242,30 +242,30 @@ factory_relation_types = [
             'inverse_name':'bib_type_of',
             'meta_type':'factory_types'
         }
-    }, 
+    },
 
     {'has_type': {
             'subject_type': ['Task'],
-            'object_type': ['GList'], 
-            'inverse_name': 'is_type_of', 
+            'object_type': ['GList'],
+            'inverse_name': 'is_type_of',
             'meta_type': 'factory_types',
             'object_cardinality': 1
         }
-    }, 
+    },
 
     {'has_cover_page': {
             'subject_type': ['File'],
-            'object_type': ['File'], 
-            'inverse_name': 'cover_page_of', 
+            'object_type': ['File'],
+            'inverse_name': 'cover_page_of',
             'meta_type': 'factory_types',
             'object_cardinality': 1
         }
-    }, 
+    },
 
     {'has_thumbnail': {
             'subject_type': ['Page', 'File'],
-            'object_type': ['File'], 
-            'inverse_name': 'thumbnail_of', 
+            'object_type': ['File'],
+            'inverse_name': 'thumbnail_of',
             'meta_type': 'factory_types',
             'member_of': 'Binary',
             'object_cardinality': 1
@@ -274,35 +274,13 @@ factory_relation_types = [
 
     {'has_help': {
             'subject_type':['*'],
-            'object_type':['*'], 
-            'inverse_name':'help_of', 
+            'object_type':['*'],
+            'inverse_name':'help_of',
             'meta_type':'factory_types',
             'member_of': 'Binary',
             'object_cardinality': 100
         }
-    }, 
-
-]
-
-
-#factory data is data which is required while intialization of the database first time
-factory_data = [ {'_type':'Group','name':'home'},
-           	 {'_type': u'Group'},{'name': u'Trash'}	
-		
-	       ]
-attribute_types = [{'_type':'AttributeType','name':'start_enroll'},
-		   {'_type':'AttributeType','name':'end_enroll'},
-                   {'_type':'AttributeType','name':'nussd_course_type'},				 
-   		   {'_type':'AttributeType','name': 'course_structure_minutes'},
-		   {'_type':'AttributeType','name': 'max_marks'},
-		   {'_type':'AttributeType','name': 'min_marks'},		                 	
-		   {'_type':'AttributeType','name': 'course_structure_assignment'},
-		   {'_type':'AttributeType','name': 'course_structure_assessment'}
-			
-]
-
-relation_types = [{'_type':'RelationType','name':'group_has_course_event'},
-		  {'_type': "RelationType", 'name': "has_logo"},			
+    },
 
 ]
 
