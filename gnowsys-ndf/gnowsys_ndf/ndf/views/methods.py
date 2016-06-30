@@ -293,10 +293,10 @@ def get_counter_obj(userid, groupid) :
         pass
     else :
         counter_obj = counter_collection.collection.Counter()
-        counter_obj.user_id=user_id
-        auth_obj= node_collection.one({'_type':'Author','created_by':user_id})
+        counter_obj.user_id=userid
+        auth_obj= node_collection.one({'_type':'Author','created_by':userid})
         counter_obj.auth_id=ObjectId(auth_obj._id)
-        counter_obj.group_id=ObjectId(group_id)
+        counter_obj.group_id=ObjectId(groupid)
         counter_obj.last_update=datetime.today()
         counter_obj.enrolled = False
         counter_obj.save()
