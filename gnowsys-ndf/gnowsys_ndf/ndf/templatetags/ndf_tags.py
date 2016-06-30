@@ -3661,7 +3661,7 @@ def get_download_filename(node, file_size_name='original'):
 			extension = mimetypes.guess_extension(node.if_file.mime_type)
 
 		name = node.altnames if node.altnames else node.name
-		file_name = slugify(name)
+		file_name = slugify(name.split('.')[0])
 
 		if extension:
 			file_name += '.' + extension
