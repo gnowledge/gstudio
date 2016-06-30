@@ -287,15 +287,19 @@ def get_execution_time(f):
    if BENCHMARK == 'OFF':
         return f
 
-def create_counter_document(user_id, group_id) :
-    counter_obj = counter_collection.collection.Counter()
-    counter_obj.user_id=user_id
-    auth_obj= node_collection.one({'_type':'Author','created_by':user_id})
-    counter_obj.auth_id=ObjectId(auth_obj._id)
-    counter_obj.group_id=ObjectId(group_id)
-    counter_obj.last_update=datetime.today()
-    counter_obj.enrolled = False
-    counter_obj.save()
+def get_counter_obj(user_id, group_id) :
+    counter_obj = counter_collection.one({'user_id':args[0].user.id, 'group_id': ObjectId(benchmark_node.group)})
+    if counter_obj :
+        pass
+    else :
+        counter_obj = counter_collection.collection.Counter()
+        counter_obj.user_id=user_id
+        auth_obj= node_collection.one({'_type':'Author','created_by':user_id})
+        counter_obj.auth_id=ObjectId(auth_obj._id)
+        counter_obj.group_id=ObjectId(group_id)
+        counter_obj.last_update=datetime.today()
+        counter_obj.enrolled = False
+        counter_obj.save()
     return counter_obj
 
 import json
