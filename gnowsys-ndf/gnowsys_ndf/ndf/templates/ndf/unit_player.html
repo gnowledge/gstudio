@@ -133,7 +133,7 @@
                         {% if thread_node and "QuizItemEvent" not in node.member_of_names_list %}
                             {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
                             {% get_node thread_node as thread_node_obj %}
-                            {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=True thread_node_exists=True %}
+                            {% include 'ndf/gin-line-texteditor.html' with node=thread_node_obj var_name="content_org" allow_to_comment=allow_to_comment %}
                         {% endif %}
 
                         <!-- END of discussion content area -->

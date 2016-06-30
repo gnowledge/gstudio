@@ -26,13 +26,13 @@ from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROE
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
-from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+# from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups,get_relation_value  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.data_review import data_review
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_sg_member_of
 from gnowsys_ndf.ndf.views.group import CreateModeratedGroup, CreateEventGroup, CreateGroup
-from gnowsys_ndf.ndf.views.notify import set_notif_val
+from gnowsys_ndf.ndf.views.notify import *
 
 
 @login_required

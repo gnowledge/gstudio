@@ -3242,11 +3242,16 @@ def get_thread_node(node_id):
 	if node_id:
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		thread_obj = None
-		if node_obj.relation_set:
-			for rel in node_obj.relation_set:
-				if rel and 'has_thread' in rel:
-					thread_obj = rel['has_thread'][0]
-		# print "\n\nthread_obj--",thread_obj
+		has_thread_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_thread'})
+		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),'relation_type.$id': has_thread_rt._id})
+		if thread_rt:
+			thread_obj = thread_rt['right_subject']
+
+		# if node_obj.relation_set:
+		# 	for rel in node_obj.relation_set:
+		# 		if rel and 'has_thread' in rel:
+		# 			thread_obj = rel['has_thread'][0]
+		# # print "\n\nthread_obj--",thread_obj
 		return thread_obj
 	return None
 
@@ -3540,15 +3545,21 @@ def get_user_quiz_resp(node_obj, user_obj):
 	thread_obj = None
 	if node_obj and user_obj:
 		try:
-			for each_rel in node_obj.relation_set:
-				if each_rel and "has_thread" in each_rel:
-					thread_id = each_rel['has_thread'][0]
-					thread_obj = node_collection.one({'_id': ObjectId(thread_id)})
+			grel_dict = get_relation_value(node_obj._id,"has_thread", True)
+			is_cursor = grel_dict.get("cursor",False)
+			if not is_cursor:
+				thread_obj = grel_dict.get("grel_node")
+
+			# for each_rel in node_obj.relation_set:
+			# 	if each_rel and "has_thread" in each_rel:
+			# 		thread_id = each_rel['has_thread'][0]
+			# 		thread_obj = node_collection.one({'_id': ObjectId(thread_id)})
 		except:
 			pass
 		if thread_obj:
-
+			# print "\n thread_obj.post_node: ",thread_obj._id
 			qip = node_collection.one({'_id':{'$in': thread_obj.post_node}, 'created_by': user_obj.id})
+			# print "\nqip= ",qip.count()
 			if qip:
 				qip_sub = get_attribute_value(qip._id,'quizitempost_user_submitted_ans')
 				if qip_sub:
@@ -3558,6 +3569,7 @@ def get_user_quiz_resp(node_obj, user_obj):
 						result['recent_ans'] = recent_ans
 					else:
 						result['recent_ans'] = recent_ans.values()[0]
+		# return json.dumps(result,ensure_ascii=False)
 		return result
 
 @get_execution_time
@@ -3703,11 +3715,24 @@ def get_file_obj(node):
 def get_help_pages_of_node(node_obj):
 	all_help_page_node_list = []
 	try:
-		for each_rel in node_obj.relation_set:
-			if each_rel and "has_help" in each_rel:
-				help_pages_id_list = each_rel["has_help"]
-				all_help_page_node_list = [node_collection.one({'_id':ObjectId(each_help_id)}) for each_help_id in help_pages_id_list]
-				return all_help_page_node_list
+		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_help'})
+		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type.$id': has_help_rt._id, 'status': u'PUBLISHED'})
+		if help_rt:
+			for each_help_rt in help_rt:
+				# print each_help_rt.right_subject
+				help_pg_node = node_collection.one({'_id':ObjectId(each_help_rt.right_subject)})
+				if help_pg_node:
+					all_help_page_node_list.append(help_pg_node)
+
+
+			# print "\n\n help_rt",help_rt.count()
+			# help_pages_id_list = help_rt['right_subject']
+			# print help_pages_id_list
+			# if isinstance(help_pages_id_list,list):
+			# 	all_help_page_node_list = [node_collection.one({'_id':ObjectId(each_help_id)}) for each_help_id in help_pages_id_list]
+			# elif isinstance(help_pages_id_list,ObjectId):
+			# print "\n\nall_help_page_node_list",all_help_page_node_list
+			return all_help_page_node_list
 	except:
 		return all_help_page_node_list
 

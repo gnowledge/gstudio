@@ -1,0 +1,40 @@
+* This documentation is w.r.t 'property_order' field of class Node (refer ndf/models.py).*
+
+- What is property_order:
+	- 'property_order' is basically composed of a list of basic fields(defined in class Node),AttributeTypes and/or RelationTypes.
+
+- Use of property_order:
+	- To generate templates with dynamic HTML field widgets (create/edit).
+
+- How to set property_order:
+	- A script is defined to update property_order of all GSystemTypes.
+	- Run
+		#+BEGIN_EXAMPLE
+		python manage.py shell
+		execfile('property_order_reset.py')
+		#+END_EXAMPLE
+
+- How to edit/update property_order:
+	- Example,
+		- Suppose, we want to add AT 'mobile_number' in Event GST
+		- Under /management/commands/schema_files//, we have STs_run1.csv, ATs.csv, RTs.csv, STs_run2.csv.
+
+		- *Step 1:* Find the AT 'mobile_number' in ATs.csv and edit the 'subject_type' column, add the GST name 'Event'
+		- *Step 2:* Find the ST 'Event' in STs_run1.csv and edit the 'attribute_type_set' column, add the AT name 'mobile_number'
+		- *Step 3:* In /gnowsys-ndf/property_order_reset.py/, find the property_order command for GST Event and edit the fields' list, add 'mobile_number'.
+		- *Step 4:* Run 
+			#+BEGIN_EXAMPLE
+			python manage.py create_schema ATs.csv
+			#+END_EXAMPLE
+		- *Step 5:* Run 
+			#+BEGIN_EXAMPLE
+			python manage.py create_schema STs_run2.csv 
+			#+END_EXAMPLE
+		- *Step 6:* Run 
+			#+BEGIN_EXAMPLE
+			echo "execfile('property_order_reset.py')" | python manage.py shell 
+			#+END_EXAMPLE
+
+
+/Note:/
+	- While updating .csv fields, do note the delimiters.

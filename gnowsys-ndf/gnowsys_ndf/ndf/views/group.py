@@ -24,14 +24,15 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.models import NodeJSONEncoder
-# from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
-from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget, get_collection, set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
+from gnowsys_ndf.ndf.models import NodeJSONEncoder,node_collection, triple_collection 
 from gnowsys_ndf.ndf.views.methods import *
+# from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
+# from gnowsys_ndf.ndf.models import c
+from gnowsys_ndf.ndf.views.ajax_views import *
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
+# from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
 # ######################################################################################################################################
 
 group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'Group'})
@@ -1226,9 +1227,6 @@ class CreateCourseEventGroup(CreateEventGroup):
                 each_rm_file.save(groupid=new_group_obj._id)
 
 
-
-
-
     def create_corresponding_gsystem(self,gs_name,gs_member_of,gs_under_coll_set_of_obj, group_obj):
 
         try:
@@ -1273,7 +1271,6 @@ class CreateCourseEventGroup(CreateEventGroup):
                     # prior_node_obj.collection_set.append(each_res_node._id)
                     # node.save()
                     prior_node_obj.save()
-                    
             else:
                 for each in node.collection_set:
                     each_node = node_collection.one({'_id': ObjectId(each)})
@@ -2215,7 +2212,7 @@ def switch_group(request,group_id,node_id):
   try:
     node = node_collection.one({"_id": ObjectId(node_id)})
     existing_grps = node.group_set
-    from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
+    
     if request.method == "POST":
 
       new_grps_list = request.POST.getlist("new_groups_list[]", "")
