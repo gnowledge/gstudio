@@ -32,6 +32,7 @@ from gnowsys_ndf.notification import models as notification
 from bbb_api import *
 
 @get_execution_time
+@login_required
 def event(request, group_id):
  
  if ObjectId.is_valid(group_id) is False :
@@ -99,6 +100,7 @@ def event(request, group_id):
                           )
 
 @get_execution_time
+@login_required
 def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None):
   """
   View for handling Event and it's sub-types detail-view
