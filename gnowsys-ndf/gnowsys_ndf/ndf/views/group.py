@@ -2486,6 +2486,7 @@ def create_sub_group(request,group_id):
 @login_required
 @get_execution_time
 def upload_using_save_file(request,group_id):
+    print "naman3"
     from gnowsys_ndf.ndf.views.file import save_file
     try:
         group_id = ObjectId(group_id)
@@ -2627,8 +2628,16 @@ def upload_using_save_file(request,group_id):
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
 
     if title == "gallery":
+        counter_obj=get_counter_obj(request.user.id,group_id)
+        counter_obj.no_files_created+=1
+        counter_obj.last_update = datetime.today()
+        counter_obj.save()
         return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
     elif title == "raw material":
+    	counter_obj=get_counter_obj(request.user.id,group_id)
+        counter_obj.no_files_created+=1
+        counter_obj.last_update = datetime.today()
+        counter_obj.save()
         return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     else:
         return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )

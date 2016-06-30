@@ -331,6 +331,10 @@ def create_edit_page(request, group_id, node_id=None):
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
         if "CourseEventGroup" in group_obj.member_of_names_list and blog_type:
+            counter_obj=get_counter_obj(request.user.id,ObjectId(group_id)
+            counter_obj.no_notes_written=counter_obj.no_notes_written+1
+            counter_obj.last_update = datetime.today()
+            counter_obj.save()
             return HttpResponseRedirect(reverse('course_notebook_tab_note',
                                     kwargs={
                                             'group_id': group_id,
