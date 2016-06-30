@@ -287,8 +287,8 @@ def get_execution_time(f):
    if BENCHMARK == 'OFF':
         return f
 
-def get_counter_obj(user_id, group_id) :
-    counter_obj = counter_collection.one({'user_id':args[0].user.id, 'group_id': ObjectId(benchmark_node.group)})
+def get_counter_obj(userid, groupid) :
+    counter_obj = counter_collection.one({'user_id':userid, 'group_id': groupid})
     if counter_obj :
         pass
     else :
