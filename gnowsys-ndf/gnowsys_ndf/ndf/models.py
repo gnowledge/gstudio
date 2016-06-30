@@ -3292,8 +3292,12 @@ class Counter(DjangoDocument):
         'group_id':ObjectId, #course_id
         'last_update': datetime.datetime,
         'enrolled':bool,
+
+        #interactions
         'no_comments_by_user':int,
-        'no_comments_for_user':int, 
+        'no_comments_for_user':int,
+
+        #files 
         'no_files_created':int,
         'no_visits_gained_on_files':int, # benchmark
         'no_comments_received_on_files':int,
@@ -3302,10 +3306,14 @@ class Counter(DjangoDocument):
         'comments_by_others_on_files': dict,
         'rating_count_received_on_files': int,
         'avg_rating_received_on_files':float,
+
+        #quiz
         'no_questions_attempted':int,
         'no_correct_answers':int,
         'no_incorrect_answers':int,
         'no_notes_written':int,
+
+        #notes
         'no_views_gained_on_notes':int, # benchmark
         'no_others_notes_visited':int, # benchmark
         'no_comments_received_on_notes':int,
