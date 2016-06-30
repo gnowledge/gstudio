@@ -17,6 +17,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
+from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import QUIZ_TYPE_CHOICES
@@ -334,11 +335,13 @@ def save_quizitem_answer(request, group_id):
             # group_obj = node_collection.one({'_id': ObjectId(group_id)})
             new_list = []
             user_given_ans = request.POST.getlist("user_given_ans[]", '')
+
+            #print 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',user_given_ans
             node_id = request.POST.get("node", '')
             # print "\n\n user_give_ans",user_given_ans
             node_obj = node_collection.one({'_id': ObjectId(node_id)})
+            #print node_obj
             thread_obj = user_ans = None
-
             '''
             print "\n\n node_obj::::::::",node_obj.relation_set
             try:
@@ -423,6 +426,31 @@ def save_quizitem_answer(request, group_id):
                 # print "\n user_ans.attribute_set",user_ans.attribute_set
                 response_dict['count'] = len(new_list)
                 response_dict['success'] = True
+                #code to update counter collection
+                counter_obj=counter_collection.one({'group_id':group_id,'user_id':user_id})
+                if already_ans_obj==None:
+                    for one_att in user_ans.attribute_set:
+                        if 'quizitempost_user_submitted_ans' in one_att:
+                            if len(one_att['quizitempost_user_submitted_ans'])!=0:
+                                counter_obj.no_questions_attempted+=1
+                                counter_obj.save()
+                for num in node_obj.attribute_set:
+                    if 'correct_answer' in num:
+                        cor_ans=num['correct_answer']
+                
+                for one_att in user_ans.attribute_set:
+                    if 'quizitempost_user_submitted_ans' in one_att:
+                        if len(one_att['quizitempost_user_submitted_ans'])!=0:
+                            if cmp(cor_ans,user_given_ans)==0:
+                                counter_obj.no_correct_answers+=1
+                                counter_obj.save()
+                            else:
+                                counter_obj.no_incorrect_answers+=1
+                                counter_obj.save()
+                #updated counter collection            	
+
+
+
             return HttpResponse(json.dumps(response_dict))
 
 

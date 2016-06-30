@@ -141,6 +141,10 @@ def invite_users(request,group_id):
                             new_users.append(each)
                             node.author_set.append(each);
                 node.save(groupid=group_id)
+                for each in users:
+                    counter_obj=get_counter_obj(each,ObjectId(group_id))
+                    counter_obj.enrolled=True
+                    counter_obj.save()
                 try:
                     # Send invitations according to not_status variable
                     activ="invitation to join in group"

@@ -1,7 +1,7 @@
 import re
 import urllib
 
-''' -- imports from installed packages -- ''' 
+''' -- imports from installed packages -- '''
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from mongokit import paginator
@@ -41,7 +41,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	"""
 
 	is_video = request.GET.get('is_video', "")
-	
+
 	try:
 		group_id = ObjectId(group_id)
 	except:
@@ -50,23 +50,23 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	if app_id is None:
 		app_id = str(app._id)
 
-	# # Code for displaying user shelf 
+	# # Code for displaying user shelf
 	# shelves = []
 	# shelf_list = {}
-	# auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+	# auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 
 	# if auth:
 	#   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
 	#   dbref_has_shelf = has_shelf_RT.get_dbref()
-	#   shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+	#   shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })
 	#   shelf_list = {}
 
 	#   if shelf:
 	# 	for each in shelf:
-	# 		shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)}) 
+	# 		shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
 	# 		shelves.append(shelf_name)
 
-	# 		shelf_list[shelf_name.name] = []         
+	# 		shelf_list[shelf_name.name] = []
 	# 		for ID in shelf_name.collection_set:
 	# 		  shelf_item = node_collection.one({'_id': ObjectId(ID) })
 	# 		  shelf_list[shelf_name.name].append(shelf_item.name)
@@ -101,33 +101,33 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	query_dict.append({'attribute_set.educationaluse': {'$ne': 'eBooks'}})
 
 	# files = node_collection.find({
-	# 								'member_of': ObjectId(GST_FILE._id), 
+	# 								'member_of': ObjectId(GST_FILE._id),
 	# 								'_type': 'File',
-	# 								'fs_file_ids': {'$ne': []}, 
-	# 								'group_set': ObjectId(group_id), 
+	# 								'fs_file_ids': {'$ne': []},
+	# 								'group_set': ObjectId(group_id),
 	# 								'$and': query_dict,
 	# 								'$or': [
 	# 										{ 'access_policy': u"PUBLIC" },
 	# 										{ '$and': [
-	# 													{'access_policy': u"PRIVATE"}, 
+	# 													{'access_policy': u"PRIVATE"},
 	# 													{'created_by': request.user.id}
 	# 												]
 	# 										}
 	# 									]
-											 
+
 	# 								}).sort("last_update", -1)
 
-	files = node_collection.find({												
+	files = node_collection.find({
 									# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 									'member_of': {'$in': [GST_FILE._id]},
 									# '_type': 'File',
-									# 'fs_file_ids': {'$ne': []}, 
+									# 'fs_file_ids': {'$ne': []},
 									'group_set': {'$all': [ObjectId(group_id)]},
 									'$and': query_dict,
 									'$or': [
 											{ 'access_policy': u"PUBLIC" },
 											{ '$and': [
-														{'access_policy': u"PRIVATE"}, 
+														{'access_policy': u"PRIVATE"},
 														{'created_by': request.user.id}
 													]
 											}
@@ -140,20 +140,20 @@ def resource_list(request, group_id, app_id=None, page_no=1):
   	# 									'$or': [
 			# 									{ 'access_policy': u"PUBLIC" },
 			# 									{ '$and': [
-			# 												{'access_policy': u"PRIVATE"}, 
+			# 												{'access_policy': u"PRIVATE"},
 			# 												{'created_by': request.user.id}
 			# 											]
 			# 									}
 			# 								],
 			# 							'type_of': {'$in': [wiki_page._id]}
-			# 							}).sort("last_update", -1) 
+			# 							}).sort("last_update", -1)
 
 
 	educationaluse_stats = {}
-	
+
 
 	if files:
-		eu_list = []  # count 
+		eu_list = []  # count
 		for each in files:
 			eu_list += [i.get("educationaluse") for i in each.attribute_set if i.has_key("educationaluse")]
 
@@ -166,13 +166,13 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 				educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
 			educationaluse_stats["all"] = files.count()
 
-		
+
 		# print educationaluse_stats
 		result_paginated_cur = files
 		result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
 	collection_pages_cur = node_collection.find({
-									'member_of': {'$in': [GST_FILE._id]},
+									'member_of': {'$in': [GST_FILE._id, GST_PAGE._id ]},
                                     'group_set': {'$all': [ObjectId(group_id)]},
                                     '$and': query_dict,
                                     '$or': [
@@ -200,7 +200,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 		datavisual.append({"name":"Collections","count": coll_page_count})
 	datavisual = json.dumps(datavisual)
 
-	return render_to_response("ndf/resource_list.html", 
+	return render_to_response("ndf/resource_list.html",
 								{'title': title, 'app':e_library_GST,
 								 'appId':app._id, "app_gst": app,
 								 # 'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
@@ -220,7 +220,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 								 'collection': collection_pages_cur,
 								 'groupid': group_id, 'group_id':group_id,
 								 "datavisual":datavisual,
-								}, 
+								},
 								context_instance = RequestContext(request))
 
 @get_execution_time
@@ -318,30 +318,30 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		# 			elif each_filter["selFieldGstudioType"] == "field":
 		# 				temp_dict[each_filter["selFieldValue"]] = each_filter["selFieldText"]
 		# 				temp_list.append(temp_dict)
-				
-		# 		if temp_list:			        	
+
+		# 		if temp_list:
 		# 			query_dict.append({ "$or": temp_list})
 
 		# print "query_dict : ", query_dict
 
-		files = node_collection.find({												
+		files = node_collection.find({
 										'member_of': {'$in': [GST_FILE._id]},
 										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 										# '_type': 'File',
-										# 'fs_file_ids': {'$ne': []}, 
+										# 'fs_file_ids': {'$ne': []},
 										'group_set': {'$all': [ObjectId(group_id)]},
 										'$and': query_dict,
 										'$or': [
 												{ 'access_policy': u"PUBLIC" },
 												{ '$and': [
-															{'access_policy': u"PRIVATE"}, 
+															{'access_policy': u"PRIVATE"},
 															{'created_by': request.user.id}
 														]
 												}
 											]
 										}).sort("last_update", -1)
 
-	  
+
 		educationaluse_stats = {}
 		# print "files_count: ", files.count()
 
@@ -366,7 +366,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 					educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
 				educationaluse_stats["all"] = files.count()
 				educationaluse_stats["Collections"] = collection_set_count
-			
+
 			result_paginated_cur = files
 			result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
@@ -427,7 +427,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 				"filter_result": filter_result,
 				"group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
 				'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
-				"resource_type": result_paginated_cur, "detail_urlname": detail_urlname, 
+				"resource_type": result_paginated_cur, "detail_urlname": detail_urlname,
 				"filetype": filetype, "res_type_name": "", "page_info": result_pages
-			}, 
+			},
 			context_instance = RequestContext(request))
