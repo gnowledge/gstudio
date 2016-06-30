@@ -84,7 +84,15 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 
 			gs_obj_list.append(gs_obj)
 		elif existing_file_gs:
-				gs_obj_list.append(existing_file_gs)
+			if existing_file_gs.status == u'DELETED':
+				existing_file_gs.status = u'PUBLISHED'
+			trash_grp_id = node_collection.one({'_type': 'Group', 'name': u'Trash'})._id
+			if trash_grp_id in existing_file_gs.group_set:
+				existing_file_gs.group_set.remove(trash_grp_id)
+			if group_id not in existing_file_gs.group_set:
+				existing_file_gs.group_set.append(group_id)
+			existing_file_gs.save(groupid=group_id,validate=False)
+			gs_obj_list.append(existing_file_gs)
 
 	if make_collection and collection_set:
 		first_obj.collection_set = collection_set
