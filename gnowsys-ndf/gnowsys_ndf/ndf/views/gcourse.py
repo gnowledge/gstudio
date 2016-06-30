@@ -33,7 +33,7 @@ from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
+from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource,get_counter_obj
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.views.analytics_methods import *
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status
@@ -1789,19 +1789,22 @@ def enroll_to_course(request, group_id):
         group_obj.save()
         response_dict["success"] = True
         # creating a new counter document for a user for a given course for the purpose of analytics
-        counter_obj = counter_collection.one({'user_id':request.user.id, 'group_id': ObjectId(group_id)})
-        if counter_obj:
-            counter_obj.enrolled = True
-            counter_obj.save()
-        else:
-            counter_obj = counter_collection.collection.Counter()
-            counter_obj.user_id=request.user.id
-            auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
-            counter_obj.auth_id=ObjectId(auth_obj._id)
-            counter_obj.group_id=ObjectId(group_id)
-            counter_obj.last_update=datetime.datetime.now()
-            counter_obj.enrolled = True
-            counter_obj.save()
+        counter_obj=get_counter_obj(request.user.id,ObjectId(group_id))
+        counter_obj.enrolled=True
+        counter_obj.save()
+        # counter_obj = counter_collection.one({'user_id':request.user.id, 'group_id': ObjectId(group_id)})
+        # if counter_obj:
+        #     counter_obj.enrolled = True
+        #     counter_obj.save()
+        # else:
+        #     counter_obj = counter_collection.collection.Counter()
+        #     counter_obj.user_id=request.user.id
+        #     auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
+        #     counter_obj.auth_id=ObjectId(auth_obj._id)
+        #     counter_obj.group_id=ObjectId(group_id)
+        #     counter_obj.last_update=datetime.datetime.now()
+        #     counter_obj.enrolled = True
+        #     counter_obj.save()
         return HttpResponse(json.dumps(response_dict))
 
 @login_required
@@ -2243,7 +2246,6 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
 
 @get_execution_time
 def course_about(request, group_id):
-
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name

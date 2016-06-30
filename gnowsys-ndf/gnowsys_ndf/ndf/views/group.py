@@ -1569,6 +1569,22 @@ class EventGroupCreateEditHandler(View):
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
+
+                    # creating a new counter document for a user for a given course for the purpose of analytics
+                    counter_obj = counter_collection.one({'user_id':request.user.id, 'group_id': ObjectId(group_obj._id)})
+                    if counter_obj:
+                        counter_obj.enrolled = True
+                        counter_obj.save()
+                    else:
+                        counter_obj = counter_collection.collection.Counter()
+                        counter_obj.user_id=request.user.id
+                        auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
+                        counter_obj.auth_id=ObjectId(auth_obj._id)
+                        counter_obj.group_id=ObjectId(group_obj._id)
+                        counter_obj.last_update=datetime.datetime.now()
+                        counter_obj.enrolled = True
+                        counter_obj.save()
+
                 # elif sg_type == "ProgramEventGroup":
                     # mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
                 mod_group.set_logo(request,group_obj,logo_rt = "has_profile_pic")
