@@ -2022,10 +2022,9 @@ def group_type_info(groupid,user=0):
 	if cache_result:
 		return cache_result
 
-	group_gst = node_collection.one({'_id': ObjectId(groupid)},
-		{'post_node': 1, 'prior_node': 1, 'group_type': 1})
-
-	group_type = ""
+	# group_gst = node_collection.one({'_id': ObjectId(groupid)},
+	# 	{'post_node': 1, 'prior_node': 1, 'group_type': 1})
+	group_gst = get_group_name_id(groupid, get_obj=True)
 
 	if group_gst.post_node:
 		group_type = "BaseModerated"
