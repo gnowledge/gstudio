@@ -440,9 +440,6 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
    property_order_list = get_property_order_with_value(event_gs) #.property_order #stores the properties defining a particular event in a list e.g. name, start_time, attendees, etc..
    
    if request.method == "POST":
-    print "#####################"
-    print request.POST.getlist(u'event_coordinator')
-    print "#####################"
     # [A] Save event-node's base-field(s)
     # print "\n Going before....", type(event_gs), "\n event_gs.keys(): ", event_gs.keys()
     # get_node_common_fields(request, event_gs, group_id, event_gst)
@@ -475,10 +472,6 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
     # [B] Store AT and/or RT field(s) of given event-node (i.e., event_gs)
     for tab_details in property_order_list:
       for field_set in tab_details[1]:
-        print "##########################"
-        print "field_set:"
-        print field_set
-        print "##########################s"
         # field_set pattern -- {[field_set[0]:node_structure, field_set[1]:field_base/AT/RT_instance{'_id':, 'name':, 'altnames':}, field_set[2]:node_value]}
         # field_set pattern -- {'_id', 'data_type', 'name', 'altnames', 'value'}
         # print " ", field_set["name"]
@@ -539,9 +532,6 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
             else: #field_instance_type == RelationType
               field_value_list = request.POST.getlist(field_instance["name"])
-              # print "#######################"
-              # print field_value_list
-              # print "#######################"
               # field_instance_type = "GRelation"
               #code for creation of relation Session of 
               for i, field_value in enumerate(field_value_list):
@@ -609,11 +599,6 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
              msg_string = "\n Event is organized by " + str ( event_organizer_str ) 
           else:
              msg_string = "" 
-          print "--------------------------"
-          print event_node.name
-          print event_node._id
-          print "--------------------------"
-          
  
           # url_create = createMeetingURL(event_node.name, event_node._id, 'aPW', 'mPW', 'welcome', 'www.google.com', SALT , URL);
 
