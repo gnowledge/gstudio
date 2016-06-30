@@ -3295,24 +3295,24 @@ class Counter(DjangoDocument):
         'no_comments_by_user':int,
         'no_comments_for_user':int, 
         'no_files_created':int,
-        'no_visits_gained':int, # benchmark
-        'no_comments_received_files':int,
+        'no_visits_gained_on_files':int, # benchmark
+        'no_comments_received_on_files':int,
         'no_others_file_visited':int,# benchmark
-        'no_comments_on_other_files':int,
-        'comments_by_files': dict,
-        'rating_count_files': int,
-        'avg_rating_awarded_files':float,
+        'no_comments_on_others_files':int,
+        'comments_by_others_on_files': dict,
+        'rating_count_received_on_files': int,
+        'avg_rating_received_on_files':float,
         'no_questions_attempted':int,
         'no_correct_answers':int,
         'no_incorrect_answers':int,
         'no_notes_written':int,
-        'no_views_gained':int, # benchmark
+        'no_views_gained_on_notes':int, # benchmark
         'no_others_notes_visited':int, # benchmark
-        'no_comments_received_notes':int,
-        'no_comments_on_other_notes':int,
-        'comments_by_notes': dict,
-        'rating_count_notes': int,
-        'avg_rating_awarded_notes':float,
+        'no_comments_received_on_notes':int,
+        'no_comments_on_others_notes':int,
+        'comments_by_others_on_notes': dict,
+        'rating_count_received_on_notes': int,
+        'avg_rating_received_on_notes':float,
     }
 
     indexes = [
@@ -3330,22 +3330,22 @@ class Counter(DjangoDocument):
         'no_comments_by_user': 0,
         'no_comments_for_user':0,
         'no_files_created':0,
-        'no_visits_gained':0,
-        'no_comments_received_files':0,
-        'no_others_file_visited':0,
-        'no_comments_on_other_files':0,
-        'rating_count_files': 0,
-        'avg_rating_awarded_files':0.0,
+        'no_visits_gained_on_files':0,
+        'no_comments_received_on_files':0,
+        'no_others_files_visited':0,
+        'no_comments_on_others_files':0,
+        'rating_count_received_on_files': 0,
+        'avg_rating_received_on_files':0.0,
         'no_questions_attempted':0,
         'no_correct_answers':0,
         'no_incorrect_answers':0,
         'no_notes_written':0,
-        'no_views_gained':0,
+        'no_views_gained_on_notes':0,
         'no_others_notes_visited':0, 
-        'no_comments_received_notes':0,
-        'no_comments_on_other_notes':0,
-        'rating_count_notes': 0,
-        'avg_rating_awarded_notes':0.0
+        'no_comments_received_on_notes':0,
+        'no_comments_on_others_notes':0,
+        'rating_count_received_on_notes': 0,
+        'avg_rating_received_on_notes':0.0
     }
     
     use_dot_notation = True

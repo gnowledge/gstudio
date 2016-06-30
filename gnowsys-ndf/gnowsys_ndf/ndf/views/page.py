@@ -230,8 +230,10 @@ def create_edit_page(request, group_id, node_id=None):
                                       {'message': 'Page with same name already exists in the group!'},
                                       context_instance=RequestContext(request))
         elif node_id:
+            new_page = False
             page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
         else:
+            new_page = True
             page_node = node_collection.collection.GSystem()
 
         # page_type = request.POST.getlist("type_of",'')
@@ -331,6 +333,7 @@ def create_edit_page(request, group_id, node_id=None):
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
         if "CourseEventGroup" in group_obj.member_of_names_list and blog_type:
+          #add code for creation of new note counter
             return HttpResponseRedirect(reverse('course_notebook_tab_note',
                                     kwargs={
                                             'group_id': group_id,
