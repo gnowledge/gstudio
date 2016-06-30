@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict, get_counter_obj
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
@@ -2047,6 +2047,22 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     if notebook_id:
         notebook_obj = node_collection.one({'_id': ObjectId(notebook_id)})
         thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
+
+        #Update counter collection
+        if user_id :
+            note_node_obj = node_collection.one({'_id':ObjectId(notebook_id)})
+            note_creator_id = note_node_obj.created_by
+            if note_creator_id != user_id :
+                counter_obj = get_counter_obj(request.user.id, ObjectId(group_id))
+                counter_obj.no_others_notes_visited += 1
+                counter_obj_creator = get_counter_obj(note_creator_id, ObjectId(group_id))
+                counter_obj_creator.no_views_gained_on_notes += 1
+                counter_obj.last_update = datetime.datetime.now()
+                counter_obj_creator.last_update = datetime.datetime.now()
+                counter_obj.save()
+                counter_obj_creator.save()
+
+
     else:
         if user_blogs and user_blogs.count():
             notebook_obj = user_blogs[0]
@@ -2219,6 +2235,21 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         allow_to_comment = None
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
+        
+        #Update counters collection
+        file_node_obj = node_collection.one({'_id': ObjectId(node_id)})
+        file_creator_id = file_node_obj.created_by
+        if file_creator_id != request.user.id :
+            counter_obj = get_counter_obj(request.user.id, ObjectId(group_id))
+            counter_obj.no_others_files_visited += 1
+            counter_obj_creator = get_counter_obj(file_creator_id, ObjectId(group_id))
+            counter_obj_creator.no_visits_gained_on_files += 1
+            counter_obj.last_update = datetime.datetime.now()
+            counter_obj_creator.last_update = datetime.datetime.now()
+            counter_obj.save()
+            counter_obj_creator.save()
+
+
     else:
 
         gstaff_users.extend(group_obj.group_admin)

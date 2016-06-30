@@ -130,7 +130,7 @@ def get_execution_time(f):
             except :
                 pass
             benchmark_node.save()
-            if benchmark_node.user and benchmark_node.group != 'None':
+            '''if benchmark_node.user and benchmark_node.group != 'None':
                 counter_obj = counter_collection.one({'user_id':args[0].user.id, 'group_id': ObjectId(benchmark_node.group)})
                 if benchmark_node.name == 'course_raw_material' or benchmark_node.name == 'course_gallery' or benchmark_node.name == 'course_notebook' or benchmark_node.name == 'get_node_common_fields':
                     if counter_obj :
@@ -278,7 +278,7 @@ def get_execution_time(f):
                             counter_obj.last_update = datetime.today()
                             counter_obj_creator.last_update = datetime.today()
                             counter_obj.save()
-                            counter_obj_creator.save()
+                            counter_obj_creator.save()'''
 
 
             return ret
