@@ -399,7 +399,7 @@
                 </script>
 
               {% else %}
-                <a href="{{MEDIA_URL}}{{node.if_file.original.relurl}}">
+                <a href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
                   {{node.name}}
                 </a>
               {% endif %}

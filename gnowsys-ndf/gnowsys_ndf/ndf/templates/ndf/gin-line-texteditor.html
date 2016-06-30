@@ -9,15 +9,15 @@
 {% block head %}
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
-  <script src="/static/ndf/js/MediaStreamRecorder.js"></script> 
+  <script src="/static/ndf/js/MediaStreamRecorder.js"></script>
   <script src="/static/ndf/js/adapter.js"></script>
 
   <!-- Scripts and stylesheets for SideComments -->
   <!-- <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script> -->
   <!-- <link rel="stylesheet" type"text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css"> -->
   <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css"> -->
-  <script src="/static/ndf/js/MediaStreamRecorder.js"></script> 
-  <script src="/static/ndf/js/adapter.js"></script> 
+  <script src="/static/ndf/js/MediaStreamRecorder.js"></script>
+  <script src="/static/ndf/js/adapter.js"></script>
   {% if user.is_authenticated %}
     <!-- orgitdown! -->
     <!-- <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
@@ -41,6 +41,11 @@
 
 <div >
   <br/>
+
+    <input type="hidden" id="prior-node" style="visibility:hidden" value="">
+    <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
+    <input type="hidden" id="last-edited-row" data-edited-row-id="">
+
     {% if allow_to_comment %}
       <div data-alert class="alert-box new_comments hide info radius">
         <div class="new_cmnts_lbl">New comment(s) added. Please refresh to see.</div>
@@ -57,7 +62,6 @@
           Comment  {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
         {% endif %}
       </div>
-    {% endif %}
     </div>
 
     {% comment %}
@@ -67,10 +71,6 @@
       <input type="file" id="uploaded-files" style="" value="" multiple class="hide">
     {% endif %}
     {% endcomment %}
-    <input type="hidden" id="prior-node" style="visibility:hidden" value="">
-
-    <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
-    <input type="hidden" id="last-edited-row" data-edited-row-id="">
 
   <div id="replies-area">
 
@@ -83,7 +83,7 @@
           <div clas="discussion-title row " >
              <div class="discussion-title-username">
               <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
-                {{ each_reply.username }} 
+                {{ each_reply.username }}
               </a>
                 <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
             </div>
@@ -115,14 +115,14 @@
           <div class="discussion-footer">
             <a class="reply-btn reply_res"  data-id='{{ each_reply.oid }}' onclick='openCKEditor($(this),"{{each_reply.oid}}")' data-org-content='{{ each_reply.content }}'>
               <i class="fa fa-reply"></i>
-              {% trans "Reply" %} 
+              {% trans "Reply" %}
             </a>
             {% if request.user.id == each_reply.userid or is_gstaff %}
               <a class="reply-btn delete_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" style="float:right">
                 <i class="fa fa-trash-o"></i>
                 {% trans "Delete" %}
               </a>
-               <a class="reply-btn edit_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick='editreply($(this))' style="float:right;margin-right:10px!important"> 
+               <a class="reply-btn edit_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick='editreply($(this))' style="float:right;margin-right:10px!important">
                 <i class="fa fa-pencil-square-o"></i>
                 {% trans "Edit" %} |
               </a>
@@ -137,6 +137,7 @@
 
     <!-- END of populating replies -->
   </div>
+    {% endif %}
 
   <!-- orgitdown container -->
 
@@ -210,7 +211,7 @@
 
                 //$("#create-discussion").trigger("click");
               }
-              
+
               else{ alert(data) }
             }//,
 
@@ -306,7 +307,7 @@
                   htmlReply +="<a class='reply-btn delete_res' data-id='" + data[1]+ "'data-userid='"+ data[5] +"' onclick='deleteReply($(this))' style='float:right'><i class='fa fa-trash-o'></i> Delete"
                   htmlReply +="<a class='reply-btn edit_res' data-id='"+ data[1] +"' data-userid='{{each_reply.userid}}' data-userid='"+ data[5] +"' onclick='editreply($(this))' style='float:right;margin-right:10px!important'><i class='fa fa-pencil-square-o'></i> Edit |"
                   }
-          +"</div>"   
+          +"</div>"
         +"</div>"
       +"</div>";
     return htmlReply;
@@ -354,19 +355,19 @@
               $("#orgitdownreps").val("");  // make textarea empty
               if(priorNodeId == "{{ node.pk }}")  // main reply
               {
-                
+
                 //sample format of data = [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
                 // add reply text content after #replies-area
                 var parent_margin_level = $(sourceObj).closest("div").attr("class");
-                
+
                 $("#replies-area").prepend(createReplyHTML('margin-top:25px;margin-left:0px', data,1));
                 // $(".content").appendChild().(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
               }
               else  // sub-reply
               {
                 parent_margin_level = $(sourceObj).attr("data-reply-level");
-                child_margin_level = parseInt(parent_margin_level) + 1;          
-                
+                child_margin_level = parseInt(parent_margin_level) + 1;
+
 
                 $(sourceObj).after(createReplyHTML('margin-left:'+((child_margin_level-1)*48)+'px', data,parseInt(parent_margin_level)+1));
 
@@ -374,7 +375,7 @@
               // updating tab-text
               old_count = old_count + 1
               updateDiscussionTabText();
-              
+
             }
             else if( data[0] == "no_content" ){
 
@@ -389,12 +390,12 @@
       alert(" {% trans 'Please provide the reply content.' %}")
     } // --- END of IF-ELSE
                 //  $.ajax({
-                //         url: "{% url 'get_gin_line_template' group_id node.pk %}",                        
+                //         url: "{% url 'get_gin_line_template' group_id node.pk %}",
                 //         type: "GET",
                 //         datatype: "html",
-                        
+
                 //       success: function(data) {
-                            
+
                 //             alert(data);
                 //             $(".comment-sections:visible").html(data);
                 //       }
@@ -507,11 +508,11 @@ function editreply(sourceObj){
    if(checkCurrEdit()){
            return false;
      }
-  
+
   var parent_div = sourceObj.parent();
 
     parent_div.append("<a class='reply-btn save_res' onclick='save_reply($(this))' data-id='" + curr_data_id + "' style='float:right;margin-right:10px!important'><i class='fa fa-floppy-o'></i> Save</a>");
- 
+
   var group_id = "{{group_id}}";
   $.ajax({
           url: "{% url 'edit_comment' group_id 'None' %}",
@@ -536,8 +537,8 @@ function editreply(sourceObj){
              setCurrNodeEdit(1);
              // $(sourceObj).append(data);
           },
-        }); 
-  
+        });
+
 
 }
 
@@ -568,7 +569,7 @@ function save_reply(sourceObj){
             edit_res = curr_thread.closest('.edit_res');
             reply_res = curr_thread.closest('.reply_res');
             delete_res = curr_thread.closest('.delete_res');
-            
+
             content_thread.show();
             reply_res.show();
             edit_res.show();

@@ -4663,13 +4663,14 @@ def delete_node(
                             if node_to_be_deleted.fs.files.exists(each) and node_collection.find({'fs_file_ids': {'$in': [each]} }).count() == 1:
                                 # print "\tdeleting node in GridFS : ", each
                                 node_to_be_deleted.fs.files.delete(each)
-
                     elif hasattr(node_to_be_deleted, 'if_file'):
                         fh_original_id = node_to_be_deleted.if_file.original.id
                         if node_collection.find({'_type': 'GSystem', 'if_file.original.id': ObjectId(fh_original_id) }).count() == 1:
                             for each_file in ['original', 'mid', 'thumbnail']:
                                 fh_id = node_to_be_deleted.if_file[each_file]['id']
-                                Filehive.delete_file_from_filehive(fh_id)
+                                fh_relurl = node_to_be_deleted.if_file[each_file]['relurl']
+                                if fh_id or fh_relurl:
+                                    Filehive.delete_file_from_filehive(fh_id, fh_relurl)
 
                 # Finally delete the node
                 node_to_be_deleted.delete()
@@ -4902,17 +4903,17 @@ def create_thread_for_node(request, group_id, node):
 			if thread_obj:
 				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': [node._id]}}, upsert = False, multi = False)
 				thread_obj.reload()
-				print "\n\n Found old model thread node existing"
+				# print "\n\n Found old model thread node existing"
 			else:
 				thread_obj = node_collection.find_one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
-				print "\n\n Found updated thread node existing"
+				# print "\n\n Found updated thread node existing"
 			if thread_obj:
 				if thread_obj.name != u"Thread of "+ unicode(node.name):
 					node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
 					thread_obj.reload()
-					print "\n\n thread_obj found -- name update if needed"
+					# print "\n\n thread_obj found -- name update if needed"
 			else:
-				print "\n\n Creating new thread node"
+				# print "\n\n Creating new thread node"
 				thread_obj = node_collection.collection.GSystem()
 
 				thread_obj.name = u"Thread of " + unicode(node.name)
@@ -4947,8 +4948,8 @@ def create_thread_for_node(request, group_id, node):
 				gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
 				node.reload()
 				thread_obj.reload()
-				print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
-				print "\n\n node", node._id, "--", node.relation_set
+				# print "\n\n thread", thread_obj._id, "--", thread_obj.relation_set
+				# print "\n\n node", node._id, "--", node.relation_set
 			if release_response_val:
 				rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
 				release_response_val = eval(release_response_val)
@@ -4964,10 +4965,10 @@ def create_thread_for_node(request, group_id, node):
 				create_gattribute(thread_obj._id, end_time_at, end_time)
 
 			thread_obj.reload()
-			print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
+			# print "\n\n thread_obj", thread_obj.attribute_set, "\n---\n"
 			return thread_obj
 	except Exception as e:
-		print "000\n\n",e
+		print "Something went wrong while creating thread node. ",e
 
 def node_thread_access(group_id, node):
     """
@@ -4983,11 +4984,18 @@ def node_thread_access(group_id, node):
        * thread_node - used in discussion.html
        * success (i.e True/False)
     """
+
+    from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
+
     has_thread_node = None
+    discussion_enable_val = get_attribute_value(node._id,"discussion_enable")
+
+    if not discussion_enable_val:
+        return has_thread_node, discussion_enable_val
+
     thread_start_time = None
     thread_end_time = None
     allow_to_comment = True  # default set to True to allow commenting if no date is set for thread
-    from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
     # has_thread_node_thread_grel = get_relation_value(node._id,"has_thread")
     grel_dict = get_relation_value(node._id,"has_thread", True)
     is_cursor = grel_dict.get("cursor",False)
@@ -5152,7 +5160,7 @@ def create_clone(user_id, node, group_id):
         #     cloned_copy.fs_file_ids = node.fs_file_ids
         #     cloned_copy.file_size = node.file_size
         #     cloned_copy.mime_type = node.mime_type
-
+        '''
         if "File" == node._type:
             cloned_copy = node_collection.collection.File()
             cloned_copy.fs_file_ids = node.fs_file_ids
@@ -5185,7 +5193,28 @@ def create_clone(user_id, node, group_id):
         cloned_copy.content_org = node.content_org
         cloned_copy.content = node.content
         cloned_copy.save()
-        return cloned_copy
+        '''
+        cloned_copy = node.copy()
+        cloned_copy['_id'] = ObjectId()
+        cloned_copy['group_set'] = [group_id]
+        cloned_copy['status'] = u"PUBLISHED"
+        cloned_copy['modified_by'] = int(user_id)
+        cloned_copy['created_by'] = int(user_id)
+        # cloned_copy['prior_node'] = node.prior_node
+        cloned_copy['contributors'] = [int(user_id)]
+        cloned_copy['post_node'] = []
+        cloned_copy['prior_node'] = []
+        cloned_copy['relation_set'] = []
+        cloned_copy['attribute_set'] = []
+        cloned_copy['origin'] = [{'fork_of': node._id}]
+        if "QuizItem" in node.member_of_names_list:
+            quiz_item_event_gst = node_collection.one({'_type': "GSystemType", 'name': "QuizItemEvent"})
+            cloned_copy['member_of'] = [quiz_item_event_gst._id]
+        cloned_obj_id = node_collection.collection.insert(cloned_copy)
+        cloned_obj = node_collection.one({'_id': ObjectId(cloned_obj_id)})
+        cloned_obj.save(groupid=group_id, validate=False)
+        return cloned_obj
+
     except Exception as re_clone_err:
         print re_clone_err
         print "Failed cloning resource"
@@ -5200,91 +5229,129 @@ def replicate_resource(request, node, group_id):
         user_id = request.user.id
         new_gsystem = create_clone(user_id, node, group_id)
 
-        clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
-        create_grelation(new_gsystem._id, clone_of_RT, node._id)
-        # node_attribute_set_dict = {}
-        # [node_attribute_set_dict.update(d) for d in node.attribute_set]
-        # for each_attr_key,each_attr_val in node_attribute_set_dict.items():
-        #     fetch_attr_type = node_collection.one({'_type': "AttributeType", 'name': unicode(each_attr_key)})
-        #     create_grelation(new_gsystem._id, fetch_attr_type, each_attr_val)
-        #     print node_attribute_set_dict
-        try:
-            if "Page" in node.member_of_names_list:
-                mem_type_of = node.type_of[0]
-                if node_collection.one({'_id': ObjectId(mem_type_of)}).name != "Info page":
-                  create_thread_for_node_flag = False
-        except:
-            pass
+        if new_gsystem:
+            # FORKING TRIPLES
 
-        for each_attr in node.attribute_set:
-            if each_attr and "discussion_enable" in each_attr:
-                create_thread_for_node_flag = True
-        for each_rel in node.relation_set:
-            if each_rel and "has_thread" in each_rel:
-                create_thread_for_node_flag = True
-            if each_rel and "has_help" in each_rel:
-                help_page_ids = each_rel['has_help']
-                # print "\n help_page_ids",help_page_ids
-                if help_page_ids:
-                    list_of_cloned_help_pages = []
-                    # replicate each help page node
-                    for each_help_page_id in help_page_ids:
-                        help_node = node_collection.one({'_id': ObjectId(each_help_page_id)})
-                        if help_node:
-                            cloned_help_page = create_clone(user_id, help_node, group_id)
-                            if cloned_help_page:
-                                if cloned_help_page._id not in list_of_cloned_help_pages:
-                                    list_of_cloned_help_pages.append(cloned_help_page._id)
-                    if list_of_cloned_help_pages:
-                        has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
-                        help_gr = create_grelation(new_gsystem._id, has_help_rt, list_of_cloned_help_pages)
-                    # print "\nlist_of_cloned_help_pages ",list_of_cloned_help_pages
-        if create_thread_for_node_flag:
-            discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
-            create_gattribute(new_gsystem._id, discussion_enable_at, False)
-            thread_obj = create_thread_for_node(request,group_id, new_gsystem)
-            if thread_obj != None:
-                has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
-                gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
+            ##### TRIPLES GATTRIBUTES
+            node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
+
+            for each_gattr in node_gattr_cur:
+                at_id = each_gattr['attribute_type']['_id']
+                obj_val = each_gattr['object_value']
+                at_node = node_collection.one({'_id': ObjectId(at_id)})
+                create_gattribute(new_gsystem._id,at_node,obj_val)
+
+            ##### TRIPLES GRELATIONS
+            node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id})
+
+            for each_rel in node_grel_cur:
+                thread_created = False
+                rt_id = each_rel['relation_type']['_id']
+                right_subj = each_rel['right_subject']
+                rt_node = node_collection.one({'_id': ObjectId(rt_id)})
+                if rt_node.name == 'has_thread':
+                    thread_created = True
+                right_sub_new = None
+                if isinstance(right_subj,list):
+                    right_sub_new = []
+                    right_subj_node = node_collection.one({'_id': {'$in': right_subj}})
+                    for each_rs in right_subj_node:
+                        new_right_subj_node = create_clone(user_id, each_rs, group_id)
+                        right_sub_new.append(new_right_subj_node._id)
+                else:
+                    right_subj_node = node_collection.one({'_id': ObjectId(right_subj)})
+                    right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+                    right_sub_new = right_sub_new_node._id
+
+                create_grelation(new_gsystem._id,rt_node,right_sub_new)
+            if "QuizItemEvent" in new_gsystem.member_of_names_list:
+                if not thread_created:
+                    thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+
+        # clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
+        # create_grelation(new_gsystem._id, clone_of_RT, node._id)
+        # # node_attribute_set_dict = {}
+        # # [node_attribute_set_dict.update(d) for d in node.attribute_set]
+        # # for each_attr_key,each_attr_val in node_attribute_set_dict.items():
+        # #     fetch_attr_type = node_collection.one({'_type': "AttributeType", 'name': unicode(each_attr_key)})
+        # #     create_grelation(new_gsystem._id, fetch_attr_type, each_attr_val)
+        # #     print node_attribute_set_dict
+        # try:
+        #     if "Page" in node.member_of_names_list:
+        #         mem_type_of = node.type_of[0]
+        #         if node_collection.one({'_id': ObjectId(mem_type_of)}).name != "Info page":
+        #           create_thread_for_node_flag = False
+        # except:
+        #     pass
+
+        # for each_attr in node.attribute_set:
+        #     if each_attr and "discussion_enable" in each_attr:
+        #         create_thread_for_node_flag = True
+        # for each_rel in node.relation_set:
+        #     if each_rel and "has_thread" in each_rel:
+        #         create_thread_for_node_flag = True
+        #     if each_rel and "has_help" in each_rel:
+        #         help_page_ids = each_rel['has_help']
+        #         # print "\n help_page_ids",help_page_ids
+        #         if help_page_ids:
+        #             list_of_cloned_help_pages = []
+        #             # replicate each help page node
+        #             for each_help_page_id in help_page_ids:
+        #                 help_node = node_collection.one({'_id': ObjectId(each_help_page_id)})
+        #                 if help_node:
+        #                     cloned_help_page = create_clone(user_id, help_node, group_id)
+        #                     if cloned_help_page:
+        #                         if cloned_help_page._id not in list_of_cloned_help_pages:
+        #                             list_of_cloned_help_pages.append(cloned_help_page._id)
+        #             if list_of_cloned_help_pages:
+        #                 has_help_rt = node_collection.one({'_type': "RelationType", 'name': "has_help"})
+        #                 help_gr = create_grelation(new_gsystem._id, has_help_rt, list_of_cloned_help_pages)
+        #             # print "\nlist_of_cloned_help_pages ",list_of_cloned_help_pages
+        # if create_thread_for_node_flag:
+        #     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+        #     create_gattribute(new_gsystem._id, discussion_enable_at, False)
+        #     thread_obj = create_thread_for_node(request,group_id, new_gsystem)
+        #     if thread_obj != None:
+        #         has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+        #         gr = create_grelation(new_gsystem._id, has_thread_rt, thread_obj._id)
 
 
-        if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
-            # from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
+        # if "QuizItem" in node.member_of_names_list or "QuizItemEvent" in node.member_of_names_list:
+        #     # from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 
-            # thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
-            # grel_dict = get_relation_value(node._id,"has_thread")
-            # is_cursor = grel_dict.get("cursor",False)
-            # if not is_cursor:
-            #     thread_obj = grel_dict.get("grel_node")
-            #     thread_grel = grel_dict.get("grel_id")
+        #     # thread_obj,thread_grel = get_relation_value(node._id,"has_thread")
+        #     # grel_dict = get_relation_value(node._id,"has_thread")
+        #     # is_cursor = grel_dict.get("cursor",False)
+        #     # if not is_cursor:
+        #     #     thread_obj = grel_dict.get("grel_node")
+        #     #     thread_grel = grel_dict.get("grel_id")
 
-            # Setup all relevant Attributes for QuizItemEvent
-            node.get_neighbourhood(node.member_of)
+        #     # Setup all relevant Attributes for QuizItemEvent
+        #     node.get_neighbourhood(node.member_of)
 
-            quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
-            options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
-            correct_answer_AT = node_collection.one({'_type': "AttributeType", 'name': "correct_answer"})
-            quizitem_show_correct_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_show_correct_ans"})
-            quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
-            quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
-            quizitem_check_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_check_answer"})
+        #     quiz_type_AT = node_collection.one({'_type': "AttributeType", 'name': "quiz_type"})
+        #     options_AT = node_collection.one({'_type': "AttributeType", 'name': "options"})
+        #     correct_answer_AT = node_collection.one({'_type': "AttributeType", 'name': "correct_answer"})
+        #     quizitem_show_correct_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_show_correct_ans"})
+        #     quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
+        #     quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
+        #     quizitem_check_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_check_answer"})
 
-            if node.quiz_type:
-                create_gattribute(new_gsystem._id,quiz_type_AT, node.quiz_type)
-            if node.options:
-                create_gattribute(new_gsystem._id,options_AT, node.options)
-            if node.correct_answer:
-                create_gattribute(new_gsystem._id,correct_answer_AT, node.correct_answer)
-            if "quizitem_show_correct_ans" in node and node.quizitem_show_correct_ans != None:
-                create_gattribute(new_gsystem._id,quizitem_show_correct_ans_AT, node.quizitem_show_correct_ans)
-            if "quizitem_check_answer" in node and node.quizitem_show_correct_ans != None:
-                create_gattribute(new_gsystem._id,quizitem_check_ans_AT, node.quizitem_check_answer)
-            if node.quizitem_problem_weight:
-                create_gattribute(new_gsystem._id,quizitem_problem_weight_AT, node.quizitem_problem_weight)
-            if node.quizitem_max_attempts:
-                create_gattribute(new_gsystem._id,quizitem_max_attempts_AT, node.quizitem_max_attempts)
+        #     if node.quiz_type:
+        #         create_gattribute(new_gsystem._id,quiz_type_AT, node.quiz_type)
+        #     if node.options:
+        #         create_gattribute(new_gsystem._id,options_AT, node.options)
+        #     if node.correct_answer:
+        #         create_gattribute(new_gsystem._id,correct_answer_AT, node.correct_answer)
+        #     if "quizitem_show_correct_ans" in node and node.quizitem_show_correct_ans != None:
+        #         create_gattribute(new_gsystem._id,quizitem_show_correct_ans_AT, node.quizitem_show_correct_ans)
+        #     if "quizitem_check_answer" in node and node.quizitem_show_correct_ans != None:
+        #         create_gattribute(new_gsystem._id,quizitem_check_ans_AT, node.quizitem_check_answer)
+        #     if node.quizitem_problem_weight:
+        #         create_gattribute(new_gsystem._id,quizitem_problem_weight_AT, node.quizitem_problem_weight)
+        #     if node.quizitem_max_attempts:
+        #         create_gattribute(new_gsystem._id,quizitem_max_attempts_AT, node.quizitem_max_attempts)
 
-        new_gsystem.reload()
         return new_gsystem
     except Exception as replicate_resource_err:
         print replicate_resource_err
@@ -5390,13 +5457,8 @@ def get_group_join_status(group_obj):
 def get_course_completetion_status(group_obj, user_id,ids_list=False):
     result_dict = {'success': False}
     try:
-      all_cs_count = 0
-      completed_cs_count = 0
-      res_completed_ids = []
-      completed_ids = []
-      incompleted_ids = []
-      all_node_ids = []
       user_obj = User.objects.get(pk=int(user_id))
+      '''
       for cs in group_obj.collection_set:
         cs_node = node_collection.one({'_id': ObjectId(cs)})
         all_node_ids.append(cs_node._id)
@@ -5423,38 +5485,98 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
                       completed_ids.append(res)
                     # else:
                     #   incompleted_ids.append(res)
-                  if sublistExists(completed_ids, cu_node.collection_set):
+                  if all(each_item in completed_ids for each_item in cu_node.collection_set):
                     completed_ids.append(cu_node._id)
                   else:
                     partially_exists = any(each_id in completed_ids for each_id in cu_node.collection_set)
                     if partially_exists:
                       incompleted_ids.append(cu_node._id)
 
-              if sublistExists(completed_ids, css_node.collection_set):
+              if all(each_item in completed_ids for each_item in css_node.collection_set):
                 completed_ids.append(css_node._id)
               else:
                 partially_exists = any(each_id in completed_ids for each_id in css_node.collection_set)
-                if partially_exists or sublistExists(incompleted_ids, css_node.collection_set):
+                if partially_exists or all(each_item in incompleted_ids for each_item in css_node.collection_set):
                   incompleted_ids.append(css_node._id)
 
-          if sublistExists(completed_ids, cs_node.collection_set):
+          if all(each_item in completed_ids for each_item in cs_node.collection_set):
             completed_ids.append(cs_node._id)
           else:
             partially_exists = any(each_id in completed_ids for each_id in cs_node.collection_set)
-            if partially_exists or sublistExists(incompleted_ids, cs_node.collection_set):
+            if partially_exists or all(each_item in incompleted_ids for each_item in cs_node.collection_set):
               incompleted_ids.append(cs_node._id)
+      '''
 
-      return_perc = (completed_cs_count/float(all_cs_count))*100
+
+      all_res = set()
+      regex_res_ids = ''
+      completed_unit_ids = []
+      unit_event_gst = node_collection.one({'_type':"GSystemType", 'name':"CourseUnitEvent"})
+      cs_event_gst = node_collection.one({'_type':"GSystemType", 'name':"CourseSectionEvent"})
+      css_event_gst = node_collection.one({'_type':"GSystemType", 'name':"CourseSubSectionEvent"})
+
+      all_units_of_grp = node_collection.find({'member_of': unit_event_gst._id,'group_set': group_obj._id})
+      all_sessions_of_grp = node_collection.find({'member_of': css_event_gst._id,'group_set': group_obj._id})
+      all_modules_of_grp = node_collection.find({'member_of': cs_event_gst._id,'group_set': group_obj._id})
+
+      unit_info_before_query = {}
+      for each in all_units_of_grp:
+        all_res.update(each.collection_set)
+        unit_info_before_query.update({unicode(each._id): set(map(unicode,each.collection_set))})
+
+      for each_res in all_res:
+        regex_res_ids += '/'+each_res.__str__()+'/$|'
+      regex_res_ids = regex_res_ids[:-1]
+      benchmark_res = benchmark_collection.find({'name':"course_resource_detail", 'calling_url': {'$regex': regex_res_ids}, 'user': user_obj.username, 'group': unicode(group_obj._id)},{'_id':0,'calling_url':1})
+
+      unit_info_after_query = {}
+      for each_benchmark in benchmark_res:
+        calling_url_split = each_benchmark['calling_url'].split('/')
+        if len(calling_url_split) > 5:
+          if calling_url_split[5] in unit_info_after_query.keys():
+            val = unit_info_after_query[unicode(calling_url_split[5])]
+          else:
+            val = set()
+          val.add(calling_url_split[6])
+          unit_info_after_query.update({unicode(calling_url_split[5]):val})
+
+      for each_unit in unit_info_after_query:
+        if each_unit in unit_info_before_query:
+          if unit_info_after_query[each_unit] == unit_info_before_query[each_unit]:
+            completed_unit_ids.append(ObjectId(each_unit))
+      completed_sessions_ids_final = []
+      completed_units_cur = node_collection.find({'_id': {'$in': completed_unit_ids}},{'_id':0, 'prior_node':1})
+      completed_sessions_ids = [each_completed_unit_node.prior_node[0] for each_completed_unit_node in completed_units_cur]
+      completed_sessions_cur = node_collection.find({'_id': {'$in': completed_sessions_ids},'member_of': css_event_gst._id})
+
+      for each_session in completed_sessions_cur:
+        if all(each_u_id in completed_unit_ids for each_u_id in each_session.collection_set):
+          completed_sessions_ids_final.append(each_session._id)
+
+      completed_sessions_cur_final = node_collection.find({'_id': {'$in': completed_sessions_ids_final},'member_of': css_event_gst._id})
+      completed_modules_ids = [each_completed_session_node.prior_node[0] for each_completed_session_node in completed_sessions_cur_final]
+      completed_modules_cur = node_collection.find({'_id': {'$in': completed_modules_ids},'member_of': cs_event_gst._id})
+      completed_modules = []
+      for each_module in completed_modules_cur:
+        if all(each_m_id in completed_sessions_ids_final for each_m_id in each_module.collection_set):
+          completed_modules.append(each_module._id)
+
+
+      # print "\nTotal modules : ", all_modules_of_grp.count()
+      # print "\nCompleted modules : ", len(completed_modules_ids)
+
+      # print "\nTotal Units : ", all_units_of_grp.count()
+      # print "\nCompleted Units : ", len(completed_unit_ids)
+
+      return_perc = (len(completed_modules_ids)/float(all_modules_of_grp.count()))*100
 
       # print "\n\n return_perc==== ",return_perc
       result_dict['course_complete_percentage'] = return_perc
-      result_dict['completed_count'] = completed_cs_count
-      result_dict['total_count'] = all_cs_count
+      result_dict['modules_completed_count'] = len(completed_modules_ids)
+      result_dict['modules_total_count'] = all_modules_of_grp.count()
+      result_dict['units_completed_count'] = len(completed_modules_ids)
+      result_dict['units_total_count'] = all_modules_of_grp.count()
 
-      if ids_list:
-        result_dict['completed_ids_list'] = json.dumps(completed_ids,cls=NodeJSONEncoder)
-        result_dict['incompleted_ids_list'] = json.dumps(incompleted_ids,cls=NodeJSONEncoder)
-        result_dict['list_of_leaf_node_ids'] = json.dumps(res_completed_ids,cls=NodeJSONEncoder)
       result_dict.update({'success': False})
       # print "\n\nresult_dict == ",result_dict
       return result_dict
