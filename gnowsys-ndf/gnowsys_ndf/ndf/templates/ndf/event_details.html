@@ -167,16 +167,29 @@ table, th, td {
                           <br><br>
 
                           {% if show %}
-                            {%  if node.url %}
-                           <div align = "center">
-                            <button target = "_blank" onClick="window.open('{{url}}')">Join</button>
-                            </div> 
-                            {%endif%} 
+
+                            {%if active == 0%}
+
+                            <div align = "center">
+                            <button target = "_blank" onClick="window.open('{{url}}')">Join</button> 
+                          </div>
+
+                            {% elif active == -1%}
+                             <div align = "center">
+                             <button disabled>{{node.name}} has not started yet</button>
+                           </div>
+
+                            {% else %}
+                             <div align = "center">
+                             <button disabled>{{node.name}} has ended</button>
+                           </div>
+
+                            {% endif %} 
 
                           {% else %}
-                          <div align = "center">
-                          <button disabled>You are not invited for {{node.name}}</button>
-                          </div>                                                                       
+                           <div align = "center">
+                          <button disabled>You are not invited for {{node.name}}</button>        
+                          </div>  
                           {% endif %} 
                           {% endif %}
                            

@@ -1,4 +1,5 @@
 ''' -- imports from python libraries -- '''
+import datetime
 # from datetime import datetime
 
 ''' -- imports from installed packages -- '''
@@ -270,6 +271,22 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
     y = node.relation_set
 
+    st_time = node.attribute_set[0]['start_time']
+    end_time = node.attribute_set[1]['end_time']
+    now = datetime.datetime.now()
+
+    buff = datetime.timedelta(hours=24)
+
+    beg = st_time - buff
+    en = end_time + buff
+
+    if now <= en and beg <= now :
+      active =  0
+    elif now > en : 
+      active = 1
+    else:
+      active = -1    
+
     show = False
     is_moderator = False
 
@@ -325,6 +342,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                           'Eventtype':Eventtype, 
                           'show':show,
                           'url':url,
+                          'active':active,
                            # 'property_order_list': property_order_list
                         }
   else:
