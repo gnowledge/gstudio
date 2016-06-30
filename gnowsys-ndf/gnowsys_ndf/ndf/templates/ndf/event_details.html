@@ -176,12 +176,12 @@ table, th, td {
 
                             {% elif active == -1%}
                              <div align = "center">
-                             <button disabled>{{node.name}} has not started yet</button>
+                             <button disabled>{{node.name}} will start in {{days_left}} days</button>
                            </div>
 
                             {% else %}
                              <div align = "center">
-                             <button disabled>{{node.name}} has ended</button>
+                             <button disabled>{{node.name}} ended {{days_left}} days back</button>
                            </div>
 
                             {% endif %} 

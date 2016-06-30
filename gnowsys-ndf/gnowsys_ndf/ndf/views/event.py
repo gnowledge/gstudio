@@ -279,13 +279,16 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
     beg = st_time - buff
     en = end_time + buff
+    days_left = 0
 
     if now <= en and beg <= now :
       active =  0
     elif now > en : 
       active = 1
+      days_left = (now-en).days
     else:
-      active = -1    
+      active = -1  
+      days_left = (beg-now).days  
 
     show = False
     is_moderator = False
@@ -343,6 +346,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                           'show':show,
                           'url':url,
                           'active':active,
+                          'days_left':days_left,
                            # 'property_order_list': property_order_list
                         }
   else:
