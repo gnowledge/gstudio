@@ -42,7 +42,7 @@
             </a></h1>
           </li>
           <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-          <li class="toggle-topbar"><a href="#"><span>{% trans "Menu" %}</span></a></li>
+          <li class="toggle-topbar menu-icon"><a href="#"><span>{% trans "Menu" %}</span></a></li>
         </ul>
 
         <section class="top-bar-section">
@@ -422,7 +422,7 @@
               <ul class="title-area text-center">
                 <li class="name" title="{% firstof  group_object.altnames group_object.name %}">
                   <h1>
-                    <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+                    <a href="{% url 'groupchange' group_id %}">
 
                           {% get_relation_value group_object.pk 'has_profile_pic' as grel_dict %}
                           {% if not grel_dict.cursor and grel_dict.grel_node %}
@@ -431,7 +431,7 @@
                                     <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
                           {% endif %}
 
-                          <span>{% firstof group_object.altnames|truncatechars:7 group_object.name|truncatechars:7 %}</span>
+                          <span style="color:black!important">{% firstof group_object.altnames|truncatechars:7 group_object.name|truncatechars:7 %}</span>
                     </a>
                   </h1>
                 </li>

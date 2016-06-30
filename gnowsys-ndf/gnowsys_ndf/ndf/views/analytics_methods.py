@@ -164,11 +164,11 @@ class AnalyticsMethods(object):
 
 	def get_evaluated_quizitems_count(self,correct_ans_flag=False, incorrect_ans_flag=False):
 
-
 		if not hasattr(self,'list_of_qi_ids') and not hasattr(self,'total_qi_cur'):
 			self.total_qi_cur = self.get_attempted_quizitems_count(True)
 			self.list_of_qi_ids = []
 			for each_qi in self.total_qi_cur:
+				correct_ans_list = None
 				if each_qi.origin:
 					prior_node_id = each_qi.origin[0].get('prior_node_id_of_thread',None)
 					if prior_node_id:
@@ -659,7 +659,7 @@ class AnalyticsMethods(object):
 	def get_users_points(self, point_breakup=False):
 
 		total_points = 0
-		point_breakup_dict = {'Files': 0, 'Notes': 0, 'Quiz': 0, 'Interactions': 0}
+		point_breakup_dict = {"Files": 0, "Notes": 0, "Quiz": 0, "Interactions": 0}
 		user_files = self.get_user_files_count()
 		user_notes = self.get_user_notes_count()
 		correct_attempted_quizitems = self.get_evaluated_quizitems_count(True,False)
@@ -669,16 +669,17 @@ class AnalyticsMethods(object):
 		# print "\n get_users_points -- ",total_points
 		if point_breakup:
 			if user_files:
-				point_breakup_dict['Files'] = user_files*GSTUDIO_FILE_UPLOAD_POINTS
+				point_breakup_dict["Files"] = user_files*GSTUDIO_FILE_UPLOAD_POINTS
 			if user_notes:
-				point_breakup_dict['Notes'] = user_notes*GSTUDIO_NOTE_CREATE_POINTS
+				point_breakup_dict["Notes"] = user_notes*GSTUDIO_NOTE_CREATE_POINTS
 			if correct_attempted_quizitems:
-				point_breakup_dict['Quiz'] = correct_attempted_quizitems*GSTUDIO_QUIZ_CORRECT_POINTS
+				point_breakup_dict["Quiz"] = correct_attempted_quizitems*GSTUDIO_QUIZ_CORRECT_POINTS
 			if user_comments:
-				point_breakup_dict['Interactions'] = user_comments*GSTUDIO_COMMENT_POINTS
-			point_breakup_dict['Total'] = total_points
+				point_breakup_dict["Interactions"] = user_comments*GSTUDIO_COMMENT_POINTS
+			point_breakup_dict["Total"] = total_points
 			# print point_breakup_dict
-			return point_breakup_dict
+			non_empty_dict = { k:v for k, v in point_breakup_dict.items() if v != 0 }
+			return json.dumps(non_empty_dict)
 		return total_points
 
 	def get_user_joined_groups(self):

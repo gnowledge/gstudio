@@ -248,15 +248,27 @@
                 <center>
                 <div class="show-image">
                   <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
+                   {% if  node.if_file.original.relurl %}
                     <img src="{{MEDIA_URL}}{{node.if_file.original.relurl}} " style="min-height:200px;" />
-
+                   {% elif node.collection_set %}
+                   <img src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-page-multiple.svg">
+                    {% endif %}
                   </a>
+                  {% if node.collection_set %}
+                  <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
+                      <a  class=" {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
+                         Show Collection
+                         {# <i class="fi-projection-screen"> </i> #}
+                      </a>
+                    </figcaption>
+                    {% else %}
                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
                       <a  target="_blank" href="{% url 'read_file' group_name_tag node.pk download_filename %}">
                          View in Full Screen
                          <i class="fi-projection-screen"> </i>
-                    </figcaption>
                       </a>
+                    </figcaption>
+                    {% endif %}
                 </div>
                 </center>
               {% elif 'image' in node.if_file.mime_type and is_collection_card_view != "True" %}
@@ -331,7 +343,7 @@
                   </h4>
 
                   <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
-                    {% trans 'Download' %}"{{ grid_fs_obj.filename }}"
+                    {% trans 'Download' %}
                   </a>
                   <h4 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
                     <small>Next <i class="fi-arrow-right"></i></small>
@@ -344,7 +356,7 @@
 
                 <script>
                   // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
-                  var Book = ePub("{{MEDIA_URL}}{{node.if_file.original.relurl}}", {
+                  var Book = ePub("{% url 'read_file' group_name_tag node download_filename %}", {
                     width: 400,
                     height: false,
                     restore: true
@@ -470,9 +482,11 @@
           {% if user.is_authenticated %}
 
             {% if node.if_file.mime_type %}
+                {% if not node.collection_set %}
                 <a class="button tiny" title="Click here to Download" href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
                   Download
                 </a>
+                {% endif %}
                 {% comment %}
                {% get_gstudio_social_share_resource as social_share %}
                   {% if social_share %}
