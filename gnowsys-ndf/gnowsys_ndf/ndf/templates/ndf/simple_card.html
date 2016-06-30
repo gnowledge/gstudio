@@ -129,7 +129,8 @@
       {{resource.created_by|get_username|truncatechars:"10"}}</a>
      {% endif %}
          <i style="float:right">{{resource.created_at|date:"d-m-Y"}}</i>
-     {% if user.is_authenticated  %}
+     
+     {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %} 
       {% if not no_checkbox  %}
         </a> <input type="checkbox" style="margin:0; float:left;" class="filenode" name="filenode" value="{{resource.pk}}">
       {% endif %}
