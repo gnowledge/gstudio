@@ -5581,9 +5581,9 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
 
       # print "\n\n return_perc==== ",return_perc
       result_dict['course_complete_percentage'] = return_perc
-      result_dict['modules_completed_count'] = len(completed_modules_ids)
+      result_dict['modules_completed_count'] = completed_modules_cur.count()
       result_dict['modules_total_count'] = all_modules_of_grp.count()
-      result_dict['units_completed_count'] = len(completed_unit_ids)
+      result_dict['units_completed_count'] = completed_units_cur.count()
       result_dict['units_total_count'] = all_units_of_grp.count()
 
       result_dict.update({'success': False})
