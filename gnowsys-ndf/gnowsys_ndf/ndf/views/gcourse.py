@@ -2143,9 +2143,9 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         if file_creator_id != counter_obj.user_id :
             counter_obj.no_others_files_visited += 1
             counter_obj_creator = get_counter_obj(file_creator_id,ObjectId(group_id))
-            counter_obj_creator.no_visits_gained += 1
-            counter_obj.last_update = datetime.today()
-            counter_obj_creator.last_update = datetime.today()
+            counter_obj_creator.no_visits_gained_on_files += 1
+            counter_obj.last_update = datetime.datetime.now()
+            counter_obj_creator.last_update = datetime.datetime.now()
             counter_obj.save()
             counter_obj_creator.save()
     else:
