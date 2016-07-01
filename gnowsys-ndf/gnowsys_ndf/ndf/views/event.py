@@ -287,7 +287,11 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       active = 1
     else:
       active = -1  
-      days_left = (beg-now).days 
+      days_left = (st_time-now).days 
+
+    print "*******"  
+    print st_time
+    print "*******"  
 
     show = False
     is_moderator = False
