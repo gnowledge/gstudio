@@ -44,18 +44,7 @@ class Command(BaseCommand):
 def create_or_update_counter(user_obj, group_id):
 
     counter_obj = counter_collection.one({'user_id': user_obj.id, 'group_id': group_id})
-    if counter_obj:
-        counter_obj.enrolled = True
-        counter_obj.save()
-    else:
-        counter_obj = counter_collection.collection.Counter()
-        counter_obj.user_id=user_obj.id
-        auth_obj= node_collection.one({'_type':'Author','created_by':user_obj.id})
-        counter_obj.auth_id=ObjectId(auth_obj._id)
-        counter_obj.group_id=ObjectId(group_id)
-        counter_obj.last_update=datetime.datetime.now()
-        counter_obj.enrolled = True
-        counter_obj.save()
+
     if not counter_obj:
         log_file.write("\n\nCreating Counter for User: "+ str(user_obj.id)+ "  Group :"+ str(group_id))
         counter_obj = counter_collection.collection.Counter()
@@ -68,7 +57,7 @@ def create_or_update_counter(user_obj, group_id):
     counter_obj.auth_id = auth_node._id
     counter_obj.group_id = group_id
     counter_obj.user_id = user_obj.id
-
+    counter_obj.enrolled = True
     #counter_obj.modules_completed = analytics_instance.get_completed_modules_count()
     #counter_obj.units_completed = analytics_instance.get_completed_units_count()
     # Calculate points of user
