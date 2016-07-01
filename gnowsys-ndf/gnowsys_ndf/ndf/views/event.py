@@ -323,7 +323,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     
     SALT = '8cd8ef52e8e101574e400365b55e11a6'
     URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/'
-    createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, '#')
+    createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, '/#')
     
     if is_moderator:
       url = joinURL(node._id, request.user, 'mPW', SALT, URL)
