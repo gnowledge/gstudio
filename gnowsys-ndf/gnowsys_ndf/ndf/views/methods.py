@@ -5237,6 +5237,7 @@ def replicate_resource(request, node, group_id):
         create_thread_for_node_flag = True
         user_id = request.user.id
         new_gsystem = create_clone(user_id, node, group_id)
+        thread_created = False
 
         if new_gsystem:
             # FORKING TRIPLES
@@ -5254,7 +5255,6 @@ def replicate_resource(request, node, group_id):
             node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id})
 
             for each_rel in node_grel_cur:
-                thread_created = False
                 rt_id = each_rel['relation_type']['_id']
                 right_subj = each_rel['right_subject']
                 rt_node = node_collection.one({'_id': ObjectId(rt_id)})
