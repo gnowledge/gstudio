@@ -208,3 +208,14 @@
     </div>
   </div>
 </div>
+
+
+<script type="text/javascript">
+    $(document).ready(function() {
+      var points_dict = {{users_points_breakup|safe}}
+      if (points_dict.hasOwnProperty('Total')){
+        delete points_dict['Total']
+      }
+      generateGraph(points_dict)
+    })
+</script>

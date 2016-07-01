@@ -178,12 +178,24 @@ def get_mid_size_img(request, group_id, _id):
         group_name, group_id = get_group_name_id(group_id)
 
     img_obj = node_collection.one({"_id": ObjectId(_id)})
+
     try:
-        f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[2]))
-        return HttpResponse(f.read(), content_type=f.content_type)
+        if hasattr(img_obj, 'if_file'):
+            f = img_obj.get_file(img_obj.if_file.mid.relurl)
+            return HttpResponse(f, content_type=img_obj.if_file.mime_type)
+
+        else:
+            f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[2]))
+            return HttpResponse(f.read(), content_type=f.content_type)
+
     except IndexError:
-        f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[0]))
-        return HttpResponse(f.read(), content_type=f.content_type)
+
+        if hasattr(img_obj, 'if_file'):
+            f = img_obj.get_file(img_obj.if_file.original.relurl)
+            return HttpResponse(f, content_type=img_obj.if_file.mime_type)
+        else:
+            f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[0]))
+            return HttpResponse(f.read(), content_type=f.content_type)
 
 @get_execution_time
 def image_search(request,group_id):

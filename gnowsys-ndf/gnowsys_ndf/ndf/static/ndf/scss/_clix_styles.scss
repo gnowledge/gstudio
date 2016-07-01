@@ -5,19 +5,12 @@
 
 .workspace{
 
+    min-height:100%;
     // group level menu bar
     .app.button-bar {
         height: 45px;
     }
-
-    //This is the main content container between the header and footer
-    /*background: url("watermark.png") no-repeat 0 80%;*/
-  min-height: 100%;
-  /*margin-bottom: -130px!important;*/
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-
+    
     /*&:after{
         //Hack for setting div height to the height of the browser window
     content:"";
@@ -59,10 +52,6 @@ body>footer {
 
     .title-area {
       height: auto;
-
-      img {
-        height: 45px;
-      }
 
       a{
         &:hover{
@@ -300,7 +289,7 @@ body>footer {
     position: relative;
     /*background: url(/static/ndf/images/login-background.png);*/
     background-size: 100% 100%;
-    height: 100%;
+    min-height: 100vh;
 
     .login-page-opacity {
         height: 100%;
@@ -316,11 +305,12 @@ body>footer {
 
     .login-page-form {
         background-color: #fff;
-        margin-top: 100px;
-        margin-bottom: 100px;
         border-radius: 10px;
         padding: 10px 40px;
         opacity: 0.95;
+        max-width: 90%;
+        width: 350px;
+        margin: 100px auto;
         box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
 
         .login-page-header {

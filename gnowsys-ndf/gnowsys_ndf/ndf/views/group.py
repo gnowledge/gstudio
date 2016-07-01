@@ -24,14 +24,15 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.models import NodeJSONEncoder
-# from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
-from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget, get_collection, set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
+from gnowsys_ndf.ndf.models import NodeJSONEncoder,node_collection, triple_collection 
 from gnowsys_ndf.ndf.views.methods import *
+# from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
+# from gnowsys_ndf.ndf.models import c
+from gnowsys_ndf.ndf.views.ajax_views import *
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
+# from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
 # ######################################################################################################################################
 
 group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'Group'})
@@ -1185,26 +1186,46 @@ class CreateCourseEventGroup(CreateEventGroup):
                 create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
             self.ce_set_up(request, course_node, group_obj)
 
-    def ce_set_up(self, request, node, group_obj):
+    def ce_set_up(self, request, existing_course_obj, new_course_obj):
         """
             Will build into Recursive function
             To fetch from Course'collection_set
             and build new GSystem for CourseEventGroup
 
-            node is course node
-            group_obj is CourseEvent node
+            existing_course_obj is course existing_course_obj
+            new_course_obj is CourseEvent existing_course_obj
 
         """
         try:
-            group_obj.content = node.content
-            group_obj.content_org = node.content_org
-            group_obj.save()
-            self.call_setup(request, node, group_obj, group_obj)
+            new_course_obj.content = existing_course_obj.content
+            new_course_obj.content_org = existing_course_obj.content_org
+            new_course_obj.save()
+            self.call_setup(request, existing_course_obj, new_course_obj, new_course_obj)
+            self.update_raw_material_group_set(existing_course_obj, new_course_obj)
             return True
 
         except Exception as e:
 
             print e, "CourseEventGroup structure setup Error"
+
+    def update_raw_material_group_set(self,old_group_obj, new_group_obj):
+        # Fetch all files from Raw-Material using tag 'raw@material'
+        # rm_files_cur = node_collection.find({'tags': 'raw@material', 'member_of': file_gst._id, 'group_set': old_group_obj._id})
+
+        # June 17 2016. Importing files uploaded by user 'administrator' in old_group_obj
+        administrator_user = User.objects.get(username='administrator')
+
+        rm_files_cur = node_collection.find({'member_of': file_gst._id, 'group_set': old_group_obj._id, \
+            '$or':[{'tags': 'raw@material'}, {'created_by': administrator_user.id}]})
+
+        if rm_files_cur.count():
+            for each_rm_file in rm_files_cur:
+                each_rm_file.group_set.append(new_group_obj._id)
+                if self.user_id not in each_rm_file.contributors:
+                    each_rm_file.contributors.append(self.user_id)
+                each_rm_file.modified_by = self.user_id
+                each_rm_file.save(groupid=new_group_obj._id)
+
 
     def create_corresponding_gsystem(self,gs_name,gs_member_of,gs_under_coll_set_of_obj, group_obj):
 
@@ -1250,7 +1271,6 @@ class CreateCourseEventGroup(CreateEventGroup):
                     # prior_node_obj.collection_set.append(each_res_node._id)
                     # node.save()
                     prior_node_obj.save()
-                    
             else:
                 for each in node.collection_set:
                     each_node = node_collection.one({'_id': ObjectId(each)})
@@ -2192,7 +2212,7 @@ def switch_group(request,group_id,node_id):
   try:
     node = node_collection.one({"_id": ObjectId(node_id)})
     existing_grps = node.group_set
-    from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
+    
     if request.method == "POST":
 
       new_grps_list = request.POST.getlist("new_groups_list[]", "")
