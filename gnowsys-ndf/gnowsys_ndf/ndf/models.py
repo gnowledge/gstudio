@@ -3311,9 +3311,9 @@ class Counter(DjangoDocument):
         'no_questions_attempted':int,
         'no_correct_answers':int,
         'no_incorrect_answers':int,
-        'no_notes_written':int,
 
         #notes
+        'no_notes_written':int,
         'no_views_gained_on_notes':int, # benchmark
         'no_others_notes_visited':int, # benchmark
         'no_comments_received_on_notes':int,
