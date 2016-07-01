@@ -44,6 +44,18 @@ class Command(BaseCommand):
 def create_or_update_counter(user_obj, group_id):
 
     counter_obj = counter_collection.one({'user_id': user_obj.id, 'group_id': group_id})
+    if counter_obj:
+        counter_obj.enrolled = True
+        counter_obj.save()
+    else:
+        counter_obj = counter_collection.collection.Counter()
+        counter_obj.user_id=user_obj.id
+        auth_obj= node_collection.one({'_type':'Author','created_by':user_obj.id})
+        counter_obj.auth_id=ObjectId(auth_obj._id)
+        counter_obj.group_id=ObjectId(group_id)
+        counter_obj.last_update=datetime.datetime.now()
+        counter_obj.enrolled = True
+        counter_obj.save()
     if not counter_obj:
         log_file.write("\n\nCreating Counter for User: "+ str(user_obj.id)+ "  Group :"+ str(group_id))
         counter_obj = counter_collection.collection.Counter()
@@ -65,7 +77,7 @@ def create_or_update_counter(user_obj, group_id):
 
     ## INTERACTIONS ##
     counter_obj.no_comments_by_user = analytics_instance.get_total_comments_by_user()
-
+    
     ## FILES ##
     # Get all files uploaded by user
     counter_obj.no_files_created = analytics_instance.get_user_files_count()
