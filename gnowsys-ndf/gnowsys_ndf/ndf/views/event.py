@@ -275,20 +275,19 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     end_time = node.attribute_set[1]['end_time']
     now = datetime.datetime.now()
 
-    buff = datetime.timedelta(hours=24)
+    buff_start = datetime.timedelta(hours=24)
 
-    beg = st_time - buff
-    en = end_time + buff
+    beg = st_time - buff_start
+    en = end_time
     days_left = 0
 
     if now <= en and beg <= now :
       active =  0
     elif now > en : 
       active = 1
-      days_left = (now-en).days
     else:
       active = -1  
-      days_left = (beg-now).days  
+      days_left = (beg-now).days 
 
     show = False
     is_moderator = False
@@ -321,11 +320,11 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
           show = True
           break      
     
-    SALT = '8cd8ef52e8e101574e400365b55e11a6'
-    URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/'
-    # SALT = '8e5018ee58116b9ebed38a80260f5bcb'
-    # URL = 'http://192.168.201.108/bigbluebutton/'
-    createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, '#')
+    # SALT = '8cd8ef52e8e101574e400365b55e11a6'
+    # URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/'
+    SALT = '8e5018ee58116b9ebed38a80260f5bcb'
+    URL = 'http://192.168.201.108/bigbluebutton/'
+    createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'logout.html')
     
     if is_moderator:
       url = joinURL(node._id, request.user, 'mPW', SALT, URL)
