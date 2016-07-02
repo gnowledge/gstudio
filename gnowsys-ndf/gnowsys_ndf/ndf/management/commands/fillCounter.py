@@ -58,6 +58,7 @@ def create_or_update_counter(user_obj, group_id):
     counter_obj.group_id = group_id
     counter_obj.user_id = user_obj.id
     counter_obj.enrolled = True
+    counter_obj.last_update = datetime.datetime.now()
     #counter_obj.modules_completed = analytics_instance.get_completed_modules_count()
     #counter_obj.units_completed = analytics_instance.get_completed_units_count()
     # Calculate points of user
