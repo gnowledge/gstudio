@@ -208,20 +208,34 @@ table, th, td {
                               </div>
                          </div>
                           {% endif %}
-                          
+
+                         <div class = "row"> 
                           {% with node.html_content|safe as description %}
                           {% if description != "None" %}
                          <div class="small-3 columns">
-                                <label>Brief description about event:</label>
+                                <label>Brief Description:</label>
                          </div>       
                           <div class="small-5 end columns">
                                 <label>{{ description }}</label>
                           </div>
+                          <br>
+                          <br>
                           {% endif %}
                           {% endwith %}
-
+                        </div>
+                        
 
                           {% if is_bbb %}
+
+                          <div class="row">
+                            <div class="small-3 columns">
+                              <label>Meeting Type:</label>
+                            </div>
+                            <div class="small-5 end columns">
+                              <label>Online</label>
+                            </div>
+                          </div>
+                          <br>
 
                           {% if show%}
 
@@ -250,11 +264,15 @@ table, th, td {
                           {% endif %}
 
                           {% else %}
-
-                             <div align = "center">
-                             <button disabled>{{node.name}} is an offline meeting</button>
+                            <div class="row">
+                              <div class="small-3 columns">
+                                <label>Meeting Type:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>Offline</label>
+                              </div>
                             </div>
-
+                            
                           {% endif %}
                     
                     </fieldset>   
