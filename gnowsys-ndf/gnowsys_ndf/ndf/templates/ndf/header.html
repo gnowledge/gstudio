@@ -314,7 +314,7 @@
                   {# --{{request.session.buddies_authid_name_dict}}-- #}
             {% endif %}
 			<li class="text-center">
-              <a href='/state_analytics'>{% trans "State Analytics" %}</a>
+              <a href="{% url 'map_view' groupid %}">{% trans "State Analytics" %}</a>
             </li>
             <li>
               <a class="logout" href="{% url 'auth_logout' %}">

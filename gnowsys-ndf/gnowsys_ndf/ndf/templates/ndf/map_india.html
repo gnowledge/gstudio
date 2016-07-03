@@ -376,7 +376,7 @@ d3.json("/static/ndf/js/india_map.topo.json", function(error, states) {
     .on("click", state_clicked)
     .on('mouseover', function(d){
       if(!$('#info_bar').hasClass('disabled')){
-        $('#info_bar').text(states_code[d.properties.name]);
+        $('#info_bar').text(d.properties.name);
         $('#info_bar').show();
       }
     })

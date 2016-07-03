@@ -1,0 +1,122 @@
+[
+    {
+        "State Code": "AP", 
+        "Name": "Andhra Pradesh"
+    }, 
+    {
+        "State Code": "AR", 
+        "Name": "Arunachal Pradesh"
+    }, 
+    {
+        "State Code": "AS", 
+        "Name": "Assam"
+    }, 
+    {
+        "State Code": "BR", 
+        "Name": "Bihar"
+    }, 
+    {
+        "State Code": "CT", 
+        "Name": "Chhattisgarh"
+    }, 
+    {
+        "State Code": "DL", 
+        "Name": "Delhi"
+    }, 
+    {
+        "State Code": "GA", 
+        "Name": "Goa"
+    }, 
+    {
+        "State Code": "GJ", 
+        "Name": "Gujarat"
+    }, 
+    {
+        "State Code": "HR", 
+        "Name": "Haryana"
+    }, 
+    {
+        "State Code": "HP", 
+        "Name": "Himachal Pradesh"
+    }, 
+    {
+        "State Code": "JK", 
+        "Name": "Jammu & Kashmir"
+    }, 
+    {
+        "State Code": "JH", 
+        "Name": "Jharkhand"
+    }, 
+    {
+        "State Code": "KA", 
+        "Name": "Karnataka"
+    }, 
+    {
+        "State Code": "KL", 
+        "Name": "Kerala"
+    }, 
+    {
+        "State Code": "MP", 
+        "Name": "Madhya Pradesh"
+    }, 
+    {
+        "State Code": "MH", 
+        "Name": "Maharashtra"
+    }, 
+    {
+        "State Code": "MN", 
+        "Name": "Manipur"
+    }, 
+    {
+        "State Code": "ML", 
+        "Name": "Meghalaya"
+    }, 
+    {
+        "State Code": "MZ", 
+        "Name": "Mizoram"
+    }, 
+    {
+        "State Code": "NL", 
+        "Name": "Nagaland"
+    }, 
+    {
+        "State Code": "OR", 
+        "Name": "Odisha"
+    }, 
+    {
+        "State Code": "PB", 
+        "Name": "Punjab"
+    }, 
+    {
+        "State Code": "RJ", 
+        "Name": "Rajasthan"
+    }, 
+    {
+        "State Code": "SK", 
+        "Name": "Sikkim"
+    }, 
+    {
+        "State Code": "TN", 
+        "Name": "Tamil Nadu"
+    }, 
+    {
+        "State Code": "TL", 
+        "Name": "Telangana"
+    }, 
+    {
+        "State Code": "TR", 
+        "Name": "Tripura"
+    }, 
+    {
+        "State Code": "UT", 
+        "Name": "Uttarakhand"
+    }, 
+    {
+        "State Code": "UP", 
+        "Name": "Uttar Pradesh"
+    }, 
+    {
+        "State Code": "WB", 
+        "Name": "West Bengal"
+    }
+]
