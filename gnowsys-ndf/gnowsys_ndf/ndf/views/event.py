@@ -289,10 +289,6 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       active = -1  
       days_left = (st_time-now).days 
 
-    print "*******"  
-    print st_time
-    print "*******"  
-
     show = False
     is_moderator = False
 
@@ -324,6 +320,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
           show = True
           break      
     
+    bbb = node.is_bigbluebutton      
+
     # SALT = '8cd8ef52e8e101574e400365b55e11a6'
     # URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/'
     SALT = '8e5018ee58116b9ebed38a80260f5bcb'
@@ -333,7 +331,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     if is_moderator:
       url = joinURL(node._id, request.user, 'mPW', SALT, URL)
     else:
-        url = joinURL(node._id, request.user, 'aPW', SALT, URL)    
+        url = joinURL(node._id, request.user, 'aPW', SALT, URL)        
 
     context_variables = { 'groupid': group_id, 
                           'app_id': app_id,'app_collection_set': app_collection_set, 
@@ -352,6 +350,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                           'url':url,
                           'active':active,
                           'days_left':days_left,
+                          'is_bbb': bbb,
                            # 'property_order_list': property_order_list
                         }
   else:
@@ -393,7 +392,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       elif attr and u"max_marks" in attr:
         session_max_marks = attr[u"max_marks"]
     context_variables.update({'session_min_marks':session_min_marks})
-    context_variables.update({'session_max_marks':session_max_marks})
+    context_variables.update({'session_max_marks':session_max_marks}) 
 
   return render_to_response(template, 
                               context_variables,
@@ -492,7 +491,12 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
         # print "-----------------Name------------------"
         # print name
         event_gs.name=name 
-    
+
+    if request.POST.get("is_bigbluebutton") == unicode("Yes"):
+      event_gs.is_bigbluebutton = True
+    else:
+      event_gs.is_bigbluebutton = False  
+
     event_gs.save(is_changed=is_changed,groupid=group_id)
     # print "\n Event: ", event_gs._id, " -- ", event_gs.name, "\n"
   
@@ -562,9 +566,6 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               # field_instance_type = "GRelation"
               #code for creation of relation Session of 
               for i, field_value in enumerate(field_value_list):
-                print "#######"
-                print field_value
-                print "#######"
                 field_value = parse_template_data(ObjectId, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
                 field_value_list[i] = field_value
               if field_value_list:

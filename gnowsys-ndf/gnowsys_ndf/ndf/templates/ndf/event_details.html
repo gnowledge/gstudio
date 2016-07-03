@@ -221,7 +221,9 @@ table, th, td {
                           {% endwith %}
 
 
-                          {% if show %}
+                          {% if is_bbb %}
+
+                          {% if show%}
 
                             {%if active == 0%}
 
@@ -245,6 +247,14 @@ table, th, td {
                            <div align = "center">
                           <button disabled>You are not invited for {{node.name}}</button>
                           </div>  
+                          {% endif %}
+
+                          {% else %}
+
+                             <div align = "center">
+                             <button disabled>{{node.name}} is an offline meeting</button>
+                            </div>
+
                           {% endif %}
                     
                     </fieldset>   
