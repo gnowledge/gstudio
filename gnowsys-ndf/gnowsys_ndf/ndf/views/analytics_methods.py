@@ -9,9 +9,8 @@ benchmark_collection = db[Benchmark.collection_name]
 class AnalyticsMethods(object):
 	# print "=== Class Defination === "
 
-	def __init__(self, request, user_id, username, group_id):
+	def __init__(self, user_id, username, group_id):
 		super(AnalyticsMethods, self).__init__()
-		self.request = request
 		self.group_id = group_id
 		self.group_obj = node_collection.one({'_id': ObjectId(self.group_id)})
 		self.user_id = user_id

@@ -2510,7 +2510,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
     user_obj = User.objects.get(pk=int(user_id))
     analytics_data['username'] = user_obj.username
 
-    analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+    analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
 
@@ -2762,7 +2762,7 @@ def course_analytics_admin(request, group_id):
     for uid, gsts in ud.iteritems():
         fd[uid] = {gst_name_id_dict[g]: gsts[g]*gst_name_point_dict[g] for g in gsts}
         ua_dict = fd[uid]
-        analytics_instance = AnalyticsMethods(request, uid, user_id_name_dict[uid], group_id)
+        analytics_instance = AnalyticsMethods(uid, user_id_name_dict[uid], group_id)
         correct_attempted_quizitems = analytics_instance.get_evaluated_quizitems_count(True,False)
         ua_dict['quiz_points'] = correct_attempted_quizitems * GSTUDIO_QUIZ_CORRECT_POINTS
 

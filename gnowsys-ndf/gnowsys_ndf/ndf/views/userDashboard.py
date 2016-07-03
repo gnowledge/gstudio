@@ -687,7 +687,7 @@ def my_dashboard(request, group_id):
     title = 'My Dashboard'
 
     cmnts_rcvd_by_user = 0
-    analytics_instance = AnalyticsMethods(request, user_id,user_obj.username, auth_id)
+    analytics_instance = AnalyticsMethods(user_id,user_obj.username, auth_id)
     users_points = analytics_instance.get_users_points()
     total_cmnts_by_user = analytics_instance.get_total_comments_by_user(site_wide=True)
     cmts_on_user_notes = analytics_instance.get_comments_counts_on_users_notes(False, site_wide=True)
