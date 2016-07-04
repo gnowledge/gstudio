@@ -267,45 +267,70 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     Add="Stop"       
   #fecth the data
 
-  if (None != app_set_instance_id):
+  if app_set_instance_id: #only if we view details of the particular event
+    if request.user:
+      usr = node_collection.one({'_type':u'Author','name':unicode(request.user)})
+      usrid = usr._id
 
-    usr = node_collection.one({'_type':u'Author','name':unicode(request.user)})
-    usrid = usr._id
-
-    y = node.relation_set
-
-    st_time = node.attribute_set[0]['start_time']
-    end_time = node.attribute_set[1]['end_time']
+    for i in node.attribute_set:
+      try:
+        start_time = i['start_time']
+        break
+      except:
+        pass
+    # st_time = node.attribute_set[0]['start_time']
+    
+    for i in node.attribute_set:
+      try:
+        end_time = i['end_time']
+        break
+      except:
+        pass
+    
+    # end_time = node.attribute_set[1]['end_time']
+    
     now = datetime.datetime.now()
 
     buff_start = datetime.timedelta(hours=24)
 
-    beg = st_time - buff_start
-    en = end_time
+    beg = start_time - buff_start
+    end = end_time
     days_left = 0
 
-    if now <= en and beg <= now :
+    if now <= end and beg <= now :
       active =  0
-    elif now > en : 
+    elif now > end : 
       active = 1
+      # print "############"
+      # for i,v in enumerate(node.attribute_set):
+      #   try:
+      #     if v['event_status']:
+      #       node.attribute_set[i]['event_status'] = unicode('Completed')
+      #       print node.attribute_set[i]['event_status']
+      #       node.save()
+      #       print "###############"
+      #       print "Completed"
+      #       break
+      #   except:
+      #     pass
     else:
       active = -1  
-      days_left = (st_time-now).days 
+      days_left = (start_time-now).days 
 
-    show = False
+    is_attendee = False
     is_moderator = False
 
     attendee_list = []
     moderator_list = []
 
-    for i in y:
+    for i in node.relation_set:
       try:
         attendee_list =  i['has_attendees']
         break
       except:
         pass
 
-    for i in y:
+    for i in node.relation_set:
       try:
         moderator_list = i['event_coordinator']
         break
@@ -314,23 +339,31 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
     for i in moderator_list:
       if usrid == i:
-        show = True
+        is_attendee = True
         is_moderator = True
 
     if not is_moderator:    
       for i in attendee_list:
         if usrid == i:
-          show = True
+          is_attendee = True
           break      
-    
-    bbb = node.is_bigbluebutton 
+#####################
+    bbb = False
+    for i in node.attribute_set:
+      try:
+        bbb = i['is_bigbluebutton']
+        break
+      except:
+        pass
 
+    # bbb = node.is_bigbluebutton 
+#####################
     createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'logout.html')
     
     if is_moderator:
       url = joinURL(node._id, request.user, 'mPW', SALT, URL)
     else:
-        url = joinURL(node._id, request.user, 'aPW', SALT, URL)        
+      url = joinURL(node._id, request.user, 'aPW', SALT, URL)        
 
     context_variables = { 'groupid': group_id, 
                           'app_id': app_id,'app_collection_set': app_collection_set, 
@@ -345,7 +378,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                           'task_attendance' : event_task_Attendance_reschedule,
                           'marks_entry_completed' :marks_entry_completed,
                           'Eventtype':Eventtype, 
-                          'show':show,
+                          'show':is_attendee,
                           'url':url,
                           'active':active,
                           'days_left':days_left,
@@ -491,10 +524,10 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
         # print name
         event_gs.name=name 
 
-    if request.POST.get("is_bigbluebutton") == unicode("Yes"):
-      event_gs.is_bigbluebutton = True
-    else:
-      event_gs.is_bigbluebutton = False  
+    # if request.POST.get("is_bigbluebutton") == unicode("Yes"):
+    #   event_gs.is_bigbluebutton = True
+    # else:
+    #   event_gs.is_bigbluebutton = False  
 
     event_gs.save(is_changed=is_changed,groupid=group_id)
     # print "\n Event: ", event_gs._id, " -- ", event_gs.name, "\n"
