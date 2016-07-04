@@ -17,6 +17,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
+from gnowsys_ndf.ndf.views.methods import get_counter_obj
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
@@ -336,7 +337,7 @@ def save_quizitem_answer(request, group_id):
             new_list = []
             user_given_ans = request.POST.getlist("user_given_ans[]", '')
 
-            #print 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',user_given_ans
+            
             node_id = request.POST.get("node", '')
             # print "\n\n user_give_ans",user_given_ans
             node_obj = node_collection.one({'_id': ObjectId(node_id)})
@@ -427,7 +428,7 @@ def save_quizitem_answer(request, group_id):
                 response_dict['count'] = len(new_list)
                 response_dict['success'] = True
                 #code to update counter collection
-                counter_obj=counter_collection.one({'group_id':group_id,'user_id':user_id})
+                counter_obj=get_counter_obj(user_id,group_id)
                 if already_ans_obj==None:
                     for one_att in user_ans.attribute_set:
                         if 'quizitempost_user_submitted_ans' in one_att:
@@ -437,15 +438,45 @@ def save_quizitem_answer(request, group_id):
                 for num in node_obj.attribute_set:
                     if 'correct_answer' in num:
                         cor_ans=num['correct_answer']
+                    if 'quiz_type' in num:
+                        type_of_quiz=num['quiz_type']
                 
                 for one_att in user_ans.attribute_set:
                     if 'quizitempost_user_submitted_ans' in one_att:
-                        if len(one_att['quizitempost_user_submitted_ans'])!=0:
-                            if cmp(cor_ans,user_given_ans)==0:
+                        if type_of_quiz=='Single-Choice':
+                            if len(one_att['quizitempost_user_submitted_ans'])!=0:
+                                if cmp(cor_ans,user_given_ans)==0:
+                                    counter_obj.no_correct_answers+=1
+                                    counter_obj.save()
+                                else:
+                                    counter_obj.no_incorrect_answers+=1
+                                    counter_obj.save()
+                        if type_of_quiz=='Multiple-Choice':
+                            if len(one_att['quizitempost_user_submitted_ans'])!=0:
+                                search=True
+                                i=0
+                                user_given_ans=[x.encode('UTF8') for x in user_given_ans]
+                                cor_ans=[x.encode('UTF8') for x in cor_ans]
+                                
+
+                                while i<len(user_given_ans):
+
+                                    try:
+                                        cor_ans.index(user_given_ans[i])
+                                        search=True
+                                        i=i+1
+                                    except Exception as e1:
+                                        search=False
+                                        break
+                                if search==True:
+                                    counter_obj.no_correct_answers+=1
+                                    counter_obj.save()
+                                else:
+                                    counter_obj.no_incorrect_answers+=1
+                                    counter_obj.save()
+                        if type_of_quiz=='Short-Response':
+                            if len(user_given_ans)!=0:
                                 counter_obj.no_correct_answers+=1
-                                counter_obj.save()
-                            else:
-                                counter_obj.no_incorrect_answers+=1
                                 counter_obj.save()
                 #updated counter collection            	
 
