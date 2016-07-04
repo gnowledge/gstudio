@@ -32,6 +32,9 @@ from gnowsys_ndf.notification import models as notification
 ''' -- imports for bigbluebutton wrappers -- '''
 from bbb_api import *
 
+''' -- import bigbluebutton server settings -- '''
+from gnowsys_ndf.local_settings import *
+
 @get_execution_time
 @login_required
 def event(request, group_id):
@@ -320,12 +323,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
           show = True
           break      
     
-    bbb = node.is_bigbluebutton      
+    bbb = node.is_bigbluebutton 
 
-    # SALT = '8cd8ef52e8e101574e400365b55e11a6'
-    # URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/'
-    SALT = '8e5018ee58116b9ebed38a80260f5bcb'
-    URL = 'http://192.168.201.108/bigbluebutton/'
     createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'logout.html')
     
     if is_moderator:
