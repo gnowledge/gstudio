@@ -68,6 +68,9 @@ def create_or_update_counter(user_obj, group_id):
     ## INTERACTIONS ##
     counter_obj.no_comments_by_user = analytics_instance.get_total_comments_by_user()
     counter_obj.no_comments_for_user = analytics_instance.get_total_comments_for_user()
+
+    counter_obj.rating_count_received_on_files = analytics_instance.get_ratings_counts_received_on_files()
+    counter_obj.rating_count_received_on_notes = analytics_instance.get_ratings_counts_received_on_notes()
     ## FILES ##
     # Get all files uploaded by user
     counter_obj.no_files_created = analytics_instance.get_user_files_count()

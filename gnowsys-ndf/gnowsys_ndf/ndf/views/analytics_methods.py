@@ -721,3 +721,61 @@ class AnalyticsMethods(object):
 	 		return self.all_comments_on_user_notes.count() + self.all_comments_on_user_files.count()
 	 	else:
 	 		return 0	
+
+
+	def get_ratings_counts_received_on_files(self):
+
+		total_rating = 0
+		unique_user_list = []
+
+		if not hasattr(self,"file_gst"):
+			self.file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"},{'_id': 1})
+		rcvd_files_ratings_query = {'member_of': self.file_gst._id, 'created_by': self.user_id, 'group_set': self.group_obj._id,
+		'created_by': self.user_id }
+		all_files = node_collection.collection.aggregate([
+						{ "$match": rcvd_files_ratings_query },
+						{ "$unwind": "$rating" },
+						{ "$group": { "_id": None, "count": { "$sum": 1 }, "rating": { "$addToSet": "$rating" } } }
+					])
+		if 'result' in all_files:
+			result = all_files['result']
+			if result:
+				cnt = result[0]['count']
+				rating_list = result[0]['rating']
+				for rdict in rating_list:
+					total_rating += rdict['score']
+					if rdict['user_id'] not in unique_user_list:
+						unique_user_list.append(rdict['user_id'])
+ 		
+ 		return total_rating
+
+ 	def get_ratings_counts_received_on_notes(self):
+
+		total_rating = 0
+		unique_user_list = []
+		if not hasattr(self, 'page_gst'):
+			self.page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"},{'_id': 1})
+		if not hasattr(self, 'blog_page_gst'):
+			self.blog_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"},{'_id': 1})
+		rcvd_notes_ratings_query = {'member_of': self.page_gst._id,'type_of': self.blog_page_gst._id,'group_set': self.group_obj._id,
+				'created_by': self.user_id }
+		# print "\n\nrcvd_notes_ratings_query", rcvd_notes_ratings_query
+
+		all_notes = node_collection.collection.aggregate([
+						{ "$match": rcvd_notes_ratings_query },
+						{ "$unwind": "$rating" },
+						{ "$group": { "_id": None, "count": { "$sum": 1 }, "rating": { "$addToSet": "$rating" } } }
+					])
+		if 'result' in all_notes:
+			result = all_notes['result']
+			if result:
+				cnt = result[0]['count']
+				rating_list = result[0]['rating']
+				for rdict in rating_list:
+					total_rating += rdict['score']
+					if rdict['user_id'] not in unique_user_list:
+						unique_user_list.append(rdict['user_id'])
+
+
+		# return avg_rating_notes,len(unique_user_list)
+		return total_rating
