@@ -685,3 +685,39 @@ class AnalyticsMethods(object):
 
 		groups_cur = node_collection.find({'_type': "Group", 'author_set': self.user_id})
 		return groups_cur
+
+	def get_total_comments_for_user(self,return_cur_obj=False,site_wide=False):
+	
+		if site_wide:
+			self.user_notes_cur = self.get_user_notes_count(True, True)
+			self.user_files_cur = self.get_user_files_count(True, True)
+	 	else:
+	 		self.user_notes_cur = self.get_user_notes_count(True)
+	 		self.user_files_cur = self.get_user_files_count(True)
+
+	 	user_notes_cur_ids = [each_user_note._id for each_user_note in self.user_notes_cur]
+	 	user_files_cur_ids = [each_user_file._id for each_user_file in self.user_files_cur]
+
+	 	if not hasattr(self, "reply_gst"):
+	 		self.reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"},{'_id': 1})
+
+	 	list_of_dict_notes = []
+	 	list_of_dict_files = []
+	 	for each_user_note_id in user_notes_cur_ids:
+	 		list_of_dict_notes.append({'prior_node_id_of_thread': ObjectId(each_user_note_id)})
+	 	for each_user_file_id in user_files_cur_ids:
+	 		list_of_dict_files.append({'prior_node_id_of_thread': ObjectId(each_user_file_id)})	
+
+	 	self.all_comments_on_user_notes = node_collection.find({'member_of': self.reply_gst._id, 'origin': {'$in': list_of_dict_notes}},{'_id': 1, 'created_by': 1})
+	 	self.all_comments_on_user_files = node_collection.find({'member_of': self.reply_gst._id, 'origin': {'$in': list_of_dict_files}},{'_id': 1, 'created_by': 1})
+	 	if return_cur_obj:
+
+
+
+	 		return self.all_comments_on_user_notes + self.all_comments_on_user_files
+
+
+	 	if self.all_comments_on_user_notes or self.all_comments_on_user_files:
+	 		return self.all_comments_on_user_notes.count() + self.all_comments_on_user_files.count()
+	 	else:
+	 		return 0	

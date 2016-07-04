@@ -61,13 +61,13 @@ def create_or_update_counter(user_obj, group_id):
     counter_obj.last_update = datetime.datetime.now()
     #counter_obj.modules_completed = analytics_instance.get_completed_modules_count()
     #counter_obj.units_completed = analytics_instance.get_completed_units_count()
-    # Calculate points of user
+    #Calculate points of user
     #counter_obj.course_score = analytics_instance.get_users_points()
     # Get all comments posted by user
 
     ## INTERACTIONS ##
     counter_obj.no_comments_by_user = analytics_instance.get_total_comments_by_user()
-    
+    counter_obj.no_comments_for_user = analytics_instance.get_total_comments_for_user()
     ## FILES ##
     # Get all files uploaded by user
     counter_obj.no_files_created = analytics_instance.get_user_files_count()
