@@ -67,7 +67,7 @@ def ratings(request, group_id, node_id):
 			total_rating=counter_obj.rating_count_received_on_files*counter_obj.avg_rating_received_on_files
 			total_rating=total_rating+int(rating)
 			counter_obj.rating_count_received_on_files+=1
-			counter_obj.avg_rating_received_on_files=total_rating/counter_obj.rating_count_received_on*_files
+			counter_obj.avg_rating_received_on_files=total_rating/counter_obj.rating_count_received_on_files
 			counter_obj.save()
 
 	# done modifying ratings for counter collection
