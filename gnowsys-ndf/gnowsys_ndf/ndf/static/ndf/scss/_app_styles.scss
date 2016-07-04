@@ -460,49 +460,94 @@ body{
 
 
 
-body>footer{
+body>footer {
   //Site footer
-  padding:10px 10px;
+  padding:10px 5px;
   position: relative;
-  color:#888;
-  min-height: 170px;
-  background-color: rgba(0,0,0,0.8);
+  background-color: rgb(93, 5, 95);
 
-
-  section:first-child{
-     //border-bottom: 1px solid #222;
-     margin-bottom: 1rem;
-
-   }
-
-   a{
-
-    color: #bbbbbb ;
-    //margin-left:10px;
-    &:hover{
-      color:#03a9f4 !important;
-
+  p {
+    margin: 10px;
+    font-size: 18px;
+  }
+  h2 {
+    font-size: 25px;
+  }
+  li {
+    color: #BBBBBB;
+  }
+  a {
+    color: #BBBBBB;
+    margin-top:0;
+    padding: 0;
+    display: inline;
+    &:hover {
+      text-decoration: none;
+      color: #3824a5;
+      margin-top:0;
+      padding: 0;
+      display: inline;
     }
   }
-  .footer-meta {
-    color: #B3B3B3;
-    strong a {
-      color: #B3B3B3;
+
+  .myfooter {
+    ul {
+      list-style-type: none;
+      text-decoration: none;
+      li {
+        font-size: 15px;
+        margin-bottom: 5px;
+      }
+    }
+  }
+  .footer-section {
+    color: #FFFFFF;
+    text-align: center;
+  }
+  .inline_mar-right {
+    display: inline-block;
+    margin: 0 25px 15px 0;
+  }
+  //Footer links
+  .footer_content {
+    margin: 20px;
+  }
+  .footer_link_content {
+    display:inline-block;
+    vertical-align: top;
+    margin:20px;
+    text-align: left;
+  }
+  .links_collapse {
+    max-height: 78px;
+    overflow: hidden;
+    transition: all 0.5s ease-out;
+
+    ul {
+      list-style-type: none;
+      text-decoration: none;
+      display: inline;
+      padding: 0;
+      margin: 0px !important;
+    }
+  }
+  .links_show {
+    //change as per requirement on addition on more links in future
+    max-height: 600px;
+  }
+  .show_foot_links {
+    color: #666666;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
   .footer-logo {
     height: 65px;
     width: 150px;
   }
-  .columns ul {
-    margin: 10px 0px;
-  }
-  strong a{
-    border-bottom: 1px dotted #555;
-    //margin-bottom:rem;
-  }
 }
-
 
 .coll-arrows{
     cursor:pointer;
