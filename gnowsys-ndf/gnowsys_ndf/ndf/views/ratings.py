@@ -41,7 +41,7 @@ def ratings(request, group_id, node_id):
 			unique=False
 			if blog:
 				if blog.name=='Blog page':
-					total_rating=counter_obj.rating_count_received_on_notes*counter_obj.avg_rating_received_on_note
+					total_rating=counter_obj.rating_count_received_on_notes*counter_obj.avg_rating_received_on_notes
 					total_rating=total_rating-rat['score']
 					total_rating=total_rating+int(rating)
 					if counter_obj.rating_count_received_on_notes!=0:
