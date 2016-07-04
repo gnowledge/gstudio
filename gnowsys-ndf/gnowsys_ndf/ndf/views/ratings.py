@@ -41,33 +41,33 @@ def ratings(request, group_id, node_id):
 			unique=False
 			if blog:
 				if blog.name=='Blog page':
-					total_rating=counter_obj.rating_count_notes*counter_obj.avg_rating_awarded_notes
+					total_rating=counter_obj.rating_count_received_on_notes*counter_obj.avg_rating_received_on_note
 					total_rating=total_rating-rat['score']
 					total_rating=total_rating+int(rating)
-					if counter_obj.rating_count_notes!=0:
-						counter_obj.avg_rating_awarded_notes=total_rating/counter_obj.rating_count_notes
+					if counter_obj.rating_count_received_on_notes!=0:
+						counter_obj.avg_rating_received_on_notes=total_rating/counter_obj.rating_count_received_on_notes
 					counter_obj.save()
 			if blog==None:
-				total_rating=counter_obj.rating_count_files*counter_obj.avg_rating_awarded_files
+				total_rating=counter_obj.rating_count_received_on_files*counter_obj.avg_rating_received_on_files
 				total_rating=total_rating-rat['score']
 				total_rating=total_rating+int(rating)
-				if counter_obj.rating_count_files!=0:
-					counter_obj.avg_rating_awarded_files=total_rating/counter_obj.rating_count_files
+				if counter_obj.rating_count_received_on_files!=0:
+					counter_obj.avg_rating_received_on_files=total_rating/counter_obj.rating_count_received_on_files
 				counter_obj.save()
 
 	if unique:
 		if blog:
 			if blog.name=='Blog page':
-				total_rating=counter_obj.rating_count_notes*counter_obj.avg_rating_awarded_notes
+				total_rating=counter_obj.rating_count_received_on_notes*counter_obj.avg_rating_receivced_on_notes
 				total_rating=total_rating+int(rating)
-				counter_obj.rating_count_notes+=1
-				counter_obj.avg_rating_awarded_notes=total_rating/counter_obj.rating_count_notes
+				counter_obj.rating_count_received_on_notes+=1
+				counter_obj.avg_rating_received_on_notes=total_rating/counter_obj.rating_count_received_on_notes
 				counter_obj.save()
 		if blog==None:
-			total_rating=counter_obj.rating_count_files*counter_obj.avg_rating_awarded_files
+			total_rating=counter_obj.rating_count_received_on_files*counter_obj.avg_rating_received_on_files
 			total_rating=total_rating+int(rating)
-			counter_obj.rating_count_files+=1
-			counter_obj.avg_rating_awarded_files=total_rating/counter_obj.rating_count_files
+			counter_obj.rating_count_received_on_files+=1
+			counter_obj.avg_rating_received_on_files=total_rating/counter_obj.rating_count_received_on_files
 			counter_obj.save()
 
 	# done modifying ratings for counter collection

@@ -2146,9 +2146,9 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         if file_creator_id != counter_obj.user_id :
             counter_obj.no_others_files_visited += 1
             counter_obj_creator = get_counter_obj(file_creator_id,ObjectId(group_id))
-            counter_obj_creator.no_visits_gained += 1
-            counter_obj.last_update = datetime.today()
-            counter_obj_creator.last_update = datetime.today()
+            counter_obj_creator.no_visits_gained_on_files += 1
+            counter_obj.last_update = datetime.datetime.now()
+            counter_obj_creator.last_update = datetime.datetime.now()
             counter_obj.save()
             counter_obj_creator.save()
     else:
@@ -2512,7 +2512,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
     user_obj = User.objects.get(pk=int(user_id))
     analytics_data['username'] = user_obj.username
 
-    analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+    analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
 
@@ -2764,7 +2764,7 @@ def course_analytics_admin(request, group_id):
     for uid, gsts in ud.iteritems():
         fd[uid] = {gst_name_id_dict[g]: gsts[g]*gst_name_point_dict[g] for g in gsts}
         ua_dict = fd[uid]
-        analytics_instance = AnalyticsMethods(request, uid, user_id_name_dict[uid], group_id)
+        analytics_instance = AnalyticsMethods(uid, user_id_name_dict[uid], group_id)
         correct_attempted_quizitems = analytics_instance.get_evaluated_quizitems_count(True,False)
         ua_dict['quiz_points'] = correct_attempted_quizitems * GSTUDIO_QUIZ_CORRECT_POINTS
 

@@ -1,0 +1,48 @@
+subject_type,member_of,name,altnames,inverse_name,object_type,object_cardinality
+"[""Person""]","[""Binary""]",person_belongs_to_country,Country;Person,country_of_person,"[""Country""]",1
+"[""College"", ""University""]","[""Binary""]",organization_belongs_to_country,Country;Organisation/Institute,country_of_organization,"[""Country""]",1
+"[""Person""]","[""Binary""]",person_belongs_to_state,State;Person,state_of_person,"[""State""]",1
+"[""College"", ""University""]","[""Binary""]",organization_belongs_to_state,State;Organisation/Institute,state_of_organization,"[""State""]",1
+"[""Person""]","[""Binary""]",person_belongs_to_district,District;Person,district_of_person,"[""District""]",1
+"[""College"", ""University""]","[""Binary""]",organization_belongs_to_district,District;Organisation/Institute,district_of_organization,"[""District""]",1
+"[""Student""]","[""Binary""]",student_belongs_to_college,College ( Graduation );Student,college_of_student,"[""College""]",1
+"[""Student""]","[""Binary""]",student_belongs_to_university,University;Student,university_of_student,"[""University""]",1
+"[""Person""]","[""Binary""]",contact_person,College(s);Contact Person(s),has_contact_person,"[""College""]",100
+"[""Faculty Coordinator""]","[""Binary""]",faculty_incharge_of_university,University;Faculty Coordinator(s),has_faculty_incharge,"[""University""]",100
+"[""Faculty Coordinator""]","[""Binary""]",faculty_incharge_of_college,College(s);Faculty Coordinator(s),has_faculty_incharge,"[""College""]",100
+"[""Program Officer""]","[""Binary""]",officer_incharge_of,College(s);Program Officer(s),has_officer_incharge,"[""College""]",100
+"[""NSS Coordinator""]","[""Binary""]",nss_coordinator_of,College;NSS Coordinator,has_nss_coordinator,"[""College""]",1
+"[""University""]","[""Binary""]",affiliated_college,Affiliated Colleges;Affiliated to,college_affiliated_to,"[""College""]",100
+"[""Event""]","[""Binary""]",event_organised_by,Organised by;Event(s),organiser_of_event,"[""College"", ""University""]",100
+"[""Event""]","[""Binary""]",event_coordinator,Coordinator(s);Event(s),coordinator_of_event,"[""Person"", ""Author""]",100
+"[""Event""]","[""Binary""]",event_has_participants,Participant(s)/Attende(es);Event(s),participated_in_event,"[""Person"", ""Author""]",100
+"[""Event""]","[""Binary""]",has_attended,Attended;Event,attended_event,"[""Person"", ""Author""]",100
+"[""Event""]","[""Binary""]",has_attendees,Attendees;Event,attende_event,"[""Person"", ""Author""]",100
+"[""Event""]","[""Binary""]",session_of,Session of;Classroom Session Event,has_classroom_session,"[""CourseSubSection""]",1
+"[""NUSSD Course""]","[""Binary""]",course_has_event,Event(s);Course(s),event_of_course,"[""Event""]",100
+"[""Announced Course""]","[""Binary""]",announced_for,Course;Announced Course,announced_as,"[""NUSSD Course"",""Course""]",1
+"[""Announced Course""]","[""Binary""]",acourse_for_college,College;Announced Course,college_has_acourse,"[""College"",""Group"",""Author""]",1
+"[""Student""]","[""Binary""]",student_of_caste_category,Caste;Student,caste_category_of_student,"[""Caste""]",1
+"[""Student""]","[""Binary""]",student_has_domicile,State/Union Territory of Domicile;Student,domicile_of_student,"[""State""]",1
+"[""Student""]","[""Binary""]",selected_course,Enrolled in Course(s);Student(s),course_selected,"[""Announced Course""]",100
+"[""Voluntary Teacher""]","[""Binary""]",trainer_of_course,Volunteer to teach Course;Volunteered by,course_has_trainer,"[""NUSSD Course""]",100
+"[""Voluntary Teacher""]","[""Binary""]",trainer_of_college,Volunteer to teach College;Volunteered by,college_has_trainer,"[""College""]",100
+"[""Voluntary Teacher""]","[""Triadic""]",trainer_teaches_course_in_college,Volunteer to teach Course in College;Volunteered by,course_in_college_taught_by,"[[""NUSSD Course""], [""College""]]",100
+"[""Master Trainer""]","[""Binary""]",master_trainer_of_course,Volunteer to teach Course(s) [At max. 2];Master Trainer,course_has_master_trainer,"[""NUSSD Course""]",100
+"[""Master Trainer""]","[""Binary""]",master_trainer_of_university,University;Master Trainer,university_has_master_trainer,"[""University""]",100
+"[""Course Developer""]","[""Binary""]",developer_of_course,Volunteer to develop Course;Developed by,course_has_developer,"[""NUSSD Course""]",100
+"[""District""]","[""Binary""]",district_of,State;District(s),has_district,"[""State""]",1
+"[""College""]","[""Binary""]",has_group,Group;Group for,group_of,"[""Group""]",1
+"[""Person""]","[""Binary""]",has_login,Login link;Login for,login_of,"[""Author""]",1
+"[""Group""]","[""Binary""]",group_has_batch,Group;Batch,batch_in_group,"[""Batch""]",100
+"[""Batch""]","[""Binary""]",has_batch_member,Batch;Member(s),batch_member_of,"[""Student""]",100
+"[""Batch""]","[""Binary""]",has_course,Batch Course,course_of,"[""Announced Course""]",1
+"[""StudentCourseEnrollment""]","[""Binary""]",for_acourse,Course;Enrollment,course_has_enrollment,"[""Announced Course""]",100
+"[""StudentCourseEnrollment""]","[""Binary""]",for_college,College;Enrollment,college_has_enrollment,"[""College""]",1
+"[""StudentCourseEnrollment""]","[""Binary""]",for_university,University;Enrollment,university_has_enrollment,"[""University""]",1
+"[""StudentCourseEnrollment"",""Page"",""File""]","[""Binary""]",has_current_approval_task,Approval Task;Enrollment,task_for_enrollment_approval,"[""Task""]",1
+"[""Event""]","[""Binary""]",event_has_batch,Batch;Event,batch_for_event,"[""Batch""]",1
+"[""CourseEventGroup""]","[""Binary""]",group_has_course_event,CourseEventGroup;Course,course_event_for_group,"[""Course""]",1
+"[""Course"",""Group"",""ProgramEventGroup"",""PartnerGroup""]","[""Binary""]",has_logo,Course;File,logo_of,"[""File""]",1
+"[""QuizItemEvent"",""Page"",""File""]","[""Binary""]",clone_of,QuizItemEvent;QuizItem,has_clone,"[""QuizItem"",""Page"",""File""]",1
+"[""QuizItem"",""QuizItemEvent"",""Page"",""File"",""Forum""]","[""Binary""]",has_thread,QuizItemEvent;Twist,thread_of,"[""Twist""]",100

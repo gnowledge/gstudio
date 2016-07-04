@@ -1582,7 +1582,7 @@ class EventGroupCreateEditHandler(View):
                         auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
                         counter_obj.auth_id=ObjectId(auth_obj._id)
                         counter_obj.group_id=ObjectId(group_obj._id)
-                        counter_obj.last_update=datetime.datetime.now()
+                        counter_obj.last_update=datetime.today()
                         counter_obj.enrolled = True
                         counter_obj.save()
 
