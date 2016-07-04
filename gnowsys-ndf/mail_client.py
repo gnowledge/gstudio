@@ -6,6 +6,7 @@ import time
 import user_authentications
 import create_page
 import send_page
+import update_page
 
 detach_dir = '.'
 if 'attachments' not in os.listdir(detach_dir):
@@ -74,8 +75,10 @@ class Email1:
 	activity = ''
 	act_title = ''
 	fromuser = ''
+	Subject = ''
 	Filename = None
 	Body = ''
+	ObjectId = None
 
 	def mail_extract(self, msgId, conn):
 		try:
@@ -89,8 +92,8 @@ class Email1:
 				fromuser = mail[header]
 				self.fromuser = parse_mail(fromuser)
 			for header in ['subject']:
-				Subject = mail[header]
-				self.username, self.grp_name, self.activity, self.act_title = parse_subject(Subject)
+				self.Subject = mail[header]
+				self.username, self.grp_name, self.activity, self.act_title = parse_subject(self.Subject)
 				
 			for part in mail.walk():
 				if part.get_content_type() == 'text/plain':
@@ -112,16 +115,10 @@ class Email1:
 						fp.close()
 					else:
 						print "not downloaded " , self.Filename
-			
-			#conn.close()
-			#conn.logout()
-			print self.fromuser
-			print self.username 
-			print self.grp_name
-			print self.activity 
-			print self.act_title
-			print self.Body
-
+	
+			for OBJID in ['_id']:
+				self.ObjectId = mail[OBJID]
+				print self.ObjectId
 		except:
 			print 'Not able to download all attachments.'
 
@@ -137,6 +134,10 @@ class Email1:
 		return self.act_title
 	def return_body(self):
 		return self.Body
+	def return_id(self):
+		return self.ObjectId
+	def return_sub(self):
+		return self.Subject
 
 c = open_connection()
 d = open_unseen(c)
@@ -144,14 +145,28 @@ print d
 obj = Email1()
 for msgId in d[0].split():
 	obj.mail_extract(msgId, c)
-	id,check,error=user_authentications.authenticate_user(user=obj.return_username(),
-		group_name=obj.return_grp_name())
-	print error
 
-	if(check==True):
-		done = create_page.create_page(name=obj.return_act_title(),content=obj.return_body(),
-				created_by=id,group_name=obj.return_grp_name(),sendMailTo=obj.return_from())
-		print done
+	if(obj.return_id()):
+		print 'here'
+		update_page.update_page(name=obj.return_act_title(),content=obj.return_body(),
+			id=obj.return_id(),sub=obj.return_sub(),sendMailTo=obj.return_from())
+
+		send_page.send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
+				page_content=obj.return_body(),subject=obj.return_sub(),id=obj.return_id())
+
+	else:
+		id,check,error=user_authentications.authenticate_user(user=obj.return_username(),
+			group_name=obj.return_grp_name())
+		print error
+		if(check==True):
+			p_id = create_page.create_page(name=obj.return_act_title(),content=obj.return_body(),
+					created_by=id,group_name=obj.return_grp_name(),sendMailTo=obj.return_from(),
+					subject=obj.return_sub())
+			if(isinstance(p_id,str)):
+				send_page.send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
+					page_content=obj.return_body(),subject=obj.return_sub(),id=p_id)
+			else:
+				print p_id
 
 close_connection(c)
 

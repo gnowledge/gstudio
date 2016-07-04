@@ -28,11 +28,6 @@ def create_page(**kwargs):
 	else:
 		return error_message["User details required"]
 
-	if kwargs.has_key('sendMailTo'):
-		sendMailTo = kwargs.get('sendMailTo','')
-	else:
-		sendMailTo = 'ps.mio.bits@gmail.com'
-
 	gst_page = node_collection.one({'_type':u'GSystemType','name':u'Page'})
 	gst_group = node_collection.one({'_type':u'Group','name':group_name})
 
@@ -48,11 +43,10 @@ def create_page(**kwargs):
 	else:
 		p.fill_gstystem_values(name = name,member_of=[gst_page._id],created_by = created_by,
 			content = content,group_set=[gst_group._id])
-		
-		send_page.send_page(to_user=sendMailTo,page_name=name,
-				page_content=content)
-
-		p.save()
-		return 0;
+		try:
+			p.save()
+		except:
+			print "in except"
+		return str(p._id);
 
 

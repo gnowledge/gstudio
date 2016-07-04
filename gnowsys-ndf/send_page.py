@@ -4,12 +4,13 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email import message
 
-def send_page(to_user,page_name,page_content):
+def send_page(to_user,page_name,page_content,subject,id):
 	msg = MIMEMultipart('alternative')
-	msg['Subject'] = "Page successfully created"
+	msg['Subject'] = subject
 	msg['From'] = "ps.mio.bits@gmail.com"
 	msg['To'] = to_user 
-	msg['Update'] = "False"
+	msg['_id'] = id
+	
 	html = """\
 	<html>
 	<head></head>
