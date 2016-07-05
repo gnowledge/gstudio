@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.moderation import *
+# from gnowsys_ndf.ndf.views.moderation import *
 # from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
 # ######################################################################################################################################
 
@@ -2243,15 +2243,18 @@ def switch_group(request,group_id,node_id):
 
             if each_group_obj.moderation_level > -1:
                 # means group is moderated one.
+                from gnowsys_ndf.ndf.views.moderation import moderation_status
                 each_result_dict = moderation_status(request, each_group_obj._id, node._id, get_only_response_dict=True)
                 if each_result_dict['is_under_moderation']:
                     # means, this node already exists in one of -
                     # - the underlying mod group of this (each_group_obj).
                     pass
                 else:
+                    from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
                     each_group_set = get_moderator_group_set(existing_grps, each_group_id, get_details=False)
                     merge_group_set = set(each_group_set + new_grps_list_all)
                     new_grps_list_all = list(merge_group_set)
+                    from gnowsys_ndf.ndf.views.moderation import create_moderator_task
                     t = create_moderator_task(request, node.group_set[-1], node._id,on_upload=True)
 
             else:
@@ -2623,6 +2626,15 @@ def upload_using_save_file(request,group_id):
             each_gs_file.contributors.append(usrid)
         if title == "raw material":
             each_gs_file.tags =  [u'raw@material']
+        group_object = node_collection.one({'_id': ObjectId(group_id)})
+        if group_object.edit_policy == "EDITABLE_MODERATED":
+                        from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
+                        # print "\n\n\n\ninside editable moderated block"
+                        each_gs_file.group_set = get_moderator_group_set(each_gs_file.group_set, group_object._id)
+                        # print "\n\n\npage_node._id",page_node._id
+                        each_gs_file.status = u'MODERATION'
+                        # print "\n\n\n page_node.status",page_node.status
+
         each_gs_file.save()
         create_gattribute(each_gs_file._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
