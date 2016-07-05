@@ -19,7 +19,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.views.methods import get_counter_obj
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_QUIZ_CORRECT_POINTS 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import QUIZ_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import HistoryManager
@@ -447,6 +447,7 @@ def save_quizitem_answer(request, group_id):
                             if len(one_att['quizitempost_user_submitted_ans'])!=0:
                                 if cmp(cor_ans,user_given_ans)==0:
                                     counter_obj.no_correct_answers+=1
+                                    counter_obj.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS 
                                     counter_obj.save()
                                 else:
                                     counter_obj.no_incorrect_answers+=1
@@ -470,6 +471,7 @@ def save_quizitem_answer(request, group_id):
                                         break
                                 if search==True:
                                     counter_obj.no_correct_answers+=1
+                                    counter_obj.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS 
                                     counter_obj.save()
                                 else:
                                     counter_obj.no_incorrect_answers+=1
@@ -477,6 +479,7 @@ def save_quizitem_answer(request, group_id):
                         if type_of_quiz=='Short-Response':
                             if len(user_given_ans)!=0:
                                 counter_obj.no_correct_answers+=1
+                                counter_obj.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS 
                                 counter_obj.save()
                 #updated counter collection            	
 

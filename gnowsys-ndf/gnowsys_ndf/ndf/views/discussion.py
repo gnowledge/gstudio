@@ -16,7 +16,7 @@ import json
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK, GSTUDIO_COMMENT_POINTS
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -256,6 +256,7 @@ def discussion_reply(request, group_id, node_id):
                     counter_obj = get_counter_obj(request.user.id, ObjectId(group_id))
                     counter_obj.no_comments_on_others_files += 1
                     counter_obj.no_comments_by_user += 1
+                    counter_obj.course_score += GSTUDIO_COMMENT_POINTS
                     counter_obj_creator = get_counter_obj(file_creator_id, ObjectId(group_id))
                     counter_obj_creator.no_comments_received_on_files += 1
                     counter_obj_creator.no_comments_for_user += 1
@@ -273,6 +274,7 @@ def discussion_reply(request, group_id, node_id):
                     counter_obj = get_counter_obj(request.user.id, ObjectId(group_id))
                     counter_obj.no_comments_by_user += 1
                     counter_obj.no_comments_on_others_notes += 1
+                    counter_obj.course_score += GSTUDIO_COMMENT_POINTS
                     counter_obj_creator = get_counter_obj(note_creator_id, ObjectId(group_id))
                     counter_obj_creator.no_comments_for_user += 1
                     counter_obj_creator.no_comments_received_on_notes += 1

@@ -23,7 +23,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import LANGUAGES
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_NAME, GSTUDIO_NOTE_CREATE_POINTS
 from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import HistoryManager
@@ -337,6 +337,7 @@ def create_edit_page(request, group_id, node_id=None):
             counter_obj=get_counter_obj(request.user.id,ObjectId(group_id))
             if new_page:
               counter_obj.no_notes_written=counter_obj.no_notes_written+1
+              counter_obj.course_score += GSTUDIO_NOTE_CREATE_POINTS
               counter_obj.last_update = datetime.datetime.now()
               counter_obj.save()
           #add code for creation of new note counter

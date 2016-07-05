@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM, GSTUDIO_FILE_UPLOAD_POINTS
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import NodeJSONEncoder,node_collection, triple_collection 
@@ -2647,12 +2647,14 @@ def upload_using_save_file(request,group_id):
     if title == "gallery":
         counter_obj=get_counter_obj(request.user.id,group_id)
         counter_obj.no_files_created+=1
+        counter_obj.course_score+=GSTUDIO_FILE_UPLOAD_POINTS
         counter_obj.last_update = datetime.today()
         counter_obj.save()
         return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
     elif title == "raw material":
     	counter_obj=get_counter_obj(request.user.id,group_id)
         counter_obj.no_files_created+=1
+        counter_obj.course_score+=GSTUDIO_FILE_UPLOAD_POINTS
         counter_obj.last_update = datetime.today()
         counter_obj.save()
         return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
