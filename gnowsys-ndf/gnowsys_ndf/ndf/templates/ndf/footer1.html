@@ -1,0 +1,52 @@
+{% load i18n %}
+{% load get_latest_git_hash from simple_filters %}
+
+<footer>
+  <section class="row">
+    <div class="medium-10 columns ">
+      <div class="row">
+        <div class="medium-12 columns">
+          <ul class="inline-list">
+            <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
+            <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
+            <li><a href="{{site.GROUPS}}">{% trans "Groups" %}</a></li>
+            <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
+            <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
+            <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
+            <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
+
+            <!--
+            <li><a href="https://gitlab.com/gnowledge/gstudio/issues">{% trans "Issues" %}</a></li>
+            -->
+            <li><a href="{{site.ISSUES_PAGE}}">{% trans "Feedback" %}</a></li>
+
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="medium-12 columns footer-meta">
+          {% get_latest_git_hash as git_commit_hash %}
+            <strong >{% trans "Powered by" %} <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">{% trans "gstudio" %} </a> {% trans "built at Gnowledge Lab" %}, <a href="http://www.hbcse.tifr.res.in/" target="_blank">{% trans "Homi Bhabha Centre for Science Education" %}</a>, <a href="http://www.tifr.res.in/" target="_blank">{% trans "TIFR" %}</a>.</strong>
+          {# <!--{{site.ORG_NAME |safe }}--> #}
+        </div>
+      </div>
+    </div>
+    <div class="medium-2 columns ">
+        <img class="footer-logo" src="{{site.LOGO}}" />
+    </div>
+  </section>
+  <!--div class="row">
+    <!--div class="medium-2 columns" style="margin-top: -0.9cm">
+      <p>
+        <a href="{{site.GIT_REPO}}">{% trans "View Source Code" %}</a><br>
+
+        <a class="show-span-on-hover" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/">
+          <img src="/static/ndf/images/cc-by-sa.png" alt="Creative Commons License" title="All material is licensed under a Creative Commons Attribution-Share Alike 3.0 Unported License unless mentioned otherwise." style="border-width:0" src="/static/ndf/images/cc-by-sa.png"/>
+        </a>
+      </p>
+    </div>
+
+    <div class="medium-12 columns footer-meta">
+    </div>
+  </div-->
+</footer>
