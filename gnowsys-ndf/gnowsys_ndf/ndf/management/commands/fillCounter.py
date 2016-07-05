@@ -81,6 +81,10 @@ def create_or_update_counter(user_obj, group_id):
     # Get all unique users who visited files uploaded by user
     counter_obj.no_others_files_visited = analytics_instance.get_others_files_read_count()
     counter_obj.avg_rating_received_on_files = float(analytics_instance.get_ratings_received_on_user_files())
+    # Get the dictionary for unique users commented on files uploaded by user
+    counter_obj.comments_by_others_on_files = analytics_instance.get_commented_unique_users_dict(False,True)
+    # Get all unique users who visited files created by user
+    counter_obj.no_visits_gained_on_files = analytics_instance.total_users_visted_my_files()
 
     ## NOTES ##
     # Get all notes/blog pages created by user
@@ -93,6 +97,8 @@ def create_or_update_counter(user_obj, group_id):
     counter_obj.no_views_gained_on_notes = analytics_instance.total_users_read_my_notes()
     counter_obj.no_others_notes_visited = analytics_instance.get_others_notes_read_count()
     counter_obj.avg_rating_received_on_notes = float(analytics_instance.get_ratings_received_on_user_notes())
+    # Get the dictionary for unique users commented on notes uploaded by user
+    counter_obj.comments_by_others_on_notes = analytics_instance.get_commented_unique_users_dict(True,False)
 
     ## QUIZ ##
     # Get all quizitemevents attempted correctly by user

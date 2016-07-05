@@ -332,6 +332,66 @@ class AnalyticsMethods(object):
 
 		return len(commentors_ids)
 
+
+	def get_commented_unique_users_dict(self, for_notes=False,for_files=False):
+
+		notes_or_files_cur = None
+		commentors_ids = {}
+
+		'''
+		# APPROACH 1
+		if for_notes:
+			if not hasattr(self,"user_notes_cur"):
+				notes_or_files_cur = self.get_user_notes_count(True)
+			else:
+				notes_or_files_cur = self.user_notes_cur.rewind()
+		elif for_files:
+			if not hasattr(self,"user_files_cur"):
+				notes_or_files_cur = self.get_user_files_count(True)
+			else:
+				notes_or_files_cur = self.user_files_cur.rewind()
+
+		twist_gst = node_collection.one({'_type': "GSystemType", 'name': 'Twist'})
+		user_notes_or_files_cur_ids = []
+
+		for each_note_or_file in notes_or_files_cur:
+			if each_note_or_file.relation_set:
+				for each_note_or_file_rel in each_note_or_file.relation_set:
+					if each_note_or_file_rel and 'has_thread' in each_note_or_file_rel:
+						user_notes_or_files_cur_ids.append(each_note_or_file_rel['has_thread'][0])
+
+		user_notes_or_files_threads_cur = node_collection.find({'member_of': twist_gst._id, '_id': {'$in': user_notes_or_files_cur_ids}})
+		for each_thread in user_notes_or_files_threads_cur:
+			commentors_ids.extend(each_thread.author_set)
+		if commentors_ids:
+			commentors_ids = set(list(commentors_ids))
+
+
+		return len(commentors_ids)
+
+		'''
+		# APPROACH 2
+
+		if for_notes:
+			if not hasattr(self,"all_comments_on_user_notes"):
+				notes_or_files_cur = self.get_comments_counts_on_users_notes(True)
+			else:
+				notes_or_files_cur = self.all_comments_on_user_notes.rewind()
+		if for_files:
+			if not hasattr(self,"all_comments_on_user_files"):
+				notes_or_files_cur = self.get_comments_counts_on_users_files(True)
+			else:
+				notes_or_files_cur = self.all_comments_on_user_files.rewind()
+		for each_note_file_cmt in notes_or_files_cur:
+			if str(each_note_file_cmt.created_by) in commentors_ids.keys() :
+				commentors_ids[str(each_note_file_cmt.created_by)] += 1
+			else :
+				commentors_ids[str(each_note_file_cmt.created_by)] = 1
+			
+
+		return commentors_ids
+
+
 	def get_total_files_count(self):
 
 
