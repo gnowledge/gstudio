@@ -3292,6 +3292,9 @@ class Counter(DjangoDocument):
         'group_id':ObjectId, #course_id
         'last_update': datetime.datetime,
         'enrolled':bool,
+        'modules_completed':int,
+        'course_score':int,
+        'units_completed':int,
 
         #interactions
         'no_comments_by_user':int,
@@ -3353,7 +3356,10 @@ class Counter(DjangoDocument):
         'no_comments_received_on_notes':0,
         'no_comments_on_others_notes':0,
         'rating_count_received_on_notes': 0,
-        'avg_rating_received_on_notes':0.0
+        'avg_rating_received_on_notes':0.0,
+        'modules_completed':0,
+        'course_score':0,
+        'units_completed':0
     }
     
     use_dot_notation = True

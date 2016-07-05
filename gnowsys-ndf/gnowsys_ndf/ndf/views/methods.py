@@ -5758,6 +5758,11 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
       result_dict['modules_total_count'] = all_modules_of_grp.count()
       result_dict['units_completed_count'] = completed_units_cur.count()
       result_dict['units_total_count'] = all_units_of_grp.count()
+      counter_obj = get_counter_obj(user_id, ObjectId(group_obj._id))
+      counter_obj.modules_completed = completed_modules_cur.count()
+      counter_obj.units_completed = completed_units_cur.count()
+      counter_obj.last_update = datetime.today()
+      counter_obj.save()
 
       result_dict.update({'success': False})
       # print "\n\nresult_dict == ",result_dict
