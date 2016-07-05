@@ -301,7 +301,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       active =  0
     elif now > end : 
       active = 1
-      # print "############"
+      # print "$$$$$$"
       # for i,v in enumerate(node.attribute_set):
       #   try:
       #     if v['event_status']:
@@ -311,11 +311,12 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       #       print "###############"
       #       print "Completed"
       #       break
-      #   except:
-      #     pass
+        # except:
+        #   pass
+      # node.save()     
     else:
       active = -1  
-      days_left = (start_time-now).days 
+      days_left = (start_time-now).days  
 
     is_attendee = False
     is_moderator = False
@@ -347,7 +348,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
         if usrid == i:
           is_attendee = True
           break      
-#####################
+
     bbb = False
     for i in node.attribute_set:
       try:
@@ -356,8 +357,6 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       except:
         pass
 
-    # bbb = node.is_bigbluebutton 
-#####################
     createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'logout.html')
     
     if is_moderator:
@@ -424,7 +423,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       elif attr and u"max_marks" in attr:
         session_max_marks = attr[u"max_marks"]
     context_variables.update({'session_min_marks':session_min_marks})
-    context_variables.update({'session_max_marks':session_max_marks}) 
+    context_variables.update({'session_max_marks':session_max_marks})   
 
   return render_to_response(template, 
                               context_variables,
