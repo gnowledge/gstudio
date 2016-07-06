@@ -13,6 +13,7 @@
 <script src="/static/ndf/js/topojson.v1.min.js"></script>
 <style>
 #map {
+  position: relative;
   background-color: #fff;
   border: 1px solid #ccc;
 }
@@ -156,10 +157,17 @@ polyline{
   z-index: -1;
   background-color: rgba(0,0,0,0.5);
 }
+.edit_btn{
+  position: absolute;
+  bottom: 15px;
+  left:15px;
+}
 </style>
 <div id="info_bar"></div>
-<a class="edit_btn button">Edit</a>
-<div id="map"></div>
+<div id="map">
+  <a class="edit_btn button">Edit</a>
+  
+</div>
 
 <script>
 window.onload = function(){
@@ -184,6 +192,9 @@ function close_lb(){
 }
 
 function set_content_lb(data){
+  if(data === undefined){
+    data = {};
+  }
   if(data.head === undefined){
     data.head = "";
   }
@@ -289,37 +300,39 @@ function refresh_graphs(){
 
 
 <script>
-var states_code = {
-  "AP":"Andhra Pradesh",
-  "TL":"Telangana",
-  "AS":"Assam",
-  "bih":"Bihar",
-  "chh":"Chhattisgarh",
-  "del":"Delhi",
-  "goa":"Goa",
-  "guj":"Gujarat",
-  "har":"Haryana",
-  "hip":"Himachal Pradesh",
-  "jak":"Jammu and Kashmir",
-  "jha":"Jharkhand",
-  "kar":"Karnataka",
-  "ker":"Kerala",
-  "map":"Madhya Pradesh",
-  "mah":"Maharashtra",
-  "man":"Manipur",
-  "meg":"Meghalaya",
-  "miz":"Mizoram",
-  "nag":"Nagaland",
-  "ori":"Orissa",
-  "pun":"Punjab",
-  "raj":"Rajasthan",
-  "sik":"Sikkim",
-  "tan":"Tamil Nadu",
-  "tri":"Tripura",
-  "utp":"Uttar Pradesh",
-  "utt":"Uttarakhand",
-  "web":"West Bengal"
-}
+var states_code = [
+  {"code": "AP", "name": "Andhra Pradesh"},
+  {"code": "AR", "name": "Arunachal Pradesh"},
+  {"code": "AS", "name": "Assam"},
+  {"code": "BR", "name": "Bihar"},
+  {"code": "CT", "name": "Chhattisgarh"},
+  {"code": "DL", "name": "Delhi"},
+  {"code": "GA", "name": "Goa"},
+  {"code": "GJ", "name": "Gujarat"},
+  {"code": "HR", "name": "Haryana"},
+  {"code": "HP", "name": "Himachal Pradesh"},
+  {"code": "JK", "name": "Jammu & Kashmir"},
+  {"code": "JH", "name": "Jharkhand"},
+  {"code": "KA", "name": "Karnataka"},
+  {"code": "KL", "name": "Kerala"},
+  {"code": "MP", "name": "Madhya Pradesh"},
+  {"code": "MH", "name": "Maharashtra"},
+  {"code": "MN", "name": "Manipur"},
+  {"code": "ML", "name": "Meghalaya"},
+  {"code": "MZ", "name": "Mizoram"},
+  {"code": "NL", "name": "Nagaland"},
+  {"code": "OR", "name": "Odisha"},
+  {"code": "PB", "name": "Punjab"},
+  {"code": "RJ", "name": "Rajasthan"},
+  {"code": "SK", "name": "Sikkim"},
+  {"code": "TN", "name": "Tamil Nadu"},
+  {"code": "TL", "name": "Telangana"},
+  {"code": "TR", "name": "Tripura"},
+  {"code": "UT", "name": "Uttarakhand"},
+  {"code": "UP", "name": "Uttar Pradesh"},
+  {"code": "WB", "name": "West Bengal"}
+];
+
 
 var m_width = document.getElementById('map').getBoundingClientRect().width,
     width = 938,
@@ -334,19 +347,27 @@ var projection = d3.geo.mercator()
 
 var path = d3.geo.path()
     .projection(projection);
-
+var zoom_behavior = d3.behavior.zoom();
 var svg = d3.select("#map").append("svg")
     .attr("id","main_svg")
     .attr("preserveAspectRatio", "xMidYMid")
     .attr("viewBox", "0 0 " + width + " " + height)
     .attr("width", m_width)
-    .attr("height", m_width * height / width);
-
+    .attr("height", m_width * height / width)
+    .call(zoom_behavior.on('zoom',redraw));
+function redraw(){
+  if(pnt){
+    return;
+  }
+  var s = d3.event.scale;
+  var t = d3.event.translate;
+  g.style("stroke-width",1/s).attr("transform","translate("+t+")scale("+s+")");
+}
 svg.append("rect")
     .attr("class", "background")
     .attr("width", width)
     .attr("height", height)
-    .on("click", state_clicked2);
+    .on("click", state_clicked);
 
 var g = svg.append("g");
 
@@ -369,7 +390,7 @@ d3.json("/static/ndf/js/india_map.topo.json", function(error, states) {
     .on('mouseout', function(d){
       $('#info_bar').hide();
     })
-  g_cir = g.append("g").attr("id", "circes_group");
+  g_cir = g.append("g").attr("id", "circles_group");
   zoom(dflt_zoom);
   load_organization();
 });
@@ -401,23 +422,8 @@ $(document).on("click",".city",function(){
 
   open_lb();
 });
-$(document).on("click",".edit_city",function(){
-  curr_edit = d3.select(this);
-  data = {
-    "head":"Edit City",
-    "content":'Name: <input id="city_name" type="text" /> \
-            State: \
-            <select id="state_list">\
-            <option name="TL">Telangana</option></select><br>\
-            <a class="save_btn button">Save</a>',
-  }
-  set_content_lb(data);
+$(document).on("click",".edit_city",function(){edit_org_form_init(this); });
 
-  var dt = curr_edit.data()[0];
-  $('#city_name').val(dt.properties.name);
-  $('#state_list').val(dt.properties.state);
-  open_lb();
-});
 $(document).on("click",".save_btn",function(){
   var dt = curr_edit.data()[0];
   dt.properties.name = $('#city_name').val();
@@ -427,7 +433,25 @@ $(document).on("click",".save_btn",function(){
   update_organization(dt,dt.id);
 
 });
-
+function edit_org_form_init(obj){
+  curr_edit = d3.select(obj);
+  data = {
+    "head":"Edit City",
+    "content":'Name: <input id="city_name" type="text" /> \
+            State: \
+            <select id="state_list"></select><br>\
+            <a class="save_btn button">Save</a>',
+  }
+  set_content_lb(data);
+  var $st_list = $('#state_list');
+  for(i=0; i<states_code.length; i++){
+    $st_list.append('<option value="'+states_code[i].code+'">'+states_code[i].name+'</option>')
+  }
+  var dt = curr_edit.data()[0];
+  $('#city_name').val(dt.properties.name);
+  $('#state_list').val(dt.properties.state);
+  open_lb();
+}
 function zoom(xyz) {
   g.transition()
     .duration(750)
@@ -436,6 +460,13 @@ function zoom(xyz) {
     .style("stroke-width", 1.0 / xyz[2] + "px")
     .selectAll(".city")
     .attr("d", path.pointRadius(20.0 / xyz[2]));
+
+  var t = projection.translate();
+  t[0] = (xyz[0]*xyz[2] - t[0])*-1;
+  t[1] = (xyz[1]*xyz[2] - t[1])*-1;
+  console.log(t);
+  zoom_behavior.scale(xyz[2]).translate(t)
+  return;
 }
 
 function get_xyz(d) {
@@ -457,7 +488,6 @@ var g_cir;
 $('.edit_btn').click(function(){
   if(pnt){
     $('.edit_btn').text('Exit edit mode');
-    zoom(dflt_zoom);
     g.select("#organization").remove();
 
     g_cir = g.append("g")
@@ -467,7 +497,7 @@ $('.edit_btn').click(function(){
       .data(organizations)
       .enter()
       .append("circle")
-      .attr("r", "1.5")
+      .attr("r", "0.5")
       .attr("class", "edit_city")
       .attr("id", function(d) { return d.properties.name; })
       .attr("transform", function(d){ return "translate(" + d.coordinates[0] + "," + d.coordinates[1] + ")"})
@@ -481,6 +511,9 @@ $('.edit_btn').click(function(){
     $('.edit_btn').text('Edit');
     g.select("#edit_mode").remove();
     pnt = true;
+    $('#info_bar').removeClass('disabled');
+    zoom(dflt_zoom);
+    load_organization();
   }
 });
 function state_clicked(d){
@@ -492,28 +525,39 @@ function state_clicked(d){
 
 	var point = d3.mouse(this)
 	, p = {x: point[0], y: point[1] };
+
 	// Append a new point
-  dt = {
+  var dt = [{
     properties:{
       name: "",
-      state: "TL",
+      state: "",
     },
     coordinates:[(p.x), (p.y)],
-  };
-	g_cir.append("circle")
-		.data(dt)
-		.attr("transform", "translate(" + p.x + "," + p.y + ")")
-		.attr("r", "1.5")
+  }];
+
+	var new_cir = g_cir.append("circle");
+	new_cir.data(dt);
+
+	new_cir.attr("transform", "translate(" + p.x + "," + p.y + ")")
+		.attr("r", "0.5")
 		.attr("class", "edit_city")
 		.style("cursor", "pointer")
 		.call(drag);
+
+  edit_org_form_init($(new_cir)[0][0]);
 }
 
 var drag = d3.behavior.drag()
+.on("dragstart", function(){d3.event.sourceEvent.stopPropagation();})
 .on("drag", dragmove);
-function dragmove(d) {
+function dragmove(d) { 
   var x = d3.event.x;
   var y = d3.event.y;
+
+  var dt = d3.select(this).data()[0];
+  dt.coordinates[0] = x;
+  dt.coordinates[1] = y;
+  d3.select(this).data(dt);
   d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
 }
 
@@ -559,7 +603,6 @@ function load_organization(){
     url: '/{{groupid}}/state_analytics/fetch_organization',
     method: 'GET',
     success: function(data){
-      console.log(data);
       var det = JSON.parse(data);
       for(i=0; i<det.length; i++){
        det[i] = JSON.parse(det[i]);
@@ -577,6 +620,9 @@ function update_organization(data,id=''){
     data: JSON.stringify(data),
     success: function(data){
       console.log(data);
+      data = JSON.parse(data);
+      curr_edit.data()[0]['id'] = data.id;
+      curr_edit.attr('id', data.id);
     }
   });
 }
