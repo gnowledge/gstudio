@@ -42,6 +42,7 @@ from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE
 from gnowsys_ndf.settings import META_TYPE
+from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.ndf.rcslib import RCS
 from registration.signals import user_registered
 
@@ -733,6 +734,20 @@ class Node(DjangoDocument):
         except Exception, e:
             print "\nError while processing invalid fields: ", e
             pass
+
+        # if Add-Buddy fature is enabled:
+        #   - Get all user id's of active buddies with currently logged in user.
+        #   - Check if each of buddy-user-id does not exists in contributors of node object, add it.
+        if GSTUDIO_BUDDY_LOGIN:
+            buddy_contributors = Buddy.get_buddy_userids_list_within_datetime(
+                                                    self.created_by,
+                                                    self.last_update or self.created_at
+                                                )
+
+            if buddy_contributors:
+                for each_bcontrib in buddy_contributors:
+                    if each_bcontrib not in self.contributors:
+                        self.contributors.append(each_bcontrib)
 
         super(Node, self).save(*args, **kwargs)
 
@@ -3283,7 +3298,7 @@ class Buddy(DjangoDocument):
 
     @staticmethod
     def get_buddy_cur_from_userid_datetime(user_id, datetime_obj):
-        return buddy_collection.find({'loggedin_userid': user_id, 'starts_at': {'$lt': datetime_obj}, '$or': [{'ends_at': {'$gt': datetime_obj}}, {'ends_at': None} ] })
+        return buddy_collection.find({'loggedin_userid': user_id, 'starts_at': {'$lte': datetime_obj}, '$or': [{'ends_at': {'$gte': datetime_obj}}, {'ends_at': None} ] })
 
     @staticmethod
     def get_buddy_userids_list_within_datetime(user_id, datetime_obj):
@@ -3293,7 +3308,6 @@ class Buddy(DjangoDocument):
             all_buddies_authid_list += each_buddy_obj.get_all_buddies_auth_ids()
             for each_buddy_authid, in_out_time in each_buddy_obj.buddy_in_out.iteritems():
                 for each_io in in_out_time:
-                    print (not each_io['out'] and datetime_obj > each_io['in'])
                     if (not each_io['out'] and datetime_obj > each_io['in']) \
                     or (each_io['out'] and datetime_obj < each_io['out'] and datetime_obj > each_io['in']):
                         all_buddies_authid_list.append(each_buddy_authid)
