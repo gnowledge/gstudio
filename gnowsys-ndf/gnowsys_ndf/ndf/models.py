@@ -2041,6 +2041,89 @@ class Group(GSystem):
         # node_collection.find({'_type': 'Group'}, {'name': 1, '_id': 0})]
     }
 
+    @staticmethod
+    def get_group_name_id(group_name_or_id, get_obj=False):
+        '''
+          - This method takes possible group name/id as an argument and returns (group-name and id) or group object.
+
+          - If no second argument is passed, as method name suggests, returned result is "group_name" first and "group_id" second.
+
+          - When we need the entire group object, just pass second argument as (boolian) True. In the case group object will be returned.
+
+          Example 1: res_group_name, res_group_id = get_group_name_id(group_name_or_id)
+          - "res_group_name" will contain name of the group.
+          - "res_group_id" will contain _id/ObjectId of the group.
+
+          Example 2: res_group_obj = get_group_name_id(group_name_or_id, get_obj=True)
+          - "res_group_obj" will contain entire object.
+
+          Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
+          try:
+              group_id = ObjectId(group_id)
+          except:
+              group_name, group_id = get_group_name_id(group_id)
+
+        '''
+        # if cached result exists return it
+        if not get_obj:
+            from django.template.defaultfilters import slugify
+            from django.core.cache import cache
+
+            slug = slugify(group_name_or_id)
+            # for unicode strings like hindi-text slugify doesn't works
+            cache_key = 'get_group_name_id_' + str(slug) if slug else str(abs(hash(group_name_or_id)))
+            cache_result = cache.get(cache_key)
+
+            if cache_result:
+                return cache_result
+        # ---------------------------------
+
+        # case-1: argument - "group_name_or_id" is ObjectId
+        if ObjectId.is_valid(group_name_or_id):
+
+            group_obj = node_collection.one({"_id": ObjectId(group_name_or_id)})
+
+            # checking if group_obj is valid
+            if group_obj:
+                # if (group_name_or_id == group_obj._id):
+                group_id = group_name_or_id
+                group_name = group_obj.name
+
+                if get_obj:
+                    return group_obj
+                else:
+                    # setting cache with both ObjectId and group_name
+                    cache.set(cache_key, (group_name, group_id), 60 * 60)
+                    cache_key = u'get_group_name_id_' + slugify(group_name)
+                    cache.set(cache_key, (group_name, group_id), 60 * 60)
+                    return group_name, group_id
+
+        # case-2: argument - "group_name_or_id" is group name
+        else:
+            group_obj = node_collection.one(
+                {"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_name_or_id)})
+
+            # checking if group_obj is valid
+            if group_obj:
+                # if (group_name_or_id == group_obj.name):
+                group_name = group_name_or_id
+                group_id = group_obj._id
+
+                if get_obj:
+                    return group_obj
+                else:
+                    # setting cache with both ObjectId and group_name
+                    cache.set(cache_key, (group_name, group_id), 60*60)
+                    cache_key = u'get_group_name_id_' + slugify(group_name)
+                    cache.set(cache_key, (group_name, group_id), 60*60)
+                    return group_name, group_id
+
+        if get_obj:
+            return None
+        else:
+            return None, None
+
+
     def is_gstaff(self, user):
         """
         Checks whether given user belongs to GStaff.
@@ -2062,6 +2145,27 @@ class Group(GSystem):
         if (user.is_superuser) or (user.id == self.created_by) or (user.id in self.group_admin):
             return True
 
+        else:
+            return False
+
+
+    @staticmethod
+    def can_access(user_id, group):
+        '''Returns True if user can aceess (read/edit/write) group resource.
+        ARGS:
+            - user_id (int): Django User id
+            - group (Group or ObjectID or str-of-group-name): It can be either group's
+                                                        object or group's _id or group's name.
+        '''
+        if isinstance(group, Group):
+            group_obj = group
+        else:
+            group_obj = Group.get_group_name_id(group, get_obj=True)
+
+        user_query = User.objects.filter(id=user_id)
+
+        if group_obj and user_query:
+            return group_obj.is_gstaff(user_query[0]) or (user_id in group_obj.author_set)
         else:
             return False
 
