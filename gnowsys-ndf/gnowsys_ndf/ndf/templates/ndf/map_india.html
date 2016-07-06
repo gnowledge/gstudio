@@ -32,7 +32,7 @@
 #countries>path:hover{
   fill: rgb(142, 248, 121);
 }
-#cities {
+#organization {
   stroke-width: 0;
 }
 .city {
@@ -158,6 +158,7 @@ polyline{
 }
 </style>
 <div id="info_bar"></div>
+<a class="edit_btn button">Edit</a>
 <div id="map"></div>
 
 <script>
@@ -175,11 +176,11 @@ function init_lb(){
 }
 function open_lb(){
   $('body').css('overflow', 'hidden');
-  $('#lightbox').fadeIn(300);
+  $('#lightbox').fadeIn(0);
 }
 function close_lb(){
   $('body').css('overflow', '');
-  $('#lightbox').fadeOut(300);
+  $('#lightbox').fadeOut(0);
 }
 
 function set_content_lb(data){
@@ -289,9 +290,9 @@ function refresh_graphs(){
 
 <script>
 var states_code = {
-  "anp":"Andhra Pradesh",
-  "tel":"Telangana",
-  "ass":"Assam",
+  "AP":"Andhra Pradesh",
+  "TL":"Telangana",
+  "AS":"Assam",
   "bih":"Bihar",
   "chh":"Chhattisgarh",
   "del":"Delhi",
@@ -318,21 +319,6 @@ var states_code = {
   "utp":"Uttar Pradesh",
   "utt":"Uttarakhand",
   "web":"West Bengal"
-}
-
-var cities = {
-  "cities":[
-    {"properties":{"name":"qwe","state":"tel"},"coordinates":[674.74,253.32]},
-    {"properties":{"name":"asd","state":"arp"},"coordinates":[713.89,226.09]},
-    {"properties":{"name":"wqe","state":"ass"},"coordinates":[709.58,228.75]},
-    {"properties":{"name":"aas","state":"bih"},"coordinates":[692.86,229.89]},
-    {"properties":{"name":"fad","state":"chh"},"coordinates":[682.98,242.30]},
-    {"properties":{"name":"asf","state":"del"},"coordinates":[670.94,221.78]},
-    {"properties":{"name":"asd","state":"goa"},"coordinates":[662.83,259.02]},
-    {"properties":{"name":"sfd","state":"guj"},"coordinates":[659.03,237.11]},
-    {"properties":{"name":"cvf","state":"har"},"coordinates":[669.80,216.84]},
-    {"properties":{"name":"tyr","state":"hip"},"coordinates":[670.56,213.42]}
-  ]
 }
 
 var m_width = document.getElementById('map').getBoundingClientRect().width,
@@ -385,11 +371,12 @@ d3.json("/static/ndf/js/india_map.topo.json", function(error, states) {
     })
   g_cir = g.append("g").attr("id", "circes_group");
   zoom(dflt_zoom);
+  load_organization();
 });
 
 $(document).on("click",".city",function(){
   data = {
-    "head":"Kuch nahi",
+    "head":"Analytics",
     "content":'<div id="main_container">\
         <div class="select_wrapper">\
           <select id="object_type">\
@@ -414,13 +401,38 @@ $(document).on("click",".city",function(){
 
   open_lb();
 });
+$(document).on("click",".edit_city",function(){
+  curr_edit = d3.select(this);
+  data = {
+    "head":"Edit City",
+    "content":'Name: <input id="city_name" type="text" /> \
+            State: \
+            <select id="state_list">\
+            <option name="TL">Telangana</option></select><br>\
+            <a class="save_btn button">Save</a>',
+  }
+  set_content_lb(data);
 
+  var dt = curr_edit.data()[0];
+  $('#city_name').val(dt.properties.name);
+  $('#state_list').val(dt.properties.state);
+  open_lb();
+});
+$(document).on("click",".save_btn",function(){
+  var dt = curr_edit.data()[0];
+  dt.properties.name = $('#city_name').val();
+  dt.properties.state = $('#state_list').val();
+  curr_edit.data(dt);
+  close_lb();
+  update_organization(dt,dt.id);
+
+});
 
 function zoom(xyz) {
   g.transition()
     .duration(750)
     .attr("transform", "translate(" + projection.translate() + ")scale(" + xyz[2] + ")translate(-" + xyz[0] + ",-" + xyz[1] + ")")
-    .selectAll(["#countries", "#states", "#cities"])
+    .selectAll(["#countries", "#states", "#organization"])
     .style("stroke-width", 1.0 / xyz[2] + "px")
     .selectAll(".city")
     .attr("d", path.pointRadius(20.0 / xyz[2]));
@@ -436,9 +448,41 @@ function get_xyz(d) {
   return [x, y, z];
 }
 
-pnt=true;
+var pnt=true;
+var organizations;
+var curr_edit;
 var curr = 0;
 var g_cir;
+
+$('.edit_btn').click(function(){
+  if(pnt){
+    $('.edit_btn').text('Exit edit mode');
+    zoom(dflt_zoom);
+    g.select("#organization").remove();
+
+    g_cir = g.append("g")
+      .attr("id", "edit_mode")
+
+    g_cir.selectAll("circle")
+      .data(organizations)
+      .enter()
+      .append("circle")
+      .attr("r", "1.5")
+      .attr("class", "edit_city")
+      .attr("id", function(d) { return d.properties.name; })
+      .attr("transform", function(d){ return "translate(" + d.coordinates[0] + "," + d.coordinates[1] + ")"})
+      .call(drag);
+
+    $('#info_bar').addClass('disabled');
+
+    pnt = false;
+  }
+  else{
+    $('.edit_btn').text('Edit');
+    g.select("#edit_mode").remove();
+    pnt = true;
+  }
+});
 function state_clicked(d){
 	if(pnt){
 		state_clicked2(d);
@@ -449,14 +493,22 @@ function state_clicked(d){
 	var point = d3.mouse(this)
 	, p = {x: point[0], y: point[1] };
 	// Append a new point
+  dt = {
+    properties:{
+      name: "",
+      state: "TL",
+    },
+    coordinates:[(p.x), (p.y)],
+  };
 	g_cir.append("circle")
-		.data([{"x": p.x,"y": p.y}])
+		.data(dt)
 		.attr("transform", "translate(" + p.x + "," + p.y + ")")
-		.attr("r", "1")
-		.attr("class", "dot")
+		.attr("r", "1.5")
+		.attr("class", "edit_city")
 		.style("cursor", "pointer")
 		.call(drag);
 }
+
 var drag = d3.behavior.drag()
 .on("drag", dragmove);
 function dragmove(d) {
@@ -464,29 +516,20 @@ function dragmove(d) {
   var y = d3.event.y;
   d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
 }
-var copy="";
-function print_coord(){
-	g_cir.selectAll('circle').each(function(){
-		var dt = d3.select(this).data();
-		copy += '{"properties":{"name":"","state":"null"},"coordinates":['+(dt[0].x).toFixed(2)+','+(dt[0].y).toFixed(2)+']},\n';
-	});
-}
-
-
 
 
 function state_clicked2(d) {
-  g.selectAll("#cities").remove();
+  g.selectAll("#organization").remove();
 
   if (d && state !== d) {
     var xyz = get_xyz(d);
     state = d;
-    state_name = d.properties.name;
+    state_name = d.id;
 
       g.append("g")
-        .attr("id", "cities")
+        .attr("id", "organization")
         .selectAll("circle")
-        .data(cities["cities"].filter(function(d) { return state_name == d.properties.state; }))
+        .data(organizations.filter(function(d) { return state_name == d.properties.state; }))
         .enter()
         .append("circle")
         .attr("r", "0.5")
@@ -510,6 +553,33 @@ window.onresize = function() {
   svg.attr("height", w * height / width);
 };
 
+var x;
+function load_organization(){
+  $.ajax({
+    url: '/{{groupid}}/state_analytics/fetch_organization',
+    method: 'GET',
+    success: function(data){
+      console.log(data);
+      var det = JSON.parse(data);
+      for(i=0; i<det.length; i++){
+       det[i] = JSON.parse(det[i]);
+      }
+      organizations = det;
+    }
+  });
+}
+
+
+function update_organization(data,id=''){
+  $.ajax({
+    url: '/{{groupid}}/state_analytics/update_organization/' + id,
+    method: 'POST',
+    data: JSON.stringify(data),
+    success: function(data){
+      console.log(data);
+    }
+  });
+}
 
 
 
