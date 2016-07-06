@@ -34,7 +34,7 @@ DATABASES = {
 
 Step 2:
 	python manage.py movedb (One-time command, ref: https://github.com/gnowledge/gstudio/pull/1235)
-	git pull origin alpha
+	git pull origin master
 
 	pip install -r ../requirements.txt
 
