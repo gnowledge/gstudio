@@ -35,75 +35,81 @@
 {% elif first_arg %}
   <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
 {% endif %}
-
-<div class="hr-card-image center large-6 columns" title="{% firstof resource.altnames resource.name %}">
+<div class="hr-card-image center large-12 columns" title="{% firstof resource.altnames resource.name %}">
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
-    {% if resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
-    <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
+    {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
+        <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
+    {% elif resource.if_file.thumbnail.relurl and 'video' in resource.if_file.mime_type %}
+        <img src="{{MEDIA_URL}}{{resource.if_file.thumbnail.relurl}}">
+    {% elif resource.if_file.mid.relurl %}
+        <img src="{{MEDIA_URL}}{{resource.if_file.mid.relurl}}">
+    {% elif resource.if_file.original.relurl and 'image' in resource.if_file.mime_type %}
+        <img src="{{MEDIA_URL}}{{resource.if_file.original.relurl}}">
+    {% elif resource.fs_file_ids.2 and not 'video' in resource.mime_type %}
+      <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
-    <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
+      <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
     {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
-      {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
+      {% if resource.collection_set  %}
+        <i class="collection"></i>
+      {% elif attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
         <i class="{{attr_set_dict.educationaluse|lower}}"></i>
       {% elif resource.fs_file_ids.0 and 'image' in resource.mime_type %}
-      <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
-      {% elif resource.mime_type %}
-        <i class="{{resource.mime_type|lower|split:'/'|join:' '}}"></i>
+        <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
+      
+      {% elif ".ggb" in resource.name %}   <!-- thumbnail for ggb files   -->
+        <img src="/static/ndf/images/geogebra-icon.png" alt="Geogebra" >
+      {% elif resource.if_file.mime_type %}
+        <i class="{{resource.if_file.mime_type|lower|split:'/'|join:' '}}"></i>
       {% else  %}
         <i class="{{resource.member_of_names_list.0|lower }}"></i>
       {% endif %}
-
     {% elif "Group" in resource.member_of_names_list or has_logo == True or has_prof_pic == True %}
       {% if "Course" in resource.member_of_names_list or has_logo == True %}
 
         {% get_relation_value resource.pk 'has_logo' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
-                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
+        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
+                  <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
           {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
+                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height" >
         {% endif %}
+
 
       {% else %}
-
         {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
-                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" />
+        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.mid.relurl %}
+                  <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
           {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height">
+                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  class="img-height" >
         {% endif %}
-
       {% endif %}
 
-    {% elif resource.collection_set %}
-        <i class="collection"></i>
-
-    {% else %}
-        <img src="/static/ndf/images/metaStudio-profile.svg"  class="img-height">
+    {% else%}
+      <img src="/static/ndf/images/metaStudio-profile.svg"  class="img-height">
     {% endif %}
-
-    <div class="hr-card-title" title="{% firstof resource.altnames resource.name %}">
-    {% firstof resource.name|capfirst %}
+  </div>
+    <div class=" large-12 columns hr-card-title" title="{% firstof resource.altnames resource.name %}">
+    
+    {% firstof resource.altnames resource.name %}
     <!-- {% get_node_ratings request resource.pk as ratings %} -->
             <!-- <div class="rating-stars center" style="width:{{ratings.avg|multiply:16}}px;"> <!-- 16px = 1 star -->
               <!-- <div></div>
             </div> -->
     </div>
 
-  </div>
   <!-- End Card  Image -->
-   <div class="large-6 columns">
+   <div class="hr-card-desc large-12 columns" title="{{resource.content_org}}">
 
     <!-- Card Description -->
 
     <!-- suppy no_description=True for not having description -->
     {% if not no_description %}
-      <div class="hr-card-desc large-12 columns" title="{{resource.content_org}}">
        {{resource.content_org|default_if_none:"Add some description."|truncatechars:75}}
-      </div>
     {% endif %}
      <!-- {{resource.author_set|length}} -->
     <!-- End Card Description  -->
   </div>
+    <hr>
 </div>
 
 

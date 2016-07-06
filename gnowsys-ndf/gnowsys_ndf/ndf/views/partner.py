@@ -217,16 +217,29 @@ def nroer_groups(request, group_id, groups_category):
 def partner_showcase(request, group_id):
 
     group_name, group_id = get_group_name_id(group_id)
+    resource_count = []
     
     all_source = node_collection.find({'attribute_set.source': {'$exists': True, '$ne': ''} }).distinct('attribute_set.source')
 
     partner_group = node_collection.one({'_type': 'GSystemType', 'name': 'PartnerGroup'})
 
     source_partners = node_collection.find({'_type': 'Group', 'member_of': {'$in': [partner_group._id]}, 'name': {'$in': all_source} }).sort('name',1)
+    # tmp_source = node_collection.find({'attribute_set.source': "CCRT" })
+    # print "\n\n tmp_source",tmp_source.count()
     
+    print "\n\n source_partners",source_partners.count()
+    for each in source_partners:
+      # print "sas"
+      tmp_source = node_collection.find({'attribute_set.source': each.name })
+      resource_count.append(tmp_source.count()) 
+    print "\n\n tmp_source ",resource_count
+       
+    source_partners.rewind()
+
     return render_to_response('ndf/partner_showcase.html',
                             {
                               'group_id': group_id, 'groupid': group_id,
-                              'source_partners': source_partners
+                              'source_partners': source_partners,
+                              'tmp_source':resource_count
                             }, context_instance=RequestContext(request)
                           )
