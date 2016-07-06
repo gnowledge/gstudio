@@ -735,7 +735,7 @@ class Node(DjangoDocument):
             print "\nError while processing invalid fields: ", e
             pass
 
-        # if Add-Buddy fature is enabled:
+        # if Add-Buddy feature is enabled:
         #   - Get all user id's of active buddies with currently logged in user.
         #   - Check if each of buddy-user-id does not exists in contributors of node object, add it.
         if GSTUDIO_BUDDY_LOGIN:
@@ -2065,18 +2065,18 @@ class Group(GSystem):
 
           - When we need the entire group object, just pass second argument as (boolian) True. In the case group object will be returned.
 
-          Example 1: res_group_name, res_group_id = get_group_name_id(group_name_or_id)
+          Example 1: res_group_name, res_group_id = Group.get_group_name_id(group_name_or_id)
           - "res_group_name" will contain name of the group.
           - "res_group_id" will contain _id/ObjectId of the group.
 
-          Example 2: res_group_obj = get_group_name_id(group_name_or_id, get_obj=True)
+          Example 2: res_group_obj = Group.get_group_name_id(group_name_or_id, get_obj=True)
           - "res_group_obj" will contain entire object.
 
           Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
           try:
               group_id = ObjectId(group_id)
           except:
-              group_name, group_id = get_group_name_id(group_id)
+              group_name, group_id = Group.get_group_name_id(group_id)
 
         '''
         # if cached result exists return it
@@ -2166,11 +2166,11 @@ class Group(GSystem):
 
     @staticmethod
     def can_access(user_id, group):
-        '''Returns True if user can aceess (read/edit/write) group resource.
+        '''Returns True if user can access (read/edit/write) group resource.
         ARGS:
             - user_id (int): Django User id
             - group (Group or ObjectID or str-of-group-name): It can be either group's
-                                                        object or group's _id or group's name.
+                                                        object or _id or name.
         '''
         if isinstance(group, Group):
             group_obj = group
