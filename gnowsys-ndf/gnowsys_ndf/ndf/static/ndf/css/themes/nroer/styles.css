@@ -27917,7 +27917,7 @@ course-title {
   margin: 5px;
   overflow: hidden;
   width: 100%;
-  height: 16rem;
+  height: 18rem !important;
 }
 /* line 4515, ../../../scss/_app_styles.scss */
 .hr-card:hover {
@@ -27926,25 +27926,21 @@ course-title {
 }
 /* line 4520, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-status {
-  z-index: 99;
-  width: auto;
-  top: 30px;
-  position: absolute;
-  background-color: #00b300;
-  color: white;
+  font-size: 0.6em;
+  color: gray;
 }
-/* line 4533, ../../../scss/_app_styles.scss */
+/* line 4526, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-title {
-  font-size: 0.8 em;
+  font-size: 0.7 0.5 em;
   color: #0d0d0d;
 }
-/* line 4542, ../../../scss/_app_styles.scss */
+/* line 4535, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-desc {
   font-size: 0.7em;
   color: #333333;
   border-bottom: thick black;
 }
-/* line 4551, ../../../scss/_app_styles.scss */
+/* line 4544, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image {
   max-height: 12rem;
   padding: 0px;
@@ -27955,7 +27951,7 @@ course-title {
   overflow: hidden;
   height: 10rem;
 }
-/* line 4562, ../../../scss/_app_styles.scss */
+/* line 4555, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -27963,7 +27959,7 @@ course-title {
   opacity: 0.9;
   height: 100%;
 }
-/* line 4571, ../../../scss/_app_styles.scss */
+/* line 4564, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -27977,47 +27973,47 @@ course-title {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 4585, ../../../scss/_app_styles.scss */
+/* line 4578, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.file:before {
   content: "\f18e";
 }
-/* line 4588, ../../../scss/_app_styles.scss */
+/* line 4581, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.page:before {
   content: "\f18e";
 }
-/* line 4591, ../../../scss/_app_styles.scss */
+/* line 4584, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.collection:before {
   content: "\f18a";
 }
-/* line 4594, ../../../scss/_app_styles.scss */
+/* line 4587, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.documents:before {
   content: "\f18b";
 }
-/* line 4597, ../../../scss/_app_styles.scss */
+/* line 4590, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.pdf:before {
   content: "\f18b";
 }
-/* line 4600, ../../../scss/_app_styles.scss */
+/* line 4593, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.text:before {
   content: "\f18e";
 }
-/* line 4603, ../../../scss/_app_styles.scss */
+/* line 4596, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.interactives:before {
   content: "\f1b2";
 }
-/* line 4606, ../../../scss/_app_styles.scss */
+/* line 4599, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.ebooks:before {
   content: "\f11e";
 }
-/* line 4609, ../../../scss/_app_styles.scss */
+/* line 4602, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.images:before {
   content: "\f125";
 }
-/* line 4612, ../../../scss/_app_styles.scss */
+/* line 4605, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.audios:before, .hr-card .hr-card-image i.audio:before {
   content: "\f17b";
 }
-/* line 4615, ../../../scss/_app_styles.scss */
+/* line 4608, ../../../scss/_app_styles.scss */
 .hr-card .hr-card-image i.videos:before, .hr-card .hr-card-image i.video:before {
   content: "\f20e";
 }
