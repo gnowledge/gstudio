@@ -246,14 +246,36 @@ table, th, td {
                           </div>
 
                             {% elif active == -1%}
+                             
+                              {% if shortly %}
+
                              <div align = "center">
-                             <button disabled>{{node.name}} will start in {{days_left}} days</button>
-                           </div>
+                             <button disabled>{{node.name}} will begin shortly</button>
+                             </div>
+
+                              {% else %}
+                               
+                                 {% if days_left == 0 %}
+
+                                       <div align = "center">
+                                       <button disabled>{{node.name}} will start in {{hours_left}} hours</button>
+                                       </div>
+
+                                 {% else %}
+
+                                       <div align = "center">
+                                       <button disabled>{{node.name}} will start in {{days_left}} days</button>
+                                       </div>
+
+                                 {% endif %}
+
+                              {% endif %}   
 
                             {% else %}
+
                              <div align = "center">
                              <button disabled>{{node.name}} has ended</button>
-                           </div>
+                             </div>
 
                             {% endif %} 
 
