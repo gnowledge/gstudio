@@ -1,6 +1,8 @@
 {% load i18n %}
 {% load get_latest_git_hash from simple_filters %}
+{% load get_pages from ndf_tags %}
 
+{% get_pages "Info page" as infopages %}
 <footer>
     <div class="myfooter">
     <div class="footer-section container content-section">
@@ -35,6 +37,17 @@
                             <li><a href="https://gitlab.com/gnowledge/gstudio/issues">{% trans "Issues" %}</a></li>
                             -->
                             <li><a href="{{site.ISSUES_PAGE}}">{% trans "Feedback" %}</a></li>
+                        </ul>
+                    </div>
+                    <div class="show_foot_links">Show More</div>
+                </div>
+                <div class="footer_link_cont">
+                    <h4 style="color: #999;">Info pages</h4>
+                    <div class="links_collapse">
+                        <ul>
+                            {% for infopage in infopages %}
+                                <li><a href="{% url 'page_details' group_name_tag infopage %}">{% trans infopage.name %}</a></li>
+                            {% endfor %}
                         </ul>
                     </div>
                     <div class="show_foot_links">Show More</div>

@@ -3761,3 +3761,12 @@ def get_course_completetion_data(group_obj, user, ids_list=False):
 
             return_dict = {"leaf_ids":list_of_leaf_node_ids,"completed_ids":completed_ids_list,"incompleted_ids":incompleted_ids_list}
 	return return_dict
+
+
+@register.assignment_tag
+def get_pages(page_type):
+	page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+	help_page = node_collection.one({'_type': "Group", 'name': "help"})
+	page_type_gst = node_collection.one({'_type': "GSystemType", 'name': page_type})
+	page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': page_type_gst._id, 'group_set': help_page._id})
+	return page_nodes
