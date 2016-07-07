@@ -26,7 +26,6 @@
 
 
  <div class="hr-card large-12 ">
-
 {% check_is_gstaff groupid request.user as gstaff_access %}
 {% if first_arg and second_arg and third_arg %}
   <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
@@ -110,6 +109,13 @@
     <!-- End Card Description  -->
   </div>
     <hr>
+ <div class="hr-card-status large-12 columns">
+    {% for each in resource_meta_info %}
+      {% if resource.name == each.res_name %}
+      Total Resources : {{each.res_count}}
+      {% endif %}
+    {% endfor %}
+ </div>
 </div>
 
 
