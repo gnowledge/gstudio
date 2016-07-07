@@ -272,21 +272,15 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       usr = node_collection.one({'_type':u'Author','name':unicode(request.user)})
       usrid = usr._id
 
+    bbb = False
     for i in node.attribute_set:
-      try:
+      if unicode('start_time') in i.keys():
         start_time = i['start_time']
-        break
-      except:
-        pass
-    # st_time = node.attribute_set[0]['start_time']
-    
-    for i in node.attribute_set:
-      try:
+      elif unicode('end_time') in i.keys():
         end_time = i['end_time']
-        break
-      except:
-        pass
-    
+      elif unicode('is_bigbluebutton') in i.keys():
+        bbb = i['is_bigbluebutton']
+    # st_time = node.attribute_set[0]['start_time']
     # end_time = node.attribute_set[1]['end_time']
     
     now = datetime.datetime.now()
@@ -325,19 +319,11 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     moderator_list = []
 
     for i in node.relation_set:
-      try:
+      if unicode('attendee_list') in i.keys():
         attendee_list =  i['has_attendees']
-        break
-      except:
-        pass
-
-    for i in node.relation_set:
-      try:
+      elif unicode('moderator_list') in i.keys():
         moderator_list = i['event_coordinator']
-        break
-      except:
-        pass
-
+        
     for i in moderator_list:
       if usrid == i:
         is_attendee = True
@@ -347,15 +333,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       for i in attendee_list:
         if usrid == i:
           is_attendee = True
-          break      
-
-    bbb = False
-    for i in node.attribute_set:
-      try:
-        bbb = i['is_bigbluebutton']
-        break
-      except:
-        pass
+          break
 
     createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'logout.html')
     
