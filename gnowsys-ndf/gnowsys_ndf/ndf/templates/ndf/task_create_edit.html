@@ -4,7 +4,7 @@
 {% load i18n %}
 
 {% block title %} {{title}} {% endblock %}
-
+{% get_group_name "group_id" as group_name_tag %}
 {% block head %}
 	<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
 	<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
@@ -124,7 +124,7 @@
 	 
 	    <div class="medium-5 columns">
 	    	
-	    	<input type = 'button' onclick = "fillist()" value = "Done">
+	    	<input type = 'button' onclick = "fillist()" value = "Done" id="done-btn">
 	    </div>
 	    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 	</div>                   
@@ -342,6 +342,19 @@
 
   var watchers_arr = new Array();
   $(document).on("click", "#save-node", function() {
+  $( "#done-btn" ).trigger( "click" );
+  $.ajax({
+            type: "POST",
+            url: "{% url 'task_edit' group_name_tag  task_id %}",
+            dataType: "html",
+            data:{
+                "csrfmiddlewaretoken": "{{ csrf_token }}",
+              },
+          success: function(data) {
+            
+          }
+
+                });
     $("div.watchers input[type='checkbox']:checked").each(function() {
       if ($.inArray(this.value, watchers_arr) == -1) {
         watchers_arr.push(this.value);
@@ -500,26 +513,27 @@
 
 	function fillist()
 	{
-	      assignee_list=[]
-	      disp_assignee_list = []
-	      $('#assignee_warning').empty()
-	      if ($('#assignees').val() == "Group Assignees" || $('#assignees').val() == "Multiple Assignee" ){
-	       
-	      $('#list').children(":checkbox").each(function(){ 
-	            if (this.checked == true)
-	 			{  
-					assignee_list.push(Number(this.value))
-					disp_assignee_list.push($('#' + this.value + '').text())
+        assignee_list=[]
+        disp_assignee_list = []
+        $('#assignee_warning').empty()
+        if ($('#assignees').val() == "Group Assignees" || $('#assignees').val() == "Multiple Assignee" ){
+         
+        $('#list').children(":checkbox").each(function(){ 
+              if (this.checked == true)
+        {  
+          assignee_list.push(Number(this.value))
+          disp_assignee_list.push($('#' + this.value + '').text())
                 }
-	      });
-	      		$("#Assignee").attr('value',assignee_list)
-	      }
-	      else
-	      {		disp_assignee_list.push($('#customDropdown2 option:selected').text())
-            	$('#Assignee').attr('value',$('#customDropdown2').val())
-	      }
-	      
-	      	$('#Assignees_list').attr('value',assignee_list)
+        });
+            $("#Assignee").attr('value',assignee_list)
+        }
+        else
+        {   disp_assignee_list.push($('#customDropdown2 option:selected').text())
+              $('#Assignee').attr('value',$('#customDropdown2').val())
+        }
+        
+	      	
+          $('#Assignees_list').attr('value',assignee_list)
 	      	$('#selected_assignees').empty()
 	      	$('#selected_assignees').append("<label> <h4>" + disp_assignee_list + "</h4></label>")
 	      	$('#selectAssigneeslist').foundation('reveal', 'close');
