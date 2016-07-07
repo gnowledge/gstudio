@@ -162,6 +162,8 @@ def update_notes_or_files_visited(user_id, group_id,node_id,if_file,if_note) :
             counter_obj.no_others_files_visited += 1
             counter_obj_creator = get_counter_obj(file_creator_id, group_id)
             counter_obj_creator.no_visits_gained_on_files += 1
+            counter_obj_creator.last_update = datetime.today()
+            counter_obj_creator.save()
 
     elif if_note:
         note_node_obj = node_collection.one({'_id':node_id})
@@ -170,11 +172,13 @@ def update_notes_or_files_visited(user_id, group_id,node_id,if_file,if_note) :
             counter_obj.no_others_notes_visited += 1
             counter_obj_creator = get_counter_obj(note_creator_id, group_id)
             counter_obj_creator.no_views_gained_on_notes += 1
+            counter_obj_creator.last_update = datetime.today()
+            counter_obj_creator.save()
 
-    counter_obj.last_update = datetime.datetime.now()
-    counter_obj_creator.last_update = datetime.datetime.now()
+
+    counter_obj.last_update = datetime.today()
     counter_obj.save()
-    counter_obj_creator.save()
+    
 
 import json
 import bson
