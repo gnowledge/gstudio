@@ -1054,5 +1054,17 @@
         "max_digits": "", 
         "validators": "[]", 
         "help_text": "[]"
+    }, 
+    {
+        "altnames": "Invite all group members", 
+        "name": "invite_group", 
+        "data_type": "bool", 
+        "complex_data_type": "[]", 
+        "required": "TRUE", 
+        "editable": "TRUE", 
+        "subject_type": "[\"Event\"]", 
+        "max_digits": "", 
+        "validators": "[]", 
+        "help_text": "[]"
     }
 ]

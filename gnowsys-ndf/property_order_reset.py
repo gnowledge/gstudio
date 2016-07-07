@@ -2,7 +2,7 @@ from gnowsys_ndf.ndf.models import *
 
 # ================================================================== Tabs for Event
 
-el_name = ["name", "start_time", "end_time", "is_bigbluebutton" , "event_coordinator", "has_attendees", "location", "content_org", "event_status", "tags"]
+el_name = ["name", "start_time", "end_time", "is_bigbluebutton" , "event_coordinator", "invite_group", "has_attendees", "location", "content_org", "event_status", "tags"]
 el = []
 for i, n in enumerate(el_name):
   old_n = n
