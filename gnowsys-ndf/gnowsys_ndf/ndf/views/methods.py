@@ -141,7 +141,7 @@ def get_execution_time(f):
         return f
 
 def get_counter_obj(userid, groupid) :
-    counter_obj = counter_collection.one({'user_id':userid, 'group_id': groupid})
+    counter_obj = csounter_collection.one({'user_id':userid, 'group_id': groupid})
     if not counter_obj :
         counter_obj = counter_collection.collection.Counter()
         counter_obj.user_id=userid

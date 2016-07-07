@@ -2503,7 +2503,6 @@ def create_sub_group(request,group_id):
 @login_required
 @get_execution_time
 def upload_using_save_file(request,group_id):
-    print "naman3"
     from gnowsys_ndf.ndf.views.file import save_file
     try:
         group_id = ObjectId(group_id)
