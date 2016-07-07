@@ -3171,6 +3171,36 @@ class Buddy(DjangoDocument):
         return active_buddy_auth_list
 
 
+    def get_all_buddies_auth_ids(self):
+        return self['buddy_in_out'].keys()
+
+    def get_all_buddies_user_ids(self):
+        return Author.get_user_id_list_from_author_oid_list(self['buddy_in_out'].keys())
+
+    @staticmethod
+    def get_buddy_cur_from_userid_datetime(user_id, datetime_obj):
+        return buddy_collection.find({'loggedin_userid': user_id, 'starts_at': {'$lt': datetime_obj}, '$or': [{'ends_at': {'$gt': datetime_obj}}, {'ends_at': None} ] })
+
+    @staticmethod
+    def get_buddy_userids_list_within_datetime(user_id, datetime_obj):
+        buddy_cur = Buddy.get_buddy_cur_from_userid_datetime(user_id, datetime_obj)
+        all_buddies_authid_list = []
+        for each_buddy_obj in buddy_cur:
+            all_buddies_authid_list += each_buddy_obj.get_all_buddies_auth_ids()
+            for each_buddy_authid, in_out_time in each_buddy_obj.buddy_in_out.iteritems():
+                for each_io in in_out_time:
+                    print (not each_io['out'] and datetime_obj > each_io['in'])
+                    if (not each_io['out'] and datetime_obj > each_io['in']) \
+                    or (each_io['out'] and datetime_obj < each_io['out'] and datetime_obj > each_io['in']):
+                        all_buddies_authid_list.append(each_buddy_authid)
+
+        if not all_buddies_authid_list:
+            return []
+
+        else:
+            return Author.get_user_id_list_from_author_oid_list(set(dict.fromkeys(all_buddies_authid_list).keys()))
+
+
     def save(self, *args, **kwargs):
 
         is_new = False if ('_id' in self) else True
