@@ -267,6 +267,22 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     Add="Stop"       
   #fecth the data
 
+  context_variables = { 'groupid': group_id, 
+                          'app_id': app_id,'app_collection_set': app_collection_set, 
+                          'app_set_id': app_set_id,
+                          'title':title,
+                          'nodes': nodes, 'node': node,
+                          'event_gst':event_gst.name,
+                          'Add':Add,
+                          'reschedule_time' : reschedule_time,
+                          'reschedule'    : reschedule, 
+                          'task_date' : event_task_date_reschedule,
+                          'task_attendance' : event_task_Attendance_reschedule,
+                          'marks_entry_completed' :marks_entry_completed,
+                          'Eventtype':Eventtype, 
+                           # 'property_order_list': property_order_list
+                        }
+
   if app_set_instance_id: #only if we view details of the particular event
     if request.user:
       usr = node_collection.one({'_type':u'Author','name':unicode(request.user)})
@@ -334,45 +350,15 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     else:
       url = joinURL(node._id, request.user, 'aPW', SALT, URL)        
 
-    context_variables = { 'groupid': group_id, 
-                          'app_id': app_id,'app_collection_set': app_collection_set, 
-                          'app_set_id': app_set_id,
-                          'title':title,
-                          'nodes': nodes, 'node': node,
-                          'event_gst':event_gst.name,
-                          'Add':Add,
-                          'reschedule_time' : reschedule_time,
-                          'reschedule'    : reschedule, 
-                          'task_date' : event_task_date_reschedule,
-                          'task_attendance' : event_task_Attendance_reschedule,
-                          'marks_entry_completed' :marks_entry_completed,
-                          'Eventtype':Eventtype, 
-                          'show':is_attendee,
+    extra_context_variables = {'show':is_attendee,
                           'url':url,
                           'active':active,
                           'days_left':days_left,
                           'is_bbb': bbb,
                           'shortly':shortly,
                           'hours_left':hours_left, 
-                           # 'property_order_list': property_order_list
                         }
-  else:
-     context_variables = { 'groupid': group_id, 
-                          'app_id': app_id,'app_collection_set': app_collection_set, 
-                          'app_set_id': app_set_id,
-                          'title':title,
-                          'nodes': nodes, 'node': node,
-                          'event_gst':event_gst.name,
-                          'Add':Add,
-                          'reschedule_time' : reschedule_time,
-                          'reschedule'    : reschedule, 
-                          'task_date' : event_task_date_reschedule,
-                          'task_attendance' : event_task_Attendance_reschedule,
-                          'marks_entry_completed' :marks_entry_completed,
-                          'Eventtype':Eventtype,
-                           # 'property_order_list': property_order_list
-                        }    
-
+    context_variables.update(extra_context_variables)
 
   
   if batch :
