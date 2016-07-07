@@ -1850,6 +1850,7 @@ def get_data_for_event_task(request, group_id):
     event_count={}
     list31=[1,3,5,7,8,10,12]
     list30=[4,6,9,11]
+    import datetime
     currentYear = datetime.datetime.now().year
     #create the date format in unix format for querying it from data
     #Task attribute_type start time's object value takes the only date

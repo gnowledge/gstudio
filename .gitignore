@@ -71,3 +71,6 @@ wikidata/
 *local_settings.py
 img/
 media/
+schema_files/
+
+wsgi.py
