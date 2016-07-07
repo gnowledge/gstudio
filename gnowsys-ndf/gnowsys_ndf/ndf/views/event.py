@@ -267,26 +267,36 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     Add="Stop"       
   #fecth the data
 
+  context_variables = { 'groupid': group_id, 
+                          'app_id': app_id,'app_collection_set': app_collection_set, 
+                          'app_set_id': app_set_id,
+                          'title':title,
+                          'nodes': nodes, 'node': node,
+                          'event_gst':event_gst.name,
+                          'Add':Add,
+                          'reschedule_time' : reschedule_time,
+                          'reschedule'    : reschedule, 
+                          'task_date' : event_task_date_reschedule,
+                          'task_attendance' : event_task_Attendance_reschedule,
+                          'marks_entry_completed' :marks_entry_completed,
+                          'Eventtype':Eventtype, 
+                           # 'property_order_list': property_order_list
+                        }
+
   if app_set_instance_id: #only if we view details of the particular event
     if request.user:
       usr = node_collection.one({'_type':u'Author','name':unicode(request.user)})
       usrid = usr._id
 
+    bbb = False
     for i in node.attribute_set:
-      try:
+      if unicode('start_time') in i.keys():
         start_time = i['start_time']
-        break
-      except:
-        pass
-    # st_time = node.attribute_set[0]['start_time']
-    
-    for i in node.attribute_set:
-      try:
+      elif unicode('end_time') in i.keys():
         end_time = i['end_time']
-        break
-      except:
-        pass
-    
+      elif unicode('is_bigbluebutton') in i.keys():
+        bbb = i['is_bigbluebutton']
+    # st_time = node.attribute_set[0]['start_time']
     # end_time = node.attribute_set[1]['end_time']
     
     now = datetime.datetime.now()
@@ -317,19 +327,11 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     moderator_list = []
 
     for i in node.relation_set:
-      try:
+      if unicode('attendee_list') in i.keys():
         attendee_list =  i['has_attendees']
-        break
-      except:
-        pass
-
-    for i in node.relation_set:
-      try:
+      elif unicode('moderator_list') in i.keys():
         moderator_list = i['event_coordinator']
-        break
-      except:
-        pass
-
+        
     for i in moderator_list:
       if usrid == i:
         is_attendee = True
@@ -339,15 +341,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       for i in attendee_list:
         if usrid == i:
           is_attendee = True
-          break      
-
-    bbb = False
-    for i in node.attribute_set:
-      try:
-        bbb = i['is_bigbluebutton']
-        break
-      except:
-        pass
+          break
 
     createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'logout.html')
     
@@ -356,45 +350,15 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     else:
       url = joinURL(node._id, request.user, 'aPW', SALT, URL)        
 
-    context_variables = { 'groupid': group_id, 
-                          'app_id': app_id,'app_collection_set': app_collection_set, 
-                          'app_set_id': app_set_id,
-                          'title':title,
-                          'nodes': nodes, 'node': node,
-                          'event_gst':event_gst.name,
-                          'Add':Add,
-                          'reschedule_time' : reschedule_time,
-                          'reschedule'    : reschedule, 
-                          'task_date' : event_task_date_reschedule,
-                          'task_attendance' : event_task_Attendance_reschedule,
-                          'marks_entry_completed' :marks_entry_completed,
-                          'Eventtype':Eventtype, 
-                          'show':is_attendee,
+    extra_context_variables = {'show':is_attendee,
                           'url':url,
                           'active':active,
                           'days_left':days_left,
                           'is_bbb': bbb,
                           'shortly':shortly,
                           'hours_left':hours_left, 
-                           # 'property_order_list': property_order_list
                         }
-  else:
-     context_variables = { 'groupid': group_id, 
-                          'app_id': app_id,'app_collection_set': app_collection_set, 
-                          'app_set_id': app_set_id,
-                          'title':title,
-                          'nodes': nodes, 'node': node,
-                          'event_gst':event_gst.name,
-                          'Add':Add,
-                          'reschedule_time' : reschedule_time,
-                          'reschedule'    : reschedule, 
-                          'task_date' : event_task_date_reschedule,
-                          'task_attendance' : event_task_Attendance_reschedule,
-                          'marks_entry_completed' :marks_entry_completed,
-                          'Eventtype':Eventtype,
-                           # 'property_order_list': property_order_list
-                        }    
-
+    context_variables.update(extra_context_variables)
 
   
   if batch :
