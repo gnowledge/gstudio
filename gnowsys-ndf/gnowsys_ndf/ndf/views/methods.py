@@ -5253,26 +5253,40 @@ def replicate_resource(request, node, group_id):
 
             ##### TRIPLES GRELATIONS
             node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id})
+            # To handle multiple GRelations of same RT i.e of object_cardinality  > 1
+            # If looped over the list and called create_grelation multiple time, this will create 
+            # all grelations but will set PUBLISHED status for ONLY the last one and mark as DELETED the earlier ones
+            # Hence making use of following dictionary
 
+
+            relation_dict_rt_key_rs_val = {}
             for each_rel in node_grel_cur:
                 rt_id = each_rel['relation_type']['_id']
                 right_subj = each_rel['right_subject']
-                rt_node = node_collection.one({'_id': ObjectId(rt_id)})
+                if rt_id in relation_dict_rt_key_rs_val.keys() :
+                    if not isinstance(relation_dict_rt_key_rs_val[rt_id],list):
+                        value_list = []
+                        value_list.append(relation_dict_rt_key_rs_val[rt_id])
+                        value_list.append(right_subj)
+                        relation_dict_rt_key_rs_val[rt_id] = value_list
+                    else:
+                        relation_dict_rt_key_rs_val[rt_id].append(right_subj)
+                else:
+                    relation_dict_rt_key_rs_val[rt_id] = right_subj
+            # print "\n\n relation_dict_rt_key_rs_val === ",relation_dict_rt_key_rs_val
+
+            for eachrtid, eachrsval in relation_dict_rt_key_rs_val.items():
+                rt_node = node_collection.one({'_id': ObjectId(eachrtid)})
                 if rt_node.name == 'has_thread':
                     thread_created = True
-                right_sub_new = None
-                if isinstance(right_subj,list):
-                    right_sub_new = []
-                    right_subj_node = node_collection.one({'_id': {'$in': right_subj}})
-                    for each_rs in right_subj_node:
-                        new_right_subj_node = create_clone(user_id, each_rs, group_id)
-                        right_sub_new.append(new_right_subj_node._id)
-                else:
-                    right_subj_node = node_collection.one({'_id': ObjectId(right_subj)})
+                cloned_rs_ids = []
+                for eachrsval_id in eachrsval:
+                    right_subj_node = node_collection.one({'_id': ObjectId(eachrsval_id)})
                     right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
-                    right_sub_new = right_sub_new_node._id
+                    cloned_rs_ids.append(right_sub_new_node._id)
+                create_grelation(new_gsystem._id,rt_node,cloned_rs_ids)
 
-                create_grelation(new_gsystem._id,rt_node,right_sub_new)
+
             if "QuizItemEvent" in new_gsystem.member_of_names_list:
                 if not thread_created:
                     thread_obj = create_thread_for_node(request,group_id, new_gsystem)
