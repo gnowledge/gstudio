@@ -329,9 +329,9 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     for i in node.relation_set:
       if unicode('attendee_list') in i.keys():
         attendee_list =  i['has_attendees']
-      elif unicode('moderator_list') in i.keys():
+      elif unicode('event_coordinator') in i.keys():
         moderator_list = i['event_coordinator']
-        
+
     for i in moderator_list:
       if usrid == i:
         is_attendee = True
