@@ -291,32 +291,24 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     
     now = datetime.datetime.now()
 
-    buff_start = datetime.timedelta(hours=24)
-
-    beg = start_time - buff_start
+    beg = start_time
     end = end_time
     days_left = 0
+    hours_left = 0
+    shortly = False
 
     if now <= end and beg <= now :
       active =  0
     elif now > end : 
       active = 1
-      # print "$$$$$$"
-      # for i,v in enumerate(node.attribute_set):
-      #   try:
-      #     if v['event_status']:
-      #       node.attribute_set[i]['event_status'] = unicode('Completed')
-      #       print node.attribute_set[i]['event_status']
-      #       node.save()
-      #       print "###############"
-      #       print "Completed"
-      #       break
-        # except:
-        #   pass
-      # node.save()     
     else:
       active = -1  
-      days_left = (start_time-now).days  
+      days_left = (start_time-now).days
+      hours_left = (start_time-now).seconds//3600
+
+      if hours_left == 0:
+        shortly = True           
+
 
     is_attendee = False
     is_moderator = False
@@ -382,6 +374,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                           'active':active,
                           'days_left':days_left,
                           'is_bbb': bbb,
+                          'shortly':shortly,
+                          'hours_left':hours_left, 
                            # 'property_order_list': property_order_list
                         }
   else:
