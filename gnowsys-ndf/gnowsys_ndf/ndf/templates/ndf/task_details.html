@@ -182,7 +182,7 @@
           <b>{% trans "Description:" %}</b>
         {% if task_type_name.0.name != "Moderation" %}
           {% if user_obj.username == request.user.username or request.user.is_superuser %}
-          <a href="#" class="button tiny edit-desc" style="float:right" > {% trans 'sEdit' %}</a>
+          <a href="#" class="button tiny edit-desc" style="float:right" > {% trans 'Edit' %}</a>
           {% endif %}
         {% endif %}
         </label>
@@ -266,7 +266,7 @@
       
     {% if task_type_name.0.name != "Moderation" %}
       {% if collection != 'True' %}
-      <a href="{% url 'task_edit' group_name node %}" class="small button split edit">
+      <a href="{% url 'task_edit' node.group_set.0 node %}" class="small button split edit">
         <i class="fi-pencil"></i> Update <span data-dropdown="edit-options"></span>
       </a> 
       {% endif %}
