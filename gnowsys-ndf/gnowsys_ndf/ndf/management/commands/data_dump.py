@@ -9,6 +9,7 @@ from gnowsys_ndf.settings import *
 node_collection_ids = set()
 triple_collection_ids = set()
 filehives_collection_ids = set()
+counter_collection_ids = set()
 filehives_media_urls = set()
 build_rcs = set()
 rcs_paths_found = set()
@@ -32,6 +33,7 @@ class Command(BaseCommand):
         group_node = node_collection.one({"_type":"Group","_id":ObjectId(group_id)}) 
         if group_node:
             print "\n Initializing Dump of : ", group_node.name
+            get_counter_ids(group_node._id)
             nodes_falling_under_grp = node_collection.find({"group_set":ObjectId(group_node._id)})
             for each_node in nodes_falling_under_grp:
                 node_collection_ids.add(each_node._id)  
@@ -196,6 +198,10 @@ def get_nested_ids(node,field_name):
             if each_node and each_node[field_name]:
                 get_nested_ids(each_node, field_name)
 
+def get_counter_ids(group_id) :
+    counter_collection_cur = counter_collection.find({'group_id':ObjectId(group_id)})
+    for each_obj in counter_collection_cur :
+        counter_collection_ids.add(each_obj._id)
 
 def dump_node_ids(list_of_ids,collection_name):
     print "\n In dump_node_ids"
