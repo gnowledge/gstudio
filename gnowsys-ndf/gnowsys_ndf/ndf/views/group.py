@@ -1570,21 +1570,15 @@ class EventGroupCreateEditHandler(View):
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
-
                     # creating a new counter document for a user for a given course for the purpose of analytics
-                    counter_obj = counter_collection.one({'user_id':request.user.id, 'group_id': ObjectId(group_obj._id)})
-                    if counter_obj:
-                        counter_obj.enrolled = True
-                        counter_obj.save()
-                    else:
-                        counter_obj = counter_collection.collection.Counter()
-                        counter_obj.user_id=request.user.id
-                        auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
-                        counter_obj.auth_id=ObjectId(auth_obj._id)
-                        counter_obj.group_id=ObjectId(group_obj._id)
-                        counter_obj.last_update=datetime.today()
-                        counter_obj.enrolled = True
-                        counter_obj.save()
+                    counter_obj = counter_collection.collection.Counter()
+                    counter_obj.user_id=request.user.id
+                    auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
+                    counter_obj.auth_id=ObjectId(auth_obj._id)
+                    counter_obj.group_id=ObjectId(group_obj._id)
+                    counter_obj.last_update=datetime.today()
+                    counter_obj.enrolled = True
+                    counter_obj.save()
 
                 # elif sg_type == "ProgramEventGroup":
                     # mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
@@ -2503,7 +2497,6 @@ def create_sub_group(request,group_id):
 @login_required
 @get_execution_time
 def upload_using_save_file(request,group_id):
-    print "naman3"
     from gnowsys_ndf.ndf.views.file import save_file
     try:
         group_id = ObjectId(group_id)
@@ -2644,20 +2637,16 @@ def upload_using_save_file(request,group_id):
         create_gattribute(each_gs_file._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
 
-    if title == "gallery":
+    if title =="gallery" or title == "raw material":
         counter_obj=get_counter_obj(request.user.id,group_id)
         counter_obj.no_files_created+=1
         counter_obj.course_score+=GSTUDIO_FILE_UPLOAD_POINTS
         counter_obj.last_update = datetime.today()
         counter_obj.save()
-        return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
-    elif title == "raw material":
-    	counter_obj=get_counter_obj(request.user.id,group_id)
-        counter_obj.no_files_created+=1
-        counter_obj.course_score+=GSTUDIO_FILE_UPLOAD_POINTS
-        counter_obj.last_update = datetime.today()
-        counter_obj.save()
-        return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
+        if title == "gallery":
+            return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
+        else:
+            return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     else:
         return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
     # return HttpResponseRedirect(url_name)
