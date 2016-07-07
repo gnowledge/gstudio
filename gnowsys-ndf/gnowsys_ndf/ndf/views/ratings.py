@@ -35,7 +35,6 @@ def ratings(request, group_id, node_id):
 	blog=None
 	if len(node_obj.type_of)!=0:
 		blog=node_collection.one({'_id':node_obj.type_of[0]})
-	#print blog,blog,blog,blog,blog,blog
 	for rat in node_obj.rating:
 		if rat['user_id']==request.user.id:
 			unique=False

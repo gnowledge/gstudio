@@ -295,7 +295,6 @@ def get_execution_time(f):
 
 def get_counter_obj(userid, groupid) :
     counter_obj = counter_collection.one({'user_id':userid, 'group_id': groupid})
-    print "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA------------------"
     if counter_obj :
         pass
     else :
