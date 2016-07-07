@@ -63,3 +63,4 @@ def updater(all_events):
 		if now > end_time:
 			create_gattribute(event._id , status , unicode("Completed"))
 			
+			
