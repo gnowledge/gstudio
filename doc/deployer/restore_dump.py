@@ -18,6 +18,7 @@ def run():
     nodes_path = '/data/gstudio_data_restore/data/rcs-repo/Nodes'
     triples_path = '/data/gstudio_data_restore/data/rcs-repo/Triples'
     filehives_path = '/data/gstudio_data_restore/data/rcs-repo/Filehives'
+    counters_path = '/data/gstudio_data_restore/data/rec-repo/Counters'
 
     log_file_name = 'data_restore.log'
     if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
@@ -32,7 +33,7 @@ def run():
 
     # path_list = [('Node',nodes_path)]
     # path_list = [('Triples',triples_path)]
-    path_list = [('Node',nodes_path),('Triples',triples_path), ('Filehives', filehives_path)]
+    path_list = [('Node',nodes_path),('Triples',triples_path), ('Filehives', filehives_path), ('Counters', counters_path)]
     for path in path_list:
         print "\n Path -- ",path[0]
         file_path_exists =  os.path.exists(path[1])
@@ -170,6 +171,130 @@ def run():
 
                             print "Inserting Filehives doc"
                             filehive_collection.collection.insert(data)
+
+                    if path[0] == "Counters":
+                        print "Counters"
+                        c = counters_collection.find_one({'_id': ObjectId(data['_id'])})
+                        if c:
+                            log_file.write("\n*************************************************************")
+                            log_file.write("\nFound Existing Counters : " + str(c._id))
+
+                            counter_changed = False
+                            print "Updating Counter doc"
+                            print c.name
+
+                            if c.last_update != data['last_update'] :
+                                c.last_update = data['last_update']
+                                counter_changed = True
+
+                            if c.enrolled != data['enrolled'] :
+                                c.enrolled = data['enrolled']
+                                counter_changed = True
+
+                            if c.modules_completed != data['modules_completed'] :
+                                c.modules_completed = data['modules_completed']
+                                counter_changed = True
+
+                            if c.course_score != data['course_score'] :
+                                c.course_score = data['course_score']
+                                counter_changed = True
+
+                            if c.units_completed != data['units_completed'] :
+                                c.units_completed = data['units_completed']
+                                counter_changed = True
+
+                            if c.no_comments_by_user != data['no_comments_by_user'] :
+                                c.no_comments_by_user = data['no_comments_by_user']
+                                counter_changed = True
+
+                            if c.no_comments_for_user != data['no_comments_for_user'] :
+                                c.no_comments_for_user = data['no_comments_for_user']
+                                counter_changed = True
+
+                            if c.no_files_created != data['no_files_created'] :
+                                c.no_files_created = data['no_files_created']
+                                counter_changed = True
+
+                            if c.no_visits_gained_on_files != data['no_visits_gained_on_files'] :
+                                c.no_visits_gained_on_files = data['no_visits_gained_on_files']
+                                counter_changed = True
+
+                            if c.no_comments_received_on_files != data['no_comments_received_on_files'] :
+                                c.no_comments_received_on_files = data['no_comments_received_on_files']
+                                counter_changed = True
+
+                            if c.no_others_files_visited != data['no_others_files_visited'] :
+                                c.no_others_files_visited = data['no_others_files_visited']
+                                counter_changed = True
+
+                            if c.no_comments_on_others_files != data['no_comments_on_others_files'] :
+                                c.no_comments_on_others_files = data['no_comments_on_others_files']
+                                counter_changed = True
+
+                            if c.rating_count_received_on_files != data['rating_count_received_on_files'] :
+                                c.rating_count_received_on_files = data['rating_count_received_on_files']
+                                counter_changed = True
+
+                            if c.avg_rating_received_on_files != data['avg_rating_received_on_files'] :
+                                c.avg_rating_received_on_files = data['avg_rating_received_on_files']
+                                counter_changed = True
+
+                            if c.no_questions_attempted != data['no_questions_attempted'] :
+                                c.no_questions_attempted = data['no_questions_attempted']
+                                counter_changed = True
+
+                            if c.no_correct_answers != data['no_correct_answers'] :
+                                c.no_correct_answers = data['no_correct_answers']
+                                counter_changed = True
+
+                            if c.no_incorrect_answers != data['no_incorrect_answers'] :
+                                c.no_incorrect_answers = data['no_incorrect_answers']
+                                counter_changed = True
+
+                            if c.no_notes_written != data['no_notes_written'] :
+                                c.no_notes_written = data['no_notes_written']
+                                counter_changed = True
+
+                            if c.no_views_gained_on_notes != data['no_views_gained_on_notes'] :
+                                c.no_views_gained_on_notes = data['no_views_gained_on_notes']
+                                counter_changed = True
+
+                            if c.no_others_notes_visited != data['no_others_notes_visited'] :
+                                c.no_others_notes_visited = data['no_others_notes_visited']
+                                counter_changed = True
+
+                            if c.no_comments_received_on_notes != data['no_comments_received_on_notes'] :
+                                c.no_comments_received_on_notes = data['no_comments_received_on_notes']
+                                counter_changed = True
+
+                            if c.no_comments_on_others_notes != data['no_comments_on_others_notes'] :
+                                c.no_comments_on_others_notes = data['no_comments_on_others_notes']
+                                counter_changed = True
+
+                            if c.rating_count_received_on_notes != data['rating_count_received_on_notes'] :
+                                c.rating_count_received_on_notes = data['rating_count_received_on_notes']
+                                counter_changed = True
+
+                            if c.avg_rating_received_on_notes != data['avg_rating_received_on_notes'] :
+                                c.avg_rating_received_on_notes = data['avg_rating_received_on_notes']
+                                counter_changed = True
+
+                            if c.comments_by_others_on_files != data['comments_by_others_on_files'] and data['comments_by_others_on_files']:
+                                n.comments_by_others_on_files.extend(data['comments_by_others_on_files'])
+                                counter_changed = True
+
+                            if c.comments_by_others_on_notes != data['comments_by_others_on_notes'] and data['comments_by_others_on_notes']:
+                                n.comments_by_others_on_notes.extend(data['comments_by_others_on_notes'])
+                                counter_changed = True
+
+                            if counter_changed:
+                                log_file.write("\n Counter Updated: \n\t OLD: " + str(c), + "\n\tNew: "+str(data))
+                                c.save()
+                        else:
+                            print "Inserting Counter doc"
+                            log_file.write("\n Inserting Counter doc : " + str(data))
+                            counter_collection.collection.insert(data)
+
 
                 except Exception as e:
                     print "Exception occured while processing: ", e
