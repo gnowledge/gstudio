@@ -208,8 +208,9 @@ def get_nested_ids(node,field_name):
 
 def get_counter_ids(group_id) :
     counter_collection_cur = counter_collection.find({'group_id':ObjectId(group_id)})
-    for each_obj in counter_collection_cur :
-        counter_collection_ids.add(each_obj._id)
+    if counter_collection_cur :
+        for each_obj in counter_collection_cur :
+            counter_collection_ids.add(each_obj._id)
 
 def dump_node_ids(list_of_ids,collection_name):
     print "\n In dump_node_ids"

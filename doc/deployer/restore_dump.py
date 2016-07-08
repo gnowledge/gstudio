@@ -18,7 +18,7 @@ def run():
     nodes_path = '/data/gstudio_data_restore/data/rcs-repo/Nodes'
     triples_path = '/data/gstudio_data_restore/data/rcs-repo/Triples'
     filehives_path = '/data/gstudio_data_restore/data/rcs-repo/Filehives'
-    counters_path = '/data/gstudio_data_restore/data/rec-repo/Counters'
+    counters_path = '/data/gstudio_data_restore/data/rcs-repo/Counters'
 
     log_file_name = 'data_restore.log'
     if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
