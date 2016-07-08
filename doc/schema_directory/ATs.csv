@@ -87,3 +87,4 @@ quizitempost_user_submitted_ans,QuizItemPost User Submitted Answer,list,[],"[""Q
 quizitempost_user_checked_ans,QuizItemPost User Checked Answer,list,[],"[""QuizItemPost""]",TRUE,TRUE,[],[],
 discussion_enable,Discussion Enable,bool,[],"[""Page"", ""File"",""E-Book"",""QuizItemEvent""]",TRUE,TRUE,[],[],
 is_bigbluebutton,Online Meeting,bool,[],"[""Event""]",TRUE,TRUE,[],[],
+invite_group,Invite all group members,bool,[],"[""Event""]",TRUE,TRUE,[],[],
