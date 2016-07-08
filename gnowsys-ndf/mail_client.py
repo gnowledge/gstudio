@@ -1,3 +1,4 @@
+from gnowsys_ndf.ndf.models import *
 import email
 import imaplib
 import os
@@ -7,6 +8,7 @@ import user_authentications
 import create_page
 import send_page
 import update_page
+import parse_html
 
 detach_dir = '.'
 if 'attachments' not in os.listdir(detach_dir):
@@ -40,29 +42,41 @@ def close_connection(conn):
 		print "Couldn't logout of the account!"
 
 def parse_subject(sub):
+	#Formats for subject:
+	#If no square brackets are there in the subject,it means that
+	#User wants to create a 'Page in home group'
+	#else subject format should be as follows:-  [Group-Name][Page/Forum] Page/Forum name
+	
 	i=1
 	s = 0
 	e = 0
-	username = ''
-	group_name = ''
-	activity = ''
+	group_name = 'home'
+	activity = 'Page'
 	activity_name = ''
-	
-	while(i<=4):
+	ctr = 0;
+	for index in range(len(sub)):
+		if(sub[index]=='[' or sub[index]==']'):
+			ctr = ctr+1
+	if(ctr==0):
+		ctr=0
+	elif(ctr==4):
+		ctr=2
+	elif(ctr==6):
+		ctr=3
+	while(i<=ctr):
 		s = sub.find('[',e)+1
 		e = sub.find(']',s)
 		
 		if(i==1):
-			username = sub[s:e]
-		elif(i==2):
 			group_name = sub[s:e]
-		elif(i==3):
+		elif(i==2):
 			activity = sub[s:e]
-		else:
-			activity_name = sub[s:e]
 		i = i+1
-	
-	return username,group_name,activity,activity_name
+		s = e+1
+
+	activity_name = sub[s:len(sub)]
+	activity_name = activity_name.strip()
+	return group_name,activity,activity_name
 
 def parse_mail(email):
 	s = email.find('<')+1
@@ -70,7 +84,6 @@ def parse_mail(email):
 	return email[s:e]
 
 class Email1:
-	username = ''
 	grp_name = ''
 	activity = ''
 	act_title = ''
@@ -78,6 +91,9 @@ class Email1:
 	Subject = ''
 	Filename = None
 	Body = ''
+	MessageId = ''
+	References = None
+	update = False
 	ObjectId = None
 
 	def mail_extract(self, msgId, conn):
@@ -93,10 +109,10 @@ class Email1:
 				self.fromuser = parse_mail(fromuser)
 			for header in ['subject']:
 				self.Subject = mail[header]
-				self.username, self.grp_name, self.activity, self.act_title = parse_subject(self.Subject)
+				self.grp_name, self.activity, self.act_title = parse_subject(self.Subject)
 				
 			for part in mail.walk():
-				if part.get_content_type() == 'text/plain':
+				if (part.get_content_type() == 'text/plain'):
 					self.Body = part.get_payload(decode=True)
 					
 			for part in mail.walk():
@@ -115,17 +131,47 @@ class Email1:
 						fp.close()
 					else:
 						print "not downloaded " , self.Filename
-	
-			for OBJID in ['_id']:
-				self.ObjectId = mail[OBJID]
-				print self.ObjectId
+
+			for header in ['Message-ID']:
+				self.MessageId = mail[header]
+
+			for header in ['References']:
+				self.References = mail[header]
+
+			if(self.References!=None):
+				self.update = True
+				start = self.References.find('<',0)
+				end = self.References.find('>',start)
+				end = end+1
+				m_id = self.References[start:end]
+				gst_obj = node_collection.find({'_type':u'GSystem'})
+				
+				for i in range(gst_obj.count()):
+					if({'mio': m_id} in gst_obj[i].origin):
+						self.ObjectId = str(gst_obj[i]._id)
+
+				for part in mail.walk():
+					if (part.get_content_type() == 'text/plain' or part.get_content_type() == 'text/html'):
+						self.Body = part.get_payload(decode=True)
+				
+				self.act_title , self.Body = parse_html.get_content(self.Body)
+
+			#print "here 1"
+			#print "1" + self.grp_name
+			#print "2" + self.activity
+			#print "3" + self.act_title
+			#print "4" + self.fromuser
+			#print "5" + self.Subject
+			#print "7" + self.Body
+			#print "8" + self.MessageId
+			#print "9" + self.References
+			#print self.ObjectId
+			#print self.update
 		except:
 			print 'Not able to download all attachments.'
 
 	def return_from(self):
 		return self.fromuser
-	def return_username(self):
-		return self.username
 	def return_grp_name(self):
 		return self.grp_name
 	def return_activity(self):
@@ -134,10 +180,16 @@ class Email1:
 		return self.act_title
 	def return_body(self):
 		return self.Body
-	def return_id(self):
-		return self.ObjectId
 	def return_sub(self):
 		return self.Subject
+	def return_MessageId(self):
+		return self.MessageId
+	def return_Ref(self):
+		return self.References
+	def return_update(self):
+		return self.update
+	def return_ObjectId(self):
+		return self.ObjectId
 
 c = open_connection()
 d = open_unseen(c)
@@ -146,28 +198,21 @@ obj = Email1()
 for msgId in d[0].split():
 	obj.mail_extract(msgId, c)
 
-	if(obj.return_id()):
-		print 'here'
-		update_page.update_page(name=obj.return_act_title(),content=obj.return_body(),
-			id=obj.return_id(),sub=obj.return_sub(),sendMailTo=obj.return_from())
-
-		send_page.send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
-				page_content=obj.return_body(),subject=obj.return_sub(),id=obj.return_id())
-
-	else:
-		id,check,error=user_authentications.authenticate_user(user=obj.return_username(),
-			group_name=obj.return_grp_name())
-		print error
+	if(obj.return_update()==False):
+		id,check,error=user_authentications.authenticate_user(mail=obj.return_from(),group_name=obj.return_grp_name())
+		print id,error
 		if(check==True):
 			p_id = create_page.create_page(name=obj.return_act_title(),content=obj.return_body(),
-					created_by=id,group_name=obj.return_grp_name(),sendMailTo=obj.return_from(),
-					subject=obj.return_sub())
+				created_by=id,group_name=obj.return_grp_name(),m_id=obj.return_MessageId())
 			if(isinstance(p_id,str)):
 				send_page.send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
-					page_content=obj.return_body(),subject=obj.return_sub(),id=p_id)
+					page_content=obj.return_body(),subject=obj.return_sub(),m_id=obj.return_MessageId(),ref=obj.return_Ref())
 			else:
 				print p_id
-
+	else:
+		update_page.update_page(name=obj.return_act_title(),content=obj.return_body(),id=obj.return_ObjectId())
+		send_page.send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
+			page_content=obj.return_body(),subject=obj.return_sub(),m_id=obj.return_MessageId(),ref=obj.return_Ref())
 close_connection(c)
 
 	 

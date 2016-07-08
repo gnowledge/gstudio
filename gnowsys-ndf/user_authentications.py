@@ -3,10 +3,10 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from report_error import error_message
 
-def authenticate_user(user,group_name):
+def authenticate_user(mail,group_name):
 	id = -1
 	try:
-		id = User.objects.get(username=user).id
+		id = User.objects.get(email=mail).id
 	except:
 		return id,False,error_message["User does not exist"]
 	
