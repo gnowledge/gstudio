@@ -287,6 +287,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     if request.user.id:
       usr = node_collection.one({'_type':u'Author','name':unicode(request.user.username)})
       usrid = usr._id
+ 
 
     bbb = False
     invite_group = False
@@ -329,11 +330,11 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     attendee_list = []
     moderator_list = []   
 
-    if invite_group and Group.can_access(usr.created_by , node.group_set):
+    if invite_group:
       is_attendee = True
 
     for i in node.relation_set:
-      if unicode('attendee_list') in i.keys():
+      if unicode('has_attendees') in i.keys():
         attendee_list =  i['has_attendees']
       elif unicode('event_coordinator') in i.keys():
         moderator_list = i['event_coordinator']
@@ -347,7 +348,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       for i in attendee_list:
         if usrid == i:
           is_attendee = True
-          break
+          break 
 
     url = ""      
 
@@ -574,8 +575,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                    field_value = parse_template_data(ObjectId, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
                 field_value_list[i] = field_value
               if field_value_list:
-                if field_instance["name"] == "has_attendees":
-                  if invite_group == "False":
+                if field_instance["name"] == "has_attendees" and invite_group == "False":
                     event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), [])
                 else:
                   event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), field_value_list)
