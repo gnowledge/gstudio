@@ -5279,12 +5279,15 @@ def replicate_resource(request, node, group_id):
                 rt_node = node_collection.one({'_id': ObjectId(eachrtid)})
                 if rt_node.name == 'has_thread':
                     thread_created = True
-                cloned_rs_ids = []
-                for eachrsval_id in eachrsval:
-                    right_subj_node = node_collection.one({'_id': ObjectId(eachrsval_id)})
-                    right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
-                    cloned_rs_ids.append(right_sub_new_node._id)
-                create_grelation(new_gsystem._id,rt_node,cloned_rs_ids)
+                if isinstance(eachrsval, ObjectId):
+                    create_grelation(new_gsystem._id,rt_node,eachrsval)
+                else:
+                    cloned_rs_ids = []
+                    for eachrsval_id in eachrsval:
+                        right_subj_node = node_collection.one({'_id': ObjectId(eachrsval_id)})
+                        right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+                        cloned_rs_ids.append(right_sub_new_node._id)
+                    create_grelation(new_gsystem._id,rt_node,cloned_rs_ids)
 
 
             if "QuizItemEvent" in new_gsystem.member_of_names_list:
