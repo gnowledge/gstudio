@@ -589,7 +589,7 @@ GSTUDIO_REPLICATION_GROUPS = [
 # DON'T EDIT this variable here.
 # ONLY TO BE EDITED in local_settings file
 GSTUDIO_DEFAULT_GAPPS_LIST = []
-GSTUDIO_USER_GAPPS_LIST = ['Page', 'File']
+GSTUDIO_USER_GAPPS_LIST = ['Page', 'File', 'Task', 'Course', 'Event', 'Quiz']
 
 # Defined all site specific variables
 GSTUDIO_ORG_NAME = '''<p>

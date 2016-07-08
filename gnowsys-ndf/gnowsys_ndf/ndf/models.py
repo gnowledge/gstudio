@@ -42,6 +42,7 @@ from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE
 from gnowsys_ndf.settings import META_TYPE
+from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.ndf.rcslib import RCS
 from registration.signals import user_registered
 
@@ -783,6 +784,20 @@ class Node(DjangoDocument):
         except Exception, e:
             print "\nError while processing invalid fields: ", e
             pass
+
+        # if Add-Buddy feature is enabled:
+        #   - Get all user id's of active buddies with currently logged in user.
+        #   - Check if each of buddy-user-id does not exists in contributors of node object, add it.
+        if GSTUDIO_BUDDY_LOGIN:
+            buddy_contributors = Buddy.get_buddy_userids_list_within_datetime(
+                                                    self.created_by,
+                                                    self.last_update or self.created_at
+                                                )
+
+            if buddy_contributors:
+                for each_bcontrib in buddy_contributors:
+                    if each_bcontrib not in self.contributors:
+                        self.contributors.append(each_bcontrib)
 
         super(Node, self).save(*args, **kwargs)
 
@@ -2091,6 +2106,89 @@ class Group(GSystem):
         # node_collection.find({'_type': 'Group'}, {'name': 1, '_id': 0})]
     }
 
+    @staticmethod
+    def get_group_name_id(group_name_or_id, get_obj=False):
+        '''
+          - This method takes possible group name/id as an argument and returns (group-name and id) or group object.
+
+          - If no second argument is passed, as method name suggests, returned result is "group_name" first and "group_id" second.
+
+          - When we need the entire group object, just pass second argument as (boolian) True. In the case group object will be returned.
+
+          Example 1: res_group_name, res_group_id = Group.get_group_name_id(group_name_or_id)
+          - "res_group_name" will contain name of the group.
+          - "res_group_id" will contain _id/ObjectId of the group.
+
+          Example 2: res_group_obj = Group.get_group_name_id(group_name_or_id, get_obj=True)
+          - "res_group_obj" will contain entire object.
+
+          Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
+          try:
+              group_id = ObjectId(group_id)
+          except:
+              group_name, group_id = Group.get_group_name_id(group_id)
+
+        '''
+        # if cached result exists return it
+        if not get_obj:
+            from django.template.defaultfilters import slugify
+            from django.core.cache import cache
+
+            slug = slugify(group_name_or_id)
+            # for unicode strings like hindi-text slugify doesn't works
+            cache_key = 'get_group_name_id_' + str(slug) if slug else str(abs(hash(group_name_or_id)))
+            cache_result = cache.get(cache_key)
+
+            if cache_result:
+                return cache_result
+        # ---------------------------------
+
+        # case-1: argument - "group_name_or_id" is ObjectId
+        if ObjectId.is_valid(group_name_or_id):
+
+            group_obj = node_collection.one({"_id": ObjectId(group_name_or_id)})
+
+            # checking if group_obj is valid
+            if group_obj:
+                # if (group_name_or_id == group_obj._id):
+                group_id = group_name_or_id
+                group_name = group_obj.name
+
+                if get_obj:
+                    return group_obj
+                else:
+                    # setting cache with both ObjectId and group_name
+                    cache.set(cache_key, (group_name, group_id), 60 * 60)
+                    cache_key = u'get_group_name_id_' + slugify(group_name)
+                    cache.set(cache_key, (group_name, group_id), 60 * 60)
+                    return group_name, group_id
+
+        # case-2: argument - "group_name_or_id" is group name
+        else:
+            group_obj = node_collection.one(
+                {"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_name_or_id)})
+
+            # checking if group_obj is valid
+            if group_obj:
+                # if (group_name_or_id == group_obj.name):
+                group_name = group_name_or_id
+                group_id = group_obj._id
+
+                if get_obj:
+                    return group_obj
+                else:
+                    # setting cache with both ObjectId and group_name
+                    cache.set(cache_key, (group_name, group_id), 60*60)
+                    cache_key = u'get_group_name_id_' + slugify(group_name)
+                    cache.set(cache_key, (group_name, group_id), 60*60)
+                    return group_name, group_id
+
+        if get_obj:
+            return None
+        else:
+            return None, None
+
+
     def is_gstaff(self, user):
         """
         Checks whether given user belongs to GStaff.
@@ -2112,6 +2210,27 @@ class Group(GSystem):
         if (user.is_superuser) or (user.id == self.created_by) or (user.id in self.group_admin):
             return True
 
+        else:
+            return False
+
+
+    @staticmethod
+    def can_access(user_id, group):
+        '''Returns True if user can access (read/edit/write) group resource.
+        ARGS:
+            - user_id (int): Django User id
+            - group (Group or ObjectID or str-of-group-name): It can be either group's
+                                                        object or _id or name.
+        '''
+        if isinstance(group, Group):
+            group_obj = group
+        else:
+            group_obj = Group.get_group_name_id(group, get_obj=True)
+
+        user_query = User.objects.filter(id=user_id)
+
+        if group_obj and user_query:
+            return group_obj.is_gstaff(user_query[0]) or (user_id in group_obj.author_set)
         else:
             return False
 
@@ -3219,6 +3338,35 @@ class Buddy(DjangoDocument):
             buddy_obj = None
 
         return active_buddy_auth_list
+
+
+    def get_all_buddies_auth_ids(self):
+        return self['buddy_in_out'].keys()
+
+    def get_all_buddies_user_ids(self):
+        return Author.get_user_id_list_from_author_oid_list(self['buddy_in_out'].keys())
+
+    @staticmethod
+    def get_buddy_cur_from_userid_datetime(user_id, datetime_obj):
+        return buddy_collection.find({'loggedin_userid': user_id, 'starts_at': {'$lte': datetime_obj}, '$or': [{'ends_at': {'$gte': datetime_obj}}, {'ends_at': None} ] })
+
+    @staticmethod
+    def get_buddy_userids_list_within_datetime(user_id, datetime_obj):
+        buddy_cur = Buddy.get_buddy_cur_from_userid_datetime(user_id, datetime_obj)
+        all_buddies_authid_list = []
+        for each_buddy_obj in buddy_cur:
+            all_buddies_authid_list += each_buddy_obj.get_all_buddies_auth_ids()
+            for each_buddy_authid, in_out_time in each_buddy_obj.buddy_in_out.iteritems():
+                for each_io in in_out_time:
+                    if (not each_io['out'] and datetime_obj > each_io['in']) \
+                    or (each_io['out'] and datetime_obj < each_io['out'] and datetime_obj > each_io['in']):
+                        all_buddies_authid_list.append(each_buddy_authid)
+
+        if not all_buddies_authid_list:
+            return []
+
+        else:
+            return Author.get_user_id_list_from_author_oid_list(set(dict.fromkeys(all_buddies_authid_list).keys()))
 
 
     def save(self, *args, **kwargs):

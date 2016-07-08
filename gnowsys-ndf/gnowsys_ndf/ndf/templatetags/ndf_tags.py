@@ -863,7 +863,7 @@ def shelf_allowed(node):
 # This function is a duplicate of get_gapps_menubar and modified for the gapps_iconbar.html template to shows apps in the sidebar instead
 @get_execution_time
 @register.inclusion_tag('ndf/gapps_iconbar.html')
-def get_gapps_iconbar(request, group_id):
+def get_gapps_iconbar(request, group_id, user_access=None):
     """Get GApps menu-bar
     """
     try:
@@ -921,7 +921,7 @@ def get_gapps_iconbar(request, group_id):
 		gapps={}
         return {
             "template": "ndf/gapps_iconbar.html",
-            "request": request,
+            "request": request, 'user_access': user_access,
             "groupid": group_id, "group_name_tag": group_name,
             "gapps": gapps, "selectedGapp": selected_gapp
         }
@@ -936,7 +936,7 @@ def get_gapps_iconbar(request, group_id):
         return {
             'template': 'ndf/gapps_iconbar.html',
             'request': request, 'gapps': gapps, 'selectedGapp': selected_gapp,
-            'groupid': group_id
+            'groupid': group_id, 'user_access': user_access,
         }
 
 
@@ -2022,10 +2022,9 @@ def group_type_info(groupid,user=0):
 	if cache_result:
 		return cache_result
 
-	group_gst = node_collection.one({'_id': ObjectId(groupid)},
-		{'post_node': 1, 'prior_node': 1, 'group_type': 1})
-
-	group_type = ""
+	# group_gst = node_collection.one({'_id': ObjectId(groupid)},
+	# 	{'post_node': 1, 'prior_node': 1, 'group_type': 1})
+	group_gst = get_group_name_id(groupid, get_obj=True)
 
 	if group_gst.post_node:
 		group_type = "BaseModerated"
@@ -2063,10 +2062,13 @@ def user_access_policy(node, user):
   user_access = False
 
   try:
-  	# Please make a note, here the order in which check is performed is IMPORTANT!
+    # Please make a note, here the order in which check is performed is IMPORTANT!
+
+    if not user.is_authenticated:
+        return "disallow"
 
     if user.is_superuser:
-      user_access = True
+        user_access = True
 
     else:
       # group_node = node_collection.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
@@ -2099,7 +2101,8 @@ def user_access_policy(node, user):
 
   except Exception as e:
     error_message = "\n UserAccessPolicyError: " + str(e) + " !!!\n"
-    raise Exception(error_message)
+    # raise Exception(error_message)
+    return 'disallow'
 
 @get_execution_time
 @register.assignment_tag
