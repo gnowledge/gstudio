@@ -75,20 +75,6 @@ var graphs ={
 				.attr("height", function(d) { return Math.abs(y(d.value) - y(0)); });
 		}
 	},
-	"trash1": {
-			"name": 'Bar Graph',
-			"func": function(data){
-				var x = d3.scale.linear()
-				    .domain([0, d3.max(data, function(d) { return d.value; })])
-				    .range([0, 420]);
-
-				items =  d3.select(".graph_cont").selectAll("div").data(data);
-				items.enter().append("div");
-				items.exit().remove();
-				items.style("width", function(d) { return x(d.value) + "px"; })
-					.text(function(d) { return d.label + ' : ' + d.value; });
-			}
-		 },
 	"1": {
 			"name": 'Pie Graph', 
 			"func": function(data){

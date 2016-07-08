@@ -328,7 +328,7 @@ function graph_select_init(){
     var ele = d3.select('#graph_type').select('.opt_to_select');
     for(i=0; i<val.graph_type.length; i++){
       ele.append('option')
-        .attr('value', i)
+        .attr('value', val.graph_type[i])
         .html(graphs[i].name);
     }
 
