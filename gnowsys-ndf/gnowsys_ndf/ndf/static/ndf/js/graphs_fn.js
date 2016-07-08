@@ -92,6 +92,10 @@ var graphs ={
 	"1": {
 			"name": 'Pie Graph', 
 			"func": function(data){
+				var color = d3.scale.ordinal()
+  							.domain(["Lorem ipsum", "dolor sit", "amet", "consectetur", "adipisicing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt"])
+  							.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
 				var key = function(d){ return d.data.label; };
 				var svg = d3.select(".graph_cont")
 				.append("svg")
