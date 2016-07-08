@@ -736,7 +736,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
 @login_required
 @get_execution_time
 def uploadDoc(request, group_id):
-
+    
     try:
         group_id = ObjectId(group_id)
     except:
@@ -768,7 +768,6 @@ def submitDoc(request, group_id):
     """
     submit files for saving into gridfs and creating object
     """
-
     try:
         group_id = ObjectId(group_id)
     except:

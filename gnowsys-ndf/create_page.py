@@ -28,6 +28,8 @@ def create_page(**kwargs):
 	else:
 		return error_message["User details required"]
 
+	m_id = kwargs.get('m_id','')
+
 	gst_page = node_collection.one({'_type':u'GSystemType','name':u'Page'})
 	gst_group = node_collection.one({'_type':u'Group','name':group_name})
 
@@ -43,6 +45,7 @@ def create_page(**kwargs):
 	else:
 		p.fill_gstystem_values(name = name,member_of=[gst_page._id],created_by = created_by,
 			content = content,group_set=[gst_group._id])
+		p.origin.append({'mio':m_id})
 		try:
 			p.save()
 		except:
