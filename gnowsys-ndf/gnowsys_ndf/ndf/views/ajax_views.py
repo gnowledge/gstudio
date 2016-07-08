@@ -6366,3 +6366,28 @@ def save_user_password(request, group_id):
         response_dict['success'] = True
     return HttpResponse(json.dumps(response_dict))
 
+@login_required
+@get_execution_time
+def upload_video_thumbnail(request,group_id):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    print "00..0..."
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    title = request.POST.get('context_name','')
+    usrid = request.user.id
+
+    from gnowsys_ndf.ndf.views.filehive import write_files
+
+    gs_obj_list = write_files(request, group_id)
+    gs_obj_id = gs_obj_list[0]['if_file']['original']['relurl']
+    print "gs_obj_list: ", gs_obj_list[0]['_id']
+
+    discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
+    for each_gs_file in gs_obj_list:
+        #set interaction-settings
+        create_gattribute(each_gs_file._id, discussion_enable_at, True)
+        return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
+
+    return StreamingHttpResponse(gs_obj_id)
