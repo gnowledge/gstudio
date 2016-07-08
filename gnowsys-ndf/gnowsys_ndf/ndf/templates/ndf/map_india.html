@@ -189,4 +189,62 @@ div.city_hover_tooltip>div{
   {%endif%}
 </div>
 
+<script>
+  
+  function load_organization(){
+  $.ajax({
+    url: '/{{groupid}}/state_analytics/fetch_organization',
+    method: 'GET',
+    success: function(data){
+      var det = JSON.parse(data);
+      for(i=0; i<det.length; i++){
+       det[i] = JSON.parse(det[i]);
+      }
+      organizations = det;
+    }
+  });
+}
+
+function update_organization(data,id){
+  if(id===undefined)
+  {
+    id = '';
+  }
+  $.ajax({
+    url: '/{{groupid}}/state_analytics/update_organization/' + id,
+    method: 'POST',
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    data: JSON.stringify(data),
+    beforeSend: function(xhr, settings) {
+      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    },
+    success: function(data){
+      data = JSON.parse(data);
+      curr_edit.data()[0]['id'] = data.id;
+      curr_edit.attr('id', data.id);
+    }
+  });
+}
+
+function delete_organization(id){
+  if(id===undefined){
+    return;
+  }
+  $.ajax({
+    url: '/{{groupid}}/state_analytics/delete_organization/' + id,
+    method: 'POST',
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    beforeSend: function(xhr, settings) {
+      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    },
+    success: function(data){
+      data = JSON.parse(data);
+      if(data.status)
+        curr_edit.remove();
+    }
+  });
+}
+</script>
 {% endblock body_content %}

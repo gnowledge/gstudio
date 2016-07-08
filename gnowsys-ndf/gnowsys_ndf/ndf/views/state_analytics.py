@@ -22,7 +22,7 @@ from django.core.files.move import file_move_safe
 from django.core.files.temp import gettempdir
 from django.core.files.uploadedfile import UploadedFile # django file handler
 from mongokit import paginator
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib.admin.views.decorators import staff_member_required
 from gnowsys_ndf.ndf.models import *
 from pymongo import Connection
 from gnowsys_ndf.ndf.views.methods import create_grelation,get_group_name_id, delete_node
@@ -31,8 +31,7 @@ def map_view(request,group_id):
 	return render_to_response("ndf/map_india.html",{ 'group_id':group_id, 'groupid':group_id}
 		, context_instance=RequestContext(request))
 
-# add staff required
-@csrf_exempt
+@staff_member_required
 def add_organization(request,group_id,node_id=None):
 	try:
 		group_id = ObjectId(group_id)
@@ -67,7 +66,6 @@ def add_organization(request,group_id,node_id=None):
 	else:
 		return HttpResponse("Not POST")
 				
-@csrf_exempt
 def fetch_organization(request,group_id=None):
 
 	state_gst = node_collection.find({'_type':'GSystemType','name':'State'})
@@ -97,7 +95,7 @@ def fetch_organization(request,group_id=None):
 
 	return HttpResponse(json.dumps(result))
 
-@csrf_exempt
+@staff_member_required
 def delete_organization(request, group_id=None,node_id=None):
 	if not node_id:
 		return HttpResponse({'status':0,'message':'Node id not sent'})

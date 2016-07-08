@@ -506,6 +506,7 @@ function update_organization(data,id){
   {
     id = '';
   }
+  data["csrfmiddlewaretoken"] = '{{csrf_token}}';
   $.ajax({
     url: '/{{groupid}}/state_analytics/update_organization/' + id,
     method: 'POST',
