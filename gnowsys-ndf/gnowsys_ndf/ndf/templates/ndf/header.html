@@ -273,10 +273,7 @@
               <a href="/{{ user.username }}/mailclient">{% trans "MailClient" %}</a>
             {% endif %}
 
-            <li class="text-center">
-              <a href='/{{group_id}}/analytics/summary'>{% trans "Analytics" %}</a>
-            </li>
-
+            
             {% if user.is_superuser %}
               <li class="text-center">
                 <a href="/admin/data">{% trans "Admin Data" %}</a>
@@ -316,7 +313,9 @@
               </blockquote>
                   {# --{{request.session.buddies_authid_name_dict}}-- #}
             {% endif %}
-
+			<li class="text-center">
+              <a href="{% url 'map_view' groupid %}">{% trans "State Analytics" %}</a>
+            </li>
             <li>
               <a class="logout" href="{% url 'auth_logout' %}">
                 <i class="fi-power"></i> &nbsp;{% trans "Logout" %}

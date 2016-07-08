@@ -1,0 +1,192 @@
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
+
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock title %}
+
+{% block extended_header %}
+
+<script src="/static/ndf/bower_components/d3/d3.min.js"></script>
+<script src="/static/ndf/js/saveSvgAsPng.js"></script>
+<script src="/static/ndf/js/graphs_fn.js"></script>
+<script src="/static/ndf/js/topojson.v1.min.js"></script>
+<script src="/static/ndf/js/state_analytics.js"></script>
+{% endblock %}
+
+{% block body_content %}
+
+<style>
+#map {
+  position: relative;
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+.background {
+  fill: none;
+  pointer-events: all;
+}
+#countries, #states {
+  fill: #cde;
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+#countries .active, #states .active {
+  fill: #89a;
+}
+#countries>path:hover{
+  fill: rgb(142, 248, 121);
+}
+#organization {
+  stroke-width: 0;
+}
+.city {
+  fill: #345;
+  stroke: #fff;
+}
+pre.prettyprint {
+  border: 1px solid #ccc;
+  margin-bottom: 0;
+  padding: 9.5px;
+}
+#light_box{
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width:50%;
+  height: 50%;
+}
+#circles{
+  z-index: 10;
+}
+
+.graph_cont div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+
+/*for pie chart*/
+svg {
+  width: 100%;
+}
+
+path.slice{
+  stroke-width:2px;
+}
+
+polyline{
+  opacity: .3;
+  stroke: black;
+  stroke-width: 2px;
+  fill: none;
+}
+
+
+.axis {
+    font: 10px sans-serif;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }.axis {
+    font: 10px sans-serif;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+#info_bar{
+  display: none;
+  position: absolute;
+  width:100%;
+  text-align: center;
+  padding: 5px;
+  background-color: #C5F0FF;
+  z-index: 10;
+}
+.fix_center{
+  position: fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  margin:auto;
+}
+#lightbox{
+  display: none;
+  position: fixed;
+  z-index: 999;
+  overflow: auto;
+}
+#lightbox .close_lb_btn{
+  color: #AAAAAA;
+  cursor: pointer;
+  font-size: 2.22222rem;
+  font-weight: bold;
+  line-height: 1;
+  position: absolute;
+  top: 0.55556rem;
+  right: 1.22222rem;
+  text-decoration: none;
+}
+#modal_lb{
+  position: relative;
+  top: 50px;
+  width: 90%;
+  margin: 20px auto;
+  border-radius: 5px;
+  left: 0;
+  background-color: #FFFFFF;
+  padding: 1.25rem;
+  border: solid 1px #666666;
+}
+#blackout_lb{
+  z-index: -1;
+  background-color: rgba(0,0,0,0.5);
+}
+.edit_btn{
+  position: absolute;
+  bottom: 15px;
+  left:15px;
+}
+
+div.city_hover_tooltip {   
+  display: none;
+  position: absolute;
+}
+div.city_hover_tooltip>div{
+  position:absolute;
+  bottom: 100%;
+  text-align: center;
+  padding: 10px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  
+}
+</style>
+<div id="info_bar"></div>
+<div id="map">
+  {%if user.is_staff%}
+  <a class="edit_btn button">Edit</a>
+  {%endif%}
+</div>
+
+{% endblock body_content %}

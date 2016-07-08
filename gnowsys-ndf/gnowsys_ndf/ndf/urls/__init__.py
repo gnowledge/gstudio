@@ -16,7 +16,7 @@ from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
 from gnowsys_ndf.ndf.views.home import homepage, landing_page
 from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
-from gnowsys_ndf.ndf.views import rpc_resources
+from gnowsys_ndf.ndf.views import rpc_resources, state_analytics
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'
@@ -46,14 +46,14 @@ urlpatterns = patterns('',
     # (r'^$', HomeRedirectView.as_view()),
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
-
-
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
 
     # all main apps
     # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
     (r'^(?P<group_id>[^/]+)/mailclient', include('gnowsys_ndf.ndf.urls.mailclient')),
+    (r'^(?P<group_id>[^/]+)/state_analytics', include('gnowsys_ndf.ndf.urls.state_analytics')),
+    # url(r'^state_analytics/',include('gnowsys_ndf.ndf.urls.')),
     (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_id>[^/]+)/filehive', include('gnowsys_ndf.ndf.urls.filehive')),
