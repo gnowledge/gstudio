@@ -516,6 +516,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
             field_data_type = field_set['data_type'] #data type of AT/RT e.g. datetime.datetime for start_time
 
             # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
+            invite_group = False
             if field_instance_type == AttributeType:
               if "File" in field_instance["validators"]:
                 # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
@@ -556,6 +557,9 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 # print "--------------------------------------------------------------------------------------------------"
                 # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
+              if field_instance["name"] == 'invite_group':
+                invite_group = field_value
+
             else: #field_instance_type == RelationType
               field_value_list = request.POST.getlist(field_instance["name"])
               # field_instance_type = "GRelation"
@@ -567,7 +571,11 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                    field_value = parse_template_data(ObjectId, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
                 field_value_list[i] = field_value
               if field_value_list:
-                event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), field_value_list)
+                if field_instance["name"] == "has_attendees":
+                  if invite_group == "False":
+                    event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), [])
+                else:
+                  event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), field_value_list)
               # if isinstance(event_gs_triple_instance, list):
               #   print "\n"
               #   for each in event_gs_triple_instance:
@@ -609,18 +617,18 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               event_coordinator_str = event_coordinator_str + i.name + "  "
           for i in event_organized_by_cur:
               event_organizer_str = event_coordinator_str + i.name + "  "     
-          for j in event_attendees:
-                      auth = node_collection.one({"_id":ObjectId(j)})
-                      user_obj = User.objects.get(id=auth.created_by)
-                      if user_obj not in to_user_list:
-                              to_user_list.append(user_obj)
-                      render_label = render_to_string(
+          render_label = render_to_string(
                             "notification/label.html",
                             {
                                 "sender": "metaStudio",
                                 "activity": "Event Created",
                                 "conjunction": "-"
                             })
+          for j in event_attendees:
+                      auth = node_collection.one({"_id":ObjectId(j)})
+                      user_obj = User.objects.get(id=auth.created_by)
+                      if user_obj not in to_user_list:
+                              to_user_list.append(user_obj)
           if event_organized_by:
              msg_string = "\n Event is organized by " + str ( event_organizer_str ) 
           else:
