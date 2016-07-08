@@ -25,13 +25,15 @@ try:
 			if copy_move_confirmation == 'y' or copy_move_confirmation == 'Y':
 				for each_source_file in source_grp_files:
 					if copy_files and not move_files:
-						each_source_file.group_set.append(destination_group_obj._id)
+						if destination_group_obj._id not in each_source_file.group_set:
+							each_source_file.group_set.append(destination_group_obj._id)
 					elif move_files and not copy_files:
 						# Remove source_group_id and add destination_group_id
 						# This is to prevent file that are cross-published 
 						# to multiple groups other than source_group
 						each_source_file.group_set.remove(source_group_obj._id)
-						each_source_file.group_set.append(destination_group_obj._id)
+						if destination_group_obj._id not in each_source_file.group_set:
+							each_source_file.group_set.append(destination_group_obj._id)
 					each_source_file.save()
 		else:
 			print "\n No files found in source group."
