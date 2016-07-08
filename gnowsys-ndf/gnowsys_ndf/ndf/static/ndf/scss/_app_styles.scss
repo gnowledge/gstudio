@@ -1943,13 +1943,24 @@ aside#help{
     padding-left: 2%;
   }
 
+  .app-card-container{
+    display: inline-block;
+    vertical-align: top;
+    margin: 15px;
+  }
+  .app-card-wrapper{
+    position:relative; 
+    margin: auto;width:100%; 
+    text-align:center; 
+    clear: both;
+    max-width: calc(70rem + 70px);
+  }
+
   .app-card{
     width: 19rem;
-    min-height: 10rem;
     margin: 15px 20px;
     float: left;
     padding: 1em;
-    margin-left:-10%;
     height:18rem;
     background-color:#fafafa;
     border: thin solid #D3D3D3;
