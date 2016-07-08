@@ -162,6 +162,22 @@ polyline{
   bottom: 15px;
   left:15px;
 }
+
+div.city_hover_tooltip {   
+  display: none;
+  position: absolute;
+}
+div.city_hover_tooltip>div{
+  position:absolute;
+  bottom: 100%;
+  text-align: center;
+  padding: 10px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  
+}
 </style>
 <div id="info_bar"></div>
 <div id="map">
@@ -355,6 +371,9 @@ var svg = d3.select("#map").append("svg")
     .attr("width", m_width)
     .attr("height", m_width * height / width)
     .call(zoom_behavior.on('zoom',redraw));
+
+
+
 function redraw(){
   if(pnt){
     return;
@@ -397,7 +416,7 @@ d3.json("/static/ndf/js/india_map.topo.json", function(error, states) {
 
 $(document).on("click",".city",function(){
   data = {
-    "head":"Analytics",
+    "head":d3.select(this).data()[0].properties.name + " Analytics",
     "content":'<div id="main_container">\
         <div class="select_wrapper">\
           <select id="object_type">\
@@ -422,6 +441,31 @@ $(document).on("click",".city",function(){
 
   open_lb();
 });
+var city_hover_tooltip = d3.select("#map").append("div")
+    .attr("class", "city_hover_tooltip");
+
+city_hover_tooltip.append("div");
+
+
+$(document).on("mouseenter",'.city',function(e){
+
+  var dt = d3.select(this).data()[0];
+  var x = e.pageX - $('#map').offset().left;
+  var y = e.pageY - $('#map').offset().top;
+  city_hover_tooltip.select('div').html(dt.properties.name);
+  city_hover_tooltip.style("left",x +'px')
+  .style("top",y + 'px')
+  .style("display","block");
+
+});
+
+
+$(document).on("mouseout",'.city',function(){
+  city_hover_tooltip.select('div').html("")
+  city_hover_tooltip.style("display","none");
+
+});
+
 $(document).on("click",".edit_city",function(){edit_org_form_init(this); });
 
 $(document).on("click",".save_btn",function(){
@@ -431,8 +475,16 @@ $(document).on("click",".save_btn",function(){
   curr_edit.data(dt);
   close_lb();
   update_organization(dt,dt.id);
-
 });
+$(document).on("click",".delete_btn",function(){
+  var dt = curr_edit.data()[0];
+  if(dt.id!==undefined)
+    delete_organization(dt.id);
+  else
+    curr_edit.remove();
+  close_lb();
+});
+
 function edit_org_form_init(obj){
   curr_edit = d3.select(obj);
   data = {
@@ -440,7 +492,7 @@ function edit_org_form_init(obj){
     "content":'Name: <input id="city_name" type="text" /> \
             State: \
             <select id="state_list"></select><br>\
-            <a class="save_btn button">Save</a>',
+            <a class="save_btn button">Save</a><a class="delete_btn button">Delete</a>',
   }
   set_content_lb(data);
   var $st_list = $('#state_list');
@@ -464,7 +516,6 @@ function zoom(xyz) {
   var t = projection.translate();
   t[0] = (xyz[0]*xyz[2] - t[0])*-1;
   t[1] = (xyz[1]*xyz[2] - t[1])*-1;
-  console.log(t);
   zoom_behavior.scale(xyz[2]).translate(t)
   return;
 }
@@ -613,13 +664,16 @@ function load_organization(){
 }
 
 
-function update_organization(data,id=''){
+function update_organization(data,id){
+  if(id===undefined)
+  {
+    id = '';
+  }
   $.ajax({
     url: '/{{groupid}}/state_analytics/update_organization/' + id,
     method: 'POST',
     data: JSON.stringify(data),
     success: function(data){
-      console.log(data);
       data = JSON.parse(data);
       curr_edit.data()[0]['id'] = data.id;
       curr_edit.attr('id', data.id);
@@ -627,7 +681,20 @@ function update_organization(data,id=''){
   });
 }
 
-
+function delete_organization(id){
+  if(id===undefined){
+    return;
+  }
+  $.ajax({
+    url: '/{{groupid}}/state_analytics/delete_organization/' + id,
+    method: 'POST',
+    success: function(data){
+      data = JSON.parse(data);
+      if(data.status)
+        curr_edit.remove();
+    }
+  });
+}
 
 </script>
 {% endblock body_content %}
