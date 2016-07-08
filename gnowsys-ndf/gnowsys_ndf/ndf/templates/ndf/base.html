@@ -5,6 +5,7 @@
 {% get_group_name groupid as group_name_tag %}
 {% get_site_variables as site %}
 {% get_oid_variables as oids %}
+{% user_access_policy groupid request.user as user_access %}
 
 {% cache 360 static_html_head %}  <!-- cache static dependencies for a hour -->
 <!DOCTYPE html>
