@@ -330,7 +330,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     moderator_list = []   
 
     if invite_group:
-      is_moderator = True
+      is_attendee = True
 
     for i in node.relation_set:
       if unicode('attendee_list') in i.keys():
