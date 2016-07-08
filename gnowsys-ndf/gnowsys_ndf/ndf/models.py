@@ -388,13 +388,13 @@ class Node(DjangoDocument):
                 modified_by = request.user.id
             elif kwargs.has_key('created_by'):
                 modified_by = created_by
-        self.modified_by = int(modified_by) if modified_by else 0
+        self.modified_by = int(modified_by) if modified_by else self.created_by
 
         # 'contributors': [int]
         if kwargs.has_key('contributors'):
-            contributors = kwargs.get('contributors', [])
+            contributors = kwargs.get('contributors', [self.created_by])
         else:
-            contributors = request.POST.get('contributors', [])
+            contributors = request.POST.get('contributors', [self.created_by])
         self.contributors = contributors
         if contributors and not isinstance(contributors, list):
             self.contributors = [int(each) for each in contributors]
