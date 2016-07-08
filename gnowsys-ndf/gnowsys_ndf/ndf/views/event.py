@@ -23,7 +23,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
-from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import node_collection,Group
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value,get_execution_time
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
@@ -329,7 +329,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     attendee_list = []
     moderator_list = []   
 
-    if invite_group:
+    if invite_group and Group.can_access(usr.created_by , node.group_set):
       is_attendee = True
 
     for i in node.relation_set:
@@ -349,12 +349,15 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
           is_attendee = True
           break
 
-    createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'logout.html')
-    
-    if is_moderator:
-      url = joinURL(node._id, request.user, 'mPW', SALT, URL)
-    else:
-      url = joinURL(node._id, request.user, 'aPW', SALT, URL)        
+    url = ""      
+
+    if active == 0:      
+      createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'logout.html')
+      
+      if is_moderator:
+        url = joinURL(node._id, request.user, 'mPW', SALT, URL)
+      else:
+        url = joinURL(node._id, request.user, 'aPW', SALT, URL)        
 
     extra_context_variables = {'show':is_attendee,
                           'url':url,
