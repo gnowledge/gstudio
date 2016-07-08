@@ -181,8 +181,7 @@ def run():
 
                             counter_changed = False
                             print "Updating Counter doc"
-                            print c.name
-
+                            print c.user_id
                             if c.last_update != data['last_update'] :
                                 c.last_update = data['last_update']
                                 counter_changed = True
