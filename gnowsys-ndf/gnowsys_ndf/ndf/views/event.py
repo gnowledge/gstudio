@@ -284,11 +284,13 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                         }
 
   if app_set_instance_id: #only if we view details of the particular event
-    if request.user:
-      usr = node_collection.one({'_type':u'Author','name':unicode(request.user)})
+    if request.user.id:
+      usr = node_collection.one({'_type':u'Author','name':unicode(request.user.username)})
       usrid = usr._id
 
     bbb = False
+    invite_group = False
+
     for i in node.attribute_set:
       if unicode('start_time') in i.keys():
         start_time = i['start_time']
@@ -296,6 +298,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
         end_time = i['end_time']
       elif unicode('is_bigbluebutton') in i.keys():
         bbb = i['is_bigbluebutton']
+      elif unicode('invite_group') in i.keys():
+        invite_group = i['invite_group']  
     # st_time = node.attribute_set[0]['start_time']
     # end_time = node.attribute_set[1]['end_time']
     
@@ -317,14 +321,16 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       hours_left = (start_time-now).seconds//3600
 
       if hours_left == 0:
-        shortly = True           
+        shortly = True  
 
 
     is_attendee = False
-    is_moderator = False
-
+    is_moderator = False 
     attendee_list = []
-    moderator_list = []
+    moderator_list = []   
+
+    if invite_group:
+      is_moderator = True
 
     for i in node.relation_set:
       if unicode('attendee_list') in i.keys():
