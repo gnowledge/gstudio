@@ -347,23 +347,24 @@
   
     $(document).ready(function () {
 
-      $('#invite_groupYes').click(function()
-          {
-             $('label[for="has_attendees"]').hide ();
-             $('#has_attendees').hide();
-             $('#panel_Basic').find('.small-5').find('#has_attendees').next().next().next().hide();
-             $('#panel_Basic').find('.small-5').find('#has_attendees').next().hide();
+    var tim = 1000  
 
-          });
+    $('#invite_groupYes').click(function()
+          {
+   
+   $('label[for="has_attendees"]').fadeOut(tim);
+   $('#has_attendees').fadeOut(tim);
+   $('#panel_Basic').find('.small-5').find('#has_attendees').next().next().next().fadeOut(tim);
+   $('#panel_Basic').find('.small-5').find('#has_attendees').next().fadeOut(tim);
+        });
 
       $('#invite_groupNo').click(function()
-          {
-            $('label[for="has_attendees"]').show();
-            $('#has_attendees').show();
-            $('#panel_Basic').find('.small-5').find('#has_attendees').next().next().next().show();
-            $('#panel_Basic').find('.small-5').find('#has_attendees').next().show();
-          });    
-     
+        {
+  $('label[for="has_attendees"]').fadeIn(tim);
+  $('#has_attendees').fadeIn(tim);
+  $('#panel_Basic').find('.small-5').find('#has_attendees').next().next().next().fadeIn(tim);
+  $('#panel_Basic').find('.small-5').find('#has_attendees').next().fadeIn(tim);
+  });         
     });
 
 {% endblock %}	
