@@ -1,4 +1,5 @@
 from gnowsys_ndf.ndf.models import *
+import shutil
 import email
 import imaplib
 import os
@@ -11,8 +12,11 @@ import update_page
 import parse_html
 
 detach_dir = '.'
-if 'attachments' not in os.listdir(detach_dir):
-	os.mkdir('attachments')
+if 'attachment' not in os.listdir(detach_dir):
+	os.mkdir('attachment')
+else:
+	shutil.rmtree('/attachment')
+	
 print 'hi'
 def open_connection():
 	try:
@@ -123,7 +127,7 @@ class Email1:
 				self.Filename = part.get_filename()
 
 				if bool(self.Filename):
-					filePath = os.path.join(detach_dir, 'attachments', self.Filename)
+					filePath = os.path.join(detach_dir, 'attachment', self.Filename)
 					if not os.path.isfile(filePath):
 						print "downloaded this",  self.Filename
 						fp = open(filePath, 'wb')
@@ -198,21 +202,21 @@ obj = Email1()
 for msgId in d[0].split():
 	obj.mail_extract(msgId, c)
 
-	if(obj.return_update()==False):
-		id,check,error=user_authentications.authenticate_user(mail=obj.return_from(),group_name=obj.return_grp_name())
-		print id,error
-		if(check==True):
-			p_id = create_page.create_page(name=obj.return_act_title(),content=obj.return_body(),
-				created_by=id,group_name=obj.return_grp_name(),m_id=obj.return_MessageId())
-			if(isinstance(p_id,str)):
-				send_page.send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
-					page_content=obj.return_body(),subject=obj.return_sub(),m_id=obj.return_MessageId(),ref=obj.return_Ref())
-			else:
-				print p_id
-	else:
-		update_page.update_page(name=obj.return_act_title(),content=obj.return_body(),id=obj.return_ObjectId())
-		send_page.send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
-			page_content=obj.return_body(),subject=obj.return_sub(),m_id=obj.return_MessageId(),ref=obj.return_Ref())
+	#if(obj.return_update()==False):
+	#	id,check,error=user_authentications.authenticate_user(mail=obj.return_from(),group_name=obj.return_grp_name())
+	#	print id,error
+	#	if(check==True):
+	#		p_id = create_page.create_page(name=obj.return_act_title(),content=obj.return_body(),
+	#			created_by=id,group_name=obj.return_grp_name(),m_id=obj.return_MessageId())
+	#		if(isinstance(p_id,str)):
+	#			send_page.send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
+	#				page_content=obj.return_body(),subject=obj.return_sub(),m_id=obj.return_MessageId(),ref=obj.return_Ref())
+	#		else:
+	#			print p_id
+	#else:
+	#	update_page.update_page(name=obj.return_act_title(),content=obj.return_body(),id=obj.return_ObjectId())
+	#	send_page.send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
+	#		page_content=obj.return_body(),subject=obj.return_sub(),m_id=obj.return_MessageId(),ref=obj.return_Ref())
 close_connection(c)
 
 	 
