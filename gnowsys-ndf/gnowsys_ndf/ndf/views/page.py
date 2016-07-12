@@ -361,7 +361,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     else:
         if node_id:
-
+            page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
             #page_node,ver=get_page(request,page_node)
             page_node.get_neighbourhood(page_node.member_of)
 
