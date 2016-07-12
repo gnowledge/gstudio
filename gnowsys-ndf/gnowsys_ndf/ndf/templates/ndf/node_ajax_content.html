@@ -6,6 +6,7 @@
 {% get_group_name groupid as group_name_tag %}
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js"></script>
 <style type="text/css">
   legend{
       text-align: center;
@@ -298,13 +299,9 @@
                   <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="{{node.if_file.mime_type}}">
                   {% trans "Your browser does not support the video tag." %}
                 </video>
-                <canvas id="canvas" 
-                        width="50px" height="50px"
-                        style="display:block;">
-                </canvas>
-                <div id="screenShots"></div>
-                <input type="button" id="snap" onclick="startScreenshot()" value="take snapshot">
-                <input type="button" id="save-snap" onclick="saveScreenshot()" value="save snapshot">
+              
+              {% include 'ndf/video_thumbnail.html' with video_id="video-area" group_id=group_id parent_node=node.pk %}                
+              
               {% elif 'audio' in node.if_file.mime_type %}
                 <audio src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" controls loop>
                   <p>{% trans 'Your browser does not support the audio element' %} </p>
@@ -937,80 +934,68 @@ function dataURLToBlob(dataURL){
 function saveScreenshot(){
     var canvas = document.getElementById("canvas");
     var blob_object = new Blob();
-    canvas.toBlob(function(blob) {
-      var newImg = document.createElement("img"),
-      url = URL.createObjectURL(blob);
-      var blob = new Blob();
-      blob = canvas.toDataURL("image/png");
-      console.log(blob);
-      get_blob = dataURLToBlob(blob);
-      blob_object = get_blob;
-      console.log(get_blob);
-  });
-
     var d = new Date();
     timeStamp = d.getTime();
     fileName = "{{node.name}}"+"-th-"+timeStamp.toString();
-    file = blob_object
 
-    //alert(timeStamp);
-    console.log(blob_object);
-    
-   
-// Create a new FormData object.
-    var formsData = new FormData();
+    if (canvas.toBlob) {
+          canvas.toBlob(
+              function (blob) {
+                  // Do something with the blob object,
+                  // e.g. creating a multipart form for file uploads:
+                  var formData = new FormData();
+                  // formData.append('file', blob, fileName);
 
+                  console.log(blob);
+                  // console.log(blob+"hello");
+                  blob_object = blob;
+                  file = blob
+                                 formData.append('filehive', file, fileName);
+                  // appending csrfmiddlewaretoken and user-id
+                  formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+                  // formsData.append('imgBase64', blob_object);
+                  formData.append('user','{{request.user.id}}');
 
-      // // Check the file type.
-      // if (!file.type.match('image.*')) {  continue; }
+                  // Set up the request.
+                  xhr = new XMLHttpRequest();
 
-      // Add the file to the request.
-      formsData.append('filehive', file, fileName);//passing timestamp as file name
+                  // Open the connection.
+                  xhr.open('POST', "{% url 'upload_video_thumbnail' group_id %}");
 
-    // appending csrfmiddlewaretoken and user-id
-    formsData.append('csrfmiddlewaretoken', '{{csrf_token}}');
-    formsData.append('user','{{request.user.id}}');
+                  // Set up a handler for when the request finishes sucessfully.
+                  xhr.onload = function () {
 
-    // Set up the request.
-    xhr = new XMLHttpRequest();
+                    if (xhr.status === 200)
+                    {
+                      // File(s) uploaded.
+                     // if file is not uploaded sucessfully
+                      if(xhr.responseText == "UploadError")
+                      {
+                         alert("Error occurred");
+                      }
+                      // check if image is not in the list, add it.
+                      else if(xhr.responseText )
+                      {
+                          
+                            alert(xhr.responseText);
 
-    // Open the connection.
-    xhr.open('POST', "{% url 'upload_video_thumbnail' group_id %}", true);
+                      }
 
-    // Set up a handler for when the request finishes sucessfully.
-    xhr.onload = function () {
+                    }
+                    else
+                    {
+                      alert('An error occurred!');
+                    }
+                  };
 
-      if (xhr.status === 200)
-      {
-        // File(s) uploaded.
-       // if file is not uploaded sucessfully
-        if(xhr.responseText == "UploadError")
-        {
-           alert("Error occurred");
-        }
-        // check if image is not in the list, add it.
-        else if(xhr.responseText )
-        {
-            
-              alert(xhr.responseText);
+                  // Send the Data.
+                  xhr.send(formData);
 
-        }
-
-        // updating metadata of files, if file is uploaded sucessfully
-        // if(xhr.responseText != "UploadError")
-        // {
-        //   // alert('xhr.responseText != "UploadError"');
-        // }
-      }
-      else
-      {
-        alert('An error occurred!');
-      }
-    };
-
-    // Send the Data.
-    xhr.send(formsData);
-
+                                /* ... */
+                            },
+                            'image/jpeg'
+                        );
+                  }
 
 
 }
