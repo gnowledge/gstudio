@@ -2,9 +2,8 @@
 {% xextends "ndf/base.html" with first_body_column=0 %}
 
 {% load i18n %}
-
+{%load ndf_tags%}
 {% block title %} {{title}} {% endblock title %}
-
 {% block extended_header %}
 
 <script src="/static/ndf/bower_components/d3/d3.min.js"></script>
@@ -184,7 +183,8 @@ div.city_hover_tooltip>div{
 </style>
 <div id="info_bar"></div>
 <div id="map">
-  {%if user.is_staff%}
+{%check_is_gstaff groupid request.user as my_gtaff%}
+  {%if my_gtaff%}
   <a class="edit_btn button">Edit</a>
   {%endif%}
 </div>
@@ -193,7 +193,7 @@ div.city_hover_tooltip>div{
   
   function load_organization(){
   $.ajax({
-    url: '/{{groupid}}/state_analytics/fetch_organization',
+    url: "{%url 'fetch_organization' groupid%}",
     method: 'GET',
     success: function(data){
       var det = JSON.parse(data);
@@ -211,7 +211,7 @@ function update_organization(data,id){
     id = '';
   }
   $.ajax({
-    url: '/{{groupid}}/state_analytics/update_organization/' + id,
+    url: "{%url 'add_organization' groupid  'node_id'%}".replace('node_id',id),
     method: 'POST',
     contentType: "application/json; charset=utf-8",
     dataType: "json",
@@ -220,7 +220,8 @@ function update_organization(data,id){
       xhr.setRequestHeader("X-CSRFToken", csrftoken);
     },
     success: function(data){
-      data = JSON.parse(data);
+      //console.log(data);
+      //data = JSON.parse(data);
       curr_edit.data()[0]['id'] = data.id;
       curr_edit.attr('id', data.id);
     }
@@ -232,7 +233,7 @@ function delete_organization(id){
     return;
   }
   $.ajax({
-    url: '/{{groupid}}/state_analytics/delete_organization/' + id,
+    url: "{%url 'delete_organization' groupid  'node_id'%}".replace('node_id',id),
     method: 'POST',
     contentType: "application/json; charset=utf-8",
     dataType: "json",
@@ -240,7 +241,7 @@ function delete_organization(id){
       xhr.setRequestHeader("X-CSRFToken", csrftoken);
     },
     success: function(data){
-      data = JSON.parse(data);
+      //data = JSON.parse(data);
       if(data.status)
         curr_edit.remove();
     }
