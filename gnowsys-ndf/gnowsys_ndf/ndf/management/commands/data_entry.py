@@ -302,8 +302,6 @@ def parse_data_create_gsystem(json_file_path, file_name):
             log_list.append(info_message)
             print "\n HERE == "
             global user_id
-            print "\n user_id - ", user_id
-
             node = create_edit_gsystem(gsystem_type_id, gsystem_type_name, parsed_json_document, user_id)
             print "\n node created === ", node._id, " === ", node.name, node.altnames
             # print "attribute_relation_list == ",attribute_relation_list

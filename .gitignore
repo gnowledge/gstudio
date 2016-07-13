@@ -73,4 +73,3 @@ img/
 media/
 gnowsys-ndf/wsgi.py
 *schema_files*
-*schema_directory*
