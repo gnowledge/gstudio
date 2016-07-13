@@ -23912,7 +23912,7 @@ body {
 body > footer {
   padding: 10px 5px;
   position: relative;
-  background-color: #5d055f;
+  background-color: rgba(0, 0, 0, 0.8);
 }
 /* line 469, ../../../scss/_app_styles.scss */
 body > footer ul {
