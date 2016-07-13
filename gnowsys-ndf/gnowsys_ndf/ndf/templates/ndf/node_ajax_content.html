@@ -4,6 +4,7 @@
 
 {% get_schema node as schema %}
 {% get_group_name groupid as group_name_tag %}
+{% check_is_gstaff groupid request.user as is_gstaff %}
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js"></script>
@@ -299,9 +300,16 @@
                   <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="{{node.if_file.mime_type}}">
                   {% trans "Your browser does not support the video tag." %}
                 </video>
-              
-              {% include 'ndf/video_thumbnail.html' with video_id="video-area" group_id=group_id parent_node=node.pk %}                
-              
+              <br>
+                {% if node.created_by == request.user.id or is_gstaff %}
+                  <a class="button change-thumbnail">Add/Change thumbnail</a>
+                  <div class="change-thumbnail-area" style="display:none">
+                    
+                    {% get_relation_value node.pk 'has_thumbnail' as grel_dict %}
+
+                    {% include 'ndf/video_thumbnail.html' with grel_dict=grel_dict video_id="video-area" group_id=group_id parent_node=node.pk %}                
+                  </div>
+                {% endif %}
               {% elif 'audio' in node.if_file.mime_type %}
                 <audio src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" controls loop>
                   <p>{% trans 'Your browser does not support the audio element' %} </p>
@@ -873,132 +881,9 @@
   </section>
 
 <script type="text/javascript">
-var video_obj = document.getElementById("video-area");
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
-var ssContainer = document.getElementById("screenShots");
-var videoHeight, videoWidth;
-var drawTimer = null;
-console.log(video_obj);  
+  $(".change-thumbnail").click(function(){
+    $(".change-thumbnail-area").show();
 
-function initScreenshot() {
-  videoHeight = video_obj.videoHeight; 
-  videoWidth = video_obj.videoWidth;
-  canvas.width = 120;
-  canvas.height = 120;
-}
-
-function grabScreenshot() {
-  ctx.drawImage(video_obj, 0, 0, 120, 120);
-  var img = new Image();
-  img.src = canvas.toDataURL("image/png");
-  img.width = 120;
-  console.log(canvas)
-}
-
-function startScreenshot() {
-  
-  initScreenshot();
-  if (drawTimer == null) {
-    drawTimer = grabScreenshot();
-
-      
-      // alert(test);
-  }
-}
-function dataURLToBlob(dataURL){
-                var BASE64_MARKER = ';base64,';
-    if (dataURL.indexOf(BASE64_MARKER) == -1) {
-      var parts = dataURL.split(',');
-      var contentType = parts[0].split(':')[1];
-      var raw = decodeURIComponent(parts[1]);
-
-      return new Blob([raw], {type: contentType});
-    }
-
-    var parts = dataURL.split(BASE64_MARKER);
-    var contentType = parts[0].split(':')[1];
-    console.log(contentType);
-    var raw = window.atob(parts[1]);
-    var rawLength = raw.length;
-
-    var uInt8Array = new Uint8Array(rawLength);
-
-    for (var i = 0; i < rawLength; ++i) {
-      uInt8Array[i] = raw.charCodeAt(i);
-    }
-
-    return new Blob([uInt8Array], {type: contentType});
-  }
-
-function saveScreenshot(){
-    var canvas = document.getElementById("canvas");
-    var blob_object = new Blob();
-    var d = new Date();
-    timeStamp = d.getTime();
-    fileName = "{{node.name}}"+"-th-"+timeStamp.toString();
-
-    if (canvas.toBlob) {
-          canvas.toBlob(
-              function (blob) {
-                  // Do something with the blob object,
-                  // e.g. creating a multipart form for file uploads:
-                  var formData = new FormData();
-                  // formData.append('file', blob, fileName);
-
-                  console.log(blob);
-                  // console.log(blob+"hello");
-                  blob_object = blob;
-                  file = blob
-                                 formData.append('filehive', file, fileName);
-                  // appending csrfmiddlewaretoken and user-id
-                  formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
-                  // formsData.append('imgBase64', blob_object);
-                  formData.append('user','{{request.user.id}}');
-
-                  // Set up the request.
-                  xhr = new XMLHttpRequest();
-
-                  // Open the connection.
-                  xhr.open('POST', "{% url 'upload_video_thumbnail' group_id %}");
-
-                  // Set up a handler for when the request finishes sucessfully.
-                  xhr.onload = function () {
-
-                    if (xhr.status === 200)
-                    {
-                      // File(s) uploaded.
-                     // if file is not uploaded sucessfully
-                      if(xhr.responseText == "UploadError")
-                      {
-                         alert("Error occurred");
-                      }
-                      // check if image is not in the list, add it.
-                      else if(xhr.responseText )
-                      {
-                          
-                            alert(xhr.responseText);
-
-                      }
-
-                    }
-                    else
-                    {
-                      alert('An error occurred!');
-                    }
-                  };
-
-                  // Send the Data.
-                  xhr.send(formData);
-
-                                /* ... */
-                            },
-                            'image/jpeg'
-                        );
-                  }
-
-
-}
-
+  })
 
 </script>
