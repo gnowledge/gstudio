@@ -23819,11 +23819,11 @@ body > footer h2 {
 }
 /* line 484, ../../../scss/_app_styles.scss */
 body > footer li {
-  color: #BBBBBB;
+  color: #bbbbbb;
 }
 /* line 487, ../../../scss/_app_styles.scss */
 body > footer a {
-  color: #BBBBBB;
+  color: #bbbbbb;
   margin-top: 0;
   padding: 0;
   display: inline;
@@ -23831,14 +23831,14 @@ body > footer a {
 /* line 492, ../../../scss/_app_styles.scss */
 body > footer a:hover {
   text-decoration: none;
-  color: #3824a5;
+  color: #ffffff;
   margin-top: 0;
   padding: 0;
   display: inline;
 }
 /* line 502, ../../../scss/_app_styles.scss */
 body > footer .myfooter .footer-section {
-  color: #FFFFFF;
+  color: #ffffff;
   text-align: center;
 }
 /* line 506, ../../../scss/_app_styles.scss */
@@ -23880,7 +23880,7 @@ body > footer .myfooter .footer_link_cont .links_show {
 }
 /* line 540, ../../../scss/_app_styles.scss */
 body > footer .myfooter .footer_link_cont .show_foot_links {
-  color: #666666;
+  color: #777777;
   cursor: pointer;
 }
 /* line 544, ../../../scss/_app_styles.scss */
