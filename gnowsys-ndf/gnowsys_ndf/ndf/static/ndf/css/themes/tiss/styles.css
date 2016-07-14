@@ -27404,11 +27404,15 @@ course-title {
 .event-card .event-card-status.forthcoming {
   background-color: #F2910D;
 }
-/* line 4141, ../../../scss/_app_styles.scss */
+/* line 4140, ../../../scss/_app_styles.scss */
+.event-card .event-card-status.upcoming {
+  background-color: #F2910D;
+}
+/* line 4144, ../../../scss/_app_styles.scss */
 .event-card .event-card-status.completed {
   background-color: #4d4d4d;
 }
-/* line 4146, ../../../scss/_app_styles.scss */
+/* line 4149, ../../../scss/_app_styles.scss */
 .event-card .event-card-notifications {
   position: absolute;
   top: 2px;
@@ -27417,46 +27421,46 @@ course-title {
   color: #F04124;
   font-weight: 600;
 }
-/* line 4154, ../../../scss/_app_styles.scss */
+/* line 4157, ../../../scss/_app_styles.scss */
 .event-card .event-card-notifications .badge {
   padding: 0px 5px;
   font-size: 1.4em;
   font-weight: 600;
 }
-/* line 4161, ../../../scss/_app_styles.scss */
+/* line 4164, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status {
   font-weight: 500;
   font-size: 1.2em;
   padding: 0.5em 0.8em 0.6em;
 }
-/* line 4166, ../../../scss/_app_styles.scss */
+/* line 4169, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.open {
   color: #00b300;
 }
-/* line 4170, ../../../scss/_app_styles.scss */
+/* line 4173, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.closed {
   color: red;
 }
-/* line 4174, ../../../scss/_app_styles.scss */
+/* line 4177, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.in-progress {
   color: #000;
 }
-/* line 4177, ../../../scss/_app_styles.scss */
+/* line 4180, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.forthcoming {
   color: #F2910D;
 }
-/* line 4181, ../../../scss/_app_styles.scss */
+/* line 4184, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status.completed {
   color: #4d4d4d;
 }
-/* line 4185, ../../../scss/_app_styles.scss */
+/* line 4188, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-status .event-time {
   font-size: 0.7em;
   display: block;
   font-weight: 400;
   display: inline;
 }
-/* line 4193, ../../../scss/_app_styles.scss */
+/* line 4196, ../../../scss/_app_styles.scss */
 .event-card .event-card-title {
   color: #0d0d0d;
   display: inline-block;
@@ -27467,19 +27471,19 @@ course-title {
   font-size: 1.5em;
   font-weight: 400;
 }
-/* line 4204, ../../../scss/_app_styles.scss */
+/* line 4207, ../../../scss/_app_styles.scss */
 .event-card .event-card-desc {
   word-wrap: break-word;
   font-size: 0.6em;
   color: #333333;
   padding-left: 4px;
 }
-/* line 4210, ../../../scss/_app_styles.scss */
+/* line 4213, ../../../scss/_app_styles.scss */
 .event-card p {
   margin: 0px;
   padding: 10px;
 }
-/* line 4216, ../../../scss/_app_styles.scss */
+/* line 4219, ../../../scss/_app_styles.scss */
 .event-card .event-card-image {
   padding: 0px;
   margin: 0px;
@@ -27491,7 +27495,7 @@ course-title {
   background-color: #e5e5e5;
   border-radius: 10px 10px 0px 0px;
 }
-/* line 4227, ../../../scss/_app_styles.scss */
+/* line 4230, ../../../scss/_app_styles.scss */
 .event-card .event-card-image img {
   border-radius: 2px 2px 0 0;
   display: block;
@@ -27500,7 +27504,7 @@ course-title {
   opacity: 0.9;
   height: 100%;
 }
-/* line 4236, ../../../scss/_app_styles.scss */
+/* line 4239, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i {
   font-size: 7rem;
   opacity: 0.75;
@@ -27514,51 +27518,51 @@ course-title {
   text-transform: none;
   text-decoration: inherit;
 }
-/* line 4250, ../../../scss/_app_styles.scss */
+/* line 4253, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.file:before {
   content: "\f18e";
 }
-/* line 4253, ../../../scss/_app_styles.scss */
+/* line 4256, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.page:before {
   content: "\f18e";
 }
-/* line 4256, ../../../scss/_app_styles.scss */
+/* line 4259, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.collection:before {
   content: "\f18a";
 }
-/* line 4259, ../../../scss/_app_styles.scss */
+/* line 4262, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.documents:before {
   content: "\f18b";
 }
-/* line 4262, ../../../scss/_app_styles.scss */
+/* line 4265, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.pdf:before {
   content: "\f18b";
 }
-/* line 4265, ../../../scss/_app_styles.scss */
+/* line 4268, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.text:before {
   content: "\f18e";
 }
-/* line 4268, ../../../scss/_app_styles.scss */
+/* line 4271, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.interactives:before {
   content: "\f1b2";
 }
-/* line 4271, ../../../scss/_app_styles.scss */
+/* line 4274, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.ebooks:before {
   content: "\f11e";
 }
-/* line 4274, ../../../scss/_app_styles.scss */
+/* line 4277, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.images:before {
   content: "\f125";
 }
-/* line 4277, ../../../scss/_app_styles.scss */
+/* line 4280, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.audios:before, .event-card .event-card-image i.audio:before {
   content: "\f17b";
 }
-/* line 4280, ../../../scss/_app_styles.scss */
+/* line 4283, ../../../scss/_app_styles.scss */
 .event-card .event-card-image i.videos:before, .event-card .event-card-image i.video:before {
   content: "\f20e";
 }
-/* line 4284, ../../../scss/_app_styles.scss */
+/* line 4287, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-footer {
   padding: 0.7em 1em;
   border-top: 1px solid #DCDCDC;
@@ -27569,7 +27573,7 @@ course-title {
   background-color: #F3F3F3;
   border-radius: 0px 0px 10px 10px;
 }
-/* line 4294, ../../../scss/_app_styles.scss */
+/* line 4297, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-footer .footer-label {
   text-transform: uppercase;
   font-size: 10px;
@@ -27577,54 +27581,54 @@ course-title {
   margin-bottom: 2px;
   color: #ADADAD;
 }
-/* line 4302, ../../../scss/_app_styles.scss */
+/* line 4305, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-footer .date {
   color: #929292;
   font-size: 0.85em;
   letter-spacing: 0.5px;
 }
-/* line 4307, ../../../scss/_app_styles.scss */
+/* line 4310, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-footer .date i:not(.edit-course-duration, .edit-course-enrollment) {
   margin-right: 0.3em;
 }
-/* line 4311, ../../../scss/_app_styles.scss */
+/* line 4314, ../../../scss/_app_styles.scss */
 .event-card .event-card-session-footer .row {
   margin: 10px 0px 0px;
 }
-/* line 4315, ../../../scss/_app_styles.scss */
+/* line 4318, ../../../scss/_app_styles.scss */
 .event-card .edit-course-duration, .event-card .edit-course-enrollment {
   float: right;
   font-size: 1.5em;
   color: #DADADA;
 }
-/* line 4319, ../../../scss/_app_styles.scss */
+/* line 4322, ../../../scss/_app_styles.scss */
 .event-card .edit-course-duration:hover, .event-card .edit-course-enrollment:hover {
   color: #565656;
 }
-/* line 4323, ../../../scss/_app_styles.scss */
+/* line 4326, ../../../scss/_app_styles.scss */
 .event-card .published.scard-action {
   background: #A6D9CB;
 }
-/* line 4327, ../../../scss/_app_styles.scss */
+/* line 4330, ../../../scss/_app_styles.scss */
 .event-card .draft.scard-action {
   content: "Draft";
   background: #DCDCDC;
 }
-/* line 4332, ../../../scss/_app_styles.scss */
+/* line 4335, ../../../scss/_app_styles.scss */
 .event-card .deleted.scard-action {
   border-color: transparent #f04124 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 4337, ../../../scss/_app_styles.scss */
+/* line 4340, ../../../scss/_app_styles.scss */
 .event-card .moderation.scard-action {
   border-color: transparent #0eacb5 transparent transparent;
   border-color: rgba(255, 255, 255, 0) #0eacb5 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
 }
-/* line 4341, ../../../scss/_app_styles.scss */
+/* line 4344, ../../../scss/_app_styles.scss */
 .event-card .moderation.scard-action .label-text:before {
   content: "Mod";
 }
-/* line 4345, ../../../scss/_app_styles.scss */
+/* line 4348, ../../../scss/_app_styles.scss */
 .event-card .scard_footer {
   border-top: 1px solid rgba(160, 160, 160, 0.2);
   padding: 0.25rem 0.5rem;
@@ -27635,17 +27639,17 @@ course-title {
 
 /* End Course/events Card CSS*/
 /* Landing page */
-/* line 4357, ../../../scss/_app_styles.scss */
+/* line 4360, ../../../scss/_app_styles.scss */
 .landing_page {
   position: relative;
   text-align: center;
 }
-/* line 4361, ../../../scss/_app_styles.scss */
+/* line 4364, ../../../scss/_app_styles.scss */
 .landing_page .panel {
   background-color: inherit;
   border: none;
 }
-/* line 4366, ../../../scss/_app_styles.scss */
+/* line 4369, ../../../scss/_app_styles.scss */
 .landing_page .landing_page_background {
   height: 100%;
   width: 100%;
@@ -27657,24 +27661,24 @@ course-title {
   background: -ms-linear-gradient(left, #E9A900, #B0108D);
   background: -o-linear-gradient(left, #E9A900, #B0108D);
 }
-/* line 4378, ../../../scss/_app_styles.scss */
+/* line 4381, ../../../scss/_app_styles.scss */
 .landing_page .clix_brief {
   text-align: left;
   padding: 20px 5%;
 }
-/* line 4382, ../../../scss/_app_styles.scss */
+/* line 4385, ../../../scss/_app_styles.scss */
 .landing_page .clix_brief img {
   margin: 30px 20px;
   height: 70px;
 }
 @media screen and (max-width: 450px) {
-  /* line 4382, ../../../scss/_app_styles.scss */
+  /* line 4385, ../../../scss/_app_styles.scss */
   .landing_page .clix_brief img {
     margin: 25px 10px;
     height: 55px;
   }
 }
-/* line 4390, ../../../scss/_app_styles.scss */
+/* line 4393, ../../../scss/_app_styles.scss */
 .landing_page .clix_brief p {
   color: #fff;
   font-size: 26px;
@@ -27682,12 +27686,12 @@ course-title {
   font-family: 'ubuntu-light';
 }
 @media screen and (max-width: 450px) {
-  /* line 4390, ../../../scss/_app_styles.scss */
+  /* line 4393, ../../../scss/_app_styles.scss */
   .landing_page .clix_brief p {
     font-size: 18px;
   }
 }
-/* line 4401, ../../../scss/_app_styles.scss */
+/* line 4404, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix {
   background-color: rgba(255, 255, 255, 0.92);
   border-radius: 10px;
@@ -27698,12 +27702,12 @@ course-title {
   box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.5);
 }
 @media screen and (min-width: 1025px) {
-  /* line 4401, ../../../scss/_app_styles.scss */
+  /* line 4404, ../../../scss/_app_styles.scss */
   .landing_page .invitation_to_clix {
     margin: 200px auto;
   }
 }
-/* line 4413, ../../../scss/_app_styles.scss */
+/* line 4416, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix > span {
   font-family: 'ubuntu-bold';
   color: #6658af;
@@ -27714,7 +27718,7 @@ course-title {
   display: inline-block;
   vertical-align: middle;
 }
-/* line 4423, ../../../scss/_app_styles.scss */
+/* line 4426, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix p {
   color: #b0108d;
   font-size: 21px;
@@ -27722,28 +27726,28 @@ course-title {
   font-weight: 300;
   font-family: 'ubuntu-light';
 }
-/* line 4431, ../../../scss/_app_styles.scss */
+/* line 4434, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix img {
   height: 30px;
 }
-/* line 4434, ../../../scss/_app_styles.scss */
+/* line 4437, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix form {
   margin-top: 30px;
 }
-/* line 4437, ../../../scss/_app_styles.scss */
+/* line 4440, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix form input {
   font-size: 24px;
   height: 45px;
   margin: 5px 0px 24px;
 }
-/* line 4444, ../../../scss/_app_styles.scss */
+/* line 4447, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix input.button {
   font-size: 15px;
   border-radius: 5px;
   font-family: 'ubuntu-bold';
   text-transform: uppercase;
 }
-/* line 4450, ../../../scss/_app_styles.scss */
+/* line 4453, ../../../scss/_app_styles.scss */
 .landing_page .invitation_to_clix a.grey {
   color: #999;
   /*display: inline-block;
@@ -27754,7 +27758,7 @@ course-title {
   font-family: 'ubuntu-bold';
   text-transform: uppercase;*/
 }
-/* line 4461, ../../../scss/_app_styles.scss */
+/* line 4464, ../../../scss/_app_styles.scss */
 .landing_page .flowers {
   left: 50px;
   height: 500px;
@@ -27762,18 +27766,18 @@ course-title {
   opacity: 0.6;
 }
 @media screen and (max-width: 450px) {
-  /* line 4461, ../../../scss/_app_styles.scss */
+  /* line 4464, ../../../scss/_app_styles.scss */
   .landing_page .flowers {
     height: 250px;
   }
 }
 @media screen and (min-width: 451px) and (max-width: 1025px) {
-  /* line 4461, ../../../scss/_app_styles.scss */
+  /* line 4464, ../../../scss/_app_styles.scss */
   .landing_page .flowers {
     height: 350px;
   }
 }
-/* line 4473, ../../../scss/_app_styles.scss */
+/* line 4476, ../../../scss/_app_styles.scss */
 .landing_page .bees {
   position: absolute;
   top: 5px;
@@ -27781,33 +27785,33 @@ course-title {
   height: 150px;
 }
 @media screen and (max-width: 450px) {
-  /* line 4473, ../../../scss/_app_styles.scss */
+  /* line 4476, ../../../scss/_app_styles.scss */
   .landing_page .bees {
     right: 15px;
     height: 100px;
   }
 }
-/* line 4483, ../../../scss/_app_styles.scss */
+/* line 4486, ../../../scss/_app_styles.scss */
 .landing_page h2 {
   color: #A0148E;
   font-weight: 600;
 }
-/* line 4487, ../../../scss/_app_styles.scss */
+/* line 4490, ../../../scss/_app_styles.scss */
 .landing_page .landing-page-text {
   color: #6153ae;
 }
-/* line 4490, ../../../scss/_app_styles.scss */
+/* line 4493, ../../../scss/_app_styles.scss */
 .landing_page .landing-page-text p {
   font-size: 18px;
 }
 
 /* END of Landing page */
-/* line 4496, ../../../scss/_app_styles.scss */
+/* line 4499, ../../../scss/_app_styles.scss */
 .audio-caption {
   cursor: pointer;
 }
 
-/* line 4500, ../../../scss/_app_styles.scss */
+/* line 4503, ../../../scss/_app_styles.scss */
 .gallery-image {
   cursor: pointer;
   max-height: 100px;
