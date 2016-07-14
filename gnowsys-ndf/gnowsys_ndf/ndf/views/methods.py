@@ -952,42 +952,31 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 
     elif (nid is None) and (nlist):
 
-      # for oid in nlist:
-      #   obj = node_collection.one({'_id': oid})
-      #   dict2.append(obj)
         for each in drawer:
             if each._id not in nlist:
                 dict1[each._id] = each
 
-        #loop replaced by a list comprehension
-        dict2=[node_collection.one({'_id': oid}) for oid in nlist]
+        dict2 = [node_collection.one({'_id': oid}) for oid in nlist]
 
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
-            dict_drawer['1'] = dict1
-            dict_drawer['2'] = dict2
+        dict_drawer['1'] = dict1
+        dict_drawer['2'] = dict2
 
     else:
         for each in drawer:
-
             if each._id != nid:
                 if each._id not in nlist:
                     dict1[each._id] = each
 
-        if each._id != nid:
-            if each._id not in nlist:
-                dict1[each._id] = each
-
-        #loop replaced by a list comprehension
-        dict2=[node_collection.one({'_id': oid})  for oid in nlist]
-
+        dict2 = [node_collection.one({'_id': oid})  for oid in nlist]
 
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
-            dict_drawer['1'] = dict1
-            dict_drawer['2'] = dict2
+        dict_drawer['1'] = dict1
+        dict_drawer['2'] = dict2
 
     if checked == "RelationType" or checked == "CourseUnits":
         return dict_drawer
