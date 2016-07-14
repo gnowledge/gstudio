@@ -37,12 +37,14 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
 
 
 gst_course = node_collection.one({'_type': "GSystemType", 'name': "Course"})
+gst_basecoursegroup = node_collection.one({'_type': "GSystemType", 'name': "BaseCourseGroup"})
 ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
 gst_acourse = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
 gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
 group_id = node_collection.one({'_type': "Group", 'name': "home"})._id
 
 def explore(request):
+    return HttpResponseRedirect(reverse('explore_courses', kwargs={}))
 
     title = 'explore'
 
@@ -57,7 +59,7 @@ def explore(request):
 def explore_courses(request):
 
     title = 'courses'
-    print ce_gst._id
+    # print ce_gst._id
     ce_cur = node_collection.find({'member_of': ce_gst._id,
                                         '$or': [
                                           {'created_by': request.user.id}, 
@@ -103,8 +105,8 @@ def explore_basecourses(request):
 
     title = 'base courses'
 
-    course_cur = node_collection.find({'member_of': gst_course._id}).sort('last_update', -1)
-    context_variable = {'title': title, 'doc_cur': course_cur, 'card': 'ndf/event_card.html',
+    course_cur = node_collection.find({'member_of': {'$in': [gst_course._id, gst_basecoursegroup._id]}}).sort('last_update', -1)
+    context_variable = {'title': title, 'doc_cur': course_cur, 'card': 'ndf/simple_card.html',
                         'group_id': group_id, 'groupid': group_id}
     return render_to_response(
         "ndf/explore.html",
