@@ -1849,7 +1849,7 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
-    if "CourseEventGroup" in group_obj.member_of_names_list:
+    if "CourseEventGroup" in group_obj.member_of_names_list or "BaseCourseGroup" in group_obj.member_of_names_list:
         return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
 
     if group_obj and group_obj.post_node:
@@ -1966,8 +1966,8 @@ def group_dashboard(request, group_id=None):
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
       alternate_template = "ndf/gcourse_event_group.html"
-      course_collection_data = get_collection(request,group_obj._id,group_obj._id)
-      course_collection_data = json.loads(course_collection_data.content)
+      # course_collection_data = get_collection(request,group_obj._id,group_obj._id)
+      # course_collection_data = json.loads(course_collection_data.content)
 
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
@@ -2047,7 +2047,8 @@ def group_dashboard(request, group_id=None):
                                                        'subgroups_cur':subgroups_cur,
                                                        # 'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image,
-                                                       'old_profile_pics':old_profile_pics
+                                                       'old_profile_pics':old_profile_pics,
+                                                       'group_obj': group_obj,
                                                       },context_instance=RequestContext(request)
                           )
 
