@@ -57,17 +57,15 @@ class Command(BaseCommand):
 	def updater(self,all_events):
 
 		now = datetime.datetime.now()
-		status = node_collection.one({'_type' : 'AttributeType' , 'name': 'event_status'})
+		e_status = node_collection.one({'_type' : 'AttributeType' , 'name': 'event_status'})
 
 		for event in all_events:
 			for i in event.attribute_set:
-				try:
+				if unicode('end_time') in i.keys():
 					end_time = i['end_time']
-					break
-				except:
-					pass
+				elif unicode('event_status') in i.keys():
+					status = i['event_status']	
 
-			if now > end_time:
-				create_gattribute(event._id , status , unicode("Completed"))
-			
-			
+			if status == unicode("Scheduled"):
+				if now > end_time:
+					create_gattribute(event._id , e_status , unicode("Completed"))
