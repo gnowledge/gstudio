@@ -33,6 +33,7 @@ from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict
 from gnowsys_ndf.ndf.views.notify import set_notif_val
+from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.views.analytics_methods import *
@@ -142,7 +143,7 @@ def create_edit(request, group_id, node_id=None):
                         'groupid': group_id
                     }
     if node_id:
-        course_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
+        course_node = node_collection.one({'_id': ObjectId(node_id)})
         grel_dict = get_relation_value(node_id,'has_logo')
         is_cursor = grel_dict.get("cursor",False)
         if not is_cursor:
@@ -166,48 +167,60 @@ def create_edit(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
-        course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE),groupid=group_id)
-        create_gattribute(course_node._id, at_course_type, u"General")
+        basecoursegroup_gst = node_collection.one({'_type': "GSystemType", 'name': u"BaseCourseGroup"})
+        if not course_node:
+            base_course_group_name = request.POST.get('name','')
+            group = CreateGroup(request)
+            result = group.create_group(base_course_group_name)
+            if result[0]:
+                course_node = result[1]
+                course_node.member_of = [basecoursegroup_gst._id]
+                course_node.save()
+                # course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE),groupid=group_id)
+                # create_gattribute(course_node._id, at_course_type, u"General")
+                # print "\n course_node ---- ", course_node
+        if course_node:
+            course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, basecoursegroup_gst),groupid=group_id)
+            
+            # adding thumbnail
+            f = request.FILES.get("doc", "")
+            # print "\nf is ",f
 
-        # adding thumbnail
-        f = request.FILES.get("doc", "")
-        # print "\nf is ",f
+            if f:
 
-        if f:
-
-            # if existing logo image is found
-            if logo_img_node:
-                # print "\nlogo_img_node--",logo_img_node
-                # check whether it appears in any other node's grelation
-                rel_obj = None
-                rel_obj = triple_collection.find({"_type": "GRelation", 'subject': {'$ne': ObjectId(course_node._id)}, 'right_subject': logo_img_node._id})
-                file_cur = node_collection.find({'_type':"File",'fs_file_ids':logo_img_node.fs_file_ids,'_id': {'$ne': logo_img_node._id}})
-                # print "\nrel_obj--",rel_obj.count()
-                # print "\nfile_cur.count()--",file_cur.count()
-                if rel_obj.count() > 0 or file_cur.count() > 0:
-                    # if found elsewhere too, delete it from current node's grelation ONLY
-                    # print "\n Image exists for others"
-                    if grel_id:
-                        del_status, del_status_msg = delete_grelation(
-                            node_id=ObjectId(grel_id),
+                # if existing logo image is found
+                if logo_img_node:
+                    # print "\nlogo_img_node--",logo_img_node
+                    # check whether it appears in any other node's grelation
+                    rel_obj = None
+                    rel_obj = triple_collection.find({"_type": "GRelation", 'subject': {'$ne': ObjectId(course_node._id)}, 'right_subject': logo_img_node._id})
+                    file_cur = node_collection.find({'_type':"File",'fs_file_ids':logo_img_node.fs_file_ids,'_id': {'$ne': logo_img_node._id}})
+                    # print "\nrel_obj--",rel_obj.count()
+                    # print "\nfile_cur.count()--",file_cur.count()
+                    if rel_obj.count() > 0 or file_cur.count() > 0:
+                        # if found elsewhere too, delete it from current node's grelation ONLY
+                        # print "\n Image exists for others"
+                        if grel_id:
+                            del_status, del_status_msg = delete_grelation(
+                                node_id=ObjectId(grel_id),
+                                deletion_type=1
+                            )
+                            # print del_status, "--", del_status_msg
+                    else:
+                        # else delete the logo file
+                        # print "\n delete node"
+                        del_status, del_status_msg = delete_node(
+                            node_id=logo_img_node._id,
                             deletion_type=1
                         )
                         # print del_status, "--", del_status_msg
-                else:
-                    # else delete the logo file
-                    # print "\n delete node"
-                    del_status, del_status_msg = delete_node(
-                        node_id=logo_img_node._id,
-                        deletion_type=1
-                    )
-                    # print del_status, "--", del_status_msg
 
-            fileobj,fs = save_file(f,f.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
-            if fileobj:
-                rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
-                # print "\n creating GRelation has_logo\n"
-                create_grelation(course_node._id, rt_has_logo, ObjectId(fileobj))
-        return HttpResponseRedirect(reverse('course_detail', kwargs={'group_id': group_id, '_id': course_node._id}))
+                fileobj,fs = save_file(f,f.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+                if fileobj:
+                    rt_has_logo = node_collection.one({'_type': "RelationType", 'name': "has_logo"})
+                    # print "\n creating GRelation has_logo\n"
+                    create_grelation(course_node._id, rt_has_logo, ObjectId(fileobj))
+        return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': course_node._id}))
     else:
         if node_id:
             context_variables['node'] = course_node
@@ -1908,6 +1921,8 @@ def course_dashboard(request, group_id):
                 completed_count = result_status['completed_count']
 
     template = 'ndf/gcourse_event_group.html'
+    if 'BaseCourseGroup' in group_obj.member_of_names_list:
+        template = 'ndf/basecourse_group.html'
 
 
     context_variables = RequestContext(request, {
@@ -1948,6 +1963,9 @@ def course_content(request, group_id):
 
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
+
+    if 'BaseCourseGroup' in group_obj.member_of_names_list:
+        template = 'ndf/basecourse_group.html'
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     '''
     banner_pic_obj = None
@@ -1988,6 +2006,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     all_blogs = blog_pages = user_blogs = user_id = None
     allow_to_comment = notebook_obj = None
     template = 'ndf/gcourse_event_group.html'
+
     page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
     thread_node = None
@@ -2139,6 +2158,8 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     if gstaff_access:
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
+    if 'BaseCourseGroup' in group_obj.member_of_names_list:
+        template = 'ndf/basecourse_group.html'
 
     context_variables.update({'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
     return render_to_response(template,
@@ -2250,8 +2271,12 @@ def course_about(request, group_id):
 
       # print 'Weeks:', (end_day - start_day).days / 7
       weeks_count = (end_day - start_day).days / 7
-
+    show_analytics_notifications = True
     template = 'ndf/gcourse_event_group.html'
+    if 'BaseCourseGroup' in group_obj.member_of_names_list:
+        template = 'ndf/basecourse_group.html'
+        show_analytics_notifications = False
+
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     '''
     banner_pic_obj = None
@@ -2278,7 +2303,8 @@ def course_about(request, group_id):
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
             'weeks_count': weeks_count,
-            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
+            'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj,
+            'show_analytics_notifications':show_analytics_notifications
         })
     return render_to_response(template, context_variables)
 
