@@ -419,6 +419,9 @@
 
     // ready function
     $(document).ready(function() {
+        {% if show_analytics_notifications %}
+          loaddata();
+        {% endif %}
         var course_about_panel = $('.course-desc')
         if(course_about_panel.height() > 90 ){
           $(".show-more").removeClass("hide")
