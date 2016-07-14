@@ -43,13 +43,13 @@
 		</div>
 		{% endcomment %}
 	</div>
-	<div class="small-12 medium-7 columns">
-		<div style="display: inline-block;">
-			{% if title == "base courses" and is_gstaff %}
-				<a class="tiny button radius right" href="{% url 'create_edit' groupid %}"><i class="fi-plus"></i>{% trans " Create Course" %}</a>
-			{% endif %}
+	{% if title == "base courses" and is_gstaff %}
+		<div class="small-12 medium-7 columns">
+			<div style="display: inline-block;">
+					<a class="tiny button radius right" href="{% url 'create_edit' groupid %}"><i class="fi-plus"></i>{% trans " Create Course" %}</a>
+			</div>
 		</div>
-	</div>
+	{% endif %}
 
 
 	{% if title == 'explore' %}
