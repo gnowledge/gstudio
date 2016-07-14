@@ -112,26 +112,28 @@
       </div-->
     {% endif %}
     <!-- End Card Description  -->
-    <!-- Card Next Session -->
-    {% get_course_session_status resource as event_session_status %}
-    <div class="event-card-session-status {{event_status_msg|lower}}">
-    {% if event_status_msg == "CLOSED"%}
-      No Sessions
-
-    {% elif next_session %}
+    <!-- Card Next Session 
+    {% comment %}
       {% get_course_session_status resource as event_session_status %}
-       {% if event_session_status.1 == True %}
-        First
-       {% else %}
-        Next
-       {% endif %}
-       Session
-      <b class="event-time">{{event_session_status.0|date:"d-m-Y"}}</b>
-      {% comment %}
-      <div class="event-time">25th Jan 2016 &#8226; 12:00 pm</div>
-      {% endcomment %}
-    {% endif %}
-    </div>
+
+      <div class="event-card-session-status {{event_status_msg|lower}}">
+      {% if event_status_msg == "CLOSED"%}
+        No Sessions
+
+      {% elif next_session %}
+
+        {% get_course_session_status resource as event_session_status %}
+         {% if event_session_status.1 == True %}
+          First
+         {% else %}
+          Next
+         {% endif %}
+         Session
+        <b class="event-time">{{event_session_status.0|date:"d-m-Y"}}</b>
+      {% endif %}
+      </div>
+    {% endcomment %}
+    -->
     <!-- {{resource.author_set|length}}<i class="fa fa-users"></i> -->
     <!--Event card footer-->
     <div class="event-card-session-footer">
