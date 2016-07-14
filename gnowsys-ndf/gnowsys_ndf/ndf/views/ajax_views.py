@@ -1861,16 +1861,36 @@ def get_data_for_event_task(request, group_id):
     year = request.GET.get('start','')[0:4]
     start = datetime.datetime(int(currentYear), int(month), 1)
     task_start = str(int(month))+"/"+"01"+"/"+str(int(year))
+    
+    now = datetime.datetime.now()
+    e_status = node_collection.one({'_type' : 'AttributeType' , 'name': 'event_status'})
+
     if int(month) in list31:
      end=datetime.datetime(int(currentYear),int(month), 31)
      task_end=str(int(month))+"/"+"31"+"/"+str(int(year))
     elif int(month) in list30:
      end=datetime.datetime(int(currentYear),int(month), 30)
      task_end=str(int(month))+"/"+"30"+"/"+str(int(year))
+    # Check for leap year 
+    elif currentYear%4 == 0:
+      if currentYear%100 == 0:
+        if currentYear%400 == 0:
+          end=datetime.datetime(int(currentYear),int(month), 29)
+          task_end=str(int(month))+"/"+"29"+"/"+str(int(year))
+        else:
+          end=datetime.datetime(int(currentYear),int(month), 28)
+          task_end=str(int(month))+"/"+"28"+"/"+str(int(year))
+      else:
+        end=datetime.datetime(int(currentYear),int(month), 29)
+        task_end=str(int(month))+"/"+"29"+"/"+str(int(year))
     else:
-     end=datetime.datetime(int(currentYear),int(month), 28)
-     task_end=str(int(month))+"/"+"28"+"/"+str(int(year))
+       end=datetime.datetime(int(currentYear),int(month), 28)
+       task_end=str(int(month))+"/"+"28"+"/"+str(int(year))       
+
     #day_list of events
+
+    # For including events on the last date of the month uptill 00:00:00 of first date of next month
+    end = end + datetime.timedelta(days = 1)   
 
     if no == '1' or no == '2':
        #condition to search events only in case of above condition so that it
@@ -1891,18 +1911,26 @@ def get_data_for_event_task(request, group_id):
           date=i.attribute_set[0]['start_time']
           formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           update({'start':formated_date})
+
           for j in i.attribute_set:
-                if unicode('event_status') in j.keys():
-                  if j['event_status'] == 'Scheduled':
-                        #Default Color Blue would be applied
-                        pass
-                  if j['event_status'] == 'Rescheduled':
-                        update({'backgroundColor':'#ffd700'})
-                  if j['event_status'] == 'Completed':
-                        update({'backgroundColor':'green'})
-                  if j['event_status'] == 'Incomplete':
-                        update({'backgroundColor':'red'})
+            if unicode('end_time') in j.keys():
+              end_time = j['end_time']
+            elif unicode('event_status') in j.keys():
+              status = j['event_status']  
+
+          if now > end_time and status == "Scheduled":
+            create_gattribute(i._id , e_status , unicode("Completed")) 
+            status = "Completed"
+
+          if status == "Rescheduled":
+            update({'backgroundColor':'#ffd700'})
+          if status == "Completed":
+            update({'backgroundColor':'green'})
+          if status == "Incomplete":
+            update({'backgroundColor':'red'})       
+
           append(dict(attr_value))
+
     if no == '2':
         #All the Rescheduled ones
         nodes = node_collection.find({'_type':'GSystem','member_of':{'$in':list(all_list)},'attribute_set.event_edit_reschedule.reschedule_dates':{ '$elemMatch':{'$gt':start}},'group_set':ObjectId(group_id)},{'attribute_set.event_edit_reschedule.reschedule_dates':1,"name":1})
