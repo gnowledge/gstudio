@@ -293,7 +293,7 @@ class Node(DjangoDocument):
     use_dot_notation = True
 
 
-    def fill_node_values(self, request, **kwargs):
+    def fill_node_values(self, request=None, **kwargs):
 
         # 'name': unicode,
         if kwargs.has_key('name'):
@@ -315,11 +315,11 @@ class Node(DjangoDocument):
 
         # 'plural': unicode,
         if kwargs.has_key('plural'):
-            plural = kwargs.get('plural', None)
+            plural = kwargs.get('plural','')
         elif request:
-            plural = request.POST.get('plural', None)
+            plural = request.POST.get('plural','')
         else:
-            plural = None
+            plural = ''
         self.plural = unicode(plural)
 
         # 'prior_node': [ObjectId],
@@ -370,7 +370,7 @@ class Node(DjangoDocument):
         elif request:
             member_of = request.POST.get('member_of', [])
         else:
-            member_of = ''
+            member_of = []
         self.member_of = member_of
         # if member_of and not isinstance(member_of, list):
         #     self.member_of = [ObjectId(each) for each in member_of]
@@ -393,32 +393,32 @@ class Node(DjangoDocument):
         # 'created_by': int
         if not self.created_by:
             if kwargs.has_key('created_by'):
-                created_by = kwargs.get('created_by', '')
+                created_by = kwargs.get('created_by',0)
             elif request:
                 created_by = request.user.id
             else:
-                created_by = ''
+                created_by = 0
             self.created_by = int(created_by) if created_by else 0
 
         # 'modified_by': int, # test required: only ids of Users
         if kwargs.has_key('modified_by'):
-            modified_by = kwargs.get('modified_by', None)
+            modified_by = kwargs.get('modified_by', 0)
         elif request:
             if hasattr(request, 'user'):
                 modified_by = request.user.id
             elif kwargs.has_key('created_by'):
                 modified_by = created_by
         else:
-            modified_by = None
+            modified_by = 0
         self.modified_by = int(modified_by) if modified_by else 0
 
         # 'contributors': [int]
         if kwargs.has_key('contributors'):
-            contributors = kwargs.get('contributors', [])
+            contributors = kwargs.get('contributors', [self.created_by])
         elif request:
-            contributors = request.POST.get('contributors', [])
+            contributors = request.POST.get('contributors', [self.created_by])
         else:
-            contributors = []
+            contributors = [self.created_by]
         self.contributors = contributors
         if contributors and not isinstance(contributors, list):
             self.contributors = [int(each) for each in contributors]
@@ -513,11 +513,11 @@ class Node(DjangoDocument):
 
         # 'url': unicode,
         if kwargs.has_key('url'):
-            url = kwargs.get('url', None)
+            url = kwargs.get('url','')
         elif request:
-            url = request.POST.get('url', None)
+            url = request.POST.get('url','')
         else:
-            url = None
+            url = ''
         self.url = unicode(url)
 
         # 'comment_enabled': bool,

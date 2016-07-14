@@ -6,6 +6,7 @@ import time
 import sys
 import imaplib
 import shutil
+import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.header import Header
@@ -20,6 +21,7 @@ from gnowsys_ndf.ndf.views.filehive import *
 from gnowsys_ndf.ndf.views.methods import create_grelation
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from django.shortcuts import render
+from django.conf import settings
 
 error_message = {"Page name required":1,
 				"Page Content required":2,
@@ -29,6 +31,17 @@ error_message = {"Page name required":1,
 				"User authenticated":6,
 				"User not a member of this group":7,
 				"Group does not exist":8}
+
+#EXTRACTING EMAILID AND PASSWORD FROM THE SETTINGS.PY FILE
+mio_from_email = ''
+mio_from_password  = ''
+
+if settings.GSTUDIO_MIO_FROM_EMAIL!='':
+	mio_from_email = settings.GSTUDIO_MIO_FROM_EMAIL
+else:
+	mio_from_email = settings.DEFAULT_MIO_FROM_EMAIL
+mio_from_password = settings.GSTUDIO_MIO_FROM_EMAIL_PASSWORD
+#************************************************************
 
 def create_page(**kwargs): 
 	p = node_collection.collection.GSystem()
@@ -76,8 +89,8 @@ def create_page(**kwargs):
 		p.origin.append({'mio':m_id})
 		try:
 			p.save()
-		except:
-			print "in except"
+		except Exception as e:
+			print "Exception in while creating page from mail:  " + str(e)
 		return str(p._id);
 
 def send_page(to_user,page_name,page_content,subject,m_id,ref):
@@ -91,7 +104,7 @@ def send_page(to_user,page_name,page_content,subject,m_id,ref):
                 msg["References"] = ref+"\n"+m_id
 
         msg['Subject'] = subject
-        msg['From'] = "ps.mio.bits@gmail.com"
+        msg['From'] = mio_from_email
         msg['To'] = to_user
         
         context = {'pg_name': page_name,'pg_content': page_content}
@@ -102,20 +115,22 @@ def send_page(to_user,page_name,page_content,subject,m_id,ref):
         smtpObj=smtplib.SMTP('smtp.gmail.com', 587)
         smtpObj.ehlo()
         smtpObj.starttls()
-        smtpObj.login('ps.mio.bits@gmail.com','1Guesswhat')
-        smtpObj.sendmail('ps.mio.bits@gmail.com',to_user,msg.as_string())
+        smtpObj.login(mio_from_email,mio_from_password)
+        smtpObj.sendmail(mio_from_email,to_user,msg.as_string())
         smtpObj.quit()
 
-def update_page(name,content,id):
+def update_page(name,content,id,user_id):
 	gst_page = node_collection.one({u'_id':ObjectId(id)})
 	gst_page.name = unicode(name)
 	gst_page.altnames = unicode(name)
 	gst_page.content = unicode(content)
+	gst_page.last_update = datetime.datetime.today()
+	gst_page.modified_by = user_id
 
 	try:
 		gst_page.save()
-	except:
-		print 'in except'
+	except Exception as e:
+		print "Exception while updating page from mail:  " + str(e)
 
 def upload(gp_name,filename,name,author,content):
 	home_grp = node_collection.one({'_type': "Group", 'name':gp_name})
@@ -152,7 +167,7 @@ def upload(gp_name,filename,name,author,content):
 										unique_gs_per_file=True,
 										content_org=content
 										)
-		print "\n\nGS obj id "+str(file_gs_obj._id)+"\n\n"
+		#print "\n\nGS obj id "+str(file_gs_obj._id)+"\n\n"
 		try:
 			# file_gs_obj.save(groupid=home_grp._id)
 			file_gs_obj.save(groupid=home_grp._id)
@@ -160,6 +175,8 @@ def upload(gp_name,filename,name,author,content):
 			print 'exception while saving', e
 	else:
 		print "file exists"
+		return 0
+
 	return 'done'
 
 def authenticate_user(mail,group_name):
@@ -169,18 +186,10 @@ def authenticate_user(mail,group_name):
 	except:
 		return id,False,error_message["User does not exist"]
 	
-	# Extracting lists of all groups
-	gst_group = node_collection.find({'_type':u'Group'})
-	group_list = []
-	
-	for each in gst_group:
-		group_list.append(each.name)
-
-	if(group_name in group_list):
-		gst_home = get_group_name_id(group_name,get_obj=True)
-		if(id in gst_home.author_set):
+	if node_collection.find({ '_type': 'Group', 'name': unicode(group_name)}).count() > 0:
+		if node_collection.find({ '_type': 'Group', 'name': unicode(group_name), 'author_set': {'$in': [id]} }).count() > 0:
 			return id,True,error_message["User authenticated"]
-		else:	
+		else:
 			return id,False,error_message["User not a member of this group"]
 	else:
 		return id,False,error_message["Group does not exist"]
@@ -234,29 +243,29 @@ print 'hi'
 def open_connection():
 	try:
 		connection = imaplib.IMAP4_SSL('imap.gmail.com')
-		typ, accountDetails = connection.login('ps.mio.bits@gmail.com', '1Guesswhat')
+		typ, accountDetails = connection.login(mio_from_email , mio_from_password)
 		return connection
-	except:
-		print 'Not able to sign in!'
+	except Exception as e:
+		print 'Not able to sign in!'+str(e)
 		
 def open_unseen(conn):
 	try:
 		conn.select('INBOX')
 		typ, data = conn.search(None, 'UNSEEN')
 		return data
-	except:
-		print 'Error searching Inbox.'
+	except Exception as e:
+		print 'Error searching Inbox.'+str(e)
 
 
 def close_connection(conn):
 	try:
 		conn.close()
-	except:
-		print "Couldn't close the Mailbox!"
+	except Exception as e:
+		print "Couldn't close the Mailbox!"+str(e)
 	try:
 		conn.logout()
-	except:
-		print "Couldn't logout of the account!"
+	except Exception as e:
+		print "Couldn't logout of the account!"+str(e)
 
 def parse_subject(sub):
 	#Formats for subject:
@@ -372,8 +381,8 @@ class Email1:
 						self.Body = part.get_payload(decode=True)
 				
 				self.act_title , self.Body = get_content(self.Body)
-		except:
-			print 'Not able to download all attachments.'
+		except Exception as e:
+			print 'Not able to download all attachments.'+str(e)
 
 	def return_from(self):
 		return self.fromuser
@@ -398,16 +407,16 @@ class Email1:
 	def return_fileName(self):
 		return self.Filename
 
-c = open_connection()
-d = open_unseen(c)
-print d
+connection_state = open_connection()
+unread_inbox = open_unseen(connection_state)
+print unread_inbox
 obj = Email1()
-for msgId in d[0].split():
-	obj.mail_extract(msgId, c)
+for msgId in unread_inbox[0].split():
+	obj.mail_extract(msgId, connection_state)
 
+	id,check,error = authenticate_user(mail=obj.return_from(),group_name=obj.return_grp_name())
+	print id,error
 	if(obj.return_update()==False):
-		id,check,error = authenticate_user(mail=obj.return_from(),group_name=obj.return_grp_name())
-		print id,error
 		if(check==True):
 			if(obj.return_fileName()!=None):
 				p_id = upload(gp_name=obj.return_grp_name(),
@@ -424,9 +433,9 @@ for msgId in d[0].split():
 			else:
 				print p_id
 	else:
-		update_page(name=obj.return_act_title(),content=obj.return_body(),id=obj.return_ObjectId())
+		update_page(name=obj.return_act_title(),content=obj.return_body(),id=obj.return_ObjectId(),user_id=id)
 		send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
 			page_content=obj.return_body(),subject=obj.return_sub(),m_id=obj.return_MessageId(),ref=obj.return_Ref())
-close_connection(c)
+close_connection(connection_state)
 
 #**************************************************************************************#
