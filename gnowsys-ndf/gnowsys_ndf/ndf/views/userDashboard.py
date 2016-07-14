@@ -439,6 +439,12 @@ def group_dashboard(request, group_id):
                         banner_pic = node_collection.one(
                             {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_Banner_pic"][0]}
                         )
+                if "has_thumbnail" in each:
+                    if each["has_thumbnail"]:
+                        banner_pic = node_collection.one(
+                            {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_thumbnail"][0]}
+                        )
+
     # Approve StudentCourseEnrollment view
     approval = False
     enrollment_details = []
@@ -588,13 +594,16 @@ def upload_prof_pic(request, group_id):
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
         file_uploaded = request.FILES.get("filehive", "")
         pic_rt = request.POST.get("pic_rt", "")
+        node_id = request.POST.get("node_id", "")
         # print "\n\n pic_rt === ", pic_rt
         has_profile_or_banner_rt = None
         if pic_rt == "is_banner":
             has_profile_or_banner_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
         elif pic_rt == "is_profile":
             has_profile_or_banner_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
-    
+        if pic_rt == "is_thumbnail":
+            # print "================================"
+            has_profile_or_banner_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_thumbnail') })
         choose_from_existing_pic = request.POST.get("old_pic_ele","")
 
         warehouse_grp_obj = node_collection.one({'_type': "Group", 'name': "warehouse"})
@@ -605,8 +614,13 @@ def upload_prof_pic(request, group_id):
             if fileobj:
                 profile_pic_image = node_collection.one({'_id': ObjectId(gs_obj_id)})
                 # The 'if' below is required in case file node is deleted but exists in grid_fs
-                if profile_pic_image:
+                if profile_pic_image and not node_id:
                     gr_node = create_grelation(group_obj._id, has_profile_or_banner_rt, profile_pic_image._id)
+                    # Move fileobj to "Warehouse" group 
+                    node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
+                elif node_id:
+                    # print "-----------------------------------------------------------------",node_id
+                    gr_node = create_grelation(ObjectId(node_id), has_profile_or_banner_rt, profile_pic_image._id)
                     # Move fileobj to "Warehouse" group 
                     node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
                 else:
