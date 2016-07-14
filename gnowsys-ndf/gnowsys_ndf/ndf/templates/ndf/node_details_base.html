@@ -61,6 +61,7 @@
       {% firstof node.name node.altnames node.name %} 
   </div>
   <br>
+
 {% endblock %}
 
 
@@ -74,6 +75,19 @@
   
     {% include "ndf/collection_ajax_view.html" %}  
   </div>
+  {% check_group node.pk as is_group %}
+  {% if not 'video' in node.if_file.mime_type and not is_group  %}
+    <dl class="accordion" data-accordion>
+        <dd class="accordion-navigation" data-options="deep_linking:true">
+              <a href="#panel1" style="background-color: #2980B9; color:#FFF">Change Thumbnail</a>
+              <div id="panel1" class="content">
+                          {% include "ndf/upload_pic_widget.html" with  node_id=node.pk url_name="file" widget_for="file_detail_view" is_banner=False is_profile=False is_thumbnail=True %}
+              </div>
+        
+        </dd>
+    </dl>
+
+  {% endif %}
 
   {% if node.teaches %}
     <div class="teaches-block">
