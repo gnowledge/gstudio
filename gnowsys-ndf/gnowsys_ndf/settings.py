@@ -826,7 +826,7 @@ GSTUDIO_INSTITUTE_ID = ''
 #*******MIO_SETTINGS*************
 DEFAULT_MIO_FROM_EMAIL = 'ps.mio.bits@gmail.com'
 GSTUDIO_MIO_FROM_EMAIL = ''
-GSTUDIO_MIO_FROM_EMAIL_PASSWORD = ''
+GSTUDIO_MIO_FROM_EMAIL_PASSWORD = '1Guesswhat'
 #*********************************
 
 try:

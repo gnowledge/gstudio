@@ -41,6 +41,7 @@ if settings.GSTUDIO_MIO_FROM_EMAIL!='':
 else:
 	mio_from_email = settings.DEFAULT_MIO_FROM_EMAIL
 mio_from_password = settings.GSTUDIO_MIO_FROM_EMAIL_PASSWORD
+
 #************************************************************
 
 def create_page(**kwargs): 
@@ -167,7 +168,6 @@ def upload(gp_name,filename,name,author,content):
 										unique_gs_per_file=True,
 										content_org=content
 										)
-		#print "\n\nGS obj id "+str(file_gs_obj._id)+"\n\n"
 		try:
 			# file_gs_obj.save(groupid=home_grp._id)
 			file_gs_obj.save(groupid=home_grp._id)
@@ -233,13 +233,10 @@ def get_content(html_body):
 detach_dir = '.'
 if 'attachment' not in os.listdir(detach_dir):
 	os.mkdir('attachment')
-	print "made"
 else:
 	shutil.rmtree('attachment')
 	os.mkdir('attachment')
-	print "new made"
-	
-print 'hi'
+
 def open_connection():
 	try:
 		connection = imaplib.IMAP4_SSL('imap.gmail.com')
@@ -351,7 +348,6 @@ class Email1:
 				if bool(self.Filename):
 					filePath = os.path.join(detach_dir, 'attachment', self.Filename)
 					if not os.path.isfile(filePath):
-						print "downloaded this",  self.Filename
 						fp = open(filePath, 'wb')
 						fp.write(part.get_payload(decode=True))
 						fp.close()
@@ -415,7 +411,6 @@ for msgId in unread_inbox[0].split():
 	obj.mail_extract(msgId, connection_state)
 
 	id,check,error = authenticate_user(mail=obj.return_from(),group_name=obj.return_grp_name())
-	print id,error
 	if(obj.return_update()==False):
 		if(check==True):
 			if(obj.return_fileName()!=None):
@@ -430,8 +425,6 @@ for msgId in unread_inbox[0].split():
 			if(isinstance(p_id,str)):
 				send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
 					page_content=obj.return_body(),subject=obj.return_sub(),m_id=obj.return_MessageId(),ref=obj.return_Ref())
-			else:
-				print p_id
 	else:
 		update_page(name=obj.return_act_title(),content=obj.return_body(),id=obj.return_ObjectId(),user_id=id)
 		send_page(to_user=obj.return_from(),page_name=obj.return_act_title(),
