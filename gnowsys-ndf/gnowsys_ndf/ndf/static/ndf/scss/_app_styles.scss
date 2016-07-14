@@ -1918,81 +1918,83 @@ aside#help{
 }
 
 
-  .repository-title{
-    color:#D7D7D7;
-    font-size: 1.1em;
-    width:auto;
-    background-color: rgba(0, 0, 0, 0.8);
-    text-align:left;
-    display:inline-block;
-    margin-left:2px;
-    position:relative;
-    text-align:center;
-  }
-  .repository-desc{
-    font-size: 1.1em;
-    width:auto;
-    background-color:#E5E5E5;
-    text-align:left;
-    display:inline-block;
-    color:#878787;
-    position:relative;
-    margin-left:4px;
-  }
+.repository-title{
+  color:#D7D7D7;
+  font-size: 1.1em;
+  width:auto;
+  background-color: rgba(0, 0, 0, 0.8);
+  text-align:left;
+  display:inline-block;
+  margin-left:2px;
+  position:relative;
+  text-align:center;
+}
+
+.repository-desc{
+  font-size: 1.1em;
+  width:auto;
+  background-color:#E5E5E5;
+  text-align:left;
+  display:inline-block;
+  color:#878787;
+  position:relative;
+  margin-left:4px;
+}
+
 .card-holder{
-    padding-left: 2%;
-  }
+  padding-left: 2%;
+}
 
-  .app-card-container{
-    display: inline-block;
-    vertical-align: top;
-    margin: 15px;
-  }
-  .app-card-wrapper{
-    position:relative; 
-    margin: auto;width:100%; 
-    text-align:center; 
-    clear: both;
-    max-width: calc(70rem + 70px);
-  }
+.app-card-wrapper{
+  position: relative; 
+  margin: auto;
+  width: 100%; 
+  text-align:center; 
+  clear: both;
+  max-width: calc(70rem + 70px);
+}
 
-  .app-card{
-    width: 19rem;
-    margin: 15px 20px;
-    float: left;
-    padding: 1em;
-    height:18rem;
-    background-color:#fafafa;
-    border: thin solid #D3D3D3;
-  }
+.app-card-container{
+  display: inline-block;
+  vertical-align: top;
+  margin: 15px;
+}
 
-  .app-card:hover{
-    box-shadow: 0px 0px 15px #808080;
-    border: thin solid #D3D3D3;
-    border-radius: 5px;
-    transition: all 0.6s ease 0s;
-  }
+.app-card{
+  width: 19rem;
+  margin: 15px 20px;
+  float: left;
+  padding: 1em;
+  height:18rem;
+  background-color:#fafafa;
+  border: thin solid #D3D3D3;
+}
 
-  .app-card-icon{
-    color:#4c4c4c;
-    position: relative;
-    font-size: 6em;
+.app-card:hover{
+  box-shadow: 0px 0px 15px #808080;
+  border: thin solid #D3D3D3;
+  border-radius: 5px;
+  transition: all 0.6s ease 0s;
+}
 
+.app-card-icon{
+  color:#4c4c4c;
+  position: relative;
+  font-size: 6em;
+}
 
-  }
-  .app-card-title{
-    padding-bottom:-1em;
-  }
+.app-card-title{
+  padding-bottom:-1em;
+}
 
-  .app-card-content{
-    color:#4c4c4c;
-    text-align:center;
-    margin-top:0.5cm;
-  }
+.app-card-content{
+  color:#4c4c4c;
+  text-align:center;
+  margin-top:0.5cm;
+}
 
 
 .fullscreen-icon{
-
   display:none;
 }
 
