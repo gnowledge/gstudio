@@ -38,10 +38,10 @@ mio_from_password  = ''
 
 if settings.GSTUDIO_MIO_FROM_EMAIL!='':
 	mio_from_email = settings.GSTUDIO_MIO_FROM_EMAIL
+	mio_from_password = settings.GSTUDIO_MIO_FROM_EMAIL_PASSWORD
 else:
-	mio_from_email = settings.DEFAULT_MIO_FROM_EMAIL
-mio_from_password = settings.GSTUDIO_MIO_FROM_EMAIL_PASSWORD
-
+	mio_from_email = settings.DEFAULT_FROM_EMAIL
+	mio_from_password = ''
 #************************************************************
 
 def create_page(**kwargs): 
@@ -186,14 +186,11 @@ def authenticate_user(mail,group_name):
 	except:
 		return id,False,error_message["User does not exist"]
 	
-	if node_collection.find({ '_type': 'Group', 'name': unicode(group_name)}).count() > 0:
-		if node_collection.find({ '_type': 'Group', 'name': unicode(group_name), 'author_set': {'$in': [id]} }).count() > 0:
-			return id,True,error_message["User authenticated"]
-		else:
-			return id,False,error_message["User not a member of this group"]
+	if node_collection.find({ '_type': 'Group', 'name': unicode(group_name), 'author_set': {'$in': [id]} }).count() > 0:
+		return id,True,error_message["User authenticated"]
 	else:
-		return id,False,error_message["Group does not exist"]
-
+		return id,False,error_message["User not a member of this group"]
+	
 
 class MyHTMLParser(HTMLParser):
     pg_content = ''
