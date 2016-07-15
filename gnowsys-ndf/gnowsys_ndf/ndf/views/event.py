@@ -268,6 +268,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   #fecth the data
 
   context_variables = { 'groupid': group_id, 
+                         'group_id':group_id, 
                           'app_id': app_id,'app_collection_set': app_collection_set, 
                           'app_set_id': app_set_id,
                           'title':title,
@@ -290,7 +291,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
  
 
     bbb = False
-    invite_group = False
+    open_event = False
 
     for i in node.attribute_set:
       if unicode('start_time') in i.keys():
@@ -299,8 +300,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
         end_time = i['end_time']
       elif unicode('is_bigbluebutton') in i.keys():
         bbb = i['is_bigbluebutton']
-      elif unicode('invite_group') in i.keys():
-        invite_group = i['invite_group']  
+      elif unicode('open_event') in i.keys():
+        open_event = i['open_event']  
     # st_time = node.attribute_set[0]['start_time']
     # end_time = node.attribute_set[1]['end_time']
     
@@ -330,7 +331,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     attendee_list = []
     moderator_list = []   
 
-    if invite_group:
+    if open_event:
       is_attendee = True
 
     for i in node.relation_set:
@@ -520,7 +521,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
             field_data_type = field_set['data_type'] #data type of AT/RT e.g. datetime.datetime for start_time
 
             # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
-            invite_group = False
+            open_event = False
             if field_instance_type == AttributeType:
               if "File" in field_instance["validators"]:
                 # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
@@ -561,8 +562,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 # print "--------------------------------------------------------------------------------------------------"
                 # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
-              if field_instance["name"] == 'invite_group':
-                invite_group = field_value
+              if field_instance["name"] == 'open_event':
+                open_event = field_value
 
             else: #field_instance_type == RelationType
               field_value_list = request.POST.getlist(field_instance["name"])
@@ -575,7 +576,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                    field_value = parse_template_data(ObjectId, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
                 field_value_list[i] = field_value
               if field_value_list:
-                if field_instance["name"] == "has_attendees" and invite_group == "False":
+                if field_instance["name"] == "has_attendees" and open_event == "False":
                     event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), [])
                 else:
                   event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), field_value_list)
@@ -610,40 +611,46 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 event_attendees = i['has_attendees']
              if unicode('event_coordinator') in i.keys():
                 event_coordinator = i['event_coordinator'] 
-          event_url = "/"+str(group_id)+"/event/"+str(app_set_id) +"/"+str(event_node._id)
-          site = Site.objects.get(pk=1)
-          site = site.name.__str__()
-          event_link = "http://" + site + event_url
-          event_organized_by_cur = node_collection.find({"_id":{'$in':event_organized_by}})
-          event_coordinator_cur = node_collection.find({"_id":{'$in':event_coordinator}})
-          for i in event_coordinator_cur:
-              event_coordinator_str = event_coordinator_str + i.name + "  "
-          for i in event_organized_by_cur:
-              event_organizer_str = event_coordinator_str + i.name + "  "     
-          render_label = render_to_string(
-                            "notification/label.html",
-                            {
-                                "sender": "metaStudio",
-                                "activity": "Event Created",
-                                "conjunction": "-"
-                            })
-          for j in event_attendees:
-                      auth = node_collection.one({"_id":ObjectId(j)})
-                      user_obj = User.objects.get(id=auth.created_by)
-                      if user_obj not in to_user_list:
-                              to_user_list.append(user_obj)
-          if event_organized_by:
-             msg_string = "\n Event is organized by " + str ( event_organizer_str ) 
-          else:
-             msg_string = "" 
- 
-          # url_create = createMeetingURL(event_node.name, event_node._id, 'aPW', 'mPW', 'welcome', 'www.google.com', SALT , URL);
+          try:  
+            event_url = "/"+str(group_id)+"/event/"+str(app_set_id) +"/"+str(event_node._id)
+            site = Site.objects.get(pk=1)
+            site = site.name.__str__()
+            event_link = "http://" + site + event_url
+            event_organized_by_cur = node_collection.find({"_id":{'$in':event_organized_by}})
+            event_coordinator_cur = node_collection.find({"_id":{'$in':event_coordinator}})
+            for i in event_coordinator_cur:
+                event_coordinator_str = event_coordinator_str + i.name + "  "
+            for i in event_organized_by_cur:
+                event_organizer_str = event_coordinator_str + i.name + "  "     
+            render_label = render_to_string(
+                              "notification/label.html",
+                              {
+                                  "sender": "metaStudio",
+                                  "activity": "Event Created",
+                                  "conjunction": "-"
+                              })
+            for j in event_attendees:
+                        auth = node_collection.one({"_id":ObjectId(j)})
+                        user_obj = User.objects.get(id=auth.created_by)
+                        if user_obj not in to_user_list:
+                                to_user_list.append(user_obj)
+            if event_organized_by:
+               msg_string = "\n Event is organized by " + str ( event_organizer_str ) 
+            else:
+               msg_string = "" 
+   
+            # url_create = createMeetingURL(event_node.name, event_node._id, 'aPW', 'mPW', 'welcome', 'www.google.com', SALT , URL);
 
-          # bbb_start(event_node.name, event_node._id)
-          message_string = "Invitation for Event"+ " " + str(event_node.name) + msg_string   + "\n Event will be co-ordinated by " +str (event_coordinator_str) + "\n- Please click [[" + event_link + "][here]] to view the details of the event"
-          message_string = "Hello World"
-          notification.create_notice_type(render_label, message_string, "notification") ##This is sent via email to all attendees in the group
-          notification.send(to_user_list, render_label, {"from_user":"metaStudio"})
+            # bbb_start(event_node.name, event_node._id)
+            message_string = "Invitation for Event"+ " " + str(event_node.name) + msg_string   + "\n Event will be co-ordinated by " +str (event_coordinator_str) + "\n- Please click [[" + event_link + "][here]] to view the details of the event"
+            message_string = "Hello World"
+            notification.create_notice_type(render_label, message_string, "notification") ##This is sent via email to all attendees in the group
+            notification.send(to_user_list, render_label, {"from_user":"metaStudio"})
+
+          except Exception as e:
+            error_message = str(e)
+            #print error_message
+            pass
 
           return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_node._id}))
   event_attendees = request.POST.getlist('has_attendees','')

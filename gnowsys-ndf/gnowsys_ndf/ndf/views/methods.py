@@ -2204,7 +2204,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
 
             field = node_collection.one({'_id': ObjectId(at_rt_objectid_or_attr_name)}, {
                                         '_type': 1, 'subject_type': 1, 'object_type': 1, 'name': 1, 'altnames': 1, 'inverse_name': 1})
-            print at_rt_objectid_or_attr_name, "--------------- ", field
+            
 
             altnames = u""
             value = None
