@@ -277,7 +277,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
  
 
     bbb = False
-    invite_group = False
+    open_event = False
 
     for i in node.attribute_set:
       if unicode('start_time') in i.keys():
@@ -286,8 +286,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
         end_time = i['end_time']
       elif unicode('is_bigbluebutton') in i.keys():
         bbb = i['is_bigbluebutton']
-      elif unicode('invite_group') in i.keys():
-        invite_group = i['invite_group']  
+      elif unicode('open_event') in i.keys():
+        open_event = i['open_event']  
     # st_time = node.attribute_set[0]['start_time']
     # end_time = node.attribute_set[1]['end_time']
     
@@ -317,7 +317,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     attendee_list = []
     moderator_list = []   
 
-    if invite_group:
+    if open_event:
       is_attendee = True
 
     for i in node.relation_set:
@@ -507,7 +507,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
             field_data_type = field_set['data_type'] #data type of AT/RT e.g. datetime.datetime for start_time
 
             # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
-            invite_group = False
+            open_event = False
             if field_instance_type == AttributeType:
               if "File" in field_instance["validators"]:
                 # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
@@ -548,8 +548,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 # print "--------------------------------------------------------------------------------------------------"
                 # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
-              if field_instance["name"] == 'invite_group':
-                invite_group = field_value
+              if field_instance["name"] == 'open_event':
+                open_event = field_value
 
             else: #field_instance_type == RelationType
               field_value_list = request.POST.getlist(field_instance["name"])
@@ -562,7 +562,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                    field_value = parse_template_data(ObjectId, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
                 field_value_list[i] = field_value
               if field_value_list:
-                if field_instance["name"] == "has_attendees" and invite_group == "False":
+                if field_instance["name"] == "has_attendees" and open_event == "False":
                     send_event_notif_to_all_grp_members(group_obj, app_set_id, event_gs)
                 else:
                   event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), field_value_list)
