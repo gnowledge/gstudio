@@ -114,6 +114,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
         group_id = ObjectId(group_id)
   except:
         group_name, group_id = get_group_name_id(group_id)
+  group_obj = node_collection.one({'_id': group_id})
   session_node = ""
   app = None
   session_node = ""
@@ -253,7 +254,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   else:
     Add="Stop"       
   #fecth the data
-
+  can_access_val = Group.can_access(request.user.id, group_obj)
   context_variables = { 'groupid': group_id, 'group_id': group_id, 
                           'app_id': app_id,'app_collection_set': app_collection_set, 
                           'app_set_id': app_set_id,
@@ -317,7 +318,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     attendee_list = []
     moderator_list = []   
 
-    if open_event:
+    if open_event and can_access_val:
       is_attendee = True
 
     for i in node.relation_set:
@@ -723,7 +724,6 @@ def send_event_notif_to_all_grp_members(group_obj, app_set_id, event_node, user_
          msg_string = "" 
 
       message_string = "Invitation for Event"+ " " + str(event_node.name) + msg_string   + "\n Event will be co-ordinated by " +str (event_coordinator_str) + "\n- Please click [[" + event_link + "][here]] to view the details of the event"
-      message_string = "Hello World"
       notification.create_notice_type(render_label, message_string, "notification") ##This is sent via email to all attendees in the group
       notification.send(to_user_list, render_label, {"from_user":"metaStudio"})
    except Exception as mailerror:
