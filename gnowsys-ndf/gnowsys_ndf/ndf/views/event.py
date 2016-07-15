@@ -287,7 +287,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       elif unicode('is_bigbluebutton') in i.keys():
         bbb = i['is_bigbluebutton']
       elif unicode('open_event') in i.keys():
-        open_event = i['open_event']  
+        open_event = i['open_event']    
     # st_time = node.attribute_set[0]['start_time']
     # end_time = node.attribute_set[1]['end_time']
     
@@ -354,6 +354,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                           'is_bbb': bbb,
                           'shortly':shortly,
                           'hours_left':hours_left, 
+                          'open_event':open_event,
                         }
     context_variables.update(extra_context_variables)
 

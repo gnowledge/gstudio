@@ -223,6 +223,28 @@ table, th, td {
                           {% endif %}
                           {% endwith %}
                         </div>
+
+                        {% if open_event %}
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Open Event:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>Yes</label>
+                              </div>
+                            </div>
+                          {% else %}
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Open Event:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>No</label>
+                              </div>
+                            </div>  
+                          {% endif %} 
+
+                          <br>
                         
 
                           {% if is_bbb %}
@@ -296,6 +318,8 @@ table, th, td {
                             </div>
                             
                           {% endif %}
+
+
                     
                     </fieldset>   
                     </section>
