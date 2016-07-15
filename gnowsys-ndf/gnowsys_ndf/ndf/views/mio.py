@@ -16,13 +16,13 @@ from HTMLParser import HTMLParser
 from gnowsys_ndf.ndf.models import * 
 from django.http import HttpRequest
 from django.contrib.auth.models import User
-from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH
+from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH,GSTUDIO_MIO_FROM_EMAIL,GSTUDIO_MIO_FROM_EMAIL_PASSWORD,DEFAULT_FROM_EMAIL,GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.views.filehive import *
 from gnowsys_ndf.ndf.views.methods import create_grelation
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from django.shortcuts import render
-from django.conf import settings
 
+User_object = None
 error_message = {"Page name required":1,
 				"Page Content required":2,
 				"User details required":3,
@@ -36,25 +36,47 @@ error_message = {"Page name required":1,
 mio_from_email = ''
 mio_from_password  = ''
 
-if settings.GSTUDIO_MIO_FROM_EMAIL!='':
-	mio_from_email = settings.GSTUDIO_MIO_FROM_EMAIL
-	mio_from_password = settings.GSTUDIO_MIO_FROM_EMAIL_PASSWORD
+if GSTUDIO_MIO_FROM_EMAIL!='':
+	mio_from_email = GSTUDIO_MIO_FROM_EMAIL
+	mio_from_password = GSTUDIO_MIO_FROM_EMAIL_PASSWORD
 else:
-	mio_from_email = settings.DEFAULT_FROM_EMAIL
+	mio_from_email = DEFAULT_FROM_EMAIL
 	mio_from_password = ''
 #************************************************************
 
+def authenticate_user(mail,group_name):
+	global User_object
+	id = -1
+	try:
+		id = User.objects.get(email=mail).id
+		User_object = get_group_name_id(group_name_or_id=id, get_obj=True)
+	except:
+		return id,False,error_message["User does not exist"]
+	
+	if node_collection.find({ '_type': 'Group', 'name': unicode(group_name), 'author_set': {'$in': [id]} }).count() > 0:
+		return id,True,error_message["User authenticated"]
+	else:
+		return id,False,error_message["User not a member of this group"]
+
 def create_page(**kwargs): 
+	global User_object
 	p = node_collection.collection.GSystem()
 
-	if kwargs.has_key('group_name'):
-		group_name = kwargs.get('group_name','home')
+	if kwargs.has_key('created_by'):
+		created_by = kwargs.get('created_by','')
 	else:
-		group_name = 'home'
+		return error_message["User details required"]
+	
+	if kwargs.has_key('group_name'):
+		group_name = kwargs.get('group_name',User_object.username)
+	else:
+		group_name = User_object.username
 	group_name = unicode(group_name)
 
-	if kwargs.has_key('name'):
+	if kwargs.has_key('name') and kwargs['name']:
 		name = kwargs.get('name','')
+	elif kwargs.has_key('name'):
+		name = 'Untitled'+datetime.datetime.now()
 	else:
 		return error_message["Page name required"]
 	name = unicode(name)
@@ -64,11 +86,6 @@ def create_page(**kwargs):
 	else:
 		return error_message["Page Content required"]
 	content = unicode(content)
-
-	if kwargs.has_key('created_by'):
-		created_by = kwargs.get('created_by','')
-	else:
-		return error_message["User details required"]
 
 	m_id = kwargs.get('m_id','')
 
@@ -107,8 +124,9 @@ def send_page(to_user,page_name,page_content,subject,m_id,ref):
         msg['Subject'] = subject
         msg['From'] = mio_from_email
         msg['To'] = to_user
-        
-        context = {'pg_name': page_name,'pg_content': page_content}
+        img_name = GSTUDIO_SITE_NAME.lower()
+        print img_name
+        context = {'pg_name': page_name,'pg_content': page_content,'img_url':img_name}
     	Html = render(None, 'ndf/mio_index.html', context)
        	html = str(Html)
        	html = html.strip('Content-Type: text/html; charset=utf-8\n')	
@@ -179,19 +197,6 @@ def upload(gp_name,filename,name,author,content):
 
 	return 'done'
 
-def authenticate_user(mail,group_name):
-	id = -1
-	try:
-		id = User.objects.get(email=mail).id
-	except:
-		return id,False,error_message["User does not exist"]
-	
-	if node_collection.find({ '_type': 'Group', 'name': unicode(group_name), 'author_set': {'$in': [id]} }).count() > 0:
-		return id,True,error_message["User authenticated"]
-	else:
-		return id,False,error_message["User not a member of this group"]
-	
-
 class MyHTMLParser(HTMLParser):
     pg_content = ''
     pg_name = ''
@@ -227,13 +232,6 @@ def get_content(html_body):
 
 #********************MAIL-CLIENT*******************************************************#
 
-detach_dir = '.'
-if 'attachment' not in os.listdir(detach_dir):
-	os.mkdir('attachment')
-else:
-	shutil.rmtree('attachment')
-	os.mkdir('attachment')
-
 def open_connection():
 	try:
 		connection = imaplib.IMAP4_SSL('imap.gmail.com')
@@ -266,11 +264,11 @@ def parse_subject(sub):
 	#If no square brackets are there in the subject,it means that
 	#User wants to create a 'Page in home group'
 	#else subject format should be as follows:-  [Group-Name][Page/Forum] Page/Forum name
-	
+	global User_object
 	i=1
 	s = 0
 	e = 0
-	group_name = 'home'
+	group_name = User_object.username
 	activity = 'Page'
 	activity_name = ''
 	ctr = 0;
@@ -410,6 +408,14 @@ for msgId in unread_inbox[0].split():
 	id,check,error = authenticate_user(mail=obj.return_from(),group_name=obj.return_grp_name())
 	if(obj.return_update()==False):
 		if(check==True):
+			
+			detach_dir = '.'
+			if 'attachment' not in os.listdir(detach_dir):
+				os.mkdir('attachment')
+			else:
+				shutil.rmtree('attachment')
+				os.mkdir('attachment')
+
 			if(obj.return_fileName()!=None):
 				p_id = upload(gp_name=obj.return_grp_name(),
 										filename=obj.return_fileName(),
