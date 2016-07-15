@@ -2539,14 +2539,14 @@ def course_analytics(request, group_id, user_id, render_template=False):
     # Comments on Notes Section
     analytics_data['cmts_on_user_notes'] = counter_obj.no_comments_received_on_notes
     # print "\n Total Comments On User Notes === ", cmts_on_user_notes, "\n\n"
-    # analytics_data['unique_users_commented_on_user_notes'] = analytics_instance.get_commented_unique_users_count(True,False)
+    # analytics_data['unique_users_commented_on_user_notes'] = len(counter_obj.comments_by_others_on_notes.keys())
     # print "\n Total Unique Users - Commented on User Notes === ", unique_users_commented_on_user_notes, "\n\n"
 
 
     # Comments on Files Section
     analytics_data['cmts_on_user_files'] = counter_obj.no_comments_received_on_files
     # print "\n Total Comments User Files === ", cmts_on_user_files, "\n\n"
-    analytics_data['unique_users_commented_on_user_files'] = analytics_instance.get_commented_unique_users_count(False,True)
+    analytics_data['unique_users_commented_on_user_files'] = len(counter_obj.comments_by_others_on_files.keys())
     # print "\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files, "\n\n"
 
     # BY User
