@@ -1,27 +1,8 @@
 from gnowsys_ndf.ndf.models import *
-"""
-# ================================================================== Tabs for StudentCourseEnrollment
-
-sce_name = ["nussd_course_type", "start_enroll", "end_enroll"]
-sce = []
-for i, n in enumerate(sce_name):
-  old_n = n
-  n = node_collection.one({'_type': {'$in': ["AttributeType", "RelationType"]}, 'name': n})
-  if n:
-    print "\n ", (i+1), " ", n._id, " -- ", n.name, " -- ", n.property_order
-    sce.append(n._id)
-  else:
-    print "\n ", (i+1), " ", old_n
-    sce.append(old_n)
-
-scepo = [["Enroll", sce]]
-sce_gst = node_collection.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
-node_collection.collection.update({'_id': sce_gst._id}, {'$set': {'property_order': scepo}}, upsert=False, multi=False)
-sce_gst.reload()
 
 # ================================================================== Tabs for Event
 
-el_name = ["name", "start_time", "end_time", "event_organised_by", "event_coordinator", "has_attendees", "location", "content_org", "event_status", "tags"]
+el_name = ["name", "start_time", "end_time", "is_bigbluebutton" , "event_coordinator", "invite_group", "has_attendees", "location", "content_org", "event_status", "tags"]
 el = []
 for i, n in enumerate(el_name):
   old_n = n
@@ -46,6 +27,28 @@ for n in event_cur:
   print "\n ", n._id, " -- ", n.name, " -- ", get_property_order_with_value(n)
   n.reload()
   print "\n ", n._id, " -- ", n.name, " -- ", n.property_order
+
+
+"""
+# ================================================================== Tabs for StudentCourseEnrollment
+
+sce_name = ["nussd_course_type", "start_enroll", "end_enroll"]
+sce = []
+for i, n in enumerate(sce_name):
+  old_n = n
+  n = node_collection.one({'_type': {'$in': ["AttributeType", "RelationType"]}, 'name': n})
+  if n:
+    print "\n ", (i+1), " ", n._id, " -- ", n.name, " -- ", n.property_order
+    sce.append(n._id)
+  else:
+    print "\n ", (i+1), " ", old_n
+    sce.append(old_n)
+
+scepo = [["Enroll", sce]]
+sce_gst = node_collection.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
+node_collection.collection.update({'_id': sce_gst._id}, {'$set': {'property_order': scepo}}, upsert=False, multi=False)
+sce_gst.reload()
+
 
 # ================================================================== Tabs for Classroom Session & Exam
 
