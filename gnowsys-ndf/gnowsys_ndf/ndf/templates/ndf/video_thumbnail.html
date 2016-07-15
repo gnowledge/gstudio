@@ -1,13 +1,15 @@
 <div class="large-12 columns">
   <div class="large-12 columns row">
-    {% if grel_dict %}
         <div class="large-6 columns">
           <label>Existing Thumbnail</label>
+    {% if grel_dict %}
           <img  src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.thumbnail.relurl}}">
-        </div>
+    {% elif node.if_file.thumbnail.relurl %}
+          <img  src="{{MEDIA_URL}}{{node.if_file.thumbnail.relurl}}">
     {% endif %}
+        </div>
         <div class="large-6 columns">
-          <label>captured Thumbnail</label>
+          <label>Captured Thumbnail</label>
           <canvas id="canvas" width="50px" height="50px" style="display:block;"></canvas>
           <div id="screenShots"></div>
         </div>

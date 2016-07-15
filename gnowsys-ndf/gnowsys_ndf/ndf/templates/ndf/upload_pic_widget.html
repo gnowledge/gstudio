@@ -15,6 +15,8 @@
           {% else %}
               {% if "Author" in group_object.member_of_names_list %}
                   <i class="fi-torso style2 text-center"></i>
+              {% elif node.if_file.mid.relurl %}
+                   <img src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" alt="Profile picture for this group." class="img-height">
               {% else %}
                    <img src="/static/ndf/images/default-bg.png" alt="Profile picture for this group." class="img-height">
               {% endif %}
