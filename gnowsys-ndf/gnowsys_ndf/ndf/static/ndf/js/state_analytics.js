@@ -210,7 +210,6 @@ $(document).on("mouseenter",'.city',function(e){
 
 });
 
-
 $(document).on("mouseout",'.city',function(){
   city_hover_tooltip.select('div').html("")
   city_hover_tooltip.style("display","none");
@@ -223,6 +222,11 @@ $(document).on("click",".save_btn",function(){
   var dt = curr_edit.data()[0];
   dt.properties.name = $('#city_name').val();
   dt.properties.state = $('#state_list').val();
+  dt.coordinates[0] = $('#city_lon').val();
+  dt.coordinates[1] = $('#city_lat').val();
+
+  var transform_pnt = projection(dt.coordinates);
+  curr_edit.attr("transform", "translate(" + transform_pnt[0] + "," + transform_pnt[1] + ")");
   curr_edit.data(dt);
   close_lb();
   update_organization(dt,dt.id);
@@ -378,6 +382,8 @@ function edit_org_form_init(obj){
     "content":'Name: <input id="city_name" type="text" /> \
             State: \
             <select id="state_list"></select><br>\
+            Latitude: <input id="city_lat" type="number" step="0.001" />\
+            Longitude: <input id="city_lon" type="number" step="0.001" />\
             <a class="save_btn button">Save</a><a class="delete_btn button">Delete</a>',
   }
   set_content_lb(data);
@@ -388,6 +394,8 @@ function edit_org_form_init(obj){
   var dt = curr_edit.data()[0];
   $('#city_name').val(dt.properties.name);
   $('#state_list').val(dt.properties.state);
+  $('#city_lon').val(dt.coordinates[0]);
+  $('#city_lat').val(dt.coordinates[1]);
   open_lb();
 }
 function zoom(xyz) {
@@ -426,13 +434,17 @@ function state_clicked(d){
 	var point = d3.mouse(this)
 	, p = {x: point[0], y: point[1] };
 
+	var coords = projection.invert([p.x,p.y]);
+  coords[0] = coords[0].toFixed(3);
+  coords[1] = coords[1].toFixed(3);
+
 	// Append a new point
   var dt = [{
     properties:{
       name: "",
       state: "",
     },
-    coordinates:[(p.x), (p.y)],
+    coordinates:coords,
   }];
 
 	var new_cir = g_cir.append("circle");
@@ -452,8 +464,10 @@ function dragmove(d) {
   var y = d3.event.y;
 
   var dt = d3.select(this).data()[0];
-  dt.coordinates[0] = x;
-  dt.coordinates[1] = y;
+  var coords = projection.invert([x,y]);
+  coords[0] = coords[0].toFixed(3);
+  coords[1] = coords[1].toFixed(3);
+  dt.coordinates = coords;
   d3.select(this).data(dt);
   d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
 }
@@ -485,52 +499,5 @@ function state_clicked2(d) {
     zoom(dflt_zoom);
     $('#info_bar').removeClass('disabled');
   }
-}
-
-function load_organization(){
-  $.ajax({
-    url: '/{{groupid}}/state_analytics/fetch_organization',
-    method: 'GET',
-    success: function(data){
-      var det = JSON.parse(data);
-      for(i=0; i<det.length; i++){
-       det[i] = JSON.parse(det[i]);
-      }
-      organizations = det;
-    }
-  });
-}
-
-function update_organization(data,id){
-  if(id===undefined)
-  {
-    id = '';
-  }
-  data["csrfmiddlewaretoken"] = '{{csrf_token}}';
-  $.ajax({
-    url: '/{{groupid}}/state_analytics/update_organization/' + id,
-    method: 'POST',
-    data: JSON.stringify(data),
-    success: function(data){
-      data = JSON.parse(data);
-      curr_edit.data()[0]['id'] = data.id;
-      curr_edit.attr('id', data.id);
-    }
-  });
-}
-
-function delete_organization(id){
-  if(id===undefined){
-    return;
-  }
-  $.ajax({
-    url: '/{{groupid}}/state_analytics/delete_organization/' + id,
-    method: 'POST',
-    success: function(data){
-      data = JSON.parse(data);
-      if(data.status)
-        curr_edit.remove();
-    }
-  });
 }
 //Function end===============================================================

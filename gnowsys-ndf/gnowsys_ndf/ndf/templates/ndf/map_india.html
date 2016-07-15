@@ -213,15 +213,12 @@ function update_organization(data,id){
   $.ajax({
     url: "{%url 'add_organization' groupid  'node_id'%}".replace('node_id',id),
     method: 'POST',
-    contentType: "application/json; charset=utf-8",
     dataType: "json",
     data: JSON.stringify(data),
     beforeSend: function(xhr, settings) {
       xhr.setRequestHeader("X-CSRFToken", csrftoken);
     },
     success: function(data){
-      //console.log(data);
-      //data = JSON.parse(data);
       curr_edit.data()[0]['id'] = data.id;
       curr_edit.attr('id', data.id);
     }
@@ -235,13 +232,11 @@ function delete_organization(id){
   $.ajax({
     url: "{%url 'delete_organization' groupid  'node_id'%}".replace('node_id',id),
     method: 'POST',
-    contentType: "application/json; charset=utf-8",
     dataType: "json",
     beforeSend: function(xhr, settings) {
       xhr.setRequestHeader("X-CSRFToken", csrftoken);
     },
     success: function(data){
-      //data = JSON.parse(data);
       if(data.status)
         curr_edit.remove();
     }
