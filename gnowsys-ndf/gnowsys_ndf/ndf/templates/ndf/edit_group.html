@@ -52,7 +52,6 @@
 
 </style>
 
-
 <dl class="accordion" data-accordion>
 
   <dd>
@@ -229,6 +228,9 @@
 {% endblock %}
 
 {% block script %}
+  {% if node %}
+    $("#form-edit-node").append('<input type="hidden" name="node_id" value="{{node.pk}}"><input type="hidden" name="name" value="{{node.name}}">')
+  {% endif %}
 
   $("#app_selected").click( function() {
     var url="{% url 'app_selection' groupid %}";
