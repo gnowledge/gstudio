@@ -326,7 +326,7 @@ class Email1:
 				self.fromuser = parse_mail(fromuser)
 			for header in ['subject']:
 				self.Subject = mail[header]
-				self.grp_name, self.activity, self.act_title = parse_subject(self.Subject)
+				#self.grp_name, self.activity, self.act_title = parse_subject(self.Subject)
 				
 			for part in mail.walk():
 				if (part.get_content_type() == 'text/plain'):
@@ -396,6 +396,8 @@ class Email1:
 		return self.ObjectId
 	def return_fileName(self):
 		return self.Filename
+	def change_subject(self):
+		self.grp_name, self.activity, self.act_title = parse_subject(self.Subject)
 
 connection_state = open_connection()
 unread_inbox = open_unseen(connection_state)
@@ -407,7 +409,7 @@ for msgId in unread_inbox[0].split():
 	id,check,error = authenticate_user(mail=obj.return_from(),group_name=obj.return_grp_name())
 	if(obj.return_update()==False):
 		if(check==True):
-			
+			obj.change_subject()
 			detach_dir = '.'
 			if 'attachment' not in os.listdir(detach_dir):
 				os.mkdir('attachment')
