@@ -229,7 +229,7 @@
 
 {% block script %}
   {% if node %}
-    $("#form-edit-node").append('<input type="hidden" name="node_id" value="{{node.pk}}"><input type="hidden" name="name" value="{{node.name}}">')
+    $("#form-edit-node").append('<input type="hidden" name="node_id" value="{{node.pk}}"><input type="hidden" name="name" value="{{node.name}}"><input type="hidden" name="group_page_edit" value="True">')
   {% endif %}
 
   $("#app_selected").click( function() {

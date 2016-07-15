@@ -1377,6 +1377,10 @@ class GroupCreateEditHandler(View):
         group_name = request.POST.get('name', '').strip()  # hidden-form-field
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
+        group_page_edit = request.POST.get('group_page_edit', False)
+        if not isinstance(group_page_edit, bool):
+            group_page_edit = eval(group_page_edit)
+
         subgroup_flag = request.POST.get('subgroup', '')
         partnergroup_flag = request.POST.get('partnergroup_flag', '')
         url_name = 'groupchange'
@@ -1421,9 +1425,15 @@ class GroupCreateEditHandler(View):
             group_obj = result[1]
             group_name = group_obj.name
             # url_name = 'groupchange'
-            if not partnergroup_flag:
-                # print request.POST.get('apps_to_set', '')
-                app_selection(request, group_obj._id)
+            if group_page_edit:
+                is_node_changed=get_node_common_fields(request, group_obj, group_id, gst_group)
+                group_obj.save(is_changed=is_node_changed)
+                group_obj.save()
+
+            elif not partnergroup_flag:
+                if request.POST.get('apps_to_set', ''):
+                    app_selection(request, group_obj._id)
+
             else:
                 group_obj.member_of = [partner_group_gst._id]
                 group_obj.save()
