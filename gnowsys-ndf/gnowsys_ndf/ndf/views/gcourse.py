@@ -2480,7 +2480,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
     user_obj = User.objects.get(pk=int(user_id))
     analytics_data['username'] = user_obj.username
-
+    counter_obj = get_counter_obj(user_obj.id,ObjectId(group_id))
     analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
@@ -2506,12 +2506,12 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['username'] = user_obj.username
     analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
     # print "\n Total QuizItemEvents === ", analytics_data['total_quizitems'], "\n\n"
-    analytics_data['attempted_quizitems'] = analytics_instance.get_attempted_quizitems_count()
+    analytics_data['attempted_quizitems'] = counter_obj.no_questions_attempted
     # print "\n Attempted QuizItemEvents === ", analytics_data['attempted_quizitems'], "\n\n"
     if 'correct_attempted_quizitems' not in analytics_data:
-        analytics_data['correct_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(True,False)
+        analytics_data['correct_attempted_quizitems'] = counter_obj.no_correct_answers
     # print "\n Correct Attempted QuizItemEvents === ", analytics_data['correct_attempted_quizitems'], "\n\n"
-    analytics_data['incorrect_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(False,True)
+    analytics_data['incorrect_attempted_quizitems'] = counter_obj.no_incorrect_answers
     # print "\n InCorrect Attempted QuizItemEvents === ", analytics_data['incorrect_attempted_quizitems'], "\n\n"
 
 
@@ -2519,7 +2519,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
     # analytics_data['total_notes'] = analytics_instance.get_total_notes_count()
     # print "\n Total Notes === ", total_notes, "\n\n"
     if 'user_notes' not in analytics_data:
-        analytics_data['user_notes'] = analytics_instance.get_user_notes_count()
+        analytics_data['user_notes'] = counter_obj.no_notes_written
     # print "\n User Notes === ", user_notes, "\n\n"
 
 
@@ -2527,58 +2527,58 @@ def course_analytics(request, group_id, user_id, render_template=False):
     # analytics_data['total_files'] = analytics_instance.get_total_files_count()
     # print "\n Total Files === ", total_files, "\n\n"
     if 'user_files' not in analytics_data:
-        analytics_data['user_files'] = analytics_instance.get_user_files_count()
+        analytics_data['user_files'] = counter_obj.no_files_created
     # print "\n User's Files === ", user_files, "\n\n"
 
 
     # Comments
     if 'total_cmnts_by_user' not in analytics_data:
-        analytics_data['total_cmnts_by_user'] = analytics_instance.get_total_comments_by_user()
+        analytics_data['total_cmnts_by_user'] = counter_obj.no_comments_by_user
     # print "\n Total Comments By User === ", total_cmnts_by_user, "\n\n"
 
     # Comments on Notes Section
-    analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
+    analytics_data['cmts_on_user_notes'] = counter_obj.no_comments_received_on_notes
     # print "\n Total Comments On User Notes === ", cmts_on_user_notes, "\n\n"
     # analytics_data['unique_users_commented_on_user_notes'] = analytics_instance.get_commented_unique_users_count(True,False)
     # print "\n Total Unique Users - Commented on User Notes === ", unique_users_commented_on_user_notes, "\n\n"
 
 
     # Comments on Files Section
-    analytics_data['cmts_on_user_files'] = analytics_instance.get_comments_counts_on_users_files()
+    analytics_data['cmts_on_user_files'] = counter_obj.no_comments_received_on_files
     # print "\n Total Comments User Files === ", cmts_on_user_files, "\n\n"
     analytics_data['unique_users_commented_on_user_files'] = analytics_instance.get_commented_unique_users_count(False,True)
     # print "\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files, "\n\n"
 
     # BY User
     # TO IMPROVE
-    analytics_data['total_notes_read_by_user'] = analytics_instance.get_others_notes_read_count()
+    analytics_data['total_notes_read_by_user'] = counter_obj.no_others_notes_visited
     # print "\n Total Notes read by User === ", total_notes_read_by_user, "\n\n"
 
     # TO IMPROVE
-    analytics_data['total_files_viewed_by_user'] = analytics_instance.get_others_files_read_count()
+    analytics_data['total_files_viewed_by_user'] = counter_obj.no_others_files_visited
     # print "\n Total Files viewed by User === ", total_files_viewed_by_user, "\n\n"
 
     # TO IMPROVE
-    analytics_data['other_viewing_my_files'] = analytics_instance.total_users_visted_my_files()
+    analytics_data['other_viewing_my_files'] = counter_obj.no_visits_gained_on_files
     # print "\n Total Users viewing My FILES === ", other_viewing_my_files, "\n\n"
 
     # TO IMPROVE
-    analytics_data['others_reading_my_notes'] = analytics_instance.total_users_read_my_notes()
+    analytics_data['others_reading_my_notes'] = counter_obj.no_views_gained_on_notes
     # print "\n Total Users reading My NOTES === ", others_reading_my_notes, "\n\n"
 
-    analytics_data['commented_on_others_notes'] = analytics_instance.get_other_notes_commented_by_user_count()
+    analytics_data['commented_on_others_notes'] = counter_obj.no_comments_on_others_notes
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
 
-    analytics_data['commented_on_others_files'] = analytics_instance.get_other_files_commented_by_user_count()
+    analytics_data['commented_on_others_files'] = counter_obj.no_comments_on_others_files
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
 
     # all_cmts = analytics_instance.get_avg_rating_on_my_comments()
-    analytics_data['total_rating_rcvd_on_notes'] = analytics_instance.get_ratings_received_on_user_notes()
+    analytics_data['total_rating_rcvd_on_notes'] = counter_obj.avg_rating_received_on_notes
     # print "\n\n analytics_data['total_rating_rcvd_on_notes'] === ",analytics_data['total_rating_rcvd_on_notes']
-    analytics_data['total_rating_rcvd_on_files'] = analytics_instance.get_ratings_received_on_user_files()
+    analytics_data['total_rating_rcvd_on_files'] = counter_obj.avg_rating_received_on_files
     # print "\n\n analytics_data['total_rating_rcvd_on_files'] === ",analytics_data['total_rating_rcvd_on_files']
-    cmts_on_user_notes = analytics_instance.get_comments_counts_on_users_notes(False, site_wide=True)
-    cmts_on_user_files = analytics_instance.get_comments_counts_on_users_files(False, site_wide=True)
+    cmts_on_user_notes = counter_obj.no_comments_received_on_notes
+    cmts_on_user_files = counter_obj.no_comments_received_on_files
     analytics_data['cmnts_rcvd_by_user'] = 0
     if 'cmts_on_user_notes' in analytics_data and 'cmts_on_user_files' in analytics_data:
         analytics_data['cmnts_rcvd_by_user'] = analytics_data['cmts_on_user_notes'] + analytics_data['cmts_on_user_files']
@@ -2596,7 +2596,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
         analytics_data['unit_progress_meter'] = 0
 
     if "users_points" not in analytics_data:
-        analytics_data['users_points'] = analytics_instance.get_users_points()
+        analytics_data['users_points'] = counter_obj.course_score
 
     analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
 
