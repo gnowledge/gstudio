@@ -125,7 +125,6 @@ def send_page(to_user,page_name,page_content,subject,m_id,ref):
         msg['From'] = mio_from_email
         msg['To'] = to_user
         img_name = GSTUDIO_SITE_NAME.lower()
-        print img_name
         context = {'pg_name': page_name,'pg_content': page_content,'img_url':img_name}
     	Html = render(None, 'ndf/mio_index.html', context)
        	html = str(Html)
@@ -143,7 +142,7 @@ def update_page(name,content,id,user_id):
 	gst_page.name = unicode(name)
 	gst_page.altnames = unicode(name)
 	gst_page.content = unicode(content)
-	gst_page.last_update = datetime.datetime.today()
+	gst_page.last_update = datetime.datetime.now()
 	gst_page.modified_by = user_id
 
 	try:
@@ -400,7 +399,7 @@ class Email1:
 
 connection_state = open_connection()
 unread_inbox = open_unseen(connection_state)
-print unread_inbox
+
 obj = Email1()
 for msgId in unread_inbox[0].split():
 	obj.mail_extract(msgId, connection_state)
