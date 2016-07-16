@@ -55,6 +55,10 @@ class Command(BaseCommand):
 
 
 	def updater(self,all_events):
+		'''
+		This function will iterate over all events and will mark the "Scheduled" meets whose end_time is 
+		over as "Completed" in event_status of event object's Attribute Set
+		'''
 
 		now = datetime.datetime.now()
 		e_status = node_collection.one({'_type' : 'AttributeType' , 'name': 'event_status'})
