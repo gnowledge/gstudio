@@ -48,15 +48,18 @@ def authenticate_user(mail,group_name):
 	global User_object
 	id = -1
 	try:
-		id = User.objects.get(email=mail).id
-		User_object = get_group_name_id(group_name_or_id=id, get_obj=True)
+		User_object = User.objects.get(email=mail)
+		id = User_object.id
+		if not group_name:
+			group_name = User_object.username
 	except:
-		return id,False,error_message["User does not exist"]
-	
-	if node_collection.find({ '_type': 'Group', 'name': unicode(group_name), 'author_set': {'$in': [id]} }).count() > 0:
-		return id,True,error_message["User authenticated"]
+		return id,False,error_message["User does not exist"],group_name
+
+	auth_obj = get_group_name_id(group_name, get_obj=True)
+	if id in auth_obj.author_set or id in auth_obj.contributors:
+		return id,True,error_message["User authenticated"],group_name
 	else:
-		return id,False,error_message["User not a member of this group"]
+		return id,False,error_message["User not a member of this group"],group_name
 
 def create_page(**kwargs): 
 	global User_object
@@ -90,8 +93,8 @@ def create_page(**kwargs):
 	m_id = kwargs.get('m_id','')
 
 	gst_page = node_collection.one({'_type':u'GSystemType','name':u'Page'})
-	gst_group = node_collection.one({'_type':u'Group','name':group_name})
-
+	gst_group = get_group_name_id(group_name, get_obj=True)
+	
 	available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),
 		'group_set': ObjectId(gst_group._id)})
 
@@ -263,14 +266,13 @@ def parse_subject(sub):
 	#If no square brackets are there in the subject,it means that
 	#User wants to create a 'Page in home group'
 	#else subject format should be as follows:-  [Group-Name][Page/Forum] Page/Forum name
-	global User_object
 	i=1
 	s = 0
 	e = 0
-	group_name = User_object.username
+	group_name = ''
 	activity = 'Page'
 	activity_name = ''
-	ctr = 0;
+	ctr = 0
 	for index in range(len(sub)):
 		if(sub[index]=='[' or sub[index]==']'):
 			ctr = ctr+1
@@ -326,7 +328,7 @@ class Email1:
 				self.fromuser = parse_mail(fromuser)
 			for header in ['subject']:
 				self.Subject = mail[header]
-				#self.grp_name, self.activity, self.act_title = parse_subject(self.Subject)
+				self.grp_name, self.activity, self.act_title = parse_subject(self.Subject)
 				
 			for part in mail.walk():
 				if (part.get_content_type() == 'text/plain'):
@@ -396,20 +398,21 @@ class Email1:
 		return self.ObjectId
 	def return_fileName(self):
 		return self.Filename
-	def change_subject(self):
-		self.grp_name, self.activity, self.act_title = parse_subject(self.Subject)
+	def change_gp_name(self,gp):
+		self.grp_name = gp
 
 connection_state = open_connection()
 unread_inbox = open_unseen(connection_state)
-
 obj = Email1()
 for msgId in unread_inbox[0].split():
 	obj.mail_extract(msgId, connection_state)
-
-	id,check,error = authenticate_user(mail=obj.return_from(),group_name=obj.return_grp_name())
+	
+	id,check,error,groupName = authenticate_user(mail=obj.return_from(),group_name=obj.return_grp_name())
+	obj.change_gp_name(gp=groupName)
+	
 	if(obj.return_update()==False):
 		if(check==True):
-			obj.change_subject()
+			
 			detach_dir = '.'
 			if 'attachment' not in os.listdir(detach_dir):
 				os.mkdir('attachment')
