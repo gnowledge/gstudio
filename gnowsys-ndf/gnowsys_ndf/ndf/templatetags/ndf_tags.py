@@ -3765,6 +3765,10 @@ def get_course_completetion_data(group_obj, user, ids_list=False):
 
 @register.assignment_tag
 def get_pages(page_type):
+	'''
+	returns the array of 'page_type' pages in the group 'help'
+	ex. page_type='Info page' returns all Info pages in help group
+	'''
 	page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
 	help_page = node_collection.one({'_type': "Group", 'name': "help"})
 	page_type_gst = node_collection.one({'_type': "GSystemType", 'name': page_type})
