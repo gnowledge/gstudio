@@ -5252,7 +5252,7 @@ def replicate_resource(request, node, group_id):
                 create_gattribute(new_gsystem._id,at_node,obj_val)
 
             ##### TRIPLES GRELATIONS
-            node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id})
+            node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id, 'status': u'PUBLISHED'})
             # To handle multiple GRelations of same RT i.e of object_cardinality  > 1
             # If looped over the list and called create_grelation multiple time, this will create 
             # all grelations but will set PUBLISHED status for ONLY the last one and mark as DELETED the earlier ones
@@ -5264,11 +5264,12 @@ def replicate_resource(request, node, group_id):
                 rt_id = each_rel['relation_type']['_id']
                 right_subj = each_rel['right_subject']
                 if rt_id in relation_dict_rt_key_rs_val.keys() :
-                    if not isinstance(relation_dict_rt_key_rs_val[rt_id],list):
-                        value_list = []
-                        value_list.append(relation_dict_rt_key_rs_val[rt_id])
-                        value_list.append(right_subj)
-                        relation_dict_rt_key_rs_val[rt_id] = value_list
+                    val_list = relation_dict_rt_key_rs_val[rt_id]
+                    if not isinstance(val_list,list):
+                        rs_list = []
+                        rs_list.append(val_list)
+                        rs_list.append(right_subj)
+                        relation_dict_rt_key_rs_val[rt_id] = rs_list
                     else:
                         relation_dict_rt_key_rs_val[rt_id].append(right_subj)
                 else:
@@ -5280,7 +5281,9 @@ def replicate_resource(request, node, group_id):
                 if rt_node.name == 'has_thread':
                     thread_created = True
                 if isinstance(eachrsval, ObjectId):
-                    create_grelation(new_gsystem._id,rt_node,eachrsval)
+                    right_subj_node = node_collection.one({'_id': ObjectId(eachrsval)})
+                    right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
+                    create_grelation(new_gsystem._id,rt_node,right_sub_new_node._id)
                 else:
                     cloned_rs_ids = []
                     for eachrsval_id in eachrsval:
