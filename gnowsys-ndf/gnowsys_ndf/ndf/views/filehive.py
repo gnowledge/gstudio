@@ -84,7 +84,8 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 
 			gs_obj_list.append(gs_obj)
 		elif existing_file_gs:
-				gs_obj_list.append(existing_file_gs)
+			# create a new GSystem for same filehive object
+			write_files(request, group_id, make_collection=False, unique_gs_per_file=False)
 
 	if make_collection and collection_set:
 		first_obj.collection_set = collection_set
