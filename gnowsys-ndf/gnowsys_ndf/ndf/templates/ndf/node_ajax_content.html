@@ -240,6 +240,7 @@
 
 
               <!-- not a collection -->
+              {% if not is_group %}
               {% if not topic %}
                 <h3 class="text-gray">{{node.name}}:</h3>
               {% endif %}
@@ -406,6 +407,8 @@
                   {{node.name}}
                 </a>
               {% endif %}
+              {% endif %}
+
 
             {% comment %}
               <!-- commenting following block which shows slider if resource is collection of all images/videos/audios -->
