@@ -1294,7 +1294,10 @@ class GroupCreateEditHandler(View):
         logo_img_node = None
         parent_obj_partner = None
         subgroup_flag = request.GET.get('subgroup','')
-
+        node_edit_flag = request.GET.get('node_edit',False)
+        if not isinstance(node_edit_flag, bool):
+            node_edit_flag = eval(node_edit_flag)
+        # print "\n node_edit_flag ==== ",type(node_edit_flag)
         partnergroup_flag = request.GET.get('partnergroup','')
         if partnergroup_flag:
             partnergroup_flag = eval(partnergroup_flag)
@@ -1326,9 +1329,12 @@ class GroupCreateEditHandler(View):
 
         title = action + ' Group'
 
-        # In the case of need, we can simply replace:
+        # In the case of need old group edit interface (node_edit_base.html), we can simply replace:
         # "ndf/create_group.html" with "ndf/edit_group.html"
         template = "ndf/create_group.html"
+        if node_edit_flag:
+            # Coming for page-edit interface (Collection, Metadata, Help)
+            template = "ndf/edit_group.html"
         if subgroup_flag:
             subgroup_flag = eval(subgroup_flag)
         if partnergroup_flag:
@@ -1371,6 +1377,10 @@ class GroupCreateEditHandler(View):
         group_name = request.POST.get('name', '').strip()  # hidden-form-field
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
+        group_page_edit = request.POST.get('group_page_edit', False)
+        if not isinstance(group_page_edit, bool):
+            group_page_edit = eval(group_page_edit)
+
         subgroup_flag = request.POST.get('subgroup', '')
         partnergroup_flag = request.POST.get('partnergroup_flag', '')
         url_name = 'groupchange'
@@ -1415,9 +1425,15 @@ class GroupCreateEditHandler(View):
             group_obj = result[1]
             group_name = group_obj.name
             # url_name = 'groupchange'
-            if not partnergroup_flag:
-                # print request.POST.get('apps_to_set', '')
-                app_selection(request, group_obj._id)
+            if group_page_edit:
+                is_node_changed=get_node_common_fields(request, group_obj, group_id, gst_group)
+                group_obj.save(is_changed=is_node_changed)
+                group_obj.save()
+
+            elif not partnergroup_flag:
+                if request.POST.get('apps_to_set', ''):
+                    app_selection(request, group_obj._id)
+
             else:
                 group_obj.member_of = [partner_group_gst._id]
                 group_obj.save()
@@ -2117,6 +2133,8 @@ def group_dashboard(request, group_id=None):
 @login_required
 @get_execution_time
 def app_selection(request, group_id):
+    from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+
     if ObjectId.is_valid(group_id) is False:
         group_ins = node_collection.find_one({
             '_type': "Group", "name": group_id
@@ -2183,7 +2201,8 @@ def app_selection(request, group_id):
 
 @get_execution_time
 def switch_group(request,group_id,node_id):
-  
+  from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+
   try:
       group_id = ObjectId(group_id)
   except:
@@ -2261,9 +2280,9 @@ def switch_group(request,group_id,node_id):
       data_list = []
       user_id = request.user.id
       all_user_groups = []
-    # for each in get_all_user_groups():
-    #   all_user_groups.append(each.name)
-    #loop replaced by a list comprehension
+      # for each in get_all_user_groups():
+      #   all_user_groups.append(each.name)
+      #loop replaced by a list comprehension
       top_partners_list = ["State Partners", "Individual Partners", "Institutional Partners"]
       all_user_groups = [each.name for each in get_all_user_groups()]
       if not request.user.is_superuser:
