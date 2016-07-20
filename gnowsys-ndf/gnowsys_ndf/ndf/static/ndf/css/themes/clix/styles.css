@@ -27791,6 +27791,19 @@ course-title {
   border: 1px solid !important;
 }
 
+/* line 4506, ../../../scss/_app_styles.scss */
+.show-collection {
+  color: white;
+  font-size: 1.1em;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  text-align: left;
+  display: inline-block;
+  margin-left: 2px;
+  position: relative;
+  text-align: center;
+}
+
 /*
 *  CLIx Platform Stylesheet
 */

@@ -60,7 +60,9 @@
 <div class="repository-title" itemprop="{{schema.1.name}}" style="font-size:1.2em !important;width:100%;margin-top:8px"> 
       {% firstof node.name node.altnames node.name %} 
   </div>
-  <br>
+<br>
+  
+
 {% endblock %}
 
 
@@ -69,9 +71,15 @@
 
 
 {% block collection_content %}
-  
+  {% if node.collection_set and not node.if_file.original.relurl %}
+      <div class="show-collection">    
+        <a class=" {% if node.collection_set %}collection-exists{% endif %}"  style="width:100%" data-oid="{{node.pk|safe}}">
+         Show Collection
+        </a>
+     </div>
+  {% endif %}
   <div id="view_collection">
-  
+    
     {% include "ndf/collection_ajax_view.html" %}  
   </div>
 
