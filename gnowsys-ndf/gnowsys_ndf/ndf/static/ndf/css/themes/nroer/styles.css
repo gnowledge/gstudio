@@ -27975,3 +27975,15 @@ course-title {
   max-height: 100px;
   border: 1px solid !important;
 }
+
+/* line 4506, ../../../scss/_app_styles.scss */
+.show-collection {
+  color: white;
+  font-size: 1.1em;
+  width: 100%;
+  text-align: left;
+  display: inline-block;
+  margin-left: 2px;
+  position: relative;
+  text-align: center;
+}

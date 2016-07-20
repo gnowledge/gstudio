@@ -248,21 +248,12 @@
               {% if is_collection_card_view == True and node.collection_set  %}
                 <center>
                 <div class="show-image">
-                  <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
-                   {% if  node.if_file.original.relurl %}
+                   {% if node.if_file.original.relurl %}
+                    <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
                     <img src="{{MEDIA_URL}}{{node.if_file.original.relurl}} " style="min-height:200px;" />
-                   {% elif node.collection_set %}
-                   <img src="/static/ndf/bower_components/foundation-icon-fonts/svgs/fi-page-multiple.svg">
                     {% endif %}
                   </a>
-                  {% if node.collection_set %}
-                  <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
-                      <a  class=" {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
-                         Show Collection
-                         {# <i class="fi-projection-screen"> </i> #}
-                      </a>
-                    </figcaption>
-                    {% else %}
+                  {% if not node.collection_set %}
                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
                       <a  target="_blank" href="{% url 'read_file' group_name_tag node.pk download_filename %}">
                          View in Full Screen
