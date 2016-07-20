@@ -952,42 +952,31 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 
     elif (nid is None) and (nlist):
 
-      # for oid in nlist:
-      #   obj = node_collection.one({'_id': oid})
-      #   dict2.append(obj)
         for each in drawer:
             if each._id not in nlist:
                 dict1[each._id] = each
 
-        #loop replaced by a list comprehension
-        dict2=[node_collection.one({'_id': oid}) for oid in nlist]
+        dict2 = [node_collection.one({'_id': oid}) for oid in nlist]
 
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
-            dict_drawer['1'] = dict1
-            dict_drawer['2'] = dict2
+        dict_drawer['1'] = dict1
+        dict_drawer['2'] = list(set(dict2))
 
     else:
         for each in drawer:
-
             if each._id != nid:
                 if each._id not in nlist:
                     dict1[each._id] = each
 
-        if each._id != nid:
-            if each._id not in nlist:
-                dict1[each._id] = each
-
-        #loop replaced by a list comprehension
-        dict2=[node_collection.one({'_id': oid})  for oid in nlist]
-
+        dict2 = [node_collection.one({'_id': oid})  for oid in nlist]
 
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
-            dict_drawer['1'] = dict1
-            dict_drawer['2'] = dict2
+        dict_drawer['1'] = dict1
+        dict_drawer['2'] = list(set(dict2))
 
     if checked == "RelationType" or checked == "CourseUnits":
         return dict_drawer
@@ -1405,7 +1394,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
         if not checked:
           if nlist:
             for each in nlist:
-              if each not in right_drawer_list:
+              if each not in right_drawer_list and each in node.collection_set:
                 node.collection_set.remove(each)
                 # Also for removing prior node element after removing collection element
                 node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
@@ -1435,9 +1424,14 @@ def build_collection(node, check_collection, right_drawer_list, checked):
 
     elif check_collection == "collection":
         #  collection
+
         if right_drawer_list != '':
-            right_drawer_list = [ObjectId(each.strip())
-                                 for each in right_drawer_list.split(",")]
+            if isinstance(right_drawer_list, list):
+                right_drawer_list = [ObjectId(each)
+                                     for each in right_drawer_list]
+            else:
+                right_drawer_list = [ObjectId(each.strip())
+                                     for each in right_drawer_list.split(",")]
 
             nlist = node.collection_set
 
