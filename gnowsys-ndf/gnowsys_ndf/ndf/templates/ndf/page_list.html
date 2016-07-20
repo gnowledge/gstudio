@@ -143,7 +143,7 @@
 
 
   {% group_type_info groupid request.user as grouptype %}
-
+  
   <!-- Existing card list-->
   {% for node in page_nodes %}
 
@@ -160,59 +160,26 @@
 
 
 
+{% include 'ndf/pagination.html' with urlname="page_paged" first_arg=group_name_tag   %}
 </div>
+
 
 <div class="content row" id="panel2-4">
 {% get_resource_collection groupid title as page_collections %}
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-  {% autopaginate page_collections 23 %}
 
   <!-- Existing card list-->
   {% for node in page_collections %}
-    <li class="card">
-      <div class="page">
-      <header>
-        <div class="label-list">
-        {% for tag in node.tags|slice:":3" %}
-          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-        {% endfor %}
-        </div>
+      
+       <li class="card-image-wrapper" >
+             {% include 'ndf/simple_card.html' with  has_contributor=True resource=node url_name="page_details" first_arg=group_name_tag second_arg=node %}
 
-        <h4>
-          {{ node.name|truncatechars:20 }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-        </h4>
-      </header>
+        </li>
 
-      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
-      <a class="small button expand" href="{% url 'page_details' group_name_tag node %}"> {% trans 'Page Details' %}</a>
-
-      {% if node.created_by == request.user.id %}
-        <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">{% trans 'Delete' %}</a>
-      {% endif %}
-
-      {% group_type_info groupid request.user as grouptype %}
-      {% if grouptype == "Moderated" %}
-      {% if node.status == "DRAFT" %}
-      <a class="button alert tiny" > {% trans 'Under Moderation' %}</a>
-      {% endif %}
-      {% endif %}
-
-      <footer>
-          <div class="age">
-            {{ node.member_of_names_list|join:', ' }}{% trans  'created' %} {{node.created_at|timesince}} {% trans 'ago' %}
-            <br/>
-            by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span>
-          </div>
-        <span><strong>{{node.contributors|length}}</strong>{% trans  'Contributor' %}{{node.contributors|pluralize}}</span>
-      </footer>
-
-      </div>
-    </li>
-
-  {% empty %}
+    {% empty %}
     {% if not searching %}
      <h5>    {% blocktrans %} This group doesn't have any collections.{% endblocktrans %} </h5>
     {% endif %}
@@ -220,8 +187,6 @@
   {% endfor %}
 
 </ul>
-
-{% paginate %}
 
 </div>
 </div>
