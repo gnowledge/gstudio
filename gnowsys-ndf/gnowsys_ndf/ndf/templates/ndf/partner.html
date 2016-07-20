@@ -1,4 +1,5 @@
-{% extends "ndf/base.html" %}
+{% load simple_filters %}
+{% xextends "ndf/base.html" with first_body_column=0 %}
 {% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
@@ -12,17 +13,17 @@
 {% endblock %}
 
 {% block body_content %}
-  <div class="repository-title large-4 columns">{{groups_category}}</div> 
-  <div class="repository-desc large-8 columns">{{app_gst.content_org|default_if_none:''|safe}}</div>
+  <div class="repository-title medium-3 medium-offset-2 large-3 large-offset-2 columns">{{groups_category}}</div> 
+  <div class="repository-desc medium-6 large-7 columns">{{app_gst.content_org|default_if_none:''|safe}}</div>
 <div class="content row">
-  <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-3">
+  <div class="app-card-wrapper">
     {% autopaginate group_nodes 23 %}
     {% for node in group_nodes %}
-      <li class="card-image-wrapper"> 
+      <div class="app-card-container">
         {% include 'ndf/main_simple_card.html' with  resource=node has_prof_pic=True url_name="groupchange" first_arg=node.name %}
-      </li>
+      </div>
     {% endfor %}
-  </ul>
+  </div>
 </div>
 {% paginate %}
 
