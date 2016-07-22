@@ -6366,3 +6366,32 @@ def save_user_password(request, group_id):
         response_dict['success'] = True
     return HttpResponse(json.dumps(response_dict))
 
+@login_required
+@get_execution_time
+def upload_video_thumbnail(request,group_id):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    # group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    # title = request.POST.get('context_name','')
+    parent_node = request.POST.get('parent_node','')
+    # print "\n\nparent_node",request.POST
+    usrid = request.user.id
+    from gnowsys_ndf.ndf.views.filehive import write_files
+
+    gs_obj_list = write_files(request, group_id)
+
+    gs_obj_id = gs_obj_list[0]['_id']
+    if gs_obj_id:
+      gs_obj_node = node_collection.one({'_id':ObjectId(gs_obj_id)})
+      pr_obj_node = node_collection.one({'_id':ObjectId(parent_node)})
+      
+      has_thumbnail_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_thumbnail') })
+      
+      gr_node = create_grelation(pr_obj_node._id, has_thumbnail_rt, gs_obj_id)
+      # print "\n\n\ngr_node",gr_node
+      warehouse_grp_obj = node_collection.one({'_type': "Group", 'name': "warehouse"})
+      node_collection.collection.update({'_id': ObjectId(gs_obj_id)}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
+
+    return StreamingHttpResponse(str(gs_obj_id))

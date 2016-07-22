@@ -7,13 +7,18 @@
     </div>
         <div class="text-center">
         <div class="div-height">
+          {% get_relation_value node.pk 'has_thumbnail' as grel_dict %}
           {% if prof_pic_obj %}
-                  <img src="{{MEDIA_URL}}{{prof_pic_obj.if_file.original.relurl}}" class="img-height"/>
+            <img src="{{MEDIA_URL}}{{prof_pic_obj.if_file.original.relurl}}" class="img-height"/>
+          {% elif grel_dict %}   
+            <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.thumbnail.relurl}}" class="img-height"/>
           {% else %}
               {% if "Author" in group_object.member_of_names_list %}
                   <i class="fi-torso style2 text-center"></i>
+              {% elif node.if_file.mid.relurl %}
+                   <img src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" alt="Profile picture for this group." class="img-height">
               {% else %}
-                  <img src="/static/ndf/images/default-bg.png" alt="Profile picture for this group."  class="img-height">
+                   <img src="/static/ndf/images/default-bg.png" alt="Profile picture for this group." class="img-height">
               {% endif %}
           {% endif %}
         </div>
@@ -61,6 +66,10 @@
                           <input type="hidden" name="pic_rt" value="is_banner"></input>
                         {% elif  is_profile and not is_banner %}
                           <input type="hidden" name="pic_rt" value="is_profile"></input>
+                        {% elif  is_thumbnail and not is_banner or is_profile %}
+                          <input type="hidden" name="pic_rt" value="is_thumbnail"></input>
+                          <input type="hidden" name="node_id" value="{{node_id}}"></input>
+
                         {% endif %}
 
                         <div class="{{widget_for}}_upload_cancel_div">
