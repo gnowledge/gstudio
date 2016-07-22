@@ -250,11 +250,11 @@
               {% if is_collection_card_view == True and node.collection_set  %}
                 <center>
                 <div class="show-image">
-                   {% if node.if_file.original.relurl %}
+                   {% if node.if_file.original.relurl and 'image' in node.if_file.mime_type  %}
                     <a class="th {% if node.collection_set %}collection-exists{% endif %}"   data-oid="{{node.pk|safe}}">
                     <img src="{{MEDIA_URL}}{{node.if_file.original.relurl}} " style="min-height:200px;" />
+                    </a>
                     {% endif %}
-                  </a>
                   {% if not node.collection_set %}
                   <figcaption style="position:relative;top:0;left:0" title="Click Here to View Image in Full Screen">
                       <a  target="_blank" href="{% url 'read_file' group_name_tag node.pk download_filename %}">
