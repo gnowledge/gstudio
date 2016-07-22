@@ -743,6 +743,7 @@ class Node(DjangoDocument):
                                                     self.created_by,
                                                     self.last_update or self.created_at
                                                 )
+            # print 'buddy_contributors : ', buddy_contributors
 
             if buddy_contributors:
                 for each_bcontrib in buddy_contributors:
@@ -3121,7 +3122,10 @@ class Buddy(DjangoDocument):
 
     def remove_all_buddies(self):
         '''
-        Removes/releses all existing-active buddies.
+        - Removes/releses all existing-active buddies in single buddy object.
+        - it doesn't close buddy session/object.
+        - i.e: It don't add datetime.datetime.now() to 'ends_at' field.
+        - without doing DB .save() operation.
         '''
         active_buddy_authid_list = self.get_active_authid_list_from_single_buddy()
 
@@ -3135,16 +3139,16 @@ class Buddy(DjangoDocument):
         '''
         terminates the buddy session:
             - removes all buddies.
-            - adds end time ('ends_at').
+            - It add datetime.datetime.now() to 'ends_at' field.
             - buddy object will be saved using .save() method.
         '''
 
-        active_buddy_authid_list = self.get_active_authid_list_from_single_buddy()
+        if not self.ends_at:
+            self = self.remove_all_buddies()
+            self.ends_at = datetime.datetime.now()
+            self.save()
 
-        self = self.remove_all_buddies()
-        self.ends_at = datetime.datetime.now()
-        self.save()
-
+        # active_buddy_authid_list = self.get_active_authid_list_from_single_buddy()
         # active_buddy_userids_list = Author.get_user_id_list_from_author_oid_list(active_buddy_authid_list)
         # DjangoActiveUsersGroup.update_user_set(remove=active_buddy_userids_list)
 
@@ -3298,14 +3302,21 @@ class Buddy(DjangoDocument):
 
     @staticmethod
     def get_buddy_cur_from_userid_datetime(user_id, datetime_obj):
-        return buddy_collection.find({'loggedin_userid': user_id, 'starts_at': {'$lte': datetime_obj}, '$or': [{'ends_at': {'$gte': datetime_obj}}, {'ends_at': None} ] })
+        return buddy_collection.find({
+                                    'loggedin_userid': user_id,
+                                    'starts_at': {'$lte': datetime_obj},
+                                    '$or': [
+                                            {'ends_at': {'$gte': datetime_obj}},
+                                            {'ends_at': None}
+                                        ]
+                                })
 
     @staticmethod
     def get_buddy_userids_list_within_datetime(user_id, datetime_obj):
         buddy_cur = Buddy.get_buddy_cur_from_userid_datetime(user_id, datetime_obj)
         all_buddies_authid_list = []
         for each_buddy_obj in buddy_cur:
-            all_buddies_authid_list += each_buddy_obj.get_all_buddies_auth_ids()
+            # all_buddies_authid_list += each_buddy_obj.get_all_buddies_auth_ids()
             for each_buddy_authid, in_out_time in each_buddy_obj.buddy_in_out.iteritems():
                 for each_io in in_out_time:
                     if (not each_io['out'] and datetime_obj > each_io['in']) \
@@ -3317,6 +3328,28 @@ class Buddy(DjangoDocument):
 
         else:
             return Author.get_user_id_list_from_author_oid_list(set(dict.fromkeys(all_buddies_authid_list).keys()))
+
+
+    # method for sitewide buddies:
+
+    @staticmethod
+    def sitewide_all_buddies():
+        return buddy_collection.find()
+
+    @staticmethod
+    def sitewide_all_active_buddies():
+        return buddy_collection.find({'ends_at': None})
+
+    @staticmethod
+    def sitewide_remove_all_buddies():
+        sitewide_all_active_buddies = Buddy.sitewide_all_active_buddies()
+
+        for each_buddy in sitewide_all_active_buddies:
+            each_buddy.end_buddy_session()
+
+        return sitewide_all_active_buddies
+
+    # --- END OF method for sitewide buddies
 
 
     def save(self, *args, **kwargs):
