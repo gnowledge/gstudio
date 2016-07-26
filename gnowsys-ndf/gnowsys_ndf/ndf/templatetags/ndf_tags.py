@@ -2727,14 +2727,13 @@ def get_field_type(node_structure, field_name):
 @register.inclusion_tag('ndf/html_field_widget.html')
 # def html_widget(node_id, field, field_type, field_value):
 # def html_widget(node_id, node_member_of, field, field_value):
-def html_widget(groupid, node_id, field):
+def html_widget(groupid, node_id, field,node_content=None):
   """
   Returns html-widget for given attribute-field; that is, passed in form of
   field_name (as attribute's name) and field_type (as attribute's data-type)
   """
   # gs = None
   field_value_choices = []
-
   # This field is especially required for drawer-widets to work used in cases of RelationTypes
   # Represents a dummy document that holds node's _id and node's right_subject value(s) from it's GRelation instance
   node_dict = {}
@@ -2863,7 +2862,8 @@ def html_widget(groupid, node_id, field):
             'is_list_of': is_list_of,
             'is_mongokit_is_radio': is_mongokit_is_radio,
             'is_special_field': is_special_field, 'included_template_name': included_template_name,
-            'is_required_field': is_required_field
+            'is_required_field': is_required_field,
+            'node_content':node_content
             # 'is_special_tab_field': is_special_tab_field
     }
 
