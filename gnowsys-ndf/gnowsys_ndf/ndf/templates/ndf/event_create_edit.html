@@ -101,7 +101,7 @@
             <label for="{{field.name}}" class="right inline"> {{field.altnames}} </label>
           </div>
           <div class="small-5 end columns">
-            {% html_widget groupid node.pk field %}
+            {% html_widget groupid node.pk field node.content %}
           </div>
             {% endif %}
            {% endif %}
@@ -113,7 +113,7 @@
             <label for="{{field.name}}" class="right inline"> {{field.altnames}} </label>
           </div>
           <div class="small-5 end columns">
-            {% html_widget groupid node.pk field %}
+            {% html_widget groupid node.pk field node.content %}
           </div>
             {% endif %} 
           {% endif %}
