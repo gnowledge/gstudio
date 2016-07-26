@@ -1,4 +1,5 @@
 ''' -- imports from python libraries -- '''
+import datetime
 # from datetime import datetime
 
 ''' -- imports from installed packages -- '''
@@ -22,14 +23,20 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
-from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import node_collection,Group
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value,get_execution_time
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.notification import models as notification
 
+''' -- imports for bigbluebutton wrappers -- '''
+from bbb_api import *
+
+''' -- import bigbluebutton server settings -- '''
+from gnowsys_ndf.local_settings import *
 
 @get_execution_time
+@login_required
 def event(request, group_id):
  
  if ObjectId.is_valid(group_id) is False :
@@ -97,26 +104,17 @@ def event(request, group_id):
                           )
 
 @get_execution_time
+@login_required
 def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None):
   """
   View for handling Event and it's sub-types detail-view
   """
-  auth = None
-  # if ObjectId.is_valid(group_id) is False :
-  #   group_ins = node_collection.one({'_type': "Group","name": group_id})
-  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #   if group_ins:
-  #     group_id = str(group_ins._id)
-  #   else :
-  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #     if auth :
-  #       group_id = str(auth._id)
-  # else :
-  #   pass
+
   try:
         group_id = ObjectId(group_id)
   except:
         group_name, group_id = get_group_name_id(group_id)
+  group_obj = node_collection.one({'_id': group_id})
   session_node = ""
   app = None
   session_node = ""
@@ -146,7 +144,6 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   #template_prefix = "mis"
 
   if request.user:
-    if auth is None:
       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
   '''  agency_type = auth.agency_type
     Event_Types = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
@@ -257,22 +254,110 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   else:
     Add="Stop"       
   #fecth the data
+  can_access_val = Group.can_access(request.user.id, group_obj)
+  context_variables = { 'groupid': group_id, 'group_id': group_id, 
+                          'app_id': app_id,'app_collection_set': app_collection_set, 
+                          'app_set_id': app_set_id,
+                          'title':title,
+                          'nodes': nodes, 'node': node,
+                          'event_gst':event_gst.name,
+                          'Add':Add,
+                          'reschedule_time' : reschedule_time,
+                          'reschedule'    : reschedule, 
+                          'task_date' : event_task_date_reschedule,
+                          'task_attendance' : event_task_Attendance_reschedule,
+                          'marks_entry_completed' :marks_entry_completed,
+                          'Eventtype':Eventtype, 
+                           # 'property_order_list': property_order_list
+                        }
+
+  if app_set_instance_id: #only if we view details of the particular event
+    if request.user.id:
+      usr = node_collection.one({'_type':u'Author','name':unicode(request.user.username)})
+      usrid = usr._id
+ 
+
+    bbb = False
+    open_event = False
+
+    for i in node.attribute_set:
+      if unicode('start_time') in i.keys():
+        start_time = i['start_time']
+      elif unicode('end_time') in i.keys():
+        end_time = i['end_time']
+      elif unicode('is_bigbluebutton') in i.keys():
+        bbb = i['is_bigbluebutton']
+      elif unicode('open_event') in i.keys():
+        open_event = i['open_event']    
+    # st_time = node.attribute_set[0]['start_time']
+    # end_time = node.attribute_set[1]['end_time']
+    
+    now = datetime.datetime.now()
+
+    beg = start_time
+    end = end_time
+    days_left = 0
+    hours_left = 0
+    shortly = False
+
+    if now <= end and beg <= now :
+      active =  0
+    elif now > end : 
+      active = 1
+    else:
+      active = -1  
+      days_left = (start_time-now).days
+      hours_left = (start_time-now).seconds//3600
+
+      if hours_left == 0:
+        shortly = True  
+
+
+    is_attendee = False
+    is_moderator = False 
+    attendee_list = []
+    moderator_list = []   
+
+    if open_event and can_access_val:
+      is_attendee = True
+
+    for i in node.relation_set:
+      if unicode('has_attendees') in i.keys():
+        attendee_list =  i['has_attendees']
+      elif unicode('event_coordinator') in i.keys():
+        moderator_list = i['event_coordinator']
+
+    for i in moderator_list:
+      if usrid == i:
+        is_attendee = True
+        is_moderator = True
+
+    if not is_moderator:    
+      for i in attendee_list:
+        if usrid == i:
+          is_attendee = True
+          break 
+
+    url = ""      
+
+    if active == 0:      
+      createMeeting(node.name, node._id, 'welcome', 'mPW', 'aPW', SALT , URL, 'logout.html')
       
-  context_variables = { 'groupid': group_id, 
-                        'app_id': app_id,'app_collection_set': app_collection_set, 
-                        'app_set_id': app_set_id,
-                        'title':title,
-                        'nodes': nodes, 'node': node,
-                        'event_gst':event_gst.name,
-                        'Add':Add,
-                        'reschedule_time' : reschedule_time,
-                        'reschedule'    : reschedule, 
-                        'task_date' : event_task_date_reschedule,
-                        'task_attendance' : event_task_Attendance_reschedule,
-                        'marks_entry_completed' :marks_entry_completed,
-                        'Eventtype':Eventtype, 
-                         # 'property_order_list': property_order_list
-                      }
+      if is_moderator:
+        url = joinURL(node._id, request.user, 'mPW', SALT, URL)
+      else:
+        url = joinURL(node._id, request.user, 'aPW', SALT, URL)        
+
+    extra_context_variables = {'show':is_attendee,
+                          'url':url,
+                          'active':active,
+                          'days_left':days_left,
+                          'is_bbb': bbb,
+                          'shortly':shortly,
+                          'hours_left':hours_left, 
+                          'open_event':open_event,
+                        }
+    context_variables.update(extra_context_variables)
 
   
   if batch :
@@ -295,7 +380,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       elif attr and u"max_marks" in attr:
         session_max_marks = attr[u"max_marks"]
     context_variables.update({'session_min_marks':session_min_marks})
-    context_variables.update({'session_max_marks':session_max_marks})
+    context_variables.update({'session_max_marks':session_max_marks})   
 
   return render_to_response(template, 
                               context_variables,
@@ -311,35 +396,14 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   View for handling Event and it's sub-types create-edit-view
   """
   auth = None
-  # if ObjectId.is_valid(group_id) is False :
-  #   group_ins = node_collection.one({'_type': "Group","name": group_id})
-  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #   if group_ins:
-  #     group_id = str(group_ins._id)
-  #   else :
-  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-  #     if auth :
-  #       group_id = str(auth._id)
-  # else :
-  #   pass
-  try:
-        group_id = ObjectId(group_id)
-  except:
-        group_name, group_id = get_group_name_id(group_id)
-  ''' 
-  app = None
-  if app_id is None:
-    app = node_collection.one({'_type': "GSystemType", 'name': app_name})
-    if app:
-      app_id = str(app._id)
-  else:
-    app = node_collection.one({'_id': ObjectId(app_id)})
 
-  app_name = app.name 
-  '''
+  try:
+        group_id = ObjectId(group_id) #group_id is a valid ObjectId
+  except:
+        group_name, group_id = get_group_name_id(group_id) #instead of group_id the name of the object is passed via URL to the function
+  group_obj = node_collection.one({'_id': group_id})
   app_set = ""
-  app_collection_set = []
-  title = ""
+  title = ""    #Stores the name of the type of event such as Meeting, Inauguration, etc.
   session_of=""
   module=""
   Add=""
@@ -352,53 +416,42 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
   template_prefix = "mis"
 
-  '''if request.user:
-    if auth is None:
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
-    agency_type = auth.agency_type
-    Event_Types = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
-    if Event_Types:
-      for eachset in Event_Types.collection_set:
-        app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
-  '''
-
   group_inverse_rel_id = [] 
-  Group_type=node_collection.one({'_id':ObjectId(group_id)})
+  Group_type=node_collection.one({'_id':ObjectId(group_id)}) #instance of the group object in which the event is created e.g. "home" is a group
   for i in Group_type.relation_set:
        if unicode("group_of") in i.keys():
           group_inverse_rel_id = i['group_of']
   Group_name = node_collection.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
   Eventtype='Eventtype'
+
   if Group_name:
 
       if (any( unicode('has_group') in d for d in Group_name.relation_set)) == True:
            Eventtype='CollegeEvents'     
       else:
            Eventtype='Eventtype'
+
   Glisttype=node_collection.find({"_type": "GSystemType", "name":"GList"})
-  Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":Eventtype},{'collection_set': 1})
-  app_collection_set=[]
+  Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":Eventtype},{'collection_set': 1}) #Stores the object ids of all the types of events e.g. Meeting, Inauguration, ...
+  app_collection_set=[] #stores the id, name and type_of for all event types (Meeting, Inauguration, etc.) as a list
   if Event_Types:
     for eachset in Event_Types.collection_set:
           app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
-  # for eachset in app.collection_set:
-  #   app_collection_set.append(node_collection.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
   iteration=request.POST.get("iteration","")
   if iteration == "":
         iteration=1
-  
         
   for i in range(int(iteration)):
    if app_set_id:
-     event_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+     event_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1}) #GSystemType Object for the event corresponding to app_set_id e.g. Meeting
      title = event_gst.name
-     event_gs = node_collection.collection.GSystem()
-     event_gs.member_of.append(event_gst._id)
+     event_gs = node_collection.collection.GSystem() #create a new GSystem Object for the Event
+     event_gs.member_of.append(event_gst._id) #event_gs is a member_of event_gst
 
-   if app_set_instance_id:
+   if app_set_instance_id: #app_set_instance_id is the objectid of the event object which is already created
      event_gs = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
-   property_order_list = get_property_order_with_value(event_gs)#.property_order
+   property_order_list = get_property_order_with_value(event_gs) #.property_order #stores the properties defining a particular event in a list e.g. name, start_time, attendees, etc..
    
    if request.method == "POST":
     # [A] Save event-node's base-field(s)
@@ -417,15 +470,24 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
             field_value=request.POST.get('start_time'+"_"+str(i),'')  
         else:
             field_value = request.POST.get('start_time','')
+        # print "----------------Field Value-----------"
+        # print field_value
         if event_gst.name == "Exam":
            name = "Exam" + "--" + slugify(request.POST.get("batch_name","")) + "--" + field_value 
         else:
            name= "Class" + "--"+ slugify(request.POST.get("course_name","")) + "--" + field_value
+        # print "-----------------Name------------------"
+        # print name
         event_gs.name=name 
-    
+
+    # if request.POST.get("is_bigbluebutton") == unicode("Yes"):
+    #   event_gs.is_bigbluebutton = True
+    # else:
+    #   event_gs.is_bigbluebutton = False  
+
     event_gs.save(is_changed=is_changed,groupid=group_id)
     # print "\n Event: ", event_gs._id, " -- ", event_gs.name, "\n"
-  
+    check_attendee = True
     # [B] Store AT and/or RT field(s) of given event-node (i.e., event_gs)
     for tab_details in property_order_list:
       for field_set in tab_details[1]:
@@ -435,8 +497,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
         # * Fetch only Attribute field(s) / Relation field(s)
         
-        if field_set.has_key('_id'):
-          field_instance = node_collection.one({'_id': field_set['_id']})
+        if field_set.has_key('_id'): #Implies field_set is not a basefield but is an AT/RT
+          field_instance = node_collection.one({'_id': field_set['_id']})#field_instance is an instance for AT or RT e.g. start_time
           field_instance_type = type(field_instance)
 
           if field_instance_type in [AttributeType, RelationType]:
@@ -444,9 +506,10 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
             if field_instance["name"] == "attendees":
               continue
 
-            field_data_type = field_set['data_type']
+            field_data_type = field_set['data_type'] #data type of AT/RT e.g. datetime.datetime for start_time
 
             # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
+            open_event = False
             if field_instance_type == AttributeType:
               if "File" in field_instance["validators"]:
                 # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
@@ -484,25 +547,29 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               
               if field_value:
                 event_gs_triple_instance = create_gattribute(event_gs._id, node_collection.collection.AttributeType(field_instance), field_value)
+                # print "--------------------------------------------------------------------------------------------------"
                 # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
-            else:
+              if field_instance["name"] == 'open_event':
+                open_event = field_value
+
+            else: #field_instance_type == RelationType
               field_value_list = request.POST.getlist(field_instance["name"])
               # field_instance_type = "GRelation"
               #code for creation of relation Session of 
               for i, field_value in enumerate(field_value_list):
-                field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
+                try:
+                  field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
+                except:
+                   field_value = parse_template_data(ObjectId, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
                 field_value_list[i] = field_value
               if field_value_list:
-                event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), field_value_list)
-              # if isinstance(event_gs_triple_instance, list):
-              #   print "\n"
-              #   for each in event_gs_triple_instance:
-              #     print " event_gs_triple_instance: ", each._id, " -- ", each.name
-              #   print "\n"
+                if field_instance["name"] == "has_attendees" and open_event == "False":
+                    send_event_notif_to_all_grp_members(group_obj, app_set_id, event_gs)
+                else:
+                  event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), field_value_list)
 
-              # else:
-              #   print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
+    # End of for loop on property_order_list
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     '''return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))'''
     if event_gst.name == u'Classroom Session' or event_gst.name == u'Exam':
@@ -511,52 +578,15 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
           return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
   
     else:
-          to_user_list = []
-          event_organizer_str = ""
-          event_coordinator_str = ""
-          event_organized_by = []
-          event_coordinator = []
+          event_attendees = []
           event_node = node_collection.one({'_id':ObjectId(event_gs._id)})
           for i in event_node.relation_set:
-             if unicode('event_organised_by') in i.keys():
-                event_organized_by = i['event_organised_by']
              if unicode('has_attendees') in i.keys():
                 event_attendees = i['has_attendees']
-             if unicode('event_coordinator') in i.keys():
-                event_coordinator = i['event_coordinator'] 
-          event_url = "/"+str(group_id)+"/event/"+str(app_set_id) +"/"+str(event_node._id)
-          site = Site.objects.get(pk=1)
-          site = site.name.__str__()
-          event_link = "http://" + site + event_url
-          event_organized_by_cur = node_collection.find({"_id":{'$in':event_organized_by}})
-          event_coordinator_cur = node_collection.find({"_id":{'$in':event_coordinator}})
-          for i in event_coordinator_cur:
-              event_coordinator_str = event_coordinator_str + i.name + "  "
-          for i in event_organized_by_cur:
-              event_organizer_str = event_coordinator_str + i.name + "  "     
-          for j in event_attendees:
-                      auth = node_collection.one({"_id":ObjectId(j)})
-                      user_obj = User.objects.get(id=auth.created_by)
-                      if user_obj not in to_user_list:
-                              to_user_list.append(user_obj)
-                      render_label = render_to_string(
-                            "notification/label.html",
-                            {
-                                "sender": "metaStudio",
-                                "activity": "Event Created",
-                                "conjunction": "-"
-                            })
-          if event_organized_by:
-             msg_string = "\n Event is organized by " + str ( event_organizer_str ) 
-          else:
-             msg_string = "" 
-          notification.create_notice_type(render_label,"Invitation for Event"+ " " + str(event_node.name) + msg_string   + "\n Event will be co-ordinated by " +str (event_coordinator_str) 
-                        + "\n- Please click [[" + event_link + "][here]] to view the details of the event" , "notification")
-          notification.send(to_user_list, render_label, {"from_user":"metaStudio"})
-
+          send_event_notif_to_all_grp_members(group_obj, app_set_id, event_gs, event_attendees)
           return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_node._id}))
-  event_attendees = request.POST.getlist('has_attendees','')
 
+  event_attendees = request.POST.getlist('has_attendees','')
   
   event_gs.get_neighbourhood(event_gs.member_of)
   course=[]
@@ -642,5 +672,61 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                               context_variables,
                               context_instance = RequestContext(request)
                             )
-  
-  
+
+def send_event_notif_to_all_grp_members(group_obj, app_set_id, event_node, user_list):
+   group_id = group_obj._id
+   to_user_list = []
+   event_organizer_str = ""
+   event_coordinator_str = ""
+   event_organized_by = []
+   event_attendees = []
+   event_coordinator = []
+   for i in event_node.relation_set:
+      if unicode('event_organised_by') in i.keys():
+         event_organized_by = i['event_organised_by']
+      if unicode('has_attendees') in i.keys():
+         event_attendees = i['has_attendees']
+      if unicode('event_coordinator') in i.keys():
+         event_coordinator = i['event_coordinator'] 
+   try:
+      event_url = "/"+str(group_id)+"/event/"+str(app_set_id) +"/"+str(event_node._id)
+      site = Site.objects.get(pk=1)
+      site = site.name.__str__()
+      event_link = "http://" + site + event_url
+      event_organized_by_cur = node_collection.find({"_id":{'$in':event_organized_by}})
+      event_coordinator_cur = node_collection.find({"_id":{'$in':event_coordinator}})
+      for i in event_coordinator_cur:
+          event_coordinator_str = event_coordinator_str + i.name + "  "
+      for i in event_organized_by_cur:
+          event_organizer_str = event_coordinator_str + i.name + "  "     
+      render_label = render_to_string(
+                        "notification/label.html",
+                        {
+                            "sender": "metaStudio",
+                            "activity": "Event Created",
+                            "conjunction": "-"
+                        })
+      if user_list:
+          for j in event_attendees:
+                      auth = node_collection.one({"_id":ObjectId(j)})
+                      user_obj = User.objects.get(id=auth.created_by)
+                      if user_obj not in to_user_list:
+                              to_user_list.append(user_obj)
+      else:
+          for each_member in group_obj.author_set:
+                      user_obj = User.objects.get(id=each_member)
+                      if user_obj not in to_user_list:
+                              to_user_list.append(user_obj)
+       
+      if event_organized_by:
+         msg_string = "\n Event is organized by " + str ( event_organizer_str ) 
+      else:
+         msg_string = "" 
+
+      message_string = "Invitation for Event"+ " " + str(event_node.name) + msg_string   + "\n Event will be co-ordinated by " +str (event_coordinator_str) + "\n- Please click [[" + event_link + "][here]] to view the details of the event"
+      notification.create_notice_type(render_label, message_string, "notification") ##This is sent via email to all attendees in the group
+      notification.send(to_user_list, render_label, {"from_user":"metaStudio"})
+   except Exception as mailerror:
+      error_msg = "Unable to send notifications!!!  ", str(mailerror)
+      # print error_msg
+      pass

@@ -343,4 +343,30 @@
       });
     }
 
+  // All members of group or selected invitees
+  
+    $(document).ready(function () {
+
+    var tim = 1000  
+
+    $('#open_eventYes').click(function()
+          {
+   
+   $('label[for="has_attendees"]').fadeOut(tim);
+   $('#has_attendees').fadeOut(tim);
+   $('#has_attendees').removeAttr("required");
+   $('#panel_Basic').find('.small-5').find('#has_attendees').next().next().next().fadeOut(tim);
+   $('#panel_Basic').find('.small-5').find('#has_attendees').next().fadeOut(tim);
+        });
+
+      $('#open_eventNo').click(function()
+        {
+  $('label[for="has_attendees"]').fadeIn(tim);
+  $('#has_attendees').fadeIn(tim);
+  $('#has_attendees').attr({"required":""});
+  $('#panel_Basic').find('.small-5').find('#has_attendees').next().next().next().fadeIn(tim);
+  $('#panel_Basic').find('.small-5').find('#has_attendees').next().fadeIn(tim);
+  });         
+    });
+
 {% endblock %}	
