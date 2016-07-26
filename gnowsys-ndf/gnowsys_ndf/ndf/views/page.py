@@ -15,7 +15,7 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext
-
+from mongokit import paginator
 try:
   from bson import ObjectId
 except ImportError:  # old pymongo
@@ -55,7 +55,7 @@ app = gst_page
 
 
 @get_execution_time
-def page(request, group_id, app_id=None):
+def page(request, group_id, app_id=None,page_no=1):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
     try:
@@ -67,7 +67,7 @@ def page(request, group_id, app_id=None):
         app_ins = node_collection.find_one({'_type': "GSystemType", "name": "Page"})
         if app_ins:
             app_id = str(app_ins._id)
-
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     content=[]
     version=[]
     con=[]
@@ -107,12 +107,13 @@ def page(request, group_id, app_id=None):
                                             'group_set': {'$all': [ObjectId(group_id)]},
                                             'status': {'$nin': ['HIDDEN']}
                                         }).sort('last_update', -1)
-
+        paginator_pages = paginator.Paginator(page_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
         return render_to_response("ndf/page_list.html",
                                   {'title': title,
                                    'appId':app._id,'shelf_list': shelf_list,'shelves': shelves,
                                    'searching': True, 'query': search_field,
-                                   'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
+                                   'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id,
+                                   'page_info':paginator_pages
                                   },
                                   context_instance=RequestContext(request)
         )
@@ -141,13 +142,15 @@ def page(request, group_id, app_id=None):
                                                ],
                                                'status': {'$nin': ['HIDDEN']}
                                            }).sort('last_update', -1)
+        paginator_pages = paginator.Paginator(page_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
         return render_to_response("ndf/page_list.html",
                                           {'title': title,
                                            'appId':app._id,
                                            'shelf_list': shelf_list,'shelves': shelves,
                                            'page_nodes': page_nodes,
                                            'groupid':group_id,
-                                           'group_id':group_id
+                                           'group_id':group_id,
+                                           'page_info':paginator_pages
                                           },
                                           context_instance=RequestContext(request))
 
