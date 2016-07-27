@@ -18,7 +18,7 @@ import json
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
 from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES
-from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
+from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
@@ -69,72 +69,116 @@ ins_objectid = ObjectId()
 def get_execution_time(f):
    if BENCHMARK == 'ON':
 
-	    def wrap(*args,**kwargs):
-	        time1 = time.time()
-	        total_parm_size = 0
-	        for key, value in kwargs.iteritems():
-	           total_parm_size = total_parm_size + getsizeof(value)
-	        total_param = len(kwargs)
-	        ret = f(*args,**kwargs)
-	        t2 = time.clock()
-	        time2 = time.time()
-	        time_diff = time2 - time1
-	        benchmark_node =  col.Benchmark()
-	        benchmark_node.time_taken = unicode(str(time_diff))
-	        benchmark_node.name = unicode(f.func_name)
-	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
-	        try :
-	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
-	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
-	        except :
-	        	pass
-	        try :
-	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
-	        except :
-	        	pass
-	        try :
-	        	benchmark_node.user = unicode(args[0].user.username)
-	        except :
-	        	pass
-	        benchmark_node.parameters = unicode(total_param)
-	        benchmark_node.size_of_parameters = unicode(total_parm_size)
-	        benchmark_node.last_update = datetime.today()
-	        try:
-	        	benchmark_node.calling_url = unicode(args[0].path)
-	        	url = benchmark_node.calling_url.split("/")
+        def wrap(*args,**kwargs):
+            time1 = time.time()
+            total_parm_size = 0
+            for key, value in kwargs.iteritems():
+               total_parm_size = total_parm_size + getsizeof(value)
+            total_param = len(kwargs)
+            ret = f(*args,**kwargs)
+            t2 = time.clock()
+            time2 = time.time()
+            time_diff = time2 - time1
+            benchmark_node =  col.Benchmark()
+            benchmark_node.time_taken = unicode(str(time_diff))
+            benchmark_node.name = unicode(f.func_name)
+            benchmark_node.has_data = { "POST" : 0, "GET" : 0}
+            try :
+                benchmark_node.has_data["POST"] = bool(args[0].POST)
+                benchmark_node.has_data["GET"] = bool(args[0].GET)
+            except :
+                pass
+            try :
+                benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
+            except :
+                pass
+            try :
+                benchmark_node.user = unicode(args[0].user.username)
+            except :
+                pass
+            benchmark_node.parameters = unicode(total_param)
+            benchmark_node.size_of_parameters = unicode(total_parm_size)
+            benchmark_node.last_update = datetime.today()
+            try:
+                benchmark_node.calling_url = unicode(args[0].path)
+                url = benchmark_node.calling_url.split("/")
 
-	        	if url[1] != "" :
-	        		group = url[1]
-	        		benchmark_node.group = group
-	        		try :
-	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
-	        			if bool(n) :
-	        				benchmark_node.group = group;
-	        		except :
-	        			group_name, group = get_group_name_id(group)
-	        			benchmark_node.group = str(group)
-	        	else :
-	        		pass
+                if url[1] != "" :
+                    group = url[1]
+                    benchmark_node.group = group
+                    try :
+                        n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+                        if bool(n) :
+                            benchmark_node.group = group;
+                    except :
+                        group_name, group = get_group_name_id(group)
+                        benchmark_node.group = str(group)
+                else :
+                    pass
 
-	        	if url[2] == "" :
-	        		benchmark_node.action = None
-	        	else :
-	        		benchmark_node.action = url[2]
-		        	if url[3] != '' :
-		        		benchmark_node.action +=  str('/'+url[3])
-		        	else :
-		        		pass
-	        	if "node_id" in args[0].GET and "collection_nav" in f.func_name:
-	        		benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
-	        		# modify calling_url if collection_nav is called i.e collection-player
-	        except :
-	        	pass
-	        benchmark_node.save()
-	        return ret
+                if url[2] == "" :
+                    benchmark_node.action = None
+                else :
+                    benchmark_node.action = url[2]
+                    if url[3] != '' :
+                        benchmark_node.action +=  str('/'+url[3])
+                    else :
+                        pass
+                if "node_id" in args[0].GET and "collection_nav" in f.func_name:
+                    benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
+                    # modify calling_url if collection_nav is called i.e collection-player
+            except :
+                pass
+            benchmark_node.save()
+           
+
+
+
+            return ret
    if BENCHMARK == 'ON':
         return wrap
    if BENCHMARK == 'OFF':
         return f
+
+def get_counter_obj(userid, groupid) :
+    counter_obj = counter_collection.one({'user_id':userid, 'group_id': groupid})
+    if not counter_obj :
+        counter_obj = counter_collection.collection.Counter()
+        counter_obj.user_id=userid
+        auth_obj= node_collection.one({'_type':'Author','created_by':userid})
+        counter_obj.auth_id=ObjectId(auth_obj._id)
+        counter_obj.group_id=ObjectId(groupid)
+        counter_obj.last_update=datetime.today()
+        counter_obj.enrolled = False
+        counter_obj.save()
+    return counter_obj
+
+def update_notes_or_files_visited(user_id, group_id,node_id,if_file,if_note) :
+    counter_obj = get_counter_obj(user_id, group_id)
+    if if_file:
+        file_node_obj = node_collection.one({'_id': node_id})
+        file_creator_id = file_node_obj.created_by
+        if file_creator_id != user_id :
+            counter_obj.no_others_files_visited += 1
+            counter_obj_creator = get_counter_obj(file_creator_id, group_id)
+            counter_obj_creator.no_visits_gained_on_files += 1
+            counter_obj_creator.last_update = datetime.today()
+            counter_obj_creator.save()
+
+    elif if_note:
+        note_node_obj = node_collection.one({'_id':node_id})
+        note_creator_id = note_node_obj.created_by
+        if note_creator_id != user_id :
+            counter_obj.no_others_notes_visited += 1
+            counter_obj_creator = get_counter_obj(note_creator_id, group_id)
+            counter_obj_creator.no_views_gained_on_notes += 1
+            counter_obj_creator.last_update = datetime.today()
+            counter_obj_creator.save()
+
+
+    counter_obj.last_update = datetime.today()
+    counter_obj.save()
+    
 
 import json
 import bson
@@ -5599,6 +5643,7 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
       result_dict['modules_total_count'] = all_modules_of_grp.count()
       result_dict['units_completed_count'] = completed_units_cur.count()
       result_dict['units_total_count'] = all_units_of_grp.count()
+      
 
       result_dict.update({'success': False})
       # print "\n\nresult_dict == ",result_dict

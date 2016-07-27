@@ -687,6 +687,7 @@ class Node(DjangoDocument):
                     if each_invalid_field in self:
                         print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
 
+
         except Exception, e:
             print e
             pass
@@ -2452,7 +2453,7 @@ class HistoryManager():
         (b) False - Otherwise
         """
 
-        collection_tuple = (MetaType, GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation, Filehive, Buddy)
+        collection_tuple = (MetaType, GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation, Filehive, Buddy, Counter)
         file_res = False    # True, if no error/exception occurred
 
         if document_object is not None and \
@@ -3456,6 +3457,144 @@ class allLinks(DjangoDocument):
     # required_fields = ['member_of', 'link']
     use_dot_notation = True
 """
+@connection.register
+class Counter(DjangoDocument):
+
+    collection_name = 'Counters'
+
+    structure = {
+       '_type': unicode, # check required: required field, Possible
+                          # values are to be taken only from the list
+                          # NODE_TYPE_CHOICES
+        #'username': unicode,
+        #'institute_id': GSTUDIO_INSTITUTE_ID
+        'user_id': int,
+        'auth_id': ObjectId,
+        'group_id':ObjectId, #course_id
+        'last_update': datetime.datetime,
+        'enrolled':bool,
+        'modules_completed':int,
+        'course_score':int,
+        'units_completed':int,
+
+        #interactions
+        'no_comments_by_user':int,
+        'no_comments_for_user':int,
+
+        #files 
+        'no_files_created':int,
+        'no_visits_gained_on_files':int, # benchmark
+        'no_comments_received_on_files':int,
+        'no_others_files_visited':int,# benchmark
+        'no_comments_on_others_files':int,
+        'comments_by_others_on_files': dict,
+        'rating_count_received_on_files': int,
+        'avg_rating_received_on_files':float,
+
+        #quiz
+        'no_questions_attempted':int,
+        'no_correct_answers':int,
+        'no_incorrect_answers':int,
+
+        #notes
+        'no_notes_written':int,
+        'no_views_gained_on_notes':int, # benchmark
+        'no_others_notes_visited':int, # benchmark
+        'no_comments_received_on_notes':int,
+        'no_comments_on_others_notes':int,
+        'comments_by_others_on_notes': dict,
+        'rating_count_received_on_notes': int,
+        'avg_rating_received_on_notes':float,
+    }
+
+    indexes = [
+        {
+            # 1: Compound index
+            'fields': [
+                ('user_id', INDEX_ASCENDING), ('group_id', INDEX_ASCENDING)
+            ]
+        }, 
+    ]
+
+    required_fields = ['user_id', 'group_id', 'auth_id'] 
+    
+    default_values = {
+        'no_comments_by_user': 0,
+        'no_comments_for_user':0,
+        'no_files_created':0,
+        'no_visits_gained_on_files':0,
+        'no_comments_received_on_files':0,
+        'no_others_files_visited':0,
+        'no_comments_on_others_files':0,
+        'rating_count_received_on_files': 0,
+        'avg_rating_received_on_files':0.0,
+        'no_questions_attempted':0,
+        'no_correct_answers':0,
+        'no_incorrect_answers':0,
+        'no_notes_written':0,
+        'no_views_gained_on_notes':0,
+        'no_others_notes_visited':0, 
+        'no_comments_received_on_notes':0,
+        'no_comments_on_others_notes':0,
+        'rating_count_received_on_notes': 0,
+        'avg_rating_received_on_notes':0.0,
+        'modules_completed':0,
+        'course_score':0,
+        'units_completed':0
+    }
+    
+    use_dot_notation = True
+    def __unicode__(self):
+        return self._id
+
+    def identity(self):
+        return self.__unicode__()
+
+    def save(self, *args, **kwargs):
+
+        is_new = False if ('_id' in self) else True
+
+        super(Counter, self).save(*args, **kwargs)
+
+        # storing Filehive JSON in RSC system:
+        history_manager = HistoryManager()
+        rcs_obj = RCS()
+
+        if is_new:
+
+            # Create history-version-file
+            if history_manager.create_or_replace_json_file(self):
+                fp = history_manager.get_file_path(self)
+                message = "This document of Counter is created on " + str(datetime.datetime.now())
+                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+        else:
+            # Update history-version-file
+            fp = history_manager.get_file_path(self)
+
+            try:
+                rcs_obj.checkout(fp)
+
+            except Exception as err:
+                try:
+                    if history_manager.create_or_replace_json_file(self):
+                        fp = history_manager.get_file_path(self)
+                        message = "This document of Counter is re-created on " + str(datetime.datetime.now())
+                        rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+                except Exception as err:
+                    print "\n DocumentError: This document (", self._id, ") can't be re-created!!!\n"
+                    node_collection.collection.remove({'_id': self._id})
+                    raise RuntimeError(err)
+
+            try:
+                if history_manager.create_or_replace_json_file(self):
+                    message = "This document of Counter is lastly updated on " + str(datetime.datetime.now())
+                    rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+
+            except Exception as err:
+                print "\n DocumentError: This document (", self._id, ") can't be updated!!!\n"
+                raise RuntimeError(err)
 
 # DATABASE Variables
 db = get_database()
@@ -3465,8 +3604,9 @@ triple_collection   = db[Triple.collection_name].Triple
 benchmark_collection= db[Benchmark.collection_name]
 filehive_collection = db[Filehive.collection_name].Filehive
 buddy_collection    = db[Buddy.collection_name].Buddy
-
+counter_collection  = db[Counter.collection_name].Counter
 gridfs_collection   = db["fs.files"]
 chunk_collection    = db["fs.chunks"]
 
 import signals
+

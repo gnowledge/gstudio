@@ -23,13 +23,13 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import LANGUAGES
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_NAME, GSTUDIO_NOTE_CREATE_POINTS
 from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_execution_time,parse_data
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_execution_time,parse_data,get_counter_obj
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string, node_thread_access
@@ -226,12 +226,15 @@ def create_edit_page(request, group_id, node_id=None):
         page_name = request.POST.get('name', '')
         # print "====== page_name: ", page_name
         if page_name.strip().lower() in node_list and not node_id:
+            new_page=False
             return render_to_response("error_base.html",
                                       {'message': 'Page with same name already exists in the group!'},
                                       context_instance=RequestContext(request))
         elif node_id:
+            new_page = False
             page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
         else:
+            new_page = True
             page_node = node_collection.collection.GSystem()
 
         # page_type = request.POST.getlist("type_of",'')
@@ -331,6 +334,14 @@ def create_edit_page(request, group_id, node_id=None):
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
         if "CourseEventGroup" in group_obj.member_of_names_list and blog_type:
+            counter_obj=get_counter_obj(request.user.id,ObjectId(group_id))
+            if new_page:
+              counter_obj.no_notes_written=counter_obj.no_notes_written+1
+              counter_obj.course_score += GSTUDIO_NOTE_CREATE_POINTS
+              counter_obj.last_update = datetime.datetime.now()
+              counter_obj.save()
+          #add code for creation of new note counter
+
             return HttpResponseRedirect(reverse('course_notebook_tab_note',
                                     kwargs={
                                             'group_id': group_id,

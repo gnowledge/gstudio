@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM, GSTUDIO_FILE_UPLOAD_POINTS
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import NodeJSONEncoder,node_collection, triple_collection
@@ -1590,6 +1590,16 @@ class EventGroupCreateEditHandler(View):
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
+                    # creating a new counter document for a user for a given course for the purpose of analytics
+                    counter_obj = counter_collection.collection.Counter()
+                    counter_obj.user_id=request.user.id
+                    auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
+                    counter_obj.auth_id=ObjectId(auth_obj._id)
+                    counter_obj.group_id=ObjectId(group_obj._id)
+                    counter_obj.last_update=datetime.today()
+                    counter_obj.enrolled = True
+                    counter_obj.save()
+
                 # elif sg_type == "ProgramEventGroup":
                     # mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
                 mod_group.set_logo(request,group_obj,logo_rt = "has_profile_pic")
@@ -2650,10 +2660,16 @@ def upload_using_save_file(request,group_id):
         create_gattribute(each_gs_file._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
 
-    if title == "gallery":
-        return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
-    elif title == "raw material":
-        return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
+    if title =="gallery" or title == "raw material":
+        counter_obj=get_counter_obj(request.user.id,group_id)
+        counter_obj.no_files_created+=1
+        counter_obj.course_score+=GSTUDIO_FILE_UPLOAD_POINTS
+        counter_obj.last_update = datetime.today()
+        counter_obj.save()
+        if title == "gallery":
+            return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
+        else:
+            return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     else:
         return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
     # return HttpResponseRedirect(url_name)

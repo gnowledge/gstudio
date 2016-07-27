@@ -9,6 +9,7 @@ from gnowsys_ndf.settings import *
 node_collection_ids = set()
 triple_collection_ids = set()
 filehives_collection_ids = set()
+counter_collection_ids = set()
 filehives_media_urls = set()
 build_rcs = set()
 rcs_paths_found = set()
@@ -32,6 +33,7 @@ class Command(BaseCommand):
         group_node = node_collection.one({"_type":"Group","_id":ObjectId(group_id)}) 
         if group_node:
             print "\n Initializing Dump of : ", group_node.name
+            get_counter_ids(group_node._id)
             nodes_falling_under_grp = node_collection.find({"group_set":ObjectId(group_node._id)})
             for each_node in nodes_falling_under_grp:
                 node_collection_ids.add(each_node._id)  
@@ -105,6 +107,13 @@ class Command(BaseCommand):
                 print "*"*90
                 dump_node_ids(filehives_collection_ids,'filehive_collection')
 
+                # rcs of Counter collection
+                print "*"*90
+                print "\n--- Restoring Counters RCS --- "
+                print "*"*90
+                dump_node_ids(counter_collection_ids,'counter_collection')
+
+
 
 
                 # Copy media file to /data/media location
@@ -138,13 +147,14 @@ class Command(BaseCommand):
                 log_file.write("######### Script ran on : " + time.strftime("%c") + " #########\n\n")
 
                 log_file.write("\n*************************************************************")
-                log_file.write("\n\nTotal Migrations Expected: "+ str(len(node_collection_ids) + len(triple_collection_ids) + len(filehives_collection_ids) + len(filehives_media_urls)))
+                log_file.write("\n\nTotal Migrations Expected: "+ str(len(node_collection_ids) + len(triple_collection_ids) + len(filehives_collection_ids) + len(filehives_media_urls) + len(counter_collection_ids)))
 
                 log_file.write("\n*************************************************************")
                 log_file.write("\n\nNodes Migrations Expected: "+ str(len(node_collection_ids)))
                 log_file.write("\n\nTriple Migrations Expected: "+ str(len(triple_collection_ids)))
                 log_file.write("\n\nFilehives Migrations Expected: "+ str(len(filehives_collection_ids)))
                 log_file.write("\n\nFile Media Migrations Expected: "+ str(len(filehives_media_urls)))
+                log_file.write("\n\nCounters Migrations Expected: "+ str(len(counter_collection_ids)))
 
                 log_file.write("\n*************************************************************")
                 log_file.write("\n\nSuccessful Migrations: "+ str(len(rcs_paths_found)))
@@ -196,6 +206,11 @@ def get_nested_ids(node,field_name):
             if each_node and each_node[field_name]:
                 get_nested_ids(each_node, field_name)
 
+def get_counter_ids(group_id) :
+    counter_collection_cur = counter_collection.find({'group_id':ObjectId(group_id)})
+    if counter_collection_cur :
+        for each_obj in counter_collection_cur :
+            counter_collection_ids.add(each_obj._id)
 
 def dump_node_ids(list_of_ids,collection_name):
     print "\n In dump_node_ids"
@@ -209,6 +224,8 @@ def dump_node_ids(list_of_ids,collection_name):
                 each_node_by_id = triple_collection.find_one({"_id":ObjectId(each_id_of_list)})
             elif collection_name == "filehive_collection":
                 each_node_by_id = filehive_collection.find_one({"_id":ObjectId(each_id_of_list)})
+            elif collection_name == "counter_collection":
+                each_node_by_id = counter_collection.find_one({"_id":ObjectId(each_id_of_list)})  
             if each_node_by_id:
                 path = historyMgr.get_file_path(each_node_by_id)
                 path = path + ",v"
