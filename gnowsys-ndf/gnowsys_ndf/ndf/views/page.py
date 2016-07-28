@@ -24,12 +24,12 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_NAME, GSTUDIO_NOTE_CREATE_POINTS
-from gnowsys_ndf.ndf.models import Node, GSystem, Triple
+from gnowsys_ndf.ndf.models import Node, GSystem, Triple, Counter
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_execution_time,parse_data,get_counter_obj
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_execution_time,parse_data
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string, node_thread_access
@@ -334,10 +334,12 @@ def create_edit_page(request, group_id, node_id=None):
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
         if "CourseEventGroup" in group_obj.member_of_names_list and blog_type:
-            counter_obj=get_counter_obj(request.user.id,ObjectId(group_id))
+            counter_obj = Counter.get_counter_obj(request.user.id,ObjectId(group_id))
             if new_page:
-              counter_obj.no_notes_written=counter_obj.no_notes_written+1
-              counter_obj.course_score += GSTUDIO_NOTE_CREATE_POINTS
+              # counter_obj.no_notes_written=counter_obj.no_notes_written+1
+              counter_obj['page']['blog']['created'] += 1
+              # counter_obj.course_score += GSTUDIO_NOTE_CREATE_POINTS
+              counter_obj['group_points'] += GSTUDIO_NOTE_CREATE_POINTS
               counter_obj.last_update = datetime.datetime.now()
               counter_obj.save()
           #add code for creation of new note counter

@@ -24,7 +24,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM, GSTUDIO_FILE_UPLOAD_POINTS
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.models import NodeJSONEncoder,node_collection, triple_collection
+from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter
 from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 # from gnowsys_ndf.ndf.models import c
@@ -1591,13 +1591,20 @@ class EventGroupCreateEditHandler(View):
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
                     # creating a new counter document for a user for a given course for the purpose of analytics
-                    counter_obj = counter_collection.collection.Counter()
-                    counter_obj.user_id=request.user.id
                     auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
-                    counter_obj.auth_id=ObjectId(auth_obj._id)
-                    counter_obj.group_id=ObjectId(group_obj._id)
-                    counter_obj.last_update=datetime.today()
-                    counter_obj.enrolled = True
+
+                    counter_obj = counter_collection.collection.Counter()
+                    counter_obj.fill_counter_values(
+                                                    user_id=request.user.id,
+                                                    auth_id=auth_obj._id,
+                                                    group_id=group_id._id,
+                                                    is_group_member=True
+                                                )
+                    # counter_obj.user_id=request.user.id
+                    # counter_obj.auth_id=ObjectId(auth_obj._id)
+                    # counter_obj.group_id=ObjectId(group_obj._id)
+                    # counter_obj.last_update=datetime.today()
+                    # counter_obj.enrolled = True
                     counter_obj.save()
 
                 # elif sg_type == "ProgramEventGroup":
@@ -2661,10 +2668,10 @@ def upload_using_save_file(request,group_id):
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
 
     if title =="gallery" or title == "raw material":
-        counter_obj=get_counter_obj(request.user.id,group_id)
-        counter_obj.no_files_created+=1
-        counter_obj.course_score+=GSTUDIO_FILE_UPLOAD_POINTS
-        counter_obj.last_update = datetime.today()
+        counter_obj = Counter.get_counter_obj(request.user.id, group_id)
+        counter_obj['file']['created'] += 1
+        counter_obj['group_points'] += GSTUDIO_FILE_UPLOAD_POINTS
+        counter_obj.last_update = datetime.now()
         counter_obj.save()
         if title == "gallery":
             return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
