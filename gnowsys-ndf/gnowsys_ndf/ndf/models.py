@@ -24,8 +24,7 @@ from django_mongokit import get_database
 from django_mongokit.document import DjangoDocument
 from django.core.files.images import get_image_dimensions
 
-from mongokit import IS
-from mongokit import OR
+from mongokit import IS, OR
 from mongokit import INDEX_ASCENDING, INDEX_DESCENDING
 
 try:
@@ -3446,65 +3445,95 @@ class node_holder(DjangoDocument):
         required_fields = ['details_to_hold']
         use_dot_notation = True
 
-"""
-@connection.register
-class allLinks(DjangoDocument):
-    structure = {
-	'member_of':ObjectId,
-	'link':unicode,
-	'required_for':unicode,
-    }
-    # required_fields = ['member_of', 'link']
-    use_dot_notation = True
-"""
+
 @connection.register
 class Counter(DjangoDocument):
 
     collection_name = 'Counters'
 
+    default_resource_stats = {
+        'created' : 0,  # no of files/pages/any-app's instance created
+
+        'visitors_gained': 0, # Count of unique visitors(user's) not total visits
+        'visits_on_others_res':  0, # count of visits not resources
+
+        'comments_gained':  0,  # Count of comments not resources
+        'commented_on_others_res':  0, # count of resources not comments
+        'comments_by_others_on_res': {},
+
+        'avg_rating_gained': 0,  # total_rating/rating_count_received
+        'rating_count_received': int,
+    }
+
     structure = {
-       '_type': unicode, # check required: required field, Possible
-                          # values are to be taken only from the list
-                          # NODE_TYPE_CHOICES
-        #'username': unicode,
-        #'institute_id': GSTUDIO_INSTITUTE_ID
+       '_type': unicode,
         'user_id': int,
         'auth_id': ObjectId,
-        'group_id':ObjectId, #course_id
+        'group_id': ObjectId,
         'last_update': datetime.datetime,
-        'enrolled':bool,
-        'modules_completed':int,
-        'course_score':int,
-        'units_completed':int,
 
-        #interactions
-        'no_comments_by_user':int,
-        'no_comments_for_user':int,
+        # 'enrolled':bool,
+        'is_group_member': bool,
+        # 'course_score':int,
+        'group_points': int,
 
-        #files 
-        'no_files_created':int,
-        'no_visits_gained_on_files':int, # benchmark
-        'no_comments_received_on_files':int,
-        'no_others_files_visited':int,# benchmark
-        'no_comments_on_others_files':int,
-        'comments_by_others_on_files': dict,
-        'rating_count_received_on_files': int,
-        'avg_rating_received_on_files':float,
+        # -- notes --
+        # 'no_notes_written':int,
+        # 'no_views_gained_on_notes':int, # benchmark
+        # 'no_others_notes_visited':int, # benchmark
+        # 'no_comments_received_on_notes':int,
+        # 'no_comments_on_others_notes':int,
+        # 'comments_by_others_on_notes': dict,
+        # 'rating_count_received_on_notes': int,
+        # 'avg_rating_received_on_notes':float,
+        'page': {'blog': dict, 'wiki': dict, 'info': dict},
 
-        #quiz
-        'no_questions_attempted':int,
-        'no_correct_answers':int,
-        'no_incorrect_answers':int,
+        # -- files --
+        # 'no_files_created':int,
+        # 'no_visits_gained_on_files':int, # benchmark
+        # 'no_comments_received_on_files':int,
+        # 'no_others_files_visited':int,# benchmark
+        # 'no_comments_on_others_files':int,
+        # 'comments_by_others_on_files': dict,
+        # 'rating_count_received_on_files': int,
+        # 'avg_rating_received_on_files':float,
+        'file': dict,
 
-        #notes
-        'no_notes_written':int,
-        'no_views_gained_on_notes':int, # benchmark
-        'no_others_notes_visited':int, # benchmark
-        'no_comments_received_on_notes':int,
-        'no_comments_on_others_notes':int,
-        'comments_by_others_on_notes': dict,
-        'rating_count_received_on_notes': int,
-        'avg_rating_received_on_notes':float,
+        # -- quiz --
+        # 'no_questions_attempted':int,
+        # 'no_correct_answers':int,
+        # 'no_incorrect_answers':int,
+        'quiz': {'attempted': int, 'correct': int, 'incorrect': int},
+
+        # -- interactions --
+        # # decided that this can be derived from addition of comments in page, file
+        # 'no_comments_by_user':int,
+        # 'no_comments_for_user':int,
+        'total_comments_by_user': int,
+
+        # Total fields should be updated on enroll action
+        # On module/unit add/delete, update 'total' fields for all users in celery
+        # 'modules_completed':int,
+        # 'units_completed':int,
+        'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}}
+    }
+
+    default_values = {
+        'last_update': datetime.datetime.now(),
+        'is_group_member': False,
+        'group_points': 0,
+        'page.blog': default_resource_stats,
+        'page.wiki': default_resource_stats,
+        'page.info': default_resource_stats,
+        'file': default_resource_stats,
+        'quiz.attempted': 0,
+        'quiz.correct': 0,
+        'quiz.incorrect': 0,
+        'total_comments_by_user': 0,
+        'course.modules.total': 0,
+        'course.modules.completed': 0,
+        'course.units.total': 0,
+        'course.units.completed': 0,
     }
 
     indexes = [
@@ -3513,42 +3542,80 @@ class Counter(DjangoDocument):
             'fields': [
                 ('user_id', INDEX_ASCENDING), ('group_id', INDEX_ASCENDING)
             ]
-        }, 
+        },
     ]
 
-    required_fields = ['user_id', 'group_id', 'auth_id'] 
-    
-    default_values = {
-        'no_comments_by_user': 0,
-        'no_comments_for_user':0,
-        'no_files_created':0,
-        'no_visits_gained_on_files':0,
-        'no_comments_received_on_files':0,
-        'no_others_files_visited':0,
-        'no_comments_on_others_files':0,
-        'rating_count_received_on_files': 0,
-        'avg_rating_received_on_files':0.0,
-        'no_questions_attempted':0,
-        'no_correct_answers':0,
-        'no_incorrect_answers':0,
-        'no_notes_written':0,
-        'no_views_gained_on_notes':0,
-        'no_others_notes_visited':0, 
-        'no_comments_received_on_notes':0,
-        'no_comments_on_others_notes':0,
-        'rating_count_received_on_notes': 0,
-        'avg_rating_received_on_notes':0.0,
-        'modules_completed':0,
-        'course_score':0,
-        'units_completed':0
-    }
-    
+    required_fields = ['user_id', 'group_id', 'auth_id']
+
+    # default_values = {
+    #     'no_comments_by_user': 0,
+    #     'no_comments_for_user':0,
+    #     'no_files_created':0,
+    #     'no_visits_gained_on_files':0,
+    #     'no_comments_received_on_files':0,
+    #     'no_others_files_visited':0,
+    #     'no_comments_on_others_files':0,
+    #     'rating_count_received_on_files': 0,
+    #     'avg_rating_received_on_files':0.0,
+    #     'no_questions_attempted':0,
+    #     'no_correct_answers':0,
+    #     'no_incorrect_answers':0,
+    #     'no_notes_written':0,
+    #     'no_views_gained_on_notes':0,
+    #     'no_others_notes_visited':0,
+    #     'no_comments_received_on_notes':0,
+    #     'no_comments_on_others_notes':0,
+    #     'rating_count_received_on_notes': 0,
+    #     'avg_rating_received_on_notes':0.0,
+    #     'modules_completed':0,
+    #     'course_score':0,
+    #     'units_completed':0
+    # }
+
     use_dot_notation = True
+
     def __unicode__(self):
         return self._id
 
     def identity(self):
         return self.__unicode__()
+
+    def fill_counter_values(self,
+                            user_id,
+                            auth_id,
+                            group_id,
+                            is_group_member=default_values['is_group_member'],
+                            group_points=default_values['group_points'],
+                            last_update=datetime.datetime.now()
+                            ):
+
+        self['user_id'] = int(user_id)
+        self['auth_id'] = ObjectId(auth_id)
+        self['group_id'] = ObjectId(group_id)
+        self['last_update'] = last_update
+
+        return self
+
+
+    @staticmethod
+    def get_counter_obj(userid, group_id) :
+
+        user_id  = int(userid)
+        group_id = ObjectId(group_id)
+
+        # query and check for existing counter obj:
+        counter_obj = counter_collection.one({'user_id': user_id, 'group_id': group_id})
+
+        # create one if not exists:
+        if not counter_obj :
+            # instantiate new counter instance
+            counter_obj = counter_collection.collection.Counter()
+            auth_obj = node_collection.one({'_type': u'Author', 'created_by': user_id})
+            counter_obj.fill_counter_values(user_id=user_id, auth_id=auth_obj._id, group_id=group_id)
+            counter_obj.save()
+
+        return counter_obj
+
 
     def save(self, *args, **kwargs):
 
