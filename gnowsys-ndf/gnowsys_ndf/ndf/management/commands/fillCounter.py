@@ -35,30 +35,38 @@ class Command(BaseCommand):
                 print "\n Group/Course: ", each_ce.name
                 users_set = each_ce.author_set
                 for each_user in users_set:
-                     user_obj = User.objects.get(pk=each_user)
-                    create_or_update_counter(user_obj,each_ce._id)
+                    user_obj_list = User.objects.filter(pk=each_user)
+                    if user_obj_list:
+                        create_or_update_counter(user_obj_list[0], each_ce._id)
+                        print "\n--- Done with processing: ", user_obj_list[0].username
+
             log_file.close()
         except Exception as fillCounterError:
-            print "\n Error occurred!!!" + str(fillCounterError)
+            print "\n Error occurred while loop over each Announced Course's author: " + str(fillCounterError)
+            pass
 
 
 def create_or_update_counter(user_obj, group_id):
 
+    # import ipdb; ipdb.set_trace()
     counter_obj = counter_collection.one({'user_id': user_obj.id, 'group_id': group_id})
-
     if not counter_obj:
-        log_file.write("\n\nCreating Counter for User: "+ str(user_obj.id)+ "  Group :"+ str(group_id))
+        log_line = "\n\nCreating Counter for User: "+ str(user_obj.id)+ ",  Group :"+ str(group_id)
+        print log_line
+        log_file.write(log_line)
         counter_obj = counter_collection.collection.Counter()
     else:
-        log_file.write("\n\nUpdating Counter for User: "+ str(user_obj.id)+ "  Group :"+ str(group_id))
+        log_line = "\n\nUpdating Counter for User: "+ str(user_obj.id)+ "  Group :"+ str(group_id)
+        print log_line
+        log_file.write(log_line)
     auth_node = node_collection.one({'_type': 'Author', 'created_by': user_obj.id})
 
-    analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
+    analytics_instance = AnalyticsMethods(user_obj.id, user_obj.username, group_id)
 
     counter_obj['auth_id']  = auth_node._id
     counter_obj['group_id'] = group_id
     counter_obj['user_id']  = user_obj.id
-    counter_obj['enrolled'] = True
+    counter_obj['is_group_member'] = True
     counter_obj['last_update'] = datetime.datetime.now()
 
     counter_obj['course']['modules']['completed'] = analytics_instance.get_completed_modules_count()
@@ -119,5 +127,4 @@ def create_or_update_counter(user_obj, group_id):
     counter_obj['quiz']['attempted'] = analytics_instance.get_attempted_quizitems_count()
 
     counter_obj.save()
-    log_file.write(str(counter_obj.to_json()))
-
+    log_file.write(counter_obj._id.__str__())

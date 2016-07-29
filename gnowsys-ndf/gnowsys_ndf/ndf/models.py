@@ -3462,7 +3462,7 @@ class Counter(DjangoDocument):
         'comments_by_others_on_res': {},
 
         'avg_rating_gained': 0,  # total_rating/rating_count_received
-        'rating_count_received': int,
+        'rating_count_received': 0,
     }
 
     structure = {

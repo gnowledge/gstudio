@@ -265,12 +265,12 @@ def discussion_reply(request, group_id, node_id):
                     # counter_obj_creator.no_comments_received_on_files += 1
                     counter_obj_creator['file']['comments_gained'] += 1
                     # counter_obj_creator.no_comments_for_user += 1
-                    if str(counter_obj.user_id) in counter_obj_creator.file.comments_by_others_on_res.keys():
+                    if str(counter_obj.user_id) in counter_obj_creator.file['comments_by_others_on_res'].keys():
                         # counter_obj_creator.comments_by_others_on_files[str(counter_obj.user_id)] += 1
                         counter_obj_creator['file']['comments_by_others_on_res'][str(counter_obj.user_id)] += 1
                     else:
                         # counter_obj_creator.comments_by_others_on_files.update({str(counter_obj.user_id):1})
-                        counter_obj_creator.file.comments_by_others_on_res.update({str(counter_obj.user_id):1})
+                        counter_obj_creator.file['comments_by_others_on_res'].update({str(counter_obj.user_id):1})
                     counter_obj.last_update = datetime.now()
                     counter_obj_creator.last_update = datetime.now()
                     counter_obj.save()
@@ -291,11 +291,11 @@ def discussion_reply(request, group_id, node_id):
                     counter_obj_creator['page']['blog']['comments_gained'] += 1
 
                     # if str(counter_obj.user_id) in counter_obj_creator.comments_by_others_on_notes.keys():
-                    if str(counter_obj.user_id) in counter_obj_creator.page.blog.comments_by_others_on_res.keys():
+                    if str(counter_obj.user_id) in counter_obj_creator.page.blog['comments_by_others_on_res'].keys():
                         # counter_obj_creator.comments_by_others_on_notes[str(counter_obj.user_id)] += 1
                         counter_obj_creator['page']['blog']['comments_by_others_on_res'][str(counter_obj.user_id)] += 1
                     else:
-                        counter_obj_creator.page.blog.comments_by_others_on_res.update({str(counter_obj.user_id):1})
+                        counter_obj_creator.page.blog['comments_by_others_on_res'].update({str(counter_obj.user_id):1})
                     counter_obj.last_update = datetime.now()
                     counter_obj_creator.last_update = datetime.now()
                     counter_obj.save()
