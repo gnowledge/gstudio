@@ -25,14 +25,17 @@ sitename=Site.objects.all()[0]
 
 @get_execution_time
 def ratings(request, group_id, node_id):
-	rating=request.POST.get('rating', '')
+
+	rating = request.POST.get('rating', '')
 	node_obj = node_collection.one({'_id': ObjectId(node_id)})
 	ratedict = {}
 	already_rated_by_user = False
 	#functions to modify counter collection for analytics
-	counter_obj=counter_collection.one({'user_id':node_obj.created_by,'group_id':ObjectId(group_id)})
+	# counter_obj=counter_collection.one({'user_id':node_obj.created_by,'group_id':ObjectId(group_id)})
+	counter_obj = Counter.get_counter_obj(node_obj.created_by, ObjectId(group_id))
 	unique=True
 	blog=None
+
 	if len(node_obj.type_of)!=0:
 		blog=node_collection.one({'_id':node_obj.type_of[0]})
 	for rat in node_obj.rating:
@@ -40,33 +43,49 @@ def ratings(request, group_id, node_id):
 			unique=False
 			if blog:
 				if blog.name=='Blog page':
-					total_rating=counter_obj.rating_count_received_on_notes*counter_obj.avg_rating_received_on_notes
-					total_rating=total_rating-rat['score']
-					total_rating=total_rating+int(rating)
-					if counter_obj.rating_count_received_on_notes!=0:
-						counter_obj.avg_rating_received_on_notes=total_rating/counter_obj.rating_count_received_on_notes
+					# total_rating = counter_obj.rating_count_received_on_notes*counter_obj.avg_rating_received_on_notes
+					total_rating = counter_obj['page']['blog']['rating_count_received'] * counter_obj['page']['blog']['avg_rating_gained']
+					total_rating = total_rating - rat['score']
+					total_rating = total_rating + int(rating)
+
+					if counter_obj['page']['blog']['rating_count_received'] != 0:
+						# counter_obj.avg_rating_received_on_notes=total_rating/counter_obj.rating_count_received_on_notes
+						counter_obj['page']['blog']['avg_rating_gained'] = total_rating / counter_obj['page']['blog']['rating_count_received']
+
 					counter_obj.save()
-			if blog==None:
-				total_rating=counter_obj.rating_count_received_on_files*counter_obj.avg_rating_received_on_files
-				total_rating=total_rating-rat['score']
-				total_rating=total_rating+int(rating)
-				if counter_obj.rating_count_received_on_files!=0:
-					counter_obj.avg_rating_received_on_files=total_rating/counter_obj.rating_count_received_on_files
+
+			if blog == None:
+				# total_rating = counter_obj.rating_count_received_on_files*counter_obj.avg_rating_received_on_files
+				total_rating = counter_obj['file']['rating_count_received'] * counter_obj['file']['avg_rating_gained']
+				total_rating = total_rating - rat['score']
+				total_rating = total_rating + int(rating)
+				# if counter_obj.rating_count_received_on_files!=0:
+				if counter_obj['file']['rating_count_received'] != 0:
+					# counter_obj.avg_rating_received_on_files=total_rating/counter_obj.rating_count_received_on_files
+					counter_obj['file']['avg_rating_gained'] = total_rating / counter_obj['file']['rating_count_received']
+
 				counter_obj.save()
 
 	if unique:
 		if blog:
 			if blog.name=='Blog page':
-				total_rating=counter_obj.rating_count_received_on_notes*counter_obj.avg_rating_received_on_notes
-				total_rating=total_rating+int(rating)
-				counter_obj.rating_count_received_on_notes+=1
-				counter_obj.avg_rating_received_on_notes=total_rating/counter_obj.rating_count_received_on_notes
+				# total_rating=counter_obj.rating_count_received_on_notes*counter_obj.avg_rating_received_on_notes
+				total_rating=counter_obj['page']['blog']['rating_count_received'] * counter_obj['page']['blog']['avg_rating_gained']
+				total_rating = total_rating + int(rating)
+				# counter_obj.rating_count_received_on_notes+=1
+				counter_obj['page']['blog']['rating_count_received'] += 1
+				# counter_obj.avg_rating_received_on_notes=total_rating/counter_obj.rating_count_received_on_notes
+				counter_obj['page']['blog']['avg_rating_gained'] = total_rating / counter_obj['page']['blog']['rating_count_received']
 				counter_obj.save()
-		if blog==None:
-			total_rating=counter_obj.rating_count_received_on_files*counter_obj.avg_rating_received_on_files
-			total_rating=total_rating+int(rating)
-			counter_obj.rating_count_received_on_files+=1
-			counter_obj.avg_rating_received_on_files=total_rating/counter_obj.rating_count_received_on_files
+
+		if blog == None:
+			# total_rating = counter_obj.rating_count_received_on_files*counter_obj.avg_rating_received_on_files
+			total_rating = counter_obj['file']['rating_count_received'] * counter_obj['file']['avg_rating_gained']
+			total_rating = total_rating + int(rating)
+			# counter_obj.rating_count_received_on_files += 1
+			counter_obj['file']['rating_count_received'] += 1
+			# counter_obj.avg_rating_received_on_files = total_rating/counter_obj.rating_count_received_on_files
+			counter_obj['file']['avg_rating_gained'] = total_rating / counter_obj['file']['rating_count_received']
 			counter_obj.save()
 
 	# done modifying ratings for counter collection
