@@ -1597,7 +1597,7 @@ class EventGroupCreateEditHandler(View):
                     counter_obj.fill_counter_values(
                                                     user_id=request.user.id,
                                                     auth_id=auth_obj._id,
-                                                    group_id=group_id._id,
+                                                    group_id=group_obj._id,
                                                     is_group_member=True
                                                 )
                     # counter_obj.user_id=request.user.id
