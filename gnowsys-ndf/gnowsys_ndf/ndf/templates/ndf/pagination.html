@@ -53,8 +53,10 @@
 						<a href="{% url urlname first_arg second_arg third_arg each_page %}"> {{ each_page }} </a>
 					{% elif second_arg %}
 						<a href="{% url urlname first_arg second_arg each_page %}"> {{ each_page }} </a>
+					{% elif first_arg %}
+						<a href="{% url urlname first_arg  each_page %}"> {{ each_page }} </a>	
 					{% else %}
-						<a href="{% url urlname first_arg each_page %}"> {{ each_page }} </a>
+						<a href="{% url urlname  each_page %}"> {{ each_page }} </a>
 					{% endif %}
 
 					</li>
@@ -72,8 +74,11 @@
 						<a href="{% url urlname first_arg second_arg third_arg page_info.previous_page %}"> &laquo; Previous </a>
 					{% elif second_arg %}
 						<a href="{% url urlname first_arg second_arg page_info.previous_page %}"> &laquo; Previous </a>
-					{% else %}
+
+					{% elif first_arg %}
 						<a href="{% url urlname first_arg page_info.previous_page %}"> &laquo; Previous </a>
+					{% else %}
+						<a href="{% url urlname page_info.previous_page %}"> &laquo; Previous </a>
 					{% endif %}
 
 					</li>
@@ -87,9 +92,12 @@
 					{% elif second_arg %}
 						<li><a href="{% url urlname first_arg second_arg 1 %}"> 1 </a></li>
 						<li><a href="{% url urlname first_arg second_arg 2 %}"> 2 </a></li>
-					{% else %}
+					{% elif first_arg %}
 						<li><a href="{% url urlname first_arg 1 %}"> 1 </a></li>
 						<li><a href="{% url urlname first_arg 2 %}"> 2 </a></li>
+					{% else %}
+						<li><a href="{% url urlname  1 %}"> 1 </a></li>
+						<li><a href="{% url urlname  2 %}"> 2 </a></li>
 					{% endif %}
 
 						<li class="unavailable" aria-disabled="true"><span class="subheader">&hellip;</span></li>
@@ -106,8 +114,12 @@
 						<a href="{% url urlname first_arg second_arg page_info.previous_page %}">
 							{{ page_info.previous_page }}
 						</a>
-					{% else %}
+					{% elif first_arg %}
 						<a href="{% url urlname first_arg page_info.previous_page %}">
+							{{ page_info.previous_page }}
+						</a>
+					{% else %}
+						<a href="{% url urlname  page_info.previous_page %}">
 							{{ page_info.previous_page }}
 						</a>
 					{% endif %}
@@ -127,8 +139,12 @@
 						<a href="{% url urlname first_arg second_arg page_info.current_page %}">
 							{{ page_info.current_page }}
 						</a>
-					{% else %}
+					{% elif first_arg %}
 						<a href="{% url urlname first_arg page_info.current_page %}">
+							{{ page_info.current_page }}
+						</a>
+					{% else %}
+						<a href="{% url urlname  page_info.current_page %}">
 							{{ page_info.current_page }}
 						</a>
 					{% endif %}
@@ -148,8 +164,12 @@
 							<a href="{% url urlname first_arg second_arg page_info.next_page %}">
 								{{ page_info.next_page }}
 							</a>
-						{% else %}
+						{% elif first_arg %}
 							<a href="{% url urlname first_arg page_info.next_page %}">
+								{{ page_info.next_page }}
+							</a>
+						{% else %}
+							<a href="{% url urlname  page_info.next_page %}">
 								{{ page_info.next_page }}
 							</a>
 						{% endif %}
@@ -176,8 +196,12 @@
 									<a href="{% url urlname first_arg second_arg page_info.num_pages|add:'-1' %}">
 										{{ page_info.num_pages|add:'-1' }}
 									</a>
-								{% else %}
+								{% elif first_arg %}
 									<a href="{% url urlname first_arg page_info.num_pages|add:'-1' %}">
+										{{ page_info.num_pages|add:'-1' }}
+									</a>
+								{% else %}
+									<a href="{% url urlname  page_info.num_pages|add:'-1' %}">
 										{{ page_info.num_pages|add:'-1' }}
 									</a>
 								{% endif %}
@@ -197,8 +221,12 @@
 								<a href="{% url urlname first_arg second_arg page_info.num_pages %}">
 									{{ page_info.num_pages }}
 								</a>
-							{% else %}
+							{% elif first_arg %}
 								<a href="{% url urlname first_arg page_info.num_pages %}">
+									{{ page_info.num_pages }}
+								</a>
+							{% else %}
+								<a href="{% url urlname  page_info.num_pages %}">
 									{{ page_info.num_pages }}
 								</a>
 							{% endif %}
@@ -217,8 +245,12 @@
 							<a href="{% url urlname first_arg second_arg page_info.next_page %}">
 								Next &raquo;
 							</a>
-						{% else %}
+						{% elif first_arg %}
 							<a href="{% url urlname first_arg page_info.next_page %}">
+								Next &raquo;
+							</a>
+						{% else %}
+							<a href="{% url urlname  page_info.next_page %}">
 								Next &raquo;
 							</a>
 						{% endif %}
