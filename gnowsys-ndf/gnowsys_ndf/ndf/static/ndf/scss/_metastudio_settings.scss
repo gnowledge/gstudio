@@ -27,8 +27,8 @@ $primary-color: $theme-color;
 $secondary-color: lighten(desaturate($primary-color,80%),30%);
 // $alert-color: #f04124;
 // $success-color: #43AC6A;
- //$warning-color: #f2bf8a;
- $info-color: $color0;
+// $warning-color: #f2bf8a;
+$info-color: $color0;
 
 $header-font-color: #222;
 $body-bg-color: #666;
