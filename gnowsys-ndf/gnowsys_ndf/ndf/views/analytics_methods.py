@@ -215,8 +215,8 @@ class AnalyticsMethods(object):
 		else:
 			return 0
 
-	def get_user_notes_count(self, return_cur_obj=False, site_wide=False):
 
+	def get_user_notes_count(self, return_cur_obj=False, site_wide=False):
 
 		# if not hasattr(self,'user_notes_cur'):
 		if not hasattr(self,"blog_page_gst") and not hasattr(self,"page_gst"):
@@ -230,18 +230,15 @@ class AnalyticsMethods(object):
 		# else:
 		# 	self.user_notes_cur.rewind()
 		if return_cur_obj:
-
-
 			return self.user_notes_cur
-
 
 		if self.user_notes_cur:
 			return self.user_notes_cur.count()
 		else:
 			return 0
 
-	def get_comments_counts_on_users_notes(self, return_cur_obj=False, site_wide=False):
 
+	def get_comments_counts_on_users_notes(self, return_cur_obj=False, site_wide=False):
 
 		if site_wide:
 			self.user_notes_cur = self.get_user_notes_count(True, True)
@@ -387,7 +384,7 @@ class AnalyticsMethods(object):
 				commentors_ids[str(each_note_file_cmt.created_by)] += 1
 			else :
 				commentors_ids[str(each_note_file_cmt.created_by)] = 1
-			
+
 
 		return commentors_ids
 
@@ -406,7 +403,6 @@ class AnalyticsMethods(object):
 			return 0
 
 	def get_user_files_count(self, return_cur_obj=False, site_wide=False):
-
 
 		if not hasattr(self,"file_gst"):
 			self.file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"},{'_id': 1})
@@ -769,7 +765,7 @@ class AnalyticsMethods(object):
 					total_rating += rdict['score']
 					if rdict['user_id'] not in unique_user_list:
 						unique_user_list.append(rdict['user_id'])
- 		
+
  		return total_rating
 
  	def get_ratings_counts_received_on_notes(self):
@@ -804,7 +800,7 @@ class AnalyticsMethods(object):
 		return total_rating
 
 	def get_total_comments_for_user(self,return_cur_obj=False,site_wide=False):
-	
+
 		if site_wide:
 			self.user_notes_cur = self.get_user_notes_count(True, True)
 			self.user_files_cur = self.get_user_files_count(True, True)
@@ -823,7 +819,7 @@ class AnalyticsMethods(object):
 	 	for each_user_note_id in user_notes_cur_ids:
 	 		list_of_dict_notes.append({'prior_node_id_of_thread': ObjectId(each_user_note_id)})
 	 	for each_user_file_id in user_files_cur_ids:
-	 		list_of_dict_files.append({'prior_node_id_of_thread': ObjectId(each_user_file_id)})	
+	 		list_of_dict_files.append({'prior_node_id_of_thread': ObjectId(each_user_file_id)})
 
 	 	self.all_comments_on_user_notes = node_collection.find({'member_of': self.reply_gst._id, 'origin': {'$in': list_of_dict_notes}},{'_id': 1, 'created_by': 1})
 	 	self.all_comments_on_user_files = node_collection.find({'member_of': self.reply_gst._id, 'origin': {'$in': list_of_dict_files}},{'_id': 1, 'created_by': 1})
@@ -837,4 +833,4 @@ class AnalyticsMethods(object):
 	 	if self.all_comments_on_user_notes or self.all_comments_on_user_files:
 	 		return self.all_comments_on_user_notes.count() + self.all_comments_on_user_files.count()
 	 	else:
-	 		return 0		
+	 		return 0

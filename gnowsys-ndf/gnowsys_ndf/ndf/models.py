@@ -2313,6 +2313,27 @@ class Author(Group):
         return auth
 
 
+    @staticmethod
+    def get_total_comments_by_user(user_id, return_cur=False, site_wide=False, group_id=None):
+
+        reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"}, {'_id': 1})
+
+        comments_query = {'member_of': reply_gst._id,'created_by': user_id}
+
+        if not site_wide:
+            group_id = group_id | ObjectId()
+            comments_query.update({'group_set': group_id})
+
+        users_replies_cur = node_collection.find(comments_query)
+
+        if users_replies_cur:
+            if return_cur:
+                return users_replies_cur
+            return users_replies_cur.count()
+        else:
+            return 0
+
+
 #  HELPER -- CLASS DEFINITIONS
 class HistoryManager():
     """Handles history management for documents of a collection
@@ -3451,6 +3472,10 @@ class Counter(DjangoDocument):
 
     collection_name = 'Counters'
 
+    # resources will be created will be of following type:
+    resource_list = ['page', 'file']
+
+    # resources will be created will have following default schema dict:
     default_resource_stats = {
         'created' : 0,  # no of files/pages/any-app's instance created
 
@@ -3464,6 +3489,7 @@ class Counter(DjangoDocument):
         'avg_rating_gained': 0,  # total_rating/rating_count_received
         'rating_count_received': 0,
     }
+
 
     structure = {
        '_type': unicode,
@@ -3486,7 +3512,7 @@ class Counter(DjangoDocument):
         # 'comments_by_others_on_notes': dict,
         # 'rating_count_received_on_notes': int,
         # 'avg_rating_received_on_notes':float,
-        'page': {'blog': dict, 'wiki': dict, 'info': dict},
+        'page': {'blog': dict, 'wiki': dict, 'info': dict},  # resource
 
         # -- files --
         # 'no_files_created':int,
@@ -3497,7 +3523,7 @@ class Counter(DjangoDocument):
         # 'comments_by_others_on_files': dict,
         # 'rating_count_received_on_files': int,
         # 'avg_rating_received_on_files':float,
-        'file': dict,
+        'file': dict,  # resource
 
         # -- quiz --
         # 'no_questions_attempted':int,
@@ -3546,32 +3572,6 @@ class Counter(DjangoDocument):
     ]
 
     required_fields = ['user_id', 'group_id', 'auth_id']
-
-    # default_values = {
-    #     'no_comments_by_user': 0,
-    #     'no_comments_for_user':0,
-    #     'no_files_created':0,
-    #     'no_visits_gained_on_files':0,
-    #     'no_comments_received_on_files':0,
-    #     'no_others_files_visited':0,
-    #     'no_comments_on_others_files':0,
-    #     'rating_count_received_on_files': 0,
-    #     'avg_rating_received_on_files':0.0,
-    #     'no_questions_attempted':0,
-    #     'no_correct_answers':0,
-    #     'no_incorrect_answers':0,
-    #     'no_notes_written':0,
-    #     'no_views_gained_on_notes':0,
-    #     'no_others_notes_visited':0,
-    #     'no_comments_received_on_notes':0,
-    #     'no_comments_on_others_notes':0,
-    #     'rating_count_received_on_notes': 0,
-    #     'avg_rating_received_on_notes':0.0,
-    #     'modules_completed':0,
-    #     'course_score':0,
-    #     'units_completed':0
-    # }
-
     use_dot_notation = True
 
     def __unicode__(self):
@@ -3615,6 +3615,35 @@ class Counter(DjangoDocument):
             counter_obj.save()
 
         return counter_obj
+
+
+    def get_file_points(self):
+        from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS
+        return self['file']['created'] * GSTUDIO_FILE_UPLOAD_POINTS
+
+
+    def get_page_points(self, page_type='blog'):
+        from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS
+        return self['page'][page_type]['created'] * GSTUDIO_NOTE_CREATE_POINTS
+
+
+    def get_quiz_points(self):
+        from gnowsys_ndf.settings import GSTUDIO_QUIZ_CORRECT_POINTS
+        return self['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
+
+
+    def get_interaction_points(self):
+        from gnowsys_ndf.settings import GSTUDIO_COMMENT_POINTS
+        return self['total_comments_by_user'] * GSTUDIO_COMMENT_POINTS
+
+
+    def total_user_points(self):
+        file_point = self.get_file_points()
+        note_point = self.get_page_points()
+        quiz_point = self.get_quiz_points()
+        interaction_point = self.get_interaction_points()
+
+        return file_point + note_point + quiz_point + interaction_point
 
 
     def save(self, *args, **kwargs):

@@ -53,15 +53,12 @@ def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
     """
-    try:
-        group_id = ObjectId(group_id)
-    except:
-        group_name, group_id = get_group_name_id(group_id)
 
     if request.user.is_anonymous():
         return HttpResponseRedirect(reverse('explore_courses', kwargs={}))
 
-    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id  = group_obj._id
 
     group_obj_post_node_list = []
     app_id = None
@@ -74,7 +71,6 @@ def course(request, group_id, course_id=None):
     course_enrollment_status = None
     app_set_id = None
     query = {}
-
     course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
 
     if course_ins:
@@ -2544,7 +2540,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['cmts_on_user_files'] = counter_obj['file']['comments_gained']
     # print "\n Total Comments User Files === ", cmts_on_user_files, "\n\n"
     # analytics_data['unique_users_commented_on_user_files'] = len(counter_obj.comments_by_others_on_files.keys())
-    analytics_data['unique_users_commented_on_user_files'] = len(counter_obj.file.comments_by_others_on_res.keys())
+    analytics_data['unique_users_commented_on_user_files'] = len(counter_obj.file['comments_by_others_on_res'].keys())
     # print "\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files, "\n\n"
 
     # BY User
