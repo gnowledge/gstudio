@@ -15,4 +15,5 @@
 	          </li>
 		{% endfor %}
 	</ul>
+	{% include 'ndf/pagination.html' with urlname="my-groups_paged" first_arg=groupid second_arg=""  third_arg="" page_info=group_page_cur %}
 {% endblock body_content %}
