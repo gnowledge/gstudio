@@ -211,7 +211,7 @@
 
         <li class="group">
           {# <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}"> #}
-          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore_courses' %}">
+          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% if site.SITE_NAME == 'metaStudio' %}{% url 'explore_groups' %}{% else %}{% url 'explore_courses' %}{% endif %}">
             {% trans 'EXPLORE' %}
           </a>
         </li>
