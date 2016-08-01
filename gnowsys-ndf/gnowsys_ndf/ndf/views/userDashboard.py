@@ -671,20 +671,35 @@ def my_groups(request, group_id):
         # raise 404
 
     try:
-        auth_obj = get_group_name_id(group_id, get_obj=True)
+        auth = get_group_name_id(group_id, get_obj=True)
 
     except:
         user_id = eval(group_id)
-        auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
-
-    auth_id = auth_obj._id
+        auth = node_collection.one({'_type': "Author", 'created_by': user_id})
+    usrid = auth.created_by 
+    current_user = usrid
+    if current_user:
+        exclued_from_public = ""  
+        if int(current_user) == int(usrid):
+          Access_policy=["PUBLIC","PRIVATE"]
+        if int(current_user) != int(usrid):
+          Access_policy=["PUBLIC"]
+    else:
+          Access_policy=["PUBLIC"]  
+          exclued_from_public =  ObjectId(task_gst._id) 
+    
+    group_cur = node_collection.find(
+        {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
+        '$or': [{'group_admin': int(usrid)}, {'author_set': int(usrid)}]}).sort('last_update', -1)
+    
+    auth_id = auth._id
     title = 'My Groups'
 
     return render_to_response('ndf/my-groups.html',
                 {
                     'group_id': auth_id, 'groupid': auth_id,
-                    'node': auth_obj,
-                    'title': title
+                    'node': auth,
+                    'title': title,'group_cur':group_cur
                 },
                 context_instance=RequestContext(request)
         )

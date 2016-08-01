@@ -5,6 +5,14 @@
 
 {% block body_content %}
 	<h3>
-		My groups
+		My Groups:
 	</h3>
+	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
+
+		{% for each_obj in group_cur %}
+				<li class="card-image-wrapper" style="margin-top:13px;">
+					{% include 'ndf/simple_card.html' with resource=each_obj  no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk   %}
+	          </li>
+		{% endfor %}
+	</ul>
 {% endblock body_content %}
