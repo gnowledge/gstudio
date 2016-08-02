@@ -3637,13 +3637,21 @@ class Counter(DjangoDocument):
         return self['total_comments_by_user'] * GSTUDIO_COMMENT_POINTS
 
 
-    def total_user_points(self):
-        file_point = self.get_file_points()
-        note_point = self.get_page_points()
-        quiz_point = self.get_quiz_points()
-        interaction_point = self.get_interaction_points()
+    def get_all_user_points_dict(self):
+        point_breakup_dict = {"Files": 0, "Notes": 0, "Quiz": 0, "Interactions": 0}
 
-        return file_point + note_point + quiz_point + interaction_point
+        point_breakup_dict['Files'] = self.get_file_points()
+        point_breakup_dict['Notes'] = self.get_page_points(page_type='blog')
+        point_breakup_dict['Quiz']  = self.get_quiz_points()
+        point_breakup_dict['Interactions'] = self.get_interaction_points()
+
+        return point_breakup_dict
+
+
+    def total_user_points(self):
+
+        point_breakup_dict = self.get_all_user_points_dict()
+        return sum(point_breakup_dict.values())
 
 
     def save(self, *args, **kwargs):

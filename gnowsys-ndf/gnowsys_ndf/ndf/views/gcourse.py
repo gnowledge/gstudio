@@ -2441,7 +2441,7 @@ def course_filters(request, group_id):
 @login_required
 @get_execution_time
 def course_analytics(request, group_id, user_id, render_template=False):
-    from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
+
 
     cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
     cache_result = cache.get(cache_key)
@@ -2453,8 +2453,11 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
     analytics_data = {}
     data_points_dict = request.GET.get('data_points_dict', {})
+    # print '== data_points_dict: ', data_points_dict
 
     if data_points_dict and not isinstance(data_points_dict, dict):
+        from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
+
         data_points_dict = json.loads(data_points_dict)
         # print "\n\ndata_points_dict",data_points_dict
         analytics_data['correct_attempted_quizitems'] = (data_points_dict['quiz_points'] / GSTUDIO_QUIZ_CORRECT_POINTS)
@@ -2464,8 +2467,8 @@ def course_analytics(request, group_id, user_id, render_template=False):
         analytics_data['users_points'] = data_points_dict['users_points']
 
     user_obj = User.objects.get(pk=int(user_id))
-    analytics_data['username'] = user_obj.username
-    counter_obj = Counter.get_counter_obj(user_obj.id,ObjectId(group_id))
+
+    counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
     analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
@@ -2485,10 +2488,8 @@ def course_analytics(request, group_id, user_id, render_template=False):
     # analytics_data['completed_res'] = analytics_instance.get_completed_resources_count()
     # print "\n Completed Resources === ", completed_res, "\n\n"
 
-
-    # QuizItem Section
-
     analytics_data['username'] = user_obj.username
+    # QuizItem Section
     analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
     # print "\n Total QuizItemEvents === ", analytics_data['total_quizitems'], "\n\n"
     # analytics_data['attempted_quizitems'] = counter_obj.no_questions_attempted
@@ -2502,7 +2503,6 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['incorrect_attempted_quizitems'] = counter_obj['quiz']['incorrect']
     # print "\n InCorrect Attempted QuizItemEvents === ", analytics_data['incorrect_attempted_quizitems'], "\n\n"
 
-
     # Notes Section
     # analytics_data['total_notes'] = analytics_instance.get_total_notes_count()
     # print "\n Total Notes === ", total_notes, "\n\n"
@@ -2511,7 +2511,6 @@ def course_analytics(request, group_id, user_id, render_template=False):
         analytics_data['user_notes'] = counter_obj['page']['blog']['created']
     # print "\n User Notes === ", user_notes, "\n\n"
 
-
     # Files Section
     # analytics_data['total_files'] = analytics_instance.get_total_files_count()
     # print "\n Total Files === ", total_files, "\n\n"
@@ -2519,7 +2518,6 @@ def course_analytics(request, group_id, user_id, render_template=False):
         # analytics_data['user_files'] = counter_obj.no_files_created
         analytics_data['user_files'] = counter_obj['file']['created']
     # print "\n User's Files === ", user_files, "\n\n"
-
 
     # Comments
     if 'total_cmnts_by_user' not in analytics_data:
@@ -2605,10 +2603,12 @@ def course_analytics(request, group_id, user_id, render_template=False):
         # analytics_data['users_points'] = counter_obj.course_score
         analytics_data['users_points'] = counter_obj['group_points']
 
-    analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+    # analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+    analytics_data['users_points_breakup'] = counter_obj.get_all_user_points_dict()
 
     del analytics_instance
     cache.set(cache_key, analytics_data, 60*10)
+
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)
@@ -2619,41 +2619,64 @@ def course_analytics(request, group_id, user_id, render_template=False):
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
+
     cache_key = u'course_analytics_admin' + unicode(group_id)
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
-    from gnowsys_ndf.ndf.views.analytics_methods import AnalyticsMethods
-    from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
-    group_obj   = get_group_name_id(group_id, get_obj=True)
+
+    # from gnowsys_ndf.ndf.views.analytics_methods import AnalyticsMethods
+    # from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
+
+    group_obj = get_group_name_id(group_id, get_obj=True)
     admin_analytics_data_list = []
     admin_analytics_data_append = admin_analytics_data_list.append
     FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
 
-    for each_author in group_obj.author_set:
+    all_group_authors = node_collection.find({'_type': u'Author', 'created_by': {'$in': group_obj.author_set}})
+    # print group_obj.author_set
+
+    auth_counters = counter_collection.find({'user_id': {'$in': group_obj.author_set}, 'group_id': ObjectId(group_id) })
+
+    for each_author_obj in all_group_authors:
         admin_analytics_data = {}
-        usr_counter_obj = Counter.get_counter_obj(each_author, ObjectId(group_id))
-        user_obj = User.objects.get(pk=int(each_author))
+
+        try:
+            user_counter_obj = Counter(auth_counters.clone().where('this.user_id == '+str(each_author_obj.created_by)+' && this.group_id ==  "'+str(group_id)+'"')[0])
+        except Exception, e:
+            user_counter_obj = Counter.get_counter_obj(each_author_obj.created_by, ObjectId(group_id))
+            print e
+
+        # try:
+        #     user_obj = User.objects.get(pk=int(each_author_obj))
+        # except Exception, e:
+        #     continue
 
         # analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
         # username = user_obj.username
         # user_id = user_obj.id
         # users_points = analytics_instance.get_users_points()
-        admin_analytics_data['username'] = user_obj.username
-        admin_analytics_data['user_id'] = user_obj.id
-        admin_analytics_data['users_points'] = usr_counter_obj['group_points']
-        admin_analytics_data["files_points"] = usr_counter_obj['file']['created'] * GSTUDIO_FILE_UPLOAD_POINTS
+        admin_analytics_data['username']    = each_author_obj.name
+        admin_analytics_data['user_id']     = each_author_obj.created_by
+        admin_analytics_data['users_points']= user_counter_obj['group_points']
+
+        # admin_analytics_data["files_points"] = user_counter_obj['file']['created'] * GSTUDIO_FILE_UPLOAD_POINTS
+        admin_analytics_data["files_points"] = user_counter_obj.get_file_points()
         if FILES_MAX_POINT_VAL < admin_analytics_data["files_points"]:
             FILES_MAX_POINT_VAL = admin_analytics_data["files_points"]
-        admin_analytics_data['notes_points'] = usr_counter_obj['page']['blog']['created'] * GSTUDIO_NOTE_CREATE_POINTS
+
+        # admin_analytics_data['notes_points'] = user_counter_obj['page']['blog']['created'] * GSTUDIO_NOTE_CREATE_POINTS
+        admin_analytics_data['notes_points'] = user_counter_obj.get_page_points(page_type='blog')
         if NOTES_MAX_POINT_VAL < admin_analytics_data['notes_points']:
             NOTES_MAX_POINT_VAL = admin_analytics_data['notes_points']
 
-        admin_analytics_data['quiz_points'] = usr_counter_obj['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
+        # admin_analytics_data['quiz_points'] = user_counter_obj['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
+        admin_analytics_data['quiz_points'] = user_counter_obj.get_quiz_points()
         if QUIZ_MAX_POINT_VAL < admin_analytics_data['quiz_points']:
             QUIZ_MAX_POINT_VAL = admin_analytics_data['quiz_points']
 
-        admin_analytics_data['interactions_points'] = usr_counter_obj['total_comments_by_user'] * GSTUDIO_COMMENT_POINTS
+        # admin_analytics_data['interactions_points'] = user_counter_obj['total_comments_by_user'] * GSTUDIO_COMMENT_POINTS
+        admin_analytics_data['interactions_points'] = user_counter_obj.get_interaction_points()
         if INTERACTIONS_MAX_POINT_VAL < admin_analytics_data['interactions_points']:
             INTERACTIONS_MAX_POINT_VAL = admin_analytics_data['interactions_points']
 
@@ -2681,7 +2704,7 @@ def course_analytics_admin(request, group_id):
     response_dict = json.dumps(response_dict)
     cache.set(cache_key, response_dict, 60*10)
 
-    # print "\n admin_analytics_list === ",admin_analytics_list
+    # print "\n admin_analytics_data_list === ",admin_analytics_data_list
     return HttpResponse(response_dict)
 
 '''
