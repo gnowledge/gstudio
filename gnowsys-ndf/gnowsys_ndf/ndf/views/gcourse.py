@@ -2540,7 +2540,9 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['cmts_on_user_files'] = counter_obj['file']['comments_gained']
     # print "\n Total Comments User Files === ", cmts_on_user_files, "\n\n"
     # analytics_data['unique_users_commented_on_user_files'] = len(counter_obj.comments_by_others_on_files.keys())
-    analytics_data['unique_users_commented_on_user_files'] = len(counter_obj.file['comments_by_others_on_res'].keys())
+
+    analytics_data['unique_users_commented_on_user_files'] = len(counter_obj['file']['comments_by_others_on_res'].keys())
+
     # print "\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files, "\n\n"
 
     # BY User
@@ -2614,7 +2616,75 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
     # return HttpResponse(json.dumps(analytics_data))
 
+@login_required
+@get_execution_time
+def course_analytics_admin(request, group_id):
+    cache_key = u'course_analytics_admin' + unicode(group_id)
+    cache_result = cache.get(cache_key)
+    if cache_result:
+        return HttpResponse(cache_result)
+    from gnowsys_ndf.ndf.views.analytics_methods import AnalyticsMethods
+    from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    admin_analytics_data_list = []
+    admin_analytics_data_append = admin_analytics_data_list.append
+    FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
 
+    for each_author in group_obj.author_set:
+        admin_analytics_data = {}
+        usr_counter_obj = Counter.get_counter_obj(each_author, ObjectId(group_id))
+        user_obj = User.objects.get(pk=int(each_author))
+
+        # analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+        # username = user_obj.username
+        # user_id = user_obj.id
+        # users_points = analytics_instance.get_users_points()
+        admin_analytics_data['username'] = user_obj.username
+        admin_analytics_data['user_id'] = user_obj.id
+        admin_analytics_data['users_points'] = usr_counter_obj['group_points']
+        admin_analytics_data["files_points"] = usr_counter_obj['file']['created'] * GSTUDIO_FILE_UPLOAD_POINTS
+        if FILES_MAX_POINT_VAL < admin_analytics_data["files_points"]:
+            FILES_MAX_POINT_VAL = admin_analytics_data["files_points"]
+        admin_analytics_data['notes_points'] = usr_counter_obj['page']['blog']['created'] * GSTUDIO_NOTE_CREATE_POINTS
+        if NOTES_MAX_POINT_VAL < admin_analytics_data['notes_points']:
+            NOTES_MAX_POINT_VAL = admin_analytics_data['notes_points']
+
+        admin_analytics_data['quiz_points'] = usr_counter_obj['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
+        if QUIZ_MAX_POINT_VAL < admin_analytics_data['quiz_points']:
+            QUIZ_MAX_POINT_VAL = admin_analytics_data['quiz_points']
+
+        admin_analytics_data['interactions_points'] = usr_counter_obj['total_comments_by_user'] * GSTUDIO_COMMENT_POINTS
+        if INTERACTIONS_MAX_POINT_VAL < admin_analytics_data['interactions_points']:
+            INTERACTIONS_MAX_POINT_VAL = admin_analytics_data['interactions_points']
+
+        # del analytics_instance
+        admin_analytics_data_append(admin_analytics_data)
+
+    max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
+    'quiz_max_points': QUIZ_MAX_POINT_VAL, 'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
+
+    column_headers = [
+        ("username", "Name"),
+        # ("user_id", "user_id"),
+        ("users_points", "Total Points"),
+        ("files_points", "Files"),
+        ("notes_points", "Notes"),
+        ("quiz_points", "Quiz"),
+        ("interactions_points", "Interactions"),
+    ]
+    response_dict = {}
+    response_dict["column_headers"] = column_headers
+    response_dict["success"] = True
+    response_dict["students_data_set"] = admin_analytics_data_list
+    response_dict['max_points_dict'] = max_points_dict
+
+    response_dict = json.dumps(response_dict)
+    cache.set(cache_key, response_dict, 60*10)
+
+    # print "\n admin_analytics_list === ",admin_analytics_list
+    return HttpResponse(response_dict)
+
+'''
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
@@ -2700,11 +2770,8 @@ def course_analytics_admin(request, group_id):
     gst_reply = node_collection.one({'_type': "GSystemType", 'name': "Reply"})
     gst_reply_id = gst_reply._id
 
-    # group: I2C-V2
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
-
     author_set = group_obj.author_set
-
     all_res_cur = node_collection.find({'_type': 'GSystem', 'group_set': {'$in': [group_obj._id]}, '$or': [{'member_of': {'$in': [gst_file_id, gst_reply_id]}}, {'member_of': gst_page_id, 'type_of': gst_blog_id}], 'created_by': {'$in': author_set} })
 
 
@@ -2778,6 +2845,9 @@ def course_analytics_admin(request, group_id):
     # print response_dict
     # print "\n admin_analytics_list === ",admin_analytics_list
     return HttpResponse(response_dict)
+
+'''
+
 
 @login_required
 @get_execution_time
