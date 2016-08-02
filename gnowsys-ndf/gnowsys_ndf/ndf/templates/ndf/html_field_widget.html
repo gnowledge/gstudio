@@ -282,7 +282,7 @@
   <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
 
   {% else %}
-  <select id="{{field.name}}" name="{{field.name}}" multiple size="2" required="" style="float:left; width:80%; height: 2.9rem;">
+  <select id="{{field.name}}" name="{{field.name}}" multiple size="2" {% if not field.altnames == "Attendees" %} required="" {% endif %} style="float:left; width:80%; height: 2.9rem;">
     {% if not field_value %}
     <option value="">{% blocktrans with alt=field.altnames|lower %} - - - Select {{alt}} - - - {% endblocktrans %}</option>
     {% endif %}
