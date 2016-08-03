@@ -2818,22 +2818,27 @@ def html_widget(groupid, node_id, field,node_content=None):
       is_relation_field = True
       is_required_field = True
       #patch
-      group = node_collection.find({"_id":ObjectId(groupid)})
+      group = node_collection.one({"_id":ObjectId(groupid)})
+      group_users = []
+      group_users.extend(group.group_admin)
+      group_users.extend(group.author_set)
+      group_users.append(group.created_by)
+      # print "*************************",group.created_by
       person = node_collection.find({"_id":{'$in': field["object_type"]}},{"name":1})
 
       if person[0].name == "Author":
           if field.name == "has_attendees":
-              field_value_choices.extend(list(node_collection.find({'member_of': {'$in':field["object_type"]},
-                                                                  'created_by':{'$in':group[0]["group_admin"]+group[0]["author_set"]},
+              field_value_choices.extend(list(node_collection.find({'_type': 'Author',
+                                                                  'created_by':{'$in':group_users},
 
                                                                  })
                                                                  ))
           else:
-              field_value_choices.extend(list(node_collection.find({'member_of': {'$in':field["object_type"]},
-                                                            'created_by':{'$in':group[0]["group_admin"]+group[0]["author_set"]},                                																														}).sort('name', 1)
-                                      )
-                                )
-      #End path
+              field_value_choices.extend(list(node_collection.find({'_type': 'Author',
+                                                                  'created_by':{'$in':group_users},
+
+                                                                 })
+                                                                 ))      #End path
       else:
         field_value_choices.extend(list(node_collection.find({'member_of': {'$in': field["object_type"]},
                                                               'status': u"PUBLISHED",
