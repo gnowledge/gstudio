@@ -579,7 +579,9 @@ GSTUDIO_SECOND_LEVEL_HEADER = True
 GSTUDIO_MY_GROUPS_IN_HEADER = True
 GSTUDIO_MY_COURSES_IN_HEADER = False
 GSTUDIO_MY_DASHBOARD_IN_HEADER = False
-GSTUDIO_DEFAULT_EXPLORE_URL = "explore_courses" #e.g explore_groups,explore,base_courses
+GSTUDIO_DEFAULT_EXPLORE_URL = "explore_courses"
+ #GSTUDIO_DEFAULT_EXPLORE_URL it defines url which will be loaded when user clicks on explore button
+ # e.g explore_courses will go to explore/courses url. likewise options are explore_groups and explore_basecourses
 GSTUDIO_REPLICATION_GROUPS = [
     u"Author", u"home"
 ]
