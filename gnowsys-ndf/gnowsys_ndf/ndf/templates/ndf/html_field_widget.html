@@ -5,11 +5,11 @@
 
 <!-- Base fields / AttributeType fields -->
 {% if is_base_field or is_attribute_field %}
-  {% if is_special_field %}
+  {% if is_special_field  %}
   <!-- Intentionally put this field at the top, as below because of it's data-type different widget may come -->
     <div style="float:left;">
       {% include included_template_name with var_name=field.name var_placeholder="Enter the content here" var_value=field_value|default_if_none:"" node_id=node_id %}
-      {% if is_required_field %}
+      {% if is_required_field and not field.altnames == "Attendees" %}
       <i style="color:red; display:inline">*</i>
       <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
       {% endif %}
@@ -19,22 +19,22 @@
     <input type="email" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
           placeholder="{{field.help_text|default_if_none:''}}" 
           {% if not field.editable %}readonly{% endif %} 
-          {% if is_required_field %}required{% endif %} 
+          {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} 
           pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}" 
           style="float:left; width:95%"
     />
-    {% if is_required_field or field.validators %}
-    {% if is_required_field %}
+    {% if is_required_field or field.validators and not field.altnames == "Attendees" %}
+    {% if is_required_field and not field.altnames == "Attendees" %}
     <i style="color:red; float:left display:inline">*</i>
     {% endif %}
-    <small class="error{% if not is_required_field %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
+    <small class="error{% if not is_required_field  %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
     {% endif %}
 
   {% elif field.validators.0 == "tel" %}
     <input type="tel" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
           placeholder="{{field.help_text|default_if_none:''}}" 
           {% if not field.editable %}readonly{% endif %} 
-          {% if is_required_field %}required{% endif %}
+          {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %}
           min="{{field.max_digits|default_if_none:''}}"
           maxlength="{{field.max_digits|default_if_none:''}}"
           class = "{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}" 
@@ -69,7 +69,7 @@
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
           placeholder="{{field.help_text|default_if_none:''}}" 
           {% if field.editable and not field.editable %}readonly{% endif %} 
-          {% if is_required_field %}required{% endif %} 
+          {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} 
           class="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
           style="float:left; width:95%"
           maxlength="{{field.max_digits|default_if_none:''}}"
@@ -116,7 +116,7 @@
     </script>
 
     {% if is_required_field or field.validators %}
-    {% if is_required_field %}
+    {% if is_required_field and not field.altnames == "Attendees" %}
     <i style="color:red; float:left display:inline">*</i>
     {% endif %}
     <small class="error{% if not is_required_field %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
@@ -126,7 +126,7 @@
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
           placeholder="{{field.help_text|default_if_none:''}}" 
           {% if field.editable and not field.editable %}readonly{% endif %} 
-          {% if is_required_field %}required{% endif %} 
+          {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} 
           maxlength="{{field.max_digits|default_if_none:''}}" 
           class = "{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
           style="float:left; width:95%"
@@ -160,7 +160,7 @@
     </script>
 
 
-    {% if is_required_field %}
+    {% if is_required_field and not field.altnames == "Attendees" %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% trans "Please fill valid" %} {{field.altnames}}! </small>
     {% endif %}
@@ -169,7 +169,7 @@
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{% if field.validators %}{{field_value|date:field.validators.0|default_if_none:''}}{% endif %}" 
           placeholder="{{field.help_text|default_if_none:''}}"
           {% if not field.editable %}readonly{% endif %} 
-          {% if is_required_field %}required{% endif %} 
+          {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} 
           class="{% if field.validators|length > 1 %}{{field.validators.1|default_if_none:''}}{% endif %}" 
           style="float:left; width:10rem" 
     />
@@ -184,17 +184,17 @@
     {% if forloop.counter != 1 %}
     &nbsp;&nbsp;&nbsp;
     {% endif %}
-    <input type="radio" name="{{field.name}}" value="{{value|yesno:'Yes,No'}}" id="{{field.name}}{{value|yesno:'Yes,No'}}" {% if value|yesno:'Yes,No' == field_value|yesno:'Yes,No' %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value|yesno:'Yes,No'}}">{{value|yesno:'Yes,No'}}</label>
+    <input type="radio" name="{{field.name}}" value="{{value|yesno:'Yes,No'}}" id="{{field.name}}{{value|yesno:'Yes,No'}}" {% if value|yesno:'Yes,No' == field_value|yesno:'Yes,No' %} checked {% endif %} {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %}/><label for="{{field.name}}{{value|yesno:'Yes,No'}}">{{value|yesno:'Yes,No'}}</label>
     {% endfor %}
-    {% if is_required_field %}
+    {% if is_required_field and not field.altnames == "Attendees" %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
     {% endif %}
     </div>
 
   {% elif is_list_of %}
-    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|join:', '|default_if_none:''}}" placeholder="Separate {{field.altnames|lower}} by commas..." {% if is_required_field %}required{% endif %} style="float:left; width:95%">
-    {% if is_required_field %}
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|join:', '|default_if_none:''}}" placeholder="Separate {{field.altnames|lower}} by commas..." {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} style="float:left; width:95%">
+    {% if is_required_field and not field.altnames == "Attendees" %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
     {% endif %}
@@ -218,13 +218,13 @@
       }
     </style>
     <div style="float:left;">
-      <input type="text" id="uploadFile_{{field.name}}" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:18rem; margin-right:0.5rem;" {% if is_required_field %}required{% endif %} />
+      <input type="text" id="uploadFile_{{field.name}}" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:18rem; margin-right:0.5rem;" {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} />
       <div href="#" class="fileUpload button tiny round" style="margin-top:2px;">
           <span>{% trans "Upload" %}</span>
-          <input id="uploadBtn_{{field.name}}" type="file" name="{{field.name}}" class="upload" {% if is_required_field %}required{% endif %} />
+          <input id="uploadBtn_{{field.name}}" type="file" name="{{field.name}}" class="upload" {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %} />
           <small class="error">{% trans "Upload! " %}</small>
       </div>
-      {% if is_required_field %}
+      {% if is_required_field and not field.altnames == "Attendees" %}
       <i style="color:red; float:left display:inline">*</i>
       {% endif %}
     </div>
@@ -246,24 +246,25 @@
       {% if forloop.counter != 1 %}
       &nbsp;&nbsp;&nbsp;
       {% endif %}
-      <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value}}">{{value}}</label>
+      <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field and not field.altnames == "Attendees" %}required{% endif %}/><label for="{{field.name}}{{value}}">{{value}}</label>
       {% endfor %}
       </div>
-      {% if is_required_field %}
+      {% if is_required_field and not field.altnames == "Attendees" %}
       <i style="color:red; float:left display:inline">*</i>
       <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
       {% endif %}
 
     {% else %}
-      <select id="{{field.name}}" name="{{field.name}}" required="" style="float:left; width:95%">
+      <select id="{{field.name}}" name="{{field.name}}" {% if not field.altnames == "Attendees" %} required="" {% endif %} style="float:left; width:95%">
         <option value="">{% blocktrans with alt=field.altnames|lower %} - - - Select {{alt}} - - - {% endblocktrans %}</option>
         {% for choice in field_value_choices %}
         <option value="{{choice}}" {% if choice in field_value %} selected {% endif %} >{% blocktrans %} {{choice}} {% endblocktrans %}</option>
         {% endfor %}
       </select>
+      {% if not field.altnames == "Attendees" %}
       <i style="color:red; float:left display:inline">*</i>
       <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>  
-
+      {% endif %}
     {% endif %}
 
 
@@ -272,15 +273,16 @@
 <!-- RelationType fields -->
 {% elif is_relation_field %}
   {% if field.object_cardinality == 1 %}
-  <select id="{{field.name}}" name="{{field.name}}" required="" style="float:left; width:95%">
+  <select id="{{field.name}}" name="{{field.name}}" {% if not field.altnames == "Attendees" %} required="" {% endif %} style="float:left; width:95%">
     <option value="">{% blocktrans with alt=field.altnames|lower %} - - - Select {{alt}} - - - {% endblocktrans %}</option>
     {% for choice in field_value_choices %}
     <option value="{{choice.pk}}" {% if choice.pk in field_value %} selected {% endif %} >{% blocktrans with alt=choice.name %} {{alt}} {% endblocktrans %}</option>
     {% endfor %}
   </select>
-  <i style="color:red; float:left display:inline">*</i>
-  <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
-
+  {% if not field.altnames == "Attendees" %}
+    <i style="color:red; float:left display:inline">*</i>
+    <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
+  {% endif %}
   {% else %}
   <select id="{{field.name}}" name="{{field.name}}" multiple size="2" {% if not field.altnames == "Attendees" %} required="" {% endif %} style="float:left; width:80%; height: 2.9rem;">
     {% if not field_value %}
@@ -294,9 +296,10 @@
     {% endfor %}
 
   </select>
-  <i style="color:red; float:left display:inline">*</i>
-  <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
-  
+  {% if not field.altnames == "Attendees" %}
+    <i style="color:red; float:left display:inline">*</i>
+    <small class="error">{% trans "Please select" %} {{field.altnames}}! </small>
+  {% endif %}
   <a href="" class="button tiny round" style="float: right;" data-reveal-id="{{field.name}}_modal">
     {% if not field_value %}{% trans "Select" %}{% else %}{% trans "Change" %}{% endif %}
   </a>
