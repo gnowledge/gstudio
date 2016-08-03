@@ -2666,19 +2666,19 @@ def upload_using_save_file(request,group_id):
         create_gattribute(each_gs_file._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
         group_object = node_collection.one({'_id': ObjectId(group_id)})
-        if group_object.edit_policy == "EDITABLE_MODERATED":
-                    from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
-                    # print "\n\n\n\ninside editable moderated block"
-                    each_gs_file.group_set = get_moderator_group_set(each_gs_file.group_set, group_object._id)
-                    # print "\n\n\npage_node._id",page_node._id
-                    each_gs_file.status = u'MODERATION'
-                    # print "\n\n\n page_node.status",page_node.status
+        if (group_object.edit_policy == "EDITABLE_MODERATED") and (group_object.moderation_level > 0):
+            from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
+            # print "\n\n\n\ninside editable moderated block"
+            each_gs_file.group_set = get_moderator_group_set(each_gs_file.group_set, group_object._id)
+            # print "\n\n\npage_node._id",page_node._id
+            each_gs_file.status = u'MODERATION'
+            # print "\n\n\n page_node.status",page_node.status
         each_gs_file.save()
 
-    if title =="gallery" or title == "raw material":
+    if (title == "gallery") or (title == "raw material"):
         counter_obj = Counter.get_counter_obj(request.user.id, group_id)
-        counter_obj['file']['created'] += 1
-        counter_obj['group_points'] += GSTUDIO_FILE_UPLOAD_POINTS
+        counter_obj['file']['created'] += len(fileobj_list)
+        counter_obj['group_points'] += (len(fileobj_list) * GSTUDIO_FILE_UPLOAD_POINTS)
         counter_obj.last_update = datetime.now()
         counter_obj.save()
         if title == "gallery":
