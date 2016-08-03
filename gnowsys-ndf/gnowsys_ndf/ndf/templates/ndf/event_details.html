@@ -19,7 +19,8 @@
   <script src="/static/ndf/bower_components/moment/moment.js"></script> 
   <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
   <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script>
+   <!-- checked -->
   <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 
@@ -49,6 +50,7 @@ table, th, td {
 		min-height: 10vh;
 			
     }
+  
 </style>
 
 <div id="view_event">
@@ -141,8 +143,7 @@ table, th, td {
                                   </div>
                                 </div>
                                 
-                          {% endif %}
-                          {% endif %}
+                          {% endif %}             
                           
                          
                          {% if node.event_coordinator %} 
@@ -161,6 +162,10 @@ table, th, td {
                               {% endfor %}
                             </div>
                           </div>
+                          {% endif %}
+
+                          <br>
+
                           {% endif %}
                            
 
@@ -203,15 +208,118 @@ table, th, td {
                               </div>
                          </div>
                           {% endif %}
-                            <br>
-                          
-                          <br>
+
+                         <div class = "row"> 
                           {% with node.html_content|safe as description %}
                           {% if description != "None" %}
-                          <label>Brief description about event:</label>
-                          {{ description }}
+                         <div class="small-3 columns">
+                                <label>Brief Description:</label>
+                         </div>       
+                          <div class="small-5 end columns">
+                                <label>{{ description }}</label>
+                          </div>
+                          <br>
+                          <br>
                           {% endif %}
                           {% endwith %}
+                        </div>
+
+                        {% if open_event %}
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Open Event:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>Yes</label>
+                              </div>
+                            </div>
+                          {% else %}
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Open Event:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>No</label>
+                              </div>
+                            </div>  
+                          {% endif %} 
+
+                          <br>
+                        
+
+                          {% if is_bbb %}
+
+                          <div class="row">
+                            <div class="small-3 columns">
+                              <label>Meeting Type:</label>
+                            </div>
+                            <div class="small-5 end columns">
+                              <label>Online</label>
+                            </div>
+                          </div>
+                          <br>
+
+                          {% if show%}
+
+                            {%if active == 0%}
+
+                          <div align = "center">
+                            <button target = "_blank" onClick="window.open('{{url}}')">Join</button> 
+                          </div>
+
+                            {% elif active == -1%}
+                             
+                              {% if shortly %}
+
+                             <div align = "center">
+                             <button disabled>{{node.name}} will begin shortly</button>
+                             </div>
+
+                              {% else %}
+                               
+                                 {% if days_left == 0 %}
+
+                                       <div align = "center">
+                                       <button disabled>{{node.name}} will start in {{hours_left}} hours</button>
+                                       </div>
+
+                                 {% else %}
+
+                                       <div align = "center">
+                                       <button disabled>{{node.name}} will start in {{days_left}} days</button>
+                                       </div>
+
+                                 {% endif %}
+
+                              {% endif %}   
+
+                            {% else %}
+
+                             <div align = "center">
+                             <button disabled>{{node.name}} has ended</button>
+                             </div>
+
+                            {% endif %} 
+
+                          {% else %}
+                           <div align = "center">
+                          <button disabled>For joining {{node.name}} contact the Co-ordinator</button>
+                          </div>  
+                          {% endif %}
+
+                          {% else %}
+                            <div class="row">
+                              <div class="small-3 columns">
+                                <label>Meeting Type:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>Offline</label>
+                              </div>
+                            </div>
+                            
+                          {% endif %}
+
+
                     
                     </fieldset>   
                     </section>

@@ -29,7 +29,7 @@ from django.template.loader import render_to_string
 # get pub of gpg key with which to sign syncdata attachments
 from gnowsys_ndf.settings import SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH
 
-#to display error template if non existent pub is given in settings.py
+#to display error template if non existent pub is given` in settings.py
 from django.shortcuts import render
 
 ''' -- imports from python libraries -- '''
@@ -2198,6 +2198,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
 
             field = node_collection.one({'_id': ObjectId(at_rt_objectid_or_attr_name)}, {
                                         '_type': 1, 'subject_type': 1, 'object_type': 1, 'name': 1, 'altnames': 1, 'inverse_name': 1})
+            
 
             altnames = u""
             value = None

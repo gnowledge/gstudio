@@ -285,19 +285,6 @@
 
         if (!oid) {return};
 
-        $.ajax({
-          url: "{% url 'get_resource_by_oid' group_name_tag %}",
-          type: 'GET',
-          data: {'oid': oid},
-          success: function(data){
-            console.log(data);
-            var dataObj = JSON.parse(data),
-              name = dataObj.altnames?dataObj.altnames:dataObj.name;
-            $('#overlay-description-by-oid-title').html('<h3 class="text-center">' + name + '</h3>');
-            $('#overlay-description-by-oid-content').html(dataObj.content);
-          }
-        });
-
       });
 
     // start of document.ready()
