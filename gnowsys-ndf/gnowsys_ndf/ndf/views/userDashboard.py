@@ -19,6 +19,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE, GSTUDIO_SITE_NAME
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
+from mongokit import paginator
 
 # from gnowsys_ndf.ndf.models import *
 # from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
@@ -665,26 +666,43 @@ def my_courses(request, group_id):
         )
 
 
-def my_groups(request, group_id):
+def my_groups(request, group_id,page_no=1):
 
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     # if request.user == 'AnonymousUser':
         # raise 404
 
     try:
-        auth_obj = get_group_name_id(group_id, get_obj=True)
+        auth = get_group_name_id(group_id, get_obj=True)
 
     except:
         user_id = eval(group_id)
-        auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
-
-    auth_id = auth_obj._id
+        auth = node_collection.one({'_type': "Author", 'created_by': user_id})
+    usrid = auth.created_by 
+    current_user = usrid
+    if current_user:
+        exclued_from_public = ""  
+        if int(current_user) == int(usrid):
+          Access_policy=["PUBLIC","PRIVATE"]
+        if int(current_user) != int(usrid):
+          Access_policy=["PUBLIC"]
+    else:
+          Access_policy=["PUBLIC"]  
+          exclued_from_public =  ObjectId(task_gst._id) 
+    
+    group_cur = node_collection.find(
+        {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
+        '$or': [{'group_admin': int(usrid)}, {'author_set': int(usrid)}]}).sort('last_update', -1)
+    group_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+    
+    auth_id = auth._id
     title = 'My Groups'
 
     return render_to_response('ndf/my-groups.html',
                 {
-                    'group_id': auth_id, 'groupid': auth_id,
-                    'node': auth_obj,
-                    'title': title
+                    'group_id': group_id, 'groupid': group_id,
+                    'node': auth,
+                    'title': title,'group_cur':group_cur,'group_page_cur':group_page_cur
                 },
                 context_instance=RequestContext(request)
         )

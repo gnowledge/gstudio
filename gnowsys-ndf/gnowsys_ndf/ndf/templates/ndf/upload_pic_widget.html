@@ -18,7 +18,7 @@
               {% elif node.if_file.mid.relurl %}
                    <img src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" alt="Profile picture for this group." class="img-height">
               {% else %}
-                   <img src="/static/ndf/images/default-bg.png" alt="Profile picture for this group." class="img-height">
+                    <img src="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/images/default-bg.png" alt="Profile picture for this group." class="img-height">
               {% endif %}
           {% endif %}
         </div>

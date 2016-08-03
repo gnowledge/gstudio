@@ -41,6 +41,8 @@
   <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
 {% elif first_arg %}
   <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
+{% else %}
+  <a href='{% url url_name  %}{{search_url_text|safe}}'>
 {% endif %}
 {% endif %}
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
