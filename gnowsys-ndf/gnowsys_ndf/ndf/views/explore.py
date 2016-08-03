@@ -8,6 +8,7 @@ from django.http import Http404
 from django.shortcuts import render_to_response  # , render  uncomment when to use
 from django.template import RequestContext
 from django.template import TemplateDoesNotExist
+from mongokit import paginator
 # from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 # from django.contrib.auth.models import User
@@ -54,8 +55,8 @@ def explore(request):
         context_instance=RequestContext(request))
 
 @get_execution_time
-def explore_courses(request):
-
+def explore_courses(request,page_no=1):
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     title = 'courses'
     print ce_gst._id
     ce_cur = node_collection.find({'member_of': ce_gst._id,
@@ -65,9 +66,9 @@ def explore_courses(request):
                                           {'author_set': request.user.id},
                                           {'group_type': 'PUBLIC'} 
                                           ]}).sort('last_update', -1)
-
+    ce_page_cur = paginator.Paginator(ce_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variable = {'title': title, 'doc_cur': ce_cur, 'card': 'ndf/event_card.html',
-                        'group_id': group_id, 'groupid': group_id}
+                        'group_id': group_id, 'groupid': group_id,'ce_page_cur':ce_page_cur}
 
     return render_to_response(
         "ndf/explore.html",
@@ -76,7 +77,8 @@ def explore_courses(request):
 
 
 @get_execution_time
-def explore_groups(request):
+def explore_groups(request,page_no=1):
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     title = 'groups'
     gstaff_access = check_is_gstaff(group_id,request.user)
     if gstaff_access:
@@ -84,8 +86,9 @@ def explore_groups(request):
     else:
         group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id,'name':{'$nin':GSTUDIO_DEFAULT_GROUPS }}).sort('last_update', -1)
 
+    ce_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variable = {'title': title, 'doc_cur': group_cur, 'card': 'ndf/simple_card.html',
-                        'group_id': group_id, 'groupid': group_id}
+                        'group_id': group_id, 'groupid': group_id,'ce_page_cur':ce_page_cur}
 
     return render_to_response(
         "ndf/explore.html",
@@ -95,8 +98,9 @@ def explore_groups(request):
 
 @login_required
 @get_execution_time
-def explore_basecourses(request):
+def explore_basecourses(request,page_no=1):
 
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     gstaff_access = check_is_gstaff(group_id,request.user)
     if not gstaff_access:
         return HttpResponseRedirect(reverse('explore_courses'))
@@ -104,8 +108,9 @@ def explore_basecourses(request):
     title = 'base courses'
 
     course_cur = node_collection.find({'member_of': gst_course._id}).sort('last_update', -1)
+    ce_page_cur = paginator.Paginator(course_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variable = {'title': title, 'doc_cur': course_cur, 'card': 'ndf/event_card.html',
-                        'group_id': group_id, 'groupid': group_id}
+                        'group_id': group_id, 'groupid': group_id,'ce_page_cur':ce_page_cur}
     return render_to_response(
         "ndf/explore.html",
         context_variable,
