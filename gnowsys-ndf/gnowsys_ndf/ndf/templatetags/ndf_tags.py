@@ -2828,7 +2828,12 @@ def html_widget(groupid, node_id, field,node_content=None):
 
                                                                  })
                                                                  ))
-                #End path
+          else:
+              field_value_choices.extend(list(node_collection.find({'member_of': {'$in':field["object_type"]},
+                                                            'created_by':{'$in':group[0]["group_admin"]+group[0]["author_set"]},                                																														}).sort('name', 1)
+                                      )
+                                )
+      #End path
       else:
         field_value_choices.extend(list(node_collection.find({'member_of': {'$in': field["object_type"]},
                                                               'status': u"PUBLISHED",
