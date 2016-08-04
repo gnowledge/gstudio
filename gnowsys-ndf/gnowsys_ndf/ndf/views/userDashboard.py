@@ -21,8 +21,8 @@ from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
 from mongokit import paginator
 
-from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
+# from gnowsys_ndf.ndf.models import *
+# from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
 
@@ -69,7 +69,7 @@ def userpref(request, group_id):
 def uDashboard(request, group_id):
 
     try:
-        usrid = int(group_id) 
+        usrid = int(group_id)
         auth = node_collection.one({'_type': "Author", 'created_by': usrid})
     except:
         auth = get_group_name_id(group_id, get_obj=True)
@@ -99,14 +99,14 @@ def uDashboard(request, group_id):
     )
 
     if current_user:
-        exclued_from_public = ""  
+        exclued_from_public = ""
         if int(current_user) == int(usrid):
           Access_policy=["PUBLIC","PRIVATE"]
         if int(current_user) != int(usrid):
           Access_policy=["PUBLIC"]
     else:
-          Access_policy=["PUBLIC"]  
-          exclued_from_public =  ObjectId(task_gst._id)  
+          Access_policy=["PUBLIC"]
+          exclued_from_public =  ObjectId(task_gst._id)
 
     dashboard_count = {}
     group_list = []
@@ -141,13 +141,13 @@ def uDashboard(request, group_id):
             {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':usrid}
         ).sort('last_update', -1).limit(10)
                    dashboard_count.update({'Task': task_cur.count()})
-        
+
         current_user_obj = User.objects.get(id=current_user)
         usr_fname = current_user_obj.first_name
         usr_lname = current_user_obj.last_name
 
     group_cur = node_collection.find(
-        {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
+        {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy},
         '$or': [{'group_admin': int(usrid)}, {'author_set': int(usrid)}]}).sort('last_update', -1).limit(10)
 
     dashboard_count.update({'group':group_cur.count()})
@@ -169,7 +169,7 @@ def uDashboard(request, group_id):
     #    if i._type != 'Batch' or i._type != 'Course' or i._type != 'Module':
     #        a_user.append(i)
     #loop replaced by a list comprehension
-    a_user=[i for i in activity_user if (i._type != 'Batch' or i._type != 'Course' or i._type != 'Module')]        
+    a_user=[i for i in activity_user if (i._type != 'Batch' or i._type != 'Course' or i._type != 'Module')]
     #a temp. variable which stores the lookup for append method
     user_activity_append_temp=user_activity.append
     for each in a_user:
@@ -220,7 +220,7 @@ def uDashboard(request, group_id):
     To populate collaborators according
     to their latest modification of particular resource:
     """
-    for each in obj.sort('last_update', -1):    
+    for each in obj.sort('last_update', -1):
         for val in each.contributors:
             name = User.objects.get(pk=val).username
             collab_drawer_append_temp({'usrname': name, 'Id': val,
@@ -284,7 +284,7 @@ def uDashboard(request, group_id):
          },
         context_instance=RequestContext(request)
     )
-       
+
 @get_execution_time
 def user_preferences(request, group_id, auth_id):
     try:
@@ -308,11 +308,11 @@ def user_preferences(request, group_id, auth_id):
                 #     create_attribute.attribute_type=at_user_pref
                 #     create_attribute.subject=grp._id
                 #     create_attribute.object_value=lst
-                #     create_attribute.save()            
+                #     create_attribute.save()
             return HttpResponse("Success")
 
 
-        else:  
+        else:
             list_at_pref=[]
             user_id=request.user.id
             if not at_user_pref:
@@ -343,8 +343,8 @@ def user_template_view(request, group_id):
     attr_assignee = triple_collection.find({"_type": "GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username})
     for attr in attr_assignee :
      task_node = node_collection.find_one({'_id': attr.subject})
-     blank_list.append(task_node) 
-       
+     blank_list.append(task_node)
+
     notification_object = notification.NoticeSetting.objects.filter(user_id=request.user.id)
     for each in notification_object:
       ntid = each.notice_type_id
@@ -352,10 +352,10 @@ def user_template_view(request, group_id):
       label = ntype.label.split("-")[0]
       blank_list.append({'label':label, 'display': ntype.display})
     blank_list.reverse()
-     
+
     blank_list = []
     activity = ""
-    activity_user = node_collection.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'Group'},{'_type':'File'}]}, 
+    activity_user = node_collection.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'Group'},{'_type':'File'}]},
                                                  {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] }).sort('last_update', -1).limit(4)
     for each in activity_user:
       if each.created_by == each.modified_by :
@@ -371,7 +371,7 @@ def user_template_view(request, group_id):
         member_of = node_collection.find_one({"_id": each.member_of[0]})
         blank_list.append(each)
     print blank_list
-    
+
     template = "ndf/task_card_view.html"
     #variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
     variable = RequestContext(request, {'TASK_inst':blank_list,'group_name':group_id,'group_id': group_id, 'groupid': group_id})
@@ -381,8 +381,8 @@ def user_template_view(request, group_id):
 @get_execution_time
 def user_activity(request, group_id):
     activity_user = node_collection.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
-                                                 
-                                                 {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
+
+                                                 {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}]
 
                                                  }).sort('last_update', -1)
     blank_list=[]
@@ -421,14 +421,14 @@ def group_dashboard(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
     group_obj = node_collection.one({"_id": ObjectId(group_id)})
     has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
-    
+
     all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
             old_profile_pics.append(n)
     banner_pic=""
-    
+
     for each in group_obj.relation_set:
                 if "has_profile_pic" in each:
                     if each["has_profile_pic"]:
@@ -523,7 +523,7 @@ def group_dashboard(request, group_id):
                 data["Remaining"] = remaining_count
 
                 enrollment_details.append(data)
-    
+
     page = '1'
     return render_to_response (
         "ndf/group_dashboard.html",
@@ -564,7 +564,7 @@ def user_profile(request, group_id):
 				for k in a.get('language_proficiency',''):
 					language = get_language_tuple(k)
 					auth_node['language_proficiency'].append(language)
-			if  a.get('subject_proficiency',None) != None:			
+			if  a.get('subject_proficiency',None) != None:
 				auth_node['subject_proficiency'] =  list(a.get('subject_proficiency',''))
 		auth_node.save()
 		user_dict['node'] = auth_node
@@ -616,12 +616,12 @@ def upload_prof_pic(request, group_id):
                 # The 'if' below is required in case file node is deleted but exists in grid_fs
                 if profile_pic_image and not node_id:
                     gr_node = create_grelation(group_obj._id, has_profile_or_banner_rt, profile_pic_image._id)
-                    # Move fileobj to "Warehouse" group 
+                    # Move fileobj to "Warehouse" group
                     node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
                 elif node_id:
                     # print "-----------------------------------------------------------------",node_id
                     gr_node = create_grelation(ObjectId(node_id), has_profile_or_banner_rt, profile_pic_image._id)
-                    # Move fileobj to "Warehouse" group 
+                    # Move fileobj to "Warehouse" group
                     node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
                 else:
                     success_state = False
@@ -629,7 +629,7 @@ def upload_prof_pic(request, group_id):
             # update status of old GRelation
             profile_pic_image = node_collection.one({'_id': ObjectId(choose_from_existing_pic)})
             gr_node = create_grelation(group_obj._id,has_profile_or_banner_rt,profile_pic_image._id)
-            # Move fileobj to "Warehouse" group 
+            # Move fileobj to "Warehouse" group
             if warehouse_grp_obj._id not in profile_pic_image.group_set:
                 node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
             group_obj.reload()
@@ -714,19 +714,25 @@ def my_dashboard(request, group_id):
     user_obj = User.objects.get(pk=int(user_id))
     auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
     auth_id = auth_obj._id
-    t0 = time.time()
     title = 'My Dashboard'
 
     cmnts_rcvd_by_user = 0
-    analytics_instance = AnalyticsMethods(request, user_id,user_obj.username, auth_id)
+    analytics_instance = AnalyticsMethods(user_id, user_obj.username, auth_id)
+
     users_points = analytics_instance.get_users_points()
-    total_cmnts_by_user = analytics_instance.get_total_comments_by_user(site_wide=True)
+
+    # total_cmnts_by_user = analytics_instance.get_total_comments_by_user(site_wide=True)
+    total_cmnts_by_user = Author.get_total_comments_by_user(user_id, site_wide=True)
+
     cmts_on_user_notes = analytics_instance.get_comments_counts_on_users_notes(False, site_wide=True)
     cmts_on_user_files = analytics_instance.get_comments_counts_on_users_files(False, site_wide=True)
-    if cmts_on_user_notes and cmts_on_user_files:
+
+    if cmts_on_user_notes or cmts_on_user_files:
         cmnts_rcvd_by_user = cmts_on_user_notes + cmts_on_user_files
+
     groups_cur = analytics_instance.get_user_joined_groups()
     my_course_objs = get_user_course_groups(user_id)
+
     del analytics_instance
 
     return render_to_response('ndf/my_dashboard.html',

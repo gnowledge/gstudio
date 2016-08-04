@@ -3,6 +3,7 @@
 {% load cache %}
 
   {% get_group_object groupid as group_object %}
+  {% get_explore_url as explore_url %}
 
   {% if site.SITE_NAME != "NROER" %}
   <div id="feedsModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
@@ -181,7 +182,6 @@
 
         <!-- Current group selector -->
         {% if user.is_authenticated %}
-         {% get_explore_url as explore_url %}
             {% if site.MY_DASHBOARD_IN_HEADER %}
             <li>
               <a title="My Dashboard" class="{%if title == 'My Dashboard'%}active{%endif%}" href="{% url 'my_dashboard' request.user.id %}">

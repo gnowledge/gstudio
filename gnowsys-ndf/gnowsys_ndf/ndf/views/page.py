@@ -23,8 +23,8 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import LANGUAGES
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.models import Node, GSystem, Triple
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_NAME, GSTUDIO_NOTE_CREATE_POINTS
+from gnowsys_ndf.ndf.models import Node, GSystem, Triple, Counter
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
@@ -229,12 +229,15 @@ def create_edit_page(request, group_id, node_id=None):
         page_name = request.POST.get('name', '')
         # print "====== page_name: ", page_name
         if page_name.strip().lower() in node_list and not node_id:
+            new_page=False
             return render_to_response("error_base.html",
                                       {'message': 'Page with same name already exists in the group!'},
                                       context_instance=RequestContext(request))
         elif node_id:
+            new_page = False
             page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
         else:
+            new_page = True
             page_node = node_collection.collection.GSystem()
 
         # page_type = request.POST.getlist("type_of",'')
@@ -334,6 +337,16 @@ def create_edit_page(request, group_id, node_id=None):
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
         if "CourseEventGroup" in group_obj.member_of_names_list and blog_type:
+            counter_obj = Counter.get_counter_obj(request.user.id,ObjectId(group_id))
+            if new_page:
+              # counter_obj.no_notes_written=counter_obj.no_notes_written+1
+              counter_obj['page']['blog']['created'] += 1
+              # counter_obj.course_score += GSTUDIO_NOTE_CREATE_POINTS
+              counter_obj['group_points'] += GSTUDIO_NOTE_CREATE_POINTS
+              counter_obj.last_update = datetime.datetime.now()
+              counter_obj.save()
+          #add code for creation of new note counter
+
             return HttpResponseRedirect(reverse('course_notebook_tab_note',
                                     kwargs={
                                             'group_id': group_id,

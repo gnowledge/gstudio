@@ -16,7 +16,7 @@ import json
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK, GSTUDIO_COMMENT_POINTS
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -42,7 +42,7 @@ import ast
 import string
 import json
 import locale
-import multiprocessing as mp 
+import multiprocessing as mp
 from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
@@ -89,7 +89,7 @@ def create_discussion(request, group_id, node_id):
     # thread = node_collection.one({"member_of": ObjectId(twist_st._id),"relation_set.thread_of.0": ObjectId(node._id)})
     # print "\n thread is ---", thread
     # thread = node_collection.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
-    
+
     # the following code will never be executed
     # not commenting it for now.
     if not thread:
@@ -98,7 +98,7 @@ def create_discussion(request, group_id, node_id):
       # print "\n thread_obj===",thread_obj
       # retriving RelationType
       # relation_type = node_collection.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
-      
+
       # Creating thread with the name of node
       # thread_obj = node_collection.collection.GSystem()
 
@@ -112,7 +112,7 @@ def create_discussion(request, group_id, node_id):
       # thread_obj.member_of.append(ObjectId(twist_st._id))
       # thread_obj.prior_node.append(ObjectId(node_id))
       # thread_obj.group_set.append(ObjectId(group_id))
-      
+
       # thread_obj.save()
       # print "\n\n Thread id ", thread_obj._id
       # creating GRelation
@@ -127,9 +127,9 @@ def create_discussion(request, group_id, node_id):
       response_data =  [ "Thread-exist", str(thread._id) ]
 
       return HttpResponse(json.dumps(response_data))
-  
+
   except Exception as e:
-    
+
     error_message = "\n DiscussionThreadCreateError: " + str(e) + "\n"
     raise Exception(error_message)
     # return HttpResponse("server-error")
@@ -164,14 +164,14 @@ def discussion_reply(request, group_id, node_id):
 
         # print "\n\n node.name === ", node.member_of_names_list, node._id, node.name
 
-        # process and save node if it reply has content  
+        # process and save node if it reply has content
         if content_org:
-      
+
             user_id = int(request.user.id)
             user_name = unicode(request.user.username)
 
             # auth = node_collection.one({'_type': 'Author', 'name': user_name })
-            
+
             # creating empty GST and saving it
             reply_obj = node_collection.collection.GSystem()
 
@@ -185,7 +185,7 @@ def discussion_reply(request, group_id, node_id):
             reply_obj.member_of.append(ObjectId(reply_st._id))
             reply_obj.prior_node.append(ObjectId(prior_node))
             reply_obj.group_set.append(ObjectId(group_id))
-        
+
             reply_obj.content_org = unicode(content_org)
             filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
             # reply_obj.content = org2html(content_org, file_prefix=filename)
@@ -212,14 +212,14 @@ def discussion_reply(request, group_id, node_id):
                         access_policy = thread_obj.access_policy
                     else:
                         access_policy = u'PUBLIC'
-                        
+
                 except:
                     access_policy = u'PUBLIC'
 
                 for key,value in request.FILES.items():
                     fname=unicode(value.__dict__['_name'])
                     # print "key=",key,"value=",value,"fname=",fname
-                    
+
                     fileobj,fs=save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=access_policy, count=0, first_object="", oid=True)
 
 
@@ -230,7 +230,7 @@ def discussion_reply(request, group_id, node_id):
 
                     try:
                         file_obj=node_collection.find_one({'_id': ObjectId(obid)})
-                        lstobj_collection.append(file_obj._id) 
+                        lstobj_collection.append(file_obj._id)
                     except:
                         pass
                     if "CourseEventGroup" not in group_object.member_of_names_list:
@@ -242,9 +242,65 @@ def discussion_reply(request, group_id, node_id):
             # ==============================
             reply_obj.collection_set = lstobj_collection
             # print "=== lstobj_collection: ", lstobj_collection
-        
+
             # saving the reply obj
             reply_obj.save()
+
+            #Update Counter Collection
+            thread_obj = node_collection.one({'_id':ObjectId(node_id)})
+            file_note_id = thread_obj.prior_node[0]
+            file_note_obj = node_collection.one({'_id':file_note_id})
+            if file_note_obj.if_file.mime_type :
+                file_creator_id = file_note_obj.created_by
+                if file_creator_id != request.user.id :
+                    counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+                    # counter_obj.no_comments_on_others_files += 1
+                    counter_obj['file']['commented_on_others_res'] += 1
+                    # counter_obj.no_comments_by_user += 1
+                    counter_obj['total_comments_by_user'] += 1
+                    # counter_obj.course_score += GSTUDIO_COMMENT_POINTS
+                    counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
+
+                    counter_obj_creator = Counter.get_counter_obj(file_creator_id, ObjectId(group_id))
+                    # counter_obj_creator.no_comments_received_on_files += 1
+                    counter_obj_creator['file']['comments_gained'] += 1
+                    # counter_obj_creator.no_comments_for_user += 1
+                    if str(counter_obj.user_id) in counter_obj_creator.file['comments_by_others_on_res'].keys():
+                        # counter_obj_creator.comments_by_others_on_files[str(counter_obj.user_id)] += 1
+                        counter_obj_creator['file']['comments_by_others_on_res'][str(counter_obj.user_id)] += 1
+                    else:
+                        # counter_obj_creator.comments_by_others_on_files.update({str(counter_obj.user_id):1})
+                        counter_obj_creator.file['comments_by_others_on_res'].update({str(counter_obj.user_id):1})
+                    counter_obj.last_update = datetime.now()
+                    counter_obj_creator.last_update = datetime.now()
+                    counter_obj.save()
+                    counter_obj_creator.save()
+            else :
+                note_creator_id = file_note_obj.created_by
+                if note_creator_id != request.user.id :
+                    counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+                    # counter_obj.no_comments_by_user += 1
+                    counter_obj['total_comments_by_user'] += 1
+                    # counter_obj.no_comments_on_others_notes += 1
+                    counter_obj['page']['blog']['commented_on_others_res'] += 1
+                    counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
+
+                    counter_obj_creator = Counter.get_counter_obj(note_creator_id, ObjectId(group_id))
+                    # counter_obj_creator.no_comments_for_user += 1
+                    # counter_obj_creator.no_comments_received_on_notes += 1
+                    counter_obj_creator['page']['blog']['comments_gained'] += 1
+
+                    # if str(counter_obj.user_id) in counter_obj_creator.comments_by_others_on_notes.keys():
+                    if str(counter_obj.user_id) in counter_obj_creator.page.blog['comments_by_others_on_res'].keys():
+                        # counter_obj_creator.comments_by_others_on_notes[str(counter_obj.user_id)] += 1
+                        counter_obj_creator['page']['blog']['comments_by_others_on_res'][str(counter_obj.user_id)] += 1
+                    else:
+                        counter_obj_creator.page.blog['comments_by_others_on_res'].update({str(counter_obj.user_id):1})
+                    counter_obj.last_update = datetime.now()
+                    counter_obj_creator.last_update = datetime.now()
+                    counter_obj.save()
+                    counter_obj_creator.save()
+
             formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
 
             files = []
@@ -254,7 +310,7 @@ def discussion_reply(request, group_id, node_id):
                 temp_list.append(str(temp['_id']))
                 temp_list.append(str(temp['mime_type']))
                 temp_list.append(str(temp['name']))
-                
+
                 files.append(temp_list)
 
             # print files
@@ -273,7 +329,7 @@ def discussion_reply(request, group_id, node_id):
                     node.save()
                 site = Site.objects.get(pk=1)
                 site = site.name.__str__()
-                
+
                 from_user = user_name
 
                 to_user_list = [node_creator_user_obj]
@@ -302,10 +358,10 @@ def discussion_reply(request, group_id, node_id):
 
         else: # no reply content
 
-            return HttpResponse(json.dumps(["no_content"]))      
+            return HttpResponse(json.dumps(["no_content"]))
 
     except Exception as e:
-      
+
         error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
         raise Exception(error_message)
 
@@ -321,14 +377,14 @@ def discussion_delete_reply(request, group_id, node_id):
         group_name, group_id = get_group_name_id(group_id)
 
     nodes_to_delete = json.loads(request.POST.get("nodes_to_delete", "[]"))
-    
+
     deleted_replies = []
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
     # print "\n\nnode_obj.name", node_obj.name, node_obj.member_of_names_list,node_obj._id
 
     for each_reply in nodes_to_delete:
         temp_reply = node_collection.one({"_id": ObjectId(each_reply)})
-        
+
         if temp_reply:
             deleted_replies.append(temp_reply._id.__str__())
             temp_reply.delete()
@@ -346,7 +402,7 @@ def discussion_delete_reply(request, group_id, node_id):
 @login_required
 @get_execution_time
 def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
-    
+
     try:
         group_id = ObjectId(group_id)
     except:
@@ -373,7 +429,7 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
     context_variables['var_name'] = "content_org",
     context_variables['var_value'] = node_obj.content
     context_variables['node_id'] = node_obj._id
-    context_variables['ckeditor_toolbar'] ="BasicToolbar" 
+    context_variables['ckeditor_toolbar'] ="BasicToolbar"
 
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
