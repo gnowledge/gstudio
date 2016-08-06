@@ -3588,7 +3588,6 @@ class Counter(DjangoDocument):
                             group_points=default_values['group_points'],
                             last_update=datetime.datetime.now()
                             ):
-
         self['user_id'] = int(user_id)
         self['auth_id'] = ObjectId(auth_id)
         self['group_id'] = ObjectId(group_id)
@@ -3599,7 +3598,6 @@ class Counter(DjangoDocument):
 
     @staticmethod
     def get_counter_obj(userid, group_id) :
-
         user_id  = int(userid)
         group_id = ObjectId(group_id)
 
@@ -3649,9 +3647,83 @@ class Counter(DjangoDocument):
 
 
     def total_user_points(self):
-
         point_breakup_dict = self.get_all_user_points_dict()
         return sum(point_breakup_dict.values())
+
+
+    @staticmethod
+    def add_comment_pt(resource_obj_or_id, current_group_id, active_user_id):
+        # confirming arg 'resource_obj_or_id' is Object or oid and
+        # setting resource_obj accordingly.
+        if isinstance(resource_obj_or_id, GSystem):
+            resource_obj = resource_obj_or_id
+        elif isinstance(resource_obj_or_id, ObjectId):
+            resource_obj = node_collection.one({'_id': ObjectId(resource_obj_or_id)})
+        else:
+            # needs to put some error raising logic or default return logic
+            pass
+
+        resource_oid = resource_obj._id
+        # resource_group_oid = resource_obj.group_set[0]
+
+        # identifying resource's type:
+        resource_type = ''
+        resource_type_of = ''
+        # ideally, member_of field should be used to check resource_type. But it may cause performance hit.
+        # hence using 'if_file.mime_type'
+        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list):
+            resource_type = 'file'
+        elif u'Page' in resource_obj.member_of_names_list:
+            resource_type = 'page'
+            # mostly it 'type_of' will be [] hence kept: if not at first.
+            if not resource_obj.type_of:
+                resource_type_of = 'blog'
+            else:
+                resource_type_of = node_collection.one({
+                                        '_id': resource_obj.type_of[0]
+                                    }).name.split(' ')[0].lower()
+
+        # get resource's creator:
+        resource_created_by_user_id = resource_obj.created_by
+
+        # counter object of resource creator
+        counter_obj_creator = Counter.get_counter_obj(resource_created_by_user_id, current_group_id)
+
+        # update counter obj
+        key_str = 'counter_obj_creator["' \
+                  + resource_type \
+                  + (('"]["' + resource_type_of) if resource_type_of else '') \
+                  + '"]["comments_by_others_on_res"]'
+
+        existing_user_comment_cnt = eval(key_str).get(str(active_user_id), 0)
+        eval(key_str).update({str(active_user_id): (existing_user_comment_cnt + 1) })
+
+        counter_obj_creator.last_update = datetime.datetime.now()
+        counter_obj_creator.save()
+
+        # processing analytics for (one) active user.
+        # NOTE: [Only if active user is other than resource creator]
+        if active_user_id != resource_created_by_user_id:
+            from gnowsys_ndf.settings import GSTUDIO_COMMENT_POINTS
+
+            counter_obj = Counter.get_counter_obj(active_user_id, current_group_id)
+
+            # counter_obj['file']['commented_on_others_res'] += 1
+            key_str_resource_type = '["' + resource_type + '"]'\
+                                    + (('["' + resource_type_of + '"]') if resource_type_of else '')
+
+            key_str = 'counter_obj' \
+                      + key_str_resource_type \
+                      + '["commented_on_others_res"]'
+            existing_commented_on_others_res = eval(key_str)
+            eval('counter_obj' + key_str_resource_type).update( \
+                { 'commented_on_others_res': (existing_commented_on_others_res + 1) })
+
+            counter_obj['total_comments_by_user'] += 1
+            counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
+
+            counter_obj.last_update = datetime.datetime.now()
+            counter_obj.save()
 
 
     def save(self, *args, **kwargs):
