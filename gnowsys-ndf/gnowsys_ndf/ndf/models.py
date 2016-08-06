@@ -3689,11 +3689,14 @@ class Counter(DjangoDocument):
         # counter object of resource creator
         counter_obj_creator = Counter.get_counter_obj(resource_created_by_user_id, current_group_id)
 
+        counter_obj_creator['file']['comments_gained'] += 1
+
         # update counter obj
-        key_str = 'counter_obj_creator["' \
-                  + resource_type \
-                  + (('"]["' + resource_type_of) if resource_type_of else '') \
-                  + '"]["comments_by_others_on_res"]'
+        key_str_resource_type = '["' + resource_type + '"]'\
+                                    + (('["' + resource_type_of + '"]') if resource_type_of else '')
+        key_str = 'counter_obj_creator' \
+                  + key_str_resource_type \
+                  + '["comments_by_others_on_res"]'
 
         existing_user_comment_cnt = eval(key_str).get(str(active_user_id), 0)
         eval(key_str).update({str(active_user_id): (existing_user_comment_cnt + 1) })
@@ -3709,9 +3712,6 @@ class Counter(DjangoDocument):
             counter_obj = Counter.get_counter_obj(active_user_id, current_group_id)
 
             # counter_obj['file']['commented_on_others_res'] += 1
-            key_str_resource_type = '["' + resource_type + '"]'\
-                                    + (('["' + resource_type_of + '"]') if resource_type_of else '')
-
             key_str = 'counter_obj' \
                       + key_str_resource_type \
                       + '["commented_on_others_res"]'
