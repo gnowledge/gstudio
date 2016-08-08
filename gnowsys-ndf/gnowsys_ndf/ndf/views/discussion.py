@@ -257,10 +257,10 @@ def discussion_reply(request, group_id, node_id):
                 # removing redundancy of user ids:
                 active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
 
-            for each_active_user_id in active_user_ids_list:
-                Counter.add_comment_pt(resource_obj_or_id=file_note_obj,
-                                       current_group_id=group_id,
-                                       active_user_id=each_active_user_id)
+            Counter.add_comment_pt(resource_obj_or_id=file_note_obj,
+                                   current_group_id=group_id,
+                                   active_user_id_or_list=active_user_ids_list)
+
 
             # if file_note_obj.if_file.mime_type :
             #     file_creator_id = file_note_obj.created_by

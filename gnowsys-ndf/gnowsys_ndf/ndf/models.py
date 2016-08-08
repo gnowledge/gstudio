@@ -3710,7 +3710,12 @@ class Counter(DjangoDocument):
 
 
     @staticmethod
-    def add_comment_pt(resource_obj_or_id, current_group_id, active_user_id):
+    def add_comment_pt(resource_obj_or_id, current_group_id, active_user_id_or_list=[]):
+
+        if not isinstance(active_user_id_or_list, list):
+            active_user_id_list = [active_user_id_or_list]
+        else:
+            active_user_id_list = active_user_id_or_list
 
         resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
         resource_oid = resource_obj._id
@@ -3718,46 +3723,50 @@ class Counter(DjangoDocument):
 
         # get resource's creator:
         resource_created_by_user_id = resource_obj.created_by
+        resource_contributors_user_ids_list = resource_obj.contributors
 
-        # counter object of resource creator
+        # counter object of resource contributor
         # ------- creator counter update: done ---------
-        counter_obj_creator = Counter.get_counter_obj(resource_created_by_user_id, current_group_id)
-        counter_obj_creator['file']['comments_gained'] += 1
+        for each_resource_contributor in resource_contributors_user_ids_list:
+            counter_obj_each_contributor = Counter.get_counter_obj(each_resource_contributor, current_group_id)
+            counter_obj_each_contributor['file']['comments_gained'] += 1
 
-        # update counter obj
-        key_str_resource_type = '["' + resource_type + '"]'\
-                                    + (('["' + resource_type_of + '"]') if resource_type_of else '')
-        key_str = 'counter_obj_creator' \
-                  + key_str_resource_type \
-                  + '["comments_by_others_on_res"]'
+            # update counter obj
+            key_str_resource_type = '["' + resource_type + '"]'\
+                                        + (('["' + resource_type_of + '"]') if resource_type_of else '')
+            key_str = 'counter_obj_each_contributor' \
+                      + key_str_resource_type \
+                      + '["comments_by_others_on_res"]'
 
-        existing_user_comment_cnt = eval(key_str).get(str(active_user_id), 0)
-        eval(key_str).update({str(active_user_id): (existing_user_comment_cnt + 1) })
+            for each_active_user_id in active_user_id_list:
+                existing_user_comment_cnt = eval(key_str).get(str(each_active_user_id), 0)
+                eval(key_str).update({str(each_active_user_id): (existing_user_comment_cnt + 1) })
 
-        counter_obj_creator.last_update = datetime.datetime.now()
-        counter_obj_creator.save()
+            counter_obj_each_contributor.last_update = datetime.datetime.now()
+            counter_obj_each_contributor.save()
         # ------- creator counter update: done ---------
 
         # processing analytics for (one) active user.
         # NOTE: [Only if active user is other than resource creator]
-        if active_user_id != resource_created_by_user_id:
-            from gnowsys_ndf.settings import GSTUDIO_COMMENT_POINTS
+        from gnowsys_ndf.settings import GSTUDIO_COMMENT_POINTS
+        for each_active_user_id in active_user_id_list:
+            if each_active_user_id not in resource_contributors_user_ids_list:
 
-            counter_obj = Counter.get_counter_obj(active_user_id, current_group_id)
+                counter_obj = Counter.get_counter_obj(each_active_user_id, current_group_id)
 
-            # counter_obj['file']['commented_on_others_res'] += 1
-            key_str = 'counter_obj' \
-                      + key_str_resource_type \
-                      + '["commented_on_others_res"]'
-            existing_commented_on_others_res = eval(key_str)
-            eval('counter_obj' + key_str_resource_type).update( \
-                { 'commented_on_others_res': (existing_commented_on_others_res + 1) })
+                # counter_obj['file']['commented_on_others_res'] += 1
+                key_str = 'counter_obj' \
+                          + key_str_resource_type \
+                          + '["commented_on_others_res"]'
+                existing_commented_on_others_res = eval(key_str)
+                eval('counter_obj' + key_str_resource_type).update( \
+                    { 'commented_on_others_res': (existing_commented_on_others_res + 1) })
 
-            counter_obj['total_comments_by_user'] += 1
-            counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
+                counter_obj['total_comments_by_user'] += 1
+                counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
 
-            counter_obj.last_update = datetime.datetime.now()
-            counter_obj.save()
+                counter_obj.last_update = datetime.datetime.now()
+                counter_obj.save()
 
 
     def save(self, *args, **kwargs):
