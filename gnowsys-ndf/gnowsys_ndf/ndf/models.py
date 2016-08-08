@@ -292,6 +292,7 @@ class Node(DjangoDocument):
     use_dot_notation = True
 
 
+    # custom methods provided for Node class
     def fill_node_values(self, request=HttpRequest(), **kwargs):
 
         # 'name': unicode,
@@ -505,27 +506,38 @@ class Node(DjangoDocument):
         return self
 
 
-    ########## Setter(@x.setter) & Getter(@property) ##########
-    @property
-    def user_details_dict(self):
-        """Retrieves names of created-by & modified-by users from the given
-        node, and appends those to 'user_details' dict-variable
+    @staticmethod
+    def get_node_obj_from_id_or_obj(node_obj_or_id, expected_type):
+        # confirming arg 'node_obj_or_id' is Object or oid and
+        # setting node_obj accordingly.
+        node_obj = None
+        if isinstance(node_obj_or_id, expected_type):
+            node_obj = node_obj_or_id
+        elif isinstance(node_obj_or_id, ObjectId):
+            node_obj = node_collection.one({'_id': ObjectId(node_obj_or_id)})
+        else:
+            # error raised:
+            raise RuntimeError('No Node class instance found with provided arg for get_node_obj_from_id_or_obj(' + str(node_obj_or_id) + ', expected_type=' + expected_type + ')')
 
+        return node_obj
+
+
+    def type_of_names_list(self, smallcase=False):
+        """Returns a list having names of each type_of (GSystemType, i.e Wiki page,
+        Blog page, etc.), built from 'type_of' field (list of ObjectIds)
         """
-        user_details = {}
-        if self.created_by:
-            user_details['created_by'] = User.objects.get(pk=self.created_by).username
+        type_of_names = []
+        if self.type_of:
+            node_cur = node_collection.find({'_id': {'$in': self.type_of}})
+            if smallcase:
+                type_of_names = [node.name.lower() for node in node_cur]
+            else:
+                type_of_names = [node.name for node in node_cur]
 
-        contributor_names = []
-        for each_pk in self.contributors:
-            contributor_names.append(User.objects.get(pk=each_pk).username)
-        user_details['contributors'] = contributor_names
+        return type_of_names
 
-        if self.modified_by:
-            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
 
-        return user_details
-
+    ########## Setter(@x.setter) & Getter(@property) ##########
     @property
     def member_of_names_list(self):
         """Returns a list having names of each member (GSystemType, i.e Page,
@@ -556,6 +568,28 @@ class Node(DjangoDocument):
                         if mem:
                             member_of_names.append(mem.name)
         return member_of_names
+
+
+    @property
+    def user_details_dict(self):
+        """Retrieves names of created-by & modified-by users from the given
+        node, and appends those to 'user_details' dict-variable
+
+        """
+        user_details = {}
+        if self.created_by:
+            user_details['created_by'] = User.objects.get(pk=self.created_by).username
+
+        contributor_names = []
+        for each_pk in self.contributors:
+            contributor_names.append(User.objects.get(pk=each_pk).username)
+        user_details['contributors'] = contributor_names
+
+        if self.modified_by:
+            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
+
+        return user_details
+
 
     @property
     def prior_node_dict(self):
@@ -3580,6 +3614,30 @@ class Counter(DjangoDocument):
     def identity(self):
         return self.__unicode__()
 
+    @staticmethod
+    def _get_resource_type_tuple(resource_obj):
+
+        # identifying resource's type:
+        resource_type = ''
+        resource_type_of = ''
+
+        # ideally, member_of field should be used to check resource_type. But it may cause performance hit.
+        # hence using 'if_file.mime_type'
+        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list):
+            resource_type = 'file'
+
+        elif u'Page' in resource_obj.member_of_names_list:
+            resource_type = 'page'
+            # mostly it 'type_of' will be [] hence kept: if not at first.
+            if not resource_obj.type_of:
+                resource_type_of = 'blog'
+            else:
+                resource_type_of_names_list = resource_obj.type_of_names_list(smallcase=True)
+                resource_type_of = resource_type_of_names_list[0].split(' ')[0]
+
+        return (resource_type, resource_type_of)
+
+
     def fill_counter_values(self,
                             user_id,
                             auth_id,
@@ -3653,42 +3711,17 @@ class Counter(DjangoDocument):
 
     @staticmethod
     def add_comment_pt(resource_obj_or_id, current_group_id, active_user_id):
-        # confirming arg 'resource_obj_or_id' is Object or oid and
-        # setting resource_obj accordingly.
-        if isinstance(resource_obj_or_id, GSystem):
-            resource_obj = resource_obj_or_id
-        elif isinstance(resource_obj_or_id, ObjectId):
-            resource_obj = node_collection.one({'_id': ObjectId(resource_obj_or_id)})
-        else:
-            # needs to put some error raising logic or default return logic
-            pass
 
+        resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
         resource_oid = resource_obj._id
-        # resource_group_oid = resource_obj.group_set[0]
-
-        # identifying resource's type:
-        resource_type = ''
-        resource_type_of = ''
-        # ideally, member_of field should be used to check resource_type. But it may cause performance hit.
-        # hence using 'if_file.mime_type'
-        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list):
-            resource_type = 'file'
-        elif u'Page' in resource_obj.member_of_names_list:
-            resource_type = 'page'
-            # mostly it 'type_of' will be [] hence kept: if not at first.
-            if not resource_obj.type_of:
-                resource_type_of = 'blog'
-            else:
-                resource_type_of = node_collection.one({
-                                        '_id': resource_obj.type_of[0]
-                                    }).name.split(' ')[0].lower()
+        resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
 
         # get resource's creator:
         resource_created_by_user_id = resource_obj.created_by
 
         # counter object of resource creator
+        # ------- creator counter update: done ---------
         counter_obj_creator = Counter.get_counter_obj(resource_created_by_user_id, current_group_id)
-
         counter_obj_creator['file']['comments_gained'] += 1
 
         # update counter obj
@@ -3703,6 +3736,7 @@ class Counter(DjangoDocument):
 
         counter_obj_creator.last_update = datetime.datetime.now()
         counter_obj_creator.save()
+        # ------- creator counter update: done ---------
 
         # processing analytics for (one) active user.
         # NOTE: [Only if active user is other than resource creator]
