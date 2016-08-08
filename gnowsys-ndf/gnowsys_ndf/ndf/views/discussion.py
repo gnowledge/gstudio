@@ -16,7 +16,7 @@ import json
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK, GSTUDIO_COMMENT_POINTS
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK, GSTUDIO_COMMENT_POINTS, GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -33,7 +33,6 @@ from gnowsys_ndf.ndf.views.methods import create_thread_for_node
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-import datetime
 import time
 from sys import getsizeof, exc_info
 import subprocess
@@ -137,6 +136,7 @@ def create_discussion(request, group_id, node_id):
 
 # to add discussion replie
 @get_execution_time
+@login_required
 def discussion_reply(request, group_id, node_id):
 
     try:
@@ -251,9 +251,16 @@ def discussion_reply(request, group_id, node_id):
             file_note_id = thread_obj.prior_node[0]
             file_note_obj = node_collection.one({'_id':file_note_id})
 
-            Counter.add_comment_pt(resource_obj_or_id=file_note_obj,
-                                   current_group_id=group_id,
-                                   active_user_id=request.user.id)
+            active_user_ids_list = [request.user.id]
+            if GSTUDIO_BUDDY_LOGIN:
+                active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.now())
+                # removing redundancy of user ids:
+                active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+            for each_active_user_id in active_user_ids_list:
+                Counter.add_comment_pt(resource_obj_or_id=file_note_obj,
+                                       current_group_id=group_id,
+                                       active_user_id=each_active_user_id)
 
             # if file_note_obj.if_file.mime_type :
             #     file_creator_id = file_note_obj.created_by
