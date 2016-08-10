@@ -3622,16 +3622,19 @@ class Counter(DjangoDocument):
                             group_points=default_values['group_points'],
                             last_update=datetime.datetime.now()
                             ):
+
         self['user_id'] = int(user_id)
         self['auth_id'] = ObjectId(auth_id)
         self['group_id'] = ObjectId(group_id)
+        self['is_group_member'] = is_group_member
+        self['group_points'] = group_points
         self['last_update'] = last_update
 
         return self
 
 
     @staticmethod
-    def get_counter_obj(userid, group_id) :
+    def get_counter_obj(userid, group_id, auth_id=None):
         user_id  = int(userid)
         group_id = ObjectId(group_id)
 
@@ -3640,10 +3643,15 @@ class Counter(DjangoDocument):
 
         # create one if not exists:
         if not counter_obj :
+
             # instantiate new counter instance
             counter_obj = counter_collection.collection.Counter()
-            auth_obj = node_collection.one({'_type': u'Author', 'created_by': user_id})
-            counter_obj.fill_counter_values(user_id=user_id, auth_id=auth_obj._id, group_id=group_id)
+
+            if not auth_id:
+                auth_obj = node_collection.one({'_type': u'Author', 'created_by': user_id})
+                auth_id = auth_obj._id
+
+            counter_obj.fill_counter_values(user_id=user_id, group_id=group_id, auth_id=auth_id)
             counter_obj.save()
 
         return counter_obj
