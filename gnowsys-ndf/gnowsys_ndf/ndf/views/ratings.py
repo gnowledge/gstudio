@@ -13,6 +13,7 @@ from django.shortcuts import render_to_response
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_node_ratings
 from gnowsys_ndf.ndf.models import *
 import json
+import datetime
 
 try:
 	from bson import ObjectId
@@ -26,7 +27,6 @@ def ratings(request, group_id, node_id):
 	rating_given = request.POST.get('rating', '')
 	node_obj = node_collection.one({'_id': ObjectId(node_id)})
 	ratedict = {}
-	already_rated_by_user = False
 
 	# # functions to modify counter collection for analytics
 	# # counter_obj=counter_collection.one({'user_id':node_obj.created_by,'group_id':ObjectId(group_id)})
@@ -92,21 +92,34 @@ def ratings(request, group_id, node_id):
 
 	# done modifying ratings for counter collection
 
-	Counter.update_ratings(node_obj, group_id, rating_given, active_user_id_or_list=[request.user.id])
+
+	active_user_ids_list = [request.user.id]
+	if GSTUDIO_BUDDY_LOGIN:
+		active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
+		# removing redundancy of user ids:
+		active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+	# print "active_user_ids_list: ", active_user_ids_list
+	Counter.update_ratings(node_obj, group_id, rating_given, active_user_id_or_list=active_user_ids_list)
 
 	if rating_given:
-		ratedict['score']=int(rating_given)
-		ratedict['user_id']=request.user.id
-		ratedict['ip_address']=request.META['REMOTE_ADDR']
+		import ipdb; ipdb.set_trace()
+		for each_active_user_id in active_user_ids_list:
 
-		for each_rating in node_obj.rating:
-			if each_rating['user_id'] == request.user.id:
-				each_rating['score']=int(rating_given)
-				already_rated_by_user = True
-				break
+			already_rated_by_user = False
 
-		if not already_rated_by_user:
-			node_obj.rating.append(ratedict)
+			ratedict['score']=int(rating_given)
+			ratedict['user_id']=each_active_user_id
+			ratedict['ip_address']=request.META['REMOTE_ADDR']
+
+			for each_rating in node_obj.rating:
+				if each_rating['user_id'] == each_active_user_id:
+					each_rating['score'] = int(rating_given)
+					already_rated_by_user = True
+					break
+
+			if not already_rated_by_user:
+				node_obj.rating.append(ratedict.copy())
 
 		node_obj.save(groupid=group_id)
 
