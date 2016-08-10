@@ -22,9 +22,9 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import LANGUAGES
+from gnowsys_ndf.settings import LANGUAGES, GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_NAME, GSTUDIO_NOTE_CREATE_POINTS
-from gnowsys_ndf.ndf.models import Node, GSystem, Triple, Counter
+from gnowsys_ndf.ndf.models import Node, GSystem, Triple, Counter, Buddy
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
@@ -337,15 +337,28 @@ def create_edit_page(request, group_id, node_id=None):
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
         if "CourseEventGroup" in group_obj.member_of_names_list and blog_type:
-            counter_obj = Counter.get_counter_obj(request.user.id,ObjectId(group_id))
             if new_page:
-              # counter_obj.no_notes_written=counter_obj.no_notes_written+1
-              counter_obj['page']['blog']['created'] += 1
-              # counter_obj.course_score += GSTUDIO_NOTE_CREATE_POINTS
-              counter_obj['group_points'] += GSTUDIO_NOTE_CREATE_POINTS
-              counter_obj.last_update = datetime.datetime.now()
-              counter_obj.save()
-          #add code for creation of new note counter
+              # counter_obj = Counter.get_counter_obj(request.user.id,ObjectId(group_id))
+              # # counter_obj.no_notes_written=counter_obj.no_notes_written+1
+              # counter_obj['page']['blog']['created'] += 1
+              # # counter_obj.course_score += GSTUDIO_NOTE_CREATE_POINTS
+              # counter_obj['group_points'] += GSTUDIO_NOTE_CREATE_POINTS
+              # counter_obj.last_update = datetime.datetime.now()
+              # counter_obj.save()
+
+              active_user_ids_list = [request.user.id]
+              if GSTUDIO_BUDDY_LOGIN:
+                  active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
+                  # removing redundancy of user ids:
+                  active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+              counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+
+              for each_counter_obj in counter_objs_cur:
+                  each_counter_obj['page']['blog']['created'] += 1
+                  each_counter_obj['group_points'] += GSTUDIO_NOTE_CREATE_POINTS
+                  each_counter_obj.last_update = datetime.datetime.now()
+                  each_counter_obj.save()
 
             return HttpResponseRedirect(reverse('course_notebook_tab_note',
                                     kwargs={
