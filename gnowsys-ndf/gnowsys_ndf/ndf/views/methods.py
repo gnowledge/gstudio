@@ -41,8 +41,8 @@ from django.shortcuts import render
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
-from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES
-from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
+from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN
+# from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
@@ -133,56 +133,6 @@ def get_execution_time(f):
     if BENCHMARK == 'OFF':
         return f
 
-
-# def get_counter_obj(userid, group_id) :
-
-#     user_id  = int(userid)
-#     group_id = ObjectId(group_id)
-
-#     # query and check for existing counter obj:
-#     counter_obj = counter_collection.one({'user_id': user_id, 'group_id': group_id})
-
-#     # create one if not exists:
-#     if not counter_obj :
-#         # instantiate new counter instance
-#         counter_obj = counter_collection.collection.Counter()
-#         counter_obj['user_id'] = user_id
-#         auth_obj = node_collection.one({'_type': u'Author', 'created_by': user_id})
-#         counter_obj['auth_id'] = ObjectId(auth_obj._id)
-#         counter_obj['group_id'] = ObjectId(group_id)
-#         counter_obj['last_update'] = datetime.now()
-#         counter_obj.save()
-
-#     return counter_obj
-
-def update_notes_or_files_visited(user_id, group_id,node_id,if_file,if_note) :
-    counter_obj = Counter.get_counter_obj(user_id, group_id)
-    if if_file:
-        file_node_obj = node_collection.one({'_id': node_id})
-        file_creator_id = file_node_obj.created_by
-        if file_creator_id != user_id :
-            # counter_obj.no_others_files_visited += 1
-            counter_obj['file']['visits_on_others_res'] += 1
-            counter_obj_creator = Counter.get_counter_obj(file_creator_id, group_id)
-            # counter_obj_creator.no_visits_gained_on_files += 1
-            counter_obj_creator['file']['visitors_gained'] += 1
-            counter_obj_creator.last_update = datetime.now()
-            counter_obj_creator.save()
-
-    elif if_note:
-        note_node_obj = node_collection.one({'_id':node_id})
-        note_creator_id = note_node_obj.created_by
-        if note_creator_id != user_id :
-            # counter_obj.no_others_notes_visited += 1
-            counter_obj['page']['blog']['visits_on_others_res'] += 1
-            counter_obj_creator = Counter.get_counter_obj(note_creator_id, group_id)
-            # counter_obj_creator.no_views_gained_on_notes += 1
-            counter_obj_creator['page']['blog']['visitors_gained'] += 1
-            counter_obj_creator.last_update = datetime.now()
-            counter_obj_creator.save()
-
-    counter_obj.last_update = datetime.now()
-    counter_obj.save()
 
 
 import json
@@ -450,6 +400,71 @@ def get_group_name_id(group_name_or_id, get_obj=False):
     else:
         return None, None
 
+
+def update_notes_or_files_visited(user_id, group_id,node_id,if_file,if_note) :
+    # counter_obj = Counter.get_counter_obj(user_id, group_id)
+    # if if_file:
+    #     file_node_obj = node_collection.one({'_id': node_id})
+    #     file_creator_id = file_node_obj.created_by
+    #     if file_creator_id != user_id :
+    #         # counter_obj.no_others_files_visited += 1
+    #         counter_obj['file']['visits_on_others_res'] += 1
+    #         counter_obj_creator = Counter.get_counter_obj(file_creator_id, group_id)
+    #         # counter_obj_creator.no_visits_gained_on_files += 1
+    #         counter_obj_creator['file']['visitors_gained'] += 1
+    #         counter_obj_creator.last_update = datetime.now()
+    #         counter_obj_creator.save()
+
+    # elif if_note:
+    #     note_node_obj = node_collection.one({'_id':node_id})
+    #     note_creator_id = note_node_obj.created_by
+    #     if note_creator_id != user_id :
+    #         # counter_obj.no_others_notes_visited += 1
+    #         counter_obj['page']['blog']['visits_on_others_res'] += 1
+    #         counter_obj_creator = Counter.get_counter_obj(note_creator_id, group_id)
+    #         # counter_obj_creator.no_views_gained_on_notes += 1
+    #         counter_obj_creator['page']['blog']['visitors_gained'] += 1
+    #         counter_obj_creator.last_update = datetime.now()
+    #         counter_obj_creator.save()
+
+    # counter_obj.last_update = datetime.now()
+    # counter_obj.save()
+
+    active_user_ids_list = [user_id]
+    if GSTUDIO_BUDDY_LOGIN:
+        active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(user_id, datetime.now())
+        # removing redundancy of user ids:
+        active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+    counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+
+    for each_counter_obj in counter_objs_cur:
+        if if_file:
+            file_node_obj = node_collection.one({'_id': node_id})
+            file_creator_id = file_node_obj.created_by
+            if file_creator_id != user_id :
+                # each_counter_obj.no_others_files_visited += 1
+                each_counter_obj['file']['visits_on_others_res'] += 1
+                counter_obj_creator = Counter.get_counter_obj(file_creator_id, group_id)
+                # counter_obj_creator.no_visits_gained_on_files += 1
+                counter_obj_creator['file']['visitors_gained'] += 1
+                counter_obj_creator.last_update = datetime.now()
+                counter_obj_creator.save()
+
+        elif if_note:
+            note_node_obj = node_collection.one({'_id':node_id})
+            note_creator_id = note_node_obj.created_by
+            if note_creator_id != user_id :
+                # each_counter_obj.no_others_notes_visited += 1
+                each_counter_obj['page']['blog']['visits_on_others_res'] += 1
+                counter_obj_creator = Counter.get_counter_obj(note_creator_id, group_id)
+                # counter_obj_creator.no_views_gained_on_notes += 1
+                counter_obj_creator['page']['blog']['visitors_gained'] += 1
+                counter_obj_creator.last_update = datetime.now()
+                counter_obj_creator.save()
+
+        each_counter_obj.last_update = datetime.now()
+        each_counter_obj.save()
 
 
 @get_execution_time

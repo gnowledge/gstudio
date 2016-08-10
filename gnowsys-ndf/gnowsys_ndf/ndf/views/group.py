@@ -2685,12 +2685,10 @@ def upload_using_save_file(request,group_id):
         counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
         # counter_obj = Counter.get_counter_obj(request.user.id, group_id)
         for each_counter_obj in counter_objs_cur:
-            print "\n\n==============", each_counter_obj['file'], ' : ', each_counter_obj['group_points']
             each_counter_obj['file']['created'] += len(fileobj_list)
             each_counter_obj['group_points'] += (len(fileobj_list) * GSTUDIO_FILE_UPLOAD_POINTS)
             each_counter_obj.last_update = datetime.now()
             each_counter_obj.save()
-            print "==============", each_counter_obj['file'], ' : ', each_counter_obj['group_points']
 
         if title == "gallery":
             return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
