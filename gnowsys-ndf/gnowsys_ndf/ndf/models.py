@@ -3673,6 +3673,27 @@ class Counter(DjangoDocument):
         return counter_obj
 
 
+    @staticmethod
+    def get_counter_objs_cur(user_ids_list, group_id):
+        group_id = ObjectId(group_id)
+
+        # query and check for existing counter obj:
+        counter_objs_cur = counter_collection.find({
+                                                'user_id': {'$in': user_ids_list},
+                                                'group_id': group_id
+                                            })
+
+        if counter_objs_cur.count() == len(user_ids_list):
+            return counter_objs_cur
+
+        else:
+            create_counter_for_user_ids = set(user_ids_list) - {uc.created_by for uc in counter_objs_cur}
+            for each_user_id in create_counter_for_user_ids:
+                get_counter_obj(each_user_id)
+
+            return counter_objs_cur.rewind()
+
+
     def get_file_points(self):
         from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS
         return self['file']['created'] * GSTUDIO_FILE_UPLOAD_POINTS
@@ -3709,6 +3730,20 @@ class Counter(DjangoDocument):
         return sum(point_breakup_dict.values())
 
 
+    # private helper functions:
+    @staticmethod
+    def __key_str_counter_resource_type_of(resource_type,
+                                        resource_type_of,
+                                        counter_obj_var_name='counter_obj'):
+        # returns str of counter_objs, resource_type and resource_type_of
+        # e.g: 'counter_obj[resource_type][resource_type_of]'
+
+        key_str_resource_type = '["' + resource_type + '"]'\
+                                + (('["' + resource_type_of + '"]') if resource_type_of else '')
+
+        return (counter_obj_var_name + key_str_resource_type)
+
+
     @staticmethod
     def add_comment_pt(resource_obj_or_id, current_group_id, active_user_id_or_list=[]):
 
@@ -3725,22 +3760,27 @@ class Counter(DjangoDocument):
         resource_created_by_user_id = resource_obj.created_by
         resource_contributors_user_ids_list = resource_obj.contributors
 
+        key_str_resource_type = '["' + resource_type + '"]'\
+                                + (('["' + resource_type_of + '"]') if resource_type_of else '')
+        key_str = 'counter_obj_each_contributor' \
+                  + key_str_resource_type \
+                  + '["comments_by_others_on_res"]'
+
         # counter object of resource contributor
         # ------- creator counter update: done ---------
         for each_resource_contributor in resource_contributors_user_ids_list:
             counter_obj_each_contributor = Counter.get_counter_obj(each_resource_contributor, current_group_id)
-            counter_obj_each_contributor['file']['comments_gained'] += 1
 
             # update counter obj
-            key_str_resource_type = '["' + resource_type + '"]'\
-                                        + (('["' + resource_type_of + '"]') if resource_type_of else '')
-            key_str = 'counter_obj_each_contributor' \
-                      + key_str_resource_type \
-                      + '["comments_by_others_on_res"]'
-
             for each_active_user_id in active_user_id_list:
                 existing_user_comment_cnt = eval(key_str).get(str(each_active_user_id), 0)
                 eval(key_str).update({str(each_active_user_id): (existing_user_comment_cnt + 1) })
+
+            # update comments gained:
+            key_str_comments_gained = "counter_obj_each_contributor" \
+                                      + key_str_resource_type
+            comments_gained = eval(key_str_comments_gained + '["comments_gained"]')
+            eval(key_str_comments_gained).update({"comments_gained": (comments_gained + 1)})
 
             counter_obj_each_contributor.last_update = datetime.datetime.now()
             counter_obj_each_contributor.save()
@@ -3767,6 +3807,69 @@ class Counter(DjangoDocument):
 
                 counter_obj.last_update = datetime.datetime.now()
                 counter_obj.save()
+
+
+    @staticmethod
+    def update_ratings(resource_obj_or_id, current_group_id, rating_given, active_user_id_or_list=[]):
+
+        if not isinstance(active_user_id_or_list, list):
+            active_user_id_list = [active_user_id_or_list]
+        else:
+            active_user_id_list = active_user_id_or_list
+
+        resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
+        resource_oid = resource_obj._id
+        resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
+
+        # get resource's creator:
+        # resource_created_by_user_id = resource_obj.created_by
+        resource_contributors_user_ids_list = resource_obj.contributors
+
+        # creating {user_id: score}
+        # e.g: {162: 3, 163: 3, 164: 3, 165: 3, 166: 3, 167: 3}
+        userid_score_rating_dict = {d['user_id']: d['score'] for d in resource_obj.rating}
+
+        user_counter_cur = Counter.get_counter_objs_cur(resource_contributors_user_ids_list, current_group_id)
+
+        key_str_counter_resource_type = Counter.__key_str_counter_resource_type_of(resource_type,
+                                                                           resource_type_of,
+                                                                           'each_uc')
+
+        key_str_counter_resource_type_rating_count_received = key_str_counter_resource_type \
+                                                              + '["rating_count_received"]'
+
+        key_str_counter_resource_type_avg_rating_gained = key_str_counter_resource_type \
+                                                              + '["avg_rating_gained"]'
+
+        # iterating over each user id in contributors
+        # uc: user counter
+        for each_uc in user_counter_cur:
+            userid_score_rating_dict_copy = userid_score_rating_dict.copy()
+
+            rating_count_received = eval(key_str_counter_resource_type_rating_count_received)
+            avg_rating_gained = eval(key_str_counter_resource_type_avg_rating_gained)
+
+            total_rating = rating_count_received * avg_rating_gained
+
+            # first time rating giving user:
+            if active_user_id_list[0] not in userid_score_rating_dict_copy:
+                # add new key: value in dict to avoid errors
+                userid_score_rating_dict_copy.update({active_user_id_list[0]: 0})
+                eval(key_str_counter_resource_type).update( \
+                                    {'rating_count_received': (rating_count_received + 1)} )
+
+            total_rating = total_rating - userid_score_rating_dict_copy[active_user_id_list[0]]
+            total_rating = total_rating + int(rating_given)
+
+            # getting value from updated 'rating_count_received'. hence repeated.
+            rating_count_received = eval(key_str_counter_resource_type_rating_count_received) or 1
+            # storing float result to get more accurate avg.
+            avg_rating_gained = float(format(total_rating / float(rating_count_received), '.2f'))
+
+            eval(key_str_counter_resource_type).update( \
+                                    {'avg_rating_gained': avg_rating_gained})
+
+            each_uc.save()
 
 
     def save(self, *args, **kwargs):
