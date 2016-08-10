@@ -3538,43 +3538,19 @@ class Counter(DjangoDocument):
         'group_points': int,
 
         # -- notes --
-        # 'no_notes_written':int,
-        # 'no_views_gained_on_notes':int, # benchmark
-        # 'no_others_notes_visited':int, # benchmark
-        # 'no_comments_received_on_notes':int,
-        # 'no_comments_on_others_notes':int,
-        # 'comments_by_others_on_notes': dict,
-        # 'rating_count_received_on_notes': int,
-        # 'avg_rating_received_on_notes':float,
         'page': {'blog': dict, 'wiki': dict, 'info': dict},  # resource
 
         # -- files --
-        # 'no_files_created':int,
-        # 'no_visits_gained_on_files':int, # benchmark
-        # 'no_comments_received_on_files':int,
-        # 'no_others_files_visited':int,# benchmark
-        # 'no_comments_on_others_files':int,
-        # 'comments_by_others_on_files': dict,
-        # 'rating_count_received_on_files': int,
-        # 'avg_rating_received_on_files':float,
         'file': dict,  # resource
 
         # -- quiz --
-        # 'no_questions_attempted':int,
-        # 'no_correct_answers':int,
-        # 'no_incorrect_answers':int,
         'quiz': {'attempted': int, 'correct': int, 'incorrect': int},
 
         # -- interactions --
-        # # decided that this can be derived from addition of comments in page, file
-        # 'no_comments_by_user':int,
-        # 'no_comments_for_user':int,
         'total_comments_by_user': int,
 
         # Total fields should be updated on enroll action
         # On module/unit add/delete, update 'total' fields for all users in celery
-        # 'modules_completed':int,
-        # 'units_completed':int,
         'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}}
     }
 
@@ -3844,32 +3820,35 @@ class Counter(DjangoDocument):
         # iterating over each user id in contributors
         # uc: user counter
         for each_uc in user_counter_cur:
-            userid_score_rating_dict_copy = userid_score_rating_dict.copy()
 
-            rating_count_received = eval(key_str_counter_resource_type_rating_count_received)
-            avg_rating_gained = eval(key_str_counter_resource_type_avg_rating_gained)
+            for each_active_user_id in active_user_id_list:
 
-            total_rating = rating_count_received * avg_rating_gained
+                userid_score_rating_dict_copy = userid_score_rating_dict.copy()
 
-            # first time rating giving user:
-            if active_user_id_list[0] not in userid_score_rating_dict_copy:
-                # add new key: value in dict to avoid errors
-                userid_score_rating_dict_copy.update({active_user_id_list[0]: 0})
+                rating_count_received = eval(key_str_counter_resource_type_rating_count_received)
+                avg_rating_gained = eval(key_str_counter_resource_type_avg_rating_gained)
+
+                total_rating = rating_count_received * avg_rating_gained
+
+                # first time rating giving user:
+                if each_active_user_id not in userid_score_rating_dict_copy:
+                    # add new key: value in dict to avoid errors
+                    userid_score_rating_dict_copy.update({each_active_user_id: 0})
+                    eval(key_str_counter_resource_type).update( \
+                                        {'rating_count_received': (rating_count_received + 1)} )
+
+                total_rating = total_rating - userid_score_rating_dict_copy[each_active_user_id]
+                total_rating = total_rating + int(rating_given)
+
+                # getting value from updated 'rating_count_received'. hence repeated.
+                rating_count_received = eval(key_str_counter_resource_type_rating_count_received) or 1
+                # storing float result to get more accurate avg.
+                avg_rating_gained = float(format(total_rating / float(rating_count_received), '.2f'))
+
                 eval(key_str_counter_resource_type).update( \
-                                    {'rating_count_received': (rating_count_received + 1)} )
+                                        {'avg_rating_gained': avg_rating_gained})
 
-            total_rating = total_rating - userid_score_rating_dict_copy[active_user_id_list[0]]
-            total_rating = total_rating + int(rating_given)
-
-            # getting value from updated 'rating_count_received'. hence repeated.
-            rating_count_received = eval(key_str_counter_resource_type_rating_count_received) or 1
-            # storing float result to get more accurate avg.
-            avg_rating_gained = float(format(total_rating / float(rating_count_received), '.2f'))
-
-            eval(key_str_counter_resource_type).update( \
-                                    {'avg_rating_gained': avg_rating_gained})
-
-            each_uc.save()
+                each_uc.save()
 
 
     def save(self, *args, **kwargs):

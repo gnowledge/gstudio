@@ -31,11 +31,9 @@ def ratings(request, group_id, node_id):
 	# # functions to modify counter collection for analytics
 	# # counter_obj=counter_collection.one({'user_id':node_obj.created_by,'group_id':ObjectId(group_id)})
 	# counter_obj = Counter.get_counter_obj(node_obj.created_by, ObjectId(group_id))
-	# # import ipdb; ipdb.set_trace()
 	# unique=True
 	# blog=None
 
-	# import ipdb; ipdb.set_trace()
 
 	# if len(node_obj.type_of)!=0:
 	# 	blog=node_collection.one({'_id':node_obj.type_of[0]})
@@ -92,7 +90,6 @@ def ratings(request, group_id, node_id):
 
 	# done modifying ratings for counter collection
 
-
 	active_user_ids_list = [request.user.id]
 	if GSTUDIO_BUDDY_LOGIN:
 		active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
@@ -103,7 +100,6 @@ def ratings(request, group_id, node_id):
 	Counter.update_ratings(node_obj, group_id, rating_given, active_user_id_or_list=active_user_ids_list)
 
 	if rating_given:
-		import ipdb; ipdb.set_trace()
 		for each_active_user_id in active_user_ids_list:
 
 			already_rated_by_user = False
