@@ -124,7 +124,6 @@
               <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                 {% with group_obj.member_of_names_list.0 as sg_type %}
                   <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fi-page-edit"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
-                {% endwith %}
                 <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_id %}"> <i class="fi-clipboard-notes"></i> {% if group_obj.collection_set %}{% trans "Edit Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></li>
                 {% comment %}
                 <li><a class="tiny radius settings" ><i class="fi-clock"></i> {% trans " Plan Release Dates" %}</a></li>
@@ -133,7 +132,7 @@
                   <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
                 </li>
                 <li>
-                  <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% trans ' Add Students' %}</a>
+                  <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% if sg_type == "CourseEventGroup" %}{% trans ' Add Students' %}{% else %}{% trans ' Add Members' %} {% endif %} </a>
                   {% include "ndf/invite_users.html" with no_subscribe_btn=True node=group_obj%}
                 </li>
                 <li>
@@ -141,8 +140,9 @@
                   {% include "ndf/invite_admins.html" with no_subscribe_btn=True node=group_obj %}
                 </li>
                 <li>
-                  <a href="{% url 'manage_users' group_id %}" class="fi-torso"> Manage Students</a>
+                  <a href="{% url 'manage_users' group_id %}" class="fi-torso">{% if sg_type == "CourseEventGroup" %} Manage Students{% else %}Manage Members  {% endif %}</a>
                 </li>
+                {% endwith %}
 
               </ul>
             </div>
