@@ -14,7 +14,7 @@
 		/*float: left;*/
 		/*margin-left: 1rem;*/
 		width: 40%;
-		font-size: 0.70em !important;
+		font-size: 0.85em !important;
 		margin-top: 0.1rem !important;
 		text-align: center;
 	}
@@ -157,26 +157,6 @@
 				<div class="row btn-row">
 					<!-- History -->
 					<a href = "{% url 'node_version' groupid node.pk  %}" class="tiny button radius right-btn" >{% trans "History" %}</a> 
-						<!-- Cross Publish -->
-						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
-							{% if node.created_by == request.user.id or is_gstaff %}
-							<!-- {% switch_group_conditions request.user group_id as switch_conditions %} -->
-							<!-- If resource is already under moderation, don't show cross-publish button -->
-
-								<span  title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius right-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
-								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
-									<h4>{% trans "Select Groups" %}</h4>
-									<div id="switchgrp" class="content">
-									<ul id="group_drawer" class="large-block-grid-2">
-									</ul><br/>
-									<input type="button" id="save_switch_group" class="round button push-4" value="{% trans 'Save selected group' %}">
-									</div>
-									<a class="close-reveal-modal">&#215;</a>
-								</div>
-							{% else %}
-								<input type="button" class="tiny button radius left-btn secondary disabled" title="{% trans 'You are not authorized for this action' %}" value="{% trans 'Cross Publish' %}">
-							{% endif %}
-						{% endif %}
 						<!-- Delete button				 -->
 						{% if node.created_by == request.user.id or is_gstaff %}
 							{% if "Page" in node.member_of_names_list or "File" in node.member_of_names_list or "Term" in node.member_of_names_list %}
@@ -188,6 +168,26 @@
 							<input type="button" class="tiny button radius right-btn secondary disabled" value="{% trans 'Delete' %} {{node.member_of_names_list.0}}" title="{% trans 'You are not authorized for this action' %}">
 						{% endif %}
 
+						<!-- Cross Publish -->
+						{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
+							{% if node.created_by == request.user.id or is_gstaff %}
+							<!-- {% switch_group_conditions request.user group_id as switch_conditions %} -->
+							<!-- If resource is already under moderation, don't show cross-publish button -->
+
+								<span  title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius mod-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
+								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
+									<h4>{% trans "Select Groups" %}</h4>
+									<div id="switchgrp" class="content">
+									<ul id="group_drawer" class="large-block-grid-2">
+									</ul><br/>
+									<input type="button" id="save_switch_group" class="round button push-4" value="{% trans 'Save selected group' %}">
+									</div>
+									<a class="close-reveal-modal">&#215;</a>
+								</div>
+							{% else %}
+								<input type="button" class="tiny button radius mod-btn secondary disabled" title="{% trans 'You are not authorized for this action' %}" value="{% trans 'Cross Publish' %}">
+							{% endif %}
+						{% endif %}
 
 				</div>
 				{% endif %}
@@ -403,7 +403,7 @@
 		                    <!-- Reveal Modals begin -->
 		                    <div id="firstModal" class="reveal-modal" data-reveal></div>
 					{% endcomment %}
-							<a href="{% url 'program' groupid %}" class="tiny button radius left-btn"><span>{% trans 'List Programs' %}</span></a>
+							<a href="{% url 'program' groupid %}" class="tiny button radius left-btn"><span>{% trans 'Programs' %}</span></a>
 					
 					<!-- Join/ Unsubscribe -->
 						{% if user.is_authenticated %}
