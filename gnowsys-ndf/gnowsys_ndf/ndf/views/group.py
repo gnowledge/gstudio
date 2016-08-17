@@ -21,15 +21,15 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM, GSTUDIO_FILE_UPLOAD_POINTS
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM, GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter
+from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter, counter_collection
 from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff # get_existing_groups
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
@@ -1591,21 +1591,20 @@ class EventGroupCreateEditHandler(View):
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
                     # creating a new counter document for a user for a given course for the purpose of analytics
-                    auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
 
-                    counter_obj = counter_collection.collection.Counter()
-                    counter_obj.fill_counter_values(
-                                                    user_id=request.user.id,
-                                                    auth_id=auth_obj._id,
-                                                    group_id=group_obj._id,
-                                                    is_group_member=True
-                                                )
-                    # counter_obj.user_id=request.user.id
-                    # counter_obj.auth_id=ObjectId(auth_obj._id)
-                    # counter_obj.group_id=ObjectId(group_obj._id)
-                    # counter_obj.last_update=datetime.today()
-                    # counter_obj.enrolled = True
-                    counter_obj.save()
+                    counter_obj = Counter.get_counter_obj(userid, group_id)
+                    # print "===========================", counter_obj
+
+                    # auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
+
+                    # counter_obj = counter_collection.collection.Counter()
+                    # counter_obj.fill_counter_values(
+                    #                                 user_id=request.user.id,
+                    #                                 auth_id=auth_obj._id,
+                    #                                 group_id=group_obj._id,
+                    #                                 is_group_member=True
+                    #                             )
+                    # counter_obj.save()
 
                 # elif sg_type == "ProgramEventGroup":
                     # mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
@@ -2553,13 +2552,14 @@ def upload_using_save_file(request,group_id):
     #     #     url_name = "/"+str(group_id)+"/#gallery-tab"
 
     from gnowsys_ndf.ndf.views.filehive import write_files
+    is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
 
     # gs_obj_list = write_files(request, group_id)
     fileobj_list = write_files(request, group_id)
     fileobj_id = fileobj_list[0]['_id']
     file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
 
-    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER":
+    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
         if request.POST:
             # mtitle = request.POST.get("docTitle", "")
             # userid = request.POST.get("user", "")
@@ -2609,7 +2609,6 @@ def upload_using_save_file(request,group_id):
                 # create gattribute for file with source value
                 source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
                 src = create_gattribute(ObjectId(file_node._id), source_AT, source)
-                print "\n\n\n\n\n\n++src",src
 
             if Audience:
               # create gattribute for file with Audience value
@@ -2661,10 +2660,10 @@ def upload_using_save_file(request,group_id):
         each_gs_file.status = u"PUBLISHED"
         if usrid not in each_gs_file.contributors:
             each_gs_file.contributors.append(usrid)
-        if title == "raw material":
+
+        if title == "raw material" or (title == "gallery" and is_user_gstaff):
             each_gs_file.tags =  [u'raw@material']
-        create_gattribute(each_gs_file._id, discussion_enable_at, True)
-        return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
+
         group_object = node_collection.one({'_id': ObjectId(group_id)})
         if (group_object.edit_policy == "EDITABLE_MODERATED") and (group_object.moderation_level > 0):
             from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
@@ -2674,17 +2673,29 @@ def upload_using_save_file(request,group_id):
             each_gs_file.status = u'MODERATION'
             # print "\n\n\n page_node.status",page_node.status
         each_gs_file.save()
+        create_gattribute(each_gs_file._id, discussion_enable_at, True)
+        return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
 
     if (title == "gallery") or (title == "raw material"):
-        counter_obj = Counter.get_counter_obj(request.user.id, group_id)
-        counter_obj['file']['created'] += len(fileobj_list)
-        counter_obj['group_points'] += (len(fileobj_list) * GSTUDIO_FILE_UPLOAD_POINTS)
-        counter_obj.last_update = datetime.now()
-        counter_obj.save()
-        if title == "gallery":
-            return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
-        else:
-            return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
+
+        active_user_ids_list = [request.user.id]
+        if GSTUDIO_BUDDY_LOGIN:
+            active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.now())
+            # removing redundancy of user ids:
+            active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+        counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+        # counter_obj = Counter.get_counter_obj(request.user.id, group_id)
+        for each_counter_obj in counter_objs_cur:
+            each_counter_obj['file']['created'] += len(fileobj_list)
+            each_counter_obj['group_points'] += (len(fileobj_list) * GSTUDIO_FILE_UPLOAD_POINTS)
+            each_counter_obj.last_update = datetime.now()
+            each_counter_obj.save()
+
+    if title == "gallery" and not is_user_gstaff:
+        return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
+    elif title == "raw material" or (title == "gallery" and is_user_gstaff):
+        return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     else:
-        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
+        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}))
     # return HttpResponseRedirect(url_name)

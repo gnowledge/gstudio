@@ -2038,7 +2038,10 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
 
         if user_id :
             #updating counters collection
-            update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(notebook_id),False,True)
+            # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(notebook_id),False,True)
+            Counter.add_visit_count(resource_obj_or_id=notebook_obj,
+                                    current_group_id=group_id,
+                                    loggedin_userid=request.user.id)
 
 
     else:
@@ -2115,7 +2118,10 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
         #updating counters collection
-        update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
+        # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
+        Counter.add_visit_count(resource_obj_or_id=file_obj,
+                                current_group_id=group_id,
+                                loggedin_userid=request.user.id)
 
     else:
 
@@ -2204,13 +2210,20 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         allow_to_comment = None
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
-        #updating counters collection
-        update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
+        # updating counters collection:
+        # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
+        Counter.add_visit_count(resource_obj_or_id=file_obj,
+                                current_group_id=group_id,
+                                loggedin_userid=request.user.id)
+
 
     else:
-
+        all_superusers = User.objects.filter(is_superuser=True)
+        all_superusers_ids = all_superusers.values_list('id',flat=True)
         gstaff_users.extend(group_obj.group_admin)
         gstaff_users.append(group_obj.created_by)
+        gstaff_users.extend(all_superusers_ids)
+
         files_cur = node_collection.find({
                                         'created_by': {'$nin': gstaff_users},
                                         '_type': {'$in':["File","GSystem"]},
@@ -2556,12 +2569,12 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
     # TO IMPROVE
     # analytics_data['other_viewing_my_files'] = counter_obj.no_visits_gained_on_files
-    analytics_data['other_viewing_my_files'] = counter_obj['file']['visitors_gained']
+    analytics_data['other_viewing_my_files'] = counter_obj['file']['visits_gained']
     # print "\n Total Users viewing My FILES === ", other_viewing_my_files, "\n\n"
 
     # TO IMPROVE
     # analytics_data['others_reading_my_notes'] = counter_obj.no_views_gained_on_notes
-    analytics_data['others_reading_my_notes'] = counter_obj['page']['blog']['visitors_gained']
+    analytics_data['others_reading_my_notes'] = counter_obj['page']['blog']['visits_gained']
     # print "\n Total Users reading My NOTES === ", others_reading_my_notes, "\n\n"
 
     # analytics_data['commented_on_others_notes'] = counter_obj.no_comments_on_others_notes
