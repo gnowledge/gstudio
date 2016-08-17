@@ -2569,12 +2569,12 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
     # TO IMPROVE
     # analytics_data['other_viewing_my_files'] = counter_obj.no_visits_gained_on_files
-    analytics_data['other_viewing_my_files'] = counter_obj['file']['visitors_gained']
+    analytics_data['other_viewing_my_files'] = counter_obj['file']['visits_gained']
     # print "\n Total Users viewing My FILES === ", other_viewing_my_files, "\n\n"
 
     # TO IMPROVE
     # analytics_data['others_reading_my_notes'] = counter_obj.no_views_gained_on_notes
-    analytics_data['others_reading_my_notes'] = counter_obj['page']['blog']['visitors_gained']
+    analytics_data['others_reading_my_notes'] = counter_obj['page']['blog']['visits_gained']
     # print "\n Total Users reading My NOTES === ", others_reading_my_notes, "\n\n"
 
     # analytics_data['commented_on_others_notes'] = counter_obj.no_comments_on_others_notes

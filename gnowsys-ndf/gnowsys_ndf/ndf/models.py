@@ -3513,7 +3513,7 @@ class Counter(DjangoDocument):
     default_resource_stats = {
         'created' : 0,  # no of files/pages/any-app's instance created
 
-        'visitors_gained': 0, # Count of unique visitors(user's) not total visits
+        'visits_gained': 0, # Count of unique visitors(user's) not total visits
         'visits_on_others_res':  0, # count of visits not resources
 
         'comments_gained':  0,  # Count of comments not resources
@@ -3824,8 +3824,8 @@ class Counter(DjangoDocument):
                                                                            'each_uc')
         key_str_counter_resource_type_visits_on_others_res = key_str_counter_resource_type \
                                                               + '["visits_on_others_res"]'
-        key_str_creator_counter_resource_type_visitors_gained = key_str_counter_resource_type \
-                                                              + '["visitors_gained"]'
+        key_str_creator_counter_resource_type_visits_gained = key_str_counter_resource_type \
+                                                              + '["visits_gained"]'
 
         for each_uc in counter_objs_cur:
             # if each_uc['user_id'] not in resource_contributors_user_ids_list:
@@ -3843,9 +3843,9 @@ class Counter(DjangoDocument):
         creator_counter_objs_cur = Counter.get_counter_objs_cur(diff_contrib_ids_list, current_group_id)
 
         for each_uc in creator_counter_objs_cur:
-            # counter_obj_creator['file']['visitors_gained'] += 1
-            visitors_gained = eval(key_str_creator_counter_resource_type_visitors_gained)
-            eval(key_str_counter_resource_type).update({"visitors_gained": (visitors_gained + diff_contrib_ids_list_length)})
+            # counter_obj_creator['file']['visits_gained'] += 1
+            visits_gained = eval(key_str_creator_counter_resource_type_visits_gained)
+            eval(key_str_counter_resource_type).update({"visits_gained": (visits_gained + diff_contrib_ids_list_length)})
             each_uc.save()
 
 

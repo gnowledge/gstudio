@@ -98,7 +98,7 @@ def create_or_update_counter(user_obj, group_id):
     # counter_obj['comments_by_others_on_files'] = analytics_instance.get_commented_unique_users_dict(False,True)
     counter_obj['file']['comments_by_others_on_res'] = analytics_instance.get_commented_unique_users_dict(False,True)
     # Get all unique users who visited files created by user
-    counter_obj['file']['visitors_gained'] = analytics_instance.total_users_visted_my_files()
+    counter_obj['file']['visits_gained'] = analytics_instance.total_users_visted_my_files()
 
     ## NOTES ##
     # Get all notes/blog pages created by user
@@ -110,7 +110,7 @@ def create_or_update_counter(user_obj, group_id):
     # counter_obj['no_comments_on_others_notes'] = analytics_instance.get_other_notes_commented_by_user_count()
     counter_obj['page']['blog']['commented_on_others_res'] = analytics_instance.get_other_notes_commented_by_user_count()
     # Get all unique users who visited notes created by user
-    counter_obj['page']['blog']['visitors_gained'] = analytics_instance.total_users_read_my_notes()
+    counter_obj['page']['blog']['visits_gained'] = analytics_instance.total_users_read_my_notes()
     counter_obj['page']['blog']['visits_on_others_res'] = analytics_instance.get_others_notes_read_count()
     counter_obj['page']['blog']['avg_rating_gained'] = float(analytics_instance.get_ratings_received_on_user_notes())
     # Get the dictionary for unique users commented on notes uploaded by user
