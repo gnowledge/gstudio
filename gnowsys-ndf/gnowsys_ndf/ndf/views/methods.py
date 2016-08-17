@@ -442,7 +442,7 @@ def update_notes_or_files_visited(user_id, group_id,node_id,if_file,if_note) :
         if if_file:
             file_node_obj = node_collection.one({'_id': node_id})
             file_creator_id = file_node_obj.created_by
-            if file_creator_id != user_id :
+            if file_creator_id != user_id:
                 # each_counter_obj.no_others_files_visited += 1
                 each_counter_obj['file']['visits_on_others_res'] += 1
                 counter_obj_creator = Counter.get_counter_obj(file_creator_id, group_id)

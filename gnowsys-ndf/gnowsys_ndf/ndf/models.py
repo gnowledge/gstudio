@@ -3794,6 +3794,61 @@ class Counter(DjangoDocument):
 
 
     @staticmethod
+    def add_visit_count(resource_obj_or_id, current_group_id, loggedin_userid):
+
+        active_user_ids_list = [loggedin_userid]
+        if GSTUDIO_BUDDY_LOGIN:
+            active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(loggedin_userid, datetime.datetime.now())
+            # removing redundancy of user ids:
+            # active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+        resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
+        resource_oid = resource_obj._id
+        resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
+
+        # get resource's creator:
+        resource_created_by_user_id = resource_obj.created_by
+        resource_contributors_user_ids_list = resource_obj.contributors
+
+        # contributors will not get increament in visit count increment for own resource.
+        diff_user_ids_list = list(set(active_user_ids_list) - set(resource_contributors_user_ids_list))
+        diff_user_ids_list_length = len(diff_user_ids_list)
+        if diff_user_ids_list_length == 0:
+            return
+
+        counter_objs_cur = Counter.get_counter_objs_cur(diff_user_ids_list, current_group_id)
+
+        key_str_counter_resource_type = Counter.__key_str_counter_resource_type_of(resource_type,
+                                                                           resource_type_of,
+                                                                           'each_uc')
+        key_str_counter_resource_type_visits_on_others_res = key_str_counter_resource_type \
+                                                              + '["visits_on_others_res"]'
+        key_str_creator_counter_resource_type_visitors_gained = key_str_counter_resource_type \
+                                                              + '["visitors_gained"]'
+
+        for each_uc in counter_objs_cur:
+            # if each_uc['user_id'] not in resource_contributors_user_ids_list:
+            visits_on_others_res = eval(key_str_counter_resource_type_visits_on_others_res)
+            eval(key_str_counter_resource_type).update({"visits_on_others_res": (visits_on_others_res + 1)})
+            each_uc.save()
+
+
+        # contributors will not get increament in visit count increment for own resource.
+        diff_contrib_ids_list = list(set(resource_contributors_user_ids_list) - set(active_user_ids_list))
+        diff_contrib_ids_list_length = len(diff_contrib_ids_list)
+        if diff_contrib_ids_list_length == 0:
+            return
+
+        creator_counter_objs_cur = Counter.get_counter_objs_cur(diff_contrib_ids_list, current_group_id)
+
+        for each_uc in creator_counter_objs_cur:
+            # counter_obj_creator['file']['visitors_gained'] += 1
+            visitors_gained = eval(key_str_creator_counter_resource_type_visitors_gained)
+            eval(key_str_counter_resource_type).update({"visitors_gained": (visitors_gained + diff_contrib_ids_list_length)})
+            each_uc.save()
+
+
+    @staticmethod
     def update_ratings(resource_obj_or_id, current_group_id, rating_given, active_user_id_or_list=[]):
 
         if not isinstance(active_user_id_or_list, list):
@@ -3810,7 +3865,7 @@ class Counter(DjangoDocument):
         resource_contributors_user_ids_list = resource_obj.contributors
 
         # creating {user_id: score}
-        # e.g: {162: 3, 163: 3, 164: 3, 165: 3, 166: 3, 167: 3}
+        # e.g: {162: 5, 163: 3, 164: 4}
         userid_score_rating_dict = {d['user_id']: d['score'] for d in resource_obj.rating}
 
         user_counter_cur = Counter.get_counter_objs_cur(resource_contributors_user_ids_list, current_group_id)
@@ -3818,10 +3873,8 @@ class Counter(DjangoDocument):
         key_str_counter_resource_type = Counter.__key_str_counter_resource_type_of(resource_type,
                                                                            resource_type_of,
                                                                            'each_uc')
-
         key_str_counter_resource_type_rating_count_received = key_str_counter_resource_type \
                                                               + '["rating_count_received"]'
-
         key_str_counter_resource_type_avg_rating_gained = key_str_counter_resource_type \
                                                               + '["avg_rating_gained"]'
 
