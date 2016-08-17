@@ -2644,7 +2644,7 @@ def upload_using_save_file(request,group_id):
         each_gs_file.status = u"PUBLISHED"
         if usrid not in each_gs_file.contributors:
             each_gs_file.contributors.append(usrid)
-        if title == "raw material" or is_user_gstaff:
+        if title == "raw material" or (title == "gallery" and is_user_gstaff):
             each_gs_file.tags = [u'raw@material']
         each_gs_file.save()
         create_gattribute(each_gs_file._id, discussion_enable_at, True)
@@ -2652,7 +2652,7 @@ def upload_using_save_file(request,group_id):
 
     if title == "gallery" and not is_user_gstaff:
         return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
-    elif title == "raw material" or is_user_gstaff:
+    elif title == "raw material" or (title == "gallery" and is_user_gstaff):
         return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     else:
         return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
