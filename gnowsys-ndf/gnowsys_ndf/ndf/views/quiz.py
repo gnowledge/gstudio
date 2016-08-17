@@ -428,16 +428,28 @@ def save_quizitem_answer(request, group_id):
                 response_dict['count'] = len(new_list)
                 response_dict['success'] = True
 
+                active_user_ids_list = [request.user.id]
+                if GSTUDIO_BUDDY_LOGIN:
+                    active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
+                    # removing redundancy of user ids:
+                    # active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+                counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+
                 #code to update counter collection
-                counter_obj = Counter.get_counter_obj(user_id, group_id)
+                # counter_obj = Counter.get_counter_obj(user_id, group_id)
+
 
                 if already_ans_obj==None:
                     for one_att in user_ans.attribute_set:
                         if 'quizitempost_user_submitted_ans' in one_att:
                             if len(one_att['quizitempost_user_submitted_ans'])!=0:
                                 # counter_obj.no_questions_attempted+=1
-                                counter_obj['quiz']['attempted'] +=1
-                                counter_obj.save()
+                                for each_uc in counter_objs_cur:
+                                    each_uc['quiz']['attempted'] +=1
+                                    each_uc.save()
+
+                                counter_objs_cur.rewind()
 
                 for num in node_obj.attribute_set:
                     if 'correct_answer' in num:
@@ -449,15 +461,18 @@ def save_quizitem_answer(request, group_id):
                     if 'quizitempost_user_submitted_ans' in one_att:
                         if type_of_quiz=='Single-Choice':
                             if len(one_att['quizitempost_user_submitted_ans'])!=0:
-                                if cmp(cor_ans,user_given_ans)==0:
-                                    # counter_obj.no_correct_answers+=1
-                                    counter_obj['quiz']['correct'] += 1
-                                    counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
-                                    counter_obj.save()
-                                else:
-                                    # counter_obj.no_incorrect_answers+=1
-                                    counter_obj['quiz']['incorrect'] += 1
-                                    counter_obj.save()
+
+                                for each_uc in counter_objs_cur:
+                                    if cmp(cor_ans,user_given_ans)==0:
+                                        # counter_obj.no_correct_answers+=1
+                                        each_uc['quiz']['correct'] += 1
+                                        each_uc['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                        each_uc.save()
+                                    else:
+                                        # each_uc.no_incorrect_answers+=1
+                                        each_uc['quiz']['incorrect'] += 1
+                                        each_uc.save()
+                                counter_objs_cur.rewind()
 
                         if type_of_quiz=='Multiple-Choice':
                             if len(one_att['quizitempost_user_submitted_ans'])!=0:
@@ -476,24 +491,27 @@ def save_quizitem_answer(request, group_id):
                                     except Exception as e1:
                                         search=False
                                         break
-                                if search==True:
-                                    # counter_obj.no_correct_answers+=1
-                                    counter_obj['quiz']['correct'] += 1
-                                    # counter_obj.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS
-                                    counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
-                                    counter_obj.save()
-                                else:
-                                    # counter_obj.no_incorrect_answers+=1
-                                    counter_obj['quiz']['incorrect'] += 1
-                                    counter_obj.save()
+                                for each_uc in counter_objs_cur:
+                                    if search==True:
+                                        # counter_obj.no_correct_answers+=1
+                                        each_uc['quiz']['correct'] += 1
+                                        # each_uc.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS
+                                        each_uc['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                        each_uc.save()
+                                    else:
+                                        # each_uc.no_incorrect_answers+=1
+                                        each_uc['quiz']['incorrect'] += 1
+                                        each_uc.save()
+                                counter_objs_cur.rewind()
 
                         if type_of_quiz=='Short-Response':
                             if len(user_given_ans)!=0:
                                 # counter_obj.no_correct_answers+=1
-                                counter_obj['quiz']['correct'] += 1
-                                # counter_obj.course_score += GSTUDIO_QUIZ_CORRECT_POINTS
-                                counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
-                                counter_obj.save()
+                                for each_uc in counter_objs_cur:
+                                    each_uc['quiz']['correct'] += 1
+                                    # each_uc.course_score += GSTUDIO_QUIZ_CORRECT_POINTS
+                                    each_uc['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                    each_uc.save()
                 #updated counter collection
 
 
