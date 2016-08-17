@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff # get_existing_groups
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
@@ -2536,6 +2536,7 @@ def upload_using_save_file(request,group_id):
     #     #     url_name = "/"+str(group_id)+"/#gallery-tab"
 
     from gnowsys_ndf.ndf.views.filehive import write_files
+    is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
 
     # gs_obj_list = write_files(request, group_id)
     fileobj_list = write_files(request, group_id)
@@ -2592,7 +2593,6 @@ def upload_using_save_file(request,group_id):
                 # create gattribute for file with source value
                 source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
                 src = create_gattribute(ObjectId(file_node._id), source_AT, source)
-                print "\n\n\n\n\n\n++src",src
 
             if Audience:
               # create gattribute for file with Audience value
@@ -2644,15 +2644,15 @@ def upload_using_save_file(request,group_id):
         each_gs_file.status = u"PUBLISHED"
         if usrid not in each_gs_file.contributors:
             each_gs_file.contributors.append(usrid)
-        if title == "raw material":
-            each_gs_file.tags =  [u'raw@material']
+        if title == "raw material" or is_user_gstaff:
+            each_gs_file.tags = [u'raw@material']
         each_gs_file.save()
         create_gattribute(each_gs_file._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
 
-    if title == "gallery":
+    if title == "gallery" and not is_user_gstaff:
         return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
-    elif title == "raw material":
+    elif title == "raw material" or is_user_gstaff:
         return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     else:
         return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
