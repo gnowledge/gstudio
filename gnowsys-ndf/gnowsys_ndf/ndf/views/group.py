@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff # get_existing_groups
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
@@ -2552,13 +2552,14 @@ def upload_using_save_file(request,group_id):
     #     #     url_name = "/"+str(group_id)+"/#gallery-tab"
 
     from gnowsys_ndf.ndf.views.filehive import write_files
+    is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
 
     # gs_obj_list = write_files(request, group_id)
     fileobj_list = write_files(request, group_id)
     fileobj_id = fileobj_list[0]['_id']
-
     file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
-    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER":
+
+    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
         if request.POST:
             # mtitle = request.POST.get("docTitle", "")
             # userid = request.POST.get("user", "")
@@ -2608,7 +2609,6 @@ def upload_using_save_file(request,group_id):
                 # create gattribute for file with source value
                 source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
                 src = create_gattribute(ObjectId(file_node._id), source_AT, source)
-                print "\n\n\n\n\n\n++src",src
 
             if Audience:
               # create gattribute for file with Audience value
@@ -2660,8 +2660,10 @@ def upload_using_save_file(request,group_id):
         each_gs_file.status = u"PUBLISHED"
         if usrid not in each_gs_file.contributors:
             each_gs_file.contributors.append(usrid)
-        if title == "raw material":
+
+        if title == "raw material" or (title == "gallery" and is_user_gstaff):
             each_gs_file.tags =  [u'raw@material']
+
         group_object = node_collection.one({'_id': ObjectId(group_id)})
         if (group_object.edit_policy == "EDITABLE_MODERATED") and (group_object.moderation_level > 0):
             from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
@@ -2690,10 +2692,10 @@ def upload_using_save_file(request,group_id):
             each_counter_obj.last_update = datetime.now()
             each_counter_obj.save()
 
-        if title == "gallery":
-            return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
-        else:
-            return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
+    if title == "gallery" and not is_user_gstaff:
+        return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
+    elif title == "raw material" or (title == "gallery" and is_user_gstaff):
+        return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     else:
-        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
+        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}))
     # return HttpResponseRedirect(url_name)

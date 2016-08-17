@@ -2218,9 +2218,12 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
 
 
     else:
-
+        all_superusers = User.objects.filter(is_superuser=True)
+        all_superusers_ids = all_superusers.values_list('id',flat=True)
         gstaff_users.extend(group_obj.group_admin)
         gstaff_users.append(group_obj.created_by)
+        gstaff_users.extend(all_superusers_ids)
+
         files_cur = node_collection.find({
                                         'created_by': {'$nin': gstaff_users},
                                         '_type': {'$in':["File","GSystem"]},
