@@ -3674,7 +3674,7 @@ class Counter(DjangoDocument):
             # following will create counter instances for one which does not exists
             create_counter_for_user_ids = set(user_ids_list) - {uc['user_id'] for uc in counter_objs_cur}
             for each_user_id in create_counter_for_user_ids:
-                Counter.get_counter_obj(each_user_id)
+                Counter.get_counter_obj(each_user_id, group_id)
 
             return counter_objs_cur.rewind()
 
