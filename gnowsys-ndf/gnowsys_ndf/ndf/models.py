@@ -3836,16 +3836,14 @@ class Counter(DjangoDocument):
 
         # contributors will not get increament in visit count increment for own resource.
         diff_contrib_ids_list = list(set(resource_contributors_user_ids_list) - set(active_user_ids_list))
-        diff_contrib_ids_list_length = len(diff_contrib_ids_list)
-        if diff_contrib_ids_list_length == 0:
+        if not diff_contrib_ids_list:
             return
 
         creator_counter_objs_cur = Counter.get_counter_objs_cur(diff_contrib_ids_list, current_group_id)
 
         for each_uc in creator_counter_objs_cur:
-            # counter_obj_creator['file']['visits_gained'] += 1
             visits_gained = eval(key_str_creator_counter_resource_type_visits_gained)
-            eval(key_str_counter_resource_type).update({"visits_gained": (visits_gained + diff_contrib_ids_list_length)})
+            eval(key_str_counter_resource_type).update({"visits_gained": (visits_gained + diff_user_ids_list_length)})
             each_uc.save()
 
 
