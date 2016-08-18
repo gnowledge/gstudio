@@ -1778,11 +1778,13 @@ def file_edit(request,group_id,_id):
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             # To fill the metadata info while creating and editing file node
             metadata = request.POST.get("metadata_info", '')
+            # print ".....................",metadata
             if metadata:
                 # Only while metadata editing
                 if metadata == "metadata":
                     if file_node:
                         get_node_metadata(request,file_node)
+                        file_node.save()
             # End of filling metadata
 
             return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
