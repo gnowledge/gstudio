@@ -454,6 +454,7 @@ def save_quizitem_answer(request, group_id):
                     if 'quiz_type' in each_attr:
                         type_of_quiz = each_attr['quiz_type']
                 '''
+
                 for each_user_ans_attr in user_ans.attribute_set:
                     if 'quizitempost_user_submitted_ans' in each_user_ans_attr:
                         if quiz_type_val=='Single-Choice':
@@ -462,13 +463,15 @@ def save_quizitem_answer(request, group_id):
                                 for each_counter_obj in counter_objs_cur:
                                     if cmp(quiz_correct_ans,user_given_ans)==0:
                                         # counter_obj.no_correct_answers+=1
-                                        each_counter_obj['quiz']['correct'] += 1
-                                        each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
-                                        each_counter_obj.save()
+                                        if not already_ans_obj:
+                                            each_counter_obj['quiz']['correct'] += 1
+                                            each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                            each_counter_obj.save()
                                     else:
                                         # each_counter_obj.no_incorrect_answers+=1
-                                        each_counter_obj['quiz']['incorrect'] += 1
-                                        each_counter_obj.save()
+                                        if not already_ans_obj:
+                                            each_counter_obj['quiz']['incorrect'] += 1
+                                            each_counter_obj.save()
                                 counter_objs_cur.rewind()
 
                         if quiz_type_val=='Multiple-Choice':
@@ -508,27 +511,30 @@ def save_quizitem_answer(request, group_id):
                                 for each_counter_obj in counter_objs_cur:
                                     if search==True:
                                         try:
-                                            # counter_obj.no_correct_answers+=1
-                                            each_counter_obj['quiz']['correct'] += 1
-                                            # each_counter_obj.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS
-                                            each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
-                                            each_counter_obj.save()
+                                            if not already_ans_obj:
+                                                # counter_obj.no_correct_answers+=1
+                                                each_counter_obj['quiz']['correct'] += 1
+                                                # each_counter_obj.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS
+                                                each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                                each_counter_obj.save()
                                         except Exception as rer:
                                             print "\n Error ", rer
                                     else:
                                         # each_counter_obj.no_incorrect_answers+=1
-                                        each_counter_obj['quiz']['incorrect'] += 1
-                                        each_counter_obj.save()
+                                        if not already_ans_obj:
+                                            each_counter_obj['quiz']['incorrect'] += 1
+                                            each_counter_obj.save()
                                 counter_objs_cur.rewind()
 
                         if quiz_type_val=='Short-Response':
                             if len(user_given_ans)!=0:
                                 # counter_obj.no_correct_answers+=1
                                 for each_counter_obj in counter_objs_cur:
-                                    each_counter_obj['quiz']['correct'] += 1
-                                    # each_counter_obj.course_score += GSTUDIO_QUIZ_CORRECT_POINTS
-                                    each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
-                                    each_counter_obj.save()
+                                    if not already_ans_obj:
+                                        each_counter_obj['quiz']['correct'] += 1
+                                        # each_counter_obj.course_score += GSTUDIO_QUIZ_CORRECT_POINTS
+                                        each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                        each_counter_obj.save()
                 #updated counter collection
 
 
