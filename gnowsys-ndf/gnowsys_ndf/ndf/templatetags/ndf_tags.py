@@ -3581,7 +3581,8 @@ def get_user_quiz_resp(node_obj, user_obj):
 					if node_obj.quiz_type == "Short-Response":
 						result['recent_ans'] = recent_ans
 					else:
-						result['recent_ans'] = recent_ans.values()[0]
+						user_ans = recent_ans.values()[0]
+						result['recent_ans'] = (map(str,[re.sub(r'[\t\n\r]', '', u_ans) for u_ans in user_ans]))
 		# return json.dumps(result,ensure_ascii=False)
 		return result
 
