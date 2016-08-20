@@ -827,7 +827,9 @@ class Node(DjangoDocument):
             try:
                 if history_manager.create_or_replace_json_file(self):
                     fp = history_manager.get_file_path(self)
-                    user = User.objects.get(pk=self.created_by).username
+                    user_list = User.objects.filter(pk=self.created_by)
+                    user = user_list[0].username if user_list else 'user'
+                    # user = User.objects.get(pk=self.created_by).username
                     message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
                     rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
             except Exception as err:
@@ -845,7 +847,9 @@ class Node(DjangoDocument):
                 try:
                     if history_manager.create_or_replace_json_file(self):
                         fp = history_manager.get_file_path(self)
-                        user = User.objects.get(pk=self.created_by).username
+                        # user = User.objects.get(pk=self.created_by).username
+                        user_list = User.objects.filter(pk=self.created_by)
+                        user = user_list[0].username if user_list else 'user'
                         message = "This document (" + self.name + ") is re-created by " + user + " on " + self.created_at.strftime("%d %B %Y")
                         rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
 
@@ -856,7 +860,9 @@ class Node(DjangoDocument):
 
             try:
                 if history_manager.create_or_replace_json_file(self):
-                    user = User.objects.get(pk=self.modified_by).username
+                    # user = User.objects.get(pk=self.modified_by).username
+                    user_list = User.objects.filter(pk=self.created_by)
+                    user = user_list[0].username if user_list else 'user'
                     message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
                     rcs_obj.checkin(fp, 1, message.encode('utf-8'))
 
@@ -2633,6 +2639,24 @@ class HistoryManager():
                     print "\n Exception for document's ("+doc_obj.name+") key ("+k+") -- ", str(e), "\n"
 
         return doc_obj
+
+
+    @staticmethod
+    def delete_json_file(node_id_or_obj, expected_type):
+        node_obj = Node.get_node_obj_from_id_or_obj(node_id_or_obj, expected_type)
+        history_manager = HistoryManager()
+        json_file_path = history_manager.get_file_path(node_obj)
+        version_file_path = json_file_path + ',v'
+        try:
+            os.remove(version_file_path)
+            print "\nDeleted RCS json version file : ", version_file_path
+            os.remove(json_file_path)
+            print "\nDeleted RCS json file : ", json_file_path
+        except Exception, e:
+            print "\nException occured while deleting RCS file for node '", node_obj._id.__str__(), "' : ", e
+
+
+
 
 class NodeJSONEncoder(json.JSONEncoder):
   def default(self, o):

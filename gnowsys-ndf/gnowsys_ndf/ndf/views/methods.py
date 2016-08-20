@@ -4139,7 +4139,12 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
         if deletion_type == 1:
             # Remove from database
             str_deletion_type = "purged"
-            triple_collection.collection.remove(query)
+            single_gattribute_to_be_purged = triple_collection.find_one(query)
+            if single_gattribute_to_be_purged:
+                # deleting related RCS file
+                HistoryManager.delete_json_file(single_gattribute_to_be_purged, type(single_gattribute_to_be_purged))
+                triple_collection.collection.remove(query)
+
             # print "\n 6 >> purged also... " + ",
             # ".join(gattribute_deleted_id)
 
@@ -4412,7 +4417,12 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
             if deletion_type == 1:
                 # Remove from database
                 str_deletion_type = "purged"
+                single_grelation_to_be_purged = triple_collection.find_one(query_by_id)
+                HistoryManager.delete_json_file(single_grelation_to_be_purged, type(single_grelation_to_be_purged))
                 triple_collection.collection.remove(query_by_id)
+
+
+
                 # print "\n 6 >> purged (relation) also... " + ",
                 # ".join(grelation_deleted_id)
         else:
@@ -4446,11 +4456,16 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
             if deletion_type == 1:
                 # Remove from database
                 str_deletion_type = "purged"
+                grelations_to_be_purged = triple_collection.find(query_for_relation)
+                for each_grelations_to_be_purged in grelations_to_be_purged:
+                    # deleting related RCS file
+                    HistoryManager.delete_json_file(each_grelations_to_be_purged, type(each_grelations_to_be_purged))
                 triple_collection.collection.remove(query_for_relation)
                 triple_collection.collection.remove(query_for_inverse_relation)
                 # print "\n 6 >> purged (relation) also... " + ", ".join(grelation_deleted_id)
                 # print "\n 6 >> purged (inverse-relation) also... " + ",
                 # ".join(inverse_grelation_deleted_id)
+
 
         # Formulate delete-status-message
         if grelation_deleted_id:
@@ -4739,6 +4754,9 @@ def delete_node(
                                 fh_relurl = node_to_be_deleted.if_file[each_file]['relurl']
                                 if fh_id or fh_relurl:
                                     Filehive.delete_file_from_filehive(fh_id, fh_relurl)
+
+                # deleting related RCS file
+                HistoryManager.delete_json_file(node_to_be_deleted, type(node_to_be_deleted))
 
                 # Finally delete the node
                 node_to_be_deleted.delete()

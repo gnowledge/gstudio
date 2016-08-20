@@ -227,7 +227,7 @@ body{
 
   margin-bottom: 0.5rem;
   // padding-bottom: 0em;   // khaal
-  
+
   #first-header.top-bar {
 
     background-color: #3e3e3e;
@@ -465,7 +465,7 @@ body>footer {
   padding:10px 5px;
   position: relative;
   background-color: rgba(0,0,0,0.8);
-  
+
   ul {
     list-style-type: none;
     text-decoration: none;
@@ -546,7 +546,7 @@ body>footer {
         }
       }
     }
-    
+
   }
 }
 
@@ -1946,10 +1946,10 @@ aside#help{
 }
 
 .app-card-wrapper{
-  position: relative; 
+  position: relative;
   margin: auto;
-  width: 100%; 
-  text-align:center; 
+  width: 100%;
+  text-align:center;
   clear: both;
   max-width: calc(70rem + 70px);
 }
@@ -4255,7 +4255,7 @@ course-title{
     position: absolute;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 1.5em;
+    font-size: 2em;
     font-weight: 400;
   }
 
@@ -4287,7 +4287,7 @@ course-title{
       display: block;
       /*visibility: hidden;*/
       margin: 0 auto;
-      opacity: 0.9;
+      opacity: 0.25;
       height:100%;
     }
 
@@ -4443,7 +4443,7 @@ course-title{
       @media screen and (max-width: 450px) {
         margin: 25px 10px;
         height: 55px;
-      } 
+      }
     }
     p {
       color: #fff;
