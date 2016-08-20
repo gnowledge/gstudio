@@ -3259,7 +3259,7 @@ def get_thread_node(node_id):
 		# 	for rel in node_obj.relation_set:
 		# 		if rel and 'has_thread' in rel:
 		# 			thread_obj = rel['has_thread'][0]
-		# # print "\n\nthread_obj--",thread_obj
+		# print "\n\nthread_obj--",thread_obj
 		return thread_obj
 	return None
 

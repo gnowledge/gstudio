@@ -138,7 +138,6 @@ def create_discussion(request, group_id, node_id):
 @get_execution_time
 @login_required
 def discussion_reply(request, group_id, node_id):
-
     try:
         group_id = ObjectId(group_id)
     except:
@@ -149,13 +148,20 @@ def discussion_reply(request, group_id, node_id):
         prior_node = request.POST.get("prior_node_id", "")
         content_org = request.POST.get("reply_text_content", "") # reply content
         node = node_collection.one({"_id": ObjectId(node_id)})
-        # gs_type_node_id = get_relation_value(node_id,'thread_of')
         gs_type_node_id = None
-        if node and node.relation_set:
-            for each_rel in node.relation_set:
-                if each_rel and "thread_of" in each_rel:
-                    gs_type_node_id = each_rel['thread_of'][0]
-                    break
+
+        if u'Twist' not in node.member_of_names_list:
+            grel_dict = get_relation_value(node_id,'thread_of', True)
+            node = grel_dict['grel_node']
+        if node.prior_node:
+            gs_type_node_id = node.prior_node[0]
+
+        # if node and node.relation_set:
+        #     for each_rel in node.relation_set:
+        #         if each_rel and "thread_of" in each_rel:
+        #             gs_type_node_id = each_rel['thread_of'][0]
+        #             break
+
         # grel_dict = get_relation_value(node_id,'thread_of')
         # is_cursor = grel_dict.get("cursor",False)
         # if not is_cursor:
@@ -247,23 +253,21 @@ def discussion_reply(request, group_id, node_id):
             reply_obj.save()
 
             #Update Counter Collection
-            thread_obj = node_collection.one({'_id':ObjectId(node_id)})
-            file_note_id = thread_obj.prior_node[0]
-            file_note_obj = node_collection.one({'_id':file_note_id})
-
-            active_user_ids_list = [request.user.id]
-            if GSTUDIO_BUDDY_LOGIN:
-                active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.now())
-                # removing redundancy of user ids:
-                active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
-
-            Counter.add_comment_pt(resource_obj_or_id=file_note_obj,
-                                   current_group_id=group_id,
-                                   active_user_id_or_list=active_user_ids_list)
+            # thread_obj = node_collection.one({'_id':ObjectId(node_id)})
+            if gs_type_node_id:
+                gs_type_node = node_collection.one({'_id':gs_type_node_id})
+                active_user_ids_list = [request.user.id]
+                if GSTUDIO_BUDDY_LOGIN:
+                    active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.now())
+                    # removing redundancy of user ids:
+                    active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+                Counter.add_comment_pt(resource_obj_or_id=gs_type_node,
+                                       current_group_id=group_id,
+                                       active_user_id_or_list=active_user_ids_list)
 
 
-            # if file_note_obj.if_file.mime_type :
-            #     file_creator_id = file_note_obj.created_by
+            # if gs_type_node.if_file.mime_type :
+            #     file_creator_id = gs_type_node.created_by
             #     if file_creator_id != request.user.id :
             #         counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
             #         # counter_obj.no_comments_on_others_files += 1
@@ -288,7 +292,7 @@ def discussion_reply(request, group_id, node_id):
             #         counter_obj.save()
             #         counter_obj_creator.save()
             # else :
-            #     note_creator_id = file_note_obj.created_by
+            #     note_creator_id = gs_type_node.created_by
             #     if note_creator_id != request.user.id :
             #         counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
             #         # counter_obj.no_comments_by_user += 1
