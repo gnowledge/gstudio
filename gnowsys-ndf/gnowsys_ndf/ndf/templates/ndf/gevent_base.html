@@ -74,11 +74,11 @@
 {% endblock %}
 
 {% block head %}
-<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+{# <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script> #}
 <!-- orgitdown! toolbar settings -->
-<script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+{# <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script> #}
 <!-- orgitdown! skin -->
-<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+{# <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" /> #}
 
 <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css">
@@ -329,39 +329,13 @@
     </div>
     </div>
     </div>
-    {% if title == "gallery" %} 
+    {% if title == "gallery" %}
         {% include 'ndf/pagination.html' with urlname="course_gallery_paged" first_arg=group_name_tag page_info=gallery_page_info %}
       {% elif title == "raw material" %}
         {% include 'ndf/pagination.html' with urlname="course_raw_material_paged" first_arg=group_name_tag    page_info=raw_material_page_info %}
       {% endif  %}
   </div>
 </div>
-<script type="text/javascript">
-  $(function() {
-    $("#selectCourseTab").on('change', function() {
-        switch($(this).val()) {
-          case 'about_course':
-            window.location="{% url 'course_about' group_id %}"
-          break;
-          case 'course_content':
-            window.location="{% url 'course_content' group_id %}"
-          break;
-          case 'raw_material':
-            window.location="{% url 'course_raw_material' group_id %}"
-          break;
-          case 'notebook':
-            window.location="{% url 'course_notebook' group_id %}"
-          break;
-          case 'gallery':
-            window.location="{% url 'course_gallery' group_id %}"
-          break;
-          case 'dashboard':
-            window.location="{% url 'course_dashboard' group_id %}"
-          break;
-        }
-    })
-  })
-</script>
 {% endblock %}
 {% block script %}
 
