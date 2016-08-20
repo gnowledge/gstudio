@@ -539,7 +539,7 @@ def save_quizitem_answer(request, group_id):
                                     if search==True:
                                         try:
                                             if not already_submitted_ans or is_user_given_ans_not_in_recent_submitted_ans:
-                                                if is_user_given_ans_not_in_recent_submitted_ans and and each_counter_obj['quiz']['incorrect']:
+                                                if is_user_given_ans_not_in_recent_submitted_ans and  each_counter_obj['quiz']['incorrect']:
                                                     each_counter_obj['quiz']['incorrect'] -= 1
                                                 if not recent_submitted_ans_was_correct:
                                                     each_counter_obj['quiz']['correct'] += 1
@@ -551,7 +551,7 @@ def save_quizitem_answer(request, group_id):
                                     else:
                                         # each_counter_obj.no_incorrect_answers+=1
                                         if not already_submitted_ans or is_user_given_ans_not_in_recent_submitted_ans:
-                                            if is_user_given_ans_not_in_recent_submitted_ans and and each_counter_obj['quiz']['correct']:
+                                            if is_user_given_ans_not_in_recent_submitted_ans and  each_counter_obj['quiz']['correct']:
                                                 each_counter_obj['quiz']['correct'] -= 1
                                             if recent_submitted_ans_was_correct:
                                                 each_counter_obj['quiz']['incorrect'] += 1
