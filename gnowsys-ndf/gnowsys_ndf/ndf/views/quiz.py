@@ -336,12 +336,8 @@ def save_quizitem_answer(request, group_id):
             # group_obj = node_collection.one({'_id': ObjectId(group_id)})
             new_list = []
             user_given_ans = request.POST.getlist("user_given_ans[]", '')
-
-
             node_id = request.POST.get("node", '')
-            # print "\n\n user_give_ans",user_given_ans
             node_obj = node_collection.one({'_id': ObjectId(node_id)})
-            #print node_obj
             thread_obj = user_ans = None
             '''
             print "\n\n node_obj::::::::",node_obj.relation_set
@@ -399,6 +395,11 @@ def save_quizitem_answer(request, group_id):
                     # add thread obj to user's post/reply prior_node
                     node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
                 quiz_type_val = get_attribute_value(node_obj._id,"quiz_type")
+                quiz_correct_ans = get_attribute_value(node_obj._id,"correct_answer")
+                # print "\n quiz_type_val: ", quiz_type_val
+                # print "\n quiz_correct_ans: ", quiz_correct_ans
+                # print "\n user_given_ans: ",user_given_ans
+                quiz_correct_ans = (map(unicode,[re.sub(r'[\r]', '', cor_ans) for cor_ans in quiz_correct_ans]))
 
                 # print "\n get_attribute_value--", get_attribute_value
                 if user_given_ans and user_ans:
@@ -440,78 +441,104 @@ def save_quizitem_answer(request, group_id):
                 # counter_obj = Counter.get_counter_obj(user_id, group_id)
 
 
-                if already_ans_obj==None:
-                    for one_att in user_ans.attribute_set:
-                        if 'quizitempost_user_submitted_ans' in one_att:
-                            if len(one_att['quizitempost_user_submitted_ans'])!=0:
+                if not already_ans_obj:
+                    # This is the first time to attempt this quizitemevent
+                    for userr_each_attr in user_ans.attribute_set:
+                        if 'quizitempost_user_submitted_ans' in userr_each_attr:
+                            if len(userr_each_attr['quizitempost_user_submitted_ans'])!=0:
                                 # counter_obj.no_questions_attempted+=1
-                                for each_uc in counter_objs_cur:
-                                    each_uc['quiz']['attempted'] +=1
-                                    each_uc.save()
-
+                                for each_counter_obj in counter_objs_cur:
+                                    each_counter_obj['quiz']['attempted'] += 1
+                                    each_counter_obj.save()
                                 counter_objs_cur.rewind()
+                '''
+                for each_attr in node_obj.attribute_set:
+                    if 'correct_answer' in each_attr:
+                        quiz_correct_ans = each_attr['correct_answer']
+                    if 'quiz_type' in each_attr:
+                        type_of_quiz = each_attr['quiz_type']
+                '''
 
-                for num in node_obj.attribute_set:
-                    if 'correct_answer' in num:
-                        cor_ans=num['correct_answer']
-                    if 'quiz_type' in num:
-                        type_of_quiz=num['quiz_type']
+                for each_user_ans_attr in user_ans.attribute_set:
+                    if 'quizitempost_user_submitted_ans' in each_user_ans_attr:
+                        if quiz_type_val=='Single-Choice':
+                            if len(each_user_ans_attr['quizitempost_user_submitted_ans'])!=0:
 
-                for one_att in user_ans.attribute_set:
-                    if 'quizitempost_user_submitted_ans' in one_att:
-                        if type_of_quiz=='Single-Choice':
-                            if len(one_att['quizitempost_user_submitted_ans'])!=0:
-
-                                for each_uc in counter_objs_cur:
-                                    if cmp(cor_ans,user_given_ans)==0:
+                                for each_counter_obj in counter_objs_cur:
+                                    if cmp(quiz_correct_ans,user_given_ans)==0:
                                         # counter_obj.no_correct_answers+=1
-                                        each_uc['quiz']['correct'] += 1
-                                        each_uc['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
-                                        each_uc.save()
+                                        if not already_ans_obj:
+                                            each_counter_obj['quiz']['correct'] += 1
+                                            each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                            each_counter_obj.save()
                                     else:
-                                        # each_uc.no_incorrect_answers+=1
-                                        each_uc['quiz']['incorrect'] += 1
-                                        each_uc.save()
+                                        # each_counter_obj.no_incorrect_answers+=1
+                                        if not already_ans_obj:
+                                            each_counter_obj['quiz']['incorrect'] += 1
+                                            each_counter_obj.save()
                                 counter_objs_cur.rewind()
 
-                        if type_of_quiz=='Multiple-Choice':
-                            if len(one_att['quizitempost_user_submitted_ans'])!=0:
-                                search=True
+                        if quiz_type_val=='Multiple-Choice':
+                            if each_user_ans_attr['quizitempost_user_submitted_ans']:
+                                search = False
+                                user_given_ans = [x.encode('UTF8') for x in user_given_ans]
+                                quiz_correct_ans = [x.encode('UTF8') for x in quiz_correct_ans]
+                                # print "\n user_given_ans : ", user_given_ans
+                                # print "\n quiz_correct_ans: ", quiz_correct_ans
+                                # Remove Carriage Return from Python strings ['\r'] in quiz_correct_ans
+                                quiz_correct_ans_tmp = []
+                                for each_option in quiz_correct_ans:
+                                    each_option = each_option.replace('\r','')
+                                    quiz_correct_ans_tmp.append(each_option)
+                                quiz_correct_ans = quiz_correct_ans_tmp
+
+                                for each_user_given_ans in user_given_ans:
+                                    if each_user_given_ans in quiz_correct_ans:
+                                        search = True
+
+                                # print "\n search : ", search
+
+                                '''
                                 i=0
-                                user_given_ans=[x.encode('UTF8') for x in user_given_ans]
-                                cor_ans=[x.encode('UTF8') for x in cor_ans]
-
-
                                 while i<len(user_given_ans):
 
                                     try:
-                                        cor_ans.index(user_given_ans[i])
+                                        quiz_correct_ans.index(user_given_ans[i])
                                         search=True
                                         i=i+1
                                     except Exception as e1:
                                         search=False
                                         break
-                                for each_uc in counter_objs_cur:
+                                '''
+
+
+                                for each_counter_obj in counter_objs_cur:
                                     if search==True:
-                                        # counter_obj.no_correct_answers+=1
-                                        each_uc['quiz']['correct'] += 1
-                                        # each_uc.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS
-                                        each_uc['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
-                                        each_uc.save()
+                                        try:
+                                            if not already_ans_obj:
+                                                # counter_obj.no_correct_answers+=1
+                                                each_counter_obj['quiz']['correct'] += 1
+                                                # each_counter_obj.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS
+                                                each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                                each_counter_obj.save()
+                                        except Exception as rer:
+                                            print "\n Error ", rer
                                     else:
-                                        # each_uc.no_incorrect_answers+=1
-                                        each_uc['quiz']['incorrect'] += 1
-                                        each_uc.save()
+                                        # each_counter_obj.no_incorrect_answers+=1
+                                        if not already_ans_obj:
+                                            each_counter_obj['quiz']['incorrect'] += 1
+                                            each_counter_obj.save()
                                 counter_objs_cur.rewind()
 
-                        if type_of_quiz=='Short-Response':
+                        if quiz_type_val=='Short-Response':
                             if len(user_given_ans)!=0:
                                 # counter_obj.no_correct_answers+=1
-                                for each_uc in counter_objs_cur:
-                                    each_uc['quiz']['correct'] += 1
-                                    # each_uc.course_score += GSTUDIO_QUIZ_CORRECT_POINTS
-                                    each_uc['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
-                                    each_uc.save()
+                                for each_counter_obj in counter_objs_cur:
+                                    if not already_ans_obj:
+                                        each_counter_obj['quiz']['correct'] += 1
+                                        # each_counter_obj.course_score += GSTUDIO_QUIZ_CORRECT_POINTS
+                                        each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                        each_counter_obj.save()
                 #updated counter collection
 
 
