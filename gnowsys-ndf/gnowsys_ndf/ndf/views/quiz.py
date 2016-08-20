@@ -337,7 +337,8 @@ def save_quizitem_answer(request, group_id):
             new_list = []
             old_submitted_ans = None
             recent_ans = None
-            is_user_given_ans_in_recent_submitted_ans = False
+            is_user_given_ans_not_in_recent_submitted_ans = False
+            recent_submitted_ans_was_correct = False
 
             user_given_ans = request.POST.getlist("user_given_ans[]", '')
             node_id = request.POST.get("node", '')
@@ -442,8 +443,8 @@ def save_quizitem_answer(request, group_id):
                     recent_ans = old_submitted_ans[-1].values()
                     if recent_ans:
                         recent_ans = recent_ans[0]
-                    is_user_given_ans_in_recent_submitted_ans = all(each_usr_given_ans in recent_ans for each_usr_given_ans in user_given_ans)
-
+                    is_user_given_ans_not_in_recent_submitted_ans = all(each_usr_given_ans not in recent_ans for each_usr_given_ans in user_given_ans)
+                    recent_submitted_ans_was_correct = any(each_submitted_ans in quiz_correct_ans for each_submitted_ans in recent_ans)
                 # print "\n recent_ans == ", recent_ans
                 # print "\n user_given_ans == ", user_given_ans
 
@@ -483,19 +484,20 @@ def save_quizitem_answer(request, group_id):
                                 for each_counter_obj in counter_objs_cur:
                                     if cmp(quiz_correct_ans,user_given_ans)==0:
                                         # counter_obj.no_correct_answers+=1
-                                        if not already_submitted_ans or is_user_given_ans_in_recent_submitted_ans:
-                                            if is_user_given_ans_in_recent_submitted_ans:
+                                        if not already_submitted_ans or is_user_given_ans_not_in_recent_submitted_ans:
+                                            if is_user_given_ans_not_in_recent_submitted_ans and each_counter_obj['quiz']['incorrect']:
                                                 each_counter_obj['quiz']['incorrect'] -= 1
-
-                                            each_counter_obj['quiz']['correct'] += 1
-                                            each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                            if not recent_submitted_ans_was_correct:
+                                                each_counter_obj['quiz']['correct'] += 1
+                                                each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
                                             each_counter_obj.save()
                                     else:
                                         # each_counter_obj.no_incorrect_answers+=1
-                                        if not already_submitted_ans or is_user_given_ans_in_recent_submitted_ans:
-                                            if is_user_given_ans_in_recent_submitted_ans:
+                                        if not already_submitted_ans or is_user_given_ans_not_in_recent_submitted_ans:
+                                            if is_user_given_ans_not_in_recent_submitted_ans and each_counter_obj['quiz']['correct']:
                                                 each_counter_obj['quiz']['correct'] -= 1
-                                            each_counter_obj['quiz']['incorrect'] += 1
+                                            if recent_submitted_ans_was_correct:
+                                                each_counter_obj['quiz']['incorrect'] += 1
                                             each_counter_obj.save()
                                 counter_objs_cur.rewind()
 
@@ -536,22 +538,23 @@ def save_quizitem_answer(request, group_id):
                                 for each_counter_obj in counter_objs_cur:
                                     if search==True:
                                         try:
-                                            if not already_submitted_ans or is_user_given_ans_in_recent_submitted_ans:
-                                                if is_user_given_ans_in_recent_submitted_ans:
+                                            if not already_submitted_ans or is_user_given_ans_not_in_recent_submitted_ans:
+                                                if is_user_given_ans_not_in_recent_submitted_ans and and each_counter_obj['quiz']['incorrect']:
                                                     each_counter_obj['quiz']['incorrect'] -= 1
-                                                # counter_obj.no_correct_answers+=1
-                                                each_counter_obj['quiz']['correct'] += 1
-                                                # each_counter_obj.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS
-                                                each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                                if not recent_submitted_ans_was_correct:
+                                                    each_counter_obj['quiz']['correct'] += 1
+                                                    # each_counter_obj.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS
+                                                    each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
                                                 each_counter_obj.save()
                                         except Exception as rer:
                                             print "\n Error ", rer
                                     else:
                                         # each_counter_obj.no_incorrect_answers+=1
-                                        if not already_submitted_ans or is_user_given_ans_in_recent_submitted_ans:
-                                            if is_user_given_ans_in_recent_submitted_ans:
+                                        if not already_submitted_ans or is_user_given_ans_not_in_recent_submitted_ans:
+                                            if is_user_given_ans_not_in_recent_submitted_ans and and each_counter_obj['quiz']['correct']:
                                                 each_counter_obj['quiz']['correct'] -= 1
-                                            each_counter_obj['quiz']['incorrect'] += 1
+                                            if recent_submitted_ans_was_correct:
+                                                each_counter_obj['quiz']['incorrect'] += 1
                                             each_counter_obj.save()
                                 counter_objs_cur.rewind()
 
@@ -559,7 +562,7 @@ def save_quizitem_answer(request, group_id):
                             if len(user_given_ans)!=0:
                                 # counter_obj.no_correct_answers+=1
                                 for each_counter_obj in counter_objs_cur:
-                                    if not already_submitted_ans or is_user_given_ans_in_recent_submitted_ans:
+                                    if not already_submitted_ans:
                                         each_counter_obj['quiz']['correct'] += 1
                                         # each_counter_obj.course_score += GSTUDIO_QUIZ_CORRECT_POINTS
                                         each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
