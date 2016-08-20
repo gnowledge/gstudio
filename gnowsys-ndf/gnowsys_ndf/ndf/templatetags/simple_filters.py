@@ -1,6 +1,7 @@
 from django import template
 from django.template.loader_tags import do_extends
 # from datetime import date, timedelta
+from django.template.defaultfilters import stringfilter
 
 import tokenize
 import StringIO
@@ -84,6 +85,16 @@ def get_dict_from_list_of_dicts(list_of_dicts,convert_objid_to_str=False):
 def split(str, splitter):
     return str.split(splitter)
 
+
+@register.filter
+@stringfilter
+def re_format(value):
+    import re
+    value = eval(value)
+    l = []
+    for e in value:
+        l.append(re.sub(r'[\r]', '', e))
+    return l
 
 @get_execution_time
 @register.assignment_tag
