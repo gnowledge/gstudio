@@ -443,8 +443,8 @@ def switch_group_conditions(user,group_id):
 @register.assignment_tag
 def get_all_user_groups():
 	try:
-		all_groups = node_collection.find({'_type':'Author'}).sort('name', 1)
-		return list(all_groups)
+		return node_collection.find({'_type':'Author'}).sort('name', 1)
+		# return list(all_groups)
 	except:
 		print "Exception in get_all_user_groups"
 
