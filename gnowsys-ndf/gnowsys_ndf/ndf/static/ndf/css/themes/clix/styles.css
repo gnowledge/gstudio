@@ -27510,7 +27510,7 @@ course-title {
   position: absolute;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1.5em;
+  font-size: 2em;
   font-weight: 400;
 }
 /* line 4262, ../../../scss/_app_styles.scss */
@@ -27543,7 +27543,7 @@ course-title {
   display: block;
   /*visibility: hidden;*/
   margin: 0 auto;
-  opacity: 0.9;
+  opacity: 0.25;
   height: 100%;
 }
 /* line 4294, ../../../scss/_app_styles.scss */
@@ -27860,17 +27860,17 @@ course-title {
   border: 1px solid !important;
 }
 
-/* line 4506, ../../../scss/_app_styles.scss */
+/* line 4564, ../../../scss/_app_styles.scss */
 .show-collection {
-  color: white;
+  color: black !important;
   font-size: 1.1em;
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  text-align: left;
+  background-color: rgba(0, 0, 0, 0.8) !important;
   display: inline-block;
   margin-left: 2px;
   position: relative;
   text-align: center;
+  border: 1px solid #eee;
 }
 
 /*
