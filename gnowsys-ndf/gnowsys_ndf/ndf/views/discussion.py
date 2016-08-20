@@ -138,7 +138,6 @@ def create_discussion(request, group_id, node_id):
 @get_execution_time
 @login_required
 def discussion_reply(request, group_id, node_id):
-
     try:
         group_id = ObjectId(group_id)
     except:
@@ -151,11 +150,11 @@ def discussion_reply(request, group_id, node_id):
         node = node_collection.one({"_id": ObjectId(node_id)})
         gs_type_node_id = None
 
-        if 'Twist' not in node.member_of_names_list:
+        if u'Twist' not in node.member_of_names_list:
             grel_dict = get_relation_value(node_id,'thread_of', True)
-            thread_obj = grel_dict['grel_node']
-            if thread_obj.prior_node:
-                gs_type_node_id = thread_obj.prior_node[0]
+            node = grel_dict['grel_node']
+        if node.prior_node:
+            gs_type_node_id = node.prior_node[0]
 
         # if node and node.relation_set:
         #     for each_rel in node.relation_set:
@@ -257,13 +256,11 @@ def discussion_reply(request, group_id, node_id):
             # thread_obj = node_collection.one({'_id':ObjectId(node_id)})
             if gs_type_node_id:
                 gs_type_node = node_collection.one({'_id':gs_type_node_id})
-
                 active_user_ids_list = [request.user.id]
                 if GSTUDIO_BUDDY_LOGIN:
                     active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.now())
                     # removing redundancy of user ids:
                     active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
-
                 Counter.add_comment_pt(resource_obj_or_id=gs_type_node,
                                        current_group_id=group_id,
                                        active_user_id_or_list=active_user_ids_list)
