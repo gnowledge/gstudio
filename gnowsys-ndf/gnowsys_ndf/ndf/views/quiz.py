@@ -396,6 +396,10 @@ def save_quizitem_answer(request, group_id):
                     node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
                 quiz_type_val = get_attribute_value(node_obj._id,"quiz_type")
                 quiz_correct_ans = get_attribute_value(node_obj._id,"correct_answer")
+                # print "\n quiz_type_val: ", quiz_type_val
+                # print "\n quiz_correct_ans: ", quiz_correct_ans
+                # print "\n user_given_ans: ",user_given_ans
+                quiz_correct_ans = (map(unicode,[re.sub(r'[\r]', '', cor_ans) for cor_ans in quiz_correct_ans]))
 
                 # print "\n get_attribute_value--", get_attribute_value
                 if user_given_ans and user_ans:

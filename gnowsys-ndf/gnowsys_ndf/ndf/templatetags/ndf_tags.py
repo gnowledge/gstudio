@@ -3582,7 +3582,9 @@ def get_user_quiz_resp(node_obj, user_obj):
 						result['recent_ans'] = recent_ans
 					else:
 						user_ans = recent_ans.values()[0]
-						result['recent_ans'] = (map(str,[re.sub(r'[\t\n\r]', '', u_ans) for u_ans in user_ans]))
+						# result['recent_ans'] = (map(unicode,[re.sub(r'[\t\n\r]', '', u_ans) for u_ans in user_ans]))
+						# result['recent_ans'] = [u_ans.decode('utf-8').decode('utf-8') for u_ans in user_ans]
+						result['recent_ans'] = user_ans
 		# return json.dumps(result,ensure_ascii=False)
 		return result
 
