@@ -1592,7 +1592,7 @@ class EventGroupCreateEditHandler(View):
                     mod_group.initialize_course_event_structure(request, group_obj._id)
                     # creating a new counter document for a user for a given course for the purpose of analytics
 
-                    counter_obj = Counter.get_counter_obj(userid, group_id)
+                    # counter_obj = Counter.get_counter_obj(userid, group_id)
                     # print "===========================", counter_obj
 
                     # auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})

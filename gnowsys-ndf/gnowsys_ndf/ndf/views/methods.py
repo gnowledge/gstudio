@@ -401,6 +401,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
         return None, None
 
 
+@login_required
 def update_notes_or_files_visited(user_id, group_id,node_id,if_file,if_note) :
     # counter_obj = Counter.get_counter_obj(user_id, group_id)
     # if if_file:
