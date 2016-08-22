@@ -2391,18 +2391,23 @@ def inline_edit_res(request, group_id, node_id):
 
 @get_execution_time
 def course_filters(request, group_id):
+
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
+
     gstaff_users = []
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
+
     notebook_filter = False
     no_url_flag = True
     detail_urlname = None
+
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
         }
+
     filter_applied = request.GET.get("filter_applied", "")
     filter_dict = request.GET.get("filter_dict", "")
     title = request.GET.get("title", "")
