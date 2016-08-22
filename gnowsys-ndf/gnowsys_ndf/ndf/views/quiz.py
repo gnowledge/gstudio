@@ -322,6 +322,7 @@ def quiz_details(request, group_id, node_id):
                                   context_instance=RequestContext(request)
         )
 
+
 @login_required
 @get_execution_time
 def save_quizitem_answer(request, group_id):
@@ -333,7 +334,7 @@ def save_quizitem_answer(request, group_id):
             except:
                 group_name, group_id = get_group_name_id(group_id)
             import datetime
-            # group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
             new_list = []
             old_submitted_ans = None
             recent_ans = None

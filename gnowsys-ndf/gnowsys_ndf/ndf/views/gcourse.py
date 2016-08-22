@@ -1899,7 +1899,7 @@ def course_dashboard(request, group_id):
     allow_to_join = get_group_join_status(group_obj)
     result_status = course_complete_percentage = None
     total_count = completed_count = None
-    if request.user.is_authenticated:
+    if request.user.is_authenticated():
         result_status = get_course_completetion_status(group_obj, request.user.id)
         if result_status:
             if "course_complete_percentage" in result_status:
@@ -2039,9 +2039,10 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
         if user_id :
             #updating counters collection
             # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(notebook_id),False,True)
-            Counter.add_visit_count(resource_obj_or_id=notebook_obj,
-                                    current_group_id=group_id,
-                                    loggedin_userid=request.user.id)
+            if request.user.is_authenticated():
+                Counter.add_visit_count(resource_obj_or_id=notebook_obj,
+                                        current_group_id=group_id,
+                                        loggedin_userid=request.user.id)
 
 
     else:
@@ -2119,9 +2120,10 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
         #updating counters collection
         # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
-        Counter.add_visit_count(resource_obj_or_id=file_obj,
-                                current_group_id=group_id,
-                                loggedin_userid=request.user.id)
+        if request.user.is_authenticated():
+            Counter.add_visit_count(resource_obj_or_id=file_obj,
+                                    current_group_id=group_id,
+                                    loggedin_userid=request.user.id)
 
     else:
 
@@ -2212,9 +2214,10 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
         # updating counters collection:
         # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
-        Counter.add_visit_count(resource_obj_or_id=file_obj,
-                                current_group_id=group_id,
-                                loggedin_userid=request.user.id)
+        if request.user.is_authenticated():
+            Counter.add_visit_count(resource_obj_or_id=file_obj,
+                                    current_group_id=group_id,
+                                    loggedin_userid=request.user.id)
 
 
     else:
@@ -2901,7 +2904,7 @@ def build_progress_bar(request, group_id, node_id):
     try:
         group_obj   = get_group_name_id(group_id, get_obj=True)
         course_complete_percentage = total_count = completed_count = None
-        if request.user.is_authenticated:
+        if request.user.is_authenticated():
             result_status = get_course_completetion_status(group_obj, request.user.id)
     except Exception as e:
         # print "\n\n Error while fetching ---", e
