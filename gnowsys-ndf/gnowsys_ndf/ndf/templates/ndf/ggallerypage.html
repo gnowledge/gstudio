@@ -8,75 +8,6 @@
         {% get_course_filters group_id title as filter_dict %}
         {% include "ndf/filters.html" with filter_dict=filter_dict %}
     </div>
-    {% comment %}
-    <div class="row gallery-header">
-        <div class="medium-4 columns filters">
-            <div class="row collapse">
-                <div class="medium-2 columns"> View By</div>
-                <div class="medium-3 columns">
-                    <select placeholder="Select File Types">
-                        <option value="all">All File Types</option>
-                        <option value="pdf">Pdf</option>
-                        <option value="image">Image</option>
-                        <option value="compressed">Compressed</option>
-                    </select>
-                </div>
-                <div class="medium-1 columns">
-                <i class="fi-list-thumbnails"></i>
-                </div>
-                <div class="medium-2 columns">
-                    <span>Sort By</span>
-                </div>
-                <div class="medium-3 columns end">
-                    <select placeholder="Sort">
-                        <option value="all">Top Rated</option>
-                        <option value="school1">Recent</option>
-                        <option value="school2">Most Commented</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="medium-8 columns">
-            <div class="row">
-                <div class="medium-9 search columns">
-                    <div class="row collapse prefix-round">
-                        <div class="small-2 columns">
-                            <i class="fi-filter"></i>
-                            <span>Add Filter</span>
-                        </div>
-                        <div class="small-2 columns">
-                            <select placeholder="User" class="primary-filter">
-                                <option value="all">User</option>
-                                <option value="school1">Size</option>
-                            </select>
-                        </div>
-                        <div class="small-2 columns">
-                            <select placeholder="Sort" class="secondary-filter">
-                                <option value="all">Select User</option>
-                                <option value="school1">Bunny</option>
-                                <option value="school2">Apple</option>
-                            </select>
-                        </div>
-                        <div class="small-6 columns filter-tags">
-                            <div class="filter-tag">Filter 1 <span>&times;</span></div>
-                            <div class="filter-tag">Filter 1 <span>&times;</span></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="medium-3 side-heading columns">
-                    <div class="row collapse prefix-round">
-                        <div class="small-3 columns">
-                            <a href="#" class="button prefix"><i class="fa fa-search"></i></a>
-                        </div>
-                        <div class="small-9 columns">
-                            <input type="text" placeholder="Search">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endcomment %}
 
     <div class="row gallery-panel">
         <div class="medium-12 columns gallery-content" >
@@ -220,6 +151,7 @@
 
     function applyFilter(filtersObjArr){
         filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        // console.log(filtersObjArr);
         $.ajax({
           url: "{% url 'course_filters' group_id %}",
           data: {
@@ -318,11 +250,11 @@
     var video_list = " ";
     $('.filenode:checked').each(function() {
         // curr_obj = $(this).attr("value");
-        
+
         mime_type_list = $(this).closest('.scard-container').find('div').attr('data-mime-type');
         if_image =  mime_type_list.search("image");
         if_audio =  mime_type_list.search("audio");
-        if_video =  mime_type_list.search("video");       
+        if_video =  mime_type_list.search("video");
          if( if_image == 0 ) {
             url_list = $(this).closest('.scard-container').find('div').attr('original-src');
             img_list = img_list+url_list+",";
@@ -346,7 +278,7 @@
                 "csrfmiddlewaretoken": '{{ csrf_token }}',
                 "img_list": img_list,
                 "audio_list": audio_list,
-                "video_list": video_list             
+                "video_list": video_list
             },
             success: function(data) {
                 $("#create_collection_model").html(data);

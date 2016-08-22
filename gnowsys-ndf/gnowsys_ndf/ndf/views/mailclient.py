@@ -8,7 +8,6 @@ from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity, get_execution_time
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 from gnowsys_ndf.settings import SYNCDATA_SENDING_EMAIL_ID, SYNCDATA_FROM_EMAIL_ID,SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH, SQLITE3_DB_PATH
 
 #---------Django Mailbox imports----------------#
@@ -34,8 +33,8 @@ import datetime
 import subprocess
 import traceback
 import requests
-import time 
-        
+import time
+
 #-----------------Dictionary of popular servers--------------#
 server_dict = {
     "Gmail": "imap.gmail.com",
@@ -64,7 +63,7 @@ def connected_to_internet(url='http://www.google.com/', timeout=2):
 def mailclient(request, group_id):
     '''
     This function fetches the mailboxes and the corresponding E-Mail IDs.
-    The Mailbox.active_mailboxes.all() returns all mailboxes but given a 
+    The Mailbox.active_mailboxes.all() returns all mailboxes but given a
     user has his/her own set of mailboxes , this is checked by mapping it
     through table 'user_mailboxes' which consists of the (user_id,mailbox_id)
     '''
@@ -85,7 +84,7 @@ def mailclient(request, group_id):
         user_id = str(request.user.id)
 
         cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
-        
+
         query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
         cursor = conn.execute(query)
 
@@ -94,7 +93,7 @@ def mailclient(request, group_id):
         all_mailboxes_in_db = Mailbox.active_mailboxes.all()
         for row in cursor:
             mailbox_ids.append(row[0])
-        print "mbox ids", mailbox_ids        
+        print "mbox ids", mailbox_ids
         query = 'select name from django_mailbox_mailbox where id='
         for box_id in mailbox_ids:
             box_id = str(box_id)
@@ -128,7 +127,7 @@ def mailclient(request, group_id):
         'group_id': group_id,
         'mailbox_data': mailbox_data
     })
- 
+
 @login_required
 @get_execution_time
 def mailbox_create_edit(request, group_id):
@@ -142,7 +141,7 @@ def mailbox_create_edit(request, group_id):
     }
 
     This function creates a new Mailbox. First it renders the template which has the input form. When the form is submitted, this function
-    is called again and the data is used to create a new mailbox. The email-id, password and the website on which the email-id is made 
+    is called again and the data is used to create a new mailbox. The email-id, password and the website on which the email-id is made
     is verified and if the credentials are correct a new mailbox is saved in the database. Also the function adds the mailbox id, user_id
     record to another database to keep record of which user has which mailbox id.
     '''
@@ -177,12 +176,12 @@ def mailbox_create_edit(request, group_id):
         try:
             uri = "imap+ssl://" + emailid_split[0] + "%40" + emailid_split[1] +  ":" + pwd + "@" + webserver + "?archive=" + mailbox_name.replace(" ","_")
             newbox.uri = uri
-        except IndexError: 
+        except IndexError:
             print "Incorrect Email ID given!"
             error_obj= "Incorrect Email ID given!"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
             # return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
-        
+
         try:
             #may throw exception
             newbox.get_connection()
@@ -190,7 +189,7 @@ def mailbox_create_edit(request, group_id):
             print "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
             error_obj= "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-            
+
         except IMAP4.error:
             print "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
             error_obj= "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
@@ -202,7 +201,7 @@ def mailbox_create_edit(request, group_id):
             error_obj= str(error) + '----See terminal for traceback----One unfixed bug is: if password contains 1 or more "#" characters then mailbox cant be created '
             print(traceback.format_exc())
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-        
+
         #only on calling save() the mailbox is alotted an id
         newbox.save()
 
@@ -221,7 +220,7 @@ def mailbox_create_edit(request, group_id):
             query = 'insert into user_mailboxes values (?,?);'
 
             #may throw exception
-            cursor = conn.execute(query, (request.user.id, newbox.id))            
+            cursor = conn.execute(query, (request.user.id, newbox.id))
             conn.commit()
             conn.close()
         except Exception as error:
@@ -230,8 +229,8 @@ def mailbox_create_edit(request, group_id):
             print error
             error_obj= str(error) + ",mailbox_create_edit() fn, Mailbox created will be deleted"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-        
-        
+
+
         return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
     else:
         title = "Add A New Mailbox"
@@ -239,7 +238,7 @@ def mailbox_create_edit(request, group_id):
                                             'groupname': group_name,
                                             "group_id" : group_id,
                                             "groupid" : group_id,
-                                            'server_dict' : server_dict 
+                                            'server_dict' : server_dict
                                             })
         return render_to_response(template, variable)
 
@@ -272,7 +271,7 @@ def read_mails(path, _type, displayFrom):
     '''
     cur_path = path + '/cur'
     new_path = path + '/new'
-    
+
     start = displayFrom
     end  = displayFrom + 20
 
@@ -283,7 +282,7 @@ def read_mails(path, _type, displayFrom):
     if _type == '0':
         all_unread_mails = sorted_ls(new_path)
         all_unread_mails.reverse()
-        
+
         if end > len(all_unread_mails):
             end = len(all_unread_mails)
 
@@ -299,9 +298,9 @@ def read_mails(path, _type, displayFrom):
                         temp[key] = msg[key].split(';')
                     else:
                         temp[key] = []
-                else:       
+                else:
                     temp[key] = msg[key]
-            
+
             for attachment_path in temp["Attachments"]:
                 if attachment_path != '':
                     _name = attachment_path.split("/")[-1]
@@ -314,13 +313,13 @@ def read_mails(path, _type, displayFrom):
             temp['text'] = msg.get_payload()
             temp['file_name'] = temp_mail
             mails_list.append(temp)
-            
+
         return mails_list
-    
+
     if _type == '1':
         all_unread_mails = sorted_ls(cur_path)
         all_unread_mails.reverse()
-        
+
         if end > len(all_unread_mails):
             end = len(all_unread_mails)
 
@@ -336,7 +335,7 @@ def read_mails(path, _type, displayFrom):
                         temp[key] = msg[key].split(';')
                     else:
                         temp[key] = []
-                else:       
+                else:
                     temp[key] = msg[key]
 
             for attachment_path in temp["Attachments"]:
@@ -349,16 +348,16 @@ def read_mails(path, _type, displayFrom):
             temp['file_name'] = temp_mail
             mails_list.append(temp)
 
-        return mails_list   
+        return mails_list
 
 
 def store_mails(mails, path):
     '''
     takes {
-        mails   :   The E-Mail message that needs to be stored as a file 
+        mails   :   The E-Mail message that needs to be stored as a file
         path    :   The path where the file needs to be stored
     }
-    
+
     Stores the mails in the Maildir format
     '''
     for mail in mails:
@@ -366,13 +365,13 @@ def store_mails(mails, path):
         to_addr = email.utils.formataddr(('Recipient', mail.to_addresses[0]))
         now = datetime.datetime.now()
         cc_addr = None
-        
+
         if len(mail.to_addresses) > 1:
-            nameslist = mail.to_addresses[1:-1]     
+            nameslist = mail.to_addresses[1:-1]
             cc_list=""
             for names in nameslist:
                 cc_list = cc_list + names + ';'
-            
+
             cc_list = cc_list + mail.to_addresses[-1]
             cc_addr = email.utils.formataddr(('CC List', cc_list))
 
@@ -387,7 +386,7 @@ def store_mails(mails, path):
             msg['To'] = to_addr
             if len(mail.to_addresses) > 1:
                 msg['CC'] = cc_addr
-            
+
             msg['Subject'] = mail.subject
             mail_data = mail.html
             mail_data = mail_data.replace('\r', '')
@@ -399,10 +398,10 @@ def store_mails(mails, path):
                 all_attachments_path = ''
                 for attachment in all_attachments:
                     all_attachments_path = all_attachments_path + attachment.document.path + ';'
-                
+
                 msg['Attachments'] = all_attachments_path
 
-                
+
 
             mbox.add(msg)
             mbox.flush()
@@ -417,35 +416,35 @@ def store_mails(mails, path):
 def server_sync(mail):
     #if 'SYNCDATA' in mail.subject:
     a = True
-    username = None                        
+    username = None
     json_file_path = ''
     file_object_path = ''
-    if a:       
+    if a:
         print '##**'*30
         #for file_path in list_of_decrypted_attachments:
         for file_path in mail:
-            print file_path    
+            print file_path
             if file_path.find('.json') != -1:
                 json_file_path = file_path
             else:
                 file_object_path = file_path
             node_exists = False
-            
+
             with open(json_file_path,'r') as json_file:
                     json_data = json_file.read()
-                    json_data = json.loads(json_data)                       
+                    json_data = json.loads(json_data)
                     #json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
                     json_data = json_util.loads(json_data)
-                                    
+
             cursor= None
             user_id = 0
-            
+
             try:
                 settings_dir1 = os.path.dirname(__file__)
                 settings_dir2 = os.path.dirname(settings_dir1)
                 settings_dir3 = os.path.dirname(settings_dir2)
                 path = os.path.abspath(os.path.dirname(settings_dir3))
-                #may throw error        
+                #may throw error
                 #conn = sqlite3.connect(path + '/example-sqlite3.db')
                 #user_id = json_data[u'created_by']
                 #user_id = 1
@@ -454,16 +453,16 @@ def server_sync(mail):
                 user_id = json_data[u'created_by']
             except Exception as error:
                 print error
-            
+
             if user_id:
-                try:    
-                        username = User.objects.get(pk=val).username    
+                try:
+                        username = User.objects.get(pk=val).username
                 except:
                         username = None
 
             if file_object_path != '':
                 ''' for the creation of the file object '''
-                #print file_object_path 
+                #print file_object_path
                 with open(file_object_path,'rb+') as to_be_saved_file:
                     req_groupid = None
                     for obj in json_data["group_set"]:
@@ -474,26 +473,26 @@ def server_sync(mail):
 
                     to_be_saved_file = io.BytesIO(to_be_saved_file.read())
                     to_be_saved_file.name = json_data["name"]
-                    #print "error point node",json_data    
+                    #print "error point node",json_data
                     node_id, is_video = save_file(to_be_saved_file, json_data["name"], json_data["created_by"], req_groupid, json_data["content_org"], json_data["tags"], json_data["mime_type"].split('/')[1], json_data["language"], username, json_data["access_policy"],server_sync=True,object_id=json_data["_id"],oid=True)
 
                     if type(node_id) == list:
                         node_id = node_id[1]
                     node_to_update = node_collection.one({ "_id": ObjectId(node_id) })
-                                    
+
                     temp_dict = {}
                     for key, values in json_data.items():
                         if key != 'fs_file_ids':
                             temp_dict[key] = values
-                
+
                     node_to_update.update(temp_dict)
                     node_to_update.save()
-                            
+
             else:
                 # We need to check from the _type what we have that needs to be saved
                 #updated data
                 if json_data.get('_type',0) != 0:
-                        #Updateable data       
+                        #Updateable data
                         # if node is present update it
                         try:
                                 if json_data['_type'] in ['GAttribute','GRelation','RelationType','AttributeType','GSystemType']:
@@ -501,16 +500,16 @@ def server_sync(mail):
                                                 temp_node = triple_collection.collection.GAttribute()
                                         elif json_data['_type'] == 'GRelation':
                                                 temp_node = triple_collection.collection.GRelation()
-                                        elif json_data['_type'] == 'RelationType': 
+                                        elif json_data['_type'] == 'RelationType':
                                                 temp_node = node_collection.collection.RelationType()
                                         elif json_data['_type'] == 'AttributeType':
-                                                temp_node = node_collection.collection.AttributeType()        
+                                                temp_node = node_collection.collection.AttributeType()
                                         elif json_data['_type'] == 'GSystemType':
                                                 temp_node = node_collection.collection.GSystemType()
                                         temp_dict = {}
                                         if json_data['_type'] in ['GAttribute','GRelation']:
-                                                json_data.pop('name')           
-                                        
+                                                json_data.pop('name')
+
                                         for key,values in json_data.items():
                                                         if key in ['attribute_type','relation_type','relation_type_set','attribute_type_set']:
                                                                 if key == 'attribute_type':
@@ -518,13 +517,13 @@ def server_sync(mail):
                                                                 elif key == 'relation_type':
                                                                         node = node_collection.one({"_id":ObjectId(json_data['relation_type']['_id'])})
                                                                 elif key == 'relation_type_set':
-                                                                        values = json_data['relation_type_set']      
+                                                                        values = json_data['relation_type_set']
                                                                         if values is not None:
                                                                                 node = process_list(values)
                                                                 elif key == 'attribute_type_set':
-                                                                        values = json_data['attribute_type_set']      
+                                                                        values = json_data['attribute_type_set']
                                                                         if values is not None:
-                                                                                node = process_list(values) 
+                                                                                node = process_list(values)
                                                                 if node:
                                                                         temp_node[key] = node
                                                         else:
@@ -532,34 +531,34 @@ def server_sync(mail):
                                         temp_node.update(temp_dict)
                                         try:
                                                 temp_node.save()
-                                        except: 
-                                                '''        
-                                                for i,v in temp_dict.items():  
+                                        except:
+                                                '''
+                                                for i,v in temp_dict.items():
                                                         temp_node[i] = v
                                                 print "after temp node",temp_node
                                                 temp_node.save()
                                                 '''
                                                 print (traceback.format_exc())
-                                           
-                                
+
+
                                 else:
                                         if json_data['_type'] == 'Group':
                                                 temp_node = node_collection.collection.Group()
                                         elif json_data['_type']  == 'Author':
                                                 temp_node = node_collection.collection.Author()
-                                        else:                           
+                                        else:
                                                 temp_node = node_collection.collection.GSystem()
                                         temp_dict = {}
                                         ''' dictionary creation '''
-                
+
                                         for key, values in json_data.items():
                                                 temp_dict[key] = values
 
                                         temp_node.update(temp_dict)
                                         temp_node.save()
                         except:
-                                        print(traceback.format_exc())                        
-                                             
+                                        print(traceback.format_exc())
+
                 else:
                         #Non- Updatedble data
                         try:
@@ -567,8 +566,8 @@ def server_sync(mail):
                                         gridfs_collection.insert(json_data)
                                 else:
                                         #print "chunk data",json_data["_id"]
-                                        chunk_collection.insert(json_data)  
-                                               
+                                        chunk_collection.insert(json_data)
+
                         except:
                                 print(traceback.format_exc())
                 temp_node = json_data
@@ -601,12 +600,12 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
     }
     returns{
             List of all the mails in the range (displayFrom, displayFrom + 20) from the mailbox
-            belonging to the user with the User-Name as username and Mail-Box name as mailboxname 
+            belonging to the user with the User-Name as username and Mail-Box name as mailboxname
     }
 
     This function establishes the connection and fetches the mails from the corresponding imap server.
-    During fetching it checks for the subject of the mail and then segregates mails either for local 
-    storage or update the mongodb with the data received. The mails are stored in maildir format in the 
+    During fetching it checks for the subject of the mail and then segregates mails either for local
+    storage or update the mongodb with the data received. The mails are stored in maildir format in the
     'ndf/mailbox_data' folder.
     '''
 
@@ -617,32 +616,32 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
         if box.name == mailboxname:
             required_mailbox=box
             break
-    
+
     # To find the path to the mailbox_data folder where the mails are stored in the maildir format
     settings_dir = os.path.dirname(__file__)
     PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
     # path = os.path.join(PROJECT_ROOT, 'MailClient/')
     path = GSTUDIO_MAIL_DIR_PATH + '/'
-    
+
     if not os.path.exists(path):
         os.makedirs(path)
-    
+
     path = path + 'mailbox_data/'
     if not os.path.exists(path):
         os.makedirs(path)
-    
+
     path = path + username
     # Necessary for the storage of mails in maildir format : if not exists -> make the corresponding the directories
     if not os.path.exists(path):
         os.makedirs(path)
-    
+
     path = path + '/' + mailboxname
     if not os.path.exists(path):
         os.makedirs(path)
 
     if not os.path.exists(path):
         os.makedirs(path)
-    if not os.path.exists(path + '/tmp'): 
+    if not os.path.exists(path + '/tmp'):
         os.makedirs(path + '/tmp')
     if not os.path.exists(path + '/cur'):
         os.makedirs(path + '/cur')
@@ -665,7 +664,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                 print len(all_mails)
                 # To manage the mails that comes as a part of the server-sync technique
                 print all_mails
-                all_mails = sorted(all_mails)                        
+                all_mails = sorted(all_mails)
                 print "all_mails",all_mails
                 for mail in all_mails:
                     server_sync(mail)
@@ -674,7 +673,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                 print 'STORING NEW MAILS'
                 store_mails(all_mails,path)
                 print 'STORAGE DONE'
-            
+
             print 'FETCHING FROM LOCAL STORAGE'
             all_mails = read_mails(path, mail_type, displayFrom)
             i=1
@@ -701,7 +700,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
 @get_execution_time
 def render_mailbox_pane(request,group_id):
     '''
-    This function sends the fecthed mails using 'get_mails_in_box' 
+    This function sends the fecthed mails using 'get_mails_in_box'
     function to the mailcontent template as a result of post request.
     '''
 
@@ -713,7 +712,7 @@ def render_mailbox_pane(request,group_id):
         'groupname': group_name,
         "group_id" : group_id,
         "groupid"  : group_id,
-        "emails"   : mails 
+        "emails"   : mails
         })
         return render_to_response(template,variable)
 
@@ -739,8 +738,8 @@ def mailbox_edit(request, group_id,mailboxname):
     home_grp_id = node_collection.one({'name': "home"})
     title = "Edit Mailbox"
     username = request.user.username
-    cursor= None  
-    email_id = ''                          
+    cursor= None
+    email_id = ''
     try:
         settings_dir1 = os.path.dirname(__file__)
         settings_dir2 = os.path.dirname(settings_dir1)
@@ -753,13 +752,13 @@ def mailbox_edit(request, group_id,mailboxname):
         userid=None
         for row in cursor:
             userid = row[0]
-            
+
         user_mailboxes = []
         query = 'select mailbox_id from user_mailboxes where user_id=\''+str(userid)+'\''
         cursor = conn.execute(query)
         for row in cursor:
             user_mailboxes.append(row[0])
-            
+
         mailboxes_name = []
         query = 'select id from django_mailbox_mailbox where name=\''+mailboxname+'\''
         cursor = conn.execute(query)
@@ -772,7 +771,7 @@ def mailbox_edit(request, group_id,mailboxname):
                 the_id = k
                 break
 
-        
+
         query = 'select uri from django_mailbox_mailbox where id='+ str(the_id)
         cursor = conn.execute(query)
         for row in cursor:
@@ -785,7 +784,7 @@ def mailbox_edit(request, group_id,mailboxname):
 
     except Exception as error:
         print error
-    
+
     variable = RequestContext(request, {'title': title,
                                         'groupname': group_name,
                                         'groupid': group_id,
@@ -817,7 +816,7 @@ def mailbox_edit(request, group_id,mailboxname):
             error_obj= "Incorrect Email ID given!"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
 
-        try: 
+        try:
             newbox= Mailbox()
             newbox.uri = uri
             #may throw error
@@ -826,19 +825,19 @@ def mailbox_edit(request, group_id,mailboxname):
             print "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
             error_obj= "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-            
+
         except IMAP4.error:
             print "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
             error_obj= "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-            
+
         try:
             settings_dir1 = os.path.dirname(__file__)
             settings_dir2 = os.path.dirname(settings_dir1)
             settings_dir3 = os.path.dirname(settings_dir2)
             # path = os.path.abspath(os.path.dirname(settings_dir3))
             path = SQLITE3_DB_PATH
-            #may throw error        
+            #may throw error
             conn = sqlite3.connect(path)
             user_id = str(request.user.id)
             cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
@@ -849,12 +848,12 @@ def mailbox_edit(request, group_id,mailboxname):
             print error
             error_obj= str(error) + ", mailbox_edit() fn"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-            
+
         mailbox_ids=[]
         for row in cursor:
             mailbox_ids.append(row[0])
 
-        # edit mailbox with passed mailbox_id 
+        # edit mailbox with passed mailbox_id
         box = None
         flag = 0
         boxes= Mailbox.active_mailboxes.all()
@@ -885,7 +884,7 @@ def mailbox_delete(request, group_id,mailboxname):
     }
 
     This function is used to delete the mailbox. The user is directed to a confirmation page. If the user also selects to save the
-    mails before deleting the mailbox, the function moves the mails into archive folder. Otherwise the function deletes the mails 
+    mails before deleting the mailbox, the function moves the mails into archive folder. Otherwise the function deletes the mails
     and the mailbox from the database if the user confirms deletion.
     '''
     group_name, group_id = get_group_name_id(group_id)
@@ -909,16 +908,16 @@ def mailbox_delete(request, group_id,mailboxname):
             mails_path_dir1 = os.path.dirname(__file__)
             mails_path_dir2 = os.path.dirname(mails_path_dir1)
             src = str(mails_path_dir2) + "/MailClient/mailbox_data/" + str(request.user.username) + "/" + mailboxname
-            dst = str(mails_path_dir2) + "/MailClient/mailbox_data" + "/Archived_Mails/" + str(request.user.username) + "/" + mailboxname 
-            
+            dst = str(mails_path_dir2) + "/MailClient/mailbox_data" + "/Archived_Mails/" + str(request.user.username) + "/" + mailboxname
+
             settings_dir = os.path.dirname(__file__)
             PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
             # path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
             path_MailClient = GSTUDIO_MAIL_DIR_PATH
-        
+
             if not os.path.exists(path_MailClient):
                 os.makedirs(path_MailClient)
-        
+
             p1 = path_MailClient + '/Archived_Mails/'
             if not os.path.exists(p1):
                 os.makedirs(p1)
@@ -939,13 +938,13 @@ def mailbox_delete(request, group_id,mailboxname):
             except Exception as error:
                 print error
                 error_obj= str(error) + ", mailbox_delete() fn"
-                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})    
-            
+                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+
         elif save_mails== "NO" and yes =="YES":
             mails_path_dir1 = os.path.dirname(__file__)
             mails_path_dir2 = os.path.dirname(mails_path_dir1)
             src = str(mails_path_dir2) + "/MailClient/mailbox_data/" + str(request.user.username) + "/" + mailboxname
-                       
+
             print '*'*30
             print src
             try:
@@ -953,10 +952,10 @@ def mailbox_delete(request, group_id,mailboxname):
             except Exception as error:
                 print error
                 error_obj= str(error) + ", mailbox_delete() fn"
-                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})    
+                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
 
         if yes == "YES":
-            
+
             settings_dir1 = os.path.dirname(__file__)
             settings_dir2 = os.path.dirname(settings_dir1)
             settings_dir3 = os.path.dirname(settings_dir2)
@@ -971,12 +970,12 @@ def mailbox_delete(request, group_id,mailboxname):
             except Exception as error:
                 print error
                 error_obj= str(error) + ", mailbox_delete() fn"
-                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})    
+                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
 
             mailbox_ids=[]
             for row in cursor:
-                mailbox_ids.append(row[0])                  
-            print mailbox_ids        
+                mailbox_ids.append(row[0])
+            print mailbox_ids
             box = None
             flag = 0
             boxes= Mailbox.active_mailboxes.all()
@@ -986,7 +985,7 @@ def mailbox_delete(request, group_id,mailboxname):
                     break
 
             if flag == 1:
-                #delete from our 'mapping' database (the database which tracks which user_id is asscociated with which mailbox_id )                    
+                #delete from our 'mapping' database (the database which tracks which user_id is asscociated with which mailbox_id )
 
                 # conn2 = sqlite3.connect(path + '/example-sqlite3.db')
                 cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
@@ -994,7 +993,7 @@ def mailbox_delete(request, group_id,mailboxname):
                 cursor = conn.execute(query)
                 conn.commit()
 
-                #NOTE: we must delete the mailbox from our 'mapping' database first and then from django_mailbox database because 
+                #NOTE: we must delete the mailbox from our 'mapping' database first and then from django_mailbox database because
                 # when you call the delete function of django_mailbox API on a mailbox object, the mailbox id is lost!
                 # And we need that id value to delete from our 'mapping' database. Hence order is important
 
@@ -1036,7 +1035,7 @@ def mailclient_error_display(request, group_id, error_obj):
 
 @login_required
 @get_execution_time
-def mailbox_settings(request, group_id,mailboxname):    
+def mailbox_settings(request, group_id,mailboxname):
     '''
     takes {
         request : HTTP request
@@ -1052,7 +1051,7 @@ def mailbox_settings(request, group_id,mailboxname):
     template = "ndf/mailclient_settings.html"
     group_name, group_id = get_group_name_id(group_id)
     title = "Settings Page"
-    
+
     context_dict = { "title" : title,
                     "group_name" : group_name,
                     "group_id" : group_id,
@@ -1060,7 +1059,7 @@ def mailbox_settings(request, group_id,mailboxname):
                     "mailbox_name" : mailboxname
                     }
     variable = RequestContext(request,context_dict)
-    return render_to_response(template,variable) 
+    return render_to_response(template,variable)
 
 def get_email_id(filename,mailboxname,username):
     settings_dir = os.path.dirname(__file__)
@@ -1082,7 +1081,7 @@ def get_email_id(filename,mailboxname,username):
 
 @login_required
 @get_execution_time
-def compose_mail(request, group_id,mailboxname):    
+def compose_mail(request, group_id,mailboxname):
     '''
         takes {
         request : HTTP request
@@ -1094,7 +1093,7 @@ def compose_mail(request, group_id,mailboxname):
     }
 
     The function renders the form to create a new email and then processes it when the form is submitted (user hits 'send'). The 'to',
-    'cc', 'bcc', subject and body are processed and attached to django_mailbo's EmailMessage class object(email object). Files added 
+    'cc', 'bcc', subject and body are processed and attached to django_mailbo's EmailMessage class object(email object). Files added
     as 'attachments' are read and attached to the email object and the mail is sent.
 
     '''
@@ -1117,12 +1116,12 @@ def compose_mail(request, group_id,mailboxname):
         print error
         error_obj= str(error) + ", mailbox_edit() fn"
         return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-            
+
     mailbox_ids=[]
     for row in cursor:
         mailbox_ids.append(row[0])
 
-    # find mailbox with passed mailbox_id 
+    # find mailbox with passed mailbox_id
     box = None
     flag = 0
     boxes= Mailbox.active_mailboxes.all()
@@ -1169,8 +1168,8 @@ def compose_mail(request, group_id,mailboxname):
         # return render_to_response(template,variable)
         return render(request,template,context_dict)
         print '$' * 20
-    
-    elif request.method == "POST":    
+
+    elif request.method == "POST":
 
         user_id = request.POST.get("user_id","")
         to = request.POST.get("to_addrs", "")
@@ -1195,7 +1194,7 @@ def compose_mail(request, group_id,mailboxname):
         if cc:
             cc=cc.replace(" ","")
             cc_list=cc.split(";")
-        
+
         bcc = request.POST.get("bcc_addrs", "")
         if bcc:
             bcc=bcc.replace(" ","")
@@ -1211,8 +1210,8 @@ def compose_mail(request, group_id,mailboxname):
         mail.from_email = mailbox_email_id
         mail.subject= subject
         mail.content_subtype = "html"
-        mail.body = body 
-        for f in files_list:        
+        mail.body = body
+        for f in files_list:
             print '-'*30
             print f.name
             print f.size
@@ -1225,7 +1224,7 @@ def compose_mail(request, group_id,mailboxname):
         except Exception as error:
                 print error
                 error_obj= str(error) + ", compose_mail() fn"
-                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})    
+                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
 
         return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
 
@@ -1246,7 +1245,7 @@ def update_mail_status(request,group_id):
     '''
     group_name, group_id = get_group_name_id(group_id)
     template = "ndf/mailstatuschange.html"
-    
+
     if request.method=='POST' and request.is_ajax():
 
         mailboxname = request.POST['mailBoxName']
@@ -1267,7 +1266,7 @@ def update_mail_status(request,group_id):
         cur_path = path + '/cur/' + filename
 
         shutil.move(new_path,cur_path)
-    
+
         new_path = path + '/new/'
         cur_path = path + '/cur/'
 
@@ -1282,7 +1281,7 @@ def update_mail_status(request,group_id):
         if mail_type == '0':
             all_unread_mails = sorted_ls(new_path)
             all_unread_mails.reverse()
-        
+
             if end > len(all_unread_mails):
                 end = len(all_unread_mails)
 
@@ -1298,9 +1297,9 @@ def update_mail_status(request,group_id):
                             temp[key] = msg[key].split(';')
                         else:
                             temp[key] = []
-                    else:       
+                    else:
                         temp[key] = msg[key]
-            
+
                 for attachment_path in temp["Attachments"]:
                     if attachment_path != '':
                         _name = attachment_path.split("/")[-1]
@@ -1344,19 +1343,19 @@ def fetch_mail_body(request,group_id):
         username =  request.POST['username']
         mail_type = request.POST['mail_type']
         filename = request.POST['file_name']
-        
+
         settings_dir = os.path.dirname(__file__)
         PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
         # path = os.path.join(PROJECT_ROOT, 'MailClient/')
         path = GSTUDIO_MAIL_DIR_PATH + '/'
         path = path + 'mailbox_data/'
         path = path + username + '/' + mailboxname
-        
+
         cur_path = path + '/cur'
         new_path = path + '/new'
-        
+
         p = Parser()
-        
+
         if mail_type == '0':
             msg = p.parse(open(join(new_path, filename)))
         else:
@@ -1391,7 +1390,7 @@ def unique_mailbox_name(request,group_id):
     To check whether the mailbox name is unique for a user.
     Different users can still have two separate mailboxes with same names.
     '''
-    
+
     group_name, group_id = get_group_name_id(group_id)
     template = "ndf/mail_condition_check.html"
     if request.method == 'POST' and request.is_ajax():
@@ -1418,7 +1417,7 @@ def unique_mailbox_name(request,group_id):
         settings_dir3 = os.path.dirname(settings_dir2)
         # path = os.path.abspath(os.path.dirname(settings_dir3))
         path = SQLITE3_DB_PATH
-                
+
         try:
             conn = sqlite3.connect(path)
             cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
@@ -1483,7 +1482,7 @@ def unique_mailbox_id(request,group_id):
         success = True
 
         email_id_data = request.POST['email_data']
-        
+
         if email_id_data == '':
             variable = RequestContext(request, {
                 'groupname': group_name,
@@ -1494,7 +1493,7 @@ def unique_mailbox_id(request,group_id):
                 'success' : 0,
             })
             return render_to_response(template,variable)
-        
+
         user_id = str(request.user.id)
 
         settings_dir1 = os.path.dirname(__file__)
@@ -1502,7 +1501,7 @@ def unique_mailbox_id(request,group_id):
         settings_dir3 = os.path.dirname(settings_dir2)
         # path = os.path.abspath(os.path.dirname(settings_dir3))
         path = SQLITE3_DB_PATH
-                
+
         try:
             conn = sqlite3.connect(path)
             cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")

@@ -2,9 +2,7 @@ import json
 from bson import json_util
 
 # ''' -- imports from installed packages -- '''
-# from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-# from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  #, render
 from django.template import RequestContext
 from django.contrib.auth.models import User
@@ -18,17 +16,8 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import Buddy, Author #, DjangoActiveUsersGroup
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_execution_time
-
-# ''' -- imports from application folders/files -- '''
-# from gnowsys_ndf.settings import META_TYPE, GAPPS, MEDIA_ROOT
-# from gnowsys_ndf.ndf.models import node_collection
-# from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
-# from gnowsys_ndf.ndf.views.methods import get_node_metadata, node_thread_access, create_thread_for_node
-# from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
-# from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id
-# gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
-# GST_AUDIO = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
 from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID
+
 
 @login_required
 def list_buddy(request, group_id='home'):

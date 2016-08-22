@@ -2,7 +2,6 @@
 # from datetime import datetime
 import datetime
 import json
-
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect  # , HttpResponse uncomment when to use
 from django.http import HttpResponse
@@ -24,6 +23,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
+from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict, update_notes_or_files_visited
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
@@ -53,15 +53,12 @@ def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
     """
-    try:
-        group_id = ObjectId(group_id)
-    except:
-        group_name, group_id = get_group_name_id(group_id)
 
     if request.user.is_anonymous():
         return HttpResponseRedirect(reverse('explore_courses', kwargs={}))
 
-    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id  = group_obj._id
 
     group_obj_post_node_list = []
     app_id = None
@@ -74,7 +71,6 @@ def course(request, group_id, course_id=None):
     course_enrollment_status = None
     app_set_id = None
     query = {}
-
     course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
 
     if course_ins:
@@ -1788,7 +1784,13 @@ def enroll_to_course(request, group_id):
             group_obj.author_set.append(user_id)
         group_obj.save()
         response_dict["success"] = True
+        # get new/existing counter document for a user for a given course for the purpose of analytics
+        counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+        counter_obj['is_group_member'] = True
+        counter_obj.save()
+
         return HttpResponse(json.dumps(response_dict))
+
 
 @login_required
 @get_execution_time
@@ -1897,7 +1899,7 @@ def course_dashboard(request, group_id):
     allow_to_join = get_group_join_status(group_obj)
     result_status = course_complete_percentage = None
     total_count = completed_count = None
-    if request.user.is_authenticated:
+    if request.user.is_authenticated():
         result_status = get_course_completetion_status(group_obj, request.user.id)
         if result_status:
             if "course_complete_percentage" in result_status:
@@ -2033,6 +2035,16 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     if notebook_id:
         notebook_obj = node_collection.one({'_id': ObjectId(notebook_id)})
         thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
+
+        if user_id :
+            #updating counters collection
+            # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(notebook_id),False,True)
+            if request.user.is_authenticated():
+                Counter.add_visit_count(resource_obj_or_id=notebook_obj,
+                                        current_group_id=group_id,
+                                        loggedin_userid=request.user.id)
+
+
     else:
         if user_blogs and user_blogs.count():
             notebook_obj = user_blogs[0]
@@ -2106,6 +2118,13 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         allow_to_comment = None
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
+        #updating counters collection
+        # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
+        if request.user.is_authenticated():
+            Counter.add_visit_count(resource_obj_or_id=file_obj,
+                                    current_group_id=group_id,
+                                    loggedin_userid=request.user.id)
+
     else:
 
         files_cur = node_collection.find({
@@ -2193,6 +2212,14 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         allow_to_comment = None
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
+        # updating counters collection:
+        # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
+        if request.user.is_authenticated():
+            Counter.add_visit_count(resource_obj_or_id=file_obj,
+                                    current_group_id=group_id,
+                                    loggedin_userid=request.user.id)
+
+
     else:
         all_superusers = User.objects.filter(is_superuser=True)
         all_superusers_ids = all_superusers.values_list('id',flat=True)
@@ -2232,7 +2259,6 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
 
 @get_execution_time
 def course_about(request, group_id):
-
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
@@ -2368,18 +2394,23 @@ def inline_edit_res(request, group_id, node_id):
 
 @get_execution_time
 def course_filters(request, group_id):
+
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
+
     gstaff_users = []
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
+
     notebook_filter = False
     no_url_flag = True
     detail_urlname = None
+
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
         }
+
     filter_applied = request.GET.get("filter_applied", "")
     filter_dict = request.GET.get("filter_dict", "")
     title = request.GET.get("title", "")
@@ -2431,7 +2462,7 @@ def course_filters(request, group_id):
 @login_required
 @get_execution_time
 def course_analytics(request, group_id, user_id, render_template=False):
-    from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
+
 
     cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
     cache_result = cache.get(cache_key)
@@ -2443,8 +2474,11 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
     analytics_data = {}
     data_points_dict = request.GET.get('data_points_dict', {})
+    # print '== data_points_dict: ', data_points_dict
 
     if data_points_dict and not isinstance(data_points_dict, dict):
+        from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
+
         data_points_dict = json.loads(data_points_dict)
         # print "\n\ndata_points_dict",data_points_dict
         analytics_data['correct_attempted_quizitems'] = (data_points_dict['quiz_points'] / GSTUDIO_QUIZ_CORRECT_POINTS)
@@ -2454,9 +2488,9 @@ def course_analytics(request, group_id, user_id, render_template=False):
         analytics_data['users_points'] = data_points_dict['users_points']
 
     user_obj = User.objects.get(pk=int(user_id))
-    analytics_data['username'] = user_obj.username
 
-    analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+    counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
+    analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
 
@@ -2475,85 +2509,101 @@ def course_analytics(request, group_id, user_id, render_template=False):
     # analytics_data['completed_res'] = analytics_instance.get_completed_resources_count()
     # print "\n Completed Resources === ", completed_res, "\n\n"
 
-
-    # QuizItem Section
-
     analytics_data['username'] = user_obj.username
+    # QuizItem Section
     analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
     # print "\n Total QuizItemEvents === ", analytics_data['total_quizitems'], "\n\n"
-    analytics_data['attempted_quizitems'] = analytics_instance.get_attempted_quizitems_count()
+    # analytics_data['attempted_quizitems'] = counter_obj.no_questions_attempted
+    analytics_data['attempted_quizitems'] = counter_obj['quiz']['attempted']
     # print "\n Attempted QuizItemEvents === ", analytics_data['attempted_quizitems'], "\n\n"
     if 'correct_attempted_quizitems' not in analytics_data:
-        analytics_data['correct_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(True,False)
+        # analytics_data['correct_attempted_quizitems'] = counter_obj.no_correct_answers
+        analytics_data['correct_attempted_quizitems'] = counter_obj['quiz']['correct']
     # print "\n Correct Attempted QuizItemEvents === ", analytics_data['correct_attempted_quizitems'], "\n\n"
-    analytics_data['incorrect_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(False,True)
+    # analytics_data['incorrect_attempted_quizitems'] = counter_obj.no_incorrect_answers
+    analytics_data['incorrect_attempted_quizitems'] = counter_obj['quiz']['incorrect']
     # print "\n InCorrect Attempted QuizItemEvents === ", analytics_data['incorrect_attempted_quizitems'], "\n\n"
-
 
     # Notes Section
     # analytics_data['total_notes'] = analytics_instance.get_total_notes_count()
     # print "\n Total Notes === ", total_notes, "\n\n"
     if 'user_notes' not in analytics_data:
-        analytics_data['user_notes'] = analytics_instance.get_user_notes_count()
+        # analytics_data['user_notes'] = counter_obj.no_notes_written
+        analytics_data['user_notes'] = counter_obj['page']['blog']['created']
     # print "\n User Notes === ", user_notes, "\n\n"
-
 
     # Files Section
     # analytics_data['total_files'] = analytics_instance.get_total_files_count()
     # print "\n Total Files === ", total_files, "\n\n"
     if 'user_files' not in analytics_data:
-        analytics_data['user_files'] = analytics_instance.get_user_files_count()
+        # analytics_data['user_files'] = counter_obj.no_files_created
+        analytics_data['user_files'] = counter_obj['file']['created']
     # print "\n User's Files === ", user_files, "\n\n"
-
 
     # Comments
     if 'total_cmnts_by_user' not in analytics_data:
-        analytics_data['total_cmnts_by_user'] = analytics_instance.get_total_comments_by_user()
+        # analytics_data['total_cmnts_by_user'] = counter_obj.no_comments_by_user
+        analytics_data['total_cmnts_by_user'] = counter_obj['total_comments_by_user']
     # print "\n Total Comments By User === ", total_cmnts_by_user, "\n\n"
 
     # Comments on Notes Section
-    analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
+    # analytics_data['cmts_on_user_notes'] = counter_obj.no_comments_received_on_notes
+    analytics_data['cmts_on_user_notes'] = counter_obj['page']['blog']['comments_gained']
     # print "\n Total Comments On User Notes === ", cmts_on_user_notes, "\n\n"
-    # analytics_data['unique_users_commented_on_user_notes'] = analytics_instance.get_commented_unique_users_count(True,False)
+    # analytics_data['unique_users_commented_on_user_notes'] = len(counter_obj.comments_by_others_on_notes.keys())
     # print "\n Total Unique Users - Commented on User Notes === ", unique_users_commented_on_user_notes, "\n\n"
 
 
     # Comments on Files Section
-    analytics_data['cmts_on_user_files'] = analytics_instance.get_comments_counts_on_users_files()
+    # analytics_data['cmts_on_user_files'] = counter_obj.no_comments_received_on_files
+    analytics_data['cmts_on_user_files'] = counter_obj['file']['comments_gained']
     # print "\n Total Comments User Files === ", cmts_on_user_files, "\n\n"
-    analytics_data['unique_users_commented_on_user_files'] = analytics_instance.get_commented_unique_users_count(False,True)
+    # analytics_data['unique_users_commented_on_user_files'] = len(counter_obj.comments_by_others_on_files.keys())
+
+    analytics_data['unique_users_commented_on_user_files'] = len(counter_obj['file']['comments_by_others_on_res'].keys())
+
     # print "\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files, "\n\n"
 
     # BY User
     # TO IMPROVE
-    analytics_data['total_notes_read_by_user'] = analytics_instance.get_others_notes_read_count()
+    # analytics_data['total_notes_read_by_user'] = counter_obj.no_others_notes_visited
+    analytics_data['total_notes_read_by_user'] = counter_obj['page']['blog']['visits_on_others_res']
     # print "\n Total Notes read by User === ", total_notes_read_by_user, "\n\n"
 
     # TO IMPROVE
-    analytics_data['total_files_viewed_by_user'] = analytics_instance.get_others_files_read_count()
+    # analytics_data['total_files_viewed_by_user'] = counter_obj.no_others_files_visited
+    analytics_data['total_files_viewed_by_user'] = counter_obj['file']['visits_on_others_res']
     # print "\n Total Files viewed by User === ", total_files_viewed_by_user, "\n\n"
 
     # TO IMPROVE
-    analytics_data['other_viewing_my_files'] = analytics_instance.total_users_visted_my_files()
+    # analytics_data['other_viewing_my_files'] = counter_obj.no_visits_gained_on_files
+    analytics_data['other_viewing_my_files'] = counter_obj['file']['visits_gained']
     # print "\n Total Users viewing My FILES === ", other_viewing_my_files, "\n\n"
 
     # TO IMPROVE
-    analytics_data['others_reading_my_notes'] = analytics_instance.total_users_read_my_notes()
+    # analytics_data['others_reading_my_notes'] = counter_obj.no_views_gained_on_notes
+    analytics_data['others_reading_my_notes'] = counter_obj['page']['blog']['visits_gained']
     # print "\n Total Users reading My NOTES === ", others_reading_my_notes, "\n\n"
 
-    analytics_data['commented_on_others_notes'] = analytics_instance.get_other_notes_commented_by_user_count()
+    # analytics_data['commented_on_others_notes'] = counter_obj.no_comments_on_others_notes
+    analytics_data['commented_on_others_notes'] = counter_obj['page']['blog']['commented_on_others_res']
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
 
-    analytics_data['commented_on_others_files'] = analytics_instance.get_other_files_commented_by_user_count()
+    # analytics_data['commented_on_others_files'] = counter_obj.no_comments_on_others_files
+    analytics_data['commented_on_others_files'] = counter_obj['file']['commented_on_others_res']
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
 
     # all_cmts = analytics_instance.get_avg_rating_on_my_comments()
-    analytics_data['total_rating_rcvd_on_notes'] = analytics_instance.get_ratings_received_on_user_notes()
+    # analytics_data['total_rating_rcvd_on_notes'] = counter_obj.avg_rating_received_on_notes
+    analytics_data['total_rating_rcvd_on_notes'] = counter_obj['page']['blog']['avg_rating_gained']
     # print "\n\n analytics_data['total_rating_rcvd_on_notes'] === ",analytics_data['total_rating_rcvd_on_notes']
-    analytics_data['total_rating_rcvd_on_files'] = analytics_instance.get_ratings_received_on_user_files()
+    # analytics_data['total_rating_rcvd_on_files'] = counter_obj.avg_rating_received_on_files
+    analytics_data['total_rating_rcvd_on_files'] = counter_obj['file']['avg_rating_gained']
     # print "\n\n analytics_data['total_rating_rcvd_on_files'] === ",analytics_data['total_rating_rcvd_on_files']
-    cmts_on_user_notes = analytics_instance.get_comments_counts_on_users_notes(False, site_wide=True)
-    cmts_on_user_files = analytics_instance.get_comments_counts_on_users_files(False, site_wide=True)
+    # cmts_on_user_notes = counter_obj.no_comments_received_on_notes
+    cmts_on_user_notes = counter_obj['page']['blog']['comments_gained']
+    # cmts_on_user_files = counter_obj.no_comments_received_on_files
+    cmts_on_user_files = counter_obj['file']['comments_gained']
     analytics_data['cmnts_rcvd_by_user'] = 0
     if 'cmts_on_user_notes' in analytics_data and 'cmts_on_user_files' in analytics_data:
         analytics_data['cmnts_rcvd_by_user'] = analytics_data['cmts_on_user_notes'] + analytics_data['cmts_on_user_files']
@@ -2571,12 +2621,15 @@ def course_analytics(request, group_id, user_id, render_template=False):
         analytics_data['unit_progress_meter'] = 0
 
     if "users_points" not in analytics_data:
-        analytics_data['users_points'] = analytics_instance.get_users_points()
+        # analytics_data['users_points'] = counter_obj.course_score
+        analytics_data['users_points'] = counter_obj['group_points']
 
-    analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+    # analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+    analytics_data['users_points_breakup'] = counter_obj.get_all_user_points_dict()
 
     del analytics_instance
     cache.set(cache_key, analytics_data, 60*10)
+
     return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)
@@ -2584,7 +2637,98 @@ def course_analytics(request, group_id, user_id, render_template=False):
 
     # return HttpResponse(json.dumps(analytics_data))
 
+@login_required
+@get_execution_time
+def course_analytics_admin(request, group_id):
 
+    cache_key = u'course_analytics_admin' + unicode(group_id)
+    cache_result = cache.get(cache_key)
+    if cache_result:
+        return HttpResponse(cache_result)
+
+    # from gnowsys_ndf.ndf.views.analytics_methods import AnalyticsMethods
+    # from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
+
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    admin_analytics_data_list = []
+    admin_analytics_data_append = admin_analytics_data_list.append
+    FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
+
+    all_group_authors = node_collection.find({'_type': u'Author', 'created_by': {'$in': group_obj.author_set}})
+    # print group_obj.author_set
+
+    auth_counters = counter_collection.find({'user_id': {'$in': group_obj.author_set}, 'group_id': ObjectId(group_id) })
+
+    for each_author_obj in all_group_authors:
+        admin_analytics_data = {}
+
+        try:
+            user_counter_obj = Counter(auth_counters.clone().where('this.user_id == '+str(each_author_obj.created_by)+' && this.group_id ==  "'+str(group_id)+'"')[0])
+        except Exception, e:
+            user_counter_obj = Counter.get_counter_obj(each_author_obj.created_by, ObjectId(group_id))
+            print e
+
+        # try:
+        #     user_obj = User.objects.get(pk=int(each_author_obj))
+        # except Exception, e:
+        #     continue
+
+        # analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+        # username = user_obj.username
+        # user_id = user_obj.id
+        # users_points = analytics_instance.get_users_points()
+        admin_analytics_data['username']    = each_author_obj.name
+        admin_analytics_data['user_id']     = each_author_obj.created_by
+        admin_analytics_data['users_points']= user_counter_obj['group_points']
+
+        # admin_analytics_data["files_points"] = user_counter_obj['file']['created'] * GSTUDIO_FILE_UPLOAD_POINTS
+        admin_analytics_data["files_points"] = user_counter_obj.get_file_points()
+        if FILES_MAX_POINT_VAL < admin_analytics_data["files_points"]:
+            FILES_MAX_POINT_VAL = admin_analytics_data["files_points"]
+
+        # admin_analytics_data['notes_points'] = user_counter_obj['page']['blog']['created'] * GSTUDIO_NOTE_CREATE_POINTS
+        admin_analytics_data['notes_points'] = user_counter_obj.get_page_points(page_type='blog')
+        if NOTES_MAX_POINT_VAL < admin_analytics_data['notes_points']:
+            NOTES_MAX_POINT_VAL = admin_analytics_data['notes_points']
+
+        # admin_analytics_data['quiz_points'] = user_counter_obj['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
+        admin_analytics_data['quiz_points'] = user_counter_obj.get_quiz_points()
+        if QUIZ_MAX_POINT_VAL < admin_analytics_data['quiz_points']:
+            QUIZ_MAX_POINT_VAL = admin_analytics_data['quiz_points']
+
+        # admin_analytics_data['interactions_points'] = user_counter_obj['total_comments_by_user'] * GSTUDIO_COMMENT_POINTS
+        admin_analytics_data['interactions_points'] = user_counter_obj.get_interaction_points()
+        if INTERACTIONS_MAX_POINT_VAL < admin_analytics_data['interactions_points']:
+            INTERACTIONS_MAX_POINT_VAL = admin_analytics_data['interactions_points']
+
+        # del analytics_instance
+        admin_analytics_data_append(admin_analytics_data)
+
+    max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
+    'quiz_max_points': QUIZ_MAX_POINT_VAL, 'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
+
+    column_headers = [
+        ("username", "Name"),
+        # ("user_id", "user_id"),
+        ("users_points", "Total Points"),
+        ("files_points", "Files"),
+        ("notes_points", "Notes"),
+        ("quiz_points", "Quiz"),
+        ("interactions_points", "Interactions"),
+    ]
+    response_dict = {}
+    response_dict["column_headers"] = column_headers
+    response_dict["success"] = True
+    response_dict["students_data_set"] = admin_analytics_data_list
+    response_dict['max_points_dict'] = max_points_dict
+
+    response_dict = json.dumps(response_dict)
+    cache.set(cache_key, response_dict, 60*10)
+
+    # print "\n admin_analytics_data_list === ",admin_analytics_data_list
+    return HttpResponse(response_dict)
+
+'''
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
@@ -2670,11 +2814,8 @@ def course_analytics_admin(request, group_id):
     gst_reply = node_collection.one({'_type': "GSystemType", 'name': "Reply"})
     gst_reply_id = gst_reply._id
 
-    # group: I2C-V2
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
-
     author_set = group_obj.author_set
-
     all_res_cur = node_collection.find({'_type': 'GSystem', 'group_set': {'$in': [group_obj._id]}, '$or': [{'member_of': {'$in': [gst_file_id, gst_reply_id]}}, {'member_of': gst_page_id, 'type_of': gst_blog_id}], 'created_by': {'$in': author_set} })
 
 
@@ -2708,7 +2849,7 @@ def course_analytics_admin(request, group_id):
     for uid, gsts in ud.iteritems():
         fd[uid] = {gst_name_id_dict[g]: gsts[g]*gst_name_point_dict[g] for g in gsts}
         ua_dict = fd[uid]
-        analytics_instance = AnalyticsMethods(request, uid, user_id_name_dict[uid], group_id)
+        analytics_instance = AnalyticsMethods(uid, user_id_name_dict[uid], group_id)
         correct_attempted_quizitems = analytics_instance.get_evaluated_quizitems_count(True,False)
         ua_dict['quiz_points'] = correct_attempted_quizitems * GSTUDIO_QUIZ_CORRECT_POINTS
 
@@ -2749,6 +2890,9 @@ def course_analytics_admin(request, group_id):
     # print "\n admin_analytics_list === ",admin_analytics_list
     return HttpResponse(response_dict)
 
+'''
+
+
 @login_required
 @get_execution_time
 def build_progress_bar(request, group_id, node_id):
@@ -2760,7 +2904,7 @@ def build_progress_bar(request, group_id, node_id):
     try:
         group_obj   = get_group_name_id(group_id, get_obj=True)
         course_complete_percentage = total_count = completed_count = None
-        if request.user.is_authenticated:
+        if request.user.is_authenticated():
             result_status = get_course_completetion_status(group_obj, request.user.id)
     except Exception as e:
         # print "\n\n Error while fetching ---", e

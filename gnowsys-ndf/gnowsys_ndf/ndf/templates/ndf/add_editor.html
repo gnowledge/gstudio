@@ -80,6 +80,7 @@
 {% endcomment %}
 
 {% trans var_placeholder as content %}
+{% comment %}
 {% if node_id %}
 <!-- <input type="hidden" value="{#% check_existence_textObj_mobwrite node_id %#}"> -->
 <textarea id="{{node_id|mongo_id}}" class="small-12 columns" name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}">{{var_value}}</textarea>
@@ -88,6 +89,8 @@
 <textarea id="orgitdown_{{var_name}}" class="small-12 columns orgedit" name="{{var_name}}" placeholder="{% blocktrans %}  {{content}} {% endblocktrans %}" value="{{var_value}}">{{var_value}}</textarea>
 
 {% endif %}
+{% endcomment %}
+{% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node_content|default_if_none:"" node_id=node.pk ckeditor_toolbar="GeneralToolbar" %}
 <script>
 {% if node_id %}
   $("#{{node_id|mongo_id}}").orgitdown(mySettings);

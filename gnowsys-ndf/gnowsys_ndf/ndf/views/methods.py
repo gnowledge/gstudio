@@ -1,3 +1,27 @@
+''' -- imports from python libraries -- '''
+# import os -- Keep such imports here
+import datetime
+import time
+import subprocess
+import re
+import ast
+import string
+import json
+import locale
+import pymongo
+import multiprocessing as mp
+import mongokit
+import json
+# import csv
+
+from sys import getsizeof, exc_info
+from bson import BSON
+from bson import json_util
+# from datetime import datetime, timedelta, date
+from collections import OrderedDict
+from mongokit import paginator
+# from collections import Counter
+
 ''' -- imports from installed packages -- '''
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
@@ -9,132 +33,107 @@ from django.shortcuts import render_to_response  # , render
 from django.http import HttpResponse, HttpRequest
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.cache import cache
-
-from mongokit import paginator
-import mongokit
-import json
+from django.contrib.sites.models import Site
+from django.template.loader import render_to_string
+# to display error template if non existent pub is given in settings.py
+from django.shortcuts import render
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
-from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES
-from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
+from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN
+# from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
-from django.contrib.sites.models import Site
-from django.template.loader import render_to_string
 # get pub of gpg key with which to sign syncdata attachments
 from gnowsys_ndf.settings import SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH
-
-#to display error template if non existent pub is given in settings.py
-from django.shortcuts import render
-
-''' -- imports from python libraries -- '''
-# import os -- Keep such imports here
-import datetime
-import time
-from sys import getsizeof, exc_info
-import subprocess
-import re
-import ast
-import string
-import json
-import locale
-import pymongo
-from bson import BSON
-from bson import json_util
-import multiprocessing as mp
 from datetime import datetime, timedelta, date
-# import csv
-# from collections import Counter
-from collections import OrderedDict
 
-col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
-theme_item_GST = node_collection.one(
-    {'_type': 'GSystemType', 'name': 'theme_item'})
+theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
-
-# C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
-
 grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
 ins_objectid = ObjectId()
 
+# C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
 def get_execution_time(f):
    if BENCHMARK == 'ON':
 
-	    def wrap(*args,**kwargs):
-	        time1 = time.time()
-	        total_parm_size = 0
-	        for key, value in kwargs.iteritems():
-	           total_parm_size = total_parm_size + getsizeof(value)
-	        total_param = len(kwargs)
-	        ret = f(*args,**kwargs)
-	        t2 = time.clock()
-	        time2 = time.time()
-	        time_diff = time2 - time1
-	        benchmark_node =  col.Benchmark()
-	        benchmark_node.time_taken = unicode(str(time_diff))
-	        benchmark_node.name = unicode(f.func_name)
-	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
-	        try :
-	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
-	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
-	        except :
-	        	pass
-	        try :
-	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
-	        except :
-	        	pass
-	        try :
-	        	benchmark_node.user = unicode(args[0].user.username)
-	        except :
-	        	pass
-	        benchmark_node.parameters = unicode(total_param)
-	        benchmark_node.size_of_parameters = unicode(total_parm_size)
-	        benchmark_node.last_update = datetime.today()
-	        try:
-	        	benchmark_node.calling_url = unicode(args[0].path)
-	        	url = benchmark_node.calling_url.split("/")
+    def wrap(*args,**kwargs):
+        time1 = time.time()
+        total_parm_size = 0
+        for key, value in kwargs.iteritems():
+           total_parm_size = total_parm_size + getsizeof(value)
+        total_param = len(kwargs)
+        ret = f(*args,**kwargs)
+        t2 = time.clock()
+        time2 = time.time()
+        time_diff = time2 - time1
+        benchmark_node =  benchmark_collection.Benchmark()
+        benchmark_node.time_taken = unicode(str(time_diff))
+        benchmark_node.name = unicode(f.func_name)
+        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
+        try :
+            benchmark_node.has_data["POST"] = bool(args[0].POST)
+            benchmark_node.has_data["GET"] = bool(args[0].GET)
+        except :
+            pass
+        try :
+            benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
+        except :
+            pass
+        try :
+            benchmark_node.user = unicode(args[0].user.username)
+        except :
+            pass
+        benchmark_node.parameters = unicode(total_param)
+        benchmark_node.size_of_parameters = unicode(total_parm_size)
+        benchmark_node.last_update = datetime.today()
+        try:
+            benchmark_node.calling_url = unicode(args[0].path)
+            url = benchmark_node.calling_url.split("/")
 
-	        	if url[1] != "" :
-	        		group = url[1]
-	        		benchmark_node.group = group
-	        		try :
-	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
-	        			if bool(n) :
-	        				benchmark_node.group = group;
-	        		except :
-	        			group_name, group = get_group_name_id(group)
-	        			benchmark_node.group = str(group)
-	        	else :
-	        		pass
+            if url[1] != "" :
+                group = url[1]
+                benchmark_node.group = group
+                try :
+                    n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+                    if bool(n) :
+                        benchmark_node.group = group;
+                except :
+                    group_name, group = get_group_name_id(group)
+                    benchmark_node.group = str(group)
+            else :
+                pass
 
-	        	if url[2] == "" :
-	        		benchmark_node.action = None
-	        	else :
-	        		benchmark_node.action = url[2]
-		        	if url[3] != '' :
-		        		benchmark_node.action +=  str('/'+url[3])
-		        	else :
-		        		pass
-	        	if "node_id" in args[0].GET and "collection_nav" in f.func_name:
-	        		benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
-	        		# modify calling_url if collection_nav is called i.e collection-player
-	        except :
-	        	pass
-	        benchmark_node.save()
-	        return ret
-   if BENCHMARK == 'ON':
+            if url[2] == "" :
+                benchmark_node.action = None
+            else :
+                benchmark_node.action = url[2]
+                if url[3] != '' :
+                    benchmark_node.action +=  str('/'+url[3])
+                else :
+                    pass
+            if "node_id" in args[0].GET and "collection_nav" in f.func_name:
+                benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
+                # modify calling_url if collection_nav is called i.e collection-player
+        except :
+            pass
+        benchmark_node.save()
+        return ret
+
+    if BENCHMARK == 'ON':
         return wrap
-   if BENCHMARK == 'OFF':
+    if BENCHMARK == 'OFF':
         return f
+
+
 
 import json
 import bson
@@ -401,6 +400,72 @@ def get_group_name_id(group_name_or_id, get_obj=False):
     else:
         return None, None
 
+
+@login_required
+def update_notes_or_files_visited(user_id, group_id,node_id,if_file,if_note) :
+    # counter_obj = Counter.get_counter_obj(user_id, group_id)
+    # if if_file:
+    #     file_node_obj = node_collection.one({'_id': node_id})
+    #     file_creator_id = file_node_obj.created_by
+    #     if file_creator_id != user_id :
+    #         # counter_obj.no_others_files_visited += 1
+    #         counter_obj['file']['visits_on_others_res'] += 1
+    #         counter_obj_creator = Counter.get_counter_obj(file_creator_id, group_id)
+    #         # counter_obj_creator.no_visits_gained_on_files += 1
+    #         counter_obj_creator['file']['visits_gained'] += 1
+    #         counter_obj_creator.last_update = datetime.now()
+    #         counter_obj_creator.save()
+
+    # elif if_note:
+    #     note_node_obj = node_collection.one({'_id':node_id})
+    #     note_creator_id = note_node_obj.created_by
+    #     if note_creator_id != user_id :
+    #         # counter_obj.no_others_notes_visited += 1
+    #         counter_obj['page']['blog']['visits_on_others_res'] += 1
+    #         counter_obj_creator = Counter.get_counter_obj(note_creator_id, group_id)
+    #         # counter_obj_creator.no_views_gained_on_notes += 1
+    #         counter_obj_creator['page']['blog']['visits_gained'] += 1
+    #         counter_obj_creator.last_update = datetime.now()
+    #         counter_obj_creator.save()
+
+    # counter_obj.last_update = datetime.now()
+    # counter_obj.save()
+
+    active_user_ids_list = [user_id]
+    if GSTUDIO_BUDDY_LOGIN:
+        active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(user_id, datetime.now())
+        # removing redundancy of user ids:
+        active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+    counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+
+    for each_counter_obj in counter_objs_cur:
+        if if_file:
+            file_node_obj = node_collection.one({'_id': node_id})
+            file_creator_id = file_node_obj.created_by
+            if file_creator_id != user_id:
+                # each_counter_obj.no_others_files_visited += 1
+                each_counter_obj['file']['visits_on_others_res'] += 1
+                counter_obj_creator = Counter.get_counter_obj(file_creator_id, group_id)
+                # counter_obj_creator.no_visits_gained_on_files += 1
+                counter_obj_creator['file']['visits_gained'] += 1
+                counter_obj_creator.last_update = datetime.now()
+                counter_obj_creator.save()
+
+        elif if_note:
+            note_node_obj = node_collection.one({'_id':node_id})
+            note_creator_id = note_node_obj.created_by
+            if note_creator_id != user_id :
+                # each_counter_obj.no_others_notes_visited += 1
+                each_counter_obj['page']['blog']['visits_on_others_res'] += 1
+                counter_obj_creator = Counter.get_counter_obj(note_creator_id, group_id)
+                # counter_obj_creator.no_views_gained_on_notes += 1
+                counter_obj_creator['page']['blog']['visits_gained'] += 1
+                counter_obj_creator.last_update = datetime.now()
+                counter_obj_creator.save()
+
+        each_counter_obj.last_update = datetime.now()
+        each_counter_obj.save()
 
 
 @get_execution_time
@@ -2061,9 +2126,9 @@ def cast_to_data_type(value, data_type):
 
     elif data_type == "datetime.datetime":
         # "value" should be in following example format
-        # In [10]: datetime.datetime.strptime( "11/12/2014", "%d/%m/%Y")
-        # Out[10]: datetime.datetime(2014, 12, 11, 0, 0)
-        casted_value = datetime.datetime.strptime(value, "%d/%m/%Y")
+        # In [10]: datetime.strptime( "11/12/2014", "%d/%m/%Y")
+        # Out[10]: datetime(2014, 12, 11, 0, 0)
+        casted_value = datetime.strptime(value, "%d/%m/%Y")
 
     return casted_value
 
@@ -2198,6 +2263,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
 
             field = node_collection.one({'_id': ObjectId(at_rt_objectid_or_attr_name)}, {
                                         '_type': 1, 'subject_type': 1, 'object_type': 1, 'name': 1, 'altnames': 1, 'inverse_name': 1})
+
 
             altnames = u""
             value = None
@@ -4074,7 +4140,12 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
         if deletion_type == 1:
             # Remove from database
             str_deletion_type = "purged"
-            triple_collection.collection.remove(query)
+            single_gattribute_to_be_purged = triple_collection.find_one(query)
+            if single_gattribute_to_be_purged:
+                # deleting related RCS file
+                HistoryManager.delete_json_file(single_gattribute_to_be_purged, type(single_gattribute_to_be_purged))
+                triple_collection.collection.remove(query)
+
             # print "\n 6 >> purged also... " + ",
             # ".join(gattribute_deleted_id)
 
@@ -4347,7 +4418,12 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
             if deletion_type == 1:
                 # Remove from database
                 str_deletion_type = "purged"
+                single_grelation_to_be_purged = triple_collection.find_one(query_by_id)
+                HistoryManager.delete_json_file(single_grelation_to_be_purged, type(single_grelation_to_be_purged))
                 triple_collection.collection.remove(query_by_id)
+
+
+
                 # print "\n 6 >> purged (relation) also... " + ",
                 # ".join(grelation_deleted_id)
         else:
@@ -4381,11 +4457,16 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
             if deletion_type == 1:
                 # Remove from database
                 str_deletion_type = "purged"
+                grelations_to_be_purged = triple_collection.find(query_for_relation)
+                for each_grelations_to_be_purged in grelations_to_be_purged:
+                    # deleting related RCS file
+                    HistoryManager.delete_json_file(each_grelations_to_be_purged, type(each_grelations_to_be_purged))
                 triple_collection.collection.remove(query_for_relation)
                 triple_collection.collection.remove(query_for_inverse_relation)
                 # print "\n 6 >> purged (relation) also... " + ", ".join(grelation_deleted_id)
                 # print "\n 6 >> purged (inverse-relation) also... " + ",
                 # ".join(inverse_grelation_deleted_id)
+
 
         # Formulate delete-status-message
         if grelation_deleted_id:
@@ -4674,6 +4755,9 @@ def delete_node(
                                 fh_relurl = node_to_be_deleted.if_file[each_file]['relurl']
                                 if fh_id or fh_relurl:
                                     Filehive.delete_file_from_filehive(fh_id, fh_relurl)
+
+                # deleting related RCS file
+                HistoryManager.delete_json_file(node_to_be_deleted, type(node_to_be_deleted))
 
                 # Finally delete the node
                 node_to_be_deleted.delete()
@@ -5248,7 +5332,7 @@ def replicate_resource(request, node, group_id):
             ##### TRIPLES GRELATIONS
             node_grel_cur = triple_collection.find({'_type': 'GRelation', 'subject': node._id, 'status': u'PUBLISHED'})
             # To handle multiple GRelations of same RT i.e of object_cardinality  > 1
-            # If looped over the list and called create_grelation multiple time, this will create 
+            # If looped over the list and called create_grelation multiple time, this will create
             # all grelations but will set PUBLISHED status for ONLY the last one and mark as DELETED the earlier ones
             # Hence making use of following dictionary
 
@@ -5272,8 +5356,6 @@ def replicate_resource(request, node, group_id):
 
             for eachrtid, eachrsval in relation_dict_rt_key_rs_val.items():
                 rt_node = node_collection.one({'_id': ObjectId(eachrtid)})
-                if rt_node.name == 'has_thread':
-                    thread_created = True
                 if isinstance(eachrsval, ObjectId):
                     right_subj_node = node_collection.one({'_id': ObjectId(eachrsval)})
                     right_sub_new_node = create_clone(user_id, right_subj_node, group_id)
@@ -5286,6 +5368,12 @@ def replicate_resource(request, node, group_id):
                         cloned_rs_ids.append(right_sub_new_node._id)
                     create_grelation(new_gsystem._id,rt_node,cloned_rs_ids)
 
+                # To maintain the thread-node relation using prior_node field
+                if rt_node.name == 'has_thread':
+                    thread_created = True
+                    if right_sub_new_node:
+                        right_sub_new_node.prior_node = [new_gsystem._id]
+                        right_sub_new_node.save()
 
             if "QuizItemEvent" in new_gsystem.member_of_names_list:
                 if not thread_created:
@@ -5599,6 +5687,7 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
       result_dict['modules_total_count'] = all_modules_of_grp.count()
       result_dict['units_completed_count'] = completed_units_cur.count()
       result_dict['units_total_count'] = all_units_of_grp.count()
+
 
       result_dict.update({'success': False})
       # print "\n\nresult_dict == ",result_dict

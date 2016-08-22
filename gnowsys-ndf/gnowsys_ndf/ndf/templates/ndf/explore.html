@@ -60,8 +60,15 @@
 				{% endif %}
 	          </li>
 			{% endfor %}
+			
 		</section>
-
+			{% if title == "courses" %}
+				{% include 'ndf/pagination.html' with urlname="courses_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
+			{% elif title == "base courses"  %}
+				{% include 'ndf/pagination.html' with urlname="basecourses_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
+			{% elif title == "groups" %}
+				{% include 'ndf/pagination.html' with urlname="groups_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
+			{% endif %}
 	{% endif %}
 
 
