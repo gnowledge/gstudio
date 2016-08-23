@@ -185,7 +185,9 @@
 		$selectName.show();
 		$(this).find('span').hide();
 		$("#filter-clear-btn").show();
+		$selectName.val('initial-select')
 	})
+
 	$("#filter-clear-btn").on('click', function(){
 		$(".filter-body").find('select, input').hide();
 		$("#filter_button>span").show();
@@ -199,11 +201,14 @@
 
 		// if --Select-- is choosen then reset secondary selection
 		if (selectedNameEl.index() == 0) {
-
 			// making --Select-- to appear with less opacity and disabled way
-			$selectValue.children()[0].style.display = "block";
-			$selectValue.attr('disabled', true);
-			$selectValue.css('opacity', 0.5);
+			// $selectValue.children()[0].style.display = "block";
+			// $selectValue.attr('disabled', true);
+			// $selectValue.css('opacity', 0.5);
+			$selectValue.hide();
+			$(".filter-body").find('select, input').hide();
+			$("#filter_button>span").show();
+			$(".filter-body").find('select').val('');
 
 			return false;
 		};
@@ -246,18 +251,20 @@
 				newOption.setAttribute("data-primary-type", ffPriDataType);
 				$selectValue.append(newOption);
 			};
+			$selectValue.show();
 		}
 		else if( ffValues == "initial-select")  // handling selection of very-first option
 		{
 			$selectValue.children("option:first-child").show();
 			$selectValue.children("option:not(:first-child)").detach();
 			$selectValue.css("height", "");
+			$selectValue.show();
 		}
 		else if( !ffValues || ffValues == "[]" )  // handling key with no values
 		{
 			alert("{% trans 'No values for the key' %} : " + ffName);
+			$selectValue.hide();
 		}
-		$selectValue.show();
 	})
 
 	$selectValue.on('change', function(e){
