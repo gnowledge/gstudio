@@ -3632,8 +3632,15 @@ def get_course_filters(group_id, filter_context):
 
 		# if each_course_filter_key == "tags" and filter_context.lower() == "notebook":
 		if each_course_filter_key == "tags":
+			# gstaff_users.extend(group_obj.group_admin)
+			# gstaff_users.append(group_obj.created_by)
+			all_superusers = User.objects.filter(is_superuser=True)
+			all_superusers_ids = all_superusers.values_list('id',flat=True)
 			gstaff_users.extend(group_obj.group_admin)
 			gstaff_users.append(group_obj.created_by)
+			gstaff_users.extend(all_superusers_ids)
+
+
 
 			all_tags_list = [] # To prevent if no tags are found in any blog pages
 			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'Tags'}
