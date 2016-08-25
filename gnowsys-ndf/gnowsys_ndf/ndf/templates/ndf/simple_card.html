@@ -118,8 +118,9 @@
 
     <!-- suppy no_description=True for not having description -->
     {% if not no_description %}
-      <div class="scard-desc" title="{{resource.content_org}}">
-       {{resource.content|safe|striptags|default_if_none:"Add some description."|truncatechars:50}}
+      <div class="scard-desc" title="{% firstof resource.content|safe|striptags resource.content_org|safe|striptags %}">
+      {% firstof resource.content|safe|striptags|truncatechars:50 resource.content_org|safe|striptags|truncatechars:50 %}
+       
       </div>
     {% endif %}
 </div>
