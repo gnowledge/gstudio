@@ -924,7 +924,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
 
         file_gs_obj.fill_gstystem_values(
                                     request=HttpRequest(),
-                                    name=resource_data["file_name"],
+                                    name=resource_data["name"],
                                     group_set=[home_group._id],
                                     language=language,
                                     uploaded_file=files,
@@ -1055,7 +1055,6 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
 
     # th_id: thumbnail id
     th_obj = create_resource_gsystem(updated_res_data, row_no, group_set_id=warehouse_group._id)
-
     th_id = th_obj._id
 
     # th_obj = node_collection.one({'_id': ObjectId(th_id)})
@@ -1085,6 +1084,12 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     # node_fs_file_ids = node_obj.fs_file_ids
 
     # if len(node_fs_file_ids) == 1:
+    th_obj.group_set.append(ObjectId(warehouse_group._id))
+    th_obj.group_set.remove(ObjectId(home_group._id))
+    # print "**********************************",th_obj.group_set
+
+
+    th_obj.save()
     #     node_fs_file_ids.append(ObjectId(th_gridfs_id))
     # elif len(node_fs_file_ids) > 1:
     #     node_fs_file_ids[1] = ObjectId(th_gridfs_id)
