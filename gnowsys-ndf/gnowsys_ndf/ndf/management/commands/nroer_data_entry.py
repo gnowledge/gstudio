@@ -939,6 +939,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
         file_gs_obj.content_org = resource_data['content_org']
         file_gs_obj.tags = resource_data["tags"]
         file_gs_obj.content = resource_data['content_org']
+        file_gs_obj.status=u"PUBLISHED"
         file_gs_obj.save()
         # print "-------------------------",file_gs_obj.content_org
         file_gs_obj.save(groupid=home_group._id)
