@@ -499,27 +499,27 @@ def parse_data_create_gsystem(json_file_path):
             # print "nodeid : ", nodeid
 
             # ----- for updating language -----
-            node_lang = get_language_tuple(eval(parsed_json_document['language']))
+            # node_lang = get_language_tuple(eval(parsed_json_document['language']))
             # print "============= :", node_lang
             # print "============= lang :", node_obj.language
 
-            if node_obj and node_obj.language != node_lang:
+            # if node_obj and node_obj.language != node_lang:
 
-                update_res = node_collection.collection.update(
-                                    {'_id': ObjectId(nodeid), 'language': {'$ne': node_lang}},
-                                    {'$set': {'language': node_lang}},
-                                    upsert=False,
-                                    multi=False
-                                )
+            #     update_res = node_collection.collection.update(
+            #                         {'_id': ObjectId(nodeid), 'language': {'$ne': node_lang}},
+            #                         {'$set': {'language': node_lang}},
+            #                         upsert=False,
+            #                         multi=False
+            #                     )
 
-                if update_res['updatedExisting']:
-                    node_obj.reload()
+            #     if update_res['updatedExisting']:
+            #         node_obj.reload()
 
-                    info_message = "\n\n- Update to language of resource: " + str(update_res)
-                    log_print(info_message)
+            #         info_message = "\n\n- Update to language of resource: " + str(update_res)
+            #         log_print(info_message)
 
-                    info_message = "\n\n- Now language of resource updates to: " + str(node_obj.language)
-                    log_print(info_message)
+            #         info_message = "\n\n- Now language of resource updates to: " + str(node_obj.language)
+            #         log_print(info_message)
                 # print "============= lang :", node_obj.language
 
             # ----- END of updating language -----
@@ -833,7 +833,6 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
     resource_link = resource_data.get("resource_link")  # actual download file link
     resource_link = resource_link.replace(' ', '%20')
 
-    content_org = resource_data["content_org"]
     if not resource_link:
         resource_link = resource_link_common + resource_data.get("file_name")
         # print "---------------",resource_link
@@ -913,7 +912,6 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
 
         return None
 
-
     else:  # creating new resource/file-gsystem
 
         info_message = "\n- Creating resource: " + str(resource_data["name"])
@@ -939,9 +937,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
         file_gs_obj.content_org = resource_data['content_org']
         file_gs_obj.tags = resource_data["tags"]
         file_gs_obj.content = resource_data['content_org']
-        file_gs_obj.status=u"PUBLISHED"
-        file_gs_obj.save()
-        # print "-------------------------",file_gs_obj.content_org
+        file_gs_obj.status = u"PUBLISHED"
         file_gs_obj.save(groupid=home_group._id)
 
         if 'video' in file_gs_obj.if_file.mime_type:
@@ -1077,7 +1073,7 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     log_print(info_message)
 
     print '\n Created/Updated GRelation Object:\n'
-    print create_grelation(ObjectId(node_id), has_thumbnail_rt, ObjectId(th_id))
+    create_grelation(ObjectId(node_id), has_thumbnail_rt, ObjectId(th_id))
     print '\n\n'
 
     info_message = "\n- Grelation processing done for has_thumbnail.\n"
@@ -1088,9 +1084,9 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
 
     # if len(node_fs_file_ids) == 1:
     th_obj.group_set.append(ObjectId(warehouse_group._id))
-    th_obj.group_set.remove(ObjectId(home_group._id))
+    if ObjectId(home_group._id) in th_obj.group_set:
+        th_obj.group_set.remove(ObjectId(home_group._id))
     # print "**********************************",th_obj.group_set
-
 
     th_obj.save()
     #     node_fs_file_ids.append(ObjectId(th_gridfs_id))
