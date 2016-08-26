@@ -833,6 +833,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
     resource_link = resource_data.get("resource_link")  # actual download file link
     resource_link = resource_link.replace(' ', '%20')
 
+    content_org = resource_data["content_org"]
     if not resource_link:
         resource_link = resource_link_common + resource_data.get("file_name")
         # print "---------------",resource_link
@@ -868,7 +869,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
 
     name = unicode(resource_data["name"])  # name to be given to gsystem
     userid = resource_data["created_by"]
-    content_org = resource_data["content_org"]
+    # content_org = resource_data["content_org"]
     tags = resource_data["tags"]
     if resource_data['language']:
         language = get_language_tuple(eval(resource_data['language']))
@@ -925,7 +926,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
 
         file_gs_obj.fill_gstystem_values(
                                     request=HttpRequest(),
-                                    name=resource_data["file_name"],
+                                    name=resource_data["name"],
                                     group_set=[home_group._id],
                                     language=language,
                                     uploaded_file=files,
@@ -934,7 +935,13 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
                                     origin={'csv-import':csv_file_name},
                                     unique_gs_per_file=True
                                 )
-
+        # print "+++++++++++++++++++++++++++++++++++++",file_gs_obj.content_org,file_gs_obj
+        file_gs_obj.content_org = resource_data['content_org']
+        file_gs_obj.tags = resource_data["tags"]
+        file_gs_obj.content = resource_data['content_org']
+        file_gs_obj.status=u"PUBLISHED"
+        file_gs_obj.save()
+        # print "-------------------------",file_gs_obj.content_org
         file_gs_obj.save(groupid=home_group._id)
 
         if 'video' in file_gs_obj.if_file.mime_type:
@@ -1046,12 +1053,11 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     updated_res_data['resource_link'] = thumbnail_url
     updated_res_data['name'] = u'Thumbnail: ' + thumbnail_url.split('/')[-1]
 
-    updated_res_data['content_org'] = ''
-    updated_res_data['tags'] = []
+    # updated_res_data['content_org'] = ''
+    # updated_res_data['tags'] = []
 
     # th_id: thumbnail id
     th_obj = create_resource_gsystem(updated_res_data, row_no, group_set_id=warehouse_group._id)
-
     th_id = th_obj._id
 
     # th_obj = node_collection.one({'_id': ObjectId(th_id)})
@@ -1081,6 +1087,12 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     # node_fs_file_ids = node_obj.fs_file_ids
 
     # if len(node_fs_file_ids) == 1:
+    th_obj.group_set.append(ObjectId(warehouse_group._id))
+    th_obj.group_set.remove(ObjectId(home_group._id))
+    # print "**********************************",th_obj.group_set
+
+
+    th_obj.save()
     #     node_fs_file_ids.append(ObjectId(th_gridfs_id))
     # elif len(node_fs_file_ids) > 1:
     #     node_fs_file_ids[1] = ObjectId(th_gridfs_id)
