@@ -1533,8 +1533,8 @@ class GSystem(Node):
             self['_id'] = ObjectId()
 
         # origin:
-        if kwargs.has_key('origin'):
-            self['origin'] = kwargs.get('origin', '')
+        if origin:
+            self['origin'].append(origin)
         # else:  # rarely/no origin field value will be sent via form/request.
         #     self['origin'] = request.POST.get('origin', '').strip()
 
