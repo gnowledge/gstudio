@@ -3607,7 +3607,7 @@ def get_course_filters(group_id, filter_context):
 	all_users = False
 	only_gstaff = False
 	all_user_objs_uname = all_user_objs_id = None
-
+	file_gst = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
 	if filter_context.lower() == "raw material":
 		only_gstaff = True
 	elif filter_context.lower() == "notebook":
@@ -3632,8 +3632,15 @@ def get_course_filters(group_id, filter_context):
 
 		# if each_course_filter_key == "tags" and filter_context.lower() == "notebook":
 		if each_course_filter_key == "tags":
+			# gstaff_users.extend(group_obj.group_admin)
+			# gstaff_users.append(group_obj.created_by)
+			all_superusers = User.objects.filter(is_superuser=True)
+			all_superusers_ids = all_superusers.values_list('id',flat=True)
 			gstaff_users.extend(group_obj.group_admin)
 			gstaff_users.append(group_obj.created_by)
+			gstaff_users.extend(all_superusers_ids)
+
+
 
 			all_tags_list = [] # To prevent if no tags are found in any blog pages
 			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'Tags'}
@@ -3647,14 +3654,14 @@ def get_course_filters(group_id, filter_context):
 
 			elif filter_context.lower() == "gallery":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs]
-				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+				result_cur = node_collection.find({'member_of': file_gst._id,'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
 							'created_by': {'$nin': gstaff_users}
 							},{'tags': 1, '_id': False})
 
 			elif filter_context.lower() == "raw material":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
-				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+				result_cur = node_collection.find({'member_of': file_gst._id,'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
 							'created_by': {'$in': gstaff_users}
 							},{'tags': 1, '_id': False})

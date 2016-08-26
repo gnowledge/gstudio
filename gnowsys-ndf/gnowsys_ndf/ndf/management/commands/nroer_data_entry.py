@@ -829,7 +829,6 @@ def create_thread_obj(node_id):
 
 
 def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
-
     # fetching resource from url
     resource_link = resource_data.get("resource_link")  # actual download file link
     resource_link = resource_link.replace(' ', '%20')
@@ -871,7 +870,10 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
     userid = resource_data["created_by"]
     content_org = resource_data["content_org"]
     tags = resource_data["tags"]
-    language = get_language_tuple(eval(resource_data['language']))
+    if resource_data['language']:
+        language = get_language_tuple(eval(resource_data['language']))
+    else:
+        language = ('en', 'English')
     group_set_id = ObjectId(group_set_id) if group_set_id else home_group._id
 
     img_type = None

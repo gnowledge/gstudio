@@ -2082,8 +2082,11 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     allow_to_upload = False
     group_name  = group_obj.name
     gstaff_users = []
+    all_superusers = User.objects.filter(is_superuser=True)
+    all_superusers_ids = all_superusers.values_list('id',flat=True)
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
+    gstaff_users.extend(all_superusers_ids)
     allow_to_join = None
     files_cur = None
     allow_to_join = get_group_join_status(group_obj)
@@ -2400,8 +2403,11 @@ def course_filters(request, group_id):
     group_name  = group_obj.name
 
     gstaff_users = []
+    all_superusers = User.objects.filter(is_superuser=True)
+    all_superusers_ids = all_superusers.values_list('id',flat=True)
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
+    gstaff_users.extend(all_superusers_ids)
 
     notebook_filter = False
     no_url_flag = True
@@ -2416,11 +2422,18 @@ def course_filters(request, group_id):
     title = request.GET.get("title", "")
     if filter_applied:
         filter_applied = eval(filter_applied)
-    query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}}
+    # query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}}
+    # Exclude files that are part of course content.
+    # Earlier 'has_clone' RT was used to identify such resources,
+    # which was updated as per PR#1496 https://github.com/gnowledge/gstudio/pull/1496
+    query = {'group_set': group_id, 'origin.fork_of':{'$exists': False}}
+
     template = 'ndf/file_list_tab.html'
 
     if title.lower() == "gallery" or title.lower() == "raw material":
-        query.update({'_type': "File"})
+        file_gst = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
+        # query.update({'_type': "File"})
+        query.update({'member_of': file_gst._id})
 
     elif title.lower() == "notebook":
         page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
@@ -2448,7 +2461,7 @@ def course_filters(request, group_id):
             return HttpResponse("reload")
 
     # print "\n\n query === ", title, "\n\n---  \n",query
-    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1, 'if_file': 1}).sort('created_at', -1)
     # print "\n\n Total files: ", files_cur.count()
     context_variables.update({'files_cur': files_cur,"resource_type": files_cur,
                               "no_footer":True, "no_description":True, "no_url":no_url_flag,

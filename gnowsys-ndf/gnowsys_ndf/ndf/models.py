@@ -786,43 +786,42 @@ class Node(DjangoDocument):
 
         super(Node, self).save(*args, **kwargs)
 
-    	#This is the save method of the node class.It is still not
-    	#known on which objects is this save method applicable We
-    	#still do not know if this save method is called for the
-    	#classes which extend the Node Class or for every class There
-    	#is a very high probability that it is called for classes
-    	#which extend the Node Class only The classes which we have
-    	#i.e. the MyReduce() and ToReduce() class do not extend from
-    	#the node class Hence calling the save method on those objects
-    	#should not create a recursive function
+        # This is the save method of the node class.It is still not
+        # known on which objects is this save method applicable We
+        # still do not know if this save method is called for the
+        # classes which extend the Node Class or for every class There
+        # is a very high probability that it is called for classes
+        # which extend the Node Class only The classes which we have
+        # i.e. the MyReduce() and ToReduce() class do not extend from
+        # the node class Hence calling the save method on those objects
+        # should not create a recursive function
 
-    	#If it is a new document then Make a new object of ToReduce
-    	#class and the id of this document to that object else Check
-    	#whether there is already an object of ToReduce() with the id
-    	#of this object.  If there is an object present pass else add
-    	#that object I have not applied the above algorithm
+        # If it is a new document then Make a new object of ToReduce
+        # class and the id of this document to that object else Check
+        # whether there is already an object of ToReduce() with the id
+        # of this object.  If there is an object present pass else add
+        # that object I have not applied the above algorithm
 
-   	#Instead what I have done is that I have searched the
-   	#ToReduce() collection class and searched whether the ID of
-   	#this document is present or not.  If the id is not present
-   	#then add that id.If it is present then do not add that id
+        # Instead what I have done is that I have searched the
+        # ToReduce() collection class and searched whether the ID of
+        # this document is present or not.  If the id is not present
+        # then add that id.If it is present then do not add that id
 
-   	old_doc = node_collection.collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})
+        old_doc = node_collection.collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})
 
-    		#print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
-    	if  not old_doc:
+        #print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
+        if  not old_doc:
+            z = node_collection.collection.ToReduceDocs()
+            z.doc_id = self._id
+            z.required_for = to_reduce_doc_requirement
+            z.save()
 
-
-    		z = node_collection.collection.ToReduceDocs()
-    		z.doc_id = self._id
-    		z.required_for = to_reduce_doc_requirement
-    		z.save()
-
-    	#If you create/edit anything then this code shall add it in the URL
+        #If you create/edit anything then this code shall add it in the URL
 
         history_manager = HistoryManager()
         rcs_obj = RCS()
-	if is_new:
+
+        if is_new:
             # Create history-version-file
             try:
                 if history_manager.create_or_replace_json_file(self):
@@ -869,11 +868,13 @@ class Node(DjangoDocument):
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
                 raise RuntimeError(err)
-	#gets the last version no.
-        rcsno = history_manager.get_current_version(self)
-	#update the snapshot feild
-	if kwargs.get('groupid'):
-		node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+
+        #update the snapshot feild
+        if kwargs.get('groupid'):
+            # gets the last version no.
+            rcsno = history_manager.get_current_version(self)
+            node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+
 
     # User-Defined Functions
     def get_possible_attributes(self, gsystem_type_id_or_list):

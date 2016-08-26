@@ -5151,6 +5151,8 @@ def get_language_tuple(lang):
         lang (str or unicode): it is the one of item from tuple.
         It may either language-code or language-name.
     """
+    if not lang:
+        return ('en', 'English')
 
     all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
 
