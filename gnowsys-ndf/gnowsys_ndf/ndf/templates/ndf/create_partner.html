@@ -6,7 +6,7 @@
 {% block title %} {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}} {{node.name}}{% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader"> {{parent_obj_partner.name}}</h2>
+<h2 class="subheader"> {{parent_obj_partner.name}} {{group_id}}</h2>
 {% endblock %}
 
 {% block related_content %}
@@ -22,14 +22,13 @@
 
 {% block body_content %}
 
-  <h3> {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}} {{node.name}}</h3><br>
-  <form id="create_group" class="" method="post"
-  {% if node %} action="{% url 'edit_group' node.pk %}"
+  <h3> {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}}</h3><br>
+  <form id="create_partner" class="" method="post"
+  {% if node %} action="{% url 'edit_group' group_id %}"
   {% else %} action="{% url 'create_group' parent_obj_partner.pk %}"
   {% endif %}
   data-abide enctype="multipart/form-data">
     {% csrf_token %}
-    {% cache 3600 create_partner request.user.id request.LANGUAGE_CODE %}
     <fieldset>
 
     <div id="people-details-edit-div" class="tabs-content">
@@ -138,10 +137,11 @@
             <a target="_blank" href="{% url 'read_file' group_id logo_img_node.pk %}">{% trans "View existing thumbnail " %}</a>
             <input type="button" class="button tiny" id="change_logo" value="Edit">
             <input type="button" class="button tiny hide" id="cancel_change_logo" value="Cancel">
-            <input type="file" name="docFile" id="docFile" class="hide" accept="image/*"/>
+            <input type="file" name="filehive" id="docFile" class="hide" accept="image/*"/>
           {% else %}
-          <input type="file" name="docFile" id="docFile" accept="image/*"/>
+          <input type="file" name="filehive" id="docFile" accept="image/*"/>
           {% endif %}
+            <input type="hidden" name="context_name" value="{{title}}">
       </div>
     </div>
     </div>
@@ -153,7 +153,6 @@
     {% endif %}
 
 </fieldset>
-  {% endcache %}
 
 {% comment %}
       <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
@@ -223,12 +222,17 @@
           <div style='display:table-cell;' colspan='2'> 
             <!-- <input type="button" id="savegrp" value="Create Group"  class="button" onClick="check_values()">
             <input type="submit" id="grpsubmit" value="Create Group" class="button" style="visibility:hidden" > -->
+            
             <input type="submit" value="Create Partner" id="grpsubmit" class="button">
           </div>
         </div>
   {% endcomment %}
         <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">            -->
-            <input type="submit" value="Create Partner" id="grpsubmit" class="button">
+            {% if node %}
+              <input type="submit" value="Save partner details" id="grpsubmit" class="button">
+            {% else %}
+              <input type="submit" value="Create Partner" id="grpsubmit" class="button">
+            {% endif %}
 <!-- <input type="" value="Create Partner" id="grpsubmit" class="button disabled"> -->
       </div>
   </form>
@@ -368,7 +372,7 @@
     $("#docFile").val("")
   })
 
-  $("#docFile").change(function(event) {
+  $("#filehive").change(function(event) {
     file_mime_type = this.files[0].type;
     if(file_mime_type.indexOf("svg") >= 0 ){
       alert(".svg images are currently not supported")

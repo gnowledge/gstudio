@@ -345,7 +345,7 @@ class CreateGroup(object):
         # if logo_img_node_grel_id:
         #     logo_img_node = logo_img_node_grel_id[0]
         #     grel_id = logo_img_node_grel_id[1]
-        f = request.FILES.get("docFile", "")
+        f = request.FILES.get("filehive", "")
         # print "\nf is ",f
 
         if f:
@@ -356,7 +356,7 @@ class CreateGroup(object):
                 # check whether it appears in any other node's grelation
                 rel_obj = None
                 rel_obj = triple_collection.find({"_type": "GRelation", 'subject': {'$ne': ObjectId(group_obj._id)}, 'right_subject': logo_img_node._id})
-                file_cur = node_collection.find({'_type':"File",'fs_file_ids':logo_img_node.fs_file_ids,'_id': {'$ne': logo_img_node._id}})
+                file_cur = node_collection.find({'_type':"GSystem",'_id': {'$ne': logo_img_node._id}})
                 # print "\nrel_obj--",rel_obj.count()
                 # print "\nfile_cur.count()--",file_cur.count()
                 if rel_obj.count() > 0 or file_cur.count() > 0:
@@ -375,13 +375,23 @@ class CreateGroup(object):
                         node_id=logo_img_node._id,
                         deletion_type=1
                     )
-                    # print del_status, "--", del_status_msg
+                    print del_status, "--", del_status_msg
 
-            fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            from gnowsys_ndf.ndf.views.filehive import write_files
+            is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
+
+            # gs_obj_list = write_files(request, group_id)
+            fileobj_list = write_files(request, group_obj._id)
+            # print "request&&&&&&&&&&&&&&&&&&&&&&",request
+            fileobj_id = fileobj_list[0]['_id']
+            # print "fileobj_id****************************",fileobj_list
+            fileobj = node_collection.one({'_id': ObjectId(fileobj_id) })
+            # print "fileobj_id-------------------",fileobj
+            # fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
             if fileobj:
                 rt_has_logo = node_collection.one({'_type': "RelationType", 'name': unicode(logo_rt)})
-                # print "\n creating GRelation has_logo\n"
-                create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj))
+                print "\n creating GRelation has_logo\n"
+                create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj._id))
 
 # --- END of class CreateGroup ---
 # --------------------------------
@@ -1311,7 +1321,6 @@ class GroupCreateEditHandler(View):
             group_id = ObjectId(group_id)
         except:
             group_name, group_id = get_group_name_id(group_id)
-
         group_obj = None
         nodes_list = []
         logo_img_node = None
