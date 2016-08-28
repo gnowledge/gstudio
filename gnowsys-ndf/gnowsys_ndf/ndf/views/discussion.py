@@ -407,7 +407,7 @@ def discussion_delete_reply(request, group_id, node_id):
 
     replies_cur = node_collection.find({'origin.thread_id': ObjectId(node_id)})
     # print "\n replies_cur",replies_cur.count()
-    if not replies_cur.count():
+    if (not replies_cur.count()) and (int(request.user.id) in node_obj.author_set):
         author_set_ids = node_obj.author_set
         author_set_ids.remove(int(request.user.id))
         node_obj.author_set = author_set_ids

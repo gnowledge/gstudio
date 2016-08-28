@@ -691,7 +691,7 @@ GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT = ["NCF", "State", "All"]
 
 GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL = ["Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary"]
 
-GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = ["Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy"]
+GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = ["Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy", "Art", "Education"]
 
 GSTUDIO_RESOURCES_CURRICULAR = ["True", "False"]
 

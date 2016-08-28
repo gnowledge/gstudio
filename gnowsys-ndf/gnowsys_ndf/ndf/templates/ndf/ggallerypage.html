@@ -1,8 +1,9 @@
 {% load get_course_filters get_group_name from ndf_tags %}
 {% load i18n %}
+{% load simple_filters %}
+
 {% get_group_name groupid as group_name_tag %}
 
-{% load simple_filters %}
 <div class="gallery-page">
     <div class="row gallery-header">
         {% get_course_filters group_id title as filter_dict %}
@@ -103,6 +104,7 @@
     </div>
 
 </div>
+</div>
 <div class="reveal-container">
     {% if file_obj %}
         {% include "ndf/ggallerymodal.html" with node=file_obj %}
@@ -123,7 +125,7 @@
         {% endif %}
     })
 
-    // On close event of reveal-modal ----------------------------------------------
+    // On close event of reveal-modal
     $(document).on('close', '.file-detail-modal', function () {
         $('.file-detail-modal-close')[0].click()
     });
@@ -204,15 +206,10 @@
             }
           });
         }
-
         else{
           alert("Select atleast 1 resource");
-
-
         }
-
     });
-
 
 
     $('.add-to-collection').click(function() {
@@ -234,10 +231,8 @@
             }
           });
         }
-
         else{
           alert("Select atleast 1 resource");
-
 
         }
 
@@ -286,8 +281,6 @@
                 $("#create_collection_model").foundation('reveal', 'open');
             }
           });
-
-
   })
 
 </script>
