@@ -202,23 +202,24 @@ def create_forum(request, group_id):
         colf.save(groupid=group_id)
 
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
-        link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
-        for each in colg.author_set:
-            bx=User.objects.filter(id=each)
-            if bx:
-                bx=User.objects.get(id=each)
-            else:
-                continue
-            activity="Added forum"
-            msg=usrname+" has added a forum in the group -'"+colg.name+"'\n"+"Please visit "+link+" to see the forum."
-            if bx:
-                auth = node_collection.one({'_type': 'Author', 'name': unicode(bx.username) })
-                if colg._id and auth:
-                    no_check=forum_notification_status(colg._id,auth._id)
+        try:
+            link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
+            for each in colg.author_set:
+                bx=User.objects.filter(id=each)
+                if bx:
+                    bx=User.objects.get(id=each)
                 else:
-                    no_check=True
-                if no_check:
-                    ret = set_notif_val(request,colg._id,msg,activity,bx)
+                    continue
+                activity="Added forum"
+                msg=usrname+" has added a forum in the group -'"+colg.name+"'\n"+"Please visit "+link+" to see the forum."
+                if bx:
+                    auth = node_collection.one({'_type': 'Author', 'name': unicode(bx.username) })
+                    if colg._id and auth:
+                        no_check=forum_notification_status(colg._id,auth._id)
+                    else:
+                        no_check=True
+                    if no_check:
+                        ret = set_notif_val(request,colg._id,msg,activity,bx)
 
         # returning response to ndf/forumdetails.html
         return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id }))
@@ -323,19 +324,20 @@ def edit_forum(request,group_id,forum_id):
        # colf.attribute_set.append(end_dt)
         colf.save(groupid=group_id)
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
-        link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
-        for each in colg.author_set:
-            bx=User.objects.get(id=each)
-            activity="Edited forum"
-            msg=usrname+" has edited forum -" +colf.name+" in the group -'"+colg.name+"'\n"+"Please visit "+link+" to see the forum."
-            if bx:
-                auth = node_collection.one({'_type': 'Author', 'name': unicode(bx.username) })
-                if colg._id and auth:
-                    no_check=forum_notification_status(colg._id,auth._id)
-                else:
-                    no_check=True
-                if no_check:
-                    ret = set_notif_val(request,colg._id,msg,activity,bx)
+        try:
+            link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
+            for each in colg.author_set:
+                bx=User.objects.get(id=each)
+                activity="Edited forum"
+                msg=usrname+" has edited forum -" +colf.name+" in the group -'"+colg.name+"'\n"+"Please visit "+link+" to see the forum."
+                if bx:
+                    auth = node_collection.one({'_type': 'Author', 'name': unicode(bx.username) })
+                    if colg._id and auth:
+                        no_check=forum_notification_status(colg._id,auth._id)
+                    else:
+                        no_check=True
+                    if no_check:
+                        ret = set_notif_val(request,colg._id,msg,activity,bx)
 
         # returning response to ndf/forumdetails.html
         return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id }))
