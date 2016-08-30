@@ -941,7 +941,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
         file_gs_obj.save(groupid=home_group._id)
 
         if 'video' in file_gs_obj.if_file.mime_type:
-            convertVideo.delay(user_id, str(gs_obj._id), file_name)
+            convertVideo.delay(nroer_team_id, str(file_gs_obj._id), resource_data["name"])
 
         # fileobj_oid, video = save_file(files, name, userid, group_set_id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
         # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
