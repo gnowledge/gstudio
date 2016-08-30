@@ -293,12 +293,7 @@ function cancel(){
 
     if (name == old_forum_name && name != "")
     {
-      if (nodes.indexOf(name) != -1)  
-      { 
-        $("#message").css("display", "block");
-        $("#message").text("{% trans 'Forum  with same name already exist. Please choose another name' %}");
-        event.preventDefault();
-      }
+      
     }
     else if (name == ""){
       $("#message").css("display", "block");

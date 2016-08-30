@@ -27,7 +27,7 @@ from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROE
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups,get_relation_value  # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.data_review import data_review
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_sg_member_of
@@ -80,7 +80,7 @@ def moderation_status(request, group_id, node_id, get_only_response_dict=False):
 	if "Group" in selected_group_obj.member_of_names_list:
 		list_of_sg_member_of = get_sg_member_of(selected_group_obj._id)
 
-	# Based on the resource's current group's member_of 
+	# Based on the resource's current group's member_of
 	# or if resource is in top_level_group, based on its sg_member_of
 	if "ModeratingGroup" in selected_group_obj.member_of_names_list or "ModeratingGroup" in list_of_sg_member_of or selected_group_obj.name == "home":
 		sg_member_of = "ModeratingGroup"
@@ -192,7 +192,7 @@ def all_under_moderation(request, group_id):
 			}, RequestContext(request))
 
 	else:
-		raise Http404('Group is not EDITABLE_MODERATED') 
+		raise Http404('Group is not EDITABLE_MODERATED')
 
 @login_required
 def moderation(request, group_id, page_no=1):
@@ -204,7 +204,7 @@ def moderation(request, group_id, page_no=1):
 	context_variables = data_review(request, group_id, page_no, get_paged_resources=True)
 	# adding title in context_variables
 	context_variables['title'] = 'moderation'
-	
+
 	template_name = "ndf/moderation_data_review.html"
 
 	return render_to_response(template_name, context_variables, context_instance=RequestContext(request))
@@ -234,7 +234,7 @@ def approve_resource(request, group_id):
 
 			# if set(node_group_set) != set(updated_group_set):
 			if group_set_details_dict['is_group_set_updated']:
-				
+
 				node_obj.group_set = updated_group_set
 
 				# ---| checking for top group. \
@@ -272,7 +272,7 @@ def approve_resource(request, group_id):
 			flag = 1
 		else:
 			flag = 0
-		
+
 	elif approve_or_reject == "Reject":
 		reject_reason_msg = request.POST.get('reject_reason', '')
 		# print "reject_reason_msg----", reject_reason_msg
@@ -348,7 +348,7 @@ def create_moderator_task(request, group_id, node_id, \
 	try:
 		task_dict = {}
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
-		
+
 		# task_id_val = get_relation_value(node_obj._id,"has_current_approval_task")
 		grel_dict = get_relation_value(node_obj._id,"has_current_approval_task")
 		is_cursor = grel_dict.get("cursor",False)
@@ -391,7 +391,7 @@ def create_moderator_task(request, group_id, node_id, \
 
 				task_content_org = u'\n\nResource under moderation: "' + unicode(node_obj.name) \
 								+ u'" having id: "' + unicode(node_obj._id.__str__()) + '"' \
-								
+
 			task_dict = {
 				"name": task_title,
 				"group_set": [group_obj._id],
@@ -511,7 +511,7 @@ def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
 	- node_group_set: existing/current group_set of node object.
 	- curr_group_id: current group in which this node resides.
 	Pass the deep copy of group_set and not the reference.
-	e.g: 
+	e.g:
 	updated_group_set = get_moderator_group_set(node_group_set[:], group_id)
 	------------
 	if there is need of extra information along with group_set, pass <get_details=True> as last arg.
@@ -560,7 +560,7 @@ def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
 
 	elif 'ProgramEventGroup' in list_of_sg_member_of:
 		member_of = node_collection.one({'_type': 'GSystemType', 'name': u'ProgramEventGroup'})
-	
+
 	elif 'CourseEventGroup' in list_of_sg_member_of:
 		member_of = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
 
@@ -573,7 +573,7 @@ def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
     	# GST of "ModeratingGroup"
 		member_of = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
     # getting sub-group having:
-    # curr_group in prior_node 
+    # curr_group in prior_node
     # and member_of as fetched above
     # and moderation_level > -1
 	sub_mod_group_obj = node_collection.one({
@@ -606,11 +606,11 @@ def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
 		is_top_group, top_group_obj = mod_group_instance.get_top_group_of_hierarchy(curr_group_id)
 		# print "==== ", is_top_group
 		# print "==== ", top_group_obj
-		
+
 		if ObjectId(curr_group_id) in group_set:
 			# remove current group's _id
 			removed_group_id = group_set.pop(group_set.index(ObjectId(curr_group_id)))
-        
+
 		if is_top_group and (not ObjectId(top_group_obj._id) in group_set):
 			# add parent/top group's _id
 			group_set.append(top_group_obj._id)
@@ -618,7 +618,7 @@ def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
 			newly_appended_group_name = top_group_obj.name
 			is_group_set_updated = True
 			is_new_group_top_group = True
-        
+
 	if get_details:
 		details_dict = {
 			"updated_group_set": group_set,

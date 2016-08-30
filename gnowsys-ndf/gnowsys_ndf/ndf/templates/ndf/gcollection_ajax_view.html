@@ -72,7 +72,7 @@
           if (node.node_type == "CourseUnitEvent"){
           // if (node.node_type == "Page" || node.node_type == "File"  || node.node_type == "QuizItemEvent" ) {
             cu_ids.push(node.id)
-            if (node.collection_set.length > 0 ){
+            if (node.collection_set && node.collection_set.length > 0 ){
               cr_ids = cr_ids.concat(node.collection_set)
               $li.find('.jqtree-title').addClass('module-page');
               url = '/{{group_name_tag}}/gcourse/course_section/' + node.parent.id + '/' + node.id + '/' + node.collection_set[0]

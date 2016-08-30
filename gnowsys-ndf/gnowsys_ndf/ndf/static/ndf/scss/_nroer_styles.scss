@@ -20,9 +20,9 @@
     
     &:after{
         //Hack for setting div height to the height of the browser window
-        content:"";
-        display:block;
-        height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
+        content: "";
+        display: block;
+        height: 130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
     }
 }
 

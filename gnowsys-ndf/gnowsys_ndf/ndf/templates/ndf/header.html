@@ -1,8 +1,9 @@
-{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value from ndf_tags %}
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url from ndf_tags %}
 {% load i18n %}
 {% load cache %}
 
   {% get_group_object groupid as group_object %}
+  {% get_explore_url as explore_url %}
 
   {% if site.SITE_NAME != "NROER" %}
   <div id="feedsModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
@@ -50,7 +51,7 @@
 
       <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
       <!-- {#% cache 3600 top_header request.LANGUAGE_CODE request.path request.user.username %} -->
-      {% if site.SITE_NAME == "NROER" and group_name_tag == 'home' %}
+      {% if site.SITE_NAME == "NROER"  %}
 
         <!-- NROER level one menu -->
         {% get_nroer_menu request group_name_tag as nroer_menu %}
@@ -211,7 +212,7 @@
 
         <li class="group">
           {# <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}"> #}
-          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore_courses' %}">
+          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url explore_url %}">
             {% trans 'EXPLORE' %}
           </a>
         </li>
@@ -458,7 +459,17 @@
 
                         {% else %}
 
-                          {% if site.SITE_NAME != "NROER" %}
+                          {% if site.SITE_NAME == "NROER" and user.is_superuser  %}
+                            <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
+                              <i class="fi-results"></i> {% trans "Updates" %}
+                            </a>
+                            <li>
+                              <a class="feeds_btn" data-tooltip title="Feeds">
+                                <i class="fi-rss"></i>
+                              </a>
+                            </li>
+                          {% endif %}
+                          {% if site.SITE_NAME != "NROER"   %}
                             <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
                               <i class="fi-results"></i> {% trans "Updates" %}
                             </a>

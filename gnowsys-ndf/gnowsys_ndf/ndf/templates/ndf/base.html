@@ -15,7 +15,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="description" content="">
-  <meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; width=device-width" />
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width" />
 
   <link rel="shortcut icon" href="{{site.FAVICON}}">
 
@@ -284,19 +284,6 @@
         // var url = "/{{group_id}}/ajax/get_resource_by_oid/" + oid;
 
         if (!oid) {return};
-
-        $.ajax({
-          url: "{% url 'get_resource_by_oid' group_name_tag %}",
-          type: 'GET',
-          data: {'oid': oid},
-          success: function(data){
-            console.log(data);
-            var dataObj = JSON.parse(data),
-              name = dataObj.altnames?dataObj.altnames:dataObj.name;
-            $('#overlay-description-by-oid-title').html('<h3 class="text-center">' + name + '</h3>');
-            $('#overlay-description-by-oid-content').html(dataObj.content);
-          }
-        });
 
       });
 

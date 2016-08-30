@@ -436,7 +436,6 @@
 
     {% endblock %}
 
-	{% cache 300 node_edit_base_metadata request.LANGUAGE_CODE %}
     <div class="content contents panel" id="panel-metadata" style="width:100%; display:none;" >
       	<div class="row">
 		  	<div class="small-12 large-12 columns"><h4>{% trans "Please add or edit Metadata" %} </h4></div>
@@ -527,7 +526,6 @@
 
 	<div id="metadata_info"></div>
 	</div>
-	{% endcache %}
 
     <div class="content contents" id="panel-thread" style="width:95%; display:none;" >
       	<div class="row">
@@ -880,7 +878,7 @@
 		$(".assesses_tab").hide();
 		$(".teaches_tab").hide();
 		$(".prior_node_tab").hide();
-		$("#metadata_info").empty();
+		
 
 
 

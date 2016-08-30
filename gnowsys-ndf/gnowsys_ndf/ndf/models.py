@@ -24,8 +24,7 @@ from django_mongokit import get_database
 from django_mongokit.document import DjangoDocument
 from django.core.files.images import get_image_dimensions
 
-from mongokit import IS
-from mongokit import OR
+from mongokit import IS, OR
 from mongokit import INDEX_ASCENDING, INDEX_DESCENDING
 
 try:
@@ -293,6 +292,7 @@ class Node(DjangoDocument):
     use_dot_notation = True
 
 
+    # custom methods provided for Node class
     def fill_node_values(self, request=HttpRequest(), **kwargs):
 
         # 'name': unicode,
@@ -506,27 +506,38 @@ class Node(DjangoDocument):
         return self
 
 
-    ########## Setter(@x.setter) & Getter(@property) ##########
-    @property
-    def user_details_dict(self):
-        """Retrieves names of created-by & modified-by users from the given
-        node, and appends those to 'user_details' dict-variable
+    @staticmethod
+    def get_node_obj_from_id_or_obj(node_obj_or_id, expected_type):
+        # confirming arg 'node_obj_or_id' is Object or oid and
+        # setting node_obj accordingly.
+        node_obj = None
+        if isinstance(node_obj_or_id, expected_type):
+            node_obj = node_obj_or_id
+        elif isinstance(node_obj_or_id, ObjectId):
+            node_obj = node_collection.one({'_id': ObjectId(node_obj_or_id)})
+        else:
+            # error raised:
+            raise RuntimeError('No Node class instance found with provided arg for get_node_obj_from_id_or_obj(' + str(node_obj_or_id) + ', expected_type=' + expected_type + ')')
 
+        return node_obj
+
+
+    def type_of_names_list(self, smallcase=False):
+        """Returns a list having names of each type_of (GSystemType, i.e Wiki page,
+        Blog page, etc.), built from 'type_of' field (list of ObjectIds)
         """
-        user_details = {}
-        if self.created_by:
-            user_details['created_by'] = User.objects.get(pk=self.created_by).username
+        type_of_names = []
+        if self.type_of:
+            node_cur = node_collection.find({'_id': {'$in': self.type_of}})
+            if smallcase:
+                type_of_names = [node.name.lower() for node in node_cur]
+            else:
+                type_of_names = [node.name for node in node_cur]
 
-        contributor_names = []
-        for each_pk in self.contributors:
-            contributor_names.append(User.objects.get(pk=each_pk).username)
-        user_details['contributors'] = contributor_names
+        return type_of_names
 
-        if self.modified_by:
-            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
 
-        return user_details
-
+    ########## Setter(@x.setter) & Getter(@property) ##########
     @property
     def member_of_names_list(self):
         """Returns a list having names of each member (GSystemType, i.e Page,
@@ -557,6 +568,28 @@ class Node(DjangoDocument):
                         if mem:
                             member_of_names.append(mem.name)
         return member_of_names
+
+
+    @property
+    def user_details_dict(self):
+        """Retrieves names of created-by & modified-by users from the given
+        node, and appends those to 'user_details' dict-variable
+
+        """
+        user_details = {}
+        if self.created_by:
+            user_details['created_by'] = User.objects.get(pk=self.created_by).username
+
+        contributor_names = []
+        for each_pk in self.contributors:
+            contributor_names.append(User.objects.get(pk=each_pk).username)
+        user_details['contributors'] = contributor_names
+
+        if self.modified_by:
+            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
+
+        return user_details
+
 
     @property
     def prior_node_dict(self):
@@ -687,6 +720,7 @@ class Node(DjangoDocument):
                     if each_invalid_field in self:
                         print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
 
+
         except Exception, e:
             print e
             pass
@@ -752,48 +786,49 @@ class Node(DjangoDocument):
 
         super(Node, self).save(*args, **kwargs)
 
-    	#This is the save method of the node class.It is still not
-    	#known on which objects is this save method applicable We
-    	#still do not know if this save method is called for the
-    	#classes which extend the Node Class or for every class There
-    	#is a very high probability that it is called for classes
-    	#which extend the Node Class only The classes which we have
-    	#i.e. the MyReduce() and ToReduce() class do not extend from
-    	#the node class Hence calling the save method on those objects
-    	#should not create a recursive function
+        # This is the save method of the node class.It is still not
+        # known on which objects is this save method applicable We
+        # still do not know if this save method is called for the
+        # classes which extend the Node Class or for every class There
+        # is a very high probability that it is called for classes
+        # which extend the Node Class only The classes which we have
+        # i.e. the MyReduce() and ToReduce() class do not extend from
+        # the node class Hence calling the save method on those objects
+        # should not create a recursive function
 
-    	#If it is a new document then Make a new object of ToReduce
-    	#class and the id of this document to that object else Check
-    	#whether there is already an object of ToReduce() with the id
-    	#of this object.  If there is an object present pass else add
-    	#that object I have not applied the above algorithm
+        # If it is a new document then Make a new object of ToReduce
+        # class and the id of this document to that object else Check
+        # whether there is already an object of ToReduce() with the id
+        # of this object.  If there is an object present pass else add
+        # that object I have not applied the above algorithm
 
-   	#Instead what I have done is that I have searched the
-   	#ToReduce() collection class and searched whether the ID of
-   	#this document is present or not.  If the id is not present
-   	#then add that id.If it is present then do not add that id
+        # Instead what I have done is that I have searched the
+        # ToReduce() collection class and searched whether the ID of
+        # this document is present or not.  If the id is not present
+        # then add that id.If it is present then do not add that id
 
-   	old_doc = node_collection.collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})
+        old_doc = node_collection.collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})
 
-    		#print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
-    	if  not old_doc:
+        #print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
+        if  not old_doc:
+            z = node_collection.collection.ToReduceDocs()
+            z.doc_id = self._id
+            z.required_for = to_reduce_doc_requirement
+            z.save()
 
-
-    		z = node_collection.collection.ToReduceDocs()
-    		z.doc_id = self._id
-    		z.required_for = to_reduce_doc_requirement
-    		z.save()
-
-    	#If you create/edit anything then this code shall add it in the URL
+        #If you create/edit anything then this code shall add it in the URL
 
         history_manager = HistoryManager()
         rcs_obj = RCS()
-	if is_new:
+
+        if is_new:
             # Create history-version-file
             try:
                 if history_manager.create_or_replace_json_file(self):
                     fp = history_manager.get_file_path(self)
-                    user = User.objects.get(pk=self.created_by).username
+                    user_list = User.objects.filter(pk=self.created_by)
+                    user = user_list[0].username if user_list else 'user'
+                    # user = User.objects.get(pk=self.created_by).username
                     message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
                     rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
             except Exception as err:
@@ -811,7 +846,9 @@ class Node(DjangoDocument):
                 try:
                     if history_manager.create_or_replace_json_file(self):
                         fp = history_manager.get_file_path(self)
-                        user = User.objects.get(pk=self.created_by).username
+                        # user = User.objects.get(pk=self.created_by).username
+                        user_list = User.objects.filter(pk=self.created_by)
+                        user = user_list[0].username if user_list else 'user'
                         message = "This document (" + self.name + ") is re-created by " + user + " on " + self.created_at.strftime("%d %B %Y")
                         rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
 
@@ -822,18 +859,22 @@ class Node(DjangoDocument):
 
             try:
                 if history_manager.create_or_replace_json_file(self):
-                    user = User.objects.get(pk=self.modified_by).username
+                    # user = User.objects.get(pk=self.modified_by).username
+                    user_list = User.objects.filter(pk=self.created_by)
+                    user = user_list[0].username if user_list else 'user'
                     message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
                     rcs_obj.checkin(fp, 1, message.encode('utf-8'))
 
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
                 raise RuntimeError(err)
-	#gets the last version no.
-        rcsno = history_manager.get_current_version(self)
-	#update the snapshot feild
-	if kwargs.get('groupid'):
-		node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+
+        #update the snapshot feild
+        if kwargs.get('groupid'):
+            # gets the last version no.
+            rcsno = history_manager.get_current_version(self)
+            node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+
 
     # User-Defined Functions
     def get_possible_attributes(self, gsystem_type_id_or_list):
@@ -1492,8 +1533,8 @@ class GSystem(Node):
             self['_id'] = ObjectId()
 
         # origin:
-        if kwargs.has_key('origin'):
-            self['origin'] = kwargs.get('origin', '')
+        if origin:
+            self['origin'].append(origin)
         # else:  # rarely/no origin field value will be sent via form/request.
         #     self['origin'] = request.POST.get('origin', '').strip()
 
@@ -2313,6 +2354,27 @@ class Author(Group):
         return auth
 
 
+    @staticmethod
+    def get_total_comments_by_user(user_id, return_cur=False, site_wide=False, group_id=None):
+
+        reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"}, {'_id': 1})
+
+        comments_query = {'member_of': reply_gst._id,'created_by': user_id}
+
+        if not site_wide:
+            group_id = group_id | ObjectId()
+            comments_query.update({'group_set': group_id})
+
+        users_replies_cur = node_collection.find(comments_query)
+
+        if users_replies_cur:
+            if return_cur:
+                return users_replies_cur
+            return users_replies_cur.count()
+        else:
+            return 0
+
+
 #  HELPER -- CLASS DEFINITIONS
 class HistoryManager():
     """Handles history management for documents of a collection
@@ -2452,7 +2514,7 @@ class HistoryManager():
         (b) False - Otherwise
         """
 
-        collection_tuple = (MetaType, GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation, Filehive, Buddy)
+        collection_tuple = (MetaType, GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation, Filehive, Buddy, Counter)
         file_res = False    # True, if no error/exception occurred
 
         if document_object is not None and \
@@ -2578,6 +2640,24 @@ class HistoryManager():
                     print "\n Exception for document's ("+doc_obj.name+") key ("+k+") -- ", str(e), "\n"
 
         return doc_obj
+
+
+    @staticmethod
+    def delete_json_file(node_id_or_obj, expected_type):
+        node_obj = Node.get_node_obj_from_id_or_obj(node_id_or_obj, expected_type)
+        history_manager = HistoryManager()
+        json_file_path = history_manager.get_file_path(node_obj)
+        version_file_path = json_file_path + ',v'
+        try:
+            os.remove(version_file_path)
+            print "\nDeleted RCS json version file : ", version_file_path
+            os.remove(json_file_path)
+            print "\nDeleted RCS json file : ", json_file_path
+        except Exception, e:
+            print "\nException occured while deleting RCS file for node '", node_obj._id.__str__(), "' : ", e
+
+
+
 
 class NodeJSONEncoder(json.JSONEncoder):
   def default(self, o):
@@ -3445,17 +3525,462 @@ class node_holder(DjangoDocument):
         required_fields = ['details_to_hold']
         use_dot_notation = True
 
-"""
+
 @connection.register
-class allLinks(DjangoDocument):
-    structure = {
-	'member_of':ObjectId,
-	'link':unicode,
-	'required_for':unicode,
+class Counter(DjangoDocument):
+
+    collection_name = 'Counters'
+
+    # resources will be created will be of following type:
+    resource_list = ['page', 'file']
+
+    # resources will be created will have following default schema dict:
+    default_resource_stats = {
+        'created' : 0,  # no of files/pages/any-app's instance created
+
+        'visits_gained': 0, # Count of unique visitors(user's) not total visits
+        'visits_on_others_res':  0, # count of visits not resources
+
+        'comments_gained':  0,  # Count of comments not resources
+        'commented_on_others_res':  0, # count of resources not comments
+        'comments_by_others_on_res': {},
+
+        'avg_rating_gained': 0,  # total_rating/rating_count_received
+        'rating_count_received': 0,
     }
-    # required_fields = ['member_of', 'link']
+
+
+    structure = {
+       '_type': unicode,
+        'user_id': int,
+        'auth_id': ObjectId,
+        'group_id': ObjectId,
+        'last_update': datetime.datetime,
+
+        # 'enrolled':bool,
+        'is_group_member': bool,
+        # 'course_score':int,
+        'group_points': int,
+
+        # -- notes --
+        'page': {'blog': dict, 'wiki': dict, 'info': dict},  # resource
+
+        # -- files --
+        'file': dict,  # resource
+
+        # -- quiz --
+        'quiz': {'attempted': int, 'correct': int, 'incorrect': int},
+
+        # -- interactions --
+        'total_comments_by_user': int,
+
+        # Total fields should be updated on enroll action
+        # On module/unit add/delete, update 'total' fields for all users in celery
+        'course':{'modules':{'completed':int, 'total':int}, 'units':{'completed':int, 'total':int}}
+    }
+
+    default_values = {
+        'last_update': datetime.datetime.now(),
+        'is_group_member': False,
+        'group_points': 0,
+        'page.blog': default_resource_stats,
+        'page.wiki': default_resource_stats,
+        'page.info': default_resource_stats,
+        'file': default_resource_stats,
+        'quiz.attempted': 0,
+        'quiz.correct': 0,
+        'quiz.incorrect': 0,
+        'total_comments_by_user': 0,
+        'course.modules.total': 0,
+        'course.modules.completed': 0,
+        'course.units.total': 0,
+        'course.units.completed': 0,
+    }
+
+    indexes = [
+        {
+            # 1: Compound index
+            'fields': [
+                ('user_id', INDEX_ASCENDING), ('group_id', INDEX_ASCENDING)
+            ]
+        },
+    ]
+
+    required_fields = ['user_id', 'group_id', 'auth_id']
     use_dot_notation = True
-"""
+
+    def __unicode__(self):
+        return self._id
+
+    def identity(self):
+        return self.__unicode__()
+
+    @staticmethod
+    def _get_resource_type_tuple(resource_obj):
+
+        # identifying resource's type:
+        resource_type = ''
+        resource_type_of = ''
+
+        # ideally, member_of field should be used to check resource_type. But it may cause performance hit.
+        # hence using 'if_file.mime_type'
+        if resource_obj.if_file.mime_type or (u'File' in resource_obj.member_of_names_list):
+            resource_type = 'file'
+
+        elif u'Page' in resource_obj.member_of_names_list:
+            resource_type = 'page'
+            # mostly it 'type_of' will be [] hence kept: if not at first.
+            if not resource_obj.type_of:
+                resource_type_of = 'blog'
+            else:
+                resource_type_of_names_list = resource_obj.type_of_names_list(smallcase=True)
+                resource_type_of = resource_type_of_names_list[0].split(' ')[0]
+
+        return (resource_type, resource_type_of)
+
+
+    def fill_counter_values(self,
+                            user_id,
+                            auth_id,
+                            group_id,
+                            is_group_member=default_values['is_group_member'],
+                            group_points=default_values['group_points'],
+                            last_update=datetime.datetime.now()
+                            ):
+
+        self['user_id'] = int(user_id)
+        self['auth_id'] = ObjectId(auth_id)
+        self['group_id'] = ObjectId(group_id)
+        self['is_group_member'] = is_group_member
+        self['group_points'] = group_points
+        self['last_update'] = last_update
+
+        return self
+
+
+    @staticmethod
+    def get_counter_obj(userid, group_id, auth_id=None):
+        user_id  = int(userid)
+        group_id = ObjectId(group_id)
+
+        # query and check for existing counter obj:
+        counter_obj = counter_collection.one({'user_id': user_id, 'group_id': group_id})
+
+        # create one if not exists:
+        if not counter_obj :
+
+            # instantiate new counter instance
+            counter_obj = counter_collection.collection.Counter()
+
+            if not auth_id:
+                auth_obj = node_collection.one({'_type': u'Author', 'created_by': user_id})
+                auth_id = auth_obj._id
+
+            counter_obj.fill_counter_values(user_id=user_id, group_id=group_id, auth_id=auth_id)
+            counter_obj.save()
+
+        return counter_obj
+
+
+    @staticmethod
+    def get_counter_objs_cur(user_ids_list, group_id):
+        group_id = ObjectId(group_id)
+
+        # query and check for existing counter obj:
+        counter_objs_cur = counter_collection.find({
+                                                'user_id': {'$in': user_ids_list},
+                                                'group_id': group_id
+                                            })
+
+        if counter_objs_cur.count() == len(user_ids_list):
+            return counter_objs_cur
+
+        else:
+            # following will create counter instances for one which does not exists
+            create_counter_for_user_ids = set(user_ids_list) - {uc['user_id'] for uc in counter_objs_cur}
+            for each_user_id in create_counter_for_user_ids:
+                Counter.get_counter_obj(each_user_id, group_id)
+
+            return counter_objs_cur.rewind()
+
+
+    def get_file_points(self):
+        from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS
+        return self['file']['created'] * GSTUDIO_FILE_UPLOAD_POINTS
+
+
+    def get_page_points(self, page_type='blog'):
+        from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS
+        return self['page'][page_type]['created'] * GSTUDIO_NOTE_CREATE_POINTS
+
+
+    def get_quiz_points(self):
+        from gnowsys_ndf.settings import GSTUDIO_QUIZ_CORRECT_POINTS
+        return self['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
+
+
+    def get_interaction_points(self):
+        from gnowsys_ndf.settings import GSTUDIO_COMMENT_POINTS
+        return self['total_comments_by_user'] * GSTUDIO_COMMENT_POINTS
+
+
+    def get_all_user_points_dict(self):
+        point_breakup_dict = {"Files": 0, "Notes": 0, "Quiz": 0, "Interactions": 0}
+
+        point_breakup_dict['Files'] = self.get_file_points()
+        point_breakup_dict['Notes'] = self.get_page_points(page_type='blog')
+        point_breakup_dict['Quiz']  = self.get_quiz_points()
+        point_breakup_dict['Interactions'] = self.get_interaction_points()
+
+        return point_breakup_dict
+
+
+    def total_user_points(self):
+        point_breakup_dict = self.get_all_user_points_dict()
+        return sum(point_breakup_dict.values())
+
+
+    # private helper functions:
+    @staticmethod
+    def __key_str_counter_resource_type_of(resource_type,
+                                        resource_type_of,
+                                        counter_obj_var_name='counter_obj'):
+        # returns str of counter_objs, resource_type and resource_type_of
+        # e.g: 'counter_obj[resource_type][resource_type_of]'
+
+        key_str_resource_type = '["' + resource_type + '"]'\
+                                + (('["' + resource_type_of + '"]') if resource_type_of else '')
+
+        return (counter_obj_var_name + key_str_resource_type)
+
+
+    @staticmethod
+    def add_comment_pt(resource_obj_or_id, current_group_id, active_user_id_or_list=[]):
+
+        if not isinstance(active_user_id_or_list, list):
+            active_user_id_list = [active_user_id_or_list]
+        else:
+            active_user_id_list = active_user_id_or_list
+
+        resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
+        resource_oid = resource_obj._id
+        resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
+
+        # get resource's creator:
+        resource_created_by_user_id = resource_obj.created_by
+        resource_contributors_user_ids_list = resource_obj.contributors
+
+        key_str_resource_type = '["' + resource_type + '"]'\
+                                + (('["' + resource_type_of + '"]') if resource_type_of else '')
+        key_str = 'counter_obj_each_contributor' \
+                  + key_str_resource_type \
+                  + '["comments_by_others_on_res"]'
+
+        # counter object of resource contributor
+        # ------- creator counter update: done ---------
+        for each_resource_contributor in resource_contributors_user_ids_list:
+            counter_obj_each_contributor = Counter.get_counter_obj(each_resource_contributor, current_group_id)
+
+            # update counter obj
+            for each_active_user_id in active_user_id_list:
+                existing_user_comment_cnt = eval(key_str).get(str(each_active_user_id), 0)
+                eval(key_str).update({str(each_active_user_id): (existing_user_comment_cnt + 1) })
+
+            # update comments gained:
+            key_str_comments_gained = "counter_obj_each_contributor" \
+                                      + key_str_resource_type
+            comments_gained = eval(key_str_comments_gained + '["comments_gained"]')
+            eval(key_str_comments_gained).update({"comments_gained": (comments_gained + 1)})
+
+            counter_obj_each_contributor.last_update = datetime.datetime.now()
+            counter_obj_each_contributor.save()
+        # ------- creator counter update: done ---------
+
+        # processing analytics for (one) active user.
+        # NOTE: [Only if active user is other than resource creator]
+        from gnowsys_ndf.settings import GSTUDIO_COMMENT_POINTS
+        for each_active_user_id in active_user_id_list:
+            if each_active_user_id not in resource_contributors_user_ids_list:
+
+                counter_obj = Counter.get_counter_obj(each_active_user_id, current_group_id)
+
+                # counter_obj['file']['commented_on_others_res'] += 1
+                key_str = 'counter_obj' \
+                          + key_str_resource_type \
+                          + '["commented_on_others_res"]'
+                existing_commented_on_others_res = eval(key_str)
+                eval('counter_obj' + key_str_resource_type).update( \
+                    { 'commented_on_others_res': (existing_commented_on_others_res + 1) })
+
+                counter_obj['total_comments_by_user'] += 1
+                counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
+
+                counter_obj.last_update = datetime.datetime.now()
+                counter_obj.save()
+
+
+    @staticmethod
+    def add_visit_count(resource_obj_or_id, current_group_id, loggedin_userid):
+
+        active_user_ids_list = [loggedin_userid]
+        if GSTUDIO_BUDDY_LOGIN:
+            active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(loggedin_userid, datetime.datetime.now())
+            # removing redundancy of user ids:
+            # active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+        resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
+        resource_oid = resource_obj._id
+        resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
+
+        # get resource's creator:
+        resource_created_by_user_id = resource_obj.created_by
+        resource_contributors_user_ids_list = resource_obj.contributors
+
+        # contributors will not get increament in visit count increment for own resource.
+        diff_user_ids_list = list(set(active_user_ids_list) - set(resource_contributors_user_ids_list))
+        diff_user_ids_list_length = len(diff_user_ids_list)
+        if diff_user_ids_list_length == 0:
+            return
+
+        counter_objs_cur = Counter.get_counter_objs_cur(diff_user_ids_list, current_group_id)
+
+        key_str_counter_resource_type = Counter.__key_str_counter_resource_type_of(resource_type,
+                                                                           resource_type_of,
+                                                                           'each_uc')
+        key_str_counter_resource_type_visits_on_others_res = key_str_counter_resource_type \
+                                                              + '["visits_on_others_res"]'
+        key_str_creator_counter_resource_type_visits_gained = key_str_counter_resource_type \
+                                                              + '["visits_gained"]'
+
+        for each_uc in counter_objs_cur:
+            # if each_uc['user_id'] not in resource_contributors_user_ids_list:
+            visits_on_others_res = eval(key_str_counter_resource_type_visits_on_others_res)
+            eval(key_str_counter_resource_type).update({"visits_on_others_res": (visits_on_others_res + 1)})
+            each_uc.save()
+
+
+        # contributors will not get increament in visit count increment for own resource.
+        diff_contrib_ids_list = list(set(resource_contributors_user_ids_list) - set(active_user_ids_list))
+        if not diff_contrib_ids_list:
+            return
+
+        creator_counter_objs_cur = Counter.get_counter_objs_cur(diff_contrib_ids_list, current_group_id)
+
+        for each_uc in creator_counter_objs_cur:
+            visits_gained = eval(key_str_creator_counter_resource_type_visits_gained)
+            eval(key_str_counter_resource_type).update({"visits_gained": (visits_gained + diff_user_ids_list_length)})
+            each_uc.save()
+
+
+    @staticmethod
+    def update_ratings(resource_obj_or_id, current_group_id, rating_given, active_user_id_or_list=[]):
+
+        if not isinstance(active_user_id_or_list, list):
+            active_user_id_list = [active_user_id_or_list]
+        else:
+            active_user_id_list = active_user_id_or_list
+
+        resource_obj = Node.get_node_obj_from_id_or_obj(resource_obj_or_id, GSystem)
+        resource_oid = resource_obj._id
+        resource_type, resource_type_of = Counter._get_resource_type_tuple(resource_obj)
+
+        # get resource's creator:
+        # resource_created_by_user_id = resource_obj.created_by
+        resource_contributors_user_ids_list = resource_obj.contributors
+
+        # creating {user_id: score}
+        # e.g: {162: 5, 163: 3, 164: 4}
+        userid_score_rating_dict = {d['user_id']: d['score'] for d in resource_obj.rating}
+
+        user_counter_cur = Counter.get_counter_objs_cur(resource_contributors_user_ids_list, current_group_id)
+
+        key_str_counter_resource_type = Counter.__key_str_counter_resource_type_of(resource_type,
+                                                                           resource_type_of,
+                                                                           'each_uc')
+        key_str_counter_resource_type_rating_count_received = key_str_counter_resource_type \
+                                                              + '["rating_count_received"]'
+        key_str_counter_resource_type_avg_rating_gained = key_str_counter_resource_type \
+                                                              + '["avg_rating_gained"]'
+
+        # iterating over each user id in contributors
+        # uc: user counter
+        for each_uc in user_counter_cur:
+
+            for each_active_user_id in active_user_id_list:
+
+                userid_score_rating_dict_copy = userid_score_rating_dict.copy()
+
+                rating_count_received = eval(key_str_counter_resource_type_rating_count_received)
+                avg_rating_gained = eval(key_str_counter_resource_type_avg_rating_gained)
+
+                total_rating = rating_count_received * avg_rating_gained
+
+                # first time rating giving user:
+                if each_active_user_id not in userid_score_rating_dict_copy:
+                    # add new key: value in dict to avoid errors
+                    userid_score_rating_dict_copy.update({each_active_user_id: 0})
+                    eval(key_str_counter_resource_type).update( \
+                                        {'rating_count_received': (rating_count_received + 1)} )
+
+                total_rating = total_rating - userid_score_rating_dict_copy[each_active_user_id]
+                total_rating = total_rating + int(rating_given)
+
+                # getting value from updated 'rating_count_received'. hence repeated.
+                rating_count_received = eval(key_str_counter_resource_type_rating_count_received) or 1
+                # storing float result to get more accurate avg.
+                avg_rating_gained = float(format(total_rating / float(rating_count_received), '.2f'))
+
+                eval(key_str_counter_resource_type).update( \
+                                        {'avg_rating_gained': avg_rating_gained})
+
+                each_uc.save()
+
+
+    def save(self, *args, **kwargs):
+
+        is_new = False if ('_id' in self) else True
+
+        super(Counter, self).save(*args, **kwargs)
+
+        # storing Filehive JSON in RSC system:
+        history_manager = HistoryManager()
+        rcs_obj = RCS()
+
+        if is_new:
+
+            # Create history-version-file
+            if history_manager.create_or_replace_json_file(self):
+                fp = history_manager.get_file_path(self)
+                message = "This document of Counter is created on " + str(datetime.datetime.now())
+                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+        else:
+            # Update history-version-file
+            fp = history_manager.get_file_path(self)
+
+            try:
+                rcs_obj.checkout(fp)
+
+            except Exception as err:
+                try:
+                    if history_manager.create_or_replace_json_file(self):
+                        fp = history_manager.get_file_path(self)
+                        message = "This document of Counter is re-created on " + str(datetime.datetime.now())
+                        rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+                except Exception as err:
+                    print "\n DocumentError: This document (", self._id, ") can't be re-created!!!\n"
+                    node_collection.collection.remove({'_id': self._id})
+                    raise RuntimeError(err)
+
+            try:
+                if history_manager.create_or_replace_json_file(self):
+                    message = "This document of Counter is lastly updated on " + str(datetime.datetime.now())
+                    rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+
+            except Exception as err:
+                print "\n DocumentError: This document (", self._id, ") can't be updated!!!\n"
+                raise RuntimeError(err)
 
 # DATABASE Variables
 db = get_database()
@@ -3465,8 +3990,9 @@ triple_collection   = db[Triple.collection_name].Triple
 benchmark_collection= db[Benchmark.collection_name]
 filehive_collection = db[Filehive.collection_name].Filehive
 buddy_collection    = db[Buddy.collection_name].Buddy
-
+counter_collection  = db[Counter.collection_name].Counter
 gridfs_collection   = db["fs.files"]
 chunk_collection    = db["fs.chunks"]
 
 import signals
+
