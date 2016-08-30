@@ -41,7 +41,7 @@
           {% endif %}
         {% endif %}
 
-        <li class="active"><a href="#all_events" class="tiny expand button radius  btn-width">{% if req_from_course %}{% trans "All eCourses" %}{% else %}{% trans "All Events" %}{% endif %}</a></li>
+        <li class="active"><a href="#all_events" class="tiny expand button radius  btn-width">{% if req_from_course %}{% trans "All eCourses" %}{% else %}{% trans "All" %}{% endif %}</a></li>
         {% if request.user.is_authenticated  and not is_gstaff %}
           <li><a href="#my_events" class="tiny expand button radius  btn-width">{% if req_from_course %}{% trans "My eCourses" %}{% else %}{% trans "My Events" %}{% endif %}</a></li>
         {% endif %}

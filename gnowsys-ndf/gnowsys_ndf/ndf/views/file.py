@@ -484,6 +484,23 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
                                 }).sort("last_update", -1)
 
 
+    elif tab_type == "Documents":
+        result_cur = node_collection.find({'member_of': {'$nin':[ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
+                                            '_type': {'$in': ['File', 'GSystem']},
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+                                            
+                                            'if_file.mime_type': {'$ne': None},
+                                            '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                    {'access_policy': u"PRIVATE"},
+                                                    {'created_by': userid}
+                                                ]
+                                             }
+                                            ]
+                                        }).sort("last_update", -1)
+
+
     else:
         result_cur = node_collection.find({'member_of': {operator: member_of_list},
                                     '_type': {'$in': ['File', 'GSystem']}, 'fs_file_ids':{'$ne': []},
@@ -576,7 +593,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
         elif filetype == "Documents":
             if app == "File":
-                result_dict = get_query_cursor_filetype('$nin', [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp)
+                result_dict = get_query_cursor_filetype('$nin', [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp,"Documents")
 
             # elif app == "E-Library":
             #     d_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)

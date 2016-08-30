@@ -2075,7 +2075,10 @@ def group_dashboard(request, group_id=None):
   '''
   default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
-  return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
+  if alternate_template: 
+    return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
+  else:
+    return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
                                                        'group_id':group_id, 'user':request.user,
                                                        # 'shelf_list': shelf_list,
                                                        'list_of_unit_events': list_of_unit_events,
