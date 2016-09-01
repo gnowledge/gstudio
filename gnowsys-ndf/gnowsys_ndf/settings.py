@@ -430,6 +430,9 @@ MIDDLEWARE_CLASSES = (
     # gstudio custom middleware(s):
     # 'gnowsys_ndf.ndf.middleware.Buddy.BuddySession',
     # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
+
+    # for profiling methods:
+    # 'gnowsys_ndf.ndf.middleware.ProfileMiddleware.ProfileMiddleware',
 )
 
 # AUTH_PROFILE_MODULE = 'gnowsys_ndf.ndf.models.UserProfile'
