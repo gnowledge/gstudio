@@ -432,7 +432,7 @@ MIDDLEWARE_CLASSES = (
     # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
 
     # for profiling methods:
-    'gnowsys_ndf.ndf.middleware.ProfileMiddleware.ProfileMiddleware',
+    # 'gnowsys_ndf.ndf.middleware.ProfileMiddleware.ProfileMiddleware',
 )
 
 # AUTH_PROFILE_MODULE = 'gnowsys_ndf.ndf.models.UserProfile'
