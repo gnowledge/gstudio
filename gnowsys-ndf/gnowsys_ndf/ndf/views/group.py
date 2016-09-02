@@ -2058,7 +2058,7 @@ def group_dashboard(request, group_id=None):
         else:
             allow_to_join = "Open"
   if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
-      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': {'$in': ["File","GSystem"]}})
   '''
   property_order_list = []
   if "group_of" in group_obj:
