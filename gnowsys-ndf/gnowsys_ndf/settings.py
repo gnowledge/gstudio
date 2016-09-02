@@ -15,12 +15,12 @@ import djcelery
 #     move_file_or_dirctory)
 
 DEBUG = False
-# ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
 
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
-GSTUDIO_DEFAULT_GROUPS = ['home','Trash','desk','help','warehouse']
+GSTUDIO_DEFAULT_GROUPS = ['home', 'Trash', 'desk', 'help', 'warehouse']
 LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'))
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
@@ -773,8 +773,6 @@ CACHES = {
     }
 }
 
-WETUBE_USERNAME = "glab"
-WETUBE_PASSWORD = "gl@b$@)we!ube"
 
 # Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
