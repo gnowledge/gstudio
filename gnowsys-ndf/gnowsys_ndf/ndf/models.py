@@ -1456,6 +1456,27 @@ class GSystemType(Node):
     use_autorefs = True                         # To support Embedding of Documents
 
 
+    @staticmethod
+    def get_id_from_name(gst_name):
+        from django.template.defaultfilters import slugify
+        from django.core.cache import cache
+
+        slug = slugify(gst_name)
+        cache_key = 'gst_name_' + str(gst_name) if slug else str(abs(hash(gst_name)))
+        cache_result = cache.get(cache_key)
+
+        if cache_result:
+            return cache_result
+
+        # setting cache with both ObjectId and group_name
+        gst_id = node_collection.one(
+                                    {'_type': u'GSystemType', 'name': unicode(gst_name)},
+                                    {'_id': True}
+                                ).get('_id')
+        cache.set(cache_key, gst_id, 60 * 60)
+        return gst_id
+
+
 @connection.register
 class GSystem(Node):
     """GSystemType instance
