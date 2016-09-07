@@ -7,7 +7,6 @@
 {% get_oid_variables as oids %}
 {% user_access_policy groupid request.user as user_access %}
 
-{% cache 360 static_html_head %}  <!-- cache static dependencies for a hour -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,7 +43,6 @@
   <!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
   <!-- External library stylesheets-->
-{% endcache %}
   <title>{{ site.SITE_NAME }} - {% block title %} {% endblock %} </title>
 
   {% block head %}{% endblock %}
@@ -139,9 +137,8 @@
             {% get_group_type request.path request.user as group_type %}
 
             {% if group_type %}
-
-            {% block body_content %} {% endblock %}
-            {% block extra_content %}  {% endblock %}
+              {% block body_content %} {% endblock %}
+              {% block extra_content %}  {% endblock %}
             {% endif %}
 
             <input type="hidden" value="{{newgroup}}">

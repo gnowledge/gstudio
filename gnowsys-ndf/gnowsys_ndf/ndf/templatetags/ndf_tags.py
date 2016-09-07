@@ -100,8 +100,8 @@ def get_site_registration_variable_visibility(registration_variable=None):
 @get_execution_time
 @register.assignment_tag
 def get_site_variables():
-	result = cache.get('site_var')
 
+	result = cache.get('site_var')
 	if result:
 		return result
 
@@ -141,8 +141,8 @@ def get_site_variables():
 @get_execution_time
 @register.assignment_tag
 def get_oid_variables():
-	result = cache.get('oid_var')
 
+	result = cache.get('oid_var')
 	if result:
 		return result
 
@@ -1376,17 +1376,6 @@ def get_theme_node(groupid, node):
 		return True
 
 
-# @register.assignment_tag
-# def get_group_name(val):
-#          GroupName = []
-
-# 	 for each in val.group_set:
-
-# 		grpName = node_collection.one({'_id': ObjectId(each) }).name.__str__()
-# 		GroupName.append(grpName)
-# 	 return GroupName
-
-
 @get_execution_time
 @register.assignment_tag
 def get_edit_url(groupid):
@@ -2072,8 +2061,8 @@ def user_access_policy(node, user):
 
     else:
       # group_node = node_collection.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
-      group_name, group_id = get_group_name_id(node)
-      group_node = node_collection.one({"_id": ObjectId(group_id)})
+      group_node = get_group_name_id(node, get_obj=True)
+      # group_node = node_collection.one({"_id": ObjectId(group_id)})
 
       if user.id == group_node.created_by:
         user_access = True
@@ -2229,10 +2218,7 @@ def check_is_gstaff(groupid, user):
 
   groupid = groupid if groupid else 'home'
   try:
-  	try:
-	    group_node = node_collection.one({'_id': ObjectId(groupid)})
-  	except:
-  		group_node = get_group_name_id(groupid, get_obj=True)
+	group_node = Group.get_group_name_id(groupid, get_obj=True)
 
 	if group_node:
 		return group_node.is_gstaff(user)
@@ -2688,23 +2674,8 @@ def get_version_of_module(module_id):
 @get_execution_time
 @register.assignment_tag
 def get_group_name(groupid):
-	# group_name = ""
-	# ins_objectid  = ObjectId()
-	# if ins_objectid.is_valid(groupid) is True :
-	# 	group_ins = node_collection.find_one({'_type': "Group","_id": ObjectId(groupid)})
-	# 	if group_ins:
-	# 		group_name = group_ins.name
-	# 	else :
-	# 		auth = node_collection.one({'_type': 'Author', "_id": ObjectId(groupid) })
-	# 		if auth :
-	# 			group_name = auth.name
-
-	# else :
-	# 	pass
-
-	group_name, group_id = get_group_name_id(groupid)
-
-	return group_name
+	# group_name, group_id = get_group_name_id(groupid)
+	return get_group_name_id(groupid)[0]
 
 
 @register.filter
