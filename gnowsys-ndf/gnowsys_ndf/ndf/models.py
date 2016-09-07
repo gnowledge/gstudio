@@ -544,30 +544,31 @@ class Node(DjangoDocument):
         File, etc.), built from 'member_of' field (list of ObjectIds)
 
         """
-        member_of_names = []
+        # member_of_names = []
 
-        if self.member_of:
-            for each_member_id in self.member_of:
-                if type(each_member_id) == ObjectId:
-                    _id = each_member_id
-                else:
-                    _id = each_member_id['$oid']
-                if _id:
-                    mem = node_collection.one({'_id': ObjectId(_id)})
-                    if mem:
-                        member_of_names.append(mem.name)
-        else:
-            if "gsystem_type" in self:
-                for each_member_id in self.gsystem_type:
-                    if type(each_member_id) == ObjectId:
-                        _id = each_member_id
-                    else:
-                        _id = each_member_id['$oid']
-                    if _id:
-                        mem = node_collection.one({'_id': ObjectId(_id)})
-                        if mem:
-                            member_of_names.append(mem.name)
-        return member_of_names
+        # if self.member_of:
+        #     for each_member_id in self.member_of:
+        #         if type(each_member_id) == ObjectId:
+        #             _id = each_member_id
+        #         else:
+        #             _id = each_member_id['$oid']
+        #         if _id:
+        #             mem = node_collection.one({'_id': ObjectId(_id)})
+        #             if mem:
+        #                 member_of_names.append(mem.name)
+        # else:
+        #     if "gsystem_type" in self:
+        #         for each_member_id in self.gsystem_type:
+        #             if type(each_member_id) == ObjectId:
+        #                 _id = each_member_id
+        #             else:
+        #                 _id = each_member_id['$oid']
+        #             if _id:
+        #                 mem = node_collection.one({'_id': ObjectId(_id)})
+        #                 if mem:
+        #                     member_of_names.append(mem.name)
+        # return member_of_names
+        return [GSystemType.get_gst_name_id(gst_id)[0] for gst_id in self.member_of]
 
 
     @property
@@ -1456,25 +1457,65 @@ class GSystemType(Node):
     use_autorefs = True                         # To support Embedding of Documents
 
 
+    # @staticmethod
+    # def get_id_from_name(gst_name):
+    #     from django.template.defaultfilters import slugify
+    #     from django.core.cache import cache
+
+    #     slug = slugify(gst_name)
+    #     cache_key = 'gst_name_' + str(gst_name) if slug else str(abs(hash(gst_name)))
+    #     cache_result = cache.get(cache_key)
+
+    #     if cache_result:
+    #         return cache_result
+
+    #     # setting cache with both ObjectId and group_name
+    #     gst_id = node_collection.one(
+    #                                 {'_type': u'GSystemType', 'name': unicode(gst_name)},
+    #                                 {'_id': True}
+    #                             ).get('_id')
+    #     cache.set(cache_key, gst_id, 60 * 60)
+    #     return gst_id
+
     @staticmethod
-    def get_id_from_name(gst_name):
+    def get_gst_name_id(gst_name_or_id):
+        # if cached result exists return it
         from django.template.defaultfilters import slugify
         from django.core.cache import cache
 
-        slug = slugify(gst_name)
-        cache_key = 'gst_name_' + str(gst_name) if slug else str(abs(hash(gst_name)))
+        slug = slugify(gst_name_or_id)
+        cache_key = 'gst_name_id' + str(slug)
         cache_result = cache.get(cache_key)
 
         if cache_result:
             return cache_result
+        # ---------------------------------
 
-        # setting cache with both ObjectId and group_name
-        gst_id = node_collection.one(
-                                    {'_type': u'GSystemType', 'name': unicode(gst_name)},
-                                    {'_id': True}
-                                ).get('_id')
-        cache.set(cache_key, gst_id, 60 * 60)
-        return gst_id
+        gst_id = ObjectId(gst_name_or_id) if ObjectId.is_valid(gst_name_or_id) else None
+        gst_obj = node_collection.one({
+                                        "_type": "GSystemType",
+                                        "$or":[
+                                            {"_id": gst_id},
+                                            {"name": unicode(gst_name_or_id)}
+                                        ]
+                                    })
+
+        if gst_obj:
+            gst_name = gst_obj.name
+            gst_id = gst_obj._id
+
+            # setting cache with ObjectId
+            cache_key = u'gst_name_id' + str(slugify(gst_id))
+            cache.set(cache_key, (gst_name, gst_id), 60 * 60)
+
+            # setting cache with gst_name
+            cache_key = u'gst_name_id' + str(slugify(gst_name))
+            cache.set(cache_key, (gst_name, gst_id), 60 * 60)
+
+            return gst_name, gst_id
+
+        return None, None
+
 
 
 @connection.register
