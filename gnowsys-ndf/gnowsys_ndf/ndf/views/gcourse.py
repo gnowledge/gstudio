@@ -71,22 +71,25 @@ def course(request, group_id, course_id=None):
     course_enrollment_status = None
     app_set_id = None
     query = {}
-    course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
 
-    if course_ins:
-        course_id = str(course_ins._id)
+    # course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
+    # if course_ins:
+    #     course_id = str(course_ins._id)
 
     group_obj_post_node_list = group_obj.post_node
-    app_set = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
-    app_set_id = app_set._id
-    ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
+    # app_set = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+    # app_set_id = app_set._id
+    app_set_name, app_set_id = GSystemType.get_gst_name_id("Announced Course")
+
+    # ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
+    ce_gst_name, ce_gst_id = GSystemType.get_gst_name_id("CourseEventGroup")
 
     # Course search view
     # title = GST_COURSE.name
     # if GST_COURSE.name == "Course":
     title = "eCourses"
 
-    query = {'member_of': ce_gst._id,'_id':{'$in': group_obj_post_node_list}}
+    query = {'member_of': ce_gst_id,'_id':{'$in': group_obj_post_node_list}}
     gstaff_access = False
     if request.user.id:
         # if user is admin then show all ce
@@ -95,7 +98,7 @@ def course(request, group_id, course_id=None):
             query.update({'author_set':{'$ne':int(request.user.id)}})
 
         course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"}).sort('last_update', -1)
-        enr_ce_coll = node_collection.find({'member_of': ce_gst._id,'author_set': int(request.user.id),'_id':{'$in': group_obj_post_node_list}}).sort('last_update', -1)
+        enr_ce_coll = node_collection.find({'member_of': ce_gst_id,'author_set': int(request.user.id),'_id':{'$in': group_obj_post_node_list}}).sort('last_update', -1)
 
         user_access =  user_access_policy(group_id ,request.user)
         if user_access == "allow":
@@ -107,7 +110,7 @@ def course(request, group_id, course_id=None):
     return render_to_response("ndf/gcourse.html",
                             {'title': title,
                              'app_id': app_id, 'course_gst': GST_COURSE,
-                            'req_from_course':True,
+                             'req_from_course':True,
                              'app_set_id': app_set_id,
                              'searching': True, 'course_coll': course_coll,
                              'groupid': group_id, 'group_id': group_id,
