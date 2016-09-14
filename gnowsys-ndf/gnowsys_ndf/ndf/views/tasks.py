@@ -1,5 +1,14 @@
-from celery import task
+import json
+import ox
+import os
+import magic
+import subprocess
+import mimetypes
+import pandora_client
 
+from PIL import Image, ImageDraw
+from StringIO import StringIO
+from celery import task
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
@@ -7,37 +16,25 @@ from django.contrib.sites.models import Site
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_collection
-import json
-
-import ox
-import os
-import magic
-import subprocess
-import mimetypes
-import pandora_client
-from PIL import Image, ImageDraw
-from StringIO import StringIO
-
 from gnowsys_ndf.settings import MEDIA_ROOT
-
 
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-
-# sitename = Site.objects.all()[0]
-site = Site.objects.get(pk=1)
-site_domain = site.domain
-# print "=== site_domain: ", site_domain
-sitename = unicode(site.name.__str__())
-
 @task
 def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
     '''
-        Attach notification mail to celery task
+    Attach notification mail to celery task
     '''
+
+    # sitename = Site.objects.all()[0]
+    site = Site.objects.get(pk=1)
+    site_domain = site.domain
+    # print "=== site_domain: ", site_domain
+    sitename = unicode(site.name.__str__())
+
     request_user = User.objects.get(id=request_user_id)
     to_send_user = User.objects.get(id=to_user)
     try:
@@ -63,14 +60,14 @@ def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
         return False
 
 
-@task    
+@task
 def convertVideo(userid, file_id, filename):
     """
     converting video into webm format, if video already in webm format ,then pass to create thumbnails
     """
-    
+
     fileobj = node_collection.one({'_id':ObjectId(file_id)})
-    
+
     objid = fileobj._id
     fileVideoName = str(objid)
     initialFileName = str(objid)
@@ -79,7 +76,7 @@ def convertVideo(userid, file_id, filename):
         files =  fileobj.fs.files.get(ObjectId(fileobj.fs_file_ids[0]))
     elif hasattr(fileobj, 'if_file'):
         files = fileobj.get_file(fileobj.if_file['original']['relurl'])
-    
+
     # -- create tmp directory
     os.system("mkdir -p "+ "/tmp"+"/"+str(userid)+"/"+fileVideoName+"/")
     # -- create tmp file
@@ -98,9 +95,9 @@ def convertVideo(userid, file_id, filename):
         proc = subprocess.Popen(['ffmpeg', '-y', '-i', input_filename,output_filename])
         proc.wait()
         files = open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".webm")
-    else : 
+    else :
         files = open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName)
-    
+
     filetype = "video"
     filepath = "/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName
     # print "filepath: ", filepath
@@ -115,7 +112,7 @@ def convertVideo(userid, file_id, filename):
         mins = duration / 60
         if mins > 60 :
             hrs = mins / 60
-            mins = mins % 60 
+            mins = mins % 60
     else:
         secs = duration
     videoDuration = ""
@@ -124,7 +121,7 @@ def convertVideo(userid, file_id, filename):
     if duration > 30 :
         videoDuration = "00:00:30"
     else :
-        videoDuration = "00:00:00"      
+        videoDuration = "00:00:00"
     proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+".png")]) # GScreating thumbnail of video using ffmpeg
     proc.wait()
 
@@ -135,14 +132,14 @@ def convertVideo(userid, file_id, filename):
     draw.text((120, 100), durationTime, (255, 255, 255)) # drawing duration time on thumbnail image
     background.save("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+"Time.png")
     thumbnailvideo = open("/tmp/"+str(userid)+"/"+fileVideoName+"/"+initialFileName+"Time.png")
-    
+
     webmfiles = files
     '''storing thumbnail of video with duration in saved object'''
-    
-    # th_gridfs_id = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="image/png") 
-    
+
+    # th_gridfs_id = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="image/png")
+
     if hasattr(fileobj, 'fs_file_ids'):
-        th_gridfs_id = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="image/png") 
+        th_gridfs_id = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="image/png")
         node_fs_file_ids = fileobj.fs_file_ids
 
         if len(node_fs_file_ids) == 1:
@@ -236,8 +233,8 @@ def convertVideo(userid, file_id, filename):
                                             )
 
             # print fileobj
-            
-            
+
+
 
 
 
@@ -252,8 +249,8 @@ def convertVideo(userid, file_id, filename):
 # @periodic_task(run_every=timedelta(seconds=SYNCDATA_DURATION))
 # def run_syncdata_script():
 #     #check if last scan file is update
-#     #if not skip the execution the script might be running 
-#     #or stuck  
+#     #if not skip the execution the script might be running
+#     #or stuck
 #     #manage directory path
 
 #     data_fetch_script_name = 'fetch_data'
