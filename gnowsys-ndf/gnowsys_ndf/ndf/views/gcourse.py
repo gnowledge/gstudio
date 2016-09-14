@@ -2043,7 +2043,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
             #updating counters collection
             # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(notebook_id),False,True)
             if request.user.is_authenticated():
-                Counter.add_visit_count(resource_obj_or_id=notebook_obj,
+                Counter.add_visit_count.delay(resource_obj_or_id=notebook_obj,
                                         current_group_id=group_id,
                                         loggedin_userid=request.user.id)
 
@@ -2127,7 +2127,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         #updating counters collection
         # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
         if request.user.is_authenticated():
-            Counter.add_visit_count(resource_obj_or_id=file_obj,
+            Counter.add_visit_count.delay(resource_obj_or_id=file_obj,
                                     current_group_id=group_id,
                                     loggedin_userid=request.user.id)
 
@@ -2221,10 +2221,9 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         # updating counters collection:
         # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
         if request.user.is_authenticated():
-            Counter.add_visit_count(resource_obj_or_id=file_obj,
-                                    current_group_id=group_id,
+            Counter.add_visit_count.delay(resource_obj_or_id=file_obj._id.__str__(),
+                                    current_group_id=group_id.__str__(),
                                     loggedin_userid=request.user.id)
-
 
     else:
         all_superusers = User.objects.filter(is_superuser=True)
