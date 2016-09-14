@@ -18,6 +18,7 @@ from django.contrib.auth.models import Group as DjangoGroup
 from django.contrib.sessions.models import Session
 from django.db import models
 from django.http import HttpRequest
+from celery import task
 
 from django_mongokit import connection
 from django_mongokit import get_database
@@ -511,13 +512,14 @@ class Node(DjangoDocument):
         # confirming arg 'node_obj_or_id' is Object or oid and
         # setting node_obj accordingly.
         node_obj = None
+
         if isinstance(node_obj_or_id, expected_type):
             node_obj = node_obj_or_id
-        elif isinstance(node_obj_or_id, ObjectId):
+        elif isinstance(node_obj_or_id, ObjectId) or ObjectId.is_valid(node_obj_or_id):
             node_obj = node_collection.one({'_id': ObjectId(node_obj_or_id)})
         else:
             # error raised:
-            raise RuntimeError('No Node class instance found with provided arg for get_node_obj_from_id_or_obj(' + str(node_obj_or_id) + ', expected_type=' + expected_type + ')')
+            raise RuntimeError('No Node class instance found with provided arg for get_node_obj_from_id_or_obj(' + str(node_obj_or_id) + ', expected_type=' + str(expected_type) + ')')
 
         return node_obj
 
@@ -3880,8 +3882,8 @@ class Counter(DjangoDocument):
                 counter_obj.last_update = datetime.datetime.now()
                 counter_obj.save()
 
-
     @staticmethod
+    @task
     def add_visit_count(resource_obj_or_id, current_group_id, loggedin_userid):
 
         active_user_ids_list = [loggedin_userid]
