@@ -4,7 +4,7 @@ from celery import Celery
 
 #os.environ.setdefault('DJANGO_MAILBOX', 'Local')
 app = Celery('gnowsys_ndf',
-             include=['gnowsys_ndf.tasks'])
+             include=['gnowsys_ndf.tasks', 'gnowsys_ndf.models'])
 
 app.config_from_object('gnowsys_ndf.celeryconfig')
 
