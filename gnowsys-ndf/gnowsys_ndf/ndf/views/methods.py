@@ -20,6 +20,7 @@ from bson import json_util
 # from datetime import datetime, timedelta, date
 from collections import OrderedDict
 from mongokit import paginator
+from celery import task
 # from collections import Counter
 
 ''' -- imports from installed packages -- '''
@@ -62,8 +63,9 @@ ins_objectid = ObjectId()
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
+@task
 def get_execution_time(f):
-   if BENCHMARK == 'ON':
+   # if BENCHMARK == 'ON':
 
     def wrap(*args,**kwargs):
         time1 = time.time()
@@ -128,10 +130,12 @@ def get_execution_time(f):
         benchmark_node.save()
         return ret
 
-    if BENCHMARK == 'ON':
-        return wrap
-    if BENCHMARK == 'OFF':
-        return f
+    return wrap
+
+    # if BENCHMARK == 'ON':
+    #     return wrap
+    # if BENCHMARK == 'OFF':
+    #     return f
 
 
 
