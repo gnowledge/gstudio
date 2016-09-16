@@ -542,7 +542,7 @@ def get_metadata_values():
 
 @get_execution_time
 @register.assignment_tag
-def get_attribute_value(node_id, attr,get_data_type=False):
+def get_attribute_value(node_id, attr, get_data_type=False):
 	try:
 		attr_val = ""
 		node_attr = None

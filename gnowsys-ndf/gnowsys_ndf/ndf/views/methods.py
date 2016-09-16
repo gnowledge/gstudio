@@ -20,7 +20,6 @@ from bson import json_util
 # from datetime import datetime, timedelta, date
 from collections import OrderedDict
 from mongokit import paginator
-from celery import task
 # from collections import Counter
 
 ''' -- imports from installed packages -- '''
@@ -38,6 +37,7 @@ from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 # to display error template if non existent pub is given in settings.py
 from django.shortcuts import render
+from django.core.handlers.wsgi import WSGIRequest
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
@@ -51,8 +51,8 @@ from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 # get pub of gpg key with which to sign syncdata attachments
 from gnowsys_ndf.settings import SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH
+from gnowsys_ndf.ndf.views.tasks import record_in_benchmark
 from datetime import datetime, timedelta, date
-
 
 history_manager = HistoryManager()
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
@@ -63,82 +63,55 @@ ins_objectid = ObjectId()
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
-@task
 def get_execution_time(f):
-   # if BENCHMARK == 'ON':
 
     def wrap(*args,**kwargs):
-        print "222222222222222"
-        time1 = time.time()
-        total_parm_size = 0
-        for key, value in kwargs.iteritems():
-           total_parm_size = total_parm_size + getsizeof(value)
-        total_param = len(kwargs)
-        ret = f(*args,**kwargs)
-        t2 = time.clock()
-        time2 = time.time()
-        time_diff = time2 - time1
-        benchmark_node =  benchmark_collection.Benchmark()
-        benchmark_node.time_taken = unicode(str(time_diff))
-        benchmark_node.name = unicode(f.func_name)
-        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
-        try :
-            benchmark_node.has_data["POST"] = bool(args[0].POST)
-            benchmark_node.has_data["GET"] = bool(args[0].GET)
-        except :
-            pass
-        try :
-            benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
-        except :
-            pass
-        try :
-            benchmark_node.user = unicode(args[0].user.username)
-        except :
-            pass
-        benchmark_node.parameters = unicode(total_param)
-        benchmark_node.size_of_parameters = unicode(total_parm_size)
-        benchmark_node.last_update = datetime.today()
-        try:
-            benchmark_node.calling_url = unicode(args[0].path)
-            url = benchmark_node.calling_url.split("/")
 
-            if url[1] != "" :
-                group = url[1]
-                benchmark_node.group = group
-                try :
-                    n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
-                    if bool(n) :
-                        benchmark_node.group = group;
-                except :
-                    group_name, group = get_group_name_id(group)
-                    benchmark_node.group = str(group)
-            else :
+        time1 = time.time()
+        ret = f(*args,**kwargs)
+        time2 = time.time()
+
+        post_bool = get_bool = False,
+        sessionid = user_name = path = '',
+
+        total_param = len(kwargs)
+        req = args[0]
+
+        if isinstance(req, WSGIRequest):
+            # try :
+            post_bool = bool(args[0].POST)
+            get_bool = bool(args[0].GET)
+            # except :
+            #     pass
+
+            try :
+                sessionid = unicode(args[0].COOKIES['sessionid'])
+            except :
                 pass
 
-            if url[2] == "" :
-                benchmark_node.action = None
-            else :
-                benchmark_node.action = url[2]
-                if url[3] != '' :
-                    benchmark_node.action +=  str('/'+url[3])
-                else :
-                    pass
-            if "node_id" in args[0].GET and "collection_nav" in f.func_name:
-                benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
-                # modify calling_url if collection_nav is called i.e collection-player
-        except :
-            pass
-        benchmark_node.save()
+            try :
+                user_name = unicode(args[0].user.username)
+            except :
+                pass
+
+            # try :
+            path = unicode(args[0].path)
+            # except :
+            #     pass
+
+        record_in_benchmark.delay(kwargs_len=len(kwargs),
+                            # total_param_size=sum([getsizeof(each_kwarg) for each_kwarg in kwargs.values()]),
+                            total_param_size=None,
+                            post_bool=post_bool,
+                            get_bool=get_bool,
+                            sessionid=sessionid,
+                            user_name=user_name,
+                            path=path,
+                            funct_name=f.func_name,
+                            time_taken=unicode(str(time2 - time1))
+                        )
         return ret
-
-    print "11111111111"
     return wrap
-
-    # if BENCHMARK == 'ON':
-    #     return wrap
-    # if BENCHMARK == 'OFF':
-    #     return f
-
 
 
 import json
