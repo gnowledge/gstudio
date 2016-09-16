@@ -5,6 +5,7 @@ import magic
 import subprocess
 import mimetypes
 import pandora_client
+import datetime
 
 from PIL import Image, ImageDraw
 from StringIO import StringIO
@@ -15,7 +16,7 @@ from django.contrib.sites.models import Site
 
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.models import Node
-from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_collection
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_collection, benchmark_collection
 from gnowsys_ndf.settings import MEDIA_ROOT
 
 try:
@@ -270,3 +271,42 @@ def convertVideo(userid, file_id, filename):
 
 #     return 'Both scripts executed'
 
+
+@task
+def record_in_benchmark(kwargs_len, total_param_size, post_bool, get_bool, sessionid, user_name, path, funct_name, time_taken):
+    benchmark_node = benchmark_collection.Benchmark()
+    benchmark_node.time_taken   = time_taken
+    benchmark_node.name         = unicode(funct_name)
+    benchmark_node.has_data     = { "POST" : 0, "GET" : 0}
+    benchmark_node.has_data["POST"] = bool(post_bool)
+    benchmark_node.has_data["GET"]  = bool(get_bool)
+    benchmark_node.session_key  = unicode(sessionid)
+    benchmark_node.user = unicode(user_name)
+    benchmark_node.parameters = unicode(kwargs_len)
+    benchmark_node.size_of_parameters = unicode(total_param_size)
+    benchmark_node.last_update = datetime.datetime.now()
+    try:
+        benchmark_node.calling_url = unicode(path)
+        url = path.split("/")
+
+        if url[1] != '' :
+            group = url[1]
+            group_name, group_id = get_group_name_id(group)
+            benchmark_node.group = str(group_id)
+        else :
+            pass
+
+        if url[2] == "" :
+            benchmark_node.action = None
+        else :
+            benchmark_node.action = url[2]
+            if url[3] != '' :
+                benchmark_node.action +=  str('/'+url[3])
+            else :
+                pass
+        if "node_id" in get_data and "collection_nav" in funct_name:
+            benchmark_node.calling_url += "?selected="+req.GET['node_id']
+            # modify calling_url if collection_nav is called i.e collection-player
+    except :
+        pass
+    benchmark_node.save()

@@ -68,6 +68,7 @@ def get_execution_time(f):
    # if BENCHMARK == 'ON':
 
     def wrap(*args,**kwargs):
+        print "222222222222222"
         time1 = time.time()
         total_parm_size = 0
         for key, value in kwargs.iteritems():
@@ -130,6 +131,7 @@ def get_execution_time(f):
         benchmark_node.save()
         return ret
 
+    print "11111111111"
     return wrap
 
     # if BENCHMARK == 'ON':
