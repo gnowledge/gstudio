@@ -8,7 +8,14 @@
 
 
 {% block style %}
-
+.top-gap
+{
+margin-top:15px !important;
+}
+.filter-body
+{
+margin-top:5px !important;
+}
   .first-load { display: none; }
 
   .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; color: black; }
@@ -25,6 +32,7 @@
   .tabs-content > .content.active{
   margin-left:-1px !important;
   }
+
 
 {% endblock %}
 
@@ -252,7 +260,7 @@
 
 
 {% block body_content %}
-  <div class="large-4 columns repository-title">
+  <div class="large-4 columns repository-title top-gap">
       {% if app_gst.altnames and app_gst.altnames != "None" %}
          {% trans app_gst.altnames %}
       {% else %}
@@ -260,7 +268,7 @@
       {% endif%}
   </div>
     
-    <div class="large-8 columns repository-desc">{{app_gst.content_org|default_if_none:""|safe}}</div>
+    <div class="large-8 columns repository-desc top-gap">{{app_gst.content_org|default_if_none:""|safe}}</div>
   {% if title == "E-Library" %}
     {% get_filters_data "File" as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
