@@ -542,29 +542,36 @@ def get_metadata_values():
 
 @get_execution_time
 @register.assignment_tag
-def get_attribute_value(node_id, attr, get_data_type=False):
-	try:
-		attr_val = ""
-		node_attr = None
-		if node_id:
-			node = node_collection.one({'_id': ObjectId(node_id) })
-			gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr) })
-			# print "node: ",node.name,"\n"
-			# print "attr: ",gattr.name,"\n"
-			if get_data_type:
-				data_type = gattr.data_type
-			if node and gattr:
-				node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})
+def get_attribute_value(node_id, attr_name, get_data_type=False):
+    cache_key = str(node_id) + 'attribute_value' + str(attr_name)
+    cache_result = cache.get(cache_key)
 
-		# print "\n\n node_attr==",node_attr
-		if node_attr:
-			attr_val = node_attr.object_value
-		# print "attr_val: ",attr_val,"\n"
-		if get_data_type:
-			return {'value': attr_val, 'data_type': data_type}
-		return attr_val
-	except:
-		return attr_val
+    if (cache_key in cache) and not get_data_type:
+        return cache_result
+
+    attr_val = ""
+    node_attr = None
+    if node_id:
+    	# node = node_collection.one({'_id': ObjectId(node_id) })
+    	gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
+
+    	# print "node: ",node.name,"\n"
+    	# print "attr: ",gattr.name,"\n"
+    	if get_data_type:
+    		data_type = gattr.data_type
+    	if gattr: # and node  :
+    		node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node_id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})
+
+    # print "\n\n node_attr==",node_attr
+    if node_attr:
+    	attr_val = node_attr.object_value
+
+    if get_data_type:
+        return result_dict
+
+    cache.set(cache_key, attr_val, 60 * 60)
+    return attr_val
+
 
 @get_execution_time
 @register.assignment_tag
@@ -2216,16 +2223,25 @@ def check_is_gstaff(groupid, user):
   False -- If above criteria is not met (doesn't belongs to any of the category, mentioned above)!
   """
 
+  group_name, group_id = Group.get_group_name_id(groupid)
+  cache_key = 'is_gstaff' + str(group_id) + str(user.id)
+
+  if cache_key in cache:
+    return cache.get(cache_key)
+
   groupid = groupid if groupid else 'home'
+
   try:
-	group_node = Group.get_group_name_id(groupid, get_obj=True)
 
-	if group_node:
-		return group_node.is_gstaff(user)
+    if group_id:
+        group_node = Group.get_group_name_id(groupid, get_obj=True)
+        result = group_node.is_gstaff(user)
+        cache.set(cache_key, result, 60 * 60)
+        return result
 
-	else:
-		error_message = "No group exists with this id ("+str(groupid)+") !!!"
-		raise Exception(error_message)
+    else:
+    	error_message = "No group exists with this id ("+str(groupid)+") !!!"
+    	raise Exception(error_message)
 
   except Exception as e:
     error_message = "\n IsGStaffCheckError: " + str(e) + " \n"
