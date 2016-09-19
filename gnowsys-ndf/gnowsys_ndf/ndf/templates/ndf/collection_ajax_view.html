@@ -113,7 +113,11 @@
                   // csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function(data) {
-                  if (node_type == "Page"){
+                  if (node_type == "Group"){
+                   window.history.pushState("", "", "/{{group_name_tag}}/"+"?selected="+node.id+"");
+                    $(".view_page_link").trigger('click')
+                  }
+                  else if (node_type == "Page"){
                    window.history.pushState("", "", "/{{group_name_tag}}/page/{{node.pk}}"+"?selected="+node.id+"");
                   }
                   else if(node_type == "File"){
