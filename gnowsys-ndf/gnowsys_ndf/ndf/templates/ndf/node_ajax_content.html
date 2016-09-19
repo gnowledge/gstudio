@@ -486,10 +486,18 @@
 
      {% if not topic and not is_group %}
              <div>
+             {% if site.SITE_NAME != "NROER" %}
                <small class="text-gray">
                   [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
                 </small>
                 </br>
+              {% endif %}
+                {% if node.attribute_set.1.source  and site.SITE_NAME == "NROER" %}
+                <small class="text-gray">
+                  [<em>{% trans "Source" %} {{ node.attribute_set.1.source}}</em> ]
+                </small>
+                </br>
+                {% endif %}
           {% if user.is_authenticated %}
 
             {% if node.if_file.mime_type %}

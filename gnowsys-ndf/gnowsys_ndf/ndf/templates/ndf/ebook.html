@@ -11,25 +11,58 @@
 <link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
 <script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
 
-<style>
+
+
+
+{% endblock head %}
+{% block style %}
 .top-gap
 {
-margin-top:15px;
-}
-.theme-panel
-{
-    background-color: #ddd;
-    padding: 0.85rem;
-    margin-top: 1em;
-    border: 1px solid #c3ecfe;
+margin-top:15px !important;
 }
 .filter-body
 {
-margin-top:5px;
+margin-top:5px !important;
 }
-</style>
+  .first-load { display: none; }
 
-{% endblock head %}
+  .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; color: black; }
+  .tabs dd > a, .tabs .tab-title > a {color: #4c4c4c;}
+
+  .tabs dd { width: 100%; }
+
+  .tabs dd a { padding-right: 0; width: 100%; }
+
+  .count { position: absolute; right: 5px; opacity: 0.75; }
+
+  .panel > .side-nav > .tabs i {margin-right: 0.5rem;}
+
+  .tabs-content > .content.active{
+  margin-left:-1px !important;
+  }
+
+
+{% endblock %}
+{% block related_content %}
+  <div class="panel" style="background-color:#ddd; padding: 0.25rem;margin-top:1em">
+    
+    <ul class="side-nav">
+      <dl class="tabs" data-tab >
+
+        <!-- Collections -->
+        <dd>
+          <i class="fi-book"></i>
+                {% trans "eBooks" %}
+            <span class="count">
+               {{all_ebooks.count}}
+            </span>
+        </dd>
+    </ul>
+  </div>
+
+
+
+{% endblock  %}
 
 {% block meta_content %}
 
