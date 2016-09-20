@@ -11,20 +11,23 @@
 <link rel="stylesheet" type="text/css" href="/static/ndf/css/open-sans-bold-font.css">
 <script type="text/javascript" src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"></script>
 
-
-
-
-{% endblock head %}
-{% block style %}
+<style>
 .top-gap
 {
-margin-top:15px !important;
+margin-top:15px;
+}
+.theme-panel
+{
+    background-color: #ddd;
+    padding: 0.85rem;
+    margin-top: 1em;
+    border: 1px solid #c3ecfe;
 }
 .filter-body
 {
-margin-top:5px !important;
+margin-top:5px;
 }
-  .first-load { display: none; }
+.first-load { display: none; }
 
   .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; color: black; }
   .tabs dd > a, .tabs .tab-title > a {color: #4c4c4c;}
@@ -40,9 +43,10 @@ margin-top:5px !important;
   .tabs-content > .content.active{
   margin-left:-1px !important;
   }
+</style>
 
+{% endblock head %}
 
-{% endblock %}
 {% block related_content %}
   <div class="panel" style="background-color:#ddd; padding: 0.25rem;margin-top:1em">
     
@@ -63,6 +67,7 @@ margin-top:5px !important;
 
 
 {% endblock  %}
+
 
 {% block meta_content %}
 
