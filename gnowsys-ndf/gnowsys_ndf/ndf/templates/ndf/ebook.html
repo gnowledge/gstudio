@@ -58,7 +58,9 @@ margin-top:5px;
           <i class="fi-book"></i>
                 {% trans "eBooks" %}
             <span class="count">
-               {{all_ebooks.count}}
+               {% if all_ebooks %}
+                  {{all_ebooks.count}}
+               {% endif %}
             </span>
         </dd>
     </ul>
