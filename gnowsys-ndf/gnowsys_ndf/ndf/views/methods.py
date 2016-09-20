@@ -2216,7 +2216,7 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
             gr_node.relation_type = relationtype._id
             gr_node.right_subject = ObjectId(relation_id)
             gr_node.status = u"PUBLISHED"
-            gr_node.save()
+            gr_node.save(triple_node=relationtype, triple_id=relationtype._id)
 
 
 @get_execution_time
@@ -2581,7 +2581,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 ga_node.status = u"PUBLISHED"
 
             ga_node.object_value = object_value
-            ga_node.save()
+            ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
 
             if object_value == u"None":
                 info_message = " GAttribute (" + ga_node.name + \
@@ -2612,7 +2612,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 old_object_value = ga_node.object_value
 
                 ga_node.status = u"DELETED"
-                ga_node.save()
+                ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
 
                 info_message = " GAttribute (" + ga_node.name + \
                     ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -2659,7 +2659,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 if is_ga_node_changed or ga_node.status == u"DELETED":
                     if ga_node.status == u"DELETED":
                         ga_node.status = u"PUBLISHED"
-                        ga_node.save()
+                        ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
 
 
                         info_message = " GAttribute (" + ga_node.name + \
@@ -2674,7 +2674,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                     else:
                         ga_node.status = u"PUBLISHED"
-                        ga_node.save()
+                        ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
 
                         info_message = " GAttribute (" + \
                             ga_node.name + ") updated successfully.\n"
@@ -2734,7 +2734,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.right_subject = right_subject_id_or_list
 
             gr_node.status = u"PUBLISHED"
-            gr_node.save()
+            gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
 
             gr_node_name = gr_node.name
@@ -2805,7 +2805,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
         def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text):
             gr_node.status = u"PUBLISHED"
-            gr_node.save()
+            gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
+
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
             relation_type_node_inverse_name = relation_type_node.inverse_name
@@ -4318,7 +4319,7 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
         # relation_set field updated -- \n", res
 
         gr_node.status = u"DELETED"
-        gr_node.save()
+        gr_node.save(triple_node=rt_node, triple_id=rt_node._id)
 
 
     try:
