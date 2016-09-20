@@ -10,7 +10,7 @@ except ImportError:  # old pymongo
 
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType
 from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
@@ -22,6 +22,32 @@ class Command(BaseCommand):
       + "(only if they doesn't exists) in your database."
 
   def handle(self, *args, **options):
+    all_grelations = triple_collection.find({'_type': 'GRelation'})
+    all_gattributes = triple_collection.find({'_type': 'GAttribute'})
+    print "\n Working on Triples data. \n Total GRelations found: ", all_grelations.count()
+    print " Total GAttributes found: ", all_gattributes.count()
+    print "\n This will take few minutes. Please wait.."
+    for each_grelation in all_grelations:
+        # print each_grelation
+        print '.',
+        rt_node = each_grelation.relation_type
+        if not isinstance(rt_node, ObjectId):
+            rt_obj = RelationType(db.dereference(rt_node))
+            each_grelation.relation_type = rt_obj._id
+            try:
+                each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+            except Exception as er:
+                print "\n Error Occurred while updating Triples data. ", er
+                pass
+
+    for each_gattribute in all_gattributes:
+        at_node = each_gattribute.attribute_type
+        if not isinstance(at_node, ObjectId):
+            at_obj = AttributeType(db.dereference(at_node))
+            each_gattribute.attribute_type = at_obj._id
+            each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+
+
     # Keep latest changes in field(s) to be added at top
 
     # adding 'if_file' in GSystem instances:
@@ -31,7 +57,6 @@ class Command(BaseCommand):
     #         'mid': {'_id': None, 'relurl': None},
     #         'thumbnail': {'_id': None, 'relurl': None}
     #     },
-
     gsres = node_collection.collection.update({
                     '_type': {'$in': [u'GSystem', u'File', u'Group']},
                     'if_file': {'$exists': False} 
