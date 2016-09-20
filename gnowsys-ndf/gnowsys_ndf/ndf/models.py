@@ -2852,13 +2852,13 @@ class Triple(DjangoDocument):
     subject_type_list = []
     subject_member_of_list = []
     name_value = u""
-
     if self._type == "GAttribute":
+      self.attribute_type = kwargs['triple_node']
       attribute_type_name = self.attribute_type['name']
       attribute_object_value = unicode(self.object_value)
 
       self.name = "%(subject_name)s -- %(attribute_type_name)s -- %(attribute_object_value)s" % locals()
-      name_value = self.name
+      name_value = self.name 
 
       subject_type_list = self.attribute_type['subject_type']
       subject_member_of_list = subject_document.member_of
@@ -2875,8 +2875,10 @@ class Triple(DjangoDocument):
           if set(gst_node.type_of) & set(subject_type_list):
             subject_system_flag = True
             break
+      self.attribute_type = kwargs['triple_id']
 
     elif self._type == "GRelation":
+      self.relation_type = kwargs['triple_node']
       subject_type_list = self.relation_type['subject_type']
       object_type_list = self.relation_type['object_type']
 
@@ -2922,13 +2924,10 @@ class Triple(DjangoDocument):
           # Single relation: ObjectId()
           # Multi relation: [ObjectId(), ObjectId(), ...]
           right_subject_document = node_collection.one({'_id': self.right_subject})
-
           right_subject_member_of_list = right_subject_document.member_of
           right_subject_name = right_subject_document.name
 
           self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
-
-
       name_value = self.name
 
       left_intersection = set(subject_type_list) & set(left_subject_member_of_list)
@@ -2962,6 +2961,8 @@ class Triple(DjangoDocument):
 
         if left_subject_system_flag and right_subject_system_flag:
           subject_system_flag = True
+
+      self.relation_type = kwargs['triple_id']
 
     if self._type =="GRelation" and subject_system_flag == False:
       # print "The 2 lists do not have any common element"
@@ -3029,7 +3030,8 @@ class Triple(DjangoDocument):
 class GAttribute(Triple):
     structure = {
         'attribute_type_scope': basestring,
-        'attribute_type': AttributeType,  # Embedded document of AttributeType Class
+        # 'attribute_type': AttributeType,  # Embedded document of AttributeType Class
+        'attribute_type': ObjectId,  # ObjectId of AttributeType node
         'object_value_scope': basestring,
         'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
@@ -3054,7 +3056,8 @@ class GAttribute(Triple):
 class GRelation(Triple):
     structure = {
         'relation_type_scope': basestring,
-        'relation_type': RelationType,  # DBRef of RelationType Class
+        # 'relation_type': RelationType,  # DBRef of RelationType Class
+        'relation_type': ObjectId,  # ObjectId of RelationType node
         'right_subject_scope': basestring,
         # ObjectId's of GSystems Class / List of list of ObjectId's of GSystem Class
         'right_subject': OR(ObjectId, list)
