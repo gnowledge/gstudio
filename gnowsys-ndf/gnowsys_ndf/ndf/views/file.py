@@ -1528,7 +1528,7 @@ def file_detail(request, group_id, _id):
 
     if auth:
         has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
         #a temp. variable which stores the lookup for append method
         shelves_append_temp=shelves.append
         if shelf:

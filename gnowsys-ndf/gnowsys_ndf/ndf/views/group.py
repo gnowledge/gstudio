@@ -1817,7 +1817,7 @@ def group(request, group_id, app_id=None, agency_type=None):
 #     shelf_list = {}
 
 #     # if auth:
-#     #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+#     #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
 
 #     #   if shelf:
 #     #     for each in shelf:
@@ -1947,7 +1947,7 @@ def group_dashboard(request, group_id=None):
 
       has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
 
-      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
       shelf_list = {}
 
       if shelf:
@@ -1983,7 +1983,7 @@ def group_dashboard(request, group_id=None):
       # grel_id = grel_dict.get("grel_id")
 
   has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
-  all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+  all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_profile_pic_rt._id, 'status': u"DELETED"})
   if all_old_prof_pics:
     for each_grel in all_old_prof_pics:
       n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
@@ -2506,7 +2506,7 @@ def create_sub_group(request,group_id):
           shelf_list = {}
 
           if auth:
-              shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+              shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
 
               if shelf:
                   for each in shelf:

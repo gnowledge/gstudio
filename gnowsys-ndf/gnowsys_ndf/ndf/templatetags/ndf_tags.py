@@ -554,7 +554,7 @@ def get_attribute_value(node_id, attr,get_data_type=False):
 			if get_data_type:
 				data_type = gattr.data_type
 			if node and gattr:
-				node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})
+				node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node._id, 'attribute_type': gattr._id, 'status':"PUBLISHED"})
 
 		# print "\n\n node_attr==",node_attr
 		if node_attr:
@@ -1580,7 +1580,7 @@ def get_resources(node_id,resources):
         AT_educationaluse = node_collection.one({'_type': 'AttributeType', 'name': u'educationaluse'})
         for each in teaches_grelations:
                 obj=node_collection.one({'_id':ObjectId(each.subject)})
-                mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type.$id': AT_educationaluse._id, "subject":each.subject})
+                mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type': AT_educationaluse._id, "subject":each.subject})
                 for k,v in resources.items():
                         if mime_type.object_value == k:
                                 if obj.name not in resources[k]:
@@ -1627,7 +1627,7 @@ def get_contents(node_id, selected=None, choice=None):
 		if (rel_obj._type == "File") or (gst_file._id in rel_obj.member_of):
 			gattr = node_collection.one({'_type': 'AttributeType', 'name': u'educationaluse'})
 			# list_gattr = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id, 'object_value': selected })
-			list_gattr = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id })
+			list_gattr = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id, "subject":rel_obj._id })
 
 			for attr in list_gattr:
 				left_obj = node_collection.one({'_id': ObjectId(attr.subject) })
@@ -2464,7 +2464,7 @@ def get_pandoravideo_metadata(src_id):
 def get_source_id(obj_id):
   try:
     source_id_at = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
-    att_set = triple_collection.one({'_type': 'GAttribute', 'subject': ObjectId(obj_id), 'attribute_type.$id': source_id_at._id})
+    att_set = triple_collection.one({'_type': 'GAttribute', 'subject': ObjectId(obj_id), 'attribute_type': source_id_at._id})
     return att_set.object_value
   except Exception as e:
     return 'null'
@@ -2512,7 +2512,7 @@ def get_object_value(node):
    for each in at_set:
       attribute_type = node_collection.one({'_type':"AttributeType" , 'name':each})
       if attribute_type:
-      	get_att = triple_collection.one({'_type':"GAttribute", 'subject':node._id, 'attribute_type.$id': attribute_type._id})
+      	get_att = triple_collection.one({'_type':"GAttribute", 'subject':node._id, 'attribute_type': attribute_type._id})
       	if get_att:
         	att_name_value[attribute_type.altnames] = get_att.object_value
 
@@ -2677,7 +2677,7 @@ def get_version_of_module(module_id):
 	'''
 	ver_at = node_collection.one({'_type':'AttributeType','name':'version'})
 	if ver_at:
-		attr = triple_collection.one({'_type':'GAttribute','attribute_type.$id':ver_at._id,'subject':ObjectId(module_id)})
+		attr = triple_collection.one({'_type':'GAttribute','attribute_type':ver_at._id,'subject':ObjectId(module_id)})
 		if attr:
 			return attr.object_value
 		else:

@@ -1643,7 +1643,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             relationtype = node_collection.one(
                 {"_type": "RelationType", "name": "teaches"})
             list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
             for relation in list_grelations:
                 # nlist.append(ObjectId(relation.right_subject))
                 relation.delete()
@@ -1665,7 +1665,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             relationtype = node_collection.one(
                 {"_type": "RelationType", "name": "teaches"})
             list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
             for relation in list_grelations:
                 relation.delete()
 
@@ -1680,7 +1680,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             relationtype = node_collection.one(
                 {"_type": "RelationType", "name": "assesses"})
             list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
             for relation in list_grelations:
                 relation.delete()
 
@@ -1701,7 +1701,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             relationtype = node_collection.one(
                 {"_type": "RelationType", "name": "assesses"})
             list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
             for relation in list_grelations:
                 relation.delete()
 
@@ -2197,7 +2197,7 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
     # removes all existing relations given subject and relation type and then
     # creates again.
     triple_collection.collection.remove(
-        {"_type": "GRelation", "subject": subject_id, "relation_type.$id": relationtype._id})
+        {"_type": "GRelation", "subject": subject_id, "relation_type": relationtype._id})
 
     for relation_id in right_subject_id_list:
         create_grelation(
@@ -2213,7 +2213,7 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
 
             gr_node = collection.GRelation()
             gr_node.subject = ObjectId(subject_id)
-            gr_node.relation_type = relationtype
+            gr_node.relation_type = relationtype._id
             gr_node.right_subject = ObjectId(relation_id)
             gr_node.status = u"PUBLISHED"
             gr_node.save()
@@ -2564,14 +2564,14 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
     old_object_value = None
 
     ga_node = triple_collection.one(
-        {'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
+        {'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node._id})
     if ga_node is None:
         # Code for creation
         try:
             ga_node = triple_collection.collection.GAttribute()
 
             ga_node.subject = subject_id
-            ga_node.attribute_type = attribute_type_node
+            ga_node.attribute_type = attribute_type_node._id
 
             if (not object_value) and type(object_value) != bool:
                 object_value = u"None"
@@ -2682,9 +2682,9 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                         # Fetch corresponding document & update it's
                         # attribute_set with proper value
                         node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: {"$exists": True}},
-                                                          {'$set': {
-                                                              'attribute_set.$.' + attribute_type_node.name: ga_node.object_value}},
-                                                          upsert=False, multi=False)
+                                                      {'$set': {
+                                                          'attribute_set.$.' + attribute_type_node.name: ga_node.object_value}},
+                                                      upsert=False, multi=False)
                 else:
                     info_message = " GAttribute (" + ga_node.name + \
                         ") already exists (Nothing updated) !\n"
@@ -2730,7 +2730,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node = triple_collection.collection.GRelation()
 
             gr_node.subject = subject_id
-            gr_node.relation_type = relation_type_node
+            gr_node.relation_type = relation_type_node._id
             gr_node.right_subject = right_subject_id_or_list
 
             gr_node.status = u"PUBLISHED"
@@ -2899,7 +2899,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             # Iterate and find all relationships (including DELETED ones' also)
             nodes = triple_collection.find({
                 '_type': "GRelation", 'subject': subject_id,
-                'relation_type.$id': relation_type_node._id
+                'relation_type': relation_type_node._id
             })
 
             gr_node_list = []
@@ -2963,7 +2963,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                 for nid in right_subject_id_or_list:
                     gr_node = triple_collection.one({
                         '_type': "GRelation", 'subject': subject_id,
-                        'relation_type.$id': relation_type_node._id, 'right_subject': nid
+                        'relation_type': relation_type_node._id, 'right_subject': nid
                     })
 
                     if gr_node is None:
@@ -2997,7 +2997,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node_cur = triple_collection.find({
                 "_type": "GRelation", "subject": subject_id,
-                "relation_type.$id": relation_type_node_id
+                "relation_type": relation_type_node_id
             })
 
             for node in gr_node_cur:
@@ -3322,14 +3322,14 @@ def get_user_task(userObject):
     attributetype_end_time = node_collection.find_one(
         {"_type": 'AttributeType', 'name': 'end_time'})
     attr_assignee = triple_collection.find(
-        {"_type": "GAttribute", "attribute_type.$id": attributetype_assignee._id, "object_value": userObject.username})
+        {"_type": "GAttribute", "attribute_type": attributetype_assignee._id, "object_value": userObject.username})
     for attr in attr_assignee:
         blankdict = {}
         task_node = node_collection.find_one({'_id': attr.subject})
         attr_status = triple_collection.find_one(
-            {"_type": "GAttribute", "attribute_type.$id": attributetype_status._id, "subject": task_node._id})
+            {"_type": "GAttribute", "attribute_type": attributetype_status._id, "subject": task_node._id})
         attr_end_time = triple_collection.find_one(
-            {"_type": "GAttribute", "attribute_type.$id": attributetype_end_time._id, "subject": task_node._id})
+            {"_type": "GAttribute", "attribute_type": attributetype_end_time._id, "subject": task_node._id})
         if attr_status.object_value is not "closed":
             group = node_collection.find_one({"_id": task_node.group_set[0]})
             user = User.objects.get(id=task_node.created_by)
@@ -4282,8 +4282,9 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
     query_for_inverse_relation = OrderedDict()  # Search by right_subject field
 
     def _perform_delete_updates_on_node(gr_node):
-        rel_name = gr_node.relation_type.name
-        inv_rel_name = gr_node.relation_type.inverse_name
+        rt_node = node_collection.one({'_id': ObjectId(gr_node.relation_type)})
+        rel_name = rt_node.name
+        inv_rel_name = rt_node.inverse_name
         subj = gr_node.subject
         right_subj = gr_node.right_subject
 
@@ -5326,7 +5327,7 @@ def replicate_resource(request, node, group_id):
             node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
 
             for each_gattr in node_gattr_cur:
-                at_id = each_gattr['attribute_type']['_id']
+                at_id = each_gattr['attribute_type']
                 obj_val = each_gattr['object_value']
                 at_node = node_collection.one({'_id': ObjectId(at_id)})
                 create_gattribute(new_gsystem._id,at_node,obj_val)
@@ -5341,7 +5342,7 @@ def replicate_resource(request, node, group_id):
 
             relation_dict_rt_key_rs_val = {}
             for each_rel in node_grel_cur:
-                rt_id = each_rel['relation_type']['_id']
+                rt_id = each_rel['relation_type']
                 right_subj = each_rel['right_subject']
                 if rt_id in relation_dict_rt_key_rs_val.keys() :
                     val_list = relation_dict_rt_key_rs_val[rt_id]

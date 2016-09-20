@@ -1932,7 +1932,7 @@ def _get_current_and_old_display_pics(group_obj):
             )
             break
 
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
@@ -1963,7 +1963,7 @@ def course_content(request, group_id):
                 break
 
     has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
 
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
@@ -2006,7 +2006,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
                 break
 
     has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
@@ -2103,7 +2103,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                 break
 
     has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
@@ -2194,7 +2194,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                 break
 
     has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
@@ -2297,7 +2297,7 @@ def course_about(request, group_id):
                 break
 
     has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_banner_pic_rt._id, 'status': u"DELETED"})
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})

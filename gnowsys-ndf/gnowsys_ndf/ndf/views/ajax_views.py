@@ -323,7 +323,7 @@ def shelf(request, group_id):
 
           shelf_R = triple_collection.collection.GRelation()
           shelf_R.subject = ObjectId(auth._id)
-          shelf_R.relation_type = has_shelf_RT
+          shelf_R.relation_type = has_shelf_RT._id
           shelf_R.right_subject = ObjectId(shelf_gs._id)
           shelf_R.save(groupid=group_id)
         else:
@@ -361,7 +361,7 @@ def shelf(request, group_id):
       shelf_list = {}
 
       if auth:
-        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id})
+        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id})
 
         if shelf:
           for each in shelf:
@@ -410,7 +410,7 @@ def drawer_widget(request, group_id):
       elif field == "teaches":
         app = None
         relationtype = node_collection.one({"_type": "RelationType", "name": "teaches"})
-        list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+        list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
         for relation in list_grelations:
           nlist.append(ObjectId(relation.right_subject))
 
@@ -419,7 +419,7 @@ def drawer_widget(request, group_id):
       elif field == "assesses":
         app = field
         relationtype = node_collection.one({"_type": "RelationType", "name": "assesses"})
-        list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+        list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
         for relation in list_grelations:
           nlist.append(ObjectId(relation.right_subject))
 
@@ -623,7 +623,7 @@ def search_drawer(request, group_id):
           if field == "teaches":
             relationtype = node_collection.one({"_type": "RelationType", "name": "teaches"})
             list_grelations = triple_collection.find({
-                "_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id
+                "_type": "GRelation", "subject": node._id, "relation_type": relationtype._id
             })
             for relation in list_grelations:
               nlist.append(ObjectId(relation.right_subject))
@@ -631,7 +631,7 @@ def search_drawer(request, group_id):
           elif field == "assesses":
             relationtype = node_collection.one({"_type": "RelationType", "name": "assesses"})
             list_grelations = triple_collection.find({
-                "_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id
+                "_type": "GRelation", "subject": node._id, "relation_type": relationtype._id
             })
             for relation in list_grelations:
               nlist.append(ObjectId(relation.right_subject))
@@ -1377,7 +1377,7 @@ def sotore_md5_module_set(object_id, module_set_md5):
     if node_at is not None:
         try:
             attr_obj = triple_collection.collection.GAttribute()                #created instance of attribute class
-            attr_obj.attribute_type = node_at
+            attr_obj.attribute_type = node_at._id
             attr_obj.subject = object_id
             attr_obj.object_value = unicode(module_set_md5)
             attr_obj.save()
@@ -1398,7 +1398,7 @@ def create_version_of_module(subject_id, node_id):
     This method will create attribute version_no of module with at type version
     '''
     rt_has_module = node_collection.one({'_type':'RelationType', 'name':'has_module'})
-    relation = triple_collection.find({'_type': 'GRelation', 'subject': node_id, 'relation_type.$id':rt_has_module._id})
+    relation = triple_collection.find({'_type': 'GRelation', 'subject': node_id, 'relation_type':rt_has_module._id})
     at_version = node_collection.one({'_type':'AttributeType', 'name':'version'})
     attr_versions = []
     if relation.count() > 0:
@@ -1407,7 +1407,7 @@ def create_version_of_module(subject_id, node_id):
             if module_id:
                 attr = triple_collection.one({
                     '_type': 'GAttribute', 'subject': ObjectId(module_id.right_subject),
-                    'attribute_type.$id': at_version._id
+                    'attribute_type': at_version._id
                 })
             if attr:
                 attr_versions.append(attr.object_value)
@@ -1416,13 +1416,13 @@ def create_version_of_module(subject_id, node_id):
         attr_versions.sort()
         attr_ver = float(attr_versions[-1])
         attr = triple_collection.collection.GAttribute()
-        attr.attribute_type = at_version
+        attr.attribute_type = at_version._id
         attr.subject = subject_id
         attr.object_value = round((attr_ver+0.1),1)
         attr.save()
     else:
         attr = triple_collection.collection.GAttribute()
-        attr.attribute_type = at_version
+        attr.attribute_type = at_version._id
         attr.subject = ObjectId(subject_id)
         attr.object_value = 1
         attr.save()
@@ -1433,7 +1433,7 @@ def create_relation_of_module(subject_id, right_subject_id):
     rt_has_module = node_collection.one({'_type': 'RelationType', 'name': 'has_module'})
     if rt_has_module and subject_id and right_subject_id:
         relation = triple_collection.collection.GRelation()                         #instance of GRelation class
-        relation.relation_type = rt_has_module
+        relation.relation_type = rt_has_module._id
         relation.right_subject = right_subject_id
         relation.subject = subject_id
         relation.save()
@@ -1445,7 +1445,7 @@ def check_module_exits(module_set_md5):
     This method will check is module already exits ?
     '''
     node_at = node_collection.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]})
-    attribute = triple_collection.one({'_type':'GAttribute', 'attribute_type.$id': node_at._id, 'object_value': module_set_md5})
+    attribute = triple_collection.one({'_type':'GAttribute', 'attribute_type': node_at._id, 'object_value': module_set_md5})
     if attribute is not None:
         return 'True'
     else:
@@ -1767,7 +1767,7 @@ def get_data_for_batch_drawer(request, group_id):
     batch_coll = node_collection.find({"_type": "GSystem", 'member_of':st._id, 'group_set': {'$all': [ObjectId(group_id)]}})
     if node_id:
         rt_has_batch_member = node_collection.one({'_type':'RelationType','name':'has_batch_member'})
-        relation_coll = triple_collection.find({'_type':'GRelation', 'right_subject':ObjectId(node_id), 'relation_type.$id':rt_has_batch_member._id})
+        relation_coll = triple_collection.find({'_type':'GRelation', 'right_subject':ObjectId(node_id), 'relation_type':rt_has_batch_member._id})
         for each in relation_coll:
             dic = {}
             n = triple_collection.one({'_id':ObjectId(each.subject)})
@@ -1965,7 +1965,7 @@ def get_data_for_event_task(request, group_id):
                 GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
                 task_nodes = node_collection.find({"_type": "GSystem", 'member_of':GST_TASK._id, 'group_set': ObjectId(group_id)})
           if groupname._type == "Author":
-                task_nodes = triple_collection.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.id}).sort('last_update',-1)
+                task_nodes = triple_collection.find({"_type":"GAttribute", "attribute_type":attributetype_assignee._id, "object_value":request.user.id}).sort('last_update',-1)
           for attr in task_nodes:
            if groupname._type == "Group":
                task_node = node_collection.one({'_id':attr._id})
@@ -1973,7 +1973,7 @@ def get_data_for_event_task(request, group_id):
                task_node = node_collection.one({'_id':attr.subject})
            if task_node:
                         attr1=triple_collection.find_one({
-                            "_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id,
+                            "_type":"GAttribute", "subject":task_node._id, "attribute_type":attributetype_key1._id,
                             'object_value':{'$gte':task_start,'$lte':task_end}
                          })
                         attr_value={}
@@ -2244,7 +2244,7 @@ def view_articles(request, group_id):
       for every in ref_entry:
 
         id=every._id
-        gst_attribute=triple_collection.one({"_type": "GAttribute", 'subject': ObjectId(every._id), 'attribute_type.$id':ObjectId(GST_one._id)})
+        gst_attribute=triple_collection.one({"_type": "GAttribute", 'subject': ObjectId(every._id), 'attribute_type':ObjectId(GST_one._id)})
         cite=gst_attribute.object_value
         dict1 = {'name': every.name, 'cite': cite}
         list_entry.append(dict1)
@@ -2267,7 +2267,7 @@ def get_author_set_users(request, group_id):
         # course_name = ""
         # rt_has_course = node_collection.one({'_type':'RelationType', 'name':'has_course'})
         # if rt_has_course and node._id:
-        #     course = triple_collection.one({"_type": "GRelation", 'right_subject':node._id, 'relation_type.$id':rt_has_course._id})
+        #     course = triple_collection.one({"_type": "GRelation", 'right_subject':node._id, 'relation_type':rt_has_course._id})
         #     if course:
         #         course_name = node_collection.one({'_id':ObjectId(course.subject)}).name
         if node.created_by == request.user.id:
@@ -3058,20 +3058,20 @@ def set_user_link(request, group_id):
 
           colleges = triple_collection.find({
               '_type': "GRelation", 'subject': node._id,
-              'relation_type.$id': student_belonds_to_college._id
+              'relation_type': student_belonds_to_college._id
           })
 
           for each in colleges:
-            g = triple_collection.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type.$id': has_group._id})
+            g = triple_collection.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type': has_group._id})
             node_collection.collection.update({'_id': g.right_subject}, {'$addToSet': {'author_set': author.created_by}}, upsert=False, multi=False)
 
         elif "Voluntary Teacher" in node_type:
           trainer_of_college = node_collection.one({'_type': "RelationType", 'name': "trainer_of_college"}, {'_id': 1})
 
-          colleges = triple_collection.find({'_type': "GRelation", 'subject': node._id, 'relation_type.$id': trainer_of_college._id})
+          colleges = triple_collection.find({'_type': "GRelation", 'subject': node._id, 'relation_type': trainer_of_college._id})
 
           for each in colleges:
-            g = triple_collection.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type.$id': has_group._id})
+            g = triple_collection.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type': has_group._id})
             node_collection.collection.update({'_id': g.right_subject}, {'$addToSet': {'author_set': author.created_by}}, upsert=False, multi=False)
 
 
@@ -3260,7 +3260,7 @@ def get_districts(request, group_id):
       if rt_district_of:
         cur_districts = triple_collection.find({
             '_type': "GRelation", 'right_subject': ObjectId(state_id),
-            'relation_type.$id': rt_district_of._id
+            'relation_type': rt_district_of._id
         }).sort('name', 1)
 
         if cur_districts.count():

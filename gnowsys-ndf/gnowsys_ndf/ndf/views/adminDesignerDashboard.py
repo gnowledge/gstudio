@@ -228,7 +228,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         if translate:        
             relation_type=node_collection.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
             grelation=node_collection.collection.GRelation()
-            grelation.relation_type=relation_type
+            grelation.relation_type=relation_type._id
             grelation.subject=new_instance_type['_id']
             grelation.right_subject=ObjectId(node_id)
             grelation.name=u""

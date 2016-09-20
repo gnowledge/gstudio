@@ -296,7 +296,7 @@ def data_review_save(request, group_id):
             else:
                 rel_nodes = triple_collection.find({'_type': "GRelation", 
                                       'subject': file_node._id, 
-                                      'relation_type.$id': relation_type_node._id
+                                      'relation_type.': relation_type_node._id
                                     })
                 
                 rel_oid_name = {}

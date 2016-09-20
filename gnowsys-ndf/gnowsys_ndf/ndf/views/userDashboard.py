@@ -199,7 +199,7 @@ def uDashboard(request, group_id):
         user_assigned = []
         attributetype_assignee = node_collection.find_one({"_type":'AttributeType', 'name':'Assignee'})
         attr_assignee = triple_collection.find(
-            {"_type": "GAttribute", "attribute_type.$id": attributetype_assignee._id, "object_value": request.user.id}
+            {"_type": "GAttribute", "attribute_type": attributetype_assignee._id, "object_value": request.user.id}
         ).sort('last_update', -1).limit(10)
         dashboard_count.update({'Task':attr_assignee.count()})
         for attr in attr_assignee :
@@ -240,7 +240,7 @@ def uDashboard(request, group_id):
                     )
                     break
     has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type': has_profile_pic_rt._id, 'status': u"DELETED"})
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
@@ -300,7 +300,7 @@ def user_preferences(request, group_id, auth_id):
                         lst.append(obj);
                 if lst:
                     ga_node = create_gattribute(grp._id, at_user_pref, lst)
-                # gattribute = triple_collection.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_user_pref._id},{'subject':grp._id}]})
+                # gattribute = triple_collection.one({'$and':[{'_type':'GAttribute'},{'attribute_type':at_user_pref._id},{'subject':grp._id}]})
                 # if gattribute:
                 #     gattribute.delete()
                 # if lst:
@@ -340,7 +340,7 @@ def user_template_view(request, group_id):
 
     blank_list = []
     attributetype_assignee = node_collection.find_one({"_type": 'AttributeType', 'name':'Assignee'})
-    attr_assignee = triple_collection.find({"_type": "GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username})
+    attr_assignee = triple_collection.find({"_type": "GAttribute", "attribute_type":attributetype_assignee._id, "object_value":request.user.username})
     for attr in attr_assignee :
      task_node = node_collection.find_one({'_id': attr.subject})
      blank_list.append(task_node)
@@ -422,7 +422,7 @@ def group_dashboard(request, group_id):
     group_obj = node_collection.one({"_id": ObjectId(group_id)})
     has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
 
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_profile_pic_rt._id, 'status': u"DELETED"})
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
