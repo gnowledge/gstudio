@@ -38,7 +38,8 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'ModeratingGroup','meta_type':'factory_types'},
                          {'name':'Info page','meta_type':'factory_types'},
                          {'name':'Blog page','meta_type':'factory_types'},
-                         {'name':'Wiki page','meta_type':'factory_types'}
+                         {'name':'Wiki page','meta_type':'factory_types'},
+                         {'name':'BaseCourseGroup','meta_type':'factory_types'}
                         ]
 
 
@@ -204,7 +205,7 @@ factory_relation_types = [
     },
 
     {'has_profile_pic': {
-            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup'],
+            'subject_type':['Author','Group','ModeratingGroup','CourseEventGroup','ProgramEventGroup','PartnerGroup', 'BaseCourseGroup'],
             'object_type':['Image','File'],
             'inverse_name':'profile_pic_of',
             'meta_type':'factory_types'

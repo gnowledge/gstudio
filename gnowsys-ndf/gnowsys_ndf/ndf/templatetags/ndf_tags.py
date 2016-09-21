@@ -550,7 +550,7 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
         return cache_result
 
     attr_val = ""
-    node_attr = None
+    node_attr = data_type = None
     if node_id:
     	# node = node_collection.one({'_id': ObjectId(node_id) })
     	gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
@@ -567,7 +567,7 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
     	attr_val = node_attr.object_value
 
     if get_data_type:
-        return result_dict
+        return {'value': attr_val, 'data_type': data_type}
 
     cache.set(cache_key, attr_val, 60 * 60)
     return attr_val

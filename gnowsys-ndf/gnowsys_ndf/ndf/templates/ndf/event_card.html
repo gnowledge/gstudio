@@ -5,22 +5,22 @@
 <style type="text/css">
 
   .rating-stars > div {
-      background-image:url("/static/ndf/images/stars.png");
-      height: 17px;
-    }
-    .event-status{
-      font-size: 0.8em;
-      font-weight: bold;
-    }
-    .closed{
-      color: red;
-    }
-    .forthcoming{
-      color: #03a9f4;
-    }
-    .open{
-      color: green;
-    }
+    background-image:url("/static/ndf/images/stars.png");
+    height: 17px;
+  }
+  .event-status{
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+  .closed{
+    color: red;
+  }
+  .forthcoming{
+    color: #03a9f4;
+  }
+  .open{
+    color: green;
+  }
 
 </style>
 
@@ -96,45 +96,61 @@
             {{event_status_msg}}
         {% endif%}
       {% endif%}
-    </div>
+  </div>
+  <!-- Card Notification -->
+    <!-- <div class="event-card-notifications">
+      <span class="badge red" > 2 </span>
+    </div> -->
+  <!-- End Card Notification -->
 
+    <!-- Card Description -->
+
+    <!-- suppy no_description=True for not having description -->
+    {% if not no_description %}
+      <!--div class="event-card-desc" title="{{resource.content_org}}">
+       {#resource.content_org|default_if_none:"Add some description."|truncatechars:75#}
+      </div-->
+    {% endif %}
+    <!-- End Card Description  -->
+    <!-- Card Next Session
     {% comment %}
-    <!-- Card Notification -->
-      <!-- <div class="event-card-notifications">
-        <span class="badge red" > 2 </span>
-      </div> -->
-    <!-- End Card Notification -->
+      {% get_course_session_status resource as event_session_status %}
 
-      <!-- Card Description -->
-
-      <!-- suppy no_description=True for not having description -->
-      {% if not no_description %}
-        <!--div class="event-card-desc" title="{{resource.content_org}}">
-         {#resource.content_org|default_if_none:"Add some description."|truncatechars:75#}
-        </div-->
-      {% endif %}
-    {% endcomment %}
-
-      <!-- End Card Description  -->
-      <!-- Card Next Session -->
-      {# {% get_course_session_status resource as event_session_status %} #}
       <div class="event-card-session-status {{event_status_msg|lower}}">
       {% if event_status_msg == "CLOSED"%}
         No Sessions
 
-        {% comment %}
-          {% elif next_session %}
-          {% get_course_session_status resource as event_session_status %}
-           {% if event_session_status.1 == True %}
-            First
-           {% else %}
-            Next
-           {% endif %}
-           Session
-          <b class="event-time">{{event_session_status.0|date:"d-m-Y"}}</b>
-        {% endcomment %}
+      {% elif next_session %}
 
+        {% get_course_session_status resource as event_session_status %}
+         {% if event_session_status.1 == True %}
+          First
+         {% else %}
+          Next
+         {% endif %}
+         Session
+        <b class="event-time">{{event_session_status.0|date:"d-m-Y"}}</b>
       {% endif %}
+      </div>
+    {% endcomment %}
+    -->
+    <!-- {{resource.author_set|length}}<i class="fa fa-users"></i> -->
+    <!--Event card footer-->
+    <div class="event-card-session-footer">
+
+      {% comment %}
+      <div class="date"><i class="fa fa-calendar-o"></i> Jan 5th,2016 - Mar 4, 2016</div>
+      {% endcomment %}
+      <div class="row collapse">
+        <div class="small-12 columns footer-label">Course Duration</div>
+        <div class="small-12 columns date">
+        {% get_attribute_value resource.pk 'start_time' as course_start_date %}
+        {% get_attribute_value resource.pk 'end_time' as course_end_date %}
+          <i class="fa fa-calendar-o"></i> {{course_start_date|date:"d M Y"}} - {{course_end_date|date:"d M Y"}}
+          {% comment %}
+            <i class="fa fa-pencil-square-o edit-course-duration"></i>
+          {% endcomment %}
+        </div>
       </div>
       <!-- {{resource.author_set|length}}<i class="fa fa-users"></i> -->
       <!--Event card footer-->
