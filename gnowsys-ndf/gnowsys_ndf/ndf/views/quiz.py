@@ -25,7 +25,7 @@ from gnowsys_ndf.ndf.models import QUIZ_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.rcslib import RCS
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls, get_group_name_id, create_thread_for_node

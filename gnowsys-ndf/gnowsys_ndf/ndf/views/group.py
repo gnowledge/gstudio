@@ -30,7 +30,7 @@ from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff # get_existing_groups
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
 # ######################################################################################################################################
@@ -2075,7 +2075,7 @@ def group_dashboard(request, group_id=None):
   '''
   default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
-  if alternate_template: 
+  if alternate_template:
     return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
   else:
     return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,

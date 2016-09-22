@@ -45,7 +45,7 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAP
 from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN
 # from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
@@ -1095,8 +1095,9 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
     node.name=unicode(name)
     # Required to link temporary files with the current user who is modifying this document
     usrname = request.user.username
-    filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
-    node.content = org2html(content_org, file_prefix=filename)
+    # filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
+    # node.content = org2html(content_org, file_prefix=filename)
+    node.content = unicode(content_org)
 
 @get_execution_time
 def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
@@ -1320,11 +1321,14 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         # org editor for wiki page and ckeditor for blog and info pages
         if node_page_type_list:
           if "Wiki page" in node_page_type_list:
-            node.content = unicode(org2html(content_org, file_prefix=filename))
+            # node.content = unicode(org2html(content_org, file_prefix=filename))
+            node.content = unicode(content_org)
+            pass
           else:
             node.content = unicode(content_org)
         else:
-          node.content = unicode(org2html(content_org, file_prefix=filename))
+          # node.content = unicode(org2html(content_org, file_prefix=filename))
+            node.content = unicode(content_org)
         is_changed = True
     '''
 
@@ -3177,9 +3181,10 @@ def discussion_reply(request, group_id, node_id):
             reply_obj.group_set.append(ObjectId(group_id))
 
             reply_obj.content_org = unicode(content_org)
-            filename = slugify(
-                unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
-            reply_obj.content = org2html(content_org, file_prefix=filename)
+            reply_obj.content = unicode(content_org)
+            # filename = slugify(
+            #     unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
+            # reply_obj.content = org2html(content_org, file_prefix=filename)
 
             # saving the reply obj
             reply_obj.save()
@@ -3449,8 +3454,8 @@ def create_task(task_dict, task_type_creation="single"):
                 filename = slugify(
                     task_dict["name"]) + "-" + task_dict["created_by_name"] + "-" + ObjectId().__str__()
                 task_dict_keys.remove("created_by_name")
-                task_node.content = org2html(
-                    task_dict[key], file_prefix=filename)
+                # task_node.content = org2html(task_dict[key], file_prefix=filename)
+                task_node.content = unicode(task_dict[key])
 
             else:
                 task_node[key] = task_dict[key]

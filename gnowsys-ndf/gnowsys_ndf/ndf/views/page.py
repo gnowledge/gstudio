@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem, Triple, Counter, Buddy
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_execution_time,parse_data
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff

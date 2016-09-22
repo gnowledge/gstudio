@@ -24,7 +24,7 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 import datetime
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -49,7 +49,7 @@ def tests(request, group_id):
 	        group_id = str(auth._id)
     else :
 	pass
-	
+
     #print "\n inside meeting \n"
     #print "\ngroup_id: ", group_id,"\n"
 

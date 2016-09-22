@@ -29,7 +29,6 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val,get_userobject
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_forum_twists,get_all_replies
 from gnowsys_ndf.settings import GAPPS
-from gnowsys_ndf.ndf.org2any import org2html
 import StringIO
 import sys
 try:

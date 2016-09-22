@@ -23,7 +23,7 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         nodes = node_collection.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype}).sort('last_update', -1)
     else :
         nodes = node_collection.find({'_type':class_name}).sort('last_update', -1)
-        
+
 
     objects_details = []
     for each in nodes:
@@ -31,18 +31,18 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         member_of_list = []
         collection_list = []
         attribute_type_set = []
-        relation_type_set = [] 
+        relation_type_set = []
         for e in each.member_of:
             member_of_list.append(node_collection.one({'_id':e}).name)
             # member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
-        
+
         for members in each.member_of:
             member.append(node_collection.one({ '_id': members}).name)
             # member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
-        
+
         # for coll in each.collection_set:
         #     collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
-        
+
         if class_name in ("GSystemType"):
             for at_set in each.attribute_type_set:
                 attribute_type_set.append(at_set.name)
@@ -57,7 +57,7 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     group = node_collection.find({'_type':"Group"})
     for each in group:
         groups.append({'id':each._id,"title":each.name})
-    
+
     systemtypes = []
     systemtype = node_collection.find({'_type':"GSystemType"})
     for each in systemtype:
@@ -127,37 +127,38 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         if translate:
             new_instance_type = eval("node_collection.collection"+"."+class_name)()
         for key,value in class_structure.items():
-            
+
             if value == bool:
                 if request.POST.get(key,""):
                     if request.POST.get(key,"") in ('1','2'):
                         if request.POST.get(key,"") == '1':
                             new_instance_type[key] = True
                         else :
-                            new_instance_type[key] = False  
-                            
+                            new_instance_type[key] = False
+
             elif value == unicode:
                 if request.POST.get(key,""):
-                    
+
                     if key == "content_org":
                         new_instance_type[key] = unicode(request.POST.get(key,""))
                         # Required to link temporary files with the current user who is modifying this document
                         usrname = request.user.username
                         filename = slugify(new_instance_type['name']) + "-" + usrname + "-"
-                        new_instance_type['content'] = org2html(new_instance_type[key], file_prefix=filename)
+                        # new_instance_type['content'] = org2html(new_instance_type[key], file_prefix=filename)
+                        new_instance_type['content'] = unicode(new_instance_type[key])
                     else :
                         if translate:
                             if key in ("name","inverse_name"):
                                 new_instance_type[key] = unicode(request.POST.get(key+"_trans",""))
                                 language= request.POST.get('lan')
                                 new_instance_type.language = get_language_tuple(language)
-                                
+
                             else:
                                 new_instance_type[key] = unicode(request.POST.get(key,""))
                         else:
                             new_instance_type[key] = unicode(request.POST.get(key,""))
 
-            elif value == list: 
+            elif value == list:
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"").split(",")
 
@@ -192,7 +193,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
             elif value == datetime.datetime:
                 if key == "last_update":
                     new_instance_type[key] = datetime.datetime.now()
-                
+
             elif key == "status":
                 if request.POST.get(key,""):
                     new_instance_type[key] = unicode(request.POST.get(key,""))
@@ -204,7 +205,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                 if request.POST.get(key,""):
                     new_instance_type[key] = int(request.POST.get(key,""))
 
-            else: 
+            else:
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"")
 
@@ -225,7 +226,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
             new_instance_type.subject_type = parent_node.subject_type
 
         new_instance_type.save()
-        if translate:        
+        if translate:
             relation_type=node_collection.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
             grelation=node_collection.collection.GRelation()
             grelation.relation_type=relation_type
@@ -233,7 +234,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
             grelation.right_subject=ObjectId(node_id)
             grelation.name=u""
             grelation.save()
-            
+
         return HttpResponseRedirect("/admin/designer/"+class_name)
 
 
@@ -249,7 +250,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
             else:
                 # newdict[key] = "unicode"
                 newdict[key] = ["unicode", new_instance_type[key]]
-              
+
         elif value == list:
             # newdict[key] = "list"
             newdict[key] = ["list", new_instance_type[key]]
@@ -267,7 +268,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         elif key == "status":
             # newdict[key] = "status"
             newdict[key] = ["status", new_instance_type[key]]
-        else: 
+        else:
             # newdict[key] = value
             newdict[key] = [value, new_instance_type[key]]
 
@@ -283,20 +284,20 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     variable =  None
     class_structure_with_values = {}
     if node_id:
-        
+
         for key, value in class_structure.items():
             class_structure_with_values[key] = [class_structure[key][0], new_instance_type[key]]
 
 
         variable = RequestContext(request, {'node': new_instance_type,
-                                            'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
-                                            'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
+                                            'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer",
+                                            'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist,
                                             'options': options, 'required_fields': required_fields,"translate":translate,"lan":LANGUAGES,
-                                            'groupid': groupid,'group_id':groupid 
+                                            'groupid': groupid,'group_id':groupid
                                         })
 
     else:
 
         variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid })
-      
+
     return render_to_response(template, variable)
