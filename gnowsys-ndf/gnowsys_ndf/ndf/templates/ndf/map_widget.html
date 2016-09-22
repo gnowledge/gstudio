@@ -42,9 +42,8 @@
 {% endcache %}
 
 <body>
-
 	<div id="map" data-mode="{{mode}}">
-		<input type="hidden" data-map-markers="{{ node.location }}" value="{{location}}" name="map-geojson-data"/>
+		<input type="hidden" data-map-markers='{% firstof location_geo_json node.location %}' value="{{location}}" name="map-geojson-data"/>
 	</div>
 
 	<div style="display:none;">

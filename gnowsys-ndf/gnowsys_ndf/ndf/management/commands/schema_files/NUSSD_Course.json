@@ -1,0 +1,44 @@
+[
+    {
+        "course_code": "FC-MYSB", 
+        "Altnames": "Motivating  Youth for Skill Building", 
+        "Name": "Motivating Youth for Skill Building", 
+        "nussd_course_type": "Foundation Course"
+    }, 
+    {
+        "course_code": "FC-DL", 
+        "Altnames": "Digital Literacy", 
+        "Name": "Digital Literacy", 
+        "nussd_course_type": "Foundation Course"
+    }, 
+    {
+        "course_code": "FC-FL", 
+        "Altnames": "Financial Literacy", 
+        "Name": "Financial Literacy", 
+        "nussd_course_type": "Foundation Course"
+    }, 
+    {
+        "course_code": "FC-LL", 
+        "Altnames": "Legal Literacy", 
+        "Name": "Legal Literacy", 
+        "nussd_course_type": "Foundation Course"
+    }, 
+    {
+        "course_code": "FC-EC", 
+        "Altnames": "English  Communication", 
+        "Name": "English Communication", 
+        "nussd_course_type": "Foundation Course"
+    }, 
+    {
+        "course_code": "FC-WC", 
+        "Altnames": "Working with Communities Leading to a field  Practicum", 
+        "Name": "Working with Communities", 
+        "nussd_course_type": "Foundation Course"
+    }, 
+    {
+        "course_code": "FC-YLPS", 
+        "Altnames": "Youth Leadership & Soft Skills", 
+        "Name": "Youth Leadership and People Skills", 
+        "nussd_course_type": "Foundation Course"
+    }
+]

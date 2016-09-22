@@ -85,6 +85,8 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/feeds', include('gnowsys_ndf.ndf.urls.feeds')),
     (r'^(?P<group_id>[^/]+)/trash',include('gnowsys_ndf.ndf.urls.trash')),
 
+    (r'^(?P<group_id>[^/]+)/type_created',include('gnowsys_ndf.ndf.urls.type_created')),
+
     url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.topics.topic_detail_view', name='topic_details'),
 
     # -- django-json-rpc method calls --

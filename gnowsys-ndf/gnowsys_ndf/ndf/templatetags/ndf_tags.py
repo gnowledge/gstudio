@@ -674,10 +674,9 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_widget.html'):
 	drawer1 = {}
 	drawer2 = None
-	# groupid = ""
-	group_obj = node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
 	admin_related_drawer = True
 
+	group_obj = node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
 	if group_obj:
 		groupid = str(group_obj[0]._id)
 
@@ -751,13 +750,58 @@ def list_widget( fields_name, fields_type, fields_value, template1='ndf/option_w
 	# 	return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid,'groupid': groupid, 'admin_related_drawer': admin_related_drawer }
 
 
+@get_execution_time
+@register.assignment_tag
+@register.inclusion_tag('ndf/admin_fields.html')
+def get_selected_drawer_items_single_dropdown(fields_name,fields_value):
+	fields_selection1 = ["subject_type","language","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
+	drawer2 ={}
+	if fields_name in fields_selection1:
+		fields_value_id_list = []
 
+		if fields_value:
+			for each in fields_value:
+				if type(each) == ObjectId:
+					fields_value_id_list.append(each)
+				else:
+					fields_value_id_list.append(each._id)
 
+		if fields_value_id_list:
+			drawer2 = []
+			for each_id in fields_value_id_list:
+				each_node = node_collection.one({'_id': each_id})
+				if each_node:
+					drawer2.append(each_node)
 
+		return drawer2
 
+	return []
+			
+@get_execution_time
+@register.assignment_tag
+@register.inclusion_tag('ndf/admin_fields.html')
+def get_all_drawer_items_single_dropdown(fields_name,fields_value):
+	fields_selection1 = ["subject_type","language","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
+	fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType","language":"GSystemType"}
+	types = fields[fields_name]
+	drawer1 = {}
+	if fields_name in fields_selection1:
+		if fields_name in ("applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype"):
+			for each in NODE_TYPE_CHOICES:
+				drawer1[each] = each
+		elif fields_name in ("data_type"):
+			for each in DATA_TYPE_CHOICES:
+				drawer1[each] = each
+		elif fields_name in ("language"):
+				drawer1['hi']='hi'
+				drawer1['en']='en'
+				drawer1['mar']='mar'
+		else:
+			drawer = node_collection.find({"_type":types})
+			for each in drawer:
+				drawer1[each]=each	
+	return drawer1
 
-
-	
 @get_execution_time
 @register.assignment_tag
 @register.inclusion_tag('ndf/admin_fields.html')
@@ -781,8 +825,11 @@ def get_all_drawer_items(fields_name,fields_value):
 def get_selected_drawer_items(fields_name,fields_value):
 	drawer2 = None
 	alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
-	fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
-	fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType","language":"GSystemType"}
+	fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of","subject_type"]
+	fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType",
+	 "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES",
+	  "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES",
+	   "type_of": "GSystemType","language":"GSystemType" , "subject_type":"GSystemType" }
 	types = fields[fields_name]
 
 	if fields_name in fields_selection2:
@@ -1905,7 +1952,7 @@ def get_class_list(group_id,class_name):
 def get_class_type_list(group_id,class_name):
 	"""Get list of class 
 	"""
-	class_list = ["GSystemType", "RelationType", "AttributeType"]
+	class_list = ["GSystemType", "RelationType", "AttributeType","GSystem"]
 	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"designer","groupid":group_id}
 
 @get_execution_time
@@ -1972,7 +2019,52 @@ def get_input_fields(fields_type, fields_name, translate=None ):
 	# return {'template': 'ndf/admin_fields.html', 
 	# 				"fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
 	# 				"field_type_list":field_type_list,"translate":translate}
-	
+
+@get_execution_time
+@register.inclusion_tag('ndf/fetch_fields.html')
+def fetch_req_fields(fields_type, fields_name ):
+	'''
+	this ndf tag returns the fields_name and fields_type of the GSystem object
+	for name and altname of the GS
+	'''
+	return {"fields_name":fields_name, "fields_type": fields_type[0] , "fields_value": fields_type[1] }
+
+@get_execution_time
+@register.inclusion_tag('ndf/fetch_fields.html')
+def ats_fields(fields_type, fields_name,groupid,complex_dt,help_text,validators,filled_up=None):
+	'''
+	this ndf tag returns the fields_name and fields_type of the GSystem object -- ats
+	'''
+	fields_value = None
+	if filled_up[1]:
+		for each in filled_up[1]:
+			for value in each:
+				if value == fields_name:
+					fields_value = each[value]
+	regularexp = None
+	for each in validators:
+		regularexp = each
+
+	return {"fields_name":fields_name, "fields_type": fields_type, "fields_value":fields_value ,'groupid':groupid,
+	'complex_dt':complex_dt ,'gs_type':'attribute_set', 'help_text':help_text , 'validators':validators , 'regularexp':regularexp }
+
+@get_execution_time
+@register.inclusion_tag('ndf/fetch_fields.html')
+def rts_fields(fields_name,fields_object_type,groupid,filled_up=None):
+	'''
+	this ndf tag returns the fields_name and fields_type of the GSystem object -- rts
+	'''
+	fields_value = None
+	if filled_up[1]:
+		for each in filled_up[1]:
+			for value in each:
+				if value == fields_name:
+					fields_value = each[value]
+	drawer1 = {}
+	for each in fields_object_type:
+		drawer1[each] = each
+	return {"fields_name":fields_name, "groupid":groupid, "fields_object_type":fields_object_type 
+	,'gs_type':'relation_set' , "fields_value":fields_value , "drawer1":drawer1 }
 
 @get_execution_time
 @register.assignment_tag
@@ -2692,6 +2784,9 @@ def html_widget(groupid, node_id, field):
   field_name (as attribute's name) and field_type (as attribute's data-type)
   """
   # gs = None
+
+
+
   field_value_choices = []
 
   # This field is especially required for drawer-widets to work used in cases of RelationTypes
@@ -2728,7 +2823,8 @@ def html_widget(groupid, node_id, field):
     # field_type = gs.structure[field['name']]
     field_type = field['data_type']
     field_altnames = field['altnames']
-    field_value = field['value']
+    # field_value = field['value']
+    field_value = None
 
     if type(field_type) == IS:
       field_value_choices = field_type._operands
@@ -2772,7 +2868,8 @@ def html_widget(groupid, node_id, field):
 
     elif is_AT_RT_base == "AttributeType":
       is_attribute_field = True
-      is_required_field = field["required"]
+      is_required_field = None
+      # is_required_field = field["required"]
 
     elif is_AT_RT_base == "RelationType":
       is_relation_field = True

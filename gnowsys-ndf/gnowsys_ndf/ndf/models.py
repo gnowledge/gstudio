@@ -816,6 +816,7 @@ class AttributeType(Node):
 	'upload_to': unicode,
 	'path': unicode,
 	'verify_exist': bool,
+    #   raise issue y used 
 	'min_length': int, 
 	'required': bool,
 	'label': unicode,
@@ -827,6 +828,11 @@ class AttributeType(Node):
 
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
+
+    # validators={
+    # 'data_type':x in DATA_TYPE_CHOICES
+    # 'data_type':lambda x: x in DATA_TYPE_CHOICES
+    # }
 
     ##########  User-Defined Functions ##########
 
@@ -947,6 +953,11 @@ class AttributeType(Node):
                         'data_type': eval(dt),
                         'object_value': attr_value
                     }
+
+    def designer_validator(self,object_to_be_validated):
+        # print self.name
+        
+        return None
 
 
 @connection.register

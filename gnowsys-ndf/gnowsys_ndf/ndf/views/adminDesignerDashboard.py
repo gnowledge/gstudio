@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 
 from gnowsys_ndf.settings import LANGUAGES
+from gnowsys_ndf.settings import GSTUDIO_HELP_TIP,GSYSTEMTYPE_DEFINITIONLIST,ATTRIBUTETYPE_DEFINITIONLIST,RELATIONTYPE_DEFINITIONLIST,CONTENTLIST,DEPENDENCYLIST,OPTIONLIST
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import *
 
@@ -32,18 +33,19 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         collection_list = []
         attribute_type_set = []
         relation_type_set = [] 
-        for e in each.member_of:
-            member_of_list.append(node_collection.one({'_id':e}).name)
-            # member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
-        
-        for members in each.member_of:
-            member.append(node_collection.one({ '_id': members}).name)
-            # member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
+        if class_name in ("GSystemType","AttributeType","RelationType") :
+            for e in each.member_of:
+                member_of_list.append(node_collection.one({'_id':e}).name)
+                # member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
+            
+            for members in each.member_of:
+                member.append(node_collection.one({ '_id': members}).name)
+                # member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
         
         # for coll in each.collection_set:
         #     collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
         
-        if class_name in ("GSystemType"):
+        if class_name == "GSystemType" :
             for at_set in each.attribute_type_set:
                 attribute_type_set.append(at_set.name)
                 # attribute_type_set.append(at_set.name+" - "+str(at_set._id))
@@ -52,7 +54,26 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
                 # relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
             objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list), "attribute_type_set":", ".join(attribute_type_set), "relation_type_set":", ".join(relation_type_set)})
         else :
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list)})
+            if class_name in ("AttributeType","RelationType"):      
+                objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list)})
+
+            else:
+                if class_name == "GSystem" :
+                    group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set if node_collection.find_one({"_id":eachgroup}) ]
+                    mem_ty=[]
+                    if each.member_of:
+                        for e in each.member_of:
+                            mem_ty.append(str(e))
+                            # find = node_collection.one({ '_id': ObjectId(e),'_type':"GSystem"})
+                            # find_name = find.name
+                            # member.append(find_name)
+                            # print e,find,"here\n\n"
+                        k = mem_ty[0]
+                    else:
+                        k = None
+                        member = []
+                    objects_details.append({"Id":each._id,"Title":each.name, "Alt_Title":each.altnames, "Mem":k ,"Type":", ".join(member), "collection_list":", ".join(collection_list), "Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at })
+
     groups = []
     group = node_collection.find({'_type':"Group"})
     for each in group:
@@ -71,10 +92,11 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     groupid = ""
     group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
-	groupid = str(group_obj[0]._id)
+        groupid = str(group_obj[0]._id)
+        group_name = group_obj[0].name
 
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"designer","groupid":groupid,'meta_types':meta_types,'group_id':groupid})
+    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"designer","groupid":groupid,'meta_types':meta_types,'group_id':groupid, "group_name":group_name })
     return render_to_response(template, variable)
 
 
@@ -90,24 +112,51 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     contentlist = []
     dependencylist = []
     options = []
+
     translate=request.GET.get('translate','')
     if class_name == "AttributeType":
-        definitionlist = ['name','altnames','language','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        definitionlist = ATTRIBUTETYPE_DEFINITIONLIST
+        contentlist = CONTENTLIST
+        dependencylist = DEPENDENCYLIST
+        options = OPTIONLIST
         # definitionlist = ['name','altnames','language','subject_type','data_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
-        contentlist = ['content_org']
-        dependencylist = ['prior_node']
-        options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
+        # definitionlist = {'name':'Name : ' ,'altnames':'Alternate Name : ' ,'language':'Language : ' ,'subject_type':'Subject Type : ' ,'data_type':'Data Type : ' ,'member_of':'Member of MetaType : ' ,'verbose_name':'Verbose Name : ' ,'null':'Null : ' ,'blank':'Blank : ' ,'help_text':'Help Text : ' ,'max_digits':'Maximum Digits : ' ,'decimal_places':'Decimal Places : ' ,'auto_now':'Auto Now : ' ,'auto_now_add':'Auto Now Add : ' ,'path':'Path : ' ,'verify_exist':'Verify Existence : ' ,'status':'Status : ' }
+        # definitionlist = [{'name':'Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language ' },{'subject_type':'Subject Type '} ,{'data_type':'Data Type '} ,{'member_of':'Member of MetaType ' },{'verbose_name':'Verbose Name '} ,{'null':'Null '} ,{'blank':'Blank '} ,{'help_text':'Help Text ' },{'max_digits':'Maximum Digits ' },{'decimal_places':'Decimal Places ' },{'auto_now':'Auto Now '} ,{'auto_now_add':'Auto Now Add '} ,{'path':'Path '} ,{'verify_exist':'Verify Existence '} ,{'status':'Status ' }]
+        # contentlist = ['content_org']
+        # contentlist = {'content_org':'content organization' }
+        # dependencylist = ['prior_node']
+        # dependencylist = {'prior_node':'Prior Node : ' }
+        # options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
+        # options = {'featured':'Featured : ' ,'created_at':'Created At : ' ,'start_publication':'Start Publication : ' ,'tags':'Tags : ' ,'url':'URL : ' ,'last_update':'Last Update : ' ,'login_required':'Login Required : ' }
     elif class_name == "GSystemType":
-        definitionlist = ['name','altnames','language','status','member_of','meta_type_set','attribute_type_set','relation_type_set','type_of']
-        contentlist = ['content_org']
-        dependencylist = ['prior_node']
-        options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
+        definitionlist = GSYSTEMTYPE_DEFINITIONLIST
+        contentlist = CONTENTLIST
+        dependencylist = DEPENDENCYLIST
+        options = OPTIONLIST
+        # definitionlist = ['name','altnames','language','status','member_of','meta_type_set','attribute_type_set','relation_type_set','type_of']
+        # definitionlist = [{'name':'Name : '} ,{'altnames':'Alternate Name : '} ,{'language':'Language : ' },{'status':'Status : '} ,{'member_of':'Member of MetaType : '} ,{'meta_type_set':'Select the MetaType : ' },{'attribute_type_set':'Select the AttributeType : ' },{'relation_type_set':'Select the RelationType : ' },{'type_of':'Type Of GSystemType : '} ]
+        # definitionlist = {'name':'Name : ' ,'altnames':'Alternate Name : ' ,'language':'Language : ' ,'status':'Status : ' ,'member_of':'Member of MetaType : ' ,'meta_type_set':'Select the MetaType : ' ,'attribute_type_set':'Select the AttributeType : ' ,'relation_type_set':'Select the RelationType : ' ,'type_of':'Type Of GSystemType : ' }
+        # contentlist = ['content_org']
+        # contentlist = {'content_org':'content organization' }
+        # dependencylist = ['prior_node']
+        # dependencylist = {'prior_node':'Prior Node : ' }
+        # options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
+        # options = {'featured':'Featured : ' ,'created_at':'Created At : ' ,'start_publication':'Start Publication : ' ,'tags':'Tags : ' ,'url':'URL : ' ,'last_update':'Last Update : ' ,'login_required':'Login Required : ' }
     elif class_name == "RelationType":
-        definitionlist = ['name','inverse_name','altnames','language','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','is_symmetric','is_reflexive','is_transitive','status','member_of']
+        definitionlist = RELATIONTYPE_DEFINITIONLIST
+        contentlist = CONTENTLIST
+        dependencylist = DEPENDENCYLIST
+        options = OPTIONLIST
+        # definitionlist = ['name','inverse_name','altnames','language','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','is_symmetric','is_reflexive','is_transitive','status','member_of']
+        # definitionlist = [{'name':'Name '} ,{'inverse_name':'Inverse Name '} ,{'altnames':'Alternate Name '} ,{'language':'Language '} ,{'subject_type':'Subject Type '}  ,{'object_type':'Object Type '} ,{'subject_cardinality':'Subject Cardinality '} ,{'object_cardinality':'Object Cardinality '} ,{'subject_applicable_nodetype':'Subject Applicable Node Type '} ,{'object_applicable_nodetype':'Object Applicable Node Type '} ,{'is_symmetric':'Is Symmetric '} ,{'is_reflexive':'Is Reflexive '} ,{'is_transitive':'Is Transitive '} ,{'status':'Status '} ,{'member_of':'Member of MetaType '}]
+        # definitionlist = {'name':'Name : ' ,'inverse_name':'Inverse Name : ' ,'altnames':'Alternate Name : ' ,'language':'Language : ' ,'subject_type':'Subject Type : '  ,'object_type':'Object Type : ' ,'subject_cardinality':'Subject Cardinality : ' ,'object_cardinality':'Object Cardinality : ' ,'subject_applicable_nodetype':'Subject Applicable Node Type : ' ,'object_applicable_nodetype':'Object Applicable Node Type : ' ,'is_symmetric':'Is Symmetric : ' ,'is_reflexive':'Is Reflexive : ' ,'is_transitive':'Is Transitive : ' ,'status':'Status : ' ,'member_of':'Member of MetaType : '}
         # definitionlist = ['name','inverse_name','altnames','language','subject_type','object_type','subject_cardinality','object_cardinality','is_symmetric','is_reflexive','is_transitive','status','member_of']
-        contentlist = ['content_org']
-        dependencylist = ['prior_node']
-        options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
+        # contentlist = ['content_org']
+        # contentlist = {'content_org':'content organization' }
+        # dependencylist = ['prior_node']
+        # dependencylist = {'prior_node':'Prior Node : ' }
+        # options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
+        # options = {'featured':'Featured : ' ,'created_at':'Created At : ' ,'start_publication':'Start Publication : ' ,'tags':'Tags : ' ,'url':'URL : ' ,'last_update':'Last Update : ' ,'login_required':'Login Required : ' }
     else :
         definitionlist = []
         contentlist = []
@@ -116,6 +165,8 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
     class_structure = eval(class_name).structure
     required_fields = eval(class_name).required_fields
+
+    help_tip = GSTUDIO_HELP_TIP
 
     newdict = {}
     if node_id:
@@ -276,7 +327,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     groupid = ""
     group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
-	groupid = str(group_obj[0]._id)
+        groupid = str(group_obj[0]._id)
 
     template = "ndf/adminDashboardCreate.html"
 
@@ -292,11 +343,11 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                                             'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
                                             'options': options, 'required_fields': required_fields,"translate":translate,"lan":LANGUAGES,
-                                            'groupid': groupid,'group_id':groupid 
+                                            'groupid': groupid,'group_id':groupid ,'help_tip':help_tip
                                         })
 
     else:
 
-        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid })
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid, 'help_tip':help_tip })
       
     return render_to_response(template, variable)

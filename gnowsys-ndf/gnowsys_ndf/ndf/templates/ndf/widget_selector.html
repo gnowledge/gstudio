@@ -157,10 +157,7 @@ HOW TO USE
   }
 
 </style>
-
-
 <div class="selector-widget" id="{{for}}-selector-widget">
-
   <div class="row">
     <div class="small-10 medium-12 columns">
       <div class="select-search-container" data-selector-widget-for="{{for}}">
@@ -175,7 +172,7 @@ HOW TO USE
     <div class="small-12 medium-12 medium-centered columns">
       <div class="to-be-selected hide" data-selector-widget-for="{{for}}">
 
-      {% for each_opt in all_options|dictsort:'name' %}
+      {% for each_opt in all_options %}
 
         <div class="item" 
           data-title="{{each_opt.name}}"
@@ -296,6 +293,7 @@ HOW TO USE
     this.classList.remove('traversing-el');
     this.querySelector('.item-description').classList.add('hide');
     selDiv.appendChild(this);
+    // selDiv.replaceChild(this,this);
 
     var closeBtn = document.createElement("i");
     closeBtn.className = "fi-x-circle remove-tag";
@@ -320,6 +318,7 @@ HOW TO USE
     // console.log(selectedItems);
 
     if (selectedItems) { selectedItems.appendChild(selDiv); };
+    // if (selectedItems) { selectedItems.replaceChild(selDiv,selDiv); };
   }
 
   for (var i = sItems.length - 1; i >= 0; i--) {

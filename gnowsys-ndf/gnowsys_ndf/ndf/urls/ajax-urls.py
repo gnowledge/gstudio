@@ -4,7 +4,6 @@ from django.views.generic import TemplateView
 
 from gnowsys_ndf.ndf.views import ajax_views
 
-
 urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',                        
     url(r'^collection/', 'select_drawer', name='select_drawer'),
     url(r'^collectionNav/', 'collection_nav', name='collection_nav'),
@@ -49,7 +48,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^course_create_collection/', 'course_create_collection', name='course_create_collection'),
     url(r'^course_create_note/', 'course_create_note', name='course_create_note'),#create note in gallery and raw material
     
-
                        # Ajax-urls required for MIS --------------------------------
 
     url(r'^get_detailed_report/', 'get_detailed_report', name='get_detailed_report'),
@@ -95,4 +93,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^show_coll_cards/$', 'show_coll_cards', name='show_coll_cards'),
     url(r'^get_visits_count/$', 'get_visits_count', name='get_visits_count'),
 
+    # url for graph display
+
+    url(r'^graph/adminRenderGraph/(?P<node_id>[^/]+)/fetch/(?P<graph_type>[^/]+)$', 'adminRenderGraph', name='adminRenderGraph'),
 )
