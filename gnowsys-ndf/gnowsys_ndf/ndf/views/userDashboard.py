@@ -231,16 +231,17 @@ def uDashboard(request, group_id):
     shelf_list = {}
     show_only_pie = True
 
-    if not profile_pic_image:
+    has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+    get_prof_relation = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"PUBLISHED"})
+    if not profile_pic_image and get_prof_relation.count() != 0:
         if auth:
             for each in auth.relation_set:
                 if "has_profile_pic" in each:
-                    profile_pic_image = node_collection.one(
-                        {'_type': "GSystem", '_id': each["has_profile_pic"][0]}
-                    )
-                    break
-    has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+                        profile_pic_image = node_collection.one(
+                            {'_type': "GSystem", '_id': ObjectId(each["has_profile_pic"][0])}
+                        )
+                        break
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
