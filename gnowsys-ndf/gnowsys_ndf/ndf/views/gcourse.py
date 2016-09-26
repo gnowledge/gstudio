@@ -127,24 +127,26 @@ def course(request, group_id, course_id=None):
 @login_required
 @get_execution_time
 def create_edit(request, group_id, node_id=None):
-    """Creates/Modifies details about the given quiz-item.
+    """Creates/Modifies details of base course group.
     """
+
     try:
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
-    logo_img_node = None
-    grel_id = None
-    fileobj = None
-    at_course_type = node_collection.one({'_type': 'AttributeType', 'name': 'nussd_course_type'})
-    context_variables = {'title': GST_COURSE.name,
-                        'group_id': group_id,
-                        'groupid': group_id
-                    }
+
+    logo_img_node = grel_id = fileobj = None
+    # at_course_type = node_collection.one({'_type': 'AttributeType', 'name': 'nussd_course_type'})
+    context_variables = {
+                    'title': GST_COURSE.name,
+                    'group_id': group_id,
+                    'groupid': group_id
+                }
+
     if node_id:
         course_node = node_collection.one({'_id': ObjectId(node_id)})
         grel_dict = get_relation_value(node_id,'has_logo')
-        is_cursor = grel_dict.get("cursor",False)
+        is_cursor = grel_dict.get("cursor", False)
         if not is_cursor:
             logo_img_node = grel_dict.get("grel_node")
             grel_id = grel_dict.get("grel_id")
@@ -157,12 +159,16 @@ def create_edit(request, group_id, node_id=None):
     else:
         course_node = node_collection.collection.GSystem()
 
-    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(GST_COURSE._id),'group_set': ObjectId(group_id),'status':{"$in":[u"DRAFT",u"PUBLISHED"]}})
+    available_nodes = node_collection.find({
+            '_type': u'GSystem', 'member_of': ObjectId(GST_COURSE._id),
+            'group_set': ObjectId(group_id), 'status': {"$in": [u"DRAFT", u"PUBLISHED"]}
+            },
+            {'_id': 0, 'name': 1}
+        )
 
-    nodes_list = []
-    for each in available_nodes:
-      nodes_list.append(str((each.name).strip().lower()))
-
+    # for each in available_nodes:
+    #     nodes_list.append(str((each.name).strip().lower()))
+    nodes_list = [str((each.name).strip().lower()) for each in available_nodes]
 
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
@@ -180,7 +186,7 @@ def create_edit(request, group_id, node_id=None):
                 # print "\n course_node ---- ", course_node
         if course_node:
             course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, basecoursegroup_gst),groupid=group_id)
-            
+
             # adding thumbnail
             f = request.FILES.get("doc", "")
             # print "\nf is ",f
