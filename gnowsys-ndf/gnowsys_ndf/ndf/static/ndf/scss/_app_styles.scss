@@ -4573,3 +4573,11 @@ course-title{
     text-align:center;
     border: 1px solid #eee;
 }
+.processing-screen{
+  background-color:$theme-color !important;
+}
+
+.processing-screen-label{
+  width:500px !important;
+  font-style: normal !important;
+}
