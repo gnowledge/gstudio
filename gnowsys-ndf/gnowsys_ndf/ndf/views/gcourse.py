@@ -41,9 +41,18 @@ from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, c
 from gnowsys_ndf.notification import models as notification
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
-GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
-gst_file = node_collection.one({'_type': "GSystemType", 'name': u"File"})
-gst_page = node_collection.one({'_type': "GSystemType", 'name': u"Page"})
+course_gst_name, course_gst_id = GSystemType.get_gst_name_id("Course")
+
+# GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+# ann_course_gst_name, ann_course_gst_id = GSystemType.get_gst_name_id("Announced Course")
+
+# gst_file = node_collection.one({'_type': "GSystemType", 'name': u"File"})
+file_gst_name, file_gst_id = GSystemType.get_gst_name_id("File")
+
+# gst_page = node_collection.one({'_type': "GSystemType", 'name': u"Page"})
+page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
+blog_page_gst_name, blog_page_gst_id = GSystemType.get_gst_name_id('Blog page')
+
 has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
 
 app = GST_COURSE
@@ -98,7 +107,7 @@ def course(request, group_id, course_id=None):
         if not gstaff_access:
             query.update({'author_set':{'$ne':int(request.user.id)}})
 
-        course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"}).sort('last_update', -1)
+        course_coll = node_collection.find({'member_of': course_gst_id,'group_set': ObjectId(group_id),'status':u"DRAFT"}).sort('last_update', -1)
         enr_ce_coll = node_collection.find({'member_of': ce_gst_id,'author_set': int(request.user.id),'_id':{'$in': group_obj_post_node_list}}).sort('last_update', -1)
 
         user_access =  user_access_policy(group_id ,request.user)
@@ -124,6 +133,7 @@ def course(request, group_id, course_id=None):
                             context_instance=RequestContext(request)
                             )
 
+
 @login_required
 @get_execution_time
 def create_edit(request, group_id, node_id=None):
@@ -143,6 +153,7 @@ def create_edit(request, group_id, node_id=None):
                     'groupid': group_id
                 }
 
+    course_node = None
     if node_id:
         course_node = node_collection.one({'_id': ObjectId(node_id)})
         grel_dict = get_relation_value(node_id,'has_logo')
@@ -156,11 +167,11 @@ def create_edit(request, group_id, node_id=None):
         #     logo_img_node = logo_img_node_grel_id[0]
         #     grel_id = logo_img_node_grel_id[1]
 
-    else:
-        course_node = node_collection.collection.GSystem()
+    # else:
+    #     course_node = node_collection.collection.GSystem()
 
     available_nodes = node_collection.find({
-            '_type': u'GSystem', 'member_of': ObjectId(GST_COURSE._id),
+            '_type': u'GSystem', 'member_of': ObjectId(course_gst_id),
             'group_set': ObjectId(group_id), 'status': {"$in": [u"DRAFT", u"PUBLISHED"]}
             },
             {'_id': 0, 'name': 1}
@@ -330,9 +341,11 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
     app = None
     if app_id is None:
-        app = node_collection.one({'_type': "GSystemType", 'name': app_name})
+        # app = node_collection.one({'_type': "GSystemType", 'name': app_name})
+        app_gst_name, app_gst_id = GSystemType.get_gst_name_id(app_name)
+
         if app:
-            app_id = str(app._id)
+            app_id = str(app_gst_id)
     else:
         app = node_collection.one({'_id': ObjectId(app_id)})
     # app_set = ""
@@ -741,11 +754,8 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 )
             )
 
-    univ = node_collection.one({
-        '_type': "GSystemType", 'name': "University"
-    }, {
-        '_id': 1
-    })
+    # univ = node_collection.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1 })
+    university_gst_name, university_gst_id = GSystemType.get_gst_name_id('University')
     university_cur = None
 
     if not mis_admin:
@@ -756,9 +766,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
     if tiss_site:
         hide_mis_meta_content = False
-    if univ and mis_admin:
+    if university_gst_id and mis_admin:
         university_cur = node_collection.find(
-            {'member_of': univ._id, 'group_set': mis_admin._id},
+            {'member_of': university_gst_id, 'group_set': mis_admin._id},
             {'name': 1}
         ).sort('name', 1)
 
@@ -826,10 +836,11 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
 
   app = None
   if app_id is None:
-    app = node_collection.one({'_type': "GSystemType", 'name': app_name})
+    # app = node_collection.one({'_type': "GSystemType", 'name': app_name})
+    app_gst_name, app_gst_id = GSystemType.get_gst_name_id(app_name)
 
-    if app:
-      app_id = str(app._id)
+    if app_gst_id:
+      app_id = str(app_gst_id)
   else:
     app = node_collection.one({'_id': ObjectId(app_id)})
 
@@ -1075,9 +1086,10 @@ def create_course_struct(request, group_id, node_id):
 
     course_node = node_collection.one({"_id": ObjectId(node_id)})
 
-    cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSection"})
+    # cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSection"})
+    cs_gst_name, cs_gst_id = GSystemType.get_gst_name_id('CourseSection')
     cs_gs = node_collection.collection.GSystem()
-    cs_gs.member_of.append(cs_gst._id)
+    cs_gs.member_of.append(cs_gst_id)
     property_order_list_cs = get_property_order_with_value(cs_gs)
 
     css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSection"})
@@ -1142,13 +1154,17 @@ def save_course_section(request, group_id):
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
         if "CourseEventGroup" in group_obj.member_of_names_list:
-            cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSectionEvent"})
+            # cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSectionEvent"})
+            cs_gst_name, cs_gst_id = GSystemType.get_gst_name_id('CourseSectionEvent')
+
         else:
-            cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSection"})
+            # cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSection"})
+            cs_gst_name, cs_gst_id = GSystemType.get_gst_name_id('CourseSection')
+
         cs_node_name = request.POST.get("cs_name", '')
         course_node_id = request.POST.get("course_node_id", '')
         cs_new = node_collection.collection.GSystem()
-        cs_new.member_of.append(cs_gst._id)
+        cs_new.member_of.append(cs_gst_id)
         cs_new.name = cs_node_name
         cs_new.modified_by = int(request.user.id)
         cs_new.group_set.append(group_id)
@@ -1192,14 +1208,16 @@ def save_course_sub_section(request, group_id):
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
         if "CourseEventGroup" in group_obj.member_of_names_list:
-            css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSectionEvent"})
+            # css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSectionEvent"})
+            css_gst_name, css_gst_id = GSystemType.get_gst_name_id('CourseSubSectionEvent')
         else:
-            css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSection"})
+            # css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSection"})
+            css_gst_name, css_gst_id = GSystemType.get_gst_name_id('CourseSubSection')
 
         css_node_name = request.POST.get("css_name", '')
         cs_node_id = request.POST.get("cs_node_id", '')
         css_new = node_collection.collection.GSystem()
-        css_new.member_of.append(css_gst._id)
+        css_new.member_of.append(css_gst_id)
         # set name
         css_new.name = css_node_name
         css_new.group_set.append(group_id)
@@ -1365,8 +1383,9 @@ def add_units(request, group_id):
         unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
     except:
         unit_node = None
-    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-    page_instances = node_collection.find({"type_of": page_gst._id})
+    # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    # page_gst_name, page_gst_id = GSystemType.get_gst_name_id('page')
+    page_instances = node_collection.find({"type_of": page_gst_id})
     page_ins_list = [i for i in page_instances]
 
     variable = RequestContext(request, {
@@ -1419,10 +1438,12 @@ def get_resources(request, group_id):
                 if resource_type == "Quiz":
                     resource_type = "QuizItem"
 
-                resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
+                # resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
+                resource_gst_name, resource_gst_id = GSystemType.get_gst_name_id(resource_type)
+
                 res = node_collection.find(
                     {
-                        'member_of': resource_gst._id,
+                        'member_of': resource_gst_id,
                         'status': u"PUBLISHED",
                         '$or':[{'group_set': ObjectId(group_id)},{'contributors': request.user.id}]
                     }
@@ -1482,9 +1503,10 @@ def save_resources(request, group_id):
         except:
             cu_new = None
         if not cu_new:
-            cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnit"})
+            # cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnit"})
+            cu_gst_name, cu_gst_id = GSystemType.get_gst_name_id('CourseUnit')
             cu_new = node_collection.collection.GSystem()
-            cu_new.member_of.append(cu_gst._id)
+            cu_new.member_of.append(cu_gst_id)
             # set name
             cu_new.name = unit_name.strip()
             cu_new.modified_by = int(request.user.id)
@@ -1573,9 +1595,11 @@ def create_edit_unit(request, group_id):
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
         if "CourseEventGroup" in group_obj.member_of_names_list:
-            cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnitEvent"})
+            # cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnitEvent"})
+            cu_gst_name, cu_gst_id = GSystemType.get_gst_name_id('CourseUnitEvent')
         else:
-            cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnit"})
+            # cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnit"})
+            cu_gst_name, cu_gst_id = GSystemType.get_gst_name_id('CourseUnit')
 
         css_node_id = request.POST.get("css_node_id", '')
         unit_node_id = request.POST.get("unit_node_id", '')
@@ -1587,7 +1611,7 @@ def create_edit_unit(request, group_id):
             cu_node = None
         if cu_node is None:
             cu_node = node_collection.collection.GSystem()
-            cu_node.member_of.append(cu_gst._id)
+            cu_node.member_of.append(cu_gst_id)
             # set name
             cu_node.name = unit_name.strip()
             cu_node.modified_by = int(request.user.id)
@@ -1604,7 +1628,6 @@ def create_edit_unit(request, group_id):
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_node._id}}, upsert=False, multi=False)
 
         return HttpResponse(json.dumps(response_dict))
-
 
 
 @login_required
@@ -2018,8 +2041,10 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     allow_to_comment = notebook_obj = None
     template = 'ndf/gcourse_event_group.html'
 
-    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-    blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+    # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    # blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+    # blog_page_gst_name, blog_page_gst_id = GSystemType.get_gst_name_id('Blog page')
+
     thread_node = None
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     '''
@@ -2051,12 +2076,12 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     if request.user.is_authenticated():
         user_id = request.user.id
 
-    blog_pages = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+    blog_pages = node_collection.find({'member_of':gst_page_id, 'type_of': blog_page_gst_id,
      'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
     # print "\n -- blog --",blog_pages.count()
 
     if user_id:
-        user_blogs = node_collection.find({'member_of':page_gst._id, 'type_of': blogpage_gst._id,
+        user_blogs = node_collection.find({'member_of':gst_page_id, 'type_of': blog_page_gst_id,
          'group_set': group_obj._id, 'created_by': user_id },{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
         # print "\n -- user --",user_blogs.count()
 
@@ -2161,10 +2186,10 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         files_cur = node_collection.find({
                                         '_type': {'$in': ["File", "GSystem"]},
                                         '$or': [
-                                                {'member_of': gst_file._id},
+                                                {'member_of': file_gst_id},
                                                 {
                                                     'collection_set': {'$exists': "true",'$not': {'$size': 0} },
-                                                    'member_of': gst_page._id,
+                                                    'member_of': page_gst_id,
                                                 }
                                             ],
                                         'group_set': {'$all': [ObjectId(group_id)]},
@@ -2265,10 +2290,10 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                         'group_set': {'$all': [ObjectId(group_id)]},
                                         'relation_set.clone_of': {'$exists': False},
                                         '$or': [
-                                                {'member_of': gst_file._id},
+                                                {'member_of': file_gst_id},
                                                 {
                                                     'collection_set': {'$exists': True,'$not': {'$size': 0} },
-                                                    'member_of': gst_page._id,
+                                                    'member_of': page_gst_id,
                                                 },
                                             ],
                                             },
@@ -2465,14 +2490,14 @@ def course_filters(request, group_id):
     template = 'ndf/file_list_tab.html'
 
     if title.lower() == "gallery" or title.lower() == "raw material":
-        file_gst = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
+        # file_gst = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
         # query.update({'_type': "File"})
-        query.update({'member_of': file_gst._id})
+        query.update({'member_of': gst_file_id})
 
     elif title.lower() == "notebook":
-        page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-        blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-        query.update({'member_of':page_gst._id, 'type_of': blogpage_gst._id})
+        # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+        # blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+        query.update({'member_of':gst_page_id, 'type_of': blog_page_gst_id})
         notebook_filter = True
         no_url_flag = False
         detail_urlname = "course_notebook_tab_note"
@@ -2850,13 +2875,13 @@ def course_analytics_admin(request, group_id):
     from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
 
     gst_page = node_collection.one({'_type': 'GSystemType', 'name': u'Page'})
-    gst_page_id = gst_page._id
+    gst_page_id = page_gst_id
 
     gst_blog = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
     gst_blog_id = gst_blog._id
 
     gst_file = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
-    gst_file_id = gst_file._id
+    gst_file_id = file_gst_id
 
     gst_reply = node_collection.one({'_type': "GSystemType", 'name': "Reply"})
     gst_reply_id = gst_reply._id
