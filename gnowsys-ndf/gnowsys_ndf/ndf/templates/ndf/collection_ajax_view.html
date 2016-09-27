@@ -21,8 +21,8 @@
 
     function TreeTillNode () {
       // This gives the last hierarchy node id from browser url.
-      // var url = window.location.search.replace("?selected=", "")
-      url = "{{selected}}";
+      var url = window.location.search.replace("?selected=", "")
+      // url = "{{selected}}";
 
       // Condition to check whether the tree has been loaded on the page completely or not before attempting any function on tree(such as 'getNodeById')
       if (url && $(".collection").not(".jqtree-loading").length > 0){
@@ -122,7 +122,6 @@
                   
                   if (node_type == "Group"){
                    window.history.pushState("", "", "/{{group_name_tag}}/"+"?selected="+node.id+"");
-                    $(".view_page_link").trigger('click')
                   }
                   else if (node_type == "Page"){
                    window.history.pushState("", "", "/{{group_name_tag}}/page/{{node.pk}}"+"?selected="+node.id+"");
