@@ -541,7 +541,7 @@ def parse_data_create_gsystem(json_file_path):
             thumbnail_url = parsed_json_document.get('thumbnail')
             # print "thumbnail_url : ", thumbnail_url
 
-            if thumbnail_url and nodeid:
+            if (thumbnail_url and nodeid) and (thumbnail_url != parsed_json_document.get('thumbnail') ):
                 try:
                     info_message = "\n\n- Attaching thumbnail to resource\n"
                     log_print(info_message)
@@ -551,8 +551,15 @@ def parse_data_create_gsystem(json_file_path):
                     print e
 
             # print type(nodeid), "-------", nodeid, "\n"
+            if (thumbnail_url == parsed_json_document.get('resource_link')) and (warehouse_group._id in node_obj.group_set) :
+                for i,each_groupid in enumerate(node_obj.group_set):
+                    if each_groupid == warehouse_group._id:
+                        node_obj.group_set.pop(i)
+                if home_group._id not in node_obj.group_set:
+                    node_obj.group_set.append(home_group._id)
+                node_obj.save()
 
-            # create thread node
+        # create thread node
             if isinstance(nodeid, ObjectId):
                 thread_result = create_thread_obj(nodeid)
 
@@ -828,6 +835,7 @@ def create_thread_obj(node_id):
 
 def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
     # fetching resource from url
+    
     resource_link = resource_data.get("resource_link")  # actual download file link
     resource_link = resource_link.replace(' ', '%20')
 

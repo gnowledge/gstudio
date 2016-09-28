@@ -27899,3 +27899,14 @@ course-title {
   text-align: center;
   border: 1px solid #eee;
 }
+
+/* line 4576, ../../../scss/_app_styles.scss */
+.processing-screen {
+  background-color: #0eacb5 !important;
+}
+
+/* line 4580, ../../../scss/_app_styles.scss */
+.processing-screen-label {
+  width: 500px !important;
+  font-style: normal !important;
+}
