@@ -19,9 +19,10 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE, GSTUDIO_SITE_NAME, GSTUDIO_USER_GAPPS_LIST
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
+from mongokit import paginator
 
-from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
+# from gnowsys_ndf.ndf.models import *
+# from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
 
@@ -231,16 +232,17 @@ def uDashboard(request, group_id):
     shelf_list = {}
     show_only_pie = True
 
-    if not profile_pic_image:
+    has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+    get_prof_relation = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"PUBLISHED"})
+    if not profile_pic_image and get_prof_relation.count() != 0:
         if auth:
             for each in auth.relation_set:
                 if "has_profile_pic" in each:
-                    profile_pic_image = node_collection.one(
-                        {'_type': "GSystem", '_id': each["has_profile_pic"][0]}
-                    )
-                    break
-    has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
-    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+                        profile_pic_image = node_collection.one(
+                            {'_type': "GSystem", '_id': ObjectId(each["has_profile_pic"][0])}
+                        )
+                        break
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
@@ -443,6 +445,11 @@ def group_dashboard(request, group_id):
                         banner_pic = node_collection.one(
                             {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_Banner_pic"][0]}
                         )
+                if ("has_thumbnail" in each) and each["has_thumbnail"]:
+                        banner_pic = node_collection.one(
+                            {'_type': {"$in": ["GSystem", "File"]}, '_id': each["has_thumbnail"][0]}
+                        )
+
     # Approve StudentCourseEnrollment view
     approval = False
     enrollment_details = []
@@ -607,6 +614,7 @@ def upload_prof_pic(request, group_id):
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
         file_uploaded = request.FILES.get("filehive", "")
         pic_rt = request.POST.get("pic_rt", "")
+        node_id = request.POST.get("node_id", "")
         # print "\n\n pic_rt === ", pic_rt
         has_profile_or_banner_rt = None
         if pic_rt == "is_banner":
@@ -614,6 +622,9 @@ def upload_prof_pic(request, group_id):
         elif pic_rt == "is_profile":
             has_profile_or_banner_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
 
+        if pic_rt == "is_thumbnail":
+            # print "================================"
+            has_profile_or_banner_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_thumbnail') })
         choose_from_existing_pic = request.POST.get("old_pic_ele","")
 
         warehouse_grp_obj = node_collection.one({'_type': "Group", 'name': "warehouse"})
@@ -624,8 +635,13 @@ def upload_prof_pic(request, group_id):
             if fileobj:
                 profile_pic_image = node_collection.one({'_id': ObjectId(gs_obj_id)})
                 # The 'if' below is required in case file node is deleted but exists in grid_fs
-                if profile_pic_image:
+                if profile_pic_image and not node_id:
                     gr_node = create_grelation(group_obj._id, has_profile_or_banner_rt, profile_pic_image._id)
+                    # Move fileobj to "Warehouse" group
+                    node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
+                elif node_id:
+                    # print "-----------------------------------------------------------------",node_id
+                    gr_node = create_grelation(ObjectId(node_id), has_profile_or_banner_rt, profile_pic_image._id)
                     # Move fileobj to "Warehouse" group
                     node_collection.collection.update({'_id': profile_pic_image._id}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
                 else:
@@ -642,6 +658,7 @@ def upload_prof_pic(request, group_id):
         if user:
             group_id = user
         return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
+
 
 def my_courses(request, group_id):
 
@@ -671,26 +688,43 @@ def my_courses(request, group_id):
         )
 
 
-def my_groups(request, group_id):
+def my_groups(request, group_id,page_no=1):
 
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     # if request.user == 'AnonymousUser':
         # raise 404
 
     try:
-        auth_obj = get_group_name_id(group_id, get_obj=True)
+        auth = get_group_name_id(group_id, get_obj=True)
 
     except:
         user_id = eval(group_id)
-        auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
+        auth = node_collection.one({'_type': "Author", 'created_by': user_id})
+    usrid = auth.created_by
+    current_user = usrid
+    if current_user:
+        exclued_from_public = ""
+        if int(current_user) == int(usrid):
+          Access_policy=["PUBLIC","PRIVATE"]
+        if int(current_user) != int(usrid):
+          Access_policy=["PUBLIC"]
+    else:
+          Access_policy=["PUBLIC"]
+          exclued_from_public =  ObjectId(task_gst._id)
 
-    auth_id = auth_obj._id
+    group_cur = node_collection.find(
+        {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy},
+        '$or': [{'group_admin': int(usrid)}, {'author_set': int(usrid)}]}).sort('last_update', -1)
+    group_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+
+    auth_id = auth._id
     title = 'My Groups'
 
     return render_to_response('ndf/my-groups.html',
                 {
-                    'group_id': auth_id, 'groupid': auth_id,
-                    'node': auth_obj,
-                    'title': title
+                    'group_id': group_id, 'groupid': group_id,
+                    'node': auth,
+                    'title': title,'group_cur':group_cur,'group_page_cur':group_page_cur
                 },
                 context_instance=RequestContext(request)
         )
@@ -702,19 +736,25 @@ def my_dashboard(request, group_id):
     user_obj = User.objects.get(pk=int(user_id))
     auth_obj = node_collection.one({'_type': "Author", 'created_by': user_id})
     auth_id = auth_obj._id
-    t0 = time.time()
     title = 'My Dashboard'
 
     cmnts_rcvd_by_user = 0
-    analytics_instance = AnalyticsMethods(request, user_id,user_obj.username, auth_id)
+    analytics_instance = AnalyticsMethods(user_id, user_obj.username, auth_id)
+
     users_points = analytics_instance.get_users_points()
-    total_cmnts_by_user = analytics_instance.get_total_comments_by_user(site_wide=True)
+
+    # total_cmnts_by_user = analytics_instance.get_total_comments_by_user(site_wide=True)
+    total_cmnts_by_user = Author.get_total_comments_by_user(user_id, site_wide=True)
+
     cmts_on_user_notes = analytics_instance.get_comments_counts_on_users_notes(False, site_wide=True)
     cmts_on_user_files = analytics_instance.get_comments_counts_on_users_files(False, site_wide=True)
-    if cmts_on_user_notes and cmts_on_user_files:
+
+    if cmts_on_user_notes or cmts_on_user_files:
         cmnts_rcvd_by_user = cmts_on_user_notes + cmts_on_user_files
+
     groups_cur = analytics_instance.get_user_joined_groups()
     my_course_objs = get_user_course_groups(user_id)
+
     del analytics_instance
 
     return render_to_response('ndf/my_dashboard.html',

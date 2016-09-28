@@ -41,6 +41,8 @@
   <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}">
 {% elif first_arg %}
   <a href='{% url url_name first_arg %}{{search_url_text|safe}}'>
+{% else %}
+  <a href='{% url url_name  %}{{search_url_text|safe}}'>
 {% endif %}
 {% endif %}
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
@@ -50,6 +52,8 @@
     {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
     {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
         <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
+    {% elif grel_dict.grel_node.if_file.thumbnail.relurl and  'video' or "File" in resource.if_file.mime_type %}
+        <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}">
     {% elif resource.if_file.thumbnail.relurl and 'video' in resource.if_file.mime_type %}
         <img src="{{MEDIA_URL}}{{resource.if_file.thumbnail.relurl}}">
     {% elif resource.if_file.mid.relurl %}
@@ -114,8 +118,9 @@
 
     <!-- suppy no_description=True for not having description -->
     {% if not no_description %}
-      <div class="scard-desc" title="{{resource.content_org}}">
-       {{resource.content|safe|striptags|default_if_none:"Add some description."|truncatechars:50}}
+      <div class="scard-desc" title="{% firstof resource.content|safe|striptags resource.content_org|safe|striptags %}">
+      {% firstof resource.content|safe|striptags|truncatechars:50 resource.content_org|safe|striptags|truncatechars:50 %}
+       
       </div>
     {% endif %}
 </div>

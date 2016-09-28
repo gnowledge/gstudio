@@ -9,9 +9,8 @@ benchmark_collection = db[Benchmark.collection_name]
 class AnalyticsMethods(object):
 	# print "=== Class Defination === "
 
-	def __init__(self, request, user_id, username, group_id):
+	def __init__(self, user_id, username, group_id):
 		super(AnalyticsMethods, self).__init__()
-		self.request = request
 		self.group_id = group_id
 		self.group_obj = node_collection.one({'_id': ObjectId(self.group_id)})
 		self.user_id = user_id
@@ -216,8 +215,8 @@ class AnalyticsMethods(object):
 		else:
 			return 0
 
-	def get_user_notes_count(self, return_cur_obj=False, site_wide=False):
 
+	def get_user_notes_count(self, return_cur_obj=False, site_wide=False):
 
 		# if not hasattr(self,'user_notes_cur'):
 		if not hasattr(self,"blog_page_gst") and not hasattr(self,"page_gst"):
@@ -231,18 +230,15 @@ class AnalyticsMethods(object):
 		# else:
 		# 	self.user_notes_cur.rewind()
 		if return_cur_obj:
-
-
 			return self.user_notes_cur
-
 
 		if self.user_notes_cur:
 			return self.user_notes_cur.count()
 		else:
 			return 0
 
-	def get_comments_counts_on_users_notes(self, return_cur_obj=False, site_wide=False):
 
+	def get_comments_counts_on_users_notes(self, return_cur_obj=False, site_wide=False):
 
 		if site_wide:
 			self.user_notes_cur = self.get_user_notes_count(True, True)
@@ -333,6 +329,66 @@ class AnalyticsMethods(object):
 
 		return len(commentors_ids)
 
+
+	def get_commented_unique_users_dict(self, for_notes=False,for_files=False):
+
+		notes_or_files_cur = None
+		commentors_ids = {}
+
+		'''
+		# APPROACH 1
+		if for_notes:
+			if not hasattr(self,"user_notes_cur"):
+				notes_or_files_cur = self.get_user_notes_count(True)
+			else:
+				notes_or_files_cur = self.user_notes_cur.rewind()
+		elif for_files:
+			if not hasattr(self,"user_files_cur"):
+				notes_or_files_cur = self.get_user_files_count(True)
+			else:
+				notes_or_files_cur = self.user_files_cur.rewind()
+
+		twist_gst = node_collection.one({'_type': "GSystemType", 'name': 'Twist'})
+		user_notes_or_files_cur_ids = []
+
+		for each_note_or_file in notes_or_files_cur:
+			if each_note_or_file.relation_set:
+				for each_note_or_file_rel in each_note_or_file.relation_set:
+					if each_note_or_file_rel and 'has_thread' in each_note_or_file_rel:
+						user_notes_or_files_cur_ids.append(each_note_or_file_rel['has_thread'][0])
+
+		user_notes_or_files_threads_cur = node_collection.find({'member_of': twist_gst._id, '_id': {'$in': user_notes_or_files_cur_ids}})
+		for each_thread in user_notes_or_files_threads_cur:
+			commentors_ids.extend(each_thread.author_set)
+		if commentors_ids:
+			commentors_ids = set(list(commentors_ids))
+
+
+		return len(commentors_ids)
+
+		'''
+		# APPROACH 2
+
+		if for_notes:
+			if not hasattr(self,"all_comments_on_user_notes"):
+				notes_or_files_cur = self.get_comments_counts_on_users_notes(True)
+			else:
+				notes_or_files_cur = self.all_comments_on_user_notes.rewind()
+		if for_files:
+			if not hasattr(self,"all_comments_on_user_files"):
+				notes_or_files_cur = self.get_comments_counts_on_users_files(True)
+			else:
+				notes_or_files_cur = self.all_comments_on_user_files.rewind()
+		for each_note_file_cmt in notes_or_files_cur:
+			if str(each_note_file_cmt.created_by) in commentors_ids.keys() :
+				commentors_ids[str(each_note_file_cmt.created_by)] += 1
+			else :
+				commentors_ids[str(each_note_file_cmt.created_by)] = 1
+
+
+		return commentors_ids
+
+
 	def get_total_files_count(self):
 
 
@@ -347,7 +403,6 @@ class AnalyticsMethods(object):
 			return 0
 
 	def get_user_files_count(self, return_cur_obj=False, site_wide=False):
-
 
 		if not hasattr(self,"file_gst"):
 			self.file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"},{'_id': 1})
@@ -686,3 +741,96 @@ class AnalyticsMethods(object):
 
 		groups_cur = node_collection.find({'_type': "Group", 'author_set': self.user_id})
 		return groups_cur
+
+	def get_ratings_counts_received_on_files(self):
+
+		total_rating = 0
+		unique_user_list = []
+
+		if not hasattr(self,"file_gst"):
+			self.file_gst = node_collection.one({'_type': "GSystemType", 'name': "File"},{'_id': 1})
+		rcvd_files_ratings_query = {'member_of': self.file_gst._id, 'created_by': self.user_id, 'group_set': self.group_obj._id,
+		'created_by': self.user_id }
+		all_files = node_collection.collection.aggregate([
+						{ "$match": rcvd_files_ratings_query },
+						{ "$unwind": "$rating" },
+						{ "$group": { "_id": None, "count": { "$sum": 1 }, "rating": { "$addToSet": "$rating" } } }
+					])
+		if 'result' in all_files:
+			result = all_files['result']
+			if result:
+				cnt = result[0]['count']
+				rating_list = result[0]['rating']
+				for rdict in rating_list:
+					total_rating += rdict['score']
+					if rdict['user_id'] not in unique_user_list:
+						unique_user_list.append(rdict['user_id'])
+
+ 		return total_rating
+
+ 	def get_ratings_counts_received_on_notes(self):
+
+		total_rating = 0
+		unique_user_list = []
+		if not hasattr(self, 'page_gst'):
+			self.page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"},{'_id': 1})
+		if not hasattr(self, 'blog_page_gst'):
+			self.blog_page_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"},{'_id': 1})
+		rcvd_notes_ratings_query = {'member_of': self.page_gst._id,'type_of': self.blog_page_gst._id,'group_set': self.group_obj._id,
+				'created_by': self.user_id }
+		# print "\n\nrcvd_notes_ratings_query", rcvd_notes_ratings_query
+
+		all_notes = node_collection.collection.aggregate([
+						{ "$match": rcvd_notes_ratings_query },
+						{ "$unwind": "$rating" },
+						{ "$group": { "_id": None, "count": { "$sum": 1 }, "rating": { "$addToSet": "$rating" } } }
+					])
+		if 'result' in all_notes:
+			result = all_notes['result']
+			if result:
+				cnt = result[0]['count']
+				rating_list = result[0]['rating']
+				for rdict in rating_list:
+					total_rating += rdict['score']
+					if rdict['user_id'] not in unique_user_list:
+						unique_user_list.append(rdict['user_id'])
+
+
+		# return avg_rating_notes,len(unique_user_list)
+		return total_rating
+
+	def get_total_comments_for_user(self,return_cur_obj=False,site_wide=False):
+
+		if site_wide:
+			self.user_notes_cur = self.get_user_notes_count(True, True)
+			self.user_files_cur = self.get_user_files_count(True, True)
+	 	else:
+	 		self.user_notes_cur = self.get_user_notes_count(True)
+	 		self.user_files_cur = self.get_user_files_count(True)
+
+	 	user_notes_cur_ids = [each_user_note._id for each_user_note in self.user_notes_cur]
+	 	user_files_cur_ids = [each_user_file._id for each_user_file in self.user_files_cur]
+
+	 	if not hasattr(self, "reply_gst"):
+	 		self.reply_gst = node_collection.one({'_type': "GSystemType", 'name': "Reply"},{'_id': 1})
+
+	 	list_of_dict_notes = []
+	 	list_of_dict_files = []
+	 	for each_user_note_id in user_notes_cur_ids:
+	 		list_of_dict_notes.append({'prior_node_id_of_thread': ObjectId(each_user_note_id)})
+	 	for each_user_file_id in user_files_cur_ids:
+	 		list_of_dict_files.append({'prior_node_id_of_thread': ObjectId(each_user_file_id)})
+
+	 	self.all_comments_on_user_notes = node_collection.find({'member_of': self.reply_gst._id, 'origin': {'$in': list_of_dict_notes}},{'_id': 1, 'created_by': 1})
+	 	self.all_comments_on_user_files = node_collection.find({'member_of': self.reply_gst._id, 'origin': {'$in': list_of_dict_files}},{'_id': 1, 'created_by': 1})
+	 	if return_cur_obj:
+
+
+
+	 		return self.all_comments_on_user_notes + self.all_comments_on_user_files
+
+
+	 	if self.all_comments_on_user_notes or self.all_comments_on_user_files:
+	 		return self.all_comments_on_user_notes.count() + self.all_comments_on_user_files.count()
+	 	else:
+	 		return 0

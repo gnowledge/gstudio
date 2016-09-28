@@ -499,27 +499,27 @@ def parse_data_create_gsystem(json_file_path):
             # print "nodeid : ", nodeid
 
             # ----- for updating language -----
-            node_lang = get_language_tuple(eval(parsed_json_document['language']))
+            # node_lang = get_language_tuple(eval(parsed_json_document['language']))
             # print "============= :", node_lang
             # print "============= lang :", node_obj.language
 
-            if node_obj and node_obj.language != node_lang:
+            # if node_obj and node_obj.language != node_lang:
 
-                update_res = node_collection.collection.update(
-                                    {'_id': ObjectId(nodeid), 'language': {'$ne': node_lang}},
-                                    {'$set': {'language': node_lang}},
-                                    upsert=False,
-                                    multi=False
-                                )
+            #     update_res = node_collection.collection.update(
+            #                         {'_id': ObjectId(nodeid), 'language': {'$ne': node_lang}},
+            #                         {'$set': {'language': node_lang}},
+            #                         upsert=False,
+            #                         multi=False
+            #                     )
 
-                if update_res['updatedExisting']:
-                    node_obj.reload()
+            #     if update_res['updatedExisting']:
+            #         node_obj.reload()
 
-                    info_message = "\n\n- Update to language of resource: " + str(update_res)
-                    log_print(info_message)
+            #         info_message = "\n\n- Update to language of resource: " + str(update_res)
+            #         log_print(info_message)
 
-                    info_message = "\n\n- Now language of resource updates to: " + str(node_obj.language)
-                    log_print(info_message)
+            #         info_message = "\n\n- Now language of resource updates to: " + str(node_obj.language)
+            #         log_print(info_message)
                 # print "============= lang :", node_obj.language
 
             # ----- END of updating language -----
@@ -542,7 +542,7 @@ def parse_data_create_gsystem(json_file_path):
             thumbnail_url = parsed_json_document.get('thumbnail')
             # print "thumbnail_url : ", thumbnail_url
 
-            if thumbnail_url and nodeid:
+            if (thumbnail_url and nodeid) and (thumbnail_url != parsed_json_document.get('thumbnail') ):
                 try:
                     info_message = "\n\n- Attaching thumbnail to resource\n"
                     log_print(info_message)
@@ -552,8 +552,15 @@ def parse_data_create_gsystem(json_file_path):
                     print e
 
             # print type(nodeid), "-------", nodeid, "\n"
+            if (thumbnail_url == parsed_json_document.get('resource_link')) and (warehouse_group._id in node_obj.group_set) :
+                for i,each_groupid in enumerate(node_obj.group_set):
+                    if each_groupid == warehouse_group._id:
+                        node_obj.group_set.pop(i)
+                if home_group._id not in node_obj.group_set:
+                    node_obj.group_set.append(home_group._id)
+                node_obj.save()
 
-            # create thread node
+        # create thread node
             if isinstance(nodeid, ObjectId):
                 thread_result = create_thread_obj(nodeid)
 
@@ -829,8 +836,8 @@ def create_thread_obj(node_id):
 
 
 def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
-
     # fetching resource from url
+    
     resource_link = resource_data.get("resource_link")  # actual download file link
     resource_link = resource_link.replace(' ', '%20')
 
@@ -869,9 +876,12 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
 
     name = unicode(resource_data["name"])  # name to be given to gsystem
     userid = resource_data["created_by"]
-    content_org = resource_data["content_org"]
+    # content_org = resource_data["content_org"]
     tags = resource_data["tags"]
-    language = get_language_tuple(eval(resource_data['language']))
+    if resource_data['language']:
+        language = get_language_tuple(eval(resource_data['language']))
+    else:
+        language = ('en', 'English')
     group_set_id = ObjectId(group_set_id) if group_set_id else home_group._id
 
     img_type = None
@@ -910,7 +920,6 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
 
         return None
 
-
     else:  # creating new resource/file-gsystem
 
         info_message = "\n- Creating resource: " + str(resource_data["name"])
@@ -923,7 +932,7 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
 
         file_gs_obj.fill_gstystem_values(
                                     request=HttpRequest(),
-                                    name=resource_data["file_name"],
+                                    name=resource_data["name"],
                                     group_set=[home_group._id],
                                     language=language,
                                     uploaded_file=files,
@@ -932,11 +941,15 @@ def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
                                     origin={'csv-import':csv_file_name},
                                     unique_gs_per_file=True
                                 )
-
+        # print "+++++++++++++++++++++++++++++++++++++",file_gs_obj.content_org,file_gs_obj
+        file_gs_obj.content_org = resource_data['content_org']
+        file_gs_obj.tags = resource_data["tags"]
+        file_gs_obj.content = resource_data['content_org']
+        file_gs_obj.status = u"PUBLISHED"
         file_gs_obj.save(groupid=home_group._id)
 
         if 'video' in file_gs_obj.if_file.mime_type:
-            convertVideo.delay(user_id, str(gs_obj._id), file_name)
+            convertVideo.delay(nroer_team_id, str(file_gs_obj._id), resource_data["name"])
 
         # fileobj_oid, video = save_file(files, name, userid, group_set_id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
         # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
@@ -1044,12 +1057,11 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     updated_res_data['resource_link'] = thumbnail_url
     updated_res_data['name'] = u'Thumbnail: ' + thumbnail_url.split('/')[-1]
 
-    updated_res_data['content_org'] = ''
-    updated_res_data['tags'] = []
+    # updated_res_data['content_org'] = ''
+    # updated_res_data['tags'] = []
 
     # th_id: thumbnail id
     th_obj = create_resource_gsystem(updated_res_data, row_no, group_set_id=warehouse_group._id)
-
     th_id = th_obj._id
 
     # th_obj = node_collection.one({'_id': ObjectId(th_id)})
@@ -1069,7 +1081,7 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     log_print(info_message)
 
     print '\n Created/Updated GRelation Object:\n'
-    print create_grelation(ObjectId(node_id), has_thumbnail_rt, ObjectId(th_id))
+    create_grelation(ObjectId(node_id), has_thumbnail_rt, ObjectId(th_id))
     print '\n\n'
 
     info_message = "\n- Grelation processing done for has_thumbnail.\n"
@@ -1079,6 +1091,12 @@ def attach_resource_thumbnail(thumbnail_url, node_id, resource_data, row_no):
     # node_fs_file_ids = node_obj.fs_file_ids
 
     # if len(node_fs_file_ids) == 1:
+    th_obj.group_set.append(ObjectId(warehouse_group._id))
+    if ObjectId(home_group._id) in th_obj.group_set:
+        th_obj.group_set.remove(ObjectId(home_group._id))
+    # print "**********************************",th_obj.group_set
+
+    th_obj.save()
     #     node_fs_file_ids.append(ObjectId(th_gridfs_id))
     # elif len(node_fs_file_ids) > 1:
     #     node_fs_file_ids[1] = ObjectId(th_gridfs_id)

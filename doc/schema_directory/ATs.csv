@@ -38,7 +38,7 @@ tot_when,When did you attend TOT?,list,"[""datetime.datetime""]","[""Voluntary T
 nxt_mon_sch,Schedule for Next Few Month,basestring,[],"[""Voluntary Teacher""]",FALSE,TRUE,[],,
 start_time,Start Time,datetime.datetime,[],"[""Event"", ""Announced Course"",""Group"",""Twist"",""CourseEventGroup"",""CourseSubSection"",""CourseSubSectionEvent""]",TRUE,FALSE,"[""d/m/Y H:i"", ""date_month_day_year""]",DD/MM/YYYY HH:MM,
 end_time,End Time,datetime.datetime,[],"[""Event"", ""Announced Course"",""Group"",""Twist"",""CourseEventGroup""]",TRUE,FALSE,"[""d/m/Y H:i"", ""date_month_day_year""]",DD/MM/YYYY HH:MM,
-attendees,Attendence,list,"[""ObjectId""]","[""Event""]",TRUE,TRUE,[],,
+attendees,Attendence,list,"[""ObjectId""]","[""Event""]",FALSE,TRUE,[],,
 nussd_course_type,Course Type,IS(),"[""General"",""Foundation Course"", ""Level-1 Domain"", ""Level-2 Domain""]","[""NUSSD Course"", ""Course"", ""Voluntary Teacher"", ""Master Trainer"", ""Classroom Session"", ""Exam"", ""StudentCourseEnrollment""]",TRUE,TRUE,[],,
 course_code,Course Code,basestring,[],"[""NUSSD Course"", ""Announced Course""]",TRUE,TRUE,"[""text"", ""course_code_check""]","Combination of alphabets, numbers and hyphen",10
 theory_credit,Theory Credit (in Hours),int,[],"[""NUSSD Course"", ""Announced Course""]",TRUE,TRUE,"[""text"", ""input_only_num"", ""[1-9]{1,3}""]",Enter Hours ,3
@@ -86,3 +86,5 @@ quizitem_check_answer,QuizItem Check Answer,bool,[],"[""QuizItem"",""QuizItemEve
 quizitempost_user_submitted_ans,QuizItemPost User Submitted Answer,list,[],"[""QuizItemPost""]",TRUE,TRUE,[],[],
 quizitempost_user_checked_ans,QuizItemPost User Checked Answer,list,[],"[""QuizItemPost""]",TRUE,TRUE,[],[],
 discussion_enable,Discussion Enable,bool,[],"[""Page"", ""File"",""E-Book"",""QuizItemEvent""]",TRUE,TRUE,[],[],
+is_bigbluebutton,Online Meeting,bool,[],"[""Event""]",TRUE,TRUE,[],[],
+open_event,Open Event (All group members can join the event),bool,[],"[""Event""]",TRUE,TRUE,[],[],

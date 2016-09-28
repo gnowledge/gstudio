@@ -18,51 +18,14 @@
 
     <div class="app-card-icon" title="{% firstof resource.altnames resource.name %}" >
 <!--{{resource.member_of_names_list}} --> 
-    
+    {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
     {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
-    {% if resource.fs_file_ids.1 %}
-    <img src="{% url 'get_mid_size_img' first_arg second_arg %}" style="width:35%" alt="">
-    {% elif resource.collection_set %}
-        <i class="collection"></i>
-    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list%}
-      {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
-        <i class="{{attr_set_dict.educationaluse|lower}}"></i>
-      {% elif resource.mime_type %}
-        <i class="{{resource.mime_type|lower|split:'/'|join:' '}}"></i>
-      {% else  %}
-        <i class="{{resource.member_of_names_list.0|lower }}"></i>
-      {% endif %}
-    {% elif "PartnerGroup" in resource.member_of_names_list or "Group" in resource.member_of_names_list or "Course" in resource.member_of_names_list or has_logo == True %}
-      {% if "Course" in resource.member_of_names_list or has_logo == True %}
-
-
-        {% get_relation_value resource.pk 'has_logo' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
-                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.1 %}" alt="" style="width:50%" />
-          {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  style="width:50%" class="img-height" >
-        {% endif %}
-
-      {% else %}
-
-        {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
-        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
-                  <img src="{% url 'get_gridfs_resource' grel_dict.grel_node.fs_file_ids.2 %}" alt="" style="width:50%" />
-          {% else %}
-                  <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  style="width:50%" class="img-height">
-        {% endif %}
-
-      {% endif %}
-
-    {% elif resource.collection_set %}
-        <i class="collection"></i>
+    {% if grel_dict.grel_node.if_file.original.relurl %}
+      <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.original.relurl}}" style="width:50%">
     {% else %}
-        <i class="common-icon"></i>
+      <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." style="width:50%" class="img-height" >
     {% endif %}
   </div>
-
-   
-
     <div class="app-card-content" title="{{resource.content_org}}">
      {{resource.content_org|default_if_none:"Add some description."|truncatechars:45}}
     </div>   

@@ -21,15 +21,15 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM, GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.models import NodeJSONEncoder,node_collection, triple_collection
+from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter, counter_collection
 from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff # get_existing_groups
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
@@ -207,8 +207,8 @@ class CreateGroup(object):
             group_obj.content_org = content_org
 
             # Required to link temporary files with the current user who is:
-            usrname = self.request.user.username
-            filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+            # usrname = self.request.user.username
+            # filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
             # group_obj.content = org2html(content_org, file_prefix=filename)
             group_obj.content = content_org
             is_changed = True
@@ -345,7 +345,7 @@ class CreateGroup(object):
         # if logo_img_node_grel_id:
         #     logo_img_node = logo_img_node_grel_id[0]
         #     grel_id = logo_img_node_grel_id[1]
-        f = request.FILES.get("docFile", "")
+        f = request.FILES.get("filehive", "")
         # print "\nf is ",f
 
         if f:
@@ -356,7 +356,7 @@ class CreateGroup(object):
                 # check whether it appears in any other node's grelation
                 rel_obj = None
                 rel_obj = triple_collection.find({"_type": "GRelation", 'subject': {'$ne': ObjectId(group_obj._id)}, 'right_subject': logo_img_node._id})
-                file_cur = node_collection.find({'_type':"File",'fs_file_ids':logo_img_node.fs_file_ids,'_id': {'$ne': logo_img_node._id}})
+                file_cur = node_collection.find({'_type':"GSystem",'_id': {'$ne': logo_img_node._id}})
                 # print "\nrel_obj--",rel_obj.count()
                 # print "\nfile_cur.count()--",file_cur.count()
                 if rel_obj.count() > 0 or file_cur.count() > 0:
@@ -375,13 +375,23 @@ class CreateGroup(object):
                         node_id=logo_img_node._id,
                         deletion_type=1
                     )
-                    # print del_status, "--", del_status_msg
+                    print del_status, "--", del_status_msg
 
-            fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            from gnowsys_ndf.ndf.views.filehive import write_files
+            is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
+
+            # gs_obj_list = write_files(request, group_id)
+            fileobj_list = write_files(request, group_obj._id)
+            # print "request&&&&&&&&&&&&&&&&&&&&&&",request
+            fileobj_id = fileobj_list[0]['_id']
+            # print "fileobj_id****************************",fileobj_list
+            fileobj = node_collection.one({'_id': ObjectId(fileobj_id) })
+            # print "fileobj_id-------------------",fileobj
+            # fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
             if fileobj:
                 rt_has_logo = node_collection.one({'_type': "RelationType", 'name': unicode(logo_rt)})
-                # print "\n creating GRelation has_logo\n"
-                create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj))
+                print "\n creating GRelation has_logo\n"
+                create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj._id))
 
 # --- END of class CreateGroup ---
 # --------------------------------
@@ -590,6 +600,7 @@ class CreateModeratedGroup(CreateSubGroup):
 
             # values will be taken from POST form fields
             group_obj = self.get_group_fields(group_name, node_id=node_id)
+            # print group_obj
 
             try:
                 if top_mod_groups_parent:
@@ -1197,9 +1208,11 @@ class CreateCourseEventGroup(CreateEventGroup):
 
         """
         try:
-            new_course_obj.content = existing_course_obj.content
-            new_course_obj.content_org = existing_course_obj.content_org
-            new_course_obj.save()
+            if not new_course_obj.content:
+                new_course_obj.content = existing_course_obj.content
+                new_course_obj.content_org = existing_course_obj.content_org
+                new_course_obj.save()
+
             self.call_setup(request, existing_course_obj, new_course_obj, new_course_obj)
             self.update_raw_material_group_set(existing_course_obj, new_course_obj)
             return True
@@ -1308,13 +1321,15 @@ class GroupCreateEditHandler(View):
             group_id = ObjectId(group_id)
         except:
             group_name, group_id = get_group_name_id(group_id)
-
         group_obj = None
         nodes_list = []
         logo_img_node = None
         parent_obj_partner = None
         subgroup_flag = request.GET.get('subgroup','')
-
+        node_edit_flag = request.GET.get('node_edit',False)
+        if not isinstance(node_edit_flag, bool):
+            node_edit_flag = eval(node_edit_flag)
+        # print "\n node_edit_flag ==== ",type(node_edit_flag)
         partnergroup_flag = request.GET.get('partnergroup','')
         if partnergroup_flag:
             partnergroup_flag = eval(partnergroup_flag)
@@ -1346,9 +1361,12 @@ class GroupCreateEditHandler(View):
 
         title = action + ' Group'
 
-        # In the case of need, we can simply replace:
+        # In the case of need old group edit interface (node_edit_base.html), we can simply replace:
         # "ndf/create_group.html" with "ndf/edit_group.html"
         template = "ndf/create_group.html"
+        if node_edit_flag:
+            # Coming for page-edit interface (Collection, Metadata, Help)
+            template = "ndf/edit_group.html"
         if subgroup_flag:
             subgroup_flag = eval(subgroup_flag)
         if partnergroup_flag:
@@ -1391,6 +1409,10 @@ class GroupCreateEditHandler(View):
         group_name = request.POST.get('name', '').strip()  # hidden-form-field
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
+        group_page_edit = request.POST.get('group_page_edit', False)
+        if not isinstance(group_page_edit, bool):
+            group_page_edit = eval(group_page_edit)
+
         subgroup_flag = request.POST.get('subgroup', '')
         partnergroup_flag = request.POST.get('partnergroup_flag', '')
         url_name = 'groupchange'
@@ -1435,9 +1457,15 @@ class GroupCreateEditHandler(View):
             group_obj = result[1]
             group_name = group_obj.name
             # url_name = 'groupchange'
-            if not partnergroup_flag:
-                # print request.POST.get('apps_to_set', '')
-                app_selection(request, group_obj._id)
+            if group_page_edit:
+                is_node_changed=get_node_common_fields(request, group_obj, group_id, gst_group)
+                group_obj.save(is_changed=is_node_changed)
+                group_obj.save()
+
+            elif not partnergroup_flag:
+                if request.POST.get('apps_to_set', ''):
+                    app_selection(request, group_obj._id)
+
             else:
                 group_obj.member_of = [partner_group_gst._id]
                 group_obj.save()
@@ -1541,6 +1569,7 @@ class EventGroupCreateEditHandler(View):
         course_node_id = request.POST.get('course_node_id', '')
         # check if group's editing policy is already 'EDITABLE_MODERATED' or
         # it was not and now it's changed to 'EDITABLE_MODERATED' or vice-versa.
+        # import ipdb; ipdb.set_trace()
         if (edit_policy == "EDITABLE_MODERATED") or (group_obj.edit_policy == "EDITABLE_MODERATED"):
 
             moderation_level = request.POST.get('moderation_level', '')
@@ -1570,6 +1599,22 @@ class EventGroupCreateEditHandler(View):
                 # Successfully had set dates to EventGroup
                 if sg_type == "CourseEventGroup":
                     mod_group.initialize_course_event_structure(request, group_obj._id)
+                    # creating a new counter document for a user for a given course for the purpose of analytics
+
+                    # counter_obj = Counter.get_counter_obj(userid, group_id)
+                    # print "===========================", counter_obj
+
+                    # auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
+
+                    # counter_obj = counter_collection.collection.Counter()
+                    # counter_obj.fill_counter_values(
+                    #                                 user_id=request.user.id,
+                    #                                 auth_id=auth_obj._id,
+                    #                                 group_id=group_obj._id,
+                    #                                 is_group_member=True
+                    #                             )
+                    # counter_obj.save()
+
                 # elif sg_type == "ProgramEventGroup":
                     # mod_group.set_logo(request,group_obj,logo_rt = "has_logo")
                 mod_group.set_logo(request,group_obj,logo_rt = "has_profile_pic")
@@ -2013,7 +2058,7 @@ def group_dashboard(request, group_id=None):
         else:
             allow_to_join = "Open"
   if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
-      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': {'$in': ["File","GSystem"]}})
   '''
   property_order_list = []
   if "group_of" in group_obj:
@@ -2030,7 +2075,10 @@ def group_dashboard(request, group_id=None):
   '''
   default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
-  return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
+  if alternate_template:
+    return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
+  else:
+    return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
                                                        'group_id':group_id, 'user':request.user,
                                                        # 'shelf_list': shelf_list,
                                                        'list_of_unit_events': list_of_unit_events,
@@ -2137,6 +2185,8 @@ def group_dashboard(request, group_id=None):
 @login_required
 @get_execution_time
 def app_selection(request, group_id):
+    from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+
     if ObjectId.is_valid(group_id) is False:
         group_ins = node_collection.find_one({
             '_type': "Group", "name": group_id
@@ -2203,6 +2253,7 @@ def app_selection(request, group_id):
 
 @get_execution_time
 def switch_group(request,group_id,node_id):
+  from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 
   try:
       group_id = ObjectId(group_id)
@@ -2281,9 +2332,9 @@ def switch_group(request,group_id,node_id):
       data_list = []
       user_id = request.user.id
       all_user_groups = []
-    # for each in get_all_user_groups():
-    #   all_user_groups.append(each.name)
-    #loop replaced by a list comprehension
+      # for each in get_all_user_groups():
+      #   all_user_groups.append(each.name)
+      #loop replaced by a list comprehension
       top_partners_list = ["State Partners", "Individual Partners", "Institutional Partners"]
       all_user_groups = [each.name for each in get_all_user_groups()]
       if not request.user.is_superuser:
@@ -2513,13 +2564,14 @@ def upload_using_save_file(request,group_id):
     #     #     url_name = "/"+str(group_id)+"/#gallery-tab"
 
     from gnowsys_ndf.ndf.views.filehive import write_files
+    is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
 
     # gs_obj_list = write_files(request, group_id)
     fileobj_list = write_files(request, group_id)
     fileobj_id = fileobj_list[0]['_id']
     file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
 
-    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER":
+    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
         if request.POST:
             # mtitle = request.POST.get("docTitle", "")
             # userid = request.POST.get("user", "")
@@ -2569,7 +2621,6 @@ def upload_using_save_file(request,group_id):
                 # create gattribute for file with source value
                 source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
                 src = create_gattribute(ObjectId(file_node._id), source_AT, source)
-                print "\n\n\n\n\n\n++src",src
 
             if Audience:
               # create gattribute for file with Audience value
@@ -2621,16 +2672,42 @@ def upload_using_save_file(request,group_id):
         each_gs_file.status = u"PUBLISHED"
         if usrid not in each_gs_file.contributors:
             each_gs_file.contributors.append(usrid)
-        if title == "raw material":
+
+        if title == "raw material" or (title == "gallery" and is_user_gstaff):
             each_gs_file.tags =  [u'raw@material']
+
+        group_object = node_collection.one({'_id': ObjectId(group_id)})
+        if (group_object.edit_policy == "EDITABLE_MODERATED") and (group_object.moderation_level > 0):
+            from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
+            # print "\n\n\n\ninside editable moderated block"
+            each_gs_file.group_set = get_moderator_group_set(each_gs_file.group_set, group_object._id)
+            # print "\n\n\npage_node._id",page_node._id
+            each_gs_file.status = u'MODERATION'
+            # print "\n\n\n page_node.status",page_node.status
         each_gs_file.save()
         create_gattribute(each_gs_file._id, discussion_enable_at, True)
         return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
 
-    if title == "gallery":
+    if (title == "gallery") or (title == "raw material"):
+
+        active_user_ids_list = [request.user.id]
+        if GSTUDIO_BUDDY_LOGIN:
+            active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.now())
+            # removing redundancy of user ids:
+            active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+        counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+        # counter_obj = Counter.get_counter_obj(request.user.id, group_id)
+        for each_counter_obj in counter_objs_cur:
+            each_counter_obj['file']['created'] += len(fileobj_list)
+            each_counter_obj['group_points'] += (len(fileobj_list) * GSTUDIO_FILE_UPLOAD_POINTS)
+            each_counter_obj.last_update = datetime.now()
+            each_counter_obj.save()
+
+    if title == "gallery" and not is_user_gstaff:
         return HttpResponseRedirect(reverse('course_gallery', kwargs={'group_id': group_id}))
-    elif title == "raw material":
+    elif title == "raw material" or (title == "gallery" and is_user_gstaff):
         return HttpResponseRedirect(reverse('course_raw_material', kwargs={'group_id': group_id}))
     else:
-        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
+        return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}))
     # return HttpResponseRedirect(url_name)

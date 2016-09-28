@@ -17,7 +17,9 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+# from gnowsys_ndf.ndf.views.methods import get_counter_obj
+from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_QUIZ_CORRECT_POINTS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import QUIZ_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import HistoryManager
@@ -53,12 +55,12 @@ def quiz(request, group_id):
     gst_quiz_item_id = node_collection.one({'_type': 'GSystemType', 'name': u'QuizItem'})._id
     quiz_item_nodes = node_collection.find({'member_of': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
     return render_to_response("ndf/quiz.html",
-                              {'title': title, 
+                              {'title': title,
                                'quiz_nodes': quiz_nodes,
                                'quiz_item_nodes': quiz_item_nodes,
                                'groupid':group_id,
                                'group_id':group_id
-                              }, 
+                              },
                               context_instance=RequestContext(request)
     )
 
@@ -148,7 +150,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         quizitem_problem_weight_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_problem_weight"})
         quizitem_max_attempts_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_max_attempts"})
         quizitem_check_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitem_check_answer"})
-        
+
 
         quiz_node_id = request.POST.get('quiz_node_id','')
         maximum_attempts_val = request.POST.get('maximum_attempts','1')
@@ -187,7 +189,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
             # quiz_item_node['options'] = options
             create_gattribute(quiz_item_node._id, options_AT, options)
 
-        # Extracting correct-answer, depending upon 'Multiple-Choice' / 'Single-Choice' 
+        # Extracting correct-answer, depending upon 'Multiple-Choice' / 'Single-Choice'
         qt_initial = quiz_type[:quiz_type.find("-")].lower()
         # quiz_item_node['correct_answer'] = []
 
@@ -255,7 +257,7 @@ def create_edit_quiz(request, group_id, node_id=None):
         group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
-        
+
     context_variables = { 'title': gst_quiz.name,
                           'group_id': group_id,
                           'groupid': group_id
@@ -270,15 +272,15 @@ def create_edit_quiz(request, group_id, node_id=None):
             quiz_node = node_collection.collection.GSystem()
         # get_node_common_fields(request, quiz_node, group_id, gst_quiz)
         quiz_node.save(is_changed=get_node_common_fields(request, quiz_node, group_id, gst_quiz),groupid=group_id)
-        quiz_node.get_neighbourhood(quiz_node.member_of)    
+        quiz_node.get_neighbourhood(quiz_node.member_of)
         # get_node_metadata(request, quiz_node,gst_quiz)
         #if teaches is required
-        # teaches_list = request.POST.get('teaches_list','') # get the teaches list 
+        # teaches_list = request.POST.get('teaches_list','') # get the teaches list
         # if teaches_list !='':
         #       teaches_list=teaches_list.split(",")
         # create_grelation_list(quiz_node._id,"teaches",teaches_list)
 
-        # assesses_list = request.POST.get('assesses_list','') # get the assesses list  
+        # assesses_list = request.POST.get('assesses_list','') # get the assesses list
         # if assesses_list !='':
         #       assesses_list=assesses_list.split(",")
         # create_grelation_list(quiz_node._id,"assesses",assesses_list)
@@ -293,7 +295,7 @@ def create_edit_quiz(request, group_id, node_id=None):
                                   context_variables,
                                   context_instance=RequestContext(request)
         )
-        
+
 @login_required
 @get_execution_time
 def quiz_details(request, group_id, node_id):
@@ -320,6 +322,7 @@ def quiz_details(request, group_id, node_id):
                                   context_instance=RequestContext(request)
         )
 
+
 @login_required
 @get_execution_time
 def save_quizitem_answer(request, group_id):
@@ -331,14 +334,17 @@ def save_quizitem_answer(request, group_id):
             except:
                 group_name, group_id = get_group_name_id(group_id)
             import datetime
-            # group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
             new_list = []
+            old_submitted_ans = None
+            recent_ans = None
+            is_user_given_ans_not_in_recent_submitted_ans = False
+            recent_submitted_ans_was_correct = False
+
             user_given_ans = request.POST.getlist("user_given_ans[]", '')
             node_id = request.POST.get("node", '')
-            # print "\n\n user_give_ans",user_given_ans
             node_obj = node_collection.one({'_id': ObjectId(node_id)})
             thread_obj = user_ans = None
-
             '''
             print "\n\n node_obj::::::::",node_obj.relation_set
             try:
@@ -363,11 +369,14 @@ def save_quizitem_answer(request, group_id):
             qip_gst = node_collection.one({ '_type': 'GSystemType', 'name': 'QuizItemPost'})
             qip_user_submitted_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_submitted_ans"})
             qip_user_checked_ans_AT = node_collection.one({'_type': "AttributeType", 'name': "quizitempost_user_checked_ans"})
-            already_ans_obj = None
+            already_ans_obj = already_submitted_ans = None
             # print "\n\n thread_obj == ", thread_obj
             if thread_obj != None:
                 already_ans_obj = node_collection.find_one({'member_of': qip_gst._id,'created_by': user_id, 'prior_node': thread_obj._id})
+
                 if already_ans_obj:
+                    already_submitted_ans = get_attribute_value(already_ans_obj._id,"quizitempost_user_submitted_ans")
+                    # print "\n already_submitted_ans == ", already_submitted_ans
                     # check whether user has already checked or submitted ans
                     user_ans = already_ans_obj
                 else:
@@ -395,6 +404,12 @@ def save_quizitem_answer(request, group_id):
                     # add thread obj to user's post/reply prior_node
                     node_collection.collection.update({'_id': thread_obj._id}, {'$push': {'post_node':user_ans._id}},upsert=False,multi=False)
                 quiz_type_val = get_attribute_value(node_obj._id,"quiz_type")
+                quiz_correct_ans = get_attribute_value(node_obj._id,"correct_answer")
+                # print "\n quiz_type_val: ", quiz_type_val
+                # print "\n quiz_correct_ans: ", quiz_correct_ans
+                # print "\n user_given_ans: ",user_given_ans
+                quiz_correct_ans = (map(unicode,[re.sub(r'[\r]', '', cor_ans) for cor_ans in quiz_correct_ans]))
+
 
                 # print "\n get_attribute_value--", get_attribute_value
                 if user_given_ans and user_ans:
@@ -414,7 +429,7 @@ def save_quizitem_answer(request, group_id):
                             elif user_action == "submit":
                                 if already_ans_obj:
                                     old_submitted_ans = get_attribute_value(user_ans._id,"quizitempost_user_submitted_ans")
-                                    if old_submitted_ans != "None" and old_submitted_ans != "":
+                                    if old_submitted_ans != "None" and old_submitted_ans != "" and old_submitted_ans:
                                         new_list = old_submitted_ans
                                 new_list.append({str(curr_datetime):user_given_ans})
                                 if new_list:
@@ -423,6 +438,140 @@ def save_quizitem_answer(request, group_id):
                 # print "\n user_ans.attribute_set",user_ans.attribute_set
                 response_dict['count'] = len(new_list)
                 response_dict['success'] = True
+
+                active_user_ids_list = [request.user.id]
+                if old_submitted_ans:
+                    recent_ans = old_submitted_ans[-1].values()
+                    if recent_ans:
+                        recent_ans = recent_ans[0]
+                    is_user_given_ans_not_in_recent_submitted_ans = all(each_usr_given_ans not in recent_ans for each_usr_given_ans in user_given_ans)
+                    recent_submitted_ans_was_correct = any(each_submitted_ans in quiz_correct_ans for each_submitted_ans in recent_ans)
+                # print "\n recent_ans == ", recent_ans
+                # print "\n user_given_ans == ", user_given_ans
+
+                if GSTUDIO_BUDDY_LOGIN:
+                    active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
+                    # removing redundancy of user ids:
+                    # active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+                counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+
+                #code to update counter collection
+                # counter_obj = Counter.get_counter_obj(user_id, group_id)
+
+                if not already_submitted_ans:
+                    # This is the first time to attempt this quizitemevent
+                    for userr_each_attr in user_ans.attribute_set:
+                        if 'quizitempost_user_submitted_ans' in userr_each_attr:
+                            if len(userr_each_attr['quizitempost_user_submitted_ans'])!=0:
+                                # counter_obj.no_questions_attempted+=1
+                                for each_counter_obj in counter_objs_cur:
+                                    each_counter_obj['quiz']['attempted'] += 1
+                                    each_counter_obj.save()
+                                counter_objs_cur.rewind()
+                '''
+                for each_attr in node_obj.attribute_set:
+                    if 'correct_answer' in each_attr:
+                        quiz_correct_ans = each_attr['correct_answer']
+                    if 'quiz_type' in each_attr:
+                        type_of_quiz = each_attr['quiz_type']
+                '''
+
+                for each_user_ans_attr in user_ans.attribute_set:
+                    if 'quizitempost_user_submitted_ans' in each_user_ans_attr:
+                        if quiz_type_val=='Single-Choice':
+                            if len(each_user_ans_attr['quizitempost_user_submitted_ans'])!=0:
+
+                                for each_counter_obj in counter_objs_cur:
+                                    if cmp(quiz_correct_ans,user_given_ans)==0:
+                                        # counter_obj.no_correct_answers+=1
+                                        if not already_submitted_ans or is_user_given_ans_not_in_recent_submitted_ans:
+                                            if is_user_given_ans_not_in_recent_submitted_ans and each_counter_obj['quiz']['incorrect']:
+                                                each_counter_obj['quiz']['incorrect'] -= 1
+                                            if not recent_submitted_ans_was_correct:
+                                                each_counter_obj['quiz']['correct'] += 1
+                                                each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                            each_counter_obj.save()
+                                    else:
+                                        # each_counter_obj.no_incorrect_answers+=1
+                                        if not already_submitted_ans or is_user_given_ans_not_in_recent_submitted_ans:
+                                            if is_user_given_ans_not_in_recent_submitted_ans and each_counter_obj['quiz']['correct']:
+                                                each_counter_obj['quiz']['correct'] -= 1
+                                            if recent_submitted_ans_was_correct:
+                                                each_counter_obj['quiz']['incorrect'] += 1
+                                            each_counter_obj.save()
+                                counter_objs_cur.rewind()
+
+                        if quiz_type_val=='Multiple-Choice':
+                            if each_user_ans_attr['quizitempost_user_submitted_ans']:
+                                search = False
+                                user_given_ans = [x.encode('UTF8') for x in user_given_ans]
+                                quiz_correct_ans = [x.encode('UTF8') for x in quiz_correct_ans]
+                                # print "\n user_given_ans : ", user_given_ans
+                                # print "\n quiz_correct_ans: ", quiz_correct_ans
+                                # Remove Carriage Return from Python strings ['\r'] in quiz_correct_ans
+                                quiz_correct_ans_tmp = []
+                                for each_option in quiz_correct_ans:
+                                    each_option = each_option.replace('\r','')
+                                    quiz_correct_ans_tmp.append(each_option)
+                                quiz_correct_ans = quiz_correct_ans_tmp
+
+                                for each_user_given_ans in user_given_ans:
+                                    if each_user_given_ans in quiz_correct_ans:
+                                        search = True
+
+                                # print "\n search : ", search
+
+                                '''
+                                i=0
+                                while i<len(user_given_ans):
+
+                                    try:
+                                        quiz_correct_ans.index(user_given_ans[i])
+                                        search=True
+                                        i=i+1
+                                    except Exception as e1:
+                                        search=False
+                                        break
+                                '''
+
+
+                                for each_counter_obj in counter_objs_cur:
+                                    if search==True:
+                                        try:
+                                            if not already_submitted_ans or is_user_given_ans_not_in_recent_submitted_ans:
+                                                if is_user_given_ans_not_in_recent_submitted_ans and  each_counter_obj['quiz']['incorrect']:
+                                                    each_counter_obj['quiz']['incorrect'] -= 1
+                                                if not recent_submitted_ans_was_correct:
+                                                    each_counter_obj['quiz']['correct'] += 1
+                                                    # each_counter_obj.course_score+=GSTUDIO_QUIZ_CORRECT_POINTS
+                                                    each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                                each_counter_obj.save()
+                                        except Exception as rer:
+                                            print "\n Error ", rer
+                                    else:
+                                        # each_counter_obj.no_incorrect_answers+=1
+                                        if not already_submitted_ans or is_user_given_ans_not_in_recent_submitted_ans:
+                                            if is_user_given_ans_not_in_recent_submitted_ans and  each_counter_obj['quiz']['correct']:
+                                                each_counter_obj['quiz']['correct'] -= 1
+                                            if recent_submitted_ans_was_correct:
+                                                each_counter_obj['quiz']['incorrect'] += 1
+                                            each_counter_obj.save()
+                                counter_objs_cur.rewind()
+
+                        if quiz_type_val=='Short-Response':
+                            if len(user_given_ans)!=0:
+                                # counter_obj.no_correct_answers+=1
+                                for each_counter_obj in counter_objs_cur:
+                                    if not already_submitted_ans:
+                                        each_counter_obj['quiz']['correct'] += 1
+                                        # each_counter_obj.course_score += GSTUDIO_QUIZ_CORRECT_POINTS
+                                        each_counter_obj['group_points'] += GSTUDIO_QUIZ_CORRECT_POINTS
+                                        each_counter_obj.save()
+                #updated counter collection
+
+
+
             return HttpResponse(json.dumps(response_dict))
 
 

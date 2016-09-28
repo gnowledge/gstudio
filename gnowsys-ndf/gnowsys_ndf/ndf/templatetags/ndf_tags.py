@@ -38,7 +38,7 @@ from mongokit import paginator
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
 try:
@@ -476,8 +476,8 @@ def switch_group_conditions(user,group_id):
 @register.assignment_tag
 def get_all_user_groups():
 	try:
-		all_groups = node_collection.find({'_type':'Author'}).sort('name', 1)
-		return list(all_groups)
+		return node_collection.find({'_type':'Author'}).sort('name', 1)
+		# return list(all_groups)
 	except:
 		print "Exception in get_all_user_groups"
 
@@ -2760,14 +2760,13 @@ def get_field_type(node_structure, field_name):
 @register.inclusion_tag('ndf/html_field_widget.html')
 # def html_widget(node_id, field, field_type, field_value):
 # def html_widget(node_id, node_member_of, field, field_value):
-def html_widget(groupid, node_id, field):
+def html_widget(groupid, node_id, field,node_content=None):
   """
   Returns html-widget for given attribute-field; that is, passed in form of
   field_name (as attribute's name) and field_type (as attribute's data-type)
   """
   # gs = None
   field_value_choices = []
-
   # This field is especially required for drawer-widets to work used in cases of RelationTypes
   # Represents a dummy document that holds node's _id and node's right_subject value(s) from it's GRelation instance
   node_dict = {}
@@ -2852,22 +2851,27 @@ def html_widget(groupid, node_id, field):
       is_relation_field = True
       is_required_field = True
       #patch
-      group = node_collection.find({"_id":ObjectId(groupid)})
+      group = node_collection.one({"_id":ObjectId(groupid)})
+      group_users = []
+      group_users.extend(group.group_admin)
+      group_users.extend(group.author_set)
+      group_users.append(group.created_by)
+      # print "*************************",group.created_by
       person = node_collection.find({"_id":{'$in': field["object_type"]}},{"name":1})
 
       if person[0].name == "Author":
           if field.name == "has_attendees":
-              field_value_choices.extend(list(node_collection.find({'member_of': {'$in':field["object_type"]},
-                                                                  'created_by':{'$in':group[0]["group_admin"]+group[0]["author_set"]},
+              field_value_choices.extend(list(node_collection.find({'_type': 'Author',
+                                                                  'created_by':{'$in':group_users},
 
                                                                  })
                                                                  ))
           else:
-              field_value_choices.extend(list(node_collection.find({'member_of': {'$in':field["object_type"]},
-                                                            'created_by':{'$in':group[0]["group_admin"]},                                																														}).sort('name', 1)
-                                      )
-                                )
-      #End path
+              field_value_choices.extend(list(node_collection.find({'_type': 'Author',
+                                                                  'created_by':{'$in':group_users},
+
+                                                                 })
+                                                                 ))      #End path
       else:
         field_value_choices.extend(list(node_collection.find({'member_of': {'$in': field["object_type"]},
                                                               'status': u"PUBLISHED",
@@ -2896,7 +2900,8 @@ def html_widget(groupid, node_id, field):
             'is_list_of': is_list_of,
             'is_mongokit_is_radio': is_mongokit_is_radio,
             'is_special_field': is_special_field, 'included_template_name': included_template_name,
-            'is_required_field': is_required_field
+            'is_required_field': is_required_field,
+            'node_content':node_content
             # 'is_special_tab_field': is_special_tab_field
     }
 
@@ -3287,7 +3292,7 @@ def get_thread_node(node_id):
 		# 	for rel in node_obj.relation_set:
 		# 		if rel and 'has_thread' in rel:
 		# 			thread_obj = rel['has_thread'][0]
-		# # print "\n\nthread_obj--",thread_obj
+		# print "\n\nthread_obj--",thread_obj
 		return thread_obj
 	return None
 
@@ -3399,6 +3404,11 @@ def get_ebook_help_text():
 @register.assignment_tag
 def get_gstudio_interaction_types():
 	return GSTUDIO_INTERACTION_TYPES
+
+@get_execution_time
+@register.assignment_tag
+def get_explore_url():
+	return GSTUDIO_DEFAULT_EXPLORE_URL
 
 @get_execution_time
 @register.assignment_tag
@@ -3604,7 +3614,10 @@ def get_user_quiz_resp(node_obj, user_obj):
 					if node_obj.quiz_type == "Short-Response":
 						result['recent_ans'] = recent_ans
 					else:
-						result['recent_ans'] = recent_ans.values()[0]
+						user_ans = recent_ans.values()[0]
+						# result['recent_ans'] = (map(unicode,[re.sub(r'[\t\n\r]', '', u_ans) for u_ans in user_ans]))
+						# result['recent_ans'] = [u_ans.decode('utf-8').decode('utf-8') for u_ans in user_ans]
+						result['recent_ans'] = user_ans
 		# return json.dumps(result,ensure_ascii=False)
 		return result
 
@@ -3627,7 +3640,7 @@ def get_course_filters(group_id, filter_context):
 	all_users = False
 	only_gstaff = False
 	all_user_objs_uname = all_user_objs_id = None
-
+	file_gst = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
 	if filter_context.lower() == "raw material":
 		only_gstaff = True
 	elif filter_context.lower() == "notebook":
@@ -3652,8 +3665,15 @@ def get_course_filters(group_id, filter_context):
 
 		# if each_course_filter_key == "tags" and filter_context.lower() == "notebook":
 		if each_course_filter_key == "tags":
+			# gstaff_users.extend(group_obj.group_admin)
+			# gstaff_users.append(group_obj.created_by)
+			all_superusers = User.objects.filter(is_superuser=True)
+			all_superusers_ids = all_superusers.values_list('id',flat=True)
 			gstaff_users.extend(group_obj.group_admin)
 			gstaff_users.append(group_obj.created_by)
+			gstaff_users.extend(all_superusers_ids)
+
+
 
 			all_tags_list = [] # To prevent if no tags are found in any blog pages
 			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'Tags'}
@@ -3667,14 +3687,14 @@ def get_course_filters(group_id, filter_context):
 
 			elif filter_context.lower() == "gallery":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs]
-				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+				result_cur = node_collection.find({'member_of': file_gst._id,'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
 							'created_by': {'$nin': gstaff_users}
 							},{'tags': 1, '_id': False})
 
 			elif filter_context.lower() == "raw material":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
-				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+				result_cur = node_collection.find({'member_of': file_gst._id,'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
 							'created_by': {'$in': gstaff_users}
 							},{'tags': 1, '_id': False})
@@ -3794,3 +3814,16 @@ def get_course_completetion_data(group_obj, user, ids_list=False):
 
             return_dict = {"leaf_ids":list_of_leaf_node_ids,"completed_ids":completed_ids_list,"incompleted_ids":incompleted_ids_list}
 	return return_dict
+
+
+@register.assignment_tag
+def get_pages(page_type):
+	'''
+	returns the array of 'page_type' pages in the group 'help'
+	ex. page_type='Info page' returns all Info pages in help group
+	'''
+	page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+	help_page = node_collection.one({'_type': "Group", 'name': "help"})
+	page_type_gst = node_collection.one({'_type': "GSystemType", 'name': page_type})
+	page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': page_type_gst._id, 'group_set': help_page._id})
+	return page_nodes

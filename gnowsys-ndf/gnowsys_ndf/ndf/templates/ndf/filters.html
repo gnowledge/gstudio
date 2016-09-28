@@ -7,10 +7,10 @@
 	filtersObjArr -- is array containing all selected filters.
 		- Each of the filter is contained in following format of JS Object:
 			{
-				"selFieldValue": selFieldValue,
-				"selFieldGstudioType": selFieldGstudioType,
-				"selFieldText": selFieldText,
-				"selFieldPrimaryType": selFieldPrimaryType
+				"selFieldValue": <selFieldValue>,
+				"selFieldGstudioType": <selFieldGstudioType>,
+				"selFieldText": <selFieldText>,
+				"selFieldPrimaryType": <selFieldPrimaryType>
 			}
 
 	Example - for filter "audience: Teachers"
@@ -182,11 +182,12 @@
 		$selectValue = $("select[name='filter-field-value']"); // second <select>
 
 	$('#filter_button').on('click', function(){
-		console.log('showing');
 		$selectName.show();
 		$(this).find('span').hide();
 		$("#filter-clear-btn").show();
+		$selectName.val('initial-select')
 	})
+
 	$("#filter-clear-btn").on('click', function(){
 		$(".filter-body").find('select, input').hide();
 		$("#filter_button>span").show();
@@ -200,11 +201,14 @@
 
 		// if --Select-- is choosen then reset secondary selection
 		if (selectedNameEl.index() == 0) {
-
 			// making --Select-- to appear with less opacity and disabled way
-			$selectValue.children()[0].style.display = "block";
-			$selectValue.attr('disabled', true);
-			$selectValue.css('opacity', 0.5);
+			// $selectValue.children()[0].style.display = "block";
+			// $selectValue.attr('disabled', true);
+			// $selectValue.css('opacity', 0.5);
+			$selectValue.hide();
+			$(".filter-body").find('select, input').hide();
+			$("#filter_button>span").show();
+			$(".filter-body").find('select').val('');
 
 			return false;
 		};
@@ -247,18 +251,20 @@
 				newOption.setAttribute("data-primary-type", ffPriDataType);
 				$selectValue.append(newOption);
 			};
+			$selectValue.show();
 		}
 		else if( ffValues == "initial-select")  // handling selection of very-first option
 		{
 			$selectValue.children("option:first-child").show();
 			$selectValue.children("option:not(:first-child)").detach();
 			$selectValue.css("height", "");
+			$selectValue.show();
 		}
 		else if( !ffValues || ffValues == "[]" )  // handling key with no values
 		{
 			alert("{% trans 'No values for the key' %} : " + ffName);
+			$selectValue.hide();
 		}
-		$selectValue.show();
 	})
 
 	$selectValue.on('change', function(e){

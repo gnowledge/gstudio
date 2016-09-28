@@ -69,12 +69,15 @@ def getvideoThumbnail(request, group_id, _id):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
-    videoobj = node_collection.one({"_id": ObjectId(_id)})
+    videoobj = node_collection.one({"_id": ObjectId(_id)})        
     if videoobj:
-        if (videoobj.fs.files.exists(videoobj.fs_file_ids[0])):
+        if hasattr(videoobj, 'if_file'):
+            f = videoobj.get_file(videoobj.if_file.mid.relurl)
+            return HttpResponse(f, content_type=videoobj.if_file.mime_type)
+
+        else:
             f = videoobj.fs.files.get(ObjectId(videoobj.fs_file_ids[0]))
-            return HttpResponse(f.read())
-        
+            return HttpResponse(f.read(), content_type=f.content_type)
 @get_execution_time    
 def getFullvideo(request, group_id, _id):
     # ins_objectid  = ObjectId()

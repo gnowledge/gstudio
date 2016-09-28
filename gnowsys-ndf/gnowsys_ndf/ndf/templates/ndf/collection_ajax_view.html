@@ -21,8 +21,8 @@
 
     function TreeTillNode () {
       // This gives the last hierarchy node id from browser url.
-      // var url = window.location.search.replace("?selected=", "")
-      url = "{{selected}}";
+      var url = window.location.search.replace("?selected=", "")
+      // url = "{{selected}}";
 
       // Condition to check whether the tree has been loaded on the page completely or not before attempting any function on tree(such as 'getNodeById')
       if (url && $(".collection").not(".jqtree-loading").length > 0){
@@ -112,8 +112,18 @@
                   nod_type: node_type
                   // csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
+                beforeSend: function ( ) {    
+                      $("#processing_screen_ModalLabel").text("Please wait");
+                      $("#processing_screen_Modal").foundation('reveal', 'open');
+                },
                 success: function(data) {
-                  if (node_type == "Page"){
+                  $("#processing_screen_Modal").removeClass("alert");
+                  $("#processing_screen_Modal").foundation('reveal', 'close');
+                  
+                  if (node_type == "Group"){
+                   window.history.pushState("", "", "/{{group_name_tag}}/"+"?selected="+node.id+"");
+                  }
+                  else if (node_type == "Page"){
                    window.history.pushState("", "", "/{{group_name_tag}}/page/{{node.pk}}"+"?selected="+node.id+"");
                   }
                   else if(node_type == "File"){
@@ -270,7 +280,9 @@ ul.jqtree-tree .jqtree-element { /* Hanging Indent Setting */
 
 {% endblock %}
   
-
+  <div id="processing_screen_Modal" class="processing-screen reveal-modal medium  radius" data-reveal data-alert>
+        <div id="processing_screen_ModalLabel" class="processing-screen-label" style="font-style: normal !important;"></div>
+    </div>
   {% if topic %}
     <!-- For displaying related nodes in topic page -->
     <!-- Related node means all collection elements of its teme item i.e all siblings of topic node -->

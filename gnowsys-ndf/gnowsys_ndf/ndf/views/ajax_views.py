@@ -1850,6 +1850,7 @@ def get_data_for_event_task(request, group_id):
     event_count={}
     list31=[1,3,5,7,8,10,12]
     list30=[4,6,9,11]
+    import datetime
     currentYear = datetime.datetime.now().year
     #create the date format in unix format for querying it from data
     #Task attribute_type start time's object value takes the only date
@@ -1860,16 +1861,36 @@ def get_data_for_event_task(request, group_id):
     year = request.GET.get('start','')[0:4]
     start = datetime.datetime(int(currentYear), int(month), 1)
     task_start = str(int(month))+"/"+"01"+"/"+str(int(year))
+    
+    now = datetime.datetime.now()
+    e_status = node_collection.one({'_type' : 'AttributeType' , 'name': 'event_status'})
+
     if int(month) in list31:
      end=datetime.datetime(int(currentYear),int(month), 31)
      task_end=str(int(month))+"/"+"31"+"/"+str(int(year))
     elif int(month) in list30:
      end=datetime.datetime(int(currentYear),int(month), 30)
      task_end=str(int(month))+"/"+"30"+"/"+str(int(year))
+    # Check for leap year 
+    elif currentYear%4 == 0:
+      if currentYear%100 == 0:
+        if currentYear%400 == 0:
+          end=datetime.datetime(int(currentYear),int(month), 29)
+          task_end=str(int(month))+"/"+"29"+"/"+str(int(year))
+        else:
+          end=datetime.datetime(int(currentYear),int(month), 28)
+          task_end=str(int(month))+"/"+"28"+"/"+str(int(year))
+      else:
+        end=datetime.datetime(int(currentYear),int(month), 29)
+        task_end=str(int(month))+"/"+"29"+"/"+str(int(year))
     else:
-     end=datetime.datetime(int(currentYear),int(month), 28)
-     task_end=str(int(month))+"/"+"28"+"/"+str(int(year))
+       end=datetime.datetime(int(currentYear),int(month), 28)
+       task_end=str(int(month))+"/"+"28"+"/"+str(int(year))       
+
     #day_list of events
+
+    # For including events on the last date of the month uptill 00:00:00 of first date of next month
+    end = end + datetime.timedelta(days = 1)   
 
     if no == '1' or no == '2':
        #condition to search events only in case of above condition so that it
@@ -1890,18 +1911,26 @@ def get_data_for_event_task(request, group_id):
           date=i.attribute_set[0]['start_time']
           formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           update({'start':formated_date})
+
           for j in i.attribute_set:
-                if unicode('event_status') in j.keys():
-                  if j['event_status'] == 'Scheduled':
-                        #Default Color Blue would be applied
-                        pass
-                  if j['event_status'] == 'Rescheduled':
-                        update({'backgroundColor':'#ffd700'})
-                  if j['event_status'] == 'Completed':
-                        update({'backgroundColor':'green'})
-                  if j['event_status'] == 'Incomplete':
-                        update({'backgroundColor':'red'})
+            if unicode('end_time') in j.keys():
+              end_time = j['end_time']
+            elif unicode('event_status') in j.keys():
+              status = j['event_status']  
+
+          if now > end_time and status == "Scheduled":
+            create_gattribute(i._id , e_status , unicode("Completed")) 
+            status = "Completed"
+
+          if status == "Rescheduled":
+            update({'backgroundColor':'#ffd700'})
+          if status == "Completed":
+            update({'backgroundColor':'green'})
+          if status == "Incomplete":
+            update({'backgroundColor':'red'})       
+
           append(dict(attr_value))
+
     if no == '2':
         #All the Rescheduled ones
         nodes = node_collection.find({'_type':'GSystem','member_of':{'$in':list(all_list)},'attribute_set.event_edit_reschedule.reschedule_dates':{ '$elemMatch':{'$gt':start}},'group_set':ObjectId(group_id)},{'attribute_set.event_edit_reschedule.reschedule_dates':1,"name":1})
@@ -6366,3 +6395,32 @@ def save_user_password(request, group_id):
         response_dict['success'] = True
     return HttpResponse(json.dumps(response_dict))
 
+@login_required
+@get_execution_time
+def upload_video_thumbnail(request,group_id):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    # group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    # title = request.POST.get('context_name','')
+    parent_node = request.POST.get('parent_node','')
+    # print "\n\nparent_node",request.POST
+    usrid = request.user.id
+    from gnowsys_ndf.ndf.views.filehive import write_files
+
+    gs_obj_list = write_files(request, group_id)
+
+    gs_obj_id = gs_obj_list[0]['_id']
+    if gs_obj_id:
+      gs_obj_node = node_collection.one({'_id':ObjectId(gs_obj_id)})
+      pr_obj_node = node_collection.one({'_id':ObjectId(parent_node)})
+      
+      has_thumbnail_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_thumbnail') })
+      
+      gr_node = create_grelation(pr_obj_node._id, has_thumbnail_rt, gs_obj_id)
+      # print "\n\n\ngr_node",gr_node
+      warehouse_grp_obj = node_collection.one({'_type': "Group", 'name': "warehouse"})
+      node_collection.collection.update({'_id': ObjectId(gs_obj_id)}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
+
+    return StreamingHttpResponse(str(gs_obj_id))
