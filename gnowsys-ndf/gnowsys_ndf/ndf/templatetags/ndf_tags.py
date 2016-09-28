@@ -369,18 +369,51 @@ def all_gapps():
 @register.assignment_tag
 def get_group_gapps(group_id=None):
 
-	group_obj = node_collection.one({"_id": ObjectId(group_id) }, { "name": 1, "attribute_set.apps_list": 1, '_type': 1 })
+	# group_obj = node_collection.one({"_id": ObjectId(group_id) }, { "name": 1, "attribute_set.apps_list": 1, '_type': 1 })
 
-	if group_obj:
-		group_name = group_obj.name
-		for attr in group_obj.attribute_set:
-			if attr and "apps_list" in attr:
-				gapps_list = attr["apps_list"]
-				# print "\n", gapps_list,"\n"
+	if ObjectId.is_valid(group_id):
 
-				all_gapp_ids_list = [node_collection.one({'_id':ObjectId(g['_id'])}) for g in gapps_list]
-				# print all_gapp_ids_list,">>>>>>>>>>\n\n works like prior_node"
-				return all_gapp_ids_list
+		# group_attrs = group_obj.get_possible_attributes(group_obj._id)
+		# print group_attrs
+		print "==================="
+
+		# gapps_list = group_attrs.get('apps_list', [])
+		at_apps_list = node_collection.one({'_type': 'AttributeType', 'name': 'apps_list'})
+		# attr_list = triple_collection.find({'_type': 'GAttribute', 'attribute_type.$id': at_apps_list._id, 'subject':group_obj._id})
+		# attr_list = triple_collection.one({
+		# 									'_type': 'GAttribute',
+		# 									'attribute_type.$id': at_apps_list._id,
+		# 									'subject': ObjectId(group_id),
+		# 									'status': u'PUBLISHED'
+		# 								},
+		# 								{'_id': 0, 'object_value': 1}
+		# 							)
+
+		attr_list = triple_collection.find_one({
+											'_type': 'GAttribute',
+											'attribute_type.$id': at_apps_list._id,
+											'subject': ObjectId(group_id),
+											'status': u'PUBLISHED',
+											'object_value': {'$exists': 1}
+										},
+										{'_id': 0, 'object_value': 1}
+									)
+		# print attr_list.count()," ---------- count "
+
+		if attr_list:
+			all_gapp_ids_list = [node_collection.one({'_id': g['_id']}) for g in attr_list['object_value']]
+			# all_gapp_ids_list = attr_list
+			# print "\n legnt==== ", all_gapp_ids_list
+			return all_gapp_ids_list
+		# group_name = group_obj.name
+		# for attr in group_obj.attribute_set:
+		# 	if attr and "apps_list" in attr:
+		# 		gapps_list = attr["apps_list"]
+		# 		# print "\n", gapps_list,"\n"
+
+		# 		all_gapp_ids_list = [node_collection.one({'_id':ObjectId(g['_id'])}) for g in gapps_list]
+		# 		# print all_gapp_ids_list,">>>>>>>>>>\n\n works like prior_node"
+		# 		return all_gapp_ids_list
 
 
 	return []
