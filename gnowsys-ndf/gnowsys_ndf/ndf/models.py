@@ -1340,6 +1340,8 @@ class RelationType(Node):
                 })
             else:
                 left_or_right_subject_node = []
+                if isinstance(left_or_right_subject, ObjectId):
+                    left_or_right_subject = [left_or_right_subject]
                 for each in left_or_right_subject:
                     each_node = node_collection.one({
                         '_id': each
