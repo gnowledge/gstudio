@@ -2076,12 +2076,12 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     if request.user.is_authenticated():
         user_id = request.user.id
 
-    blog_pages = node_collection.find({'member_of':gst_page_id, 'type_of': blog_page_gst_id,
+    blog_pages = node_collection.find({'member_of':page_gst_id, 'type_of': blog_page_gst_id,
      'group_set': group_obj._id, 'created_by': {'$ne': user_id}},{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
     # print "\n -- blog --",blog_pages.count()
 
     if user_id:
-        user_blogs = node_collection.find({'member_of':gst_page_id, 'type_of': blog_page_gst_id,
+        user_blogs = node_collection.find({'member_of':page_gst_id, 'type_of': blog_page_gst_id,
          'group_set': group_obj._id, 'created_by': user_id },{'_id': 1, 'created_at': 1, 'created_by': 1, 'name': 1, 'content': 1}).sort('created_at', -1)
         # print "\n -- user --",user_blogs.count()
 
@@ -2497,7 +2497,7 @@ def course_filters(request, group_id):
     elif title.lower() == "notebook":
         # page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
         # blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-        query.update({'member_of':gst_page_id, 'type_of': blog_page_gst_id})
+        query.update({'member_of':page_gst_id, 'type_of': blog_page_gst_id})
         notebook_filter = True
         no_url_flag = False
         detail_urlname = "course_notebook_tab_note"
@@ -2875,7 +2875,7 @@ def course_analytics_admin(request, group_id):
     from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
 
     gst_page = node_collection.one({'_type': 'GSystemType', 'name': u'Page'})
-    gst_page_id = page_gst_id
+    page_gst_id = page_gst_id
 
     gst_blog = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
     gst_blog_id = gst_blog._id
@@ -2888,10 +2888,10 @@ def course_analytics_admin(request, group_id):
 
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     author_set = group_obj.author_set
-    all_res_cur = node_collection.find({'_type': 'GSystem', 'group_set': {'$in': [group_obj._id]}, '$or': [{'member_of': {'$in': [gst_file_id, gst_reply_id]}}, {'member_of': gst_page_id, 'type_of': gst_blog_id}], 'created_by': {'$in': author_set} })
+    all_res_cur = node_collection.find({'_type': 'GSystem', 'group_set': {'$in': [group_obj._id]}, '$or': [{'member_of': {'$in': [gst_file_id, gst_reply_id]}}, {'member_of': page_gst_id, 'type_of': gst_blog_id}], 'created_by': {'$in': author_set} })
 
 
-    gst_dict = {gst_page_id: 0, gst_file_id: 0, gst_reply_id: 0}
+    gst_dict = {page_gst_id: 0, gst_file_id: 0, gst_reply_id: 0}
 
     ud = { auth_id: gst_dict.copy() for auth_id in author_set}
 
@@ -2901,8 +2901,8 @@ def course_analytics_admin(request, group_id):
     # final dict
     fd = {}
 
-    gst_name_id_dict = {gst_page_id: 'notes_points', gst_file_id: 'files_points', gst_reply_id: 'interactions_points'}
-    gst_name_point_dict = {gst_page_id: GSTUDIO_NOTE_CREATE_POINTS, gst_file_id: GSTUDIO_FILE_UPLOAD_POINTS, gst_reply_id: GSTUDIO_COMMENT_POINTS}
+    gst_name_id_dict = {page_gst_id: 'notes_points', gst_file_id: 'files_points', gst_reply_id: 'interactions_points'}
+    gst_name_point_dict = {page_gst_id: GSTUDIO_NOTE_CREATE_POINTS, gst_file_id: GSTUDIO_FILE_UPLOAD_POINTS, gst_reply_id: GSTUDIO_COMMENT_POINTS}
 
     admin_analytics_data_list = []
     admin_analytics_data_append = admin_analytics_data_list.append
