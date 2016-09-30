@@ -22,8 +22,8 @@
 
 {% block body_content %}
 
-  <h3> {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}} {{group_id}}</h3><br>
-  <form id="create_partner" class="" method="post"
+  <h3> {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}}</h3><br>
+  <form id="create_partner" class="" method="get"
   {% if node %} action="{% url 'edit_group' group_id %}"
   {% else %} action="{% url 'create_group' parent_obj_partner.pk %}"
   {% endif %}
@@ -58,7 +58,7 @@
               </label>
             </div>
             <div class="small-5 columns end">
-              {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+              {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk %}
             </div>
           </div>
           <div class="row">
@@ -382,20 +382,24 @@
   });
   $("#grpsubmit").click(function(event) {
     $("#name_input,#email_id").removeAttr("disabled")
-  });
+  }); 
 
-  #("#grpsubmits").click(function(){
-      $.ajax({
-              type: "GET",
+  $("#grpsubmits").click(function(event) {
+    $.ajax({
+              type: "POST",
               url: "{% url 'edit_group' group_id %}",
               datatype: "html",
               data:{
-                      'ckeditor_toolbar' : "{{ckeditor_toolbar}}"
+                    'csrfmiddlewaretoken': "{{csrf_token}}",   
                 },
               success: function(data) {
-                  alert("success");
+                  location.reload();
                 }
 
                
             });
+
+  });
+
+
 {% endblock %}
