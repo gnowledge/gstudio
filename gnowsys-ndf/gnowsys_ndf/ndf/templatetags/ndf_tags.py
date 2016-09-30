@@ -609,41 +609,45 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
 @get_execution_time
 @register.assignment_tag
 def get_relation_value(node_id, grel, return_single_right_subject=False):
-	try:
-		result_dict = {}
-		if node_id:
-			node = node_collection.one({'_id': ObjectId(node_id) })
-			relation_type_node = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
-			if node and relation_type_node:
-				if relation_type_node.object_cardinality > 1:
-					node_grel = triple_collection.find({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
-					if node_grel:
-						grel_val = []
-						grel_id = []
-						for each_node in node_grel:
-							grel_val.append(each_node.right_subject)
-							grel_id.append(each_node._id)
-						grel_val_node_cur = node_collection.find({'_id':{'$in' : grel_val}})
-						result_dict.update({"cursor": True})
-						if return_single_right_subject:
-							grel_val_node_cur = node_collection.find_one({'_id':{'$in' : grel_val}})
-							result_dict.update({"cursor": False})
-						# nodes = [grel_node_val for grel_node_val in grel_val_node_cur]
-						# print "\n\n grel_val_node, grel_id == ",grel_val_node, grel_id
-						result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node_cur})
-				else:
-					node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
-					if node_grel:
-						grel_val = node_grel.right_subject
-						grel_id = node_grel._id
-						grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
-						# returns right_subject of grelation and GRelation _id
-						result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node, "cursor": False})
-		# print "\n\nresult_dict === ",result_dict
-		return result_dict
-	except Exception as e:
-		print e
-		return None
+
+    try:
+        result_dict = {}
+    	if node_id:
+    		node = node_collection.one({'_id': ObjectId(node_id) })
+    		relation_type_node = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
+    		if node and relation_type_node:
+    			if relation_type_node.object_cardinality > 1:
+    				node_grel = triple_collection.find({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
+    				if node_grel:
+    					grel_val = []
+    					grel_id = []
+    					for each_node in node_grel:
+    						grel_val.append(each_node.right_subject)
+    						grel_id.append(each_node._id)
+    					grel_val_node_cur = node_collection.find({'_id':{'$in' : grel_val}})
+    					result_dict.update({"cursor": True})
+    					if return_single_right_subject:
+    						grel_val_node_cur = node_collection.find_one({'_id':{'$in' : grel_val}})
+    						result_dict.update({"cursor": False})
+    					# nodes = [grel_node_val for grel_node_val in grel_val_node_cur]
+    					# print "\n\n grel_val_node, grel_id == ",grel_val_node, grel_id
+    					result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node_cur})
+                else:
+                    node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
+                    if node_grel:
+                        grel_val = node_grel.right_subject
+                        grel_val = grel_val if isinstance(grel_val, list) else [ObjectId(grel_val)]
+                        grel_val = list()
+                        grel_id = node_grel._id
+                        # grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+                        grel_val_node = node_collection.find_one({'_id':{'$in': grel_val}})
+                        # returns right_subject of grelation and GRelation _id
+                        result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node, "cursor": False})
+    	# print "\n\nresult_dict === ",result_dict
+    	return result_dict
+    except Exception as e:
+    	print e
+    	return {}
 
 @get_execution_time
 @register.inclusion_tag('ndf/drawer_widget.html')

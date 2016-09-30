@@ -2946,6 +2946,7 @@ class Triple(DjangoDocument):
       subject_type_list = self.relation_type['subject_type']
       object_type_list = self.relation_type['object_type']
 
+
       left_subject_member_of_list = subject_document.member_of
       relation_type_name = self.relation_type['name']
       if META_TYPE[4] in self.relation_type.member_of_names_list:
@@ -2988,6 +2989,8 @@ class Triple(DjangoDocument):
           # Single relation: ObjectId()
           # Multi relation: [ObjectId(), ObjectId(), ...]
           right_subject_document = node_collection.one({'_id': self.right_subject})
+          right_subject_list = self.right_subject if isinstance(self.right_subject, list) else [self.right_subject]
+          right_subject_document = node_collection.one({'_id': {'$in': right_subject_list} })
 
           right_subject_member_of_list = right_subject_document.member_of
           right_subject_name = right_subject_document.name

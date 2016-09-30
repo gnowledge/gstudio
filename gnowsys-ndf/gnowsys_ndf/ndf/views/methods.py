@@ -74,8 +74,7 @@ def get_execution_time(f):
         post_bool = get_bool = False,
         sessionid = user_name = path = '',
 
-        total_param = len(kwargs)
-        req = args[0]
+        req = args[0] if len(args) else None
 
         if isinstance(req, WSGIRequest):
             # try :
@@ -2709,11 +2708,12 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     """
     gr_node = None
     multi_relations = False
+
     try:
         subject_id = ObjectId(subject_id)
 
         def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text):
-                        # Code for creating GRelation node
+            # Code for creating GRelation node
             gr_node = triple_collection.collection.GRelation()
 
             gr_node.subject = subject_id
@@ -2871,6 +2871,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # Relationship Other than Binary one found; e.g, Triadic
                     # right_subject_id_or_list: [[id, id, ...], [id, id, ...],
                     # ...]
+                    if isinstance(right_subject_id_or_list, ObjectId):
+                        right_subject_id_or_list = [right_subject_id_or_list]
                     if right_subject_id_or_list:
                         if isinstance(right_subject_id_or_list[0], list):
                             # Reduce it to [id, id, id, ...]
