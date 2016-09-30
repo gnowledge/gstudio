@@ -4195,6 +4195,9 @@ course-title{
     &.forthcoming{
       background-color: #F2910D;
     }
+    &.upcoming{
+      background-color: #F2910D;
+    }
 
     &.completed{
       background-color: #4d4d4d;
@@ -4572,4 +4575,12 @@ course-title{
     position:relative;
     text-align:center;
     border: 1px solid #eee;
+}
+.processing-screen{
+  background-color:$theme-color !important;
+}
+
+.processing-screen-label{
+  width:500px !important;
+  font-style: normal !important;
 }

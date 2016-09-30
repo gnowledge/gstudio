@@ -29,7 +29,11 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
+
+    # gstudio admin url's
     (r'^admin/', include('gnowsys_ndf.ndf.urls.gstudio_admin')),
+
+    # django's admin site url's
     (r'^admin/', include(admin.site.urls)),
 
     # --mobwrite-- commented for time being
@@ -43,16 +47,13 @@ urlpatterns = patterns('',
 
     # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
 
-    # (r'^$', HomeRedirectView.as_view()),
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
-
 
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
 
     # all main apps
-    # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
     (r'^(?P<group_id>[^/]+)/mailclient', include('gnowsys_ndf.ndf.urls.mailclient')),
     (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
@@ -69,6 +70,7 @@ urlpatterns = patterns('',
 
     # Commented following url for khaal hackathon
     # (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
+
     (r'^(?P<group_id>[^/]+)/gcourse', include('gnowsys_ndf.ndf.urls.gcourse')),
 
     (r'^(?P<group_id>[^/]+)/program', include('gnowsys_ndf.ndf.urls.program')),

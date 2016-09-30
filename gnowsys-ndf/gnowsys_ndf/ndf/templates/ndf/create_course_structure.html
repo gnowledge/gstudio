@@ -17,7 +17,11 @@
     {% if 'NUSSD Course' in cnode.member_of_names_list %}
       <a href="{% url 'mis_course_detail' group_name_tag app_id app_set_id cnode %}"><h3><u>Go back to Course '{{cnode.name}}' </u></h3></a>
     {% else %}
-      <a href="{% url 'course_detail' group_name_tag cnode %}"><h3><u>Go back to Course '{{cnode.name}}' </h3></u></a>
+      {% if 'BaseCourseGroup' in cnode.member_of_names_list %}
+        <a href="{% url 'course_content' cnode.name %}"><h3><u>Go back to Course '{{cnode.name}}' </h3></u></a>
+      {% else %}
+        <a href="{% url 'course_detail' group_name_tag cnode %}"><h3><u>Go back to Course '{{cnode.name}}' </h3></u></a>
+      {% endif %}
     {% endif %}
   {% endif %}
 {% endblock %}
@@ -100,7 +104,7 @@
 
     .largesize{
       /*font-size:22px;*/
-      color: #e0e0e0 !important;
+      color: #808080 !important;
     }
 
     span{
@@ -133,7 +137,7 @@
     .lbl_of_cs, .lbl_of_css, .contains-unit {
       white-space: nowrap;
       overflow: hidden;
-      width: 35% !important;
+      width: 70% !important;
       /*color:#0b8a91 !important;*/
       text-overflow: ellipsis;
       font-size: large;

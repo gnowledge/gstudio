@@ -37,7 +37,6 @@ from gnowsys_ndf.settings import STATIC_ROOT, STATIC_URL
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_course_completed_ids,create_thread_for_node
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
@@ -1861,7 +1860,7 @@ def get_data_for_event_task(request, group_id):
     year = request.GET.get('start','')[0:4]
     start = datetime.datetime(int(currentYear), int(month), 1)
     task_start = str(int(month))+"/"+"01"+"/"+str(int(year))
-    
+
     now = datetime.datetime.now()
     e_status = node_collection.one({'_type' : 'AttributeType' , 'name': 'event_status'})
 
@@ -1871,7 +1870,7 @@ def get_data_for_event_task(request, group_id):
     elif int(month) in list30:
      end=datetime.datetime(int(currentYear),int(month), 30)
      task_end=str(int(month))+"/"+"30"+"/"+str(int(year))
-    # Check for leap year 
+    # Check for leap year
     elif currentYear%4 == 0:
       if currentYear%100 == 0:
         if currentYear%400 == 0:
@@ -1885,12 +1884,12 @@ def get_data_for_event_task(request, group_id):
         task_end=str(int(month))+"/"+"29"+"/"+str(int(year))
     else:
        end=datetime.datetime(int(currentYear),int(month), 28)
-       task_end=str(int(month))+"/"+"28"+"/"+str(int(year))       
+       task_end=str(int(month))+"/"+"28"+"/"+str(int(year))
 
     #day_list of events
 
     # For including events on the last date of the month uptill 00:00:00 of first date of next month
-    end = end + datetime.timedelta(days = 1)   
+    end = end + datetime.timedelta(days = 1)
 
     if no == '1' or no == '2':
        #condition to search events only in case of above condition so that it
@@ -1916,10 +1915,10 @@ def get_data_for_event_task(request, group_id):
             if unicode('end_time') in j.keys():
               end_time = j['end_time']
             elif unicode('event_status') in j.keys():
-              status = j['event_status']  
+              status = j['event_status']
 
           if now > end_time and status == "Scheduled":
-            create_gattribute(i._id , e_status , unicode("Completed")) 
+            create_gattribute(i._id , e_status , unicode("Completed"))
             status = "Completed"
 
           if status == "Rescheduled":
@@ -1927,7 +1926,7 @@ def get_data_for_event_task(request, group_id):
           if status == "Completed":
             update({'backgroundColor':'green'})
           if status == "Incomplete":
-            update({'backgroundColor':'red'})       
+            update({'backgroundColor':'red'})
 
           append(dict(attr_value))
 
@@ -5601,11 +5600,11 @@ def page_scroll(request,group_id,page):
     paged_resources = Paginator(group_obj,group_obj.count())
   files_list = []
   user_activity = []
-  tot_page=paged_resources.num_pages
-  if int(page) <= int(tot_page):
+  # tot_page=paged_resources.num_pages
+  if paged_resources.count and (int(page) <= int(paged_resources.num_pages)):
     if int(page)==1:
       page='1'
-    if int(page) != int(tot_page) and int(page) != int(1):
+    if int(page) != int(paged_resources.num_pages) and int(page) != int(1):
       page=int(page)+1
     # temp. variables which stores the lookup for append method
     user_activity_append_temp=user_activity.append
@@ -6415,9 +6414,9 @@ def upload_video_thumbnail(request,group_id):
     if gs_obj_id:
       gs_obj_node = node_collection.one({'_id':ObjectId(gs_obj_id)})
       pr_obj_node = node_collection.one({'_id':ObjectId(parent_node)})
-      
+
       has_thumbnail_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_thumbnail') })
-      
+
       gr_node = create_grelation(pr_obj_node._id, has_thumbnail_rt, gs_obj_id)
       # print "\n\n\ngr_node",gr_node
       warehouse_grp_obj = node_collection.one({'_type': "Group", 'name': "warehouse"})

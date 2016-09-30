@@ -23,7 +23,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES,GSTUDIO_DEFAULT_GROUPS
-from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_NO_OF_OBJS_PP
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_execution_time
@@ -33,6 +33,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
 
 
 gst_course = node_collection.one({'_type': "GSystemType", 'name': "Course"})
+gst_basecoursegroup = node_collection.one({'_type': "GSystemType", 'name': "BaseCourseGroup"})
 ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
 gst_acourse = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
 gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
@@ -40,6 +41,7 @@ group_id = node_collection.one({'_type': "Group", 'name': "home"})._id
 
 
 def explore(request):
+    return HttpResponseRedirect(reverse('explore_courses', kwargs={}))
 
     title = 'explore'
 
@@ -53,7 +55,6 @@ def explore(request):
 
 @get_execution_time
 def explore_courses(request,page_no=1):
-    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     title = 'courses'
     ce_cur = node_collection.find({'member_of': ce_gst._id,
                                         '$or': [
@@ -79,7 +80,6 @@ def explore_courses(request,page_no=1):
 
 @get_execution_time
 def explore_groups(request,page_no=1):
-    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     title = 'groups'
     gstaff_access = check_is_gstaff(group_id,request.user)
     if gstaff_access:
@@ -101,17 +101,21 @@ def explore_groups(request,page_no=1):
 @get_execution_time
 def explore_basecourses(request,page_no=1):
 
-    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     gstaff_access = check_is_gstaff(group_id,request.user)
     if not gstaff_access:
         return HttpResponseRedirect(reverse('explore_courses'))
 
     title = 'base courses'
 
-    course_cur = node_collection.find({'member_of': gst_course._id}).sort('last_update', -1)
+    course_cur = node_collection.find({'member_of': {'$in': [gst_course._id, gst_basecoursegroup._id]}}).sort('last_update', -1)
+
     ce_page_cur = paginator.Paginator(course_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-    context_variable = {'title': title, 'doc_cur': course_cur, 'card': 'ndf/event_card.html',
-                        'group_id': group_id, 'groupid': group_id,'ce_page_cur':ce_page_cur}
+
+    context_variable = {
+                        'title': title, 'doc_cur': course_cur, 'card': 'ndf/event_card.html',
+                        'group_id': group_id, 'groupid': group_id, 'ce_page_cur':ce_page_cur
+                        }
+
     return render_to_response(
         "ndf/explore.html",
         context_variable,

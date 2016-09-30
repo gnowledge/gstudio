@@ -19,7 +19,6 @@ from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type, get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_filter_querydict
-# from gnowsys_ndf.ndf.org2any import org2html
 
 ##############################################################################
 

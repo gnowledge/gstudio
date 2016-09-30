@@ -37,6 +37,7 @@ from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 # to display error template if non existent pub is given in settings.py
 from django.shortcuts import render
+from django.core.handlers.wsgi import WSGIRequest
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
@@ -44,14 +45,14 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAP
 from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN
 # from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 # get pub of gpg key with which to sign syncdata attachments
 from gnowsys_ndf.settings import SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH
+from gnowsys_ndf.ndf.views.tasks import record_in_benchmark
 from datetime import datetime, timedelta, date
-
 
 history_manager = HistoryManager()
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
@@ -63,76 +64,53 @@ ins_objectid = ObjectId()
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
 def get_execution_time(f):
-   if BENCHMARK == 'ON':
 
     def wrap(*args,**kwargs):
-        time1 = time.time()
-        total_parm_size = 0
-        for key, value in kwargs.iteritems():
-           total_parm_size = total_parm_size + getsizeof(value)
-        total_param = len(kwargs)
-        ret = f(*args,**kwargs)
-        t2 = time.clock()
-        time2 = time.time()
-        time_diff = time2 - time1
-        benchmark_node =  benchmark_collection.Benchmark()
-        benchmark_node.time_taken = unicode(str(time_diff))
-        benchmark_node.name = unicode(f.func_name)
-        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
-        try :
-            benchmark_node.has_data["POST"] = bool(args[0].POST)
-            benchmark_node.has_data["GET"] = bool(args[0].GET)
-        except :
-            pass
-        try :
-            benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
-        except :
-            pass
-        try :
-            benchmark_node.user = unicode(args[0].user.username)
-        except :
-            pass
-        benchmark_node.parameters = unicode(total_param)
-        benchmark_node.size_of_parameters = unicode(total_parm_size)
-        benchmark_node.last_update = datetime.today()
-        try:
-            benchmark_node.calling_url = unicode(args[0].path)
-            url = benchmark_node.calling_url.split("/")
 
-            if url[1] != "" :
-                group = url[1]
-                benchmark_node.group = group
-                try :
-                    n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
-                    if bool(n) :
-                        benchmark_node.group = group;
-                except :
-                    group_name, group = get_group_name_id(group)
-                    benchmark_node.group = str(group)
-            else :
+        time1 = time.time()
+        ret = f(*args,**kwargs)
+        time2 = time.time()
+
+        post_bool = get_bool = False,
+        sessionid = user_name = path = '',
+
+        req = args[0] if len(args) else None
+
+        if isinstance(req, WSGIRequest):
+            # try :
+            post_bool = bool(args[0].POST)
+            get_bool = bool(args[0].GET)
+            # except :
+            #     pass
+
+            try :
+                sessionid = unicode(args[0].COOKIES['sessionid'])
+            except :
                 pass
 
-            if url[2] == "" :
-                benchmark_node.action = None
-            else :
-                benchmark_node.action = url[2]
-                if url[3] != '' :
-                    benchmark_node.action +=  str('/'+url[3])
-                else :
-                    pass
-            if "node_id" in args[0].GET and "collection_nav" in f.func_name:
-                benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
-                # modify calling_url if collection_nav is called i.e collection-player
-        except :
-            pass
-        benchmark_node.save()
+            try :
+                user_name = unicode(args[0].user.username)
+            except :
+                pass
+
+            # try :
+            path = unicode(args[0].path)
+            # except :
+            #     pass
+
+        record_in_benchmark.delay(kwargs_len=len(kwargs),
+                            # total_param_size=sum([getsizeof(each_kwarg) for each_kwarg in kwargs.values()]),
+                            total_param_size=None,
+                            post_bool=post_bool,
+                            get_bool=get_bool,
+                            sessionid=sessionid,
+                            user_name=user_name,
+                            path=path,
+                            funct_name=f.func_name,
+                            time_taken=unicode(str(time2 - time1))
+                        )
         return ret
-
-    if BENCHMARK == 'ON':
-        return wrap
-    if BENCHMARK == 'OFF':
-        return f
-
+    return wrap
 
 
 import json
@@ -401,6 +379,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
         return None, None
 
 
+@login_required
 def update_notes_or_files_visited(user_id, group_id,node_id,if_file,if_note) :
     # counter_obj = Counter.get_counter_obj(user_id, group_id)
     # if if_file:
@@ -1115,8 +1094,9 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
     node.name=unicode(name)
     # Required to link temporary files with the current user who is modifying this document
     usrname = request.user.username
-    filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
-    node.content = org2html(content_org, file_prefix=filename)
+    # filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
+    # node.content = org2html(content_org, file_prefix=filename)
+    node.content = unicode(content_org)
 
 @get_execution_time
 def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
@@ -1340,11 +1320,14 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         # org editor for wiki page and ckeditor for blog and info pages
         if node_page_type_list:
           if "Wiki page" in node_page_type_list:
-            node.content = unicode(org2html(content_org, file_prefix=filename))
+            # node.content = unicode(org2html(content_org, file_prefix=filename))
+            node.content = unicode(content_org)
+            pass
           else:
             node.content = unicode(content_org)
         else:
-          node.content = unicode(org2html(content_org, file_prefix=filename))
+          # node.content = unicode(org2html(content_org, file_prefix=filename))
+            node.content = unicode(content_org)
         is_changed = True
     '''
 
@@ -2693,6 +2676,10 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
             raise Exception(error_message)
 
     # print "\n\t is_ga_node_changed: ", is_ga_node_changed
+
+    cache_key = str(subject_id) + 'attribute_value' + str(attribute_type_node.name)
+    cache.set(cache_key, object_value, 60 * 60)
+
     if "is_changed" in kwargs:
         ga_dict = {}
         ga_dict["is_changed"] = is_ga_node_changed
@@ -2721,11 +2708,12 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     """
     gr_node = None
     multi_relations = False
+
     try:
         subject_id = ObjectId(subject_id)
 
         def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text):
-                        # Code for creating GRelation node
+            # Code for creating GRelation node
             gr_node = triple_collection.collection.GRelation()
 
             gr_node.subject = subject_id
@@ -2883,6 +2871,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # Relationship Other than Binary one found; e.g, Triadic
                     # right_subject_id_or_list: [[id, id, ...], [id, id, ...],
                     # ...]
+                    if isinstance(right_subject_id_or_list, ObjectId):
+                        right_subject_id_or_list = [right_subject_id_or_list]
                     if right_subject_id_or_list:
                         if isinstance(right_subject_id_or_list[0], list):
                             # Reduce it to [id, id, id, ...]
@@ -3197,9 +3187,10 @@ def discussion_reply(request, group_id, node_id):
             reply_obj.group_set.append(ObjectId(group_id))
 
             reply_obj.content_org = unicode(content_org)
-            filename = slugify(
-                unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
-            reply_obj.content = org2html(content_org, file_prefix=filename)
+            reply_obj.content = unicode(content_org)
+            # filename = slugify(
+            #     unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
+            # reply_obj.content = org2html(content_org, file_prefix=filename)
 
             # saving the reply obj
             reply_obj.save()
@@ -3469,8 +3460,8 @@ def create_task(task_dict, task_type_creation="single"):
                 filename = slugify(
                     task_dict["name"]) + "-" + task_dict["created_by_name"] + "-" + ObjectId().__str__()
                 task_dict_keys.remove("created_by_name")
-                task_node.content = org2html(
-                    task_dict[key], file_prefix=filename)
+                # task_node.content = org2html(task_dict[key], file_prefix=filename)
+                task_node.content = unicode(task_dict[key])
 
             else:
                 task_node[key] = task_dict[key]
@@ -5150,6 +5141,8 @@ def get_language_tuple(lang):
         lang (str or unicode): it is the one of item from tuple.
         It may either language-code or language-name.
     """
+    if not lang:
+        return ('en', 'English')
 
     all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
 

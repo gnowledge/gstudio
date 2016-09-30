@@ -18,6 +18,7 @@ from django.contrib.auth.models import Group as DjangoGroup
 from django.contrib.sessions.models import Session
 from django.db import models
 from django.http import HttpRequest
+from celery import task
 
 from django_mongokit import connection
 from django_mongokit import get_database
@@ -511,13 +512,14 @@ class Node(DjangoDocument):
         # confirming arg 'node_obj_or_id' is Object or oid and
         # setting node_obj accordingly.
         node_obj = None
+
         if isinstance(node_obj_or_id, expected_type):
             node_obj = node_obj_or_id
-        elif isinstance(node_obj_or_id, ObjectId):
+        elif isinstance(node_obj_or_id, ObjectId) or ObjectId.is_valid(node_obj_or_id):
             node_obj = node_collection.one({'_id': ObjectId(node_obj_or_id)})
         else:
             # error raised:
-            raise RuntimeError('No Node class instance found with provided arg for get_node_obj_from_id_or_obj(' + str(node_obj_or_id) + ', expected_type=' + expected_type + ')')
+            raise RuntimeError('No Node class instance found with provided arg for get_node_obj_from_id_or_obj(' + str(node_obj_or_id) + ', expected_type=' + str(expected_type) + ')')
 
         return node_obj
 
@@ -544,30 +546,31 @@ class Node(DjangoDocument):
         File, etc.), built from 'member_of' field (list of ObjectIds)
 
         """
-        member_of_names = []
+        # member_of_names = []
 
-        if self.member_of:
-            for each_member_id in self.member_of:
-                if type(each_member_id) == ObjectId:
-                    _id = each_member_id
-                else:
-                    _id = each_member_id['$oid']
-                if _id:
-                    mem = node_collection.one({'_id': ObjectId(_id)})
-                    if mem:
-                        member_of_names.append(mem.name)
-        else:
-            if "gsystem_type" in self:
-                for each_member_id in self.gsystem_type:
-                    if type(each_member_id) == ObjectId:
-                        _id = each_member_id
-                    else:
-                        _id = each_member_id['$oid']
-                    if _id:
-                        mem = node_collection.one({'_id': ObjectId(_id)})
-                        if mem:
-                            member_of_names.append(mem.name)
-        return member_of_names
+        # if self.member_of:
+        #     for each_member_id in self.member_of:
+        #         if type(each_member_id) == ObjectId:
+        #             _id = each_member_id
+        #         else:
+        #             _id = each_member_id['$oid']
+        #         if _id:
+        #             mem = node_collection.one({'_id': ObjectId(_id)})
+        #             if mem:
+        #                 member_of_names.append(mem.name)
+        # else:
+        #     if "gsystem_type" in self:
+        #         for each_member_id in self.gsystem_type:
+        #             if type(each_member_id) == ObjectId:
+        #                 _id = each_member_id
+        #             else:
+        #                 _id = each_member_id['$oid']
+        #             if _id:
+        #                 mem = node_collection.one({'_id': ObjectId(_id)})
+        #                 if mem:
+        #                     member_of_names.append(mem.name)
+        # return member_of_names
+        return [GSystemType.get_gst_name_id(gst_id)[0] for gst_id in self.member_of]
 
 
     @property
@@ -786,43 +789,42 @@ class Node(DjangoDocument):
 
         super(Node, self).save(*args, **kwargs)
 
-    	#This is the save method of the node class.It is still not
-    	#known on which objects is this save method applicable We
-    	#still do not know if this save method is called for the
-    	#classes which extend the Node Class or for every class There
-    	#is a very high probability that it is called for classes
-    	#which extend the Node Class only The classes which we have
-    	#i.e. the MyReduce() and ToReduce() class do not extend from
-    	#the node class Hence calling the save method on those objects
-    	#should not create a recursive function
+        # This is the save method of the node class.It is still not
+        # known on which objects is this save method applicable We
+        # still do not know if this save method is called for the
+        # classes which extend the Node Class or for every class There
+        # is a very high probability that it is called for classes
+        # which extend the Node Class only The classes which we have
+        # i.e. the MyReduce() and ToReduce() class do not extend from
+        # the node class Hence calling the save method on those objects
+        # should not create a recursive function
 
-    	#If it is a new document then Make a new object of ToReduce
-    	#class and the id of this document to that object else Check
-    	#whether there is already an object of ToReduce() with the id
-    	#of this object.  If there is an object present pass else add
-    	#that object I have not applied the above algorithm
+        # If it is a new document then Make a new object of ToReduce
+        # class and the id of this document to that object else Check
+        # whether there is already an object of ToReduce() with the id
+        # of this object.  If there is an object present pass else add
+        # that object I have not applied the above algorithm
 
-   	#Instead what I have done is that I have searched the
-   	#ToReduce() collection class and searched whether the ID of
-   	#this document is present or not.  If the id is not present
-   	#then add that id.If it is present then do not add that id
+        # Instead what I have done is that I have searched the
+        # ToReduce() collection class and searched whether the ID of
+        # this document is present or not.  If the id is not present
+        # then add that id.If it is present then do not add that id
 
-   	old_doc = node_collection.collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})
+        old_doc = node_collection.collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})
 
-    		#print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
-    	if  not old_doc:
+        #print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
+        if  not old_doc:
+            z = node_collection.collection.ToReduceDocs()
+            z.doc_id = self._id
+            z.required_for = to_reduce_doc_requirement
+            z.save()
 
-
-    		z = node_collection.collection.ToReduceDocs()
-    		z.doc_id = self._id
-    		z.required_for = to_reduce_doc_requirement
-    		z.save()
-
-    	#If you create/edit anything then this code shall add it in the URL
+        #If you create/edit anything then this code shall add it in the URL
 
         history_manager = HistoryManager()
         rcs_obj = RCS()
-	if is_new:
+
+        if is_new:
             # Create history-version-file
             try:
                 if history_manager.create_or_replace_json_file(self):
@@ -869,11 +871,13 @@ class Node(DjangoDocument):
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
                 raise RuntimeError(err)
-	#gets the last version no.
-        rcsno = history_manager.get_current_version(self)
-	#update the snapshot feild
-	if kwargs.get('groupid'):
-		node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+
+        #update the snapshot feild
+        if kwargs.get('groupid'):
+            # gets the last version no.
+            rcsno = history_manager.get_current_version(self)
+            node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+
 
     # User-Defined Functions
     def get_possible_attributes(self, gsystem_type_id_or_list):
@@ -1336,6 +1340,8 @@ class RelationType(Node):
                 })
             else:
                 left_or_right_subject_node = []
+                if isinstance(left_or_right_subject, ObjectId):
+                    left_or_right_subject = [left_or_right_subject]
                 for each in left_or_right_subject:
                     each_node = node_collection.one({
                         '_id': each
@@ -1455,6 +1461,67 @@ class GSystemType(Node):
     use_autorefs = True                         # To support Embedding of Documents
 
 
+    # @staticmethod
+    # def get_id_from_name(gst_name):
+    #     from django.template.defaultfilters import slugify
+    #     from django.core.cache import cache
+
+    #     slug = slugify(gst_name)
+    #     cache_key = 'gst_name_' + str(gst_name) if slug else str(abs(hash(gst_name)))
+    #     cache_result = cache.get(cache_key)
+
+    #     if cache_result:
+    #         return cache_result
+
+    #     # setting cache with both ObjectId and group_name
+    #     gst_id = node_collection.one(
+    #                                 {'_type': u'GSystemType', 'name': unicode(gst_name)},
+    #                                 {'_id': True}
+    #                             ).get('_id')
+    #     cache.set(cache_key, gst_id, 60 * 60)
+    #     return gst_id
+
+    @staticmethod
+    def get_gst_name_id(gst_name_or_id):
+        # if cached result exists return it
+        from django.template.defaultfilters import slugify
+        from django.core.cache import cache
+
+        slug = slugify(gst_name_or_id)
+        cache_key = 'gst_name_id' + str(slug)
+        cache_result = cache.get(cache_key)
+
+        if cache_result:
+            return cache_result
+        # ---------------------------------
+
+        gst_id = ObjectId(gst_name_or_id) if ObjectId.is_valid(gst_name_or_id) else None
+        gst_obj = node_collection.one({
+                                        "_type": "GSystemType",
+                                        "$or":[
+                                            {"_id": gst_id},
+                                            {"name": unicode(gst_name_or_id)}
+                                        ]
+                                    })
+
+        if gst_obj:
+            gst_name = gst_obj.name
+            gst_id = gst_obj._id
+
+            # setting cache with ObjectId
+            cache_key = u'gst_name_id' + str(slugify(gst_id))
+            cache.set(cache_key, (gst_name, gst_id), 60 * 60)
+
+            # setting cache with gst_name
+            cache_key = u'gst_name_id' + str(slugify(gst_name))
+            cache.set(cache_key, (gst_name, gst_id), 60 * 60)
+
+            return gst_name, gst_id
+
+        return None, None
+
+
+
 @connection.register
 class GSystem(Node):
     """GSystemType instance
@@ -1532,8 +1599,8 @@ class GSystem(Node):
             self['_id'] = ObjectId()
 
         # origin:
-        if kwargs.has_key('origin'):
-            self['origin'] = kwargs.get('origin', '')
+        if origin:
+            self['origin'].append(origin)
         # else:  # rarely/no origin field value will be sent via form/request.
         #     self['origin'] = request.POST.get('origin', '').strip()
 
@@ -2879,6 +2946,7 @@ class Triple(DjangoDocument):
       subject_type_list = self.relation_type['subject_type']
       object_type_list = self.relation_type['object_type']
 
+
       left_subject_member_of_list = subject_document.member_of
       relation_type_name = self.relation_type['name']
       if META_TYPE[4] in self.relation_type.member_of_names_list:
@@ -2921,6 +2989,8 @@ class Triple(DjangoDocument):
           # Single relation: ObjectId()
           # Multi relation: [ObjectId(), ObjectId(), ...]
           right_subject_document = node_collection.one({'_id': self.right_subject})
+          right_subject_list = self.right_subject if isinstance(self.right_subject, list) else [self.right_subject]
+          right_subject_document = node_collection.one({'_id': {'$in': right_subject_list} })
 
           right_subject_member_of_list = right_subject_document.member_of
           right_subject_name = right_subject_document.name
@@ -3817,8 +3887,8 @@ class Counter(DjangoDocument):
                 counter_obj.last_update = datetime.datetime.now()
                 counter_obj.save()
 
-
     @staticmethod
+    @task
     def add_visit_count(resource_obj_or_id, current_group_id, loggedin_userid):
 
         active_user_ids_list = [loggedin_userid]

@@ -30,7 +30,7 @@ from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff # get_existing_groups
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
 # ######################################################################################################################################
@@ -345,7 +345,7 @@ class CreateGroup(object):
         # if logo_img_node_grel_id:
         #     logo_img_node = logo_img_node_grel_id[0]
         #     grel_id = logo_img_node_grel_id[1]
-        f = request.FILES.get("docFile", "")
+        f = request.FILES.get("filehive", "")
         # print "\nf is ",f
 
         if f:
@@ -356,7 +356,7 @@ class CreateGroup(object):
                 # check whether it appears in any other node's grelation
                 rel_obj = None
                 rel_obj = triple_collection.find({"_type": "GRelation", 'subject': {'$ne': ObjectId(group_obj._id)}, 'right_subject': logo_img_node._id})
-                file_cur = node_collection.find({'_type':"File",'fs_file_ids':logo_img_node.fs_file_ids,'_id': {'$ne': logo_img_node._id}})
+                file_cur = node_collection.find({'_type':"GSystem",'_id': {'$ne': logo_img_node._id}})
                 # print "\nrel_obj--",rel_obj.count()
                 # print "\nfile_cur.count()--",file_cur.count()
                 if rel_obj.count() > 0 or file_cur.count() > 0:
@@ -375,13 +375,23 @@ class CreateGroup(object):
                         node_id=logo_img_node._id,
                         deletion_type=1
                     )
-                    # print del_status, "--", del_status_msg
+                    print del_status, "--", del_status_msg
 
-            fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+            from gnowsys_ndf.ndf.views.filehive import write_files
+            is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
+
+            # gs_obj_list = write_files(request, group_id)
+            fileobj_list = write_files(request, group_obj._id)
+            # print "request&&&&&&&&&&&&&&&&&&&&&&",request
+            fileobj_id = fileobj_list[0]['_id']
+            # print "fileobj_id****************************",fileobj_list
+            fileobj = node_collection.one({'_id': ObjectId(fileobj_id) })
+            # print "fileobj_id-------------------",fileobj
+            # fileobj,fs = save_file(f,f.name,request.user.id,group_obj._id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
             if fileobj:
                 rt_has_logo = node_collection.one({'_type': "RelationType", 'name': unicode(logo_rt)})
-                # print "\n creating GRelation has_logo\n"
-                create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj))
+                print "\n creating GRelation has_logo\n"
+                create_grelation(group_obj._id, rt_has_logo, ObjectId(fileobj._id))
 
 # --- END of class CreateGroup ---
 # --------------------------------
@@ -1311,7 +1321,6 @@ class GroupCreateEditHandler(View):
             group_id = ObjectId(group_id)
         except:
             group_name, group_id = get_group_name_id(group_id)
-
         group_obj = None
         nodes_list = []
         logo_img_node = None
@@ -1592,7 +1601,7 @@ class EventGroupCreateEditHandler(View):
                     mod_group.initialize_course_event_structure(request, group_obj._id)
                     # creating a new counter document for a user for a given course for the purpose of analytics
 
-                    counter_obj = Counter.get_counter_obj(userid, group_id)
+                    # counter_obj = Counter.get_counter_obj(userid, group_id)
                     # print "===========================", counter_obj
 
                     # auth_obj= node_collection.one({'_type':'Author','created_by':request.user.id})
@@ -1885,7 +1894,7 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
-    if "CourseEventGroup" in group_obj.member_of_names_list:
+    if "CourseEventGroup" in group_obj.member_of_names_list or "BaseCourseGroup" in group_obj.member_of_names_list:
         return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
 
     if group_obj and group_obj.post_node:
@@ -2002,8 +2011,8 @@ def group_dashboard(request, group_id=None):
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
       alternate_template = "ndf/gcourse_event_group.html"
-      course_collection_data = get_collection(request,group_obj._id,group_obj._id)
-      course_collection_data = json.loads(course_collection_data.content)
+      # course_collection_data = get_collection(request,group_obj._id,group_obj._id)
+      # course_collection_data = json.loads(course_collection_data.content)
 
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
@@ -2049,7 +2058,7 @@ def group_dashboard(request, group_id=None):
         else:
             allow_to_join = "Open"
   if group_obj.edit_policy == "EDITABLE_MODERATED":# and group_obj._type != "Group":
-      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': {'$in': ["File","GSystem"]}})
   '''
   property_order_list = []
   if "group_of" in group_obj:
@@ -2066,7 +2075,10 @@ def group_dashboard(request, group_id=None):
   '''
   default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
-  return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
+  if alternate_template:
+    return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
+  else:
+    return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
                                                        'group_id':group_id, 'user':request.user,
                                                        # 'shelf_list': shelf_list,
                                                        'list_of_unit_events': list_of_unit_events,
@@ -2083,7 +2095,8 @@ def group_dashboard(request, group_id=None):
                                                        'subgroups_cur':subgroups_cur,
                                                        # 'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image,
-                                                       'old_profile_pics':old_profile_pics
+                                                       'old_profile_pics':old_profile_pics,
+                                                       'group_obj': group_obj,
                                                       },context_instance=RequestContext(request)
                           )
 

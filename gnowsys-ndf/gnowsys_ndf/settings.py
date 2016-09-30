@@ -5,22 +5,22 @@ import os
 import djcelery
 
 # imports from core django libraries
-from django.conf import global_settings
-from django.utils.translation import ugettext
+# from django.conf import global_settings
+# from django.utils.translation import ugettext
 # from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 
 # imports from third-party app(s)
 
-from gnowsys_ndf.ndf.utils import (is_dir_exists, ensure_dir, get_current_dbs_path,
-    move_file_or_dirctory)
+# from gnowsys_ndf.ndf.utils import (is_dir_exists, ensure_dir, get_current_dbs_path,
+#     move_file_or_dirctory)
 
-DEBUG = True
-# ALLOWED_HOSTS = ["127.0.0.1"]
+DEBUG = False
+ALLOWED_HOSTS = ["*"]
 
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
-GSTUDIO_DEFAULT_GROUPS = ['home','Trash','desk','help','warehouse']
+GSTUDIO_DEFAULT_GROUPS = ['home', 'Trash', 'desk', 'help', 'warehouse']
 LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'))
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
@@ -28,7 +28,7 @@ OTHER_COMMON_LANGUAGES = [
     ('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'),
     ('dra','Dravidian'), ('gon','Gondi'), ('bra','Braj'),
     ('mi','Malayalam'), ('mai','Maithili'), ('mag','Magahi'),
-    ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'),
+    ('lus','Lushai'), ('bho','Bhojpuri'), ('kru','Kurukh'),
     ('awa','Awadhi'), ('sa','Sanskrit'), ('sat','Santali'),
     ('him','Himachali'), ('sd','Sindhi'), ('as','Assamese'),
     ('ar', 'Arabic'), ('bn', 'Bengali'), ('ca', 'Catalan'),
@@ -430,6 +430,9 @@ MIDDLEWARE_CLASSES = (
     # gstudio custom middleware(s):
     # 'gnowsys_ndf.ndf.middleware.Buddy.BuddySession',
     # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
+
+    # for profiling methods:
+    # 'gnowsys_ndf.ndf.middleware.ProfileMiddleware.ProfileMiddleware',
 )
 
 # AUTH_PROFILE_MODULE = 'gnowsys_ndf.ndf.models.UserProfile'
@@ -475,9 +478,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gnowsys_ndf.benchmarker',
+    # 'gnowsys_ndf.benchmarker',
     'registration',
-    'djangoratings',
+    # 'djangoratings',
     'notification',
     'pagination',
     'captcha',
@@ -488,7 +491,7 @@ INSTALLED_APPS = (
     # 'django.contrib.flatpages',   #textb
     # 'online_status',              #for online_users
     # 'endless_pagination',
-    'jsonrpc',
+    # 'jsonrpc',
     'registration_email',
     'memcache_admin',
     'django_mailbox',
@@ -691,7 +694,7 @@ GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT = ["NCF", "State", "All"]
 
 GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL = ["Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary"]
 
-GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = ["Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy"]
+GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = ["Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy", "Art", "Education"]
 
 GSTUDIO_RESOURCES_CURRICULAR = ["True", "False"]
 
@@ -770,8 +773,6 @@ CACHES = {
     }
 }
 
-WETUBE_USERNAME = "glab"
-WETUBE_PASSWORD = "gl@b$@)we!ube"
 
 # Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'

@@ -18,7 +18,6 @@ from django.core.files.move import file_move_safe
 from django.core.files.temp import gettempdir
 from django.core.files.uploadedfile import UploadedFile # django file handler
 from mongokit import paginator
-from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import *
 from pymongo import Connection
 
@@ -47,20 +46,20 @@ def custom_events(request):
 
 	analytics_event = analytics_collection.Analytics()
 	analytics_event['user'] = request.user.username
-	
-	try : 
+
+	try :
 		analytics_event['session_key'] = request.session.session_key
 	except :
 		transaction['status'] = 0
 		transaction['message'] = 'Error retrieving the session key.'
-	
+
 	analytics_event['timestamp'] = datetime.datetime.now();
-	
-	try : 
+
+	try :
 		analytics_event['group_id'] = Gid(request.POST['group_id'])
 		analytics_event['action'] = json.loads(request.POST['action'])
 		analytics_event['obj'][request.POST['obj']] = json.loads(request.POST['obj_properties'])
-	except : 
+	except :
 		transaction['status'] = 0
 		transaction['message'] = 'Incomplete Data.'
 
@@ -92,7 +91,7 @@ def user_list_activities(request,group_id):
 
 	query("user",{ "username" : request.user.username })
 	cursor = analytics_collection.find({"user.name" : request.user.username}).sort("timestamp",-1)
-	
+
 	lst = []
 	temp_date = datetime.date(1970, 1, 1)
 	date_col = {}
@@ -110,7 +109,7 @@ def user_list_activities(request,group_id):
 		else :
 			lst[i][str(temp_date)].append(doc)
 			pass
-	
+
 	return render (request, "ndf/analytics_list_details.html", { "user_name" : user, "data" : lst,"group_id" : group_id, "groupid" : group_id, "specific" : False})
 
 
@@ -126,7 +125,7 @@ def user_app_activities(request,group_id,part):
 
 	query("user",{ "username" : request.user.username })
 	cursor = analytics_collection.find({"obj."+part : { "$exists" : True}, "action.key" : {"$in" : ['create', 'edit', 'add', 'delete']}, "user.name" : request.user.username}).sort("timestamp",-1)
-	
+
 	lst = []
 	temp_date = datetime.date(1970, 1, 1)
 	date_col = {}
@@ -144,7 +143,7 @@ def user_app_activities(request,group_id,part):
 		else :
 			lst[i][str(temp_date)].append(doc)
 			pass
-	
+
 	return render (request, "ndf/analytics_list_details.html", { "user_name" : user, "data" : lst,"group_id" : group_id, "groupid" : group_id, "specific" : True, "app" : part})
 
 
@@ -160,11 +159,11 @@ def get_user_sessions(user) :
 	sessions_list =[]
 	d={}
 	i=-1
-	
+
 	for doc in cursor :
 		sk = str(doc['session_key'])
 		if i!=-1 and d['session_key']==sk :
-			sessions_list[i]["start_date"] = doc['timestamp']	
+			sessions_list[i]["start_date"] = doc['timestamp']
 			sessions_list[i]["activities"]	+= 1
 			sessions_list[i]["duration"] = sessions_list[i]["end_date"] - sessions_list[i]["start_date"]
 		else :
@@ -186,11 +185,11 @@ def get_user_sessions(user) :
 def user_summary(request,group_id):
 
 	'''
-	Renders the summary of the User activities on the Metastudio 
+	Renders the summary of the User activities on the Metastudio
 	'''
 
 	query("user",{ "username" : request.user.username })
-	
+
 	session_info = get_user_sessions(request.user.username)
 
 	data = {}
@@ -213,7 +212,7 @@ def user_summary(request,group_id):
 	data['num_of_tasks'] = analytics_collection.find({ "user.name" : request.user.username, "action.key" : "create", "obj.task" : { '$exists' : 'true'}}).count()
 
 	# More statistics can be queried from the anlytics_collection and added here.
-	
+
 	return render (request, "ndf/analytics_summary.html",
 															{ "data" : data,"group_id" : group_id, "groupid" : group_id})
 
@@ -247,7 +246,7 @@ def group_summary(request,group_id):
 	pipe = [{'$match' : { 'group_id' : str(group_id)}}, {'$group': {'_id': '$user.name', 'num_of_activities': {'$sum': 1}}}]
 	sorted_list = analytics_collection.aggregate(pipeline=pipe)
 	sorted_list_acc_activities = sorted(sorted_list['result'],key = lambda k:k[u'num_of_activities'],reverse=True)
-	
+
 	data['active_users'] = []
 	i=0
 	for doc in sorted_list_acc_activities :
@@ -258,7 +257,7 @@ def group_summary(request,group_id):
 	Course = node_collection.find_one({"_type":"GSystemType","name":"Course"})
 	CourseEventGroup  =  node_collection.find_one({"_type":"GSystemType","name":"CourseEventGroup"})
         TwistGst = node_collection.find_one({"_type":"GSystemType","name":"Twist"})
-	data['forums'] = db['Nodes'].find({"url":"forum", "group_set":ObjectId(group_id)}).count()	
+	data['forums'] = db['Nodes'].find({"url":"forum", "group_set":ObjectId(group_id)}).count()
 	data['threads'] = db['Nodes'].find({"member_of":ObjectId(TwistGst._id),"group_set":ObjectId(group_id)}).count()
 	regx=re.compile("^Reply of:.*")
 	data['replies'] = db['Nodes'].find({"name": regx,"group_set":ObjectId(group_id)}).count()
@@ -276,13 +275,13 @@ def group_summary(request,group_id):
 	data['recent']['replies'] = analytics_collection.find({"action.key": {"$in" : ['add']}, "group_id": str(group_id), "obj.reply" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()
 	data['recent']['files'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.file" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()
 	data['recent']['pages'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.page" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()
-	data['recent']['create_edit_course'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.course" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()	
+	data['recent']['create_edit_course'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.course" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()
 
-	
+
 	return render (request ,"ndf/analytics_group_summary.html",
 																{ "data" : data, "group_id" : group_id, "groupid" : group_id})
 
-	
+
 @login_required
 @get_execution_time
 def group_list_activities(request,group_id):
@@ -325,16 +324,16 @@ def group_members(request, group_id) :
 	group_name, group_id = get_group_name_id(group_id)
 
 	query("group",{ "group_id" : group_id })
-	
+
 	'''
 	grouping the data  on the basis of user name
 	'''
 	pipe = [{'$match' : { 'group_id' : str(group_id)}}, {'$group': {'_id': '$user.name', 'num_of_activities': {'$sum': 1}}}]
 	sorted_list = analytics_collection.aggregate(pipeline=pipe)
 	sorted_list_acc_activities = sorted(sorted_list['result'],key = lambda k:k[u'num_of_activities'],reverse=True)
-	
+
 	computing_urls = [
-		{ 'key' : 'forums', 'url' : 'forum', 'status' : 'DRAFT' }, 
+		{ 'key' : 'forums', 'url' : 'forum', 'status' : 'DRAFT' },
 		{ 'key' : 'threads', 'url' : 'forum/thread', 'status' : 'DRAFT' },
 		{ 'key' : 'files', 'url' : 'file', 'status' : 'PUBLISHED' },
 		{ 'key' : 'pages', 'url' : 'page', 'status' : 'PUBLISHED' },
@@ -344,7 +343,7 @@ def group_members(request, group_id) :
 
 	list_of_members = []
 
-	for member in sorted_list_acc_activities : 
+	for member in sorted_list_acc_activities :
 		#try :
 		member_doc = {}
 		member_doc['count'] = member[u'num_of_activities']
@@ -352,7 +351,7 @@ def group_members(request, group_id) :
 		author = node_collection.find_one({ "_type" : "Author" , "name" : member[u'_id']})
 
 		member_doc['name'] = member[u'_id']
-		try : 
+		try :
 			member_doc['email'] = author[u'email']
 		except :
 			pass
@@ -361,7 +360,7 @@ def group_members(request, group_id) :
 			member_doc[entity['key']] = 0
 			if entity['key'] == 'replies' :
 				try :
-					nodes = node_collection.find({"name":entity['name'], "group_set":ObjectId(group_id), "created_by" : author[u'created_by'], "status": entity[u'status']}).count()	
+					nodes = node_collection.find({"name":entity['name'], "group_set":ObjectId(group_id), "created_by" : author[u'created_by'], "status": entity[u'status']}).count()
 					member_doc[entity['key']] = nodes
 				except :
 					pass
@@ -374,7 +373,7 @@ def group_members(request, group_id) :
 
 		list_of_members.append(member_doc)
 
-		#except : 
+		#except :
 		#	return HttpResponse('Fatal Error')
 
 
@@ -385,7 +384,7 @@ def group_members(request, group_id) :
 @login_required
 @get_execution_time
 def group_member_info_details(request, group_id, user) :
-	
+
 	group_name, group_id = get_group_name_id(group_id)
 	user_name = user
 
@@ -395,8 +394,8 @@ def group_member_info_details(request, group_id, user) :
 		if(cursor.count() != 0) :
 			data = {}
 			data['activities'] = []
-			
-			
+
+
 			data['activities']=[]
 			i=-1
 			temp_date = datetime.date(1970,1,1)
@@ -418,24 +417,24 @@ def group_member_info_details(request, group_id, user) :
 		return render(request, "ndf/analytics_group_member_info.html",
 																		{"data" : data , "group_id" : group_id, "groupid" : group_id, "group_name" : group_name, "user_name" : user_name})
 
-	except : 
+	except :
 		return HttpResponse("fatal error")
 
 
 '''
-ANALYTICS PROCESSING 
+ANALYTICS PROCESSING
 '''
 
 @get_execution_time
 def query(analytics_type,details) :
 	'''
-	This function checks the Analytics data(for a user) in analytics_collection and gets the time to which the query set is updated. 
-	Based on the time, it fetches raw data from Benchmark collection and hands over to normalize to do the filtering and 
+	This function checks the Analytics data(for a user) in analytics_collection and gets the time to which the query set is updated.
+	Based on the time, it fetches raw data from Benchmark collection and hands over to normalize to do the filtering and
 	redundancy check.
-	
+
 	In case, the analytics_type is 'group', the function resolves the members of the group and calls itself recursively for each user,
 	 to update the analytics_collection.
-	
+
 	'''
 
 	if analytics_type == "user" :
@@ -447,7 +446,7 @@ def query(analytics_type,details) :
 			for doc in cursor :
 				latest_timestamp = doc['timestamp']
 				break
-		
+
 		raw_data = benchmark_collection.find({"user" : details['username'], "last_update": {"$gt":latest_timestamp}}).sort("last_update",-1)
 		if raw_data is None:
 			pass
@@ -455,7 +454,7 @@ def query(analytics_type,details) :
 			normalize(raw_data)
 
 	else :
-		group_id = details['group_id']	
+		group_id = details['group_id']
 		group_node = node_collection.find_one({"_id" : ObjectId(group_id)})
 		if group_node is not None :
 			member_list = group_node[u'author_set'] + group_node[u'group_admin']
@@ -470,7 +469,7 @@ def query(analytics_type,details) :
 @get_execution_time
 def normalize(cursor) :
 	'''
-		Normailizes the raw data from Benchmark collection so as to filter irrelevent content - 
+		Normailizes the raw data from Benchmark collection so as to filter irrelevent content -
 		* filtering_list is the list of unwanted actions that gets filtered out
 		* for documents having the same structure, only one is taken to remove redundancy
 
@@ -508,23 +507,23 @@ def normalize(cursor) :
 						temp_doc[u'last_update'] = doc[u'last_update']
 				else :
 					temp_doc = doc
-			
+
 			else :
 				if temp_doc[u'calling_url'] != None :
 					url = str(temp_doc[u'calling_url']).split("/")
 					group_id = Gid(url[1])
 					gapp = url[2]
-					gapp_list(gapp)(group_id,url,temp_doc) 
-					
+					gapp_list(gapp)(group_id,url,temp_doc)
+
 				temp_doc = doc
-        
+
 	if temp_doc[u'calling_url'] != None :
 		url = str(temp_doc[u'calling_url']).split("/")
 		group_id = Gid(url[1])
 		gapp = url[2]
 		gapp_list(gapp)(group_id,url,temp_doc)
 
-	return 1	
+	return 1
 
 
 '''
@@ -542,17 +541,17 @@ def initialize_analytics_obj(doc, group_id, obj) :
 	analytics_doc.user = { "name" : author[u'name'] , "id" : author[u'created_by']}
 	analytics_doc.session_key = doc[u'session_key']
 	analytics_doc.group_id = group_id
-	analytics_doc.obj = { obj : { 'id' : None} } 
-	
+	analytics_doc.obj = { obj : { 'id' : None} }
+
 	return analytics_doc
 
 @get_execution_time
 def page_activity(group_id,url,doc):
 	'''
-	This function updates the Analytic_col database with the new activities done on the 
+	This function updates the Analytic_col database with the new activities done on the
 	page of MetaStudio, and also to see whether the page is published,deleted we
     check the status in the Nodes collection of database.
-	And also we are assuming here that if the difference between the last update and created at 
+	And also we are assuming here that if the difference between the last update and created at
 	is less than 5 seconds then we should have created the page else we must have viewed the page.
 	'''
 	analytics_doc = initialize_analytics_obj(doc, group_id, 'page')
@@ -587,9 +586,9 @@ def page_activity(group_id,url,doc):
 			analytics_doc.obj['page']['url'] = n[u'url']
 			analytics_doc.save()
 			return 1
-		
-	else:	
-		try : 
+
+	else:
+		try :
 			n = node_collection.find_one({"_id":ObjectId(url[3])})
 			author_id = n[u'created_by']
 			auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
@@ -618,18 +617,18 @@ def page_activity(group_id,url,doc):
 
 		except Exception :
 			pass
-		
+
 	return 0
 
 @get_execution_time
 def course_activity(group_id,url,doc):
 	'''
-	This function updates the analytics_collection database with the new activities done on the 
+	This function updates the analytics_collection database with the new activities done on the
 	courses of MetaStudio, and also to see whether the course is created, edited or viewed.We
     check the status in the Nodes collection of database.
-	And also we are assuming here that if the difference between the last update and created at 
+	And also we are assuming here that if the difference between the last update and created at
 	is less than 5 seconds then we should have created the course.
-	
+
 	'''
 
 	analytics_doc = initialize_analytics_obj(doc, group_id, 'course')
@@ -642,7 +641,7 @@ def course_activity(group_id,url,doc):
 					if (doc[u'last_update'] - course_created[u'created_at']).seconds < 5 :
 						analytics_doc.action = { 'key' : 'create', 'phrase' : 'created a'}
 						analytics_doc.obj['course']['id'] = ObjectId(course_created[u'_id'])
-						analytics_doc.obj['course']['name'] = str(course_created[u"name"]) 
+						analytics_doc.obj['course']['name'] = str(course_created[u"name"])
 						analytics_doc.obj['course']['url'] = course_created[u'url']
 						analytics_doc.save()
 			except :
@@ -654,7 +653,7 @@ def course_activity(group_id,url,doc):
 			try :
 				analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a'}
 				analytics_doc.obj['course']['id'] = ObjectId(url[4])
-				analytics_doc.obj['course']['name'] = str(n[u"name"]) 
+				analytics_doc.obj['course']['name'] = str(n[u"name"])
 				analytics_doc.obj['course']['url'] = course_created[u'url']
 				analytics_doc.save()
 			except Exception :
@@ -667,37 +666,37 @@ def course_activity(group_id,url,doc):
 				try :
 					analytics_doc.action = { 'key' : 'edit', 'phrase' : 'edited a'}
 					analytics_doc.obj['course']['id'] = ObjectId(url[4])
-					analytics_doc.obj['course']['name'] = str(n[u"name"]) 
+					analytics_doc.obj['course']['name'] = str(n[u"name"])
 					analytics_doc.obj['course']['url'] = course_created[u'url']
 					analytics_doc.save()
 				except Exception :
 					return 0
-				
+
 	elif(ins_objectid.is_valid(url[3])):
 		n=node_collection.find_one({"_id":ObjectId(url[3])})
 		try :
 			analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a'}
 			analytics_doc.obj['course']['id'] = ObjectId(url[4])
-			analytics_doc.obj['course']['name'] = str(n[u"name"]) 
+			analytics_doc.obj['course']['name'] = str(n[u"name"])
 			analytics_doc.obj['course']['url'] = n[u'url']
 			analytics_doc.save()
 		except Exception :
 			return 0
-	
+
 
 	return 1
 
 @get_execution_time
 def file_activity(group_id,url,doc):
 	'''
-	This function updates the analytics_collection database with the new activities done on the 
-	files of MetaStudio, and also to see whether the file is viewed,edited, deleted, uploaded . 
+	This function updates the analytics_collection database with the new activities done on the
+	files of MetaStudio, and also to see whether the file is viewed,edited, deleted, uploaded .
 	We check the status in the Nodes collection of database.
-	And also we are assuming here that if the difference between the last update and created at 
-	is less than 5 seconds then we should have uploaded the file. 
-	
+	And also we are assuming here that if the difference between the last update and created at
+	is less than 5 seconds then we should have uploaded the file.
+
 	'''
-	
+
 	analytics_doc = initialize_analytics_obj(doc, group_id, 'file')
 
 	if(url[3]=="submit"):
@@ -709,7 +708,7 @@ def file_activity(group_id,url,doc):
 					analytics_doc.action = { 'key' : 'create', 'phrase' : 'created a'}
 					analytics_doc.obj['file']['id'] = ObjectId(file_created[u'_id'])
 					analytics_doc.obj['file']['type'] = str(file_created[u"mime_type"])
-					analytics_doc.obj['file']['name'] = str(file_created[u"name"]) 
+					analytics_doc.obj['file']['name'] = str(file_created[u"name"])
 					analytics_doc.obj['file']['url'] = file_created[u'url']
 					analytics_doc.save()
 		except :
@@ -721,7 +720,7 @@ def file_activity(group_id,url,doc):
 			analytics_doc.action = { 'key' : 'download', 'phrase' : 'downloaded a'}
 			analytics_doc.obj['file']['id'] = ObjectId(url[4])
 			analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
-			analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+			analytics_doc.obj['file']['name'] = str(n[u"name"])
 			analytics_doc.obj['file']['url'] = n[u'url']
 			analytics_doc.save()
 		except Exception :
@@ -735,7 +734,7 @@ def file_activity(group_id,url,doc):
 				analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a'}
 				analytics_doc.obj['file']['id'] = ObjectId(url[4])
 				analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
-				analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+				analytics_doc.obj['file']['name'] = str(n[u"name"])
 				analytics_doc.obj['file']['url'] = n[u'url']
 				analytics_doc.save()
 			except Exception :
@@ -747,7 +746,7 @@ def file_activity(group_id,url,doc):
 			analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a'}
 			analytics_doc.obj['file']['id'] = ObjectId(url[4])
 			analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
-			analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+			analytics_doc.obj['file']['name'] = str(n[u"name"])
 			analytics_doc.obj['file']['url'] = n[u'url']
 			analytics_doc.save()
 		except Exception :
@@ -760,10 +759,10 @@ def file_activity(group_id,url,doc):
 				analytics_doc.action = { 'key' : 'delete', 'phrase' : 'deleted a'}
 				analytics_doc.obj['file']['id'] = ObjectId(url[4])
 				analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
-				analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+				analytics_doc.obj['file']['name'] = str(n[u"name"])
 				analytics_doc.obj['file']['url'] = n[u'url']
 				analytics_doc.save()
-	
+
 	elif(url[3]=="edit" or url[3]=="edit_file"):
 		if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 			if ins_objectid.is_valid(url[4]) is True:
@@ -771,7 +770,7 @@ def file_activity(group_id,url,doc):
 				analytics_doc.action = { 'key' : 'edit', 'phrase' : 'edited'}
 				analytics_doc.obj['file']['id'] = str(url[4])
 				analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
-				analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+				analytics_doc.obj['file']['name'] = str(n[u"name"])
 				analytics_doc.obj['file']['url'] = n[u'url']
 				analytics_doc.save()
 	return 1
@@ -779,11 +778,11 @@ def file_activity(group_id,url,doc):
 @get_execution_time
 def forum_activity(group_id,url,doc):
 	'''
-	The function analyzes the forum activities of the user. 
-	It takes in the raw normalized document from the normalize() function and analyzes the doc for activities like create, delete, view forums, thread, reply etc.  
+	The function analyzes the forum activities of the user.
+	It takes in the raw normalized document from the normalize() function and analyzes the doc for activities like create, delete, view forums, thread, reply etc.
 	The analyzed data is stored in the Analytics collection.
 	'''
-	
+
 	if ins_objectid.is_valid(url[3]) is False:
 		if(url[3]=="delete"):
 			if ins_objectid.is_valid(url[4]) is True:
@@ -792,11 +791,11 @@ def forum_activity(group_id,url,doc):
 					analytics_doc = initialize_analytics_obj(doc, group_id, 'forum')
 					analytics_doc.action = { 'key' : 'delete', 'phrase' : 'deleted a' }
 					analytics_doc.obj['forum']['id'] = url[4];
-					
+
 					forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[4])})
 					analytics_doc.obj['forum']['name'] = forum_node[u'name']
 					analytics_doc.obj['forum']['url'] = forum_node[u'url']
-					
+
 					analytics_doc.save();
 					return 1
 
@@ -808,14 +807,14 @@ def forum_activity(group_id,url,doc):
 						analytics_doc.action = { 'key' : 'delete', 'phrase' : 'deleted a' }
 						analytics_doc.action[2] = 'thread'
 						analytics_doc.args['thread']['id'] = ObjectId(url[6]);
-						
+
 						thread_node = db['Nodes'].find_one({ "_id" : ObjectId(url[6])})
 						analytics_doc.obj['thread']['name'] = thread_node[u'name']
 						analytics_doc.obj['forum']['url'] = thread_node[u'url']
-						
+
 						forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[5])})
 						analytics_doc.obj['thread']['forum'] = { "id" : forum_node[u'_id'], "name" : forum_node[u'name'], "url" : forum_node[u'url']};
-						
+
 						analytics_doc.save();
 						return 1
 
@@ -874,10 +873,10 @@ def forum_activity(group_id,url,doc):
 			if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 				analytics_doc = initialize_analytics_obj(doc, group_id, 'thread')
 				analytics_doc.action = { 'key' : 'edit', 'phrase' : 'edited a' }
-				
+
 				forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[4])})
 				analytics_doc.obj['thread']['forum'] = { "id" : forum_node[u'_id'], "name" : forum_node[u'name'], "url" : forum_node[u'url']};
-				
+
 				analytics_doc.obj['thread']['id'] = ObjectId(url[5]);
 				thread_node = db['Nodes'].find_one({ "_id" : ObjectId(url[5])})
 				analytics_doc.obj['thread']['name'] = thread_node[u'name'];
@@ -901,14 +900,14 @@ def forum_activity(group_id,url,doc):
 					if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 						try :
 							author = node_collection.find_one({"_type" : "Author", "name" : doc[u'user']})
-						except : 
+						except :
 							pass
-						if author : 
-							try : 
+						if author :
+							try :
 								threads = node_collection.find({"url" : "forum/thread" , "created_by" : author[u'created_by']})
-								
-								for created_thread in threads : 
-									if (doc[u'last_update'] - created_thread[u'created_at']).seconds < 5 : 
+
+								for created_thread in threads :
+									if (doc[u'last_update'] - created_thread[u'created_at']).seconds < 5 :
 										analytics_doc = initialize_analytics_obj(doc, group_id, 'thread')
 										analytics_doc.action = { 'key' : 'create', 'phrase' : 'created a' }
 										analytics_doc.obj['thread']['id'] = str(created_thread[u'_id']);
@@ -919,10 +918,10 @@ def forum_activity(group_id,url,doc):
 
 										forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[3])})
 										analytics_doc.obj['thread']['forum'] = { "id" : forum_node[u'_id'], "name" : forum_node[u'name'], "url" : forum_node[u'url']};
-										
+
 										analytics_doc.save();
 										return 1
-							except : 
+							except :
 								pass
 
 		except :
@@ -958,15 +957,15 @@ def forum_activity(group_id,url,doc):
 
 @get_execution_time
 def task_activity(group_id,url,doc):
-	
+
 	analytics_doc = initialize_analytics_obj(doc, group_id, 'task')
-	
+
 	if ins_objectid.is_valid(url[3]) is False:
 		if(url[3]=="delete_task"):
 			if ins_objectid.is_valid(url[4]) is True:
 				analytics_doc.action = {  "key" : "delete" , "phrase" : "deleted a" }
 				analytics_doc.obj['task']['id'] = url[4]
-				try : 
+				try :
 					task_node = db['Nodes'].find_one({ "_id" : ObjectId(url[4])})
 					analytics_doc.obj['task']['name'] = task_node[u'name']
 					analytics_doc.obj['task']['url'] = task_node[u'url']
@@ -981,7 +980,7 @@ def task_activity(group_id,url,doc):
 				if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 					analytics_doc.action = {  "key" : "edit" , "phrase" : "edited a" }
 					analytics_doc.obj['task']['id'] = url[4]
-					try : 
+					try :
 						task_node = db['Nodes'].find_one({ "_id" : ObjectId(url[4])})
 						analytics_doc.obj['task']['name'] = task_node[u'name']
 						analytics_doc.obj['task']['url'] = task_node[u'url']
@@ -1018,7 +1017,7 @@ def task_activity(group_id,url,doc):
 					analytics_doc.obj['task']['url'] = n[u'url']
 					analytics_doc.save();
 					return 1
-		except : 
+		except :
 			analytics_doc.action = {  "key" : "view" , "phrase" : "viewed a" }
 			analytics_doc.obj['task']['id'] = url[3]
 			analytics_doc.save();
@@ -1101,11 +1100,11 @@ def Gid(group):
 	else:
 		pass
 
-	return group_id	
+	return group_id
 
 
-				
-			
-			
+
+
+
 
 

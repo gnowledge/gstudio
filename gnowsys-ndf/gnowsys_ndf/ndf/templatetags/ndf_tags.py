@@ -100,8 +100,8 @@ def get_site_registration_variable_visibility(registration_variable=None):
 @get_execution_time
 @register.assignment_tag
 def get_site_variables():
-	result = cache.get('site_var')
 
+	result = cache.get('site_var')
 	if result:
 		return result
 
@@ -141,8 +141,8 @@ def get_site_variables():
 @get_execution_time
 @register.assignment_tag
 def get_oid_variables():
-	result = cache.get('oid_var')
 
+	result = cache.get('oid_var')
 	if result:
 		return result
 
@@ -369,18 +369,51 @@ def all_gapps():
 @register.assignment_tag
 def get_group_gapps(group_id=None):
 
-	group_obj = node_collection.one({"_id": ObjectId(group_id) }, { "name": 1, "attribute_set.apps_list": 1, '_type': 1 })
+	# group_obj = node_collection.one({"_id": ObjectId(group_id) }, { "name": 1, "attribute_set.apps_list": 1, '_type': 1 })
 
-	if group_obj:
-		group_name = group_obj.name
-		for attr in group_obj.attribute_set:
-			if attr and "apps_list" in attr:
-				gapps_list = attr["apps_list"]
-				# print "\n", gapps_list,"\n"
+	if ObjectId.is_valid(group_id):
 
-				all_gapp_ids_list = [node_collection.one({'_id':ObjectId(g['_id'])}) for g in gapps_list]
-				# print all_gapp_ids_list,">>>>>>>>>>\n\n works like prior_node"
-				return all_gapp_ids_list
+		# group_attrs = group_obj.get_possible_attributes(group_obj._id)
+		# print group_attrs
+		print "==================="
+
+		# gapps_list = group_attrs.get('apps_list', [])
+		at_apps_list = node_collection.one({'_type': 'AttributeType', 'name': 'apps_list'})
+		# attr_list = triple_collection.find({'_type': 'GAttribute', 'attribute_type.$id': at_apps_list._id, 'subject':group_obj._id})
+		# attr_list = triple_collection.one({
+		# 									'_type': 'GAttribute',
+		# 									'attribute_type.$id': at_apps_list._id,
+		# 									'subject': ObjectId(group_id),
+		# 									'status': u'PUBLISHED'
+		# 								},
+		# 								{'_id': 0, 'object_value': 1}
+		# 							)
+
+		attr_list = triple_collection.find_one({
+											'_type': 'GAttribute',
+											'attribute_type.$id': at_apps_list._id,
+											'subject': ObjectId(group_id),
+											'status': u'PUBLISHED',
+											'object_value': {'$exists': 1}
+										},
+										{'_id': 0, 'object_value': 1}
+									)
+		# print attr_list.count()," ---------- count "
+
+		if attr_list:
+			all_gapp_ids_list = [node_collection.one({'_id': g['_id']}) for g in attr_list['object_value']]
+			# all_gapp_ids_list = attr_list
+			# print "\n legnt==== ", all_gapp_ids_list
+			return all_gapp_ids_list
+		# group_name = group_obj.name
+		# for attr in group_obj.attribute_set:
+		# 	if attr and "apps_list" in attr:
+		# 		gapps_list = attr["apps_list"]
+		# 		# print "\n", gapps_list,"\n"
+
+		# 		all_gapp_ids_list = [node_collection.one({'_id':ObjectId(g['_id'])}) for g in gapps_list]
+		# 		# print all_gapp_ids_list,">>>>>>>>>>\n\n works like prior_node"
+		# 		return all_gapp_ids_list
 
 
 	return []
@@ -542,68 +575,79 @@ def get_metadata_values():
 
 @get_execution_time
 @register.assignment_tag
-def get_attribute_value(node_id, attr,get_data_type=False):
-	try:
-		attr_val = ""
-		node_attr = None
-		if node_id:
-			node = node_collection.one({'_id': ObjectId(node_id) })
-			gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr) })
-			# print "node: ",node.name,"\n"
-			# print "attr: ",gattr.name,"\n"
-			if get_data_type:
-				data_type = gattr.data_type
-			if node and gattr:
-				node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})
+def get_attribute_value(node_id, attr_name, get_data_type=False):
+    cache_key = str(node_id) + 'attribute_value' + str(attr_name)
+    cache_result = cache.get(cache_key)
 
-		# print "\n\n node_attr==",node_attr
-		if node_attr:
-			attr_val = node_attr.object_value
-		# print "attr_val: ",attr_val,"\n"
-		if get_data_type:
-			return {'value': attr_val, 'data_type': data_type}
-		return attr_val
-	except:
-		return attr_val
+    if (cache_key in cache) and not get_data_type:
+        return cache_result
+
+    attr_val = ""
+    node_attr = data_type = None
+    if node_id:
+    	# node = node_collection.one({'_id': ObjectId(node_id) })
+    	gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr_name) })
+
+    	# print "node: ",node.name,"\n"
+    	# print "attr: ",gattr.name,"\n"
+    	if get_data_type:
+    		data_type = gattr.data_type
+    	if gattr: # and node  :
+    		node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node_id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})
+
+    # print "\n\n node_attr==",node_attr
+    if node_attr:
+    	attr_val = node_attr.object_value
+
+    if get_data_type:
+        return {'value': attr_val, 'data_type': data_type}
+
+    cache.set(cache_key, attr_val, 60 * 60)
+    return attr_val
+
 
 @get_execution_time
 @register.assignment_tag
 def get_relation_value(node_id, grel, return_single_right_subject=False):
-	try:
-		result_dict = {}
-		if node_id:
-			node = node_collection.one({'_id': ObjectId(node_id) })
-			relation_type_node = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
-			if node and relation_type_node:
-				if relation_type_node.object_cardinality > 1:
-					node_grel = triple_collection.find({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
-					if node_grel:
-						grel_val = []
-						grel_id = []
-						for each_node in node_grel:
-							grel_val.append(each_node.right_subject)
-							grel_id.append(each_node._id)
-						grel_val_node_cur = node_collection.find({'_id':{'$in' : grel_val}})
-						result_dict.update({"cursor": True})
-						if return_single_right_subject:
-							grel_val_node_cur = node_collection.find_one({'_id':{'$in' : grel_val}})
-							result_dict.update({"cursor": False})
-						# nodes = [grel_node_val for grel_node_val in grel_val_node_cur]
-						# print "\n\n grel_val_node, grel_id == ",grel_val_node, grel_id
-						result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node_cur})
-				else:
-					node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
-					if node_grel:
-						grel_val = node_grel.right_subject
-						grel_id = node_grel._id
-						grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
-						# returns right_subject of grelation and GRelation _id
-						result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node, "cursor": False})
-		# print "\n\nresult_dict === ",result_dict
-		return result_dict
-	except Exception as e:
-		print e
-		return None
+
+    try:
+        result_dict = {}
+    	if node_id:
+    		node = node_collection.one({'_id': ObjectId(node_id) })
+    		relation_type_node = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
+    		if node and relation_type_node:
+    			if relation_type_node.object_cardinality > 1:
+    				node_grel = triple_collection.find({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
+    				if node_grel:
+    					grel_val = []
+    					grel_id = []
+    					for each_node in node_grel:
+    						grel_val.append(each_node.right_subject)
+    						grel_id.append(each_node._id)
+    					grel_val_node_cur = node_collection.find({'_id':{'$in' : grel_val}})
+    					result_dict.update({"cursor": True})
+    					if return_single_right_subject:
+    						grel_val_node_cur = node_collection.find_one({'_id':{'$in' : grel_val}})
+    						result_dict.update({"cursor": False})
+    					# nodes = [grel_node_val for grel_node_val in grel_val_node_cur]
+    					# print "\n\n grel_val_node, grel_id == ",grel_val_node, grel_id
+    					result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node_cur})
+                else:
+                    node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
+                    if node_grel:
+                        grel_val = node_grel.right_subject
+                        grel_val = grel_val if isinstance(grel_val, list) else [ObjectId(grel_val)]
+                        grel_val = list()
+                        grel_id = node_grel._id
+                        # grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
+                        grel_val_node = node_collection.find_one({'_id':{'$in': grel_val}})
+                        # returns right_subject of grelation and GRelation _id
+                        result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node, "cursor": False})
+    	# print "\n\nresult_dict === ",result_dict
+    	return result_dict
+    except Exception as e:
+    	print e
+    	return {}
 
 @get_execution_time
 @register.inclusion_tag('ndf/drawer_widget.html')
@@ -1376,17 +1420,6 @@ def get_theme_node(groupid, node):
 		return True
 
 
-# @register.assignment_tag
-# def get_group_name(val):
-#          GroupName = []
-
-# 	 for each in val.group_set:
-
-# 		grpName = node_collection.one({'_id': ObjectId(each) }).name.__str__()
-# 		GroupName.append(grpName)
-# 	 return GroupName
-
-
 @get_execution_time
 @register.assignment_tag
 def get_edit_url(groupid):
@@ -2072,8 +2105,8 @@ def user_access_policy(node, user):
 
     else:
       # group_node = node_collection.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
-      group_name, group_id = get_group_name_id(node)
-      group_node = node_collection.one({"_id": ObjectId(group_id)})
+      group_node = get_group_name_id(node, get_obj=True)
+      # group_node = node_collection.one({"_id": ObjectId(group_id)})
 
       if user.id == group_node.created_by:
         user_access = True
@@ -2227,19 +2260,25 @@ def check_is_gstaff(groupid, user):
   False -- If above criteria is not met (doesn't belongs to any of the category, mentioned above)!
   """
 
+  group_name, group_id = Group.get_group_name_id(groupid)
+  cache_key = 'is_gstaff' + str(group_id) + str(user.id)
+
+  if cache_key in cache:
+    return cache.get(cache_key)
+
   groupid = groupid if groupid else 'home'
+
   try:
-  	try:
-	    group_node = node_collection.one({'_id': ObjectId(groupid)})
-  	except:
-  		group_node = get_group_name_id(groupid, get_obj=True)
 
-	if group_node:
-		return group_node.is_gstaff(user)
+    if group_id:
+        group_node = Group.get_group_name_id(groupid, get_obj=True)
+        result = group_node.is_gstaff(user)
+        cache.set(cache_key, result, 60 * 60)
+        return result
 
-	else:
-		error_message = "No group exists with this id ("+str(groupid)+") !!!"
-		raise Exception(error_message)
+    else:
+    	error_message = "No group exists with this id ("+str(groupid)+") !!!"
+    	raise Exception(error_message)
 
   except Exception as e:
     error_message = "\n IsGStaffCheckError: " + str(e) + " \n"
@@ -2688,23 +2727,8 @@ def get_version_of_module(module_id):
 @get_execution_time
 @register.assignment_tag
 def get_group_name(groupid):
-	# group_name = ""
-	# ins_objectid  = ObjectId()
-	# if ins_objectid.is_valid(groupid) is True :
-	# 	group_ins = node_collection.find_one({'_type': "Group","_id": ObjectId(groupid)})
-	# 	if group_ins:
-	# 		group_name = group_ins.name
-	# 	else :
-	# 		auth = node_collection.one({'_type': 'Author', "_id": ObjectId(groupid) })
-	# 		if auth :
-	# 			group_name = auth.name
-
-	# else :
-	# 	pass
-
-	group_name, group_id = get_group_name_id(groupid)
-
-	return group_name
+	# group_name, group_id = get_group_name_id(groupid)
+	return get_group_name_id(groupid)[0]
 
 
 @register.filter
@@ -3607,7 +3631,7 @@ def get_course_filters(group_id, filter_context):
 	all_users = False
 	only_gstaff = False
 	all_user_objs_uname = all_user_objs_id = None
-
+	file_gst = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
 	if filter_context.lower() == "raw material":
 		only_gstaff = True
 	elif filter_context.lower() == "notebook":
@@ -3632,8 +3656,15 @@ def get_course_filters(group_id, filter_context):
 
 		# if each_course_filter_key == "tags" and filter_context.lower() == "notebook":
 		if each_course_filter_key == "tags":
+			# gstaff_users.extend(group_obj.group_admin)
+			# gstaff_users.append(group_obj.created_by)
+			all_superusers = User.objects.filter(is_superuser=True)
+			all_superusers_ids = all_superusers.values_list('id',flat=True)
 			gstaff_users.extend(group_obj.group_admin)
 			gstaff_users.append(group_obj.created_by)
+			gstaff_users.extend(all_superusers_ids)
+
+
 
 			all_tags_list = [] # To prevent if no tags are found in any blog pages
 			filters_dict[each_course_filter_key] = {'type': 'field', 'data_type': 'basestring', 'altnames': 'Tags'}
@@ -3647,14 +3678,14 @@ def get_course_filters(group_id, filter_context):
 
 			elif filter_context.lower() == "gallery":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs]
-				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+				result_cur = node_collection.find({'member_of': file_gst._id,'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
 							'created_by': {'$nin': gstaff_users}
 							},{'tags': 1, '_id': False})
 
 			elif filter_context.lower() == "raw material":
 				# all_user_objs_id = [eachuser.id for eachuser in all_user_objs if check_is_gstaff(group_obj._id,eachuser)]
-				result_cur = node_collection.find({'_type': "File",'group_set': group_obj._id,
+				result_cur = node_collection.find({'member_of': file_gst._id,'group_set': group_obj._id,
 							'tags':{'$exists': True, '$not': {'$size': 0}},#'tags':{'$exists': True, '$ne': []}},
 							'created_by': {'$in': gstaff_users}
 							},{'tags': 1, '_id': False})

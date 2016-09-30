@@ -51,7 +51,7 @@
 
       <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
       <!-- {#% cache 3600 top_header request.LANGUAGE_CODE request.path request.user.username %} -->
-      {% if site.SITE_NAME == "NROER" and group_name_tag == 'home' %}
+      {% if site.SITE_NAME == "NROER"  %}
 
         <!-- NROER level one menu -->
         {% get_nroer_menu request group_name_tag as nroer_menu %}
@@ -459,7 +459,17 @@
 
                         {% else %}
 
-                          {% if site.SITE_NAME != "NROER" %}
+                          {% if site.SITE_NAME == "NROER" and user.is_superuser  %}
+                            <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
+                              <i class="fi-results"></i> {% trans "Updates" %}
+                            </a>
+                            <li>
+                              <a class="feeds_btn" data-tooltip title="Feeds">
+                                <i class="fi-rss"></i>
+                              </a>
+                            </li>
+                          {% endif %}
+                          {% if site.SITE_NAME != "NROER"   %}
                             <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
                               <i class="fi-results"></i> {% trans "Updates" %}
                             </a>
