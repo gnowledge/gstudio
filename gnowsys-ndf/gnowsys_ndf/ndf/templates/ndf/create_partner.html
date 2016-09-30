@@ -22,7 +22,7 @@
 
 {% block body_content %}
 
-  <h3> {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}}</h3><br>
+  <h3> {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}} {{group_id}}</h3><br>
   <form id="create_partner" class="" method="post"
   {% if node %} action="{% url 'edit_group' group_id %}"
   {% else %} action="{% url 'create_group' parent_obj_partner.pk %}"
@@ -229,7 +229,7 @@
   {% endcomment %}
         <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">            -->
             {% if node %}
-              <input type="submit" value="Save partner details" id="grpsubmit" class="button">
+              <input type="submit" value="Save partner details" id="grpsubmits" class="button">
             {% else %}
               <input type="submit" value="Create Partner" id="grpsubmit" class="button">
             {% endif %}
@@ -383,4 +383,19 @@
   $("#grpsubmit").click(function(event) {
     $("#name_input,#email_id").removeAttr("disabled")
   });
+
+  #("#grpsubmits").click(function(){
+      $.ajax({
+              type: "GET",
+              url: "{% url 'edit_group' group_id %}",
+              datatype: "html",
+              data:{
+                      'ckeditor_toolbar' : "{{ckeditor_toolbar}}"
+                },
+              success: function(data) {
+                  alert("success");
+                }
+
+               
+            });
 {% endblock %}
