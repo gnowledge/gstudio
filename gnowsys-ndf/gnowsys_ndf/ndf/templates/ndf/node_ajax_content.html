@@ -605,10 +605,12 @@
           {% endif %}
 
           <div>
-            {% get_grid_fs_object each_node as grid_fs_obj %}
+            
+            {% comment %}
+            
             {% if "Group" in node.member_of_names_list %}
             {% get_object_value node as objvalue %}
-            <table style="width:60%; border-width:0px;" >
+              <table style="width:60%; border-width:0px;" >
               <tbody>
               {% for key, value in objvalue.items %}
               <tr>
@@ -622,8 +624,9 @@
               </tr>
               {% endfor %}
               </tbody>
-            </table>
-            {% endif %}
+              </table>
+              {% endif %}
+            {% endcomment %}
           </div>
         </div>
 
