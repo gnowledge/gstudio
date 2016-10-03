@@ -393,7 +393,7 @@
                     'csrfmiddlewaretoken': "{{csrf_token}}",   
                 },
               success: function(data) {
-                  location.reload();
+                  location.href = "{% url 'groupchange' node.pk %}"
                 }
 
                
