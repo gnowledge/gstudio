@@ -566,9 +566,9 @@
        <br>
         {% get_gstudio_social_share_resource as social_share %}
                   {% if social_share and "Group" not in node.member_of_names_list and "PartnerGroup" not in node.member_of_names_list %}
-                        <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
+                       {% comment %}  <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
                         <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
-
+                        {% endcomment %}
                         </a>
                       <a class="twitter-share-button"href="" data-size=""  data-url="" data-count-url="" data-via="" data-related=""
                      data-hashtags="" data-text="">TweetNew</a>
