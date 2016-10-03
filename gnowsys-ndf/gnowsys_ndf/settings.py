@@ -782,6 +782,7 @@ CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_d
 
 GSTUDIO_HELP_SIDEBAR = False
 GSTUDIO_SOCIAL_SHARE_RESOURCE = False
+GSTUDIO_TWITTER_VIA = "atMetaStudio"
 GSTUDIO_CAPTCHA_VISIBLE = False
 
 # the no of cards/objects/instances to be render of app (listing view).

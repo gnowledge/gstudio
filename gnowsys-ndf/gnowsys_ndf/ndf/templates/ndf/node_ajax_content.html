@@ -5,6 +5,7 @@
 {% get_download_filename node as download_filename %}
 {% get_schema node as schema %}
 {% get_group_name groupid as group_name_tag %}
+{% get_gstudio_twitter_via as twitter_via %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
@@ -32,7 +33,7 @@
     $(".twitter-share-button").attr("data-size",b);
     $(".twitter-share-button").attr("data-url",c);
     $(".twitter-share-button").attr("data-count-url",d);
-    $(".twitter-share-button").attr("data-via",e);
+    $(".twitter-share-button").attr("data-via","{{twitter_via}}");
     $(".twitter-share-button").attr("data-related",f);
     // $(".twitter-share-button").attr("data-hashtags",g);
     // $(".twitter-share-button").attr("data-text",h);
