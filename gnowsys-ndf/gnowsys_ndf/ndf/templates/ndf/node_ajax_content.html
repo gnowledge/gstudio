@@ -17,7 +17,7 @@
     
     var x = location.href;
     var hostname = location.host;
-    
+
     x = "https://www.facebook.com/dialog/feed?app_id={{fb_app_id}}&redirect_uri=http://www.metastudio.org/home/&link="+location.href+"&caption=  {{node.name}}&description={{node.content|safe}}&picture=" + hostname + "{% url 'read_file' group_name_tag node download_filename %}";
     $(".share_link").attr("href",x);
 
@@ -565,7 +565,7 @@
        {% endif %}
        <br>
         {% get_gstudio_social_share_resource as social_share %}
-                  {% if social_share and "Group" not in node.member_of_names_list %}
+                  {% if social_share and "Group" not in node.member_of_names_list and "PartnerGroup" not in node.member_of_names_list %}
                         <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
                         <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
 

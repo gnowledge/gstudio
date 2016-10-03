@@ -23,7 +23,7 @@
 {% block body_content %}
 
   <h3> {% if node %}Edit {% else %}Create New {% endif %}{{parent_obj_partner.name}}</h3><br>
-  <form id="create_partner" class="" method="get"
+  <form id="create_partner" class="" method="post"
   {% if node %} action="{% url 'edit_group' group_id %}"
   {% else %} action="{% url 'create_group' parent_obj_partner.pk %}"
   {% endif %}
