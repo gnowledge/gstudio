@@ -3364,6 +3364,11 @@ def get_gstudio_twitter_via():
 
 @get_execution_time
 @register.assignment_tag
+def get_gstudio_facebook_app_id():
+	return GSTUDIO_FACEBOOK_APP_ID
+
+@get_execution_time
+@register.assignment_tag
 def get_gstudio_social_share_resource():
 	return GSTUDIO_SOCIAL_SHARE_RESOURCE
 

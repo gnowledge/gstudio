@@ -6,6 +6,7 @@
 {% get_schema node as schema %}
 {% get_group_name groupid as group_name_tag %}
 {% get_gstudio_twitter_via as twitter_via %}
+{% get_gstudio_facebook_app_id as fb_app_id %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
@@ -16,8 +17,8 @@
     
     var x = location.href;
     var hostname = location.host;
-
-    x = "https://www.facebook.com/dialog/feed?app_id=146799965703412&redirect_uri=http://www.metastudio.org/home/&link="+location.href+"&caption=  {{node.name}}&description={{node.content|safe}}&picture=" + hostname + "{% url 'read_file' group_name_tag node download_filename %}";
+    
+    x = "https://www.facebook.com/dialog/feed?app_id={{fb_app_id}}&redirect_uri=http://www.metastudio.org/home/&link="+location.href+"&caption=  {{node.name}}&description={{node.content|safe}}&picture=" + hostname + "{% url 'read_file' group_name_tag node download_filename %}";
     $(".share_link").attr("href",x);
 
 
@@ -542,18 +543,7 @@
                   Download
                 </a>
                 {% endif %}
-               {% get_gstudio_social_share_resource as social_share %}
-                  {% if social_share %}
-                    <span>
-                        <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
-                        <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
-
-                        </a>
-                      </span>
-                      <a class="twitter-share-button"href="" data-size=""  data-url="" data-count-url="" data-via="" data-related=""
-                     data-hashtags="" data-text="">TweetNew</a>
-
-                  {% endif %}
+               
                     
                 {% endif %}
 
@@ -567,20 +557,23 @@
                   Download
                 </a>
 
-               {% get_gstudio_social_share_resource as social_share %}
-                  {% if social_share %}
-                    &nbsp;<span>
-                        <a title="Please login to share on Facebook" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l" target="_blank">
-                        <img src="/static/ndf/images/Facebook_logo.png"  width="35px">
-                        </a>
-                      </span>
-                  {% endif %}
+               
               {% endif %}
 
           {% endif %}
               </div>
        {% endif %}
+       <br>
+        {% get_gstudio_social_share_resource as social_share %}
+                  {% if social_share and "Group" not in node.member_of_names_list %}
+                        <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
+                        <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
 
+                        </a>
+                      <a class="twitter-share-button"href="" data-size=""  data-url="" data-count-url="" data-via="" data-related=""
+                     data-hashtags="" data-text="">TweetNew</a>
+
+                  {% endif %}
           {% get_list_of_fields node.type_of "name" as type_of_list %}
           {% if "Info page" not in type_of_list %}
               {% if not no_discussion %}
