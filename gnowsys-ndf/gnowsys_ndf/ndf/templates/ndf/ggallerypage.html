@@ -1,82 +1,14 @@
 {% load get_course_filters get_group_name from ndf_tags %}
 {% load i18n %}
+{% load simple_filters %}
+
 {% get_group_name groupid as group_name_tag %}
 
-{% load simple_filters %}
 <div class="gallery-page">
     <div class="row gallery-header">
         {% get_course_filters group_id title as filter_dict %}
         {% include "ndf/filters.html" with filter_dict=filter_dict %}
     </div>
-    {% comment %}
-    <div class="row gallery-header">
-        <div class="medium-4 columns filters">
-            <div class="row collapse">
-                <div class="medium-2 columns"> View By</div>
-                <div class="medium-3 columns">
-                    <select placeholder="Select File Types">
-                        <option value="all">All File Types</option>
-                        <option value="pdf">Pdf</option>
-                        <option value="image">Image</option>
-                        <option value="compressed">Compressed</option>
-                    </select>
-                </div>
-                <div class="medium-1 columns">
-                <i class="fi-list-thumbnails"></i>
-                </div>
-                <div class="medium-2 columns">
-                    <span>Sort By</span>
-                </div>
-                <div class="medium-3 columns end">
-                    <select placeholder="Sort">
-                        <option value="all">Top Rated</option>
-                        <option value="school1">Recent</option>
-                        <option value="school2">Most Commented</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="medium-8 columns">
-            <div class="row">
-                <div class="medium-9 search columns">
-                    <div class="row collapse prefix-round">
-                        <div class="small-2 columns">
-                            <i class="fi-filter"></i>
-                            <span>Add Filter</span>
-                        </div>
-                        <div class="small-2 columns">
-                            <select placeholder="User" class="primary-filter">
-                                <option value="all">User</option>
-                                <option value="school1">Size</option>
-                            </select>
-                        </div>
-                        <div class="small-2 columns">
-                            <select placeholder="Sort" class="secondary-filter">
-                                <option value="all">Select User</option>
-                                <option value="school1">Bunny</option>
-                                <option value="school2">Apple</option>
-                            </select>
-                        </div>
-                        <div class="small-6 columns filter-tags">
-                            <div class="filter-tag">Filter 1 <span>&times;</span></div>
-                            <div class="filter-tag">Filter 1 <span>&times;</span></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="medium-3 side-heading columns">
-                    <div class="row collapse prefix-round">
-                        <div class="small-3 columns">
-                            <a href="#" class="button prefix"><i class="fa fa-search"></i></a>
-                        </div>
-                        <div class="small-9 columns">
-                            <input type="text" placeholder="Search">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endcomment %}
 
     <div class="row gallery-panel">
         <div class="medium-12 columns gallery-content" >
@@ -87,11 +19,11 @@
                     <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_using_save_file' group_id %}">
                             {% csrf_token %}
-                            <label class="tiny button radius expand" style="margin: 0px;">
+                            <label class="tiny button radius expand upload-btn" style="margin: 0px;">
                                 <i class="fa fa-upload"></i>
                                 &nbsp;
                                 <span>Upload File</span>
-                                <input type="file" name="doc" id="docFile" style="display: none;"/>
+                                <input type="file" name="filehive" id="docFile" style="display: none;" multiple/>
                             </label>
                             <div class="save_cancel hide">
                                 <img id="img_preview" alt="New file" class="hide" />
@@ -106,7 +38,7 @@
                   {% endif %}
                   {% endif %}
                 <!-- Commented  create collection and create note for this commit-->
-                    <!-- <div class="small-12 medium-10 columns gallery-actions" style="display:none" >
+                    <div class="small-12 medium-10 columns gallery-actions" style="display:none" >
                         <div class="create-note " id="create-note">
                          <a style="margin: 0em 0em 1em;">
                             <i class="fi-page-edit"></i>
@@ -121,7 +53,7 @@
                             <i class="fa fa-plus"></i>
                             <span>Add to collection</span>
                         </div>
-                     -->    <!-- <div class="download-file hide">
+                        <!-- <div class="download-file hide">
                             <i class="fi-download"></i>
                             <span> Download</span>
                         </div>
@@ -140,7 +72,8 @@
 
                 {% for each_img in files_cur %}
                     <li class="card-image-wrapper gallery-img" id="{{each_img.pk}}" style="margin-top:13px;margin-left:-10px">
-                        {% include 'ndf/simple_card.html' with resource=each_img  no_footer="True" no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
+
+                        {% include 'ndf/simple_card.html' with is_course_card="True" resource=each_img no_description=True url_name=file_detail_url first_arg=group_id second_arg=each_img.pk %}
                     </li>
                 {% endfor %}
                 </ul>
@@ -171,6 +104,7 @@
     </div>
 
 </div>
+</div>
 <div class="reveal-container">
     {% if file_obj %}
         {% include "ndf/ggallerymodal.html" with node=file_obj %}
@@ -191,7 +125,7 @@
         {% endif %}
     })
 
-    // On close event of reveal-modal ----------------------------------------------
+    // On close event of reveal-modal
     $(document).on('close', '.file-detail-modal', function () {
         $('.file-detail-modal-close')[0].click()
     });
@@ -219,6 +153,7 @@
 
     function applyFilter(filtersObjArr){
         filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+        // console.log(filtersObjArr);
         $.ajax({
           url: "{% url 'course_filters' group_id %}",
           data: {
@@ -271,15 +206,10 @@
             }
           });
         }
-
         else{
           alert("Select atleast 1 resource");
-
-
         }
-
     });
-
 
 
     $('.add-to-collection').click(function() {
@@ -301,10 +231,8 @@
             }
           });
         }
-
         else{
           alert("Select atleast 1 resource");
-
 
         }
 
@@ -312,14 +240,28 @@
 
   $(".create-note").click(function(){
     var checked = $('.filenode:checked').length;
-    var coll_list= " ";
-    var url_list = " ";
+    var img_list= " ";
     var audio_list = " ";
+    var video_list = " ";
     $('.filenode:checked').each(function() {
         // curr_obj = $(this).attr("value");
 
-        url_list = $(this).closest('.scard-container').find('img').attr('src');
-        coll_list = coll_list + url_list + ",";
+        mime_type_list = $(this).closest('.scard-container').find('div').attr('data-mime-type');
+        if_image =  mime_type_list.search("image");
+        if_audio =  mime_type_list.search("audio");
+        if_video =  mime_type_list.search("video");
+         if( if_image == 0 ) {
+            url_list = $(this).closest('.scard-container').find('div').attr('original-src');
+            img_list = img_list+url_list+",";
+         }
+        else if(if_audio == 0){
+            url_list = $(this).closest('.scard-container').find('div').attr('original-src');
+            audio_list = audio_list+url_list+",";
+        }
+        else if(if_video == 0){
+            url_list = $(this).closest('.scard-container').find('div').attr('original-src');
+            video_list = video_list + url_list + ",";
+        }
 
       });
           $.ajax({
@@ -329,7 +271,9 @@
 
             data:{
                 "csrfmiddlewaretoken": '{{ csrf_token }}',
-                "coll_list" : coll_list,
+                "img_list": img_list,
+                "audio_list": audio_list,
+                "video_list": video_list
             },
             success: function(data) {
                 $("#create_collection_model").html(data);
@@ -337,8 +281,6 @@
                 $("#create_collection_model").foundation('reveal', 'open');
             }
           });
-
-
   })
 
 </script>

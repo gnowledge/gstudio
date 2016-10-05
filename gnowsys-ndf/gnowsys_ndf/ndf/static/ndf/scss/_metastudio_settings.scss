@@ -27,8 +27,8 @@ $primary-color: $theme-color;
 $secondary-color: lighten(desaturate($primary-color,80%),30%);
 // $alert-color: #f04124;
 // $success-color: #43AC6A;
- //$warning-color: #f2bf8a;
- $info-color: $color0;
+// $warning-color: #f2bf8a;
+$info-color: $color0;
 
 $header-font-color: #222;
 $body-bg-color: #666;
@@ -1236,9 +1236,9 @@ $topbar-link-bg-active-hover: $active-color;
 // $topbar-menu-link-font-size: rem-calc(13);
 // $topbar-menu-link-weight: bold;
 // $topbar-menu-link-color: #fff;
-// $topbar-menu-icon-color: #fff;
+$topbar-menu-icon-color: #888;
 // $topbar-menu-link-color-toggled: #888;
-// $topbar-menu-icon-color-toggled: #888;
+$topbar-menu-icon-color-toggled: #888;
 
 // Transitions and breakpoint styles
 // $topbar-transition-speed: 300ms;

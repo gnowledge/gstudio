@@ -1,8 +1,9 @@
-{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value from ndf_tags %}
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar user_access_policy get_user_object check_is_gstaff get_attribute_value get_sg_member_of get_relation_value get_explore_url from ndf_tags %}
 {% load i18n %}
 {% load cache %}
 
   {% get_group_object groupid as group_object %}
+  {% get_explore_url as explore_url %}
 
   {% if site.SITE_NAME != "NROER" %}
   <div id="feedsModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
@@ -42,7 +43,7 @@
             </a></h1>
           </li>
           <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-          <li class="toggle-topbar"><a href="#"><span>{% trans "Menu" %}</span></a></li>
+          <li class="toggle-topbar menu-icon"><a href="#"><span>{% trans "Menu" %}</span></a></li>
         </ul>
 
         <section class="top-bar-section">
@@ -50,7 +51,7 @@
 
       <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
       <!-- {#% cache 3600 top_header request.LANGUAGE_CODE request.path request.user.username %} -->
-      {% if site.SITE_NAME == "NROER" %}
+      {% if site.SITE_NAME == "NROER"  %}
 
         <!-- NROER level one menu -->
         {% get_nroer_menu request group_name_tag as nroer_menu %}
@@ -108,7 +109,7 @@
         </ul>
         <!-- -END of NROER level one menu -->
       {% comment %}
-        
+
       {% if "CourseEventGroup" in group_object.member_of_names_list %}
       <ul class="left">
 
@@ -189,29 +190,29 @@
             </li>
             {% endif %}
 
-          
+
           {% if site.MY_COURSES_IN_HEADER %}
             <li>
               <a title="{{title}}" class="{%if title == 'My Courses'%}active{%endif%}" href="{% url 'course' request.user.username %}">
                 {% trans 'MY COURSES' %}
               </a>
             </li>
-          {% endif %}        
-                  
+          {% endif %}
+
           {% if site.MY_GROUPS_IN_HEADER %}
             <li>
               <a title="{{title}}" class="{%if title == 'My Groups'%}active{%endif%}" href="{% url 'my_groups' request.user.username %}">
                 {% trans 'MY GROUPS' %}
               </a>
             </li>
-          {% endif %}        
-        
+          {% endif %}
+
         {% endif %}
 
 
         <li class="group">
           {# <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore' %}"> #}
-          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url 'explore_courses' %}">
+          <a title="" class="{%if title == 'Explore'%}active{%endif%}" href="{% url explore_url %}">
             {% trans 'EXPLORE' %}
           </a>
         </li>
@@ -238,12 +239,12 @@
           {% if prof_pic %}
             {% if site.ENABLE_USER_DASHBOARD %}
               <a href="{% url 'dashboard' request.user.pk %}">
-                <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
+                <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
                 {{ user.username }}
               </a>
             {% else %}
               <a>
-                <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
+                <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" id="profile-img">
                 {{ user.username }}</a>
             {% endif %}
 
@@ -266,9 +267,17 @@
             <li class="text-center">
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
             </li>
+            {% comment %}
+            <!-- CHANGE DONE HERE, MAILCLIENT ADDED -->
+            {% if user.is_authenticated %}
+            <li class="text-center">
+              <a href="/{{ user.username }}/mailclient">{% trans "MailClient" %}</a>
+            {% endif %}
+
             <li class="text-center">
               <a href='/{{group_id}}/analytics/summary'>{% trans "Analytics" %}</a>
             </li>
+
             {% if user.is_superuser %}
               <li class="text-center">
                 <a href="/admin/data">{% trans "Admin Data" %}</a>
@@ -282,11 +291,40 @@
                 </li>
               {% endif %}
             {% endif %}
+            {% endcomment %}
+
+            {% if site.BUDDY_LOGIN and user.is_authenticated %}
+
+              <li>
+                <a href="#" data-reveal-id="add-buddy" data-reveal-ajax="{% url 'list_buddy' 'home' %}">
+                  My buddies ({{request.session.buddies_authid_list|length}})
+                </a>
+
+                <div id="add-buddy" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+
+                </div>
+
+              </li>
+
+              <blockquote>
+                <ul>
+                  {% for i, each_buddy in request.session.buddies_authid_name_dict.items %}
+                  <li class="text-left">
+                    <h5><small class="fi-torso"> {{each_buddy}}</small></h5>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </blockquote>
+                  {# --{{request.session.buddies_authid_name_dict}}-- #}
+            {% endif %}
+
             <li>
               <a class="logout" href="{% url 'auth_logout' %}">
                 <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
               </a>
             </li>
+
+
           </ul>
         </li>
 
@@ -325,7 +363,7 @@
          -->
         <!-- Closes Right Nav section -->
 
-
+{% if "CourseEventGroup" not in group_object.member_of_names_list and site.SITE_NAME != "clix" %}
         <ul class="right">
           <li class="has-dropdown">
             <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
@@ -345,8 +383,8 @@
             </ul>
           </li>
         </ul>
+{% endif %}
 
-        
         <!-- Right Nav Section -->
         <ul class="right">
           <li>
@@ -385,16 +423,16 @@
               <ul class="title-area text-center">
                 <li class="name" title="{% firstof  group_object.altnames group_object.name %}">
                   <h1>
-                    <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+                    <a href="{% url 'groupchange' group_id %}">
 
                           {% get_relation_value group_object.pk 'has_profile_pic' as grel_dict %}
                           {% if not grel_dict.cursor and grel_dict.grel_node %}
-                                    <img src="{% url 'getFileThumbnail' group_id grel_dict.grel_node.pk %}" />
+                                    <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.original.relurl}}" />
                           {% else %}
                                     <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group."  height="20px" width="20px" >
                           {% endif %}
 
-                          <span>{% firstof group_object.altnames|truncatechars:7 group_object.name|truncatechars:7 %}</span>
+                          <span style="color:black!important">{% firstof group_object.altnames|truncatechars:7 group_object.name|truncatechars:7 %}</span>
                     </a>
                   </h1>
                 </li>
@@ -421,7 +459,17 @@
 
                         {% else %}
 
-                          {% if site.SITE_NAME != "NROER" %}
+                          {% if site.SITE_NAME == "NROER" and user.is_superuser  %}
+                            <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
+                              <i class="fi-results"></i> {% trans "Updates" %}
+                            </a>
+                            <li>
+                              <a class="feeds_btn" data-tooltip title="Feeds">
+                                <i class="fi-rss"></i>
+                              </a>
+                            </li>
+                          {% endif %}
+                          {% if site.SITE_NAME != "NROER"   %}
                             <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
                               <i class="fi-results"></i> {% trans "Updates" %}
                             </a>
@@ -480,8 +528,8 @@
                   <li class="" onclick="history.back();">
                     <a href="javascript:window.history.back();"><i class="fa fa-angle-left back-btn"></i> {% trans "BACK" %}</a>
                   </li>
-                  {% if site.SITE_NAME == "NROER" %}
-                    {% if group_name_tag == "home" or "CourseEventGroup" not in group_object.member_of_names_list or "ProgramEventGroup" not in list_of_sg_member_of %}
+                  {% if site.SITE_NAME == "NROER" and group_name_tag == 'home' %}
+                    {% if "CourseEventGroup" not in group_object.member_of_names_list or "ProgramEventGroup" not in list_of_sg_member_of %}
                     <!-- NROER level-two menu -->
                       {% if "repository" not in request.path %}
                         {% if "/partner/" not in request.path %}
@@ -504,11 +552,11 @@
                       {% endif %}
                       {% endif %}
                     {% else %}
-                      {% get_gapps_iconbar request groupid %}
+                      {% get_gapps_iconbar request groupid user_access %}
                     {% endif %}
                   <!-- END of NROER level two menu -->
                   {% else %}
-                    {% get_gapps_iconbar request groupid %}
+                    {% get_gapps_iconbar request groupid user_access %}
                   {% endif %}
                 </ul>
 

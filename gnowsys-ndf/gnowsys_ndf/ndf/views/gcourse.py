@@ -2,7 +2,6 @@
 # from datetime import datetime
 import datetime
 import json
-
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect  # , HttpResponse uncomment when to use
 from django.http import HttpResponse
@@ -24,6 +23,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
+from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict, update_notes_or_files_visited
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
@@ -41,6 +41,9 @@ from gnowsys_ndf.notification import models as notification
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+gst_file = node_collection.one({'_type': "GSystemType", 'name': u"File"})
+gst_page = node_collection.one({'_type': "GSystemType", 'name': u"Page"})
+has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
 
 app = GST_COURSE
 
@@ -50,15 +53,12 @@ def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
     """
-    try:
-        group_id = ObjectId(group_id)
-    except:
-        group_name, group_id = get_group_name_id(group_id)
 
     if request.user.is_anonymous():
         return HttpResponseRedirect(reverse('explore_courses', kwargs={}))
 
-    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    group_id  = group_obj._id
 
     group_obj_post_node_list = []
     app_id = None
@@ -71,7 +71,6 @@ def course(request, group_id, course_id=None):
     course_enrollment_status = None
     app_set_id = None
     query = {}
-
     course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
 
     if course_ins:
@@ -86,7 +85,7 @@ def course(request, group_id, course_id=None):
     # title = GST_COURSE.name
     # if GST_COURSE.name == "Course":
     title = "eCourses"
-    
+
     query = {'member_of': ce_gst._id,'_id':{'$in': group_obj_post_node_list}}
     gstaff_access = False
     if request.user.id:
@@ -165,8 +164,8 @@ def create_edit(request, group_id, node_id=None):
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE),groupid=group_id)
         create_gattribute(course_node._id, at_course_type, u"General")
-        
-        # adding thumbnail 
+
+        # adding thumbnail
         f = request.FILES.get("doc", "")
         # print "\nf is ",f
 
@@ -982,7 +981,7 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
 
 
   context_variables = { 'groupid': group_id, 'group_id': group_id,
-                        'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
+                        'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set,
                         'app_set_id': app_set_id,
                         'course_gst_name': course_gst.name,
                         'title': title,
@@ -998,23 +997,23 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
     # print "\n template-list: ", [template, default_template]
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
-    # return render_to_response([template, default_template], 
+    # return render_to_response([template, default_template],
     return render_to_response(template,
                               context_variables,
                               context_instance = RequestContext(request)
                             )
-  
+
   except TemplateDoesNotExist as tde:
     error_message = "\n CourseDetailListViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
-  
+
   except Exception as e:
     error_message = "\n CourseDetailListViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
 
 
-# Ajax views for setting up Course Structure 
+# Ajax views for setting up Course Structure
 
 @login_required
 @get_execution_time
@@ -1480,6 +1479,27 @@ def save_resources(request, group_id):
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
         # print "\n\n member_of_names_list----", cu_new.member_of_names_list, "list_of_res_ids", list_of_res_ids
         new_res_set = []
+
+        if "CourseUnitEvent" in cu_new.member_of_names_list:
+            list_of_res_nodes = node_collection.find({'_id': {'$in': list_of_res_ids}})
+            for each_res in list_of_res_nodes:
+                if group_id not in each_res.group_set:
+                    new_gs = replicate_resource(request, each_res, group_id)
+                    new_res_set.append(new_gs._id)
+                else:
+                    new_res_set.append(each_res._id)
+        else:
+            for each_res_node_course in list_of_res_ids:
+                if each_res_node_course not in cu_new.collection_set:
+                    new_res_set.append(each_res_node_course)
+
+        for each_res_in_unit in new_res_set:
+            if each_res_in_unit not in cu_new.collection_set:
+                cu_new.collection_set.append(each_res_in_unit)
+                cu_new.save()
+
+        '''
+        new_res_set = []
         if "CourseUnitEvent" in cu_new.member_of_names_list:
             list_of_res_nodes = node_collection.find({'_id': {'$in': list_of_res_ids}})
 
@@ -1501,6 +1521,7 @@ def save_resources(request, group_id):
             if each_res_in_unit not in cu_new.collection_set:
                 cu_new.collection_set.append(each_res_in_unit)
                 cu_new.save()
+        '''
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
         return HttpResponse(json.dumps(response_dict))
@@ -1695,7 +1716,8 @@ def add_course_file(request, group_id):
 
     context_node = node_collection.one({'_id': ObjectId(context_node_id)})
     if request.method == "POST":
-
+        title = request.POST.get('context_name','')
+        usrid = request.user.id
         context_name = request.POST.get("context_name", "")
         css_node_id = request.POST.get("css_node_id", "")
         course_node = request.POST.get("course_node", "")
@@ -1714,16 +1736,29 @@ def add_course_file(request, group_id):
 
         new_list = []
         file_uploaded = request.FILES.get("doc", "")
-        # For checking the node is already available in gridfs or not
-        if file_uploaded:
-            fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
-            file_node = node_collection.find_one({'_id': ObjectId(fileobj)})
-            file_node.prior_node.append(context_node._id)
-            file_node.status = u"PUBLISHED"
-            file_node.save()
-            context_node.collection_set.append(file_node._id)
-            file_node.save()
+        from gnowsys_ndf.ndf.views.filehive import write_files
+
+        fileobj_list = write_files(request, group_id)
+        # fileobj_id = fileobj_list[0]['_id']
+        # file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
+
+        for each_gs_file in fileobj_list:
+            each_gs_file.status = u"PUBLISHED"
+            each_gs_file.tags.append(u'raw@material')
+            each_gs_file.prior_node.append(context_node._id)
+            context_node.collection_set.append(each_gs_file._id)
+            each_gs_file.save()
         context_node.save()
+
+        # if file_uploaded:
+        #     fileobj,fs = save_file(file_uploaded,file_uploaded.name,request.user.id,group_id, "", "", username=unicode(request.user.username), access_policy="PUBLIC", count=0, first_object="", oid=True)
+        #     file_node = node_collection.find_one({'_id': ObjectId(fileobj)})
+        #     file_node.prior_node.append(context_node._id)
+        #     file_node.status = u"PUBLISHED"
+        #     file_node.save()
+        #     context_node.collection_set.append(file_node._id)
+        #     file_node.save()
+        # context_node.save()
     return HttpResponseRedirect(url_name)
 
 
@@ -1749,7 +1784,13 @@ def enroll_to_course(request, group_id):
             group_obj.author_set.append(user_id)
         group_obj.save()
         response_dict["success"] = True
+        # get new/existing counter document for a user for a given course for the purpose of analytics
+        counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+        counter_obj['is_group_member'] = True
+        counter_obj.save()
+
         return HttpResponse(json.dumps(response_dict))
+
 
 @login_required
 @get_execution_time
@@ -1794,7 +1835,7 @@ def course_summary(request, group_id):
 
 @get_execution_time
 def course_resource_detail(request, group_id, course_sub_section, course_unit, resource_id):
-    
+
     group_name, group_id = get_group_name_id(group_id)
 
     unit_node = node_collection.one({'_id': ObjectId(course_unit)})
@@ -1813,7 +1854,7 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
 
     if (resource_index + 1) < resource_count:
         resource_next_id = unit_node.collection_set[resource_index + 1]
-        
+
     if resource_index > 0:
         resource_prev_id = unit_node.collection_set[resource_index - 1]
 
@@ -1831,7 +1872,7 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
         'node': node_obj, 'unit_node': unit_node, 'resource_id': resource_id,
         'resource_index': resource_index, 'resource_next_id': resource_next_id,
         'resource_prev_id': resource_prev_id, 'resource_count': resource_count,
-        'unit_resources_list_of_dict': unit_resources_list_of_dict 
+        'unit_resources_list_of_dict': unit_resources_list_of_dict
     })
 
     template = "ndf/unit_player.html"
@@ -1843,8 +1884,11 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
 #     pass
 
 
-# ::::COURSE-PLAYER VIEWS::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# :::::::::::::::::::::::::::::::::COURSE-PLAYER VIEWS::::::::::::::::::::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+# Following View Not in Use
 @get_execution_time
 def course_dashboard(request, group_id):
 
@@ -1855,7 +1899,7 @@ def course_dashboard(request, group_id):
     allow_to_join = get_group_join_status(group_obj)
     result_status = course_complete_percentage = None
     total_count = completed_count = None
-    if request.user.is_authenticated:
+    if request.user.is_authenticated():
         result_status = get_course_completetion_status(group_obj, request.user.id)
         if result_status:
             if "course_complete_percentage" in result_status:
@@ -1876,6 +1920,27 @@ def course_dashboard(request, group_id):
         })
     return render_to_response(template, context_variables)
 
+
+
+def _get_current_and_old_display_pics(group_obj):
+    banner_pic_obj = None
+    old_profile_pics = []
+    for each in group_obj.relation_set:
+        if "has_banner_pic" in each:
+            banner_pic_obj = node_collection.one(
+                {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
+            )
+            break
+
+    all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+    if all_old_prof_pics:
+        for each_grel in all_old_prof_pics:
+            n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
+            if n not in old_profile_pics:
+                old_profile_pics.append(n)
+
+    return banner_pic_obj, old_profile_pics
+
 @get_execution_time
 def course_content(request, group_id):
 
@@ -1885,25 +1950,27 @@ def course_content(request, group_id):
 
     allow_to_join = get_group_join_status(group_obj)
     template = 'ndf/gcourse_event_group.html'
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    '''
     banner_pic_obj = None
     old_profile_pics = []
     if not banner_pic_obj:
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
     has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
     all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_banner_pic_rt._id, 'status': u"DELETED"})
+
     if all_old_prof_pics:
         for each_grel in all_old_prof_pics:
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
-
-    
+    '''
 
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
@@ -1925,14 +1992,16 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     template = 'ndf/gcourse_event_group.html'
     page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-    thread_node = None    
+    thread_node = None
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    '''
     banner_pic_obj = None
     old_profile_pics = []
     if not banner_pic_obj:
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': [u"GSystem", u"File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -1943,7 +2012,7 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
-
+    '''
     allow_to_join = get_group_join_status(group_obj)
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
@@ -1966,6 +2035,16 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     if notebook_id:
         notebook_obj = node_collection.one({'_id': ObjectId(notebook_id)})
         thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
+
+        if user_id :
+            #updating counters collection
+            # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(notebook_id),False,True)
+            if request.user.is_authenticated():
+                Counter.add_visit_count(resource_obj_or_id=notebook_obj,
+                                        current_group_id=group_id,
+                                        loggedin_userid=request.user.id)
+
+
     else:
         if user_blogs and user_blogs.count():
             notebook_obj = user_blogs[0]
@@ -1986,8 +2065,8 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
     context_variables.update({'user_blogs': user_blogs})
     context_variables.update({'tab': tab})
     context_variables.update({'node': notebook_obj})
-        
-    return render_to_response(template, 
+
+    return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
@@ -1996,29 +2075,30 @@ def course_notebook(request, group_id, tab=None, notebook_id=None):
 @get_execution_time
 def course_raw_material(request, group_id, node_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
-    
+
     coll_file_cur = []
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     allow_to_upload = False
     group_name  = group_obj.name
     gstaff_users = []
+    all_superusers = User.objects.filter(is_superuser=True)
+    all_superusers_ids = all_superusers.values_list('id',flat=True)
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
+    gstaff_users.extend(all_superusers_ids)
     allow_to_join = None
     files_cur = None
-    
-    
-
     allow_to_join = get_group_join_status(group_obj)
-
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    '''
     banner_pic_obj = None
     old_profile_pics = []
     if not banner_pic_obj:
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2029,8 +2109,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
-
-
+    '''
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'raw material',
@@ -2042,48 +2121,38 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
         allow_to_comment = None
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
+        #updating counters collection
+        # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
+        if request.user.is_authenticated():
+            Counter.add_visit_count(resource_obj_or_id=file_obj,
+                                    current_group_id=group_id,
+                                    loggedin_userid=request.user.id)
+
     else:
 
-        files_cur = node_collection.find({ '$or' : [ {'group_set': group_id, '_type': "File", 'created_by': {'$in': gstaff_users},
-                                    # 'tags': {'$regex': u"raw", '$options': "i"}
-                                    },
+        files_cur = node_collection.find({
+                                        '_type': {'$in': ["File", "GSystem"]},
+                                        '$or': [
+                                                {'member_of': gst_file._id},
+                                                {
+                                                    'collection_set': {'$exists': "true",'$not': {'$size': 0} },
+                                                    'member_of': gst_page._id,
+                                                }
+                                            ],
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        'tags': "raw@material"
+                        },
+                        {
+                            'name': 1,
+                            'collection_set':1,
+                            '_id': 1,
+                            'member_of': 1,
+                            'if_file':1
+                        }).sort("last_update", -1)
 
-                                    {'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-                                                    'group_set': {'$all': [ObjectId(group_id)]},
-                                                    '$or': [
-                                                        {'access_policy': u"PUBLIC"},
-                                                        {'$and': [
-                                                            {'access_policy': u"PRIVATE"},
-                                                            {'created_by': request.user.id}
-                                                        ]
-                                                     }
-                                                    ],
-                                                    'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-                                                
-                                    }]},{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort("last_update", -1)
-
-        # coll_cur = node_collection.find({
-        #                   'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-        #                                     'group_set': {'$all': [ObjectId(group_id)]},
-        #                                     '$or': [
-        #                                         {'access_policy': u"PUBLIC"},
-        #                                         {'$and': [
-        #                                             {'access_policy': u"PRIVATE"},
-        #                                             {'created_by': request.user.id}
-        #                                         ]
-        #                                      }
-        #                                     ],
-        #                                     'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-        #                                 }).sort("last_update", -1)
-        # print "\n coll curr type",type(coll_cur)
-        # for each in coll_cur:
-        #     coll_file_cur.append(each)            
-
-        # for each in files_cur:
-        #     coll_file_cur.append(each)
-    # print "collection cursor",coll_file_cur
     raw_material_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     # context_variables.update({'coll_file_cur':files_cur})
+
     # print "\n\n\n\n **course_raw_page_info",course_raw_page_info
     gstaff_access = check_is_gstaff(group_id,request.user)
 
@@ -2094,7 +2163,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     template = 'ndf/gcourse_event_group.html'
 
     context_variables.update({'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
-    return render_to_response(template, 
+    return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
@@ -2112,14 +2181,15 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     allow_to_upload = True
     allow_to_join = query_dict = None
     allow_to_join = get_group_join_status(group_obj)
-    
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    '''
     banner_pic_obj = None
     old_profile_pics = []
     if not banner_pic_obj:
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {'$in': ["GSystem", "File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2130,12 +2200,11 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
             n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
             if n not in old_profile_pics:
                 old_profile_pics.append(n)
-
-    
+    '''
 
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            'group_obj': group_obj, 'title': 'gallery', 'allow_to_upload':allow_to_upload, 
+            'group_obj': group_obj, 'title': 'gallery', 'allow_to_upload':allow_to_upload,
             'allow_to_join':allow_to_join,
             'old_profile_pics':old_profile_pics, "prof_pic_obj": banner_pic_obj
         }
@@ -2146,69 +2215,63 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         allow_to_comment = None
         thread_node, allow_to_comment = node_thread_access(group_id, file_obj)
         context_variables.update({'file_obj': file_obj, 'allow_to_comment':allow_to_comment})
-    else:
-        coll_cur = node_collection.find({
-                          'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-                                            'group_set': {'$all': [ObjectId(group_id)]},
-                                            '$or': [
-                                                {'access_policy': u"PUBLIC"},
-                                                {'$and': [
-                                                    {'access_policy': u"PRIVATE"},
-                                                    {'created_by': request.user.id}
-                                                ]
-                                             }
-                                            ],
-                                            'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-                                        }).sort("last_update", -1)
+        # updating counters collection:
+        # update_notes_or_files_visited(request.user.id, ObjectId(group_id),ObjectId(node_id),True,False)
+        if request.user.is_authenticated():
+            Counter.add_visit_count(resource_obj_or_id=file_obj,
+                                    current_group_id=group_id,
+                                    loggedin_userid=request.user.id)
 
+
+    else:
+        all_superusers = User.objects.filter(is_superuser=True)
+        all_superusers_ids = all_superusers.values_list('id',flat=True)
         gstaff_users.extend(group_obj.group_admin)
         gstaff_users.append(group_obj.created_by)
-        query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users}}
-        
-        # files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
-        # print "\n\n Total files: ", files_cur.count()
-        files_cur = node_collection.find({ '$or' : [ {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}, '_type': "File", 'created_by': {'$nin': gstaff_users},
-                                    # 'tags': {'$regex': u"raw", '$options': "i"}
-                                    },
+        gstaff_users.extend(all_superusers_ids)
 
-                                    {'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
-                                                    'group_set': {'$all': [ObjectId(group_id)]},
-                                                    '$or': [
-                                                        {'access_policy': u"PUBLIC"},
-                                                        {'$and': [
-                                                            {'access_policy': u"PRIVATE"},
-                                                            {'created_by': request.user.id}
-                                                        ]
-                                                     }
-                                                    ],
-                                                    'collection_set': {'$exists': "true", '$not': {'$size': 0} }
-                                                
-                                    }]},{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort("last_update", -1)
+        files_cur = node_collection.find({
+                                        'created_by': {'$nin': gstaff_users},
+                                        '_type': {'$in':["File","GSystem"]},
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        'relation_set.clone_of': {'$exists': False},
+                                        '$or': [
+                                                {'member_of': gst_file._id},
+                                                {
+                                                    'collection_set': {'$exists': True,'$not': {'$size': 0} },
+                                                    'member_of': gst_page._id,
+                                                },
+                                            ],
+                                            },
+                                        {
+                                            'name': 1,
+                                            'collection_set':1,
+                                            '_id': 1,
+                                            'member_of': 1,
+                                            'if_file':1,
+                                        }).sort("last_update", -1)
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-        context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':coll_cur})
+        context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})
     template = 'ndf/gcourse_event_group.html'
 
-    return render_to_response(template, 
+    return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
 
 @get_execution_time
 def course_about(request, group_id):
-
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
-    
+
     weeks_count = 0
     curr_date_time = datetime.datetime.now().date()
     start_date = get_attribute_value(group_obj._id,"start_time")
     last_date = get_attribute_value(group_obj._id,"end_time")
 
     allow_to_join = get_group_join_status(group_obj)
-    
-    
 
     if start_date and last_date:
       start_date = start_date.date()
@@ -2219,16 +2282,17 @@ def course_about(request, group_id):
 
       # print 'Weeks:', (end_day - start_day).days / 7
       weeks_count = (end_day - start_day).days / 7
-    
-    template = 'ndf/gcourse_event_group.html'
 
+    template = 'ndf/gcourse_event_group.html'
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    '''
     banner_pic_obj = None
     old_profile_pics = []
     if not banner_pic_obj:
         for each in group_obj.relation_set:
             if "has_banner_pic" in each:
                 banner_pic_obj = node_collection.one(
-                    {'_type': "File", '_id': each["has_banner_pic"][0]}
+                    {'_type': {"$in": ["GSystem","File"]}, '_id': each["has_banner_pic"][0]}
                 )
                 break
 
@@ -2241,6 +2305,7 @@ def course_about(request, group_id):
                 old_profile_pics.append(n)
 
     # print "\n\n prof_pic_obj" ,banner_pic_obj
+    '''
     context_variables = RequestContext(request, {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
             'group_obj': group_obj, 'title': 'about', 'allow_to_join': allow_to_join,
@@ -2271,6 +2336,7 @@ def course_gallerymodal(request, group_id, node_id):
             'allow_to_comment': allow_to_comment,
             'thread_node': thread_node,
             'allow_to_join': allow_to_join
+
         })
     return render_to_response(template, context_variables)
 
@@ -2288,8 +2354,6 @@ def course_note_page(request, group_id):
     thread_node = None
     allow_to_comment = None
     allow_to_join = get_group_join_status(group_obj)
-    
-    
 
     thread_node, allow_to_comment = node_thread_access(group_id, node_obj)
     template = 'ndf/note_page.html'
@@ -2299,7 +2363,7 @@ def course_note_page(request, group_id):
             'node': node_obj, 'title': 'course_gallerymodall',
             'allow_to_comment': allow_to_comment,
             'thread_node': thread_node, 'allow_to_join': allow_to_join,
-            
+
         })
     return render_to_response(template, context_variables)
 
@@ -2321,40 +2385,55 @@ def inline_edit_res(request, group_id, node_id):
         node_obj.save()
         template = 'ndf/node_ajax_content.html'
         context_variables['no_discussion'] = True
-        
+
     else:
         template = 'ndf/html_editor.html'
         context_variables['var_name'] = "content_org",
         context_variables['var_value'] = node_obj.content
         context_variables['node_id'] = node_obj._id
-        context_variables['ckeditor_toolbar'] ="GeneralToolbar" 
+        context_variables['ckeditor_toolbar'] ="GeneralToolbar"
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
 
 @get_execution_time
 def course_filters(request, group_id):
+
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
     group_name  = group_obj.name
+
     gstaff_users = []
+    all_superusers = User.objects.filter(is_superuser=True)
+    all_superusers_ids = all_superusers.values_list('id',flat=True)
     gstaff_users.extend(group_obj.group_admin)
     gstaff_users.append(group_obj.created_by)
+    gstaff_users.extend(all_superusers_ids)
+
     notebook_filter = False
     no_url_flag = True
     detail_urlname = None
+
     context_variables = {
             'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
         }
+
     filter_applied = request.GET.get("filter_applied", "")
     filter_dict = request.GET.get("filter_dict", "")
     title = request.GET.get("title", "")
     if filter_applied:
         filter_applied = eval(filter_applied)
-    query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}}
+    # query = {'group_set': group_id, 'relation_set.clone_of':{'$exists': False}}
+    # Exclude files that are part of course content.
+    # Earlier 'has_clone' RT was used to identify such resources,
+    # which was updated as per PR#1496 https://github.com/gnowledge/gstudio/pull/1496
+    query = {'group_set': group_id, 'origin.fork_of':{'$exists': False}}
+
     template = 'ndf/file_list_tab.html'
 
     if title.lower() == "gallery" or title.lower() == "raw material":
-        query.update({'_type': "File"})
+        file_gst = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
+        # query.update({'_type': "File"})
+        query.update({'member_of': file_gst._id})
 
     elif title.lower() == "notebook":
         page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
@@ -2382,12 +2461,12 @@ def course_filters(request, group_id):
             return HttpResponse("reload")
 
     # print "\n\n query === ", title, "\n\n---  \n",query
-    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1}).sort('created_at', -1)
+    files_cur = node_collection.find(query,{'name': 1, '_id': 1, 'fs_file_ids': 1, 'member_of': 1, 'mime_type': 1, 'if_file': 1}).sort('created_at', -1)
     # print "\n\n Total files: ", files_cur.count()
     context_variables.update({'files_cur': files_cur,"resource_type": files_cur,
-                              "no_footer":True, "no_description":True, "no_url":no_url_flag, 
+                              "no_footer":True, "no_description":True, "no_url":no_url_flag,
                               "notebook_filter": notebook_filter, "detail_urlname": detail_urlname})
-    return render_to_response(template, 
+    return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
@@ -2396,17 +2475,39 @@ def course_filters(request, group_id):
 @login_required
 @get_execution_time
 def course_analytics(request, group_id, user_id, render_template=False):
-    cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id) 
+
+
+    cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
     cache_result = cache.get(cache_key)
     if cache_result:
-        return HttpResponse(cache_result)
-    import time
-    t0 = time.time()
+        return render_to_response("ndf/user_course_analytics.html",
+                                cache_result,
+                                context_instance = RequestContext(request)
+                            )
+
     analytics_data = {}
+    data_points_dict = request.GET.get('data_points_dict', {})
+    # print '== data_points_dict: ', data_points_dict
+
+    if data_points_dict and not isinstance(data_points_dict, dict):
+        from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
+
+        data_points_dict = json.loads(data_points_dict)
+        # print "\n\ndata_points_dict",data_points_dict
+        analytics_data['correct_attempted_quizitems'] = (data_points_dict['quiz_points'] / GSTUDIO_QUIZ_CORRECT_POINTS)
+        analytics_data['user_notes'] = (data_points_dict['notes_points'] / GSTUDIO_NOTE_CREATE_POINTS)
+        analytics_data['user_files'] = (data_points_dict['files_points'] / GSTUDIO_FILE_UPLOAD_POINTS)
+        analytics_data['total_cmnts_by_user'] = (data_points_dict['interactions_points'] / GSTUDIO_COMMENT_POINTS)
+        analytics_data['users_points'] = data_points_dict['users_points']
+
     user_obj = User.objects.get(pk=int(user_id))
-    analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+
+    counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
+    analytics_instance = AnalyticsMethods(user_obj.id,user_obj.username, group_id)
     # Modules Section
     all_modules= analytics_instance.get_total_modules_count()
+
+    # TO IMPROVE
     completed_modules = analytics_instance.get_completed_modules_count()
 
     # Units Section
@@ -2421,77 +2522,101 @@ def course_analytics(request, group_id, user_id, render_template=False):
     # analytics_data['completed_res'] = analytics_instance.get_completed_resources_count()
     # print "\n Completed Resources === ", completed_res, "\n\n"
 
-
-    # QuizItem Section
-    
     analytics_data['username'] = user_obj.username
+    # QuizItem Section
     analytics_data['total_quizitems'] = analytics_instance.get_total_quizitems_count()
-    # print "\n Total QuizItemEvents === ", total_quizitems, "\n\n"
-    analytics_data['attempted_quizitems'] = analytics_instance.get_attempted_quizitems_count()
-    # print "\n Attempted QuizItemEvents === ", attempted_quizitems, "\n\n"
-    analytics_data['correct_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(True,False)
-    # print "\n Correct Attempted QuizItemEvents === ", correct_attempted_quizitems, "\n\n"
-    analytics_data['incorrect_attempted_quizitems'] = analytics_instance.get_evaluated_quizitems_count(False,True)
-    # print "\n InCorrect Attempted QuizItemEvents === ", incorrect_attempted_quizitems, "\n\n"
-
+    # print "\n Total QuizItemEvents === ", analytics_data['total_quizitems'], "\n\n"
+    # analytics_data['attempted_quizitems'] = counter_obj.no_questions_attempted
+    analytics_data['attempted_quizitems'] = counter_obj['quiz']['attempted']
+    # print "\n Attempted QuizItemEvents === ", analytics_data['attempted_quizitems'], "\n\n"
+    if 'correct_attempted_quizitems' not in analytics_data:
+        # analytics_data['correct_attempted_quizitems'] = counter_obj.no_correct_answers
+        analytics_data['correct_attempted_quizitems'] = counter_obj['quiz']['correct']
+    # print "\n Correct Attempted QuizItemEvents === ", analytics_data['correct_attempted_quizitems'], "\n\n"
+    # analytics_data['incorrect_attempted_quizitems'] = counter_obj.no_incorrect_answers
+    analytics_data['incorrect_attempted_quizitems'] = counter_obj['quiz']['incorrect']
+    # print "\n InCorrect Attempted QuizItemEvents === ", analytics_data['incorrect_attempted_quizitems'], "\n\n"
 
     # Notes Section
     # analytics_data['total_notes'] = analytics_instance.get_total_notes_count()
     # print "\n Total Notes === ", total_notes, "\n\n"
-    analytics_data['user_notes'] = analytics_instance.get_user_notes_count()
+    if 'user_notes' not in analytics_data:
+        # analytics_data['user_notes'] = counter_obj.no_notes_written
+        analytics_data['user_notes'] = counter_obj['page']['blog']['created']
     # print "\n User Notes === ", user_notes, "\n\n"
-
 
     # Files Section
     # analytics_data['total_files'] = analytics_instance.get_total_files_count()
     # print "\n Total Files === ", total_files, "\n\n"
-    analytics_data['user_files'] = analytics_instance.get_user_files_count()
+    if 'user_files' not in analytics_data:
+        # analytics_data['user_files'] = counter_obj.no_files_created
+        analytics_data['user_files'] = counter_obj['file']['created']
     # print "\n User's Files === ", user_files, "\n\n"
 
-
     # Comments
-    analytics_data['total_cmnts_by_user'] = analytics_instance.get_total_comments_by_user()
+    if 'total_cmnts_by_user' not in analytics_data:
+        # analytics_data['total_cmnts_by_user'] = counter_obj.no_comments_by_user
+        analytics_data['total_cmnts_by_user'] = counter_obj['total_comments_by_user']
     # print "\n Total Comments By User === ", total_cmnts_by_user, "\n\n"
 
     # Comments on Notes Section
-    analytics_data['cmts_on_user_notes'] = analytics_instance.get_comments_counts_on_users_notes()
+    # analytics_data['cmts_on_user_notes'] = counter_obj.no_comments_received_on_notes
+    analytics_data['cmts_on_user_notes'] = counter_obj['page']['blog']['comments_gained']
     # print "\n Total Comments On User Notes === ", cmts_on_user_notes, "\n\n"
-    # analytics_data['unique_users_commented_on_user_notes'] = analytics_instance.get_commented_unique_users_count(True,False)
+    # analytics_data['unique_users_commented_on_user_notes'] = len(counter_obj.comments_by_others_on_notes.keys())
     # print "\n Total Unique Users - Commented on User Notes === ", unique_users_commented_on_user_notes, "\n\n"
 
 
     # Comments on Files Section
-    analytics_data['cmts_on_user_files'] = analytics_instance.get_comments_counts_on_users_files()
+    # analytics_data['cmts_on_user_files'] = counter_obj.no_comments_received_on_files
+    analytics_data['cmts_on_user_files'] = counter_obj['file']['comments_gained']
     # print "\n Total Comments User Files === ", cmts_on_user_files, "\n\n"
-    analytics_data['unique_users_commented_on_user_files'] = analytics_instance.get_commented_unique_users_count(False,True)
+    # analytics_data['unique_users_commented_on_user_files'] = len(counter_obj.comments_by_others_on_files.keys())
+
+    analytics_data['unique_users_commented_on_user_files'] = len(counter_obj['file']['comments_by_others_on_res'].keys())
+
     # print "\n Total Unique Users Commented on User Files === ", unique_users_commented_on_user_files, "\n\n"
 
     # BY User
-    analytics_data['total_notes_read_by_user'] = analytics_instance.get_others_notes_read_count()
+    # TO IMPROVE
+    # analytics_data['total_notes_read_by_user'] = counter_obj.no_others_notes_visited
+    analytics_data['total_notes_read_by_user'] = counter_obj['page']['blog']['visits_on_others_res']
     # print "\n Total Notes read by User === ", total_notes_read_by_user, "\n\n"
 
-    analytics_data['total_files_viewed_by_user'] = analytics_instance.get_others_files_read_count()
+    # TO IMPROVE
+    # analytics_data['total_files_viewed_by_user'] = counter_obj.no_others_files_visited
+    analytics_data['total_files_viewed_by_user'] = counter_obj['file']['visits_on_others_res']
     # print "\n Total Files viewed by User === ", total_files_viewed_by_user, "\n\n"
 
-    analytics_data['other_viewing_my_files'] = analytics_instance.total_users_visted_my_files()
+    # TO IMPROVE
+    # analytics_data['other_viewing_my_files'] = counter_obj.no_visits_gained_on_files
+    analytics_data['other_viewing_my_files'] = counter_obj['file']['visits_gained']
     # print "\n Total Users viewing My FILES === ", other_viewing_my_files, "\n\n"
 
-    analytics_data['others_reading_my_notes'] = analytics_instance.total_users_read_my_notes()
+    # TO IMPROVE
+    # analytics_data['others_reading_my_notes'] = counter_obj.no_views_gained_on_notes
+    analytics_data['others_reading_my_notes'] = counter_obj['page']['blog']['visits_gained']
     # print "\n Total Users reading My NOTES === ", others_reading_my_notes, "\n\n"
 
-    analytics_data['commented_on_others_notes'] = analytics_instance.get_other_notes_commented_by_user_count()
+    # analytics_data['commented_on_others_notes'] = counter_obj.no_comments_on_others_notes
+    analytics_data['commented_on_others_notes'] = counter_obj['page']['blog']['commented_on_others_res']
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
 
-    analytics_data['commented_on_others_files'] = analytics_instance.get_other_files_commented_by_user_count()
+    # analytics_data['commented_on_others_files'] = counter_obj.no_comments_on_others_files
+    analytics_data['commented_on_others_files'] = counter_obj['file']['commented_on_others_res']
     # print "\n Total Notes on which User Commented === ", commented_on_others_notes, "\n\n"
-    
+
     # all_cmts = analytics_instance.get_avg_rating_on_my_comments()
-    analytics_data['total_rating_rcvd_on_notes'] = analytics_instance.get_ratings_received_on_user_notes()
+    # analytics_data['total_rating_rcvd_on_notes'] = counter_obj.avg_rating_received_on_notes
+    analytics_data['total_rating_rcvd_on_notes'] = counter_obj['page']['blog']['avg_rating_gained']
     # print "\n\n analytics_data['total_rating_rcvd_on_notes'] === ",analytics_data['total_rating_rcvd_on_notes']
-    analytics_data['total_rating_rcvd_on_files'] = analytics_instance.get_ratings_received_on_user_files()
+    # analytics_data['total_rating_rcvd_on_files'] = counter_obj.avg_rating_received_on_files
+    analytics_data['total_rating_rcvd_on_files'] = counter_obj['file']['avg_rating_gained']
     # print "\n\n analytics_data['total_rating_rcvd_on_files'] === ",analytics_data['total_rating_rcvd_on_files']
-    cmts_on_user_notes = analytics_instance.get_comments_counts_on_users_notes(False, site_wide=True)
-    cmts_on_user_files = analytics_instance.get_comments_counts_on_users_files(False, site_wide=True)
+    # cmts_on_user_notes = counter_obj.no_comments_received_on_notes
+    cmts_on_user_notes = counter_obj['page']['blog']['comments_gained']
+    # cmts_on_user_files = counter_obj.no_comments_received_on_files
+    cmts_on_user_files = counter_obj['file']['comments_gained']
     analytics_data['cmnts_rcvd_by_user'] = 0
     if 'cmts_on_user_notes' in analytics_data and 'cmts_on_user_files' in analytics_data:
         analytics_data['cmnts_rcvd_by_user'] = analytics_data['cmts_on_user_notes'] + analytics_data['cmts_on_user_files']
@@ -2502,74 +2627,98 @@ def course_analytics(request, group_id, user_id, render_template=False):
         analytics_data['module_progress_meter'] = (completed_modules/float(all_modules))*100
     else:
         analytics_data['module_progress_meter'] = 0
-    
+
     if completed_units and all_units:
         analytics_data['unit_progress_meter'] = (completed_units/float(all_units))*100
     else:
         analytics_data['unit_progress_meter'] = 0
-    
-    analytics_data['users_points'] = analytics_instance.get_users_points()
-    analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
 
-    t1 = time.time()
-    time_diff = t1 - t0
-    # print "\n ALL Total seconds == ", time_diff
+    if "users_points" not in analytics_data:
+        # analytics_data['users_points'] = counter_obj.course_score
+        analytics_data['users_points'] = counter_obj['group_points']
+
+    # analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
+    analytics_data['users_points_breakup'] = counter_obj.get_all_user_points_dict()
 
     del analytics_instance
-    cache.set(cache_key, json.dumps(analytics_data), 60*15)
-    return render_to_response("ndf/user_course_analytics.html", 
+    cache.set(cache_key, analytics_data, 60*10)
+
+    return render_to_response("ndf/user_course_analytics.html",
                                 analytics_data,
                                 context_instance = RequestContext(request)
     )
 
     # return HttpResponse(json.dumps(analytics_data))
 
-
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
+
     cache_key = u'course_analytics_admin' + unicode(group_id)
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
-    try:
-        group_id = ObjectId(group_id)
-    except:
-        group_name, group_id = get_group_name_id(group_id)
-    response_dict = {}
-    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+    # from gnowsys_ndf.ndf.views.analytics_methods import AnalyticsMethods
+    # from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
+
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    admin_analytics_data_list = []
+    admin_analytics_data_append = admin_analytics_data_list.append
     FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
 
-    admin_analytics_list = []
-    if group_obj.author_set:
-        for each_author in group_obj.author_set:
-            user_obj = User.objects.get(pk=int(each_author))
-            admin_analytics_data = {}
-            analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
-            # username = user_obj.username
-            # user_id = user_obj.id
-            # users_points = analytics_instance.get_users_points()
-            admin_analytics_data['username'] = user_obj.username
-            admin_analytics_data['user_id'] = user_obj.id
-            admin_analytics_data['users_points'] = analytics_instance.get_users_points()
-            # admin_analytics_data['users_points_breakup'] = analytics_instance.get_users_points(True)
-            users_points_breakup = analytics_instance.get_users_points(True)
-            admin_analytics_data["files_points"] = users_points_breakup['Files']
-            if FILES_MAX_POINT_VAL < users_points_breakup['Files']:
-                FILES_MAX_POINT_VAL = users_points_breakup['Files']
-            admin_analytics_data['notes_points'] = users_points_breakup['Notes']
-            if NOTES_MAX_POINT_VAL < users_points_breakup['Notes']:
-                NOTES_MAX_POINT_VAL = users_points_breakup['Notes']
-            admin_analytics_data['quiz_points'] = users_points_breakup['Quiz']
-            if QUIZ_MAX_POINT_VAL < users_points_breakup['Quiz']:
-                QUIZ_MAX_POINT_VAL = users_points_breakup['Quiz']
-            admin_analytics_data['interactions_points'] = users_points_breakup['Interactions']
-            if INTERACTIONS_MAX_POINT_VAL < users_points_breakup['Interactions']:
-                INTERACTIONS_MAX_POINT_VAL = users_points_breakup['Interactions']
-            del analytics_instance
-            admin_analytics_list.append(admin_analytics_data)
-    cache.set(cache_key, json.dumps(admin_analytics_list), 60*15)
-    # print "\n\nadmin_analytics_list ",admin_analytics_list
+    all_group_authors = node_collection.find({'_type': u'Author', 'created_by': {'$in': group_obj.author_set}})
+    # print group_obj.author_set
+
+    auth_counters = counter_collection.find({'user_id': {'$in': group_obj.author_set}, 'group_id': ObjectId(group_id) })
+
+    for each_author_obj in all_group_authors:
+        admin_analytics_data = {}
+
+        try:
+            user_counter_obj = Counter(auth_counters.clone().where('this.user_id == '+str(each_author_obj.created_by)+' && this.group_id ==  "'+str(group_id)+'"')[0])
+        except Exception, e:
+            user_counter_obj = Counter.get_counter_obj(each_author_obj.created_by, ObjectId(group_id))
+            print e
+
+        # try:
+        #     user_obj = User.objects.get(pk=int(each_author_obj))
+        # except Exception, e:
+        #     continue
+
+        # analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+        # username = user_obj.username
+        # user_id = user_obj.id
+        # users_points = analytics_instance.get_users_points()
+        admin_analytics_data['username']    = each_author_obj.name
+        admin_analytics_data['user_id']     = each_author_obj.created_by
+        admin_analytics_data['users_points']= user_counter_obj['group_points']
+
+        # admin_analytics_data["files_points"] = user_counter_obj['file']['created'] * GSTUDIO_FILE_UPLOAD_POINTS
+        admin_analytics_data["files_points"] = user_counter_obj.get_file_points()
+        if FILES_MAX_POINT_VAL < admin_analytics_data["files_points"]:
+            FILES_MAX_POINT_VAL = admin_analytics_data["files_points"]
+
+        # admin_analytics_data['notes_points'] = user_counter_obj['page']['blog']['created'] * GSTUDIO_NOTE_CREATE_POINTS
+        admin_analytics_data['notes_points'] = user_counter_obj.get_page_points(page_type='blog')
+        if NOTES_MAX_POINT_VAL < admin_analytics_data['notes_points']:
+            NOTES_MAX_POINT_VAL = admin_analytics_data['notes_points']
+
+        # admin_analytics_data['quiz_points'] = user_counter_obj['quiz']['correct'] * GSTUDIO_QUIZ_CORRECT_POINTS
+        admin_analytics_data['quiz_points'] = user_counter_obj.get_quiz_points()
+        if QUIZ_MAX_POINT_VAL < admin_analytics_data['quiz_points']:
+            QUIZ_MAX_POINT_VAL = admin_analytics_data['quiz_points']
+
+        # admin_analytics_data['interactions_points'] = user_counter_obj['total_comments_by_user'] * GSTUDIO_COMMENT_POINTS
+        admin_analytics_data['interactions_points'] = user_counter_obj.get_interaction_points()
+        if INTERACTIONS_MAX_POINT_VAL < admin_analytics_data['interactions_points']:
+            INTERACTIONS_MAX_POINT_VAL = admin_analytics_data['interactions_points']
+
+        # del analytics_instance
+        admin_analytics_data_append(admin_analytics_data)
+
+    max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
+    'quiz_max_points': QUIZ_MAX_POINT_VAL, 'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
 
     column_headers = [
         ("username", "Name"),
@@ -2580,20 +2729,187 @@ def course_analytics_admin(request, group_id):
         ("quiz_points", "Quiz"),
         ("interactions_points", "Interactions"),
     ]
-    max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
-    'quiz_max_points': QUIZ_MAX_POINT_VAL,'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
-
+    response_dict = {}
     response_dict["column_headers"] = column_headers
     response_dict["success"] = True
-    response_dict["students_data_set"] = admin_analytics_list
+    response_dict["students_data_set"] = admin_analytics_data_list
     response_dict['max_points_dict'] = max_points_dict
+
+    response_dict = json.dumps(response_dict)
+    cache.set(cache_key, response_dict, 60*10)
+
+    # print "\n admin_analytics_data_list === ",admin_analytics_data_list
+    return HttpResponse(response_dict)
+
+'''
+@login_required
+@get_execution_time
+def course_analytics_admin(request, group_id):
+    cache_key = u'course_analytics_admin' + unicode(group_id)
+    cache_result = cache.get(cache_key)
+    if cache_result:
+        return HttpResponse(cache_result)
+    # try:
+    #     group_id = ObjectId(group_id)
+    # except:
+    #     group_name, group_id = get_group_name_id(group_id)
+    # t1 = time.time()
+
+    # response_dict = {}
+    # group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    # FILES_MAX_POINT_VAL = NOTES_MAX_POINT_VAL = QUIZ_MAX_POINT_VAL = INTERACTIONS_MAX_POINT_VAL = 0
+
+    # admin_analytics_list = []
+    # if group_obj.author_set:
+    #     for each_author in group_obj.author_set:
+    #         user_obj = User.objects.get(pk=int(each_author))
+    #         admin_analytics_data = {}
+    #         analytics_instance = AnalyticsMethods(request, user_obj.id,user_obj.username, group_id)
+    #         # username = user_obj.username
+    #         # user_id = user_obj.id
+    #         # users_points = analytics_instance.get_users_points()
+    #         admin_analytics_data['username'] = user_obj.username
+    #         admin_analytics_data['user_id'] = user_obj.id
+    #         users_points_breakup = analytics_instance.get_users_points(True)
+    #         admin_analytics_data['users_points'] = users_points_breakup['Total']
+
+    #         admin_analytics_data["files_points"] = users_points_breakup['Files']
+    #         if FILES_MAX_POINT_VAL < users_points_breakup['Files']:
+    #             FILES_MAX_POINT_VAL = users_points_breakup['Files']
+    #         admin_analytics_data['notes_points'] = users_points_breakup['Notes']
+    #         if NOTES_MAX_POINT_VAL < users_points_breakup['Notes']:
+    #             NOTES_MAX_POINT_VAL = users_points_breakup['Notes']
+    #         admin_analytics_data['quiz_points'] = users_points_breakup['Quiz']
+    #         if QUIZ_MAX_POINT_VAL < users_points_breakup['Quiz']:
+    #             QUIZ_MAX_POINT_VAL = users_points_breakup['Quiz']
+    #         admin_analytics_data['interactions_points'] = users_points_breakup['Interactions']
+    #         if INTERACTIONS_MAX_POINT_VAL < users_points_breakup['Interactions']:
+    #             INTERACTIONS_MAX_POINT_VAL = users_points_breakup['Interactions']
+    #         del analytics_instance
+    #         admin_analytics_list.append(admin_analytics_data)
+    # # print "\n\nadmin_analytics_list ",admin_analytics_list
+
+    # column_headers = [
+    #     ("username", "Name"),
+    #     # ("user_id", "user_id"),
+    #     ("users_points", "Total Points"),
+    #     ("files_points", "Files"),
+    #     ("notes_points", "Notes"),
+    #     ("quiz_points", "Quiz"),
+    #     ("interactions_points", "Interactions"),
+    # ]
+    # max_points_dict = {'file_max_points': FILES_MAX_POINT_VAL,'notes_max_points': NOTES_MAX_POINT_VAL,
+    # 'quiz_max_points': QUIZ_MAX_POINT_VAL,'interactions_max_points': INTERACTIONS_MAX_POINT_VAL}
+
+    # response_dict["column_headers"] = column_headers
+    # response_dict["success"] = True
+    # response_dict["students_data_set"] = admin_analytics_list
+    # response_dict['max_points_dict'] = max_points_dict
+
+    # response_dict = json.dumps(response_dict)
+    # cache.set(cache_key, response_dict, 60*10)
+
+
+    # import time
+    # t1 = time.time()
+    from gnowsys_ndf.ndf.views.analytics_methods import AnalyticsMethods
+    from gnowsys_ndf.settings import GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS
+
+    gst_page = node_collection.one({'_type': 'GSystemType', 'name': u'Page'})
+    gst_page_id = gst_page._id
+
+    gst_blog = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+    gst_blog_id = gst_blog._id
+
+    gst_file = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
+    gst_file_id = gst_file._id
+
+    gst_reply = node_collection.one({'_type': "GSystemType", 'name': "Reply"})
+    gst_reply_id = gst_reply._id
+
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    author_set = group_obj.author_set
+    all_res_cur = node_collection.find({'_type': 'GSystem', 'group_set': {'$in': [group_obj._id]}, '$or': [{'member_of': {'$in': [gst_file_id, gst_reply_id]}}, {'member_of': gst_page_id, 'type_of': gst_blog_id}], 'created_by': {'$in': author_set} })
+
+
+    gst_dict = {gst_page_id: 0, gst_file_id: 0, gst_reply_id: 0}
+
+    ud = { auth_id: gst_dict.copy() for auth_id in author_set}
+
+    for each in all_res_cur:
+        ud[each.created_by][each.member_of[0]] += 1
+
+    # final dict
+    fd = {}
+
+    gst_name_id_dict = {gst_page_id: 'notes_points', gst_file_id: 'files_points', gst_reply_id: 'interactions_points'}
+    gst_name_point_dict = {gst_page_id: GSTUDIO_NOTE_CREATE_POINTS, gst_file_id: GSTUDIO_FILE_UPLOAD_POINTS, gst_reply_id: GSTUDIO_COMMENT_POINTS}
+
+    admin_analytics_data_list = []
+    admin_analytics_data_append = admin_analytics_data_list.append
+    notes_points_list = [0]
+    notes_points_append = notes_points_list.append
+    files_points_list = [0]
+    files_points_append = files_points_list.append
+    interactions_points_list = [0]
+    interactions_points_append = interactions_points_list.append
+    quize_points_list = [0]
+    quize_points_append = quize_points_list.append
+
+    author_cur = node_collection.find({'_type': u'Author', 'created_by': {'$in': group_obj.author_set} }, {'_id': 0, 'created_by': 1, 'name': 1})
+    user_id_name_dict = {u['created_by']: u['name'] for u in author_cur}
+
+    for uid, gsts in ud.iteritems():
+        fd[uid] = {gst_name_id_dict[g]: gsts[g]*gst_name_point_dict[g] for g in gsts}
+        ua_dict = fd[uid]
+        analytics_instance = AnalyticsMethods(uid, user_id_name_dict[uid], group_id)
+        correct_attempted_quizitems = analytics_instance.get_evaluated_quizitems_count(True,False)
+        ua_dict['quiz_points'] = correct_attempted_quizitems * GSTUDIO_QUIZ_CORRECT_POINTS
+
+        # appends:
+        notes_points_append(ua_dict['notes_points'])
+        files_points_append(ua_dict['files_points'])
+        interactions_points_append(ua_dict['interactions_points'])
+        quize_points_append(ua_dict['quiz_points'])
+
+        ua_dict['users_points'] = sum(ua_dict.values())
+        ua_dict['user_id'] = uid
+        ua_dict['username'] = user_id_name_dict[uid]
+        admin_analytics_data_append(ua_dict)
+
+    max_points_dict = {'file_max_points': max(files_points_list),'notes_max_points': max(notes_points_list),
+        'quiz_max_points': max(quize_points_list),'interactions_max_points': max(interactions_points_list)}
+
+    column_headers = [
+        ("username", "Name"),
+        # ("user_id", "user_id"),
+        ("users_points", "Total Points"),
+        ("files_points", "Files"),
+        ("notes_points", "Notes"),
+        ("quiz_points", "Quiz"),
+        ("interactions_points", "Interactions"),
+    ]
+    response_dict = {}
+    response_dict["column_headers"] = column_headers
+    response_dict["success"] = True
+    response_dict["students_data_set"] = admin_analytics_data_list
+    response_dict['max_points_dict'] = max_points_dict
+
+    response_dict = json.dumps(response_dict)
+    cache.set(cache_key, response_dict, 60*10)
+
+    # print time.time() - t1
+    # print response_dict
     # print "\n admin_analytics_list === ",admin_analytics_list
-    return HttpResponse(json.dumps(response_dict))
+    return HttpResponse(response_dict)
+
+'''
+
 
 @login_required
 @get_execution_time
 def build_progress_bar(request, group_id, node_id):
-    cache_key = u'build_progress_bar_' + unicode(group_id) + "_" + unicode(node_id) + "_" + unicode(request.user.id) 
+    cache_key = u'build_progress_bar_' + unicode(group_id) + "_" + unicode(node_id) + "_" + unicode(request.user.id)
     cache_result = cache.get(cache_key)
     if cache_result:
         return HttpResponse(cache_result)
@@ -2601,7 +2917,7 @@ def build_progress_bar(request, group_id, node_id):
     try:
         group_obj   = get_group_name_id(group_id, get_obj=True)
         course_complete_percentage = total_count = completed_count = None
-        if request.user.is_authenticated:
+        if request.user.is_authenticated():
             result_status = get_course_completetion_status(group_obj, request.user.id)
     except Exception as e:
         # print "\n\n Error while fetching ---", e
@@ -2611,7 +2927,6 @@ def build_progress_bar(request, group_id, node_id):
 
 @get_execution_time
 def get_resource_completion_status(request, group_id):
-
     result_dict = {'COMPLETED':[]}
     cr_ids = request.GET.get("cr_ids", "")
     if cr_ids:
@@ -2622,5 +2937,23 @@ def get_resource_completion_status(request, group_id):
                 'user': request.user.username
                 })
             if b.count():
+                # print "\n\nb.count()",b.count()
                 result_dict['COMPLETED'].append(each_cr)
     return HttpResponse(json.dumps(result_dict))
+
+@get_execution_time
+def manage_users(request, group_id):
+    if request.method == "GET":
+        group_obj   = get_group_name_id(group_id, get_obj=True)
+        group_id    = group_obj._id
+        group_name  = group_obj.name
+        context_variables = {
+                'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            }
+        template = 'ndf/users_mgmt.html'
+
+        return render_to_response(template,
+                                    context_variables,
+                                    context_instance = RequestContext(request)
+        )
+

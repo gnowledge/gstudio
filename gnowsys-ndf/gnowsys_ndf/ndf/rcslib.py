@@ -167,6 +167,7 @@ class RCS:
             lockflag = "-l"
         else: 
             lockflag = "-u"
+        lockflag = lockflag + " -q"
 
         cmd = 'co %s%s %s %s' % \
             (lockflag, rev, otherflags, name)
@@ -193,6 +194,7 @@ class RCS:
             lockflag = ""
         else: 
             lockflag = "-u" 
+        lockflag = lockflag + " -q"
 
         if not message: 
             message = "<none>"

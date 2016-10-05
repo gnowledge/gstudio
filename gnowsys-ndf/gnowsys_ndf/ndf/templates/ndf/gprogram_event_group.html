@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block meta_content %}
+  {% comment %}
   <h3 class="subheader">{{node.name}}</h3>
   <a href="{% url 'program' parent_groupid_of_pe %}" class="tiny button radius"> {% trans "All Events" %}</a>
 
@@ -17,18 +18,17 @@
     <a class="tiny  button radius" href="{% url 'all_under_moderation' node.pk %}">
       {% trans 'Moderation Status' %}
     </a>
-  {% comment %}
   {% else %}
   {% user_access_policy node.pk request.user as user_access %} 
   {% if user_access == "allow" %}
     <span data-tooltip title='Your file will go through moderation.'><a href="{% url 'uploadDoc' group_name_tag %}?program_res=True" class="tiny button radius">{% trans "Upload File" %}</a></span>
   {% endif %}
-  {% endcomment %}
   {% endif %}
   
   <div id="view_collection">
     {% include "ndf/collection_ajax_view.html" %}  
   </div>
+  {% endcomment %}
 {% endblock %}
 
 

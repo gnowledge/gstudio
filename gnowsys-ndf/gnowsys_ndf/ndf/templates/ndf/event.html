@@ -1,6 +1,7 @@
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+{% block title %} {% trans "Events" %} {% endblock %}
 
 {% block style %}
   {{block.super}}
@@ -45,7 +46,8 @@
       {% endif %}
     {% else %}
     <li>
-    {% endif %}    
+    {% endif %}   
+    {% if not  each.name == "Inauguration"  or each.name == "Master Trainer Program" %} 
       <div class="row">
           <a class="small-6 columns" href="{% url 'event_list' groupid each.pk %}" title="View all {{each.name}}">
             {{each.name}}
@@ -64,6 +66,7 @@
           
           {% endif %}
       </div>
+      {% endif %}
   	</li>
     </a>
 

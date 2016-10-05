@@ -1,8 +1,8 @@
 {% load ndf_tags %}
+{% load re_format from simple_filters %}
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 {% get_user_quiz_resp node request.user as total_and_curr_ans_dict %}
-
 <style type="text/css">
 	.quiz_qtn{
 		margin-left:20px !important;
@@ -31,6 +31,8 @@
 		color: red;
 	}
 </style>
+{% with node.options|re_format as node_options %}
+{% with node.correct_answer|re_format as node_correct_answer %}
 
 <div class="row">
 <label class="attempts_count right fi-info">You attempted this question {{total_and_curr_ans_dict.count}} times </label>
@@ -45,16 +47,16 @@
 
 		<div class="row">
 			<div class="quiz_qtn">
-				<b>{{node.content|safe}}</b>
+				<b>{{node.content}}</b>
 				<div class="quiz_qtn">
 					{% if node.quiz_type == "Single-Choice" %}
-						{% for each_opt in node.options %}
+						{% for each_opt in node_options %}
 							<input type="radio" name="quiz_ans"  value="{{each_opt}}"
 							{% if each_opt in total_and_curr_ans_dict.recent_ans  %}
 							checked
 							{% endif %}
 
-							{% if each_opt in node.correct_answer %}
+							{% if each_opt in node_correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
@@ -72,12 +74,12 @@
 						</div>
 						{% endcomment %}
 					{% elif node.quiz_type == "Multiple-Choice" %}
-						{% for each_opt in node.options %}
+						{% for each_opt in node_options %}
 							<input type="checkbox" name="quiz_ans" value="{{each_opt}}"
 							{% if each_opt in total_and_curr_ans_dict.recent_ans %}
 							checked
 							{% endif %}
-							{% if each_opt in node.correct_answer %}
+							{% if each_opt in node_correct_answer %}
 								class="choice" id="{{each_opt}}">{{each_opt}}<span class='fi-check hide chk_ans_lbl'></span>
 							{% else %}
 								class="choice"  id="{{each_opt}}">{{each_opt}}<span class='fi-x hide chk_ans_lbl'></span>
@@ -108,6 +110,8 @@
 		</div>
 	</fieldset>
 </div>
+{% endwith %}
+{% endwith %}
 
 <script type="text/javascript">
 	user_submitted_ans_list = {{total_and_curr_ans_dict.recent_ans|jsonify|safe}}
@@ -271,7 +275,6 @@
 					dataType: "json",
 
 					success: function(data){
-						console.log(data)
 						if(data['success']){
 							if(user_action == "submit"){
 								submit_btn_status("hide")

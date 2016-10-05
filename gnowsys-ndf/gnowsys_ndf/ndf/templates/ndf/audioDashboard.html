@@ -41,8 +41,31 @@
     </div>
 
     <div id="audios-container"></div>
+    <div>
+     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
+    {% for each in audioCollection %}
+    
+    <li class="card-audio-wrapper">
+            <audio  controls loop  src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" > </audio>
+            <figcaption title="Click here to add this file in editor" class="audio-caption" data-audio-id="{{each.pk}}" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" data-audio-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}">{{each.name}}</figcaption>
+    
+    </li>
+    {% endfor %}
+  </ul>
+    </div>
 
     <script>
+    $(".audio-caption").click(function(event){
+                                var audioURL = $(this).attr("data-audio-src");
+                                // var locationURL = 'http://' + location.host;
+                                // var locationURL = window.location.origin
+                                var completeURL = audioURL
+
+                                CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls loop src=' + completeURL +  '>' + '</audio>');
+                                $('#group_imgs_on_modal').foundation('reveal', 'close');
+                        
+
+                          });
 //     function countdown(minutes) {
 //     var seconds = 32;
 //     var mins = minutes                Function for ticker timing
@@ -144,8 +167,8 @@
             $("#save-recording").click(function(){
                           var d = new Date();
                           timeStamp = d.getTime();
-                          timeStamp = timeStamp.toString();
-                         
+                          fileName = "Rec"+timeStamp.toString();
+                          file = blob
 
                           //alert(timeStamp);
                           console.log(blob);
@@ -159,7 +182,7 @@
                         // if (!file.type.match('image.*')) {  continue; }
 
                         // Add the file to the request.
-                        formData.append('doc[]', blob, timeStamp);//passing timestamp as file name
+                        formData.append('filehive', file, fileName);//passing timestamp as file name
 
                       // appending csrfmiddlewaretoken and user-id
                       formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
@@ -169,7 +192,7 @@
                       xhr = new XMLHttpRequest();
 
                       // Open the connection.
-                      xhr.open('POST', "{% url 'save_image' group_id %}", true);
+                      xhr.open('POST', "{% url 'upload_file_ckeditor' group_id %}", true);
 
                       // Set up a handler for when the request finishes sucessfully.
                       xhr.onload = function () {
@@ -183,10 +206,10 @@
                              alert("Error occurred");
                           }
                           // check if image is not in the list, add it.
-                          else if(xhr.responseText.length == 24 )
+                          else if(xhr.responseText )
                           {
                               obj_id = parseInt(xhr.responseText);
-                              var completeURL = "/" + "{{group_id}}" + "/file" + "/readDoc" + "/" + xhr.responseText + "/" + timeStamp;
+                              var completeURL = "{{MEDIA_URL}}" + xhr.responseText;
                                           CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls> <source src="'+ completeURL +'" type="audio/ogg"></audio>');
                                              $(".btn-group").remove();
                                              $("#audios-container").remove();

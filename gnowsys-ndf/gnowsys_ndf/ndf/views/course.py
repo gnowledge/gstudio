@@ -155,7 +155,6 @@ def create_edit(request, group_id, node_id=None):
 
     else:
         course_node = node_collection.collection.GSystem()
-
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(GST_COURSE._id),'group_set': ObjectId(group_id),'status':{"$in":[u"DRAFT",u"PUBLISHED"]}})
 
     nodes_list = []
@@ -555,8 +554,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                     course_gs.content = cnode_for_content.html_content
 
                     course_gs.save(is_changed=is_changed,groupid=group_id)
-
-                    # [B] Store AT and/or RT field(s) of given course-node
+		            # [B] Store AT and/or RT field(s) of given course-node
                     for tab_details in property_order_list:
                         for field_set in tab_details[1]:
                             # Fetch only Attribute field(s) / Relation field(s)
@@ -643,7 +641,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 course_gs.status = u"PUBLISHED"
 
             course_gs.save(is_changed=is_changed,groupid=group_id)
-
             # [B] Store AT and/or RT field(s) of given course-node
             for tab_details in property_order_list:
                 for field_set in tab_details[1]:
@@ -1294,6 +1291,7 @@ def change_order(request, group_id):
         a, b = collection_set_list.index(ObjectId(node_id_up)), collection_set_list.index(ObjectId(node_id_down))
         collection_set_list[b], collection_set_list[a] = collection_set_list[a], collection_set_list[b]
         node_collection.collection.update({'_id': parent_node._id}, {'$set': {'collection_set': collection_set_list }}, upsert=False, multi=False)
+	
         parent_node.reload()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
@@ -1534,8 +1532,7 @@ def save_resources(request, group_id):
             cu_new.save(groupid=group_id)
             response_dict["create_new_unit"] = True
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
-
-        if cu_new._id not in css_node.collection_set:
+	if cu_new._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
         # print "\n\n member_of_names_list----", cu_new.member_of_names_list, "list_of_res_ids", list_of_res_ids
         new_res_set = []
@@ -1562,6 +1559,7 @@ def save_resources(request, group_id):
                 cu_new.save()
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
+
         return HttpResponse(json.dumps(response_dict))
 
 
@@ -1615,8 +1613,7 @@ def create_edit_unit(request, group_id):
 
         if cu_node._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_node._id}}, upsert=False, multi=False)
-
-        return HttpResponse(json.dumps(response_dict))
+	    return HttpResponse(json.dumps(response_dict))
 
 
 
@@ -1735,7 +1732,7 @@ def remove_resource_from_unit(request, group_id):
 
         if unit_node.collection_set and res_id:
               node_collection.collection.update({'_id': unit_node._id}, {'$pull': {'collection_set': ObjectId(res_id)}}, upsert=False, multi=False)
-
+	    
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
@@ -1777,7 +1774,7 @@ def add_course_file(request, group_id):
             context_node.collection_set.append(file_node._id)
             file_node.prior_node.append(context_node._id)
             file_node.save()
-        context_node.save()
+    
     return HttpResponseRedirect(url_name)
 
 

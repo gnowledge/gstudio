@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
 
-from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.models import Node, Counter
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
@@ -53,7 +53,7 @@ def send_invitation(request,group_id):
     try:
         colg = node_collection.one({'_id': ObjectId(group_id)})
         groupname=colg.name
-        list_of_invities=request.POST.get("users","") 
+        list_of_invities=request.POST.get("users","")
         sender=request.user
         sending_user=User.objects.get(id=sender.id)
         list_of_users=list_of_invities.split(",")
@@ -141,26 +141,35 @@ def invite_users(request,group_id):
                             new_users.append(each)
                             node.author_set.append(each);
                 node.save(groupid=group_id)
-                
-                # Send invitations according to not_status variable
-                activ="invitation to join in group"
-                if not_status == "ON":
-                    for each in exst_users:
+                for each in users:
+                    counter_obj = Counter.get_counter_obj(each, ObjectId(group_id))
+                    counter_obj['is_group_member'] = True
+                    counter_obj.save()
+                try:
+                    # Send invitations according to not_status variable
+                    activ="invitation to join in group"
+                    if not_status == "ON":
+                        for each in exst_users:
+                            bx=User.objects.get(id=each)
+                            msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+"'"
+                            set_notif_val(request,group_id,msg,activ,bx)
+                    for each in new_users:
                         bx=User.objects.get(id=each)
                         msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+"'"
                         set_notif_val(request,group_id,msg,activ,bx)
-                for each in new_users:
-                    bx=User.objects.get(id=each)
-                    msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+"'"
-                    set_notif_val(request,group_id,msg,activ,bx)
+                except Exception as mailerr:
+                    pass
             deleted_users=set(deleted_users)-set(users)
             activ="Unsubscribed from group"
             if deleted_users:
                 for each in deleted_users:
                     bx=User.objects.get(id=each)
                     node.author_set.remove(each)
-                    msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+"'"
-                    set_notif_val(request,group_id,msg,activ,bx)
+                    try:
+                        msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+"'"
+                        set_notif_val(request,group_id,msg,activ,bx)
+                    except Exception as mailerror:
+                        pass
                 node.save(groupid=group_id)
             return HttpResponse("Success")
         else:
@@ -179,7 +188,7 @@ def invite_users(request,group_id):
 
             data_list=set_drawer_widget_for_users(st,coll_obj_list)
             return HttpResponse(json.dumps(data_list))
-   
+
     except Exception as e:
         print "Exception in invite_users "+str(e)
         return HttpResponse("Failure")
@@ -211,26 +220,32 @@ def invite_admins(request,group_id):
                             new_users.append(each)
                             node.group_admin.append(each);
                 node.save(groupid=group_id)
-                
-                # Send invitations according to not_status variable
-                activ="invitation to join in group"
-                if not_status == "ON":
-                    for each in exst_users:
+
+                try:
+                    # Send invitations according to not_status variable
+                    activ="invitation to join in group"
+                    if not_status == "ON":
+                        for each in exst_users:
+                            bx=User.objects.get(id=each)
+                            msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+" as admin'"
+                            set_notif_val(request,group_id,msg,activ,bx)
+                    for each in new_users:
                         bx=User.objects.get(id=each)
                         msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+" as admin'"
                         set_notif_val(request,group_id,msg,activ,bx)
-                for each in new_users:
-                    bx=User.objects.get(id=each)
-                    msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+" as admin'"
-                    set_notif_val(request,group_id,msg,activ,bx)
+                except Exception as mailerr:
+                    pass
             deleted_users=set(deleted_users)-set(users)
             activ="Unsubscribed from group"
             if deleted_users:
                 for each in deleted_users:
                     bx=User.objects.get(id=each)
                     node.group_admin.remove(each)
-                    msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+" as admin'"
-                    set_notif_val(request,group_id,msg,activ,bx)
+                    try:
+                        msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+" as admin'"
+                        set_notif_val(request,group_id,msg,activ,bx)
+                    except Exception as mailerror:
+                        pass
                 node.save(groupid=group_id)
             return HttpResponse("Success")
         else:
@@ -255,7 +270,7 @@ def invite_admins(request,group_id):
 
             data_list=set_drawer_widget_for_users(st,coll_obj_list)
             return HttpResponse(json.dumps(data_list))
-   
+
     except Exception as e:
         print "Exception in invite_admins in notify view "+str(e)
         return HttpResponse("Failure")

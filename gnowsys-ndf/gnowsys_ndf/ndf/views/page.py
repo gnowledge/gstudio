@@ -4,7 +4,7 @@ import json
 import datetime
 import multiprocessing as mp
 from difflib import HtmlDiff
-import json 
+import json
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -15,16 +15,16 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext
-
+from mongokit import paginator
 try:
   from bson import ObjectId
 except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import LANGUAGES
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.models import Node, GSystem, Triple
+from gnowsys_ndf.settings import LANGUAGES, GSTUDIO_BUDDY_LOGIN
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_NAME, GSTUDIO_NOTE_CREATE_POINTS
+from gnowsys_ndf.ndf.models import Node, GSystem, Triple, Counter, Buddy
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
@@ -55,7 +55,7 @@ app = gst_page
 
 
 @get_execution_time
-def page(request, group_id, app_id=None):
+def page(request, group_id, app_id=None,page_no=1):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
     try:
@@ -63,11 +63,11 @@ def page(request, group_id, app_id=None):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
-    if app_id is None:  
+    if app_id is None:
         app_ins = node_collection.find_one({'_type': "GSystemType", "name": "Page"})
         if app_ins:
             app_id = str(app_ins._id)
-        
+    from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     content=[]
     version=[]
     con=[]
@@ -77,7 +77,7 @@ def page(request, group_id, app_id=None):
     shelves = []
     shelf_list = {}
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    
+
 
     if request.method == "POST":
         title = gst_page.name
@@ -86,7 +86,7 @@ def page(request, group_id, app_id=None):
                                             'member_of': {'$all': [ObjectId(app_id)]},
                                             '$or': [
                                               {'$and': [
-                                                {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                {'name': {'$regex': search_field, '$options': 'i'}},
                                                 {'$or': [
                                                   {'access_policy': u"PUBLIC"},
                                                   {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -103,17 +103,18 @@ def page(request, group_id, app_id=None):
                                                 }
                                                 ]
                                               }
-                                            ], 
+                                            ],
                                             'group_set': {'$all': [ObjectId(group_id)]},
                                             'status': {'$nin': ['HIDDEN']}
                                         }).sort('last_update', -1)
-
+        paginator_pages = paginator.Paginator(page_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
         return render_to_response("ndf/page_list.html",
-                                  {'title': title, 
+                                  {'title': title,
                                    'appId':app._id,'shelf_list': shelf_list,'shelves': shelves,
                                    'searching': True, 'query': search_field,
-                                   'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
-                                  }, 
+                                   'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id,
+                                   'page_info':paginator_pages
+                                  },
                                   context_instance=RequestContext(request)
         )
 
@@ -134,26 +135,28 @@ def page(request, group_id, app_id=None):
                                                '$or': [
                                                 {'access_policy': u"PUBLIC"},
                                                 {'$and': [
-                                                  {'access_policy': u"PRIVATE"}, 
+                                                  {'access_policy': u"PRIVATE"},
                                                   {'created_by': request.user.id}
                                                   ]
                                                 }
                                                ],
                                                'status': {'$nin': ['HIDDEN']}
                                            }).sort('last_update', -1)
+        paginator_pages = paginator.Paginator(page_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
         return render_to_response("ndf/page_list.html",
                                           {'title': title,
                                            'appId':app._id,
                                            'shelf_list': shelf_list,'shelves': shelves,
                                            'page_nodes': page_nodes,
                                            'groupid':group_id,
-                                           'group_id':group_id
+                                           'group_id':group_id,
+                                           'page_info':paginator_pages
                                           },
                                           context_instance=RequestContext(request))
-        
+
     else:
         # Page Single instance view
-        page_node = node_collection.one({"_id": ObjectId(app_id)})       
+        page_node = node_collection.one({"_id": ObjectId(app_id)})
         thread_node = None
         allow_to_comment = None
         annotations = None
@@ -174,7 +177,7 @@ def page(request, group_id, app_id=None):
                                     'groupid': group_id
                                   },
                                   context_instance = RequestContext(request)
-        )        
+        )
 
 
 
@@ -221,23 +224,24 @@ def create_edit_page(request, group_id, node_id=None):
     node_list = [str((each.name).strip().lower()) for each in available_nodes]
     # print "available_nodes: ", node_list
 
-
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
-        # page_type = request.POST.getlist("type_of",'')
         page_name = request.POST.get('name', '')
         # print "====== page_name: ", page_name
-
-        if page_name.strip().lower() in node_list:
+        if page_name.strip().lower() in node_list and not node_id:
+            new_page=False
             return render_to_response("error_base.html",
                                       {'message': 'Page with same name already exists in the group!'},
                                       context_instance=RequestContext(request))
         elif node_id:
+            new_page = False
             page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
-
         else:
+            new_page = True
             page_node = node_collection.collection.GSystem()
-        
+
+        # page_type = request.POST.getlist("type_of",'')
+
         ce_id = request.POST.get("ce_id",'')
         blog_type = request.POST.get('blog_type','')
 
@@ -293,7 +297,7 @@ def create_edit_page(request, group_id, node_id=None):
         # if page is created in program event, add page_node to group's collection set
         if program_res:
             group_obj = node_collection.one({'_id': ObjectId(group_id)})
-            group_obj.collection_set.append(page_node._id)        
+            group_obj.collection_set.append(page_node._id)
             group_obj.save()
 
         discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
@@ -333,6 +337,29 @@ def create_edit_page(request, group_id, node_id=None):
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
         if "CourseEventGroup" in group_obj.member_of_names_list and blog_type:
+            if new_page:
+              # counter_obj = Counter.get_counter_obj(request.user.id,ObjectId(group_id))
+              # # counter_obj.no_notes_written=counter_obj.no_notes_written+1
+              # counter_obj['page']['blog']['created'] += 1
+              # # counter_obj.course_score += GSTUDIO_NOTE_CREATE_POINTS
+              # counter_obj['group_points'] += GSTUDIO_NOTE_CREATE_POINTS
+              # counter_obj.last_update = datetime.datetime.now()
+              # counter_obj.save()
+
+              active_user_ids_list = [request.user.id]
+              if GSTUDIO_BUDDY_LOGIN:
+                  active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
+                  # removing redundancy of user ids:
+                  active_user_ids_list = dict.fromkeys(active_user_ids_list).keys()
+
+              counter_objs_cur = Counter.get_counter_objs_cur(active_user_ids_list, group_id)
+
+              for each_counter_obj in counter_objs_cur:
+                  each_counter_obj['page']['blog']['created'] += 1
+                  each_counter_obj['group_points'] += GSTUDIO_NOTE_CREATE_POINTS
+                  each_counter_obj.last_update = datetime.datetime.now()
+                  each_counter_obj.save()
+
             return HttpResponseRedirect(reverse('course_notebook_tab_note',
                                     kwargs={
                                             'group_id': group_id,
@@ -440,7 +467,7 @@ def translate_node(request,group_id,node_id=None):
         page_node = eval("node_collection.collection"+"."+ get_type)()
         get_translate_common_fields(request, get_type,page_node, group_id, gst_page,node_id)
         page_node.save(groupid=group_id)
-        # add triple to the GRelation 
+        # add triple to the GRelation
         # then append this ObjectId of GRelation instance in respective subject and object Nodes' relation_set field.
         relation_type = node_collection.one({'_type': 'RelationType', 'name': 'translation_of'})
         gr_node = create_grelation(ObjectId(node_id), relation_type, page_node._id)
@@ -462,7 +489,7 @@ def translate_node(request,group_id,node_id=None):
     data = None
     with open(fp, 'r') as sf:
         data = sf.read()
-       
+
         # Used json.loads(x) -- to covert string to dictionary object
         # If want to use key from this converted dictionay, use array notation because dot notation doesn't works!
         data = json.loads(data)
@@ -484,9 +511,9 @@ def translate_node(request,group_id,node_id=None):
                                 'groupid':group_id,
                                 'group_id':group_id
                                       },
-                             
+
                               context_instance = RequestContext(request)
-    )      
+    )
 
 
 @get_execution_time
@@ -520,9 +547,10 @@ def publish_page(request,group_id,node):
         node.status = unicode("PUBLISHED")
         node.modified_by = int(request.user.id)
         node.save(groupid=group_id)
+
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
-    # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
+    # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))
     if 'Quiz' in node.member_of_names_list or 'QuizItem' in node.member_of_names_list:
         return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id, 'app_id': node._id}))
     return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))

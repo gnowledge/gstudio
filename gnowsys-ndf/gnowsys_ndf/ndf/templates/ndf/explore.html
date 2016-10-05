@@ -48,7 +48,7 @@
 		{% endcomment %}
 	</div>
 	{% if title == 'explore' %}
-		Plese select course or a group.
+		Please select course or a group.
 	{% else %}
 		<section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="background-color:#fafafa;border-style:none">
 			{% for each_obj in doc_cur %}
@@ -60,8 +60,15 @@
 				{% endif %}
 	          </li>
 			{% endfor %}
+			
 		</section>
-
+			{% if title == "courses" %}
+				{% include 'ndf/pagination.html' with urlname="courses_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
+			{% elif title == "base courses"  %}
+				{% include 'ndf/pagination.html' with urlname="basecourses_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
+			{% elif title == "groups" %}
+				{% include 'ndf/pagination.html' with urlname="groups_paged" first_arg="" second_arg=""  third_arg="" page_info=ce_page_cur %}
+			{% endif %}
 	{% endif %}
 
 

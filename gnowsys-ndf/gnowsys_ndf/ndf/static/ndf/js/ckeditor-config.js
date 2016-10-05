@@ -43,9 +43,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.toolbar_GgallaryCommentsToolbar =
 	[
 		{ name: 'basicstyles', items : [ 'Bold','Italic' ] },
-		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
-		{ name: 'insert', items : [ 'Image','Flash','Iframe' ] },
 		{ name: 'tools', items : ['closebtn'] },
 	];
 
@@ -85,5 +83,5 @@ CKEDITOR.editorConfig = function( config ) {
 	config.removeDialogTabs = 'image:advanced;link:advanced';
 	config.extraPlugins = 'addImage,closebtn,addAudio';
 	config.allowedContent = true;
-	
+
 };

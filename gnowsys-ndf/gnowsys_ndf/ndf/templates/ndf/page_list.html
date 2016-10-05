@@ -34,7 +34,7 @@
     {% include "ndf/shelf.html" %}
   {% else %}
   <h4> {% trans 'Please Login to create your shelf' %}</h4>
-  {% endif %}  
+  {% endif %}
 {% endblock %}
 
 
@@ -54,21 +54,20 @@
 
   {% for node in page_collections %}
     <li>
-     
+
       <h5>
-      <a class="select" class="collection" href="{% url 'page_details' group_name_tag node %}"><i class="fi-page-multiple"></i>  {{ node.name|truncatechars:20 }}        
+      <a class="select" class="collection" href="{% url 'page_details' group_name_tag node %}"><i class="fi-page-multiple"></i>  {{ node.name|truncatechars:20 }}
     </a>
     </h5>
-    
-          
-    </li>  
-  
+
+
+    </li>
+
 
   {% endfor %} -->
   {% endcomment %}
 
   {% check_user_join request groupid as user_is_joined %}
-  
   <div class="panel" style="background-color:#ddd;">
     <b>{% trans "Visit" %}</b>
       <dl class="tabs" data-tab data-options="deep_linking:true">
@@ -78,7 +77,7 @@
       </dl><br/>
     <b>Actions</b><br/><br/>
     {% if user.is_authenticated %}
-      {% user_access_policy groupid request.user as user_access %}
+
       {% if user_access == "allow" %}
         {% if user_is_joined == "joined" or user_is_joined == "author" %}
           <a class="tiny round button" href="{% url 'page_create_edit' group_name_tag %}">
@@ -91,11 +90,11 @@
   </div>
 
 </ul>
-  
+
 {% endblock %}
 
 
-{% block body_content %} 
+{% block body_content %}
 {% get_group_name groupid as group_name_tag %}
 
 {% comment %}
@@ -111,7 +110,7 @@
       <a class="small button" href="{% url 'page_create_edit' group_name_tag %}">
 	<span class="fi-plus">&nbsp;&nbsp;{% trans "Create" %} {{title}}</span>
       </a>
-  
+
   {% endif %}
   {% endif %}
 </header>
@@ -132,8 +131,8 @@
 <div class="row">
   <div class="small-12 columns">
     <p>Search Results: <span class="label alert"> {% trans 'No' %} {{title|lower}}{{page_nodes.count|pluralize}} {% trans 'matched your search criteria!!!' %}</span></p>
-  </div>  
-</div>  
+  </div>
+</div>
 
 {% endif %}
 <div class="repository-title large-4 columns">{% trans "Pages" %}</div><br>
@@ -144,13 +143,13 @@
 
 
   {% group_type_info groupid request.user as grouptype %}
-
+  
   <!-- Existing card list-->
   {% for node in page_nodes %}
 
-       <li class="card-image-wrapper" > 
+       <li class="card-image-wrapper" >
              {% include 'ndf/simple_card.html' with  has_contributor=True resource=node url_name="page_details" first_arg=group_name_tag second_arg=node %}
-        
+
         </li>
 
 
@@ -158,62 +157,29 @@
 
 </ul>
 
-  
 
 
+
+{% include 'ndf/pagination.html' with urlname="page_paged" first_arg=group_name_tag   %}
 </div>
+
 
 <div class="content row" id="panel2-4">
 {% get_resource_collection groupid title as page_collections %}
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-  {% autopaginate page_collections 23 %}
 
   <!-- Existing card list-->
   {% for node in page_collections %}
-    <li class="card">
-      <div class="page">
-      <header>
-        <div class="label-list">
-        {% for tag in node.tags|slice:":3" %}
-          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-        {% endfor %}
-        </div>
-
-        <h4>
-          {{ node.name|truncatechars:20 }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-        </h4>
-      </header>
       
-      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-  
-      <a class="small button expand" href="{% url 'page_details' group_name_tag node %}"> {% trans 'Page Details' %}</a>
+       <li class="card-image-wrapper" >
+             {% include 'ndf/simple_card.html' with  has_contributor=True resource=node url_name="page_details" first_arg=group_name_tag second_arg=node %}
 
-      {% if node.created_by == request.user.id %}
-        <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">{% trans 'Delete' %}</a>
-      {% endif %}
+        </li>
 
-      {% group_type_info groupid request.user as grouptype %}
-      {% if grouptype == "Moderated" %}
-      {% if node.status == "DRAFT" %}
-      <a class="button alert tiny" > {% trans 'Under Moderation' %}</a>
-      {% endif %}
-      {% endif %} 
 
-      <footer>
-          <div class="age">
-            {{ node.member_of_names_list|join:', ' }}{% trans  'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
-            <br/>
-            by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-          </div>
-        <span><strong>{{node.contributors|length}}</strong>{% trans  'Contributor' %}{{node.contributors|pluralize}}</span>
-      </footer>
-
-      </div>
-    </li>  
-  
-  {% empty %}
+    {% empty %}
     {% if not searching %}
      <h5>    {% blocktrans %} This group doesn't have any collections.{% endblocktrans %} </h5>
     {% endif %}
@@ -221,8 +187,6 @@
   {% endfor %}
 
 </ul>
-
-{% paginate %}
 
 </div>
 </div>
