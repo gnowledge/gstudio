@@ -293,6 +293,18 @@ class Node(DjangoDocument):
     use_dot_notation = True
 
 
+    def add_in_group_set(self, group_id):
+        if group_id not in self.group_set:
+            self.group_set.append(ObjectId(group_id))
+        return self
+
+
+    def remove_from_group_set(self, group_id):
+        if group_id in self.group_set:
+            self.group_set.remove(ObjectId(group_id))
+        return self
+
+
     # custom methods provided for Node class
     def fill_node_values(self, request=HttpRequest(), **kwargs):
 
@@ -1684,6 +1696,7 @@ class GSystem(Node):
 
         return self
 
+
     def get_gsystem_mime_type(self):
 
         if hasattr(self, 'mime_type') and self.mime_type:
@@ -2292,6 +2305,71 @@ class Group(GSystem):
         else:
             return False
 
+
+    @staticmethod
+    def purge_group(group_name_or_id, proceed=True):
+
+        # fetch group object
+        group_obj = Group.get_group_name_id(group_name_or_id, get_obj=True)
+
+        if not group_obj:
+            raise Exception('Expects either group "name" or "_id". Got invalid argument or that group does not exists.')
+
+        group_id = group_obj._id
+
+        # get all the objects belonging to this group
+        all_nodes_under_gr = node_collection.find({'group_set': {'$in': [group_id]}})
+
+        # separate nodes belongs to one and more groups
+        only_group_nodes_cnt = all_nodes_under_gr.clone().where("this.group_set.length == 1").count()
+        multi_group_nodes_cnt = all_nodes_under_gr.clone().where("this.group_set.length > 1").count()
+
+        print "Group:", group_obj.name, "(", group_obj.altnames, ") contains:\n",\
+            "\t- unique (belongs to this group only) : ", only_group_nodes_cnt, \
+            "\n\t- shared (belongs to other groups too): ", multi_group_nodes_cnt, \
+            "\n\t============================================", \
+            "\n\t- total: ", all_nodes_under_gr.count()
+
+        if not proceed:
+            print "\nDo you want to purge group and all unique nodes(belongs to this group only) under it?"
+            print 'Enter Y/y to proceed else N/n to reject group deletion:'
+            to_proceed = raw_input()
+            proceed = True if (to_proceed in ['y', 'Y']) else False
+
+        if proceed:
+            print "\nProceeding further for deletion of group and unique resources/nodes under it..."
+            from gnowsys_ndf.ndf.views.methods import delete_node
+
+            grp_res = node_collection.find({ '$and': [ {'group_set':{'$size':1}}, {'group_set': {'$all': [ObjectId(group_id)]}} ] })
+            print "\n Total (unique) resources to be deleted: ", grp_res.count()
+
+            for each in grp_res:
+                # print "\n=== deleted: ===\n", each.name , "---", each.member_of_names_list
+                del_status, del_status_msg = delete_node(
+                    node_id=each._id,
+                    deletion_type=1
+                )
+                # print "\n---------\n",del_status, "--", del_status_msg
+                if not del_status:
+                    print "*"*80
+                    print "\n Error node: _id: ", each._id, " , name: ", each.name, " type: ", each.member_of_names_list
+                    print "*"*80
+
+            print "\n Deleting group: "
+            del_status, del_status_msg = delete_node(node_id=group_id, deletion_type=1)
+
+            # poping group_id from each of shared nodes under group
+            all_nodes_under_gr.rewind()
+            print "\n Total (shared) resources to be free from this group: ", all_nodes_under_gr.count()
+            for each_shared_node in all_nodes_under_gr:
+                if group_id in each_shared_node.group_set:
+                    each_shared_node.group_set.remove(group_id)
+                    each_shared_node.save()
+
+            return
+
+        print "\nAborting group deletion."
+        return
 
 @connection.register
 class Author(Group):
