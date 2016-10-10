@@ -2337,25 +2337,20 @@ class Group(GSystem):
             proceed = True if (to_proceed in ['y', 'Y']) else False
 
         if proceed:
-            print "\nProceeding further for deletion of group and unique resources/nodes under it..."
+            print "\nProceeding further for purging of group and unique resources/nodes under it..."
             from gnowsys_ndf.ndf.views.methods import delete_node
 
             grp_res = node_collection.find({ '$and': [ {'group_set':{'$size':1}}, {'group_set': {'$all': [ObjectId(group_id)]}} ] })
-            print "\n Total (unique) resources to be deleted: ", grp_res.count()
+            print "\n Total (unique) resources to be purge: ", grp_res.count()
 
             for each in grp_res:
-                # print "\n=== deleted: ===\n", each.name , "---", each.member_of_names_list
-                del_status, del_status_msg = delete_node(
-                    node_id=each._id,
-                    deletion_type=1
-                )
-                # print "\n---------\n",del_status, "--", del_status_msg
+                del_status, del_status_msg = delete_node(node_id=each._id, deletion_type=1 )
                 if not del_status:
                     print "*"*80
                     print "\n Error node: _id: ", each._id, " , name: ", each.name, " type: ", each.member_of_names_list
                     print "*"*80
 
-            print "\n Deleting group: "
+            print "\n Purging group: "
             del_status, del_status_msg = delete_node(node_id=group_id, deletion_type=1)
 
             # poping group_id from each of shared nodes under group
