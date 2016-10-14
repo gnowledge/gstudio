@@ -1,14 +1,13 @@
 {% load i18n %}
-
+{% load cache %}
+{% cache 3600 graph_collection_static_head %}
 {% block head %}
-
+<script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
   <!-- Scripts required for D3 graph -->
   <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
   <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
-  <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js"></script> <!-- checked -->
-  
+  <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js"></script> <!-- checked -->  
 {% endblock %}
-
 <style type="text/css">
 		#chart-concept .link
 		{
@@ -124,6 +123,7 @@
             }
 
 	</style>
+	{% endcache %}
 	<body>
 
 		<!-- This is panel on LHS of graph -->
@@ -153,7 +153,6 @@
 	<!-- Div containing svg area -->
 		<div id="chart-concept"></div>
 			<script type="text/javascript">
-
 			var graphHeight = ($(window).height()*0.87), // Getting 87% of window height 
 				graphWidth  = ($(window).width()*0.77);	 // Getting 77% of window width 
 

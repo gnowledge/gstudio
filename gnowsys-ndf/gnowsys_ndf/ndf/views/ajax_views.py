@@ -695,10 +695,8 @@ def search_drawer(request, group_id):
                                  "groupid": group_id, 'node_id': node_id
                                 },
                                 context_instance=RequestContext(request)
-
-      )
-
-
+      )    
+      
 @get_execution_time
 def get_topic_contents(request, group_id):
   if request.is_ajax() and request.method == "POST":
@@ -1529,7 +1527,7 @@ def graph_nodes(request, group_id):
                       "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set", "access_policy", "snapshot",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language",
-                      "property_order", "rating", "apps_list", "annotations", "instance of"
+                      "property_order", "rating", "apps_list", "annotations", "instance of","if_file"
                     ]
 
   # username = User.objects.get(id=page_node.created_by).username
@@ -6312,6 +6310,21 @@ def course_create_note(request, group_id):
       {
         "group_id":group_id,"img_res":img_res,"audio_res":audio_res,"video_res":video_res
       },context_instance=RequestContext(request))
+
+@get_execution_time
+def adminRenderGraph(request,group_id,node_id=None,graph_type="concept"):
+  '''
+  Renders the Concept Graph, Collection Graph, Dependency Graph
+  '''
+  try :
+    if request.is_ajax() and request.method == "GET":
+      if node_id:
+          req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
+      template = "ndf/graph_"+graph_type+".html"
+      variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+      return render_to_response(template, { 'group_id':group_id,'groupid':group_id , 'node':req_node }) 
+  except Exception as e :
+    print "from "+ graph_type +" Graph, exception",e,"\n\n"
 
 @login_required
 @get_execution_time

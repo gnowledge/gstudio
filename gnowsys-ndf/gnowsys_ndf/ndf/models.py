@@ -1144,7 +1144,9 @@ class AttributeType(Node):
 	'upload_to': unicode,
 	'path': unicode,
 	'verify_exist': bool,
-	'min_length': int,
+
+    #   raise issue y used 
+	'min_length': int, 
 	'required': bool,
 	'label': unicode,
 	'unique': bool,
@@ -1155,6 +1157,11 @@ class AttributeType(Node):
 
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
+
+    # validators={
+    # 'data_type':x in DATA_TYPE_CHOICES
+    # 'data_type':lambda x: x in DATA_TYPE_CHOICES
+    # }
 
     ##########  User-Defined Functions ##########
 
