@@ -1280,11 +1280,6 @@ class AttributeType(Node):
                         'object_value': attr_value
                     }
 
-    def designer_validator(self,object_to_be_validated):
-        # print self.name
-        
-        return None
-
 
 @connection.register
 class RelationType(Node):
