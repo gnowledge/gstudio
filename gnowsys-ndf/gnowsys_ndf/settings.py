@@ -322,7 +322,7 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
-        'NAME': 'studio-dev1',
+        'NAME': 'studio-dev',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -758,7 +758,7 @@ GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House'
 
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Discuss', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
 
-GSTUDIO_HELP_TIP = { 
+GSTUDIO_HELP_TIP = {
    "name":"Title of the object",
    "altnames":"Alternate title",
    "language":"Language of the title",
@@ -793,137 +793,137 @@ GSTUDIO_HELP_TIP = {
    "type_of":"Sub Attribute type of"
  }
 
-GSYSTEMTYPE_DEFINITIONLIST = [  
-   {  
+GSYSTEMTYPE_DEFINITIONLIST = [
+   {
       "name":"Name "
    },
-   {  
+   {
       "altnames":"Alternate Name "
    },
-   {  
+   {
       "language":"Language "
    },
-   {  
+   {
       "status":"Status "
    },
-   {  
+   {
       "member_of":"Member of MetaType "
    },
-   {  
+   {
       "meta_type_set":"Select the MetaType "
    },
-   {  
+   {
       "attribute_type_set":"Select the AttributeType "
    },
-   {  
+   {
       "relation_type_set":"Select the RelationType "
    },
-   {  
+   {
       "type_of":"Type Of "
    }
 ]
 
-ATTRIBUTETYPE_DEFINITIONLIST = [  
-   {  
+ATTRIBUTETYPE_DEFINITIONLIST = [
+   {
       "name":"Name "
    },
-   {  
+   {
       "altnames":"Alternate Name "
    },
-   {  
+   {
       "language":"Language "
    },
-   {  
+   {
       "subject_type":"Subject Type "
    },
-   {  
+   {
       "data_type":"Data Type "
    },
-   {  
+   {
       "member_of":"Member of MetaType "
    },
-   {  
+   {
       "verbose_name":"Verbose Name "
    },
-   {  
+   {
       "null":"Null "
    },
-   {  
+   {
       "blank":"Blank "
    },
-   {  
+   {
       "help_text":"Help Text "
    },
-   {  
+   {
       "max_digits":"Maximum Digits "
    },
-   {  
+   {
       "decimal_places":"Decimal Places "
    },
-   # {  
+   # {
       # "auto_now":"Auto Now "
    # },
-   {  
+   {
       "auto_now_add":"Auto Now Add "
    },
-   {  
+   {
       "path":"Path "
    },
-   {  
+   {
       "verify_exist":"Verify Existence "
    },
-   {  
+   {
       "validators":"Validators"
    },
-   {  
+   {
       "status":"Status "
    }
 ]
 
-RELATIONTYPE_DEFINITIONLIST = [  
-   {  
+RELATIONTYPE_DEFINITIONLIST = [
+   {
       "name":"Name "
    },
-   {  
+   {
       "inverse_name":"Inverse Name "
    },
-   {  
+   {
       "altnames":"Alternate Name "
    },
-   {  
+   {
       "language":"Language "
    },
-   {  
+   {
       "subject_type":"Subject Type "
    },
-   {  
+   {
       "object_type":"Object Type "
    },
-   {  
+   {
       "subject_cardinality":"Subject Cardinality "
    },
-   {  
+   {
       "object_cardinality":"Object Cardinality "
    },
-   {  
+   {
       "subject_applicable_nodetype":"Subject Applicable Node Type "
    },
-   {  
+   {
       "object_applicable_nodetype":"Object Applicable Node Type "
    },
-   {  
+   {
       "is_symmetric":"Is Symmetric "
    },
-   {  
+   {
       "is_reflexive":"Is Reflexive "
    },
-   {  
+   {
       "is_transitive":"Is Transitive "
    },
-   {  
+   {
       "status":"Status "
    },
-   {  
+   {
       "member_of":"Member of MetaType "
    }
 ]
@@ -932,26 +932,26 @@ CONTENTLIST = [{'content_org':'content organization' }]
 
 DEPENDENCYLIST = [{'prior_node':'Prior Node ' }]
 
-OPTIONLIST = [  
-   {  
+OPTIONLIST = [
+   {
       "featured":"Featured "
    },
-   {  
+   {
       "created_at":"Created At "
    },
-   {  
+   {
       "start_publication":"Start Publication "
    },
-   {  
+   {
       "tags":"Tags "
    },
-   {  
+   {
       "url":"URL "
    },
-   {  
+   {
       "last_update":"Last Update "
    },
-   {  
+   {
       "login_required":"Login Required "
    }
 ]

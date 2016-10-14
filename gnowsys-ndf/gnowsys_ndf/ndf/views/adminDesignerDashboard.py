@@ -28,6 +28,13 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
 
     objects_details = []
     for each in nodes:
+
+        try:
+            user_name = User.objects.get(id=each.created_by).username
+        except Exception, e:
+            print e
+            user_name = None
+
         member = []
         member_of_list = []
         collection_list = []
@@ -52,10 +59,10 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
             for rt_set in each.relation_type_set:
                 relation_type_set.append(rt_set.name)
                 # relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
-            objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list), "attribute_type_set":", ".join(attribute_type_set), "relation_type_set":", ".join(relation_type_set)})
+            objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":user_name,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list), "attribute_type_set":", ".join(attribute_type_set), "relation_type_set":", ".join(relation_type_set)})
         else :
             if class_name in ("AttributeType","RelationType"):
-                objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list)})
+                objects_details.append({"Id":each._id,"Title":each.name,"Type":", ".join(member),"Author":user_name,"Creation":each.created_at,'member_of':", ".join(member_of_list), "collection_list":", ".join(collection_list)})
 
             else:
                 if class_name == "GSystem" :
@@ -72,7 +79,7 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
                     else:
                         k = None
                         member = []
-                    objects_details.append({"Id":each._id,"Title":each.name, "Alt_Title":each.altnames, "Mem":k ,"Type":", ".join(member), "collection_list":", ".join(collection_list), "Type":", ".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":", ".join(group_set),"Creation":each.created_at })
+                    objects_details.append({"Id":each._id,"Title":each.name, "Alt_Title":each.altnames, "Mem":k ,"Type":", ".join(member), "collection_list":", ".join(collection_list), "Type":", ".join(member),"Author":user_name,"Group":", ".join(group_set),"Creation":each.created_at })
 
     groups = []
     group = node_collection.find({'_type':"Group"})

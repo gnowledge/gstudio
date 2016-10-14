@@ -183,7 +183,7 @@ HOW TO USE
     <div class="small-12 medium-12 medium-centered columns">
       <div class="to-be-selected hide" data-selector-widget-for="{{for}}">
 
-      {% for each_opt in all_options %}
+      {% for each_opt in all_options|dictsort:'name' %}
 
         <div class="item"
           data-title="{{each_opt.name}}"
