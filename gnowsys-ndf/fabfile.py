@@ -16,3 +16,7 @@ def update_data():
 
 def install_requirements():
 	local('pip install -r ../requirements.txt')
+
+
+def purge_group():
+	local('python manage.py purge_group')
