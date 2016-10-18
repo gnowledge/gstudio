@@ -1479,6 +1479,12 @@ class GroupCreateEditHandler(View):
             else:
                 partner_grp_result = sub_group.set_partnergroup(request, group_obj)
                 sub_group.set_logo(request, group_obj, logo_rt = "has_profile_pic")
+                # print "-------------------------------------------------",group_obj
+                is_node_changed=get_node_common_fields(request, group_obj, group_id, gst_group)
+                group_obj.save(is_changed=is_node_changed)
+                group_obj.save()
+                url_name = 'groupchange'
+                return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
         return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
 # ===END of class EditGroup() ===
 # -----------------------------------------
