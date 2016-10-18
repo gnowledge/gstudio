@@ -3,7 +3,7 @@
 {% load ndf_tags %}
 {% load cache %}
 
-{% block title %} {% trans title|capfirst %} {% endblock %}
+{% block title %} {% trans title|capfirst %} {% if node.pk %} {{group_name_tag}} {% endif %} {% endblock %}
 
 <!-- 
 by keeping future perspective of one template for create/edit of group,
