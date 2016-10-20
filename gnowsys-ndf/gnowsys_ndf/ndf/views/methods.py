@@ -3034,7 +3034,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # to DELETED
                     if node.status == u'PUBLISHED':
                         node.status = u"DELETED"
-                        node.save()
+                        node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
                         node_collection.collection.update({
                             '_id': subject_id, 'relation_set.' + relation_type_node_name: {'$exists': True}
