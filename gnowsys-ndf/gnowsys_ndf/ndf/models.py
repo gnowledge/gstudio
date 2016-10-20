@@ -949,13 +949,15 @@ class Node(DjangoDocument):
                 for attr_obj in attributes:
                     # attr_obj is of type - GAttribute [subject (node._id), attribute_type (AttributeType), object_value (value of attribute)]
                     # Must convert attr_obj.attribute_type [dictionary] to node_collection(attr_obj.attribute_type) [document-object]
-                    AttributeType.append_attribute(node_collection.collection.AttributeType(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
+                    # PREV: AttributeType.append_attribute(node_collection.collection.AttributeType(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
+                    AttributeType.append_attribute(attr_obj.attribute_type, possible_attributes, attr_obj.object_value)
 
             # Case [B]: While creating GSystem / if new attributes get added
             # Again checking in AttributeType collection - because to collect newly added user-defined attributes, if any!
             attributes = node_collection.find({'_type': 'AttributeType', 'subject_type': gsystem_type_id})
             for attr_type in attributes:
                 # Here attr_type is of type -- AttributeType
+                # PREV: AttributeType.append_attribute(attr_type, possible_attributes)
                 AttributeType.append_attribute(attr_type, possible_attributes)
 
             # type_of check for current GSystemType to which the node belongs to
@@ -1011,7 +1013,6 @@ class Node(DjangoDocument):
         """
         gsystem_type_list = []
         possible_relations = {}
-
         # Converts to list, if passed parameter is only single ObjectId
         if not isinstance(gsystem_type_id_or_list, list):
             gsystem_type_list = [gsystem_type_id_or_list]
@@ -1045,7 +1046,8 @@ class Node(DjangoDocument):
                     # collection.Node(rel_obj.relation_type)
                     # [document-object]
                     RelationType.append_relation(
-                        node_collection.collection.RelationType(rel_obj.relation_type),
+                        # PREV:  node_collection.collection.RelationType(rel_obj.relation_type),
+                        rel_obj.relation_type,
                         possible_relations, inverse_relation, rel_obj.right_subject
                     )
 
@@ -1088,7 +1090,8 @@ class Node(DjangoDocument):
                         continue
 
                     RelationType.append_relation(
-                        node_collection.collection.RelationType(rel_obj.relation_type),
+                        # node_collection.collection.RelationType(rel_obj.relation_type),
+                        rel_obj.relation_type,
                         possible_relations, inverse_relation, rel_obj.subject
                     )
 
@@ -1157,8 +1160,8 @@ class AttributeType(Node):
 	'path': unicode,
 	'verify_exist': bool,
 
-    #   raise issue y used 
-	'min_length': int, 
+    #   raise issue y used
+	'min_length': int,
 	'required': bool,
 	'label': unicode,
 	'unique': bool,
@@ -1179,7 +1182,7 @@ class AttributeType(Node):
 
     @staticmethod
     def append_attribute(attr_id_or_node, attr_dict, attr_value=None, inner_attr_dict=None):
-        if isinstance(attr_id_or_node, unicode):
+        if isinstance(attr_id_or_node, (unicode, ObjectId)):
             # Convert unicode representation of ObjectId into it's
             # corresponding ObjectId type Then fetch
             # attribute-type-node from AttributeType collection of
@@ -1348,6 +1351,16 @@ class RelationType(Node):
           'subject_or_right_subject_list': List of Value(s) of
           GRelation node's subject field } }
         """
+        if isinstance(rel_type_node, (unicode, ObjectId)):
+            # Convert unicode representation of ObjectId into it's
+            # corresponding ObjectId type Then fetch
+            # attribute-type-node from AttributeType collection of
+            # respective ObjectId
+            if ObjectId.is_valid(rel_type_node):
+                rel_type_node = node_collection.one({'_type': 'RelationType', '_id': ObjectId(rel_type_node)})
+            else:
+                print "\n Invalid ObjectId: ", rel_type_node, " is not a valid ObjectId!!!\n"
+                # Throw indicating the same
 
         left_or_right_subject_node = None
 
@@ -2994,12 +3007,13 @@ class Triple(DjangoDocument):
     subject_id = self.subject
     subject_document = node_collection.one({"_id": self.subject})
     subject_name = subject_document.name
+    right_subject_member_of_list = []
 
     subject_type_list = []
     subject_member_of_list = []
     name_value = u""
-
-    if self._type == "GAttribute":
+    if (self._type == "GAttribute") and ('triple_node' in kwargs):
+      self.attribute_type = kwargs['triple_node']
       attribute_type_name = self.attribute_type['name']
       attribute_object_value = unicode(self.object_value)
 
@@ -3021,11 +3035,12 @@ class Triple(DjangoDocument):
           if set(gst_node.type_of) & set(subject_type_list):
             subject_system_flag = True
             break
+      self.attribute_type = kwargs['triple_id']
 
-    elif self._type == "GRelation":
+    elif self._type == "GRelation" and ('triple_node' in kwargs):
+      self.relation_type = kwargs['triple_node']
       subject_type_list = self.relation_type['subject_type']
       object_type_list = self.relation_type['object_type']
-
 
       left_subject_member_of_list = subject_document.member_of
       relation_type_name = self.relation_type['name']
@@ -3068,15 +3083,15 @@ class Triple(DjangoDocument):
           # If Binary relationship found
           # Single relation: ObjectId()
           # Multi relation: [ObjectId(), ObjectId(), ...]
-          right_subject_document = node_collection.one({'_id': self.right_subject})
+
           right_subject_list = self.right_subject if isinstance(self.right_subject, list) else [self.right_subject]
-          right_subject_document = node_collection.one({'_id': {'$in': right_subject_list} })
+          right_subject_document = node_collection.find_one({'_id': {'$in': right_subject_list} })
 
-          right_subject_member_of_list = right_subject_document.member_of
-          right_subject_name = right_subject_document.name
+          if right_subject_document:
+              right_subject_member_of_list = right_subject_document.member_of
+              right_subject_name = right_subject_document.name
 
-          self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
-
+              self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
 
       name_value = self.name
 
@@ -3111,6 +3126,8 @@ class Triple(DjangoDocument):
 
         if left_subject_system_flag and right_subject_system_flag:
           subject_system_flag = True
+
+      self.relation_type = kwargs['triple_id']
 
     if self._type =="GRelation" and subject_system_flag == False:
       # print "The 2 lists do not have any common element"
@@ -3178,7 +3195,8 @@ class Triple(DjangoDocument):
 class GAttribute(Triple):
     structure = {
         'attribute_type_scope': basestring,
-        'attribute_type': AttributeType,  # Embedded document of AttributeType Class
+        # 'attribute_type': AttributeType,  # Embedded document of AttributeType Class
+        'attribute_type': ObjectId,  # ObjectId of AttributeType node
         'object_value_scope': basestring,
         'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
@@ -3203,7 +3221,8 @@ class GAttribute(Triple):
 class GRelation(Triple):
     structure = {
         'relation_type_scope': basestring,
-        'relation_type': RelationType,  # DBRef of RelationType Class
+        # 'relation_type': RelationType,  # DBRef of RelationType Class
+        'relation_type': ObjectId,  # ObjectId of RelationType node
         'right_subject_scope': basestring,
         # ObjectId's of GSystems Class / List of list of ObjectId's of GSystem Class
         'right_subject': OR(ObjectId, list)

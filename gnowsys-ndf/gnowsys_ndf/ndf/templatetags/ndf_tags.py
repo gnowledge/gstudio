@@ -379,10 +379,10 @@ def get_group_gapps(group_id=None):
 
 		# gapps_list = group_attrs.get('apps_list', [])
 		at_apps_list = node_collection.one({'_type': 'AttributeType', 'name': 'apps_list'})
-		# attr_list = triple_collection.find({'_type': 'GAttribute', 'attribute_type.$id': at_apps_list._id, 'subject':group_obj._id})
+		# attr_list = triple_collection.find({'_type': 'GAttribute', 'attribute_type': at_apps_list._id, 'subject':group_obj._id})
 		# attr_list = triple_collection.one({
 		# 									'_type': 'GAttribute',
-		# 									'attribute_type.$id': at_apps_list._id,
+		# 									'attribute_type': at_apps_list._id,
 		# 									'subject': ObjectId(group_id),
 		# 									'status': u'PUBLISHED'
 		# 								},
@@ -391,7 +391,7 @@ def get_group_gapps(group_id=None):
 
 		attr_list = triple_collection.find_one({
 											'_type': 'GAttribute',
-											'attribute_type.$id': at_apps_list._id,
+											'attribute_type': at_apps_list._id,
 											'subject': ObjectId(group_id),
 											'status': u'PUBLISHED',
 											'object_value': {'$exists': 1}
@@ -593,7 +593,7 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
     	if get_data_type:
     		data_type = gattr.data_type
     	if gattr: # and node  :
-    		node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node_id, 'attribute_type.$id': gattr._id, 'status':"PUBLISHED"})
+    		node_attr = triple_collection.find_one({'_type': "GAttribute", "subject": node_id, 'attribute_type': gattr._id, 'status':"PUBLISHED"})
 
     # print "\n\n node_attr==",node_attr
     if node_attr:
@@ -610,44 +610,46 @@ def get_attribute_value(node_id, attr_name, get_data_type=False):
 @register.assignment_tag
 def get_relation_value(node_id, grel, return_single_right_subject=False):
 
+    # import ipdb; ipdb.set_trace()
     try:
         result_dict = {}
-    	if node_id:
-    		node = node_collection.one({'_id': ObjectId(node_id) })
-    		relation_type_node = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
-    		if node and relation_type_node:
-    			if relation_type_node.object_cardinality > 1:
-    				node_grel = triple_collection.find({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
-    				if node_grel:
-    					grel_val = []
-    					grel_id = []
-    					for each_node in node_grel:
-    						grel_val.append(each_node.right_subject)
-    						grel_id.append(each_node._id)
-    					grel_val_node_cur = node_collection.find({'_id':{'$in' : grel_val}})
-    					result_dict.update({"cursor": True})
-    					if return_single_right_subject:
-    						grel_val_node_cur = node_collection.find_one({'_id':{'$in' : grel_val}})
-    						result_dict.update({"cursor": False})
-    					# nodes = [grel_node_val for grel_node_val in grel_val_node_cur]
-    					# print "\n\n grel_val_node, grel_id == ",grel_val_node, grel_id
-    					result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node_cur})
-                else:
-                    node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type.$id': relation_type_node._id,'status':"PUBLISHED"})
+        if node_id:
+            node = node_collection.one({'_id': ObjectId(node_id) })
+            relation_type_node = node_collection.one({'_type': 'RelationType', 'name': unicode(grel) })
+            if node and relation_type_node:
+                if relation_type_node.object_cardinality > 1:
+                    node_grel = triple_collection.find({'_type': "GRelation", "subject": node._id, 'relation_type': relation_type_node._id,'status':"PUBLISHED"})
                     if node_grel:
+                        grel_val = []
+                        grel_id = []
+                        for each_node in node_grel:
+                            grel_val.append(each_node.right_subject)
+                            grel_id.append(each_node._id)
+                        grel_val_node_cur = node_collection.find({'_id':{'$in' : grel_val}})
+                        result_dict.update({"cursor": True})
+                        if return_single_right_subject:
+                            grel_val_node_cur = node_collection.find_one({'_id':{'$in' : grel_val}})
+                            result_dict.update({"cursor": False})
+                        # nodes = [grel_node_val for grel_node_val in grel_val_node_cur]
+                        # print "\n\n grel_val_node, grel_id == ",grel_val_node, grel_id
+                        result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node_cur})
+                else:
+                    node_grel = triple_collection.one({'_type': "GRelation", "subject": node._id, 'relation_type': relation_type_node._id,'status':"PUBLISHED"})
+                    if node_grel:
+                        grel_val = list()
                         grel_val = node_grel.right_subject
                         grel_val = grel_val if isinstance(grel_val, list) else [ObjectId(grel_val)]
-                        grel_val = list()
                         grel_id = node_grel._id
                         # grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
                         grel_val_node = node_collection.find_one({'_id':{'$in': grel_val}})
                         # returns right_subject of grelation and GRelation _id
                         result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node, "cursor": False})
-    	# print "\n\nresult_dict === ",result_dict
-    	return result_dict
+        print "\n\nresult_dict === ",result_dict
+        return result_dict
     except Exception as e:
-    	print e
-    	return {}
+        print e
+        return {}
+
 
 @get_execution_time
 @register.inclusion_tag('ndf/drawer_widget.html')
@@ -838,7 +840,7 @@ def get_selected_drawer_items_single_dropdown(fields_name,fields_value):
 		return drawer2
 
 	return []
-			
+
 @get_execution_time
 @register.assignment_tag
 @register.inclusion_tag('ndf/admin_fields.html')
@@ -861,7 +863,7 @@ def get_all_drawer_items_single_dropdown(fields_name,fields_value):
 		else:
 			drawer = node_collection.find({"_type":types})
 			for each in drawer:
-				drawer1[each]=each	
+				drawer1[each]=each
 	return drawer1
 
 @get_execution_time
@@ -1435,7 +1437,7 @@ def get_profile_pic(user_pk):
 		if auth:
 			grel = node_collection.one({'_type': 'RelationType', 'name': unicode("has_profile_pic") })
 			if auth and grel:
-				node_grel = triple_collection.one({'_type': "GRelation", "subject": auth._id, 'relation_type.$id': grel._id,'status':"PUBLISHED"})
+				node_grel = triple_collection.one({'_type': "GRelation", "subject": auth._id, 'relation_type': grel._id,'status':"PUBLISHED"})
 		if node_grel:
 			grel_val = node_grel.right_subject
 			grel_val_node = node_collection.one({'_id':ObjectId(grel_val)})
@@ -1656,11 +1658,11 @@ def get_resources(node_id,resources):
     	node = node_collection.one({'_id': ObjectId(node_id)})
         RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
         RT_translation_of = node_collection.one({'_type':'RelationType','name': 'translation_of'})
-        teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': node._id, 'relation_type.$id': RT_teaches._id })
+        teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': node._id, 'relation_type': RT_teaches._id })
         AT_educationaluse = node_collection.one({'_type': 'AttributeType', 'name': u'educationaluse'})
         for each in teaches_grelations:
                 obj=node_collection.one({'_id':ObjectId(each.subject)})
-                mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type.$id': AT_educationaluse._id, "subject":each.subject})
+                mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type': AT_educationaluse._id, "subject":each.subject})
                 for k,v in resources.items():
                         if mime_type.object_value == k:
                                 if obj.name not in resources[k]:
@@ -1693,21 +1695,21 @@ def get_contents(node_id, selected=None, choice=None):
 
 	# "right_subject" is the translated node hence to find those relations which has translated nodes with RT 'translation_of'
 	# These are populated when translated topic clicked.
-	trans_grelations = triple_collection.find({'_type':'GRelation','right_subject':obj._id,'relation_type.$id':RT_translation_of._id })
+	trans_grelations = triple_collection.find({'_type':'GRelation','right_subject':obj._id,'relation_type':RT_translation_of._id })
 	# If translated topic then, choose its subject value since subject value is the original topic node for which resources are attached with RT teaches.
 	if trans_grelations.count() > 0:
 		obj = node_collection.one({'_id': ObjectId(trans_grelations[0].subject)})
 
 	# If no translated topic then, take the "obj" value mentioned above which is original topic node for which resources are attached with RT teaches
-	list_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': obj._id, 'relation_type.$id': RT_teaches._id })
+	list_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': obj._id, 'relation_type': RT_teaches._id })
 
 	for rel in list_grelations:
 		rel_obj = node_collection.one({'_id': ObjectId(rel.subject)})
 
 		if (rel_obj._type == "File") or (gst_file._id in rel_obj.member_of):
 			gattr = node_collection.one({'_type': 'AttributeType', 'name': u'educationaluse'})
-			# list_gattr = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id, 'object_value': selected })
-			list_gattr = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id })
+			# list_gattr = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id, "subject":rel_obj._id, 'object_value': selected })
+			list_gattr = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id, "subject":rel_obj._id })
 
 			for attr in list_gattr:
 				left_obj = node_collection.one({'_id': ObjectId(attr.subject) })
@@ -1801,13 +1803,13 @@ def get_topic_res_count(node_id):
 	if obj.language == u"hi":
 		# "right_subject" is the translated node hence to find those relations which has translated nodes with RT 'translation_of'
 		# These are populated when translated topic clicked.
-		trans_grelations = triple_collection.find({'_type':'GRelation','right_subject':obj._id,'relation_type.$id':RT_translation_of._id })
+		trans_grelations = triple_collection.find({'_type':'GRelation','right_subject':obj._id,'relation_type':RT_translation_of._id })
 		# If translated topic then, choose its subject value since subject value is the original topic node for which resources are attached with RT teaches.
 		if trans_grelations.count() > 0:
 			obj = node_collection.one({'_id': ObjectId(trans_grelations[0].subject)})
 
 	# If no translated topic then, take the "obj" value mentioned above which is original topic node for which resources are attached with RT teaches
-	list_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': obj._id, 'relation_type.$id': RT_teaches._id })
+	list_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': obj._id, 'relation_type': RT_teaches._id })
 
 	count = list_grelations.count()
 
@@ -2135,7 +2137,7 @@ def rts_fields(fields_name,fields_object_type,groupid,filled_up=None):
 	drawer1 = {}
 	for each in fields_object_type:
 		drawer1[each] = each
-	return {"fields_name":fields_name, "groupid":groupid, "fields_object_type":fields_object_type 
+	return {"fields_name":fields_name, "groupid":groupid, "fields_object_type":fields_object_type
 	,'gs_type':'relation_set' , "fields_value":fields_value , "drawer1":drawer1 }
 
 
@@ -2501,7 +2503,7 @@ def app_translations(request, app_dict):
    app_id=app_dict['id']
    get_translation_rt = node_collection.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
    if request.LANGUAGE_CODE != GSTUDIO_SITE_DEFAULT_LANGUAGE:
-      get_rel = triple_collection.one({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':ObjectId(app_id)}]})
+      get_rel = triple_collection.one({'$and':[{'_type':"GRelation"},{'relation_type':get_translation_rt._id},{'subject':ObjectId(app_id)}]})
       if get_rel:
          get_trans=node_collection.one({'_id':get_rel.right_subject})
          if get_trans.language == request.LANGUAGE_CODE:
@@ -2554,7 +2556,7 @@ def get_preferred_lang(request, group_id, nodes, node_type):
       pref_lan[u'default']= ('en', 'English')
    try:
       for each in nodes:
-         get_rel = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':each._id}]})
+         get_rel = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type':get_translation_rt._id},{'subject':each._id}]})
          if get_rel.count() > 0:
             for rel in list(get_rel):
                rel_node = node_collection.one({'_id':rel.right_subject})
@@ -2597,7 +2599,7 @@ def get_pandoravideo_metadata(src_id):
 def get_source_id(obj_id):
   try:
     source_id_at = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
-    att_set = triple_collection.one({'_type': 'GAttribute', 'subject': ObjectId(obj_id), 'attribute_type.$id': source_id_at._id})
+    att_set = triple_collection.one({'_type': 'GAttribute', 'subject': ObjectId(obj_id), 'attribute_type': source_id_at._id})
     return att_set.object_value
   except Exception as e:
     return 'null'
@@ -2609,8 +2611,8 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
    translation_list_append_temp=translation_list.append#a temp. variable which stores the lookup
    if obj_id not in r_list:
       r_list_append_temp(obj_id)
-      node_sub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':obj_id}]})
-      node_rightsub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'right_subject':obj_id}]})
+      node_sub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type':get_translation_rt._id},{'subject':obj_id}]})
+      node_rightsub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type':get_translation_rt._id},{'right_subject':obj_id}]})
 
       if list(node_sub_rt):
          node_sub_rt.rewind()
@@ -2645,7 +2647,7 @@ def get_object_value(node):
    for each in at_set:
       attribute_type = node_collection.one({'_type':"AttributeType" , 'name':each})
       if attribute_type:
-      	get_att = triple_collection.one({'_type':"GAttribute", 'subject':node._id, 'attribute_type.$id': attribute_type._id})
+      	get_att = triple_collection.one({'_type':"GAttribute", 'subject':node._id, 'attribute_type': attribute_type._id})
       	if get_att:
         	att_name_value[attribute_type.altnames] = get_att.object_value
 
@@ -2810,7 +2812,7 @@ def get_version_of_module(module_id):
 	'''
 	ver_at = node_collection.one({'_type':'AttributeType','name':'version'})
 	if ver_at:
-		attr = triple_collection.one({'_type':'GAttribute','attribute_type.$id':ver_at._id,'subject':ObjectId(module_id)})
+		attr = triple_collection.one({'_type':'GAttribute','attribute_type':ver_at._id,'subject':ObjectId(module_id)})
 		if attr:
 			return attr.object_value
 		else:
@@ -3374,7 +3376,7 @@ def get_thread_node(node_id):
 		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		thread_obj = None
 		has_thread_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_thread'})
-		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),'relation_type.$id': has_thread_rt._id})
+		thread_rt = triple_collection.find_one({'subject': ObjectId(node_id),'relation_type': has_thread_rt._id})
 		if thread_rt:
 			thread_obj = thread_rt['right_subject']
 
@@ -3862,7 +3864,7 @@ def get_help_pages_of_node(node_obj):
 	all_help_page_node_list = []
 	try:
 		has_help_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_help'})
-		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type.$id': has_help_rt._id, 'status': u'PUBLISHED'})
+		help_rt = triple_collection.find({'subject':node_obj._id,'relation_type': has_help_rt._id, 'status': u'PUBLISHED'})
 		if help_rt:
 			for each_help_rt in help_rt:
 				# print each_help_rt.right_subject

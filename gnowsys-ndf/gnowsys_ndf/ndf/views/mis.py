@@ -214,10 +214,10 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         atlist_append_temp=atlist.append
         rtlist_append_temp=rtlist.append
         for eachatset in systemtype_attributetype_set :
-            for eachattribute in triple_collection.find({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])}):
+            for eachattribute in triple_collection.find({"_type":"GAttribute", "subject":system._id, "attribute_type":ObjectId(eachatset["type_id"])}):
                 atlist_append_temp({"type":eachatset["type"],"type_id":eachatset["type_id"],"value":eachattribute.object_value})
         for eachrtset in systemtype_relationtype_set :
-            for eachrelation in triple_collection.find({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])}):
+            for eachrelation in triple_collection.find({"_type":"GRelation", "subject":system._id, "relation_type":ObjectId(eachrtset["type_id"])}):
                 right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
                 rtlist_append_temp({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
 
@@ -485,7 +485,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         #Function used by Processes implemented below
         def multi_(lst):
             for eachatset in lst:
-                eachattribute=triple_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])})
+                eachattribute=triple_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type":ObjectId(eachatset["type_id"])})
                 if eachattribute :
                     eachatset['database_value'] = eachattribute.object_value
                     eachatset['database_id'] = str(eachattribute._id)
@@ -510,7 +510,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         #Function used by Processes implemented below
         def multi_2(lst):
             for eachrtset in lst:
-                eachrelation = triple_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])})
+
+                eachrelation = triple_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type":ObjectId(eachrtset["type_id"])})
                 if eachrelation:
                     right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
                     eachrtset['database_id'] = str(eachrelation._id)

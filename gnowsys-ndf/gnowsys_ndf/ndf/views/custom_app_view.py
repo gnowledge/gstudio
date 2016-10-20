@@ -108,10 +108,10 @@ def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, a
             systemtype_relationtype_set.append({"rt_name":each.name,"type_id":str(each._id)})
 
         for eachatset in systemtype_attributetype_set :
-            for eachattribute in triple_collection.find({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])}):
+            for eachattribute in triple_collection.find({"_type":"GAttribute", "subject":system._id, "attribute_type":ObjectId(eachatset["type_id"])}):
                 atlist.append({"type":eachatset["type"],"type_id":eachatset["type_id"],"value":eachattribute.object_value})
         for eachrtset in systemtype_relationtype_set :
-            for eachrelation in triple_collection.find({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])}):
+            for eachrelation in triple_collection.find({"_type":"GRelation", "subject":system._id, "relation_type":ObjectId(eachrtset["type_id"])}):
                 right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
                 rtlist.append({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
 
@@ -259,7 +259,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
     if app_set_instance_id : # at and rt set editing instance
         system = node_collection.find_one({"_id":ObjectId(app_set_instance_id)})
         for eachatset in systemtype_attributetype_set :
-            eachattribute = node_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])})
+            eachattribute = node_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type":ObjectId(eachatset["type_id"])})
             if eachattribute :
                 eachatset['database_value'] = eachattribute.object_value
                 eachatset['database_id'] = str(eachattribute._id)
@@ -267,7 +267,8 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                 eachatset['database_value'] = ""
                 eachatset['database_id'] = ""
         for eachrtset in systemtype_relationtype_set :
-            eachrelation = node_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])})
+
+            eachrelation = node_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type":ObjectId(eachrtset["type_id"])})
             if eachrelation:
                 right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
                 eachrtset['database_id'] = str(eachrelation._id)
@@ -371,7 +372,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                 attributetype_key = node_collection.find_one({"_id":ObjectId(key)})
                 newattribute = triple_collection.collection.GAttribute()
                 newattribute.subject = newgsystem._id
-                newattribute.attribute_type = attributetype_key
+                newattribute.attribute_type = attributetype_key._id
                 newattribute.object_value = value
                 newattribute.save(groupid=group_id)
             for key,value in request_rt_dict.items():
@@ -381,7 +382,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                     right_subject = node_collection.find_one({"_id":ObjectId(value)})
                     newrelation = triple_collection.collection.GRelation()
                     newrelation.subject = newgsystem._id
-                    newrelation.relation_type = relationtype_key
+                    newrelation.relation_type = relationtype_key._id
                     newrelation.right_subject = right_subject._id
                     newrelation.save(groupid=group_id)
 
@@ -396,7 +397,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                         attributetype_key = node_collection.find_one({"_id":ObjectId(each["type_id"])})
                         newattribute = triple_collection.collection.GAttribute()
                         newattribute.subject = newgsystem._id
-                        newattribute.attribute_type = attributetype_key
+                        newattribute.attribute_type = attributetype_key._id
                         newattribute.object_value = request.POST.get(each["type_id"],"")
                         newattribute.save(groupid=group_id)
 
@@ -411,7 +412,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                         right_subject = node_collection.find_one({"_id":ObjectId(request.POST.get(eachrt["type_id"],""))})
                         newrelation = triple_collection.collection.GRelation()
                         newrelation.subject = newgsystem._id
-                        newrelation.relation_type = relationtype_key
+                        newrelation.relation_type = relationtype_key._id
                         newrelation.right_subject = right_subject._id
                         newrelation.save(groupid=group_id)
 

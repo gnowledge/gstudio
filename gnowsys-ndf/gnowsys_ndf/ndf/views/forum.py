@@ -753,9 +753,9 @@ def get_profile_pic(username):
 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(username) })
     prof_pic = node_collection.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
-    dbref_profile_pic = prof_pic.get_dbref()
+    # dbref_profile_pic = prof_pic.get_dbref()
     collection_tr = db[Triple.collection_name]
-    prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })
+    prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': prof_pic._id })
 
     # prof_pic_rel will get the cursor object of relation of user with its profile picture
     if prof_pic_rel.count() :

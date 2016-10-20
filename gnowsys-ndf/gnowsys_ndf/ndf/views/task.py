@@ -95,7 +95,7 @@ def task_details(request, group_name, task_id):
   subtask = []
   for each in at_list:
     attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': each})
-    attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
+    attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type": attributetype_key._id})
     if attr:
       if attributetype_key.name == "Assignee":
         u_list = []
@@ -277,7 +277,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
     task_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
     for each in at_list:
       attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': each})
-      attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
+      attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type": attributetype_key._id})
       if attr:
         if each == "Upload_Task":
           file_list=[]
@@ -409,7 +409,7 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
       for each in at_list:
         if request.POST.get(each, ""):
           attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': each})
-          attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
+          attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type": attributetype_key._id})
           if each == "Assignee":
             field_value = request.POST.getlist(each, "")
 
@@ -464,7 +464,7 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
 
         elif each == 'Upload_Task':
           attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': 'Upload_Task'})
-          attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
+          attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type": attributetype_key._id})
           if attr:
             value=get_file_node(attr.object_value)
             change_list.append(each.encode('utf8')+' changed from '+str(value).strip('[]')+' to '+str(file_name))
@@ -692,7 +692,7 @@ def task_collection(request,group_name,task_id=None,each_page=1):
     	new = node_collection.one({'_id': ObjectId(each)})
     	for attrvalue in at_list:
 		attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': attrvalue})
-		attr = triple_collection.find_one({"_type": "GAttribute", "subject": new._id, "attribute_type.$id": attributetype_key._id})
+		attr = triple_collection.find_one({"_type": "GAttribute", "subject": new._id, "attribute_type": attributetype_key._id})
 		if attr:
 			attr_value.update({attrvalue:attr.object_value})
 		else:
@@ -816,8 +816,8 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
 
         for attrvalue in at_list:
             attributetype_key = node_collection.find_one({"_type":'AttributeType', 'name':attrvalue})
-            attr = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type.$id": attributetype_key._id})
-            attr1 = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type.$id": attributetype_key1._id, "object_value": request.user.username})
+            attr = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type": attributetype_key._id})
+            attr1 = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type": attributetype_key1._id, "object_value": request.user.username})
             if attr:
                 if attrvalue == "Assignee":
                     uname_list = []
@@ -864,7 +864,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
 
                 if int(choice) == int(4):
                     message="Nothing Assigned"
-                    attr1 = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type.$id": attributetype_key1._id, "object_value": request.user.id})
+                    attr1 = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type": attributetype_key1._id, "object_value": request.user.id})
                     if attr1:
                         task_list.append(dict(attr_value))
 
