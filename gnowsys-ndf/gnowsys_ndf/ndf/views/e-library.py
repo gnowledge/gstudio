@@ -399,7 +399,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 
 		# # else:
 		# elif filetype == "Documents":
-		#     d_Collection = node_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
+		#     d_Collection = node_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id,"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
 
 		#     doc = []
 		#     for e in d_Collection:
