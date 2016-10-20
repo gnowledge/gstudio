@@ -218,9 +218,9 @@ def get_node_type(node):
 
 @get_execution_time
 @register.assignment_tag
-def get_node(node):
-    if node:
-        obj = node_collection.one({"_id": ObjectId(node)})
+def get_node(node_id):
+    if node_id:
+        obj = node_collection.one({"_id": ObjectId(node_id)})
         if obj:
             return obj
         else:
