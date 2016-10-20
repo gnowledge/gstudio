@@ -744,7 +744,7 @@ def parse_data_create_gsystem(json_file_path):
 
                                 nodes = triple_collection.find({'_type': "GRelation",
                                             'subject': subject_id,
-                                            'relation_type.$id': relation_type_node._id
+                                            'relation_type': relation_type_node._id
                                           })
 
                                 # sending list of all the possible right subject to relation
@@ -835,7 +835,7 @@ def create_thread_obj(node_id):
 
 def create_resource_gsystem(resource_data, row_no='', group_set_id=None):
     # fetching resource from url
-    
+
     resource_link = resource_data.get("resource_link")  # actual download file link
     resource_link = resource_link.replace(' ', '%20')
 
