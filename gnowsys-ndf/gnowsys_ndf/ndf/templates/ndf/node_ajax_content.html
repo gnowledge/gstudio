@@ -12,18 +12,11 @@
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 <script type="text/javascript">
-  $( document ).ready(function() {
-    
-    
+  $( document ).ready(function() { 
     var x = location.href;
     var hostname = location.host;
-
     x = "https://www.facebook.com/dialog/feed?app_id=146799965703412&redirect_uri=http://www.metastudio.org/home/&link="+location.href+"&caption=  {{node.name}}&description={{node.content|safe}}&picture=" + hostname + "{% url 'read_file' group_name_tag node download_filename %}";
-    $(".share_link").attr("href",x);
-
-
-  
-  
+    $(".share_link").attr("href",x);  
 });
 </script>
 
