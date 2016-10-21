@@ -22,43 +22,10 @@
     $(".share_link").attr("href",x);
 
 
-    hrefs = "href=https://twitter.com/share"; 
-    b = "large"; 
-    e = "atMetaStudio";
-    selected_child = window.location.search.replace("?selected=", "");
-    if(selected_child){
-      $(".twitter-share-button").remove();
-      d = location.hostname  + ":8000" + "/" + "{{group_id}}" + "/" + "file" + "/" + selected_child +"tweet-button";
-      parent_div = $(".share_link");
-      console.log(parent_div);
-      parent_div.append("<a class='twitter-share-button' href='' data-size=''  data-url='' data-count-url='' data-via='' data-related=''data-hashtags='' data-text=''>TweetNew</a>");
-      $(document).ready();
-      c = location.hostname  + ":8000" + "/" + "{{group_id}}" + "/" + "file" + "/" + selected_child; 
-    }
-    else{
-      
-      d = location.href+"tweet-button";
-      c = location.href;
-    }
-    console.log(selected_child);
-    f = "twitterapi,twitter"; 
-    // g= "{{node.tags|striptags}}";
-    // h="hello ghello";
-    $(".twitter-share-button").attr("href",a);
-    $(".twitter-share-button").attr("data-size",b);
-    $(".twitter-share-button").attr("data-url",c);
-    $(".twitter-share-button").attr("data-count-url",d);
-    $(".twitter-share-button").attr("data-via","{{twitter_via}}");
-    $(".twitter-share-button").attr("data-related",f);
-    // $(".twitter-share-button").attr("data-hashtags",g);
-    // $(".twitter-share-button").attr("data-text",h);
-!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+  
   
 });
 </script>
-<script type="text/javascript">
-</script>    
-
 
 <style type="text/css">
   legend{
@@ -580,11 +547,20 @@
        <br>
         {% get_gstudio_social_share_resource as social_share %}
                   {% if social_share and "Group" not in node.member_of_names_list and "PartnerGroup" not in node.member_of_names_list %}
-                         <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
-                        <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
-                        </a>
-                      <a class="twitter-share-button" href="" data-size=""  data-url="" data-count-url="" data-via="" data-related=""
-                     data-hashtags="" data-text="">TweetNew</a>
+                         <div class="large-12 columns row">
+                           <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
+                          <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
+                          </a>
+                           
+                         </div>
+                        <div class="large-6 columns">
+                            <iframe
+                            class="twitter-share-button"
+                            src="https://platform.twitter.com/widgets/tweet_button.html?size=l&url={{request.PATH}}&via={{twitter_via}}&related=&text=&hashtags="
+                            title="Twitter Tweet Button"
+                            style="border: 0;display: inline;">
+                          </iframe>
+                        </div>
 
                   {% endif %}
           {% get_list_of_fields node.type_of "name" as type_of_list %}
