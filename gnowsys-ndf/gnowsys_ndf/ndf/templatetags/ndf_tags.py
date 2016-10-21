@@ -1664,7 +1664,7 @@ def get_resources(node_id,resources):
                 obj=node_collection.one({'_id':ObjectId(each.subject)})
                 mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type': AT_educationaluse._id, "subject":each.subject})
                 for k,v in resources.items():
-                        if mime_type.object_value == k:
+                        if mime_type and mime_type.object_value == k:
                                 if obj.name not in resources[k]:
                                         resources.setdefault(k,[]).append(obj)
 
