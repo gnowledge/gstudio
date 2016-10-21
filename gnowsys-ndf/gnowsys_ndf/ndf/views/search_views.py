@@ -902,7 +902,7 @@ def advanced_search_results(request, group_id):
 			# CASE 2 -- SEARCH THE GATTRIBUTES
 			try:
 				attr_id = node_collection.one({"_type":"AttributeType", "name":at_name}, {"_id":1})
-				res = triple_collection.find({"_type":"GAttribute", "attribute_type.$id":ObjectId(attr_id._id), "object_value":{"$regex":word, "$options":"i"}}, {"name":1, "object_value":1, "subject":1})
+				res = triple_collection.find({"_type":"GAttribute", "attribute_type":ObjectId(attr_id._id), "object_value":{"$regex":word, "$options":"i"}}, {"name":1, "object_value":1, "subject":1})
 				#print "Sttr type: ", attr_id
 				for obj in res: 
 					if all_users == 0:
@@ -1121,7 +1121,7 @@ def get_node_info(request, group_id, node_name):
 			obj = node_collection.one({"_id": ObjectId(GSType)})
 
 			for attr in obj.attribute_type_set:
-				custom_attrs = triple_collection.find({"_type": "GAttribute", "subject": ObjectId(sg_node._id), "attribute_type.$id": ObjectId(attr._id)}, {"name":1, "object_value":1})
+				custom_attrs = triple_collection.find({"_type": "GAttribute", "subject": ObjectId(sg_node._id), "attribute_type": ObjectId(attr._id)}, {"name":1, "object_value":1})
 				for sg_attr in custom_attrs:
 					temp = sg_attr.name
 					i1 = temp.index('--') + 3
@@ -1172,7 +1172,7 @@ def get_node_info2(request, group_id, node_id):
 		obj = node_collection.one({"_id": ObjectId(GSType)})
 
 		for attr in obj.attribute_type_set:
-			custom_attrs = triple_collection.find({"_type": "GAttribute", "subject": ObjectId(sg_node._id), "attribute_type.$id": ObjectId(attr._id)}, {"name":1, "object_value":1})
+			custom_attrs = triple_collection.find({"_type": "GAttribute", "subject": ObjectId(sg_node._id), "attribute_type": ObjectId(attr._id)}, {"name":1, "object_value":1})
 			for sg_attr in custom_attrs:
 				temp = sg_attr.name
 				i1 = temp.index('--') + 3
@@ -1301,7 +1301,7 @@ def ra_search_results(request, group_id):
 	try:
 		relationType_obj = node_collection.one({"_type": "RelationType", "$or": [{"name": max_match_rel}, {"inverse_name": max_match_rel} ] }, {"_id": 1, "name": 1})
 
-		GRelation_objs = triple_collection.find({"_type": "GRelation", "relation_type.$id": relationType_obj._id})
+		GRelation_objs = triple_collection.find({"_type": "GRelation", "relation_type": relationType_obj._id})
 
 		#subjects = []
 		#right_subjects = []

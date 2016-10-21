@@ -29,7 +29,7 @@
     "jqtree": "#0.21.0",
     "jquery-legacy": "jquery#1.10.2",
     "jquery.transit": "#0.9.12",
-    "MathJax": "#2.4.0",
+    // "MathJax": "#2.4.0",
     "d3": "#3.4.11",
     "FileSaver": "#879b3c228c",
     "underscore": "#1.6.0",

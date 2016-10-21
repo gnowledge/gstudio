@@ -392,7 +392,7 @@ def file(request, group_id, file_id=None, page_no=1):
 
        #  pandora_video_id.append(each['_id'])
       # for each in get_member_set:
-      #     att_set=triple_collection.one({'$and':[{'subject':each['_id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+      #     att_set=triple_collection.one({'$and':[{'subject':each['_id']},{'_type':'GAttribute'},{'attribute_type':source_id_at._id}]})
       #     if att_set:
       #         obj_set={}
       #         obj_set['id']=att_set.object_value
@@ -595,7 +595,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
                 result_dict = get_query_cursor_filetype('$nin', [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp,"Documents")
 
             # elif app == "E-Library":
-            #     d_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
+            #     d_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id,"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
 
             #     doc = []
             #     for e in d_Collection:
@@ -626,7 +626,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
             if app == "File":
                 result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_IMAGE._id), GST_FILE._id], group_id, request.user.id, page_no, no_of_objs_pp)
             # elif app == "E-Library":
-            #     img_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Images"}).sort("last_update", -1)
+            #     img_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id,"subject": {'$in': coll} ,"object_value": "Images"}).sort("last_update", -1)
             #     image = []
             #     for e in img_Collection:
             #         image.append(e.subject)
@@ -675,7 +675,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
 
             # elif app == "E-Library":
-            #     vid_Collection = node_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Videos"}).sort("last_update", -1)
+            #     vid_Collection = node_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id,"subject": {'$in': coll} ,"object_value": "Videos"}).sort("last_update", -1)
             #     video = []
             #     for e in vid_Collection:
             #         video.append(e.subject)
@@ -696,7 +696,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
             #     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
         # elif filetype == "interactives" and app == "E-Library":
-        #     interCollection = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": {'$in': coll} ,"object_value": "Interactives"}).sort("last_update", -1)
+        #     interCollection = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id, "subject": {'$in': coll} ,"object_value": "Interactives"}).sort("last_update", -1)
         #     interactive = []
         #     for e in interCollection:
         #         interactive.append(e.subject)
@@ -705,7 +705,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
         #     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
         # elif filetype == "audio" and app == "E-Library":
-        #     aud_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Audios"}).sort("last_update", -1)
+        #     aud_Collection = triple_collection.find({'_type': "GAttribute", 'attribute_type': gattr._id,"subject": {'$in': coll} ,"object_value": "Audios"}).sort("last_update", -1)
 
         #     audio = []
         #     for e in aud_Collection:
@@ -1527,7 +1527,7 @@ def file_detail(request, group_id, _id):
 
     if auth:
         has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
         #a temp. variable which stores the lookup for append method
         shelves_append_temp=shelves.append
         if shelf:

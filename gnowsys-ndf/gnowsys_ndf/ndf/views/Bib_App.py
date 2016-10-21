@@ -173,7 +173,7 @@ def view_sentry(request,group_id,node_id):
     gst_bibtex=unicode(gst_bibtex, "UTF-8")
     gst_bibtex=collection.Node.one({'_id':ObjectId(gst_bibtex)})
     gst_id=GST_SENTRY._id
-    GST_SAttribute=collection.Node.one({'subject':GST_SENTRY._id,'attribute_type.$id':GST_one._id})
+    GST_SAttribute=collection.Node.one({'subject':GST_SENTRY._id,'attribute_type':GST_one._id})
     Bibtex=GST_SAttribute.object_value
     gst_note=GST_SENTRY.content_org
     variable=RequestContext(request,{'name':GST_SENTRY.name,'gst_note':gst_note,'Bibtex':Bibtex,'group_id':group_id,'groupid':group_id,'title':gst_bibtex.name})
@@ -334,7 +334,7 @@ def edit_entry(request,group_id,node_id):
         pass
 
     GST_ENTRY=collection.Node.one({'name':'entry_list','_type':'AttributeType'})
-    entry_list=collection.Node.one({'subject':ObjectId(node_id),'attribute_type.$id':GST_ENTRY._id})
+    entry_list=collection.Node.one({'subject':ObjectId(node_id),'attribute_type':GST_ENTRY._id})
     GST_current=collection.Node.one({'_id':ObjectId(node_id)})
     gst_bibtex=GST_current.member_of
     ''' converts [ObjectId('node_id')] to node_id
@@ -395,15 +395,15 @@ def edit_entry(request,group_id,node_id):
         
         GST_current.save()
         Bibtex=collection.Node.one({'name':'BibTex_entry','_type':'AttributeType'})
-        Bibtex_entry=collection.Node.one({'subject':GST_current._id,'attribute_type.$id':Bibtex._id})
+        Bibtex_entry=collection.Node.one({'subject':GST_current._id,'attribute_type':Bibtex._id})
         Bibtex_entry.object_value=unicode(var)
         Bibtex_entry.save()
         Citation=collection.Node.one({'name':'Citation','_type':'AttributeType'})
-        cite_key=collection.Node.one({'subject':GST_current._id,'attribute_type.$id':Citation._id})
+        cite_key=collection.Node.one({'subject':GST_current._id,'attribute_type':Citation._id})
         cite_key.object_value=unicode(cite)
         cite_key.save()
         entry=collection.Node.one({'name':'entry_list','_type':'AttributeType'})
-        entry_list=collection.Node.one({'subject':GST_current._id,'attribute_type.$id':entry._id})
+        entry_list=collection.Node.one({'subject':GST_current._id,'attribute_type':entry._id})
         entry_list.object_value=unicode(value)
         entry_list.save()
         return HttpResponseRedirect(reverse('view_entry', kwargs={'group_id': group_id, 'node_id': gst_entry._id}))

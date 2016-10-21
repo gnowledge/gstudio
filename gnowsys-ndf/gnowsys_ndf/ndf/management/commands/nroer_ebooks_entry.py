@@ -648,7 +648,7 @@ def parse_data_create_gsystem(json_file_path):
 
                           nodes = triple_collection.find({'_type': "GRelation",
                                       'subject': subject_id,
-                                      'relation_type.$id': relation_type_node._id
+                                      'relation_type': relation_type_node._id
                                     })
 
                           # sending list of all the possible right subject to relation
