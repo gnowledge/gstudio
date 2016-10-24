@@ -1182,7 +1182,12 @@ class AttributeType(Node):
 
     @staticmethod
     def append_attribute(attr_id_or_node, attr_dict, attr_value=None, inner_attr_dict=None):
-        if isinstance(attr_id_or_node, (unicode, ObjectId)):
+
+        from bson.dbref import DBRef
+        if isinstance(attr_id_or_node, DBRef):
+            attr_id_or_node = AttributeType(db.dereference(attr_id_or_node))
+
+        elif isinstance(attr_id_or_node, (unicode, ObjectId)):
             # Convert unicode representation of ObjectId into it's
             # corresponding ObjectId type Then fetch
             # attribute-type-node from AttributeType collection of
@@ -3006,6 +3011,8 @@ class Triple(DjangoDocument):
 
     subject_id = self.subject
     subject_document = node_collection.one({"_id": self.subject})
+    if not subject_document:
+        return
     subject_name = subject_document.name
     right_subject_member_of_list = []
 
