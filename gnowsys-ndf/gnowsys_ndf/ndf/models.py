@@ -1083,8 +1083,8 @@ class Node(DjangoDocument):
                     # convert rel_obj.relation_type [dictionary] to
                     # collection.Node(rel_obj.relation_type)
                     # [document-object]
-
-                    if META_TYPE[4] in rel_obj.relation_type.member_of_names_list:
+                    rel_type_node = node_collection.one({'_id': ObjectId(rel_obj.relation_type)})
+                    if META_TYPE[4] in rel_type_node.member_of_names_list:
                         # We are not handling inverse relation processing for
                         # Triadic relationship(s)
                         continue
