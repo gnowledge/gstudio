@@ -2556,6 +2556,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
             ga_node.attribute_type = attribute_type_node._id
 
             if (not object_value) and type(object_value) != bool:
+                # this is when value of attribute is cleared/empty
+                # in this case attribute will be created with status deleted
                 object_value = u"None"
                 ga_node.status = u"DELETED"
 
@@ -2565,7 +2567,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
             ga_node.object_value = object_value
             ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
 
-            if object_value == u"None":
+            if ga_node.status == u"DELETED":
                 info_message = " GAttribute (" + ga_node.name + \
                     ") created successfully with status as 'DELETED'!\n"
 
@@ -2587,10 +2589,12 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
             raise Exception(error_message)
 
     else:
-        # Code for updation
+        # Code for updating existing gattribute
         is_ga_node_changed = False
         try:
             if (not object_value) and type(object_value) != bool:
+                # this is when value of attribute is cleared/empty
+                # in this case attribute will be set with status deleted
                 old_object_value = ga_node.object_value
 
                 ga_node.status = u"DELETED"
@@ -2601,10 +2605,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                 # Fetch corresponding document & update it's attribute_set with
                 # proper value
-                node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: old_object_value},
-                                                  {'$pull': {
-                                                      'attribute_set': {attribute_type_node.name: old_object_value}}},
-                                                  upsert=False, multi=False)
+                node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: old_object_value}, {'$pull': {'attribute_set': {attribute_type_node.name: old_object_value}}}, upsert=False, multi=False)
 
             else:
                 if type(ga_node.object_value) == list:

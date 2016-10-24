@@ -375,7 +375,6 @@ def get_group_gapps(group_id=None):
 
 		# group_attrs = group_obj.get_possible_attributes(group_obj._id)
 		# print group_attrs
-		print "==================="
 
 		# gapps_list = group_attrs.get('apps_list', [])
 		at_apps_list = node_collection.one({'_type': 'AttributeType', 'name': 'apps_list'})
@@ -644,7 +643,7 @@ def get_relation_value(node_id, grel, return_single_right_subject=False):
                         grel_val_node = node_collection.find_one({'_id':{'$in': grel_val}})
                         # returns right_subject of grelation and GRelation _id
                         result_dict.update({"grel_id": grel_id, "grel_node": grel_val_node, "cursor": False})
-        print "\n\nresult_dict === ",result_dict
+        # print "\n\nresult_dict === ",result_dict
         return result_dict
     except Exception as e:
         print e
