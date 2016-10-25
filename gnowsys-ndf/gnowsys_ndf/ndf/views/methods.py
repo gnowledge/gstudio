@@ -1331,7 +1331,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         is_changed = True
     '''
 
-
     # visited_location in author class
     if node.location != map_geojson_data:
         node.location = map_geojson_data  # Storing location data
@@ -1359,7 +1358,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
                     is_changed = True
 
             else:
-
                 user_group_location['visited_location'] = user_last_visited_location
                 user_group_location.save(groupid=group_id)
 
@@ -1372,9 +1370,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
             node.contributors.append(usrid)
 
     return is_changed
-
-
 # ============= END of def get_node_common_fields() ==============
+
 
 @get_execution_time
 def build_collection(node, check_collection, right_drawer_list, checked):
