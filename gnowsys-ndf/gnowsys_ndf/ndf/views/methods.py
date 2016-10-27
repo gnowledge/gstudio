@@ -53,6 +53,7 @@ from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.settings import SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH
 from gnowsys_ndf.ndf.views.tasks import record_in_benchmark
 from datetime import datetime, timedelta, date
+from gnowsys_ndf.ndf.views.utils import get_dict_from_list_of_dicts
 
 history_manager = HistoryManager()
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
@@ -2136,9 +2137,7 @@ def get_node_metadata(request, node, **kwargs):
         for atname in attribute_type_list:
 
             field_value = request.POST.get(atname, "")
-            print '$' * 30
-            print atname,field_value
-            print '$' * 30
+            # print atname,field_value
 
             at = node_collection.one(
                 {"_type": "AttributeType", "name": atname})
@@ -2152,7 +2151,7 @@ def get_node_metadata(request, node, **kwargs):
                   field_value = request.POST.get(atname, "")
                   # print "\n\nnon list field value",field_value
                 field_value = cast_to_data_type(field_value, at["data_type"])
-                # print "\n\n\n\n\n\n\n\n\n\n\nfield_value",field_value
+                # print at["data_type"], "\n\nfield_value: ",field_value, ", type: ",type(field_value)
                 if "is_changed" in kwargs:
                     # print "field value"
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
@@ -2536,8 +2535,15 @@ def parse_template_data(field_data_type, field_value, **kwargs):
         raise Exception(error_message)
 
 
+
 @get_execution_time
 def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwargs):
+
+    def _update_attr_set(attr_set_list_of_dicts, attr_key, attr_value):
+        temp_attr_dict = get_dict_from_list_of_dicts(attr_set_list_of_dicts)
+        temp_attr_dict.update({unicode(attr_key): attr_value})
+        return [{k:v} for k, v in temp_attr_dict.iteritems()]
+
     ga_node = None
     info_message = ""
     old_object_value = None
@@ -2647,10 +2653,18 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                         # Fetch corresponding document & append into it's
                         # attribute_set
-                        node_collection.collection.update({'_id': subject_id},
-                                                          {'$addToSet': {
-                                                              'attribute_set': {attribute_type_node.name: object_value}}},
-                                                          upsert=False, multi=False)
+                        # node_collection.collection.update({'_id': subject_id},
+                        #                                   {'$addToSet': {
+                        #                                       'attribute_set': {attribute_type_node.name: object_value}}},
+                        #                                   upsert=False, multi=False)
+                        subject_node_obj = node_collection.one({'_id': ObjectId(subject_id)})
+                        subject_node_obj.attribute_set = _update_attr_set(
+                                                            subject_node_obj.attribute_set,
+                                                            attribute_type_node.name,
+                                                            object_value
+                                                        )
+                        subject_node_obj.save()
+
 
                     else:
                         ga_node.status = u"PUBLISHED"
@@ -2661,10 +2675,17 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                         # Fetch corresponding document & update it's
                         # attribute_set with proper value
-                        node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: {"$exists": True}},
-                                                      {'$set': {
-                                                          'attribute_set.$.' + attribute_type_node.name: ga_node.object_value}},
-                                                      upsert=False, multi=False)
+                        # node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: {"$exists": True}},
+                        #                               {'$set': {
+                        #                                   'attribute_set.$.' + attribute_type_node.name: ga_node.object_value}},
+                        #                               upsert=False, multi=False)
+                        subject_node_obj = node_collection.one({'_id': ObjectId(subject_id)})
+                        subject_node_obj.attribute_set = _update_attr_set(
+                                                            subject_node_obj.attribute_set,
+                                                            attribute_type_node.name,
+                                                            ga_node.object_value
+                                                        )
+                        subject_node_obj.save()
                 else:
                     info_message = " GAttribute (" + ga_node.name + \
                         ") already exists (Nothing updated) !\n"
