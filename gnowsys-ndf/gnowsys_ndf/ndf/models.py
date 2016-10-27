@@ -3213,7 +3213,7 @@ class GAttribute(Triple):
             # 1: Compound index
             'fields': [
                 ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
-                ('attribute_type.$id', INDEX_ASCENDING), ('status', INDEX_ASCENDING)
+                ('attribute_type', INDEX_ASCENDING), ('status', INDEX_ASCENDING)
             ],
             'check': False  # Required because $id is not explicitly specified in the structure
         }
@@ -3239,7 +3239,7 @@ class GRelation(Triple):
         # 1: Compound index
         'fields': [
             ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
-            ('relation_type.$id'), ('status', INDEX_ASCENDING), \
+            ('relation_type'), ('status', INDEX_ASCENDING), \
             ('right_subject', INDEX_ASCENDING)
         ],
         'check': False  # Required because $id is not explicitly specified in the structure
@@ -3247,7 +3247,7 @@ class GRelation(Triple):
         # 2: Compound index
         'fields': [
             ('_type', INDEX_ASCENDING), ('right_subject', INDEX_ASCENDING), \
-            ('relation_type.$id'), ('status', INDEX_ASCENDING)
+            ('relation_type'), ('status', INDEX_ASCENDING)
         ],
         'check': False  # Required because $id is not explicitly specified in the structure
     }]
