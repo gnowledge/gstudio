@@ -1534,7 +1534,7 @@ class GSystemType(Node):
 
         gst_id = ObjectId(gst_name_or_id) if ObjectId.is_valid(gst_name_or_id) else None
         gst_obj = node_collection.one({
-                                        "_type": "GSystemType",
+                                        "_type": {"$in": ["GSystemType", "MetaType"]},
                                         "$or":[
                                             {"_id": gst_id},
                                             {"name": unicode(gst_name_or_id)}
