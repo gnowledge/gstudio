@@ -635,7 +635,7 @@ if($('.breadcrumbs').length == 0)
     var iframeBodyHt = $("iframe").contents().find("body").height();
     var docHeight = $(window).height();
     docHeight -= docHeight * 0.20;
-    $("iframe").height(docHeight + 50);
+    $("iframe").not('.twitter-share-button').height(docHeight + 50);
     
     var changedHt;
     
