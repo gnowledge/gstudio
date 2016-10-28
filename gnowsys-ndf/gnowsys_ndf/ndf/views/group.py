@@ -1480,8 +1480,6 @@ class GroupCreateEditHandler(View):
                 partner_grp_result = sub_group.set_partnergroup(request, group_obj)
                 sub_group.set_logo(request, group_obj, logo_rt = "has_profile_pic")
                 # print "-------------------------------------------------",group_obj
-                url_name = 'groupchange'
-                return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
         return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
 # ===END of class EditGroup() ===
 # -----------------------------------------
