@@ -24,7 +24,8 @@ from gnowsys_ndf.ndf.models import GSystem, File, Group, Author
 from gnowsys_ndf.ndf.models import Triple, GAttribute, GRelation
 from gnowsys_ndf.ndf.models import ReducedDocs, ToReduceDocs, IndexedWordList
 from gnowsys_ndf.ndf.models import node_holder
-from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
+from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, filehive_collection, counter_collection, benchmark_collection, filehive_collection, buddy_collection
+from gnowsys_ndf.ndf.models import Filehive, Buddy, Counter
 
 from gnowsys_ndf.ndf.models import INDEX_ASCENDING
 
@@ -87,7 +88,11 @@ class Command(BaseCommand):
             print "\nFollowing are the model(s) defined: \n{0}".format(', '.join(map(lambda name_tuple: name_tuple[0], model_names)))
             collection_object_wrapper = {
                 'Nodes': node_collection.collection,
-                'Triples': triple_collection.collection
+                'Triples': triple_collection.collection,
+                'Benchmark': benchmark_collection,
+                'Filehive': filehive_collection,
+                'Buddy': buddy_collection,
+                'Counter': counter_collection
             }
 
             collection_index_dict = {}
@@ -146,7 +151,7 @@ class Command(BaseCommand):
                             index_val = ""  # Value returned after index is created/updated
 
                             index_val, index_fields_list = get_index_name(index_fields_list)
-                            
+
                             info_message = "  {0}".format(index_val)
                             print info_message
                             log_list_append("\n" + info_message)
@@ -163,7 +168,7 @@ class Command(BaseCommand):
                     continue
 
                 # Iterate through various index field-name(s) defined or
-                # field-tuple(s) [i.e. (field-name, indexing-order)] defined as 
+                # field-tuple(s) [i.e. (field-name, indexing-order)] defined as
                 # part of index-field-list in a given collection
                 """
                 for i, index_dict in enumerate(iter(indexes_defined_for_collection)):
