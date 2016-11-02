@@ -12,7 +12,8 @@
                 <br>
                 <ul>
                     <li>
-                        <strong>Powered by <a href="https://gitlab.com/gnowledge/gstudio/tree/4572458" target="_blank">gstudio </a> built at Gnowledge Lab,</strong>
+                        {% get_latest_git_hash as git_commit_hash %}
+                        <strong>Powered by <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">gstudio </a> built at Gnowledge Lab,</strong>
                     </li>
                     <li>
                         <strong><a href="http://www.hbcse.tifr.res.in/" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in/" target="_blank">TIFR</a>.</strong>
@@ -54,7 +55,7 @@
                 </div>
             </div>
             <!-- ****** -->
-        </div>  
+        </div>
     </div>
     </div>
 </footer>
