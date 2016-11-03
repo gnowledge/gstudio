@@ -25,9 +25,9 @@
       </div>
 
 <div id="pages">
-{% get_search_results_curr search_results  as temp %}
+{% get_search_results_curr search_results  as search_result_curr %}
     <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
-      {% for each in temp %}
+      {% for each in  search_result_curr.getcurr %}
         <li class="card-image-wrapper" >
         {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each %}
         </li>
