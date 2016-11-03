@@ -33,7 +33,11 @@
         </li>
       {% endfor %}
     </ul>
+      {% if not search_result_curr.getcurr %}
+       <b> No results found </b>
+      {% endif %}
 </div>
+
 <hr>
    {% comment %} 
     <dl class="accordion" data-accordion>
