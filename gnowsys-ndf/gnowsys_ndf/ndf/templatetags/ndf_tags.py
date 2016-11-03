@@ -3937,8 +3937,11 @@ def get_search_results_curr(search_results):
 	GST_REPLY = node_collection.one({'_type':'GSystemType', 'name': 'Reply'})
 	json_results = json.loads(search_results)
 	stemmed_values = json_results["stemmed"]["name"]
+	exact_values = json_results["exact"]["name"]
 	stemmed_results = []
 	for each in stemmed_values:
+		stemmed_results.append(ObjectId(each["_id"]))
+	for each in exact_values:
 		stemmed_results.append(ObjectId(each["_id"]))
 	getcurr = node_collection.find({'$and':[{'_id':{'$in' : stemmed_results }},{'member_of':{'$nin':[GST_THREAD._id,GST_REPLY._id]}}]})
 	return getcurr
