@@ -3930,21 +3930,15 @@ def get_pages(page_type):
 
 @get_execution_time
 @register.assignment_tag
-def get_ids_search_results(search_results):
+def get_search_results_curr(search_results):
 	GST_FILE = node_collection.one({'_type':'GSystemType', 'name': 'File'})
 	GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': 'Page'})
 	GST_THREAD = node_collection.one({'_type':'GSystemType', 'name': 'Twist'})
 	GST_REPLY = node_collection.one({'_type':'GSystemType', 'name': 'Reply'})
-	# print type(search_results)
 	json_results = json.loads(search_results)
 	stemmed_values = json_results["stemmed"]["name"]
-	print len(stemmed_values)
-	# print stemmed_results
 	stemmed_results = []
 	for each in stemmed_values:
 		stemmed_results.append(ObjectId(each["_id"]))
-		# curr = node_collection.find({"_id":ObjectId(each["_id"])})
-	# print "ssssssssssssssssssssssssssssssssss",stemmed_results
 	getcurr = node_collection.find({'$and':[{'_id':{'$in' : stemmed_results }},{'member_of':{'$nin':[GST_THREAD._id,GST_REPLY._id]}}]})
-	# print getcurr.count()
 	return getcurr

@@ -25,11 +25,14 @@
       </div>
 
 <div id="pages">
-{% get_ids_search_results search_results  as temp %}
+{% get_search_results_curr search_results  as temp %}
+    <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
       {% for each in temp %}
-        {{each.name}}
-    {% endfor %}
-  
+        <li class="card-image-wrapper" >
+        {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each %}
+        </li>
+      {% endfor %}
+    </ul>
 </div>
 <hr>
    {% comment %} 
