@@ -25,19 +25,18 @@
       </div>
 
 <div id="pages">
-{% get_search_results_curr search_results  as search_result_curr %}
     <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
-      {% for each in  search_result_curr.getcurr %}
+      {% for each in  search_curr %}
         <li class="card-image-wrapper" >
         {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=groupid second_arg=each %}
         </li>
       {% endfor %}
     </ul>
-      {% if not search_result_curr.getcurr %}
-       <b> No results found </b>
+      {% if not search_curr %}
+       <b> No results found  </b>
       {% endif %}
 </div>
-
+ {% include 'ndf/pagination.html' with urlname="results_search_paged" first_arg=group_name_tag second_arg="" third_arg="" page_info=search_pagination_curr %}
 <hr>
    {% comment %} 
     <dl class="accordion" data-accordion>
@@ -126,6 +125,10 @@
 </script>
 
 <script type="text/javascript">
+  $(".pagination").click(function(){
+    alert("ssss")
+    window.location.href += '?selected=true';  
+  });
   var GSystem_name = [];
   $("#search_text_rel").keyup(function(e){
 

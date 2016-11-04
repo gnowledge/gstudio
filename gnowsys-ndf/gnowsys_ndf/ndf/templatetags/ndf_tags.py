@@ -34,7 +34,6 @@ from django_mailbox.models import Mailbox
 # cache imports
 from django.core.cache import cache
 
-from mongokit import paginator
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
@@ -3927,21 +3926,3 @@ def get_pages(page_type):
 	page_type_gst = node_collection.one({'_type': "GSystemType", 'name': page_type})
 	page_nodes = node_collection.find({'member_of': page_gst._id, 'type_of': page_type_gst._id, 'group_set': help_page._id})
 	return page_nodes
-
-@get_execution_time
-@register.assignment_tag
-def get_search_results_curr(search_results):
-	GST_FILE = node_collection.one({'_type':'GSystemType', 'name': 'File'})
-	GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': 'Page'})
-	GST_THREAD = node_collection.one({'_type':'GSystemType', 'name': 'Twist'})
-	GST_REPLY = node_collection.one({'_type':'GSystemType', 'name': 'Reply'})
-	json_results = json.loads(search_results)
-	stemmed_values = json_results["stemmed"]["name"]
-	exact_values = json_results["exact"]["name"]
-	stemmed_results = []
-	for each in stemmed_values:
-		stemmed_results.append(ObjectId(each["_id"]))
-	for each in exact_values:
-		stemmed_results.append(ObjectId(each["_id"]))
-	getcurr = node_collection.find({'$and':[{'_id':{'$in' : stemmed_results }},{'member_of':{'$nin':[GST_THREAD._id,GST_REPLY._id]}}]})
-	return getcurr
