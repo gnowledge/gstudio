@@ -3182,8 +3182,8 @@ def get_filters_data(gst_name, group_name_or_id='home'):
 		else:
 			# print "================----"
 			at_set_key = 'attribute_set.' + k
-
-			all_at_list = node_collection.find({at_set_key: {'$exists': True, '$nin': ['', 'None', []], } }).distinct(at_set_key)
+			group_obj = node_collection.one({"name":group_id,"_type":"Group"})
+			all_at_list = node_collection.find({at_set_key: {'$exists': True, '$nin': ['', 'None', []], },"group_set":ObjectId(group_obj._id) }).distinct(at_set_key)
 
 			fvalue = all_at_list
 
