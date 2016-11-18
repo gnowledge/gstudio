@@ -32,7 +32,8 @@ from django.contrib.sites.models import Site
 
 from mongokit import paginator
 
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD, GSTUDIO_FILE_UPLOAD_FORM
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, GSTUDIO_FILE_UPLOAD_FORM
+# from gnowsys_ndf.settings import WETUBE_USERNAME, WETUBE_PASSWORD
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
@@ -488,7 +489,7 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
         result_cur = node_collection.find({'member_of': {'$nin':[ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
                                             '_type': {'$in': ['File', 'GSystem']},
                                             'group_set': {'$all': [ObjectId(group_id)]},
-                                            
+
                                             'if_file.mime_type': {'$ne': None},
                                             '$or': [
                                                 {'access_policy': u"PUBLIC"},
