@@ -2547,7 +2547,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
     ga_node = None
     info_message = ""
     old_object_value = None
-    attribute_type_node = Node.get_node_obj_from_id_or_obj(attribute_type_node, GAttribute)
+    attribute_type_node = Node.get_node_obj_from_id_or_obj(attribute_type_node, AttributeType)
 
     ga_node = triple_collection.one(
         {'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node._id})
