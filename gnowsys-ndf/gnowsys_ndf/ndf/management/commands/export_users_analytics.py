@@ -8,15 +8,21 @@ import csv
 from pymongo import ASCENDING
 
 ''' imports from installed packages '''
+from django.utils.text import slugify
 from django.core.management.base import BaseCommand, CommandError
 # from django.contrib.auth.models import User
 
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import Group
-from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH
+from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH, GSTUDIO_DATA_ROOT
 from gnowsys_ndf.ndf.views.gcourse import course_analytics
 # from gnowsys_ndf.ndf.views.methods import get_group_name_id
 # from gnowsys_ndf.ndf.views.analytics_methods import *
+
+try:
+    from gnowsys_ndf.server_settings import GSTUDIO_INSTITUTE_ID
+except Exception, e:
+    from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID
 
 if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
     os.makedirs(GSTUDIO_LOGS_DIR_PATH)
@@ -39,7 +45,28 @@ class Command(BaseCommand):
                 \nGroup/Course, matching argument entered "' + group_name_or_id + '" does not exists!')
 
         group_users = group_obj.author_set
-        print group_users
+        # print group_users
+
+        # CSV file name-convention: schoolcode-course-name-datetimestamp.csv
+        try:
+            group_name = slugify(group_obj['name'])
+        except Exception, e:
+            print e
+            group_name = 'i2c'
+
+        # dt: date time
+        # e.g: '21-November-2016-19h-08m-10s'
+        dt = "{:%d-%B-%Y-%Hh-%Mm-%Ss}".format(datetime.datetime.now())
+
+        file_name = GSTUDIO_INSTITUTE_ID + '-' + group_name + '-' + dt + '.csv'
+
+        GSTUDIO_EXPORTED_CSVS_DIRNAME = 'gstudio-exported-users-analytics-csvs'
+        GSTUDIO_EXPORTED_CSVS_DIR_PATH = os.path.join('/data/', GSTUDIO_EXPORTED_CSVS_DIRNAME)
+
+        if not os.path.exists(GSTUDIO_EXPORTED_CSVS_DIR_PATH):
+            os.makedirs(GSTUDIO_EXPORTED_CSVS_DIR_PATH)
+
+        file_name_path = os.path.join(GSTUDIO_EXPORTED_CSVS_DIR_PATH, file_name)
 
         for index, each_user in enumerate(group_users):
             try:
@@ -59,7 +86,7 @@ class Command(BaseCommand):
                 analytics_data.pop('module_progress_stmt')
                 # print analytics_data
 
-                with open('mycsvfile.csv', 'a') as f:  # Just use 'w' mode in 3.x
+                with open(file_name_path, 'a') as f:  # Just use 'w' mode in 3.x
                     w = csv.DictWriter(f, analytics_data.keys())
                     if index == 0:
                         w.writeheader()
