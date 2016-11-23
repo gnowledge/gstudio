@@ -2721,6 +2721,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
     # return HttpResponse(json.dumps(analytics_data))
 
+
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
