@@ -82,10 +82,8 @@ try:
 						print "\n Preparing to Hard Clone object. Please wait."
 						each_new_file = replicate_resource(None, each_source_file, destination_group_obj._id)
 					# after doing copy/move/object (update of group_set), save object:
-
 		else:
 			print "\n No files found in source group."
-
 	else:
 		print "\n Either source or destination group does not exist."
 
