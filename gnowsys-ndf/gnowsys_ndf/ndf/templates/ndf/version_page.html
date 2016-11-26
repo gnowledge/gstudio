@@ -6,6 +6,7 @@
 
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 {% block style %}
+
 .tagInsert
 {
 background:#b3ffb3;
@@ -28,7 +29,7 @@ background:#b3ffb3;
 
 {% block body_content %}
 
-  <div style="padding-top:0.8em">
+  <div style="padding-top:0.8em ">
     <h2>
 
       {% ifequal view "single" %}
@@ -43,7 +44,7 @@ background:#b3ffb3;
 
   <hr style="height:5px;background-color: #0B6580;" />
 
-  <div id="compare_versions_div" style="padding-left: 130px;">
+  <div id="compare_versions_div" style="padding-left: 130px; ">
   <form method="POST" action="">
     {% csrf_token %}
 
@@ -103,9 +104,11 @@ background:#b3ffb3;
   {% else %}
   {% comment %}
  <!-- <div class="row" style = "overflow: auto; min-height: auto;max-height: 75vh;">   --> {% endcomment %}
- <div class="medium-12 columns"> 
-    <div id="compare-view" style="padding-bottom: 20px; padding-left: 120px; width:500x;" >
+ <div class = "rows" style = "overflow:auto; min-width:100px;">
+ <div class="medium-12 columns"  > 
+    <div id="compare-view" style=" padding-bottom: 20px; padding-left: 120px; " >
     </div>
+ </div>
  </div>
  {% comment %}
  <!-- </div> -->
@@ -115,7 +118,10 @@ background:#b3ffb3;
 {% endblock %}
 
 {% block script %}
-toggleMainSidebar()
+toggleMainSidebar();
+
+
+
 drawtable()
 
 function drawtable()
