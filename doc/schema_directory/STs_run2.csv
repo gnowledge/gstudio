@@ -45,3 +45,6 @@ CourseSubSectionEvent,[],"[""factory_types""]","[""course_structure_minutes"", "
 CourseUnitEvent,[],"[""factory_types""]",[],[],[]
 QuizItemEvent,"[""QuizItem""]","[""factory_types""]","[""quizitem_show_correct_ans"",""quizitem_problem_weight"" ,""quizitem_max_attempts"" ]","[""clone_of""]",[]
 QuizItemPost,"[""Reply""]","[""factory_types""]","[""quizitempost_user_submitted_ans"", ""quizitempost_user_checked_ans""]",[],[]
+Jhapp,[],"[""factory_types""]",[],[],[]
+Jsmol,"[""Jhapp""]","[""factory_types""]",[],[],[]
+TurtleBlocks,"[""Jhapp""]","[""factory_types""]",[],[],[]
