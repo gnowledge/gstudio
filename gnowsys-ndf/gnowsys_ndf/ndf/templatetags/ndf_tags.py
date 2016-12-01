@@ -1474,8 +1474,7 @@ def get_edit_url(groupid):
 	node = node_collection.one({'_id': ObjectId(groupid) })
 	if node._type == 'GSystem':
 
-		type_name = node_collection.one({'_id': node.member_of[0]}).name
-
+		type_name = node_collection.one({'_id': ObjectId(node.member_of[0])}).name
 		if type_name == 'Quiz':
 			return 'quiz_edit'
 		elif type_name == 'Page':
@@ -1492,6 +1491,8 @@ def get_edit_url(groupid):
 			return 'edit_thread'
 		elif type_name == 'File':
 			return 'file_edit'
+		elif type_name == 'Jsmol':
+			return 'page_create_edit'
 
 
 	elif node._type == 'Group' or node._type == 'Author' :
