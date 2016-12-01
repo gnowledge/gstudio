@@ -14,10 +14,8 @@ except ImportError:  # old pymongo
 from django.core.urlresolvers import reverse
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
-ebook_gst = node_collection.one({'_type':'GSystemType', 'name': u"E-Book"})
-GST_FILE = node_collection.one({'_type':'GSystemType', 'name': u"File"})
-GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': u'Page'})
 
+GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
 @login_required
 @get_execution_time
 def jhapp(request, group_id):
@@ -25,8 +23,9 @@ def jhapp(request, group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
+  jhapp_res = node_collection.find({'member_of': {'$in': [GST_JSMOL._id]}})
 
-  return render_to_response("ndf/jhapp.html",RequestContext(request, {"groupid":group_id, "group_id":group_id}))
+  return render_to_response("ndf/jhapp.html",RequestContext(request, {"groupid":group_id, "group_id":group_id,"jhapp_res":jhapp_res}))
 
 @login_required
 @get_execution_time
@@ -72,7 +71,7 @@ def saveZapp(request,group_id):
  
   file_node.member_of = [ObjectId(jsmol_gst._id)]
   relurl_path = str("/" + un_zip_path[0] + "/" + un_zip_path[1] + "/" +un_zip_path[2] + "/" + file_name[0] + "/" + file_name[0] + ".htm" )
-  print "_______________________________",relurl_path
+  # print "_______________________________",relurl_path
   discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
   for each_gs_file in fileobj_list:
       #set interaction-settings
@@ -93,5 +92,6 @@ def saveZapp(request,group_id):
       return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
 
   file_node.if_file.original.relurl =  relurl_path
+  file_node.if_file.mime_type = u"text/html"
   file_node.save()
   return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}))
