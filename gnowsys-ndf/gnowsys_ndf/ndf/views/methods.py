@@ -5326,7 +5326,10 @@ def create_clone(user_id, node, group_id):
 def replicate_resource(request, node, group_id):
     try:
         create_thread_for_node_flag = True
-        user_id = request.user.id
+        if request:
+            user_id = request.user.id
+        else:
+            user_id = 1
         new_gsystem = create_clone(user_id, node, group_id)
         thread_created = False
 
@@ -5389,7 +5392,7 @@ def replicate_resource(request, node, group_id):
                         right_sub_new_node.save()
 
             if "QuizItemEvent" in new_gsystem.member_of_names_list:
-                if not thread_created:
+                if not thread_created and request:
                     thread_obj = create_thread_for_node(request,group_id, new_gsystem)
 
         # clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})
