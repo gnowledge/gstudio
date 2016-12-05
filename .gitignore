@@ -94,3 +94,8 @@ wikidata/
 *local_settings.py
 img/
 media/
+
+
+# dlkit
+dlkit
+dlkit_runtime
