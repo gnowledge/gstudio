@@ -427,8 +427,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_comment_lookup()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_comment_lookup_session() # Remove when implemented
-        # return sessions.CommentLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_comment_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CommentLookupSession(runtime=self._runtime)
 
     comment_lookup_session = property(fget=get_comment_lookup_session)
 
@@ -449,11 +451,13 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(commenting_managers.CommentingManager, self).get_comment_lookup_session_for_book(book_id) # Remove when implemented
+        if not self.supports_comment_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.CommentLookupSession(book_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.CommentLookupSession(book_id, self._runtime)
 
     def get_rating_lookup_session(self):
         """Gets the ``OsidSession`` associated with the rating lookup service.
@@ -467,8 +471,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_rating_lookup()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_rating_lookup_session() # Remove when implemented
-        # return sessions.RatingLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_rating_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RatingLookupSession(runtime=self._runtime)
 
     rating_lookup_session = property(fget=get_rating_lookup_session)
 
@@ -489,11 +495,13 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(commenting_managers.CommentingManager, self).get_rating_lookup_session_for_book(book_id) # Remove when implemented
+        if not self.supports_rating_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.RatingLookupSession(book_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.RatingLookupSession(book_id, self._runtime)
 
     def get_comment_query_session(self):
         """Gets the ``OsidSession`` associated with the comment query service.
@@ -507,8 +515,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_comment_query()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_comment_query_session() # Remove when implemented
-        # return sessions.CommentQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_comment_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CommentQuerySession(runtime=self._runtime)
 
     comment_query_session = property(fget=get_comment_query_session)
 
@@ -529,11 +539,13 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(commenting_managers.CommentingManager, self).get_comment_query_session_for_book(book_id) # Remove when implemented
+        if not self.supports_comment_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.CommentQuerySession(book_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.CommentQuerySession(book_id, self._runtime)
 
     def get_comment_search_session(self):
         """Gets the ``OsidSession`` associated with the comment search service.
@@ -547,8 +559,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_comment_search()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_comment_search_session() # Remove when implemented
-        # return sessions.CommentSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_comment_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CommentSearchSession(runtime=self._runtime)
 
     comment_search_session = property(fget=get_comment_search_session)
 
@@ -569,11 +583,13 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(commenting_managers.CommentingManager, self).get_comment_search_session_for_book(book_id) # Remove when implemented
+        if not self.supports_comment_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.CommentSearchSession(book_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.CommentSearchSession(book_id, self._runtime)
 
     def get_comment_admin_session(self):
         """Gets the ``OsidSession`` associated with the comment administration service.
@@ -587,8 +603,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_comment_admin()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_comment_admin_session() # Remove when implemented
-        # return sessions.CommentAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_comment_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CommentAdminSession(runtime=self._runtime)
 
     comment_admin_session = property(fget=get_comment_admin_session)
 
@@ -609,11 +627,13 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(commenting_managers.CommentingManager, self).get_comment_admin_session_for_book(book_id) # Remove when implemented
+        if not self.supports_comment_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.CommentAdminSession(book_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.CommentAdminSession(book_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_comment_notification_session(self, comment_receiver):
@@ -675,8 +695,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_comment_book()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_comment_book_session() # Remove when implemented
-        # return sessions.CommentBookSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_comment_book():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CommentBookSession(runtime=self._runtime)
 
     comment_book_session = property(fget=get_comment_book_session)
 
@@ -692,8 +714,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_comment_book_assignment()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_comment_book_assignment_session() # Remove when implemented
-        # return sessions.CommentBookAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_comment_book_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CommentBookAssignmentSession(runtime=self._runtime)
 
     comment_book_assignment_session = property(fget=get_comment_book_assignment_session)
 
@@ -726,8 +750,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_book_lookup()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_book_lookup_session() # Remove when implemented
-        # return sessions.BookLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_book_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BookLookupSession(runtime=self._runtime)
 
     book_lookup_session = property(fget=get_book_lookup_session)
 
@@ -742,8 +768,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_book_query()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_book_query_session() # Remove when implemented
-        # return sessions.BookQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_book_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BookQuerySession(runtime=self._runtime)
 
     book_query_session = property(fget=get_book_query_session)
 
@@ -758,8 +786,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_book_search()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_book_search_session() # Remove when implemented
-        # return sessions.BookSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_book_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BookSearchSession(runtime=self._runtime)
 
     book_search_session = property(fget=get_book_search_session)
 
@@ -774,8 +804,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_book_admin()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_book_admin_session() # Remove when implemented
-        # return sessions.BookAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_book_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BookAdminSession(runtime=self._runtime)
 
     book_admin_session = property(fget=get_book_admin_session)
 
@@ -812,8 +844,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_book_hierarchy()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_book_hierarchy_session() # Remove when implemented
-        # return sessions.BookHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_book_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BookHierarchySession(runtime=self._runtime)
 
     book_hierarchy_session = property(fget=get_book_hierarchy_session)
 
@@ -829,8 +863,10 @@ class CommentingManager(osid_managers.OsidManager, CommentingProfile, commenting
         ``supports_book_hierarchy_design()`` is ``true``.*
 
         """
-        super(commenting_managers.CommentingManager, self).get_book_hierarchy_design_session() # Remove when implemented
-        # return sessions.BookHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_book_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BookHierarchyDesignSession(runtime=self._runtime)
 
     book_hierarchy_design_session = property(fget=get_book_hierarchy_design_session)
 

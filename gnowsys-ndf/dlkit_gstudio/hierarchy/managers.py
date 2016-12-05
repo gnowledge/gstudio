@@ -251,8 +251,10 @@ class HierarchyManager(osid_managers.OsidManager, HierarchyProfile, hierarchy_ma
         ``supports_hierarchy_traversal()`` is ``true``.*
 
         """
-        super(hierarchy_managers.HierarchyManager, self).get_hierarchy_traversal_session() # Remove when implemented
-        # return sessions.HierarchyTraversalSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_hierarchy_traversal():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.HierarchyTraversalSession(runtime=self._runtime)
 
     hierarchy_traversal_session = property(fget=get_hierarchy_traversal_session)
 
@@ -273,11 +275,13 @@ class HierarchyManager(osid_managers.OsidManager, HierarchyProfile, hierarchy_ma
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(hierarchy_managers.HierarchyManager, self).get_hierarchy_traversal_session_for_hierarchy(hierarchy_id) # Remove when implemented
+        if not self.supports_hierarchy_traversal():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.HierarchyTraversalSession(hierarchy_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.HierarchyTraversalSession(hierarchy_id, self._runtime)
 
     def get_hierarchy_design_session(self):
         """Gets the ``OsidSession`` associated with the hierarchy design service.
@@ -291,8 +295,10 @@ class HierarchyManager(osid_managers.OsidManager, HierarchyProfile, hierarchy_ma
         ``supports_hierarchy_design()`` is ``true``.*
 
         """
-        super(hierarchy_managers.HierarchyManager, self).get_hierarchy_design_session() # Remove when implemented
-        # return sessions.HierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.HierarchyDesignSession(runtime=self._runtime)
 
     hierarchy_design_session = property(fget=get_hierarchy_design_session)
 
@@ -313,11 +319,13 @@ class HierarchyManager(osid_managers.OsidManager, HierarchyProfile, hierarchy_ma
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(hierarchy_managers.HierarchyManager, self).get_hierarchy_design_session_for_hierarchy(hierarchy_id) # Remove when implemented
+        if not self.supports_hierarchy_design():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.HierarchyDesignSession(hierarchy_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.HierarchyDesignSession(hierarchy_id, self._runtime)
 
     def get_hierarchy_sequencing_session(self):
         """Gets the ``OsidSession`` associated with the hierarchy sequencing service.
@@ -331,8 +339,10 @@ class HierarchyManager(osid_managers.OsidManager, HierarchyProfile, hierarchy_ma
         ``supports_hierarchy_sequencing()`` is ``true``.*
 
         """
-        super(hierarchy_managers.HierarchyManager, self).get_hierarchy_sequencing_session() # Remove when implemented
-        # return sessions.HierarchySequencingSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_hierarchy_sequencing():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.HierarchySequencingSession(runtime=self._runtime)
 
     hierarchy_sequencing_session = property(fget=get_hierarchy_sequencing_session)
 
@@ -353,11 +363,13 @@ class HierarchyManager(osid_managers.OsidManager, HierarchyProfile, hierarchy_ma
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(hierarchy_managers.HierarchyManager, self).get_hierarchy_sequencing_session_for_hierarchy(hierarchy_id) # Remove when implemented
+        if not self.supports_hierarchy_sequencing():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.HierarchySequencingSession(hierarchy_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.HierarchySequencingSession(hierarchy_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_hierarchy_structure_notification_session(self, hierarchy_structure_receiver):
@@ -423,8 +435,10 @@ class HierarchyManager(osid_managers.OsidManager, HierarchyProfile, hierarchy_ma
         ``supports_hierarchy_lookup()`` is ``true``.*
 
         """
-        super(hierarchy_managers.HierarchyManager, self).get_hierarchy_lookup_session() # Remove when implemented
-        # return sessions.HierarchyLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_hierarchy_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.HierarchyLookupSession(runtime=self._runtime)
 
     hierarchy_lookup_session = property(fget=get_hierarchy_lookup_session)
 
@@ -440,8 +454,10 @@ class HierarchyManager(osid_managers.OsidManager, HierarchyProfile, hierarchy_ma
         ``supports_hierarchy_query()`` is ``true``.*
 
         """
-        super(hierarchy_managers.HierarchyManager, self).get_hierarchy_query_session() # Remove when implemented
-        # return sessions.HierarchyQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_hierarchy_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.HierarchyQuerySession(runtime=self._runtime)
 
     hierarchy_query_session = property(fget=get_hierarchy_query_session)
 
@@ -457,8 +473,10 @@ class HierarchyManager(osid_managers.OsidManager, HierarchyProfile, hierarchy_ma
         ``supports_hierarchy_search()`` is ``true``.*
 
         """
-        super(hierarchy_managers.HierarchyManager, self).get_hierarchy_search_session() # Remove when implemented
-        # return sessions.HierarchySearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_hierarchy_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.HierarchySearchSession(runtime=self._runtime)
 
     hierarchy_search_session = property(fget=get_hierarchy_search_session)
 
@@ -474,8 +492,10 @@ class HierarchyManager(osid_managers.OsidManager, HierarchyProfile, hierarchy_ma
         ``supports_hierarchy_admin()`` is ``true``.*
 
         """
-        super(hierarchy_managers.HierarchyManager, self).get_hierarchy_admin_session() # Remove when implemented
-        # return sessions.HierarchyAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_hierarchy_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.HierarchyAdminSession(runtime=self._runtime)
 
     hierarchy_admin_session = property(fget=get_hierarchy_admin_session)
 

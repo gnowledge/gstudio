@@ -140,8 +140,10 @@ class ProxyManager(osid_managers.OsidManager, ProxyProfile, proxy_managers.Proxy
         ``supports_proxy()`` is ``true``.*
 
         """
-        super(proxy_managers.ProxyManager, self).get_proxy_session() # Remove when implemented
-        # return sessions.ProxySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_proxy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ProxySession(runtime=self._runtime)
 
     proxy_session = property(fget=get_proxy_session)
 

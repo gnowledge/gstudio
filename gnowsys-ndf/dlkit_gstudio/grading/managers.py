@@ -846,8 +846,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_grade_system_lookup()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_system_lookup_session() # Remove when implemented
-        # return sessions.GradeSystemLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_grade_system_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradeSystemLookupSession(runtime=self._runtime)
 
     grade_system_lookup_session = property(fget=get_grade_system_lookup_session)
 
@@ -868,11 +870,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_system_lookup_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_grade_system_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradeSystemLookupSession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradeSystemLookupSession(gradebook_id, self._runtime)
 
     def get_grade_system_query_session(self):
         """Gets the ``OsidSession`` associated with the grade system query service.
@@ -886,8 +890,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_grade_system_query()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_system_query_session() # Remove when implemented
-        # return sessions.GradeSystemQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_grade_system_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradeSystemQuerySession(runtime=self._runtime)
 
     grade_system_query_session = property(fget=get_grade_system_query_session)
 
@@ -908,11 +914,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_system_query_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_grade_system_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradeSystemQuerySession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradeSystemQuerySession(gradebook_id, self._runtime)
 
     def get_grade_system_search_session(self):
         """Gets the ``OsidSession`` associated with the grade system search service.
@@ -926,8 +934,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_grade_system_search()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_system_search_session() # Remove when implemented
-        # return sessions.GradeSystemSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_grade_system_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradeSystemSearchSession(runtime=self._runtime)
 
     grade_system_search_session = property(fget=get_grade_system_search_session)
 
@@ -948,11 +958,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_system_search_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_grade_system_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradeSystemSearchSession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradeSystemSearchSession(gradebook_id, self._runtime)
 
     def get_grade_system_admin_session(self):
         """Gets the ``OsidSession`` associated with the grade system administration service.
@@ -966,8 +978,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_grade_system_admin()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_system_admin_session() # Remove when implemented
-        # return sessions.GradeSystemAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_grade_system_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradeSystemAdminSession(runtime=self._runtime)
 
     grade_system_admin_session = property(fget=get_grade_system_admin_session)
 
@@ -988,11 +1002,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_system_admin_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_grade_system_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradeSystemAdminSession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradeSystemAdminSession(gradebook_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_grade_system_notification_session(self, grade_system_receiver):
@@ -1057,8 +1073,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_grade_system_gradebook()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_system_gradebook_session() # Remove when implemented
-        # return sessions.GradeSystemGradebookSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_grade_system_gradebook():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradeSystemGradebookSession(runtime=self._runtime)
 
     grade_system_gradebook_session = property(fget=get_grade_system_gradebook_session)
 
@@ -1075,8 +1093,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_grade_system_gradebook_assignment()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_system_gradebook_assignment_session() # Remove when implemented
-        # return sessions.GradeSystemGradebookSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_grade_system_gradebook_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradeSystemGradebookSession(runtime=self._runtime)
 
     grade_system_gradebook_assignment_session = property(fget=get_grade_system_gradebook_assignment_session)
 
@@ -1110,8 +1130,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_grade_entry_lookup()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_entry_lookup_session() # Remove when implemented
-        # return sessions.GradeEntryLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_grade_entry_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradeEntryLookupSession(runtime=self._runtime)
 
     grade_entry_lookup_session = property(fget=get_grade_entry_lookup_session)
 
@@ -1132,11 +1154,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_entry_lookup_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_grade_entry_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradeEntryLookupSession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradeEntryLookupSession(gradebook_id, self._runtime)
 
     def get_grade_entry_query_session(self):
         """Gets the ``OsidSession`` associated with the grade entry query service.
@@ -1150,8 +1174,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_grade_entry_query()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_entry_query_session() # Remove when implemented
-        # return sessions.GradeEntryQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_grade_entry_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradeEntryQuerySession(runtime=self._runtime)
 
     grade_entry_query_session = property(fget=get_grade_entry_query_session)
 
@@ -1172,11 +1198,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_entry_query_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_grade_entry_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradeEntryQuerySession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradeEntryQuerySession(gradebook_id, self._runtime)
 
     def get_grade_entry_search_session(self):
         """Gets the ``OsidSession`` associated with the grade entry search service.
@@ -1190,8 +1218,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_grade_entry_search()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_entry_search_session() # Remove when implemented
-        # return sessions.GradeEntrySearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_grade_entry_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradeEntrySearchSession(runtime=self._runtime)
 
     grade_entry_search_session = property(fget=get_grade_entry_search_session)
 
@@ -1212,11 +1242,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_entry_search_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_grade_entry_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradeEntrySearchSession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradeEntrySearchSession(gradebook_id, self._runtime)
 
     def get_grade_entry_admin_session(self):
         """Gets the ``OsidSession`` associated with the grade entry administration service.
@@ -1230,8 +1262,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_grade_entry_admin()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_entry_admin_session() # Remove when implemented
-        # return sessions.GradeEntryAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_grade_entry_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradeEntryAdminSession(runtime=self._runtime)
 
     grade_entry_admin_session = property(fget=get_grade_entry_admin_session)
 
@@ -1252,11 +1286,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_grade_entry_admin_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_grade_entry_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradeEntryAdminSession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradeEntryAdminSession(gradebook_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_grade_entry_notification_session(self, receiver):
@@ -1319,8 +1355,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_column_lookup()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_column_lookup_session() # Remove when implemented
-        # return sessions.GradebookColumnLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_column_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookColumnLookupSession(runtime=self._runtime)
 
     gradebook_column_lookup_session = property(fget=get_gradebook_column_lookup_session)
 
@@ -1341,11 +1379,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_column_lookup_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_gradebook_column_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradebookColumnLookupSession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradebookColumnLookupSession(gradebook_id, self._runtime)
 
     def get_gradebook_column_query_session(self):
         """Gets the ``OsidSession`` associated with the gradebook column query service.
@@ -1359,8 +1399,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_column_query()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_column_query_session() # Remove when implemented
-        # return sessions.GradebookColumnQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_column_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookColumnQuerySession(runtime=self._runtime)
 
     gradebook_column_query_session = property(fget=get_gradebook_column_query_session)
 
@@ -1381,11 +1423,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_column_query_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_gradebook_column_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradebookColumnQuerySession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradebookColumnQuerySession(gradebook_id, self._runtime)
 
     def get_gradebook_column_search_session(self):
         """Gets the ``OsidSession`` associated with the gradebook column search service.
@@ -1399,8 +1443,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_column_search()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_column_search_session() # Remove when implemented
-        # return sessions.GradebookColumnSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_column_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookColumnSearchSession(runtime=self._runtime)
 
     gradebook_column_search_session = property(fget=get_gradebook_column_search_session)
 
@@ -1421,11 +1467,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_column_search_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_gradebook_column_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradebookColumnSearchSession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradebookColumnSearchSession(gradebook_id, self._runtime)
 
     def get_gradebook_column_admin_session(self):
         """Gets the ``OsidSession`` associated with the gradebook column administration service.
@@ -1439,8 +1487,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_column_admin()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_column_admin_session() # Remove when implemented
-        # return sessions.GradebookColumnAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_column_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookColumnAdminSession(runtime=self._runtime)
 
     gradebook_column_admin_session = property(fget=get_gradebook_column_admin_session)
 
@@ -1461,11 +1511,13 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_column_admin_session_for_gradebook(gradebook_id) # Remove when implemented
+        if not self.supports_gradebook_column_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GradebookColumnAdminSession(gradebook_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GradebookColumnAdminSession(gradebook_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_gradebook_column_notification_session(self, gradebook_column_receiver):
@@ -1532,8 +1584,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_column_gradebook()`` is ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_column_gradebook_session() # Remove when implemented
-        # return sessions.GradebookColumnGradebookSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_column_gradebook():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookColumnGradebookSession(runtime=self._runtime)
 
     gradebook_column_gradebook_session = property(fget=get_gradebook_column_gradebook_session)
 
@@ -1551,8 +1605,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``true``.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_column_gradebook_assignment_session() # Remove when implemented
-        # return sessions.GradebookColumnGradebookAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_column_gradebook_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookColumnGradebookAssignmentSession(runtime=self._runtime)
 
     gradebook_column_gradebook_assignment_session = property(fget=get_gradebook_column_gradebook_assignment_session)
 
@@ -1586,8 +1642,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_lookup()`` is true.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_lookup_session() # Remove when implemented
-        # return sessions.GradebookLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookLookupSession(runtime=self._runtime)
 
     gradebook_lookup_session = property(fget=get_gradebook_lookup_session)
 
@@ -1602,8 +1660,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_query()`` is true.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_query_session() # Remove when implemented
-        # return sessions.GradebookQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookQuerySession(runtime=self._runtime)
 
     gradebook_query_session = property(fget=get_gradebook_query_session)
 
@@ -1618,8 +1678,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_search()`` is true.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_search_session() # Remove when implemented
-        # return sessions.GradebookSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookSearchSession(runtime=self._runtime)
 
     gradebook_search_session = property(fget=get_gradebook_search_session)
 
@@ -1634,8 +1696,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_admin()`` is true.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_admin_session() # Remove when implemented
-        # return sessions.GradebookAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookAdminSession(runtime=self._runtime)
 
     gradebook_admin_session = property(fget=get_gradebook_admin_session)
 
@@ -1672,8 +1736,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_hierarchy()`` is true.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_hierarchy_session() # Remove when implemented
-        # return sessions.GradebookHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookHierarchySession(runtime=self._runtime)
 
     gradebook_hierarchy_session = property(fget=get_gradebook_hierarchy_session)
 
@@ -1689,8 +1755,10 @@ class GradingManager(osid_managers.OsidManager, GradingProfile, grading_managers
         ``supports_gradebook_hierarchy_design()`` is true.*
 
         """
-        super(grading_managers.GradingManager, self).get_gradebook_hierarchy_design_session() # Remove when implemented
-        # return sessions.GradebookHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_gradebook_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GradebookHierarchyDesignSession(runtime=self._runtime)
 
     gradebook_hierarchy_design_session = property(fget=get_gradebook_hierarchy_design_session)
 

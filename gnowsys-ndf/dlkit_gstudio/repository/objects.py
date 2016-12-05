@@ -17,7 +17,7 @@ import importlib
 
 from . import default_mdata
 from .. import utilities
-from dlkit.abstract_osid.repository import objects as abc_repository_objects
+from ...abstract_osid.repository import objects as abc_repository_objects
 from ..osid import markers as osid_markers
 from ..osid import objects as osid_objects
 from ..osid.metadata import Metadata
@@ -27,8 +27,7 @@ from ..utilities import update_display_text_defaults
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
 
-# editing for accesing gstudio internals (data):
-from gnowsys_ndf.ndf.models import Group
+
 
 
 class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.Aggregateable, osid_markers.Sourceable):
@@ -107,7 +106,7 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
     _namespace = 'repository.Asset'
 
     def __init__(self, **kwargs):
-        # osid_objects.OsidObject.__init__(self, object_name='ASSET', **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='ASSET', **kwargs)
         self._catalog_name = 'repository'
 
 
@@ -121,8 +120,7 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        # raise errors.Unimplemented()
-        return self.title
+        raise errors.Unimplemented()
 
     title = property(fget=get_title)
 
@@ -471,7 +469,6 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
     _namespace = 'repository.Asset'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObjectForm.__init__(self, object_name='ASSET', **kwargs)
         osid_objects.OsidObjectForm.__init__(self, object_name='ASSET', **kwargs)
         self._mdata = default_mdata.get_asset_mdata()
         self._init_metadata(**kwargs)
@@ -1142,8 +1139,7 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
     _namespace = 'repository.AssetContent'
 
     def __init__(self, **kwargs):
-        # osid_objects.OsidObject.__init__(self, object_name='ASSET_CONTENT', **kwargs)
-        osid_objects.OsidObject.__init__(self, **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='ASSET_CONTENT', **kwargs)
         self._catalog_name = 'repository'
 
 
@@ -1512,8 +1508,7 @@ class Composition(abc_repository_objects.Composition, osid_objects.OsidObject, o
     _namespace = 'repository.Composition'
 
     def __init__(self, **kwargs):
-        # osid_objects.OsidObject.__init__(self, object_name='COMPOSITION', **kwargs)
-        osid_objects.OsidObject.__init__(self, **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='COMPOSITION', **kwargs)
         self._catalog_name = 'repository'
 
 
@@ -1682,8 +1677,7 @@ class Repository(abc_repository_objects.Repository, osid_objects.OsidCatalog):
 
     def __init__(self, **kwargs):
         # self._record_type_data_sets = get_registry('REPOSITORY_RECORD_TYPES', runtime)
-        # osid_objects.OsidCatalog.__init__(self, object_name='REPOSITORY', **kwargs)
-        osid_objects.OsidCatalog.__init__(self, **kwargs)
+        osid_objects.OsidCatalog.__init__(self, object_name='REPOSITORY', **kwargs)
 
     @utilities.arguments_not_none
     def get_repository_record(self, repository_record_type):

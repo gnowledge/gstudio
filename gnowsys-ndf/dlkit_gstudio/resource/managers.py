@@ -684,8 +684,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_lookup()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_lookup_session() # Remove when implemented
-        # return sessions.ResourceLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceLookupSession(runtime=self._runtime)
 
     resource_lookup_session = property(fget=get_resource_lookup_session)
 
@@ -706,11 +708,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_lookup_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_resource_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ResourceLookupSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ResourceLookupSession(bin_id, self._runtime)
 
     def get_resource_query_session(self):
         """Gets a resource query session.
@@ -724,8 +728,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_query()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_query_session() # Remove when implemented
-        # return sessions.ResourceQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceQuerySession(runtime=self._runtime)
 
     resource_query_session = property(fget=get_resource_query_session)
 
@@ -746,11 +752,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_query_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_resource_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ResourceQuerySession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ResourceQuerySession(bin_id, self._runtime)
 
     def get_resource_search_session(self):
         """Gets a resource search session.
@@ -764,8 +772,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_search()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_search_session() # Remove when implemented
-        # return sessions.ResourceSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceSearchSession(runtime=self._runtime)
 
     resource_search_session = property(fget=get_resource_search_session)
 
@@ -786,11 +796,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_search_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_resource_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ResourceSearchSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ResourceSearchSession(bin_id, self._runtime)
 
     def get_resource_admin_session(self):
         """Gets a resource administration session for creating, updating and deleting resources.
@@ -804,8 +816,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_admin()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_admin_session() # Remove when implemented
-        # return sessions.ResourceAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceAdminSession(runtime=self._runtime)
 
     resource_admin_session = property(fget=get_resource_admin_session)
 
@@ -826,11 +840,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_admin_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_resource_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ResourceAdminSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ResourceAdminSession(bin_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_resource_notification_session(self, resource_receiver):
@@ -892,8 +908,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_bin()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_bin_session() # Remove when implemented
-        # return sessions.ResourceBinSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_bin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceBinSession(runtime=self._runtime)
 
     resource_bin_session = property(fget=get_resource_bin_session)
 
@@ -909,8 +927,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_bin_assignment()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_bin_assignment_session() # Remove when implemented
-        # return sessions.ResourceBinAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_bin_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceBinAssignmentSession(runtime=self._runtime)
 
     resource_bin_assignment_session = property(fget=get_resource_bin_assignment_session)
 
@@ -943,8 +963,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``support_membership()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_membership_session() # Remove when implemented
-        # return sessions.MembershipSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_membership():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.MembershipSession(runtime=self._runtime)
 
     membership_session = property(fget=get_membership_session)
 
@@ -965,11 +987,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         are ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_membership_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_membership():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.MembershipSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.MembershipSession(bin_id, self._runtime)
 
     def get_group_session(self):
         """Gets the session for retrieving gropup memberships.
@@ -981,8 +1005,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_group()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_group_session() # Remove when implemented
-        # return sessions.GroupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_group():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GroupSession(runtime=self._runtime)
 
     group_session = property(fget=get_group_session)
 
@@ -1002,11 +1028,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_group_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_group():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GroupSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GroupSession(bin_id, self._runtime)
 
     def get_group_assignment_session(self):
         """Gets the session for assigning resources to groups.
@@ -1020,8 +1048,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_group_assignment()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_group_assignment_session() # Remove when implemented
-        # return sessions.GroupAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_group_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GroupAssignmentSession(runtime=self._runtime)
 
     group_assignment_session = property(fget=get_group_assignment_session)
 
@@ -1042,11 +1072,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_group_assignment_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_group_assignment():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GroupAssignmentSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GroupAssignmentSession(bin_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_group_notification_session(self, group_rceeiver):
@@ -1109,8 +1141,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_group_hierarchy()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_group_hierarchy_session() # Remove when implemented
-        # return sessions.GroupHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_group_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.GroupHierarchySession(runtime=self._runtime)
 
     group_hierarchy_session = property(fget=get_group_hierarchy_session)
 
@@ -1131,11 +1165,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_group_hierarchy_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_group_hierarchy():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.GroupHierarchySession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.GroupHierarchySession(bin_id, self._runtime)
 
     def get_resource_agent_session(self):
         """Gets the session for retrieving resource agent mappings.
@@ -1149,8 +1185,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_agent()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_agent_session() # Remove when implemented
-        # return sessions.ResourceAgentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_agent():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceAgentSession(runtime=self._runtime)
 
     resource_agent_session = property(fget=get_resource_agent_session)
 
@@ -1171,11 +1209,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_agent_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_resource_agent():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ResourceAgentSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ResourceAgentSession(bin_id, self._runtime)
 
     def get_resource_agent_assignment_session(self):
         """Gets the session for assigning agents to resources.
@@ -1189,8 +1229,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_agent_assignment()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_agent_assignment_session() # Remove when implemented
-        # return sessions.ResourceAgentAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_agent_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceAgentAssignmentSession(runtime=self._runtime)
 
     resource_agent_assignment_session = property(fget=get_resource_agent_assignment_session)
 
@@ -1211,11 +1253,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_agent_assignment_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_resource_agent_assignment():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ResourceAgentAssignmentSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ResourceAgentAssignmentSession(bin_id, self._runtime)
 
     def get_resource_relationship_lookup_session(self):
         """Gets the ``OsidSession`` associated with the resource relationship lookup service.
@@ -1229,8 +1273,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_relationship_lookup()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_relationship_lookup_session() # Remove when implemented
-        # return sessions.ResourceRelationshipLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_relationship_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceRelationshipLookupSession(runtime=self._runtime)
 
     resource_relationship_lookup_session = property(fget=get_resource_relationship_lookup_session)
 
@@ -1252,11 +1298,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_relationship_lookup_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_resource_relationship_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ResourceRelationshipLookupSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ResourceRelationshipLookupSession(bin_id, self._runtime)
 
     def get_resource_relationship_query_session(self):
         """Gets the ``OsidSession`` associated with the resource relationship query service.
@@ -1270,8 +1318,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_relationship_query()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_relationship_query_session() # Remove when implemented
-        # return sessions.ResourceRelationshipQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_relationship_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceRelationshipQuerySession(runtime=self._runtime)
 
     resource_relationship_query_session = property(fget=get_resource_relationship_query_session)
 
@@ -1293,11 +1343,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_relationship_query_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_resource_relationship_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ResourceRelationshipQuerySession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ResourceRelationshipQuerySession(bin_id, self._runtime)
 
     def get_resource_relationship_search_session(self):
         """Gets the ``OsidSession`` associated with the resource relationship search service.
@@ -1311,8 +1363,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_relationship_search()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_relationship_search_session() # Remove when implemented
-        # return sessions.ResourceRelationshipSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_relationship_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceRelationshipSearchSession(runtime=self._runtime)
 
     resource_relationship_search_session = property(fget=get_resource_relationship_search_session)
 
@@ -1334,11 +1388,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_relationship_search_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_resource_relationship_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ResourceRelationshipSearchSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ResourceRelationshipSearchSession(bin_id, self._runtime)
 
     def get_resource_relationship_admin_session(self):
         """Gets the ``OsidSession`` associated with the resource relationship administration service.
@@ -1352,8 +1408,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_relationship_admin()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_relationship_admin_session() # Remove when implemented
-        # return sessions.ResourceRelationshipAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_relationship_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceRelationshipAdminSession(runtime=self._runtime)
 
     resource_relationship_admin_session = property(fget=get_resource_relationship_admin_session)
 
@@ -1375,11 +1433,13 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_relationship_admin_session_for_bin(bin_id) # Remove when implemented
+        if not self.supports_resource_relationship_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ResourceRelationshipAdminSession(bin_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ResourceRelationshipAdminSession(bin_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_resource_relationship_notification_session(self, resource_relationship_receiver):
@@ -1447,8 +1507,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_resource_relationship_bin()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_relationship_bin_session() # Remove when implemented
-        # return sessions.ResourceRelationshipBinSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_relationship_bin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceRelationshipBinSession(runtime=self._runtime)
 
     resource_relationship_bin_session = property(fget=get_resource_relationship_bin_session)
 
@@ -1466,8 +1528,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_resource_relationship_bin_assignment_session() # Remove when implemented
-        # return sessions.ResourceRelationshipBinAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_resource_relationship_bin_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ResourceRelationshipBinAssignmentSession(runtime=self._runtime)
 
     resource_relationship_bin_assignment_session = property(fget=get_resource_relationship_bin_assignment_session)
 
@@ -1501,8 +1565,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_bin_lookup()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_bin_lookup_session() # Remove when implemented
-        # return sessions.BinLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bin_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BinLookupSession(runtime=self._runtime)
 
     bin_lookup_session = property(fget=get_bin_lookup_session)
 
@@ -1516,8 +1582,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_bin_query()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_bin_query_session() # Remove when implemented
-        # return sessions.BinQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bin_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BinQuerySession(runtime=self._runtime)
 
     bin_query_session = property(fget=get_bin_query_session)
 
@@ -1532,8 +1600,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_bin_search()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_bin_search_session() # Remove when implemented
-        # return sessions.BinSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bin_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BinSearchSession(runtime=self._runtime)
 
     bin_search_session = property(fget=get_bin_search_session)
 
@@ -1547,8 +1617,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_bin_admin()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_bin_admin_session() # Remove when implemented
-        # return sessions.BinAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bin_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BinAdminSession(runtime=self._runtime)
 
     bin_admin_session = property(fget=get_bin_admin_session)
 
@@ -1585,8 +1657,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_bin_hierarchy()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_bin_hierarchy_session() # Remove when implemented
-        # return sessions.BinHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bin_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BinHierarchySession(runtime=self._runtime)
 
     bin_hierarchy_session = property(fget=get_bin_hierarchy_session)
 
@@ -1602,8 +1676,10 @@ class ResourceManager(osid_managers.OsidManager, ResourceProfile, resource_manag
         ``supports_bin_hierarchy_design()`` is ``true``.*
 
         """
-        super(resource_managers.ResourceManager, self).get_bin_hierarchy_design_session() # Remove when implemented
-        # return sessions.BinHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bin_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BinHierarchyDesignSession(runtime=self._runtime)
 
     bin_hierarchy_design_session = property(fget=get_bin_hierarchy_design_session)
 

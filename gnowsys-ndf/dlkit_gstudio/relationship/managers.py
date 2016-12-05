@@ -427,8 +427,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_relationship_lookup()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_relationship_lookup_session() # Remove when implemented
-        # return sessions.RelationshipLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_relationship_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RelationshipLookupSession(runtime=self._runtime)
 
     relationship_lookup_session = property(fget=get_relationship_lookup_session)
 
@@ -449,11 +451,13 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_relationship_lookup_session_for_family(family_id) # Remove when implemented
+        if not self.supports_relationship_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.RelationshipLookupSession(family_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.RelationshipLookupSession(family_id, self._runtime)
 
     def get_relationship_query_session(self):
         """Gets the ``OsidSession`` associated with the relationship query service.
@@ -467,8 +471,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_relationship_query()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_relationship_query_session() # Remove when implemented
-        # return sessions.RelationshipQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_relationship_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RelationshipQuerySession(runtime=self._runtime)
 
     relationship_query_session = property(fget=get_relationship_query_session)
 
@@ -489,11 +495,13 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_relationship_query_session_for_family(family_id) # Remove when implemented
+        if not self.supports_relationship_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.RelationshipQuerySession(family_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.RelationshipQuerySession(family_id, self._runtime)
 
     def get_relationship_search_session(self):
         """Gets the ``OsidSession`` associated with the relationship search service.
@@ -507,8 +515,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_relationship_search()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_relationship_search_session() # Remove when implemented
-        # return sessions.RelationshipSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_relationship_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RelationshipSearchSession(runtime=self._runtime)
 
     relationship_search_session = property(fget=get_relationship_search_session)
 
@@ -529,11 +539,13 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_relationship_search_session_for_family(family_id) # Remove when implemented
+        if not self.supports_relationship_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.RelationshipSearchSession(family_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.RelationshipSearchSession(family_id, self._runtime)
 
     def get_relationship_admin_session(self):
         """Gets the ``OsidSession`` associated with the relationship administration service.
@@ -547,8 +559,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_relationship_admin()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_relationship_admin_session() # Remove when implemented
-        # return sessions.RelationshipAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_relationship_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RelationshipAdminSession(runtime=self._runtime)
 
     relationship_admin_session = property(fget=get_relationship_admin_session)
 
@@ -569,11 +583,13 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_relationship_admin_session_for_family(family_id) # Remove when implemented
+        if not self.supports_relationship_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.RelationshipAdminSession(family_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.RelationshipAdminSession(family_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_relationship_notification_session(self, relationship_receiver):
@@ -636,8 +652,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_relationship_family()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_relationship_family_session() # Remove when implemented
-        # return sessions.RelationshipFamilySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_relationship_family():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RelationshipFamilySession(runtime=self._runtime)
 
     relationship_family_session = property(fget=get_relationship_family_session)
 
@@ -654,8 +672,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_relationship_family_assignment()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_relationship_family_assignment_session() # Remove when implemented
-        # return sessions.RelationshipFamilyAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_relationship_family_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RelationshipFamilyAssignmentSession(runtime=self._runtime)
 
     relationship_family_assignment_session = property(fget=get_relationship_family_assignment_session)
 
@@ -689,8 +709,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_family_lookup()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_family_lookup_session() # Remove when implemented
-        # return sessions.FamilyLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_family_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FamilyLookupSession(runtime=self._runtime)
 
     family_lookup_session = property(fget=get_family_lookup_session)
 
@@ -705,8 +727,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_family_query()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_family_query_session() # Remove when implemented
-        # return sessions.FamilyQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_family_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FamilyQuerySession(runtime=self._runtime)
 
     family_query_session = property(fget=get_family_query_session)
 
@@ -722,8 +746,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_family_search()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_family_search_session() # Remove when implemented
-        # return sessions.FamilySearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_family_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FamilySearchSession(runtime=self._runtime)
 
     family_search_session = property(fget=get_family_search_session)
 
@@ -738,8 +764,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_family_admin()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_family_admin_session() # Remove when implemented
-        # return sessions.FamilyAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_family_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FamilyAdminSession(runtime=self._runtime)
 
     family_admin_session = property(fget=get_family_admin_session)
 
@@ -776,8 +804,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_family_hierarchy()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_family_hierarchy_session() # Remove when implemented
-        # return sessions.FamilyHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_family_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FamilyHierarchySession(runtime=self._runtime)
 
     family_hierarchy_session = property(fget=get_family_hierarchy_session)
 
@@ -793,8 +823,10 @@ class RelationshipManager(osid_managers.OsidManager, RelationshipProfile, relati
         ``supports_family_hierarchy_design()`` is ``true``.*
 
         """
-        super(relationship_managers.RelationshipManager, self).get_family_hierarchy_design_session() # Remove when implemented
-        # return sessions.FamilyHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_family_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FamilyHierarchyDesignSession(runtime=self._runtime)
 
     family_hierarchy_design_session = property(fget=get_family_hierarchy_design_session)
 

@@ -17,7 +17,7 @@ import importlib
 
 from . import default_mdata
 from .. import utilities
-from dlkit.abstract_osid.learning import objects as abc_learning_objects
+from ...abstract_osid.learning import objects as abc_learning_objects
 from ..osid import markers as osid_markers
 from ..osid import objects as osid_objects
 from ..osid.metadata import Metadata
@@ -36,8 +36,7 @@ class Objective(abc_learning_objects.Objective, osid_objects.OsidObject, osid_ma
     _namespace = 'learning.Objective'
 
     def __init__(self, **kwargs):
-        # osid_objects.OsidObject.__init__(self, object_name='OBJECTIVE', **kwargs)
-        osid_objects.OsidObject.__init__(self, **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='OBJECTIVE', **kwargs)
         self._catalog_name = 'objective_bank'
 
 
@@ -510,8 +509,7 @@ class Activity(abc_learning_objects.Activity, osid_objects.OsidObject, osid_mark
     _namespace = 'learning.Activity'
 
     def __init__(self, **kwargs):
-        # osid_objects.OsidObject.__init__(self, object_name='ACTIVITY', **kwargs)
-        osid_objects.OsidObject.__init__(self, **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='ACTIVITY', **kwargs)
         self._catalog_name = 'objective_bank'
 
 
@@ -894,8 +892,7 @@ class Proficiency(abc_learning_objects.Proficiency, osid_objects.OsidRelationshi
     _namespace = 'learning.Proficiency'
 
     def __init__(self, **kwargs):
-        # osid_objects.OsidObject.__init__(self, object_name='PROFICIENCY', **kwargs)
-        osid_objects.OsidObject.__init__(self, **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='PROFICIENCY', **kwargs)
         self._catalog_name = 'objective_bank'
 
 
@@ -1224,8 +1221,7 @@ class ObjectiveBank(abc_learning_objects.ObjectiveBank, osid_objects.OsidCatalog
 
     def __init__(self, **kwargs):
         # self._record_type_data_sets = get_registry('OBJECTIVE_BANK_RECORD_TYPES', runtime)
-        # osid_objects.OsidCatalog.__init__(self, object_name='OBJECTIVE_BANK', **kwargs)
-        osid_objects.OsidCatalog.__init__(self, **kwargs)
+        osid_objects.OsidCatalog.__init__(self, object_name='OBJECTIVE_BANK', **kwargs)
 
     @utilities.arguments_not_none
     def get_objective_bank_record(self, objective_bank_record_type):

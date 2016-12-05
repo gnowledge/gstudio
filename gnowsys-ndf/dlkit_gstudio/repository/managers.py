@@ -784,8 +784,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_lookup()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_lookup_session() # Remove when implemented
-        # return sessions.AssetLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetLookupSession(runtime=self._runtime)
 
     asset_lookup_session = property(fget=get_asset_lookup_session)
 
@@ -806,11 +808,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_lookup_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_asset_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssetLookupSession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssetLookupSession(repository_id, self._runtime)
 
     def get_asset_query_session(self):
         """Gets an asset query session.
@@ -823,8 +827,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_query()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_query_session() # Remove when implemented
-        # return sessions.AssetQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetQuerySession(runtime=self._runtime)
 
     asset_query_session = property(fget=get_asset_query_session)
 
@@ -845,11 +851,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_query_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_asset_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssetQuerySession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssetQuerySession(repository_id, self._runtime)
 
     def get_asset_search_session(self):
         """Gets an asset search session.
@@ -862,8 +870,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_search()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_search_session() # Remove when implemented
-        # return sessions.AssetSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetSearchSession(runtime=self._runtime)
 
     asset_search_session = property(fget=get_asset_search_session)
 
@@ -884,11 +894,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_search_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_asset_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssetSearchSession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssetSearchSession(repository_id, self._runtime)
 
     def get_asset_admin_session(self):
         """Gets an asset administration session for creating, updating and deleting assets.
@@ -901,8 +913,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_admin()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_admin_session() # Remove when implemented
-        # return sessions.AssetAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetAdminSession(runtime=self._runtime)
 
     asset_admin_session = property(fget=get_asset_admin_session)
 
@@ -923,11 +937,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_admin_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_asset_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssetAdminSession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssetAdminSession(repository_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_asset_notification_session(self, asset_receiver):
@@ -990,8 +1006,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_repository()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_repository_session() # Remove when implemented
-        # return sessions.AssetRepositorySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_repository():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetRepositorySession(runtime=self._runtime)
 
     asset_repository_session = property(fget=get_asset_repository_session)
 
@@ -1007,8 +1025,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_repository_assignment()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_repository_assignment_session() # Remove when implemented
-        # return sessions.AssetRepositoryAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_repository_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetRepositoryAssignmentSession(runtime=self._runtime)
 
     asset_repository_assignment_session = property(fget=get_asset_repository_assignment_session)
 
@@ -1042,8 +1062,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_temporal()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_temporal_session() # Remove when implemented
-        # return sessions.AssetTemporalSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_temporal():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetTemporalSession(runtime=self._runtime)
 
     asset_temporal_session = property(fget=get_asset_temporal_session)
 
@@ -1064,11 +1086,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_temporal_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_asset_temporal():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssetTemporalSession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssetTemporalSession(repository_id, self._runtime)
 
     def get_asset_temporal_assignment_session(self):
         """Gets the session for assigning temporal coverage to an asset.
@@ -1082,8 +1106,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_temporal_assignment()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_temporal_assignment_session() # Remove when implemented
-        # return sessions.AssetTemporalAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_temporal_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetTemporalAssignmentSession(runtime=self._runtime)
 
     asset_temporal_assignment_session = property(fget=get_asset_temporal_assignment_session)
 
@@ -1104,11 +1130,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_temporal_assignment_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_asset_temporal_assignment():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssetTemporalAssignmentSession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssetTemporalAssignmentSession(repository_id, self._runtime)
 
     def get_asset_spatial_session(self):
         """Gets the session for retrieving spatial coverage of an asset.
@@ -1122,8 +1150,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_spatial_assets()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_spatial_session() # Remove when implemented
-        # return sessions.AssetSpatialSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_spatial():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetSpatialSession(runtime=self._runtime)
 
     asset_spatial_session = property(fget=get_asset_spatial_session)
 
@@ -1144,11 +1174,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_spatial_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_asset_spatial():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssetSpatialSession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssetSpatialSession(repository_id, self._runtime)
 
     def get_asset_spatial_assignment_session(self):
         """Gets the session for assigning spatial coverage to an asset.
@@ -1162,8 +1194,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_spatial_assignment()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_spatial_assignment_session() # Remove when implemented
-        # return sessions.AssetSpatialAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_spatial_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetSpatialAssignmentSession(runtime=self._runtime)
 
     asset_spatial_assignment_session = property(fget=get_asset_spatial_assignment_session)
 
@@ -1184,11 +1218,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_spatial_assignment_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_asset_spatial_assignment():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssetSpatialAssignmentSession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssetSpatialAssignmentSession(repository_id, self._runtime)
 
     def get_asset_composition_session(self):
         """Gets the session for retrieving asset compositions.
@@ -1202,8 +1238,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_composition()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_composition_session() # Remove when implemented
-        # return sessions.AssetCompositionSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_composition():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetCompositionSession(runtime=self._runtime)
 
     asset_composition_session = property(fget=get_asset_composition_session)
 
@@ -1219,8 +1257,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_asset_composition_design()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_asset_composition_design_session() # Remove when implemented
-        # return sessions.AssetCompositionDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_asset_composition_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssetCompositionDesignSession(runtime=self._runtime)
 
     asset_composition_design_session = property(fget=get_asset_composition_design_session)
 
@@ -1236,8 +1276,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_composition_lookup()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_composition_lookup_session() # Remove when implemented
-        # return sessions.CompositionLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_composition_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CompositionLookupSession(runtime=self._runtime)
 
     composition_lookup_session = property(fget=get_composition_lookup_session)
 
@@ -1258,11 +1300,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_composition_lookup_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_composition_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.CompositionLookupSession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.CompositionLookupSession(repository_id, self._runtime)
 
     def get_composition_query_session(self):
         """Gets a composition query session.
@@ -1276,8 +1320,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_composition_query()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_composition_query_session() # Remove when implemented
-        # return sessions.CompositionQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_composition_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CompositionQuerySession(runtime=self._runtime)
 
     composition_query_session = property(fget=get_composition_query_session)
 
@@ -1298,11 +1344,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_composition_query_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_composition_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.CompositionQuerySession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.CompositionQuerySession(repository_id, self._runtime)
 
     def get_composition_search_session(self):
         """Gets a composition search session.
@@ -1316,8 +1364,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_composition_search()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_composition_search_session() # Remove when implemented
-        # return sessions.CompositionSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_composition_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CompositionSearchSession(runtime=self._runtime)
 
     composition_search_session = property(fget=get_composition_search_session)
 
@@ -1338,11 +1388,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_composition_search_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_composition_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.CompositionSearchSession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.CompositionSearchSession(repository_id, self._runtime)
 
     def get_composition_admin_session(self):
         """Gets a composition administration session for creating, updating and deleting compositions.
@@ -1356,8 +1408,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_composition_admin()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_composition_admin_session() # Remove when implemented
-        # return sessions.CompositionAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_composition_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CompositionAdminSession(runtime=self._runtime)
 
     composition_admin_session = property(fget=get_composition_admin_session)
 
@@ -1378,11 +1432,13 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_composition_admin_session_for_repository(repository_id) # Remove when implemented
+        if not self.supports_composition_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.CompositionAdminSession(repository_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.CompositionAdminSession(repository_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_composition_notification_session(self, composition_receiver):
@@ -1447,8 +1503,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_composition_repository()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_composition_repository_session() # Remove when implemented
-        # return sessions.CompositionRepositorySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_composition_repository():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CompositionRepositorySession(runtime=self._runtime)
 
     composition_repository_session = property(fget=get_composition_repository_session)
 
@@ -1465,8 +1523,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_composition_repository_assignment()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_composition_repository_assignment_session() # Remove when implemented
-        # return sessions.CompositionRepositoryAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_composition_repository_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CompositionRepositoryAssignmentSession(runtime=self._runtime)
 
     composition_repository_assignment_session = property(fget=get_composition_repository_assignment_session)
 
@@ -1500,8 +1560,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_repository_lookup()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_repository_lookup_session() # Remove when implemented
-        # return sessions.RepositoryLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_repository_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RepositoryLookupSession(runtime=self._runtime)
 
     repository_lookup_session = property(fget=get_repository_lookup_session)
 
@@ -1517,8 +1579,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_repository_query()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_repository_query_session() # Remove when implemented
-        # return sessions.RepositoryQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_repository_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RepositoryQuerySession(runtime=self._runtime)
 
     repository_query_session = property(fget=get_repository_query_session)
 
@@ -1534,8 +1598,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_repository_search()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_repository_search_session() # Remove when implemented
-        # return sessions.RepositorySearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_repository_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RepositorySearchSession(runtime=self._runtime)
 
     repository_search_session = property(fget=get_repository_search_session)
 
@@ -1551,8 +1617,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_repository_admin()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_repository_admin_session() # Remove when implemented
-        # return sessions.RepositoryAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_repository_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RepositoryAdminSession(runtime=self._runtime)
 
     repository_admin_session = property(fget=get_repository_admin_session)
 
@@ -1590,8 +1658,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_repository_hierarchy()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_repository_hierarchy_session() # Remove when implemented
-        # return sessions.RepositoryHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_repository_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RepositoryHierarchySession(runtime=self._runtime)
 
     repository_hierarchy_session = property(fget=get_repository_hierarchy_session)
 
@@ -1607,8 +1677,10 @@ class RepositoryManager(osid_managers.OsidManager, RepositoryProfile, repository
         ``supports_repository_hierarchy_design()`` is ``true``.*
 
         """
-        super(repository_managers.RepositoryManager, self).get_repository_hierarchy_design_session() # Remove when implemented
-        # return sessions.RepositoryHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_repository_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.RepositoryHierarchyDesignSession(runtime=self._runtime)
 
     repository_hierarchy_design_session = property(fget=get_repository_hierarchy_design_session)
 
