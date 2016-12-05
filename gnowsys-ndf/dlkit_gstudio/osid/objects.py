@@ -18,7 +18,7 @@ from pymongo.cursor import Cursor
 
 from . import default_mdata
 from .. import utilities
-from ...abstract_osid.osid import objects as abc_osid_objects
+from dlkit.abstract_osid.osid import objects as abc_osid_objects
 from ..osid import markers as osid_markers
 from ..primitives import Id
 from ..utilities import OsidListList
@@ -283,12 +283,12 @@ class OsidCatalog(abc_osid_objects.OsidCatalog, OsidObject, osid_markers.Sourcea
     """
 
     _namespace = 'osid.OsidCatalog'
-    
+
     def __init__(self, **kwargs):
         OsidObject.__init__(self, **kwargs)
         # Should we initialize Sourceable?
         # Should we initialize Federatable?
-    
+
 
 
 

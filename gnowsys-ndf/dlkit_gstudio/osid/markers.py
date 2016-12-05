@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.osid import markers as abc_osid_markers
+from dlkit.abstract_osid.osid import markers as abc_osid_markers
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.calendaring.primitives import DateTime
 from dlkit.primordium.id.primitives import Id

@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.osid import metadata as abc_osid_metadata
+from dlkit.abstract_osid.osid import metadata as abc_osid_metadata
 from dlkit.abstract_osid.osid import errors
 
 

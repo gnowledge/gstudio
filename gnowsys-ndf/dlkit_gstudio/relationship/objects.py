@@ -17,7 +17,7 @@ import importlib
 
 from . import default_mdata
 from .. import utilities
-from ...abstract_osid.relationship import objects as abc_relationship_objects
+from dlkit.abstract_osid.relationship import objects as abc_relationship_objects
 from ..osid import objects as osid_objects
 from ..osid.metadata import Metadata
 from ..primitives import Id
@@ -40,7 +40,8 @@ class Relationship(abc_relationship_objects.Relationship, osid_objects.OsidRelat
     _namespace = 'relationship.Relationship'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, object_name='RELATIONSHIP', **kwargs)
+        # osid_objects.OsidObject.__init__(self, object_name='RELATIONSHIP', **kwargs)
+        osid_objects.OsidObject.__init__(self, **kwargs)
         self._catalog_name = 'family'
 
 
@@ -209,7 +210,8 @@ class Family(abc_relationship_objects.Family, osid_objects.OsidCatalog):
 
     def __init__(self, **kwargs):
         # self._record_type_data_sets = get_registry('FAMILY_RECORD_TYPES', runtime)
-        osid_objects.OsidCatalog.__init__(self, object_name='FAMILY', **kwargs)
+        # osid_objects.OsidCatalog.__init__(self, object_name='FAMILY', **kwargs)
+        osid_objects.OsidCatalog.__init__(self, **kwargs)
 
     @utilities.arguments_not_none
     def get_family_record(self, family_record_type):
