@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.osid import records as abc_osid_records
+from dlkit.abstract_osid.osid import records as abc_osid_records
 
 
 

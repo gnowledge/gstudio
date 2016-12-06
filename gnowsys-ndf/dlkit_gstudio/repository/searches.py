@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.repository import searches as abc_repository_searches
+from dlkit.abstract_osid.repository import searches as abc_repository_searches
 from ..osid import searches as osid_searches
 
 

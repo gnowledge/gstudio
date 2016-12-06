@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.osid import searches as abc_osid_searches
+from dlkit.abstract_osid.osid import searches as abc_osid_searches
 from ..osid import rules as osid_rules
 
 

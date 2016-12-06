@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.repository import queries as abc_repository_queries
+from dlkit.abstract_osid.repository import queries as abc_repository_queries
 from ..id.objects import IdList
 from ..osid import queries as osid_queries
 from ..primitives import Id

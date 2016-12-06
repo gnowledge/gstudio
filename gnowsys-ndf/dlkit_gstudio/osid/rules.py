@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.osid import rules as abc_osid_rules
+from dlkit.abstract_osid.osid import rules as abc_osid_rules
 from ..osid import markers as osid_markers
 
 

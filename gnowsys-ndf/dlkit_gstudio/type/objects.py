@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.type import objects as abc_type_objects
+from dlkit.abstract_osid.type import objects as abc_type_objects
 from ..osid import objects as osid_objects
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id

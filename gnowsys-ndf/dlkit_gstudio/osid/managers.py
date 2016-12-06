@@ -9,10 +9,10 @@
 
 from . import profile
 from .. import utilities
-from ...abstract_osid.osid import managers as abc_osid_managers
+from dlkit.abstract_osid.osid import managers as abc_osid_managers
 from ..osid import markers as osid_markers
 from dlkit.abstract_osid.osid import errors
-from dlkit.primordium.id.primitives import DisplayText
+from dlkit.primordium.locale.primitives import DisplayText
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
 
