@@ -100,6 +100,13 @@ class AuthorizationSession(abc_authorization_sessions.AuthorizationSession, osid
         ``false``.
 
         """
+        # function_id.namespace gives <service_name>.<type>
+        # function_id.identifier gives function name [E.g 'lookup']
+        # qualifier_id.identifier gives Group ObjectId
+        # agent_id.identifier gives user id [Needs check]
+        # Check agent is member/admin of catalog(qualifier object)
+        # Group.can_access(agent_id)
+        # return boolean
         raise errors.Unimplemented()
 
     @utilities.arguments_not_none
