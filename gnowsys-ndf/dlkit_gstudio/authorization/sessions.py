@@ -14,6 +14,7 @@ from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
 
 
+from gnowsys_ndf.ndf.models import Group, Author
 
 
 class AuthorizationSession(abc_authorization_sessions.AuthorizationSession, osid_sessions.OsidSession):
@@ -62,7 +63,7 @@ class AuthorizationSession(abc_authorization_sessions.AuthorizationSession, osid
         raise errors.Unimplemented()
 
     @utilities.arguments_not_none
-    def is_authorized(self, agent_id, function_id, qualifier_id):
+    def is_authorized(self, agent_id, function_id=None, qualifier_id=None):
         """Determines if the given agent is authorized.
 
         An agent is authorized if an active authorization exists whose
@@ -105,9 +106,11 @@ class AuthorizationSession(abc_authorization_sessions.AuthorizationSession, osid
         # qualifier_id.identifier gives Group ObjectId
         # agent_id.identifier gives user id [Needs check]
         # Check agent is member/admin of catalog(qualifier object)
-        # Group.can_access(agent_id)
-        # return boolean
-        raise errors.Unimplemented()
+        try:
+            return Group.can_access(agent_id, qualifier_id)
+        except Exception:
+            return Author.can_access(agent_id, qualifier_id)
+        # raise errors.Unimplemented()
 
     @utilities.arguments_not_none
     def get_authorization_condition(self, function_id):
