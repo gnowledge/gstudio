@@ -41,6 +41,27 @@ MANAGER_PATHS = {
         'GRADING': ('dlkit.mongo.grading.managers.GradingManager',
                      'dlkit.mongo.grading.managers.GradingProxyManager')
     },
+    'gstudio': {
+        # 'ASSESSMENT': ('dlkit.mongo.assessment.managers.AssessmentManager',
+        #                'dlkit.mongo.assessment.managers.AssessmentProxyManager'),
+        # 'ASSESSMENT_AUTHORING': ('dlkit.mongo.assessment_authoring.managers.AssessmentAuthoringManager',
+        #                          'dlkit.mongo.assessment_authoring.managers.AssessmentAuthoringProxyManager'),
+        # 'AUTHORIZATION': ('dlkit.mongo.authorization.managers.AuthorizationManager',
+        #                   'dlkit.mongo.authorization.managers.AuthorizationProxyManager'),
+        'REPOSITORY': ('dlkit_gstudio.repository.managers.RepositoryManager',
+                       'dlkit_gstudio.repository.managers.RepositoryProxyManager'),
+        # 'LEARNING': ('dlkit.mongo.learning.managers.LearningManager',
+        #              'dlkit.mongo.learning.managers.LearningProxyManager'),
+        # 'LOGGING': ('dlkit.mongo.logging_.managers.LoggingManager',
+        #             'dlkit.mongo.logging_.managers.LoggingProxyManager'),
+        # 'COMMENTING': ('dlkit.mongo.commenting.managers.CommentingManager',
+        #                'dlkit.mongo.commenting.managers.CommentingProxyManager'),
+        # 'RESOURCE': ('dlkit.mongo.resource.managers.ResourceManager',
+        #              'dlkit.mongo.resource.managers.ResourceProxyManager'),
+        # 'GRADING': ('dlkit.mongo.grading.managers.GradingManager',
+        #              'dlkit.mongo.grading.managers.GradingProxyManager')
+    },
+
     'authz_adapter': {
         'ASSESSMENT': ('dlkit.authz_adapter.assessment.managers.AssessmentManager',
                        'dlkit.authz_adapter.assessment.managers.AssessmentProxyManager'),

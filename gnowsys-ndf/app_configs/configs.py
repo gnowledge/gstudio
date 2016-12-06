@@ -479,7 +479,7 @@ SERVICE = {
             'displayName': 'Repository Provider Implementation',
             'description': 'Implementation for repository service provider',
             'values': [
-                {'value': 'MONGO_1', 'priority': 1}
+                {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
         'commentingProviderImpl': {
