@@ -1,5 +1,10 @@
 from fabric.api import local
 
+# from django.conf import settings
+# settings.configure()
+# from gnowsys_ndf.settings import PROJECT_ROOT
+
+
 def copy_schema_csvs():
 	local('cp -v ../doc/schema_directory/* gnowsys_ndf/ndf/management/commands/schema_files/')
 
@@ -20,3 +25,11 @@ def install_requirements():
 
 def purge_group():
 	local('python manage.py purge_group')
+
+
+def setup_dlkit():
+	# 1. confirm path
+	# 2. check whether dlkit already exists. if not clone dlkit else update dlkit.
+	# 3. check whether dlkit_runtime already exists. if not clone dlkit else update dlkit_runtime.
+	# 4. get files for app_configs.
+	pass

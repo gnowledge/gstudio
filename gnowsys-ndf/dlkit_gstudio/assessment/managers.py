@@ -1070,8 +1070,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_my_assessment_taken()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_my_assessment_taken_session() # Remove when implemented
-        # return sessions.MyAssessmentTakenSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_my_assessment_taken():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.MyAssessmentTakenSession(runtime=self._runtime)
 
     my_assessment_taken_session = property(fget=get_my_assessment_taken_session)
 
@@ -1091,11 +1093,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_my_assessment_taken()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_my_assessment_taken_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_my_assessment_taken():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.MyAssessmentTakenSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.MyAssessmentTakenSession(bank_id, self._runtime)
 
     def get_assessment_session(self):
         """Gets an ``AssessmentSession`` which is responsible for taking assessments and examining responses from assessments taken.
@@ -1108,8 +1112,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_session() # Remove when implemented
-        # return sessions.AssessmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentSession(runtime=self._runtime)
 
     assessment_session = property(fget=get_assessment_session)
 
@@ -1128,11 +1134,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentSession(bank_id, self._runtime)
 
     def get_assessment_results_session(self):
         """Gets an ``AssessmentResultsSession`` to retrieve assessment results.
@@ -1146,8 +1154,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_results()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_results_session() # Remove when implemented
-        # return sessions.AssessmentResultsSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_results():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentResultsSession(runtime=self._runtime)
 
     assessment_results_session = property(fget=get_assessment_results_session)
 
@@ -1167,11 +1177,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_results()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_results_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_results():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentResultsSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentResultsSession(bank_id, self._runtime)
 
     def get_item_lookup_session(self):
         """Gets the ``OsidSession`` associated with the item lookup service.
@@ -1184,8 +1196,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_item_lookup()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_item_lookup_session() # Remove when implemented
-        # return sessions.ItemLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_item_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ItemLookupSession(runtime=self._runtime)
 
     item_lookup_session = property(fget=get_item_lookup_session)
 
@@ -1206,11 +1220,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_item_lookup_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_item_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ItemLookupSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ItemLookupSession(bank_id, self._runtime)
 
     def get_item_query_session(self):
         """Gets the ``OsidSession`` associated with the item query service.
@@ -1223,8 +1239,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_item_query()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_item_query_session() # Remove when implemented
-        # return sessions.ItemQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_item_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ItemQuerySession(runtime=self._runtime)
 
     item_query_session = property(fget=get_item_query_session)
 
@@ -1245,11 +1263,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_item_query_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_item_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ItemQuerySession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ItemQuerySession(bank_id, self._runtime)
 
     def get_item_search_session(self):
         """Gets the ``OsidSession`` associated with the item search service.
@@ -1262,8 +1282,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_item_search()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_item_search_session() # Remove when implemented
-        # return sessions.ItemSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_item_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ItemSearchSession(runtime=self._runtime)
 
     item_search_session = property(fget=get_item_search_session)
 
@@ -1284,11 +1306,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_item_search_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_item_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ItemSearchSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ItemSearchSession(bank_id, self._runtime)
 
     def get_item_admin_session(self):
         """Gets the ``OsidSession`` associated with the item administration service.
@@ -1301,8 +1325,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_item_admin()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_item_admin_session() # Remove when implemented
-        # return sessions.ItemAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_item_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ItemAdminSession(runtime=self._runtime)
 
     item_admin_session = property(fget=get_item_admin_session)
 
@@ -1323,11 +1349,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_item_admin_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_item_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ItemAdminSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ItemAdminSession(bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_item_notification_session(self, item_receiver):
@@ -1389,8 +1417,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_item_bank()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_item_bank_session() # Remove when implemented
-        # return sessions.ItemBankSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_item_bank():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ItemBankSession(runtime=self._runtime)
 
     item_bank_session = property(fget=get_item_bank_session)
 
@@ -1406,8 +1436,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_item_bank_assignment()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_item_bank_assignment_session() # Remove when implemented
-        # return sessions.ItemBankAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_item_bank_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ItemBankAssignmentSession(runtime=self._runtime)
 
     item_bank_assignment_session = property(fget=get_item_bank_assignment_session)
 
@@ -1442,8 +1474,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_lookup()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_lookup_session() # Remove when implemented
-        # return sessions.AssessmentLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentLookupSession(runtime=self._runtime)
 
     assessment_lookup_session = property(fget=get_assessment_lookup_session)
 
@@ -1464,11 +1498,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_lookup_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentLookupSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentLookupSession(bank_id, self._runtime)
 
     def get_assessment_query_session(self):
         """Gets the ``OsidSession`` associated with the assessment query service.
@@ -1482,8 +1518,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_query()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_query_session() # Remove when implemented
-        # return sessions.AssessmentQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentQuerySession(runtime=self._runtime)
 
     assessment_query_session = property(fget=get_assessment_query_session)
 
@@ -1504,11 +1542,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_query_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentQuerySession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentQuerySession(bank_id, self._runtime)
 
     def get_assessment_search_session(self):
         """Gets the ``OsidSession`` associated with the assessment search service.
@@ -1522,8 +1562,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_search()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_search_session() # Remove when implemented
-        # return sessions.AssessmentSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentSearchSession(runtime=self._runtime)
 
     assessment_search_session = property(fget=get_assessment_search_session)
 
@@ -1544,11 +1586,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_search_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentSearchSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentSearchSession(bank_id, self._runtime)
 
     def get_assessment_admin_session(self):
         """Gets the ``OsidSession`` associated with the assessment administration service.
@@ -1562,8 +1606,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_admin()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_admin_session() # Remove when implemented
-        # return sessions.AssessmentAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentAdminSession(runtime=self._runtime)
 
     assessment_admin_session = property(fget=get_assessment_admin_session)
 
@@ -1584,11 +1630,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_admin_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentAdminSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentAdminSession(bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_assessment_notification_session(self, assessment_receiver):
@@ -1653,8 +1701,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_bank()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_bank_session() # Remove when implemented
-        # return sessions.AssessmentBankSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_bank():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentBankSession(runtime=self._runtime)
 
     assessment_bank_session = property(fget=get_assessment_bank_session)
 
@@ -1670,8 +1720,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_bank_assignment()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_bank_assignment_session() # Remove when implemented
-        # return sessions.AssessmentBankAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_bank_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentBankAssignmentSession(runtime=self._runtime)
 
     assessment_bank_assignment_session = property(fget=get_assessment_bank_assignment_session)
 
@@ -1706,8 +1758,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_basic_authoring()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_basic_authoring_session() # Remove when implemented
-        # return sessions.AssessmentBasicAuthoringSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_basic_authoring():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentBasicAuthoringSession(runtime=self._runtime)
 
     assessment_basic_authoring_session = property(fget=get_assessment_basic_authoring_session)
 
@@ -1729,11 +1783,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visibe_federation()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_basic_authoring_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_basic_authoring():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentBasicAuthoringSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentBasicAuthoringSession(bank_id, self._runtime)
 
     def get_assessment_offered_lookup_session(self):
         """Gets the ``OsidSession`` associated with the assessment offered lookup service.
@@ -1747,8 +1803,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_offered_lookup()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_offered_lookup_session() # Remove when implemented
-        # return sessions.AssessmentOfferedLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_offered_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentOfferedLookupSession(runtime=self._runtime)
 
     assessment_offered_lookup_session = property(fget=get_assessment_offered_lookup_session)
 
@@ -1769,11 +1827,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_offered_lookup_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_offered_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentOfferedLookupSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentOfferedLookupSession(bank_id, self._runtime)
 
     def get_assessment_offered_query_session(self):
         """Gets the ``OsidSession`` associated with the assessment offered query service.
@@ -1787,8 +1847,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_offered_query()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_offered_query_session() # Remove when implemented
-        # return sessions.AssessmentOfferedQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_offered_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentOfferedQuerySession(runtime=self._runtime)
 
     assessment_offered_query_session = property(fget=get_assessment_offered_query_session)
 
@@ -1809,11 +1871,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_offered_query_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_offered_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentOfferedQuerySession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentOfferedQuerySession(bank_id, self._runtime)
 
     def get_assessment_offered_search_session(self):
         """Gets the ``OsidSession`` associated with the assessment offered search service.
@@ -1827,8 +1891,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_offered_search()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_offered_search_session() # Remove when implemented
-        # return sessions.AssessmentOfferedSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_offered_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentOfferedSearchSession(runtime=self._runtime)
 
     assessment_offered_search_session = property(fget=get_assessment_offered_search_session)
 
@@ -1849,11 +1915,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_offered_search_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_offered_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentOfferedSearchSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentOfferedSearchSession(bank_id, self._runtime)
 
     def get_assessment_offered_admin_session(self):
         """Gets the ``OsidSession`` associated with the assessment offered administration service.
@@ -1867,8 +1935,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_offered_admin()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_offered_admin_session() # Remove when implemented
-        # return sessions.AssessmentOfferedAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_offered_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentOfferedAdminSession(runtime=self._runtime)
 
     assessment_offered_admin_session = property(fget=get_assessment_offered_admin_session)
 
@@ -1889,11 +1959,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_offered_admin_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_offered_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentOfferedAdminSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentOfferedAdminSession(bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_assessment_offered_notification_session(self, assessment_offered_receiver):
@@ -1961,8 +2033,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_offered_bank()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_offered_bank_session() # Remove when implemented
-        # return sessions.AssessmentOfferedBankSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_offered_bank():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentOfferedBankSession(runtime=self._runtime)
 
     assessment_offered_bank_session = property(fget=get_assessment_offered_bank_session)
 
@@ -1979,8 +2053,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_offered_bank_assignment()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_offered_bank_assignment_session() # Remove when implemented
-        # return sessions.AssessmentOfferedBankAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_offered_bank_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentOfferedBankAssignmentSession(runtime=self._runtime)
 
     assessment_offered_bank_assignment_session = property(fget=get_assessment_offered_bank_assignment_session)
 
@@ -2016,8 +2092,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_taken_lookup()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_taken_lookup_session() # Remove when implemented
-        # return sessions.AssessmentTakenLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_taken_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentTakenLookupSession(runtime=self._runtime)
 
     assessment_taken_lookup_session = property(fget=get_assessment_taken_lookup_session)
 
@@ -2038,11 +2116,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_taken_lookup_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_taken_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentTakenLookupSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentTakenLookupSession(bank_id, self._runtime)
 
     def get_assessment_taken_query_session(self):
         """Gets the ``OsidSession`` associated with the assessment taken query service.
@@ -2056,8 +2136,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_taken_query()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_taken_query_session() # Remove when implemented
-        # return sessions.AssessmentTakenQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_taken_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentTakenQuerySession(runtime=self._runtime)
 
     assessment_taken_query_session = property(fget=get_assessment_taken_query_session)
 
@@ -2078,11 +2160,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_taken_query_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_taken_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentTakenQuerySession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentTakenQuerySession(bank_id, self._runtime)
 
     def get_assessment_taken_search_session(self):
         """Gets the ``OsidSession`` associated with the assessment taken search service.
@@ -2096,8 +2180,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_taken_search()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_taken_search_session() # Remove when implemented
-        # return sessions.AssessmentTakenSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_taken_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentTakenSearchSession(runtime=self._runtime)
 
     assessment_taken_search_session = property(fget=get_assessment_taken_search_session)
 
@@ -2118,11 +2204,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_taken_search_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_taken_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentTakenSearchSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentTakenSearchSession(bank_id, self._runtime)
 
     def get_assessment_taken_admin_session(self):
         """Gets the ``OsidSession`` associated with the assessment taken administration service.
@@ -2136,8 +2224,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_taken_admin()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_taken_admin_session() # Remove when implemented
-        # return sessions.AssessmentTakenAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_taken_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentTakenAdminSession(runtime=self._runtime)
 
     assessment_taken_admin_session = property(fget=get_assessment_taken_admin_session)
 
@@ -2158,11 +2248,13 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_taken_admin_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_taken_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentTakenAdminSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentTakenAdminSession(bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_assessment_taken_notification_session(self, assessment_taken_receiver):
@@ -2229,8 +2321,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_taken_bank()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_taken_bank_session() # Remove when implemented
-        # return sessions.AssessmentTakenBankSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_taken_bank():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentTakenBankSession(runtime=self._runtime)
 
     assessment_taken_bank_session = property(fget=get_assessment_taken_bank_session)
 
@@ -2247,8 +2341,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_assessment_taken_bank_assignment()`` is ``true``.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_assessment_taken_bank_assignment_session() # Remove when implemented
-        # return sessions.AssessmentTakenBankAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_taken_bank_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentTakenBankAssignmentSession(runtime=self._runtime)
 
     assessment_taken_bank_assignment_session = property(fget=get_assessment_taken_bank_assignment_session)
 
@@ -2282,8 +2378,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_bank_lookup()`` is true.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_bank_lookup_session() # Remove when implemented
-        # return sessions.BankLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bank_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BankLookupSession(runtime=self._runtime)
 
     bank_lookup_session = property(fget=get_bank_lookup_session)
 
@@ -2298,8 +2396,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_bank_query()`` is true.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_bank_query_session() # Remove when implemented
-        # return sessions.BankQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bank_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BankQuerySession(runtime=self._runtime)
 
     bank_query_session = property(fget=get_bank_query_session)
 
@@ -2314,8 +2414,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_bank_search()`` is true.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_bank_search_session() # Remove when implemented
-        # return sessions.BankSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bank_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BankSearchSession(runtime=self._runtime)
 
     bank_search_session = property(fget=get_bank_search_session)
 
@@ -2330,8 +2432,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_bank_admin()`` is true.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_bank_admin_session() # Remove when implemented
-        # return sessions.BankAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bank_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BankAdminSession(runtime=self._runtime)
 
     bank_admin_session = property(fget=get_bank_admin_session)
 
@@ -2367,8 +2471,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_bank_hierarchy()`` is true.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_bank_hierarchy_session() # Remove when implemented
-        # return sessions.BankHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bank_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BankHierarchySession(runtime=self._runtime)
 
     bank_hierarchy_session = property(fget=get_bank_hierarchy_session)
 
@@ -2384,8 +2490,10 @@ class AssessmentManager(osid_managers.OsidManager, AssessmentProfile, assessment
         ``supports_bank_hierarchy_design()`` is true.*
 
         """
-        super(assessment_managers.AssessmentManager, self).get_bank_hierarchy_design_session() # Remove when implemented
-        # return sessions.BankHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_bank_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.BankHierarchyDesignSession(runtime=self._runtime)
 
     bank_hierarchy_design_session = property(fget=get_bank_hierarchy_design_session)
 

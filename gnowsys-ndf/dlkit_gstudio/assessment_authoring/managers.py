@@ -650,8 +650,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_assessment_part_lookup()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_assessment_part_lookup_session() # Remove when implemented
-        # return sessions.AssessmentPartLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_part_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentPartLookupSession(runtime=self._runtime)
 
     assessment_part_lookup_session = property(fget=get_assessment_part_lookup_session)
 
@@ -672,11 +674,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_assessment_part_lookup_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_part_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentPartLookupSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentPartLookupSession(bank_id, self._runtime)
 
     def get_assessment_part_query_session(self):
         """Gets the ``OsidSession`` associated with the assessment part query service.
@@ -690,8 +694,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_assessment_part_query()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_assessment_part_query_session() # Remove when implemented
-        # return sessions.AssessmentPartQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_part_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentPartQuerySession(runtime=self._runtime)
 
     assessment_part_query_session = property(fget=get_assessment_part_query_session)
 
@@ -712,11 +718,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_assessment_part_query_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_part_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentPartQuerySession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentPartQuerySession(bank_id, self._runtime)
 
     def get_assessment_part_search_session(self):
         """Gets the ``OsidSession`` associated with the assessment part search service.
@@ -730,8 +738,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_assessment_part_search()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_assessment_part_search_session() # Remove when implemented
-        # return sessions.AssessmentPartSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_part_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentPartSearchSession(runtime=self._runtime)
 
     assessment_part_search_session = property(fget=get_assessment_part_search_session)
 
@@ -752,11 +762,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_assessment_part_search_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_part_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentPartSearchSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentPartSearchSession(bank_id, self._runtime)
 
     def get_assessment_part_admin_session(self):
         """Gets the ``OsidSession`` associated with the assessment part administration service.
@@ -770,8 +782,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_assessment_part_admin()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_assessment_part_admin_session() # Remove when implemented
-        # return sessions.AssessmentPartAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_part_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentPartAdminSession(runtime=self._runtime)
 
     assessment_part_admin_session = property(fget=get_assessment_part_admin_session)
 
@@ -792,11 +806,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_assessment_part_admin_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_assessment_part_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AssessmentPartAdminSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AssessmentPartAdminSession(bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_assessment_part_notification_session(self, assessment_part_receiver):
@@ -864,8 +880,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_assessment_part_bank()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_assessment_part_bank_session() # Remove when implemented
-        # return sessions.AssessmentPartBankSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_part_bank():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentPartBankSession(runtime=self._runtime)
 
     assessment_part_bank_session = property(fget=get_assessment_part_bank_session)
 
@@ -883,8 +901,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_assessment_part_bank_assignment()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_assessment_part_bank_assignment_session() # Remove when implemented
-        # return sessions.AssessmentPartBankAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_assessment_part_bank_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentPartBankAssignmentSession(runtime=self._runtime)
 
     assessment_part_bank_assignment_session = property(fget=get_assessment_part_bank_assignment_session)
 
@@ -919,8 +939,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_lookup()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_lookup_session() # Remove when implemented
-        # return sessions.SequenceRuleLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleLookupSession(runtime=self._runtime)
 
     sequence_rule_lookup_session = property(fget=get_sequence_rule_lookup_session)
 
@@ -941,11 +963,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_lookup_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_sequence_rule_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.SequenceRuleLookupSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.SequenceRuleLookupSession(bank_id, self._runtime)
 
     def get_sequence_rule_query_session(self):
         """Gets the ``OsidSession`` associated with the sequence rule query service.
@@ -959,8 +983,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_query()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_query_session() # Remove when implemented
-        # return sessions.SequenceRuleQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleQuerySession(runtime=self._runtime)
 
     sequence_rule_query_session = property(fget=get_sequence_rule_query_session)
 
@@ -981,11 +1007,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_query_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_sequence_rule_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.SequenceRuleQuerySession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.SequenceRuleQuerySession(bank_id, self._runtime)
 
     def get_sequence_rule_search_session(self):
         """Gets the ``OsidSession`` associated with the sequence rule search service.
@@ -999,8 +1027,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_search()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_search_session() # Remove when implemented
-        # return sessions.SequenceRuleSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleSearchSession(runtime=self._runtime)
 
     sequence_rule_search_session = property(fget=get_sequence_rule_search_session)
 
@@ -1021,11 +1051,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_search_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_sequence_rule_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.SequenceRuleSearchSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.SequenceRuleSearchSession(bank_id, self._runtime)
 
     def get_sequence_rule_admin_session(self):
         """Gets the ``OsidSession`` associated with the sequence rule administration service.
@@ -1039,8 +1071,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_admin()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_admin_session() # Remove when implemented
-        # return sessions.SequenceRuleAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleAdminSession(runtime=self._runtime)
 
     sequence_rule_admin_session = property(fget=get_sequence_rule_admin_session)
 
@@ -1061,11 +1095,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_admin_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_sequence_rule_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.SequenceRuleAdminSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.SequenceRuleAdminSession(bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_sequence_rule_notification_session(self, sequence_rule_receiver):
@@ -1133,8 +1169,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_bank()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_bank_session() # Remove when implemented
-        # return sessions.SequenceRuleBankSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_bank():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleBankSession(runtime=self._runtime)
 
     sequence_rule_bank_session = property(fget=get_sequence_rule_bank_session)
 
@@ -1152,8 +1190,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_bank_assignment()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_bank_assignment_session() # Remove when implemented
-        # return sessions.SequenceRuleBankAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_bank_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleBankAssignmentSession(runtime=self._runtime)
 
     sequence_rule_bank_assignment_session = property(fget=get_sequence_rule_bank_assignment_session)
 
@@ -1188,8 +1228,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_enabler_lookup()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_lookup_session() # Remove when implemented
-        # return sessions.SequenceRuleEnablerLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_enabler_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerLookupSession(runtime=self._runtime)
 
     sequence_rule_enabler_lookup_session = property(fget=get_sequence_rule_enabler_lookup_session)
 
@@ -1212,11 +1254,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_lookup_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_sequence_rule_enabler_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.SequenceRuleEnablerLookupSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerLookupSession(bank_id, self._runtime)
 
     def get_sequence_rule_enabler_query_session(self):
         """Gets the ``OsidSession`` associated with the sequence rule enabler query service.
@@ -1231,8 +1275,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_enabler_query()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_query_session() # Remove when implemented
-        # return sessions.SequenceRuleEnablerQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_enabler_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerQuerySession(runtime=self._runtime)
 
     sequence_rule_enabler_query_session = property(fget=get_sequence_rule_enabler_query_session)
 
@@ -1255,11 +1301,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_query_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_sequence_rule_enabler_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.SequenceRuleEnablerQuerySession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerQuerySession(bank_id, self._runtime)
 
     def get_sequence_rule_enabler_search_session(self):
         """Gets the ``OsidSession`` associated with the sequence rule enabler search service.
@@ -1274,8 +1322,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_enabler_search()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_search_session() # Remove when implemented
-        # return sessions.SequenceRuleEnablerSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_enabler_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerSearchSession(runtime=self._runtime)
 
     sequence_rule_enabler_search_session = property(fget=get_sequence_rule_enabler_search_session)
 
@@ -1298,11 +1348,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_search_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_sequence_rule_enabler_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.SequenceRuleEnablerSearchSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerSearchSession(bank_id, self._runtime)
 
     def get_sequence_rule_enabler_admin_session(self):
         """Gets the ``OsidSession`` associated with the sequence rule enabler administration service.
@@ -1317,8 +1369,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_enabler_admin()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_admin_session() # Remove when implemented
-        # return sessions.SequenceRuleEnablerAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_enabler_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerAdminSession(runtime=self._runtime)
 
     sequence_rule_enabler_admin_session = property(fget=get_sequence_rule_enabler_admin_session)
 
@@ -1341,11 +1395,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_admin_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_sequence_rule_enabler_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.SequenceRuleEnablerAdminSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerAdminSession(bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_sequence_rule_enabler_notification_session(self, sequence_rule_enabler_receiver):
@@ -1416,8 +1472,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_enabler_bank()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_bank_session() # Remove when implemented
-        # return sessions.SequenceRuleEnablerBankSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_enabler_bank():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerBankSession(runtime=self._runtime)
 
     sequence_rule_enabler_bank_session = property(fget=get_sequence_rule_enabler_bank_session)
 
@@ -1436,8 +1494,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_bank_assignment_session() # Remove when implemented
-        # return sessions.SequenceRuleEnablerBankAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_enabler_bank_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerBankAssignmentSession(runtime=self._runtime)
 
     sequence_rule_enabler_bank_assignment_session = property(fget=get_sequence_rule_enabler_bank_assignment_session)
 
@@ -1475,8 +1535,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_sequence_rule_enabler_rule_lookup()`` is ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_rule_lookup_session() # Remove when implemented
-        # return sessions.SequenceRuleEnablerRuleLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_enabler_rule_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerRuleLookupSession(runtime=self._runtime)
 
     sequence_rule_enabler_rule_lookup_session = property(fget=get_sequence_rule_enabler_rule_lookup_session)
 
@@ -1499,11 +1561,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_rule_lookup_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_sequence_rule_enabler_rule_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.SequenceRuleEnablerRuleLookupSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerRuleLookupSession(bank_id, self._runtime)
 
     def get_sequence_rule_enabler_rule_application_session(self):
         """Gets the ``OsidSession`` associated with the sequence rule enabler assignment service.
@@ -1520,8 +1584,10 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_rule_application_session() # Remove when implemented
-        # return sessions.SequenceRuleEnablerRuleApplicationSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_sequence_rule_enabler_rule_application():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerRuleApplicationSession(runtime=self._runtime)
 
     sequence_rule_enabler_rule_application_session = property(fget=get_sequence_rule_enabler_rule_application_session)
 
@@ -1544,11 +1610,13 @@ class AssessmentAuthoringManager(osid_managers.OsidManager, AssessmentAuthoringP
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(assessment.authoring_managers.AssessmentAuthoringManager, self).get_sequence_rule_enabler_rule_application_session_for_bank(bank_id) # Remove when implemented
+        if not self.supports_sequence_rule_enabler_rule_application():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.SequenceRuleEnablerRuleApplicationSession(bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.SequenceRuleEnablerRuleApplicationSession(bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_assessment_part_item_session(self, *args, **kwargs):

@@ -451,8 +451,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agent_lookup()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agent_lookup_session() # Remove when implemented
-        # return sessions.AgentLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agent_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgentLookupSession(runtime=self._runtime)
 
     agent_lookup_session = property(fget=get_agent_lookup_session)
 
@@ -473,11 +475,13 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agent_lookup_session_for_agency(agency_id) # Remove when implemented
+        if not self.supports_agent_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AgentLookupSession(agency_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AgentLookupSession(agency_id, self._runtime)
 
     def get_agent_query_session(self):
         """Gets the ``OsidSession`` associated with the agent query service.
@@ -490,8 +494,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agent_query()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agent_query_session() # Remove when implemented
-        # return sessions.AgentQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agent_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgentQuerySession(runtime=self._runtime)
 
     agent_query_session = property(fget=get_agent_query_session)
 
@@ -512,11 +518,13 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         are ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agent_query_session_for_agency(agency_id) # Remove when implemented
+        if not self.supports_agent_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AgentQuerySession(agency_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AgentQuerySession(agency_id, self._runtime)
 
     def get_agent_search_session(self):
         """Gets the ``OsidSession`` associated with the agent search service.
@@ -529,8 +537,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agent_search()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agent_search_session() # Remove when implemented
-        # return sessions.AgentSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agent_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgentSearchSession(runtime=self._runtime)
 
     agent_search_session = property(fget=get_agent_search_session)
 
@@ -551,11 +561,13 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agent_search_session_for_agency(agency_id) # Remove when implemented
+        if not self.supports_agent_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AgentSearchSession(agency_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AgentSearchSession(agency_id, self._runtime)
 
     def get_agent_admin_session(self):
         """Gets the ``OsidSession`` associated with the agent administration service.
@@ -568,8 +580,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agent_admin()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agent_admin_session() # Remove when implemented
-        # return sessions.AgentAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agent_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgentAdminSession(runtime=self._runtime)
 
     agent_admin_session = property(fget=get_agent_admin_session)
 
@@ -590,11 +604,13 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         are ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agent_admin_session_for_agency(agency_id) # Remove when implemented
+        if not self.supports_agent_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AgentAdminSession(agency_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AgentAdminSession(agency_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_agent_notification_session(self, agent_receiver):
@@ -656,8 +672,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agent_agency()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agent_agency_session() # Remove when implemented
-        # return sessions.AgentAgencySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agent_agency():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgentAgencySession(runtime=self._runtime)
 
     agent_agency_session = property(fget=get_agent_agency_session)
 
@@ -673,8 +691,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agent_agency_assignment()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agent_agency_assignment_session() # Remove when implemented
-        # return sessions.AgentAgencyAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agent_agency_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgentAgencyAssignmentSession(runtime=self._runtime)
 
     agent_agency_assignment_session = property(fget=get_agent_agency_assignment_session)
 
@@ -709,8 +729,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agency_lookup()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agency_lookup_session() # Remove when implemented
-        # return sessions.AgencyLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agency_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgencyLookupSession(runtime=self._runtime)
 
     agency_lookup_session = property(fget=get_agency_lookup_session)
 
@@ -726,8 +748,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agency_search()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agency_search_session() # Remove when implemented
-        # return sessions.AgencySearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agency_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgencySearchSession(runtime=self._runtime)
 
     agency_search_session = property(fget=get_agency_search_session)
 
@@ -742,8 +766,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agency_admin()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agency_admin_session() # Remove when implemented
-        # return sessions.AgencyAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agency_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgencyAdminSession(runtime=self._runtime)
 
     agency_admin_session = property(fget=get_agency_admin_session)
 
@@ -780,8 +806,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agency_hierarchy()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agency_hierarchy_session() # Remove when implemented
-        # return sessions.AgencyHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agency_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgencyHierarchySession(runtime=self._runtime)
 
     agency_hierarchy_session = property(fget=get_agency_hierarchy_session)
 
@@ -797,8 +825,10 @@ class AuthenticationManager(osid_managers.OsidManager, AuthenticationProfile, au
         ``supports_agency_hierarchy_design()`` is ``true``.*
 
         """
-        super(authentication_managers.AuthenticationManager, self).get_agency_hierarchy_design_session() # Remove when implemented
-        # return sessions.AgencyHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_agency_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AgencyHierarchyDesignSession(runtime=self._runtime)
 
     agency_hierarchy_design_session = property(fget=get_agency_hierarchy_design_session)
 

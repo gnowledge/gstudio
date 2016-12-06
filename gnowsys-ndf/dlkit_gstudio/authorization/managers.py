@@ -878,8 +878,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_authorization()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_session() # Remove when implemented
-        # return sessions.AuthorizationSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_authorization():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AuthorizationSession(runtime=self._runtime)
 
     authorization_session = property(fget=get_authorization_session)
 
@@ -900,11 +902,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_authorization():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AuthorizationSession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AuthorizationSession(vault_id, self._runtime)
 
     def get_authorization_lookup_session(self):
         """Gets the ``OsidSession`` associated with the authorization lookup service.
@@ -918,8 +922,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_authorization_lookup()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_lookup_session() # Remove when implemented
-        # return sessions.AuthorizationLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_authorization_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AuthorizationLookupSession(runtime=self._runtime)
 
     authorization_lookup_session = property(fget=get_authorization_lookup_session)
 
@@ -940,11 +946,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_lookup_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_authorization_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AuthorizationLookupSession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AuthorizationLookupSession(vault_id, self._runtime)
 
     def get_authorization_query_session(self):
         """Gets the ``OsidSession`` associated with the authorization query service.
@@ -958,8 +966,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_authorization_query()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_query_session() # Remove when implemented
-        # return sessions.AuthorizationQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_authorization_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AuthorizationQuerySession(runtime=self._runtime)
 
     authorization_query_session = property(fget=get_authorization_query_session)
 
@@ -980,11 +990,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_query_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_authorization_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AuthorizationQuerySession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AuthorizationQuerySession(vault_id, self._runtime)
 
     def get_authorization_search_session(self):
         """Gets the ``OsidSession`` associated with the authorization search service.
@@ -998,8 +1010,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_authorization_search()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_search_session() # Remove when implemented
-        # return sessions.AuthorizationSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_authorization_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AuthorizationSearchSession(runtime=self._runtime)
 
     authorization_search_session = property(fget=get_authorization_search_session)
 
@@ -1020,11 +1034,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_search_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_authorization_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AuthorizationSearchSession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AuthorizationSearchSession(vault_id, self._runtime)
 
     def get_authorization_admin_session(self):
         """Gets the ``OsidSession`` associated with the authorization administration service.
@@ -1038,8 +1054,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_authorization_admin()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_admin_session() # Remove when implemented
-        # return sessions.AuthorizationAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_authorization_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AuthorizationAdminSession(runtime=self._runtime)
 
     authorization_admin_session = property(fget=get_authorization_admin_session)
 
@@ -1060,11 +1078,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_admin_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_authorization_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.AuthorizationAdminSession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.AuthorizationAdminSession(vault_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_authorization_notification_session(self, authorization_receiver):
@@ -1130,8 +1150,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_authorization_vault()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_vault_session() # Remove when implemented
-        # return sessions.AuthorizationVaultSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_authorization_vault():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AuthorizationVaultSession(runtime=self._runtime)
 
     authorization_vault_session = property(fget=get_authorization_vault_session)
 
@@ -1148,8 +1170,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_authorization_vault_assignment()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_authorization_vault_assignment_session() # Remove when implemented
-        # return sessions.AuthorizationVaultAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_authorization_vault_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AuthorizationVaultAssignmentSession(runtime=self._runtime)
 
     authorization_vault_assignment_session = property(fget=get_authorization_vault_assignment_session)
 
@@ -1183,8 +1207,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_function_lookup()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_function_lookup_session() # Remove when implemented
-        # return sessions.FunctionLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_function_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FunctionLookupSession(runtime=self._runtime)
 
     function_lookup_session = property(fget=get_function_lookup_session)
 
@@ -1205,11 +1231,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_function_lookup_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_function_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.FunctionLookupSession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.FunctionLookupSession(vault_id, self._runtime)
 
     def get_function_query_session(self):
         """Gets the ``OsidSession`` associated with the function query service.
@@ -1223,8 +1251,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_function_query()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_function_query_session() # Remove when implemented
-        # return sessions.FunctionQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_function_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FunctionQuerySession(runtime=self._runtime)
 
     function_query_session = property(fget=get_function_query_session)
 
@@ -1245,11 +1275,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_function_query_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_function_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.FunctionQuerySession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.FunctionQuerySession(vault_id, self._runtime)
 
     def get_function_search_session(self):
         """Gets the ``OsidSession`` associated with the function search service.
@@ -1263,8 +1295,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_function_search()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_function_search_session() # Remove when implemented
-        # return sessions.FunctionSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_function_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FunctionSearchSession(runtime=self._runtime)
 
     function_search_session = property(fget=get_function_search_session)
 
@@ -1285,11 +1319,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_function_search_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_function_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.FunctionSearchSession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.FunctionSearchSession(vault_id, self._runtime)
 
     def get_function_admin_session(self):
         """Gets the ``OsidSession`` associated with the function administration service.
@@ -1303,8 +1339,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_function_admin()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_function_admin_session() # Remove when implemented
-        # return sessions.FunctionAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_function_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FunctionAdminSession(runtime=self._runtime)
 
     function_admin_session = property(fget=get_function_admin_session)
 
@@ -1325,11 +1363,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_function_admin_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_function_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.FunctionAdminSession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.FunctionAdminSession(vault_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_function_notification_session(self, function_receiver):
@@ -1392,8 +1432,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_function_vault()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_function_vault_session() # Remove when implemented
-        # return sessions.FunctionVaultSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_function_vault():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FunctionVaultSession(runtime=self._runtime)
 
     function_vault_session = property(fget=get_function_vault_session)
 
@@ -1409,8 +1451,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_function_vault_assignment()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_function_vault_assignment_session() # Remove when implemented
-        # return sessions.FunctionVaultAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_function_vault_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.FunctionVaultAssignmentSession(runtime=self._runtime)
 
     function_vault_assignment_session = property(fget=get_function_vault_assignment_session)
 
@@ -1444,8 +1488,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_qualifier_lookup()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_lookup_session() # Remove when implemented
-        # return sessions.QualifierLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_qualifier_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.QualifierLookupSession(runtime=self._runtime)
 
     qualifier_lookup_session = property(fget=get_qualifier_lookup_session)
 
@@ -1466,11 +1512,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_lookup_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_qualifier_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.QualifierLookupSession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.QualifierLookupSession(vault_id, self._runtime)
 
     def get_qualifier_query_session(self):
         """Gets the ``OsidSession`` associated with the qualifier query service.
@@ -1484,8 +1532,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_qualifier_query()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_query_session() # Remove when implemented
-        # return sessions.QualifierQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_qualifier_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.QualifierQuerySession(runtime=self._runtime)
 
     qualifier_query_session = property(fget=get_qualifier_query_session)
 
@@ -1506,11 +1556,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_query_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_qualifier_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.QualifierQuerySession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.QualifierQuerySession(vault_id, self._runtime)
 
     def get_qualifier_search_session(self):
         """Gets the ``OsidSession`` associated with the qualifier search service.
@@ -1524,8 +1576,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_qualifier_search()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_search_session() # Remove when implemented
-        # return sessions.QualifierSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_qualifier_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.QualifierSearchSession(runtime=self._runtime)
 
     qualifier_search_session = property(fget=get_qualifier_search_session)
 
@@ -1546,11 +1600,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_search_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_qualifier_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.QualifierSearchSession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.QualifierSearchSession(vault_id, self._runtime)
 
     def get_qualifier_admin_session(self):
         """Gets the ``OsidSession`` associated with the qualifier administration service.
@@ -1564,8 +1620,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_qualifier_admin()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_admin_session() # Remove when implemented
-        # return sessions.QualifierAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_qualifier_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.QualifierAdminSession(runtime=self._runtime)
 
     qualifier_admin_session = property(fget=get_qualifier_admin_session)
 
@@ -1586,11 +1644,13 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_admin_session_for_vault(vault_id) # Remove when implemented
+        if not self.supports_qualifier_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.QualifierAdminSession(vault_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.QualifierAdminSession(vault_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_qualifier_notification_session(self, qualifier_receiver):
@@ -1663,8 +1723,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_qualifier_hierarchy()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_hierarchy_session() # Remove when implemented
-        # return sessions.QualifierHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_qualifier_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.QualifierHierarchySession(runtime=self._runtime)
 
     @utilities.arguments_not_none
     def get_qualifier_hierarchy_design_session(self, qualifier_hierarchy_id):
@@ -1683,8 +1745,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_qualifier_hierarchy_design()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_hierarchy_design_session() # Remove when implemented
-        # return sessions.QualifierHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_qualifier_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.QualifierHierarchyDesignSession(runtime=self._runtime)
 
     def get_qualifier_vault_session(self):
         """Gets the session for retrieving qualifier to vault mappings.
@@ -1698,8 +1762,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_qualifier_vault()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_vault_session() # Remove when implemented
-        # return sessions.QualifierVaultSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_qualifier_vault():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.QualifierVaultSession(runtime=self._runtime)
 
     qualifier_vault_session = property(fget=get_qualifier_vault_session)
 
@@ -1715,8 +1781,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_qualifier_vault_assignment()`` is ``true``.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_qualifier_vault_assignment_session() # Remove when implemented
-        # return sessions.QualifierVaultSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_qualifier_vault_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.QualifierVaultSession(runtime=self._runtime)
 
     qualifier_vault_assignment_session = property(fget=get_qualifier_vault_assignment_session)
 
@@ -1749,8 +1817,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_vault_lookup()`` is true.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_vault_lookup_session() # Remove when implemented
-        # return sessions.VaultLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_vault_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.VaultLookupSession(runtime=self._runtime)
 
     vault_lookup_session = property(fget=get_vault_lookup_session)
 
@@ -1765,8 +1835,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_vault_query()`` is true.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_vault_query_session() # Remove when implemented
-        # return sessions.VaultQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_vault_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.VaultQuerySession(runtime=self._runtime)
 
     vault_query_session = property(fget=get_vault_query_session)
 
@@ -1781,8 +1853,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_vault_search()`` is true.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_vault_search_session() # Remove when implemented
-        # return sessions.VaultSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_vault_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.VaultSearchSession(runtime=self._runtime)
 
     vault_search_session = property(fget=get_vault_search_session)
 
@@ -1797,8 +1871,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_vault_admin()`` is true.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_vault_admin_session() # Remove when implemented
-        # return sessions.VaultAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_vault_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.VaultAdminSession(runtime=self._runtime)
 
     vault_admin_session = property(fget=get_vault_admin_session)
 
@@ -1834,8 +1910,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_vault_hierarchy()`` is true.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_vault_hierarchy_session() # Remove when implemented
-        # return sessions.VaultHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_vault_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.VaultHierarchySession(runtime=self._runtime)
 
     vault_hierarchy_session = property(fget=get_vault_hierarchy_session)
 
@@ -1851,8 +1929,10 @@ class AuthorizationManager(osid_managers.OsidManager, AuthorizationProfile, auth
         ``supports_vault_hierarchy_design()`` is true.*
 
         """
-        super(authorization_managers.AuthorizationManager, self).get_vault_hierarchy_design_session() # Remove when implemented
-        # return sessions.VaultHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_vault_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.VaultHierarchyDesignSession(runtime=self._runtime)
 
     vault_hierarchy_design_session = property(fget=get_vault_hierarchy_design_session)
 

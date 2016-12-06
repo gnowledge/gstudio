@@ -17,6 +17,6 @@ DISPLAYNAME = 'GStudio resource'
 
 DESCRIPTION = 'GStudio based resource implementation'
 
-VERSIONCOMPONENTS = [0, 1, 8]
+VERSIONCOMPONENTS = [0, 1, 10]
 
-RELEASEDATE = "2016-11-30"
+RELEASEDATE = "2016-12-04"

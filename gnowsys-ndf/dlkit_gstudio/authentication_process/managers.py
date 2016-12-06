@@ -309,8 +309,10 @@ class AuthenticationProcessManager(osid_managers.OsidManager, AuthenticationProc
         ``supports_acquisition()`` is ``true``.*
 
         """
-        super(authentication.process_managers.AuthenticationProcessManager, self).get_authentication_acquisition_session() # Remove when implemented
-        # return sessions.AuthenticationAcquisitionSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_authentication_acquisition():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AuthenticationAcquisitionSession(runtime=self._runtime)
 
     authentication_acquisition_session = property(fget=get_authentication_acquisition_session)
 
@@ -327,8 +329,10 @@ class AuthenticationProcessManager(osid_managers.OsidManager, AuthenticationProc
         ``supports_validation()`` is ``true``.*
 
         """
-        super(authentication.process_managers.AuthenticationProcessManager, self).get_authentication_validation_session() # Remove when implemented
-        # return sessions.AuthenticationValidationSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_authentication_validation():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AuthenticationValidationSession(runtime=self._runtime)
 
     authentication_validation_session = property(fget=get_authentication_validation_session)
 
@@ -343,8 +347,10 @@ class AuthenticationProcessManager(osid_managers.OsidManager, AuthenticationProc
         ``supports_trust_lookup()`` is ``true``.*
 
         """
-        super(authentication.process_managers.AuthenticationProcessManager, self).get_trust_lookup_session() # Remove when implemented
-        # return sessions.TrustLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_trust_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.TrustLookupSession(runtime=self._runtime)
 
     trust_lookup_session = property(fget=get_trust_lookup_session)
 
@@ -365,11 +371,13 @@ class AuthenticationProcessManager(osid_managers.OsidManager, AuthenticationProc
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authentication.process_managers.AuthenticationProcessManager, self).get_trust_lookup_session_for_agency(agency_id) # Remove when implemented
+        if not self.supports_trust_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.TrustLookupSession(agency_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.TrustLookupSession(agency_id, self._runtime)
 
     def get_circle_of_trust_session(self):
         """Gets the ``OsidSession`` associated with the trust circle service.
@@ -383,8 +391,10 @@ class AuthenticationProcessManager(osid_managers.OsidManager, AuthenticationProc
         ``supports_circle_of_trust()`` is ``true``.*
 
         """
-        super(authentication.process_managers.AuthenticationProcessManager, self).get_circle_of_trust_session() # Remove when implemented
-        # return sessions.CircleOfTrustSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_circle_of_trust():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.CircleOfTrustSession(runtime=self._runtime)
 
     circle_of_trust_session = property(fget=get_circle_of_trust_session)
 
@@ -405,11 +415,13 @@ class AuthenticationProcessManager(osid_managers.OsidManager, AuthenticationProc
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(authentication.process_managers.AuthenticationProcessManager, self).get_circle_of_trust_session_for_agency(agency_id) # Remove when implemented
+        if not self.supports_circle_of_trust():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.CircleOfTrustSession(agency_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.CircleOfTrustSession(agency_id, self._runtime)
 
 
 class AuthenticationProcessProxyManager(osid_managers.OsidProxyManager, AuthenticationProcessProfile, authentication_process_managers.AuthenticationProcessProxyManager):

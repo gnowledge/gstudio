@@ -865,8 +865,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_lookup()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_lookup_session() # Remove when implemented
-        # return sessions.ObjectiveLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveLookupSession(runtime=self._runtime)
 
     objective_lookup_session = property(fget=get_objective_lookup_session)
 
@@ -888,11 +890,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_lookup_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_objective_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ObjectiveLookupSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ObjectiveLookupSession(objective_bank_id, self._runtime)
 
     def get_objective_query_session(self):
         """Gets the ``OsidSession`` associated with the objective query service.
@@ -906,8 +910,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_query()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_query_session() # Remove when implemented
-        # return sessions.ObjectiveQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveQuerySession(runtime=self._runtime)
 
     objective_query_session = property(fget=get_objective_query_session)
 
@@ -929,11 +935,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_query_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_objective_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ObjectiveQuerySession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ObjectiveQuerySession(objective_bank_id, self._runtime)
 
     def get_objective_search_session(self):
         """Gets the ``OsidSession`` associated with the objective search service.
@@ -947,8 +955,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_search()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_search_session() # Remove when implemented
-        # return sessions.ObjectiveSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveSearchSession(runtime=self._runtime)
 
     objective_search_session = property(fget=get_objective_search_session)
 
@@ -970,11 +980,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_search_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_objective_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ObjectiveSearchSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ObjectiveSearchSession(objective_bank_id, self._runtime)
 
     def get_objective_admin_session(self):
         """Gets the ``OsidSession`` associated with the objective administration service.
@@ -988,8 +1000,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_admin()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_admin_session() # Remove when implemented
-        # return sessions.ObjectiveAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveAdminSession(runtime=self._runtime)
 
     objective_admin_session = property(fget=get_objective_admin_session)
 
@@ -1011,11 +1025,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_admin_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_objective_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ObjectiveAdminSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ObjectiveAdminSession(objective_bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_objective_notification_session(self, objective_receiver):
@@ -1079,8 +1095,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_hierarchy()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_hierarchy_session() # Remove when implemented
-        # return sessions.ObjectiveHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveHierarchySession(runtime=self._runtime)
 
     objective_hierarchy_session = property(fget=get_objective_hierarchy_session)
 
@@ -1102,11 +1120,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_hierarchy_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_objective_hierarchy():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ObjectiveHierarchySession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ObjectiveHierarchySession(objective_bank_id, self._runtime)
 
     def get_objective_hierarchy_design_session(self):
         """Gets the session for designing objective hierarchies.
@@ -1120,8 +1140,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_hierarchy_design()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_hierarchy_design_session() # Remove when implemented
-        # return sessions.ObjectiveHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveHierarchyDesignSession(runtime=self._runtime)
 
     objective_hierarchy_design_session = property(fget=get_objective_hierarchy_design_session)
 
@@ -1144,11 +1166,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_hierarchy_design_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_objective_hierarchy_design():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ObjectiveHierarchyDesignSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ObjectiveHierarchyDesignSession(objective_bank_id, self._runtime)
 
     def get_objective_sequencing_session(self):
         """Gets the session for sequencing objectives.
@@ -1162,8 +1186,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_sequencing()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_sequencing_session() # Remove when implemented
-        # return sessions.ObjectiveSequencingSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_sequencing():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveSequencingSession(runtime=self._runtime)
 
     objective_sequencing_session = property(fget=get_objective_sequencing_session)
 
@@ -1185,11 +1211,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_sequencing_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_objective_sequencing():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ObjectiveSequencingSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ObjectiveSequencingSession(objective_bank_id, self._runtime)
 
     def get_objective_objective_bank_session(self):
         """Gets the session for retrieving objective to objective bank mappings.
@@ -1203,8 +1231,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_objective_bank()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_objective_bank_session() # Remove when implemented
-        # return sessions.ObjectiveObjectiveBankSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_objective_bank():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveObjectiveBankSession(runtime=self._runtime)
 
     objective_objective_bank_session = property(fget=get_objective_objective_bank_session)
 
@@ -1221,8 +1251,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_objective_bank_assignment()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_objective_bank_assignment_session() # Remove when implemented
-        # return sessions.ObjectiveObjectiveBankAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_objective_bank_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveObjectiveBankAssignmentSession(runtime=self._runtime)
 
     objective_objective_bank_assignment_session = property(fget=get_objective_objective_bank_assignment_session)
 
@@ -1258,8 +1290,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_requisite()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_requisite_session() # Remove when implemented
-        # return sessions.ObjectiveRequisiteSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_requisite():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveRequisiteSession(runtime=self._runtime)
 
     objective_requisite_session = property(fget=get_objective_requisite_session)
 
@@ -1281,11 +1315,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_requisite_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_objective_requisite():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ObjectiveRequisiteSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ObjectiveRequisiteSession(objective_bank_id, self._runtime)
 
     def get_objective_requisite_assignment_session(self):
         """Gets the session for managing objective requisites.
@@ -1300,8 +1336,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_requisite_assignment()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_requisite_assignment_session() # Remove when implemented
-        # return sessions.ObjectiveRequisiteAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_requisite_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveRequisiteAssignmentSession(runtime=self._runtime)
 
     objective_requisite_assignment_session = property(fget=get_objective_requisite_assignment_session)
 
@@ -1324,11 +1362,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_requisite_assignment_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_objective_requisite_assignment():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ObjectiveRequisiteAssignmentSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ObjectiveRequisiteAssignmentSession(objective_bank_id, self._runtime)
 
     def get_activity_lookup_session(self):
         """Gets the ``OsidSession`` associated with the activity lookup service.
@@ -1342,8 +1382,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_activity_lookup()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_activity_lookup_session() # Remove when implemented
-        # return sessions.ActivityLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_activity_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ActivityLookupSession(runtime=self._runtime)
 
     activity_lookup_session = property(fget=get_activity_lookup_session)
 
@@ -1365,11 +1407,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_activity_lookup_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_activity_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ActivityLookupSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ActivityLookupSession(objective_bank_id, self._runtime)
 
     def get_activity_query_session(self):
         """Gets the ``OsidSession`` associated with the activity query service.
@@ -1383,8 +1427,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_activity_query()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_activity_query_session() # Remove when implemented
-        # return sessions.ActivityQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_activity_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ActivityQuerySession(runtime=self._runtime)
 
     activity_query_session = property(fget=get_activity_query_session)
 
@@ -1406,11 +1452,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_activity_query_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_activity_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ActivityQuerySession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ActivityQuerySession(objective_bank_id, self._runtime)
 
     def get_activity_search_session(self):
         """Gets the ``OsidSession`` associated with the activity search service.
@@ -1424,8 +1472,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_activity_search()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_activity_search_session() # Remove when implemented
-        # return sessions.ActivitySearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_activity_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ActivitySearchSession(runtime=self._runtime)
 
     activity_search_session = property(fget=get_activity_search_session)
 
@@ -1447,11 +1497,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_activity_search_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_activity_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ActivitySearchSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ActivitySearchSession(objective_bank_id, self._runtime)
 
     def get_activity_admin_session(self):
         """Gets the ``OsidSession`` associated with the activity administration service.
@@ -1465,8 +1517,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_activity_admin()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_activity_admin_session() # Remove when implemented
-        # return sessions.ActivityAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_activity_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ActivityAdminSession(runtime=self._runtime)
 
     activity_admin_session = property(fget=get_activity_admin_session)
 
@@ -1488,11 +1542,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_activity_admin_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_activity_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ActivityAdminSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ActivityAdminSession(objective_bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_activity_notification_session(self, activity_receiver):
@@ -1556,8 +1612,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_activity_objective_bank()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_activity_objective_bank_session() # Remove when implemented
-        # return sessions.ActivityObjectiveBankSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_activity_objective_bank():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ActivityObjectiveBankSession(runtime=self._runtime)
 
     activity_objective_bank_session = property(fget=get_activity_objective_bank_session)
 
@@ -1574,8 +1632,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_activity_objective_bank_assignment()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_activity_objective_bank_assignment_session() # Remove when implemented
-        # return sessions.ActivityObjectiveBankAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_activity_objective_bank_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ActivityObjectiveBankAssignmentSession(runtime=self._runtime)
 
     activity_objective_bank_assignment_session = property(fget=get_activity_objective_bank_assignment_session)
 
@@ -1611,8 +1671,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_proficiency_lookup()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_proficiency_lookup_session() # Remove when implemented
-        # return sessions.ProficiencyLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_proficiency_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ProficiencyLookupSession(runtime=self._runtime)
 
     proficiency_lookup_session = property(fget=get_proficiency_lookup_session)
 
@@ -1635,11 +1697,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(learning_managers.LearningManager, self).get_proficiency_lookup_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_proficiency_lookup():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ProficiencyLookupSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ProficiencyLookupSession(objective_bank_id, self._runtime)
 
     def get_proficiency_query_session(self):
         """Gets the ``OsidSession`` associated with the proficiency query service.
@@ -1653,8 +1717,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_proficiency_query()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_proficiency_query_session() # Remove when implemented
-        # return sessions.ProficiencyQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_proficiency_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ProficiencyQuerySession(runtime=self._runtime)
 
     proficiency_query_session = property(fget=get_proficiency_query_session)
 
@@ -1677,11 +1743,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(learning_managers.LearningManager, self).get_proficiency_query_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_proficiency_query():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ProficiencyQuerySession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ProficiencyQuerySession(objective_bank_id, self._runtime)
 
     def get_proficiency_search_session(self):
         """Gets the ``OsidSession`` associated with the proficiency search service.
@@ -1695,8 +1763,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_proficiency_search()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_proficiency_search_session() # Remove when implemented
-        # return sessions.ProficiencySearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_proficiency_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ProficiencySearchSession(runtime=self._runtime)
 
     proficiency_search_session = property(fget=get_proficiency_search_session)
 
@@ -1718,11 +1788,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(learning_managers.LearningManager, self).get_proficiency_search_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_proficiency_search():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ProficiencySearchSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ProficiencySearchSession(objective_bank_id, self._runtime)
 
     def get_proficiency_admin_session(self):
         """Gets the ``OsidSession`` associated with the proficiency administration service.
@@ -1736,8 +1808,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_proficiency_admin()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_proficiency_admin_session() # Remove when implemented
-        # return sessions.ProficiencyAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_proficiency_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ProficiencyAdminSession(runtime=self._runtime)
 
     proficiency_admin_session = property(fget=get_proficiency_admin_session)
 
@@ -1759,11 +1833,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(learning_managers.LearningManager, self).get_proficiency_admin_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_proficiency_admin():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.ProficiencyAdminSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.ProficiencyAdminSession(objective_bank_id, self._runtime)
 
     @utilities.arguments_not_none
     def get_proficiency_notification_session(self, proficiency_receiver):
@@ -1829,8 +1905,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_proficiency_objective_bank()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_proficiency_objective_bank_session() # Remove when implemented
-        # return sessions.ProficiencyObjectiveBankSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_proficiency_objective_bank():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ProficiencyObjectiveBankSession(runtime=self._runtime)
 
     proficiency_objective_bank_session = property(fget=get_proficiency_objective_bank_session)
 
@@ -1849,8 +1927,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_proficiency_objective_bank_assignment_session() # Remove when implemented
-        # return sessions.ProficiencyObjectiveBankAssignmentSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_proficiency_objective_bank_assignment():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ProficiencyObjectiveBankAssignmentSession(runtime=self._runtime)
 
     proficiency_objective_bank_assignment_session = property(fget=get_proficiency_objective_bank_assignment_session)
 
@@ -1886,8 +1966,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_my_learning_path()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_my_learning_path_session() # Remove when implemented
-        # return sessions.MyLearningPathSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_my_learning_path():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.MyLearningPathSession(runtime=self._runtime)
 
     my_learning_path_session = property(fget=get_my_learning_path_session)
 
@@ -1909,11 +1991,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(learning_managers.LearningManager, self).get_my_learning_path_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_my_learning_path():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.MyLearningPathSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.MyLearningPathSession(objective_bank_id, self._runtime)
 
     def get_learning_path_session(self):
         """Gets the ``OsidSession`` associated with the learning path service.
@@ -1927,8 +2011,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_learning_path()`` is ``true``.*
 
         """
-        super(learning_managers.LearningManager, self).get_learning_path_session() # Remove when implemented
-        # return sessions.LearningPathSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_learning_path():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.LearningPathSession(runtime=self._runtime)
 
     learning_path_session = property(fget=get_learning_path_session)
 
@@ -1950,11 +2036,13 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_visible_federation()`` are ``true``*
 
         """
-        super(learning_managers.LearningManager, self).get_learning_path_session_for_objective_bank(objective_bank_id) # Remove when implemented
+        if not self.supports_learning_path():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return sessions.LearningPathSession(objective_bank_id, runtime=self._runtime) # Enable when implemented
+        # pylint: disable=no-member
+        return sessions.LearningPathSession(objective_bank_id, self._runtime)
 
     def get_objective_bank_lookup_session(self):
         """Gets the OsidSession associated with the objective bank lookup service.
@@ -1968,8 +2056,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_bank_lookup()`` is true.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_bank_lookup_session() # Remove when implemented
-        # return sessions.ObjectiveBankLookupSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_bank_lookup():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveBankLookupSession(runtime=self._runtime)
 
     objective_bank_lookup_session = property(fget=get_objective_bank_lookup_session)
 
@@ -1985,8 +2075,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_bank_query()`` is true.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_bank_query_session() # Remove when implemented
-        # return sessions.ObjectiveBankQuerySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_bank_query():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveBankQuerySession(runtime=self._runtime)
 
     objective_bank_query_session = property(fget=get_objective_bank_query_session)
 
@@ -2002,8 +2094,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_bank_search()`` is true.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_bank_search_session() # Remove when implemented
-        # return sessions.ObjectiveBankSearchSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_bank_search():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveBankSearchSession(runtime=self._runtime)
 
     objective_bank_search_session = property(fget=get_objective_bank_search_session)
 
@@ -2019,8 +2113,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_bank_admin()`` is true.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_bank_admin_session() # Remove when implemented
-        # return sessions.ObjectiveBankAdminSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_bank_admin():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveBankAdminSession(runtime=self._runtime)
 
     objective_bank_admin_session = property(fget=get_objective_bank_admin_session)
 
@@ -2058,8 +2154,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_bank_hierarchy()`` is true.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_bank_hierarchy_session() # Remove when implemented
-        # return sessions.ObjectiveBankHierarchySession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_bank_hierarchy():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveBankHierarchySession(runtime=self._runtime)
 
     objective_bank_hierarchy_session = property(fget=get_objective_bank_hierarchy_session)
 
@@ -2075,8 +2173,10 @@ class LearningManager(osid_managers.OsidManager, LearningProfile, learning_manag
         ``supports_objective_bank_hierarchy_design()`` is true.*
 
         """
-        super(learning_managers.LearningManager, self).get_objective_bank_hierarchy_design_session() # Remove when implemented
-        # return sessions.ObjectiveBankHierarchyDesignSession(runtime=self._runtime) # Enable when implemented
+        if not self.supports_objective_bank_hierarchy_design():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.ObjectiveBankHierarchyDesignSession(runtime=self._runtime)
 
     objective_bank_hierarchy_design_session = property(fget=get_objective_bank_hierarchy_design_session)
 
