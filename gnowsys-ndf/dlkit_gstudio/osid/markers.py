@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.osid import markers as abc_osid_markers
+from dlkit.abstract_osid.osid import markers as abc_osid_markers
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.calendaring.primitives import DateTime
 from dlkit.primordium.id.primitives import Id
@@ -38,6 +38,7 @@ class Identifiable(abc_osid_markers.Identifiable):
 
     def __init__(self, runtime=None):
         self._set_authority(runtime)
+        self._gstudio_node = None
 
     def _set_authority(self, runtime):
         try:
@@ -81,7 +82,7 @@ class Identifiable(abc_osid_markers.Identifiable):
         """
         identifier = 'None' # re-implement to get real identifier for object
         return Id(
-            identifier=str(self._my_map['_id']),
+            identifier=str(self._gstudio_node['_id']),
             namespace=self._namespace,
             authority=self._authority)
 
