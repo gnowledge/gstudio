@@ -1,6 +1,6 @@
 """Not sure why this is here. Seems duplicated with osid.records. use that instead?"""
 
-from ...abstract_osid.osid import records as abc_osid_records
+from dlkit.abstract_osid.osid import records as abc_osid_records
 
 
 class OsidRecord(abc_osid_records.OsidRecord):

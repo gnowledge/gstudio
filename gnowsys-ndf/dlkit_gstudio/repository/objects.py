@@ -17,7 +17,7 @@ import importlib
 
 from . import default_mdata
 from .. import utilities
-from ...abstract_osid.repository import objects as abc_repository_objects
+from dlkit.abstract_osid.repository import objects as abc_repository_objects
 from ..osid import markers as osid_markers
 from ..osid import objects as osid_objects
 from ..osid.metadata import Metadata
@@ -1678,7 +1678,7 @@ class Repository(abc_repository_objects.Repository, osid_objects.OsidCatalog):
 
     def __init__(self, **kwargs):
         # self._record_type_data_sets = get_registry('REPOSITORY_RECORD_TYPES', runtime)
-        osid_objects.OsidCatalog.__init__(self, object_name='REPOSITORY', **kwargs)
+        osid_objects.OsidCatalog.__init__(self, **kwargs)
 
     @utilities.arguments_not_none
     def get_repository_record(self, repository_record_type):

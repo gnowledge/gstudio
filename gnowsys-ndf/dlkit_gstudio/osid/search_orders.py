@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.osid import search_orders as abc_osid_search_orders
+from dlkit.abstract_osid.osid import search_orders as abc_osid_search_orders
 from ..osid import markers as osid_markers
 from dlkit.abstract_osid.osid import errors
 

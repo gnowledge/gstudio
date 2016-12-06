@@ -18,16 +18,18 @@ from pymongo.cursor import Cursor
 
 from . import default_mdata
 from .. import utilities
-from ...abstract_osid.osid import objects as abc_osid_objects
+from dlkit.abstract_osid.osid import objects as abc_osid_objects
 from ..osid import markers as osid_markers
-from ..primitives import Id
+from ..primitives import Id, DisplayText
 from ..utilities import OsidListList
 from ..utilities import get_locale_with_proxy
 from ..utilities import update_display_text_defaults
 from .metadata import Metadata
 from dlkit.abstract_osid.osid import errors
-from dlkit.primordium.id.primitives import Id
+# from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
+from dlkit.primordium.locale.types import language, script
+from dlkit.primordium.locale.types import format as text_format
 
 
 
@@ -101,6 +103,10 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
 
     _namespace = 'osid.OsidObject'
 
+    def __init__(self, gstudio_node=None, **kwargs):
+        osid_markers.Identifiable.__init__(self)
+        self._gstudio_node = gstudio_node
+
     def get_display_name(self):
         """Gets the preferred display name associated with this instance of this OSID object appropriate for display to the user.
 
@@ -117,7 +123,17 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         naming.
 
         """
-        raise errors.Unimplemented()
+
+        # default script: 'LATN'
+        # default format: 'PLAIN'
+        # language : from node
+        return DisplayText(
+            text=self._gstudio_node['altnames'],
+            language_type=Type(**language.get_type_data(self._gstudio_node['language'][0])),
+            script_type=Type(**script.get_type_data('LATN')),
+            format_type=Type(**text_format.get_type_data('PLAIN')),
+            )
+        # raise errors.Unimplemented()
 
     display_name = property(fget=get_display_name)
 
@@ -286,6 +302,7 @@ class OsidCatalog(abc_osid_objects.OsidCatalog, OsidObject, osid_markers.Sourcea
     
     def __init__(self, **kwargs):
         OsidObject.__init__(self, **kwargs)
+
         # Should we initialize Sourceable?
         # Should we initialize Federatable?
     
@@ -870,7 +887,7 @@ class OsidForm(abc_osid_objects.OsidForm, osid_markers.Identifiable, osid_marker
 
     def _is_valid_id(self, inpt):
         """Checks if input is a valid Id"""
-        from ...abstract_osid.id.primitives import Id as abc_id
+        from dlkit.abstract_osid.id.primitives import Id as abc_id
         if isinstance(inpt, abc_id):
             return True
         else:
@@ -878,7 +895,7 @@ class OsidForm(abc_osid_objects.OsidForm, osid_markers.Identifiable, osid_marker
 
     def _is_valid_type(self, inpt):
         """Checks if input is a valid Type"""
-        from ...abstract_osid.type.primitives import Type as abc_type
+        from dlkit.abstract_osid.type.primitives import Type as abc_type
         if isinstance(inpt, abc_type):
             return True
         else:
@@ -962,7 +979,7 @@ class OsidForm(abc_osid_objects.OsidForm, osid_markers.Identifiable, osid_marker
     def _is_valid_date_time(self, inpt, metadata):
         """Checks if input is a valid DateTime object"""
         # NEED TO ADD CHECKS FOR OTHER METADATA, LIKE MINIMUM, MAXIMUM, ETC.
-        from ...abstract_osid.calendaring.primitives import DateTime as abc_datetime
+        from dlkit.abstract_osid.calendaring.primitives import DateTime as abc_datetime
         if isinstance(inpt, abc_datetime):
             return True
         else:
@@ -978,7 +995,7 @@ class OsidForm(abc_osid_objects.OsidForm, osid_markers.Identifiable, osid_marker
     def _is_valid_duration(self, inpt, metadata):
         """Checks if input is a valid Duration"""
         # NEED TO ADD CHECKS FOR OTHER METADATA, LIKE MINIMUM, MAXIMUM, ETC.
-        from ...abstract_osid.calendaring.primitives import Duration as abc_duration
+        from dlkit.abstract_osid.calendaring.primitives import Duration as abc_duration
         if isinstance(inpt, abc_duration):
             return True
         else:

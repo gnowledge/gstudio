@@ -8,11 +8,12 @@
 
 
 from .. import utilities
-from ...abstract_osid.repository import sessions as abc_repository_sessions
+from dlkit.abstract_osid.repository import sessions as abc_repository_sessions
 from ..osid import sessions as osid_sessions
 from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
-
+from .objects import Repository, RepositoryList
+from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection
 
 
 
@@ -3257,7 +3258,7 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(proxy=proxy, runtime=runtime)
+        OsidSession._init_proxy_and_runtime(self, proxy=proxy, runtime=runtime)
         self._kwargs = kwargs
 
     def can_lookup_repositories(self):
@@ -3287,7 +3288,8 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        # raise errors.Unimplemented()
+        pass
 
     def use_plenary_repository_view(self):
         """A complete view of the ``Repository`` returns is desired.
@@ -3299,7 +3301,8 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
+        # raise errors.Unimplemented()
 
     @utilities.arguments_not_none
     def get_repository(self, repository_id):
@@ -3445,7 +3448,11 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        repository_list = []
+        group_cur = node_collection.find({'_type': 'Group'})
+        repository_list = [Repository(gstudio_node=each_grp) for each_grp in group_cur]
+        return RepositoryList(repository_list)
+        # raise errors.Unimplemented()
 
     repositories = property(fget=get_repositories)
 

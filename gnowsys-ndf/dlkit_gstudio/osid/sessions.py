@@ -8,7 +8,7 @@
 
 
 from .. import utilities
-from ...abstract_osid.osid import sessions as abc_osid_sessions
+from dlkit.abstract_osid.osid import sessions as abc_osid_sessions
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
