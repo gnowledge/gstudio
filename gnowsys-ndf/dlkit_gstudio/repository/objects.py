@@ -107,7 +107,8 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
     _namespace = 'repository.Asset'
 
     def __init__(self, **kwargs):
-        # osid_objects.OsidObject.__init__(self, object_name='ASSET', **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='ASSET', **kwargs)
+        # Can remove object_name param
         self._catalog_name = 'repository'
 
 
