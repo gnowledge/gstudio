@@ -2332,6 +2332,24 @@ class Group(GSystem):
 
 
     @staticmethod
+    def can_read(user_id, group):
+        if isinstance(group, Group):
+            group_obj = group
+        else:
+            group_obj = Group.get_group_name_id(group, get_obj=True)
+
+        if group_obj:
+            if group_obj.group_type == 'PUBLIC':
+                return True
+            else:
+                user_query = User.objects.filter(id=user_id)
+                if user_query:
+                    return group_obj.is_gstaff(user_query[0]) or (user_id in group_obj.author_set)
+
+        return False
+
+
+    @staticmethod
     def purge_group(group_name_or_id, proceed=True):
 
         # fetch group object
