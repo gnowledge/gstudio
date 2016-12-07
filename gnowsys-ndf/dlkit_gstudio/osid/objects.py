@@ -815,6 +815,9 @@ class OsidForm(abc_osid_objects.OsidForm, osid_markers.Identifiable, osid_marker
     def _init_map(self):
         self._journal_comment = self._journal_comment_default
 
+    def _init_form(self):
+        """Initialize form elements"""
+
     def get_id(self):
         """ Override get_id as implemented in Identifiable.
 
@@ -1201,6 +1204,23 @@ class OsidBrowsableForm(abc_osid_objects.OsidBrowsableForm, OsidForm):
 class OsidTemporalForm(abc_osid_objects.OsidTemporalForm, OsidForm):
     """This form is used to create and update temporals."""
 
+    _namespace = "osid.OsidTemporalForm"
+
+    def __init__(self):
+        self._mdata = None
+
+    def _init_metadata(self, **kwargs):
+        # pylint: disable=attribute-defined-outside-init
+        # this method is called from descendent __init__
+        self._mdata.update(default_mdata.get_osid_temporal_mdata())
+        self._mdata['start_date'].update({'default_date_time_values': [datetime.datetime.utcnow()]})
+        self._mdata['end_date'].update({
+            'default_date_time_values': [datetime.datetime.utcnow() + datetime.timedelta(weeks=9999)]
+        })
+
+    def _init_form(self):
+        """Initialize form elements"""
+
     def get_start_date_metadata(self):
         """Gets the metadata for a start date.
 
@@ -1289,6 +1309,19 @@ class OsidAggregateableForm(abc_osid_objects.OsidAggregateableForm, OsidForm):
 class OsidContainableForm(abc_osid_objects.OsidContainableForm, OsidForm):
     """This form is used to create and update containers."""
 
+    def __init__(self):
+        self._mdata = None
+        self._sequestered_default = None
+        self._sequestered = None
+
+    def _init_metadata(self):
+        self._mdata.update(default_mdata.get_osid_containable_mdata())
+        self._sequestered_default = self._mdata['sequestered']['default_boolean_values'][0]
+        self._sequestered = self._sequestered_default
+
+    def _init_form(self):
+        """Initialize form elements"""
+
     def get_sequestered_metadata(self):
         """Gets the metadata for the sequestered flag.
 
@@ -1327,6 +1360,22 @@ class OsidContainableForm(abc_osid_objects.OsidContainableForm, OsidForm):
 
 class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
     """This form is used to create and update sourceables."""
+
+    def __init__(self):
+        self._mdata = None
+        self._provider_default = None
+        self._branding_default = None
+        self._license_default = None
+
+    def _init_metadata(self):
+        self._mdata.update(default_mdata.get_osid_sourceable_mdata())
+        update_display_text_defaults(self._mdata['license'], self._locale_map)
+        self._provider_default = self._mdata['provider']['default_id_values'][0]
+        self._branding_default = self._mdata['branding']['default_id_values']
+        self._license_default = self._mdata['license']['default_string_values'][0]
+
+    def _init_form(self):
+        """Initialize form elements"""
 
     def get_provider_metadata(self):
         """Gets the metadata for a provider.
@@ -1450,7 +1499,15 @@ class OsidOperableForm(abc_osid_objects.OsidOperableForm, OsidForm):
     """This form is used to create and update operables."""
 
     def __init__(self):
+        # Need to implement someday
         pass
+
+    def _init_metadata(self):
+        # Need to implement someday
+        pass
+
+    def _init_form(self):
+        """Initialize form elements"""
 
     def get_enabled_metadata(self):
         """Gets the metadata for the enabled flag.
@@ -1564,7 +1621,41 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
 
     """
 
-    _namespace = '# osid.OsidObjectForm'
+    _namespace = "osid.OsidObjectForm"
+
+    def __init__(self, osid_object_map=None, **kwargs): # removed record_types=None, runtime=None, 
+        self._display_name_default = None
+        self._description_default = None
+        self._genus_type_default = None
+        OsidForm.__init__(self, **kwargs)
+        OsidExtensibleForm.__init__(self, **kwargs)
+        if osid_object_map is not None:
+            self._for_update = True
+            self._my_map = osid_object_map
+            self._load_records(osid_object_map['recordTypeIds'])
+        else:
+            self._for_update = False
+            self._my_map = {}
+
+    def _init_metadata(self, **kwargs):
+        """Initialize metadata for form"""
+        self._mdata.update(default_mdata.get_osid_object_mdata())
+        OsidForm._init_metadata(self)
+        if 'default_display_name' in kwargs:
+            self._mdata['display_name']['default_string_values'][0]['text'] = kwargs['default_display_name']
+        update_display_text_defaults(self._mdata['display_name'], self._locale_map)
+        if 'default_description' in kwargs:
+            self._mdata['description']['default_string_values'][0]['text'] = kwargs['default_description']
+        update_display_text_defaults(self._mdata['description'], self._locale_map)
+        self._display_name_default = dict(self._mdata['display_name']['default_string_values'][0])
+        self._description_default = dict(self._mdata['description']['default_string_values'][0])
+        self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
+
+        if 'mdata' in kwargs:
+            self._mdata.update(kwargs['mdata'])
+
+    def _init_form(self):
+        """Initialize form elements"""
 
     def get_display_name_metadata(self):
         """Gets the metadata for a display name.
