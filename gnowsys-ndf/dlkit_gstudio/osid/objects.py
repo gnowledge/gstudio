@@ -127,8 +127,11 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         # default script: 'LATN'
         # default format: 'PLAIN'
         # language : from node
+        display_name_val = self._gstudio_node['name'] 
+        if not display_name_val:
+            display_name_val = self._gstudio_node['altnames']
         return DisplayText(
-            text=self._gstudio_node['altnames'],
+            text=display_name_val,
             language_type=Type(**language.get_type_data(self._gstudio_node['language'][0])),
             script_type=Type(**script.get_type_data('LATN')),
             format_type=Type(**text_format.get_type_data('PLAIN')),
@@ -151,7 +154,23 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         description into a specific locale using the Locale service.
 
         """
-        raise errors.Unimplemented()
+        # return DisplayText(self._gstudio_node['content'])
+
+        text_val = self._gstudio_node['content'] 
+        if not text_val:
+            text_val = "No description available."
+        # if not text_val and self._gstudio_node['altnames']:
+        #     text_val = self._gstudio_node['altnames']
+        # else:
+        #     text_val = self._gstudio_node['name']
+
+        return DisplayText(
+            text=text_val,
+            language_type=Type(**language.get_type_data(self._gstudio_node['language'][0])),
+            script_type=Type(**script.get_type_data('LATN')),
+            format_type=Type(**text_format.get_type_data('PLAIN')),
+            )
+
 
     description = property(fget=get_description)
 
