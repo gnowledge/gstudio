@@ -9,6 +9,8 @@
 
 from .. import utilities
 from dlkit.abstract_osid.osid import sessions as abc_osid_sessions
+from ..utilities import get_effective_agent_id_with_proxy
+
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
@@ -114,7 +116,7 @@ class OsidSession(abc_osid_sessions.OsidSession):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return get_effective_agent_id_with_proxy(self._proxy)
 
     effective_agent_id = property(fget=get_effective_agent_id)
 

@@ -8,6 +8,7 @@
 
 
 from .. import utilities
+from . import objects
 from dlkit.abstract_osid.repository import sessions as abc_repository_sessions
 from ..osid import sessions as osid_sessions
 from ..osid.sessions import OsidSession
@@ -15,6 +16,7 @@ from dlkit.abstract_osid.osid import errors
 from .objects import Repository, RepositoryList
 from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection
 
+CREATED = True
 
 
 class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessions.OsidSession):
@@ -3554,8 +3556,9 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(proxy=proxy, runtime=runtime)
+        OsidSession._init_proxy_and_runtime(self, proxy=proxy, runtime=runtime)
         self._kwargs = kwargs
+        self._forms = dict()
 
     def can_create_repositories(self):
         """Tests if this user can create ``Repositories``.
@@ -3615,7 +3618,17 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        if repository_record_types == []:
+            print "\n In get_repository_form_for_create()"
+            result = objects.RepositoryForm(
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy) ## Probably don't need effective agent id now that we have proxy in form.
+            self._forms[result.get_id().get_identifier()] = not CREATED
+
+            return result
+        # pass
+        # raise errors.Unimplemented()
 
     @utilities.arguments_not_none
     def create_repository(self, repository_form):

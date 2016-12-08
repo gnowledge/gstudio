@@ -1718,11 +1718,16 @@ class RepositoryForm(abc_repository_objects.RepositoryForm, osid_objects.OsidCat
     _namespace = 'repository.Repository'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidCatalogForm.__init__(self, object_name='REPOSITORY', **kwargs)
+        osid_objects.OsidCatalogForm.__init__(self, **kwargs)
         self._mdata = default_mdata.get_repository_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():
             self._init_form(**kwargs)
+
+    def _init_form(self, record_types=None, **kwargs):
+        """Initialize form map"""
+        osid_objects.OsidCatalogForm.__init__(self, **kwargs)
+
 
     @utilities.arguments_not_none
     def get_repository_form_record(self, repository_record_type):
