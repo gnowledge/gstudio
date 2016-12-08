@@ -1,0 +1,8 @@
+AUTHZ configuration:
+	- all project configuration lies under folder `app_configs` in `config.py` file.
+	- dlkit_runtime.__init__ calls dlkit_runtime.managers.Runtime()
+		- `dlkit_runtime.managers` imports config from `app_configs`
+		- with these imported config, runtime object is initialized.
+			- e.g: RUNTIME = Runtime()
+	- RUNTIME is used to call different service managers.
+		- e.g: repository_service_mgr = RUNTIME.get_service_manager('REPOSITORY', proxy=proxy)
