@@ -5,8 +5,7 @@
 # pylint: disable=too-many-ancestors
 #     Inheritance defined in specification
 
-
-
+from bson import ObjectId
 from .. import utilities
 from . import objects
 from dlkit.abstract_osid.repository import sessions as abc_repository_sessions
@@ -15,8 +14,9 @@ from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
 from .objects import Repository, RepositoryList
 from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection
-
+from gnowsys_ndf import settings
 CREATED = True
+from gnowsys_ndf.ndf.views.group import CreateGroup
 
 
 class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessions.OsidSession):
@@ -3325,7 +3325,9 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        # repository_id will be of type  dlkit.primordium.id.primitives.Id
+        repository_ident = repository_id.identifier
+        return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_ident)}))
 
     @utilities.arguments_not_none
     def get_repositories_by_ids(self, repository_ids):
@@ -3350,7 +3352,11 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        repository_list = []
+        repository_ids = [ObjectId(repository_id.identifier) for repository_id in repository_ids]
+        group_cur = node_collection.find({'_id': {'$in': repository_ids}})
+        repository_list = [Repository(gstudio_node=each_grp) for each_grp in group_cur]
+        return RepositoryList(repository_list)
 
     @utilities.arguments_not_none
     def get_repositories_by_genus_type(self, repository_genus_type):
@@ -3454,7 +3460,6 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
         group_cur = node_collection.find({'_type': 'Group'})
         repository_list = [Repository(gstudio_node=each_grp) for each_grp in group_cur]
         return RepositoryList(repository_list)
-        # raise errors.Unimplemented()
 
     repositories = property(fget=get_repositories)
 
@@ -3650,6 +3655,7 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
 
         """
         raise errors.Unimplemented()
+
 
     def can_update_repositories(self):
         """Tests if this user can update ``Repositories``.
