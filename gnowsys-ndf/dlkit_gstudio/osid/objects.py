@@ -785,8 +785,8 @@ class OsidForm(abc_osid_objects.OsidForm, osid_markers.Identifiable, osid_marker
         self._identifier = str(uuid.uuid4())
         self._mdata = None
         self._for_update = None
-        self._runtime = None # This is now being set in Extensible by higher order objects
-        self._proxy = None # This is now being set in Extensible by higher order objects
+        # self._runtime = None # This is now being set in Extensible by higher order objects
+        # self._proxy = None # This is now being set in Extensible by higher order objects
         self._kwargs = kwargs
         self._locale_map = dict()
         locale = get_locale_with_proxy(proxy)
@@ -1036,7 +1036,8 @@ class OsidForm(abc_osid_objects.OsidForm, osid_markers.Identifiable, osid_marker
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        from ..locale.objects import Locale
+        # from ..locale.objects import Locale
+
         # If no constructor arguments are given it is expected that the
         # locale service will return the default Locale.
         return get_locale_with_proxy(self._proxy)
@@ -1174,6 +1175,9 @@ class OsidExtensibleForm(abc_osid_objects.OsidExtensibleForm, OsidForm, osid_mar
     method of a session.
 
     """
+    def __init__(self, **kwargs):
+        osid_markers.Extensible.__init__(self, **kwargs)
+        # sets runtime and proxy to the current object
 
     def get_required_record_types(self):
         """Gets the required record types for this form.
@@ -1374,8 +1378,12 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         self._branding_default = self._mdata['branding']['default_id_values']
         self._license_default = self._mdata['license']['default_string_values'][0]
 
-    def _init_form(self):
+    def _init_form(self, effective_agent_id=None):
         """Initialize form elements"""
+        self._provider_id = effective_agent_id
+        self._branding_ids = self._branding_default
+        self._license_id = self._license_default
+
 
     def get_provider_metadata(self):
         """Gets the metadata for a provider.
@@ -1384,7 +1392,9 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        metadata = dict(self._mdata['provider'])
+        metadata.update({'existing_id_values': self._provider_id})
+        return Metadata(**metadata)
 
     provider_metadata = property(fget=get_provider_metadata)
 
@@ -1399,7 +1409,7 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._provider_id = provider_id
 
     def clear_provider(self):
         """Removes the provider.
@@ -1409,7 +1419,8 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._provider_id = self._provider_default
+
 
     provider = property(fset=set_provider, fdel=clear_provider)
 
@@ -1420,7 +1431,10 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        metadata = dict(self._mdata['branding'])
+        metadata.update({'existing_id_values': self._branding_ids})
+        return Metadata(**metadata)
+
 
     branding_metadata = property(fget=get_branding_metadata)
 
@@ -1435,7 +1449,7 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._branding_ids = asset_ids
 
     def clear_branding(self):
         """Removes the branding.
@@ -1445,7 +1459,7 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._branding_ids = self._branding_default
 
     branding = property(fset=set_branding, fdel=clear_branding)
 
@@ -1456,7 +1470,10 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        metadata = dict(self._mdata['license'])
+        metadata.update({'existing_string_values': self._license_id})
+        return Metadata(**metadata)
+
 
     license_metadata = property(fget=get_license_metadata)
 
@@ -1471,7 +1488,7 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._license_id = license_
 
     def clear_license(self):
         """Removes the license.
@@ -1481,7 +1498,7 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._license_id = self._license_default
 
     license_ = property(fset=set_license, fdel=clear_license)
 
@@ -1629,13 +1646,14 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         self._genus_type_default = None
         OsidForm.__init__(self, **kwargs)
         OsidExtensibleForm.__init__(self, **kwargs)
-        if osid_object_map is not None:
-            self._for_update = True
-            self._my_map = osid_object_map
-            self._load_records(osid_object_map['recordTypeIds'])
-        else:
-            self._for_update = False
-            self._my_map = {}
+        # Req for update
+        # if osid_object_map is not None:
+        #     self._for_update = True
+        #     self._my_map = osid_object_map
+        #     self._load_records(osid_object_map['recordTypeIds'])
+        # else:
+        #     self._for_update = False
+        #     self._my_map = {}
 
     def _init_metadata(self, **kwargs):
         """Initialize metadata for form"""
@@ -1656,6 +1674,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
 
     def _init_form(self):
         """Initialize form elements"""
+        self._display_name = self._display_name_default
+        self._description = self._description_default
+        self._genus_type = self._genus_type_default
+
 
     def get_display_name_metadata(self):
         """Gets the metadata for a display name.
@@ -1664,7 +1686,9 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        metadata = dict(self._mdata['display_name'])
+        metadata.update({'existing_string_values': self._display_name})
+        return Metadata(**metadata)
 
     display_name_metadata = property(fget=get_display_name_metadata)
 
@@ -1682,7 +1706,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._display_name = display_name
 
     def clear_display_name(self):
         """Clears the display name.
@@ -1692,7 +1716,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._display_name = self._display_name_default
 
     display_name = property(fset=set_display_name, fdel=clear_display_name)
 
@@ -1703,7 +1727,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        metadata = dict(self._mdata['description'])
+        metadata.update({'existing_string_values': self._description})
+        return Metadata(**metadata)
+
 
     description_metadata = property(fget=get_description_metadata)
 
@@ -1718,7 +1745,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._description = description
 
     def clear_description(self):
         """Clears the description.
@@ -1728,7 +1755,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._description = self._description_default
 
     description = property(fset=set_description, fdel=clear_description)
 
@@ -1739,7 +1766,9 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        metadata = dict(self._mdata['genus_type'])
+        metadata.update({'existing_string_values': self._genus_type})
+        return Metadata(**metadata)
 
     genus_type_metadata = property(fget=get_genus_type_metadata)
 
@@ -1757,7 +1786,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._genus_type = genus_type
 
     def clear_genus_type(self):
         """Clears the genus type.
@@ -1767,7 +1796,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._genus_type = self._genus_type_default
 
     genus_type = property(fset=set_genus_type, fdel=clear_genus_type)
 

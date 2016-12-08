@@ -293,7 +293,7 @@ class RepositoryProfile(osid_managers.OsidProfile, repository_managers.Repositor
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        return False # Change to True when implemented.
+        return True # Change to True when implemented.
 
     def supports_repository_notification(self):
         """Tests if repository notification is supported.
