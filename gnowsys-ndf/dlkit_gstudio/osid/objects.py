@@ -21,6 +21,7 @@ from .. import utilities
 from dlkit.abstract_osid.osid import objects as abc_osid_objects
 from ..osid import markers as osid_markers
 from ..primitives import Id, DisplayText
+from dlkit.abstract_osid.locale.primitives import DisplayText as abc_display_text
 from ..utilities import OsidListList
 from ..utilities import get_locale_with_proxy
 from ..utilities import update_display_text_defaults
@@ -834,6 +835,9 @@ class OsidForm(abc_osid_objects.OsidForm, osid_markers.Identifiable, osid_marker
     def _init_map(self):
         self._journal_comment = self._journal_comment_default
 
+    def _init_gstudio_map(self, record_types=None):
+        """Initialize gstudio form elements"""
+
     def _init_form(self):
         """Initialize form elements"""
 
@@ -1197,6 +1201,14 @@ class OsidExtensibleForm(abc_osid_objects.OsidExtensibleForm, OsidForm, osid_mar
     def __init__(self, **kwargs):
         osid_markers.Extensible.__init__(self, **kwargs)
         # sets runtime and proxy to the current object
+    def _init_map(self, record_types):
+        self._my_map['recordTypeIds'] = []
+        if record_types is not None:
+            self._init_records(record_types)
+        self._supported_record_type_ids = self._my_map['recordTypeIds']
+
+    def _init_gstudio_map(self, record_types=None):
+        """Initialize gstudio map for form"""
 
     def get_required_record_types(self):
         """Gets the required record types for this form.
@@ -1403,6 +1415,17 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         self._branding_ids = self._branding_default
         self._license_id = self._license_default
 
+
+    def _init_gstudio_map(self, effective_agent_id=None, **kwargs):
+        """Initialize map for form"""
+        pass
+
+    def _init_map(self, effective_agent_id=None, **kwargs):
+
+        if 'effective_agent_id' in kwargs:
+            self._my_map['providerId'] = effective_agent_id
+            self._my_map['brandingIds'] = self._branding_default
+            self._my_map['license'] = dict(self._license_default)
 
     def get_provider_metadata(self):
         """Gets the metadata for a provider.
@@ -1666,13 +1689,14 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         OsidForm.__init__(self, **kwargs)
         OsidExtensibleForm.__init__(self, **kwargs)
         # Req for update
-        # if osid_object_map is not None:
-        #     self._for_update = True
-        #     self._my_map = osid_object_map
-        #     self._load_records(osid_object_map['recordTypeIds'])
-        # else:
-        #     self._for_update = False
-        #     self._my_map = {}
+        if osid_object_map is not None:
+            self._for_update = True
+            self._my_map = osid_object_map
+            # self._load_records(osid_object_map['recordTypeIds'])
+        else:
+            self._for_update = False
+            self._my_map = {}
+            self._gstudio_map = {}
 
     def _init_metadata(self, **kwargs):
         """Initialize metadata for form"""
@@ -1691,12 +1715,37 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if 'mdata' in kwargs:
             self._mdata.update(kwargs['mdata'])
 
-    def _init_form(self):
-        """Initialize form elements"""
-        self._display_name = self._display_name_default
-        self._description = self._description_default
-        self._genus_type = self._genus_type_default
+    # def _init_map(self):
+    #     print "\n Init map === "
+    #     """Initialize map for form"""
+    #     OsidForm._init_map(self)
+    #     self._my_map['displayName'] = dict(self._display_name_default)
+    #     self._my_map['description'] = dict(self._description_default)
+    #     self._my_map['genusTypeId'] = self._genus_type_default
+    #     OsidExtensibleForm._init_map(self, record_types)
+    #     # """Initialize form elements"""
+    #     # self._display_name = self._display_name_default
+    #     # self._description = self._description_default
+    #     # self._genus_type = self._genus_type_default
 
+    # # def _init_map(self, record_types=None):
+
+
+    def _init_map(self, record_types=None):
+        """Initialize map for form"""
+        OsidForm._init_map(self)
+        self._my_map['displayName'] = dict(self._display_name_default)
+        self._my_map['description'] = dict(self._description_default)
+        self._my_map['genusTypeId'] = self._genus_type_default
+        OsidExtensibleForm._init_map(self, record_types)
+
+    def _init_gstudio_map(self, record_types=None):
+        """Initialize map for form"""
+        OsidForm._init_gstudio_map(self)
+        self._gstudio_map['name'] = dict(self._display_name_default)
+        self._gstudio_map['content'] = dict(self._description_default)
+        # self._my_map['genusTypeId'] = self._genus_type_default
+        OsidExtensibleForm._init_gstudio_map(self, record_types)
 
     def get_display_name_metadata(self):
         """Gets the metadata for a display name.
@@ -1706,7 +1755,8 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
 
         """
         metadata = dict(self._mdata['display_name'])
-        metadata.update({'existing_string_values': self._display_name})
+        metadata.update({'existing_string_values': self._my_map['displayName']['text']})
+        # metadata.update({'existing_string_values': self._display_name})
         return Metadata(**metadata)
 
     display_name_metadata = property(fget=get_display_name_metadata)
@@ -1725,7 +1775,8 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        self._display_name = display_name
+        self._gstudio_map['name'] = unicode(display_name)
+        # self._display_name = display_name
 
     def clear_display_name(self):
         """Clears the display name.
@@ -1735,7 +1786,12 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        self._display_name = self._display_name_default
+        if (self.get_display_name_metadata().is_read_only() or
+                self.get_display_name_metadata().is_required()):
+            raise errors.NoAccess()
+        self._gstudio_map['name'] = dict(self._display_name_default)
+
+        # self._display_name = self._display_name_default
 
     display_name = property(fset=set_display_name, fdel=clear_display_name)
 
@@ -1747,7 +1803,8 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
 
         """
         metadata = dict(self._mdata['description'])
-        metadata.update({'existing_string_values': self._description})
+        metadata.update({'existing_string_values': self._my_map['description']['text']})
+        # metadata.update({'existing_string_values': self._description})
         return Metadata(**metadata)
 
 
@@ -1764,7 +1821,8 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        self._description = description
+        self._gstudio_map['content'] = unicode(description)
+        # self._description = description
 
     def clear_description(self):
         """Clears the description.
@@ -1774,7 +1832,11 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        self._description = self._description_default
+        if (self.get_description_metadata().is_read_only() or
+                self.get_description_metadata().is_required()):
+            raise errors.NoAccess()
+        self._gstudio_map['content'] = dict(self._description_default)
+        # self._description = self._description_default
 
     description = property(fset=set_description, fdel=clear_description)
 
@@ -1786,7 +1848,8 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
 
         """
         metadata = dict(self._mdata['genus_type'])
-        metadata.update({'existing_string_values': self._genus_type})
+        metadata.update({'existing_string_values': self._my_map['genusTypeId']})
+        # metadata.update({'existing_string_values': self._genus_type})
         return Metadata(**metadata)
 
     genus_type_metadata = property(fget=get_genus_type_metadata)
@@ -1805,7 +1868,12 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        self._genus_type = genus_type
+        if self.get_genus_type_metadata().is_read_only():
+            raise errors.NoAccess()
+        if not self._is_valid_type(genus_type):
+            raise errors.InvalidArgument()
+        self._my_map['genusTypeId'] = str(genus_type)
+        # self._genus_type = genus_type
 
     def clear_genus_type(self):
         """Clears the genus type.
@@ -1815,7 +1883,11 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        self._genus_type = self._genus_type_default
+        if (self.get_genus_type_metadata().is_read_only() or
+                self.get_genus_type_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['genusTypeId'] = self._genus_type_default
+        # self._genus_type = self._genus_type_default
 
     genus_type = property(fset=set_genus_type, fdel=clear_genus_type)
 
@@ -1838,6 +1910,16 @@ class OsidCatalogForm(abc_osid_objects.OsidCatalogForm, OsidObjectForm, OsidSour
         OsidFederateableForm.__init__(self)
         OsidObjectForm.__init__(self, **kwargs)
 
+
+    def _init_map(self, record_types=None, **kwargs):
+        OsidSourceableForm._init_map(self, **kwargs)
+        OsidFederateableForm._init_map(self)
+        OsidObjectForm._init_map(self, record_types)
+
+    def _init_gstudio_map(self, record_types=None, **kwargs):
+        OsidSourceableForm._init_gstudio_map(self, **kwargs)
+        OsidFederateableForm._init_gstudio_map(self)
+        OsidObjectForm._init_gstudio_map(self, record_types)
 
 
 

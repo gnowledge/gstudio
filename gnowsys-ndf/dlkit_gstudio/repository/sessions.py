@@ -14,9 +14,8 @@ from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
 from .objects import Repository, RepositoryList
 from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection
-from gnowsys_ndf import settings
-CREATED = True
 from gnowsys_ndf.ndf.views.group import CreateGroup
+CREATED = True
 
 
 class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessions.OsidSession):
@@ -3326,7 +3325,9 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
 
         """
         # repository_id will be of type  dlkit.primordium.id.primitives.Id
-        repository_ident = repository_id.identifier
+        repository_ident = repository_id
+        if not isinstance(repository_id, ObjectId):
+            repository_ident = repository_id.identifier
         return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_ident)}))
 
     @utilities.arguments_not_none
@@ -3624,7 +3625,6 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
 
         """
         if repository_record_types == []:
-            print "\n In get_repository_form_for_create()"
             result = objects.RepositoryForm(
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id(),
@@ -3654,7 +3654,48 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        try:
+            if self._forms[repository_form.get_id().get_identifier()] == CREATED:
+                raise errors.IllegalState('repository_form already used in a create transaction')
+        except KeyError:
+            raise errors.Unsupported('repository_form did not originate from this session')
+
+        if not repository_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+
+        """
+        The following code to build request
+         object is purely for testing purpose
+        """        
+        from django.contrib.auth.models import User
+        u = User.objects.get(pk=1)
+        from django.test import RequestFactory
+
+        rf = RequestFactory()
+
+        req_obj = rf.get('/home')
+        req_obj.user = u
+        req_obj.user.id
+
+        self._forms[repository_form.get_id().get_identifier()] = CREATED
+
+        group_ins = CreateGroup(req_obj)
+        group_name = repository_form._gstudio_map['name']
+        status_obj_tuple = group_ins.create_group(group_name,**repository_form._gstudio_map)
+
+        if status_obj_tuple[0]:
+            # new_repo_obj = RepositoryLookupSession(self._proxy,self._runtime).get_repository(status_obj_tuple[1]['_id'])
+            new_repo_obj = objects.Repository(gstudio_node=status_obj_tuple[1])
+            print new_repo_obj
+            # <dlkit_gstudio.repository.objects.Repository object at 0x7fdeec766950>
+    
+            result = objects.Repository(
+                osid_object_map=new_repo_obj._my_map,
+                runtime=self._runtime,
+                proxy=self._proxy)
+
+            return result
+        raise Exception("Error: {0}".format(status_obj_tuple[1]))
 
 
     def can_update_repositories(self):

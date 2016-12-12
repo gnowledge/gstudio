@@ -1721,8 +1721,20 @@ class RepositoryForm(abc_repository_objects.RepositoryForm, osid_objects.OsidCat
         osid_objects.OsidCatalogForm.__init__(self, **kwargs)
         self._mdata = default_mdata.get_repository_mdata()
         self._init_metadata(**kwargs)
+        # if not self.is_for_update():
+        #     self._init_form(**kwargs)
         if not self.is_for_update():
-            self._init_form(**kwargs)
+            self._init_map(**kwargs)
+            self._init_gstudio_map(**kwargs)
+
+    def _init_map(self, record_types=None, **kwargs):
+        """Initialize form map"""
+        osid_objects.OsidCatalogForm._init_map(self, record_types, **kwargs)
+
+    def _init_gstudio_map(self, record_types=None, **kwargs):
+        """Initialize form map"""
+        osid_objects.OsidCatalogForm._init_gstudio_map(self, record_types, **kwargs)
+
 
     def _init_form(self, record_types=None, **kwargs):
         """Initialize form map"""
