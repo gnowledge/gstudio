@@ -74,7 +74,6 @@ class CreateGroup(object):
 
         # explicitely using "find_one" query
         group = node_collection.find_one({'_type': 'Group', 'name': unicode(group_name)})
-
         if group:
             return True
 
@@ -99,7 +98,6 @@ class CreateGroup(object):
         class_instance_var.get_group_fields(group_name, **group_fields)
         (NOTE: use ** before dict variables, in above case it's group_fields so it's: **group_fields)
         '''
-
         # getting the data into variables
         name = group_name
 
@@ -156,6 +154,13 @@ class CreateGroup(object):
         else:
             content_org = self.request.POST.get('content_org', '')
 
+        if kwargs.get('content', ''):
+            content = kwargs.get('content', '')
+        else:
+            content = self.request.POST.get('content', '')
+        if not content or not content_org:
+            content = content_org = u""
+
         # whenever we are passing int: 0, condition gets false
         # therefor casting to str
         if str(kwargs.get('moderation_level', '')):
@@ -205,12 +210,16 @@ class CreateGroup(object):
         #  org-content
         if group_obj.content_org != content_org:
             group_obj.content_org = content_org
+            is_changed = True
 
             # Required to link temporary files with the current user who is:
             # usrname = self.request.user.username
             # filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
             # group_obj.content = org2html(content_org, file_prefix=filename)
-            group_obj.content = content_org
+
+
+        if group_obj.content != content:
+            group_obj.content = content
             is_changed = True
 
         # decision for adding moderation_level
@@ -234,7 +243,6 @@ class CreateGroup(object):
         - Takes group name as compulsory argument.
         - Returns tuple containing: (True/False, sub_group_object/error)
         '''
-
         # for editing already existing group
         node_id = kwargs.get('node_id', None)
         # print "node_id : ", node_id

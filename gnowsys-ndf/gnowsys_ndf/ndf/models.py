@@ -1139,35 +1139,35 @@ class AttributeType(Node):
     '''
 
     structure = {
-	'data_type': basestring, # check required: only of the DATA_TYPE_CHOICES
-        'complex_data_type': [unicode], # can be a list or a dictionary
-        'subject_type': [ObjectId], # check required: only one of Type
+    'data_type': basestring, # check required: only of the DATA_TYPE_CHOICES
+    'complex_data_type': [unicode], # can be a list or a dictionary
+    'subject_type': [ObjectId], # check required: only one of Type
                                     # Nodes. GSystems cannot be set as
                                     # subject_types
-	'applicable_node_type': [basestring],	# can be one or more
+    'applicable_node_type': [basestring],	# can be one or more
                                                 # than one of
                                                 # NODE_TYPE_CHOICES
 
-	'verbose_name': basestring,
-	'null': bool,
-	'blank': bool,
-	'help_text': unicode,
-	'max_digits': int, # applicable if the datatype is a number
-	'decimal_places': int, # applicable if the datatype is a float
-	'auto_now': bool,
-	'auto_now_add': bool,
-	'upload_to': unicode,
-	'path': unicode,
-	'verify_exist': bool,
+    'verbose_name': basestring,
+    'null': bool,
+    'blank': bool,
+    'help_text': unicode,
+    'max_digits': int, # applicable if the datatype is a number
+    'decimal_places': int, # applicable if the datatype is a float
+    'auto_now': bool,
+    'auto_now_add': bool,
+    'upload_to': unicode,
+    'path': unicode,
+    'verify_exist': bool,
 
     #   raise issue y used
-	'min_length': int,
-	'required': bool,
-	'label': unicode,
-	'unique': bool,
-	'validators': list,
-	'default': unicode,
-	'editable': bool
+    'min_length': int,
+    'required': bool,
+    'label': unicode,
+    'unique': bool,
+    'validators': list,
+    'default': unicode,
+    'editable': bool
     }
 
     required_fields = ['data_type', 'subject_type']
@@ -1310,6 +1310,12 @@ class RelationType(Node):
         'inverse_name': unicode,
         'subject_type': [ObjectId],  # ObjectId's of Any Class
         'object_type': [OR(ObjectId, list)],  # ObjectId's of Any Class
+        # On hold
+        # 'subject_scope': ['any', 'most', 'some', 'none', 'atmost'] 
+        # 'object_scope': []
+
+        # To be implemented
+        # 'relation_type_scope': []
         'subject_cardinality': int,
         'object_cardinality': int,
         'subject_applicable_nodetype': basestring,  # NODE_TYPE_CHOICES [default (GST)]
@@ -2329,6 +2335,24 @@ class Group(GSystem):
             return group_obj.is_gstaff(user_query[0]) or (user_id in group_obj.author_set)
         else:
             return False
+
+
+    @staticmethod
+    def can_read(user_id, group):
+        if isinstance(group, Group):
+            group_obj = group
+        else:
+            group_obj = Group.get_group_name_id(group, get_obj=True)
+
+        if group_obj:
+            if group_obj.group_type == 'PUBLIC':
+                return True
+            else:
+                user_query = User.objects.filter(id=user_id)
+                if user_query:
+                    return group_obj.is_gstaff(user_query[0]) or (user_id in group_obj.author_set)
+
+        return False
 
 
     @staticmethod
