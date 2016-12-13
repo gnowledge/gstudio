@@ -5,7 +5,6 @@ import time
 import datetime
 import csv
 
-from pymongo import ASCENDING
 
 ''' imports from installed packages '''
 from django.utils.text import slugify
@@ -13,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 # from django.contrib.auth.models import User
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import Group
+from gnowsys_ndf.ndf.models import Group, node_collection
 from gnowsys_ndf.settings import GSTUDIO_LOGS_DIR_PATH, GSTUDIO_DATA_ROOT
 from gnowsys_ndf.ndf.views.gcourse import course_analytics
 # from gnowsys_ndf.ndf.views.methods import get_group_name_id
@@ -33,16 +32,27 @@ log_file = open(log_file_path, 'a+')
 script_start_str = "######### Script ran on : " + time.strftime("%c") + " #########\n----------------\n"
 log_file.write(str(script_start_str))
 
+
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        print "Enter 'group name(case sensitive)' OR 'id': "
-        group_name_or_id = raw_input()
-        group_obj = Group.get_group_name_id(group_name_or_id, get_obj=True)
+        gst_course_ev_gr = node_collection.one({'_type': 'GSystemType', 'name': 'CourseEventGroup'})
+        all_course_groups = node_collection.find({'_type': 'Group', 'member_of': {'$in': [gst_course_ev_gr._id]}})
 
-        if not group_obj:
-            raise ValueError('\nSorry. Request could not be completed. \
-                \nGroup/Course, matching argument entered "' + group_name_or_id + '" does not exists!')
+        for each_group_obj in all_course_groups:
+            print "\n\n Exporting CSV for: ", each_group_obj.name, "(", each_group_obj.altnames, ")\n"
+            export_group_analytics(each_group_obj)
+
+
+def export_group_analytics(group_obj):
+
+        # print "Enter 'group name(case sensitive)' OR 'id': "
+        # group_name_or_id = raw_input()
+        # group_obj = Group.get_group_name_id(group_name_or_id, get_obj=True)
+
+        # if not group_obj:
+        #     raise ValueError('\nSorry. Request could not be completed. \
+        #         \nGroup/Course, matching argument entered "' + group_name_or_id + '" does not exists!')
 
         group_users = group_obj.author_set
         # print group_users
@@ -95,3 +105,4 @@ class Command(BaseCommand):
             except Exception, e:
                 print "\nUser with id: " + str(each_user) + " does not exists!!"
                 continue
+                
