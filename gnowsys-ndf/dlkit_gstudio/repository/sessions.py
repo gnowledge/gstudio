@@ -3689,7 +3689,7 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
                 proxy=self._proxy)
 
             return result
-        raise Exception("Error: {0}".format(status_obj_tuple[1]))
+        raise errors.OperationFailed(status_obj_tuple[1])
 
 
     def can_update_repositories(self):
