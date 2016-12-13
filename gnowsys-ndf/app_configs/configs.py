@@ -221,6 +221,7 @@ GSTUDIO_1 = {
             'displayName': 'Implementation identifier for local service provider',
             'description': 'Implementation identifier for local service provider.  Typically the same identifier as the Mongo configuration',
             'values': [
+                # {'value': 'AUTHZ_ADAPTER_1', 'priority': 1}
                 {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
@@ -479,7 +480,7 @@ SERVICE = {
             'displayName': 'Repository Provider Implementation',
             'description': 'Implementation for repository service provider',
             'values': [
-                {'value': 'GSTUDIO_1', 'priority': 1}
+                {'value': 'AUTHZ_ADAPTER_1', 'priority': 1}
             ]
         },
         'commentingProviderImpl': {
