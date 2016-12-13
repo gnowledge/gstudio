@@ -3682,15 +3682,9 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
         group_ins = CreateGroup(req_obj)
         group_name = repository_form._gstudio_map['name']
         status_obj_tuple = group_ins.create_group(group_name,**repository_form._gstudio_map)
-
         if status_obj_tuple[0]:
-            # new_repo_obj = RepositoryLookupSession(self._proxy,self._runtime).get_repository(status_obj_tuple[1]['_id'])
-            new_repo_obj = objects.Repository(gstudio_node=status_obj_tuple[1])
-            print new_repo_obj
-            # <dlkit_gstudio.repository.objects.Repository object at 0x7fdeec766950>
-    
             result = objects.Repository(
-                osid_object_map=new_repo_obj._my_map,
+                gstudio_node=status_obj_tuple[1],
                 runtime=self._runtime,
                 proxy=self._proxy)
 
