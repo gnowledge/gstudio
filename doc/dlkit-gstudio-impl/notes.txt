@@ -2,6 +2,10 @@ AUTHZ configuration:
 	- all project configuration lies under folder `app_configs` in `config.py` file.
 	- dlkit_runtime.__init__ calls dlkit_runtime.managers.Runtime()
 		- `dlkit_runtime.managers` imports config from `app_configs`
+		- following modules/files imported (make sure your custom changes/paths in this files):
+			- registry
+				- override/update MANAGER_PATHS of authz_adapter's appropriate service wrt one in dlkit_gstudio.
+			- config
 		- with these imported config, runtime object is initialized.
 			- e.g: RUNTIME = Runtime()
 	- RUNTIME is used to call different service managers.
@@ -27,3 +31,5 @@ ISO Language Types (DisplayText Languages):
 		- https://en.wikipedia.org/wiki/ISO_639
 		- https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 		- http://data.okfn.org/data/core/language-codes
+
+
