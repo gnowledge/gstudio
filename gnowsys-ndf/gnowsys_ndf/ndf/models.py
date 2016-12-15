@@ -1315,7 +1315,7 @@ class RelationType(Node):
         # 'object_scope': []
 
         # To be implemented
-        # 'relation_type_scope': []
+        'relation_type_scope': list,
         'subject_cardinality': int,
         'object_cardinality': int,
         'subject_applicable_nodetype': basestring,  # NODE_TYPE_CHOICES [default (GST)]
@@ -3251,7 +3251,7 @@ class GAttribute(Triple):
 @connection.register
 class GRelation(Triple):
     structure = {
-        'relation_type_scope': basestring,
+        'relation_type_scope': dict,
         # 'relation_type': RelationType,  # DBRef of RelationType Class
         'relation_type': ObjectId,  # ObjectId of RelationType node
         'right_subject_scope': basestring,

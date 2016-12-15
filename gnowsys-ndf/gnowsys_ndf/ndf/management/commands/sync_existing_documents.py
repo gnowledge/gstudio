@@ -22,6 +22,20 @@ class Command(BaseCommand):
       + "(only if they doesn't exists) in your database."
 
   def handle(self, *args, **options):
+
+    # --------------------------------------------------------------------------
+    # Adding <'relation_type_scope': []> field to all RelationType objects
+
+    res = node_collection.collection.update({'_type': 'RelationType', 'relation_type_scope': {'$exists': False} }, {'$set': {'relation_type_scope': [] }}, upsert=False, multi=True)
+    if res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'relation_type_scope' field to " + res['n'].__str__() + " RelationType instances."
+
+    triple_res = triple_collection.collection.update({'_type': 'GRelation', 'relation_type_scope': {'$eq': None} }, {'$set': {'relation_type_scope': {} }}, upsert=False, multi=True)
+    if triple_res['updatedExisting']: # and triple_res['nModified']:
+        print "\n Added 'relation_type_scope' field to " + triple_res['n'].__str__() + " GRelation instances."
+    # --------------------------------------------------------------------------
+
+
     all_grelations = triple_collection.find({'_type': 'GRelation'})
     all_gattributes = triple_collection.find({'_type': 'GAttribute'})
     print "\n Working on Triples data. \n Total GRelations found: ", all_grelations.count()
