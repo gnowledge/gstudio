@@ -121,6 +121,7 @@ AWS_ADAPTER_1 = {
     }
 }
 '''
+
 GSTUDIO_1 = {
     'id': 'gstudio_configuration_1',
     'displayName': 'Gstudio Configuration',
@@ -481,6 +482,7 @@ SERVICE = {
             'description': 'Implementation for repository service provider',
             'values': [
                 {'value': 'AUTHZ_ADAPTER_1', 'priority': 1}
+                # {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
         'commentingProviderImpl': {
