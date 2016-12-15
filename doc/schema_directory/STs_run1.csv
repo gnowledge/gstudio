@@ -20,7 +20,7 @@ Steering Committee Member,"[""Person""]","[""factory_types""]",[],[],[]
 Program Officer,"[""Person""]","[""factory_types""]",[],[],[]
 Program Manager,"[""Person""]","[""factory_types""]",[],[],[]
 Partners,"[""Person""]","[""factory_types""]",[],[],[]
-Event,[],"[""GAPP""]","[""is_bigbluebutton"", ""open_event""]",[],[]
+Event,[],"[""GAPP""]",[],[],[]
 Inauguration,"[""Event""]","[""factory_types""]",[],[],[]
 Field Visit,"[""Event""]","[""factory_types""]",[],[],[]
 Meeting,"[""Event""]","[""factory_types""]",[],[],[]
@@ -46,5 +46,9 @@ CourseUnitEvent,[],"[""factory_types""]",[],[],[]
 QuizItemEvent,"[""QuizItem""]","[""factory_types""]",[],[],[]
 Jhapp,[],"[""factory_types""]",[],[],[]
 QuizItemPost,"[""Reply""]","[""factory_types""]",[],[],[]
+<<<<<<< HEAD
 Jsmol,"[""Jhapp""]","[""factory_types""]",[],[],[]
 TurtleBlocks,"[""Jhapp""]","[""factory_types""]",[],[],[]
+=======
+Asset,[],"[""factory_types""]",[],[],[]
+>>>>>>> 0067d4fe8e5998ab5215c69310caa297e4fac52f

@@ -239,12 +239,11 @@ def parse_data_create_gtype(json_file_path):
         json_document['name'] = unicode(json_document['name'])
         json_document['inverse_name'] = unicode(json_document['inverse_name'])
         json_document['object_cardinality'] = int(json_document['object_cardinality'])
+        json_document["relation_type_scope"] = map(unicode,eval(json_document['relation_type_scope']))
 
         perform_eval_type("subject_type", json_document, type_name, "GSystemType")
         perform_eval_type("object_type", json_document, type_name, "GSystemType")
-
         perform_eval_type("member_of", json_document, type_name, "MetaType")
-
       except Exception as e:
         error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error at line #" + str(exc_info()[-1].tb_lineno) + "...\n " + str(e)
         log_list.append(error_message)
@@ -282,11 +281,9 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
       raise Exception(error_message)
 
   type_list = []
-
   for data in json_document[eval_field]:
     if (eval_field == "complex_data_type") and ((data in DATA_TYPE_CHOICES) or (json_document['data_type'] == "IS()")):
       type_list.append(unicode(data))
-
     elif eval_field == "validators":
       type_list.append(data)
 
@@ -316,10 +313,10 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
           raise Exception(error_message)
 
       if type_to_create == "RelationType" and type(data) == list:
-        inner_type_list = []
-        for each in data:
-          _append_to_type_list(eval_field, json_document, type_to_create, type_convert_objectid, each, inner_type_list)
-        type_list.append(inner_type_list)
+          inner_type_list = []
+          for each in data:
+            _append_to_type_list(eval_field, json_document, type_to_create, type_convert_objectid, each, inner_type_list)
+          type_list.append(inner_type_list)
       else:
         _append_to_type_list(eval_field, json_document, type_to_create, type_convert_objectid, data, type_list)
   # Sets python-type converted list
