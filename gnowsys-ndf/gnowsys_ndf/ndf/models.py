@@ -518,6 +518,25 @@ class Node(DjangoDocument):
 
         return self
 
+    @staticmethod
+    def get_node_by_id(node_id):
+        '''
+            Takes ObjectId or objectId as string as arg 
+                and return object        
+        '''
+        if isinstance(node_id, ObjectId) or ObjectId.is_valid(node_id):
+            return node_collection.one({'_id': ObjectId(node_id)})
+        raise ValueError('No object found with id: ' + str(node_id))
+
+    @staticmethod
+    def get_nodes_by_ids_list(node_id_list):
+        '''
+            Takes list of ObjectIds or objectIds as string as arg 
+                and return list of object
+        '''
+        node_id_list = map(ObjectId, node_id_list)
+        return node_collection.find({'_id': {'$in': node_id_list}})
+
 
     @staticmethod
     def get_node_obj_from_id_or_obj(node_obj_or_id, expected_type):
@@ -534,6 +553,7 @@ class Node(DjangoDocument):
             raise RuntimeError('No Node class instance found with provided arg for get_node_obj_from_id_or_obj(' + str(node_obj_or_id) + ', expected_type=' + str(expected_type) + ')')
 
         return node_obj
+
 
 
     def type_of_names_list(self, smallcase=False):
