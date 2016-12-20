@@ -51,7 +51,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(proxy=proxy, runtime=runtime)
+        OsidSession._init_proxy_and_runtime(self, proxy=proxy, runtime=runtime)
         self._kwargs = kwargs
 
     def get_repository_id(self):
@@ -62,7 +62,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return self._catalog_id
 
     repository_id = property(fget=get_repository_id)
 
@@ -76,7 +76,8 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return self._catalog
+        # pass
 
     repository = property(fget=get_repository)
 
@@ -107,7 +108,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
 
     def use_plenary_asset_view(self):
         """A complete view of the ``Asset`` returns is desired.
@@ -119,7 +120,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
 
     def use_federated_repository_view(self):
         """Federates the view for methods in this session.
@@ -130,7 +131,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
 
     def use_isolated_repository_view(self):
         """Isolates the view for methods in this session.
@@ -140,7 +141,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
 
     @utilities.arguments_not_none
     def get_asset(self, asset_id):
@@ -161,7 +162,9 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        asset_identifier = ObjectId(self._get_id(asseT_id, 'repository').get_identifier())
+        result = Node.get_node_by_id(asset_identifier)
+        return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
 
     @utilities.arguments_not_none
     def get_assets_by_ids(self, asset_ids):
@@ -186,7 +189,12 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        object_id_list = []
+        for i in asset_ids:
+            object_id_list.append(ObjectId(self._get_id(i, 'repository').get_identifier()))
+        result_cur = Node.get_nodes_by_ids_list(object_id_list)
+        sorted_result = list(result_cur)
+        return objects.AssetList(sorted_result, runtime=self._runtime, proxy=self._proxy)
 
     @utilities.arguments_not_none
     def get_assets_by_genus_type(self, asset_genus_type):
@@ -205,7 +213,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
 
     @utilities.arguments_not_none
     def get_assets_by_parent_genus_type(self, asset_genus_type):
@@ -224,7 +232,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
 
     @utilities.arguments_not_none
     def get_assets_by_record_type(self, asset_record_type):
@@ -243,7 +251,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
 
     @utilities.arguments_not_none
     def get_assets_by_provider(self, resource_id):
@@ -262,7 +270,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
 
     def get_assets(self):
         """Gets all ``Assets``.
@@ -277,7 +285,10 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        # Get all Asset objects from all Groups.
+        # To be implemented
+        result = []
+        return objects.AssetList(result, runtime=self._runtime, proxy=self._proxy)
 
     assets = property(fget=get_assets)
 
@@ -311,6 +322,27 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
     ``AssetContent``.
 
     """
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
+        OsidSession._init_proxy_and_runtime(self, proxy=proxy, runtime=runtime)
+        self._kwargs = kwargs
+
+    '''
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
+        self._catalog_class = objects.Repository
+        self._session_name = 'AssetContentLookupSession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
+        self._kwargs = kwargs
+    '''
 
     def get_repository_id(self):
         """Gets the ``Repository``  ``Id`` associated with this session.
@@ -322,7 +354,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return self._catalog_id
 
     repository_id = property(fget=get_repository_id)
 
@@ -337,7 +369,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return self._catalog
 
     repository = property(fget=get_repository)
 
@@ -399,7 +431,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
 
     def use_isolated_repository_view(self):
         """Isolates the view for methods in this session.
@@ -411,7 +443,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        pass
 
     @utilities.arguments_not_none
     def get_asset_content(self, asset_content_id):
@@ -434,7 +466,9 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
+        result = Node.get_node_by_id(asset_content_identifier)
+        return objects.AssetContent(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
 
     @utilities.arguments_not_none
     def get_asset_contents_by_ids(self, asset_content_ids):
@@ -3325,10 +3359,7 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
 
         """
         # repository_id will be of type  dlkit.primordium.id.primitives.Id
-        repository_ident = repository_id
-        if not isinstance(repository_id, ObjectId):
-            repository_ident = repository_id.identifier
-        return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_ident)}))
+        return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id)}))
 
     @utilities.arguments_not_none
     def get_repositories_by_ids(self, repository_ids):
