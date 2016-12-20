@@ -48,11 +48,25 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
     ``Asset``.
 
     """
-
-    def __init__(self, proxy=None, runtime=None, **kwargs):
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(self, proxy=proxy, runtime=runtime)
+        self._catalog_class = objects.Repository
+        self._session_name = 'AssetLookupSession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
         self._kwargs = kwargs
+
+    # def __init__(self, proxy=None, runtime=None, **kwargs):
+    #     OsidSession.__init__(self)
+    #     OsidSession._init_proxy_and_runtime(self, proxy=proxy, runtime=runtime)
+    #     self._kwargs = kwargs
 
     def get_repository_id(self):
         """Gets the ``Repository``  ``Id`` associated with this session.
@@ -322,12 +336,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
     ``AssetContent``.
 
     """
-    def __init__(self, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(self, proxy=proxy, runtime=runtime)
-        self._kwargs = kwargs
 
-    '''
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.Repository
@@ -342,7 +351,6 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
             cat_name='Repository',
             cat_class=objects.Repository)
         self._kwargs = kwargs
-    '''
 
     def get_repository_id(self):
         """Gets the ``Repository``  ``Id`` associated with this session.
@@ -3359,7 +3367,7 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
 
         """
         # repository_id will be of type  dlkit.primordium.id.primitives.Id
-        return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id)}))
+        return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id.identifier)}))
 
     @utilities.arguments_not_none
     def get_repositories_by_ids(self, repository_ids):
