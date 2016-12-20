@@ -17,7 +17,7 @@ import importlib
 
 from . import default_mdata
 from .. import utilities
-from ...abstract_osid.authorization import objects as abc_authorization_objects
+from dlkit.abstract_osid.authorization import objects as abc_authorization_objects
 from ..osid import objects as osid_objects
 from ..osid.metadata import Metadata
 from ..primitives import Id
