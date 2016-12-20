@@ -6,7 +6,8 @@
 #     Inheritance defined in specification
 
 
-
+from bson.objectid import ObjectId
+from .. import types
 from .. import utilities
 from dlkit.abstract_osid.osid import sessions as abc_osid_sessions
 from ..utilities import get_effective_agent_id_with_proxy
@@ -14,8 +15,7 @@ from ..utilities import get_effective_agent_id_with_proxy
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
-
-
+from gnowsys_ndf.ndf.models import node_collection
 
 
 class OsidSession(abc_osid_sessions.OsidSession):
@@ -50,6 +50,45 @@ class OsidSession(abc_osid_sessions.OsidSession):
                     authority_param_id).get_string_value()
             except (KeyError, errors.NotFound):
                 self._authority = 'STUB_IMPL.MIT.EDU'
+
+    def _init_object(self, catalog_id, proxy, runtime, db_name, cat_name, cat_class):
+        """Initialize this object as an OsidObject."""
+        self._catalog_identifier = None
+        self._init_proxy_and_runtime(proxy, runtime)
+        if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
+            self._catalog_identifier = catalog_id.get_identifier()
+
+            try:
+                # self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
+                self._my_catalog_map = node_collection.one({'_id': ObjectId(self._catalog_identifier)})
+            except errors.NotFound:
+                if catalog_id.get_identifier_namespace() != db_name + '.' + cat_name:
+                    self._my_catalog_map = self._create_orchestrated_cat(catalog_id, db_name, cat_name)
+                else:
+                    raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
+        else:
+            self._catalog_identifier = '000000000000000000000000'
+            self._my_catalog_map = {
+                '_id': ObjectId(self._catalog_identifier),
+                'displayName': {'text': 'Default ' + cat_name,
+                                'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                                'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                                'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+                'description': {'text': 'The Default ' + cat_name,
+                                'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                                'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                                'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+                'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
+                'recordTypeIds': [] # Could this somehow inherit source catalog records?
+            }
+        # return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id)}))
+        self._catalog = cat_class(gstudio_node=self._my_catalog_map, runtime=self._runtime, proxy=self._proxy)
+        self._catalog._authority = self._authority  # there should be a better way...
+        print "\n self._catalog= ", self._catalog
+        import ipdb; ipdb.set_trace()
+        self._catalog_id = self._catalog.get_id()
+        # self._forms = dict()
+
 
     def get_locale(self):
         """Gets the locale indicating the localization preferences in effect for this session.
