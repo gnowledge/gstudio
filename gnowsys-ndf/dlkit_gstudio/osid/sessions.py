@@ -84,10 +84,8 @@ class OsidSession(abc_osid_sessions.OsidSession):
         # return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id)}))
         self._catalog = cat_class(gstudio_node=self._my_catalog_map, runtime=self._runtime, proxy=self._proxy)
         self._catalog._authority = self._authority  # there should be a better way...
-        print "\n self._catalog= ", self._catalog
-        import ipdb; ipdb.set_trace()
         self._catalog_id = self._catalog.get_id()
-        # self._forms = dict()
+        self._forms = dict()
 
 
     def get_locale(self):

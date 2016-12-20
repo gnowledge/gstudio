@@ -20,6 +20,7 @@ for each in all_repos:
 	print "\t- ", each.get_display_name().get_text()
 	test_repo = each
 # al = repository_service_mgr.get_asset_lookup_session()
+
 al_repo = repository_service_mgr.get_asset_lookup_session_for_repository(test_repo.get_repository_id())
 
 
