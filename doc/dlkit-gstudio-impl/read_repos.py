@@ -15,10 +15,17 @@ repository_service_mgr = RUNTIME.get_service_manager('REPOSITORY', proxy=proxy)
 # import ipdb; ipdb.set_trace()
 all_repos = repository_service_mgr.get_repositories()
 print "\nTotal repositories: ", all_repos.len()
-
-
+test_repo = None
 for each in all_repos:
 	print "\t- ", each.get_display_name().get_text()
+	test_repo = each
+# al = repository_service_mgr.get_asset_lookup_session()
+al_repo = repository_service_mgr.get_asset_lookup_session_for_repository(test_repo.get_repository_id())
+
+
+# asset_by_id = repository_service_mgr.get_asset_content(ObjectId('57926e16a6127d01f8e85946'))
+# print "\nAsset found:  ", asset_by_id
+
 
 
 # ============================================================= try outs
