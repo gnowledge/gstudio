@@ -905,10 +905,20 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
 
 
     """
-
-    def __init__(self, proxy=None, runtime=None, **kwargs):
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(proxy=proxy, runtime=runtime)
+        self._catalog_class = objects.Repository
+        self._session_name = 'AssetAdminSession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
+        self._forms = dict()
         self._kwargs = kwargs
 
     def get_repository_id(self):
@@ -919,7 +929,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return self._catalog_id
 
     repository_id = property(fget=get_repository_id)
 
@@ -933,7 +943,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return self._catalog
 
     repository = property(fget=get_repository)
 
@@ -995,7 +1005,27 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        # Implemented from template for
+        # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
+        for arg in asset_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
+        if asset_record_types == []:
+            obj_form = objects.AssetForm(
+                repository_id=self._catalog_id,
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)
+        else:
+            obj_form = objects.AssetForm(
+                repository_id=self._catalog_id,
+                record_types=asset_record_types,
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
+        return obj_form
+        
 
     @utilities.arguments_not_none
     def create_asset(self, asset_form):
@@ -3702,19 +3732,22 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
         if not repository_form.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
 
+        from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
+        req_obj = GStudioRequest(id=1)
+
         """
         The following code to build request
          object is purely for testing purpose
-        """        
-        from django.contrib.auth.models import User
-        u = User.objects.get(pk=1)
-        from django.test import RequestFactory
+        """
+        # from django.contrib.auth.models import User
+        # u = User.objects.get(pk=1)
+        # from django.test import RequestFactory
 
-        rf = RequestFactory()
+        # rf = RequestFactory()
 
-        req_obj = rf.get('/home')
-        req_obj.user = u
-        req_obj.user.id
+        # req_obj = rf.get('/home')
+        # req_obj.user = u
+        # req_obj.user.id
 
         self._forms[repository_form.get_id().get_identifier()] = CREATED
 
