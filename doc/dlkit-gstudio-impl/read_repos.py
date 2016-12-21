@@ -22,6 +22,10 @@ for each in all_repos:
 # al = repository_service_mgr.get_asset_lookup_session()
 
 al_repo = repository_service_mgr.get_asset_lookup_session_for_repository(test_repo.get_repository_id())
+al_repo.get_repository_id
+al_repo.get_repository_id()
+
+# test_asset = repository_service_mgr.get_asset(ObjectId('57926e16a6127d01f8e85946'))
 
 
 # asset_by_id = repository_service_mgr.get_asset_content(ObjectId('57926e16a6127d01f8e85946'))
