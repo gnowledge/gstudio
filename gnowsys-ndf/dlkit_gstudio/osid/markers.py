@@ -155,7 +155,14 @@ class Extensible(abc_osid_markers.Extensible):
 
         """
         raise errors.Unimplemented()
+    
+    def __iter__(self):
+       for attr in dir(self):
+           if not attr.startswith('__'):
+               yield attr
 
+    def __getitem__(self, item):
+       return getattr(self, item)
 
 class Browsable(abc_osid_markers.Browsable):
     """A marker interface for objects that offer property inspection."""
