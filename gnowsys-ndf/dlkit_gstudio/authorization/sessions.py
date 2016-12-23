@@ -8,7 +8,8 @@
 
 
 from .. import utilities
-from ...abstract_osid.authorization import sessions as abc_authorization_sessions
+from . import objects
+from dlkit.abstract_osid.authorization import sessions as abc_authorization_sessions
 from ..osid import sessions as osid_sessions
 from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
@@ -19,6 +20,20 @@ from gnowsys_ndf.ndf.models import Group, Author
 
 class AuthorizationSession(abc_authorization_sessions.AuthorizationSession, osid_sessions.OsidSession):
     """This is the basic session for verifying authorizations."""
+
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        self._catalog_class = objects.Vault
+        self._session_name = 'AuthorizationSession'
+        self._catalog_name = 'Vault'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='authorization',
+            cat_name='Vault',
+            cat_class=objects.Vault)
+        self._kwargs = kwargs
 
     def get_vault_id(self):
         """Gets the ``Vault``  ``Id`` associated with this session.
@@ -107,10 +122,13 @@ class AuthorizationSession(abc_authorization_sessions.AuthorizationSession, osid
         # agent_id.identifier gives user id [Needs check]
         # Check agent is member/admin of catalog(qualifier object)
         try:
-            return Group.can_access(agent_id, qualifier_id)
+            # agent_id should be django user_id
+            print "\n agent_id -- ", agent_id
+            return Group.can_access(int(agent_id.identifier), qualifier_id)
         except Exception:
-            return Author.can_access(agent_id, qualifier_id)
+            return Author.can_access(int(agent_id.identifier), qualifier_id)
         # raise errors.Unimplemented()
+
 
     @utilities.arguments_not_none
     def get_authorization_condition(self, function_id):
