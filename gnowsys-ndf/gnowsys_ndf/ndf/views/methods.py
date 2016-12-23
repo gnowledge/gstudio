@@ -2731,8 +2731,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     gr_node = None
     multi_relations = False
     relation_type_scope = kwargs.get('relation_type_scope', None)
-    if relation_type_scope:
-        relation_type_scope = _validate_scope_values(relation_type_node, relation_type_scope)
     '''
     Example:
         relation_type_scope = {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'}
@@ -2758,11 +2756,10 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.status = u"PUBLISHED"
             gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
-
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"
-            # print "\n",info_message
+
             relation_type_node_name = relation_type_node.name
             relation_type_node_inverse_name = relation_type_node.inverse_name
 
@@ -2833,8 +2830,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             relation_type_node_name = relation_type_node.name
             relation_type_node_inverse_name = relation_type_node.inverse_name
 
-            gr_node.relation_type_scope.update(relation_type_scope)
-
             subject_id = gr_node.subject
             right_subject = gr_node.right_subject
 
@@ -2864,9 +2859,12 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             # check if req_scope_values keys are present
             # in relation_type_node scope list
             for each_scope_val in req_scope_values.keys():
-                if each_scope_val not in relation_type_node.relation_type_scope:
+                if each_scope_val not in relation_type_node['relation_type_scope']:
                     del req_scope_values[each_scope_val]
             return req_scope_values
+
+        if relation_type_scope:
+            relation_type_scope = _validate_scope_values(relation_type_node, relation_type_scope)
 
         if relation_type_node["object_cardinality"]:
             # If object_cardinality value exists and greater than 1 (or eaqual to 100)
@@ -2947,6 +2945,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         # is PUBLISHED)
                         right_subject_id_or_list.remove(n.right_subject)
                         gr_node_list.append(n)
+                        if n.relation_type_scope != relation_type_scope:
+                            n.relation_type_scope.update(relation_type_scope)
+                            triple_collection.collection.update({'_id': n._id},{'$set': {'relation_type_scope': n.relation_type_scope}}, upsert=False, multi=False)
 
                         node_collection.collection.update(
                             {'_id': subject_id, 'relation_set.' +
@@ -2963,6 +2964,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                                 'relation_set.$.' + relation_type_node.inverse_name: subject_id}},
                             upsert=False, multi=False
                         )
+                        n.reload()
 
                 else:
                     # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
@@ -3003,7 +3005,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     if gr_node is None:
                         # New one found so create it
                         # check for relation_type_scope variable in kwargs and pass
-
                         gr_node = _create_grelation_node(
                             subject_id, relation_type_node, nid, "MultipleGRelation", relation_type_scope)
                         gr_node_list.append(gr_node)
@@ -3035,7 +3036,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                 "_type": "GRelation", "subject": subject_id,
                 "relation_type": relation_type_node_id
             })
-
             for node in gr_node_cur:
                 node_name = node.name
                 node_status = node.status
@@ -3052,6 +3052,10 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                             node, relation_type_node, "SingleGRelation", relation_type_scope)
 
                     elif node_status == u"PUBLISHED":
+                        if node.relation_type_scope != relation_type_scope:
+                            node.relation_type_scope.update(relation_type_scope)
+                            triple_collection.collection.update({'_id': node._id},{'$set': {'relation_type_scope': node.relation_type_scope}}, upsert=False, multi=False)
+
                         node_collection.collection.update({
                             "_id": subject_id, "relation_set." + relation_type_node_name: {'$exists': True}
                         }, {
