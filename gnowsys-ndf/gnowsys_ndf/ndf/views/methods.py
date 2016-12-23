@@ -2731,6 +2731,17 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     gr_node = None
     multi_relations = False
     relation_type_scope = kwargs.get('relation_type_scope', None)
+    '''
+    Example:
+        relation_type_scope = {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'}
+
+    In next phase, validate the scope values by adding:
+        GSTUDIO_FORMAT_SCOPE_VALUES
+        GSTUDIO_SIZE_SCOPE_VALUES
+        GSTUDIO_LANGUAGE_SCOPE_VALUES
+        in settings.py
+        - katkamrachana, 23-12-2016
+    '''
     try:
         subject_id = ObjectId(subject_id)
 
@@ -2741,7 +2752,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.subject = subject_id
             gr_node.relation_type = relation_type_node._id
             gr_node.right_subject = right_subject_id_or_list
-
+            gr_node.relation_type_scope = relation_type_scope
             gr_node.status = u"PUBLISHED"
             gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
@@ -2819,6 +2830,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
             relation_type_node_inverse_name = relation_type_node.inverse_name
+
+            gr_node.relation_type_scope.update(relation_type_scope)
 
             subject_id = gr_node.subject
             right_subject = gr_node.right_subject
