@@ -2731,6 +2731,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     gr_node = None
     multi_relations = False
     relation_type_scope = kwargs.get('relation_type_scope', None)
+    if relation_type_scope:
+        relation_type_scope = _validate_scope_values(relation_type_node, relation_type_scope)
     '''
     Example:
         relation_type_scope = {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'}
@@ -2857,6 +2859,14 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             )
 
             return gr_node
+
+        def _validate_scope_values(relation_type_node, req_scope_values):
+            # check if req_scope_values keys are present
+            # in relation_type_node scope list
+            for each_scope_val in req_scope_values.keys():
+                if each_scope_val not in relation_type_node.relation_type_scope:
+                    del req_scope_values[each_scope_val]
+            return req_scope_values
 
         if relation_type_node["object_cardinality"]:
             # If object_cardinality value exists and greater than 1 (or eaqual to 100)
