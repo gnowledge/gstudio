@@ -53,7 +53,7 @@ class AuthorizationProfile(osid_managers.OsidProfile, authorization_managers.Aut
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        return False # Change to True when implemented.
+        return True # Change to True when implemented.
 
     def supports_authorization_query(self):
         """Tests if an authorization query service is supported.

@@ -46,8 +46,6 @@ MANAGER_PATHS = {
         #                'dlkit.mongo.assessment.managers.AssessmentProxyManager'),
         # 'ASSESSMENT_AUTHORING': ('dlkit.mongo.assessment_authoring.managers.AssessmentAuthoringManager',
         #                          'dlkit.mongo.assessment_authoring.managers.AssessmentAuthoringProxyManager'),
-        # 'AUTHORIZATION': ('dlkit.mongo.authorization.managers.AuthorizationManager',
-        #                   'dlkit.mongo.authorization.managers.AuthorizationProxyManager'),
         'AUTHORIZATION': ('dlkit_gstudio.authorization.managers.AuthorizationManager',
                           'dlkit_gstudio.authorization.managers.AuthorizationProxyManager'),
         'REPOSITORY': ('dlkit_gstudio.repository.managers.RepositoryManager',

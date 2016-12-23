@@ -2725,21 +2725,36 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     Returns:
     - When one to one relationship: Created/Updated/Existed document.
     - When one to many relationship: Created/Updated/Existed list of documents.
+
+    kwargs -- can hold the scope value
     """
     gr_node = None
     multi_relations = False
+    relation_type_scope = kwargs.get('relation_type_scope', None)
+    if relation_type_scope:
+        relation_type_scope = _validate_scope_values(relation_type_node, relation_type_scope)
+    '''
+    Example:
+        relation_type_scope = {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'}
 
+    In next phase, validate the scope values by adding:
+        GSTUDIO_FORMAT_SCOPE_VALUES
+        GSTUDIO_SIZE_SCOPE_VALUES
+        GSTUDIO_LANGUAGE_SCOPE_VALUES
+        in settings.py
+        - katkamrachana, 23-12-2016
+    '''
     try:
         subject_id = ObjectId(subject_id)
 
-        def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text):
+        def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text, relation_type_scope=None):
             # Code for creating GRelation node
             gr_node = triple_collection.collection.GRelation()
 
             gr_node.subject = subject_id
             gr_node.relation_type = relation_type_node._id
             gr_node.right_subject = right_subject_id_or_list
-
+            gr_node.relation_type_scope = relation_type_scope
             gr_node.status = u"PUBLISHED"
             gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
@@ -2810,13 +2825,15 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             return gr_node
 
-        def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text):
+        def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text, relation_type_scope=None):
             gr_node.status = u"PUBLISHED"
             gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
             relation_type_node_inverse_name = relation_type_node.inverse_name
+
+            gr_node.relation_type_scope.update(relation_type_scope)
 
             subject_id = gr_node.subject
             right_subject = gr_node.right_subject
@@ -2842,6 +2859,14 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             )
 
             return gr_node
+
+        def _validate_scope_values(relation_type_node, req_scope_values):
+            # check if req_scope_values keys are present
+            # in relation_type_node scope list
+            for each_scope_val in req_scope_values.keys():
+                if each_scope_val not in relation_type_node.relation_type_scope:
+                    del req_scope_values[each_scope_val]
+            return req_scope_values
 
         if relation_type_node["object_cardinality"]:
             # If object_cardinality value exists and greater than 1 (or eaqual to 100)
@@ -2977,8 +3002,10 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
                     if gr_node is None:
                         # New one found so create it
+                        # check for relation_type_scope variable in kwargs and pass
+
                         gr_node = _create_grelation_node(
-                            subject_id, relation_type_node, nid, "MultipleGRelation")
+                            subject_id, relation_type_node, nid, "MultipleGRelation", relation_type_scope)
                         gr_node_list.append(gr_node)
 
                     else:
@@ -3022,7 +3049,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         # If deleted, change it's status back to Published from
                         # Deleted
                         node = _update_deleted_to_published(
-                            node, relation_type_node, "SingleGRelation")
+                            node, relation_type_node, "SingleGRelation", relation_type_scope)
 
                     elif node_status == u"PUBLISHED":
                         node_collection.collection.update({
@@ -3077,7 +3104,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             if gr_node is None:
                 # Code for creation
                 gr_node = _create_grelation_node(
-                    subject_id, relation_type_node, right_subject_id_or_list, "SingleGRelation")
+                    subject_id, relation_type_node, right_subject_id_or_list, "SingleGRelation", relation_type_scope)
 
             return gr_node
 
