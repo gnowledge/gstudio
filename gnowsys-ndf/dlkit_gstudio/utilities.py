@@ -149,11 +149,11 @@ def arguments_not_none(func):
 def get_provider_manager(osid, runtime=None, proxy=None, local=False):
     """
     Gets the most appropriate provider manager depending on config.
-    
+
     If local is True, then don't bother with the runtime/config and
     try to get the requested service manager directly from the local
     service implementations known to this mongodb implementation.
-    
+
     """
     if runtime is not None:
         if local:
@@ -220,12 +220,12 @@ def overlap(start1, end1, start2, end2):
 class OsidListList(list):
     """
     A morker class for initializing OsidLists with a list of other OsidLists
-    
+
     To use, load up this list with OsidLists of the same object type, and pass
     it as the argument to an OsidList of that same object type. The OsidList
     should exhaust all the contained OsidLists in order on iteration to return
     all the underlying objects as if they are part of one list.
-    
+
     """
     pass
 
@@ -292,7 +292,7 @@ def get_locale_with_proxy(proxy):
 
     This assumes that instantiating a dlkit.gst.locale.objects.Locale
     without constructor arguments wlll return the default Locale.
-    
+
     """
     from dlkit.mongo.locale.objects import Locale
     if proxy is not None:
@@ -304,3 +304,24 @@ def get_locale_with_proxy(proxy):
 def update_display_text_defaults(mdata, locale_map):
     for default_display_text in mdata['default_string_values']:
         default_display_text.update(locale_map)
+
+
+def split_osid_id(osid_id):
+    # e.g: osid.agent.Agent%3Aadministrator%40MIT-ODL
+    #      <namespace> <identifier> <authority>
+    osid_id_dict = {
+        'namespace': '',
+        'identifier': '',
+        'authority': ''
+    }
+    osid_id = str(osid_id)
+    try:
+        temp_list = osid_id.split('%3A')
+        osid_id_dict['namespace'] = temp_list.pop(0)
+        temp_list = temp_list.pop().split('%40')
+        osid_id_dict['identifier'] = temp_list[0]
+        osid_id_dict['authority'] = temp_list[1]
+    except Exception, e:
+        pass
+
+    return osid_id_dict
