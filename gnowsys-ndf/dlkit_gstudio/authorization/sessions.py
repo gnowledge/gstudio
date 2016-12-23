@@ -6,13 +6,13 @@
 #     Inheritance defined in specification
 
 
-
-from .. import utilities
 from . import objects
+from .. import utilities
 from dlkit.abstract_osid.authorization import sessions as abc_authorization_sessions
 from ..osid import sessions as osid_sessions
 from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
+
 
 
 from gnowsys_ndf.ndf.models import Group, Author
