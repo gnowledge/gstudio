@@ -121,13 +121,16 @@ class AuthorizationSession(abc_authorization_sessions.AuthorizationSession, osid
         # qualifier_id.identifier gives Group ObjectId
         # agent_id.identifier gives user id [Needs check]
         # Check agent is member/admin of catalog(qualifier object)
-        try:
-            # agent_id should be django user_id
-            print "\n agent_id -- ", agent_id
-            return Group.can_access(int(agent_id.identifier), qualifier_id)
-        except Exception:
-            return Author.can_access(int(agent_id.identifier), qualifier_id)
-        # raise errors.Unimplemented()
+
+        # try:
+        #     # agent_id should be django user_id
+        #     print "\n agent_id -- ", agent_id
+        #     return Group.can_access(int(agent_id.identifier), qualifier_id)
+        # except Exception:
+        #     return Author.can_access(agent_id, qualifier_id)
+
+        agent_id_dict = utilities.split_osid_id(str(agent_id))
+        return bool(Group.get_group_name_id(unicode(agent_id_dict['identifier']), get_obj=True))
 
 
     @utilities.arguments_not_none
