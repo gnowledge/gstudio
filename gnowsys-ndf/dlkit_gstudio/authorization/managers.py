@@ -40,7 +40,7 @@ class AuthorizationProfile(osid_managers.OsidProfile, authorization_managers.Aut
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        return False # Change to True when implemented.
+        return True # Change to True when implemented.
 
     def supports_authorization_lookup(self):
         """Tests if an authorization lookup service is supported.
