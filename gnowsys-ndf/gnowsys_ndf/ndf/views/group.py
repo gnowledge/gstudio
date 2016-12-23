@@ -6,6 +6,7 @@ import datetime
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from django.http.request import HttpRequest
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
@@ -57,7 +58,7 @@ class CreateGroup(object):
     Creates group.
     Instantiate group with request as argument
     """
-    def __init__(self, request):
+    def __init__(self, request=HttpRequest()):
         super(CreateGroup, self).__init__()
         self.request = request
         self.moderated_groups_member_of = ['ProgramEventGroup',\
