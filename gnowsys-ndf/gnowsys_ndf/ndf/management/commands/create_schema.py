@@ -239,7 +239,10 @@ def parse_data_create_gtype(json_file_path):
         json_document['name'] = unicode(json_document['name'])
         json_document['inverse_name'] = unicode(json_document['inverse_name'])
         json_document['object_cardinality'] = int(json_document['object_cardinality'])
-        json_document["relation_type_scope"] = map(unicode,eval(json_document['relation_type_scope']))
+        relation_type_scope_val = eval(json_document['relation_type_scope'])
+        json_document["relation_type_scope"] = relation_type_scope_val
+        if relation_type_scope_val:
+          json_document["relation_type_scope"] = map(unicode,relation_type_scope_val)
 
         perform_eval_type("subject_type", json_document, type_name, "GSystemType")
         perform_eval_type("object_type", json_document, type_name, "GSystemType")
@@ -253,6 +256,7 @@ def parse_data_create_gtype(json_file_path):
       try:
         info_message = "\n Creating "+type_name+"(" + json_document['name'] + ") ..."
         log_list.append(info_message)
+
         create_edit_type(type_name, json_document, user_id)
 
       except Exception as e:
@@ -331,7 +335,6 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
 def create_edit_type(type_name, json_document, user_id):
   """Creates factory Types' (including GSystemType, AttributeType, RelationType)
   """
-
   node = node_collection.one({'_type': type_name, 'name': json_document['name']})
   if node is None:
     try:
