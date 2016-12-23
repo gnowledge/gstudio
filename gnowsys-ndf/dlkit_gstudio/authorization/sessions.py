@@ -6,12 +6,13 @@
 #     Inheritance defined in specification
 
 
-
+from . import objects
 from .. import utilities
-from ...abstract_osid.authorization import sessions as abc_authorization_sessions
+from dlkit.abstract_osid.authorization import sessions as abc_authorization_sessions
 from ..osid import sessions as osid_sessions
 from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
+
 
 
 from gnowsys_ndf.ndf.models import Group, Author
@@ -19,6 +20,20 @@ from gnowsys_ndf.ndf.models import Group, Author
 
 class AuthorizationSession(abc_authorization_sessions.AuthorizationSession, osid_sessions.OsidSession):
     """This is the basic session for verifying authorizations."""
+
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        self._catalog_class = objects.Vault
+        self._session_name = 'AuthorizationSession'
+        self._catalog_name = 'Vault'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='authorization',
+            cat_name='Vault',
+            cat_class=objects.Vault)
+        self._kwargs = kwargs
 
     def get_vault_id(self):
         """Gets the ``Vault``  ``Id`` associated with this session.
