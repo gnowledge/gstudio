@@ -8,19 +8,30 @@ req_obj = GStudioRequest(id=1)
 condition.set_http_request(req_obj)
 proxy = PROXY_SESSION.get_proxy(condition)
 
+# shell pastes:
+# ipdb> proxy.authentication._django_user
+# <User: administrator>
+# proxy.authentication.agent_id.identifier
+# 1
 
 #================================================== GROUP as REPOSITORY ==================
 repository_service_mgr = RUNTIME.get_service_manager('REPOSITORY', proxy=proxy)
+# shell pastes:
+# ipdb> repository_service_mgr._proxy.authentication._django_user
+# <User: administrator>
+# ipdb> repository_service_mgr._proxy.authentication.agent_id.identifier
+# 1
 
 # import ipdb; ipdb.set_trace()
+
 all_repos = repository_service_mgr.get_repositories()
 print "\nTotal repositories: ", all_repos.len()
 test_repo = None
 for each in all_repos:
 	print "\t- ", each.get_display_name().get_text()
 	test_repo = each
-# al = repository_service_mgr.get_asset_lookup_session()
 
+# al = repository_service_mgr.get_asset_lookup_session()
 # al_repo = repository_service_mgr.get_asset_lookup_session_for_repository(test_repo.get_repository_id())
 # al_repo.get_repository_id
 # al_repo.get_repository_id()
