@@ -69,8 +69,8 @@ def saveZapp(request,group_id):
   with zipfile.ZipFile("/data/media/"+ file_node.if_file.original['relurl'], "r") as z:
     z.extractall(un_zip_split_path)
  
-  file_node.member_of = [ObjectId(jsmol_gst._id)]
-  relurl_path = str("/" + un_zip_path[0] + "/" + un_zip_path[1] + "/" +un_zip_path[2] + "/" + file_name[0] + "/" + file_name[0] + ".htm" )
+  # file_node.member_of = [ObjectId(jsmol_gst._id)]
+  relurl_path = str("/" + un_zip_path[0] + "/" + un_zip_path[1] + "/" +un_zip_path[2] + "/" + file_name[0] + "/" + "index" + ".html" )
   # print "_______________________________",relurl_path
   discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
   for each_gs_file in fileobj_list:
@@ -90,7 +90,7 @@ def saveZapp(request,group_id):
       each_gs_file.save()
       create_gattribute(each_gs_file._id, discussion_enable_at, True)
       return_status = create_thread_for_node(request,group_obj._id, each_gs_file)
-
+  file_node.url = "/data/media/"+ file_node.if_file.original['relurl']
   file_node.if_file.original.relurl =  relurl_path
   file_node.if_file.mime_type = u"text/html"
   file_node.save()
