@@ -2536,10 +2536,58 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 
 
 
+def validate_scope_values(rt_at_type_node, req_triple_scope):
+    # check if req_scope_values keys are present
+    # in rt_at_type_node scope list
+    # req_triple_scope:
+    #   {
+    #     'relation_type_scope' : {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'},
+    #     'attribute_type_scope' : {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'},
+    #     'object_scope' : unicode,
+    #     'subject_scope' : unicode
+    #   }
+
+    validated_scope_val = {}
+    for each_scope_dict_key,each_scope_dict_val in req_triple_scope.items():
+        # type(each_scope_dict_val): dict
+        if each_scope_dict_key == "relation_type_scope":
+            if each_scope_dict_val.keys() in rt_at_type_node['relation_type_scope']:
+                validated_scope_val.update({each_scope_dict_key: each_scope_dict_val})
+        if each_scope_dict_key == "attribute_type_scope":
+            if each_scope_dict_val.keys() in rt_at_type_node['attribute_type_scope']:
+                validated_scope_val.update({each_scope_dict_key: each_scope_dict_val})
+        if each_scope_dict_key == "object_scope":
+            if each_scope_dict_val.strip() in rt_at_type_node['object_scope']:
+                validated_scope_val.update({each_scope_dict_key: unicode(each_scope_dict_val)})
+        if each_scope_dict_key == "subject_scope":
+            if each_scope_dict_val.strip() in rt_at_type_node['subject_scope']:
+                validated_scope_val.update({each_scope_dict_key: unicode(each_scope_dict_val)})
+    return validated_scope_val
+
+
+def update_scope_of_triple(triple_node, rt_at_type_node, req_scope_values, is_grel=True):
+    validated_scope_values = validate_scope_values(rt_at_type_node, req_scope_values)
+    if is_grel:
+        print "\n tr ", triple_node
+        triple_node.relation_type_scope.update(validated_scope_values)
+        triple_node.object_scope.update(validated_scope_values)
+        triple_node.subject_scope.update(validated_scope_values)
+
+        triple_collection.collection.update({'_id': triple_node._id},
+            {'$set': {'relation_type_scope': triple_node.relation_type_scope}},
+            upsert=False, multi=False)
+    else:
+        triple_node.relation_type_scope.update(relation_type_scope)
+        triple_collection.collection.update({'_id': triple_node._id},
+            {'$set': {'relation_type_scope': triple_node.relation_type_scope}},
+            upsert=False, multi=False)
+    triple_node.reload()
+    return triple_node
+
 @get_execution_time
 def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwargs):
 
-    def _update_attr_set(attr_set_list_of_dicts, attr_key, attr_value):
+    def _update_attr_set(attr_set_list_of_dicts, attr_key, attr_value, triple_scope_val):
         temp_attr_dict = get_dict_from_list_of_dicts(attr_set_list_of_dicts)
         temp_attr_dict.update({unicode(attr_key): attr_value})
         return [{k:v} for k, v in temp_attr_dict.iteritems()]
@@ -2547,10 +2595,23 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
     ga_node = None
     info_message = ""
     old_object_value = None
+    triple_scope_val = kwargs.get('triple_scope', None)
     attribute_type_node = Node.get_node_obj_from_id_or_obj(attribute_type_node, AttributeType)
 
     ga_node = triple_collection.one(
         {'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node._id})
+
+    '''
+    Example:
+    triple_scope:
+      {
+        attribute_type_scope : {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'},
+        object_scope : unicode,
+        subject_scope : unicode
+      }
+
+    '''
+
     if ga_node is None:
         # Code for creation
         try:
@@ -2570,6 +2631,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
             ga_node.object_value = object_value
             ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+            ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
             if ga_node.status == u"DELETED":
                 info_message = " GAttribute (" + ga_node.name + \
@@ -2603,6 +2665,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                 ga_node.status = u"DELETED"
                 ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
                 info_message = " GAttribute (" + ga_node.name + \
                     ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -2647,6 +2710,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                     if ga_node.status == u"DELETED":
                         ga_node.status = u"PUBLISHED"
                         ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                        ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
 
                         info_message = " GAttribute (" + ga_node.name + \
@@ -2670,6 +2734,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                     else:
                         ga_node.status = u"PUBLISHED"
                         ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
+                        ga_node = update_scope_of_triple(ga_node,attribute_type_node, triple_scope_val, is_grel=False)
 
                         info_message = " GAttribute (" + \
                             ga_node.name + ") updated successfully.\n"
@@ -2730,10 +2795,15 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     """
     gr_node = None
     multi_relations = False
-    relation_type_scope = kwargs.get('relation_type_scope', None)
+    triple_scope_val = kwargs.get('triple_scope', None)
     '''
     Example:
-        relation_type_scope = {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'}
+    triple_scope:
+      {
+        relation_type_scope : {'alt_format': 'mp4', 'alt_size': '720p', 'alt_language': 'hi'},
+        object_scope : unicode,
+        subject_scope : unicode
+      }
 
     In next phase, validate the scope values by adding:
         GSTUDIO_FORMAT_SCOPE_VALUES
@@ -2745,14 +2815,14 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     try:
         subject_id = ObjectId(subject_id)
 
-        def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text, relation_type_scope=None):
+        def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text, triple_scope_val=None):
             # Code for creating GRelation node
             gr_node = triple_collection.collection.GRelation()
 
             gr_node.subject = subject_id
             gr_node.relation_type = relation_type_node._id
             gr_node.right_subject = right_subject_id_or_list
-            gr_node.relation_type_scope = relation_type_scope
+            # gr_node.relation_type_scope = relation_type_scope
             gr_node.status = u"PUBLISHED"
             gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
@@ -2767,6 +2837,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                 "_id": subject_id,
                 "relation_set." + relation_type_node_name: {"$exists": True}
             })
+            gr_node = update_scope_of_triple(gr_node,relation_type_node, triple_scope_val, is_grel=True)
 
             if left_subject:
                                 # Update value of grelation in existing as key-value pair value in
@@ -2822,7 +2893,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             return gr_node
 
-        def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text, relation_type_scope=None):
+        def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text, triple_scope_val=None):
             gr_node.status = u"PUBLISHED"
             gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
@@ -2855,16 +2926,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             return gr_node
 
-        def _validate_scope_values(relation_type_node, req_scope_values):
-            # check if req_scope_values keys are present
-            # in relation_type_node scope list
-            for each_scope_val in req_scope_values.keys():
-                if each_scope_val not in relation_type_node['relation_type_scope']:
-                    del req_scope_values[each_scope_val]
-            return req_scope_values
-
-        if relation_type_scope:
-            relation_type_scope = _validate_scope_values(relation_type_node, relation_type_scope)
 
         if relation_type_node["object_cardinality"]:
             # If object_cardinality value exists and greater than 1 (or eaqual to 100)
@@ -2945,9 +3006,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         # is PUBLISHED)
                         right_subject_id_or_list.remove(n.right_subject)
                         gr_node_list.append(n)
-                        if n.relation_type_scope != relation_type_scope:
-                            n.relation_type_scope.update(relation_type_scope)
-                            triple_collection.collection.update({'_id': n._id},{'$set': {'relation_type_scope': n.relation_type_scope}}, upsert=False, multi=False)
+                        n = update_scope_of_triple(n, relation_type_node, triple_scope_val, is_grel=True)
 
                         node_collection.collection.update(
                             {'_id': subject_id, 'relation_set.' +
@@ -3006,7 +3065,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         # New one found so create it
                         # check for relation_type_scope variable in kwargs and pass
                         gr_node = _create_grelation_node(
-                            subject_id, relation_type_node, nid, "MultipleGRelation", relation_type_scope)
+                            subject_id, relation_type_node, nid, "MultipleGRelation", triple_scope_val)
                         gr_node_list.append(gr_node)
 
                     else:
@@ -3049,12 +3108,10 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         # If deleted, change it's status back to Published from
                         # Deleted
                         node = _update_deleted_to_published(
-                            node, relation_type_node, "SingleGRelation", relation_type_scope)
+                            node, relation_type_node, "SingleGRelation", triple_scope_val)
 
                     elif node_status == u"PUBLISHED":
-                        if node.relation_type_scope != relation_type_scope:
-                            node.relation_type_scope.update(relation_type_scope)
-                            triple_collection.collection.update({'_id': node._id},{'$set': {'relation_type_scope': node.relation_type_scope}}, upsert=False, multi=False)
+                        node = update_scope_of_triple(node, relation_type_node, triple_scope_val, is_grel=True)
 
                         node_collection.collection.update({
                             "_id": subject_id, "relation_set." + relation_type_node_name: {'$exists': True}
@@ -3108,7 +3165,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             if gr_node is None:
                 # Code for creation
                 gr_node = _create_grelation_node(
-                    subject_id, relation_type_node, right_subject_id_or_list, "SingleGRelation", relation_type_scope)
+                    subject_id, relation_type_node, right_subject_id_or_list, "SingleGRelation", triple_scope_val)
 
             return gr_node
 

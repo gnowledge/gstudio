@@ -26,13 +26,24 @@ class Command(BaseCommand):
     # --------------------------------------------------------------------------
     # Adding <'relation_type_scope': []> field to all RelationType objects
 
-    res = node_collection.collection.update({'_type': 'RelationType', 'relation_type_scope': {'$exists': False} }, {'$set': {'relation_type_scope': [] }}, upsert=False, multi=True)
-    if res['updatedExisting']: # and res['nModified']:
-        print "\n Added 'relation_type_scope' field to " + res['n'].__str__() + " RelationType instances."
+    print "\nUpdating RelationTypes and AttributeTypes."
+    rt_res = node_collection.collection.update({'_type': 'RelationType', 'relation_type_scope': {'$exists': False} }, {'$set': {'relation_type_scope': [], 'object_scope': None, 'subject_scope': None }}, upsert=False, multi=True)
 
-    triple_res = triple_collection.collection.update({'_type': 'GRelation', 'relation_type_scope': {'$eq': None} }, {'$set': {'relation_type_scope': {} }}, upsert=False, multi=True)
-    if triple_res['updatedExisting']: # and triple_res['nModified']:
-        print "\n Added 'relation_type_scope' field to " + triple_res['n'].__str__() + " GRelation instances."
+    if rt_res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'scope' fields to " + rt_res['n'].__str__() + " RelationType instances."
+
+    at_res = node_collection.collection.update({'_type': 'AttributeType', 'attribute_type_scope': {'$exists': False} }, {'$set': {'relation_type_scope': [], 'object_scope': None, 'subject_scope': None }}, upsert=False, multi=True)
+    if at_res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'scope' fields to " + at_res['n'].__str__() + " AttributeType instances."
+
+    print "\nUpdating GRelations and GAttributes."
+    grel_res = triple_collection.collection.update({'_type': 'GRelation', '$or': [{'relation_type_scope': {'$eq': None}, 'subject_scope': {'$exists': False}, 'object_scope': {'$exists': False}}]}, {'$unset': { 'right_subject_scope': ""} ,'$set': {'relation_type_scope': {}, 'object_scope': None, 'subject_scope': None }}, upsert=False, multi=True)
+    if grel_res['updatedExisting']: # and grel_res['nModified']:
+        print "\n Added 'scope' fields to " + grel_res['n'].__str__() + " GRelation instances."
+
+    gattr_res = triple_collection.collection.update({'_type': 'GAttribute', '$or': [{'attribute_type_scope': {'$eq': None}, 'subject_scope': {'$exists': False}, 'object_scope': {'$exists': False} }]}, {'$unset': { 'object_value_scope': ""} ,'$set': {'attribute_type_scope': {}, 'object_scope': None, 'subject_scope': None }}, upsert=False, multi=True)
+    if gattr_res['updatedExisting']: # and gattr_res['nModified']:
+        print "\n Added 'scope' fields to " + gattr_res['n'].__str__() + " GAttribute instances."
     # --------------------------------------------------------------------------
 
 

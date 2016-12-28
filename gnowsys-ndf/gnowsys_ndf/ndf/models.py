@@ -1164,10 +1164,12 @@ class AttributeType(Node):
     'subject_type': [ObjectId], # check required: only one of Type
                                     # Nodes. GSystems cannot be set as
                                     # subject_types
+    'subject_scope': unicode, 
+    'object_scope': unicode,
+    'attribute_type_scope': list,
     'applicable_node_type': [basestring],	# can be one or more
                                                 # than one of
                                                 # NODE_TYPE_CHOICES
-
     'verbose_name': basestring,
     'null': bool,
     'blank': bool,
@@ -1330,11 +1332,8 @@ class RelationType(Node):
         'inverse_name': unicode,
         'subject_type': [ObjectId],  # ObjectId's of Any Class
         'object_type': [OR(ObjectId, list)],  # ObjectId's of Any Class
-        # On hold
-        # 'subject_scope': ['any', 'most', 'some', 'none', 'atmost'] 
-        # 'object_scope': []
-
-        # To be implemented
+        'subject_scope': unicode,
+        'object_scope': unicode,
         'relation_type_scope': list,
         'subject_cardinality': int,
         'object_cardinality': int,
@@ -3026,7 +3025,8 @@ class Triple(DjangoDocument):
   structure = {
     '_type': unicode,
     'name': unicode,
-    'subject_scope': basestring,
+    'subject_scope': unicode,
+    'object_scope': unicode,
     'subject': ObjectId,  # ObjectId's of GSystem Class
     'lang': basestring,  # Put validation for standard language codes
     'status': STATUS_CHOICES_TU
