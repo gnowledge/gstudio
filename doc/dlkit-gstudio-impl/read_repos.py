@@ -21,8 +21,8 @@ repository_service_mgr = RUNTIME.get_service_manager('REPOSITORY', proxy=proxy)
 # <User: administrator>
 # ipdb> repository_service_mgr._proxy.authentication.agent_id.identifier
 # 1
-
-# import ipdb; ipdb.set_trace()
+# ipdb> self._proxy.authentication._django_user.is_authenticated()
+# True
 
 all_repos = repository_service_mgr.get_repositories()
 print "\nTotal repositories: ", all_repos.len()
