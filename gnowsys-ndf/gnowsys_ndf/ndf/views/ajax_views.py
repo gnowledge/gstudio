@@ -6436,3 +6436,30 @@ def upload_video_thumbnail(request,group_id):
       node_collection.collection.update({'_id': ObjectId(gs_obj_id)}, {'$set': {'group_set': [warehouse_grp_obj._id] }}, upsert=False, multi=False)
 
     return StreamingHttpResponse(str(gs_obj_id))
+
+
+@get_execution_time
+def get_paged_images(request, group_id):
+  is_create_collection =  request.GET.get('is_create_collection','')
+  is_add_to_collection =  request.GET.get('is_add_to_collection','')
+  result_cur = node_collection.find({
+                          'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+                                            '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                    {'access_policy': u"PRIVATE"},
+                                                    {'created_by': request.user.id}
+                                                ]
+                                             }
+                                            ],
+                                            'collection_set': {'$exists': "true", '$not': {'$size': 0} }
+                                        }).sort("last_update", -1)
+  # print "\n\n\n result",result_cur.count()
+
+
+  return render_to_response('ndf/course_create_collection.html',
+    {
+      "group_id":group_id,"result_cur":result_cur,"is_create_collection":is_create_collection,"is_add_to_collection":is_add_to_collection
+    },context_instance=RequestContext(request))
+
