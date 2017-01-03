@@ -189,6 +189,8 @@
 
     $('.create-collection').click(function() {
         var checked = $('.filenode:checked').length;
+        is_raw_material =  window.location.href.indexOf("raw-material") > -1;
+        is_gallery = window.location.href.indexOf("gallery") > -1;
         var is_create_collection = "True";
         if (checked){
           $.ajax({
@@ -197,6 +199,8 @@
             datatype: "html",
             data:{
               'is_create_collection':is_create_collection,
+              'is_raw_material':is_raw_material,
+              'is_gallery':is_gallery
             },
             success: function(data) {
                 $("#create_collection_model").html(data);
