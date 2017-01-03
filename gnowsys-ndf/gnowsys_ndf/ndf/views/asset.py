@@ -17,6 +17,13 @@ def create_asset(request=None,
 				tags=[],
 				language=None
 				unique_gs_per_file=True):
+	'''
+	This method is equivalent to write_files() but
+	also (about to) incorporate page creation.
+
+	So plan is to not to change write_files() which is working smoothly at various places.
+	But to create another equivalent function and in future, replace this for write_files()
+	'''
 
 	name = name | request.POST.get('name') if request else None
 	user_id = created_by | request.user.id if request else None
@@ -27,25 +34,26 @@ def create_asset(request=None,
 	else:
 		uploaded_files = files
 
+	# compulsory values, if not found raise error.
 	if not all([name, user_id, group_id, uploaded_files]):
 		raise ValueError('"name", "created_by", "group", "file | page" are mandetory args."')
 
 	author_obj     = node_collection.one({'_type': u'Author', 'created_by': user_id})
 	author_obj_id  = author_obj._id
 
-	# for each_file in uploaded_files:
+	language = language | request.POST.get('language', GSTUDIO_DEFAULT_LANGUAGE) if request else GSTUDIO_DEFAULT_LANGUAGE
+	language = get_language_tuple(language)
+
+	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
+
+	# for each_resource in uploaded_files:
 
 	# 	gs_obj = node_collection.collection.GSystem()
-
-	# 	language = language | request.POST.get('language', GSTUDIO_DEFAULT_LANGUAGE) if request else GSTUDIO_DEFAULT_LANGUAGE
-	# 	language = get_language_tuple(language)
-
-	# 	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
 
 	# 	if name and not first_obj and (name != 'untitled'):
 	# 		file_name = name
 	# 	else:
-	# 		file_name = each_file.name if hasattr(each_file, 'name') else name
+	# 		file_name = each_resource.name if hasattr(each_resource, 'name') else name
 
 	# 	existing_file_gs = gs_obj.fill_gstystem_values(request=request,
 	# 								name=file_name,
