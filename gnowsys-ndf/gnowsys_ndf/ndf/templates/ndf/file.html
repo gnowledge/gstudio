@@ -274,13 +274,11 @@ margin-top:5px !important;
         {% trans app_gst.name %}
       {% endif%}
   </div>
-    
     <div class="large-8 columns repository-desc top-gap">{{app_gst.content_org|default_if_none:""|safe}}</div>
   {% if title == "E-Library" %}
-    {% get_filters_data "File" as filter_dict %}
+    {% get_filters_data "File" groupid as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
   {% endif %}
-
   <div class="tabs-content gallery">
 
     {% if already_uploaded %} 
