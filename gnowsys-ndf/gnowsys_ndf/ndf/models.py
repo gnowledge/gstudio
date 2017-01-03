@@ -1194,6 +1194,11 @@ class AttributeType(Node):
 
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
+    default_values = {
+                        'subject_scope': [], 
+                        'object_scope': [],
+                        'attribute_type_scope': [],
+                    }
 
     # validators={
     # 'data_type':x in DATA_TYPE_CHOICES
@@ -1347,6 +1352,11 @@ class RelationType(Node):
 
     required_fields = ['inverse_name', 'subject_type', 'object_type']
     use_dot_notation = True
+    default_values = {
+                        'subject_scope': [], 
+                        'object_scope': [],
+                        'relation_type_scope': [],
+                    }
 
     # User-Defined Functions ##########
     @staticmethod
@@ -3035,6 +3045,10 @@ class Triple(DjangoDocument):
   required_fields = ['name', 'subject']
   use_dot_notation = True
   use_autorefs = True
+  default_values = {
+                      'subject_scope': None,
+                      'object_scope': None
+                  }
 
   ########## Built-in Functions (Overridden) ##########
   def __unicode__(self):
@@ -3245,7 +3259,7 @@ class Triple(DjangoDocument):
 @connection.register
 class GAttribute(Triple):
     structure = {
-        'attribute_type_scope': basestring,
+        'attribute_type_scope': dict,
         # 'attribute_type': AttributeType,  # Embedded document of AttributeType Class
         'attribute_type': ObjectId,  # ObjectId of AttributeType node
         # 'object_value_scope': basestring,
@@ -3266,6 +3280,9 @@ class GAttribute(Triple):
     required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents
+    default_values = {
+                        'attribute_type_scope': {}
+                    }
 
 
 @connection.register
@@ -3278,6 +3295,9 @@ class GRelation(Triple):
         # ObjectId's of GSystems Class / List of list of ObjectId's of GSystem Class
         'right_subject': OR(ObjectId, list)
     }
+    default_values = {
+                        'relation_type_scope': {}
+                    }
 
     indexes = [{
         # 1: Compound index
