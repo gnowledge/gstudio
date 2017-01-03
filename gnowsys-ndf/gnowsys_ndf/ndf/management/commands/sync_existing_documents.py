@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
     at_res = node_collection.collection.update({'_type': 'AttributeType',\
      'attribute_type_scope': {'$exists': False} }, \
-     {'$set': {'relation_type_scope': [], 'object_scope': [],\
+     {'$set': {'attribute_type_scope': [], 'object_scope': [],\
       'subject_scope': [] }}, upsert=False, multi=True)
     if at_res['updatedExisting']: # and res['nModified']:
         print "\n Added 'scope' fields to " + at_res['n'].__str__() + " AttributeType instances."
