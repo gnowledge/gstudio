@@ -1164,8 +1164,8 @@ class AttributeType(Node):
     'subject_type': [ObjectId], # check required: only one of Type
                                     # Nodes. GSystems cannot be set as
                                     # subject_types
-    'subject_scope': unicode, 
-    'object_scope': unicode,
+    'subject_scope': list, 
+    'object_scope': list,
     'attribute_type_scope': list,
     'applicable_node_type': [basestring],	# can be one or more
                                                 # than one of
@@ -1332,8 +1332,8 @@ class RelationType(Node):
         'inverse_name': unicode,
         'subject_type': [ObjectId],  # ObjectId's of Any Class
         'object_type': [OR(ObjectId, list)],  # ObjectId's of Any Class
-        'subject_scope': unicode,
-        'object_scope': unicode,
+        'subject_scope': list,
+        'object_scope': list,
         'relation_type_scope': list,
         'subject_cardinality': int,
         'object_cardinality': int,
@@ -3025,8 +3025,8 @@ class Triple(DjangoDocument):
   structure = {
     '_type': unicode,
     'name': unicode,
-    'subject_scope': unicode,
-    'object_scope': unicode,
+    'subject_scope': basestring,
+    'object_scope': basestring,
     'subject': ObjectId,  # ObjectId's of GSystem Class
     'lang': basestring,  # Put validation for standard language codes
     'status': STATUS_CHOICES_TU
@@ -3248,7 +3248,7 @@ class GAttribute(Triple):
         'attribute_type_scope': basestring,
         # 'attribute_type': AttributeType,  # Embedded document of AttributeType Class
         'attribute_type': ObjectId,  # ObjectId of AttributeType node
-        'object_value_scope': basestring,
+        # 'object_value_scope': basestring,
         'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
 
@@ -3274,7 +3274,7 @@ class GRelation(Triple):
         'relation_type_scope': dict,
         # 'relation_type': RelationType,  # DBRef of RelationType Class
         'relation_type': ObjectId,  # ObjectId of RelationType node
-        'right_subject_scope': basestring,
+        # 'right_subject_scope': basestring,
         # ObjectId's of GSystems Class / List of list of ObjectId's of GSystem Class
         'right_subject': OR(ObjectId, list)
     }
