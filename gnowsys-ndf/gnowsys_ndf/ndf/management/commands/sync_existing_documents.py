@@ -29,16 +29,16 @@ class Command(BaseCommand):
     print "\nUpdating RelationTypes and AttributeTypes."
     rt_res = node_collection.collection.update({'_type': 'RelationType', \
         'relation_type_scope': {'$exists': False} }, \
-        {'$set': {'relation_type_scope': [], 'object_scope': None,\
-         'subject_scope': None }}, upsert=False, multi=True)
+        {'$set': {'relation_type_scope': [], 'object_scope': [],\
+         'subject_scope': [] }}, upsert=False, multi=True)
 
     if rt_res['updatedExisting']: # and res['nModified']:
         print "\n Added 'scope' fields to " + rt_res['n'].__str__() + " RelationType instances."
 
     at_res = node_collection.collection.update({'_type': 'AttributeType',\
      'attribute_type_scope': {'$exists': False} }, \
-     {'$set': {'relation_type_scope': [], 'object_scope': None,\
-      'subject_scope': None }}, upsert=False, multi=True)
+     {'$set': {'relation_type_scope': [], 'object_scope': [],\
+      'subject_scope': [] }}, upsert=False, multi=True)
     if at_res['updatedExisting']: # and res['nModified']:
         print "\n Added 'scope' fields to " + at_res['n'].__str__() + " AttributeType instances."
 
