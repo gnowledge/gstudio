@@ -2567,21 +2567,13 @@ def validate_scope_values(rt_at_type_node, req_triple_scope):
 
 def update_scope_of_triple(triple_node, rt_at_type_node, req_scope_values, is_grel=True):
     validated_scope_values = validate_scope_values(rt_at_type_node, req_scope_values)
+    triple_node.object_scope = validated_scope_values['object_scope']
+    triple_node.subject_scope = validated_scope_values['subject_scope']
     if is_grel:
-        print "\n tr ", triple_node
-        triple_node.relation_type_scope.update(validated_scope_values)
-        triple_node.object_scope.update(validated_scope_values)
-        triple_node.subject_scope.update(validated_scope_values)
-
-        triple_collection.collection.update({'_id': triple_node._id},
-            {'$set': {'relation_type_scope': triple_node.relation_type_scope}},
-            upsert=False, multi=False)
+        triple_node.relation_type_scope = validated_scope_values['relation_type_scope']
     else:
-        triple_node.relation_type_scope.update(relation_type_scope)
-        triple_collection.collection.update({'_id': triple_node._id},
-            {'$set': {'relation_type_scope': triple_node.relation_type_scope}},
-            upsert=False, multi=False)
-    triple_node.reload()
+        triple_node.attribute_type_scope = validated_scope_values['attribute_type_scope']
+    triple_node.save(triple_node=rt_at_type_node, triple_id=rt_at_type_node._id)
     return triple_node
 
 @get_execution_time
