@@ -49,7 +49,7 @@ class OsidSession(abc_osid_sessions.OsidSession):
                 self._authority = runtime.get_configuration().get_value_by_parameter(
                     authority_param_id).get_string_value()
             except (KeyError, errors.NotFound):
-                self._authority = 'STUB_IMPL.MIT.EDU'
+                self._authority = 'GSTUDIO'
 
     def _init_object(self, catalog_id, proxy, runtime, db_name, cat_name, cat_class):
         """Initialize this object as an OsidObject."""
@@ -57,7 +57,6 @@ class OsidSession(abc_osid_sessions.OsidSession):
         self._init_proxy_and_runtime(proxy, runtime)
         if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
             self._catalog_identifier = catalog_id.get_identifier()
-
             try:
                 # self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
                 self._my_catalog_map = node_collection.one({'_id': ObjectId(self._catalog_identifier)})
