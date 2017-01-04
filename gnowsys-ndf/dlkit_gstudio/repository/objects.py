@@ -503,7 +503,7 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         """Initialize form elements"""
 
         osid_objects.OsidSourceableForm._init_map(self)
-        osid_objects.OsidObjectForm._init_form(self, record_types=record_types)
+        osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         # Initialize all form elements to default values here
 
     def get_title_metadata(self):
