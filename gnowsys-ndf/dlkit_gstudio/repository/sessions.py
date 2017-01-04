@@ -1007,23 +1007,15 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
-        for arg in asset_record_types:
-            if not isinstance(arg, ABCType):
-                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
+
         if asset_record_types == []:
             obj_form = objects.AssetForm(
                 repository_id=self._catalog_id,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id(),
                 proxy=self._proxy)
-        else:
-            obj_form = objects.AssetForm(
-                repository_id=self._catalog_id,
-                record_types=asset_record_types,
-                runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id(),
-                proxy=self._proxy)
-        self._forms[obj_form.get_id().get_identifier()] = not CREATED
+            self._forms[obj_form.get_id().get_identifier()] = not CREATED
+
         return obj_form
         
 
@@ -1046,7 +1038,34 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+
+        from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
+        from gnowsys_ndf.ndf.views.asset import create_asset as gstudio_create_asset
+        req_obj = GStudioRequest(id=1)
+
+        try:
+            if self._forms[asset_form.get_id().get_identifier()] == CREATED:
+                raise errors.IllegalState('asset_form already used in a create transaction')
+        except KeyError:
+            raise errors.Unsupported('asset_form did not originate from this session')
+        if not asset_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        self._forms[asset_form.get_id().get_identifier()] = CREATED
+        # This should be part of _init_gstudio_map
+        asset_form._gstudio_map.update({'created_by': 1})
+        asset_form._gstudio_map.update({'modified_by': 1})
+        asset_obj = gstudio_create_asset(self._catalog_id.get_identifier(),\
+                                         asset_form._gstudio_map['name'],\
+                                        **asset_form._gstudio_map)
+        # # asset_obj is gstudio node 
+        if asset_obj:
+            result = objects.Asset(
+                gstudio_node=asset_obj,
+                runtime=self._runtime,
+                proxy=self._proxy)
+
+            return result
+        raise errors.OperationFailed()
 
     def can_update_assets(self):
         """Tests if this user can update ``Assets``.
@@ -3734,20 +3753,6 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
 
         from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
         req_obj = GStudioRequest(id=1)
-
-        """
-        The following code to build request
-         object is purely for testing purpose
-        """
-        # from django.contrib.auth.models import User
-        # u = User.objects.get(pk=1)
-        # from django.test import RequestFactory
-
-        # rf = RequestFactory()
-
-        # req_obj = rf.get('/home')
-        # req_obj.user = u
-        # req_obj.user.id
 
         self._forms[repository_form.get_id().get_identifier()] = CREATED
 
