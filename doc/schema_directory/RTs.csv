@@ -46,4 +46,4 @@ subject_type,member_of,name,altnames,inverse_name,object_type,object_cardinality
 "[""Course"",""BaseCourseGroup"",""Group"",""ProgramEventGroup"",""PartnerGroup""]","[""Binary""]",has_logo,Course;File,logo_of,"[""File""]",1,[],[],[]
 "[""QuizItemEvent"",""Page"",""File""]","[""Binary""]",clone_of,QuizItemEvent;QuizItem,has_clone,"[""QuizItem"",""Page"",""File""]",1,[],[],[]
 "[""QuizItem"",""QuizItemEvent"",""Page"",""File"",""Forum""]","[""Binary""]",has_thread,QuizItemEvent;Twist,thread_of,"[""Twist""]",100,[],[],[]
-"[""Asset""]","[""Binary""]",has_assetcontent,AssetContent,assetcontent_of,"[""QuizItem"",""Page"",""File""]",100,"[""alt_size"",""alt_format"",""alt_language""]",[],[]
+"[""Asset""]","[""Binary""]",has_assetcontent,AssetContent,assetcontent_of,"[""QuizItem"",""Page"",""File""]",100,"[""alt_size"",""alt_format"",""alt_language""]","[""any"",""most"",""some"",""none"",""atmost""]",[]
