@@ -1042,7 +1042,6 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
         from gnowsys_ndf.ndf.views.asset import create_asset as gstudio_create_asset
         req_obj = GStudioRequest(id=1)
-
         try:
             if self._forms[asset_form.get_id().get_identifier()] == CREATED:
                 raise errors.IllegalState('asset_form already used in a create transaction')
@@ -1052,10 +1051,8 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         self._forms[asset_form.get_id().get_identifier()] = CREATED
         # This should be part of _init_gstudio_map
-        asset_obj = gstudio_create_asset(asset_form._gstudio_map['name'],\
-                                        self._catalog_id.get_identifier(),\
-                                        req_obj.user.id ,\
-                                        **asset_form._gstudio_map)
+        asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
+         group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
 
         # # asset_obj is gstudio node 
         if asset_obj:

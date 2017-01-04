@@ -12,6 +12,7 @@ proxy = PROXY_SESSION.get_proxy(condition)
 
 ##### WRITE OPERATIONS
 
+repository_service_mgr = RUNTIME.get_service_manager('REPOSITORY', proxy=proxy)
 
 rl = repository_service_mgr.get_repository_lookup_session()
 all_repos = repository_service_mgr.get_repositories()
@@ -23,6 +24,6 @@ for each in all_repos:
 print "\n Asset creating for Group: ", test_repo.get_display_name().get_text()
 asset_form = test_repo.get_asset_form_for_create([])
 asset_form.description = 'Asset description'
-asset_form.display_name = 'Asset name'
+asset_form.display_name = 'Asset2 name'
 asset_obj = test_repo.create_asset(asset_form)
 

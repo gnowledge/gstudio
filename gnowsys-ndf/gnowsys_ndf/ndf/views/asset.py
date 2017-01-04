@@ -3,10 +3,13 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
+from django.http import HttpRequest
+
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, get_language_tuple
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LANGUAGE
 
+gst_asset = node_collection.one({'_type': u'GSystemType', 'name': u'Asset'})
 
 def create_asset(name,
 				group_id,
@@ -21,22 +24,21 @@ def create_asset(name,
 	So plan is to not to change write_files() which is working smoothly at various places.
 	But to create another equivalent function and in future, replace this for write_files()
 	'''
+	print "\n here -- "
+	if not name:
+		name = request.POST.get('name') if request else None
 
-	name = name | request.POST.get('name') if request else None
-	user_id = created_by | request.user.id if request else None
+	if not created_by:
+		created_by = created_by | request.user.id if request else None
+
 	group_name, group_id = get_group_name_id(group_id)
-
-	if request:
-		uploaded_files = request.FILES.getlist('filehive', [])
-	else:
-		uploaded_files = files
 
 	# compulsory values, if not found raise error.
 	# if not all([name, created_by, group_id, uploaded_files]):
 	if not all([name, created_by, group_id]):
 		raise ValueError('"name", "created_by", "group" are mandetory args."')
 
-	author_obj     = node_collection.one({'_type': u'Author', 'created_by': user_id})
+	author_obj     = node_collection.one({'_type': u'Author', 'created_by': created_by})
 	author_obj_id  = author_obj._id
 
 	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
@@ -52,6 +54,7 @@ def create_asset(name,
 									**kwargs)
 
 	asset_gs_obj.save(group_id=group_id)
+	return asset_gs_obj
 
 	# print asset_gs_obj
 
@@ -79,7 +82,7 @@ def create_asset(name,
 	# 		gs_obj.save(groupid=group_id,validate=False)
 
 	# 		if 'video' in gs_obj.if_file.mime_type:
-	# 			convertVideo.delay(user_id, str(gs_obj._id), file_name)
+	# 			convertVideo.delay(created_by, str(gs_obj._id), file_name)
 	# 		if not first_obj:
 	# 			first_obj = gs_obj
 	# 		else:
