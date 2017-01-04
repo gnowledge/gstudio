@@ -11,14 +11,12 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LANGUAGE
 
 gst_asset = node_collection.one({'_type': u'GSystemType', 'name': u'Asset'})
 
-def create_asset(request=HttpRequest(),
-				name=None,
-				group_id=None,
-				created_by=None,
+def create_asset(name,
+				group_id,
+				created_by,
 				content=None,
-				files=[],
-				language=None,
-				unique_gs_per_file=True):
+				request=HttpRequest(),
+				**kwargs):
 	'''
 	This method is equivalent to write_files() but
 	also (about to) incorporate page creation.
@@ -38,15 +36,11 @@ def create_asset(request=HttpRequest(),
 	# compulsory values, if not found raise error.
 	# if not all([name, created_by, group_id, uploaded_files]):
 	if not all([name, created_by, group_id]):
-		raise ValueError('"name", "created_by", "group", "file | page" are mandetory args."')
+		raise ValueError('"name", "created_by", "group" are mandetory args."')
 
 	author_obj     = node_collection.one({'_type': u'Author', 'created_by': created_by})
 	author_obj_id  = author_obj._id
 
-	if request and not language:
-		language = request.POST.get('language', GSTUDIO_DEFAULT_LANGUAGE)
-
-	language = get_language_tuple(language)
 	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
 
 	asset_gs_obj = node_collection.collection.GSystem()
@@ -57,7 +51,9 @@ def create_asset(request=HttpRequest(),
 									group_set=group_set,
 									created_by=created_by,
 									content=content,
-									language=language)
+									**kwargs)
+
+	asset_gs_obj.save(group_id=group_id)
 
 	# print asset_gs_obj
 
@@ -104,3 +100,7 @@ def create_asset(request=HttpRequest(),
 	# # return render_to_response('ndf/filehive.html', {
 	# # 	'group_id': group_id, 'groupid': group_id,
 	# # 	}, context_instance=RequestContext(request))
+
+
+def create_assetcontent():
+	pass
