@@ -183,6 +183,17 @@ def parse_data_create_gtype(json_file_path):
         json_document['name'] = unicode(json_document['name'])
         json_document['altnames'] = unicode(json_document['altnames'])
         json_document['help_text'] = unicode(json_document['help_text'])
+        json_document["object_scope"] = eval(json_document['object_scope'])
+        json_document["subject_scope"] = eval(json_document['subject_scope'])
+        json_document["attribute_type_scope"] = eval(json_document['attribute_type_scope'])
+
+        if json_document["attribute_type_scope"]:
+          json_document["attribute_type_scope"] = map(unicode,json_document["attribute_type_scope"])
+        if json_document["subject_scope"]:
+          json_document["subject_scope"] = map(unicode,json_document["subject_scope"])
+        if json_document["object_scope"]:
+          json_document["object_scope"] = map(unicode,json_document["object_scope"])
+
         if (json_document['max_digits']):
           json_document['max_digits'] = int(json_document['max_digits'])
         else:
@@ -239,10 +250,17 @@ def parse_data_create_gtype(json_file_path):
         json_document['name'] = unicode(json_document['name'])
         json_document['inverse_name'] = unicode(json_document['inverse_name'])
         json_document['object_cardinality'] = int(json_document['object_cardinality'])
-        relation_type_scope_val = eval(json_document['relation_type_scope'])
-        json_document["relation_type_scope"] = relation_type_scope_val
-        if relation_type_scope_val:
-          json_document["relation_type_scope"] = map(unicode,relation_type_scope_val)
+
+        json_document["object_scope"] = eval(json_document['object_scope'])
+        json_document["subject_scope"] = eval(json_document['subject_scope'])
+        json_document["relation_type_scope"] = eval(json_document['relation_type_scope'])
+
+        if json_document["relation_type_scope"]:
+          json_document["relation_type_scope"] = map(unicode,json_document["relation_type_scope"])
+        if json_document["subject_scope"]:
+          json_document["subject_scope"] = map(unicode,json_document["subject_scope"])
+        if json_document["object_scope"]:
+          json_document["object_scope"] = map(unicode,json_document["object_scope"])
 
         perform_eval_type("subject_type", json_document, type_name, "GSystemType")
         perform_eval_type("object_type", json_document, type_name, "GSystemType")
