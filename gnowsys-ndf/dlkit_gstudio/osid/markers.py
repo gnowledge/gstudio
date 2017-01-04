@@ -46,7 +46,7 @@ class Identifiable(abc_osid_markers.Identifiable):
             self._authority = runtime.get_configuration().get_value_by_parameter(
                 authority_param_id).get_string_value()
         except (AttributeError, KeyError, errors.NotFound):
-            self._authority = 'STUB_IMPL.MIT.EDU'
+            self._authority = 'GSTUDIO'
 
 
     def get_id(self):
