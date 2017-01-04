@@ -521,8 +521,8 @@ class Node(DjangoDocument):
     @staticmethod
     def get_node_by_id(node_id):
         '''
-            Takes ObjectId or objectId as string as arg 
-                and return object        
+            Takes ObjectId or objectId as string as arg
+                and return object
         '''
         if isinstance(node_id, ObjectId) or ObjectId.is_valid(node_id):
             return node_collection.one({'_id': ObjectId(node_id)})
@@ -531,7 +531,7 @@ class Node(DjangoDocument):
     @staticmethod
     def get_nodes_by_ids_list(node_id_list):
         '''
-            Takes list of ObjectIds or objectIds as string as arg 
+            Takes list of ObjectIds or objectIds as string as arg
                 and return list of object
         '''
         node_id_list = map(ObjectId, node_id_list)
@@ -1164,7 +1164,7 @@ class AttributeType(Node):
     'subject_type': [ObjectId], # check required: only one of Type
                                     # Nodes. GSystems cannot be set as
                                     # subject_types
-    'subject_scope': list, 
+    'subject_scope': list,
     'object_scope': list,
     'attribute_type_scope': list,
     'applicable_node_type': [basestring],	# can be one or more
@@ -1195,7 +1195,7 @@ class AttributeType(Node):
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
     default_values = {
-                        'subject_scope': [], 
+                        'subject_scope': [],
                         'object_scope': [],
                         'attribute_type_scope': [],
                     }
@@ -1353,7 +1353,7 @@ class RelationType(Node):
     required_fields = ['inverse_name', 'subject_type', 'object_type']
     use_dot_notation = True
     default_values = {
-                        'subject_scope': [], 
+                        'subject_scope': [],
                         'object_scope': [],
                         'relation_type_scope': [],
                     }
