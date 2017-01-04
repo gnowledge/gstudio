@@ -1052,11 +1052,11 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         self._forms[asset_form.get_id().get_identifier()] = CREATED
         # This should be part of _init_gstudio_map
-        asset_form._gstudio_map.update({'created_by': 1})
-        asset_form._gstudio_map.update({'modified_by': 1})
-        asset_obj = gstudio_create_asset(self._catalog_id.get_identifier(),\
-                                         asset_form._gstudio_map['name'],\
+        asset_obj = gstudio_create_asset(asset_form._gstudio_map['name'],\
+                                        self._catalog_id.get_identifier(),\
+                                        req_obj.user.id ,\
                                         **asset_form._gstudio_map)
+
         # # asset_obj is gstudio node 
         if asset_obj:
             result = objects.Asset(
