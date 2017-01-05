@@ -12,9 +12,11 @@ from dlkit.abstract_osid.repository import sessions as abc_repository_sessions
 from ..osid import sessions as osid_sessions
 from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
+from dlkit.primordium.id.primitives import Id
 from .objects import Repository, RepositoryList
 from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection
 from gnowsys_ndf.ndf.views.group import CreateGroup
+
 CREATED = True
 
 
@@ -301,8 +303,12 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         """
         # Get all Asset objects from all Groups.
         # To be implemented
-        result = []
-        return objects.AssetList(result, runtime=self._runtime, proxy=self._proxy)
+        asset_list = []
+        group_id = self._catalog_id.identifier
+        asset_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Asset'})
+        asset_cur = node_collection.find({'member_of': asset_gst._id, 'group_set': ObjectId(group_id)})
+        asset_list = [objects.Asset(gstudio_node=each_asset) for each_asset in asset_cur]
+        return objects.AssetList(asset_list, runtime=self._runtime, proxy=self._proxy)
 
     assets = property(fget=get_assets)
 
@@ -3423,7 +3429,7 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
 
         """
         # repository_id will be of type  dlkit.primordium.id.primitives.Id
-        return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id.identifier)}))
+        return objects.Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id.identifier)}))
 
     @utilities.arguments_not_none
     def get_repositories_by_ids(self, repository_ids):
@@ -3451,8 +3457,8 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
         repository_list = []
         repository_ids = [ObjectId(repository_id.identifier) for repository_id in repository_ids]
         group_cur = node_collection.find({'_id': {'$in': repository_ids}})
-        repository_list = [Repository(gstudio_node=each_grp) for each_grp in group_cur]
-        return RepositoryList(repository_list)
+        repository_list = [objects.Repository(gstudio_node=each_grp) for each_grp in group_cur]
+        return objects.RepositoryList(repository_list)
 
     @utilities.arguments_not_none
     def get_repositories_by_genus_type(self, repository_genus_type):
@@ -3554,8 +3560,8 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
         """
         repository_list = []
         group_cur = node_collection.find({'_type': 'Group'})
-        repository_list = [Repository(gstudio_node=each_grp) for each_grp in group_cur]
-        return RepositoryList(repository_list)
+        repository_list = [objects.Repository(gstudio_node=each_grp) for each_grp in group_cur]
+        return objects.RepositoryList(repository_list)
 
     repositories = property(fget=get_repositories)
 
