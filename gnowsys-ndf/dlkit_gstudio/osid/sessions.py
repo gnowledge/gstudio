@@ -9,6 +9,7 @@
 from bson.objectid import ObjectId
 from .. import types
 from .. import utilities
+
 from dlkit.abstract_osid.osid import sessions as abc_osid_sessions
 from ..utilities import get_effective_agent_id_with_proxy
 
@@ -250,3 +251,12 @@ class OsidSession(abc_osid_sessions.OsidSession):
 
     def _use_federated_catalog_view(self):
         self._catalog_view = FEDERATED
+
+    def _init_catalog(self, proxy=None, runtime=None):
+        """Initialize this object as an OsidCatalog."""
+        self._init_proxy_and_runtime(proxy, runtime)
+
+
+    def _get_provider_manager(self, osid, local=False):
+        """Gets the most appropriate provider manager depending on config."""
+        return utilities.get_provider_manager(osid, runtime=self._runtime, proxy=self._proxy, local=local)
