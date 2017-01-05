@@ -30,17 +30,17 @@ def jhapp(request, group_id):
 
 @login_required
 @get_execution_time
-def uploadZapp(request, group_id):
+def uploadjhapp(request, group_id):
 
   try:
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-  return render_to_response("ndf/uploadZapp.html",RequestContext(request, {"groupid":group_id, "group_id":group_id,'gstudio_supported_jhapps':GSTUDIO_SUPPORTED_JHAPPS}))
+  return render_to_response("ndf/uploadjhapp.html",RequestContext(request, {"groupid":group_id, "group_id":group_id,'gstudio_supported_jhapps':GSTUDIO_SUPPORTED_JHAPPS}))
 
 @login_required
 @get_execution_time
-def saveZapp(request,group_id):
+def savejhapp(request,group_id):
   from gnowsys_ndf.ndf.views.file import save_file
   try:
       group_id = ObjectId(group_id)
