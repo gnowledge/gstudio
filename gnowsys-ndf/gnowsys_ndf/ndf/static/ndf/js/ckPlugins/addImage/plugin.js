@@ -25,13 +25,22 @@ CKEDITOR.plugins.add('addImage',
                         success: function(data) {
                           $("#group_imgs_on_modal").html(data);
                           $('#group_imgs_on_modal').foundation('reveal', 'open');
-                             var oToScroll = document.getElementById("group_imgs_on_modal");
-                             oToScroll.onscroll = checkReading;
 
-                        function checkReading () {
-                              tmp = this.scrollHeight - this.scrollTop === this.clientHeight;
-                              console.log(tmp);
+                          $(".card-image-wrapper").click(function(event){
+                            var imageURL = $(this).children('img').attr("data-image-src");
+                            // var locationURL = 'http://' + location.host;
+                            var locationURL = window.location.origin
+                            var completeURL = imageURL
+                            var width = prompt("Please enter width in px",'600');
+                            if(width == null)
+                            {
+                                return false;
                             }
+                            CKEDITOR.instances[textAreaId].insertHtml('<img width="'+  width + '"src=' + completeURL +  '>' + '</img>');
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                        
+
+                          });
 
 
                         }
