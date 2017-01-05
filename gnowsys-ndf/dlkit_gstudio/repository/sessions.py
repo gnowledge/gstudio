@@ -632,9 +632,19 @@ class AssetQuerySession(abc_repository_sessions.AssetQuerySession, osid_sessions
 
     """
 
-    def __init__(self, proxy=None, runtime=None, **kwargs):
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(proxy=proxy, runtime=runtime)
+        self._catalog_class = objects.Repository
+        self._session_name = 'AssetQuerySession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
         self._kwargs = kwargs
 
     def get_repository_id(self):
@@ -690,7 +700,7 @@ class AssetQuerySession(abc_repository_sessions.AssetQuerySession, osid_sessions
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._use_federated_catalog_view()
 
     def use_isolated_repository_view(self):
         """Isolates the view for methods in this session.
@@ -3926,8 +3936,17 @@ class RepositoryHierarchySession(abc_repository_sessions.RepositoryHierarchySess
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(proxy=proxy, runtime=runtime)
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._forms = dict()
         self._kwargs = kwargs
+        hierarchy_mgr = self._get_provider_manager('HIERARCHY')
+        self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+            Id(authority='REPOSITORY',
+               namespace='CATALOG',
+               identifier='REPOSITORY'),
+             proxy=self._proxy
+        )
+
 
     def get_repository_hierarchy_id(self):
         """Gets the hierarchy ``Id`` associated with this session.

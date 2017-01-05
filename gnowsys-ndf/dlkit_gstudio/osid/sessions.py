@@ -17,6 +17,8 @@ from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
 from gnowsys_ndf.ndf.models import node_collection
 
+FEDERATED = 0
+
 
 class OsidSession(abc_osid_sessions.OsidSession):
     """The ``OsidSession`` is the top level interface for all OSID sessions.
@@ -246,3 +248,5 @@ class OsidSession(abc_osid_sessions.OsidSession):
         raise errors.Unimplemented()
 
 
+    def _use_federated_catalog_view(self):
+        self._catalog_view = FEDERATED
