@@ -23,5 +23,8 @@ test_repo = None
 for each in all_repos:
 	test_repo = each
 d =  test_repo.get_id()
-import ipdb; ipdb.set_trace()
-rl = repository_service_mgr.get_asset_lookup_session_for_repository(d)
+# import ipdb; ipdb.set_trace()
+grp_assets = test_repo.get_assets()
+print "\n Total Assets: ", grp_assets.available()
+
+# rl = repository_service_mgr.get_asset_lookup_session_for_repository(d)
