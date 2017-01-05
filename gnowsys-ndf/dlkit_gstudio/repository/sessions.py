@@ -1299,7 +1299,26 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
+        from gnowsys_ndf.ndf.views.asset import create_assetcontent as gstudio_create_assetcontent
+        req_obj = GStudioRequest(id=1)
+
+        try:
+            if self._forms[asset_content_form.get_id().get_identifier()] == CREATED:
+                raise errors.IllegalState('asset_content_form already used in a create transaction')
+        except KeyError:
+            raise errors.Unsupported('asset_content_form did not originate from this session')
+        if not asset_content_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        self._forms[asset_content_form.get_id().get_identifier()] = CREATED
+        asset_content_name = asset_content_form._gstudio_map['name']
+
+        assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id.identifier, name=asset_content_name, \
+            group_id=self._catalog_id.identifier, created_by=req_obj.user.id, **kwargs=**asset_content_form._my_map)
+
+        return objects.AssetContent(gstudio_node=assetcontent_obj,
+                              runtime=self._runtime,
+                              proxy=self._proxy)
 
     def can_update_asset_contents(self):
         """Tests if this user can update ``AssetContent``.
