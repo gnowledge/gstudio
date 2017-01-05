@@ -1266,7 +1266,18 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+
+        if asset_content_record_types == []:
+            ## WHY are we passing repository_id = self._catalog_id below, seems redundant:
+            obj_form = objects.AssetContentForm(
+                repository_id=self._catalog_id,
+                asset_id=asset_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime,
+                proxy=self._proxy)
+        obj_form._for_update = False
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
+        return obj_form
 
     @utilities.arguments_not_none
     def create_asset_content(self, asset_content_form):
