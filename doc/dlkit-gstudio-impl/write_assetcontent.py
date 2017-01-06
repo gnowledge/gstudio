@@ -30,3 +30,30 @@ asset_obj = grp_assets.next()
 print "\n Asset name: ", asset_obj.get_display_name().get_text()
 
 # rl = repository_service_mgr.get_asset_lookup_session_for_repository(d)
+
+
+# ================================================== ASSET CONTENT ========================
+
+from dlkit.primordium.id.primitives import Id
+from dlkit.primordium.transport.objects import DataInputStream
+
+##### WRITE OPERATIONS
+
+asset_content_type_list = []
+'''
+# Need to figure out this:
+try:
+    config = repo_obj._catalog._runtime.get_configuration()
+    parameter_id = Id('parameter:assetContentRecordTypeForFiles@filesystem')
+    asset_content_type_list.append(
+        config.get_value_by_parameter(parameter_id).get_type_value())
+except (AttributeError, KeyError):
+    pass
+'''
+import ipdb; ipdb.set_trace()
+assetcontent_form = test_repo.get_asset_content_form_for_create(asset_obj.ident, asset_content_type_list)
+
+
+# with open('image.png', 'r') as dot:
+#     assetcontent_form.set_data(DataInputStream(dot))
+# test_repo.create_asset_content(form)

@@ -1278,7 +1278,8 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         self._mdata = default_mdata.get_asset_content_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():
-            self._init_form(**kwargs)
+            self._init_map(**kwargs)
+            self._init_gstudio_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         """Initialize form metadata"""
@@ -1286,6 +1287,22 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         self._url_default = self._mdata['url']['default_string_values'][0]
         self._data_default = self._mdata['data']['default_object_values'][0]
         self._accessibility_type_default = self._mdata['accessibility_type']['default_type_values'][0]
+
+
+    def _init_map(self, record_types=None, **kwargs):
+        """Initialize form map"""
+        osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
+        self._my_map['url'] = self._url_default
+        self._my_map['data'] = self._data_default
+        self._my_map['accessibilityTypeId'] = self._accessibility_type_default
+        self._my_map['assignedRepositoryIds'] = [str(kwargs['repository_id'])]
+        self._my_map['assetId'] = str(kwargs['asset_id'])
+
+    def _init_gstudio_map(self, record_types=None, **kwargs):
+        """Initialize form map"""
+        osid_objects.OsidObjectForm._init_gstudio_map(self, record_types, **kwargs)
+        self._gstudio_map['assetId'] = str(kwargs['asset_id'])
+
 
     def _init_form(self, record_types=None, **kwargs):
         """Initialize form elements"""
