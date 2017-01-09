@@ -6471,3 +6471,17 @@ def get_paged_images(request, group_id):
       "group_id":group_id,"result_cur":result_cur,"is_create_collection":is_create_collection,"is_add_to_collection":is_add_to_collection
     },context_instance=RequestContext(request))
 
+
+@get_execution_time
+def get_templates_page(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  templates_gst = node_collection.one({"_type":"GSystemType","name":"Template"})
+  if templates_gst._id:
+    templates_cur = node_collection.find({"member_of":ObjectId(GST_PAGE._id),"type_of":ObjectId(templates_gst._id)})
+  template = "ndf/templates_list.html"
+  already_uploaded=request.GET.getlist('var',"")
+  variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'templates_cur':templates_cur })
+  return render_to_response(template, variable)

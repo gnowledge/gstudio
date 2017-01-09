@@ -94,8 +94,10 @@
 							{% trans "Create New " %} {{title}} :
 						{% endif  %}
 					{% endif %}
+				<span class="right">
+					<a  class="tiny button radius existing-template">{% trans "Create page from existing template" %}</a>
+				</span>
 				</span></h3>
-
 
 			    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." {% if node.group_type %}disabled=disabled{% endif %} required>
 		  		<label id="message" style="display:none; color:red"></label>
@@ -693,6 +695,24 @@
 <!-- Reveal Modals begin -->
 
 <script type="text/javascript">
+	$( ".existing-template" ).click(function() {
+		$.ajax({
+                        type: "GET",
+                    	url: "{% url 'get_templates_page' groupid %}",
+                        datatype: "html",
+                        data:{
+
+                        },
+                        success: function(data) {
+                         
+                			$("#group_imgs_on_modal").html(data);
+                          	$('#group_imgs_on_modal').foundation('reveal', 'open');
+
+                        }
+                    });
+	
+	});
+	
 
 	{% if title == "Page" or "File" in node.member_of_names_list %}
 
