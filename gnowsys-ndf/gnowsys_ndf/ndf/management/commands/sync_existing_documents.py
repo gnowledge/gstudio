@@ -26,41 +26,41 @@ class Command(BaseCommand):
     # --------------------------------------------------------------------------
     # Adding <'relation_type_scope': []> field to all RelationType objects
 
-    res = node_collection.collection.update({'_type': 'RelationType', 'relation_type_scope': {'$exists': False} }, {'$set': {'relation_type_scope': [] }}, upsert=False, multi=True)
-    if res['updatedExisting']: # and res['nModified']:
-        print "\n Added 'relation_type_scope' field to " + res['n'].__str__() + " RelationType instances."
+    print "\nUpdating RelationTypes and AttributeTypes."
+    rt_res = node_collection.collection.update({'_type': 'RelationType', \
+        'relation_type_scope': {'$exists': False} }, \
+        {'$set': {'relation_type_scope': [], 'object_scope': [],\
+         'subject_scope': [] }}, upsert=False, multi=True)
 
-    triple_res = triple_collection.collection.update({'_type': 'GRelation', 'relation_type_scope': {'$eq': None} }, {'$set': {'relation_type_scope': {} }}, upsert=False, multi=True)
-    if triple_res['updatedExisting']: # and triple_res['nModified']:
-        print "\n Added 'relation_type_scope' field to " + triple_res['n'].__str__() + " GRelation instances."
+    if rt_res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'scope' fields to " + rt_res['n'].__str__() + " RelationType instances."
+
+    at_res = node_collection.collection.update({'_type': 'AttributeType',\
+     'attribute_type_scope': {'$exists': False} }, \
+     {'$set': {'attribute_type_scope': [], 'object_scope': [],\
+      'subject_scope': [] }}, upsert=False, multi=True)
+    if at_res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'scope' fields to " + at_res['n'].__str__() + " AttributeType instances."
+
+    print "\nUpdating GRelations and GAttributes."
+    grel_res = triple_collection.collection.update({'_type': 'GRelation',\
+     '$or': [{'relation_type_scope': {'$eq': None}, 'subject_scope': \
+     {'$exists': False}, 'object_scope': {'$exists': False}}]},\
+     {'$unset': { 'right_subject_scope': ""} , '$set': \
+     {'relation_type_scope': {}, 'object_scope': None,\
+     'subject_scope': None }}, upsert=False, multi=True)
+    if grel_res['updatedExisting']: # and grel_res['nModified']:
+        print "\n Added 'scope' fields to " + grel_res['n'].__str__() + " GRelation instances."
+
+    gattr_res = triple_collection.collection.update({'_type': 'GAttribute',\
+     '$or': [{'attribute_type_scope': {'$eq': None}, 'subject_scope': \
+     {'$exists': False}, 'object_scope': {'$exists': False} }]}, \
+     {'$unset': { 'object_value_scope': ""} , '$set': \
+     {'attribute_type_scope': {}, 'object_scope': None, \
+     'subject_scope': None }}, upsert=False, multi=True)
+    if gattr_res['updatedExisting']: # and gattr_res['nModified']:
+        print "\n Added 'scope' fields to " + gattr_res['n'].__str__() + " GAttribute instances."
     # --------------------------------------------------------------------------
-
-
-    all_grelations = triple_collection.find({'_type': 'GRelation'})
-    all_gattributes = triple_collection.find({'_type': 'GAttribute'})
-    print "\n Working on Triples data. \n Total GRelations found: ", all_grelations.count()
-    print " Total GAttributes found: ", all_gattributes.count()
-    print "\n This will take few minutes. Please wait.."
-    for each_grelation in all_grelations:
-        # print each_grelation
-        print '.',
-        rt_node = each_grelation.relation_type
-        if not isinstance(rt_node, ObjectId):
-            rt_obj = RelationType(db.dereference(rt_node))
-            each_grelation.relation_type = rt_obj._id
-            try:
-                each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
-            except Exception as er:
-                print "\n Error Occurred while updating Triples data. ", er
-                pass
-
-    for each_gattribute in all_gattributes:
-        print '.',
-        at_node = each_gattribute.attribute_type
-        if not isinstance(at_node, ObjectId):
-            at_obj = AttributeType(db.dereference(at_node))
-            each_gattribute.attribute_type = at_obj._id
-            each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
 
 
     # Keep latest changes in field(s) to be added at top
@@ -106,9 +106,15 @@ class Command(BaseCommand):
 
     # Updating language fields data type:
     # - Firstly, replacing None to ('en', 'English')
-    node_collection.collection.update({ '_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']}, 'language': {'$in': [None, '', u'']} }, {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
+    node_collection.collection.update({ '_type': {'$in': ['AttributeType',\
+     'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem',\
+      'File', 'Group', 'Author']}, 'language': {'$in': [None, '', u'']} },\
+       {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
 
-    all_nodes = node_collection.find({'_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']} })
+    # language tuple gets save as list type.
+    all_nodes = node_collection.find({'_type': {'$in': ['AttributeType',\
+     'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem',\
+      'File', 'Group', 'Author']}, 'language': {'$ne': ['en', 'English']} })
 
     all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
     all_languages_concanated = reduce(lambda x, y: x+y, all_languages)
@@ -206,7 +212,7 @@ class Command(BaseCommand):
     # Replacing object_type of "trainer_of_course" & "master_trainer_of_course"
     # relationship from "Announced Course" to "NUSSD Course"
     nussd_course = node_collection.one({
-        '_type': "GSystemType", 'name': "NUSSD Course"
+        '_type': "GSystemType", 'name': "NUSSDCourse"
     })
     if nussd_course:
         nussd_course_id = nussd_course._id
@@ -460,7 +466,7 @@ class Command(BaseCommand):
         print "\n 'teaches' RelationType: no need to update."
 
     # Replacing object_type of "has_course" relationship from "NUSSD Course" to "Announced Course"
-    ann_course = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+    ann_course = node_collection.one({'_type': "GSystemType", 'name': "AnnouncedCourse"})
     if ann_course:
         res = node_collection.collection.update({'_type': "RelationType", 'name': "has_course"},
                 {'$set': {'object_type': [ann_course._id]}},
@@ -779,3 +785,31 @@ class Command(BaseCommand):
         i.save()
         print "Updated",i.name,"'s modified by feild from null to 1"
 
+    all_grelations = triple_collection.find({'_type': 'GRelation'})
+    all_gattributes = triple_collection.find({'_type': 'GAttribute'})
+    print "\n Working on Triples data. \n Total GRelations found: ", all_grelations.count()
+    print " Total GAttributes found: ", all_gattributes.count()
+    print "\n This will take few minutes. Please wait.."
+    for each_grelation in all_grelations:
+        # print each_grelation
+        print '.',
+        rt_node = each_grelation.relation_type
+        if not isinstance(rt_node, ObjectId):
+            rt_obj = RelationType(db.dereference(rt_node))
+            each_grelation.relation_type = rt_obj._id
+            print each_grelation
+            try:
+                each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+            except Exception as er:
+                print "Error Occurred while updating Triples data. ", er
+                pass
+
+    for each_gattribute in all_gattributes:
+        print '.',
+        at_node = each_gattribute.attribute_type
+        if not isinstance(at_node, ObjectId):
+            at_obj = AttributeType(db.dereference(at_node))
+            each_gattribute.attribute_type = at_obj._id
+            each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+
+    print "\nTriples data updated successfully."

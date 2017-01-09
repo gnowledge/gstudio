@@ -46,7 +46,7 @@ class Identifiable(abc_osid_markers.Identifiable):
             self._authority = runtime.get_configuration().get_value_by_parameter(
                 authority_param_id).get_string_value()
         except (AttributeError, KeyError, errors.NotFound):
-            self._authority = 'STUB_IMPL.MIT.EDU'
+            self._authority = 'GSTUDIO'
 
 
     def get_id(self):
@@ -155,7 +155,14 @@ class Extensible(abc_osid_markers.Extensible):
 
         """
         raise errors.Unimplemented()
+    
+    def __iter__(self):
+       for attr in dir(self):
+           if not attr.startswith('__'):
+               yield attr
 
+    def __getitem__(self, item):
+       return getattr(self, item)
 
 class Browsable(abc_osid_markers.Browsable):
     """A marker interface for objects that offer property inspection."""

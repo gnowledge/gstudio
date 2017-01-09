@@ -30,28 +30,3 @@ repo_create_form.set_description('TestGroup1 description')
 repo_obj = repository_service_mgr.create_repository(repo_create_form)
 
 
-# ==================================================================
-
-# from dlkit_runtime import RUNTIME, PROXY_SESSION
-# from dlkit_runtime.proxy_example import TestRequest
-
-# condition = PROXY_SESSION.get_proxy_condition()
-
-
-# dummy_request = TestRequest(username='administrator',
-#                             authenticated=True)
-
-# # from django.contrib.auth.models import User
-# # u = User.objects.get(pk=1)
-# # from django.test import RequestFactory
-
-# # rf = RequestFactory()
-
-# # req_obj = rf.get('/home')
-# # req_obj.user = u
-# # req_obj.user.id
-
-
-# # condition.set_http_request(req_obj)
-# condition.set_http_request(dummy_request)
-# proxy = PROXY_SESSION.get_proxy(condition)

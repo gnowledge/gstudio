@@ -1739,7 +1739,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         self._my_map['genusTypeId'] = self._genus_type_default
         OsidExtensibleForm._init_map(self, record_types)
 
-    def _init_gstudio_map(self, record_types=None):
+    def _init_gstudio_map(self, record_types=None, **kwargs):
         """Initialize map for form"""
         OsidForm._init_gstudio_map(self)
         self._gstudio_map['name'] = dict(self._display_name_default)

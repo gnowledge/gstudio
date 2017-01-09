@@ -12,9 +12,11 @@ from dlkit.abstract_osid.repository import sessions as abc_repository_sessions
 from ..osid import sessions as osid_sessions
 from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
+from dlkit.primordium.id.primitives import Id
 from .objects import Repository, RepositoryList
 from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection
 from gnowsys_ndf.ndf.views.group import CreateGroup
+
 CREATED = True
 
 
@@ -48,11 +50,25 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
     ``Asset``.
 
     """
-
-    def __init__(self, proxy=None, runtime=None, **kwargs):
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(self, proxy=proxy, runtime=runtime)
+        self._catalog_class = objects.Repository
+        self._session_name = 'AssetLookupSession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
         self._kwargs = kwargs
+
+    # def __init__(self, proxy=None, runtime=None, **kwargs):
+    #     OsidSession.__init__(self)
+    #     OsidSession._init_proxy_and_runtime(self, proxy=proxy, runtime=runtime)
+    #     self._kwargs = kwargs
 
     def get_repository_id(self):
         """Gets the ``Repository``  ``Id`` associated with this session.
@@ -162,7 +178,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        asset_identifier = ObjectId(self._get_id(asseT_id, 'repository').get_identifier())
+        asset_identifier = ObjectId(self._get_id(asset_id, 'repository').get_identifier())
         result = Node.get_node_by_id(asset_identifier)
         return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
 
@@ -287,8 +303,12 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         """
         # Get all Asset objects from all Groups.
         # To be implemented
-        result = []
-        return objects.AssetList(result, runtime=self._runtime, proxy=self._proxy)
+        asset_list = []
+        group_id = self._catalog_id.identifier
+        asset_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Asset'})
+        asset_cur = node_collection.find({'member_of': asset_gst._id, 'group_set': ObjectId(group_id)})
+        asset_list = [objects.Asset(gstudio_node=each_asset) for each_asset in asset_cur]
+        return objects.AssetList(asset_list, runtime=self._runtime, proxy=self._proxy)
 
     assets = property(fget=get_assets)
 
@@ -322,12 +342,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
     ``AssetContent``.
 
     """
-    def __init__(self, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(self, proxy=proxy, runtime=runtime)
-        self._kwargs = kwargs
 
-    '''
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.Repository
@@ -342,7 +357,6 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
             cat_name='Repository',
             cat_class=objects.Repository)
         self._kwargs = kwargs
-    '''
 
     def get_repository_id(self):
         """Gets the ``Repository``  ``Id`` associated with this session.
@@ -624,9 +638,19 @@ class AssetQuerySession(abc_repository_sessions.AssetQuerySession, osid_sessions
 
     """
 
-    def __init__(self, proxy=None, runtime=None, **kwargs):
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(proxy=proxy, runtime=runtime)
+        self._catalog_class = objects.Repository
+        self._session_name = 'AssetQuerySession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
         self._kwargs = kwargs
 
     def get_repository_id(self):
@@ -682,7 +706,7 @@ class AssetQuerySession(abc_repository_sessions.AssetQuerySession, osid_sessions
         *compliance: mandatory -- This method is must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._use_federated_catalog_view()
 
     def use_isolated_repository_view(self):
         """Isolates the view for methods in this session.
@@ -897,10 +921,20 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
 
 
     """
-
-    def __init__(self, proxy=None, runtime=None, **kwargs):
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(proxy=proxy, runtime=runtime)
+        self._catalog_class = objects.Repository
+        self._session_name = 'AssetAdminSession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
+        self._forms = dict()
         self._kwargs = kwargs
 
     def get_repository_id(self):
@@ -911,7 +945,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return self._catalog_id
 
     repository_id = property(fget=get_repository_id)
 
@@ -925,7 +959,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return self._catalog
 
     repository = property(fget=get_repository)
 
@@ -987,7 +1021,19 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        # Implemented from template for
+        # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
+
+        if asset_record_types == []:
+            obj_form = objects.AssetForm(
+                repository_id=self._catalog_id,
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)
+            self._forms[obj_form.get_id().get_identifier()] = not CREATED
+
+        return obj_form
+        
 
     @utilities.arguments_not_none
     def create_asset(self, asset_form):
@@ -1008,7 +1054,31 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+
+        from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
+        from gnowsys_ndf.ndf.views.asset import create_asset as gstudio_create_asset
+        req_obj = GStudioRequest(id=1)
+        try:
+            if self._forms[asset_form.get_id().get_identifier()] == CREATED:
+                raise errors.IllegalState('asset_form already used in a create transaction')
+        except KeyError:
+            raise errors.Unsupported('asset_form did not originate from this session')
+        if not asset_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        self._forms[asset_form.get_id().get_identifier()] = CREATED
+        # This should be part of _init_gstudio_map
+        asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
+         group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
+
+        # # asset_obj is gstudio node 
+        if asset_obj:
+            result = objects.Asset(
+                gstudio_node=asset_obj,
+                runtime=self._runtime,
+                proxy=self._proxy)
+
+            return result
+        raise errors.OperationFailed()
 
     def can_update_assets(self):
         """Tests if this user can update ``Assets``.
@@ -1196,7 +1266,18 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+
+        if asset_content_record_types == []:
+            ## WHY are we passing repository_id = self._catalog_id below, seems redundant:
+            obj_form = objects.AssetContentForm(
+                repository_id=self._catalog_id,
+                asset_id=asset_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime,
+                proxy=self._proxy)
+        obj_form._for_update = False
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
+        return obj_form
 
     @utilities.arguments_not_none
     def create_asset_content(self, asset_content_form):
@@ -1218,7 +1299,26 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
+        from gnowsys_ndf.ndf.views.asset import create_assetcontent as gstudio_create_assetcontent
+        req_obj = GStudioRequest(id=1)
+
+        try:
+            if self._forms[asset_content_form.get_id().get_identifier()] == CREATED:
+                raise errors.IllegalState('asset_content_form already used in a create transaction')
+        except KeyError:
+            raise errors.Unsupported('asset_content_form did not originate from this session')
+        if not asset_content_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        self._forms[asset_content_form.get_id().get_identifier()] = CREATED
+        asset_content_name = asset_content_form._gstudio_map['name']
+
+        assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id.identifier, name=asset_content_name, \
+            group_id=self._catalog_id.identifier, created_by=req_obj.user.id, **kwargs=**asset_content_form._my_map)
+
+        return objects.AssetContent(gstudio_node=assetcontent_obj,
+                              runtime=self._runtime,
+                              proxy=self._proxy)
 
     def can_update_asset_contents(self):
         """Tests if this user can update ``AssetContent``.
@@ -3359,7 +3459,7 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
 
         """
         # repository_id will be of type  dlkit.primordium.id.primitives.Id
-        return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id)}))
+        return objects.Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id.identifier)}))
 
     @utilities.arguments_not_none
     def get_repositories_by_ids(self, repository_ids):
@@ -3387,8 +3487,8 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
         repository_list = []
         repository_ids = [ObjectId(repository_id.identifier) for repository_id in repository_ids]
         group_cur = node_collection.find({'_id': {'$in': repository_ids}})
-        repository_list = [Repository(gstudio_node=each_grp) for each_grp in group_cur]
-        return RepositoryList(repository_list)
+        repository_list = [objects.Repository(gstudio_node=each_grp) for each_grp in group_cur]
+        return objects.RepositoryList(repository_list)
 
     @utilities.arguments_not_none
     def get_repositories_by_genus_type(self, repository_genus_type):
@@ -3490,8 +3590,8 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
         """
         repository_list = []
         group_cur = node_collection.find({'_type': 'Group'})
-        repository_list = [Repository(gstudio_node=each_grp) for each_grp in group_cur]
-        return RepositoryList(repository_list)
+        repository_list = [objects.Repository(gstudio_node=each_grp) for each_grp in group_cur]
+        return objects.RepositoryList(repository_list)
 
     repositories = property(fget=get_repositories)
 
@@ -3694,19 +3794,8 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
         if not repository_form.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
 
-        """
-        The following code to build request
-         object is purely for testing purpose
-        """        
-        from django.contrib.auth.models import User
-        u = User.objects.get(pk=1)
-        from django.test import RequestFactory
-
-        rf = RequestFactory()
-
-        req_obj = rf.get('/home')
-        req_obj.user = u
-        req_obj.user.id
+        from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
+        req_obj = GStudioRequest(id=1)
 
         self._forms[repository_form.get_id().get_identifier()] = CREATED
 
@@ -3883,8 +3972,17 @@ class RepositoryHierarchySession(abc_repository_sessions.RepositoryHierarchySess
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        OsidSession._init_proxy_and_runtime(proxy=proxy, runtime=runtime)
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._forms = dict()
         self._kwargs = kwargs
+        hierarchy_mgr = self._get_provider_manager('HIERARCHY')
+        self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+            Id(authority='REPOSITORY',
+               namespace='CATALOG',
+               identifier='REPOSITORY'),
+             proxy=self._proxy
+        )
+
 
     def get_repository_hierarchy_id(self):
         """Gets the hierarchy ``Id`` associated with this session.

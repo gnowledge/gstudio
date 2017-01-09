@@ -521,8 +521,8 @@ class Node(DjangoDocument):
     @staticmethod
     def get_node_by_id(node_id):
         '''
-            Takes ObjectId or objectId as string as arg 
-                and return object        
+            Takes ObjectId or objectId as string as arg
+                and return object
         '''
         if isinstance(node_id, ObjectId) or ObjectId.is_valid(node_id):
             return node_collection.one({'_id': ObjectId(node_id)})
@@ -531,7 +531,7 @@ class Node(DjangoDocument):
     @staticmethod
     def get_nodes_by_ids_list(node_id_list):
         '''
-            Takes list of ObjectIds or objectIds as string as arg 
+            Takes list of ObjectIds or objectIds as string as arg
                 and return list of object
         '''
         node_id_list = map(ObjectId, node_id_list)
@@ -1164,10 +1164,12 @@ class AttributeType(Node):
     'subject_type': [ObjectId], # check required: only one of Type
                                     # Nodes. GSystems cannot be set as
                                     # subject_types
+    'subject_scope': list,
+    'object_scope': list,
+    'attribute_type_scope': list,
     'applicable_node_type': [basestring],	# can be one or more
                                                 # than one of
                                                 # NODE_TYPE_CHOICES
-
     'verbose_name': basestring,
     'null': bool,
     'blank': bool,
@@ -1192,6 +1194,11 @@ class AttributeType(Node):
 
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
+    default_values = {
+                        'subject_scope': [],
+                        'object_scope': [],
+                        'attribute_type_scope': [],
+                    }
 
     # validators={
     # 'data_type':x in DATA_TYPE_CHOICES
@@ -1330,11 +1337,8 @@ class RelationType(Node):
         'inverse_name': unicode,
         'subject_type': [ObjectId],  # ObjectId's of Any Class
         'object_type': [OR(ObjectId, list)],  # ObjectId's of Any Class
-        # On hold
-        # 'subject_scope': ['any', 'most', 'some', 'none', 'atmost'] 
-        # 'object_scope': []
-
-        # To be implemented
+        'subject_scope': list,
+        'object_scope': list,
         'relation_type_scope': list,
         'subject_cardinality': int,
         'object_cardinality': int,
@@ -1348,6 +1352,11 @@ class RelationType(Node):
 
     required_fields = ['inverse_name', 'subject_type', 'object_type']
     use_dot_notation = True
+    default_values = {
+                        'subject_scope': [],
+                        'object_scope': [],
+                        'relation_type_scope': [],
+                    }
 
     # User-Defined Functions ##########
     @staticmethod
@@ -3027,6 +3036,7 @@ class Triple(DjangoDocument):
     '_type': unicode,
     'name': unicode,
     'subject_scope': basestring,
+    'object_scope': basestring,
     'subject': ObjectId,  # ObjectId's of GSystem Class
     'lang': basestring,  # Put validation for standard language codes
     'status': STATUS_CHOICES_TU
@@ -3035,6 +3045,10 @@ class Triple(DjangoDocument):
   required_fields = ['name', 'subject']
   use_dot_notation = True
   use_autorefs = True
+  default_values = {
+                      'subject_scope': None,
+                      'object_scope': None
+                  }
 
   ########## Built-in Functions (Overridden) ##########
   def __unicode__(self):
@@ -3245,10 +3259,10 @@ class Triple(DjangoDocument):
 @connection.register
 class GAttribute(Triple):
     structure = {
-        'attribute_type_scope': basestring,
+        'attribute_type_scope': dict,
         # 'attribute_type': AttributeType,  # Embedded document of AttributeType Class
         'attribute_type': ObjectId,  # ObjectId of AttributeType node
-        'object_value_scope': basestring,
+        # 'object_value_scope': basestring,
         'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
 
@@ -3266,6 +3280,9 @@ class GAttribute(Triple):
     required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents
+    default_values = {
+                        'attribute_type_scope': {}
+                    }
 
 
 @connection.register
@@ -3274,10 +3291,13 @@ class GRelation(Triple):
         'relation_type_scope': dict,
         # 'relation_type': RelationType,  # DBRef of RelationType Class
         'relation_type': ObjectId,  # ObjectId of RelationType node
-        'right_subject_scope': basestring,
+        # 'right_subject_scope': basestring,
         # ObjectId's of GSystems Class / List of list of ObjectId's of GSystem Class
         'right_subject': OR(ObjectId, list)
     }
+    default_values = {
+                        'relation_type_scope': {}
+                    }
 
     indexes = [{
         # 1: Compound index
