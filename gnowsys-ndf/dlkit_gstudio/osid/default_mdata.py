@@ -37,7 +37,7 @@ def get_osid_object_mdata():
         'display_name': {
             'element_label': 'Display Name',
             'instructions': 'Required, 255 character maximum',
-            'required': False,
+            'required': True, # make display_name a mandatory field.
             'read_only': False,
             'linked': False,
             'array': False,
