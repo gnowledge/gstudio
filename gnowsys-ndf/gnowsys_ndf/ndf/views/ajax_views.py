@@ -6485,3 +6485,19 @@ def get_templates_page(request, group_id):
   already_uploaded=request.GET.getlist('var',"")
   variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'templates_cur':templates_cur })
   return render_to_response(template, variable)
+
+
+@get_execution_time
+def add_transcript(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  if request.is_ajax() and request.method == "POST":
+    node_id = request.POST.get("nodeid", '')
+    trans_text = request.POST.get("transcript_text", '')
+    trans_of  = node_collection.one({'$and':[{'name':'has_transcript'},{'_type':'AttributeType'}]})
+    if node_id and trans_of:
+      create_gattribute(ObjectId(node_id), trans_of,unicode(trans_text))
+      
+  return HttpResponse(json.dumps("success"))
