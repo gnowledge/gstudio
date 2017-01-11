@@ -32,7 +32,7 @@ CKEDITOR.plugins.add('addAudio',
                                 var completeURL = audioURL
                                 CKEDITOR.instances[textAreaId].insertHtml('<audio controls loop src=' + completeURL +  '>' + '</audio>');
                                 $('#group_imgs_on_modal').foundation('reveal', 'close');
-                        
+
 
                           });
 
