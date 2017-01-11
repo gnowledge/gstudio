@@ -50,10 +50,14 @@ try:
 except (AttributeError, KeyError):
     pass
 '''
-import ipdb; ipdb.set_trace()
 assetcontent_form = test_repo.get_asset_content_form_for_create(asset_obj.ident, asset_content_type_list)
+assetcontent_form.description = 'AssetC description'
+assetcontent_form.display_name = 'AssetC3 name'
 
 
-# with open('image.png', 'r') as dot:
-#     assetcontent_form.set_data(DataInputStream(dot))
-# test_repo.create_asset_content(form)
+
+# To upload file
+# f = open('../../display-pics/black-ant.png', 'r')
+# assetcontent_form.set_data(DataInputStream(f))
+
+t = test_repo.create_asset_content(assetcontent_form)
