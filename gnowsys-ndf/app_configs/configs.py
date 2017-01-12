@@ -786,6 +786,7 @@ TEST_AUTHZ_ADAPTER_1 = {
         },
     }
 }
+'''
 
 
 TEST_SERVICE = {
@@ -799,7 +800,7 @@ TEST_SERVICE = {
             'displayName': 'Assessment Provider Implementation',
             'description': 'Implementation for assessment service provider',
             'values': [
-                {'value': 'TEST_MONGO_1', 'priority': 1}
+                {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
         'assessment_authoringProviderImpl': {
@@ -807,7 +808,7 @@ TEST_SERVICE = {
             'displayName': 'Assessment Authoring Provider Implementation',
             'description': 'Implementation for assessment authoring service provider',
             'values': [
-                {'value': 'TEST_MONGO_1', 'priority': 1}
+                {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
         'authorizationProviderImpl': {
@@ -815,7 +816,7 @@ TEST_SERVICE = {
             'displayName': 'Authorization Provider Implementation',
             'description': 'Implementation for authorization service provider',
             'values': [
-                {'value': 'TEST_MONGO_1', 'priority': 1}
+                {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
         # 'learningProviderImpl': {
@@ -831,7 +832,7 @@ TEST_SERVICE = {
             'displayName': 'Repository Provider Implementation',
             'description': 'Implementation for repository service provider',
             'values': [
-                {'value': 'TEST_MONGO_1', 'priority': 1}
+                {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
         'commentingProviderImpl': {
@@ -839,7 +840,7 @@ TEST_SERVICE = {
             'displayName': 'Commenting Provider Implementation',
             'description': 'Implementation for commenting service provider',
             'values': [
-                {'value': 'TEST_MONGO_1', 'priority': 1}
+                {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
         'resourceProviderImpl': {
@@ -855,7 +856,7 @@ TEST_SERVICE = {
             'displayName': 'Grading Provider Implementation',
             'description': 'Implementation for grading provider',
             'values': [
-                {'value': 'TEST_MONGO_1', 'priority': 1}
+                {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
         'loggingProviderImpl': {
@@ -863,9 +864,8 @@ TEST_SERVICE = {
             'displayName': 'Logging Provider Implementation',
             'description': 'Implementation for logging provider',
             'values': [
-                {'value': 'TEST_MONGO_1', 'priority': 1}
+                {'value': 'GSTUDIO_1', 'priority': 1}
             ]
         },
     }
 }
-'''
