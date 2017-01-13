@@ -49,6 +49,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^course_create_note/', 'course_create_note', name='course_create_note'),#create note in gallery and raw material
     url(r'^upload_file_ckeditor', 'upload_file_ckeditor', name='upload_file_ckeditor'),
     url(r'^upload_video_thumbnail', 'upload_video_thumbnail', name='upload_video_thumbnail'),
+    url(r'^get_video_player', 'get_video_player', name='get_video_player'),
+    url(r'^get_audio_player', 'get_audio_player', name='get_audio_player'),
     # url(r'^/upload_file/', 'upload_file', name='upload_file'),
     
                        # Ajax-urls required for MIS --------------------------------

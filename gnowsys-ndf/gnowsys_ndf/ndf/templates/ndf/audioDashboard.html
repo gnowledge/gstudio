@@ -77,17 +77,7 @@
 
     <script>
 
-    $(".audio-caption").click(function(event){
-                                var audioURL = $(this).attr("data-audio-src");
-                                // var locationURL = 'http://' + location.host;
-                                // var locationURL = window.location.origin
-                                var completeURL = audioURL
-
-                                CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls loop src=' + completeURL +  '>' + '</audio>');
-                                $('#group_imgs_on_modal').foundation('reveal', 'close');
-                        
-
-                          });
+    // 
 //     function countdown(minutes) {
 //     var seconds = 32;
 //     var mins = minutes                Function for ticker timing

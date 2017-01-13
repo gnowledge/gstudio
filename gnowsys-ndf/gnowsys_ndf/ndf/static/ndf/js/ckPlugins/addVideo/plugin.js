@@ -27,18 +27,22 @@ CKEDITOR.plugins.add('addVideo',
                           $('#group_imgs_on_modal').foundation('reveal', 'open');
 
                           $(".card-image-wrapper").click(function(event){
-                            var imageURL = $(this).children('img').attr("data-thumbnail-src");
-                            // var locationURL = 'http://' + location.host;
-                            var locationURL = window.location.origin
-                            var completeURL = imageURL
-                            var width = prompt("Please enter width in px",'600');
-                            if(width == null)
-                            {
-                                return false;
-                            }
-                            CKEDITOR.instances[textAreaId].insertHtml('<video controls="" height="432" width="768"><source src="'+ completeURL +'" type="video/webm" />  <source src="' + completeURL + '" type="video/mp4" />  Your browser does not support the video tag.</video>');
+                            var video_player_url = "/" + groupId + "/ajax/get_video_player";
+                            var datasrc = $(this).children('img').attr("data-image-id");
 
-                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                            $.ajax({
+                                        type: "GET",
+                                        url: video_player_url,
+                                        datatype: "html",
+                                        data:{
+                                            datasrc:datasrc
+                                        },
+                                        success: function(data) {
+                                            CKEDITOR.instances[textAreaId].insertHtml(data);
+                                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+                                        }
+                                });
 
 
                           });

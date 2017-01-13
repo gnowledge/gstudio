@@ -189,16 +189,7 @@
 								<input type="button" class="tiny button radius mod-btn secondary disabled" title="{% trans 'You are not authorized for this action' %}" value="{% trans 'Cross Publish' %}">
 							{% endif %}
 						{% endif %}
-						{% get_attribute_value node.pk 'has_transcript' as node_transcript %}
-						<a id="add_transcript-id" class="tiny button radius mod-btn" data-reveal-id="add_transcript"> {% trans "Add Transcript" %}</a>
-						<div id="add_transcript" class="reveal-modal" data-reveal style="position:absolute;"> 
-						 	<a class="close-reveal-modal" aria-label="Close">&#215;</a>
-						 	<textarea  id="trans-textarea" >
-								{{node_transcript}}
-							</textarea> 
-							<input type="button" class="tiny button radius add-trans"  value="{% trans 'Add' %}">
-							<input type="button" class="tiny button radius "  value="{% trans 'Cancel' %}">
-						</div>
+						
 
 				</div>
 				{% endif %}
@@ -546,27 +537,6 @@
         $("#deleteModal").foundation('reveal', 'close');
     });
 
-    $(document).on("click", ".add-trans", function() {
-			var trans_text = $('#trans-textarea').val();
-			$.ajax({
-                    type: "POST",
-                    url: "{% url 'add_transcript' group_id  %}",
-                    datatype: "html",
-                    data:{
-                           csrfmiddlewaretoken: '{{ csrf_token }}',
-                           nodeid:'{{node.pk}}',
-                           transcript_text:trans_text,
-
-                      },
-                  success: function(data) {
-                  		alert("Transcript succesfully added");
-                  		 $('.close-reveal-modal').click();
-
-                  }
-
-            });
-		
-    });
 
 
 

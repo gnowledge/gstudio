@@ -6501,3 +6501,36 @@ def add_transcript(request, group_id):
       create_gattribute(ObjectId(node_id), trans_of,unicode(trans_text))
       
   return HttpResponse(json.dumps("success"))
+
+
+@get_execution_time
+def get_video_player(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  node_id = request.GET.get("datasrc", '')
+  if node_id:
+    node_obj = node_collection.one({'_id': ObjectId(node_id) })
+  return render_to_response('ndf/widget_video_player.html',
+            {
+                'group_id': group_id, 'groupid': group_id,'video_obj':node_obj
+            },
+            context_instance=RequestContext(request))
+
+@get_execution_time
+def get_audio_player(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  node_id = request.GET.get("datasrc", '')
+  if node_id:
+    node_obj = node_collection.one({'_id': ObjectId(node_id) })
+
+  return render_to_response('ndf/widget_audio_player.html',
+            {
+                'group_id': group_id, 'groupid': group_id,'audio_obj':node_obj
+            },
+            context_instance=RequestContext(request))
+    
