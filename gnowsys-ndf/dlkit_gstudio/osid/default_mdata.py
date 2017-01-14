@@ -170,3 +170,18 @@ def get_osid_sourceable_mdata():
             'string_set': []
         }
     }
+
+
+
+def get_gstudio_catalog_mdata():
+    return {
+        'group_type': u'PUBLIC',
+        'access_policy': u'PUBLIC',
+        'edit_policy': u'EDITABLE_NON_MODERATED',
+        'subscription_policy': u'OPEN',
+        'visibility_policy': u'ANNOUNCED',
+        'disclosure_policy': u'DISCLOSED_TO_MEM',
+        'encryption_policy': u'NOT_ENCRYPTED',
+        'agency_type': u'Other',
+        'moderation_level': '-1'
+    }
