@@ -297,7 +297,7 @@
                   {% trans "Your browser does not support the video tag." %}
                 </video>
               {% elif 'video' in node.if_file.mime_type %}
-
+                {% get_attribute_value node.pk 'has_transcript' as node_transcript %}
                 {% include 'ndf/widget_video_player.html' with video_obj=node %}
                 {% if node.created_by == request.user.id or is_gstaff %}
                   <dl class="accordion" data-accordion>
@@ -312,10 +312,32 @@
                   </dl>
 
 
-                 
+                <a  class="tiny button radius" data-reveal-id="add_transcript{{node.pk}}"> {% trans "Add Transcript" %}</a>
+                <div id="add_transcript{{node.pk}}" class="reveal-modal" data-reveal style="position:absolute;"> 
+                  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                  <textarea>{{node_transcript}}</textarea> 
+                  <input onclick="add_transcript_func(this)" type="button" class="tiny button radius add-trans" data-src ="{{node}}"   value="{% trans 'Add' %}">
+                  <input type="button" class="tiny button radius "  value="{% trans 'Cancel' %}">
+                </div>
+
+                <a  class="tiny button radius" data-reveal-id="add_subtitle{{node.pk}}"> {% trans "Add Subtitle(s)" %}</a>
+                <div id="add_subtitle{{node.pk}}" class="reveal-modal" data-reveal style="position:absolute;"> 
+                  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+                </div>
+
                 {% endif %}
               {% elif 'audio' in node.if_file.mime_type %}
+                {% get_attribute_value node.pk 'has_transcript' as node_transcript %}
                 {% include 'ndf/widget_audio_player.html' with audio_obj=node %}
+                 
+                 <a  class="tiny button radius mod-btn" data-reveal-id="add_transcript{{node.pk}}"> {% trans "Add Transcript" %}</a>
+                <div id="add_transcript{{node.pk}}" class="reveal-modal" data-reveal style="position:absolute;"> 
+                  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                  <textarea>{{node_transcript}}</textarea> 
+                  <input onclick="add_transcript_func(this)" type="button" class="tiny button radius add-trans" data-src ="{{node}}"   value="{% trans 'Add' %}">
+                  <input type="button" class="tiny button radius "  value="{% trans 'Cancel' %}">
+                </div>
               {% elif 'html' in node.if_file.mime_type %}
                 <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{{MEDIA_URL}}{{node.if_file.original.relurl}}">
                   <p>{% trans 'Your browser does not support the audio element' %} </p>
@@ -906,5 +928,32 @@
     $(".change-thumbnail-area").show();
 
   })
+
+</script>
+<script type="text/javascript">
+function add_transcript_func(this_obj){
+      curr_obj = this_obj
+      var trans_text = curr_obj.previousElementSibling.value;
+      curr_obj_id = curr_obj.attributes['data-src'].value;
+      $.ajax({
+                    type: "POST",
+                    url: "{% url 'add_transcript' group_id  %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}',
+                           nodeid:curr_obj_id,
+                           transcript_text:trans_text,
+
+                      },
+                  success: function(data) {
+
+                        alert("Transcript succesfully added");
+                       $('.close-reveal-modal').click();
+
+                  }
+
+            });
+    
+    }
 
 </script>

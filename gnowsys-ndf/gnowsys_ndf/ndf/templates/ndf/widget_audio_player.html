@@ -133,38 +133,5 @@ transform: rotate(90deg);
 			{{audio_node_transcript}}
 		</div>
 		</form>
-		<a  class="tiny button radius mod-btn" data-reveal-id="add_transcript{{audio_obj.pk}}"> {% trans "Add Transcript" %}</a>
-						<div id="add_transcript{{audio_obj.pk}}" class="reveal-modal" data-reveal style="position:absolute;"> 
-						 	<a class="close-reveal-modal" aria-label="Close">&#215;</a>
-						 	<textarea id="{{audio.pk}}">{{node_transcript}}</textarea> 
-							<input onclick="add_transcript_func(this)" type="button" class="tiny button radius add-trans" data-src ="{{audio_obj}}"   value="{% trans 'Add' %}">
-							<input type="button" class="tiny button radius "  value="{% trans 'Cancel' %}">
-						</div>
 {% endif %}
 </div>
-<script>
-function add_transcript_func(this_obj){
-			curr_obj = this_obj
-			var trans_text = curr_obj.previousElementSibling.value;
-			curr_obj_id = curr_obj.attributes['data-src'].value;
-			$.ajax({
-                    type: "POST",
-                    url: "{% url 'add_transcript' group_id  %}",
-                    datatype: "html",
-                    data:{
-                           csrfmiddlewaretoken: '{{ csrf_token }}',
-                           nodeid:curr_obj_id,
-                           transcript_text:trans_text,
-
-                      },
-                  success: function(data) {
-
-	                  		alert("Transcript succesfully added");
-                  		 $('.close-reveal-modal').click();
-
-                  }
-
-            });
-		
-    }
-</script>
