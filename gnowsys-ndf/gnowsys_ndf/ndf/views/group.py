@@ -107,57 +107,57 @@ class CreateGroup(object):
 
         if kwargs.get('altnames', ''):
             altnames = kwargs.get('altnames', name)
-        else:
+        elif self.request:
             altnames = self.request.POST.get('altnames', name).strip()
 
         if kwargs.get('group_type', ''):
             group_type = kwargs.get('group_type', u'PUBLIC')
-        else:
+        elif self.request:
             group_type = self.request.POST.get('group_type', u'PUBLIC')
 
         if kwargs.get('access_policy', ''):
             access_policy = kwargs.get('access_policy', group_type)
-        else:
+        elif self.request:
             access_policy = self.request.POST.get('access_policy', group_type)
 
         if kwargs.get('edit_policy', ''):
             edit_policy = kwargs.get('edit_policy', u'EDITABLE_NON_MODERATED')
-        else:
+        elif self.request:
             edit_policy = self.request.POST.get('edit_policy', u'EDITABLE_NON_MODERATED')
 
         if kwargs.get('subscription_policy', ''):
             subscription_policy = kwargs.get('subscription_policy', u'OPEN')
-        else:
+        elif self.request:
             subscription_policy = self.request.POST.get('subscription_policy', u"OPEN")
 
         if kwargs.get('visibility_policy', ''):
             visibility_policy = kwargs.get('visibility_policy', u'ANNOUNCED')
-        else:
+        elif self.request:
             visibility_policy = self.request.POST.get('visibility_policy', u'ANNOUNCED')
 
         if kwargs.get('disclosure_policy', ''):
             disclosure_policy = kwargs.get('disclosure_policy', u'DISCLOSED_TO_MEM')
-        else:
+        elif self.request:
             disclosure_policy = self.request.POST.get('disclosure_policy', u'DISCLOSED_TO_MEM')
 
         if kwargs.get('encryption_policy', ''):
             encryption_policy = kwargs.get('encryption_policy', u'NOT_ENCRYPTED')
-        else:
+        elif self.request:
             encryption_policy = self.request.POST.get('encryption_policy', u'NOT_ENCRYPTED')
 
         if kwargs.get('agency_type', ''):
             agency_type = kwargs.get('agency_type', u'Other')
-        else:
+        elif self.request:
             agency_type = self.request.POST.get('agency_type', u'Other')
 
         if kwargs.get('content_org', ''):
             content_org = kwargs.get('content_org', '')
-        else:
+        elif self.request:
             content_org = self.request.POST.get('content_org', '')
 
         if kwargs.get('content', ''):
             content = kwargs.get('content', '')
-        else:
+        elif self.request:
             content = self.request.POST.get('content', '')
         if not content or not content_org:
             content = content_org = u""
@@ -166,7 +166,7 @@ class CreateGroup(object):
         # therefor casting to str
         if str(kwargs.get('moderation_level', '')):
             moderation_level = kwargs.get('moderation_level', '-1')
-        else:
+        elif self.request:
             moderation_level = self.request.POST.get('moderation_level', '-1')
 
         if node_id:
