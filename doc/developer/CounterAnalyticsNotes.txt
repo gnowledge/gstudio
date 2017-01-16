@@ -13,15 +13,17 @@ unit_progress_meter : Completed Units/ Total Units
 FILES
 user_files : No. of files uploaded by user
 other_viewing_my_files : No. of other(unique) users who viewed user's files
-total_rating_rcvd_on_files : Average of all user's files rating. [(Sum of rating of 'N' files)/ 'N']
-total_files_viewed_by_user : No. of other's files viewed by the user. If a single file is viewed more than once, it will be considered/counted as 1 file view.
+total_rating_rcvd_on_files : Average of all user's files ratings. [(Sum of rating of 'N' files)/ 'N']
+total_files_viewed_by_user : No. of other's files viewed by the user.
+			 If a single file is viewed more than once, it will be considered/counted as 1 file view.
 ===============================================================
 
 NOTES
 user_notes : No. of notes created by user
-total_notes_read_by_user : No. of other's notes read by the user. If a single note is read more than once, it will be considered/counted as 1 note read.
-total_rating_rcvd_on_notes : Average of all user's notes rating. [(Sum of rating of 'N' notes)/ 'N']
-others_reading_my_notes : No. of other(unique) users who read user's noted
+total_notes_read_by_user : No. of other's notes read by the user.
+			 If a single note is read more than once, it will be considered/counted as 1 note read.
+total_rating_rcvd_on_notes : Average of all user's notes ratings [(Sum of rating of 'N' notes)/ 'N'].
+others_reading_my_notes : No. of other(unique) users who read user's notes.
 ===============================================================
 
 COMMENTS
