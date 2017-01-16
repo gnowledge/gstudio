@@ -23,7 +23,7 @@ CKEDITOR.editorConfig = function( config ) {
 	[
 
 		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
-		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
+		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-' ] },
 		{ name: 'insert', items : [ 'Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe','video'] },
 		{ name: 'styles', items : [ 'Styles','Format' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] },
