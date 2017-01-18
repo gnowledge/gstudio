@@ -66,6 +66,19 @@ def trash_resource(request,group_id,node_id):
 		# return(eval('group_dashboard')(request, group_id))   
 
 @get_execution_time
+# @staff_required
+def delete_group(request,group_id):
+	response_dict = {'success': False}
+	try:
+		if group_id:
+			del_s,del_msg = delete_node(ObjectId(group_id),deletion_type=0)
+			if del_s:
+				response_dict['success'] = True
+	except Exception as e:
+		pass
+	return HttpResponse(json.dumps(response_dict))
+
+@get_execution_time
 def delete_resource(request,group_id):
 	# NOTE: purge of themes need to be handled differently.
 	# all the collection hierarchy needs to be purged in this case.
