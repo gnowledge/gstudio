@@ -331,13 +331,22 @@
 							{% if is_gstaff %}
 							<!-- Prevent creating New group from context of top mod group -->
 							{% if group_object.edit_policy != "EDITABLE_MODERATED" and is_gstaff %}
-								<a href="{% url create_url group_object.name %}" class="tiny button radius expand mod-btn" title="{% trans 'Create New' %}">
+								<a href="{% url create_url group_object.name %}" class="tiny button radius left-btn" title="{% trans 'Create New' %}">
 									{% if group_object.agency_type == 'Partner' %}
 										{% trans 'New Partner' %}
 									{% else %}
 										{% trans 'New Group' %}
 									{% endif %}
 								</a>
+								{% if node %}
+									<a class="tiny button radius delete-btn right-btn" title="{% trans 'Delete' %}">
+										{% if group_object.agency_type == 'Partner' %}
+											{% trans 'Delete Partner' %}
+										{% else %}
+											{% trans 'Delete Group' %}
+										{% endif %}
+									</a>
+								{% endif %}
 							{% endif %}								
 							{% endif %}								
 						{% else %}
@@ -525,7 +534,21 @@
                   }
 
             });
-			// alert("term_delete")
+		{% elif "Group" in node.member_of_names_list %}
+			$.ajax({
+                    type: "POST",
+                    url: "{% url 'delete_group' group_object.pk %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}'
+                      },
+                  success: function(data) {
+                        window.location.replace("{% url 'groupchange' 'home'  %}");
+                  }
+
+            });
+
+
 		{% endif %}
        
     });
