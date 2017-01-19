@@ -68,15 +68,10 @@ def trash_resource(request,group_id,node_id):
 @get_execution_time
 # @staff_required
 def delete_group(request,group_id):
-	response_dict = {'success': False}
-	try:
-		if group_id:
-			del_s,del_msg = delete_node(ObjectId(group_id),deletion_type=0)
-			if del_s:
-				response_dict['success'] = True
-	except Exception as e:
-		pass
-	return HttpResponse(json.dumps(response_dict))
+    response_dict = {'success': False}
+    del_s,del_msg = delete_node(ObjectId(group_id),deletion_type=0)
+    if del_s:
+        return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': 'home'}))
 
 @get_execution_time
 def delete_resource(request,group_id):

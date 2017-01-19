@@ -339,7 +339,7 @@
 									{% endif %}
 								</a>
 								{% if node %}
-									<a class="tiny button radius delete-btn right-btn" title="{% trans 'Delete' %}">
+									<a class="tiny button radius delete-btn grp_delete right-btn" title="{% trans 'Delete' %}">
 										{% if group_object.agency_type == 'Partner' %}
 											{% trans 'Delete Partner' %}
 										{% else %}
@@ -535,22 +535,12 @@
 
             });
 		{% elif "Group" in node.member_of_names_list %}
-			$.ajax({
-                    type: "POST",
-                    url: "{% url 'delete_group' group_object.pk %}",
-                    datatype: "html",
-                    data:{
-                           csrfmiddlewaretoken: '{{ csrf_token }}'
-                      },
-                  success: function(data) {
-                        window.location.replace("{% url 'groupchange' 'home'  %}");
-                  }
-
-            });
-
-
+			$(".grp_delete").attr('href', "{% url 'delete_group' group_object.pk %}")
+			$(".grp_delete")[0].click()
 		{% endif %}
-       
+
+
+
     });
 
     $(document).on("click", "#btnConfirmNo", function() {
