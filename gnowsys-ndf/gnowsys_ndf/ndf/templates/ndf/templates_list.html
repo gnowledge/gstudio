@@ -1,0 +1,48 @@
+{% load i18n %}
+{% load cache %}
+
+{% load ndf_tags %}
+{% block head %}
+<style type="text/css">
+	.box{
+    display: none;
+    width: 10%!important;
+    height: 10%!important;
+}
+
+a:hover + .box,.box:hover{
+    display: block;
+    position: relative;
+    z-index: 100;
+}
+
+</style>
+{% endblock %}
+{% block related_content %}
+  
+{% endblock %}
+{% block body_content %} 
+ 	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-6" >
+    {% for each in templates_cur %}
+    
+    <li class="template-list">
+            <div class="templates-div" data-content="{{each.content}}">
+             {{each.name}}
+            </div>
+    	This live preview for <a href="http://en.wikipedia.org/">Wikipedia</a><div class="box">{{each.content|safe}}</div>
+    </li>
+    {% endfor %}
+  </ul> 
+{% endblock %}
+
+<script type="text/javascript">
+				$(".template-list").click(function(event){
+                            var content = $(this).children('div').attr("data-content");
+                            alert(content);
+                            CKEDITOR.instances['ckeditor_textarea'].insertHtml(content);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+                        
+
+                          });
+
+</script>
