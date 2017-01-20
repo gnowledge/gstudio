@@ -5,7 +5,8 @@ total_modules : No. of modules in the course
 total_units : No. of units in the course
 units_completed : No. of Units the user has completed.
 		Completion is calculated on viewing/visiting the activities under a unit.
-modules_completed : No. of Modules the user has completed. If all the units falling under a module are marked as 			completed, the module is then considered to be completed.
+modules_completed : No. of Modules the user has completed. If all the units falling under a module are marked as
+		completed, the module is then considered to be completed.
 module_progress_meter : Completed Modules/ Total Modules
 unit_progress_meter : Completed Units/ Total Units
 ===============================================================
