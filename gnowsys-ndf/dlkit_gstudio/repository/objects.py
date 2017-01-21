@@ -13,6 +13,7 @@
 
 
 import importlib
+import gridfs
 
 
 from . import default_mdata
@@ -1302,6 +1303,11 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         """Initialize form map"""
         osid_objects.OsidObjectForm._init_gstudio_map(self, record_types, **kwargs)
         self._gstudio_map['assetId'] = str(kwargs['asset_id'])
+        # assetIdent is added to pass ObjectId instead of 
+        # primitives.Id. to gstudio Asset api the 
+        # as asset_id becomes str in further sessions.
+        self._gstudio_map['assetIdent'] = str(kwargs['asset_id'].identifier)
+
 
 
     def _init_form(self, record_types=None, **kwargs):
@@ -1389,7 +1395,17 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        if data is None:
+            raise errors.NullArgument()
+        # dbase = MongoClientValidated('repository',
+        #                              runtime=self._runtime).raw()
+        # filesys = gridfs.GridFS(dbase)
+        # self._my_map['data'] = data.read()
+        # data._my_data.seek(0)
+        self._gstudio_map['data'] = data
+        # data._my_data.seek(0)
+        # print data._my_data.read()
+        # self._my_map['base64'] = base64.b64encode(data._my_data.read())
 
     def clear_data(self):
         """Removes the content data.
@@ -1399,7 +1415,17 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        if (self.get_data_metadata().is_read_only() or
+                self.get_data_metadata().is_required()):
+            raise errors.NoAccess()
+        if self._my_map['data'] == self._data_default:
+            pass
+        # dbase = MongoClientValidated('repository',
+        #                              runtime=self._runtime).raw()
+        # filesys = gridfs.GridFS(dbase)
+        # filesys.delete(self._my_map['data'])
+        self._my_map['data'] = self._data_default
+        # del self._my_map['base64']
 
     data = property(fset=set_data, fdel=clear_data)
 
