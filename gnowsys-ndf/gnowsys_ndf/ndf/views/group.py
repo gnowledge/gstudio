@@ -1451,7 +1451,7 @@ class GroupCreateEditHandler(View):
             # calling method to create new group
             result = group.create_group(group_name, node_id=node_id)
 
-        # print result[0], "\n=== result : ", result[1].name, "\n\n"
+        # print result[0], "\n=== result : "
         if result[0]:
             # operation success: redirect to group-detail page
             group_obj = result[1]
@@ -1479,6 +1479,7 @@ class GroupCreateEditHandler(View):
             else:
                 partner_grp_result = sub_group.set_partnergroup(request, group_obj)
                 sub_group.set_logo(request, group_obj, logo_rt = "has_profile_pic")
+                # print "-------------------------------------------------",group_obj
         return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
 # ===END of class EditGroup() ===
 # -----------------------------------------

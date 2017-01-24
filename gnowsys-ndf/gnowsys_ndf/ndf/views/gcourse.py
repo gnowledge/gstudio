@@ -39,6 +39,7 @@ from gnowsys_ndf.ndf.views.ajax_views import get_collection
 from gnowsys_ndf.ndf.views.analytics_methods import *
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status
 from gnowsys_ndf.notification import models as notification
+from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 course_gst_name, course_gst_id = GSystemType.get_gst_name_id("Course")

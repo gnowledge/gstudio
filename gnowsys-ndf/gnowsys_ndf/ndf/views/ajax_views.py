@@ -114,6 +114,7 @@ def collection_create(request, group_id):
   '''
   existing_collection = request.POST.get("existing_collection")
   # print "\n\n\n here",existing_collection
+  coll_redir = request.POST.get('coll_redir',"")
   if existing_collection == "True":
     Collections = request.POST.getlist("collection[]", '')
     cur_collection_id = request.POST.get("cur_collection_id")
@@ -142,8 +143,9 @@ def collection_create(request, group_id):
                     page_node.status = u'MODERATION'
                     # print "\n\n\n page_node.status",page_node.status
 
+    if coll_redir == "raw-material":
+      page_node.tags.append(u'raw@material')
     page_node.save()
-
     for each in Collections:
       node_collection.collection.update({'_id': page_node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
 
@@ -6274,6 +6276,12 @@ def get_gin_line_template(request,group_id,node_id):
 def course_create_collection(request, group_id):
   is_create_collection =  request.GET.get('is_create_collection','')
   is_add_to_collection =  request.GET.get('is_add_to_collection','')
+  is_raw_material =  request.GET.get('is_raw_material','')
+  is_gallery =  request.GET.get('is_gallery','')
+  if is_raw_material == "true":
+    coll_redir = "raw-material"
+  else:
+    coll_redir = "gallery"
   result_cur = node_collection.find({
                           'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
                                             'group_set': {'$all': [ObjectId(group_id)]},
@@ -6292,7 +6300,7 @@ def course_create_collection(request, group_id):
 
   return render_to_response('ndf/course_create_collection.html',
     {
-      "group_id":group_id,"result_cur":result_cur,"is_create_collection":is_create_collection,"is_add_to_collection":is_add_to_collection
+     "coll_redir" :coll_redir ,"group_id":group_id,"result_cur":result_cur,"is_create_collection":is_create_collection,"is_add_to_collection":is_add_to_collection
     },context_instance=RequestContext(request))
 
 @get_execution_time

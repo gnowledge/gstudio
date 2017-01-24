@@ -8,10 +8,13 @@
         <div class="text-center">
         <div class="div-height">
           {% get_relation_value node.pk 'has_thumbnail' as grel_dict %}
+          {% get_relation_value node.pk 'has_logo' as grel_dict_logo %}
           {% if prof_pic_obj %}
             <img src="{{MEDIA_URL}}{{prof_pic_obj.if_file.original.relurl}}" class="img-height"/>
           {% elif grel_dict %}
             <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.thumbnail.relurl}}" class="img-height"/>
+          {% elif grel_dict_logo %}
+            <img src="{{MEDIA_URL}}{{grel_dict_logo.grel_node.if_file.thumbnail.relurl}}" class="img-height"/>
           {% else %}
               {% if "Author" in group_object.member_of_names_list %}
                   <i class="fi-torso style2 text-center"></i>

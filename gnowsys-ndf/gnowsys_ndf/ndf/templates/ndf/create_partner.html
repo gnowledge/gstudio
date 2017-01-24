@@ -58,7 +58,7 @@
               </label>
             </div>
             <div class="small-5 columns end">
-              {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+              {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content|default_if_none:"" node_id=node.pk %}
             </div>
           </div>
           <div class="row">
@@ -229,7 +229,7 @@
   {% endcomment %}
         <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">            -->
             {% if node %}
-              <input type="submit" value="Save partner details" id="grpsubmit" class="button">
+              <input type="submit" value="Save partner details" id="grpsubmits" class="button">
             {% else %}
               <input type="submit" value="Create Partner" id="grpsubmit" class="button">
             {% endif %}
@@ -382,5 +382,24 @@
   });
   $("#grpsubmit").click(function(event) {
     $("#name_input,#email_id").removeAttr("disabled")
+  }); 
+
+  $("#grpsubmits").click(function(event) {
+    $.ajax({
+              type: "POST",
+              url: "{% url 'edit_group' group_id %}",
+              datatype: "html",
+              data:{
+                    'csrfmiddlewaretoken': "{{csrf_token}}",   
+                },
+              success: function(data) {
+                    location.href = "{% if node.pk %} {% url 'groupchange' node.pk %} {% endif %}"
+                }
+
+               
+            });
+
   });
+
+
 {% endblock %}

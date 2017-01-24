@@ -34,7 +34,6 @@ from django_mailbox.models import Mailbox
 # cache imports
 from django.core.cache import cache
 
-from mongokit import paginator
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
@@ -218,9 +217,9 @@ def get_node_type(node):
 
 @get_execution_time
 @register.assignment_tag
-def get_node(node):
-    if node:
-        obj = node_collection.one({"_id": ObjectId(node)})
+def get_node(node_id):
+    if node_id:
+        obj = node_collection.one({"_id": ObjectId(node_id)})
         if obj:
             return obj
         else:
@@ -3183,8 +3182,8 @@ def get_filters_data(gst_name, group_name_or_id='home'):
 		else:
 			# print "================----"
 			at_set_key = 'attribute_set.' + k
-
-			all_at_list = node_collection.find({at_set_key: {'$exists': True, '$nin': ['', 'None', []], } }).distinct(at_set_key)
+			group_obj = node_collection.one({"name":group_id,"_type":"Group"})
+			all_at_list = node_collection.find({at_set_key: {'$exists': True, '$nin': ['', 'None', []], },"group_set":ObjectId(group_obj._id) }).distinct(at_set_key)
 
 			fvalue = all_at_list
 
@@ -3482,8 +3481,19 @@ def get_is_captcha_visible():
 
 @get_execution_time
 @register.assignment_tag
+def get_gstudio_twitter_via():
+	return GSTUDIO_TWITTER_VIA
+
+@get_execution_time
+@register.assignment_tag
+def get_gstudio_facebook_app_id():
+	return GSTUDIO_FACEBOOK_APP_ID
+
+@get_execution_time
+@register.assignment_tag
 def get_gstudio_social_share_resource():
 	return GSTUDIO_SOCIAL_SHARE_RESOURCE
+
 
 @get_execution_time
 @register.assignment_tag
