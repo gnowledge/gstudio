@@ -1311,10 +1311,19 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         if not asset_content_form.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         self._forms[asset_content_form.get_id().get_identifier()] = CREATED
-        asset_content_name = asset_content_form._gstudio_map['name']
-
-        assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id.identifier, name=asset_content_name, \
-            group_id=self._catalog_id.identifier, created_by=req_obj.user.id, **kwargs=**asset_content_form._my_map)
+        asset_id = asset_content_form._gstudio_map['assetIdent']
+        file_data = [None]
+        content_data = None
+        res_type = 'Page'
+        if 'data' in asset_content_form._gstudio_map:
+            file_data = asset_content_form._gstudio_map['data']
+            res_type = 'File'
+        else:
+            content_data = asset_content_form._gstudio_map['content']
+        assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
+         name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
+         created_by=req_obj.user.id, files=file_data, content=content_data,\
+         resource_type=res_type)
 
         return objects.AssetContent(gstudio_node=assetcontent_obj,
                               runtime=self._runtime,

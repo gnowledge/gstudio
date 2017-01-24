@@ -2595,7 +2595,7 @@ def update_scope_of_triple(triple_node, rt_at_type_node, req_scope_values, is_gr
 @get_execution_time
 def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwargs):
 
-    def _update_attr_set(attr_set_list_of_dicts, attr_key, attr_value, triple_scope_val):
+    def _update_attr_set(attr_set_list_of_dicts, attr_key, attr_value):
         temp_attr_dict = get_dict_from_list_of_dicts(attr_set_list_of_dicts)
         temp_attr_dict.update({unicode(attr_key): attr_value})
         return [{k:v} for k, v in temp_attr_dict.iteritems()]

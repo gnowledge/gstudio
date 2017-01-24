@@ -1708,8 +1708,8 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if 'default_description' in kwargs:
             self._mdata['description']['default_string_values'][0]['text'] = kwargs['default_description']
         update_display_text_defaults(self._mdata['description'], self._locale_map)
-        self._display_name_default = dict(self._mdata['display_name']['default_string_values'][0])
-        self._description_default = dict(self._mdata['description']['default_string_values'][0])
+        self._display_name_default = unicode(self._mdata['display_name']['default_string_values'][0]['text'])
+        self._description_default = unicode(self._mdata['description']['default_string_values'][0]['text'])
         self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
 
         if 'mdata' in kwargs:
@@ -1742,8 +1742,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
     def _init_gstudio_map(self, record_types=None, **kwargs):
         """Initialize map for form"""
         OsidForm._init_gstudio_map(self)
-        self._gstudio_map['name'] = dict(self._display_name_default)
-        self._gstudio_map['content'] = dict(self._description_default)
+        self._gstudio_map['name'] = self._display_name_default
+        self._gstudio_map['altnames'] = self._display_name_default
+        self._gstudio_map['content'] = self._description_default
+        self._gstudio_map['content_org'] = self._description_default
         # self._my_map['genusTypeId'] = self._genus_type_default
         OsidExtensibleForm._init_gstudio_map(self, record_types)
 
@@ -1776,6 +1778,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
 
         """
         self._gstudio_map['name'] = unicode(display_name)
+        self._gstudio_map['altnames'] = unicode(display_name)
         # self._display_name = display_name
 
     def clear_display_name(self):
@@ -1789,7 +1792,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if (self.get_display_name_metadata().is_read_only() or
                 self.get_display_name_metadata().is_required()):
             raise errors.NoAccess()
-        self._gstudio_map['name'] = dict(self._display_name_default)
+        self._gstudio_map['name'] = self._display_name_default
 
         # self._display_name = self._display_name_default
 
@@ -1822,6 +1825,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
 
         """
         self._gstudio_map['content'] = unicode(description)
+        self._gstudio_map['content_org'] = unicode(description)
         # self._description = description
 
     def clear_description(self):
@@ -1920,7 +1924,7 @@ class OsidCatalogForm(abc_osid_objects.OsidCatalogForm, OsidObjectForm, OsidSour
         OsidSourceableForm._init_gstudio_map(self, **kwargs)
         OsidFederateableForm._init_gstudio_map(self)
         OsidObjectForm._init_gstudio_map(self, record_types)
-
+        self._gstudio_map.update(default_mdata.get_gstudio_catalog_mdata())
 
 
 class OsidRuleForm(abc_osid_objects.OsidRuleForm, OsidObjectForm, OsidOperableForm):
