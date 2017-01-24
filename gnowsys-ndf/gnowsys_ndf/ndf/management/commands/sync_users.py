@@ -64,7 +64,7 @@ class Command(BaseCommand):
                         print "\nUser with id: '",user_id,"' and username: '",username,"' already exists."
 
                     else:
-                        print "\nCreating User object for user: ", username
+                        print "\nCreating User object for user [", user_id, "]: ", username
                         user_obj = User.objects.create_user(username=username, password=password, id=user_id)
                         user_id = user_obj.id
 
