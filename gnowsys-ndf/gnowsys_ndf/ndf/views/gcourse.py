@@ -2306,7 +2306,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                             'if_file':1,
                                         }).sort("last_update", -1)
         context_variables.update({'files_cur': files_cur})
-        gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        gallery_page_info = paginator.Paginator(files_cur, page_no, 25)
         context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})
     template = 'ndf/gcourse_event_group.html'
 
