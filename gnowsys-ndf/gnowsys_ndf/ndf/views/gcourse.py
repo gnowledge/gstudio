@@ -2531,25 +2531,31 @@ def course_filters(request, group_id):
     )
 
 
-@login_required
-@get_execution_time
-def course_analytics(request, group_id, user_id, render_template=False):
+# @login_required
+# @get_execution_time
+def course_analytics(request, group_id, user_id, render_template=False, get_result_dict=False):
 
-
-    cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
-    cache_result = cache.get(cache_key)
-    if cache_result:
-        return render_to_response("ndf/user_course_analytics.html",
-                                cache_result,
-                                context_instance = RequestContext(request)
-                            )
+    # set get_result_dict=True to get only raw data in dict format,
+    # without being redirected to template. So that this method can
+    # use to get dict result data in shell or for any command.
+    # this will omit data from request.
+    if request and not get_result_dict:
+        cache_key = u'course_analytics' + unicode(group_id) + "_" + unicode(user_id)
+        cache_result = cache.get(cache_key)
+        if cache_result:
+            return render_to_response("ndf/user_course_analytics.html",
+                                    cache_result,
+                                    context_instance = RequestContext(request)
+                                )
 
     analytics_data = {}
-    data_points_dict = request.GET.get('data_points_dict', {})
-    # print '== data_points_dict: ', data_points_dict
+    data_points_dict = {}
+
+    if request and not get_result_dict:
+        data_points_dict = request.GET.get('data_points_dict', {})
+        # print '== data_points_dict: ', data_points_dict
 
     if data_points_dict and not isinstance(data_points_dict, dict):
-        from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
 
         data_points_dict = json.loads(data_points_dict)
         # print "\n\ndata_points_dict",data_points_dict
@@ -2700,6 +2706,11 @@ def course_analytics(request, group_id, user_id, render_template=False):
     analytics_data['users_points_breakup'] = counter_obj.get_all_user_points_dict()
 
     del analytics_instance
+    # print analytics_data
+
+    if get_result_dict:
+        return analytics_data
+
     cache.set(cache_key, analytics_data, 60*10)
 
     return render_to_response("ndf/user_course_analytics.html",
@@ -2708,6 +2719,7 @@ def course_analytics(request, group_id, user_id, render_template=False):
     )
 
     # return HttpResponse(json.dumps(analytics_data))
+
 
 @login_required
 @get_execution_time
