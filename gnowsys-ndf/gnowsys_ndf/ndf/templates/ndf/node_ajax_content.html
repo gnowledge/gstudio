@@ -11,7 +11,6 @@
 
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
-{% comment %}
 <script type="text/javascript">
   $( document ).ready(function() { 
     var x = location.href;
@@ -20,7 +19,6 @@
     $(".share_link").attr("href",x);  
 });
 </script>
-{% endcomment %}
 
 <style type="text/css">
   legend{
@@ -541,15 +539,11 @@
        {% endif %}
        <br>
         {% get_gstudio_social_share_resource as social_share %}
-                  {% if social_share and "Group" not in node.member_of_names_list and "PartnerGroup" not in node.member_of_names_list %}
+                  {% if social_share == True and "Group" not in node.member_of_names_list and "PartnerGroup" not in node.member_of_names_list %}
                          <div class="large-12 columns row">
-                           {% comment %}
                            <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
-                           }
                           <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
                           </a>
-                           {% endcomment %}
-                           
                          </div>
                         <div class="large-6 columns">
                             <iframe
