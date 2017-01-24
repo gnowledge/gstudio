@@ -123,7 +123,7 @@ transform: rotate(90deg);
 {% if 'video' in video_obj.if_file.mime_type %}
 	
 	<video width="768" height="432" controls="" id="{{video_obj.pk}}" onseeked="myFunction()" onseeking="myFunction()" preload="metadata">
-		<source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/webm" />
+		<source src="{{MEDIA_URL}}{{video_obj.if_file.mid.relurl}}" type="video/webm" />
         <source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/ogg" />
         <source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/mp4" />
 	</video>
