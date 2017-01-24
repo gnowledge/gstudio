@@ -505,8 +505,8 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 		stemmed_results.append(ObjectId(each["_id"]))
 	getcurr = node_collection.find({'$and':[{'_id':{'$in' : stemmed_results }},{'member_of':{'$nin':[GST_THREAD._id,GST_REPLY._id]}}]}).sort("last_update", -1)
 
-	from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
-	search_pagination_curr = paginator.Paginator(getcurr, page_no, GSTUDIO_NO_OF_OBJS_PP)
+	# from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
+	# search_pagination_curr = paginator.Paginator(getcurr, page_no, GSTUDIO_NO_OF_OBJS_PP)
 	
 	if return_only_dict:
 		return search_results
@@ -516,7 +516,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 		context_to_return['processed'] = "1" 							
 		context_to_return['search_type'] = KEYWORD_SEARCH			# TYPE OF SEARCH IS KEYWORD SEARCH
 		context_to_return['search_curr'] = getcurr			# TYPE OF SEARCH IS KEYWORD SEARCH
-		context_to_return['search_pagination_curr'] = search_pagination_curr			# TYPE OF SEARCH IS KEYWORD SEARCH
+		# context_to_return['search_pagination_curr'] = search_pagination_curr			# TYPE OF SEARCH IS KEYWORD SEARCH
 
 		return render(request, 'ndf/search_page.html', context_to_return)
 
