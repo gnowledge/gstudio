@@ -1,0 +1,354 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load cache %}
+
+{% load ndf_tags %}
+{% block title %} Upload Document {% endblock %}
+
+{% block head %}
+
+<!-- Dropzonejs : Enable dropping of files with thumbnails and progress bar http://www.dropzonejs.com/ MIT LICENSE-->
+
+<!--
+<script src="/static/ndf/dropzonejs/dropzone.js"></script>
+<link rel="stylesheet" href="/static/ndf/dropzonejs/css/dropzone.css">
+-->
+{% endblock %}
+
+{% block style %}
+
+#tags_error{
+	color: red;
+}
+
+div.tags{ 
+	/*padding: 5px 10px; */
+	margin: 2px 5px;
+	/*color: white;*/
+	font-size: 1em;
+	border: solid thin #FFD400;
+}
+
+i.remove-tag{
+	padding-left: 8px;
+	font-size: 1.1em;
+	cursor: pointer;
+}
+
+{% endblock %}
+
+{% block meta_content %} 
+<h3>{% trans "Uploading" %}</h3>
+<p class="text-justify subheader">{% trans "You can upload <b>files</b> of any format to your group library." %}</p>
+{% endblock %} 
+
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+
+	<!-- following button code is not needed. Do we ? -->
+		<div class="create card hide">
+			<div class="file">
+			  <br/>
+			  <a class="button medium" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+			  	<span class="fi-upload">&nbsp;&nbsp;{% trans "New File" %}</span>
+			  </a>
+			</div>
+		</div>
+	<!-- above button code is not needed. Do we ? for time being "hide" class is added. -->
+
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
+
+{% block body_content %} 
+{% get_group_name groupid as group_name_tag %}
+{% if user.is_authenticated %}
+
+<!--
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_id %}">{% csrf_token %}
+  <div class="fallback">
+    <input type="file" name="doc[]"  id="docFile" multiple/>
+    <input type="hidden" name="user" value="{{user.id}}">
+    <input type="hidden" name="page_url" value="{{page_url}}">
+  </div>
+</form>
+-->
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'savejhapp' groupid %}">{% csrf_token %}
+	<div class ="row">
+		<fieldset small-6 large-12 columns>
+			<legend>{% trans "Upload File" %}</legend>
+			<div class="fallback">
+				<input type="hidden" name="context_name" value="{{title}}">
+				<label>{% trans "Choose File" %}</label>
+				<input type="file" name="filehive"  id="docFile" multiple/>
+				<label>{% trans "Title of File" %}</label>
+				<input type="text" name="name" id ="docTitle"  placeholder="Enter Title of File">
+			</div>
+		</fieldset>
+		<fieldset>
+			<legend>{% trans "Select JHAPP Type" %}</legend>
+			<div class="large-4 columns">
+			  <select name="jhapp-type">
+					      {% for jhapps in gstudio_supported_jhapps %}
+					      <option value="{{ jhapps }}" name="test">{{jhapps}} 
+					      </option>
+					      {% endfor %}
+					    </select>
+			</div>
+			{% for jhapps in gstudio_supported_jhapps %}
+					      {{jhapps}}
+					      {% endfor %}
+		</fieldset>
+		<fieldset>
+			<legend>{% trans "Add Description" %}</legend>
+				{% include "ndf/html_editor.html" with var_name="content_org" var_value=node.content|default_if_none:"" node_id=node.pk var_placeholder="Describe the file" %}			
+		</fieldset>
+		<!-- <fieldset>
+			<legend>{% trans "Add Tag" %}</legend>
+			<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" \
+			/>
+		</fieldset> -->
+
+			<div class="row">
+				<div class="small-12 large-8 columns">
+					<span>
+
+						<div class="row">
+							<h3 >
+								
+							<span  class="subheader small-2 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
+							</span>
+							</h3>
+							<div class="small-9 columns">
+							<div class="row collapse">
+								
+							<div class="small-10 columns">
+						    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
+						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
+					        </div>
+					        <div class="small-10 large-2 columns">
+					          <span tabindex="3" id="add-tag-btn" class="tiny button">{% trans 'Add Tag' %}</span>
+					        </div>
+							</div>							
+
+							</div>
+						</div>
+
+						<!-- show tags error msg -->
+						<div class="row hide" id="tags_error">
+							<div class="small-10 columns small-push-2">{% trans 'Non empty tags can have only alphanumeric characters, dash(-) and spaces.' %}</div>
+						</div>
+
+						<!-- show added tags -->
+						<div class="row">
+							<div id="added_tags" class="small-9 small-push-3 columns">
+								{% for each_tag in node.tags %}
+									<div class="tags label radius info">{{each_tag}}<i title="Remove this tag" class="fi-x-circle remove-tag"></i></div>
+								{% endfor %}
+							</div>
+						</div>
+
+			    	</span>
+		    	</div>
+	    	</div>  
+		<div class="row">
+		<fieldset class="medium-4 columns">
+			<legend>Visibility</legend>
+			<div class="row">
+					<div class="medium-6 columns">
+						{% if node.created_by == request.user.pk %}	
+			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"></span>
+						<div class="privacy-mode">
+						
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
+						
+							<span></span>
+						</div>
+						{% else %}
+						{% if not node %}
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"></span>
+						<div class="privacy-mode">
+						
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
+							<br/>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
+						
+							<span></span>
+						</div>
+						{% endif %}
+						{% endif %}
+					</div>
+				</div>
+		</fieldset>
+		</div>
+		<input type="hidden" name="user" value="{{user.id}}">
+		<input type="hidden" name="page_url" value="{{page_url}}">
+		<input type="submit" id="submitpostid" value="Submit" class="button small-10  small-push-1 column">
+		<p id="message" style="display:none"> {% trans "Depending on the size of file/s and your Internet speed, upload process may take time. Please do not close this window." %}
+			<br/>
+			{% trans "Please upload videos in webm format. If you upload videos of other formats, it will take longer to publish them." %} </p>
+		</form>
+
+		{% else %}
+		<p><em>{% trans "You are not an authorised user. Please login to upload files." %} </em></p>
+		{% endif %}
+		{% endblock %}
+
+
+{% block script %}
+	// <script type="text/javascript">
+	
+	$("#docFile").change(function() {
+	var max_size =100000
+	var fsize=this.files[0].size
+	fsize=fsize/1024
+	{% check_is_gstaff groupid request.user as gstaff_access %}
+	if(fsize> max_size){
+	{% if gstaff_access%}
+      	$('#docFile').val(this.value);
+	{% else %}
+      	alert("Sorry. Max File Size Limit Exceeded");
+      	$(this).val("")
+      	$('#docFile').val(this.value);
+	{% endif %}
+	}
+	else{
+	$('#docFile').val(this.value);}        
+  		});
+	
+	$(document).on('submit',"form",function(){
+		if($("#docFile").val() != "")
+		{	
+
+		$("#message").show();
+		$("#submitpostid").hide();
+		$("#submitpostid").submit();
+
+		}
+		else
+		{
+		alert("select a file");
+		return false;
+		}
+
+
+	});
+	{% if program_res %}
+    	$("#group-level-header").addClass("hide");
+    {% endif %}
+
+
+	var tags = document.getElementById("tags_id");
+	var addedTags = document.getElementById("added_tags");
+
+	function checkTag()
+	{
+		var textValue = tags.value.trim();
+		// console.log(textValue.length);
+
+		if(textValue.length < 1){ return false; }
+
+		// re expression containing special characters
+		var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
+
+		if(re.test(textValue))
+		{	// having special characters
+			$('#tags_error').removeClass("hide");
+			return false;
+		}
+		else
+		{	// passed the test and now add tag label
+			$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
+			return true;
+		}
+	}
+
+	tags.onchange = checkTag;
+	tags.onmouseup = checkTag;
+	tags.onkeyup = checkTag;
+
+	function updateAllTags() {
+		
+		var tagsArr = new Array();
+
+		$("#added_tags").children("div.tags.label").each(function(){
+			tagsArr.push(this.textContent.trim().toLowerCase());
+		});
+
+		$("input:hidden[name='tags']").val(tagsArr.toString());
+		// console.log(tagsArr)
+	}
+	
+	function removeTag(){
+		$(this).parent().fadeOut("fast", function(){
+			$(this).detach();
+			updateAllTags();
+		});
+	};
+
+	$(".remove-tag").click(removeTag);
+
+	$(".remove-tag").mouseenter(function(){
+		$(this).parent("div.tags").css("text-decoration", "line-through");
+	});
+
+	$(".remove-tag").mouseleave(function(){
+		$(this).parent("div.tags").css("text-decoration", "none");
+	});
+
+	function addTag() {
+		if(checkTag())
+		{
+			var textValue = tags.value.trim().toLowerCase();
+			tags.value = '';
+
+			var tagDiv = document.createElement("div");
+			tagDiv.className = "tags label radius info";
+			tagDiv.appendChild(document.createTextNode(textValue));
+			// tagDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+
+			var closeBtn = document.createElement("i");
+			closeBtn.className = "fi-x-circle remove-tag";
+			closeBtn.title = "Remove this tag";
+			closeBtn.onclick = removeTag;
+
+			$(closeBtn).mouseenter(function(){
+				$(this).parent("div.tags").css("text-decoration", "line-through");
+			});
+
+			$(closeBtn).mouseleave(function(){
+				$(this).parent("div.tags").css("text-decoration", "none");
+			});
+
+			tagDiv.appendChild(closeBtn);
+
+			addedTags.appendChild(tagDiv);
+
+			updateAllTags();
+		}
+		else
+		{
+			$('#tags_error').removeClass("hide");
+		}
+		tags.focus();
+	}
+
+	var addTagBtn = document.getElementById("add-tag-btn");
+	addTagBtn.onclick = addTag;
+	addTagBtn.onkeypress = addTag;
+
+	// </script>
+{% endblock %}
+

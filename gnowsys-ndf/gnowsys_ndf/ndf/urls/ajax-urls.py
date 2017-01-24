@@ -97,6 +97,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_visits_count/$', 'get_visits_count', name='get_visits_count'),
     url(r'^search_users/$', 'search_users', name='search_users'),
     url(r'^save_user_password/$', 'save_user_password', name='save_user_password'),
+    url(r'^get_paged_images/', 'get_paged_images', name='get_paged_images'),
+    url(r'^get_templates_page/', 'get_templates_page', name='get_templates_page'),
 
     # url for graph display
 
