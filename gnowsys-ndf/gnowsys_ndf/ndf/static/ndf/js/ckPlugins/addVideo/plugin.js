@@ -1,18 +1,18 @@
-CKEDITOR.plugins.add('addAudio',
+CKEDITOR.plugins.add('addVideo',
 {
     init: function(editor)
     {
         //plugin code goes here
-        var pluginName = 'addAudio';
+        var pluginName = 'addVideo';
         var groupId = editor.config.groupID.group_id;
         var nodeId = editor.config.nodeID.node_id;
-        var url = "/" + groupId + "/audio";
+        var url = "/" + groupId + "/video";
         // var textAreaId = "textarea-"+nodeId;
         var textAreaId = editor.config.textarea_id;
         CKEDITOR.dialog.add(pluginName, this.path + 'plugin.js');
         editor.addCommand(pluginName, new CKEDITOR.dialogCommand(pluginName));
 
-        editor.addCommand("addAudio", {
+        editor.addCommand("addVideo", {
             exec: function() {
 
                     $.ajax({
@@ -23,16 +23,16 @@ CKEDITOR.plugins.add('addAudio',
 
                         },
                         success: function(data) {
-                            $("#group_imgs_on_modal").html(data);
-                            $('#group_imgs_on_modal').foundation('reveal', 'open');
-                            $(".audio-caption").click(function(event){
-                               var audio_player_url = "/" + groupId + "/ajax/get_audio_player";
-                               this_obj  = this;
-                               var datasrc = this_obj.attributes['data-audio-id'].value
+                          $("#group_imgs_on_modal").html(data);
+                          $('#group_imgs_on_modal').foundation('reveal', 'open');
+
+                          $(".card-image-wrapper").click(function(event){
+                            var video_player_url = "/" + groupId + "/ajax/get_video_player";
+                            var datasrc = $(this).children('img').attr("data-image-id");
 
                             $.ajax({
                                         type: "GET",
-                                        url: audio_player_url,
+                                        url: video_player_url,
                                         datatype: "html",
                                         data:{
                                             datasrc:datasrc
@@ -47,16 +47,17 @@ CKEDITOR.plugins.add('addAudio',
 
                           });
 
+
                         }
                     });
             }
         });
 
-        editor.ui.addButton('addAudio',
+        editor.ui.addButton('addVideo',
             {
-                label: 'Record Audio or add audio file  from this Group',
+                label: 'Add Image from this Group',
                 command: pluginName,
-                icon: this.path + 'images/fi-music.svg'
+                icon: this.path + 'images/addVideo.png'
             });
 
     }

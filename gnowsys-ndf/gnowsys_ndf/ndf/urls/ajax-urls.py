@@ -49,6 +49,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^course_create_note/', 'course_create_note', name='course_create_note'),#create note in gallery and raw material
     url(r'^upload_file_ckeditor', 'upload_file_ckeditor', name='upload_file_ckeditor'),
     url(r'^upload_video_thumbnail', 'upload_video_thumbnail', name='upload_video_thumbnail'),
+    url(r'^get_video_player', 'get_video_player', name='get_video_player'),
+    url(r'^get_audio_player', 'get_audio_player', name='get_audio_player'),
     # url(r'^/upload_file/', 'upload_file', name='upload_file'),
     
                        # Ajax-urls required for MIS --------------------------------
@@ -97,6 +99,9 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_visits_count/$', 'get_visits_count', name='get_visits_count'),
     url(r'^search_users/$', 'search_users', name='search_users'),
     url(r'^save_user_password/$', 'save_user_password', name='save_user_password'),
+    url(r'^get_paged_images/', 'get_paged_images', name='get_paged_images'),
+    url(r'^get_templates_page/', 'get_templates_page', name='get_templates_page'),
+    url(r'^add_transcript/', 'add_transcript', name='add_transcript'),
 
     # url for graph display
 

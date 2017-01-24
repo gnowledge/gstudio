@@ -175,6 +175,7 @@
 							<!-- If resource is already under moderation, don't show cross-publish button -->
 
 								<span  title="{% trans 'Publish this resource in other group/s' %}" class="has-tip tip-bottom"><a id="switch_group" class="tiny button radius mod-btn" data-reveal-id="publish_resource"> {% trans "Cross Publish" %}</a></span>
+								
 								<div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 									<h4>{% trans "Select Groups" %}</h4>
 									<div id="switchgrp" class="content">
@@ -188,6 +189,7 @@
 								<input type="button" class="tiny button radius mod-btn secondary disabled" title="{% trans 'You are not authorized for this action' %}" value="{% trans 'Cross Publish' %}">
 							{% endif %}
 						{% endif %}
+						
 
 				</div>
 				{% endif %}
@@ -534,6 +536,7 @@
         set_href = false;
         $("#deleteModal").foundation('reveal', 'close');
     });
+
 
 
 

@@ -46,9 +46,10 @@ CourseUnitEvent,[],"[""factory_types""]",[],[],[]
 QuizItemEvent,"[""QuizItem""]","[""factory_types""]",[],[],[]
 Jhapp,[],"[""factory_types""]",[],[],[]
 QuizItemPost,"[""Reply""]","[""factory_types""]",[],[],[]
-<<<<<<< HEAD
 Jsmol,"[""Jhapp""]","[""factory_types""]",[],[],[]
 TurtleBlocks,"[""Jhapp""]","[""factory_types""]",[],[],[]
-=======
 Asset,[],"[""factory_types""]",[],[],[]
->>>>>>> 0067d4fe8e5998ab5215c69310caa297e4fac52f
+PoliceSquad,"[""Jhapp""]","[""factory_types""]",[],[],[]
+OpenStoryTool,"[""Jhapp""]","[""factory_types""]",[],[],[]
+BioMechanics,"[""Jhapp""]","[""factory_types""]",[],[],[]
+Template,"[""Page""]","[""factory_types""]",[],[],[]

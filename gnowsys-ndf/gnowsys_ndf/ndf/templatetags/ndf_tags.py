@@ -3828,18 +3828,22 @@ def get_info_pages(group_id):
 @register.assignment_tag
 def get_download_filename(node, file_size_name='original'):
 
+	extension = None
 	if hasattr(node, 'if_file') and node.if_file[file_size_name].relurl:
-
 		from django.template.defaultfilters import slugify
 		relurl = node.if_file[file_size_name].relurl
 		relurl_split_list = relurl.split('.')
 
 		if len(relurl_split_list) > 1:
-			extension = relurl_split_list[-1]
+			extension = "." + relurl_split_list[-1]
 		elif 'epub' in node.if_file.mime_type:
-			extension = 'epub'
+			extension = '.epub'
+		elif not extension:
+			file_hive_obj = filehive_collection.one({'_id':ObjectId(node.if_file.original.id)})
+			file_blob = node.get_file(node.if_file.original.relurl)
+			file_mime_type = file_hive_obj.get_file_mimetype(file_blob)
+			extension = mimetypes.guess_extension(file_mime_type)
 		else:
-			import mimetypes
 			extension = mimetypes.guess_extension(node.if_file.mime_type)
 
 		name = node.altnames if node.altnames else node.name
@@ -3847,7 +3851,7 @@ def get_download_filename(node, file_size_name='original'):
 		file_name = slugify(name)
 
 		if extension:
-			file_name += '.' + extension
+			file_name += extension
 
 		return file_name
 

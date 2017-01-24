@@ -78,7 +78,7 @@ i.remove-tag{
   </div>
 </form>
 -->
-<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'saveZapp' groupid %}">{% csrf_token %}
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'savejhapp' groupid %}">{% csrf_token %}
 	<div class ="row">
 		<fieldset small-6 large-12 columns>
 			<legend>{% trans "Upload File" %}</legend>
@@ -91,18 +91,18 @@ i.remove-tag{
 			</div>
 		</fieldset>
 		<fieldset>
-			<legend>{% trans "Select Language" %}</legend>
-			{% cache 600 upload_doc_language request.LANGUAGE %}
+			<legend>{% trans "Select JHAPP Type" %}</legend>
 			<div class="large-4 columns">
-			  <select name="language">
-					      {% get_language_info_list for LANGUAGES as languages %}
-					      {% for language in languages %}
-					      <option value="{{ language.code }}">{{ language.name }} 
+			  <select name="jhapp-type">
+					      {% for jhapps in gstudio_supported_jhapps %}
+					      <option value="{{ jhapps }}" name="test">{{jhapps}} 
 					      </option>
 					      {% endfor %}
 					    </select>
 			</div>
-			{% endcache %}
+			{% for jhapps in gstudio_supported_jhapps %}
+					      {{jhapps}}
+					      {% endfor %}
 		</fieldset>
 		<fieldset>
 			<legend>{% trans "Add Description" %}</legend>
