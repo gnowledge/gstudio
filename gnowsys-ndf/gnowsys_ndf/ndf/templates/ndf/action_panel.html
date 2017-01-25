@@ -409,19 +409,19 @@
 						{% if user.is_authenticated %}
 							{% if not is_gstaff %}
 								{% if user_is_joined == "joined" %}
-									<input class="tiny button radius right-btn" title="Unsubscribe from this group" type="submit" id="notify" value="{% trans 'Unsubscribe' %}"
+									<input class="tiny button radius subscription_policy right-btn" title="Unsubscribe from this group" type="button" id="unsubscribe_from_grp" value="{% trans 'Unsubscribe' %}"
 									{% if group_object.name == "home" %}
 										disabled="disabled" 
 									{% endif %}
 									>
 									{% comment %}
-										<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Stop following' %}">
+										<input class="tiny button radius right-btn" type="button" value="{% trans 'Stop following' %}">
 									{% endcomment %}
 
 								{% elif user_is_joined == "not" %}
-									<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Join' %}" title="Join this Group">
+									<input class="tiny button radius right-btn subscription_policy" type="button" id="subscribe_to_grp" value="{% trans 'Join' %}" title="Join this Group">
 									{% comment %}
-										<input class="tiny button radius right-btn" type="submit" id="notify" value="{% trans 'Follow' %}">
+										<input class="tiny button radius right-btn" type="button" value="{% trans 'Follow' %}">
 									{% endcomment %}
 								{% endif %}
 							{% else %}
@@ -535,6 +535,64 @@
         $("#deleteModal").foundation('reveal', 'close');
     });
 
+
+	$(document).on("click", "#subscribe_to_grp", function() {
+        $.ajax({
+                type: "POST",
+                url: "{% url 'enroll_to_course' group_object.pk %}",
+                datatype: "json",
+                data:{
+                       csrfmiddlewaretoken: '{{ csrf_token }}'
+                  },
+              success: function(data) {
+                data = JSON.parse(data)
+                success_state = data["success"]
+                grp_mem_count = data["member_count"]
+                if(!success_state){
+                    alert("Something went wrong. Please try again later.")
+                }
+                else{
+                    $(".subscription_policy")
+                        .attr("id", "unsubscribe_from_grp")
+                        .attr("value", "Unsubscribe")
+                        .attr("title", "Unsubscribe from this group")
+                    // Update Courp member count in Group-dashboard
+                    $(".grp_mem_count")
+                        .text(grp_mem_count)
+                        .attr('value',grp_mem_count)
+                }
+              }
+        });
+    });
+
+    $(document).on("click", "#unsubscribe_from_grp", function() {
+        $.ajax({
+                type: "POST",
+                url: "{% url 'unsubscribe_from_group' group_object.pk %}",
+                datatype: "json",
+                data:{
+                       csrfmiddlewaretoken: '{{ csrf_token }}'
+                  },
+              success: function(data) {
+                data = JSON.parse(data)
+                success_state = data["success"]
+                grp_mem_count = data["member_count"]
+                if(!success_state){
+                    alert("Something went wrong. Please try again later.")
+                }
+                else{
+                    $(".subscription_policy")
+                        .attr("id", "subscribe_to_grp")
+                        .attr("value", "Join")
+                        .attr("title", "Join this Group")
+                    // Update Courp member count in Group-dashboard
+                    $(".grp_mem_count")
+                        .text(grp_mem_count)
+                        .attr('value',grp_mem_count)
+                }
+              }
+        });
+	});
 
 
 </script>
