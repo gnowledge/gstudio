@@ -1825,7 +1825,7 @@ def unsubscribe_from_group(request, group_id):
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
         user_id = request.POST.get("user_id", "")
-        remove_admin = eval(request.POST.get("asAdmin", False))
+        remove_admin = eval(request.POST.get("asAdmin", 'False'))
         if not user_id:
             user_id = request.user.id
         user_id = int(user_id)
@@ -1866,7 +1866,7 @@ def enroll_to_course(request, group_id):
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
         user_id = request.POST.get("user_id", "")
-        add_admin = eval(request.POST.get("asAdmin", False))
+        add_admin = eval(request.POST.get("asAdmin", 'False'))
         if not user_id:
             user_id = request.user.id
         user_id = int(user_id)
@@ -3074,6 +3074,7 @@ def get_resource_completion_status(request, group_id):
     return HttpResponse(json.dumps(result_dict))
 
 @get_execution_time
+@login_required
 def manage_users(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
