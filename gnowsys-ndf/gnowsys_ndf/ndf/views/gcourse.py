@@ -1834,6 +1834,14 @@ def unsubscribe_from_group(request, group_id):
         group_obj.save()
         response_dict["success"] = True
         response_dict["member_count"] = len(group_obj.author_set)
+        try:
+            activ = "Subscription with " + group_obj.name +"."
+            mail_content = "'This is to inform you that "+ \
+            "you have been unsubscribed from group: '" + group_obj.name+ "'"
+            user_obj = User.objects.get(id=user_id)
+            set_notif_val(request, group_obj._id, mail_content, activ, user_obj)
+        except Exception as e:
+            print "\n Unable to send notifications ",e
         return HttpResponse(json.dumps(response_dict))
 
 @login_required
@@ -1867,6 +1875,15 @@ def enroll_to_course(request, group_id):
             counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
             counter_obj['is_group_member'] = True
             counter_obj.save()
+        try:
+            activ = "Subscription with " + group_obj.name +"."
+            mail_content = "'This is to inform you that "+ \
+            "you have been subscribed to group: '" + group_obj.name+ "'"
+            user_obj = User.objects.get(id=user_id)
+            set_notif_val(request, group_obj._id, mail_content, activ, user_obj)
+        except Exception as e:
+            print "\n Unable to send notifications ",e
+
         return HttpResponse(json.dumps(response_dict))
 
 
