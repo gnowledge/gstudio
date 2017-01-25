@@ -22,8 +22,8 @@ class Command(BaseCommand):
       + "(only if they doesn't exists) in your database."
 
   def handle(self, *args, **options):
-    all_grelations = triple_collection.find({'_type': 'GRelation'})
-    all_gattributes = triple_collection.find({'_type': 'GAttribute'})
+    all_grelations = triple_collection.find({'_type': 'GRelation'}, time_out=False)
+    all_gattributes = triple_collection.find({'_type': 'GAttribute'}, time_out=False)
     print "\n Working on Triples data. \n Total GRelations found: ", all_grelations.count()
     print " Total GAttributes found: ", all_gattributes.count()
     print "\n This will take few minutes. Please wait.."
@@ -94,7 +94,7 @@ class Command(BaseCommand):
     # - Firstly, replacing None to ('en', 'English')
     node_collection.collection.update({ '_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']}, 'language': {'$in': [None, '', u'']} }, {"$set": {"language": ('en', 'English')}}, upsert=False, multi=True)
 
-    all_nodes = node_collection.find({'_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']} })
+    all_nodes = node_collection.find({'_type': {'$in': ['AttributeType', 'RelationType', 'MetaType', 'ProcessType', 'GSystemType', 'GSystem', 'File', 'Group', 'Author']} }, time_out=False)
 
     all_languages = list(LANGUAGES) + OTHER_COMMON_LANGUAGES
     all_languages_concanated = reduce(lambda x, y: x+y, all_languages)

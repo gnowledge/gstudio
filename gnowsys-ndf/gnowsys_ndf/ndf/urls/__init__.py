@@ -71,9 +71,9 @@ urlpatterns = patterns('',
 
 
     # Commented following url for khaal hackathon
-    # (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
+    (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
 
-    (r'^(?P<group_id>[^/]+)/gcourse', include('gnowsys_ndf.ndf.urls.gcourse')),
+    # (r'^(?P<group_id>[^/]+)/gcourse', include('gnowsys_ndf.ndf.urls.gcourse')),
 
     (r'^(?P<group_id>[^/]+)/program', include('gnowsys_ndf.ndf.urls.program')),
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
