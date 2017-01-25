@@ -1824,7 +1824,10 @@ def unsubscribe_from_group(request, group_id):
     '''
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
-        user_id = request.user.id
+        user_id = request.POST.get("user_id", "")
+        if not user_id:
+            user_id = request.user.id
+        user_id = int(user_id)
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
         if user_id in group_obj.author_set:
             group_obj.author_set.remove(user_id)
@@ -1849,7 +1852,10 @@ def enroll_to_course(request, group_id):
     '''
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
-        user_id = request.user.id
+        user_id = request.POST.get("user_id", "")
+        if not user_id:
+            user_id = request.user.id
+        user_id = int(user_id)
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
         if user_id not in group_obj.author_set:
             group_obj.author_set.append(user_id)
@@ -1858,7 +1864,7 @@ def enroll_to_course(request, group_id):
         response_dict["member_count"] = len(group_obj.author_set)
         if 'Group' not in group_obj.member_of_names_list:
             # get new/existing counter document for a user for a given course for the purpose of analytics
-            counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+            counter_obj = Counter.get_counter_obj(user_id, ObjectId(group_id))
             counter_obj['is_group_member'] = True
             counter_obj.save()
         return HttpResponse(json.dumps(response_dict))
@@ -3041,17 +3047,16 @@ def get_resource_completion_status(request, group_id):
 
 @get_execution_time
 def manage_users(request, group_id):
-    if request.method == "GET":
-        group_obj   = get_group_name_id(group_id, get_obj=True)
-        group_id    = group_obj._id
-        group_name  = group_obj.name
-        context_variables = {
-                'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-            }
-        template = 'ndf/users_mgmt.html'
+    group_obj   = get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+        }
+    template = 'ndf/users_mgmt.html'
 
-        return render_to_response(template,
-                                    context_variables,
-                                    context_instance = RequestContext(request)
-        )
+    return render_to_response(template,
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
 

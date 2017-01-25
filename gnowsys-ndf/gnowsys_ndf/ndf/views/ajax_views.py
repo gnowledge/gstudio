@@ -6397,8 +6397,18 @@ def search_users(request, group_id):
     if request.is_ajax() and request.method == "GET":
         from bson import json_util
         username_str = request.GET.get("username_str", '')
-        filtered_users = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
-        # print "filtered_users ;; ", len(filtered_users)
+        subscription_status_val = request.GET.get("subscription_status_val", '')
+        if subscription_status_val:
+            filtered_users = []
+            users_data = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
+            group_object_author_set = node_collection.one({'_id': ObjectId(group_id)}).author_set
+            for each_filtered_user in users_data:
+                if each_filtered_user[0] in group_object_author_set:
+                    filtered_users.append(each_filtered_user+(True,))
+                else:
+                    filtered_users.append(each_filtered_user+(False,))
+        else:
+            filtered_users = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
         return HttpResponse(json_util.dumps(filtered_users, cls=NodeJSONEncoder))
 
 
