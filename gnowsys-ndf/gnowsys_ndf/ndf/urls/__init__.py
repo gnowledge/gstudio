@@ -29,7 +29,11 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
+
+    # gstudio admin url's
     (r'^admin/', include('gnowsys_ndf.ndf.urls.gstudio_admin')),
+
+    # django's admin site url's
     (r'^admin/', include(admin.site.urls)),
 
     # --mobwrite-- commented for time being
@@ -43,19 +47,17 @@ urlpatterns = patterns('',
 
     # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
 
-    # (r'^$', HomeRedirectView.as_view()),
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
-
 
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
 
     # all main apps
-    # url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),
     (r'^(?P<group_id>[^/]+)/mailclient', include('gnowsys_ndf.ndf.urls.mailclient')),
     (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
+    (r'^(?P<group_id>[^/]+)/jhapp', include('gnowsys_ndf.ndf.urls.jhapp')),
     (r'^(?P<group_id>[^/]+)/filehive', include('gnowsys_ndf.ndf.urls.filehive')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_id>[^/]+)/audio', include('gnowsys_ndf.ndf.urls.audio')),
@@ -67,9 +69,11 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/quiz', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_id>[^/]+)/discussion', include('gnowsys_ndf.ndf.urls.discussion')),
 
+
     # Commented following url for khaal hackathon
-    # (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
-    (r'^(?P<group_id>[^/]+)/gcourse', include('gnowsys_ndf.ndf.urls.gcourse')),
+    (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
+
+    # (r'^(?P<group_id>[^/]+)/gcourse', include('gnowsys_ndf.ndf.urls.gcourse')),
 
     (r'^(?P<group_id>[^/]+)/program', include('gnowsys_ndf.ndf.urls.program')),
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
@@ -93,6 +97,8 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/feeds', include('gnowsys_ndf.ndf.urls.feeds')),
     (r'^(?P<group_id>[^/]+)/trash',include('gnowsys_ndf.ndf.urls.trash')),
     (r'^(?P<group_id>[^/]+)/buddy',include('gnowsys_ndf.ndf.urls.buddy')),
+
+    (r'^(?P<group_id>[^/]+)/type_created',include('gnowsys_ndf.ndf.urls.type_created')),
 
     url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.topics.topic_detail_view', name='topic_details'),
 

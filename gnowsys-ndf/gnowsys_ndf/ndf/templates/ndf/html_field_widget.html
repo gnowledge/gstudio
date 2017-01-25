@@ -165,7 +165,8 @@
     <small class="error">{% trans "Please fill valid" %} {{field.altnames}}! </small>
     {% endif %}
 
-  {% elif field_type == "datetime" %}
+  {% elif field_type == "datetime" %}{{field.name}}
+  {% if field.validators %}{{field_value|date:field.validators.0|default_if_none:''}}{% endif %}
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{% if field.validators %}{{field_value|date:field.validators.0|default_if_none:''}}{% endif %}" 
           placeholder="{{field.help_text|default_if_none:''}}"
           {% if not field.editable %}readonly{% endif %} 
@@ -200,7 +201,9 @@
     {% endif %}
 
   {% elif field_type == "ObjectId" and field.validators.0 == "File" %}
+    {{field_type}}{{field.name}}{{field_value}}
     {% if field_value %}
+    
     <a target="_blank" href="{% url 'read_file' group_id field_value %}" id="{{field.name}}">{% trans "Click here to view " %}{{field.altnames|lower}}</a>
 
     {% else %}

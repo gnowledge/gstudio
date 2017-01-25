@@ -118,8 +118,8 @@ class Command(BaseCommand):
             node_doc.member_of.append(meta_type._id)
             node_doc.status = u"PUBLISHED"
             node_doc.save()
-        
-        # Creating factory GSystemType's 
+
+        # Creating factory GSystemType's
         create_sts(factory_gsystem_types,user_id)
 
         # Creating factory RelationType's
@@ -339,7 +339,7 @@ class Command(BaseCommand):
         if (home_grp.altnames == None) or (home_grp.altnames == 'None'):
           home_grp.altnames = u'home'
           home_grp.save()
-          print "Altnames changed to home" 
+          print "Altnames changed to home"
         # Create default group 'warehouse' wherein intermediate uploads like:
         # profile_pic, group_banner, thumbnail etc. will happen.
         warehouse_grp = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'warehouse'}]})
@@ -369,7 +369,7 @@ class Command(BaseCommand):
         if (warehouse_grp.altnames == None) or (warehouse_grp.altnames == 'None'):
           warehouse_grp.altnames = u'warehouse'
           warehouse_grp.save()
-          print "Altnames changed to warehouse" 
+          print "Altnames changed to warehouse"
 
         # Create default group 'desk' wherein all initial uploads will happen
         desk_grp = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'desk'}]})
@@ -403,7 +403,7 @@ class Command(BaseCommand):
           desk_grp.save()
           print "\nAltnames changed to desk"
 
-        # Create default group 'help' 
+        # Create default group 'help'
         help_grp = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'help'}]})
         if help_grp is None:
           gs_node = node_collection.collection.Group()
@@ -958,7 +958,7 @@ def clean_structure():
   print info_message
   log_list.append(info_message)
 
-  invalid_dates_cur = triple_collection.find({'attribute_type.$id': {'$in': [start_time._id, end_time._id]}, 'object_value': {'$not': {'$type': 9}}})
+  invalid_dates_cur = triple_collection.find({'attribute_type': {'$in': [start_time._id, end_time._id]}, 'object_value': {'$not': {'$type': 9}}})
   for each in invalid_dates_cur:
     date_format_string = ""
     old_value = ""

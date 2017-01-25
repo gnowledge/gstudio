@@ -19,7 +19,7 @@ from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK, GSTUDIO_COMMENT_POINTS, GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.ndf.views.methods import get_execution_time, get_group_name_id
@@ -451,5 +451,4 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
 
 @get_execution_time
 def get_thread_comments_count(request, group_id, thread_node_id):
-  return HttpResponse(node_collection.find({'member_of': reply_st._id, 'origin.thread_id':ObjectId(thread_node_id)}).count())
-  # return HttpResponse(json.dumps(result_set))
+    return HttpResponse(node_collection.find({'member_of': reply_st._id, 'origin.thread_id':ObjectId(thread_node_id)}).count())

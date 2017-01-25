@@ -37,6 +37,7 @@ from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 # to display error template if non existent pub is given in settings.py
 from django.shortcuts import render
+from django.core.handlers.wsgi import WSGIRequest
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
@@ -44,14 +45,15 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAP
 from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN
 # from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 # get pub of gpg key with which to sign syncdata attachments
 from gnowsys_ndf.settings import SYNCDATA_KEY_PUB, GSTUDIO_MAIL_DIR_PATH
+from gnowsys_ndf.ndf.views.tasks import record_in_benchmark
 from datetime import datetime, timedelta, date
-
+from gnowsys_ndf.ndf.views.utils import get_dict_from_list_of_dicts
 
 history_manager = HistoryManager()
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
@@ -63,76 +65,53 @@ ins_objectid = ObjectId()
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
 def get_execution_time(f):
-   if BENCHMARK == 'ON':
 
     def wrap(*args,**kwargs):
-        time1 = time.time()
-        total_parm_size = 0
-        for key, value in kwargs.iteritems():
-           total_parm_size = total_parm_size + getsizeof(value)
-        total_param = len(kwargs)
-        ret = f(*args,**kwargs)
-        t2 = time.clock()
-        time2 = time.time()
-        time_diff = time2 - time1
-        benchmark_node =  benchmark_collection.Benchmark()
-        benchmark_node.time_taken = unicode(str(time_diff))
-        benchmark_node.name = unicode(f.func_name)
-        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
-        try :
-            benchmark_node.has_data["POST"] = bool(args[0].POST)
-            benchmark_node.has_data["GET"] = bool(args[0].GET)
-        except :
-            pass
-        try :
-            benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
-        except :
-            pass
-        try :
-            benchmark_node.user = unicode(args[0].user.username)
-        except :
-            pass
-        benchmark_node.parameters = unicode(total_param)
-        benchmark_node.size_of_parameters = unicode(total_parm_size)
-        benchmark_node.last_update = datetime.today()
-        try:
-            benchmark_node.calling_url = unicode(args[0].path)
-            url = benchmark_node.calling_url.split("/")
 
-            if url[1] != "" :
-                group = url[1]
-                benchmark_node.group = group
-                try :
-                    n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
-                    if bool(n) :
-                        benchmark_node.group = group;
-                except :
-                    group_name, group = get_group_name_id(group)
-                    benchmark_node.group = str(group)
-            else :
+        time1 = time.time()
+        ret = f(*args,**kwargs)
+        time2 = time.time()
+
+        post_bool = get_bool = False,
+        sessionid = user_name = path = '',
+
+        req = args[0] if len(args) else None
+
+        if isinstance(req, WSGIRequest):
+            # try :
+            post_bool = bool(args[0].POST)
+            get_bool = bool(args[0].GET)
+            # except :
+            #     pass
+
+            try :
+                sessionid = unicode(args[0].COOKIES['sessionid'])
+            except :
                 pass
 
-            if url[2] == "" :
-                benchmark_node.action = None
-            else :
-                benchmark_node.action = url[2]
-                if url[3] != '' :
-                    benchmark_node.action +=  str('/'+url[3])
-                else :
-                    pass
-            if "node_id" in args[0].GET and "collection_nav" in f.func_name:
-                benchmark_node.calling_url += "?selected="+args[0].GET['node_id']
-                # modify calling_url if collection_nav is called i.e collection-player
-        except :
-            pass
-        benchmark_node.save()
+            try :
+                user_name = unicode(args[0].user.username)
+            except :
+                pass
+
+            # try :
+            path = unicode(args[0].path)
+            # except :
+            #     pass
+
+        record_in_benchmark.delay(kwargs_len=len(kwargs),
+                            # total_param_size=sum([getsizeof(each_kwarg) for each_kwarg in kwargs.values()]),
+                            total_param_size=None,
+                            post_bool=post_bool,
+                            get_bool=get_bool,
+                            sessionid=sessionid,
+                            user_name=user_name,
+                            path=path,
+                            funct_name=f.func_name,
+                            time_taken=unicode(str(time2 - time1))
+                        )
         return ret
-
-    if BENCHMARK == 'ON':
-        return wrap
-    if BENCHMARK == 'OFF':
-        return f
-
+    return wrap
 
 
 import json
@@ -1116,8 +1095,9 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
     node.name=unicode(name)
     # Required to link temporary files with the current user who is modifying this document
     usrname = request.user.username
-    filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
-    node.content = org2html(content_org, file_prefix=filename)
+    # filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
+    # node.content = org2html(content_org, file_prefix=filename)
+    node.content = unicode(content_org)
 
 @get_execution_time
 def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
@@ -1341,14 +1321,16 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         # org editor for wiki page and ckeditor for blog and info pages
         if node_page_type_list:
           if "Wiki page" in node_page_type_list:
-            node.content = unicode(org2html(content_org, file_prefix=filename))
+            # node.content = unicode(org2html(content_org, file_prefix=filename))
+            node.content = unicode(content_org)
+            pass
           else:
             node.content = unicode(content_org)
         else:
-          node.content = unicode(org2html(content_org, file_prefix=filename))
+          # node.content = unicode(org2html(content_org, file_prefix=filename))
+            node.content = unicode(content_org)
         is_changed = True
     '''
-
 
     # visited_location in author class
     if node.location != map_geojson_data:
@@ -1377,7 +1359,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
                     is_changed = True
 
             else:
-
                 user_group_location['visited_location'] = user_last_visited_location
                 user_group_location.save(groupid=group_id)
 
@@ -1390,9 +1371,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
             node.contributors.append(usrid)
 
     return is_changed
-
-
 # ============= END of def get_node_common_fields() ==============
+
 
 @get_execution_time
 def build_collection(node, check_collection, right_drawer_list, checked):
@@ -1643,7 +1623,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             relationtype = node_collection.one(
                 {"_type": "RelationType", "name": "teaches"})
             list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
             for relation in list_grelations:
                 # nlist.append(ObjectId(relation.right_subject))
                 relation.delete()
@@ -1665,7 +1645,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             relationtype = node_collection.one(
                 {"_type": "RelationType", "name": "teaches"})
             list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
             for relation in list_grelations:
                 relation.delete()
 
@@ -1680,7 +1660,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             relationtype = node_collection.one(
                 {"_type": "RelationType", "name": "assesses"})
             list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
             for relation in list_grelations:
                 relation.delete()
 
@@ -1701,7 +1681,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             relationtype = node_collection.one(
                 {"_type": "RelationType", "name": "assesses"})
             list_grelations = triple_collection.find(
-                {"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
+                {"_type": "GRelation", "subject": node._id, "relation_type": relationtype._id})
             for relation in list_grelations:
                 relation.delete()
 
@@ -2157,9 +2137,7 @@ def get_node_metadata(request, node, **kwargs):
         for atname in attribute_type_list:
 
             field_value = request.POST.get(atname, "")
-            print '$' * 30
-            print atname,field_value
-            print '$' * 30
+            # print atname,field_value
 
             at = node_collection.one(
                 {"_type": "AttributeType", "name": atname})
@@ -2173,7 +2151,7 @@ def get_node_metadata(request, node, **kwargs):
                   field_value = request.POST.get(atname, "")
                   # print "\n\nnon list field value",field_value
                 field_value = cast_to_data_type(field_value, at["data_type"])
-                # print "\n\n\n\n\n\n\n\n\n\n\nfield_value",field_value
+                # print at["data_type"], "\n\nfield_value: ",field_value, ", type: ",type(field_value)
                 if "is_changed" in kwargs:
                     # print "field value"
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
@@ -2197,7 +2175,7 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
     # removes all existing relations given subject and relation type and then
     # creates again.
     triple_collection.collection.remove(
-        {"_type": "GRelation", "subject": subject_id, "relation_type.$id": relationtype._id})
+        {"_type": "GRelation", "subject": subject_id, "relation_type": relationtype._id})
 
     for relation_id in right_subject_id_list:
         create_grelation(
@@ -2213,10 +2191,10 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
 
             gr_node = collection.GRelation()
             gr_node.subject = ObjectId(subject_id)
-            gr_node.relation_type = relationtype
+            gr_node.relation_type = relationtype._id
             gr_node.right_subject = ObjectId(relation_id)
             gr_node.status = u"PUBLISHED"
-            gr_node.save()
+            gr_node.save(triple_node=relationtype, triple_id=relationtype._id)
 
 
 @get_execution_time
@@ -2557,23 +2535,33 @@ def parse_template_data(field_data_type, field_value, **kwargs):
         raise Exception(error_message)
 
 
+
 @get_execution_time
 def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwargs):
+
+    def _update_attr_set(attr_set_list_of_dicts, attr_key, attr_value):
+        temp_attr_dict = get_dict_from_list_of_dicts(attr_set_list_of_dicts)
+        temp_attr_dict.update({unicode(attr_key): attr_value})
+        return [{k:v} for k, v in temp_attr_dict.iteritems()]
+
     ga_node = None
     info_message = ""
     old_object_value = None
+    attribute_type_node = Node.get_node_obj_from_id_or_obj(attribute_type_node, AttributeType)
 
     ga_node = triple_collection.one(
-        {'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
+        {'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node._id})
     if ga_node is None:
         # Code for creation
         try:
             ga_node = triple_collection.collection.GAttribute()
 
             ga_node.subject = subject_id
-            ga_node.attribute_type = attribute_type_node
+            ga_node.attribute_type = attribute_type_node._id
 
             if (not object_value) and type(object_value) != bool:
+                # this is when value of attribute is cleared/empty
+                # in this case attribute will be created with status deleted
                 object_value = u"None"
                 ga_node.status = u"DELETED"
 
@@ -2581,9 +2569,9 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 ga_node.status = u"PUBLISHED"
 
             ga_node.object_value = object_value
-            ga_node.save()
+            ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
 
-            if object_value == u"None":
+            if ga_node.status == u"DELETED":
                 info_message = " GAttribute (" + ga_node.name + \
                     ") created successfully with status as 'DELETED'!\n"
 
@@ -2605,24 +2593,23 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
             raise Exception(error_message)
 
     else:
-        # Code for updation
+        # Code for updating existing gattribute
         is_ga_node_changed = False
         try:
             if (not object_value) and type(object_value) != bool:
+                # this is when value of attribute is cleared/empty
+                # in this case attribute will be set with status deleted
                 old_object_value = ga_node.object_value
 
                 ga_node.status = u"DELETED"
-                ga_node.save()
+                ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
 
                 info_message = " GAttribute (" + ga_node.name + \
                     ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
                 # Fetch corresponding document & update it's attribute_set with
                 # proper value
-                node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: old_object_value},
-                                                  {'$pull': {
-                                                      'attribute_set': {attribute_type_node.name: old_object_value}}},
-                                                  upsert=False, multi=False)
+                node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: old_object_value}, {'$pull': {'attribute_set': {attribute_type_node.name: old_object_value}}}, upsert=False, multi=False)
 
             else:
                 if type(ga_node.object_value) == list:
@@ -2659,7 +2646,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                 if is_ga_node_changed or ga_node.status == u"DELETED":
                     if ga_node.status == u"DELETED":
                         ga_node.status = u"PUBLISHED"
-                        ga_node.save()
+                        ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
 
 
                         info_message = " GAttribute (" + ga_node.name + \
@@ -2667,24 +2654,39 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                         # Fetch corresponding document & append into it's
                         # attribute_set
-                        node_collection.collection.update({'_id': subject_id},
-                                                          {'$addToSet': {
-                                                              'attribute_set': {attribute_type_node.name: object_value}}},
-                                                          upsert=False, multi=False)
+                        # node_collection.collection.update({'_id': subject_id},
+                        #                                   {'$addToSet': {
+                        #                                       'attribute_set': {attribute_type_node.name: object_value}}},
+                        #                                   upsert=False, multi=False)
+                        subject_node_obj = node_collection.one({'_id': ObjectId(subject_id)})
+                        subject_node_obj.attribute_set = _update_attr_set(
+                                                            subject_node_obj.attribute_set,
+                                                            attribute_type_node.name,
+                                                            object_value
+                                                        )
+                        subject_node_obj.save()
+
 
                     else:
                         ga_node.status = u"PUBLISHED"
-                        ga_node.save()
+                        ga_node.save(triple_node=attribute_type_node, triple_id=attribute_type_node._id)
 
                         info_message = " GAttribute (" + \
                             ga_node.name + ") updated successfully.\n"
 
                         # Fetch corresponding document & update it's
                         # attribute_set with proper value
-                        node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: {"$exists": True}},
-                                                          {'$set': {
-                                                              'attribute_set.$.' + attribute_type_node.name: ga_node.object_value}},
-                                                          upsert=False, multi=False)
+                        # node_collection.collection.update({'_id': subject_id, 'attribute_set.' + attribute_type_node.name: {"$exists": True}},
+                        #                               {'$set': {
+                        #                                   'attribute_set.$.' + attribute_type_node.name: ga_node.object_value}},
+                        #                               upsert=False, multi=False)
+                        subject_node_obj = node_collection.one({'_id': ObjectId(subject_id)})
+                        subject_node_obj.attribute_set = _update_attr_set(
+                                                            subject_node_obj.attribute_set,
+                                                            attribute_type_node.name,
+                                                            ga_node.object_value
+                                                        )
+                        subject_node_obj.save()
                 else:
                     info_message = " GAttribute (" + ga_node.name + \
                         ") already exists (Nothing updated) !\n"
@@ -2694,6 +2696,10 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
             raise Exception(error_message)
 
     # print "\n\t is_ga_node_changed: ", is_ga_node_changed
+
+    cache_key = str(subject_id) + 'attribute_value' + str(attribute_type_node.name)
+    cache.set(cache_key, object_value, 60 * 60)
+
     if "is_changed" in kwargs:
         ga_dict = {}
         ga_dict["is_changed"] = is_ga_node_changed
@@ -2722,19 +2728,20 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     """
     gr_node = None
     multi_relations = False
+
     try:
         subject_id = ObjectId(subject_id)
 
         def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text):
-                        # Code for creating GRelation node
+            # Code for creating GRelation node
             gr_node = triple_collection.collection.GRelation()
 
             gr_node.subject = subject_id
-            gr_node.relation_type = relation_type_node
+            gr_node.relation_type = relation_type_node._id
             gr_node.right_subject = right_subject_id_or_list
 
             gr_node.status = u"PUBLISHED"
-            gr_node.save()
+            gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
 
             gr_node_name = gr_node.name
@@ -2805,7 +2812,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
         def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text):
             gr_node.status = u"PUBLISHED"
-            gr_node.save()
+            gr_node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
+
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
             relation_type_node_inverse_name = relation_type_node.inverse_name
@@ -2884,6 +2892,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # Relationship Other than Binary one found; e.g, Triadic
                     # right_subject_id_or_list: [[id, id, ...], [id, id, ...],
                     # ...]
+                    if isinstance(right_subject_id_or_list, ObjectId):
+                        right_subject_id_or_list = [right_subject_id_or_list]
                     if right_subject_id_or_list:
                         if isinstance(right_subject_id_or_list[0], list):
                             # Reduce it to [id, id, id, ...]
@@ -2899,7 +2909,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             # Iterate and find all relationships (including DELETED ones' also)
             nodes = triple_collection.find({
                 '_type': "GRelation", 'subject': subject_id,
-                'relation_type.$id': relation_type_node._id
+                'relation_type': relation_type_node._id
             })
 
             gr_node_list = []
@@ -2932,9 +2942,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                 else:
                     # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
                     # So change their status from PUBLISHED to DELETED
-                    # right_subject_id_or_list.remove(n.right_subject)
                     n.status = u"DELETED"
-                    n.save()
+                    n.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
                     info_message = " MultipleGRelation: GRelation (" + n.name + \
                         ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -2963,7 +2972,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                 for nid in right_subject_id_or_list:
                     gr_node = triple_collection.one({
                         '_type': "GRelation", 'subject': subject_id,
-                        'relation_type.$id': relation_type_node._id, 'right_subject': nid
+                        'relation_type': relation_type_node._id, 'right_subject': nid
                     })
 
                     if gr_node is None:
@@ -2997,7 +3006,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node_cur = triple_collection.find({
                 "_type": "GRelation", "subject": subject_id,
-                "relation_type.$id": relation_type_node_id
+                "relation_type": relation_type_node_id
             })
 
             for node in gr_node_cur:
@@ -3044,7 +3053,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # to DELETED
                     if node.status == u'PUBLISHED':
                         node.status = u"DELETED"
-                        node.save()
+                        node.save(triple_node=relation_type_node, triple_id=relation_type_node._id)
 
                         node_collection.collection.update({
                             '_id': subject_id, 'relation_set.' + relation_type_node_name: {'$exists': True}
@@ -3198,9 +3207,10 @@ def discussion_reply(request, group_id, node_id):
             reply_obj.group_set.append(ObjectId(group_id))
 
             reply_obj.content_org = unicode(content_org)
-            filename = slugify(
-                unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
-            reply_obj.content = org2html(content_org, file_prefix=filename)
+            reply_obj.content = unicode(content_org)
+            # filename = slugify(
+            #     unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
+            # reply_obj.content = org2html(content_org, file_prefix=filename)
 
             # saving the reply obj
             reply_obj.save()
@@ -3322,14 +3332,14 @@ def get_user_task(userObject):
     attributetype_end_time = node_collection.find_one(
         {"_type": 'AttributeType', 'name': 'end_time'})
     attr_assignee = triple_collection.find(
-        {"_type": "GAttribute", "attribute_type.$id": attributetype_assignee._id, "object_value": userObject.username})
+        {"_type": "GAttribute", "attribute_type": attributetype_assignee._id, "object_value": userObject.username})
     for attr in attr_assignee:
         blankdict = {}
         task_node = node_collection.find_one({'_id': attr.subject})
         attr_status = triple_collection.find_one(
-            {"_type": "GAttribute", "attribute_type.$id": attributetype_status._id, "subject": task_node._id})
+            {"_type": "GAttribute", "attribute_type": attributetype_status._id, "subject": task_node._id})
         attr_end_time = triple_collection.find_one(
-            {"_type": "GAttribute", "attribute_type.$id": attributetype_end_time._id, "subject": task_node._id})
+            {"_type": "GAttribute", "attribute_type": attributetype_end_time._id, "subject": task_node._id})
         if attr_status.object_value is not "closed":
             group = node_collection.find_one({"_id": task_node.group_set[0]})
             user = User.objects.get(id=task_node.created_by)
@@ -3470,8 +3480,8 @@ def create_task(task_dict, task_type_creation="single"):
                 filename = slugify(
                     task_dict["name"]) + "-" + task_dict["created_by_name"] + "-" + ObjectId().__str__()
                 task_dict_keys.remove("created_by_name")
-                task_node.content = org2html(
-                    task_dict[key], file_prefix=filename)
+                # task_node.content = org2html(task_dict[key], file_prefix=filename)
+                task_node.content = unicode(task_dict[key])
 
             else:
                 task_node[key] = task_dict[key]
@@ -4282,8 +4292,9 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
     query_for_inverse_relation = OrderedDict()  # Search by right_subject field
 
     def _perform_delete_updates_on_node(gr_node):
-        rel_name = gr_node.relation_type.name
-        inv_rel_name = gr_node.relation_type.inverse_name
+        rt_node = node_collection.one({'_id': ObjectId(gr_node.relation_type)})
+        rel_name = rt_node.name
+        inv_rel_name = rt_node.inverse_name
         subj = gr_node.subject
         right_subj = gr_node.right_subject
 
@@ -4317,7 +4328,7 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
         # relation_set field updated -- \n", res
 
         gr_node.status = u"DELETED"
-        gr_node.save()
+        gr_node.save(triple_node=rt_node, triple_id=rt_node._id)
 
 
     try:
@@ -5315,7 +5326,10 @@ def create_clone(user_id, node, group_id):
 def replicate_resource(request, node, group_id):
     try:
         create_thread_for_node_flag = True
-        user_id = request.user.id
+        if request:
+            user_id = request.user.id
+        else:
+            user_id = 1
         new_gsystem = create_clone(user_id, node, group_id)
         thread_created = False
 
@@ -5326,7 +5340,7 @@ def replicate_resource(request, node, group_id):
             node_gattr_cur = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
 
             for each_gattr in node_gattr_cur:
-                at_id = each_gattr['attribute_type']['_id']
+                at_id = each_gattr['attribute_type']
                 obj_val = each_gattr['object_value']
                 at_node = node_collection.one({'_id': ObjectId(at_id)})
                 create_gattribute(new_gsystem._id,at_node,obj_val)
@@ -5341,7 +5355,7 @@ def replicate_resource(request, node, group_id):
 
             relation_dict_rt_key_rs_val = {}
             for each_rel in node_grel_cur:
-                rt_id = each_rel['relation_type']['_id']
+                rt_id = each_rel['relation_type']
                 right_subj = each_rel['right_subject']
                 if rt_id in relation_dict_rt_key_rs_val.keys() :
                     val_list = relation_dict_rt_key_rs_val[rt_id]
@@ -5378,7 +5392,7 @@ def replicate_resource(request, node, group_id):
                         right_sub_new_node.save()
 
             if "QuizItemEvent" in new_gsystem.member_of_names_list:
-                if not thread_created:
+                if not thread_created and request:
                     thread_obj = create_thread_for_node(request,group_id, new_gsystem)
 
         # clone_of_RT = node_collection.one({'_type': "RelationType", 'name': "clone_of"})

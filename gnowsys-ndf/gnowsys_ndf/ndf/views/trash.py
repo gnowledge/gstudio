@@ -99,3 +99,30 @@ def restore_resource(request, group_id):
 		# print "\n Resore Exception ===== ", str(e)
 		pass
 	return HttpResponse(json.dumps(response_dict))
+
+@get_execution_time
+def delete_multiple_resources(request,group_id):
+	files_list = request.POST.getlist("collection[]", '')
+	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	group_obj = node_collection.find_one({"_id":ObjectId(group_id)})
+	trash_group = node_collection.find_one({"name":"Trash"})
+	files_list_obj = []
+	for each in files_list:
+		node_obj = node_collection.find_one({"_id":ObjectId(each)})
+		if ObjectId(group_id) in node_obj.group_set: 		 
+			node_obj.group_set.remove(ObjectId(group_id))
+			if ObjectId(auth._id) in node_obj.group_set:
+				node_obj.group_set.remove(ObjectId(auth._id))
+			node_obj.save()
+		if not node_obj.group_set:
+			# Add Trash group _id to node_obj's group_set
+			if trash_group._id not in node_obj.group_set:	
+				node_obj.group_set.append(trash_group._id)
+			node_obj.status = u"DELETED"
+		if node_obj.collection_set:
+			if trash_group._id not in node_obj.group_set:	
+				node_obj.group_set.append(trash_group._id)
+			node_obj.status = u"DELETED"
+		node_obj.save()
+
+	return HttpResponse(json.dumps(files_list))

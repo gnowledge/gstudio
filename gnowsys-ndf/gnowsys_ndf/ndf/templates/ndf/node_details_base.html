@@ -101,11 +101,13 @@
     <div class="teaches-block">
       <div class="repository-title large-4 columns" style="width:100%;font-size:1.2em">Teaches</div><br><br>
       <ul style="list-style: none; border-bottom: solid thin #ddd;">
-        {% for each_topic in node.teaches %}
-            {% get_topic_breadcrumb_hierarchy each_topic.pk as topic_prior_hier %}
-          <li style="border-bottom: solid thin #ddd;">
-            <a href="{% url 'topic_details' group_name_tag each_topic.pk %}?nav_li={{topic_prior_hier}}" >{% trans each_topic.name %}</a>
-          </li>
+        {% for each_teaches in node.teaches %}
+        {% for  each in each_teaches %}
+            {% get_topic_breadcrumb_hierarchy each.pk as topic_prior_hier %}
+            <li style="border-bottom: solid thin #ddd;">
+              <a href="{% url 'topic_details' group_name_tag each %}?nav_li={{topic_prior_hier}}" >{% trans each.name %}</a>
+            </li>
+        {% endfor %}
         {% endfor %}
       </ul>
     </div>

@@ -19,4 +19,5 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.search_views',
     #url(r'^cf_search/$','cf_search',name = 'cf_search'),	
     url(r'^get_nearby_words/$','get_nearby_words',name = 'get_nearby_words'),	
     url(r'^search_page/$','search_page',name = 'search_page'),
+    url(r'^/results/page-no=(?P<page_no>\d+)/$', 'results_search', name='results_search_paged')
 )

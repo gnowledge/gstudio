@@ -18,6 +18,7 @@ from django.contrib.auth.models import Group as DjangoGroup
 from django.contrib.sessions.models import Session
 from django.db import models
 from django.http import HttpRequest
+from celery import task
 
 from django_mongokit import connection
 from django_mongokit import get_database
@@ -292,6 +293,18 @@ class Node(DjangoDocument):
     use_dot_notation = True
 
 
+    def add_in_group_set(self, group_id):
+        if group_id not in self.group_set:
+            self.group_set.append(ObjectId(group_id))
+        return self
+
+
+    def remove_from_group_set(self, group_id):
+        if group_id in self.group_set:
+            self.group_set.remove(ObjectId(group_id))
+        return self
+
+
     # custom methods provided for Node class
     def fill_node_values(self, request=HttpRequest(), **kwargs):
 
@@ -511,13 +524,14 @@ class Node(DjangoDocument):
         # confirming arg 'node_obj_or_id' is Object or oid and
         # setting node_obj accordingly.
         node_obj = None
+
         if isinstance(node_obj_or_id, expected_type):
             node_obj = node_obj_or_id
-        elif isinstance(node_obj_or_id, ObjectId):
+        elif isinstance(node_obj_or_id, ObjectId) or ObjectId.is_valid(node_obj_or_id):
             node_obj = node_collection.one({'_id': ObjectId(node_obj_or_id)})
         else:
             # error raised:
-            raise RuntimeError('No Node class instance found with provided arg for get_node_obj_from_id_or_obj(' + str(node_obj_or_id) + ', expected_type=' + expected_type + ')')
+            raise RuntimeError('No Node class instance found with provided arg for get_node_obj_from_id_or_obj(' + str(node_obj_or_id) + ', expected_type=' + str(expected_type) + ')')
 
         return node_obj
 
@@ -544,30 +558,31 @@ class Node(DjangoDocument):
         File, etc.), built from 'member_of' field (list of ObjectIds)
 
         """
-        member_of_names = []
+        # member_of_names = []
 
-        if self.member_of:
-            for each_member_id in self.member_of:
-                if type(each_member_id) == ObjectId:
-                    _id = each_member_id
-                else:
-                    _id = each_member_id['$oid']
-                if _id:
-                    mem = node_collection.one({'_id': ObjectId(_id)})
-                    if mem:
-                        member_of_names.append(mem.name)
-        else:
-            if "gsystem_type" in self:
-                for each_member_id in self.gsystem_type:
-                    if type(each_member_id) == ObjectId:
-                        _id = each_member_id
-                    else:
-                        _id = each_member_id['$oid']
-                    if _id:
-                        mem = node_collection.one({'_id': ObjectId(_id)})
-                        if mem:
-                            member_of_names.append(mem.name)
-        return member_of_names
+        # if self.member_of:
+        #     for each_member_id in self.member_of:
+        #         if type(each_member_id) == ObjectId:
+        #             _id = each_member_id
+        #         else:
+        #             _id = each_member_id['$oid']
+        #         if _id:
+        #             mem = node_collection.one({'_id': ObjectId(_id)})
+        #             if mem:
+        #                 member_of_names.append(mem.name)
+        # else:
+        #     if "gsystem_type" in self:
+        #         for each_member_id in self.gsystem_type:
+        #             if type(each_member_id) == ObjectId:
+        #                 _id = each_member_id
+        #             else:
+        #                 _id = each_member_id['$oid']
+        #             if _id:
+        #                 mem = node_collection.one({'_id': ObjectId(_id)})
+        #                 if mem:
+        #                     member_of_names.append(mem.name)
+        # return member_of_names
+        return [GSystemType.get_gst_name_id(gst_id)[0] for gst_id in self.member_of]
 
 
     @property
@@ -934,13 +949,15 @@ class Node(DjangoDocument):
                 for attr_obj in attributes:
                     # attr_obj is of type - GAttribute [subject (node._id), attribute_type (AttributeType), object_value (value of attribute)]
                     # Must convert attr_obj.attribute_type [dictionary] to node_collection(attr_obj.attribute_type) [document-object]
-                    AttributeType.append_attribute(node_collection.collection.AttributeType(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
+                    # PREV: AttributeType.append_attribute(node_collection.collection.AttributeType(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
+                    AttributeType.append_attribute(attr_obj.attribute_type, possible_attributes, attr_obj.object_value)
 
             # Case [B]: While creating GSystem / if new attributes get added
             # Again checking in AttributeType collection - because to collect newly added user-defined attributes, if any!
             attributes = node_collection.find({'_type': 'AttributeType', 'subject_type': gsystem_type_id})
             for attr_type in attributes:
                 # Here attr_type is of type -- AttributeType
+                # PREV: AttributeType.append_attribute(attr_type, possible_attributes)
                 AttributeType.append_attribute(attr_type, possible_attributes)
 
             # type_of check for current GSystemType to which the node belongs to
@@ -996,7 +1013,6 @@ class Node(DjangoDocument):
         """
         gsystem_type_list = []
         possible_relations = {}
-
         # Converts to list, if passed parameter is only single ObjectId
         if not isinstance(gsystem_type_id_or_list, list):
             gsystem_type_list = [gsystem_type_id_or_list]
@@ -1030,7 +1046,8 @@ class Node(DjangoDocument):
                     # collection.Node(rel_obj.relation_type)
                     # [document-object]
                     RelationType.append_relation(
-                        node_collection.collection.RelationType(rel_obj.relation_type),
+                        # PREV:  node_collection.collection.RelationType(rel_obj.relation_type),
+                        rel_obj.relation_type,
                         possible_relations, inverse_relation, rel_obj.right_subject
                     )
 
@@ -1066,14 +1083,15 @@ class Node(DjangoDocument):
                     # convert rel_obj.relation_type [dictionary] to
                     # collection.Node(rel_obj.relation_type)
                     # [document-object]
-
-                    if META_TYPE[4] in rel_obj.relation_type.member_of_names_list:
+                    rel_type_node = node_collection.one({'_id': ObjectId(rel_obj.relation_type)})
+                    if META_TYPE[4] in rel_type_node.member_of_names_list:
                         # We are not handling inverse relation processing for
                         # Triadic relationship(s)
                         continue
 
                     RelationType.append_relation(
-                        node_collection.collection.RelationType(rel_obj.relation_type),
+                        # node_collection.collection.RelationType(rel_obj.relation_type),
+                        rel_obj.relation_type,
                         possible_relations, inverse_relation, rel_obj.subject
                     )
 
@@ -1141,6 +1159,8 @@ class AttributeType(Node):
 	'upload_to': unicode,
 	'path': unicode,
 	'verify_exist': bool,
+
+    #   raise issue y used
 	'min_length': int,
 	'required': bool,
 	'label': unicode,
@@ -1153,11 +1173,21 @@ class AttributeType(Node):
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
 
+    # validators={
+    # 'data_type':x in DATA_TYPE_CHOICES
+    # 'data_type':lambda x: x in DATA_TYPE_CHOICES
+    # }
+
     ##########  User-Defined Functions ##########
 
     @staticmethod
     def append_attribute(attr_id_or_node, attr_dict, attr_value=None, inner_attr_dict=None):
-        if isinstance(attr_id_or_node, unicode):
+
+        from bson.dbref import DBRef
+        if isinstance(attr_id_or_node, DBRef):
+            attr_id_or_node = AttributeType(db.dereference(attr_id_or_node))
+
+        elif isinstance(attr_id_or_node, (unicode, ObjectId)):
             # Convert unicode representation of ObjectId into it's
             # corresponding ObjectId type Then fetch
             # attribute-type-node from AttributeType collection of
@@ -1326,6 +1356,16 @@ class RelationType(Node):
           'subject_or_right_subject_list': List of Value(s) of
           GRelation node's subject field } }
         """
+        if isinstance(rel_type_node, (unicode, ObjectId)):
+            # Convert unicode representation of ObjectId into it's
+            # corresponding ObjectId type Then fetch
+            # attribute-type-node from AttributeType collection of
+            # respective ObjectId
+            if ObjectId.is_valid(rel_type_node):
+                rel_type_node = node_collection.one({'_type': 'RelationType', '_id': ObjectId(rel_type_node)})
+            else:
+                print "\n Invalid ObjectId: ", rel_type_node, " is not a valid ObjectId!!!\n"
+                # Throw indicating the same
 
         left_or_right_subject_node = None
 
@@ -1337,6 +1377,8 @@ class RelationType(Node):
                 })
             else:
                 left_or_right_subject_node = []
+                if isinstance(left_or_right_subject, ObjectId):
+                    left_or_right_subject = [left_or_right_subject]
                 for each in left_or_right_subject:
                     each_node = node_collection.one({
                         '_id': each
@@ -1454,6 +1496,67 @@ class GSystemType(Node):
 
     use_dot_notation = True
     use_autorefs = True                         # To support Embedding of Documents
+
+
+    # @staticmethod
+    # def get_id_from_name(gst_name):
+    #     from django.template.defaultfilters import slugify
+    #     from django.core.cache import cache
+
+    #     slug = slugify(gst_name)
+    #     cache_key = 'gst_name_' + str(gst_name) if slug else str(abs(hash(gst_name)))
+    #     cache_result = cache.get(cache_key)
+
+    #     if cache_result:
+    #         return cache_result
+
+    #     # setting cache with both ObjectId and group_name
+    #     gst_id = node_collection.one(
+    #                                 {'_type': u'GSystemType', 'name': unicode(gst_name)},
+    #                                 {'_id': True}
+    #                             ).get('_id')
+    #     cache.set(cache_key, gst_id, 60 * 60)
+    #     return gst_id
+
+    @staticmethod
+    def get_gst_name_id(gst_name_or_id):
+        # if cached result exists return it
+        from django.template.defaultfilters import slugify
+        from django.core.cache import cache
+
+        slug = slugify(gst_name_or_id)
+        cache_key = 'gst_name_id' + str(slug)
+        cache_result = cache.get(cache_key)
+
+        if cache_result:
+            return cache_result
+        # ---------------------------------
+
+        gst_id = ObjectId(gst_name_or_id) if ObjectId.is_valid(gst_name_or_id) else None
+        gst_obj = node_collection.one({
+                                        "_type": {"$in": ["GSystemType", "MetaType"]},
+                                        "$or":[
+                                            {"_id": gst_id},
+                                            {"name": unicode(gst_name_or_id)}
+                                        ]
+                                    })
+
+        if gst_obj:
+            gst_name = gst_obj.name
+            gst_id = gst_obj._id
+
+            # setting cache with ObjectId
+            cache_key = u'gst_name_id' + str(slugify(gst_id))
+            cache.set(cache_key, (gst_name, gst_id), 60 * 60)
+
+            # setting cache with gst_name
+            cache_key = u'gst_name_id' + str(slugify(gst_name))
+            cache.set(cache_key, (gst_name, gst_id), 60 * 60)
+
+            return gst_name, gst_id
+
+        return None, None
+
 
 
 @connection.register
@@ -1617,6 +1720,7 @@ class GSystem(Node):
                             self.if_file[each_image_size]['relurl'] = each_image_size_id_url['relurl']
 
         return self
+
 
     def get_gsystem_mime_type(self):
 
@@ -2226,6 +2330,66 @@ class Group(GSystem):
         else:
             return False
 
+
+    @staticmethod
+    def purge_group(group_name_or_id, proceed=True):
+
+        # fetch group object
+        group_obj = Group.get_group_name_id(group_name_or_id, get_obj=True)
+
+        if not group_obj:
+            raise Exception('Expects either group "name" or "_id". Got invalid argument or that group does not exists.')
+
+        group_id = group_obj._id
+
+        # get all the objects belonging to this group
+        all_nodes_under_gr = node_collection.find({'group_set': {'$in': [group_id]}})
+
+        # separate nodes belongs to one and more groups
+        only_group_nodes_cnt = all_nodes_under_gr.clone().where("this.group_set.length == 1").count()
+        multi_group_nodes_cnt = all_nodes_under_gr.clone().where("this.group_set.length > 1").count()
+
+        print "Group:", group_obj.name, "(", group_obj.altnames, ") contains:\n",\
+            "\t- unique (belongs to this group only) : ", only_group_nodes_cnt, \
+            "\n\t- shared (belongs to other groups too): ", multi_group_nodes_cnt, \
+            "\n\t============================================", \
+            "\n\t- total: ", all_nodes_under_gr.count()
+
+        if not proceed:
+            print "\nDo you want to purge group and all unique nodes(belongs to this group only) under it?"
+            print 'Enter Y/y to proceed else N/n to reject group deletion:'
+            to_proceed = raw_input()
+            proceed = True if (to_proceed in ['y', 'Y']) else False
+
+        if proceed:
+            print "\nProceeding further for purging of group and unique resources/nodes under it..."
+            from gnowsys_ndf.ndf.views.methods import delete_node
+
+            grp_res = node_collection.find({ '$and': [ {'group_set':{'$size':1}}, {'group_set': {'$all': [ObjectId(group_id)]}} ] })
+            print "\n Total (unique) resources to be purge: ", grp_res.count()
+
+            for each in grp_res:
+                del_status, del_status_msg = delete_node(node_id=each._id, deletion_type=1 )
+                if not del_status:
+                    print "*"*80
+                    print "\n Error node: _id: ", each._id, " , name: ", each.name, " type: ", each.member_of_names_list
+                    print "*"*80
+
+            print "\n Purging group: "
+            del_status, del_status_msg = delete_node(node_id=group_id, deletion_type=1)
+
+            # poping group_id from each of shared nodes under group
+            all_nodes_under_gr.rewind()
+            print "\n Total (shared) resources to be free from this group: ", all_nodes_under_gr.count()
+            for each_shared_node in all_nodes_under_gr:
+                if group_id in each_shared_node.group_set:
+                    each_shared_node.group_set.remove(group_id)
+                    each_shared_node.save()
+
+            return
+
+        print "\nAborting group deletion."
+        return
 
 @connection.register
 class Author(Group):
@@ -2847,13 +3011,16 @@ class Triple(DjangoDocument):
 
     subject_id = self.subject
     subject_document = node_collection.one({"_id": self.subject})
+    if not subject_document:
+        return
     subject_name = subject_document.name
+    right_subject_member_of_list = []
 
     subject_type_list = []
     subject_member_of_list = []
     name_value = u""
-
-    if self._type == "GAttribute":
+    if (self._type == "GAttribute") and ('triple_node' in kwargs):
+      self.attribute_type = kwargs['triple_node']
       attribute_type_name = self.attribute_type['name']
       attribute_object_value = unicode(self.object_value)
 
@@ -2875,8 +3042,10 @@ class Triple(DjangoDocument):
           if set(gst_node.type_of) & set(subject_type_list):
             subject_system_flag = True
             break
+      self.attribute_type = kwargs['triple_id']
 
-    elif self._type == "GRelation":
+    elif self._type == "GRelation" and ('triple_node' in kwargs):
+      self.relation_type = kwargs['triple_node']
       subject_type_list = self.relation_type['subject_type']
       object_type_list = self.relation_type['object_type']
 
@@ -2921,13 +3090,15 @@ class Triple(DjangoDocument):
           # If Binary relationship found
           # Single relation: ObjectId()
           # Multi relation: [ObjectId(), ObjectId(), ...]
-          right_subject_document = node_collection.one({'_id': self.right_subject})
 
-          right_subject_member_of_list = right_subject_document.member_of
-          right_subject_name = right_subject_document.name
+          right_subject_list = self.right_subject if isinstance(self.right_subject, list) else [self.right_subject]
+          right_subject_document = node_collection.find_one({'_id': {'$in': right_subject_list} })
 
-          self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
+          if right_subject_document:
+              right_subject_member_of_list = right_subject_document.member_of
+              right_subject_name = right_subject_document.name
 
+              self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
 
       name_value = self.name
 
@@ -2962,6 +3133,8 @@ class Triple(DjangoDocument):
 
         if left_subject_system_flag and right_subject_system_flag:
           subject_system_flag = True
+
+      self.relation_type = kwargs['triple_id']
 
     if self._type =="GRelation" and subject_system_flag == False:
       # print "The 2 lists do not have any common element"
@@ -3029,7 +3202,8 @@ class Triple(DjangoDocument):
 class GAttribute(Triple):
     structure = {
         'attribute_type_scope': basestring,
-        'attribute_type': AttributeType,  # Embedded document of AttributeType Class
+        # 'attribute_type': AttributeType,  # Embedded document of AttributeType Class
+        'attribute_type': ObjectId,  # ObjectId of AttributeType node
         'object_value_scope': basestring,
         'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
@@ -3039,7 +3213,7 @@ class GAttribute(Triple):
             # 1: Compound index
             'fields': [
                 ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
-                ('attribute_type.$id', INDEX_ASCENDING), ('status', INDEX_ASCENDING)
+                ('attribute_type', INDEX_ASCENDING), ('status', INDEX_ASCENDING)
             ],
             'check': False  # Required because $id is not explicitly specified in the structure
         }
@@ -3054,7 +3228,8 @@ class GAttribute(Triple):
 class GRelation(Triple):
     structure = {
         'relation_type_scope': basestring,
-        'relation_type': RelationType,  # DBRef of RelationType Class
+        # 'relation_type': RelationType,  # DBRef of RelationType Class
+        'relation_type': ObjectId,  # ObjectId of RelationType node
         'right_subject_scope': basestring,
         # ObjectId's of GSystems Class / List of list of ObjectId's of GSystem Class
         'right_subject': OR(ObjectId, list)
@@ -3064,7 +3239,7 @@ class GRelation(Triple):
         # 1: Compound index
         'fields': [
             ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
-            ('relation_type.$id'), ('status', INDEX_ASCENDING), \
+            ('relation_type'), ('status', INDEX_ASCENDING), \
             ('right_subject', INDEX_ASCENDING)
         ],
         'check': False  # Required because $id is not explicitly specified in the structure
@@ -3072,7 +3247,7 @@ class GRelation(Triple):
         # 2: Compound index
         'fields': [
             ('_type', INDEX_ASCENDING), ('right_subject', INDEX_ASCENDING), \
-            ('relation_type.$id'), ('status', INDEX_ASCENDING)
+            ('relation_type'), ('status', INDEX_ASCENDING)
         ],
         'check': False  # Required because $id is not explicitly specified in the structure
     }]
@@ -3818,8 +3993,8 @@ class Counter(DjangoDocument):
                 counter_obj.last_update = datetime.datetime.now()
                 counter_obj.save()
 
-
     @staticmethod
+    @task
     def add_visit_count(resource_obj_or_id, current_group_id, loggedin_userid):
 
         active_user_ids_list = [loggedin_userid]

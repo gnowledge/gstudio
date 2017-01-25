@@ -80,7 +80,6 @@
                         <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
                         {# <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" /> #}
                         {# <br/><div> #}
-                        {{each.name}}
                         {# </div> #}
                         </a>&nbsp;&nbsp;&nbsp;&nbsp;
                       {% endfor %}
@@ -106,14 +105,14 @@
                 {% elif  key == "Videos" %}
                   {% for k,v in val.items %}
                     {% if k == "fallback_lang" %}
-                      {% for each in v %}
-                        <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-                        {# <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" /> #}
-                        {# <br/><div> #}
-                        {{each.name}}
-                        {# </div> #}
-                        </a>&nbsp;&nbsp;&nbsp;&nbsp;
-                      {% endfor %}
+                      <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
+                        {% for each in v %}
+
+                          <li class="card-image-wrapper" > 
+                            {% include 'ndf/simple_card.html' with  no_footer=True resource=each url_name="page_details" first_arg=group_name_tag second_arg=each %}
+                          </li>
+                        {% endfor %}
+                        </ul>
                     {% elif k == "other_languages" %}
                       {% if v %}
                       <fieldset id="{{k}}">
@@ -136,22 +135,26 @@
                 {% else %}
                   {% for k,v in val.items %}
                     {% if k == "fallback_lang" %}
-                      {% for each in v %}
-                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
-                        &nbsp;&nbsp;
-                      {% endfor %}
+                        <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
+                        {% for each in v %}
+
+                          <li class="card-image-wrapper" > 
+                            {% include 'ndf/simple_card.html' with   no_footer=True resource=each url_name="page_details" first_arg=group_name_tag second_arg=each %}
+                          </li>
+                        {% endfor %}
+                        </ul>
                     {% elif k == "other_languages" %}
                       {% if v %}
                         <fieldset id="{{k}}">
                           <legend>{% trans "In other languages" %}</legend>
-                          {% for each in v %}
-                          <!--{# <a href="#" data-reveal-id="file-resource-overlay" data-url="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" data-resource-id="{{each.pk}}" data-group-id="{{group_id}}" class="file-resource">
-                           #}-->
-                            <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" class="file-resource">
-                             
-                             {{each.name}} </a>&nbsp;
-                            &nbsp;&nbsp;
-                          {% endfor %}
+                            <ul class="small-block-grid-5 medium-block-grid-3 large-block-grid-5" >
+                              {% for each in v %}
+
+                                <li class="card-image-wrapper" > 
+                                  {% include 'ndf/simple_card.html' with   no_footer=True resource=each url_name="page_details" first_arg=group_name_tag second_arg=each %}
+                                </li>
+                              {% endfor %}
+                            </ul>
                         </fieldset>       
                       {% endif %}
                     {% endif %}
