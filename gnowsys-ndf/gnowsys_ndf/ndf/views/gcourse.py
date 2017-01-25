@@ -1825,12 +1825,17 @@ def unsubscribe_from_group(request, group_id):
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
         user_id = request.POST.get("user_id", "")
+        remove_admin = eval(request.POST.get("asAdmin", False))
         if not user_id:
             user_id = request.user.id
         user_id = int(user_id)
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        if user_id in group_obj.author_set:
-            group_obj.author_set.remove(user_id)
+        if remove_admin:
+            if user_id in group_obj.group_admin:
+                group_obj.group_admin.remove(user_id)
+        else:
+            if user_id in group_obj.author_set:
+                group_obj.author_set.remove(user_id)
         group_obj.save()
         response_dict["success"] = True
         response_dict["member_count"] = len(group_obj.author_set)
@@ -1861,12 +1866,18 @@ def enroll_to_course(request, group_id):
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
         user_id = request.POST.get("user_id", "")
+        add_admin = eval(request.POST.get("asAdmin", False))
         if not user_id:
             user_id = request.user.id
         user_id = int(user_id)
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
-        if user_id not in group_obj.author_set:
-            group_obj.author_set.append(user_id)
+        if add_admin:
+            if user_id not in group_obj.group_admin:
+                group_obj.group_admin.append(user_id)
+        else:
+            if user_id not in group_obj.author_set:
+                group_obj.author_set.append(user_id)
+
         group_obj.save()
         response_dict["success"] = True
         response_dict["member_count"] = len(group_obj.author_set)

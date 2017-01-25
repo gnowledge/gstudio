@@ -6401,12 +6401,18 @@ def search_users(request, group_id):
         if subscription_status_val:
             filtered_users = []
             users_data = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
-            group_object_author_set = node_collection.one({'_id': ObjectId(group_id)}).author_set
+            group_object = node_collection.one({'_id': ObjectId(group_id)})
             for each_filtered_user in users_data:
-                if each_filtered_user[0] in group_object_author_set:
-                    filtered_users.append(each_filtered_user+(True,))
+                if each_filtered_user[0] in group_object.author_set:
+                    if each_filtered_user[0] in group_object.group_admin:
+                        filtered_users.append(each_filtered_user+(True,True))
+                    else:
+                        filtered_users.append(each_filtered_user+(True,False))
                 else:
-                    filtered_users.append(each_filtered_user+(False,))
+                    if each_filtered_user[0] in group_object.group_admin:
+                        filtered_users.append(each_filtered_user+(False,True))
+                    else:
+                        filtered_users.append(each_filtered_user+(False,False))
         else:
             filtered_users = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
         return HttpResponse(json_util.dumps(filtered_users, cls=NodeJSONEncoder))

@@ -409,7 +409,7 @@
 						{% if user.is_authenticated %}
 							{% if not is_gstaff %}
 								{% if user_is_joined == "joined" %}
-									<input data-user-id={{request.user.id}} class="tiny button radius subscription_policy right-btn" title="Unsubscribe from this group" type="button" id="unsubscribe_from_grp" value="{% trans 'Unsubscribe' %}"
+									<input data-user-admin='False' data-user-id={{request.user.id}} class="tiny button radius subscription_policy right-btn" title="Unsubscribe from this group" type="button" id="unsubscribe_from_grp" value="{% trans 'Unsubscribe' %}"
 									{% if group_object.name == "home" %}
 										disabled="disabled" 
 									{% endif %}
@@ -419,7 +419,7 @@
 									{% endcomment %}
 
 								{% elif user_is_joined == "not" %}
-									<input data-user-id={{request.user.id}} class="tiny button radius right-btn subscription_policy" type="button" id="subscribe_to_grp" value="{% trans 'Join' %}" title="Join this Group">
+									<input data-user-admin='False' data-user-id={{request.user.id}} class="tiny button radius right-btn subscription_policy" type="button" id="subscribe_to_grp" value="{% trans 'Join' %}" title="Join this Group">
 									{% comment %}
 										<input class="tiny button radius right-btn" type="button" value="{% trans 'Follow' %}">
 									{% endcomment %}
@@ -440,7 +440,7 @@
 
                 <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;"> 
                     <div id="group_drawer">
-                    {% include "ndf/user_search_widget.html" with action_on_user="Manage" subscription_status=True %}
+                    {% include "ndf/user_search_widget.html" with subscription_status=True %}
                     </div>
                     <a class="close-reveal-modal">&#215;</a>
                 </div>          
@@ -545,12 +545,14 @@
 
 	$(document).on("click", "#subscribe_to_grp", function() {
         user_id = $(this).attr('data-user-id')
+        asAdmin = $(this).attr('data-user-admin')
         $.ajax({
                 type: "POST",
                 url: "{% url 'enroll_to_course' group_object.pk %}",
                 datatype: "json",
                 data:{
                         user_id: user_id,
+                        asAdmin: asAdmin,
                        csrfmiddlewaretoken: '{{ csrf_token }}'
                   },
                 context: this,
@@ -585,12 +587,15 @@
 
     $(document).on("click", "#unsubscribe_from_grp", function() {
         user_id = $(this).attr('data-user-id')
+        asAdmin = $(this).attr('data-user-admin')
+
         $.ajax({
                 type: "POST",
                 url: "{% url 'unsubscribe_from_group' group_object.pk %}",
                 datatype: "json",
                 data:{
                         user_id: user_id,
+                        asAdmin: asAdmin,
                        csrfmiddlewaretoken: '{{ csrf_token }}'
                   },
                 context: this,
