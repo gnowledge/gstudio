@@ -187,7 +187,7 @@
               border: 'none',
               padding: '15px',
               color: '#fff !important',
-              backgroundColor: '#10c1cb !important',
+              // backgroundColor: '#10c1cb !important',
               '-webkit-border-radius': '10px',
               '-moz-border-radius': '10px',
               opacity: 1.0,
@@ -196,6 +196,9 @@
               transform: 'translate( -50%, -50%)'
             }
           });
+        })
+        .ajaxComplete(function(){
+          $('article').unblock();
         })
         .ajaxStop(function() {
           $('article').unblock();
