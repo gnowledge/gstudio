@@ -1636,7 +1636,7 @@ def create_edit_unit(request, group_id):
 def delete_course(request, group_id, node_id):
     del_stat = delete_item(node_id)
     if del_stat:
-        return HttpResponseRedirect(reverse('gcourse', kwargs={'group_id': ObjectId(group_id)}))
+        return HttpResponseRedirect(reverse('course', kwargs={'group_id': ObjectId(group_id)}))
 
 
 @login_required
@@ -1772,7 +1772,7 @@ def add_course_file(request, group_id):
         app_set_id = request.POST.get("app_set_id", "")
 
         # i.e  if context_name is "Course"
-        url_name = "/" + group_id + "/gcourse/add_units/?css_node_id=" + \
+        url_name = "/" + group_id + "/course/add_units/?css_node_id=" + \
             css_node_id + "&unit_node_id=" + context_node_id + "&course_node="+ course_node
         if app_id and app_set_id:
             url_name += "&app_id=" + app_id + "&app_set_id=" + app_set_id + ""
@@ -2332,7 +2332,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
                                             'if_file':1,
                                         }).sort("last_update", -1)
         context_variables.update({'files_cur': files_cur})
-        gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        gallery_page_info = paginator.Paginator(files_cur, page_no, 25)
         context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})
     template = 'ndf/gcourse_event_group.html'
 
