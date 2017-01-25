@@ -1810,6 +1810,31 @@ def add_course_file(request, group_id):
 
 @login_required
 @get_execution_time
+def unsubscribe_from_group(request, group_id):
+    '''
+    Accepts:
+     * ObjectId of group.
+     * Django user obj
+
+    Actions:
+     * Removes user from group
+
+    Returns:
+     * success (i.e True/False)
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        user_id = request.user.id
+        group_obj = node_collection.one({'_id': ObjectId(group_id)})
+        if user_id in group_obj.author_set:
+            group_obj.author_set.remove(user_id)
+        group_obj.save()
+        response_dict["success"] = True
+        response_dict["member_count"] = len(group_obj.author_set)
+        return HttpResponse(json.dumps(response_dict))
+
+@login_required
+@get_execution_time
 def enroll_to_course(request, group_id):
     '''
     Accepts:
@@ -1830,11 +1855,12 @@ def enroll_to_course(request, group_id):
             group_obj.author_set.append(user_id)
         group_obj.save()
         response_dict["success"] = True
-        # get new/existing counter document for a user for a given course for the purpose of analytics
-        counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
-        counter_obj['is_group_member'] = True
-        counter_obj.save()
-
+        response_dict["member_count"] = len(group_obj.author_set)
+        if 'Group' not in group_obj.member_of_names_list:
+            # get new/existing counter document for a user for a given course for the purpose of analytics
+            counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+            counter_obj['is_group_member'] = True
+            counter_obj.save()
         return HttpResponse(json.dumps(response_dict))
 
 
