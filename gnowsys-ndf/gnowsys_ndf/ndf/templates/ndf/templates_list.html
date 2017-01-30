@@ -29,7 +29,7 @@ a:hover + .box,.box:hover{
             <div class="templates-div" data-content="{{each.content}}">
              {{each.name}}
             </div>
-    	This live preview for <a href="http://en.wikipedia.org/">Wikipedia</a><div class="box">{{each.content|safe}}</div>
+
     </li>
     {% endfor %}
   </ul> 
@@ -38,7 +38,6 @@ a:hover + .box,.box:hover{
 <script type="text/javascript">
 				$(".template-list").click(function(event){
                             var content = $(this).children('div').attr("data-content");
-                            alert(content);
                             CKEDITOR.instances['ckeditor_textarea'].insertHtml(content);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
                         

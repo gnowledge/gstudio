@@ -36,8 +36,8 @@
 
   <!-- jQuery -->
   <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
-  
 
+  <script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script>  
 
   <!-- Enable HTML5 on old browsers -->
   <!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -171,7 +171,7 @@
   <script src="/static/ndf/js/app.js"></script>
 
   {% endcache %} <!-- end of footer cache -->
-<script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script>
+
   <script type="text/javascript">
     // Initialize Foundation CSS
       $(document).foundation();
@@ -187,7 +187,7 @@
               border: 'none',
               padding: '15px',
               color: '#fff !important',
-              backgroundColor: '#10c1cb !important',
+              // backgroundColor: '#10c1cb !important',
               '-webkit-border-radius': '10px',
               '-moz-border-radius': '10px',
               opacity: 1.0,
@@ -196,6 +196,9 @@
               transform: 'translate( -50%, -50%)'
             }
           });
+        })
+        .ajaxComplete(function(){
+          $('article').unblock();
         })
         .ajaxStop(function() {
           $('article').unblock();
