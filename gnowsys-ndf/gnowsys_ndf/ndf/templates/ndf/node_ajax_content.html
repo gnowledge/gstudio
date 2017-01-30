@@ -9,7 +9,7 @@
 {% check_is_gstaff groupid request.user as is_gstaff %}
 {#% get_gstudio_facebook_app_id as fb_app_id %#}
 {% get_gstudio_social_share_resource as social_share %}
-{% if social_share == "True" %}
+{% if social_share %}
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 <script type="text/javascript">

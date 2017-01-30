@@ -79,10 +79,11 @@
         </a>
      </div>
   {% endif %}
-  <div id="view_collection">
-    
-    {% include "ndf/collection_ajax_view.html" %}  
-  </div>
+  {% if node.collection_set %}
+    <div id="view_collection">
+      {% include "ndf/collection_ajax_view.html" %}  
+    </div>
+  {% endif %}
   {% if not 'video' in node.if_file.mime_type and not is_group  %}
     <dl class="accordion" data-accordion>
         <dd class="accordion-navigation" data-options="deep_linking:true">
