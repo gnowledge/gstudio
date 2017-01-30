@@ -8,7 +8,8 @@
 {% get_gstudio_twitter_via as twitter_via %}
 {% check_is_gstaff groupid request.user as is_gstaff %}
 {#% get_gstudio_facebook_app_id as fb_app_id %#}
-
+{% get_gstudio_social_share_resource as social_share %}
+{% if social_share == "True" %}
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
 <script type="text/javascript">
@@ -19,6 +20,7 @@
     $(".share_link").attr("href",x);  
 });
 </script>
+{% endif %}
 
 <style type="text/css">
   legend{
@@ -552,7 +554,7 @@
               </div>
        {% endif %}
        <br>
-        {% get_gstudio_social_share_resource as social_share %}
+        
                   {% if social_share == True and "Group" not in node.member_of_names_list and "PartnerGroup" not in node.member_of_names_list %}
                          <div class="large-12 columns row">
                            <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
