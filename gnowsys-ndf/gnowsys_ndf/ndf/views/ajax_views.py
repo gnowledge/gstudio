@@ -701,15 +701,15 @@ def search_drawer(request, group_id):
       
 @get_execution_time
 def get_topic_contents(request, group_id):
-  if request.is_ajax() and request.method == "POST":
-    node_id = request.POST.get("node_id", '')
-    selected = request.POST.get("selected", '')
-    choice = request.POST.get("choice", '')
-    # node = node_collection.one({'_id': ObjectId(node_id) })
+  # if request.is_ajax() and request.method == "POST":
+  node_id = request.GET.get("node_id", '')
+  selected = request.GET.get("selected", '')
+  choice = request.GET.get("choice", '')
+  # node = node_collection.one({'_id': ObjectId(node_id) })
 
-    contents = get_contents(node_id, selected, choice)
+  contents = get_contents(node_id, selected, choice)
 
-    return HttpResponse(json.dumps(contents))
+  return HttpResponse(json.dumps(contents))
 
 
 ####Bellow part is for manipulating theme topic hierarchy####
@@ -6397,8 +6397,24 @@ def search_users(request, group_id):
     if request.is_ajax() and request.method == "GET":
         from bson import json_util
         username_str = request.GET.get("username_str", '')
-        filtered_users = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
-        # print "filtered_users ;; ", len(filtered_users)
+        subscription_status_val = request.GET.get("subscription_status_val", '')
+        if subscription_status_val:
+            filtered_users = []
+            users_data = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
+            group_object = node_collection.one({'_id': ObjectId(group_id)})
+            for each_filtered_user in users_data:
+                if each_filtered_user[0] in group_object.author_set:
+                    if each_filtered_user[0] in group_object.group_admin:
+                        filtered_users.append(each_filtered_user+(True,True))
+                    else:
+                        filtered_users.append(each_filtered_user+(True,False))
+                else:
+                    if each_filtered_user[0] in group_object.group_admin:
+                        filtered_users.append(each_filtered_user+(False,True))
+                    else:
+                        filtered_users.append(each_filtered_user+(False,False))
+        else:
+            filtered_users = User.objects.filter(username__icontains=str(username_str)).values_list('id', 'username')
         return HttpResponse(json_util.dumps(filtered_users, cls=NodeJSONEncoder))
 
 
