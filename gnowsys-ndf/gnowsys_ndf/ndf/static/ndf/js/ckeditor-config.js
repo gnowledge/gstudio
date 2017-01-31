@@ -9,6 +9,7 @@
 	   CKEDITOR.plugins.addExternal('addImage',basePath+'ndf/js/ckPlugins/addImage/','plugin.js');
 	   CKEDITOR.plugins.addExternal('closebtn',basePath+'ndf/js/ckPlugins/closebtn/','plugin.js');
 	   CKEDITOR.plugins.addExternal('addAudio',basePath+'ndf/js/ckPlugins/addAudio/','plugin.js');
+	   CKEDITOR.plugins.addExternal('addVideo',basePath+'ndf/js/ckPlugins/addVideo/','plugin.js');
 
 	})();
 
@@ -22,12 +23,12 @@ CKEDITOR.editorConfig = function( config ) {
 	[
 
 		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
-		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
+		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-' ] },
 		{ name: 'insert', items : [ 'Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe','video'] },
 		{ name: 'styles', items : [ 'Styles','Format' ] },
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] },
 		{ name: 'links', items : [ 'Link','Unlink' ] },
-		{ name: 'tools', items : [ 'addImage','addAudio','Source','Maximize','-'] },
+		{ name: 'tools', items : [ 'addImage','addAudio','addVideo','Source','Maximize','-'] },
 
 	];
 
@@ -37,7 +38,7 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-' ] },
 		{ name: 'links', items : [ 'Link','Unlink'] },
 		{ name: 'insert', items : [ 'Flash','Iframe' ] },
-		{ name: 'tools', items : [ 'addImage','addAudio','Source', 'Maximize','-','closebtn'] },
+		{ name: 'tools', items : [ 'addImage','addAudio','addVideo','Source', 'Maximize','-','closebtn'] },
 	];
 
 	config.toolbar_GgallaryCommentsToolbar =
@@ -81,7 +82,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Simplify the dialog windows.
 	config.removeDialogTabs = 'image:advanced;link:advanced';
-	config.extraPlugins = 'addImage,closebtn,addAudio';
+	config.extraPlugins = 'addImage,closebtn,addAudio,addVideo';
 	config.allowedContent = true;
 
 };

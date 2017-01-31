@@ -11,7 +11,6 @@
 
 <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/ckeditor/config.js"></script>
-{% comment %}
 <script type="text/javascript">
   $( document ).ready(function() { 
     var x = location.href;
@@ -20,7 +19,6 @@
     $(".share_link").attr("href",x);  
 });
 </script>
-{% endcomment %}
 
 <style type="text/css">
   legend{
@@ -297,33 +295,47 @@
                   {% trans "Your browser does not support the video tag." %}
                 </video>
               {% elif 'video' in node.if_file.mime_type %}
-
-                <video  id="video-area" width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
-                  <source src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" type="video/webm">
-                  <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="video/ogg">
-                  <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="video/mp4">
-                  <source src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" type="{{node.if_file.mime_type}}">
-                  {% trans "Your browser does not support the video tag." %}
-                </video>
+                {% get_attribute_value node.pk 'has_transcript' as node_transcript %}
+                {% include 'ndf/widget_video_player.html' with video_obj=node %}
                 {% if node.created_by == request.user.id or is_gstaff %}
                   <dl class="accordion" data-accordion>
                       <dd class="accordion-navigation" data-options="deep_linking:true">
                             <a href="#panel1" style="background-color: #2980B9;color:#FFF;width:20%">Change Thumbnail</a>
                             <div id="panel1" class="content" style="height:210px">
                               {% get_relation_value node.pk 'has_thumbnail' as grel_dict %}
-                              {% include 'ndf/video_thumbnail.html' with grel_dict=grel_dict video_id="video-area" group_id=group_id parent_node=node.pk %}                
+                              {% include 'ndf/video_thumbnail.html' with grel_dict=grel_dict video_id=node.pk group_id=group_id parent_node=node.pk %}                
                             </div>
                       
                       </dd>
                   </dl>
 
 
-                 
+                <a  class="tiny button radius" data-reveal-id="add_transcript{{node.pk}}"> {% trans "Add Transcript" %}</a>
+                <div id="add_transcript{{node.pk}}" class="reveal-modal" data-reveal style="position:absolute;"> 
+                  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                  <textarea>{{node_transcript}}</textarea> 
+                  <input onclick="add_transcript_func(this)" type="button" class="tiny button radius add-trans" data-src ="{{node}}"   value="{% trans 'Add' %}">
+                  <input type="button" class="tiny button radius "  value="{% trans 'Cancel' %}">
+                </div>
+
+                <a  class="tiny button radius" data-reveal-id="add_subtitle{{node.pk}}"> {% trans "Add Subtitle(s)" %}</a>
+                <div id="add_subtitle{{node.pk}}" class="reveal-modal" data-reveal style="position:absolute;"> 
+                  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+                </div>
+
                 {% endif %}
               {% elif 'audio' in node.if_file.mime_type %}
-                <audio src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" controls loop>
-                  <p>{% trans 'Your browser does not support the audio element' %} </p>
-                </audio>
+                {% get_attribute_value node.pk 'has_transcript' as node_transcript %}
+                {% include 'ndf/widget_audio_player.html' with audio_obj=node %}
+                 
+                 <a  class="tiny button radius mod-btn" data-reveal-id="add_transcript{{node.pk}}"> {% trans "Add Transcript" %}</a>
+                <div id="add_transcript{{node.pk}}" class="reveal-modal" data-reveal style="position:absolute;"> 
+                  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                  <textarea>{{node_transcript}}</textarea> 
+                  <input onclick="add_transcript_func(this)" type="button" class="tiny button radius add-trans" data-src ="{{node}}"   value="{% trans 'Add' %}">
+                  <input type="button" class="tiny button radius "  value="{% trans 'Cancel' %}">
+                </div>
               {% elif 'html' in node.if_file.mime_type %}
                 <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{{MEDIA_URL}}{{node.if_file.original.relurl}}">
                   <p>{% trans 'Your browser does not support the audio element' %} </p>
@@ -541,15 +553,11 @@
        {% endif %}
        <br>
         {% get_gstudio_social_share_resource as social_share %}
-                  {% if social_share and "Group" not in node.member_of_names_list and "PartnerGroup" not in node.member_of_names_list %}
+                  {% if social_share == True and "Group" not in node.member_of_names_list and "PartnerGroup" not in node.member_of_names_list %}
                          <div class="large-12 columns row">
-                           {% comment %}
                            <a class = "share_link" href="#" accesskey="l" target="_blank"  title="Share on Facebook">
-                           }
                           <img src="/static/ndf/images/Facebook_logo.png"  width="30px">
                           </a>
-                           {% endcomment %}
-                           
                          </div>
                         <div class="large-6 columns">
                             <iframe
@@ -914,5 +922,32 @@
     $(".change-thumbnail-area").show();
 
   })
+
+</script>
+<script type="text/javascript">
+function add_transcript_func(this_obj){
+      curr_obj = this_obj
+      var trans_text = curr_obj.previousElementSibling.value;
+      curr_obj_id = curr_obj.attributes['data-src'].value;
+      $.ajax({
+                    type: "POST",
+                    url: "{% url 'add_transcript' group_id  %}",
+                    datatype: "html",
+                    data:{
+                           csrfmiddlewaretoken: '{{ csrf_token }}',
+                           nodeid:curr_obj_id,
+                           transcript_text:trans_text,
+
+                      },
+                  success: function(data) {
+
+                        alert("Transcript succesfully added");
+                       $('.close-reveal-modal').click();
+
+                  }
+
+            });
+    
+    }
 
 </script>

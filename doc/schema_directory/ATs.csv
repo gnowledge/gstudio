@@ -88,4 +88,4 @@ quizitempost_user_checked_ans,QuizItemPost User Checked Answer,list,[],"[""QuizI
 discussion_enable,Discussion Enable,bool,[],"[""Page"", ""File"",""E-Book"",""QuizItemEvent""]",TRUE,TRUE,[],[],,[],[],[]
 is_bigbluebutton,Online Meeting,bool,[],"[""Event""]",TRUE,TRUE,[],[],,[],[],[]
 open_event,Open Event (All group members can join the event),bool,[],"[""Event""]",TRUE,TRUE,[],[],,[],[],[]
-has_transcript,Transcript,basestring,[],"[""File""]",TRUE,TRUE,[],[],,[],[],[]
+has_transcript,Transcript,basestring,[],"[""File"",""Jsmol""]",TRUE,TRUE,[],[],,[],[],[]
