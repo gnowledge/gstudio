@@ -94,9 +94,11 @@
 							{% trans "Create New " %} {{title}} :
 						{% endif  %}
 					{% endif %}
+				{% if site.SITE_NAME == "clix" %}
 				<span class="right">
 					<a  class="tiny button radius existing-template">{% trans "Create page from existing template" %}</a>
 				</span>
+				{% endif %}
 				</span></h3>
 
 			    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." {% if node.group_type %}disabled=disabled{% endif %} required>
