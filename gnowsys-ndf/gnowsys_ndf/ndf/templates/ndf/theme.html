@@ -212,7 +212,7 @@ margin-top:15px;
 	{% endif %}
 	</div>
 </div>
-	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;border: 1px solid #1a1a1a;"> </div>
+	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd; right:20%;"> </div>
 
 {% endblock %}
 {% block meta_content %}
@@ -440,7 +440,7 @@ margin-top:15px;
 
 	    {% if tree == "hierarchical" %}
 
-    		$("article").block({message: '<h4>Building the theme tree...</h4>'});
+    		// $("article").block({message: '<h4>Building the theme tree...</h4>'});
 			$("#theme-drag-zoom-tree-container").addClass("hide")
 	    	$(".themes").removeClass("hide");
 
@@ -460,11 +460,11 @@ margin-top:15px;
 
     		{% if node %}
 
-    		$("article").block({message: '<h4>Building the theme graph...</h4>'});
+    		// $("article").block({message: '<h4>Building the theme graph...</h4>'});
 			    $.getJSON("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(data){ treeData = data;})
 			    .done(function(){
 			    	plotDragZoomTree(treeData);
-			    	$('article').unblock(); 
+			    	// $('article').unblock(); 
 			    });
 
 		    {% endif %}

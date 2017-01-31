@@ -23,9 +23,10 @@ class Command(BaseCommand):
 
   def handle(self, *args, **options):
 
+    # Keep latest changes in field(s) to be added at top
+
     # --------------------------------------------------------------------------
     # Adding <'relation_type_scope': []> field to all RelationType objects
-
     print "\nUpdating RelationTypes and AttributeTypes."
     rt_res = node_collection.collection.update({'_type': 'RelationType', \
         'relation_type_scope': {'$exists': False} }, \
@@ -62,8 +63,45 @@ class Command(BaseCommand):
         print "\n Added 'scope' fields to " + gattr_res['n'].__str__() + " GAttribute instances."
     # --------------------------------------------------------------------------
 
+    # updating GRelation nodes to replace relation_type's data of DBRef with ObjectId.
+    #
+    # all_grelations = triple_collection.find({'_type': 'GRelation'}, time_out=False)
+    # all_grelations = triple_collection.find({'_type': 'GRelation','relation_type': {'$type': 'object'}})
+    all_grelations = triple_collection.find({
+                                            '_type': 'GRelation',
+                                            'relation_type': {'$not': {'$type': "objectId"}}
+                                            }, time_out=False)
 
-    # Keep latest changes in field(s) to be added at top
+    print "\n Working on Triples data. \n Total GRelations found: ", all_grelations.count()
+    print "\n This will take few minutes. Please wait.."
+    for each_grelation in all_grelations:
+        # print each_grelation
+        print '.',
+        rt_obj = RelationType(db.dereference(each_grelation.relation_type))
+        each_grelation.relation_type = rt_obj._id
+        try:
+            each_grelation.save(triple_node=rt_obj,triple_id=rt_obj._id)
+        except Exception as er:
+            print "\n Error Occurred while updating Triples data. ", er
+            pass
+
+    # updating GRelation nodes to replace relation_type's data of DBRef with ObjectId.
+    #
+    # all_gattributes = triple_collection.find({'_type': 'GAttribute'}, time_out=False)
+    # all_gattributes = triple_collection.find({'_type': 'GAttribute', 'attribute_type': {'$type': 'object'}})
+    all_gattributes = triple_collection.find({
+                                            '_type': 'GAttribute',
+                                            'attribute_type': {'$not': {'$type': "objectId"}}
+                                            }, time_out=False)
+
+    print " Total GAttributes found: ", all_gattributes.count()
+    print "\n This will take few minutes. Please wait.."
+    for each_gattribute in all_gattributes:
+        print '.',
+        at_obj = AttributeType(db.dereference(each_gattribute.attribute_type))
+        each_gattribute.attribute_type = at_obj._id
+        each_gattribute.save(triple_node=at_obj,triple_id=at_obj._id)
+    # --------------------------------------------------------------------------
 
     # adding 'if_file' in GSystem instances:
     # 'if_file': {

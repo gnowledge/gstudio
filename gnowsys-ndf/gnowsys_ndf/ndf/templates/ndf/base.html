@@ -36,8 +36,8 @@
 
   <!-- jQuery -->
   <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
-  
 
+  <script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script>  
 
   <!-- Enable HTML5 on old browsers -->
   <!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -171,12 +171,14 @@
   <script src="/static/ndf/js/app.js"></script>
 
   {% endcache %} <!-- end of footer cache -->
-<script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script>
+
   <script type="text/javascript">
     // Initialize Foundation CSS
       $(document).foundation();
 
     // Register global ajax start and complete events to show ajax loader when request is in process
+      $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+      /*
       $(document)
         .ajaxStart(function() {
           $('article').block({
@@ -187,7 +189,7 @@
               border: 'none',
               padding: '15px',
               color: '#fff !important',
-              backgroundColor: '#10c1cb !important',
+              // backgroundColor: '#10c1cb !important',
               '-webkit-border-radius': '10px',
               '-moz-border-radius': '10px',
               opacity: 1.0,
@@ -197,9 +199,13 @@
             }
           });
         })
+        .ajaxComplete(function(){
+          $('article').unblock();
+        })
         .ajaxStop(function() {
           $('article').unblock();
         });
+        */
 
     // Toggles the display of main sidebar for 12 col article view
       var toggleMainSidebar = function(){
