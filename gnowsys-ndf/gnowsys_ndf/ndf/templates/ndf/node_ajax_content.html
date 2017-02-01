@@ -514,7 +514,7 @@
           {% if user.is_authenticated %}
 
             {% if node.if_file.mime_type %}
-                {% if not node.collection_set %}
+                {% if not node.collection_set and "Jsmol" not in node.member_of_names_list%}
                 <a class="button tiny" title="Click here to Download" href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
                   Download
                 </a>
@@ -524,7 +524,7 @@
                 {% endif %}
 
           {%  else %}
-            {% if node.if_file.mime_type %}
+            {% if node.if_file.mime_type and "Jsmol" not in node.member_of_names_list %}
               {% if 'video' in node.if_file.mime_type  %}
                 <a class="button tiny disabled secondary" title="Please login to download" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
               {% else %}
