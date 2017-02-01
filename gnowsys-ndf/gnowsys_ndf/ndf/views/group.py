@@ -30,7 +30,7 @@ from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of, get_relation_value, get_attribute_value, check_is_gstaff # get_existing_groups
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.moderation import *
 # from gnowsys_ndf.ndf.views.moderation import moderation_status, get_moderator_group_set, create_moderator_task
 # ######################################################################################################################################
@@ -1454,7 +1454,7 @@ class GroupCreateEditHandler(View):
             # calling method to create new group
             result = group.create_group(group_name, node_id=node_id)
 
-        # print result[0], "\n=== result : ", result[1].name, "\n\n"
+        # print result[0], "\n=== result : "
         if result[0]:
             # operation success: redirect to group-detail page
             group_obj = result[1]
@@ -1482,6 +1482,7 @@ class GroupCreateEditHandler(View):
             else:
                 partner_grp_result = sub_group.set_partnergroup(request, group_obj)
                 sub_group.set_logo(request, group_obj, logo_rt = "has_profile_pic")
+                # print "-------------------------------------------------",group_obj
         return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
 # ===END of class EditGroup() ===
 # -----------------------------------------
@@ -1822,7 +1823,7 @@ def group(request, group_id, app_id=None, agency_type=None):
 #     shelf_list = {}
 
 #     # if auth:
-#     #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+#     #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
 
 #     #   if shelf:
 #     #     for each in shelf:
@@ -1899,7 +1900,7 @@ def group_dashboard(request, group_id=None):
     old_profile_pics = []
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
-    if "CourseEventGroup" in group_obj.member_of_names_list:
+    if "CourseEventGroup" in group_obj.member_of_names_list or "BaseCourseGroup" in group_obj.member_of_names_list:
         return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
 
     if group_obj and group_obj.post_node:
@@ -1952,7 +1953,7 @@ def group_dashboard(request, group_id=None):
 
       has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
 
-      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
       shelf_list = {}
 
       if shelf:
@@ -1988,7 +1989,7 @@ def group_dashboard(request, group_id=None):
       # grel_id = grel_dict.get("grel_id")
 
   has_profile_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_profile_pic') })
-  all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type.$id': has_profile_pic_rt._id, 'status': u"DELETED"})
+  all_old_prof_pics = triple_collection.find({'_type': "GRelation", "subject": group_obj._id, 'relation_type': has_profile_pic_rt._id, 'status': u"DELETED"})
   if all_old_prof_pics:
     for each_grel in all_old_prof_pics:
       n = node_collection.one({'_id': ObjectId(each_grel.right_subject)})
@@ -2016,8 +2017,8 @@ def group_dashboard(request, group_id=None):
   if "CourseEventGroup" in group_obj.member_of_names_list:
       sg_type = "CourseEventGroup"
       alternate_template = "ndf/gcourse_event_group.html"
-      course_collection_data = get_collection(request,group_obj._id,group_obj._id)
-      course_collection_data = json.loads(course_collection_data.content)
+      # course_collection_data = get_collection(request,group_obj._id,group_obj._id)
+      # course_collection_data = json.loads(course_collection_data.content)
 
   # The line below is commented in order to:
   #     Fetch files_cur - resources under moderation in groupdahsboard.html
@@ -2080,7 +2081,7 @@ def group_dashboard(request, group_id=None):
   '''
   default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
-  if alternate_template: 
+  if alternate_template:
     return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
   else:
     return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
@@ -2100,7 +2101,8 @@ def group_dashboard(request, group_id=None):
                                                        'subgroups_cur':subgroups_cur,
                                                        # 'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image,
-                                                       'old_profile_pics':old_profile_pics
+                                                       'old_profile_pics':old_profile_pics,
+                                                       'group_obj': group_obj,
                                                       },context_instance=RequestContext(request)
                           )
 
@@ -2511,7 +2513,7 @@ def create_sub_group(request,group_id):
           shelf_list = {}
 
           if auth:
-              shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+              shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id })
 
               if shelf:
                   for each in shelf:

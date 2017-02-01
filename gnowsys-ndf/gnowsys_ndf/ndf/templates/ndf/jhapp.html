@@ -1,0 +1,31 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load cache %}
+
+{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+{% block related_content %}
+  <div class="large-12 columns">
+  <a href="{% url 'uploadjhapp' group_name_tag %}" class="tiny expand button radius">
+            {% trans "Upload Jhapp" %}
+          </a>
+  	
+  </div>
+{% endblock %}
+{% block body_content %} 
+  jhapp
+  <div class="large-12 columns">
+	
+<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5" >
+
+	{% for each_node in jhapp_res %}
+                    
+                    <li class="card-image-wrapper " id="{{each_node.pk}}" style="margin-top:13px;margin-left:-10px">
+						{% include 'ndf/simple_card.html' with url_name='page_details' resource=each_node first_arg=group_id second_arg=each_node.pk third_arg=False %}
+                    </li>
+                {% endfor %}
+</ul>
+
+</div>
+{% endblock %}
+

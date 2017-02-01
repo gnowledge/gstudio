@@ -3,7 +3,7 @@ import os
 import ast
 # from datetime import datetime
 import datetime
-import multiprocessing as mp 
+import multiprocessing as mp
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -21,7 +21,7 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.organization import *
@@ -100,9 +100,9 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         #b=app_collection_set.append
         #for eachset in agency_type_node.collection_set:
         #  b(a({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
-        
+
         # loop replaced by a list comprehension
-        app_collection_set=[node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}) for eachset in agency_type_node.collection_set]  
+        app_collection_set=[node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}) for eachset in agency_type_node.collection_set]
 
 
     # for eachset in app.collection_set:
@@ -112,7 +112,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
     if app_set_id:
       app_set = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
-      
+
       view_file_extension = ".py"
       app_set_view_file_name = ""
       app_set_view_file_path = ""
@@ -157,7 +157,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       # nodes_dict = []
       # for each in nodes:
       #   nodes_dict.append({"p_id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
-                         
+
     else :
       app_menu = "yes"
       template = "ndf/"+template_prefix+"_list.html"
@@ -209,15 +209,15 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         #for each in systemtype.relation_type_set:
         #    systemtype_relationtype_set.append({"rt_name":each.name,"type_id":str(each._id)})
         #loop replaced by a list comprehension
-        systemtype_relationtype_set=[{"rt_name":each.name,"type_id":str(each._id)} for each in systemtype.relation_type_set] 
+        systemtype_relationtype_set=[{"rt_name":each.name,"type_id":str(each._id)} for each in systemtype.relation_type_set]
         #temp. variables which stores the lookup for append method
         atlist_append_temp=atlist.append
-        rtlist_append_temp=rtlist.append   
+        rtlist_append_temp=rtlist.append
         for eachatset in systemtype_attributetype_set :
-            for eachattribute in triple_collection.find({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])}):
+            for eachattribute in triple_collection.find({"_type":"GAttribute", "subject":system._id, "attribute_type":ObjectId(eachatset["type_id"])}):
                 atlist_append_temp({"type":eachatset["type"],"type_id":eachatset["type_id"],"value":eachattribute.object_value})
         for eachrtset in systemtype_relationtype_set :
-            for eachrelation in triple_collection.find({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])}):
+            for eachrelation in triple_collection.find({"_type":"GRelation", "subject":system._id, "relation_type":ObjectId(eachrtset["type_id"])}):
                 right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
                 rtlist_append_temp({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
 
@@ -334,11 +334,11 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
     variable = RequestContext(request, {
                                         'group_id':group_id, 'groupid':group_id, 'app_name':app_name, 'app_id':app_id,
-                                        "app_collection_set":app_collection_set, "app_set_id":app_set_id, 
+                                        "app_collection_set":app_collection_set, "app_set_id":app_set_id,
                                         "nodes":nodes, "nodes_keys": nodes_keys, "app_menu":app_menu, "app_set_template":app_set_template,
                                         "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name,
                                         "app_set_instance_name":app_set_instance_name, "title":title,
-                                        "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 
+                                        "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist,
                                         'tags':tags, 'location':location, "content":content, "system_id":system_id,
                                         "system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id,
                                         "node":system, 'group_id':group_id, "property_display_order": property_display_order,
@@ -466,7 +466,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             object_type = []
            # for each in object_type_cur:
            #   object_type.append({"name":each.name, "id":str(each._id)})
-            object_type=[{"name":each.name, "id":str(each._id)} for each in object_type_cur]          
+            object_type=[{"name":each.name, "id":str(each._id)} for each in object_type_cur]
             sys_type_relation_set_append({"rt_name": eachrt.name, "type_id": str(eachrt._id), "object_type": object_type})
 
     request_at_dict = {}
@@ -479,13 +479,13 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             node_id = node_collection.one({'name':each,'_type':'GSystemType'})._id
             if node_id in app.type_of:
                 File = 'True'
-        
+
     if app_set_instance_id : # at and rt set editing instance
-        system = node_collection.find_one({"_id":ObjectId(app_set_instance_id)})    
+        system = node_collection.find_one({"_id":ObjectId(app_set_instance_id)})
         #Function used by Processes implemented below
         def multi_(lst):
             for eachatset in lst:
-                eachattribute=triple_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])})
+                eachattribute=triple_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type":ObjectId(eachatset["type_id"])})
                 if eachattribute :
                     eachatset['database_value'] = eachattribute.object_value
                     eachatset['database_id'] = str(eachattribute._id)
@@ -499,18 +499,19 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         n1=len(systemtype_attributetype_set)
         #divides the list into those many parts
         n2=n1/x
-         #Process object is created.The list after being partioned is also given as an argument. 
+         #Process object is created.The list after being partioned is also given as an argument.
         for i in range(x):
             processes.append(mp.Process(target=multi_,args=(systemtype_attributetype_set[i*n2:(i+1)*n2],)))
         for i in range(x):
-            processes[i].start()#each Process started 
+            processes[i].start()#each Process started
         for i in range(x):
             processes[i].join()#each Process converges
-            
+
         #Function used by Processes implemented below
         def multi_2(lst):
             for eachrtset in lst:
-                eachrelation = triple_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])})       
+
+                eachrelation = triple_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type":ObjectId(eachrtset["type_id"])})
                 if eachrelation:
                     right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
                     eachrtset['database_id'] = str(eachrelation._id)
@@ -525,7 +526,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         n1=len(systemtype_relationtype_set)
         #divides the list into those many parts
         n2=n1/x
-        #Process object is created.The list after being partioned is also given as an argument. 
+        #Process object is created.The list after being partioned is also given as an argument.
         for i in range(x):
             processes2.append(mp.Process(target=multi_2,args=(systemtype_relationtype_set[i*n2:(i+1)*n2],)))
         for i in range(x):
@@ -561,7 +562,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         n1=len(systemtype_attributetype_set)
         #divides the list into those many parts
         n2=n1/x
-        #Process object is created.The list after being partioned is also given as an argument. 
+        #Process object is created.The list after being partioned is also given as an argument.
         for i in range(x):
             processes3.append(mp.Process(target=multi_3,args=(systemtype_attributetype_set[i*n2:(i+1)*n2],)))
         for i in range(x):
@@ -578,13 +579,13 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         n1=len(systemtype_relationtype_set)
         #divides the list into those many parts
         n2=n1/x
-        #Process object is created.The list after being partioned is also given as an argument. 
+        #Process object is created.The list after being partioned is also given as an argument.
         for i in range(x):
             processes4.append(mp.Process(target=multi_4,args=(systemtype_relationtype_set[i*n2:(i+1)*n2],)))
         for i in range(x):
             processes4[i].start()#each Process started
         for i in range(x):
-            processes4[i].join()  #each Process converges      
+            processes4[i].join()  #each Process converges
 
         if File == 'True':
             if file1:
@@ -619,7 +620,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         if content_org:
             usrname = request.user.username
             filename = slugify(newgsystem.name) + "-" + usrname
-            newgsystem.content = org2html(content_org, file_prefix=filename)
+            # newgsystem.content = org2html(content_org, file_prefix=filename)
+            newgsystem.content = content_org
             newgsystem.content_org = content_org
 
         # check if map markers data exist in proper format then add it into newgsystem
@@ -659,7 +661,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             n1=len(lst11)
             #divides the list into those many parts
             n2=n1/x
-            #Process object is created.The list after being partioned is also given as an argument. 
+            #Process object is created.The list after being partioned is also given as an argument.
             for i in range(x):
                 processes5.append(mp.Process(target=multi_5,args=(lst11[i*n2:(i+1)*n2],)))
             for i in range(x):
@@ -693,7 +695,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             n1=len(lst12)
             #divides the list into those many parts
             n2=n1/x
-            #Process object is created.The list after being partioned is also given as an argument. 
+            #Process object is created.The list after being partioned is also given as an argument.
             for i in range(x):
                 processes6.append(mp.Process(target=multi_6,args=(lst12[i*n2:(i+1)*n2],)))
             for i in range(x):
@@ -742,7 +744,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             n1=len(systemtype_attributetype_set)
             #divides the list into those many parts
             n2=n1/x
-            #Process object is created.The list after being partioned is also given as an argument. 
+            #Process object is created.The list after being partioned is also given as an argument.
             for i in range(x):
                 processes7.append(mp.Process(target=multi_7,args=(systemtype_attributetype_set[i*n2:(i+1)*n2],)))
             for i in range(x):
@@ -787,7 +789,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             n1=len(systemtype_relationtype_set)
             #divides the list into those many parts
             n2=n1/x
-            #Process object is created.The list after being partioned is also given as an argument. 
+            #Process object is created.The list after being partioned is also given as an argument.
             for i in range(x):
                 processes8.append(mp.Process(target=multi_4,args=(systemtype_relationtype_set[i*n2:(i+1)*n2],)))
             for i in range(x):
@@ -795,7 +797,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             for i in range(x):
                 processes8[i].join() #each Process converges
         return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
-    
+
     template = "ndf/"+template_prefix+"_create_edit.html"
     variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
     return render_to_response(template, variable)
@@ -828,11 +830,11 @@ def mis_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
 
 
     template = "ndf/student_enroll.html"
-    variable = RequestContext(request, {'groupid': group_id, 
-                                        'title':title, 
-                                        'app_id':app_id, 'app_name': app_name, 
+    variable = RequestContext(request, {'groupid': group_id,
+                                        'title':title,
+                                        'app_id':app_id, 'app_name': app_name,
                                         'app_collection_set': app_collection_set, 'app_set_id': app_set_id
-                                        # 'nodes':nodes, 
+                                        # 'nodes':nodes,
                                         })
     return render_to_response(template, variable)
 

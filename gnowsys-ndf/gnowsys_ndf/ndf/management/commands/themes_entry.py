@@ -10,7 +10,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from django_mongokit import get_database
 from django.template.defaultfilters import slugify
-from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.org2any import org2html
 from mongokit import IS
 
 try:
@@ -72,8 +72,8 @@ class Command(BaseCommand):
                         # if (i == 3):
                             # break
                 except csv.Error as e:
-                    sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e)) 
-        
+                    sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e))
+
 
 def create_theme(row, descrp):
 	# print "\n Its a theme -- ", obj
@@ -99,7 +99,7 @@ def create_theme(row, descrp):
 		theme_node.save()
 	else:
 		print "\nTheme ", theme_node.name," already available"
-	
+
 
 	if len(row) > 2:
 		theme_items_list = row[1:-1]
@@ -134,7 +134,7 @@ def create_theme(row, descrp):
 				prev_node = theme_item_node
 				print "\n Theme Item ", theme_item_node.name," already available"
 
-		
+
 
 		topic = row[-1]
 		topic_node = node_collection.one({'name': unicode(topic), 'group_set': group_id, 'member_of': topic_GST._id, 'prior_node': prev_node._id })
@@ -151,7 +151,8 @@ def create_theme(row, descrp):
 				# modifying this document
 				usrname = nroer_team.username
 				filename = slugify(topic) + "-" + usrname + "-" + ObjectId().__str__()
-				topic_node.content = org2html(descrp, file_prefix=filename)
+				# topic_node.content = org2html(descrp, file_prefix=filename)
+				topic_node.content = unicode(descrp)
 
 			topic_node.language = u"en"
 			topic_node.member_of.append(topic_GST._id)
@@ -167,4 +168,4 @@ def create_theme(row, descrp):
 
 		else:
 			print "\n Topic ", topic_node.name," already available"
-	
+

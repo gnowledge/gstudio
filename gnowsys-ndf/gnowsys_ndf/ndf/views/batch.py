@@ -200,7 +200,7 @@ def save_batch(request, group_id):
             all_batches_in_grp.append(b_node._id)
 
             rt_group_has_batch = node_collection.one({'_type': 'RelationType', 'name': 'group_has_batch'})
-            relation_coll = triple_collection.find({'_type': 'GRelation', 'relation_type.$id': rt_group_has_batch._id,'subject':ObjectId(group_id)})
+            relation_coll = triple_collection.find({'_type': 'GRelation', 'relation_type': rt_group_has_batch._id,'subject':ObjectId(group_id)})
 
             for each in relation_coll:
                 all_batches_in_grp.append(each.right_subject)
@@ -226,7 +226,7 @@ def detail(request, group_id, _id):
     student_coll = []
     node = node_collection.one({'_id':ObjectId(_id)})
     rt_has_batch_member = node_collection.one({'_type':'RelationType','name':'has_batch_member'})
-    relation_coll = triple_collection.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':node._id,'status':u'PUBLISHED'})
+    relation_coll = triple_collection.find({'_type':'GRelation','relation_type':rt_has_batch_member._id,'subject':node._id,'status':u'PUBLISHED'})
 
     for each in relation_coll:
         n = node_collection.one({'_id':ObjectId(each.right_subject)})
@@ -244,7 +244,7 @@ def remove_stud_from_batch(request, group_id):
         stud_id = request.POST.get("stud_id", '')
         rt_has_batch_member = node_collection.one({'_type':'RelationType','name':'has_batch_member'})
         grelation_node = triple_collection.one({'_type':'GRelation',
-                        'relation_type.$id':rt_has_batch_member._id,
+                        'relation_type':rt_has_batch_member._id,
                         'subject':ObjectId(batch_id),'status':u'PUBLISHED',
                         'right_subject': ObjectId(stud_id)})
         rel_name = grelation_node.relation_type.name
@@ -291,7 +291,7 @@ def batch_detail(request, group_id):
         student_coll = []
         node = node_collection.one({'_id':ObjectId(batch_id)})
         rt_has_batch_member = node_collection.one({'_type':'RelationType','name':'has_batch_member'})
-        relation_coll = triple_collection.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':node._id,'status':u'PUBLISHED'})
+        relation_coll = triple_collection.find({'_type':'GRelation','relation_type':rt_has_batch_member._id,'subject':node._id,'status':u'PUBLISHED'})
 
         for each in relation_coll:
             n = node_collection.one({'_id':ObjectId(each.right_subject)})

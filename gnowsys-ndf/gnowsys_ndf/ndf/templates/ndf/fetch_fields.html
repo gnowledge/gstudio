@@ -1,0 +1,223 @@
+{% load ndf_tags %}
+{% load i18n %}
+
+<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+<link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+
+  <style>
+    #contact label{
+      display: inline-block;
+      width: 100px;
+      text-align: right;
+    }
+    #contact_submit{
+      padding-left: 100px;
+    }
+    #contact div{
+      margin-top: 1em;
+    }
+    textarea{
+      vertical-align: top;
+      height: 5em;
+    }
+      
+    .error{
+      display: none;
+      margin-left: 10px;
+    }   
+    
+    .error_show{
+      color: red;
+      margin-left: 10px;
+    }
+    
+    input.invalid, textarea.invalid{
+      border: 2px solid red;
+    }
+    
+    input.valid, textarea.valid{
+      border: 2px solid green;
+    }
+  </style>
+
+{% if fields_name == 'name' or fields_name == "altnames" %}
+<!-- <type 'unicode'> -->
+<div style="display:table-cell;">
+  <font size="3">  <input type="textbox" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" placeholder="{{each.help_text}}"  ></font>
+</div>
+
+{% endif %}
+  
+{% if gs_type == 'attribute_set' %}
+      {% if fields_type == "bool" %}
+      {{regularexp}}
+      <select id="id_auto_now_add" name="{{fields_name}}" style="width:400px height:20px" >
+        <option value="0">{% trans "Unknown" %}</option>
+        <option value="1" {% if fields_value == "1" %}selected{% endif %} >{% trans "Yes" %}</option>
+        <option value="2" {% if fields_value == "2" %}selected{% endif %} >{% trans "No" %}</option>
+      </select>
+
+      <div class="medium-3 columns end">
+      {% elif fields_type == "datetime.datetime" %} {{regularexp}}
+      <input type="text" id="{{fields_name}}" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" {% if fields_value %} selected {% endif %} > 
+      <script>
+      $(function() {
+        $( "#{{fields_name}}" ).datepicker();
+      });
+      </script>
+
+      {% elif fields_type == "status" %}{{regularexp}}
+      <select id="id_auto_now_add" name="{{fields_name}}" style="width:400px height:20px" >
+        <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >{% trans "PUBLISHED" %}</option>
+        <option value="DRAFT" {% if fields_value == "DRAFT" %}selected{% endif %} >{% trans "DRAFT" %}</option>
+        <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >{% trans "HIDDEN" %}</option>
+      </select>
+
+      {% elif fields_type == "int" or fields_type == "float" or fields_type == "long" %} {{regularexp}}
+      <div style="display:table-cell;">
+        <font size="3"> <input type="" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" placeholder="{{help_text}}" ></font>
+      </div>
+
+      {% elif fields_type == "list" %} 
+      <div id="{{fields_name}}" style="border-spacing:0px" class="list_drawer">
+        {% include 'ndf/widget_selector.html' with for=fields_name all_options="" selected_options="" %}
+      </div>
+
+      {% elif fields_type == "dict" %}
+      <div id="{{fields_name}}" style="border-spacing:0px" class="dict_drawer">
+        {% include 'ndf/widget_selector.html' with for=fields_name all_options="" selected_options="" %}
+      </div>
+
+      {% elif fields_type == "IS()" %} {{regularexp}}
+      <div id="is_drawer" style="border-spacing:0px" class="list_drawer">
+        <select name="{{fields_name}}" style="width:400px height:20px" >
+          <option value="">select</option>
+          {% for value in complex_dt %}
+          <option value="{{value}}" {% if value == fields_value %} selected {% endif %} > {{value}} </option>
+          {% endfor %}
+        </select>
+      </div>
+        
+      {% elif fields_type == "ObjectId" %}
+      <style type="text/css">
+        .fileUpload input.upload {
+          position: absolute;
+          top: 0;
+          right: 0;
+          margin: 0;
+          padding: 0;
+          font-size: 20px;
+          cursor: pointer;
+          opacity: 0;
+          filter: alpha(opacity=0);
+        }
+      </style>
+      <div style="float:left;">
+        <input type="text" id="uploadFile_{{field.name}}" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:18rem; margin-right:0.5rem;" />
+        <div href="#" class="fileUpload button tiny round" style="margin-top:2px;">
+            <span>{% trans "Upload" %}</span>
+            <input id="uploadBtn_{{field.name}}" type="file" name="{{field.name}}" class="upload"  value="{{fields_value|default_if_none:''}}"/>
+        </div>
+      </div>
+      <script type="text/javascript">
+        $('#uploadBtn_{{field.name}}').change(function () {
+          // alert("coming here " + this.value)
+          $('#uploadFile_{{field.name}}').val(this.value);
+        });
+      </script>
+
+      {% elif fields_type == "unicode" or fields_type == "basestring" %}
+        {% if fields_name == "Location" or fields_name == "location" %}
+          <div class="row">
+            <div class="large-8 columns">
+                <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button radius expand">
+                <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+                </a>
+            </div>
+          </div>
+          <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+              <a class="close-reveal-modal" >&#215;</a>
+              {% include "ndf/map_widget.html" with mode="edit" location_geo_json=fields_value %}
+          </div>
+
+          <script type="text/javascript">
+              $(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
+      
+                $.ajax({
+                  url: "{% url 'get_visited_location' groupid %}",
+                  success: function(data){ 
+             
+                    data = JSON.parse(data);
+
+                    var lastVisitedLocationVal = data;
+                    
+                    if(lastVisitedLocationVal){
+
+                      if(lastVisitedLocationVal == "[]"){
+                        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+                      }
+
+                      if(lastVisitedLocationVal.length > 0){
+                            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+                            var zoom = lastVisitedLocationVal.pop(),
+                                lng = lastVisitedLocationVal[1],
+                                lat = lastVisitedLocationVal[0];
+                              map.setView([lat, lng], zoom);
+                            }
+                    }
+                    else if( tempArr.length )
+                    {
+                      var group = new L.featureGroup(tempArr)
+                          map.fitBounds(group.getBounds());
+                    }
+                   
+                }
+              });
+
+              });
+              $(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
+              
+                map.invalidateSize();  
+              });
+
+          </script>
+
+        {# {% else if fields_name="email_id" %} #}
+        {% else %}
+        <input type="text" id="{{fields_name}}" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}" placeholder="{{help_text}}"  />
+        <script type="text/javascript">
+        $(document).ready(function() {
+          $('#email_id').on('input', function() {
+            var input=$(this);
+            var re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+            var is_email=re.test(input.val());
+            if(is_email){
+              input.removeClass("invalid").addClass("valid");
+            }
+            else
+              {
+                input.removeClass("valid").addClass("invalid");
+              }
+          });
+
+          
+        });
+
+        </script>
+        {% endif %}
+
+  {% endif %}
+{% elif gs_type == 'relation_set' %}  
+    <div class="rel" style="width:400px height:20px">
+    <select name="{{fields_name}}" style="width:400px height:20px" >
+    <option value="">select</option>
+    {% for value in fields_object_type %} 
+    <option value="{{value}}" {% if value == fields_value %}selected{% endif %} > {{value}} </option>
+    {% endfor %}
+    </select> 
+    <!-- {%include 'ndf/option_widget.html' with widget_for=fields_name selected_value=fields_value drawer1=drawer1 %} -->
+    </div>
+{% endif %}

@@ -29,7 +29,6 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val,get_userobject
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_forum_twists,get_all_replies
 from gnowsys_ndf.settings import GAPPS
-from gnowsys_ndf.ndf.org2any import org2html
 import StringIO
 import sys
 try:
@@ -536,27 +535,31 @@ def create_thread(request, group_id, forum_id):
         colrep.group_set.append(colg._id)
         colrep.save(groupid=group_id)
         has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
-        gr = create_grelation(forum._id, has_thread_rt, colrep._id)
+        gr = create_grelation(forum._id, has_thread_rt, [colrep._id])
 
-
-        '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
-        link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(colrep._id)
-        for each in colg.author_set:
-            bx=User.objects.filter(id=each)
-            if bx:
-                bx=User.objects.get(id=each)
-            else:
-                continue
-            activity="Added thread"
-            msg=request.user.username+" has added a thread in the forum " + forum.name + " in the group -'" + colg.name+"'\n"+"Please visit "+link+" to see the thread."
-            if bx:
-                auth = node_collection.one({'_type': 'Author', 'name': unicode(bx.username) })
-                if colg._id and auth:
-                    no_check=forum_notification_status(colg._id,auth._id)
+        try:
+            '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
+            link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(colrep._id)
+            for each in colg.author_set:
+                bx=User.objects.filter(id=each)
+                if bx:
+                    bx=User.objects.get(id=each)
                 else:
-                    no_check=True
-                if no_check:
-                    ret = set_notif_val(request,colg._id,msg,activity,bx)
+                    continue
+                activity="Added thread"
+                msg=request.user.username+" has added a thread in the forum " + forum.name + " in the group -'" + colg.name+"'\n"+"Please visit "+link+" to see the thread."
+                if bx:
+                    auth = node_collection.one({'_type': 'Author', 'name': unicode(bx.username) })
+                    if colg._id and auth:
+                        no_check=forum_notification_status(colg._id,auth._id)
+                    else:
+                        no_check=True
+                    if no_check:
+                        ret = set_notif_val(request,colg._id,msg,activity,bx)
+        except Exception, e:
+            print e
+
+
         url_name = "/" + group_id + "/forum/thread/" + str(colrep._id)
         return HttpResponseRedirect(url_name)
         # variables = RequestContext(request,
@@ -754,9 +757,9 @@ def get_profile_pic(username):
 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(username) })
     prof_pic = node_collection.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
-    dbref_profile_pic = prof_pic.get_dbref()
+    # dbref_profile_pic = prof_pic.get_dbref()
     collection_tr = db[Triple.collection_name]
-    prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })
+    prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': prof_pic._id })
 
     # prof_pic_rel will get the cursor object of relation of user with its profile picture
     if prof_pic_rel.count() :

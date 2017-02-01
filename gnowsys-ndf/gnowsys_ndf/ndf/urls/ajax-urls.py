@@ -4,7 +4,6 @@ from django.views.generic import TemplateView
 
 from gnowsys_ndf.ndf.views import ajax_views
 
-
 urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',                        
     url(r'^collection/', 'select_drawer', name='select_drawer'),
     url(r'^collectionNav/', 'collection_nav', name='collection_nav'),
@@ -52,7 +51,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^upload_video_thumbnail', 'upload_video_thumbnail', name='upload_video_thumbnail'),
     # url(r'^/upload_file/', 'upload_file', name='upload_file'),
     
-
                        # Ajax-urls required for MIS --------------------------------
 
     url(r'^get_detailed_report/', 'get_detailed_report', name='get_detailed_report'),
@@ -99,5 +97,10 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_visits_count/$', 'get_visits_count', name='get_visits_count'),
     url(r'^search_users/$', 'search_users', name='search_users'),
     url(r'^save_user_password/$', 'save_user_password', name='save_user_password'),
+    url(r'^get_paged_images/', 'get_paged_images', name='get_paged_images'),
+    url(r'^get_templates_page/', 'get_templates_page', name='get_templates_page'),
 
+    # url for graph display
+
+    url(r'^graph/adminRenderGraph/(?P<node_id>[^/]+)/fetch/(?P<graph_type>[^/]+)$', 'adminRenderGraph', name='adminRenderGraph'),
 )

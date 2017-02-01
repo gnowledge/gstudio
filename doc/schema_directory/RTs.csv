@@ -43,6 +43,6 @@ subject_type,member_of,name,altnames,inverse_name,object_type,object_cardinality
 "[""StudentCourseEnrollment"",""Page"",""File""]","[""Binary""]",has_current_approval_task,Approval Task;Enrollment,task_for_enrollment_approval,"[""Task""]",1
 "[""Event""]","[""Binary""]",event_has_batch,Batch;Event,batch_for_event,"[""Batch""]",1
 "[""CourseEventGroup""]","[""Binary""]",group_has_course_event,CourseEventGroup;Course,course_event_for_group,"[""Course""]",1
-"[""Course"",""Group"",""ProgramEventGroup"",""PartnerGroup""]","[""Binary""]",has_logo,Course;File,logo_of,"[""File""]",1
+"[""Course"",""BaseCourseGroup"",""Group"",""ProgramEventGroup"",""PartnerGroup""]","[""Binary""]",has_logo,Course;File,logo_of,"[""File""]",1
 "[""QuizItemEvent"",""Page"",""File""]","[""Binary""]",clone_of,QuizItemEvent;QuizItem,has_clone,"[""QuizItem"",""Page"",""File""]",1
-"[""QuizItem"",""QuizItemEvent"",""Page"",""File"",""Forum""]","[""Binary""]",has_thread,QuizItemEvent;Twist,thread_of,"[""Twist""]",100
+"[""QuizItem"",""QuizItemEvent"",""Page"",""File"",""Forum"",""Jsmol"", ""TurtleBlocks"", ""PoliceSquad"", ""OpenStoryTool"", ""BioMechanics""]","[""Binary""]",has_thread,QuizItemEvent;Twist,thread_of,"[""Twist""]",100

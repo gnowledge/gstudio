@@ -96,7 +96,7 @@
                   break;
                 }
             }
-            collapse_tree(node);
+            // collapse_tree(node);
             var nav_list = parent_arr.reverse();
             if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent" && node['node_type']!="CourseSection" && node['node_type']!="CourseSubSection" && node['node_type']!="CourseUnit" && update_url){
             // alert(nav_list);
@@ -112,14 +112,16 @@
                   nod_type: node_type
                   // csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
+                /*
                 beforeSend: function ( ) {    
                       $("#processing_screen_ModalLabel").text("Please wait");
                       $("#processing_screen_Modal").foundation('reveal', 'open');
-                },
+                },*/
                 success: function(data) {
+                  /*
                   $("#processing_screen_Modal").removeClass("alert");
                   $("#processing_screen_Modal").foundation('reveal', 'close');
-                  
+                  */
                   if (node_type == "Group"){
                    window.history.pushState("", "", "/{{group_name_tag}}/"+"?selected="+node.id+"");
                   }
@@ -146,7 +148,6 @@
                   $("#view_page").html(data);
                 }
             });
-            $('article').unblock()
             }
             else if(node['node_type']=="CourseUnitEvent"){
               $(".view_page_link").trigger('click')
@@ -176,7 +177,7 @@
           }
           else{
             var close_nele = event.previous_node
-            unselect_treenode(close_nele)
+            // unselect_treenode(close_nele)
           }
 
         });

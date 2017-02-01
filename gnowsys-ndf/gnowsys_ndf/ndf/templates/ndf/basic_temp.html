@@ -1,0 +1,105 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{%block title %} Basic Template {% endblock %}
+{% block body_content %}
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script>
+
+<form method="post" action=" " name="{{node_gs.name}}" id="{{node_gs.name}}" onsubmit="return validateForm()" >
+{% csrf_token %} 
+<table>
+<div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
+<font size="5"> {{node_gs.name}} </font> 
+
+    <div style="display:table-row;" id ="basic_list">
+        {% for bl in basic_list %}
+            {% for val,dummyval in bl.iteritems %}
+        	<tr><td>
+            <div style="display:table-cell;" >
+                <font size="3"> {{dummyval}} </font> 
+            </div></td>
+            <td id="basic_list-{{val}}" > {% fetch_req_fields gs_struc|get_dict_item:val val %} 
+                {% if val in  required_fields %}
+                <div style="display:table-cell;">
+                    <font size="3" color="red"> * </font>
+                    <font id="{{val}}_required" style="display:none" color="red">This field required</font>
+                </div>
+                {% endif %}
+            </td></tr>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <div style="display:table-row;">
+        {% for each in ats %}
+        <tr><td>
+        <!-- {% trans "AttributeType "%} -->
+        <div style="display:table-cell;"> 
+           <font size="3"> {% firstof each.altnames each.name %}  </font> 
+        </div></td>
+        <!-- field_name {{each.name}}  field_value field_type {{each.data_type}}  -->
+        <!-- This ndf tag ats_fields is done to fetch the attribute_type_set. donot replace this with html_widget tag cause it will not allow it to be saved. The field 'value' in the dict is not present as it is fetched directly from the database  -->
+        <td>{% ats_fields each.data_type each.name groupid each.complex_data_type each.help_text each.validators gs_struc|get_dict_item:'attribute_set' %}
+        </td></tr>
+        {% endfor %}
+    </div>
+
+    <div style="display:table-row;">
+        {% for each in final_ats %}
+        <tr><td>
+        <!--   {% trans "PossibleAttributeType "%} -->
+        <div style="display:table-cell;">
+           <font size="3"> {% firstof each.altnames each.name %} </font> 
+        </div></td>
+        <td>
+            {% ats_fields each.data_type each.name groupid each.complex_data_type each.help_text each.validators gs_struc|get_dict_item:'attribute_set' %}
+        </td></tr>
+        {% endfor %}
+    </div>
+    
+    <!--        {% trans "RelationType "%}  -->
+    <div style="display:table-row;">
+        {% for each in f_rts_object_dict %}
+        <div id="{{each.name}}">
+        <tr><td>
+        <div style="display:table-cell;"> 
+           <font size="3"> {% firstof each.altnames each.name %} </font> 
+        </div></td>
+        <td>
+            {% rts_fields each.name each.object_type groupid gs_struc|get_dict_item:'relation_set' %}
+        </td></tr>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- {% trans "PossibleRelationType "%}     -->
+    <div style="display:table-row;">
+        {% for each in f_pos_rts_object_dict %}
+        <div id="{{each.name}}">
+        <tr><td>
+        <div style="display:table-cell;"> 
+           <font size="3"> {% firstof each.altnames each.name %} </font> 
+        </div></td>
+        <td>
+            {% rts_fields each.name each.object_type groupid gs_struc|get_dict_item:'relation_set' %}
+        </td></tr>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+</table>
+<input type="submit" class="button" id="save-node-type" value="Save" />
+</form>
+
+{% endblock %}
+{% block script%}
+function validateForm() {
+    var x = document.forms["{{node_gs.name}}"]["name"].value;
+    if (x == null || x == "") {
+        alert("Name must be filled out");
+        return false;
+    }
+}
+{% endblock %}

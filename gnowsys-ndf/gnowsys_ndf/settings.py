@@ -5,22 +5,22 @@ import os
 import djcelery
 
 # imports from core django libraries
-from django.conf import global_settings
-from django.utils.translation import ugettext
+# from django.conf import global_settings
+# from django.utils.translation import ugettext
 # from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 
 # imports from third-party app(s)
 
-from gnowsys_ndf.ndf.utils import (is_dir_exists, ensure_dir, get_current_dbs_path,
-    move_file_or_dirctory)
+# from gnowsys_ndf.ndf.utils import (is_dir_exists, ensure_dir, get_current_dbs_path,
+#     move_file_or_dirctory)
 
-DEBUG = True
-# ALLOWED_HOSTS = ["127.0.0.1"]
+DEBUG = False
+ALLOWED_HOSTS = ["*"]
 
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
-GSTUDIO_DEFAULT_GROUPS = ['home','Trash','desk','help','warehouse']
+GSTUDIO_DEFAULT_GROUPS = ['home', 'Trash', 'desk', 'help', 'warehouse']
 LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'))
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
@@ -28,7 +28,7 @@ OTHER_COMMON_LANGUAGES = [
     ('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'),
     ('dra','Dravidian'), ('gon','Gondi'), ('bra','Braj'),
     ('mi','Malayalam'), ('mai','Maithili'), ('mag','Magahi'),
-    ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'),
+    ('lus','Lushai'), ('bho','Bhojpuri'), ('kru','Kurukh'),
     ('awa','Awadhi'), ('sa','Sanskrit'), ('sat','Santali'),
     ('him','Himachali'), ('sd','Sindhi'), ('as','Assamese'),
     ('ar', 'Arabic'), ('bn', 'Bengali'), ('ca', 'Catalan'),
@@ -478,9 +478,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gnowsys_ndf.benchmarker',
+    # 'gnowsys_ndf.benchmarker',
     'registration',
-    'djangoratings',
+    # 'djangoratings',
     'notification',
     'pagination',
     'captcha',
@@ -491,7 +491,7 @@ INSTALLED_APPS = (
     # 'django.contrib.flatpages',   #textb
     # 'online_status',              #for online_users
     # 'endless_pagination',
-    'jsonrpc',
+    # 'jsonrpc',
     'registration_email',
     'memcache_admin',
     'django_mailbox',
@@ -622,7 +622,7 @@ GSTUDIO_SITE_HOME_PAGE = None  # it is url rendered on template. e.g: "/welcome"
 GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" etc. (Override it in local_settings)
 GSTUDIO_SITE_ISSUES_PAGE = ""
 GSTUDIO_EBOOKS_HELP_TEXT = "" #ebook help text page  url(page:"how to read ebooks")
-
+GSTUDIO_SUPPORTED_JHAPPS = ['Jsmol','Police Squad','Open Story Tool','BioMechanics', 'TurtleBlocks']
 # terms & conditions
 GSTUDIO_OID_TC = None
 
@@ -756,6 +756,208 @@ GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
 GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES = ['Screening House', 'Selection House']
 
+GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Discuss', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
+
+GSTUDIO_HELP_TIP = {
+   "name":"Title of the object",
+   "altnames":"Alternate title",
+   "language":"Language of the title",
+   "subject_type":"The system types that can hold this property",
+   "data_type":"Data Type",
+   "applicable_node_type":"Applicable Node Type",
+   "member_of":"Member of MetaType ",
+   "verbose_name":"Verbose Name",
+   "null":"Value can be null",
+   "blank":"Value can be blank",
+   "max_digits":"Maximum length of digits applicable if the data type is any type of numbers ",
+   "decimal_places":" Number of decimal places if the data type is float",
+   # "auto_now":"The value is automatically filled by the computer",
+   "auto_now_add":"Auto now would insert time only if the auto now field is true",
+   "path":"Path",
+   "verify_exist":"Verify Exist",
+   "status":"Status",
+   "content_org":"Description",
+   "validators":"Regular Expressions required for Validation",
+   "help_text":"The help text to be displayed on the Tooltip for GSystem ",
+   "prior_node":"This node depends on",
+   "featured":"Featured",
+   "created_at":"Time of creation",
+   "start_publication":"Published from the date",
+   "tags":"Tags are keywords",
+   "url":"URL",
+   "last_update":"The time of modification ",
+   "login_required":"Login required",
+   "meta_type_set":"N/A",
+   "attribute_type_set":"N/A",
+   "relation_type_set":"N/A",
+   "type_of":"Sub Attribute type of"
+ }
+
+GSYSTEMTYPE_DEFINITIONLIST = [
+   {
+      "name":"Name "
+   },
+   {
+      "altnames":"Alternate Name "
+   },
+   {
+      "language":"Language "
+   },
+   {
+      "status":"Status "
+   },
+   {
+      "member_of":"Member of MetaType "
+   },
+   {
+      "meta_type_set":"Select the MetaType "
+   },
+   {
+      "attribute_type_set":"Select the AttributeType "
+   },
+   {
+      "relation_type_set":"Select the RelationType "
+   },
+   {
+      "type_of":"Type Of "
+   }
+]
+
+ATTRIBUTETYPE_DEFINITIONLIST = [
+   {
+      "name":"Name "
+   },
+   {
+      "altnames":"Alternate Name "
+   },
+   {
+      "language":"Language "
+   },
+   {
+      "subject_type":"Subject Type "
+   },
+   {
+      "data_type":"Data Type "
+   },
+   {
+      "member_of":"Member of MetaType "
+   },
+   {
+      "verbose_name":"Verbose Name "
+   },
+   {
+      "null":"Null "
+   },
+   {
+      "blank":"Blank "
+   },
+   {
+      "help_text":"Help Text "
+   },
+   {
+      "max_digits":"Maximum Digits "
+   },
+   {
+      "decimal_places":"Decimal Places "
+   },
+   # {
+      # "auto_now":"Auto Now "
+   # },
+   {
+      "auto_now_add":"Auto Now Add "
+   },
+   {
+      "path":"Path "
+   },
+   {
+      "verify_exist":"Verify Existence "
+   },
+   {
+      "validators":"Validators"
+   },
+   {
+      "status":"Status "
+   }
+]
+
+RELATIONTYPE_DEFINITIONLIST = [
+   {
+      "name":"Name "
+   },
+   {
+      "inverse_name":"Inverse Name "
+   },
+   {
+      "altnames":"Alternate Name "
+   },
+   {
+      "language":"Language "
+   },
+   {
+      "subject_type":"Subject Type "
+   },
+   {
+      "object_type":"Object Type "
+   },
+   {
+      "subject_cardinality":"Subject Cardinality "
+   },
+   {
+      "object_cardinality":"Object Cardinality "
+   },
+   {
+      "subject_applicable_nodetype":"Subject Applicable Node Type "
+   },
+   {
+      "object_applicable_nodetype":"Object Applicable Node Type "
+   },
+   {
+      "is_symmetric":"Is Symmetric "
+   },
+   {
+      "is_reflexive":"Is Reflexive "
+   },
+   {
+      "is_transitive":"Is Transitive "
+   },
+   {
+      "status":"Status "
+   },
+   {
+      "member_of":"Member of MetaType "
+   }
+]
+
+CONTENTLIST = [{'content_org':'content organization' }]
+
+DEPENDENCYLIST = [{'prior_node':'Prior Node ' }]
+
+OPTIONLIST = [
+   {
+      "featured":"Featured "
+   },
+   {
+      "created_at":"Created At "
+   },
+   {
+      "start_publication":"Start Publication "
+   },
+   {
+      "tags":"Tags "
+   },
+   {
+      "url":"URL "
+   },
+   {
+      "last_update":"Last Update "
+   },
+   {
+      "login_required":"Login Required "
+   }
+]
+
+GSYSTEM_LIST = [{'name':'Name '} ,{'altnames':'Alternate Name '}]
+
 GSTUDIO_INTERACTION_TYPES = ['Comment', 'Discuss', 'Reply', 'Post', 'Submit', 'Voice-Response', 'Answer', 'Feedback']
 # #textb
 # import warnings
@@ -773,8 +975,6 @@ CACHES = {
     }
 }
 
-WETUBE_USERNAME = "glab"
-WETUBE_PASSWORD = "gl@b$@)we!ube"
 
 # Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
@@ -782,8 +982,9 @@ CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_d
 
 GSTUDIO_HELP_SIDEBAR = False
 GSTUDIO_SOCIAL_SHARE_RESOURCE = False
+GSTUDIO_TWITTER_VIA = "atMetaStudio"
 GSTUDIO_CAPTCHA_VISIBLE = False
-
+GSTUDIO_FACEBOOK_APP_ID = ""
 # the no of cards/objects/instances to be render of app (listing view).
 GSTUDIO_NO_OF_OBJS_PP = 24
 GSTUDIO_FILE_UPLOAD_POINTS = 25
