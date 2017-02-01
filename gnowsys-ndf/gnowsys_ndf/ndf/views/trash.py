@@ -9,7 +9,7 @@ from gnowsys_ndf.ndf.views.methods import *
 from django.core.urlresolvers import reverse
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 
-trash_group = node_collection.find_one({"name":"Trash"});
+trash_group = node_collection.one({'_type': 'Group', "name": u"Trash"});
 
 @get_execution_time
 def trash_resource(request,group_id,node_id):
