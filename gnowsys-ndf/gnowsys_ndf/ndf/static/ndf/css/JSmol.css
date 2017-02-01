@@ -28,12 +28,12 @@ body
 }
         .jmolImage
         {
-        	font-family:arial !important;
-        	border:1px solid #888;
+          font-family:arial !important;
+          border:1px solid #888;
         }
         #myJmol1_Image_app_title
         {
-        	background:#eaeaea !important;
+          background:#eaeaea !important;
         }
         .outer-container
         {
@@ -57,9 +57,9 @@ body
             font-weight:bold;
             margin-bottom:10px;
             /*background: linear-gradient(#eaeaea, #fff);*/
-            background:#eaeaea;
+            background:#71A7DE;
 line-height: 40px;
-color: #222;
+color: white;
 font-size:14px;
         }
         input, select
@@ -142,8 +142,8 @@ font-weight: normal;
 }
 .blue-bg
 {
-    background:#eaeaea;
-    color:#333;
+    background:#71A7DE ;
+    color:white;
     font-weight:bold;
     font-size: 14px;
     text-align: center;
@@ -153,8 +153,8 @@ p
     margin-top:0px;
 }
 #myJmol1_appletinfotablediv {
-    height: 300px !important;
-    width: 400px !important;
+    height: 500px !important;
+    width: 700px !important;
     margin: auto;
     max-width: 100%;
 }
@@ -234,7 +234,7 @@ margin:auto;
   padding: 20px;
   background: #fff;
   border-radius: 5px;
-  width: 30%;
+  width: 50%;
   position: relative;
   transition: all 5s ease-in-out;
 }
@@ -257,7 +257,7 @@ margin:auto;
   z-index: 10000;
 }
 .popup .close:hover {
-  color: #06D85F;
+  color: red;
 }
 .popup .content {
   max-height: 30%;
@@ -282,6 +282,27 @@ margin:auto;
     font-size:16px !important;
     color:#333;
 }
+.left-20 .popup
+{
+  font-size:12px !important;
+  font-style: italic;
+  color:#666;
+}
+.left-20 .popup img
+{
+  max-width:80%;
+}
+#popup2 .popup
+{
+  width:80%;
+}
+
+#popup3 .popup
+{
+  width:70%;
+  
+}
+
 .enlarge
 {
     text-align:right;
@@ -337,4 +358,9 @@ margin:auto;
     width: 90%;
     padding:0px;
   }
+    }
+    .enlarge h4
+    {
+      margin:2px 0px;
+      padding:0px;
     }
