@@ -6,6 +6,7 @@ import datetime
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from django.http.request import HttpRequest
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
@@ -57,7 +58,7 @@ class CreateGroup(object):
     Creates group.
     Instantiate group with request as argument
     """
-    def __init__(self, request):
+    def __init__(self, request=HttpRequest()):
         super(CreateGroup, self).__init__()
         self.request = request
         self.moderated_groups_member_of = ['ProgramEventGroup',\
@@ -74,7 +75,6 @@ class CreateGroup(object):
 
         # explicitely using "find_one" query
         group = node_collection.find_one({'_type': 'Group', 'name': unicode(group_name)})
-
         if group:
             return True
 
@@ -99,7 +99,6 @@ class CreateGroup(object):
         class_instance_var.get_group_fields(group_name, **group_fields)
         (NOTE: use ** before dict variables, in above case it's group_fields so it's: **group_fields)
         '''
-
         # getting the data into variables
         name = group_name
 
@@ -108,59 +107,66 @@ class CreateGroup(object):
 
         if kwargs.get('altnames', ''):
             altnames = kwargs.get('altnames', name)
-        else:
+        elif self.request:
             altnames = self.request.POST.get('altnames', name).strip()
 
         if kwargs.get('group_type', ''):
             group_type = kwargs.get('group_type', u'PUBLIC')
-        else:
+        elif self.request:
             group_type = self.request.POST.get('group_type', u'PUBLIC')
 
         if kwargs.get('access_policy', ''):
             access_policy = kwargs.get('access_policy', group_type)
-        else:
+        elif self.request:
             access_policy = self.request.POST.get('access_policy', group_type)
 
         if kwargs.get('edit_policy', ''):
             edit_policy = kwargs.get('edit_policy', u'EDITABLE_NON_MODERATED')
-        else:
+        elif self.request:
             edit_policy = self.request.POST.get('edit_policy', u'EDITABLE_NON_MODERATED')
 
         if kwargs.get('subscription_policy', ''):
             subscription_policy = kwargs.get('subscription_policy', u'OPEN')
-        else:
+        elif self.request:
             subscription_policy = self.request.POST.get('subscription_policy', u"OPEN")
 
         if kwargs.get('visibility_policy', ''):
             visibility_policy = kwargs.get('visibility_policy', u'ANNOUNCED')
-        else:
+        elif self.request:
             visibility_policy = self.request.POST.get('visibility_policy', u'ANNOUNCED')
 
         if kwargs.get('disclosure_policy', ''):
             disclosure_policy = kwargs.get('disclosure_policy', u'DISCLOSED_TO_MEM')
-        else:
+        elif self.request:
             disclosure_policy = self.request.POST.get('disclosure_policy', u'DISCLOSED_TO_MEM')
 
         if kwargs.get('encryption_policy', ''):
             encryption_policy = kwargs.get('encryption_policy', u'NOT_ENCRYPTED')
-        else:
+        elif self.request:
             encryption_policy = self.request.POST.get('encryption_policy', u'NOT_ENCRYPTED')
 
         if kwargs.get('agency_type', ''):
             agency_type = kwargs.get('agency_type', u'Other')
-        else:
+        elif self.request:
             agency_type = self.request.POST.get('agency_type', u'Other')
 
         if kwargs.get('content_org', ''):
             content_org = kwargs.get('content_org', '')
-        else:
+        elif self.request:
             content_org = self.request.POST.get('content_org', '')
+
+        if kwargs.get('content', ''):
+            content = kwargs.get('content', '')
+        elif self.request:
+            content = self.request.POST.get('content', '')
+        if not content or not content_org:
+            content = content_org = u""
 
         # whenever we are passing int: 0, condition gets false
         # therefor casting to str
         if str(kwargs.get('moderation_level', '')):
             moderation_level = kwargs.get('moderation_level', '-1')
-        else:
+        elif self.request:
             moderation_level = self.request.POST.get('moderation_level', '-1')
 
         if node_id:
@@ -205,12 +211,16 @@ class CreateGroup(object):
         #  org-content
         if group_obj.content_org != content_org:
             group_obj.content_org = content_org
+            is_changed = True
 
             # Required to link temporary files with the current user who is:
             # usrname = self.request.user.username
             # filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
             # group_obj.content = org2html(content_org, file_prefix=filename)
-            group_obj.content = content_org
+
+
+        if group_obj.content != content:
+            group_obj.content = content
             is_changed = True
 
         # decision for adding moderation_level
@@ -234,7 +244,6 @@ class CreateGroup(object):
         - Takes group name as compulsory argument.
         - Returns tuple containing: (True/False, sub_group_object/error)
         '''
-
         # for editing already existing group
         node_id = kwargs.get('node_id', None)
         # print "node_id : ", node_id

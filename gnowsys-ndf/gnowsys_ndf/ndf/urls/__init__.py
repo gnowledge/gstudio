@@ -97,6 +97,8 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/feeds', include('gnowsys_ndf.ndf.urls.feeds')),
     (r'^(?P<group_id>[^/]+)/trash',include('gnowsys_ndf.ndf.urls.trash')),
     (r'^(?P<group_id>[^/]+)/buddy',include('gnowsys_ndf.ndf.urls.buddy')),
+    # needs to decide on asset and it's url(s).
+    # (r'^(?P<group_id>[^/]+)/asset',include('gnowsys_ndf.ndf.urls.asset')),
 
     (r'^(?P<group_id>[^/]+)/type_created',include('gnowsys_ndf.ndf.urls.type_created')),
 
