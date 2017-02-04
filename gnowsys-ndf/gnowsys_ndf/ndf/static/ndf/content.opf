@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package version="3.0" unique-identifier="uuid_id" xmlns="http://www.idpf.org/2007/opf">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:identifier id="uuid_id" opf:scheme="uuid"/></dc:identifier>
+    <dc:language>en</dc:language>
+    <dc:title>CLIx gStudio Authoring</dc:title>
+    <meta name="gstudio" content="0.9.6" />
+    <meta property="dcterms:modified">2016-08-29T12:07:01Z</meta>
+  </metadata>
+  <manifest>
+     <!-- toc and nav -->
+    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+    <item id="nav.html" href="Text/nav.html" media-type="text/html" properties="nav"/>
+
+    <!-- static images / icons-->
+    <item id="OpenSans-Regular-webfont.svg" href="Images/OpenSans-Regular-webfont.svg" media-type="image/svg+xml"/>
+    <item id="OpenSans-LightItalic-webfont.svg" href="Images/OpenSans-LightItalic-webfont.svg" media-type="image/svg+xml"/>
+    <item id="OpenSans-Light-webfont.svg" href="Images/OpenSans-Light-webfont.svg" media-type="image/svg+xml"/>
+    <item id="OpenSans-Italic-webfont.svg" href="Images/OpenSans-Italic-webfont.svg" media-type="image/svg+xml"/>
+    <item id="OpenSans-BoldItalic-webfont.svg" href="Images/OpenSans-BoldItalic-webfont.svg" media-type="image/svg+xml"/>
+    <item id="OpenSans-Bold-webfont.svg" href="Images/OpenSans-Bold-webfont.svg" media-type="image/svg+xml"/>
+    <item id="aud-play-icon.png" href="Images/aud-play-icon.png" media-type="image/png"/>
+    <item id="chevron-right.svg" href="Images/chevron-right.svg" media-type="image/svg+xml"/>
+    <item id="play-arrow.svg" href="Images/play-arrow.svg" media-type="image/svg+xml"/>
+
+    <!-- fonts -->
+    <item id="varela_round_regular.woff" href="Fonts/varela_round_regular.woff" media-type="application/font-woff"/>
+    <item id="varela_round_regular.ttf" href="Fonts/varela_round_regular.ttf" media-type="application/x-font-ttf"/>
+    <item id="OpenSans-Regular-webfont.woff" href="Fonts/OpenSans-Regular-webfont.woff" media-type="application/font-woff"/>
+    <item id="OpenSans-Regular-webfont.ttf" href="Fonts/OpenSans-Regular-webfont.ttf" media-type="application/x-font-ttf"/>
+    <item id="OpenSans-LightItalic-webfont.woff" href="Fonts/OpenSans-LightItalic-webfont.woff" media-type="application/font-woff"/>
+
+    <!-- css -->
+    <item id="foundation.css" href="Styles/foundation.css" media-type="text/css"/>
+    <item id="style.css" href="Styles/style.css" media-type="text/css"/>
+
+    <!-- misc js -->
+    <item id="video-js.css" href="Styles/video-js.css" media-type="text/css"/>
+    <item id="videojs-skin-colors.css" href="Styles/videojs-skin-colors.css" media-type="text/css"/>
+    <item id="photo-zoom.js" href="Misc/photo-zoom.js" media-type="text/javascript"/>
+    <item id="jquery-3.0.0.min.js" href="Misc/jquery-3.0.0.min.js" media-type="text/javascript"/>
+    <item id="assess-sizer.js" href="Misc/assess-sizer.js" media-type="text/javascript"/>
+    <item id="video.js" href="Misc/video.js" media-type="text/javascript"/>
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="nav.html" linear="no"/>
+  </spine>
+  <guide>
+    <reference type="toc" title="Table of Content" href="Text/nav.html"/>
+  </guide>
+</package>

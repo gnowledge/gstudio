@@ -14,21 +14,15 @@ def create_subfolders(root,subfolder_names_list):
     for subfolder in subfolder_names_list:
         os.makedirs(os.path.join(root, subfolder))
 
+
 def create_container_file(meta_path):
-    doc = minidom.Document()
-    container = doc.createElement("container")
-    container.setAttribute("version", "1.0")
-    container.setAttribute("xmlns", "urn:oasis:names:tc:opendocument:xmlns:container")
-    rootfiles = doc.createElement("rootfiles")
-    rootfile = doc.createElement("rootfile")
-    rootfile.setAttribute("file-path","OEBPS/content.opf")
-    rootfile.setAttribute("media-type","application/oebps-package+xml")
-    rootfiles.appendChild(rootfile)
-    container.appendChild(rootfiles)
-    doc.appendChild(container)
-    xml_str = doc.toprettyxml(indent="  ", encoding='UTF-8')
+    with open("/static/ndf/container.xml", "r") as base_container_obj:
+        html_doc = base_container_obj.read()
+        soup = BeautifulSoup(html_doc, 'html.parser')
+
     with open(os.path.join(meta_path,"container.xml"), "w+") as container_file:
-        container_file.write(xml_str)
+        container_file.write(soup.prettify("utf-8"))
+
 
 def create_mimetype(epub_name):
     with open(os.path.join(epub_name,"mimetype"), "w+") as mimetype_file:
@@ -40,11 +34,30 @@ def update_ncx(p):
     """
     pass
 
-def update_nav(n):
+def create_update_nav(file_display_name, filename, path):
     """
     This will update nav.html
     """
-    pass
+    soup = None
+    with open("/static/ndf/nav.html", "r") as base_nav_obj:
+        html_doc = base_nav_obj.read()
+        soup = BeautifulSoup(html_doc, 'html.parser')
+    nav_file_path = os.path.join(path,"nav.html")
+    if not os.path.exists(nav_file_path):
+        with open(nav_file_path, "w+") as nav_file:
+            # find <ol> with id "toc-list"
+            nav_list = soup.find("ol", {"id": "toc-list"})
+
+            new_nav = soup.new_tag("li")
+            new_nav_link = soup.new_tag("a", href="../Text/"+filename + ".html")
+            new_nav_link.string = file_display_name
+            new_nav.append(new_nav_link)
+            print "= ",new_nav
+            soup.body.nav.ol.append(new_nav)
+            print "- ",nav_list
+            nav_file.write(soup.prettify("utf-8"))
+
+
 def parse_content(path, content_soup):
     """
     This will fill:
@@ -99,11 +112,10 @@ def build_html(path,obj):
     import ipdb; ipdb.set_trace()
     for each_obj in obj.values():
         name = each_obj['name'].strip()
-        name_slugified = slugify(each_obj['name'].strip())
+        name_slugified = slugify(name)
         content_val = (each_obj["content"]).encode('ascii', 'ignore')
         new_content = parse_content(path, BeautifulSoup(content_val, 'html.parser'))
         # new_content = parse_content(content_val)
-        print new_content
         with open("/static/ndf/epub_activity_skeleton.html", "r") as base_file_obj:
             html_doc = base_file_obj.read()
             soup = BeautifulSoup(html_doc, 'html.parser')
@@ -112,7 +124,7 @@ def build_html(path,obj):
             content_file_obj.write(soup.prettify("utf-8"))
 
         # update_ncx(each_obj["name"])
-        # update_nav(each_obj["name"])
+        create_update_nav(name, name_slugified, path)
     pass
 
 
@@ -129,6 +141,7 @@ def update_content_file():
     """
     This will update content.opf
     """
+
     pass
 
 def create_epub(epub_name, content_list):
