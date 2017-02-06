@@ -1438,13 +1438,16 @@ def get_resources(request, group_id):
                     resource_type = "Pandora_video"
                 if resource_type == "Quiz":
                     resource_type = "QuizItem"
-
+                if resource_type == "File":
+                    resource_type = ["File", "Jsmol", "PoliceSquad", "OpenStoryTool", "TurtleBlocks", "BioMechanics"]
+                    resource_gst_id = [GSystemType.get_gst_name_id(each_gst)[1] for each_gst in resource_type]
+                else:
+                    resource_gst_name, resource_gst_id = GSystemType.get_gst_name_id(resource_type)
                 # resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
-                resource_gst_name, resource_gst_id = GSystemType.get_gst_name_id(resource_type)
 
                 res = node_collection.find(
                     {
-                        'member_of': resource_gst_id,
+                        'member_of': {'$in': resource_gst_id},
                         'status': u"PUBLISHED",
                         '$or':[{'group_set': ObjectId(group_id)},{'contributors': request.user.id}]
                     }
