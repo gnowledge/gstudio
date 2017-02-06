@@ -83,9 +83,11 @@ def explore_groups(request,page_no=1):
     title = 'groups'
     gstaff_access = check_is_gstaff(group_id,request.user)
     if gstaff_access:
-        group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id}).sort('last_update', -1)
+        group_cur = node_collection.find({'_type': 'Group',
+            'member_of': gst_group._id, 'status': u'PUBLISHED'}).sort('last_update', -1)
     else:
-        group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id,'name':{'$nin':GSTUDIO_DEFAULT_GROUPS }}).sort('last_update', -1)
+        group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id,
+            'status': u'PUBLISHED', 'name':{'$nin':GSTUDIO_DEFAULT_GROUPS }}).sort('last_update', -1)
 
     ce_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variable = {'title': title, 'doc_cur': group_cur, 'card': 'ndf/simple_card.html',

@@ -176,6 +176,8 @@
       $(document).foundation();
 
     // Register global ajax start and complete events to show ajax loader when request is in process
+      $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+      /*
       $(document)
         .ajaxStart(function() {
           $('article').block({
@@ -202,6 +204,7 @@
         .ajaxStop(function() {
           $('article').unblock();
         });
+        */
 
     // Toggles the display of main sidebar for 12 col article view
       var toggleMainSidebar = function(){

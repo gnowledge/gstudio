@@ -9,6 +9,8 @@ from gnowsys_ndf.ndf.views.methods import *
 from django.core.urlresolvers import reverse
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 
+trash_group = node_collection.one({'_type': 'Group', "name": u"Trash"});
+
 @get_execution_time
 def trash_resource(request,group_id,node_id):
 	'''
@@ -66,6 +68,19 @@ def trash_resource(request,group_id,node_id):
 		# return(eval('group_dashboard')(request, group_id))   
 
 @get_execution_time
+# @staff_required
+def delete_group(request,group_id):
+    response_dict = {'success': False}
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    del_s,del_msg = delete_node(group_obj._id, deletion_type=0)
+
+    if trash_group._id not in group_obj.group_set:	
+		group_obj.group_set.append(trash_group._id)
+		group_obj.save(groupid=group_obj._id)
+    if del_s:
+        return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': 'home'}))
+
+@get_execution_time
 def delete_resource(request,group_id):
 	# NOTE: purge of themes need to be handled differently.
 	# all the collection hierarchy needs to be purged in this case.
@@ -92,6 +107,7 @@ def restore_resource(request, group_id):
 			if node_to_be_restore.snapshot.keys():
 			
 				node_to_be_restore.group_set = [ObjectId(i) for i in node_to_be_restore.snapshot.keys()]
+				node_to_be_restore.status = u'PUBLISHED'
 				node_to_be_restore.save(group_id)
 				# print "--- ", node_to_be_restore.group_set
 				response_dict['success'] = True
