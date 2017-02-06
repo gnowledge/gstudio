@@ -186,10 +186,10 @@
 
 				$.ajax({
 	            	url: "{% url 'get_topic_contents' groupid %}",
-	             	type: 'POST',
+					// type: 'POST',
 	             	data:{
 	             		node_id: topic_id,
-	             		csrfmiddlewaretoken: '{{ csrf_token }}'
+						// csrfmiddlewaretoken: '{{ csrf_token }}'
 	             	},
 	             	success: function(data){
 	             		
