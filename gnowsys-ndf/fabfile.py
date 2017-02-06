@@ -28,8 +28,21 @@ def purge_group():
 
 
 def setup_dlkit():
-	# 1. confirm path
-	# 2. check whether dlkit already exists. if not clone dlkit else update dlkit.
-	# 3. check whether dlkit_runtime already exists. if not clone dlkit else update dlkit_runtime.
-	# 4. get files for app_configs.
-	pass
+    import os
+    dirspot = os.getcwd()
+    if "/home/docker/code/gstudio/gnowsys-ndf" == dirspot:
+ 		if not os.path.isdir('./dlkit') and not os.path.isdir('./dlkit_runtime'):
+			local('git checkout dlkit')
+			local('git pull origin dlkit')
+			local('git clone https://bitbucket.org/cjshaw/dlkit_runtime.git')
+			local('git clone https://bitbucket.org/cjshaw/dlkit-tests.git')
+			local('git clone https://bitbucket.org/cjshaw/dlkit.git')
+			os.chdir('/home/docker/code/gstudio/gnowsys-ndf/dlkit')
+			local('git submodule update --init --recursive')
+			os.chdir('/home/docker/code/gstudio/gnowsys-ndf/')
+			update_data()
+     	else:
+         	print "dlkit and dlkit_runtime are already exists."
+	else:
+		os.chdir('/home/docker/code/gstudio/gnowsys-ndf')
+		setup_dlkit()
