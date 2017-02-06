@@ -107,23 +107,26 @@
 
 
     <div id="envelop-cover">
-
       <div class="medium-12 course-page-header">
       <div class="row " >
         <div class="course-header-background">
           {% include 'ndf/upload_pic_widget.html' with url_name='course_about' widget_for="group_banner" is_banner=True is_profile=False no_update_btn=True%}
-          <div class="course-header-background-layer"></div>
         </div>
+        <div class="course-header-background-layer">
+          </div>
+    
         {% if is_gstaff %}
           <div class="row" style="z-index: 2;">
               <div class="course-settings">
+                {% comment %}
                 <span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="tiny radius right">
                   <i class="fi-widget"></i>
                 </span>
                 <span data-reveal-id="group_banner_prof_pic_prop" id="group_banner_btnUploadProfilePic" class="right">
                   <i class="fi-photo"></i>
-                  <span style="position: relative;top: -3px;left: 2px;">Change image</span>
+                  <!--<span style="position: relative;top: -3px;left: 2px;">Change image</span>-->
                 </span>
+                {% endcomment %}
                 <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                   {% with group_obj.member_of_names_list.0 as sg_type %}
                     <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fi-page-edit"></i> {% trans "Edit" %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
@@ -179,7 +182,7 @@
 
         <div class="row">
           <div class="columns small-3 small-centered course-title">
-            {% firstof group_obj.altnames group_obj.name  %}
+            <!--{% firstof group_obj.altnames group_obj.name  %}-->
           </div>
         </div>
         {% comment %}
@@ -187,7 +190,7 @@
         {% if request.user.is_authenticated %}
         <div class="row">
           <div class="columns small-3 small-centered">
-            <label>{{completed_count}} out of {{total_count}} modules completed</label>
+            <!--<label>{{completed_count}} out of {{total_count}} modules completed</label>-->
             <div class="progress success round">
             <div class="meter" style="width: {{course_complete_percentage}}%"></div>
             </div>
@@ -213,32 +216,37 @@
 
             <li class="tab-title {% ifequal title 'about' %}active{% endifequal %}">
               <a href="{% url 'course_about' group_id %}">
-                <i class="fi-eye "></i>
-                <span>{% trans "Overview" %}</span>
+                <i class=" "></i><span>{% trans "My Projects" %}</span>
               </a>
             </li>
 
             <li class="tab-title {% ifequal title 'course content' %}active{% endifequal %}">
               <a href="{% url 'course_content' group_id %}">
-                <i class="fi-list-thumbnails"></i><span>{% trans "Course Content" %}</span>
+                <i class=""></i><span>{% trans "My Performance" %}</span>
               </a>
             </li>
 
-            <li class="tab-title {% ifequal title 'raw material' %}active{% endifequal %}">
+            <li class="tab-title {% ifequal title 'my project' %}active{% endifequal %}">
               <a href="{% url 'course_raw_material' group_id %}">
-                <i class="fi-paint-bucket "></i><span>{% trans "Raw Material" %}</span>
+                <i class=""></i><span>{% trans "Bookmarks" %}</span>
               </a>
             </li>
 
             <li class="tab-title {% ifequal title 'notebook' %}active{% endifequal %}">
               <a href="{% url 'course_notebook' group_id %}">
-                <i class="fi-book "></i><span>{% trans "Notebook" %}</span>
+                <i class=""></i><span>{% trans "My Shelf" %}</span>
               </a>
             </li>
 
             <li class="tab-title {% ifequal title 'gallery' %}active{% endifequal %}">
               <a href="{% url 'course_gallery' group_id %}">
-                <i class="fi-photo "></i> <span>{% trans "Gallery" %}</span>
+                <i class=""></i> <span>{% trans "My Calender" %}</span>
+              </a>
+            </li>
+
+            <li class="tab-title {% ifequal title 'gallery' %}active{% endifequal %}">
+              <a href="#">
+                <i class=""></i> <span>{% trans "About Me" %}</span>
               </a>
             </li>
             <!--
@@ -285,11 +293,13 @@
           <div class="large-12 columns">
             <label>
               <select id="selectCourseTab">
-                <option value="about_course" {% ifequal title 'about' %}selected{% endifequal %}>{% trans "About the course" %}</option>
-                <option value="course_content" {% ifequal title 'course content' %}selected{% endifequal %}>{% trans "Course Content" %}</option>
-                <option value="raw_material" {% ifequal title 'raw material' %}selected{% endifequal %}>{% trans "Raw Material" %}g</option>
-                <option value="notebook" {% ifequal title 'notebook' %}selected{% endifequal %}>{% trans "Notebook" %}</option>
-                <option value="gallery" {% ifequal title 'gallery' %}selected{% endifequal %}>{% trans "Gallery" %}</option>
+                <option value="option_Select" {% ifequal title 'Select' %}selected{% endifequal %}>{% trans "Select" %}</option>
+                <option value="about_course" {% ifequal title 'My Projects' %}selected{% endifequal %}>{% trans "My Projects" %}</option>
+                <option value="course_content" {% ifequal title 'My Performance' %}selected{% endifequal %}>{% trans "My Performance" %}</option>
+                <option value="raw_material" {% ifequal title 'Bookmarks' %}selected{% endifequal %}>{% trans "Bookmarks" %}g</option>
+                <option value="notebook" {% ifequal title 'My Shelf' %}selected{% endifequal %}>{% trans "My Shelf" %}</option>
+                <option value="gallery" {% ifequal title 'My Calender' %}selected{% endifequal %}>{% trans "My Calender" %}</option>
+                <option value="gallery" {% ifequal title 'About Me' %}selected{% endifequal %}>{% trans "About Me" %}</option>
               </select>
             </label>
           </div>
@@ -297,7 +307,7 @@
         <!-- Load tab contents dynamically -->
         <div class="tabs-content course-book">
           <div class="content active" id="course-dashboard">
-            {% if title == 'dashboard' %}
+            <!--{% if title == 'dashboard' %}
               {% include "ndf/gcourseDashboard.html" %}
 
             {% elif title == 'course content' %}
@@ -314,7 +324,7 @@
 
             {% elif title == 'about' %}
               {% include "ndf/course_about.html" %}
-              {% comment %}
+              {% comment %}-->
               <div class="row collapse">
                 <div class="about-course-details">
                   <!--@anotation('replace this with the about course details')-->
