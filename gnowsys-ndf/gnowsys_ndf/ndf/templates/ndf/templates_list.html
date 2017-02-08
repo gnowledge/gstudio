@@ -21,8 +21,8 @@ a:hover + .box,.box:hover{
 {% block related_content %}
 
 {% endblock %}
-{% block body_content %}
- 	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-6" >
+{% block body_content %} 
+ 	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
     {% for each in templates_cur %}
 
     <li class="template-list">
@@ -40,8 +40,6 @@ a:hover + .box,.box:hover{
                             var content = $(this).children('div').attr("data-content");
                             CKEDITOR.instances['ckeditor_textarea'].insertHtml(content);
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
-
-
                           });
 
 </script>
