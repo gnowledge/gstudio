@@ -385,7 +385,6 @@ STATIC_ROOT = '/static'
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
-EPUB_store = '../doc/epubs/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -678,6 +677,9 @@ RCS_REPO_DIR = os.path.join(GSTUDIO_DATA_ROOT, RCS_REPO_DIRNAME)
 
 GSTUDIO_LOGS_DIRNAME = 'gstudio-logs'
 GSTUDIO_LOGS_DIR_PATH = os.path.join(GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIRNAME)
+
+GSTUDIO_EPUBS_LOC_NAME = 'gstudio-epubs'
+GSTUDIO_EPUBS_LOC_PATH = os.path.join(GSTUDIO_DATA_ROOT, GSTUDIO_EPUBS_LOC_NAME)
 
 GSTUDIO_MAIL_DIRNAME = 'MailClient'
 GSTUDIO_MAIL_DIR_PATH = os.path.join(GSTUDIO_DATA_ROOT, GSTUDIO_MAIL_DIRNAME)
