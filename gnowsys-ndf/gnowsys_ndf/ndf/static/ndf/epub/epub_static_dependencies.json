@@ -1,0 +1,6 @@
+{
+	"Fonts": [],
+	"Styles": ["/static/ndf/bower_components/foundation/css/foundation.css"],
+	"Misc": ["/static/ndf/bower_components/videojs/dist/video-js/video.js"],
+	"Images": []
+}

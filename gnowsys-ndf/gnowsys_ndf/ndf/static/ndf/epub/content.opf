@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package version="3.0" unique-identifier="uuid_id" xmlns="http://www.idpf.org/2007/opf">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:identifier id="uuid_id" opf:scheme="uuid"/></dc:identifier>
+    <dc:language>en</dc:language>
+    <dc:title>CLIx gStudio Authoring</dc:title>
+    <meta name="gstudio" content="0.9.6" />
+    <meta property="dcterms:modified">2016-08-29T12:07:01Z</meta>
+  </metadata>
+  <manifest>
+     <!-- toc and nav -->
+    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+    <item id="nav.html" href="Text/nav.html" media-type="text/html" properties="nav"/>
+    <item id="foundation.css" href="Styles/foundation.css" media-type="text/css"/>
+    <item id="video.js" href="Misc/video.js" media-type="text/css"/>
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="nav.html" linear="no"/>
+  </spine>
+  <guide>
+    <reference type="toc" title="Table of Content" href="Text/nav.html"/>
+  </guide>
+</package>
