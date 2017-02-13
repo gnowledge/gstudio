@@ -27,8 +27,8 @@ grp_as_repo = repo_lookup_session.get_repository(grp_as_repo_id)
 print "\n Group: ", grp_as_node.name
 
 # Create Asset 
-files_count = int(raw_input("Enter No. of files to be added*: "))
-for i in xrange(0, files_count):
+assets_count = int(raw_input("Enter No. of Assets to be added*: "))
+for i in xrange(0, assets_count):
 	print "Adding Asset %d" % (i+1)
 	asset_name = raw_input("Enter Asset Name*: ")
 	asset_desc = raw_input("Enter Asset Description: ")
@@ -38,19 +38,23 @@ for i in xrange(0, files_count):
 		asset_form.description = asset_desc
 		asset_obj = grp_as_repo.create_asset(asset_form)
 		print "\n Asset created successfully."
+
 		# Create AssetContent 
-		asset_content_type_list = []
-		assetcontent_form = grp_as_repo.get_asset_content_form_for_create(
-			asset_obj.ident, asset_content_type_list)
-		assetcontent_name = raw_input("Enter AssetContent Name*: ")
-		assetcontent_desc = raw_input("Enter AssetContent Description: ")
-		if assetcontent_name:
-			assetcontent_form.display_name = assetcontent_name
-			assetcontent_form.description = assetcontent_desc
-			# To upload file
-			filepath = raw_input("Enter path of file to be uploaded*: ")
-			if os.path.exists(filepath):
-				file_obj = open(filepath, 'r')
-				assetcontent_form.set_data(DataInputStream(file_obj))
-				assetcontent_obj = grp_as_repo.create_asset_content(assetcontent_form)
-				print "\n AssetContent created successfully."
+		assetcontents_count = int(raw_input("Enter No. of AssetContents to be added*: "))
+		for i in xrange(0, assetcontents_count):
+			print "Adding AssetContent %d" % (i+1)
+			asset_content_type_list = []
+			assetcontent_form = grp_as_repo.get_asset_content_form_for_create(
+				asset_obj.ident, asset_content_type_list)
+			assetcontent_name = raw_input("Enter AssetContent Name*: ")
+			assetcontent_desc = raw_input("Enter AssetContent Description: ")
+			if assetcontent_name:
+				assetcontent_form.display_name = assetcontent_name
+				assetcontent_form.description = assetcontent_desc
+				# To upload file
+				filepath = raw_input("Enter path of file to be uploaded*: ")
+				if os.path.exists(filepath):
+					file_obj = open(filepath, 'r')
+					assetcontent_form.set_data(DataInputStream(file_obj))
+					assetcontent_obj = grp_as_repo.create_asset_content(assetcontent_form)
+					print "\n AssetContent created successfully."
