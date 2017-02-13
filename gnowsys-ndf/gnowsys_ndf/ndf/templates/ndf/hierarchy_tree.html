@@ -84,7 +84,7 @@
 				if (node.node_type == "Topic"){        					
 					$li.find('.jqtree-element').append(
 
-            				'&nbsp;&nbsp;<a id='+node.id+' name='+node.name+' class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
+            				'&nbsp;&nbsp;<a id='+node.id+' name='+node.name+' class="topic" href="/{{groupid}}/{{topic_url}}/'+node.id+'/"> </a>' 
         			);	            			
 				}
 				else{
@@ -94,7 +94,7 @@
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
 
-                				'&nbsp;&nbsp;<a href="/{{groupid}}/topics/'+node.id+'/"> <i class="fa fa-pencil" style="color:#4c4c4c"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/{{topic_url}}/'+node.id+'/"> <i class="fa fa-pencil" style="color:#4c4c4c"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
                 			
                 			{% endif %}
         				);
@@ -266,7 +266,7 @@
 			alert($(this).siblings("a").attr("id"));
 		});
 
-		$("#add_theme_item").click(function() {
+		$("#add_theme_items").click(function() {
 			      $.ajax({
 		        type: "POST",
 		        url: "{% url 'add_theme_item' groupid %}",
