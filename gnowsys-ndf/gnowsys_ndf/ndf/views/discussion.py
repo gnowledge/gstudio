@@ -451,4 +451,6 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
 
 @get_execution_time
 def get_thread_comments_count(request, group_id, thread_node_id):
-    return HttpResponse(node_collection.find({'member_of': reply_st._id, 'origin.thread_id':ObjectId(thread_node_id)}).count())
+    return HttpResponse(node_collection.find({'group_set': group_id,
+                         'member_of': reply_st._id,
+                         'origin.thread_id':ObjectId(thread_node_id)}).count())

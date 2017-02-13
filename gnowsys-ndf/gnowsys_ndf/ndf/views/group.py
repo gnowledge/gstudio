@@ -1319,7 +1319,9 @@ class GroupCreateEditHandler(View):
             -- CourseEvent Group
             -- ProgramEvent Group
     """
+
     @method_decorator(login_required)
+    @method_decorator(staff_required)
     @method_decorator(get_execution_time)
     def get(self, request, group_id, action):
         """
@@ -1405,6 +1407,7 @@ class GroupCreateEditHandler(View):
     # --- END of get() ---
 
     @method_decorator(login_required)
+    @method_decorator(staff_required)
     @method_decorator(get_execution_time)
     def post(self, request, group_id, action):
         '''
@@ -1501,6 +1504,7 @@ class EventGroupCreateEditHandler(View):
         - ProgramEvent Group
     """
     @method_decorator(login_required)
+    @method_decorator(staff_required)
     @method_decorator(get_execution_time)
     def get(self, request, group_id, action, sg_type):
         """
@@ -1564,6 +1568,7 @@ class EventGroupCreateEditHandler(View):
     # --- END of get() ---
 
     @method_decorator(login_required)
+    @method_decorator(staff_required)
     @method_decorator(get_execution_time)
     def post(self, request, group_id, action, sg_type):
         '''
