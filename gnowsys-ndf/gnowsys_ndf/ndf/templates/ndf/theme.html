@@ -276,7 +276,7 @@ margin-top:15px;
 		<br/>
 		{% cache 300 theme_tree node.pk request.LANGUAGE_CODE tree unfold selected %}
 
-			{% include "ndf/hierarchy_tree.html" %}
+			{% include "ndf/hierarchy_tree.html" with topic_url="topics" %}
 			<div id="app-set-item" class="themes hide" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}">
 			</div>
 
