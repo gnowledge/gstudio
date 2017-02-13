@@ -2557,6 +2557,8 @@ def upload_using_save_file(request,group_id):
 
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
+    selected_topic = request.POST.getlist("topic_list", "")
+    print "--------------------",selected_topic 
     usrid = request.user.id
     # print "\n\n\nusrid",usrid
     # # url_name = "/"+str(group_id)
@@ -2671,7 +2673,10 @@ def upload_using_save_file(request,group_id):
                 if not type(tags) is list:
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 file_node.tags = tags
+            relation_type = node_collection.one({'_type':'RelationType', 'name':'teaches'})
+            create_grelation(file_node._id,relation_type,ObjectId(selected_topic[0]))
             file_node.save(groupid=group_id,validate=False)
+            
             return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
     # print "\n\nretirn gs_obj_list",gs_obj_list
     # gs_obj_id = gs_obj_list[0]['_id']
