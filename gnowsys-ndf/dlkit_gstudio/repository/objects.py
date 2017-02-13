@@ -1402,7 +1402,8 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         # filesys = gridfs.GridFS(dbase)
         # self._my_map['data'] = data.read()
         # data._my_data.seek(0)
-        self._gstudio_map['data'] = data
+        # data._my_data.seek(0)
+        self._gstudio_map['data'] = data._my_data
         # data._my_data.seek(0)
         # print data._my_data.read()
         # self._my_map['base64'] = base64.b64encode(data._my_data.read())
