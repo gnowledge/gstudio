@@ -20,7 +20,7 @@ grp_as_node_name = raw_input("Enter name of Group to add Assets*: ")
 grp_as_node = node_collection.one({"_type": "Group", "name": unicode(grp_as_node_name.strip())})
 # print "grp_as_repo: ",grp_as_repo
 # print "grp_as_repo_id: ", grp_as_repo_id
-grp_as_repo_id = Id(identifier=str(home_grp._id),
+grp_as_repo_id = Id(identifier=str(grp_as_node._id),
 		namespace="repository.Repository",
 		authority="GSTUDIO")
 grp_as_repo = repo_lookup_session.get_repository(grp_as_repo_id)
