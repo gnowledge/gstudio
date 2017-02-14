@@ -112,7 +112,7 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         """Adds OsidObject elements to object map"""
 
         super(OsidObject, self).get_object_map(obj_map)
-        obj_map['id'] = self.get_id()
+        obj_map['id'] = str(self.get_id())
         obj_map['displayName'] = get_display_text_map(self.get_display_name())
         obj_map['description'] = get_display_text_map(self.get_description())
         try:
