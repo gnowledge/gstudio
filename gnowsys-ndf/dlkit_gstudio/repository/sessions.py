@@ -508,7 +508,13 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        object_id_list = []
+        for i in asset_content_ids:
+            object_id_list.append(ObjectId(self._get_id(i, 'repository').get_identifier()))
+        result_cur = Node.get_nodes_by_ids_list(object_id_list)
+        # sorted_result = list(result_cur)
+        asset_content_objs = [AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
+        return AssetContentList(asset_content_objs)
 
     @utilities.arguments_not_none
     def get_asset_contents_by_genus_type(self, asset_content_genus_type):
