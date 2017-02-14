@@ -164,6 +164,12 @@ class Extensible(abc_osid_markers.Extensible):
     def __getitem__(self, item):
        return getattr(self, item)
 
+
+    def get_object_map(self, obj_map):
+        """Adds Extensible elements to object map"""
+        obj_map['recordTypeIds'] = [] # THIS WILL NEED TO BE IMPLEMENTED
+        return obj_map
+
 class Browsable(abc_osid_markers.Browsable):
     """A marker interface for objects that offer property inspection."""
 
@@ -373,6 +379,49 @@ class Sourceable(abc_osid_markers.Sourceable):
         raise errors.Unimplemented()
 
     license_ = property(fget=get_license)
+
+
+    def get_object_map(self, obj_map):
+        """Adds Sourceable elements to object map"""
+
+        def get_display_text_map(display_text):
+            return {'formatTypeId': str(display_text.get_format_type()),
+            'languageTypeId': str(display_text.get_language_type()),
+            'scriptTypeId': str(display_text.get_script_type()),
+            'text': str(display_text.get_text())}
+
+        blank_display_text = {'formatTypeId': 'TextFormats%3APLAIN%40okapia.net',
+        'languageTypeId': '639-2%3AENG%40ISO',
+        'scriptTypeId': u'15924%3ALATN%40ISO',
+        'text': ''}
+
+        # Provider Ids:
+        try:
+            obj_map['providerId'] = str(self.get_provider_id())
+        except errors.Unimplemented:
+            obj_map['providerId'] = ''
+
+        # Branding Ids:
+        obj_map['brandingIds'] = []
+        try:
+            branding_ids = self.get_branding_ids()
+        except errors.Unimplemented:
+            pass
+        else:
+            for branding_id in branding_ids:
+                obj_map['brandingIds'].append(str(branding_id))
+
+        # License:
+        try:
+            license_ = self.get_license()
+        except Unimplemented:
+            obj_map['license'] = blank_display_text
+        else:
+            obj_map['license'] = get_display_text(license_)
+        return obj_map
+
+
+
 
 
 class Federateable(abc_osid_markers.Federateable):

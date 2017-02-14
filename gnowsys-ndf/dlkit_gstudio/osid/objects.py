@@ -108,6 +108,28 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         osid_markers.Identifiable.__init__(self)
         self._gstudio_node = gstudio_node
 
+    def get_object_map(self, obj_map):
+        """Adds OsidObject elements to object map"""
+
+        def get_display_text_map(display_text):
+            """Returns display text elements for map"""
+            return {'formatTypeId': str(display_text.get_format_type()),
+            'languageTypeId': str(display_text.get_language_type()),
+            'scriptTypeId': str(display_text.get_script_type()),
+            'text': str(display_text.get_text())}
+
+        super(OsidObject, self).get_object_map(obj_map)
+        obj_map['displayName'] = self.get_display_name()
+        obj_map['description'] = self.get_description()
+        try:
+            obj_map['genusType'] = str(self.get_genus_type())
+        except errors.Unimplemented:
+            obj_map['genusType'] = 'Default%3ADefault%40Default'
+        return obj_map
+
+    object_map = property(get_object_map)
+
+
     def get_display_name(self):
         """Gets the preferred display name associated with this instance of this OSID object appropriate for display to the user.
 
@@ -325,7 +347,10 @@ class OsidCatalog(abc_osid_objects.OsidCatalog, OsidObject, osid_markers.Sourcea
 
         # Should we initialize Sourceable?
         # Should we initialize Federatable?
-    
+
+    def get_object_map(self, obj_map):
+        """Adds OsidCatalog elements to object map"""
+        super(OsidCatalog, self).get_object_map(obj_map)    
 
 
 
@@ -1256,6 +1281,12 @@ class OsidTemporalForm(abc_osid_objects.OsidTemporalForm, OsidForm):
     def _init_form(self):
         """Initialize form elements"""
 
+    def _init_map(self):
+        # pylint: disable=attribute-defined-outside-init
+        # this method is called from descendent __init__
+        self._my_map['startDate'] = self._mdata['start_date']['default_date_time_values'][0]
+        self._my_map['endDate'] = self._mdata['end_date']['default_date_time_values'][0]
+
     def get_start_date_metadata(self):
         """Gets the metadata for a start date.
 
@@ -1714,21 +1745,6 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
 
         if 'mdata' in kwargs:
             self._mdata.update(kwargs['mdata'])
-
-    # def _init_map(self):
-    #     print "\n Init map === "
-    #     """Initialize map for form"""
-    #     OsidForm._init_map(self)
-    #     self._my_map['displayName'] = dict(self._display_name_default)
-    #     self._my_map['description'] = dict(self._description_default)
-    #     self._my_map['genusTypeId'] = self._genus_type_default
-    #     OsidExtensibleForm._init_map(self, record_types)
-    #     # """Initialize form elements"""
-    #     # self._display_name = self._display_name_default
-    #     # self._description = self._description_default
-    #     # self._genus_type = self._genus_type_default
-
-    # # def _init_map(self, record_types=None):
 
 
     def _init_map(self, record_types=None):
