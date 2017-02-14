@@ -27,8 +27,7 @@ from ..utilities import get_registry
 from ..utilities import update_display_text_defaults
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
-
-
+from ..utilities import get_display_text_map
 
 
 class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.Aggregateable, osid_markers.Sourceable):
@@ -457,6 +456,56 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         raise errors.Unimplemented()
 
 
+
+    def get_object_map(self):
+        """Returns object map dictionary"""
+
+        obj_map = dict()
+        super(Asset, self).get_object_map(obj_map)
+        obj_map['type'] = 'Asset'
+
+        obj_map['assignedRepositoryIds'] = [] # THIS NEEDS TO BE IMPLEMENTED BY GSTUDIO TEAM
+
+        # Title:
+        try:
+            title = self.get_title()
+        except Unimplemented:
+            obj_map['title'] = get_display_text_map()
+        else:
+            obj_map['title'] = get_display_text_map(title)
+
+        # Copyright:
+        try:
+            copyright = self.get_copyright()
+        except Unimplemented:
+            obj_map['copyright'] = get_display_text_map()
+        else:
+            obj_map['copyright'] = get_display_text_map(copyright)
+
+        # Asset Contents:
+        asset_content_list = []
+        try:
+            asset_contents = self.get_asset_contents()
+        except errors.Unimplemented:
+            pass
+        else:
+            for asset_content in asset_contents:
+                asset_content_list.append(asset_content.get_object_map())
+        obj_map['assetContents'] = asset_content_list
+
+        # CONTINUE IN THIS VEIN FOR ANY OTHER ATTRIBUTES NEEDED FOR ASSET ...OK
+        return obj_map
+    # object_map = property(fget=get_object_map)
+    #     def get_object_map(self):
+    #         obj_map = dict(self._my_map)
+    #         obj_map['assetContent'] = obj_map['assetContents'] = [ac.object_map
+    #                                                               for ac in self.get_asset_contents()]
+    #         # note: assetContent is deprecated
+    #         return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)
+
+
 class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, osid_objects.OsidAggregateableForm, osid_objects.OsidSourceableForm):
     """This is the form for creating and updating ``Assets``.
 
@@ -475,7 +524,8 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         self._mdata = default_mdata.get_asset_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():
-            self._init_form(**kwargs)
+            # self._init_form(**kwargs)
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         """Initialize form metadata"""
@@ -500,12 +550,28 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         self._composition_default = self._mdata['composition']['default_id_values'][0]
         self._published_default = self._mdata['published']['default_boolean_values'][0]
 
-    def _init_form(self, record_types=None, **kwargs):
-        """Initialize form elements"""
+    def _init_map(self, record_types=None, **kwargs):
+        """Initialize form map"""
 
         osid_objects.OsidSourceableForm._init_map(self)
         osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
-        # Initialize all form elements to default values here
+        self._my_map['copyrightRegistration'] = self._copyright_registration_default
+        self._my_map['assignedRepositoryIds'] = [str(kwargs['repository_id'])]
+        self._my_map['copyright'] = self._copyright_default
+        self._my_map['title'] = self._title_default
+        self._my_map['distributeVerbatim'] = self._distribute_verbatim_default
+        self._my_map['createdDate'] = self._created_date_default
+        self._my_map['distributeAlterations'] = self._distribute_alterations_default
+        self._my_map['principalCreditString'] = self._principal_credit_string_default
+        self._my_map['publishedDate'] = self._published_date_default
+        self._my_map['sourceId'] = self._source_default
+        self._my_map['providerLinkIds'] = self._provider_links_default
+        self._my_map['publicDomain'] = self._public_domain_default
+        self._my_map['distributeCompositions'] = self._distribute_compositions_default
+        self._my_map['compositionId'] = self._composition_default
+        self._my_map['published'] = self._published_default
+        self._my_map['assetContents'] = []
+
 
     def get_title_metadata(self):
         """Gets the metadata for an asset title.
@@ -1260,6 +1326,37 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         """
         raise errors.Unimplemented()
 
+    def get_object_map(self):
+        """Returns object map dictionary"""
+        obj_map = dict()
+        super(AssetContent, self).get_object_map(obj_map)
+        obj_map['type'] = 'AssetContent'
+
+        # Asset Id:
+        obj_map['assetId'] = self.get_asset_id()
+        # GET_ASSET_ID NEEDS TO BE IMPLEMENTED BY GSTUDIO TEAM
+
+        # Accessibility Types:
+        access_type_list = []
+        try:
+            access_types = self.get_accessibility_types()
+        except (errors.Unimplemented, errors.IllegalState):
+            pass
+        else:
+            for access_type in access_types:
+                access_type_list.append(str(access_type))
+        obj_map['accessibilityTypes'] = access_type_list
+
+        # URL:
+        try:
+            obj_map['url'] = self.get_url()
+        except (errors.Unimplemented, errors.IllegalState):
+            obj_map['url'] = ''
+
+        # Data:
+        obj_map['data'] = None  # COLE: DO WE USE THIS IN OBJECT_MAP?
+        return obj_map
+    object_map = property(fget=get_object_map)
 
 class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.OsidObjectForm, osid_objects.OsidSubjugateableForm):
     """This is the form for creating and updating content for ``AssetContent``.
@@ -1605,6 +1702,13 @@ class Composition(abc_repository_objects.Composition, osid_objects.OsidObject, o
         """
         raise errors.Unimplemented()
 
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if 'assetIds' in obj_map:
+            del obj_map['assetIds']
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)
 
 class CompositionForm(abc_repository_objects.CompositionForm, osid_objects.OsidObjectForm, osid_objects.OsidContainableForm, osid_objects.OsidOperableForm, osid_objects.OsidSourceableForm):
     """This is the form for creating and updating ``Compositions``.
@@ -1624,7 +1728,7 @@ class CompositionForm(abc_repository_objects.CompositionForm, osid_objects.OsidO
         self._mdata = default_mdata.get_composition_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():
-            self._init_form(**kwargs)
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         """Initialize form metadata"""
@@ -1634,12 +1738,12 @@ class CompositionForm(abc_repository_objects.CompositionForm, osid_objects.OsidO
         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
         self._children_default = self._mdata['children']['default_id_values']
 
-    def _init_form(self, record_types=None, **kwargs):
+    def _init_map(self, record_types=None, **kwargs):
         """Initialize form elements"""
 
         osid_objects.OsidContainableForm._init_map(self)
         osid_objects.OsidSourceableForm._init_map(self)
-        osid_objects.OsidObjectForm._init_form(self, record_types=record_types)
+        osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         # Initialize all form elements to default values here
 
     @utilities.arguments_not_none
@@ -1748,6 +1852,14 @@ class Repository(abc_repository_objects.Repository, osid_objects.OsidCatalog):
         """
         raise errors.Unimplemented()
 
+    def get_object_map(self):
+        """Returns object map dictionary"""
+        obj_map = dict()
+        super(Repository, self).get_object_map(obj_map)
+        obj_map['type'] = 'Repository'
+        return obj_map
+
+    object_map = property(fget=get_object_map)
 
 class RepositoryForm(abc_repository_objects.RepositoryForm, osid_objects.OsidCatalogForm):
     """This is the form for creating and updating repositories.
@@ -1866,6 +1978,18 @@ class RepositoryNode(abc_repository_objects.RepositoryNode, osid_objects.OsidNod
     ``RepositoryHierarchySession``.
 
     """
+
+    def get_object_node_map(self):
+        node_map = dict(self.get_repository().get_object_map())
+        node_map['type'] = 'RepositoryNode'
+        node_map['parentNodes'] = []
+        node_map['childNodes'] = []
+        for repository_node in self.get_parent_repository_nodes():
+            node_map['parentNodes'].append(repository_node.get_object_node_map())
+        for repository_node in self.get_child_repository_nodes():
+            node_map['childNodes'].append(repository_node.get_object_node_map())
+        return node_map
+
 
     def get_repository(self):
         """Gets the ``Repository`` at this node.

@@ -32,7 +32,7 @@ all_repos = repository_service_mgr.get_repositories()
 print "\nTotal repositories: ", all_repos.available()
 test_repo = None
 for each in all_repos:
-	print "\t- ", each.get_display_name().get_text()
+	print "\t- ", each.get_display_name()
 	test_repo = each
 # So now test_repo holds the last repository found in the all_repos iterator.
 

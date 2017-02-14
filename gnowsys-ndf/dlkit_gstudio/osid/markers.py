@@ -13,7 +13,7 @@ from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.calendaring.primitives import DateTime
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.locale.primitives import DisplayText
-
+from ..utilities import get_display_text_map
 
 
 
@@ -163,6 +163,12 @@ class Extensible(abc_osid_markers.Extensible):
 
     def __getitem__(self, item):
        return getattr(self, item)
+
+
+    def get_object_map(self, obj_map):
+        """Adds Extensible elements to object map"""
+        obj_map['recordTypeIds'] = [] # THIS WILL NEED TO BE IMPLEMENTED
+        return obj_map
 
 class Browsable(abc_osid_markers.Browsable):
     """A marker interface for objects that offer property inspection."""
@@ -373,6 +379,38 @@ class Sourceable(abc_osid_markers.Sourceable):
         raise errors.Unimplemented()
 
     license_ = property(fget=get_license)
+
+
+    def get_object_map(self, obj_map):
+        """Adds Sourceable elements to object map"""
+
+        # Provider Ids:
+        try:
+            obj_map['providerId'] = str(self.get_provider_id())
+        except errors.Unimplemented:
+            obj_map['providerId'] = ''
+
+        # Branding Ids:
+        obj_map['brandingIds'] = []
+        try:
+            branding_ids = self.get_branding_ids()
+        except errors.Unimplemented:
+            pass
+        else:
+            for branding_id in branding_ids:
+                obj_map['brandingIds'].append(str(branding_id))
+
+        # License:
+        try:
+            license_ = self.get_license()
+        except Unimplemented:
+            obj_map['license'] = get_display_text_map()
+        else:
+            obj_map['license'] = get_display_text_map(license_)
+        return obj_map
+
+
+
 
 
 class Federateable(abc_osid_markers.Federateable):
