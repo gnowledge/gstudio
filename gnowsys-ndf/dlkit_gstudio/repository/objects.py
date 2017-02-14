@@ -27,8 +27,7 @@ from ..utilities import get_registry
 from ..utilities import update_display_text_defaults
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
-
-
+from ..utilities import get_display_text_map
 
 
 class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.Aggregateable, osid_markers.Sourceable):
@@ -461,18 +460,6 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
     def get_object_map(self):
         """Returns object map dictionary"""
 
-        def get_display_text_map(display_text):
-            """Returns display text elements for map"""
-            return {'formatTypeId': str(display_text.get_format_type()),
-            'languageTypeId': str(display_text.get_language_type()),
-            'scriptTypeId': str(display_text.get_script_type()),
-            'text': str(display_text.get_text())}
-
-        blank_display_text = {'formatTypeId': 'TextFormats%3APLAIN%40okapia.net',
-        'languageTypeId': '639-2%3AENG%40ISO',
-        'scriptTypeId': u'15924%3ALATN%40ISO',
-        'text': ''}
-
         obj_map = dict()
         super(Asset, self).get_object_map(obj_map)
         obj_map['type'] = 'Asset'
@@ -483,17 +470,17 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         try:
             title = self.get_title()
         except Unimplemented:
-            obj_map['title'] = blank_display_text
+            obj_map['title'] = get_display_text_map()
         else:
-            obj_map['title'] = get_display_text(title)
+            obj_map['title'] = get_display_text_map(title)
 
         # Copyright:
         try:
             copyright = self.get_copyright()
         except Unimplemented:
-            obj_map['copyright'] = blank_display_text
+            obj_map['copyright'] = get_display_text_map()
         else:
-            obj_map['copyright'] = get_display_text(copyright)
+            obj_map['copyright'] = get_display_text_map(copyright)
 
         # Asset Contents:
         asset_content_list = []

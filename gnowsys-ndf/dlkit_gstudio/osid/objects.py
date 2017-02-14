@@ -31,7 +31,7 @@ from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.type.primitives import Type
 from dlkit.primordium.locale.types import language, script
 from dlkit.primordium.locale.types import format as text_format
-
+from ..utilities import get_display_text_map
 
 
 
@@ -110,13 +110,6 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
 
     def get_object_map(self, obj_map):
         """Adds OsidObject elements to object map"""
-
-        def get_display_text_map(display_text):
-            """Returns display text elements for map"""
-            return {'formatTypeId': str(display_text.get_format_type()),
-            'languageTypeId': str(display_text.get_language_type()),
-            'scriptTypeId': str(display_text.get_script_type()),
-            'text': str(display_text.get_text())}
 
         super(OsidObject, self).get_object_map(obj_map)
         obj_map['displayName'] = self.get_display_name()

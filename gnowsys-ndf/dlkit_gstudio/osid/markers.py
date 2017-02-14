@@ -13,7 +13,7 @@ from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.calendaring.primitives import DateTime
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.locale.primitives import DisplayText
-
+from ..utilities import get_display_text_map
 
 
 
@@ -384,17 +384,6 @@ class Sourceable(abc_osid_markers.Sourceable):
     def get_object_map(self, obj_map):
         """Adds Sourceable elements to object map"""
 
-        def get_display_text_map(display_text):
-            return {'formatTypeId': str(display_text.get_format_type()),
-            'languageTypeId': str(display_text.get_language_type()),
-            'scriptTypeId': str(display_text.get_script_type()),
-            'text': str(display_text.get_text())}
-
-        blank_display_text = {'formatTypeId': 'TextFormats%3APLAIN%40okapia.net',
-        'languageTypeId': '639-2%3AENG%40ISO',
-        'scriptTypeId': u'15924%3ALATN%40ISO',
-        'text': ''}
-
         # Provider Ids:
         try:
             obj_map['providerId'] = str(self.get_provider_id())
@@ -415,9 +404,9 @@ class Sourceable(abc_osid_markers.Sourceable):
         try:
             license_ = self.get_license()
         except Unimplemented:
-            obj_map['license'] = blank_display_text
+            obj_map['license'] = get_display_text_map()
         else:
-            obj_map['license'] = get_display_text(license_)
+            obj_map['license'] = get_display_text_map(license_)
         return obj_map
 
 
