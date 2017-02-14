@@ -1316,7 +1316,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         content_data = None
         res_type = 'Page'
         if 'data' in asset_content_form._gstudio_map:
-            file_data = asset_content_form._gstudio_map['data']
+            file_data = [asset_content_form._gstudio_map['data']]
             res_type = 'File'
         else:
             content_data = asset_content_form._gstudio_map['content']
