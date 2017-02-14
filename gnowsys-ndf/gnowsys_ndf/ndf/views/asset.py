@@ -6,7 +6,7 @@ except ImportError:  # old pymongo
 from django.http import HttpRequest
 
 from gnowsys_ndf.ndf.models import Node, GSystemType
-from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, get_language_tuple, create_grelation
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LANGUAGE
 
@@ -58,7 +58,6 @@ def create_asset(name,
 
 	asset_gs_obj.save(group_id=group_id)
 	return asset_gs_obj
-
 
 def create_assetcontent(asset_id,
 						name,
@@ -125,9 +124,14 @@ def create_assetcontent(asset_id,
 										**kwargs)
 
 	asset_content_obj.save(group_id=group_id)
-
-	rt_has_asset_content = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
-
-	create_grelation(asset_obj._id, rt_has_asset_content, asset_content_obj._id)
+	asset_contents_list = [asset_content_obj._id]
+	rt_has_asset_content = node_collection.one({'_type': 'RelationType',
+		'name': 'has_assetcontent'})
+	asset_grels = triple_collection.find({'_type': 'GRelation', \
+		'relation_type': rt_has_asset_content._id,'subject': asset_obj._id},
+		{'_id': 0, 'right_subject': 1})
+	for each_asset in asset_grels:
+		asset_contents_list.append(each_asset['right_subject'])
+	create_grelation(asset_obj._id, rt_has_asset_content, asset_contents_list)
 
 	return asset_content_obj
