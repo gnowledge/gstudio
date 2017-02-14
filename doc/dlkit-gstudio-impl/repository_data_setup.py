@@ -56,5 +56,5 @@ for i in xrange(0, assets_count):
 				if os.path.exists(filepath):
 					file_obj = open(filepath, 'r')
 					assetcontent_form.set_data(DataInputStream(file_obj))
-					assetcontent_obj = grp_as_repo.create_asset_content(assetcontent_form)
-					print "\n AssetContent created successfully."
+				assetcontent_obj = grp_as_repo.create_asset_content(assetcontent_form)
+				print "\n AssetContent created successfully."
