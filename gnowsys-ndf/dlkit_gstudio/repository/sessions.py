@@ -14,7 +14,7 @@ from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
 from .objects import Repository, RepositoryList
-from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection
+from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection, Node
 from gnowsys_ndf.ndf.views.group import CreateGroup
 
 CREATED = True
