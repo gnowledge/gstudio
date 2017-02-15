@@ -178,8 +178,7 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        asset_identifier = ObjectId(self._get_id(asset_id, 'repository').get_identifier())
-        result = Node.get_node_by_id(asset_identifier)
+        result = Node.get_node_by_id(ObjectId(asset_id.identifier))
         return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
 
     @utilities.arguments_not_none
