@@ -1327,7 +1327,7 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         """
         # Return original url of AssetContent
-        return self['_gstudio_node']['if_file']['original']['relurl']
+        return ("media/" + self['_gstudio_node']['if_file']['original']['relurl'])
 
     url = property(fget=get_url)
 
