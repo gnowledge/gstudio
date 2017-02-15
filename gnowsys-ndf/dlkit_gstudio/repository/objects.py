@@ -14,6 +14,7 @@
 
 import importlib
 import gridfs
+from bson import ObjectId
 
 
 from . import default_mdata
@@ -28,6 +29,7 @@ from ..utilities import update_display_text_defaults
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
 from ..utilities import get_display_text_map
+from gnowsys_ndf.ndf.models import Node, node_collection, triple_collection
 
 
 class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.Aggregateable, osid_markers.Sourceable):
@@ -383,7 +385,11 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        id_list = []
+        for asset_content in self.get_asset_contents():
+            id_list.append(asset_content.get_id())
+        return AssetContentList(id_list)
+
 
     asset_content_ids = property(fget=get_asset_content_ids)
 
@@ -395,7 +401,21 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        asset_id = self.get_id().identifier
+        # asset_obj = Node.get_node_by_id(asset_id)
+        has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
+        asset_grels = triple_collection.find({'_type': 'GRelation', 
+            'subject': ObjectId(asset_id), 'relation_type': has_assetcontent_rt._id,
+            'status': u'PUBLISHED'}, {'right_subject': 1})
+        asset_content_objs = []
+        if asset_grels.count():
+            asset_content_ids = [each_rs['right_subject'] for each_rs in asset_grels]
+            # print asset_content_ids
+            result_cur = Node.get_nodes_by_ids_list(asset_content_ids)
+            asset_content_objs = [AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
+        # return AssetContentList(asset_content_objs, runtime=self._runtime, proxy=self._proxy)
+        return AssetContentList(asset_content_objs)
+
 
     asset_contents = property(fget=get_asset_contents)
 
@@ -469,7 +489,7 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         # Title:
         try:
             title = self.get_title()
-        except Unimplemented:
+        except errors.Unimplemented:
             obj_map['title'] = get_display_text_map()
         else:
             obj_map['title'] = get_display_text_map(title)
@@ -477,7 +497,7 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         # Copyright:
         try:
             copyright = self.get_copyright()
-        except Unimplemented:
+        except errors.Unimplemented:
             obj_map['copyright'] = get_display_text_map()
         else:
             obj_map['copyright'] = get_display_text_map(copyright)
@@ -1218,7 +1238,7 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return self.get_asset().get_id()
 
     asset_id = property(fget=get_asset_id)
 
@@ -1229,7 +1249,18 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
+        asset_content_ident = self.get_id().identifier
+        # asset_content_node = Node.get_node_by_id(ObjectId(asset_content_ident))
+        # Since every AssetContent can have ONLY one Asset
+        assetcontent_grel = triple_collection.find_one({'_type': 'GRelation',
+            'right_subject': ObjectId(asset_content_ident), 'relation_type': has_assetcontent_rt._id,
+            'status': u'PUBLISHED'}, {'subject': 1})
+
+        if assetcontent_grel:
+            asset_id = assetcontent_grel['subject']
+            asset_node = Node.get_node_by_id(asset_id)
+            return Asset(gstudio_node=asset_node)
 
     asset = property(fget=get_asset)
 
@@ -1333,8 +1364,8 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         obj_map['type'] = 'AssetContent'
 
         # Asset Id:
-        obj_map['assetId'] = self.get_asset_id()
-        # GET_ASSET_ID NEEDS TO BE IMPLEMENTED BY GSTUDIO TEAM
+        obj_map['assetId'] = str(self.get_asset_id())
+        # GET_ASSET_ID NEEDS TO BE IMPLEMENTED BY GSTUDIO TEAM - Done
 
         # Accessibility Types:
         access_type_list = []
