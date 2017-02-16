@@ -178,8 +178,10 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        result = Node.get_node_by_id(ObjectId(asset_id.identifier))
-        return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
+        if asset_id:
+            result = Node.get_node_by_id(ObjectId(asset_id.identifier))
+            return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
+        return pass
 
     @utilities.arguments_not_none
     def get_assets_by_ids(self, asset_ids):
@@ -895,32 +897,32 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
       if (!session.canCreateAssets()) {
           return "asset creation not permitted";
       }
-      
+
       Type types[1];
-      types[0] = assetPhotographType; 
+      types[0] = assetPhotographType;
       if (!session.canCreateAssetWithRecordTypes(types)) {
           return "creating an asset with a photograph type is not supported";
       }
-      
+
       AssetForm form = session.getAssetFormForCreate();
       Metadata metadata = form.getDisplayNameMetadata();
       if (metadata.isReadOnly()) {
           return "cannot set display name";
       }
-      
+
       form.setDisplayName("my photo");
-      
+
       PhotographRecordForm photoForm = (PhotographRecordForn) form.getRecordForm(assetPhotogaphType);
       Metadata metadata = form.getApertureMetadata();
       if (metadata.isReadOnly()) {
           return ("cannot set aperture");
       }
-      
+
       photoForm.setAperture("5.6");
       if (!form.isValid()) {
           return form.getValidationMessage();
       }
-      
+
       Asset newAsset = session.createAsset(form);
 
 
@@ -1038,7 +1040,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             self._forms[obj_form.get_id().get_identifier()] = not CREATED
 
         return obj_form
-        
+
 
     @utilities.arguments_not_none
     def create_asset(self, asset_form):
@@ -1075,7 +1077,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
          group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
 
-        # # asset_obj is gstudio node 
+        # # asset_obj is gstudio node
         if asset_obj:
             result = objects.Asset(
                 gstudio_node=asset_obj,
