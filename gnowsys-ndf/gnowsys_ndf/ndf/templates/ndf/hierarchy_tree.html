@@ -266,33 +266,7 @@
 			alert($(this).siblings("a").attr("id"));
 		});
 
-		$("#add_theme_items").click(function() {
-			      $.ajax({
-		        type: "POST",
-		        url: "{% url 'add_theme_item' groupid %}",
-		        datatype: "html",
-		        data:{
-		          context_theme: "{{node.pk}}",
-		          name: $(".name_id").val(),
-		          csrfmiddlewaretoken: '{{ csrf_token }}'
-		        },
-		        success: function(data) {
-
-		          var item = $(".name_id").val();
-
-		          if ($.trim(data) === "failure") {
-		            alert("Theme item "+ item +" already available, Please choose different name");
-		          }
-
-		          if ($.trim(data) === "success") {
-		            location.reload(true);
-		          }
-
-		          $(".name_id").val("");
-		        }
-		      });
-
-		});
+	
 
 		// script for fold themes_cards hierarchy
 		$(".fold").click(function() {
