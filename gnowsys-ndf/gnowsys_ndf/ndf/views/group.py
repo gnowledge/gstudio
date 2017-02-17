@@ -27,6 +27,8 @@ from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROG
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter, counter_collection
 from gnowsys_ndf.ndf.views.methods import *
+from gnowsys_ndf.ndf.views.asset import *
+
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
@@ -2565,6 +2567,7 @@ def upload_using_save_file(request,group_id):
     selected_topic = request.POST.getlist("topic_list", "")
     print "--------------------",selected_topic 
     usrid = request.user.id
+    name  = request.POST.get('name')
     # print "\n\n\nusrid",usrid
     # # url_name = "/"+str(group_id)
     # for key,value in request.FILES.items():
@@ -2583,11 +2586,16 @@ def upload_using_save_file(request,group_id):
 
     from gnowsys_ndf.ndf.views.filehive import write_files
     is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
-
+    content_org = request.POST.get('content_org', '')
+    uploaded_files = request.FILES.getlist('filehive', [])
+    asset_content_node = create_assetcontent(ObjectId('58a3dd4cc6bd690400016ae5'),name,group_id,request.user.id,content_org,uploaded_files)
+    print asset_content_node
+    relation_type = node_collection.one({'_type':'RelationType', 'name':'teaches'})
+    create_grelation(file_node._id,relation_type,ObjectId(selected_topic[0]))
     # gs_obj_list = write_files(request, group_id)
-    fileobj_list = write_files(request, group_id)
-    fileobj_id = fileobj_list[0]['_id']
-    file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
+    # fileobj_list = write_files(request, group_id)
+    # fileobj_id = fileobj_list[0]['_id']
+    file_node = node_collection.one({'_id': ObjectId(asset_content_node._id) })
 
     if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
         if request.POST:
@@ -2599,7 +2607,6 @@ def upload_using_save_file(request,group_id):
             # doc = request.POST.get("doc", "")
             usrname = request.user.username
             page_url = request.POST.get("page_url", "")
-            content_org = request.POST.get('content_org', '')
             access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
             tags = request.POST.get('tags', "")
             license = request.POST.get("License", "")
@@ -2678,11 +2685,17 @@ def upload_using_save_file(request,group_id):
                 if not type(tags) is list:
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 file_node.tags = tags
-            relation_type = node_collection.one({'_type':'RelationType', 'name':'teaches'})
-            create_grelation(file_node._id,relation_type,ObjectId(selected_topic[0]))
+            # rt_has_asset_content = node_collection.one({'_type': 'RelationType','name': 'has_assetcontent'})
+            # gr = create_grelation(ObjectId('58a3dd4cc6bd690400016ae5'), rt_has_asset_content, ObjectId(file_node._id))
+            # print gr
+            # # asset_node = create_asset(file_node.name,group_id,file_node.created_by,request)
+            # # print "++++++++++++++++++++++++++++++++++++++++",asset_node._id
+            # asset_content_node = create_assetcontent(ObjectId('58a3dd4cc6bd690400016ae5'),file_node.name,group_id,file_node.created_by)
+            # print "---------------------------------------",asset_content_node
+            
             file_node.save(groupid=group_id,validate=False)
             
-            return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}) )
+            return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':file_node._id}) )
     # print "\n\nretirn gs_obj_list",gs_obj_list
     # gs_obj_id = gs_obj_list[0]['_id']
     # print "\n\n\ngs_obj_id: ",gs_obj_id
