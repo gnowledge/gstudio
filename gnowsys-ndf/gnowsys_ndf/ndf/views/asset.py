@@ -91,6 +91,12 @@ def create_assetcontent(asset_id,
 
 	# compulsory values, if not found raise error.
 	# if not all([name, created_by, group_id, uploaded_files]):
+	print "asset_id: ", asset_id
+	print "name: ", name
+	print "created_by: ", created_by
+	print "group: ", group
+	print "test_content: ", test_content
+
 	if not all([name, created_by, group_id, test_content]):
 		raise ValueError('"asset_id", "name", "created_by", "group" and ("content" or "files") are mandatory args.')
 
