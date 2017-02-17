@@ -1860,8 +1860,8 @@ class Repository(abc_repository_objects.Repository, osid_objects.OsidCatalog):
     _namespace = 'repository.Repository'
 
     def __init__(self, **kwargs):
+        osid_objects.OsidCatalog.__init__(self, object_name='REPOSITORY', **kwargs)
         # self._record_type_data_sets = get_registry('REPOSITORY_RECORD_TYPES', runtime)
-        osid_objects.OsidCatalog.__init__(self, **kwargs)
 
 
     @utilities.arguments_not_none
