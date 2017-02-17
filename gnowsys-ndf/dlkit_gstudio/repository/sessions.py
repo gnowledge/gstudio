@@ -1085,7 +1085,9 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         self._forms[asset_form.get_id().get_identifier()] = CREATED
         # This should be part of _init_gstudio_map
         asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
-         group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
+         group_id=self._catalog_id.get_identifier(), created_by=1)
+        # asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
+        #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
 
         # # asset_obj is gstudio node 
         if asset_obj:
