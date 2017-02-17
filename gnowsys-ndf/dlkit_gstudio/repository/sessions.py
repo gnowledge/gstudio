@@ -1353,8 +1353,12 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             content_data = asset_content_form._gstudio_map['content']
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
          name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
-         created_by=req_obj.user.id, files=file_data, content=content_data,\
+         created_by=1, files=file_data, content=content_data,\
          resource_type=res_type)
+        # assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
+        #  name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
+        #  created_by=req_obj.user.id, files=file_data, content=content_data,\
+        #  resource_type=res_type)
 
         return objects.AssetContent(gstudio_node=assetcontent_obj,
                               runtime=self._runtime,
