@@ -1030,16 +1030,25 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
 
+        for arg in asset_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if asset_record_types == []:
             obj_form = objects.AssetForm(
                 repository_id=self._catalog_id,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id(),
                 proxy=self._proxy)
-            self._forms[obj_form.get_id().get_identifier()] = not CREATED
-
+        else:
+            obj_form = objects.AssetForm(
+                repository_id=self._catalog_id,
+                record_types=asset_record_types,
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form
-        
+
 
     @utilities.arguments_not_none
     def create_asset(self, asset_form):
@@ -1272,7 +1281,11 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-
+        if not isinstance(asset_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        for arg in asset_content_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if asset_content_record_types == []:
             obj_form = objects.AssetContentForm(
                 repository_id=self._catalog_id,
