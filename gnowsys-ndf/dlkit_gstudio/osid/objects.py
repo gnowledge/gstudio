@@ -1238,6 +1238,33 @@ class OsidExtensibleForm(abc_osid_objects.OsidExtensibleForm, OsidForm, osid_mar
     def _init_gstudio_map(self, record_types=None):
         """Initialize gstudio map for form"""
 
+    def _get_record(self, record_type):
+        """This overrides _get_record in osid.Extensible.
+
+        Perhaps we should leverage it somehow?
+
+        """
+        if (not self.has_record_type(record_type) and
+                record_type.get_identifier() not in self._record_type_data_sets):
+            raise errors.Unsupported()
+        if str(record_type) not in self._records:
+            record_initialized = self._init_record(str(record_type))
+            if record_initialized and str(record_type) not in self._gstudio_map['recordTypeIds']:
+                self._gstudio_map['recordTypeIds'].append(str(record_type))
+        return self._records[str(record_type)]
+
+    def _init_record(self, record_type_idstr):
+        """Override this from osid.Extensible because Forms use a different
+        attribute in record_type_data."""
+        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = importlib.import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['form_record_class_name'])
+        if record is not None:
+            self._records[record_type_idstr] = record(self)
+            return True
+        else:
+            return False
+
     def get_required_record_types(self):
         """Gets the required record types for this form.
 
@@ -1249,6 +1276,8 @@ class OsidExtensibleForm(abc_osid_objects.OsidExtensibleForm, OsidForm, osid_mar
 
         """
         raise errors.Unimplemented()
+
+    required_record_types = property(fget=get_required_record_types)
 
     required_record_types = property(fget=get_required_record_types)
 
