@@ -165,14 +165,26 @@ class Extensible(abc_osid_markers.Extensible):
            if not attr.startswith('__'):
                yield attr
 
-    def __getitem__(self, item):
-       return getattr(self, item)
+    def __getattr__(self, name):
+        if '_records' in self.__dict__:
+            for record in self._records:
+                try:
+                    return self._records[record][name]
+                except AttributeError:
+                    pass
+        raise AttributeError()
 
 
     def get_object_map(self, obj_map):
         """Adds Extensible elements to object map"""
         obj_map['recordTypeIds'] = [] # THIS WILL NEED TO BE IMPLEMENTED
         return obj_map
+
+
+    def _load_records(self, record_type_idstrs):
+        """Load all records from given record_type_idstrs."""
+        for record_type_idstr in record_type_idstrs:
+            self._init_record(record_type_idstr)
 
     def _init_records(self, record_types):
         """Initalize all records for this form."""
@@ -196,6 +208,55 @@ class Extensible(abc_osid_markers.Extensible):
             return True
         else:
             return False
+
+    def _get_record(self, record_type):
+        """Get the record string type value given the record_type."""
+        if not self.has_record_type(record_type):
+            raise errors.Unsupported()
+        if str(record_type) not in self._records:
+            raise errors.Unimplemented()
+        return self._records[str(record_type)]
+
+
+
+    def get_record_types(self):
+        """Gets the record types available in this object.
+
+        A record ``Type`` explicitly indicates the specification of an
+        interface to the record. A record may or may not inherit other
+        record interfaces through interface inheritance in which case
+        support of a record type may not be explicit in the returned
+        list. Interoperability with the typed interface to this object
+        should be performed through ``hasRecordType()``.
+
+        return: (osid.type.TypeList) - the record types available
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        from ..type.objects import TypeList
+        type_list = []
+        for type_idstr in self._supported_record_type_ids:
+            type_list.append(Type(**self._record_type_data_sets[Id(type_idstr).get_identifier()]))
+        return TypeList(type_list)
+
+    record_types = property(fget=get_record_types)
+
+    @utilities.arguments_not_none
+    def has_record_type(self, record_type):
+        """Tests if this object supports the given record ``Type``.
+
+        The given record type may be supported by the object through
+        interface/type inheritence. This method should be checked before
+        retrieving the record interface.
+
+        arg:    record_type (osid.type.Type): a type
+        return: (boolean) - ``true`` if a record of the given record
+                ``Type`` is available, ``false`` otherwise
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        return str(record_type) in self._supported_record_type_ids
+
 
 class Browsable(abc_osid_markers.Browsable):
     """A marker interface for objects that offer property inspection."""
