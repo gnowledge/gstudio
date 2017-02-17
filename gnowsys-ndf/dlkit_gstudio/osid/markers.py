@@ -10,6 +10,7 @@
 from .. import utilities
 from dlkit.abstract_osid.osid import markers as abc_osid_markers
 from dlkit.abstract_osid.osid import errors
+from ..utilities import get_registry
 from dlkit.primordium.calendaring.primitives import DateTime
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.locale.primitives import DisplayText
@@ -119,6 +120,9 @@ class Extensible(abc_osid_markers.Extensible):
     """A marker interface for objects that contain ``OsidRecords``."""
 
     def __init__(self, runtime=None, proxy=None, **kwargs):
+        self._records = {}
+        self._supported_record_type_ids = []
+        self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
         self._runtime = runtime
         self._proxy = proxy
 
