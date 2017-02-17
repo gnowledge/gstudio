@@ -170,6 +170,29 @@ class Extensible(abc_osid_markers.Extensible):
         obj_map['recordTypeIds'] = [] # THIS WILL NEED TO BE IMPLEMENTED
         return obj_map
 
+    def _init_records(self, record_types):
+        """Initalize all records for this form."""
+        for record_type in record_types:
+            # This conditional was inserted on 7/11/14. It may prove problematic:
+            if str(record_type) not in self._gstudio_map['recordTypeIds']:
+                record_initialized = self._init_record(str(record_type))
+                if record_initialized:
+                    self._gstudio_map['recordTypeIds'].append(str(record_type))
+
+    def _init_record(self, record_type_idstr):
+        """Initialize the record identified by the record_type_idstr."""
+        import importlib
+        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = importlib.import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['object_record_class_name'], None)
+        # only add recognized records ... so apps don't break
+        # if new records are injected by another app
+        if record is not None:
+            self._records[record_type_idstr] = record(self)
+            return True
+        else:
+            return False
+
 class Browsable(abc_osid_markers.Browsable):
     """A marker interface for objects that offer property inspection."""
 

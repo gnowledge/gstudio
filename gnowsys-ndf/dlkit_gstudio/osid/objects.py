@@ -1226,10 +1226,10 @@ class OsidExtensibleForm(abc_osid_objects.OsidExtensibleForm, OsidForm, osid_mar
         osid_markers.Extensible.__init__(self, **kwargs)
         # sets runtime and proxy to the current object
     def _init_map(self, record_types):
-        self._my_map['recordTypeIds'] = []
+        self._gstudio_map['recordTypeIds'] = []
         if record_types is not None:
             self._init_records(record_types)
-        self._supported_record_type_ids = self._my_map['recordTypeIds']
+        self._supported_record_type_ids = self._gstudio_map['recordTypeIds']
 
     def _init_gstudio_map(self, record_types=None):
         """Initialize gstudio map for form"""
