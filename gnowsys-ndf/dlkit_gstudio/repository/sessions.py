@@ -178,8 +178,9 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        result = Node.get_node_by_id(ObjectId(asset_id.identifier))
-        return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
+        if asset_id:
+            result = Node.get_node_by_id(ObjectId(asset_id.identifier))
+            return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
 
     @utilities.arguments_not_none
     def get_assets_by_ids(self, asset_ids):
@@ -1029,16 +1030,25 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
 
+        for arg in asset_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if asset_record_types == []:
             obj_form = objects.AssetForm(
                 repository_id=self._catalog_id,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id(),
                 proxy=self._proxy)
-            self._forms[obj_form.get_id().get_identifier()] = not CREATED
-
+        else:
+            obj_form = objects.AssetForm(
+                repository_id=self._catalog_id,
+                record_types=asset_record_types,
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form
-        
+
 
     @utilities.arguments_not_none
     def create_asset(self, asset_form):
@@ -1271,11 +1281,22 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-
+        if not isinstance(asset_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        for arg in asset_content_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if asset_content_record_types == []:
-            ## WHY are we passing repository_id = self._catalog_id below, seems redundant:
             obj_form = objects.AssetContentForm(
                 repository_id=self._catalog_id,
+                asset_id=asset_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime,
+                proxy=self._proxy)
+        else:
+            obj_form = objects.AssetContentForm(
+                repository_id=self._catalog_id,
+                record_types=asset_content_record_types,
                 asset_id=asset_id,
                 catalog_id=self._catalog_id,
                 runtime=self._runtime,
@@ -1283,6 +1304,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form
+
 
     @utilities.arguments_not_none
     def create_asset_content(self, asset_content_form):
