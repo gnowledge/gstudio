@@ -1279,8 +1279,6 @@ class OsidExtensibleForm(abc_osid_objects.OsidExtensibleForm, OsidForm, osid_mar
 
     required_record_types = property(fget=get_required_record_types)
 
-    required_record_types = property(fget=get_required_record_types)
-
 
 class OsidBrowsableForm(abc_osid_objects.OsidBrowsableForm, OsidForm):
     """The ``OsidBrowsableForm`` is used to create and update browsable objects.
