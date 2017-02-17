@@ -144,6 +144,9 @@ class Extensible(abc_osid_markers.Extensible):
 
     record_types = property(fget=get_record_types)
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
     @utilities.arguments_not_none
     def has_record_type(self, record_type):
         """Tests if this object supports the given record ``Type``.
