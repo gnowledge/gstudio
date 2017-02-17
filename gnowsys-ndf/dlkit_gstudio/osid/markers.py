@@ -119,7 +119,7 @@ class Identifiable(abc_osid_markers.Identifiable):
 class Extensible(abc_osid_markers.Extensible):
     """A marker interface for objects that contain ``OsidRecords``."""
 
-    def __init__(self, runtime=None, proxy=None, **kwargs):
+    def __init__(self, object_name, runtime=None, proxy=None, **kwargs):
         self._records = {}
         self._supported_record_type_ids = []
         self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
