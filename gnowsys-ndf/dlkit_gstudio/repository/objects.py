@@ -484,7 +484,12 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         super(Asset, self).get_object_map(obj_map)
         obj_map['type'] = 'Asset'
 
-        obj_map['assignedRepositoryIds'] = [] # THIS NEEDS TO BE IMPLEMENTED BY GSTUDIO TEAM
+        # THIS NEEDS TO BE IMPLEMENTED BY GSTUDIO TEAM - Done
+        repository_ident_list = self['_gstudio_node']['group_set']
+        repository_ids = [str(Id(identifier=str(each_repo_id), 
+            namespace="repository.Repository",
+            authority="GSTUDIO")) for each_repo_id in repository_ident_list]
+        obj_map['assignedRepositoryIds'] = repository_ids
 
         # Title:
         try:
@@ -513,16 +518,8 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
                 asset_content_list.append(asset_content.get_object_map())
         obj_map['assetContents'] = asset_content_list
 
-        # CONTINUE IN THIS VEIN FOR ANY OTHER ATTRIBUTES NEEDED FOR ASSET ...OK
+        # CONTINUE IN THIS VEIN FOR ANY OTHER ATTRIBUTES NEEDED FOR ASSET ...
         return obj_map
-    # object_map = property(fget=get_object_map)
-    #     def get_object_map(self):
-    #         obj_map = dict(self._my_map)
-    #         obj_map['assetContent'] = obj_map['assetContents'] = [ac.object_map
-    #                                                               for ac in self.get_asset_contents()]
-    #         # note: assetContent is deprecated
-    #         return osid_objects.OsidObject.get_object_map(self, obj_map)
-
     object_map = property(fget=get_object_map)
 
 
@@ -1329,7 +1326,8 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        # Return original url of AssetContent
+        return ("media/" + self['_gstudio_node']['if_file']['original']['relurl'])
 
     url = property(fget=get_url)
 
@@ -1384,8 +1382,14 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         except (errors.Unimplemented, errors.IllegalState):
             obj_map['url'] = ''
 
+        repository_ident_list = self['_gstudio_node']['group_set']
+        repository_ids = [str(Id(identifier=str(each_repo_id), 
+            namespace="repository.Repository",
+            authority="GSTUDIO")) for each_repo_id in repository_ident_list]
+        obj_map['assignedRepositoryIds'] = repository_ids
+
         # Data:
-        obj_map['data'] = None  # COLE: DO WE USE THIS IN OBJECT_MAP?
+        # obj_map['data'] = None  # COLE: DO WE USE THIS IN OBJECT_MAP?
         return obj_map
     object_map = property(fget=get_object_map)
 
