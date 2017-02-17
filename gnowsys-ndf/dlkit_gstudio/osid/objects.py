@@ -105,8 +105,12 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
     _namespace = 'osid.OsidObject'
 
     def __init__(self, gstudio_node=None, **kwargs):
-        osid_markers.Identifiable.__init__(self)
+        osid_markers.Identifiable.__init__(self, runtime=runtime)
+        osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
+        self._gstudio_map = gstudio_node
+        self._gstudio_map['recordTypeIds'] = []
         self._gstudio_node = gstudio_node
+        self._load_records(self._gstudio_map['recordTypeIds'])
 
     def get_object_map(self, obj_map):
         """Adds OsidObject elements to object map"""
