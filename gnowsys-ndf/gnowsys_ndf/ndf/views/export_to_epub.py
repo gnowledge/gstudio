@@ -20,7 +20,7 @@ def create_subfolders(root,subfolder_names_list):
 def create_container_file(meta_path):
     with open("/static/ndf/epub/container.xml", "r") as base_container_obj:
         html_doc = base_container_obj.read()
-        soup = BeautifulSoup(html_doc, 'html.parser')
+        soup = BeautifulSoup(html_doc, 'xml')
 
     with open(os.path.join(meta_path,"container.xml"), "w+") as container_file:
         container_file.write(soup.prettify("utf-8"))
@@ -41,28 +41,29 @@ def create_update_ncx(file_display_name, file_slugified_name):
           <navLabel>
             <text>Introduction</text>
           </navLabel>
-          <content src="Text/Gstudio_Introduction1_EBL10.html"/>
+          <content src="Text/Gstudio_Introduction1_EBL10.xhtml"/>
         </navPoint>
     """
     soup = None
-    file_path = "Text/"+ file_slugified_name + ".html"
+    file_path = "Text/"+ file_slugified_name + ".xhtml"
     with open("/static/ndf/epub/toc.ncx", "r") as base_ncx_obj:
         html_doc = base_ncx_obj.read()
-        soup = BeautifulSoup(html_doc, 'html.parser')
+        soup = BeautifulSoup(html_doc, 'xml')
 
     ncx_file_path = os.path.join(oebps_path,"toc.ncx")
 
     if os.path.exists(ncx_file_path):
         with open(ncx_file_path, "r") as existing_ncx_file:
             ncx_doc = existing_ncx_file.read()
-            soup = BeautifulSoup(ncx_doc, 'html.parser')
+            soup = BeautifulSoup(ncx_doc, 'xml')
 
     with open(ncx_file_path, "w+") as ncx_file:
-        navMap_ele = soup.find("navmap")
-        navpoint_ctr_val = len(soup.find_all("navpoint")) + 1
+        navMap_ele = soup.find("navMap")
+        navpoint_ctr_val = len(soup.find_all("navPoint")) + 1
         navPoint_ele = soup.new_tag("navPoint", 
-            id="navPoint-"+(navpoint_ctr_val).__str__(),
-            playorder=(navpoint_ctr_val).__str__())
+            id="navPoint"+(navpoint_ctr_val).__str__(),
+            # playorder=(navpoint_ctr_val).__str__()
+            )
         navLabel_ele = soup.new_tag("navLabel")
         navLabel_text_ele = soup.new_tag("text")
         navLabel_text_ele.string = file_display_name
@@ -76,23 +77,23 @@ def create_update_ncx(file_display_name, file_slugified_name):
 
 def create_update_nav(file_display_name, filename, path):
     """
-    This will update nav.html
+    This will update nav.xhtml
     """
     soup = None
-    with open("/static/ndf/epub/nav.html", "r") as base_nav_obj:
+    with open("/static/ndf/epub/nav.xhtml", "r") as base_nav_obj:
         html_doc = base_nav_obj.read()
-        soup = BeautifulSoup(html_doc, 'html.parser')
-    nav_file_path = os.path.join(path,"nav.html")
+        soup = BeautifulSoup(html_doc, 'xml')
+    nav_file_path = os.path.join(path,"nav.xhtml")
     if os.path.exists(nav_file_path):
         with open(nav_file_path, "r") as existing_nav_file:
             nav_doc = existing_nav_file.read()
-            soup = BeautifulSoup(nav_doc, 'html.parser')
+            soup = BeautifulSoup(nav_doc, 'xml')
 
     with open(nav_file_path, "w+") as nav_file:
         # find <ol> with id "toc-list"
         nav_list = soup.find("ol", {"id": "toc-list"})
         new_nav = soup.new_tag("li")
-        new_nav_link = soup.new_tag("a", href="../Text/"+filename + ".html")
+        new_nav_link = soup.new_tag("a", href="../Text/"+filename + ".xhtml")
         new_nav_link.string = file_display_name
         new_nav.append(new_nav_link)
         soup.body.nav.ol.append(new_nav)
@@ -108,17 +109,18 @@ def create_update_content_file(file_name_wo_ext, file_loc, media_type, is_non_ht
     file_name_w_ext = file_name_wo_ext
     file_path = os.path.join(file_loc,file_name_wo_ext)
     if not is_non_html:
-        file_path = os.path.join(file_loc,file_name_wo_ext+".html")
-        file_name_w_ext = file_name_wo_ext + ".html"
+        file_path = os.path.join(file_loc,file_name_wo_ext+".xhtml")
+        file_name_w_ext = file_name_wo_ext + ".xhtml"
     soup = None
     with open("/static/ndf/epub/content.opf", "r") as base_content_pkg_file:
         html_doc = base_content_pkg_file.read()
-        soup = BeautifulSoup(html_doc, 'html.parser')
+        soup = BeautifulSoup(html_doc, 'xml')
+
     content_pkg_file_path = os.path.join(oebps_path,"content.opf")
     if os.path.exists(content_pkg_file_path):
         with open(content_pkg_file_path, "r") as existing_content_file:
             content_doc = existing_content_file.read()
-            soup = BeautifulSoup(content_doc, 'html.parser')
+            soup = BeautifulSoup(content_doc, 'xml')
 
     with open(content_pkg_file_path, "w+") as content_pkg_file_obj:
         manifest_container = soup.find("manifest")
@@ -126,10 +128,12 @@ def create_update_content_file(file_name_wo_ext, file_loc, media_type, is_non_ht
         new_item.attrs.update({'media-type': media_type})
         manifest_container.append(new_item)
         if file_loc == "Text":
-            # update <spine> only for .html files
+            # update <spine> only for .xhtml files
             spine_container = soup.find("spine")
-            new_itemref = soup.new_tag("itemref", idref=file_name_wo_ext+".html")
+            new_itemref = soup.new_tag("itemref", idref=file_name_wo_ext+".xhtml")
             spine_container.append(new_itemref)
+        # meta_datetimestamp = soup.find("meta")
+
         content_pkg_file_obj.write(soup.prettify("utf-8"))
 
 
@@ -167,8 +171,8 @@ def parse_content(path, content_soup):
                     file_loc = "Videos"
                 elif "audio" in mimetype_val:
                     file_loc = "Audios"
-                each_src["src"] = (os.path.join(oebps_path, file_loc, file_name))
-                shutil.copyfile("/data/media/" + src_attr, each_src["src"])
+                each_src["src"] = (os.path.join('..',file_loc, file_name))
+                shutil.copyfile("/data/media/" + src_attr, os.path.join(oebps_path, file_loc, file_name))
                 create_update_content_file(file_name, file_loc, mimetype_val, is_non_html=True)
 
     return content_soup
@@ -193,16 +197,16 @@ def build_html(path,obj):
         content_val = (each_obj["content"]).encode('ascii', 'ignore')
         new_content = parse_content(path, BeautifulSoup(content_val, 'html.parser'))
         # new_content = parse_content(content_val)
-        with open("/static/ndf/epub/epub_activity_skeleton.html", "r") as base_file_obj:
+        with open("/static/ndf/epub/epub_activity_skeleton.xhtml", "r") as base_file_obj:
             html_doc = base_file_obj.read()
             soup = BeautifulSoup(html_doc, 'html.parser')
             soup.body.append(new_content)
-        with open(os.path.join(path, name_slugified +".html"), "w") as content_file_obj:
+        with open(os.path.join(path, name_slugified +".xhtml"), "w") as content_file_obj:
             content_file_obj.write(soup.prettify("utf-8"))
 
         # update_ncx(each_obj["name"])
         create_update_nav(name, name_slugified, path)
-        create_update_content_file(name_slugified, "Text", "text/html")
+        create_update_content_file(name_slugified, "Text", "application/xhtml+xml")
         create_update_ncx(name,name_slugified)
     pass
 
