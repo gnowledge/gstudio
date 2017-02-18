@@ -6,9 +6,10 @@
     <meta content="0" name="dtb:totalPageCount"/>
     <meta content="0" name="dtb:maxPageNumber"/>
   </head>
-  <docTitle>
-    <text></text>
+    <docTitle>
+    <text>[Subject] - [Lesson #]</text>
   </docTitle>
+
   <navMap>
   </navMap>
 </ncx>
