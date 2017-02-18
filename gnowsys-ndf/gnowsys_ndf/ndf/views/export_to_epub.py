@@ -106,6 +106,7 @@ def create_update_content_file(file_name_wo_ext, file_loc, media_type, is_non_ht
     file_loc : Text|Styles|Misc
     media-type: text/css|text/javascript
     """
+    
     file_name_w_ext = file_name_wo_ext
     file_path = os.path.join(file_loc,file_name_wo_ext)
     if not is_non_html:
@@ -124,6 +125,7 @@ def create_update_content_file(file_name_wo_ext, file_loc, media_type, is_non_ht
 
     with open(content_pkg_file_path, "w+") as content_pkg_file_obj:
         manifest_container = soup.find("manifest")
+        # print soup
         new_item = soup.new_tag("item", id=file_name_w_ext, href=file_path)
         new_item.attrs.update({'media-type': media_type})
         manifest_container.append(new_item)
@@ -132,11 +134,24 @@ def create_update_content_file(file_name_wo_ext, file_loc, media_type, is_non_ht
             spine_container = soup.find("spine")
             new_itemref = soup.new_tag("itemref", idref=file_name_wo_ext+".xhtml")
             spine_container.append(new_itemref)
-        # meta_datetimestamp = soup.find("meta")
-
         content_pkg_file_obj.write(soup.prettify("utf-8"))
 
 
+def update_content_metadata(node_id, date_value):
+
+    soup = None
+    content_pkg_file_path = os.path.join(oebps_path,"content.opf")
+    if os.path.exists(content_pkg_file_path):
+        with open(content_pkg_file_path, "r") as existing_content_file:
+            content_doc = existing_content_file.read()
+            soup = BeautifulSoup(content_doc, 'xml')
+    if soup:
+        with open(content_pkg_file_path, "w+") as content_meta_file_obj:
+            meta_datetimestamp = soup.find('meta',{"property":"dcterms:modified"})
+            meta_datetimestamp.string = date_value
+            dc_ident = soup.find('identifier',{"id": "BookId"})
+            dc_ident.string = node_id
+            content_meta_file_obj.write(soup.prettify("utf-8"))
 
 # =====
 def parse_content(path, content_soup):
@@ -224,11 +239,13 @@ def fill_from_static():
             [shutil.copyfile(each_dep, os.path.join(oebps_path, dep_type, each_dep.split('/')[-1])) for each_dep in dep_list]
             
 
-def create_epub(epub_name, content_list):
+def create_epub(node_obj):
+    epub_name = node_obj.name
+    content_list = node_obj.collection_dict
     if not os.path.exists(GSTUDIO_EPUBS_LOC_PATH):
         os.makedirs(GSTUDIO_EPUBS_LOC_PATH)
-    dt = "{:%d-%B-%Y-%Hh-%Mm-%Ss}".format(datetime.now())
-    epub_name = slugify(epub_name + dt)
+    datetimestamp = datetime.now().isoformat()
+    epub_name = slugify(epub_name + "_"+ str(datetimestamp))
     epub_root = os.path.join(GSTUDIO_EPUBS_LOC_PATH, epub_name)
     os.makedirs(epub_root)
     os.makedirs(os.path.join(epub_root, "META-INF"))
@@ -239,6 +256,7 @@ def create_epub(epub_name, content_list):
     create_container_file(os.path.join(epub_root, "META-INF"))
     create_subfolders(os.path.join(epub_root,"OEBPS"),oebps_files)
     build_html(os.path.join(epub_root,"OEBPS", "Text"),content_list)
+    update_content_metadata(str(node_obj._id), datetimestamp)
     # create_content_file(os.path.join(epub_name,"OEBPS"),content_list)
     # create_ncx_file(os.path.join(epub_name,"OEBPS"),content_list)
     fill_from_static()
