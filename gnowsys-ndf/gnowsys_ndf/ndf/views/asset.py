@@ -16,6 +16,7 @@ gst_page_name, gst_page_id = GSystemType.get_gst_name_id(u'Page')
 gst_file_name, gst_file_id = GSystemType.get_gst_name_id(u'File')
 
 def create_asset(name,
+				node_id=None,
 				group_id,
 				created_by,
 				content=None,
@@ -45,8 +46,10 @@ def create_asset(name,
 	author_obj_id  = author_obj._id
 
 	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
-
-	asset_gs_obj = node_collection.collection.GSystem()
+	if node_id:
+		asset_gs_obj = node_collection.one({'_id': ObjectId(node_id)})
+	else:
+		asset_gs_obj = node_collection.collection.GSystem()
 
 	asset_gs_obj.fill_gstystem_values(request=request,
 									name=name,
@@ -118,7 +121,6 @@ def create_assetcontent(asset_id,
 		print "resource_type arg is not supplied."
 		# handle condition based on files.
 		member_of_gst_id = gst_file_id if files[0] else gst_page_id
-
 	asset_content_obj.fill_gstystem_values(request=request,
 										name=name,
 										member_of=member_of_gst_id,

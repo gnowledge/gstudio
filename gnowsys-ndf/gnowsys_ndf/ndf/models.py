@@ -1646,7 +1646,7 @@ class GSystem(Node):
         existing_file_gs = None
         existing_file_gs_if_file = None
 
-        if uploaded_file:
+        if "_id" not in self and uploaded_file:
 
             fh_obj = filehive_collection.collection.Filehive()
             existing_fh_obj = fh_obj.check_if_file_exists(uploaded_file)
