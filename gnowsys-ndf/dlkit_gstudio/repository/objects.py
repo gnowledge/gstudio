@@ -1774,12 +1774,16 @@ class CompositionForm(abc_repository_objects.CompositionForm, osid_objects.OsidO
         self._children_default = self._mdata['children']['default_id_values']
 
     def _init_map(self, record_types=None, **kwargs):
-        """Initialize form elements"""
+        """Initialize form map"""
 
         osid_objects.OsidContainableForm._init_map(self)
         osid_objects.OsidSourceableForm._init_map(self)
         osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         # Initialize all form elements to default values here
+        # self._my_map['childIds'] = self._children_default
+        # self._my_map['assignedRepositoryIds'] = [str(kwargs['repository_id'])]
+
+
 
     @utilities.arguments_not_none
     def get_composition_form_record(self, composition_record_type):

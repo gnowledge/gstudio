@@ -26,7 +26,8 @@ d =  test_repo.get_id()
 # import ipdb; ipdb.set_trace()
 grp_assets = test_repo.get_assets()
 print "\n Total Assets: ", grp_assets.available()
-asset_obj = grp_assets.next()
-print "\n Asset name: ", asset_obj.get_display_name().get_text()
+if grp_assets.available():
+	asset_obj = grp_assets.next()
+	print "\n Asset name: ", asset_obj.get_display_name().get_text()
 
 # rl = repository_service_mgr.get_asset_lookup_session_for_repository(d)

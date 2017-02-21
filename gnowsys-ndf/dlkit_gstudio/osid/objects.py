@@ -1418,6 +1418,9 @@ class OsidContainableForm(abc_osid_objects.OsidContainableForm, OsidForm):
     def _init_form(self):
         """Initialize form elements"""
 
+    def _init_map(self):
+        self._my_map['sequestered'] = self._sequestered_default
+
     def get_sequestered_metadata(self):
         """Gets the metadata for the sequestered flag.
 
@@ -1949,6 +1952,9 @@ class OsidRelationshipForm(abc_osid_objects.OsidRelationshipForm, OsidObjectForm
         OsidTemporalForm.__init__(self)
         OsidObjectForm.__init__(self, **kwargs)
 
+    def _init_map(self, record_types=None, **kwargs):
+        OsidTemporalForm._init_map(self)
+        OsidObjectForm._init_map(self, record_types=record_types, **kwargs)
 
 
 
