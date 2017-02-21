@@ -1185,7 +1185,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         req_obj = GStudioRequest(id=1)
         asset_ident = asset_form.get_id().get_identifier()
         asset_obj_id = ObjectId(asset_ident)
-        asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],node_id = asset_obj_id\
+        asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],node_id = asset_obj_id, \
          group_id=self._catalog_id.get_identifier(), created_by=1)
         # asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
         #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
