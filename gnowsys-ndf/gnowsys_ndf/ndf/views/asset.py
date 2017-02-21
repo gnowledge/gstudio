@@ -16,9 +16,9 @@ gst_page_name, gst_page_id = GSystemType.get_gst_name_id(u'Page')
 gst_file_name, gst_file_id = GSystemType.get_gst_name_id(u'File')
 
 def create_asset(name,
-				node_id=None,
 				group_id,
 				created_by,
+				node_id=None,
 				content=None,
 				request=HttpRequest(),
 				**kwargs):
