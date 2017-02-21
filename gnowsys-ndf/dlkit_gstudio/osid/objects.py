@@ -110,7 +110,11 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         self._gstudio_map = gstudio_node
         self._gstudio_map['recordTypeIds'] = []
         self._gstudio_node = gstudio_node
+        self._my_map = {}
+        self._my_map['recordTypeIds'] = []
+        self._my_map['gstudio_node'] = gstudio_node
         self._load_records(self._gstudio_map['recordTypeIds'])
+        self._load_records(self._my_map['recordTypeIds'])
 
     def get_object_map(self, obj_map):
         """Adds OsidObject elements to object map"""
@@ -157,11 +161,6 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
             script_type=Type(**script.get_type_data('LATN')),
             format_type=Type(**text_format.get_type_data('PLAIN')),
             )
-        # raise errors.Unimplemented()
-
-
-
-
 
 
     display_name = property(fget=get_display_name)
@@ -1231,9 +1230,11 @@ class OsidExtensibleForm(abc_osid_objects.OsidExtensibleForm, OsidForm, osid_mar
         # sets runtime and proxy to the current object
     def _init_map(self, record_types):
         self._gstudio_map['recordTypeIds'] = []
+        self._my_map['recordTypeIds'] = []
         if record_types is not None:
             self._init_records(record_types)
         self._supported_record_type_ids = self._gstudio_map['recordTypeIds']
+        self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_gstudio_map(self, record_types=None):
         """Initialize gstudio map for form"""
@@ -1485,11 +1486,22 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         pass
 
     def _init_map(self, effective_agent_id=None, **kwargs):
-
         if 'effective_agent_id' in kwargs:
-            self._my_map['providerId'] = effective_agent_id
-            self._my_map['brandingIds'] = self._branding_default
-            self._my_map['license'] = dict(self._license_default)
+            try:
+                mgr = self._get_provider_manager('RESOURCE', local=True)
+                agent_session = mgr.get_resource_agent_session(proxy=self._proxy)
+                agent_session.use_federated_bin_view()
+                resource_idstr = str(agent_session.get_resource_id_by_agent(kwargs['effective_agent_id']))
+            except (errors.OperationFailed,
+                    errors.Unsupported,
+                    errors.Unimplemented,
+                    errors.NotFound):
+                resource_idstr = self._provider_default
+            self._my_map['providerId'] = resource_idstr
+        else:
+            self._my_map['providerId'] = self._provider_default
+        self._my_map['brandingIds'] = self._branding_default
+        self._my_map['license'] = dict(self._license_default)
 
     def get_provider_metadata(self):
         """Gets the metadata for a provider.
@@ -1756,7 +1768,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if osid_object_map is not None:
             self._for_update = True
             self._my_map = osid_object_map
-            # self._load_records(osid_object_map['recordTypeIds'])
+            self._load_records(osid_object_map['recordTypeIds'])
         else:
             self._for_update = False
             self._my_map = {}

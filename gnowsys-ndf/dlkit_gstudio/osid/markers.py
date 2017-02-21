@@ -193,9 +193,11 @@ class Extensible(abc_osid_markers.Extensible):
         """Initalize all records for this form."""
         for record_type in record_types:
             # This conditional was inserted on 7/11/14. It may prove problematic:
-            if str(record_type) not in self._gstudio_map['recordTypeIds']:
-                record_initialized = self._init_record(str(record_type))
-                if record_initialized:
+            record_initialized = self._init_record(str(record_type))
+            if record_initialized:
+                if str(record_type) not in self._my_map['recordTypeIds']:
+                    self._my_map['recordTypeIds'].append(str(record_type))
+                if str(record_type) not in self._gstudio_map['recordTypeIds']:
                     self._gstudio_map['recordTypeIds'].append(str(record_type))
 
     def _init_record(self, record_type_idstr):
