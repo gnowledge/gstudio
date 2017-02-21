@@ -123,7 +123,7 @@ def create_assetcontent(asset_id,
 										created_by=created_by,
 										content=content,
 										uploaded_file=files[0],
-										unique_gs_per_file=True,
+										unique_gs_per_file=False,
 										**kwargs)
 
 	asset_content_obj.save(group_id=group_id)
