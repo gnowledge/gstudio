@@ -1567,7 +1567,10 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         #if self.get_display_names_metadata().is_read_only():
         #    raise NoAccess()
         self.add_or_replace_value('displayNames', display_name)
-        self._gstudio_map['name'] = display_name.get_text()
+        if self._gstudio_map['displayNames']:
+            self._gstudio_map['name'] = self._gstudio_map['displayNames'][0]['text']
+        else:
+            self._gstudio_map['name'] = display_name.get_text()
 
     def clear_display_names(self):
         """Removes all display_names.
@@ -1618,6 +1621,10 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         #if self.get_descriptions_metadata().is_read_only():
         #    raise NoAccess()
         self.add_or_replace_value('descriptions', description)
+        if self._gstudio_map['descriptions']:
+            self._gstudio_map['content'] = self._gstudio_map['descriptions'][0]['text']
+        else:
+            self._gstudio_map['content'] = display_name.get_text()
 
     def clear_descriptions(self):
         """Removes all descriptions.
