@@ -1140,10 +1140,11 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
                 raise errors.InvalidArgument()
             else:
                 asset_id = self._get_asset_id_with_enclosure(asset_id)
-        # result = collection.find_one({'_id': ObjectId(asset_id.get_identifier())})
+
         result = Node.get_node_by_id(ObjectId(asset_id.get_identifier()))
 
-        obj_form = objects.AssetForm(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
+        obj_form = objects.AssetForm(gstudio_node=result, repository_id=self._catalog_id,
+                effective_agent_id=self.get_effective_agent_id(),runtime=self._runtime, proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form
 
@@ -1454,17 +1455,17 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         if not isinstance(asset_content_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         document = Node.get_node_by_id(asset_content_id.get_identifier())
-        # document = collection.find_one({'assetContents._id': ObjectId(asset_content_id.get_identifier())})
-        # for sub_doc in document['assetContents']: # There may be a MongoDB shortcut for this
-        #     if sub_doc['_id'] == ObjectId(asset_content_id.get_identifier()):
-        #         result = sub_doc
         obj_form = AssetContentForm(gstudio_node=document,
-                                  runtime=self._runtime,
-                                  proxy=self._proxy)
+                                    repository_id=self._catalog_id,
+                                    asset_id=asset_id,
+                                    catalog_id=self._catalog_id,
+                                    runtime=self._runtime,
+                                    proxy=self._proxy)
+
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form
-        # raise errors.Unimplemented()
+
 
     @utilities.arguments_not_none
     def update_asset_content(self, asset_content_form):
