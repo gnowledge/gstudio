@@ -182,7 +182,30 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         """
         if asset_id:
             result = Node.get_node_by_id(ObjectId(asset_id.identifier))
-            return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
+
+            # has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
+            # asset_grels = triple_collection.find({'_type': 'GRelation', 
+            #      'subject': result._id, 'relation_type': has_assetcontent_rt._id,
+            # }, {'right_subject': 1})
+            # asset_content_objs = []
+            # if asset_grels.count():
+            #     asset_content_ids = [each_rs['right_subject'] for each_rs in asset_grels]
+            #     # print asset_content_ids
+            #     result_cur = Node.get_nodes_by_ids_list(asset_content_ids)
+        
+            #     asset_content_objs = [AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
+            #     for asset_content in asset_content_objs:
+            #         asset_content_list.append(asset_content.get_object_map())
+
+
+
+            asset_content_list = []
+            asset_contents = self.get_asset_contents()
+            for asset_content in asset_contents:
+                asset_content_list.append(asset_content.get_object_map())
+            # self._gstudio_map['assetContents'] = asset_content_list
+
+            return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy, assetContents=asset_content_list)
 
 
     @utilities.arguments_not_none
@@ -1086,7 +1109,9 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         self._forms[asset_form.get_id().get_identifier()] = CREATED
         # This should be part of _init_gstudio_map
         # print "\n asset_form._gstudio_map: ", asset_form._gstudio_map
-        asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
+        asset_name = asset_form._gstudio_map['name'].strip()
+        print "\n asset_name: ", asset_name
+        asset_obj = gstudio_create_asset(name=asset_name,\
          group_id=self._catalog_id.get_identifier(), created_by=1)
         # asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
         #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)

@@ -118,7 +118,8 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         osid_objects.OsidObject.__init__(self, object_name='ASSET', **kwargs)
         # Can remove object_name param
         self._catalog_name = 'repository'
-
+        if 'assetContents' in kwargs:
+            self['assetContents'] = kwargs['assetContents']
 
     def get_title(self):
         """Gets the proper title of this asset.
