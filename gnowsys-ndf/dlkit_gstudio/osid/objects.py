@@ -1784,8 +1784,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if 'default_description' in kwargs:
             self._mdata['description']['default_string_values'][0]['text'] = kwargs['default_description']
         update_display_text_defaults(self._mdata['description'], self._locale_map)
-        self._display_name_default = unicode(self._mdata['display_name']['default_string_values'][0]['text'])
-        self._description_default = unicode(self._mdata['description']['default_string_values'][0]['text'])
+        self._display_name_default = self._mdata['display_name']
+        self._description_default = self._mdata['description']
+        # self._display_name_default = unicode(self._mdata['display_name']['default_string_values'][0]['text'])
+        # self._description_default = unicode(self._mdata['description']['default_string_values'][0]['text'])
         self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
 
         if 'mdata' in kwargs:
@@ -1809,10 +1811,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             self._gstudio_map['content'] = kwargs['content']
             self._gstudio_map['content_org'] = kwargs['content']
         else:
-            self._gstudio_map['name'] = self._display_name_default
-            self._gstudio_map['altnames'] = self._display_name_default
-            self._gstudio_map['content'] = self._description_default
-            self._gstudio_map['content_org'] = self._description_default
+            self._gstudio_map['name'] = self._display_name_default.get_text()
+            self._gstudio_map['altnames'] = self._display_name_default.get_text()
+            self._gstudio_map['content'] = self._description_default.get_text()
+            self._gstudio_map['content_org'] = self._description_default.get_text()
         # self._my_map['genusTypeId'] = self._genus_type_default
         OsidExtensibleForm._init_gstudio_map(self, record_types)
 
