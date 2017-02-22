@@ -14,7 +14,7 @@ from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
 from .objects import Repository, RepositoryList
-from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection, Node
+from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection, Node, triple_collection
 from gnowsys_ndf.ndf.views.group import CreateGroup
 from dlkit.abstract_osid.id.primitives import Id as ABCId
 from dlkit.abstract_osid.type.primitives import Type as ABCType
@@ -1455,6 +1455,18 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         if not isinstance(asset_content_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         document = Node.get_node_by_id(asset_content_id.get_identifier())
+        asset_id = None
+        has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
+        asset_content_ident = self.get_id().identifier
+        assetcontent_grel = triple_collection.find_one({'_type': 'GRelation',
+            'right_subject': ObjectId(asset_content_ident), 'relation_type': has_assetcontent_rt._id,
+            'status': u'PUBLISHED'}, {'subject': 1})
+
+        if assetcontent_grel:
+            asset_id = assetcontent_grel['subject']
+            # asset_node = Node.get_node_by_id(asset_id)
+            # return Asset(gstudio_node=asset_node)
+
         obj_form = AssetContentForm(gstudio_node=document,
                                     repository_id=self._catalog_id,
                                     asset_id=asset_id,
