@@ -554,7 +554,33 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
 
     def _init_gstudio_map(self, **kwargs):
         """Initialize form map"""
-        osid_objects.OsidObjectForm._init_gstudio_map(self, **kwargs)
+        # osid_objects.OsidObjectForm._init_gstudio_map(self, **kwargs)
+        # osid_objects.OsidSourceableForm._init_map(self)
+        # osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
+        if "gstudio_node" in kwargs:
+            repository_ident_list = kwargs['_gstudio_node']['group_set']
+            repository_ids = [str(Id(identifier=str(each_repo_id),
+                namespace="repository.Repository",
+                authority="GSTUDIO")) for each_repo_id in repository_ident_list]
+            self._gstudio_map['assignedRepositoryIds'] = repository_ids
+            asset_content_list = []
+            asset_contents = self.get_asset_contents()
+            for asset_content in asset_contents:
+                asset_content_list.append(asset_content.get_object_map())
+            self._gstudio_map['assetContents'] = asset_content_list
+        # self._my_map['copyright'] = self._copyright_default
+        # self._my_map['title'] = self._title_default
+        # self._my_map['distributeVerbatim'] = self._distribute_verbatim_default
+        # self._my_map['createdDate'] = self._created_date_default
+        # self._my_map['distributeAlterations'] = self._distribute_alterations_default
+        # self._my_map['principalCreditString'] = self._principal_credit_string_default
+        # self._my_map['publishedDate'] = self._published_date_default
+        # self._my_map['sourceId'] = self._source_default
+        # self._my_map['providerLinkIds'] = self._provider_links_default
+        # self._my_map['publicDomain'] = self._public_domain_default
+        # self._my_map['distributeCompositions'] = self._distribute_compositions_default
+        # self._my_map['compositionId'] = self._composition_default
+        # self._my_map['published'] = self._published_default
 
     def _init_metadata(self, **kwargs):
         """Initialize form metadata"""
