@@ -107,7 +107,7 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
     def __init__(self, gstudio_node, runtime=None, **kwargs):
         osid_markers.Identifiable.__init__(self, runtime=runtime)
         osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
-        self._gstudio_map = {'gstudio_node': gstudio_node}
+        self._gstudio_map = gstudio_node
         self._gstudio_map['recordTypeIds'] = []
         self._gstudio_node = gstudio_node
         self._my_map = {}
@@ -1838,9 +1838,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
+        print "\n set_display_name: ", set_display_name, "\n In osid.OsidObjectForm"
         self._gstudio_map['name'] = unicode(display_name)
         self._gstudio_map['altnames'] = unicode(display_name)
-        # self._display_name = display_name
+        self._display_name = display_name
 
     def clear_display_name(self):
         """Clears the display name.

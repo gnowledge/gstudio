@@ -1253,10 +1253,10 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
-        asset_content_ident = self.get_id().identifier
         # asset_content_node = Node.get_node_by_id(ObjectId(asset_content_ident))
         # Since every AssetContent can have ONLY one Asset
+        has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
+        asset_content_ident = self.get_id().identifier
         assetcontent_grel = triple_collection.find_one({'_type': 'GRelation',
             'right_subject': ObjectId(asset_content_ident), 'relation_type': has_assetcontent_rt._id,
             'status': u'PUBLISHED'}, {'subject': 1})
@@ -1567,7 +1567,7 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         #if self.get_display_names_metadata().is_read_only():
         #    raise NoAccess()
         self.add_or_replace_value('displayNames', display_name)
-        self._gstudio_map['name'] = self._gstudio_map['displayNames'][0]['text']
+        self._gstudio_map['name'] = display_name.get_text()
 
     def clear_display_names(self):
         """Removes all display_names.
