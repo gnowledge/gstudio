@@ -550,6 +550,11 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         if not self.is_for_update():
             # self._init_form(**kwargs)
             self._init_map(**kwargs)
+            self._init_gstudio_map(**kwargs)
+
+    def _init_gstudio_map(self, **kwargs):
+        """Initialize form map"""
+        osid_objects.OsidObjectForm._init_gstudio_map(self, **kwargs)
 
     def _init_metadata(self, **kwargs):
         """Initialize form metadata"""
@@ -1511,6 +1516,7 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         self._my_map['accessibilityTypeId'] = self._accessibility_type_default
         self._my_map['assignedRepositoryIds'] = [str(kwargs['repository_id'])]
         self._my_map['assetId'] = str(kwargs['asset_id'])
+
 
     def _init_gstudio_map(self, record_types=None, **kwargs):
         """Initialize form map"""
