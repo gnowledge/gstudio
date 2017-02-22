@@ -554,7 +554,7 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
 
     def _init_gstudio_map(self, **kwargs):
         """Initialize form map"""
-        # osid_objects.OsidObjectForm._init_gstudio_map(self, **kwargs)
+        osid_objects.OsidObjectForm._init_gstudio_map(self, **kwargs)
         # osid_objects.OsidSourceableForm._init_map(self)
         # osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         if "gstudio_node" in kwargs:
