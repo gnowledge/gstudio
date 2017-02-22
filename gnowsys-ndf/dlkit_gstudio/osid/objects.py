@@ -1803,10 +1803,16 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
     def _init_gstudio_map(self, record_types=None, **kwargs):
         """Initialize map for form"""
         OsidForm._init_gstudio_map(self)
-        self._gstudio_map['name'] = self._display_name_default
-        self._gstudio_map['altnames'] = self._display_name_default
-        self._gstudio_map['content'] = self._description_default
-        self._gstudio_map['content_org'] = self._description_default
+        if "gstudio_node" in kwargs:
+            self._gstudio_map['name'] = kwargs['name']
+            self._gstudio_map['altnames'] = kwargs['altnames']
+            self._gstudio_map['content'] = kwargs['content']
+            self._gstudio_map['content_org'] = kwargs['content']
+        else:
+            self._gstudio_map['name'] = self._display_name_default
+            self._gstudio_map['altnames'] = self._display_name_default
+            self._gstudio_map['content'] = self._description_default
+            self._gstudio_map['content_org'] = self._description_default
         # self._my_map['genusTypeId'] = self._genus_type_default
         OsidExtensibleForm._init_gstudio_map(self, record_types)
 
