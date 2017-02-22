@@ -1811,10 +1811,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             self._gstudio_map['content'] = kwargs['content']
             self._gstudio_map['content_org'] = kwargs['content']
         else:
-            self._gstudio_map['name'] = self._display_name_default.get_text()
-            self._gstudio_map['altnames'] = self._display_name_default.get_text()
-            self._gstudio_map['content'] = self._description_default.get_text()
-            self._gstudio_map['content_org'] = self._description_default.get_text()
+            self._gstudio_map['name'] = self._display_name_default['default_string_values'][0]['text']
+            self._gstudio_map['altnames'] = self._display_name_default['default_string_values'][0]['text']
+            self._gstudio_map['content'] = self._description_default['default_string_values'][0]['text']
+            self._gstudio_map['content_org'] = self._description_default['default_string_values'][0]['text']
         # self._my_map['genusTypeId'] = self._genus_type_default
         OsidExtensibleForm._init_gstudio_map(self, record_types)
 
