@@ -42,7 +42,7 @@ def get_osid_object_mdata():
             'linked': False,
             'array': False,
             'default_string_values': [{
-                'text': '',
+                'text': 'Example Text',
                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                 'formatTypeId': str(DEFAULT_FORMAT_TYPE),
