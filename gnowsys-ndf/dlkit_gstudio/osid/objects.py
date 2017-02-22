@@ -104,9 +104,17 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
 
     _namespace = 'osid.OsidObject'
 
-    def __init__(self, gstudio_node=None, **kwargs):
-        osid_markers.Identifiable.__init__(self)
+    def __init__(self, gstudio_node, runtime=None, **kwargs):
+        osid_markers.Identifiable.__init__(self, runtime=runtime)
+        osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
+        self._gstudio_map = {'gstudio_node': gstudio_node}
+        self._gstudio_map['recordTypeIds'] = []
         self._gstudio_node = gstudio_node
+        self._my_map = {}
+        self._my_map['recordTypeIds'] = []
+        self._my_map['gstudio_node'] = gstudio_node
+        self._load_records(self._gstudio_map['recordTypeIds'])
+        self._load_records(self._my_map['recordTypeIds'])
 
     def get_object_map(self, obj_map):
         """Adds OsidObject elements to object map"""
@@ -153,11 +161,6 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
             script_type=Type(**script.get_type_data('LATN')),
             format_type=Type(**text_format.get_type_data('PLAIN')),
             )
-        # raise errors.Unimplemented()
-
-
-
-
 
 
     display_name = property(fget=get_display_name)
@@ -1226,13 +1229,42 @@ class OsidExtensibleForm(abc_osid_objects.OsidExtensibleForm, OsidForm, osid_mar
         osid_markers.Extensible.__init__(self, **kwargs)
         # sets runtime and proxy to the current object
     def _init_map(self, record_types):
+        self._gstudio_map['recordTypeIds'] = []
         self._my_map['recordTypeIds'] = []
         if record_types is not None:
             self._init_records(record_types)
+        self._supported_record_type_ids = self._gstudio_map['recordTypeIds']
         self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_gstudio_map(self, record_types=None):
         """Initialize gstudio map for form"""
+
+    def _get_record(self, record_type):
+        """This overrides _get_record in osid.Extensible.
+
+        Perhaps we should leverage it somehow?
+
+        """
+        if (not self.has_record_type(record_type) and
+                record_type.get_identifier() not in self._record_type_data_sets):
+            raise errors.Unsupported()
+        if str(record_type) not in self._records:
+            record_initialized = self._init_record(str(record_type))
+            if record_initialized and str(record_type) not in self._gstudio_map['recordTypeIds']:
+                self._gstudio_map['recordTypeIds'].append(str(record_type))
+        return self._records[str(record_type)]
+
+    def _init_record(self, record_type_idstr):
+        """Override this from osid.Extensible because Forms use a different
+        attribute in record_type_data."""
+        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = importlib.import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['form_record_class_name'])
+        if record is not None:
+            self._records[record_type_idstr] = record(self)
+            return True
+        else:
+            return False
 
     def get_required_record_types(self):
         """Gets the required record types for this form.
@@ -1387,6 +1419,9 @@ class OsidContainableForm(abc_osid_objects.OsidContainableForm, OsidForm):
     def _init_form(self):
         """Initialize form elements"""
 
+    def _init_map(self):
+        self._my_map['sequestered'] = self._sequestered_default
+
     def get_sequestered_metadata(self):
         """Gets the metadata for the sequestered flag.
 
@@ -1451,11 +1486,22 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         pass
 
     def _init_map(self, effective_agent_id=None, **kwargs):
-
         if 'effective_agent_id' in kwargs:
-            self._my_map['providerId'] = effective_agent_id
-            self._my_map['brandingIds'] = self._branding_default
-            self._my_map['license'] = dict(self._license_default)
+            try:
+                mgr = self._get_provider_manager('RESOURCE', local=True)
+                agent_session = mgr.get_resource_agent_session(proxy=self._proxy)
+                agent_session.use_federated_bin_view()
+                resource_idstr = str(agent_session.get_resource_id_by_agent(kwargs['effective_agent_id']))
+            except (errors.OperationFailed,
+                    errors.Unsupported,
+                    errors.Unimplemented,
+                    errors.NotFound):
+                resource_idstr = self._provider_default
+            self._my_map['providerId'] = resource_idstr
+        else:
+            self._my_map['providerId'] = self._provider_default
+        self._my_map['brandingIds'] = self._branding_default
+        self._my_map['license'] = dict(self._license_default)
 
     def get_provider_metadata(self):
         """Gets the metadata for a provider.
@@ -1722,7 +1768,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if osid_object_map is not None:
             self._for_update = True
             self._my_map = osid_object_map
-            # self._load_records(osid_object_map['recordTypeIds'])
+            self._load_records(osid_object_map['recordTypeIds'])
         else:
             self._for_update = False
             self._my_map = {}
@@ -1918,6 +1964,9 @@ class OsidRelationshipForm(abc_osid_objects.OsidRelationshipForm, OsidObjectForm
         OsidTemporalForm.__init__(self)
         OsidObjectForm.__init__(self, **kwargs)
 
+    def _init_map(self, record_types=None, **kwargs):
+        OsidTemporalForm._init_map(self)
+        OsidObjectForm._init_map(self, record_types=record_types, **kwargs)
 
 
 

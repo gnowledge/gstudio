@@ -18,6 +18,7 @@ gst_file_name, gst_file_id = GSystemType.get_gst_name_id(u'File')
 def create_asset(name,
 				group_id,
 				created_by,
+				node_id=None,
 				content=None,
 				request=HttpRequest(),
 				**kwargs):
@@ -45,8 +46,10 @@ def create_asset(name,
 	author_obj_id  = author_obj._id
 
 	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
-
-	asset_gs_obj = node_collection.collection.GSystem()
+	if node_id:
+		asset_gs_obj = node_collection.one({'_id': ObjectId(node_id)})
+	else:
+		asset_gs_obj = node_collection.collection.GSystem()
 
 	asset_gs_obj.fill_gstystem_values(request=request,
 									name=name,
@@ -91,6 +94,7 @@ def create_assetcontent(asset_id,
 
 	# compulsory values, if not found raise error.
 	# if not all([name, created_by, group_id, uploaded_files]):
+
 	if not all([name, created_by, group_id, test_content]):
 		raise ValueError('"asset_id", "name", "created_by", "group" and ("content" or "files") are mandatory args.')
 
@@ -112,7 +116,6 @@ def create_assetcontent(asset_id,
 		print "resource_type arg is not supplied."
 		# handle condition based on files.
 		member_of_gst_id = gst_file_id if files[0] else gst_page_id
-
 	asset_content_obj.fill_gstystem_values(request=request,
 										name=name,
 										member_of=member_of_gst_id,
@@ -120,7 +123,7 @@ def create_assetcontent(asset_id,
 										created_by=created_by,
 										content=content,
 										uploaded_file=files[0],
-										unique_gs_per_file=True,
+										unique_gs_per_file=False,
 										**kwargs)
 
 	asset_content_obj.save(group_id=group_id)
