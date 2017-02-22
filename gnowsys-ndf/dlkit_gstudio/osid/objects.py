@@ -1838,7 +1838,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        print "\n set_display_name: ", set_display_name, "\n In osid.OsidObjectForm"
+        print "\n set_display_name: ", display_name, "\n In osid.OsidObjectForm"
         self._gstudio_map['name'] = unicode(display_name)
         self._gstudio_map['altnames'] = unicode(display_name)
         self._display_name = display_name
