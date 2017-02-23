@@ -123,7 +123,7 @@ def create_assetcontent(asset_id,
 										created_by=created_by,
 										content=content,
 										uploaded_file=files[0],
-										unique_gs_per_file=False,
+										unique_gs_per_file=True,
 										**kwargs)
 
 	asset_content_obj.save(group_id=group_id)
@@ -135,6 +135,7 @@ def create_assetcontent(asset_id,
 		{'_id': 0, 'right_subject': 1})
 	for each_asset in asset_grels:
 		asset_contents_list.append(each_asset['right_subject'])
+	
 	create_grelation(asset_obj._id, rt_has_asset_content, asset_contents_list)
 
 	return asset_content_obj

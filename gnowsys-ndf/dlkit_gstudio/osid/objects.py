@@ -1811,10 +1811,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         repository.AssetForm.get_asset_content_form_for_update
         """
         if "gstudio_node" in kwargs:
-            self._gstudio_map['name'] = kwargs['name']
-            self._gstudio_map['altnames'] = kwargs['altnames']
-            self._gstudio_map['content'] = kwargs['content']
-            self._gstudio_map['content_org'] = kwargs['content']
+            self._gstudio_map['name'] = kwargs['gstudio_node']['name']
+            self._gstudio_map['altnames'] = kwargs['gstudio_node']['altnames']
+            self._gstudio_map['content'] = kwargs['gstudio_node']['content']
+            self._gstudio_map['content_org'] = kwargs['gstudio_node']['content']
         else:
             self._gstudio_map['name'] = self._display_name_default['default_string_values'][0]['text']
             self._gstudio_map['altnames'] = self._display_name_default['default_string_values'][0]['text']

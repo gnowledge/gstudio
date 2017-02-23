@@ -20,6 +20,7 @@ from dlkit.abstract_osid.id.primitives import Id as ABCId
 from dlkit.abstract_osid.type.primitives import Type as ABCType
 
 CREATED = True
+UPDATED = True
 
 
 class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessions.OsidSession):
@@ -187,13 +188,13 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
             asset_grels = triple_collection.find({'_type': 'GRelation', 
                  'subject': result._id, 'relation_type': has_assetcontent_rt._id,
             }, {'right_subject': 1})
-            asset_content_objs = []
+            asset_content_list = []
             if asset_grels.count():
                 asset_content_ids = [each_rs['right_subject'] for each_rs in asset_grels]
                 # print asset_content_ids
                 result_cur = Node.get_nodes_by_ids_list(asset_content_ids)
         
-                asset_content_objs = [AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
+                asset_content_objs = [objects.AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
                 for asset_content in asset_content_objs:
                     asset_content_list.append(asset_content.get_object_map())
 
@@ -1172,6 +1173,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
 
         obj_form = objects.AssetForm(gstudio_node=result, repository_id=self._catalog_id,
                 effective_agent_id=self.get_effective_agent_id(),runtime=self._runtime, proxy=self._proxy)
+        obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form
 
@@ -1484,7 +1486,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         document = Node.get_node_by_id(asset_content_id.get_identifier())
         asset_id = None
         has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
-        asset_content_ident = self.get_id().identifier
+        asset_content_ident = asset_content_id.identifier
         assetcontent_grel = triple_collection.find_one({'_type': 'GRelation',
             'right_subject': ObjectId(asset_content_ident), 'relation_type': has_assetcontent_rt._id,
             'status': u'PUBLISHED'}, {'subject': 1})
@@ -1493,6 +1495,9 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             asset_id = assetcontent_grel['subject']
             # asset_node = Node.get_node_by_id(asset_id)
             # return Asset(gstudio_node=asset_node)
+            asset_id = (Id(identifier=str(asset_id), 
+                namespace="repository.AssetContent",
+                authority="GSTUDIO"))
 
         obj_form = AssetContentForm(gstudio_node=document,
                                     repository_id=self._catalog_id,
@@ -1558,6 +1563,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             res_type = 'File'
         else:
             content_data = asset_content_form._gstudio_map['content']
+
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
          name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
          created_by=1, files=file_data, content=content_data,\
