@@ -126,7 +126,7 @@ def create_assetcontent(asset_id,
 										unique_gs_per_file=True,
 										**kwargs)
 
-	asset_content_obj.save(group_id=group_id)
+	asset_content_obj.save(groupid=group_id)
 	asset_contents_list = [asset_content_obj._id]
 	rt_has_asset_content = node_collection.one({'_type': 'RelationType',
 		'name': 'has_assetcontent'})
