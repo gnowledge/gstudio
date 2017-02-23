@@ -33,9 +33,11 @@ from gnowsys_ndf.ndf.models import Node, node_collection, triple_collection
 
 #=================
 # for multi-language
-from ..types import Language
+from ..types import Language, Script, Format
 from ..primitives import Type, DisplayText
 DEFAULT_LANGUAGE_TYPE = Type(**Language().get_type_data('DEFAULT'))
+DEFAULT_SCRIPT_TYPE = Type(**Script().get_type_data('DEFAULT'))
+DEFAULT_FORMAT_TYPE = Type(**Format().get_type_data('DEFAULT'))
 # ==============
 
 
@@ -118,8 +120,9 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         osid_objects.OsidObject.__init__(self, object_name='ASSET', **kwargs)
         # Can remove object_name param
         self._catalog_name = 'repository'
+
         if 'assetContents' in kwargs:
-            self['assetContents'] = kwargs['assetContents']
+            self.assetContents = kwargs['assetContents']
 
     def get_title(self):
         """Gets the proper title of this asset.
@@ -1503,6 +1506,15 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         return self.get_matching_language_value('descriptions')
 
     description = property(fget=get_description)
+
+    @staticmethod
+    def _empty_display_text():
+        return DisplayText(display_text_map={
+            'text': '',
+            'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+            'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+            'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+        })
     # =====================
 
     
@@ -1600,6 +1612,8 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         #if self.get_display_names_metadata().is_read_only():
         #    raise NoAccess()
         self.add_or_replace_value('displayNames', display_name)
+        import pdb
+        pdb.set_trace()
         if self._gstudio_map['displayNames']:
             self._gstudio_map['name'] = self._gstudio_map['displayNames'][0]['text']
         else:
