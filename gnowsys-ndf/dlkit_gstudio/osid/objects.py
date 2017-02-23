@@ -107,7 +107,8 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
     def __init__(self, gstudio_node, runtime=None, **kwargs):
         osid_markers.Identifiable.__init__(self, runtime=runtime)
         osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
-        self._gstudio_map = gstudio_node
+        self._gstudio_map = {}
+        self._gstudio_map['gstudio_node'] = gstudio_node
         self._gstudio_map['recordTypeIds'] = []
         self._gstudio_node = gstudio_node
         self._my_map = {}
