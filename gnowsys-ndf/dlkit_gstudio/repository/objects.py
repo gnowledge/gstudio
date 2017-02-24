@@ -555,6 +555,29 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
             self._init_map(**kwargs)
             self._init_gstudio_map(**kwargs)
 
+    def get_asset_contents(self, asset_content_obj_id):
+        """Gets the content of this asset.
+
+        return: (osid.repository.AssetContentList) - the asset contents
+        raise:  OperationFailed - unable to complete request
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
+        asset_grels = triple_collection.find({'_type': 'GRelation', 
+            'right_subject': ObjectId(asset_content_obj_id), 'relation_type': has_assetcontent_rt._id,
+            'status': u'PUBLISHED'}, {'right_subject': 1})
+
+        asset_content_objs = []
+        if asset_grels.count():
+            asset_content_ids = [each_rs['right_subject'] for each_rs in asset_grels]
+            result_cur = Node.get_nodes_by_ids_list(asset_content_ids)
+            asset_content_objs = [AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
+        # return AssetContentList(asset_content_objs, runtime=self._runtime, proxy=self._proxy)
+        return AssetContentList(asset_content_objs)
+
+
+
     def _init_gstudio_map(self, **kwargs):
         """Initialize form map"""
         osid_objects.OsidObjectForm._init_gstudio_map(self, **kwargs)
@@ -567,7 +590,7 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
                 authority="GSTUDIO")) for each_repo_id in repository_ident_list]
             self._gstudio_map['assignedRepositoryIds'] = repository_ids
             asset_content_list = []
-            asset_contents = self.get_asset_contents()
+            asset_contents = self.get_asset_contents(kwargs['gstudio_node']['_id'])
             for asset_content in asset_contents:
                 asset_content_list.append(asset_content.get_object_map())
             self._gstudio_map['assetContents'] = asset_content_list
