@@ -395,7 +395,7 @@ class Node(DjangoDocument):
             member_of = kwargs.get('member_of', [])
         else:
             member_of = request.POST.get('member_of', [])
-        self.member_of = [ObjectId(member_of)] if member_of else member_of
+        self.member_of = [ObjectId(member_of)] if member_of and not isinstance(member_of, list) else member_of
         # if member_of and not isinstance(member_of, list):
         #     self.member_of = [ObjectId(each) for each in member_of]
 
