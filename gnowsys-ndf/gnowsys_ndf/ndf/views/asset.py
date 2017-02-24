@@ -117,7 +117,7 @@ def create_assetcontent(asset_id,
 	kwargs.update({'created_by': created_by})
 	kwargs.update({'member_of': member_of_gst_id})
 	kwargs.update({'group_set': group_set})
-	kwargs.update({'unique_gs_per_file': True})
+	kwargs.update({'unique_gs_per_file': False})
 	if content:
 		kwargs.update({'content': content})
 
