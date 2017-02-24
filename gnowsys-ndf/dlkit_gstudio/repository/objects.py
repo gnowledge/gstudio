@@ -1439,8 +1439,8 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         # ======================
         # added for multi-language support
-        obj_map['displayName'] = self._str_display_text(self._display_name)
-        obj_map['description'] = self._str_display_text(self._description)
+        obj_map['displayName'] = self._str_display_text(self.display_name)
+        obj_map['description'] = self._str_display_text(self.description)
         # =====================
         '''
         obj_map['displayName'] = {'formatTypeId': str(DEFAULT_FORMAT_TYPE),
