@@ -286,9 +286,36 @@ class Node(DjangoDocument):
                                         # 'Administration' group is
                                         # ready.
     default_values = {
+                        'name': '',
+                        'altnames': '',
+                        'plural': '',
+                        'prior_node': [],
+                        'post_node': [],
+                        'language': ('en', 'English'),
+                        'type_of': [],
+                        'member_of': [],
+                        'access_policy': '',
                         'created_at': datetime.datetime.now,
+                        # 'created_by': int,
+                        'last_update': datetime.datetime.now,
+                        # 'modified_by': int,
+                        # 'contributors': [],
+                        'location': [],
+                        'content': '',
+                        'content_org': '',
+                        'group_set': [],
+                        'collection_set': [],
+                        'property_order': [],
+                        # 'start_publication': datetime.datetime.now,
+                        'tags': [],
+                        # 'featured': True,
+                        'url': '',
+                        # 'comment_enabled': bool,
+                        # 'login_required': bool,
+                        # 'password': basestring,
                         'status': u'DRAFT',
-                        'language': ('en', 'English')
+                        'rating':[],
+                        'snapshot':{}
                     }
     use_dot_notation = True
 
@@ -385,14 +412,16 @@ class Node(DjangoDocument):
         # 'last_update': datetime.datetime,
         #   - this will be system generated (from save method), always.
 
+        created_by = 0
         # 'created_by': int
         if not self.created_by:
             if kwargs.has_key('created_by'):
                 created_by = kwargs.get('created_by', '')
-            elif request:
+            elif request and ('user' in request):
                 created_by = request.user.id
             self.created_by = int(created_by) if created_by else 0
 
+        modified_by = 0
         # 'modified_by': int, # test required: only ids of Users
         if kwargs.has_key('modified_by'):
             modified_by = kwargs.get('modified_by', None)
@@ -400,9 +429,10 @@ class Node(DjangoDocument):
             if hasattr(request, 'user'):
                 modified_by = request.user.id
             elif kwargs.has_key('created_by'):
-                modified_by = created_by
+                modified_by = self.created_by
         self.modified_by = int(modified_by) if modified_by else self.created_by
 
+        contributors = []
         # 'contributors': [int]
         if kwargs.has_key('contributors'):
             contributors = kwargs.get('contributors', [self.created_by])
