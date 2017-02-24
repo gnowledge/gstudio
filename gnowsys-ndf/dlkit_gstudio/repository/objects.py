@@ -555,7 +555,7 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
             self._init_map(**kwargs)
             self._init_gstudio_map(**kwargs)
 
-    def get_asset_contents(self, asset_content_obj_id):
+    def get_asset_contents(self, asset_obj_id):
         """Gets the content of this asset.
 
         return: (osid.repository.AssetContentList) - the asset contents
@@ -565,7 +565,7 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         """
         has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
         asset_grels = triple_collection.find({'_type': 'GRelation', 
-            'right_subject': ObjectId(asset_content_obj_id), 'relation_type': has_assetcontent_rt._id,
+            'subject': ObjectId(asset_obj_id), 'relation_type': has_assetcontent_rt._id,
             'status': u'PUBLISHED'}, {'right_subject': 1})
 
         asset_content_objs = []
