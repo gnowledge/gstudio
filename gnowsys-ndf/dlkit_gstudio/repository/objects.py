@@ -1443,16 +1443,15 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         # obj_map['displayName'] = self._str_display_text(self.display_name)
         # obj_map['description'] = self._str_display_text(self.description)
         # =====================
-        obj_map['displayName'] = DisplayText({'formatTypeId': DEFAULT_FORMAT_TYPE,
-                                              'languageTypeId': DEFAULT_LANGUAGE_TYPE,
-                                              'scriptTypeId': DEFAULT_SCRIPT_TYPE,
-                                              'text': self['_gstudio_node']['name']})
+        obj_map['displayName'] = {'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+                                              'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                              'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                              'text': self['_gstudio_node']['name']}
 
-        obj_map['description'] =  DisplayText({'formatTypeId': DEFAULT_FORMAT_TYPE,
-                                              'languageTypeId': DEFAULT_LANGUAGE_TYPE,
-                                              'scriptTypeId': DEFAULT_SCRIPT_TYPE,
-                                              'text': self['_gstudio_node']['content']})
-
+        obj_map['description'] =  {'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+                                              'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                              'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                              'text': self['_gstudio_node']['content']}
         return obj_map
     object_map = property(fget=get_object_map)
 
