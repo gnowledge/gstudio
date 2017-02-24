@@ -114,14 +114,12 @@ def create_assetcontent(asset_id,
 		print "resource_type arg is not supplied."
 		# handle condition based on files.
 		member_of_gst_id = gst_file_id if files[0] else gst_page_id
-
+	asset_content_obj = None
 	if node_id:
 		asset_content_obj = node_collection.one({'_id': ObjectId(node_id)})
-		asset_content_obj.fill_node_values(**kwargs)
 	else:
 		asset_content_obj = node_collection.collection.GSystem()
-
-
+		print "\n name: ", name
 		asset_content_obj.fill_gstystem_values(request=request,
 												name=name,
 												member_of=member_of_gst_id,
@@ -131,7 +129,10 @@ def create_assetcontent(asset_id,
 												uploaded_file=files[0],
 												unique_gs_per_file=True,
 												**kwargs)
+	print "\nasset_content_obj.name BEFORE: ", asset_content_obj.name
 
+	asset_content_obj.fill_node_values(**kwargs)
+	print "\nasset_content_obj.name: ", asset_content_obj.name
 	asset_content_obj.save(groupid=group_id)
 	asset_contents_list = [asset_content_obj._id]
 	rt_has_asset_content = node_collection.one({'_type': 'RelationType',
