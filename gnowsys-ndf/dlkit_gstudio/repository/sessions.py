@@ -1564,8 +1564,14 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         else:
             content_data = asset_content_form._gstudio_map['content']
         asset_content_id = None
-        if 'gstudio_node' in asset_content_form:
-            asset_content_id = asset_content_form['gstudio_node']['_id']
+
+
+
+        if 'gstudio_node' in asset_content_form._gstudio_map:
+            print "\n gstudio_node found in update_form"
+            asset_content_id = asset_content_form._gstudio_map['gstudio_node']['_id']
+            print "\n asset_content_id in update form", asset_content_id
+        # print "\n asset_content_form: ",asset_content_form
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,node_id=asset_content_id,\
          name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
          created_by=1, files=file_data, content=content_data,\

@@ -1440,9 +1440,11 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         # ======================
         # added for multi-language support
-        obj_map['displayName'] = self._str_display_text(self.display_name)
-        obj_map['description'] = self._str_display_text(self.description)
+        # obj_map['displayName'] = self._str_display_text(self.display_name)
+        # obj_map['description'] = self._str_display_text(self.description)
         # =====================
+        obj_map['displayName'] = get_display_text_map(self['_gstudio_node']['name'])
+        obj_map['description'] = get_display_text_map(self['_gstudio_node']['content'])
 
         return obj_map
     object_map = property(fget=get_object_map)
@@ -1566,6 +1568,8 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         """Initialize form map"""
         osid_objects.OsidObjectForm._init_gstudio_map(self, record_types, **kwargs)
         self._gstudio_map['assetId'] = str(kwargs['asset_id'])
+        if "gstudio_node" in kwargs:
+            self._gstudio_map['gstudio_node'] = kwargs['gstudio_node']
         # assetIdent is added to pass ObjectId instead of 
         # primitives.Id. to gstudio Asset api the 
         # as asset_id becomes str in further sessions.

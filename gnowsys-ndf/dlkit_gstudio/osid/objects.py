@@ -208,7 +208,8 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
 
         """
         # raise errors.Unimplemented()
-        return Type('DEFAULT%3ADEFAULT%40GSTUDIO')
+        return Type('asset-content-genus-type%3Amp4%40ODL.MIT.EDU')
+
     
     genus_type = property(fget=get_genus_type)
 
