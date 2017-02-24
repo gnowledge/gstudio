@@ -561,7 +561,7 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         # osid_objects.OsidSourceableForm._init_map(self)
         # osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         if "gstudio_node" in kwargs:
-            repository_ident_list = kwargs['_gstudio_node']['group_set']
+            repository_ident_list = kwargs['gstudio_node']['group_set']
             repository_ids = [str(Id(identifier=str(each_repo_id),
                 namespace="repository.Repository",
                 authority="GSTUDIO")) for each_repo_id in repository_ident_list]
@@ -1439,9 +1439,10 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         # ======================
         # added for multi-language support
-        # obj_map['displayName'] = self._str_display_text(self.display_name)
-        # obj_map['description'] = self._str_display_text(self.description)
+        obj_map['displayName'] = self._str_display_text(self._display_name)
+        obj_map['description'] = self._str_display_text(self._description)
         # =====================
+        '''
         obj_map['displayName'] = {'formatTypeId': str(DEFAULT_FORMAT_TYPE),
                                               'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                                               'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
@@ -1451,6 +1452,7 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
                                               'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                                               'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                                               'text': self['_gstudio_node']['content']}
+        '''
         return obj_map
     object_map = property(fget=get_object_map)
 
