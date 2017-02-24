@@ -309,12 +309,10 @@ class Node(DjangoDocument):
     def fill_node_values(self, request=HttpRequest(), **kwargs):
 
         # 'name': unicode,
-        print "\n name1:: ", name
         if kwargs.has_key('name'):
             name = kwargs.get('name', '')
         else:
             name = request.POST.get('name', '').strip()
-            print "\n name2:: ", self.name
         self.name = unicode(name)
 
         # 'altnames': unicode,

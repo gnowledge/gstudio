@@ -81,10 +81,6 @@ def create_assetcontent(asset_id,
 
 	if not name:
 		name = request.POST.get('name') if request else None
-	kwargs.update({'name': name})
-	if content:
-		kwargs.update({'content': content})
-
 	if not created_by:
 		created_by = request.user.id if request else None
 
@@ -122,7 +118,6 @@ def create_assetcontent(asset_id,
 		asset_content_obj = node_collection.one({'_id': ObjectId(node_id)})
 	else:
 		asset_content_obj = node_collection.collection.GSystem()
-		print "\n name: ", name
 		asset_content_obj.fill_gstystem_values(request=request,
 												name=name,
 												member_of=member_of_gst_id,
@@ -134,7 +129,7 @@ def create_assetcontent(asset_id,
 												**kwargs)
 	print "\nasset_content_obj.name BEFORE: ", asset_content_obj.name
 
-	# asset_content_obj.fill_node_values(**kwargs)
+	asset_content_obj.fill_node_values(**kwargs)
 	print "\nasset_content_obj.name: ", asset_content_obj.name
 	asset_content_obj.save(groupid=group_id)
 	asset_contents_list = [asset_content_obj._id]
