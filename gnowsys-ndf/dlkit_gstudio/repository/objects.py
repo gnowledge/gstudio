@@ -1358,7 +1358,8 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return bool(self['_gstudio_node']['if_file']['original']['relurl'])
+        #raise errors.Unimplemented()
 
     def get_url(self):
         """Gets the URL associated with this content for web-based retrieval.
@@ -1369,7 +1370,9 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         """
         # Return original url of AssetContent
-        return ("media/" + self['_gstudio_node']['if_file']['original']['relurl'])
+        if self.has_url():
+            return ("media/" + self['_gstudio_node']['if_file']['original']['relurl'])
+        raise errors.IllegalState()
 
     url = property(fget=get_url)
 
@@ -1432,6 +1435,8 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         # Data:
         # obj_map['data'] = None  # COLE: DO WE USE THIS IN OBJECT_MAP?
+        obj_map['genusTypeId'] = obj_map['genusType']
+        del obj_map['genusType']
 
         # ======================
         # added for multi-language support
@@ -1612,8 +1617,6 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         #if self.get_display_names_metadata().is_read_only():
         #    raise NoAccess()
         self.add_or_replace_value('displayNames', display_name)
-        import pdb
-        pdb.set_trace()
         if self._gstudio_map['displayNames']:
             self._gstudio_map['name'] = self._gstudio_map['displayNames'][0]['text']
         else:
@@ -2184,7 +2187,7 @@ class RepositoryForm(abc_repository_objects.RepositoryForm, osid_objects.OsidCat
     _namespace = 'repository.Repository'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidCatalogForm.__init__(self, **kwargs)
+        osid_objects.OsidCatalogForm.__init__(self, object_name='REPOSITORY', **kwargs)
         self._mdata = default_mdata.get_repository_mdata()
         self._init_metadata(**kwargs)
         # if not self.is_for_update():
