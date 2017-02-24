@@ -103,12 +103,6 @@ def create_assetcontent(asset_id,
 	author_obj_id  = author_obj._id
 
 	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
-	if node_id:
-		asset_content_obj = node_collection.one({'_id': ObjectId(node_id)})
-	else:
-		asset_content_obj = node_collection.collection.GSystem()
-
-
 	gst_name_id_dict = {
 		'Page': gst_page_id, 'page': gst_page_id,
 		'File': gst_file_id, 'file': gst_file_id
@@ -120,15 +114,23 @@ def create_assetcontent(asset_id,
 		print "resource_type arg is not supplied."
 		# handle condition based on files.
 		member_of_gst_id = gst_file_id if files[0] else gst_page_id
-	asset_content_obj.fill_gstystem_values(request=request,
-										name=name,
-										member_of=member_of_gst_id,
-										group_set=group_set,
-										created_by=created_by,
-										content=content,
-										uploaded_file=files[0],
-										unique_gs_per_file=True,
-										**kwargs)
+
+	if node_id:
+		asset_content_obj = node_collection.one({'_id': ObjectId(node_id)})
+		asset_content_obj.fill_node_values(**kwargs)
+	else:
+		asset_content_obj = node_collection.collection.GSystem()
+
+
+		asset_content_obj.fill_gstystem_values(request=request,
+												name=name,
+												member_of=member_of_gst_id,
+												group_set=group_set,
+												created_by=created_by,
+												content=content,
+												uploaded_file=files[0],
+												unique_gs_per_file=True,
+												**kwargs)
 
 	asset_content_obj.save(groupid=group_id)
 	asset_contents_list = [asset_content_obj._id]
