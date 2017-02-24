@@ -15,7 +15,19 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="description" content="">
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width" />
+  <!-- added by saurabh -->
+    <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation/css/foundation.css">
+    <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation/css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css">
+    <link href="https://fonts.googleapis.com/css?family=Rubik:300,400,500,700,900" rel="stylesheet">
+    <script type="text/javascript" src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/modernizr/modernizr.js"></script>
+    <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation/foundation.topbar.js">
+      
+    </script>
 
+  
   <link rel="shortcut icon" href="{{site.FAVICON}}">
 
   <!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
@@ -62,7 +74,7 @@
   {% get_group_object groupid as group_object %}
   {% check_accounts_url request.path as is_ac_url %}
 
-  {% include "ndf/header.html" %}
+  {% include "ndf/header_clix.html" %}
   {% block extended_header %}{% endblock %}
    {% comment %}
    {% get_gstudio_help_sidebar as gst_help_sidebar %}
