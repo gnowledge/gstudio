@@ -3665,7 +3665,10 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
 
         """
         # repository_id will be of type  dlkit.primordium.id.primitives.Id
-        return objects.Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id.identifier)}))
+        #return objects.Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id.identifier)}))
+        # =======
+        # updated for aliasing
+        return objects.Repository(gstudio_node=node_collection.one({'_id': ObjectId(self._get_id(repository_id, 'repository').identifier)}))
 
     @utilities.arguments_not_none
     def get_repositories_by_ids(self, repository_ids):
@@ -4158,7 +4161,8 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
 
         """
         raise errors.Unimplemented()
-
+# ===============
+# Updated for aliasing
     @utilities.arguments_not_none
     def alias_repository(self, repository_id, alias_id):
         """Adds an ``Id`` to a ``Repository`` for the purpose of creating compatibility.
@@ -4181,7 +4185,9 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        #raise errors.Unimplemented()
+        self._alias_id(primary_id=repository_id, equivalent_id=alias_id)
+# ===============
 
 
 class RepositoryHierarchySession(abc_repository_sessions.RepositoryHierarchySession, osid_sessions.OsidSession):
