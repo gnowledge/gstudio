@@ -83,9 +83,6 @@ def create_assetcontent(asset_id,
 		name = request.POST.get('name') if request else None
 	if not created_by:
 		created_by = request.user.id if request else None
-	kwargs.update({'name': name})
-	if content:
-		kwargs.update({'content': content})
 
 	group_name, group_id = get_group_name_id(group_name_or_id)
 	if group_id not in asset_obj['group_set']:
@@ -116,17 +113,21 @@ def create_assetcontent(asset_id,
 		print "resource_type arg is not supplied."
 		# handle condition based on files.
 		member_of_gst_id = gst_file_id if files[0] else gst_page_id
+	kwargs.update({'name': name})
+	kwargs.update({'created_by': created_by})
+	kwargs.update({'member_of': member_of_gst_id})
+	kwargs.update({'group_set': group_set})
+	kwargs.update({'unique_gs_per_file': True})
+	if content:
+		kwargs.update({'content': content})
+
 	asset_content_obj = None
 	if node_id:
 		asset_content_obj = node_collection.one({'_id': ObjectId(node_id)})
 	else:
 		asset_content_obj = node_collection.collection.GSystem()
 		asset_content_obj.fill_gstystem_values(request=request,
-												member_of=member_of_gst_id,
-												group_set=group_set,
-												created_by=created_by,
 												uploaded_file=files[0],
-												unique_gs_per_file=True,
 												**kwargs)
 	print "\nasset_content_obj.name BEFORE: ", asset_content_obj.name
 	print "kwargs: ", kwargs
