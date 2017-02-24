@@ -309,10 +309,12 @@ class Node(DjangoDocument):
     def fill_node_values(self, request=HttpRequest(), **kwargs):
 
         # 'name': unicode,
+        print "\n name1:: ", name
         if kwargs.has_key('name'):
             name = kwargs.get('name', '')
         else:
             name = request.POST.get('name', '').strip()
+            print "\n name2:: ", self.name
         self.name = unicode(name)
 
         # 'altnames': unicode,
@@ -1660,6 +1662,7 @@ class GSystem(Node):
             if kwargs.has_key('unique_gs_per_file') and kwargs['unique_gs_per_file']:
 
                 if existing_file_gs:
+                    print "Returning:: "
                     return existing_file_gs
 
         self.fill_node_values(request, **kwargs)
