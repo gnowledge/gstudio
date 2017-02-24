@@ -1905,7 +1905,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         """
         self._gstudio_map['content'] = unicode(description)
         self._gstudio_map['content_org'] = unicode(description)
-        # self._description = description
+        self._description = description
 
     def clear_description(self):
         """Clears the description.
@@ -1970,7 +1970,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
                 self.get_genus_type_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['genusTypeId'] = self._genus_type_default
-        # self._genus_type = self._genus_type_default
+        self._genus_type = self._genus_type_default
 
     genus_type = property(fset=set_genus_type, fdel=clear_genus_type)
 
