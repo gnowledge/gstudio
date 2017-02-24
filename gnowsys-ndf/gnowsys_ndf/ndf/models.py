@@ -286,9 +286,36 @@ class Node(DjangoDocument):
                                         # 'Administration' group is
                                         # ready.
     default_values = {
+                        'name': '',
+                        'altnames': '',
+                        'plural': '',
+                        'prior_node': [],
+                        'post_node': [],
+                        'language': ('en', 'English'),
+                        'type_of': [],
+                        'member_of': [],
+                        'access_policy': '',
                         'created_at': datetime.datetime.now,
+                        # 'created_by': int,
+                        'last_update': datetime.datetime.now,
+                        # 'modified_by': int,
+                        # 'contributors': [],
+                        'location': [],
+                        'content': '',
+                        'content_org': '',
+                        'group_set': [],
+                        'collection_set': [],
+                        'property_order': [],
+                        # 'start_publication': datetime.datetime.now,
+                        'tags': [],
+                        # 'featured': True,
+                        'url': '',
+                        # 'comment_enabled': bool,
+                        # 'login_required': bool,
+                        # 'password': basestring,
                         'status': u'DRAFT',
-                        'language': ('en', 'English')
+                        'rating':[],
+                        'snapshot':{}
                     }
     use_dot_notation = True
 

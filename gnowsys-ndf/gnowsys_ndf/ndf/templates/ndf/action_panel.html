@@ -250,7 +250,7 @@
 			<!-- Views row -->
 				<div class="row tag-rating-div">
 					<span title="{% trans 'Click to see no. of view ' %}"><label class="lbl_tag lbl_field">{% trans "Views" %}</label></span>
-					{% include "ndf/analytics_views.html" %}
+					{% include "ndf/widget_analytics_views.html" %}
 				</div>
 
 			<!-- Ratings -->
@@ -451,7 +451,7 @@
 
                 <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;"> 
                     <div id="group_drawer">
-                    {% include "ndf/user_search_widget.html" with subscription_status=True %}
+                    {% include "ndf/widget_user_search.html" with subscription_status=True %}
                     </div>
                     <a class="close-reveal-modal">&#215;</a>
                 </div>          
