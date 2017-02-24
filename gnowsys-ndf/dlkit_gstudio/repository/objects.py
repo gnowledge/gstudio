@@ -421,7 +421,6 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         asset_content_objs = []
         if asset_grels.count():
             asset_content_ids = [each_rs['right_subject'] for each_rs in asset_grels]
-            # print asset_content_ids
             result_cur = Node.get_nodes_by_ids_list(asset_content_ids)
             asset_content_objs = [AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
         # return AssetContentList(asset_content_objs, runtime=self._runtime, proxy=self._proxy)

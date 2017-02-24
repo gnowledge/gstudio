@@ -191,7 +191,6 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
             asset_content_list = []
             if asset_grels.count():
                 asset_content_ids = [each_rs['right_subject'] for each_rs in asset_grels]
-                # print asset_content_ids
                 result_cur = Node.get_nodes_by_ids_list(asset_content_ids)
         
                 asset_content_objs = [objects.AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
@@ -1109,9 +1108,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         self._forms[asset_form.get_id().get_identifier()] = CREATED
         # This should be part of _init_gstudio_map
-        # print "\n asset_form._gstudio_map: ", asset_form._gstudio_map
         asset_name = asset_form._gstudio_map['name'].strip()
-        print "\n asset_name: ", asset_name
         asset_obj = gstudio_create_asset(name=asset_name,\
          group_id=self._catalog_id.get_identifier(), created_by=1)
         # asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
@@ -1565,13 +1562,8 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             content_data = asset_content_form._gstudio_map['content']
         asset_content_id = None
 
-
-
         if 'gstudio_node' in asset_content_form._gstudio_map:
-            print "\n gstudio_node found in update_form"
             asset_content_id = asset_content_form._gstudio_map['gstudio_node']['_id']
-            print "\n asset_content_id in update form", asset_content_id
-        # print "\n asset_content_form: ",asset_content_form
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,node_id=asset_content_id,\
          name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
          created_by=1, files=file_data, content=content_data,\

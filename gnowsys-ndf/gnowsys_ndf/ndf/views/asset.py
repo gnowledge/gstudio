@@ -124,16 +124,13 @@ def create_assetcontent(asset_id,
 	asset_content_obj = None
 	if node_id:
 		asset_content_obj = node_collection.one({'_id': ObjectId(node_id)})
+		asset_content_obj.fill_node_values(**kwargs)
 	else:
 		asset_content_obj = node_collection.collection.GSystem()
 		asset_content_obj.fill_gstystem_values(request=request,
 												uploaded_file=files[0],
 												**kwargs)
-	print "\nasset_content_obj.name BEFORE: ", asset_content_obj.name
-	print "kwargs: ", kwargs
-	asset_content_obj.fill_node_values(**kwargs)
 	asset_content_obj.save(groupid=group_id)
-	print "\nasset_content_obj.name: ", asset_content_obj.name
 	asset_contents_list = [asset_content_obj._id]
 	rt_has_asset_content = node_collection.one({'_type': 'RelationType',
 		'name': 'has_assetcontent'})
