@@ -6,7 +6,7 @@ CKEDITOR.plugins.add('addJhapp',
         var pluginName = 'addJhapp';
         var groupId = editor.config.groupID.group_id;
         var nodeId = editor.config.nodeID.node_id;
-        var url = "/" + groupId + "/jhapp";
+        var url = "/" + groupId + "/ajax/get_jhapps";
         // var textAreaId = "textarea-"+nodeId;
         var textAreaId = editor.config.textarea_id;
         CKEDITOR.dialog.add(pluginName, this.path + 'plugin.js');
@@ -25,27 +25,12 @@ CKEDITOR.plugins.add('addJhapp',
                         success: function(data) {
                           $("#group_imgs_on_modal").html(data);
                           $('#group_imgs_on_modal').foundation('reveal', 'open');
-                          alert(data)
 
-                          $(".card-image-wrapper").click(function(event){
-                            var video_player_url = "/" + groupId + "/ajax/get_video_player";
-                            var datasrc = $(this).children('img').attr("data-image-id");
-
-                            $.ajax({
-                                        type: "GET",
-                                        url: video_player_url,
-                                        datatype: "html",
-                                        data:{
-                                            datasrc:datasrc
-                                        },
-                                        success: function(data) {
-                                            CKEDITOR.instances[textAreaId].insertHtml(data);
-                                            $('#group_imgs_on_modal').foundation('reveal', 'close');
-
-                                        }
-                                });
-
-
+                          $(".button-hollow-purple").click(function(event){
+                            var datasrc = $(this).attr("data-original-url");
+                            completeURL = "/media"+ datasrc;
+                            CKEDITOR.instances[textAreaId].insertHtml('<iframe style="border:none;width:100%;height:100%;min-height:800px;" src=' + completeURL +  '>' + '</img>');
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
                           });
 
 
