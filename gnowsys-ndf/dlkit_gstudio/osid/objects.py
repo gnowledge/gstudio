@@ -1826,7 +1826,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             self._gstudio_map['content_org'] = self._description_default['default_string_values'][0]['text']
         # print "Test: ", self._gstudio_map
 
-        # self._my_map['genusTypeId'] = self._genus_type_default
+        self._my_map['genusTypeId'] = self._genus_type_default
         OsidExtensibleForm._init_gstudio_map(self, record_types)
 
     def get_display_name_metadata(self):

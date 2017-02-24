@@ -400,7 +400,7 @@ class Node(DjangoDocument):
             if hasattr(request, 'user'):
                 modified_by = request.user.id
             elif kwargs.has_key('created_by'):
-                modified_by = created_by
+                modified_by = kwargs.get('created_by', '')
         self.modified_by = int(modified_by) if modified_by else self.created_by
 
         # 'contributors': [int]
