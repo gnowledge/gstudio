@@ -207,8 +207,9 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
-
+        # raise errors.Unimplemented()
+        return Type('DEFAULT%3ADEFAULT%40GSTUDIO')
+    
     genus_type = property(fget=get_genus_type)
 
     @utilities.arguments_not_none
@@ -1502,7 +1503,8 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         else:
             self._my_map['providerId'] = self._provider_default
         self._my_map['brandingIds'] = self._branding_default
-        self._my_map['license'] = dict(self._license_default)
+        self._my_map['license'] = self._license_default
+        # self._my_map['license'] = dict(self._license_default)
 
     def get_provider_metadata(self):
         """Gets the metadata for a provider.

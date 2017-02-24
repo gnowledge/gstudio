@@ -66,6 +66,7 @@ def create_assetcontent(asset_id,
 						name,
 						group_name_or_id,
 						created_by,
+						node_id=None,
 						content=None,
 						files=[None],
 						resource_type='Page',
@@ -102,8 +103,11 @@ def create_assetcontent(asset_id,
 	author_obj_id  = author_obj._id
 
 	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
+	if node_id:
+		asset_content_obj = node_collection.one({'_id': ObjectId(node_id)})
+	else:
+		asset_content_obj = node_collection.collection.GSystem()
 
-	asset_content_obj = node_collection.collection.GSystem()
 
 	gst_name_id_dict = {
 		'Page': gst_page_id, 'page': gst_page_id,
