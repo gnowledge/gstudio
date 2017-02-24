@@ -1451,7 +1451,7 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         obj_map['description'] =  DisplayText({'formatTypeId': DEFAULT_FORMAT_TYPE,
                                               'languageTypeId': DEFAULT_LANGUAGE_TYPE,
                                               'scriptTypeId': DEFAULT_SCRIPT_TYPE,
-                                              'text': self['_gstudio_node']['name']})
+                                              'text': self['_gstudio_node']['content']})
 
         return obj_map
     object_map = property(fget=get_object_map)
