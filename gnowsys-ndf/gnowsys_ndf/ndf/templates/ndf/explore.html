@@ -55,9 +55,9 @@
 	{% if title == 'explore' %}
 		Please select course or a group.
 	{% else %}
-		<section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="background-color:#fafafa;border-style:none">
+		<section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-3 large-block-grid-4" style="border-style:none;margin-left:50px;">
 			{% for each_obj in doc_cur %}
-				<li class="card-image-wrapper" style="margin-top:13px;">
+				<li class="card-image-wrapper">
 				{% if title == "base courses" %}
 					{% if "Course" in each_obj.member_of_names_list %}
 						{% include card with resource=each_obj has_logo=True no_footer=True url_name="course_detail" first_arg=groupid second_arg=each_obj.pk  %}

@@ -32,7 +32,7 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS,GSTUDIO_SUPPORTED_JHAPPS
 from gnowsys_ndf.settings import STATIC_ROOT, STATIC_URL
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
@@ -47,6 +47,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_w
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
+from gnowsys_ndf.ndf.views.asset import *
 
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -6550,3 +6551,20 @@ def get_audio_player(request, group_id):
             },
             context_instance=RequestContext(request))
     
+@login_required
+@get_execution_time
+def get_jhapps(request,group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+
+  group_obj = node_collection.one({'_id': ObjectId(group_id)})
+  jhapp_list = []
+  for each in GSTUDIO_SUPPORTED_JHAPPS:
+    each_node = node_collection.one({'name':unicode(each)})
+    if each_node:
+      jhapp_list.append(ObjectId(each_node._id))
+  jhapp_res = node_collection.find({'member_of': {'$in': jhapp_list}})
+
+  return render_to_response("ndf/jhapp_list.html",RequestContext(request, {"groupid":group_id, "group_id":group_id,'jhapp_res':jhapp_res}))
