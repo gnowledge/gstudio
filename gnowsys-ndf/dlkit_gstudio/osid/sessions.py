@@ -274,7 +274,7 @@ class OsidSession(abc_osid_sessions.OsidSession):
         try:
             mongo_host_param_id = Id('parameter:mongoHostURI@mongo')
             mongo_host = runtime.get_configuration().get_value_by_parameter(mongo_host_param_id).get_string_value()
-        except (AttributeError, KeyError, NotFound):
+        except (AttributeError, KeyError, errors.NotFound):
             return MongoClient()
         else:
             return MongoClient(mongo_host)
