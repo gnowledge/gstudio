@@ -1191,6 +1191,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
+        from dlkit.abstract_osid.repository.objects import AssetForm as ABCAssetForm
         # collection = MongoClientValidated('repository',
         #                                   collection='Asset',
         #                                   runtime=self._runtime)
