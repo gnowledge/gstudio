@@ -6,7 +6,7 @@ DEFAULT_LANGUAGE_TYPE = Type(**types.Language().get_type_data("DEFAULT"))
 DEFAULT_SCRIPT_TYPE = Type(**types.Script().get_type_data("DEFAULT"))
 DEFAULT_FORMAT_TYPE = Type(**types.Format().get_type_data("DEFAULT"))
 DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data("DEFAULT"))
-
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE
 
 
 def get_asset_mdata():
@@ -33,7 +33,7 @@ def get_asset_mdata():
             'linked': False,
             'array': False,
             'default_string_values': [{
-                'text': '',
+                'text': GSTUDIO_DEFAULT_LICENSE,
                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                 'formatTypeId': str(DEFAULT_FORMAT_TYPE),
