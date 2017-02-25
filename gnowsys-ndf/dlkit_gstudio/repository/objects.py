@@ -755,7 +755,8 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._my_map['copyright'] = self._get_display_text(copyright_, self.get_copyright_metadata())
+        self._gstudio_map['copyright'] = self._get_display_text(copyright_, self.get_copyright_metadata())['text']
 
     def clear_copyright(self):
         """Removes the copyright.
@@ -765,7 +766,11 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        if (self.get_copyright_metadata().is_read_only() or
+                self.get_copyright_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['copyright'] = dict(self._copyright_default)
+        self._gstudio_map['copyright'] = dict(self._copyright_default)['text']
 
     copyright_ = property(fset=set_copyright, fdel=clear_copyright)
 

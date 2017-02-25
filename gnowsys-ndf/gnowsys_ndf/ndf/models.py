@@ -540,6 +540,12 @@ class Node(DjangoDocument):
             status = request.POST.get('status', u'DRAFT')
         self.status = unicode(status)
 
+        if kwargs.has_key('license'):
+            license = kwargs.get('license', GSTUDIO_DEFAULT_LICENSE)
+        else:
+            license = request.POST.get('license', GSTUDIO_DEFAULT_LICENSE)
+        self.license = unicode(license)
+
         # 'rating':[{'score':int, 'user_id':int, 'ip_address':basestring}],
         #       - mostly, it's on detail view and by AJAX and not in/within forms.
 
