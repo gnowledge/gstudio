@@ -32,6 +32,14 @@ from dlkit.primordium.type.primitives import Type
 from dlkit.primordium.locale.types import language, script
 from dlkit.primordium.locale.types import format as text_format
 from ..utilities import get_display_text_map
+#=================
+# for multi-language
+from ..types import Language, Script, Format
+from ..primitives import Type, DisplayText
+DEFAULT_LANGUAGE_TYPE = Type(**Language().get_type_data('DEFAULT'))
+DEFAULT_SCRIPT_TYPE = Type(**Script().get_type_data('DEFAULT'))
+DEFAULT_FORMAT_TYPE = Type(**Format().get_type_data('DEFAULT'))
+# ==============
 
 
 class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_markers.Extensible, osid_markers.Browsable):
@@ -117,15 +125,15 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         self._load_records(self._my_map['recordTypeIds'])
         self._gstudio_map['displayName'] = DisplayText(display_text_map={
                                 'text':self._gstudio_node['name'],
-                                'language_type':Type(**language.get_type_data('ENG')),
-                                'script_type':Type(**script.get_type_data('LATN')),
-                                'format_type':Type(**text_format.get_type_data('PLAIN')),
+                                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                'formatTypeId': str(DEFAULT_FORMAT_TYPE)
                             })
         self._gstudio_map['description'] = DisplayText(display_text_map={
                                 'text':self._gstudio_node['content'],
-                                'language_type':Type(**language.get_type_data('ENG')),
-                                'script_type':Type(**script.get_type_data('LATN')),
-                                'format_type':Type(**text_format.get_type_data('PLAIN')),
+                                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                'formatTypeId': str(DEFAULT_FORMAT_TYPE)
                             })
         self._gstudio_map['displayNames'] = [self._gstudio_map['displayName']]
         self._gstudio_map['descriptions'] = [self._gstudio_map['description']]
