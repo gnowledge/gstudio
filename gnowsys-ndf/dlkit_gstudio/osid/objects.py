@@ -116,10 +116,24 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         self._my_map['gstudio_node'] = gstudio_node
         self._load_records(self._gstudio_map['recordTypeIds'])
         self._load_records(self._my_map['recordTypeIds'])
+        self._gstudio_map['displayName'] = DisplayText(
+                                text=self._gstudio_map['name'],
+                                language_type=Type(**language.get_type_data('ENG')),
+                                script_type=Type(**script.get_type_data('LATN')),
+                                format_type=Type(**text_format.get_type_data('PLAIN')),
+                            )
+        self._gstudio_map['description'] = DisplayText(
+                                text=self._gstudio_map['content'],
+                                language_type=Type(**language.get_type_data('ENG')),
+                                script_type=Type(**script.get_type_data('LATN')),
+                                format_type=Type(**text_format.get_type_data('PLAIN')),
+                            )
+        self._gstudio_map['displayNames'] = [self._gstudio_map['displayName']]
+        self._gstudio_map['descriptions'] = [self._gstudio_map['description']]
+
 
     def get_object_map(self, obj_map):
         """Adds OsidObject elements to object map"""
-
         super(OsidObject, self).get_object_map(obj_map)
         obj_map['id'] = str(self.get_id())
         obj_map['displayName'] = get_display_text_map(self.get_display_name())
@@ -162,7 +176,6 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
             script_type=Type(**script.get_type_data('LATN')),
             format_type=Type(**text_format.get_type_data('PLAIN')),
             )
-
 
     display_name = property(fget=get_display_name)
 
@@ -1824,7 +1837,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             self._gstudio_map['altnames'] = self._display_name_default['default_string_values'][0]['text']
             self._gstudio_map['content'] = self._description_default['default_string_values'][0]['text']
             self._gstudio_map['content_org'] = self._description_default['default_string_values'][0]['text']
-
+        
         self._my_map['genusTypeId'] = self._genus_type_default
         OsidExtensibleForm._init_gstudio_map(self, record_types)
 
