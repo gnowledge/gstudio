@@ -116,16 +116,16 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         self._load_records(self._gstudio_map['recordTypeIds'])
         self._load_records(self._my_map['recordTypeIds'])
         self._gstudio_map['displayName'] = DisplayText(display_text_map={
-                                text=self._gstudio_node['name'],
-                                language_type=Type(**language.get_type_data('ENG')),
-                                script_type=Type(**script.get_type_data('LATN')),
-                                format_type=Type(**text_format.get_type_data('PLAIN')),
+                                text:self._gstudio_node['name'],
+                                language_type:Type(**language.get_type_data('ENG')),
+                                script_type:Type(**script.get_type_data('LATN')),
+                                format_type:Type(**text_format.get_type_data('PLAIN')),
                             })
         self._gstudio_map['description'] = DisplayText(display_text_map={
-                                text=self._gstudio_node['content'],
-                                language_type=Type(**language.get_type_data('ENG')),
-                                script_type=Type(**script.get_type_data('LATN')),
-                                format_type=Type(**text_format.get_type_data('PLAIN')),
+                                text:self._gstudio_node['content'],
+                                language_type:Type(**language.get_type_data('ENG')),
+                                script_type:Type(**script.get_type_data('LATN')),
+                                format_type:Type(**text_format.get_type_data('PLAIN')),
                             })
         self._gstudio_map['displayNames'] = [self._gstudio_map['displayName']]
         self._gstudio_map['descriptions'] = [self._gstudio_map['description']]
