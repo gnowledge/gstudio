@@ -1509,7 +1509,12 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
             return self._empty_display_text()
 
         proxy = self._proxy
-        if proxy.locale is None:
+        try:
+            proxy_locale = proxy.locale
+        except Exception:
+            proxy_locale = None
+
+        if proxy_locale is None:
             return self.get_default_language_value(field, dictionary)
         else:
             matching_texts = [t
