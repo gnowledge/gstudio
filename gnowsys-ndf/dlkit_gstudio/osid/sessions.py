@@ -17,6 +17,7 @@ from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
 from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUP
 
 # =================
 # for aliasing ... there is probably a better way
@@ -74,6 +75,11 @@ class OsidSession(abc_osid_sessions.OsidSession):
                 else:
                     raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
         else:
+            # Use GSTUDIO_DEFAULT_GROUP
+
+            self._my_catalog_map = node_collection.one({'_type': 'Group', 'name': GSTUDIO_DEFAULT_GROUP})
+            self._catalog_identifier = self._my_catalog_map._id
+            '''
             self._catalog_identifier = '000000000000000000000000'
             self._my_catalog_map = {
                 '_id': ObjectId(self._catalog_identifier),
@@ -88,6 +94,7 @@ class OsidSession(abc_osid_sessions.OsidSession):
                 'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
                 'recordTypeIds': [] # Could this somehow inherit source catalog records?
             }
+            '''
         # return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id)}))
         self._catalog = cat_class(gstudio_node=self._my_catalog_map, runtime=self._runtime, proxy=self._proxy)
         self._catalog._authority = self._authority  # there should be a better way...
