@@ -124,27 +124,30 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         self._load_records(self._gstudio_map['recordTypeIds'])
         self._load_records(self._my_map['recordTypeIds'])
         self._gstudio_map['displayName'] = DisplayText(display_text_map={
-                                'text':self._gstudio_node['name'],
+                                'text':gstudio_node['name'],
                                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                                 'formatTypeId': str(DEFAULT_FORMAT_TYPE)
                             })
         self._gstudio_map['description'] = DisplayText(display_text_map={
-                                'text':self._gstudio_node['content'],
+                                'text':gstudio_node['content'],
                                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                                 'formatTypeId': str(DEFAULT_FORMAT_TYPE)
                             })
-        self._gstudio_map['displayNames'] = [self._gstudio_map['displayName']]
-        self._gstudio_map['descriptions'] = [self._gstudio_map['description']]
+        self._gstudio_map['displayNames'] = [get_display_text_map(self._gstudio_map['displayName'])]
+        self._gstudio_map['descriptions'] = [get_display_text_map(self._gstudio_map['description'])]
 
 
     def get_object_map(self, obj_map):
         """Adds OsidObject elements to object map"""
         super(OsidObject, self).get_object_map(obj_map)
         obj_map['id'] = str(self.get_id())
-        obj_map['displayName'] = get_display_text_map(self.get_display_name())
-        obj_map['description'] = get_display_text_map(self.get_description())
+
+        obj_map['displayName'] = get_display_text_map(self._gstudio_map['displayName'])
+        obj_map['description'] = get_display_text_map(self._gstudio_map['description'])
+        # obj_map['displayName'] = get_display_text_map(self.get_display_name())
+        # obj_map['description'] = get_display_text_map(self.get_description())
         try:
             obj_map['genusType'] = str(self.get_genus_type())
         except errors.Unimplemented:
