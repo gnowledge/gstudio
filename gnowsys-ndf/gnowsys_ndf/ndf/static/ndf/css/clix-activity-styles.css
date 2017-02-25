@@ -1,3 +1,8 @@
+@import '/static/ndf/bower_components/videojs/dist/video-js.css';
+@import '/static/ndf/bower_components/videojs/dist/video-js.min.css';
+@import '/static/ndf/css/videojs-skin-color.css';
+@import '/static/ndf/css/rubik-font.css';
+@import '/static/ndf/css/sgc-toc.css';
 
 #scstyle body{
 
@@ -671,6 +676,15 @@
 
 #scstyle .vid{
 	margin-left: 0.25em;
+}
+
+#scstyle .vidbak {
+  background-color: #efefef;
+  border-bottom: 3px solid #fff;
+}
+
+#scstyle .video-js {
+  margin: .15rem auto 0;
 }
 
 #scstyle bttn, .bttn {
