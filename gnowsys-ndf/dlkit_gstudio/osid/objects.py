@@ -123,6 +123,13 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         self._my_map['gstudio_node'] = gstudio_node
         self._load_records(self._gstudio_map['recordTypeIds'])
         self._load_records(self._my_map['recordTypeIds'])
+        self.copyright = DisplayText(display_text_map={
+                                'text':gstudio_node['license'],
+                                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+                            })
+
         self._gstudio_map['displayName'] = DisplayText(display_text_map={
                                 'text':gstudio_node['name'],
                                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
@@ -1842,6 +1849,13 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             self._gstudio_map['altnames'] = kwargs['gstudio_node']['altnames']
             self._gstudio_map['content'] = kwargs['gstudio_node']['content']
             self._gstudio_map['content_org'] = kwargs['gstudio_node']['content']
+            self.copyright = DisplayText(display_text_map={
+                                    'text':gstudio_node['license'],
+                                    'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                    'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                    'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+                                })
+
         else:
             self._gstudio_map['name'] = self._display_name_default['default_string_values'][0]['text']
             self._gstudio_map['altnames'] = self._display_name_default['default_string_values'][0]['text']
