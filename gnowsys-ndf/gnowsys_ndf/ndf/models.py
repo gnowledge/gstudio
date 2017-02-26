@@ -33,18 +33,19 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
+from registration.signals import user_registered
 
 # imports from application folders/files
 from gnowsys_ndf.settings import RCS_REPO_DIR, MEDIA_ROOT
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
-from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_AUTHOR_AGENCY_TYPES
+from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES_DEFAULT, GSTUDIO_AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.ndf.rcslib import RCS
-from registration.signals import user_registered
+from gnowsys_ndf.ndf.views.utils import add_to_list
 
 
 NODE_TYPE_CHOICES = (
@@ -65,38 +66,46 @@ NODE_TYPE_CHOICES = (
     ('Process')
 )
 
+
 TYPES_OF_GROUP = (
     ('PUBLIC'),
     ('PRIVATE'),
     ('ANONYMOUS')
 )
+TYPES_OF_GROUP_DEFAULT = 'PUBLIC'
 
 EDIT_POLICY = (
     ('EDITABLE_NON_MODERATED'),
     ('EDITABLE_MODERATED'),
     ('NON_EDITABLE')
 )
+EDIT_POLICY_DEFAULT = 'EDITABLE_NON_MODERATED'
 
 SUBSCRIPTION_POLICY = (
     ('OPEN'),
     ('BY_REQUEST'),
     ('BY_INVITATION'),
 )
+SUBSCRIPTION_POLICY_DEFAULT = 'OPEN'
 
 EXISTANCE_POLICY = (
     ('ANNOUNCED'),
     ('NOT_ANNOUNCED')
 )
+EXISTANCE_POLICY_DEFAULT = 'ANNOUNCED'
 
 LIST_MEMBER_POLICY = (
     ('DISCLOSED_TO_MEM'),
     ('NOT_DISCLOSED_TO_MEM')
 )
+LIST_MEMBER_POLICY_DEFAULT = 'DISCLOSED_TO_MEM'
 
 ENCRYPTION_POLICY = (
-    ('ENCRYPTED'),
-    ('NOT_ENCRYPTED')
+    ('NOT_ENCRYPTED'),
+    ('ENCRYPTED')
 )
+ENCRYPTION_POLICY_DEFAULT = 'NOT_ENCRYPTED'
+
 
 DATA_TYPE_CHOICES = (
     "None",
@@ -281,7 +290,7 @@ class Node(DjangoDocument):
         },
     ]
 
-    required_fields = ['name', '_type'] # 'group_set' to be included
+    required_fields = ['name', '_type', 'created_by'] # 'group_set' to be included
                                         # here after the default
                                         # 'Administration' group is
                                         # ready.
@@ -1637,6 +1646,9 @@ class GSystem(Node):
                             origin=[],
                             uploaded_file=None,
                             **kwargs):
+        '''
+        all node fields will be passed from **kwargs and rest GSystem's fields as args.
+        '''
 
         existing_file_gs = None
         existing_file_gs_if_file = None
@@ -1658,6 +1670,9 @@ class GSystem(Node):
                     return existing_file_gs
 
         self.fill_node_values(request, **kwargs)
+
+        # fill gsystem's field values:
+        self.author_set = author_set
 
         user_id = self.created_by
 
@@ -2217,7 +2232,19 @@ class Group(GSystem):
 
     use_dot_notation = True
 
-    default_values = {'moderation_level': -1}
+    # required_fields = ['_type', 'name', 'created_by']
+
+    default_values = {
+                        'group_type': TYPES_OF_GROUP_DEFAULT,
+                        'edit_policy': EDIT_POLICY_DEFAULT,
+                        'subscription_policy': SUBSCRIPTION_POLICY_DEFAULT,
+                        'visibility_policy': EXISTANCE_POLICY_DEFAULT,
+                        'disclosure_policy': LIST_MEMBER_POLICY_DEFAULT,
+                        'encryption_policy': ENCRYPTION_POLICY_DEFAULT,
+                        'agency_type': GSTUDIO_GROUP_AGENCY_TYPES_DEFAULT,
+                        'group_admin': [],
+                        'moderation_level': -1
+                    }
 
     validators = {
         'group_type': lambda x: x in TYPES_OF_GROUP,
@@ -2226,7 +2253,7 @@ class Group(GSystem):
         'visibility_policy': lambda x: x in EXISTANCE_POLICY,
         'disclosure_policy': lambda x: x in LIST_MEMBER_POLICY,
         'encryption_policy': lambda x: x in ENCRYPTION_POLICY,
-        'agency_type': lambda x: x in GSTUDIO_GROUP_AGENCY_TYPES,
+        'agency_type': lambda x: x in GSTUDIO_GROUP_AGENCY_TYPES_DEFAULT,
         # 'name': lambda x: x not in \
         # [ group_obj['name'] for group_obj in \
         # node_collection.find({'_type': 'Group'}, {'name': 1, '_id': 0})]
@@ -2362,6 +2389,80 @@ class Group(GSystem):
 
 
     @staticmethod
+    def can_read(user_id, group):
+        if isinstance(group, Group):
+            group_obj = group
+        else:
+            group_obj = Group.get_group_name_id(group, get_obj=True)
+
+        if group_obj:
+            if group_obj.group_type == 'PUBLIC':
+                return True
+            else:
+                user_query = User.objects.filter(id=user_id)
+                if user_query:
+                    return group_obj.is_gstaff(user_query[0]) or (user_id in group_obj.author_set)
+
+        return False
+
+
+    def fill_group_values(self,
+                        request=None,
+                        group_type=None,
+                        edit_policy=None,
+                        subscription_policy=None,
+                        visibility_policy=None,
+                        disclosure_policy=None,
+                        encryption_policy=None,
+                        agency_type=None,
+                        group_admin=None,
+                        moderation_level=None,
+                        **kwargs):
+        '''
+        function to fill the group object with values supplied.
+        - group information may be sent either from "request" or from "kwargs".
+        - returning basic fields filled group object
+        '''
+        arguments = locals()
+
+        for field_key, default_val in Group.default_values.items():
+            self[field_key] = field_key[default_val]
+            if arguments[field_key]:
+                value = arguments[field_key]
+            elif self.request:
+                value = self.request.POST.get(field_key, default_val)
+            self[field_key] = value
+
+        self.fill_gstystem_values(request=request, author_set=[self.created_by], **kwargs)
+
+        # explicit: group's should not have draft stage. So publish them:
+        self.status = u"PUBLISHED"
+
+        return self
+    # --- END --- fill_group_values() ------
+
+
+    @staticmethod
+    def create(request=None,
+                group_type=Group.default_values['group_type'],
+                edit_policy=Group.default_values['edit_policy'],
+                subscription_policy=Group.default_values['subscription_policy'],
+                visibility_policy=Group.default_values['visibility_policy'],
+                disclosure_policy=Group.default_values['disclosure_policy'],
+                encryption_policy=Group.default_values['encryption_policy'],
+                agency_type=Group.default_values['agency_type'],
+                group_admin=Group.default_values['group_admin'],
+                moderation_level=Group.default_values['moderation_level'],
+                **kwargs):
+
+        new_group_obj = node_collection.collection.Group()
+
+        GSystem.fill_gstystem_values(request=None,
+                            author_set=[],
+                            **kwargs)
+
+
+    @staticmethod
     def purge_group(group_name_or_id, proceed=True):
 
         # fetch group object
@@ -2420,6 +2521,7 @@ class Group(GSystem):
 
         print "\nAborting group deletion."
         return
+
 
 @connection.register
 class Author(Group):
