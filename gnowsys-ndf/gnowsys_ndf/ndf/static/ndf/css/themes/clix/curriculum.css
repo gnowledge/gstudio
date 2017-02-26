@@ -1,0 +1,394 @@
+/*Blue color variables*/
+/*Orange color variables*/
+/* line 20, ../scss/curriculum.scss */
+html {
+  height: 100%;
+}
+
+/* line 23, ../scss/curriculum.scss */
+body {
+  background: linear-gradient(135deg, #e5a426, #ae208c);
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/*Overridding foundation css*/
+/* line 33, ../scss/curriculum.scss */
+[class*="column"] + [class*="column"]:last-child {
+  float: left;
+}
+
+/* line 37, ../scss/curriculum.scss */
+.top-bar, .top-bar .name {
+  height: 55px;
+  background: #2e3f51;
+}
+
+/* line 43, ../scss/curriculum.scss */
+.top-bar .title-area {
+  box-shadow: 0px 0.6px 3px #000;
+  z-index: 20;
+}
+/* line 47, ../scss/curriculum.scss */
+.top-bar .name {
+  text-align: center;
+}
+/* line 50, ../scss/curriculum.scss */
+.top-bar .name .close-menu-dropdown, .top-bar .name .side-bar-button {
+  position: absolute;
+  left: 15px;
+  color: #fff;
+  font-size: 35px;
+  font-weight: 100;
+}
+/* line 60, ../scss/curriculum.scss */
+.top-bar li.toggle-topbar i {
+  color: #fff;
+  display: inline-block;
+  vertical-align: bottom;
+}
+/* line 68, ../scss/curriculum.scss */
+.top-bar .top-bar-section ul li {
+  background: #2e3f51;
+}
+/* line 70, ../scss/curriculum.scss */
+.top-bar .top-bar-section ul li > a {
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid #4b5b6b;
+  color: #acd4fa;
+  line-height: 40px;
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+/* line 81, ../scss/curriculum.scss */
+.top-bar .top-bar-section ul li:hover > a, .top-bar .top-bar-section ul li.active > a {
+  border-left-color: #ffc14e;
+  color: #ce7869;
+}
+/* line 89, ../scss/curriculum.scss */
+.top-bar .top-bar-section .dropdown li.parent-link a {
+  display: none;
+}
+/* line 95, ../scss/curriculum.scss */
+.top-bar .top-bar-section .side-bar-menu .add_buddy i {
+  color: #2e3f51;
+  background: #acd4fa;
+}
+
+@media screen and (min-width: 40.063em) {
+  /* line 106, ../scss/curriculum.scss */
+  .top-bar .title-area {
+    box-shadow: none;
+  }
+  /* line 108, ../scss/curriculum.scss */
+  .top-bar .title-area .name {
+    text-align: right;
+  }
+  /* line 115, ../scss/curriculum.scss */
+  .top-bar .top-bar-section li:not(.has-form) a:not(.button) {
+    cursor: pointer;
+    background: transparent;
+    border-bottom: 0px;
+    line-height: 52px;
+    border-left-width: 0px;
+  }
+  /* line 122, ../scss/curriculum.scss */
+  .top-bar .top-bar-section li:not(.has-form) a:not(.button):hover {
+    color: #ce7869;
+    border-bottom: 3px solid #ffc14e;
+  }
+  /* line 128, ../scss/curriculum.scss */
+  .top-bar .top-bar-section li:not(.has-form).active a:not(.button) {
+    color: #ce7869;
+    border-bottom: 3px solid #ffc14e;
+  }
+  /* line 136, ../scss/curriculum.scss */
+  .top-bar .top-bar-section li:not(.has-form).has-dropdown a:not(.button):hover {
+    color: #acd4fa;
+    border-bottom: 0px;
+  }
+  /* line 145, ../scss/curriculum.scss */
+  .top-bar .top-bar-section li.active:not(.has-form) a:not(.button):hover {
+    background: transparent;
+  }
+  /* line 154, ../scss/curriculum.scss */
+  .top-bar .top-bar-section .dropdown li:not(.has-form).active a:not(.button) {
+    background: #2e3f51;
+    color: #acd4fa;
+    border-bottom: 0px;
+    border-left-width: 0px;
+  }
+  /* line 163, ../scss/curriculum.scss */
+  .top-bar .top-bar-section .dropdown li:not(.has-form):not(.active) > a:not(.button) {
+    border-left-width: 0px;
+    color: #acd4fa;
+    background: #2e3f51;
+  }
+}
+/* line 175, ../scss/curriculum.scss */
+.group_breadcumbs {
+  color: #fff;
+  display: block;
+  margin: 15px auto;
+  letter-spacing: 1px;
+}
+
+/* line 182, ../scss/curriculum.scss */
+ul.horizontal_tabs_gstudio {
+  margin: 0px;
+  height: 60px;
+}
+/* line 185, ../scss/curriculum.scss */
+ul.horizontal_tabs_gstudio > li {
+  display: inline-block;
+  height: 100%;
+}
+/* line 188, ../scss/curriculum.scss */
+ul.horizontal_tabs_gstudio > li > a {
+  color: #ce7869;
+  padding: 17px 12px 13px;
+  display: block;
+  border-bottom: 3px solid transparent;
+  font-size: 17px;
+  letter-spacing: 0.3px;
+}
+/* line 196, ../scss/curriculum.scss */
+ul.horizontal_tabs_gstudio > li > a.selected, ul.horizontal_tabs_gstudio > li > a:hover {
+  border-bottom: 3px solid #ffc14e;
+}
+/* line 200, ../scss/curriculum.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action {
+  position: relative;
+}
+/* line 202, ../scss/curriculum.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action > ul {
+  position: absolute;
+  top: 50px;
+  display: none;
+  z-index: 10;
+  position: cursor;
+  margin: 0px;
+  background: #fff;
+  box-shadow: 0px 1px 6px 1px #ccc;
+}
+/* line 212, ../scss/curriculum.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action > ul li {
+  list-style: none;
+  white-space: nowrap;
+  padding: 15px 15px;
+}
+/* line 217, ../scss/curriculum.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action > ul li:hover {
+  background: #d6f2fe;
+}
+/* line 223, ../scss/curriculum.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
+  display: block;
+}
+
+/* line 232, ../scss/curriculum.scss */
+.group_content .group_banner {
+  height: 300px;
+  background: url("images/default-bg.png") no-repeat;
+  background-size: 100% 100%;
+}
+/* line 237, ../scss/curriculum.scss */
+.group_content .group_header {
+  height: 80px;
+  padding: 20px;
+  background-color: #000;
+  color: #fff;
+}
+/* line 242, ../scss/curriculum.scss */
+.group_content .group_header .group_title {
+  font-size: 30px;
+  font-weight: bold;
+  letter-spacing: 0.4px;
+}
+/* line 247, ../scss/curriculum.scss */
+.group_content .group_header .group_actions > button {
+  display: inline-block;
+  margin: 7px 10px;
+}
+/* line 252, ../scss/curriculum.scss */
+.group_content .group_sections {
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  background: #fff;
+}
+/* line 257, ../scss/curriculum.scss */
+.group_content .group_sections_content {
+  min-height: 400px;
+  background-color: #fff;
+  padding-top: 20px;
+}
+
+/* line 264, ../scss/curriculum.scss */
+.asset_tile {
+  margin-top: 10px;
+  padding-bottom: 10px;
+  border: 2px solid #eee;
+  cursor: pointer;
+}
+/* line 270, ../scss/curriculum.scss */
+.asset_tile .asset_preview {
+  min-height: 200px;
+  background-color: #eee;
+}
+/* line 275, ../scss/curriculum.scss */
+.asset_tile .asset_text {
+  padding: 2px 10px;
+}
+/* line 277, ../scss/curriculum.scss */
+.asset_tile .asset_text .asset_title {
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+/* line 282, ../scss/curriculum.scss */
+.asset_tile .asset_text .asset_desc {
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
+/* line 290, ../scss/curriculum.scss */
+.preview_asset {
+  background: #ccc;
+  border: 2px solid #999;
+  width: 100%;
+  min-height: 350px;
+}
+
+/*Custom css*/
+/* line 299, ../scss/curriculum.scss */
+.add_more_files {
+  color: #aaa;
+  font-size: 14px;
+  letter-spacing: 0.6px;
+}
+
+/* line 305, ../scss/curriculum.scss */
+input[type="text"], input[type="file"] {
+  margin: 0px;
+}
+
+/* line 308, ../scss/curriculum.scss */
+label {
+  margin-top: 1rem;
+}
+
+/* line 313, ../scss/curriculum.scss */
+input[type="file"]::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+/* line 316, ../scss/curriculum.scss */
+input[type="file"]:before {
+  content: 'Select files';
+  display: inline-block;
+  border: 1px solid #999;
+  border-radius: 5px;
+  padding: 8px 10px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 10pt;
+  color: #cc7769;
+  border-color: #cc7769;
+  float: right;
+}
+
+/* line 332, ../scss/curriculum.scss */
+input[type="file"] {
+  padding: 5px;
+  margin-top: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* line 339, ../scss/curriculum.scss */
+.button-hollow-white {
+  background: inherit;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.9px;
+  padding: 3px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 1s ease, border-color 1s ease;
+  -webkit-transition: color 1s ease, border-color 1s ease;
+}
+
+/* line 352, ../scss/curriculum.scss */
+.orange-button {
+  color: #ce7869;
+  padding: 8px 15px;
+  background: #fff;
+  border: 2px solid #aaa;
+  font-size: 14px;
+}
+
+/* line 360, ../scss/curriculum.scss */
+.icons-medium {
+  font-size: 23px;
+  line-height: 23px;
+  vertical-align: sub;
+}
+
+/* line 365, ../scss/curriculum.scss */
+.icons-large {
+  font-size: 45px;
+  line-height: 45px;
+}
+
+/* line 370, ../scss/curriculum.scss */
+.round-icon {
+  border-radius: 100%;
+  height: 20px;
+  font-size: 15px;
+  padding: 2px 5px;
+}
+
+/* line 376, ../scss/curriculum.scss */
+.hide {
+  display: none !important;
+}
+
+/* line 379, ../scss/curriculum.scss */
+.badge {
+  display: inline-block;
+  height: 21px;
+  width: 21px;
+  border-radius: 100%;
+  line-height: 21px;
+  text-align: center;
+  font-size: 15px;
+}
+/* line 388, ../scss/curriculum.scss */
+.badge.badge-blue {
+  background-color: #acd4fa;
+  color: #fff;
+}
+
+/* line 394, ../scss/curriculum.scss */
+#menu_bar_gstudio .user-profile-pic-small {
+  height: 46px;
+  width: 46px;
+  margin: 0px 10px;
+}
+/* line 400, ../scss/curriculum.scss */
+#menu_bar_gstudio .loggedin-user {
+  background: #505e6c;
+  border-radius: 100%;
+  height: 45px;
+  width: 45px;
+  display: inline-block;
+  margin: 5px 5px 0px 5px;
+}

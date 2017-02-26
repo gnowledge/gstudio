@@ -1,5 +1,5 @@
 {% load simple_filters %}
-{% xextends "ndf/base.html" with first_body_column=0 %}
+{% xextends "ndf/gbase.html" with first_body_column=0 %}
 
 {# {% extends "ndf/base.html" %} #}
 
@@ -9,8 +9,9 @@
 {% block title %}{% trans 'Events' %} {% endblock %}
 
 {% block body_content %}
+  <link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/curriculum.css">
 
-    <div class="row group_content" style="max-width:62.5rem!important;margin-left: auto;margin-right: auto;width:100%">
+    <div class="row group_content">
         <div class="small-12 columns">
             <div class="row">
                 <div class="small-12 columns group_banner"></div>

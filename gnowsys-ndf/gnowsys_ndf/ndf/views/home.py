@@ -88,33 +88,43 @@ def homepage(request, group_id):
         else:
             return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": group_id}) )
 
-@get_execution_time
+
 def landing_page(request):
-    '''
-    Method to render landing page after checking variables in local_settings/settings file.
-    '''
+    return render_to_response(
+                            "ndf/gbase.html",
+                            context_instance=RequestContext(request)
+                        )
 
-    if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
-        return render_to_response(
-                                "ndf/landing_page_nroer.html",
-                                {
-                                    "group_id": "home", 'groupid':"home",
-                                    'landing_page': 'landing_page'
-                                },
-                                context_instance=RequestContext(request)
-                            )
 
-    elif GSTUDIO_SITE_LANDING_TEMPLATE:
-        return render_to_response(
-                                GSTUDIO_SITE_LANDING_TEMPLATE,
-                                {
-                                    "group_id": "home", 'groupid':"home",
-                                    'title': 'CLIx'
-                                },
-                                context_instance=RequestContext(request)
-                            )
-    else:
-        return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home"}) )
+
+
+# @get_execution_time
+# def landing_page(request):
+#     '''
+#     Method to render landing page after checking variables in local_settings/settings file.
+#     '''
+
+#     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
+#         return render_to_response(
+#                                 "ndf/landing_page_nroer.html",
+#                                 {
+#                                     "group_id": "home", 'groupid':"home",
+#                                     'landing_page': 'landing_page'
+#                                 },
+#                                 context_instance=RequestContext(request)
+#                             )
+
+#     elif GSTUDIO_SITE_LANDING_TEMPLATE:
+#         return render_to_response(
+#                                 GSTUDIO_SITE_LANDING_TEMPLATE,
+#                                 {
+#                                     "group_id": "home", 'groupid':"home",
+#                                     'title': 'CLIx'
+#                                 },
+#                                 context_instance=RequestContext(request)
+#                             )
+#     else:
+#         return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home"}) )
 
 
 # This class overrides the django's default RedirectView class and allows us to redirect it into user group after user logsin   
