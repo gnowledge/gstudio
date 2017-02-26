@@ -1855,7 +1855,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
                                     'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                                     'formatTypeId': str(DEFAULT_FORMAT_TYPE)
                                 })
-
+            self._gstudio_map['license'] = self.copyright
         else:
             self._gstudio_map['name'] = self._display_name_default['default_string_values'][0]['text']
             self._gstudio_map['altnames'] = self._display_name_default['default_string_values'][0]['text']

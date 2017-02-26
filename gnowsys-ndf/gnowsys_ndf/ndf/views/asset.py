@@ -46,19 +46,20 @@ def create_asset(name,
 	author_obj_id  = author_obj._id
 
 	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
+	kwargs.update({'name': unicode(name)})
+	kwargs.update({'created_by': created_by})
+	kwargs.update({'member_of': gst_asset_id})
+	kwargs.update({'group_set': group_set})
+	kwargs.update({'content': content})
+
 	if node_id:
 		asset_gs_obj = node_collection.one({'_id': ObjectId(node_id)})
 	else:
 		asset_gs_obj = node_collection.collection.GSystem()
-
-	asset_gs_obj.fill_gstystem_values(request=request,
-									name=name,
-									member_of=gst_asset_id,
-									group_set=group_set,
-									created_by=created_by,
-									content=content,
-									**kwargs)
-
+		asset_gs_obj.fill_gstystem_values(request=request,
+										content=content,
+										**kwargs)
+	asset_gs_obj.fill_node_values(**kwargs)
 	asset_gs_obj.save(group_id=group_id)
 	return asset_gs_obj
 
