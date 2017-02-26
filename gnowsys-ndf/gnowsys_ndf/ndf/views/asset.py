@@ -57,7 +57,6 @@ def create_asset(name,
 	else:
 		asset_gs_obj = node_collection.collection.GSystem()
 		asset_gs_obj.fill_gstystem_values(request=request,
-										content=content,
 										**kwargs)
 	asset_gs_obj.fill_node_values(**kwargs)
 	asset_gs_obj.save(group_id=group_id)

@@ -152,7 +152,8 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         obj_map['id'] = str(self.get_id())
 
         obj_map['displayName'] = get_display_text_map(self._gstudio_map['displayName'])
-        obj_map['description'] = get_display_text_map(self._gstudio_map['description'])
+        obj_map['displayName'] = get_display_text_map(self._gstudio_map['displayName'])
+        obj_map['copyright'] = get_display_text_map(self._gstudio_map['license'])
         # obj_map['displayName'] = get_display_text_map(self.get_display_name())
         # obj_map['description'] = get_display_text_map(self.get_description())
         try:
