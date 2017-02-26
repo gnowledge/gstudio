@@ -757,6 +757,7 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         *compliance: mandatory -- This method must be implemented.*
 
         """
+        import pdb; pdb.set_trace()
         print "\n setting copyright"
         self._my_map['copyright'] = self._get_display_text(copyright_, self.get_copyright_metadata())
         self._gstudio_map['license'] = self._get_display_text(copyright_, self.get_copyright_metadata())['text']
