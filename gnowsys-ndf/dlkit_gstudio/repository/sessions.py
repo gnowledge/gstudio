@@ -1430,11 +1430,11 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             content_data = asset_content_form._gstudio_map['content']
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
          group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
-         created_by=1, files=file_data, content=content_data,\
+         created_by=1, files=file_data, \
          resource_type=res_type, **asset_content_form._gstudio_map)
         # assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
         #   group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
-        #  created_by=req_obj.user.id, files=file_data, content=content_data,\
+        #  created_by=req_obj.user.id, files=file_data, \
         #  resource_type=res_type, **asset_content_form._gstudio_map)
 
         return objects.AssetContent(gstudio_node=assetcontent_obj,
@@ -1568,11 +1568,11 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             asset_content_id = asset_content_form._gstudio_map['gstudio_node']['_id']
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,node_id=asset_content_id,\
          group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
-         created_by=1, files=file_data, content=content_data,\
+         created_by=1, files=file_data, \
          resource_type=res_type, **asset_content_form._gstudio_map)
         # assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
         #  group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
-        #  created_by=req_obj.user.id, files=file_data, content=content_data,\
+        #  created_by=req_obj.user.id, files=file_data, \
         #  resource_type=res_type, **asset_content_form._gstudio_map)
 
         self._forms[asset_content_form.get_id().get_identifier()] = UPDATED
