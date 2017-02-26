@@ -72,6 +72,7 @@
 
 {% block collection_content %}
   {% check_group node.pk as is_group %}
+  {% comment %}
   {% if node.collection_set and not node.if_file.original.relurl and not is_group %}
       <div class="show-collection">    
         <a class=" {% if node.collection_set %}collection-exists{% endif %}"  style="width:100%" data-oid="{{node.pk|safe}}">
@@ -79,6 +80,7 @@
         </a>
      </div>
   {% endif %}
+  {% endcomment %}
   {% if node.collection_set %}
     <div id="view_collection">
       {% include "ndf/collection_ajax_view.html" %}  
@@ -90,7 +92,7 @@
               <a href="#panel1" style="background-color: #2980B9; color:#FFF;width:70%!important">
                 <div style="font-size:13px">Change Thumbnail <i  style="float:right;font-size:13px" class= "fi-pencil"></i></div></a>
               <div id="panel1" class="content">
-                          {% include "ndf/upload_pic_widget.html" with  node_id=node.pk url_name="file" widget_for="file_detail_view" is_banner=False is_profile=False is_thumbnail=True %}
+                          {% include "ndf/widget_photo_upload.html" with  node_id=node.pk url_name="file" widget_for="file_detail_view" is_banner=False is_profile=False is_thumbnail=True %}
               </div>
         
         </dd>

@@ -38,6 +38,7 @@ from django.template.loader import render_to_string
 # to display error template if non existent pub is given in settings.py
 from django.shortcuts import render
 from django.core.handlers.wsgi import WSGIRequest
+from django.core.exceptions import PermissionDenied
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
@@ -62,10 +63,24 @@ topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
 ins_objectid = ObjectId()
 
+
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 
-def get_execution_time(f):
+def staff_required(func):
+    """
+    Decorator for CRUD views of Group and Event to check whether a user
+    is allowed and is active.
+    Currently, ONLY SuperUsers will be allowed.
+    """
+    def wrapper(*args, **kwargs):
+        for arg in args:
+            if arg.user.is_superuser and arg.user.is_active:
+                return func(*args, **kwargs)
+            raise PermissionDenied
+    return wrapper
 
+
+def get_execution_time(f):
     def wrap(*args,**kwargs):
 
         time1 = time.time()

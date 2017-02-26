@@ -1,7 +1,7 @@
 
 <small>
-	<label class="lbl_tag tag_ele">
-		<a class="visits_count visits_info" title="Show no. of views" style="color: #8F86BB">Show no. of views</a>
+	<label class="lbl_tag">
+		<a class="visits_count visits_info" title="Show no. of views" style="color: black">Show no. of views</a>
 	</label>
 </small>
 
@@ -40,9 +40,6 @@
 					display_views += data['total_views'] + " visits"
 					$(".visits_count").text(display_views)
 									 .attr("title", tooltip)
-									 // .css('font-size','15px')
-									 // .css('color','black')
-									 // .append("<i class='fi-eye'></i>")
 									 .removeClass("visits_count")
 									 //removing class to prevent consecutive ajax call
 				}

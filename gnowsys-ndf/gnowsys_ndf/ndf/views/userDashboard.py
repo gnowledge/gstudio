@@ -715,7 +715,7 @@ def my_groups(request, group_id,page_no=1):
           exclued_from_public =  ObjectId(task_gst._id)
 
     group_cur = node_collection.find(
-        {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy},
+        {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 'status': u'PUBLISHED',
         '$or': [{'group_admin': int(usrid)}, {'author_set': int(usrid)}]}).sort('last_update', -1)
     group_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
