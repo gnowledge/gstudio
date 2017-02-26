@@ -1850,7 +1850,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             self._gstudio_map['content'] = kwargs['gstudio_node']['content']
             self._gstudio_map['content_org'] = kwargs['gstudio_node']['content']
             self.copyright = DisplayText(display_text_map={
-                                    'text':gstudio_node['license'],
+                                    'text':kwargs['gstudio_node']['license'],
                                     'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                                     'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                                     'formatTypeId': str(DEFAULT_FORMAT_TYPE)
