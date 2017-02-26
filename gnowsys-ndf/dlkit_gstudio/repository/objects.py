@@ -590,7 +590,9 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
                 authority="GSTUDIO")) for each_repo_id in repository_ident_list]
             self._gstudio_map['assignedRepositoryIds'] = repository_ids
             asset_content_list = []
-            asset_contents = self.get_asset_contents(kwargs['gstudio_node']['_id'])
+            gstudio_asset_id = kwargs['gstudio_node']['_id']
+            self._gstudio_map['asset_id'] = gstudio_asset_id
+            asset_contents = self.get_asset_contents(gstudio_asset_id)
             for asset_content in asset_contents:
                 asset_content_list.append(asset_content.get_object_map())
             self._gstudio_map['assetContents'] = asset_content_list
