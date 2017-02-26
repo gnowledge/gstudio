@@ -1109,10 +1109,10 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         self._forms[asset_form.get_id().get_identifier()] = CREATED
         # This should be part of _init_gstudio_map
         asset_name = asset_form._gstudio_map['name'].strip()
-        asset_obj = gstudio_create_asset(name=asset_name,\
-         group_id=self._catalog_id.get_identifier(), created_by=1, **asset_form._gstudio_map)
-        # asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
-        #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id, **asset_form._gstudio_map)
+        asset_obj = gstudio_create_asset(group_id=self._catalog_id.get_identifier(),\
+         created_by=1, **asset_form._gstudio_map)
+        # asset_obj = gstudio_create_asset(group_id=self._catalog_id.get_identifier(),\
+        # created_by=req_obj.user.id, **asset_form._gstudio_map)
 
         # # asset_obj is gstudio node
         if asset_obj:
@@ -1214,10 +1214,10 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         asset_ident = asset_form._gstudio_map['asset_id']
         print "\nasset_ident: ", asset_ident
         asset_obj_id = ObjectId(asset_ident)
-        asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],node_id = asset_obj_id, \
+        asset_obj = gstudio_create_asset(node_id = asset_obj_id, \
          group_id=self._catalog_id.get_identifier(), created_by=1, **asset_form._gstudio_map)
-        # asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
-        #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id, **asset_form._gstudio_map)
+        # asset_obj = gstudio_create_asset(group_id=self._catalog_id.get_identifier(),\
+         # created_by=req_obj.user.id, **asset_form._gstudio_map)
 
         # # asset_obj is gstudio node
         self._forms[asset_ident] = UPDATED
@@ -1429,11 +1429,11 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         else:
             content_data = asset_content_form._gstudio_map['content']
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
-         name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
+         group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
          created_by=1, files=file_data, content=content_data,\
          resource_type=res_type, **asset_content_form._gstudio_map)
         # assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
-        #  name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
+        #   group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
         #  created_by=req_obj.user.id, files=file_data, content=content_data,\
         #  resource_type=res_type, **asset_content_form._gstudio_map)
 
@@ -1567,11 +1567,11 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         if 'gstudio_node' in asset_content_form._gstudio_map:
             asset_content_id = asset_content_form._gstudio_map['gstudio_node']['_id']
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,node_id=asset_content_id,\
-         name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
+         group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
          created_by=1, files=file_data, content=content_data,\
          resource_type=res_type, **asset_content_form._gstudio_map)
         # assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
-        #  name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
+        #  group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
         #  created_by=req_obj.user.id, files=file_data, content=content_data,\
         #  resource_type=res_type, **asset_content_form._gstudio_map)
 
