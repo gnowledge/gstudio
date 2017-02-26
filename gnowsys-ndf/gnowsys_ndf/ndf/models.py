@@ -40,7 +40,7 @@ from gnowsys_ndf.settings import RCS_REPO_DIR, MEDIA_ROOT
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
-from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES_DEFAULT, GSTUDIO_AUTHOR_AGENCY_TYPES
+from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_GROUP_AGENCY_TYPES_DEFAULT, GSTUDIO_AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN
@@ -2250,7 +2250,7 @@ class Group(GSystem):
         'visibility_policy': lambda x: x in EXISTANCE_POLICY,
         'disclosure_policy': lambda x: x in LIST_MEMBER_POLICY,
         'encryption_policy': lambda x: x in ENCRYPTION_POLICY,
-        'agency_type': lambda x: x in GSTUDIO_GROUP_AGENCY_TYPES_DEFAULT,
+        'agency_type': lambda x: x in GSTUDIO_GROUP_AGENCY_TYPES,
         # 'name': lambda x: x not in \
         # [ group_obj['name'] for group_obj in \
         # node_collection.find({'_type': 'Group'}, {'name': 1, '_id': 0})]
@@ -2425,7 +2425,7 @@ class Group(GSystem):
         # gsdv: GSystem default Values
         gsdv = GSystem.default_values
         [gsdv.pop(each_gsdv, None) for each_gsdv in gdv]
-        
+
         arguments = locals()
         for field_key, default_val in gsdv.items():
             try:
