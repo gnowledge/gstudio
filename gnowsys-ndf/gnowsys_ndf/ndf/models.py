@@ -545,7 +545,7 @@ class Node(DjangoDocument):
         else:
             license = request.POST.get('license', GSTUDIO_DEFAULT_LICENSE)
         self.license = unicode(license)
-
+        print "\nself.license: ", self.license
         # 'rating':[{'score':int, 'user_id':int, 'ip_address':basestring}],
         #       - mostly, it's on detail view and by AJAX and not in/within forms.
 

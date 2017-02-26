@@ -1110,9 +1110,9 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         # This should be part of _init_gstudio_map
         asset_name = asset_form._gstudio_map['name'].strip()
         asset_obj = gstudio_create_asset(name=asset_name,\
-         group_id=self._catalog_id.get_identifier(), created_by=1)
+         group_id=self._catalog_id.get_identifier(), created_by=1, **asset_form._gstudio_map)
         # asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
-        #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
+        #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id, **asset_form._gstudio_map)
 
         # # asset_obj is gstudio node
         if asset_obj:
@@ -1215,9 +1215,9 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         print "\nasset_ident: ", asset_ident
         asset_obj_id = ObjectId(asset_ident)
         asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],node_id = asset_obj_id, \
-         group_id=self._catalog_id.get_identifier(), created_by=1)
+         group_id=self._catalog_id.get_identifier(), created_by=1, **asset_form._gstudio_map)
         # asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
-        #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
+        #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id, **asset_form._gstudio_map)
 
         # # asset_obj is gstudio node
         self._forms[asset_ident] = UPDATED
@@ -1431,11 +1431,11 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
          name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
          created_by=1, files=file_data, content=content_data,\
-         resource_type=res_type)
+         resource_type=res_type, **asset_content_form._gstudio_map)
         # assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
         #  name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
         #  created_by=req_obj.user.id, files=file_data, content=content_data,\
-        #  resource_type=res_type)
+        #  resource_type=res_type, **asset_content_form._gstudio_map)
 
         return objects.AssetContent(gstudio_node=assetcontent_obj,
                               runtime=self._runtime,
@@ -1569,11 +1569,11 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,node_id=asset_content_id,\
          name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
          created_by=1, files=file_data, content=content_data,\
-         resource_type=res_type)
+         resource_type=res_type, **asset_content_form._gstudio_map)
         # assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
         #  name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
         #  created_by=req_obj.user.id, files=file_data, content=content_data,\
-        #  resource_type=res_type)
+        #  resource_type=res_type, **asset_content_form._gstudio_map)
 
         self._forms[asset_content_form.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
