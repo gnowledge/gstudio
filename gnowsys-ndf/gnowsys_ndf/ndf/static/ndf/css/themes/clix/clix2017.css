@@ -1,0 +1,435 @@
+/*
+*   CLIx Customization SASS
+*/
+/*Blue color variables*/
+/*Orange color variables*/
+/* line 19, ../../../scss/_clix2017.scss */
+html {
+  height: 100%;
+}
+
+/* line 22, ../../../scss/_clix2017.scss */
+body {
+  background: linear-gradient(135deg, #e5a426, #ae208c);
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/*Overridding foundation css*/
+/* line 33, ../../../scss/_clix2017.scss */
+.top-bar, .top-bar .name {
+  height: 55px;
+  background: #2e3f51;
+}
+
+/* line 39, ../../../scss/_clix2017.scss */
+.top-bar .title-area {
+  box-shadow: 0px 0.6px 3px #000;
+  z-index: 20;
+}
+/* line 43, ../../../scss/_clix2017.scss */
+.top-bar .name {
+  text-align: center;
+}
+/* line 46, ../../../scss/_clix2017.scss */
+.top-bar .name .close-menu-dropdown, .top-bar .name .side-bar-button {
+  position: absolute;
+  left: 15px;
+  color: #fff;
+  font-size: 35px;
+  font-weight: 100;
+}
+/* line 56, ../../../scss/_clix2017.scss */
+.top-bar li.toggle-topbar i {
+  color: #fff;
+  display: inline-block;
+  vertical-align: bottom;
+}
+/* line 64, ../../../scss/_clix2017.scss */
+.top-bar .top-bar-section ul li {
+  background: #2e3f51;
+}
+/* line 66, ../../../scss/_clix2017.scss */
+.top-bar .top-bar-section ul li > a {
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid #4b5b6b;
+  color: #acd4fa;
+  line-height: 40px;
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+/* line 77, ../../../scss/_clix2017.scss */
+.top-bar .top-bar-section ul li:hover > a, .top-bar .top-bar-section ul li.active > a {
+  border-left-color: #ffc14e;
+  color: #ce7869;
+}
+/* line 85, ../../../scss/_clix2017.scss */
+.top-bar .top-bar-section .dropdown li.parent-link a {
+  display: none;
+}
+/* line 91, ../../../scss/_clix2017.scss */
+.top-bar .top-bar-section .side-bar-menu .add_buddy i {
+  color: #2e3f51;
+  background: #acd4fa;
+}
+
+@media screen and (min-width: 40.063em) {
+  /* line 102, ../../../scss/_clix2017.scss */
+  .top-bar .title-area {
+    box-shadow: none;
+  }
+  /* line 104, ../../../scss/_clix2017.scss */
+  .top-bar .title-area .name {
+    text-align: right;
+  }
+  /* line 111, ../../../scss/_clix2017.scss */
+  .top-bar .top-bar-section li:not(.has-form) a:not(.button) {
+    cursor: pointer;
+    background: transparent;
+    border-bottom: 0px;
+    line-height: 52px;
+    border-left-width: 0px;
+  }
+  /* line 118, ../../../scss/_clix2017.scss */
+  .top-bar .top-bar-section li:not(.has-form) a:not(.button):hover {
+    color: #ce7869;
+    border-bottom: 3px solid #ffc14e;
+  }
+  /* line 124, ../../../scss/_clix2017.scss */
+  .top-bar .top-bar-section li:not(.has-form).active a:not(.button) {
+    color: #ce7869;
+    border-bottom: 3px solid #ffc14e;
+  }
+  /* line 132, ../../../scss/_clix2017.scss */
+  .top-bar .top-bar-section li:not(.has-form).has-dropdown a:not(.button):hover {
+    color: #acd4fa;
+    border-bottom: 0px;
+  }
+  /* line 141, ../../../scss/_clix2017.scss */
+  .top-bar .top-bar-section li.active:not(.has-form) a:not(.button):hover {
+    background: transparent;
+  }
+  /* line 149, ../../../scss/_clix2017.scss */
+  .top-bar .top-bar-section .dropdown li:not(.has-form) > a:not(.button) {
+    border-left-width: 2px;
+    color: #acd4fa;
+    background: #2e3f51;
+  }
+  /* line 156, ../../../scss/_clix2017.scss */
+  .top-bar .top-bar-section .dropdown li:not(.has-form):hover a:not(.button), .top-bar .top-bar-section .dropdown li:not(.has-form).active a:not(.button) {
+    background: #2e3f51;
+    color: #acd4fa;
+    border-bottom: 0px;
+    border-left-width: 2px;
+    /*&:hover {
+        color: $secondry-blue;
+        border-bottom: 0px;
+    }*/
+  }
+}
+/*Custom css*/
+/* line 175, ../../../scss/_clix2017.scss */
+[class*="column"] + [class*="column"]:last-child {
+  float: left;
+}
+
+/* line 179, ../../../scss/_clix2017.scss */
+.icons-medium {
+  font-size: 23px;
+  line-height: 23px;
+  vertical-align: sub;
+}
+
+/* line 184, ../../../scss/_clix2017.scss */
+.icons-large {
+  font-size: 45px;
+  line-height: 45px;
+}
+
+/* line 189, ../../../scss/_clix2017.scss */
+.round-icon {
+  border-radius: 100%;
+  height: 20px;
+  font-size: 15px;
+  padding: 2px 5px;
+}
+
+/* line 195, ../../../scss/_clix2017.scss */
+.hide {
+  display: none !important;
+}
+
+/* line 198, ../../../scss/_clix2017.scss */
+.badge {
+  display: inline-block;
+  height: 21px;
+  width: 21px;
+  border-radius: 100%;
+  line-height: 21px;
+  text-align: center;
+  font-size: 15px;
+}
+/* line 207, ../../../scss/_clix2017.scss */
+.badge.badge-blue {
+  background-color: #acd4fa;
+  color: #fff;
+}
+
+/* line 213, ../../../scss/_clix2017.scss */
+#menu_bar_gstudio .user-profile-pic-small {
+  height: 46px;
+  width: 46px;
+  margin: 0px 10px;
+}
+/* line 219, ../../../scss/_clix2017.scss */
+#menu_bar_gstudio .loggedin-user {
+  background: #505e6c;
+  border-radius: 100%;
+  height: 45px;
+  width: 45px;
+  display: inline-block;
+  margin: 5px 5px 0px 5px;
+  overflow: hidden;
+}
+/* line 229, ../../../scss/_clix2017.scss */
+#menu_bar_gstudio .loggedin-user img {
+  height: 100%;
+  width: 100%;
+}
+
+/*  group_list */
+/* line 236, ../../../scss/_clix2017.scss */
+.group_breadcumbs {
+  display: block;
+  margin: 15px auto;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+/* line 243, ../../../scss/_clix2017.scss */
+.group_tile {
+  height: 300px;
+  background: url("/static/ndf/images/course_backbround-2.png") no-repeat;
+  background-size: 100% 100%;
+  padding: 20px 22px;
+  color: #fff;
+  margin-bottom: 30px;
+  cursor: pointer;
+}
+/* line 252, ../../../scss/_clix2017.scss */
+.group_tile .group-name {
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: 1.1px;
+  margin-bottom: 15px;
+  display: block;
+}
+/* line 260, ../../../scss/_clix2017.scss */
+.group_tile .group_desc {
+  letter-spacing: 0.5px;
+  font-size: 17px;
+}
+
+/* curriculum */
+/* line 267, ../../../scss/_clix2017.scss */
+ul.horizontal_tabs_gstudio {
+  margin: 0px;
+  height: 60px;
+}
+/* line 270, ../../../scss/_clix2017.scss */
+ul.horizontal_tabs_gstudio > li {
+  display: inline-block;
+  height: 100%;
+}
+/* line 273, ../../../scss/_clix2017.scss */
+ul.horizontal_tabs_gstudio > li > a {
+  color: #ce7869;
+  padding: 17px 12px 13px;
+  display: block;
+  border-bottom: 3px solid transparent;
+  font-size: 17px;
+  letter-spacing: 0.3px;
+}
+/* line 281, ../../../scss/_clix2017.scss */
+ul.horizontal_tabs_gstudio > li > a.selected, ul.horizontal_tabs_gstudio > li > a:hover {
+  border-bottom: 3px solid #ffc14e;
+}
+/* line 285, ../../../scss/_clix2017.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action {
+  position: relative;
+}
+/* line 287, ../../../scss/_clix2017.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action > ul {
+  position: absolute;
+  top: 50px;
+  display: none;
+  z-index: 10;
+  position: cursor;
+  margin: 0px;
+  background: #fff;
+  box-shadow: 0px 1px 6px 1px #ccc;
+}
+/* line 297, ../../../scss/_clix2017.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action > ul li {
+  list-style: none;
+  white-space: nowrap;
+  padding: 15px 15px;
+}
+/* line 302, ../../../scss/_clix2017.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action > ul li:hover {
+  background: #d6f2fe;
+}
+/* line 308, ../../../scss/_clix2017.scss */
+ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
+  display: block;
+}
+
+/* line 317, ../../../scss/_clix2017.scss */
+.group_content .group_banner {
+  height: 300px;
+  background: url("/static/ndf/images/course_backbround-2.png") no-repeat;
+  background-size: 100% 100%;
+}
+/* line 322, ../../../scss/_clix2017.scss */
+.group_content .group_header {
+  height: 80px;
+  padding: 20px;
+  background-color: #000;
+  color: #fff;
+}
+/* line 327, ../../../scss/_clix2017.scss */
+.group_content .group_header .group_title {
+  font-size: 30px;
+  font-weight: bold;
+  letter-spacing: 0.4px;
+}
+/* line 332, ../../../scss/_clix2017.scss */
+.group_content .group_header .group_actions > button {
+  display: inline-block;
+  margin: 7px 10px;
+}
+/* line 337, ../../../scss/_clix2017.scss */
+.group_content .group_sections {
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  background: #fff;
+}
+/* line 342, ../../../scss/_clix2017.scss */
+.group_content .group_sections_content {
+  min-height: 400px;
+  background-color: #fff;
+  padding-top: 20px;
+}
+
+/* line 349, ../../../scss/_clix2017.scss */
+.asset_tile {
+  margin-top: 10px;
+  padding-bottom: 10px;
+  border: 2px solid #eee;
+  cursor: pointer;
+}
+/* line 355, ../../../scss/_clix2017.scss */
+.asset_tile .asset_preview {
+  min-height: 200px;
+  background-color: #eee;
+}
+/* line 360, ../../../scss/_clix2017.scss */
+.asset_tile .asset_text {
+  padding: 2px 10px;
+}
+/* line 362, ../../../scss/_clix2017.scss */
+.asset_tile .asset_text .asset_title {
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+/* line 367, ../../../scss/_clix2017.scss */
+.asset_tile .asset_text .asset_desc {
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
+/* line 375, ../../../scss/_clix2017.scss */
+.preview_asset {
+  background: #ccc;
+  border: 2px solid #999;
+  width: 100%;
+  min-height: 350px;
+}
+
+/*Custom css*/
+/* line 384, ../../../scss/_clix2017.scss */
+.add_more_files {
+  color: #aaa;
+  font-size: 14px;
+  letter-spacing: 0.6px;
+}
+
+/* line 390, ../../../scss/_clix2017.scss */
+input[type="text"], input[type="file"] {
+  margin: 0px;
+}
+
+/* line 393, ../../../scss/_clix2017.scss */
+label {
+  margin-top: 1rem;
+}
+
+/* line 398, ../../../scss/_clix2017.scss */
+input[type="file"]::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+/* line 401, ../../../scss/_clix2017.scss */
+input[type="file"]:before {
+  content: 'Select files';
+  display: inline-block;
+  border: 1px solid #999;
+  border-radius: 5px;
+  padding: 8px 10px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 10pt;
+  color: #cc7769;
+  border-color: #cc7769;
+  float: right;
+}
+
+/* line 417, ../../../scss/_clix2017.scss */
+input[type="file"] {
+  padding: 5px;
+  margin-top: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/*  Buttons custom css */
+/* line 424, ../../../scss/_clix2017.scss */
+.button-hollow-white {
+  background: inherit;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.9px;
+  padding: 3px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 1s ease, border-color 1s ease;
+  -webkit-transition: color 1s ease, border-color 1s ease;
+}
+
+/* line 437, ../../../scss/_clix2017.scss */
+.orange-button {
+  color: #ce7869;
+  padding: 8px 15px;
+  background: #fff;
+  border: 2px solid #aaa;
+  font-size: 14px;
+}

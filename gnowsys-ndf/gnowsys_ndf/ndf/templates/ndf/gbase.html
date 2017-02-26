@@ -1,354 +1,42 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+{% get_group_name groupid as group_name_tag %}
+{% get_site_variables as site %}
+{% get_oid_variables as oids %}
+{% user_access_policy groupid request.user as user_access %}
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
     <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation/css/foundation.css">
     <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation/css/normalize.css">
     <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css">
-    <link rel="stylesheet" href="/static/ndf/css/themes/clix/curriculum.css">
-    <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/css/themes/clix/styles.css"> -->
+    <!-- <link rel="stylesheet" href="/static/ndf/css/themes/clix/curriculum.css"> -->
+    <link rel="stylesheet" type="text/css" href="/static/ndf/css/themes/clix/clix2017.css">
     
     <link href="https://fonts.googleapis.com/css?family=Rubik:200,300,400,500,600,700,900" rel="stylesheet">
     <script type="text/javascript" src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/foundation/js/foundation/foundation.accordion.js"></script>
     <script type="text/javascript" src="/static/ndf/bower_components/modernizr/modernizr.js"></script>
+    
+    <title>{{ site.SITE_NAME }} - {% block title %} {% endblock %}</title>
+    {% block head %}{% endblock %}
+
+    <style>
+
+    {% block style %}{% endblock %}
+
+  </style>
+
 </head>
 <body>
-    <nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
-        <ul class="title-area">
-            <li class="name show-for-medium-up">
-                <a class="loggedin-user" href="#">
-                    <div></div>
-                </a>
-            </li>
-            <li class="name hide-for-medium-up">
-                <i class="fi-list side-bar-button"></i>
-                <i class="fi-x close-menu-dropdown hide"></i>
-                <a class="loggedin-user" href="#">
-                    <div></div>
-                </a>
-            </li>
-            <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar"><a href="#"><i class="icons-large fi-torso"></i>&nbsp;<span class="badge badge-blue">1</span></a></li>
-        </ul>
-
-        <section class="top-bar-section">
-            <!-- Right Nav Section -->
-            <ul class="right show-for-medium-up">
-                <li class=""><a href="#">Blog</a></li>
-                <li class=""><a href="#"><i class="icons-medium fi-info"></i>&nbsp;Help Topics</a></li>
-                <li class="has-dropdown">
-                    <a href="#">
-                        <img src="" class="user-profile-pic-small"/>
-                        Blue Parrot
-                    </a>
-                    <ul class="dropdown">
-                        <li><a href="#">First link in dropdown</a></li>
-                        <li class="active"><a href="#">Active link in dropdown</a></li>
-                    </ul>
-                </li>
-            </ul>
-            <ul class="right hide-for-medium-up dropdown-menu hide">
-                <li class=""><a href="#">My Desk</a></li>
-                <li class=""><a href="#">Explore Groups</a></li>
-                <li class=""><a href="#">Blog</a></li>
-                <li class=""><a href="#"><i class="fi-info"></i>&nbsp;Help Topics</a></li>
-                <!--li class="has-dropdown not-click">
-                    <ul class="dropdown">
-                        <!--li class="title back js-generated">
-                            <h5>
-                                <a href="javascript:void(0)">Back</a>
-                            </h5>
-                        </li>
-                        <li class="parent-link hide-for-medium-up">
-                            <a class="parent-link js-generated" href="#">Right Dropdown</a>
-                        </li>
-                        <li><a href="#">First link in dropdown</a></li>
-                        <li class="active"><a href="#">Active link in dropdown</a></li>
-                    </ul>
-                </li-->
-            </ul>
-            <ul class="right hide-for-medium-up side-bar-menu hide">
-                <li class="">
-                    <a href="#">
-                        <i class="icons-medium fi-torso"></i>&nbsp;
-                        <span>LOGGED IN BUDDIES</span>&nbsp;
-                        <span class="badge badge-blue">1</span>
-                    </a>
-                </li>
-                <li class="has-dropdown not-click">
-                    <a href="#">
-                        <img src="" class="user-profile-pic-small"/>
-                        Blue Parrot
-                    </a>
-                    <ul class="dropdown">
-                        <li><a href="#">First link in dropdown</a></li>
-                        <li class="active"><a href="#">Active link in dropdown</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="" class='add_buddy'>
-                        <center>
-                            <i class="fi-plus round-icon"></i>&nbsp;
-                            <span>Add Buddy</span>
-                        </center>
-                    </a>
-                </li>
-            </ul>
-            <!-- Left Nav Section -->
-            <ul class="left show-for-large-up">
-                <li class="active"><a href="#">My Desk</a></li>
-                <li><a href="#">Explore Groups</a></li>
-            </ul>
-          </section>
-    </nav>
-    <!--Navigation ends here -->
-    <!-- Course viewer starts here -->
-    <div class="group_breadcumbs row">
-        <div class="small-12 columns">
-            <span><b>Groups</b></span>&nbsp;&gt;
-            <span>ENGLISH CURRICULUM</span>&nbsp;&gt;
-        </div>
-    </div>
-    <div class="row group_content">
-        <div class="small-12 columns">
-            <div class="row">
-                <div class="small-12 columns group_banner"></div>
-            </div>
-            <div class="row">
-                <div class="small-12 columns group_header">
-                    <div class="group_title left">English Curriculum</div>
-                    <div class="group_actions right">
-                        <button class="button-hollow-white">Join the group</button>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="small-12 columns group_sections">
-                    <ul class="horizontal_tabs_gstudio">
-                        <li>
-                            <a href="#group_overview" class="selected">Overview</a>
-                        </li><li>
-                            <a href="#group_pages">Pages</a>
-                        </li><li>
-                            <a href="#group_elibrary">eLibrary</a>
-                        </li><li>
-                            <a href="#group_forum">Forum</a>
-                        </li><li>
-                            <a href="#group_blog">Blog</a>
-                        </li><li>
-                            <a href="#group_calendar">Calendar</a>
-                        </li><li>
-                            <a href="#group_assessment">Assessment</a>
-                        </li><li class="sub_group_action">
-                            <a href="#"> &bull;&bull;&bull;</a>
-                            <ul>
-                                <li class="create_curriculum">
-                                    <a href="./create-curriculum.html">Create curriculum</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="row">
-                <div class="small-12 columns group_sections_content">
-                    <div id="group_overview">
-
-                    </div>
-                    <div id="group_pages">
-
-                    </div>
-                    <div id="group_elibrary">
-                        <div class="elibrary-actions">
-                            <button type="button" class="orange-button">
-                                <i class="fi-filter"> </i>
-                                Filter
-                            </button>
-                            <button type="button" class="right orange-button createAsset">
-                                <i class="fi-plus"> </i>
-                                Add Asset
-                            </button>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 medium-6 large-3 columns">
-                                <div class="asset_tile">
-                                    <div class="asset_preview"></div>
-                                    <div class="asset_text">
-                                        <div class="asset_title">Asset Title</div>
-                                        <div class="asset_desc">This is a long description</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="small-12 medium-6 large-3 columns">
-                                <div class="asset_tile">
-                                    <div class="asset_preview"></div>
-                                    <div class="asset_text">
-                                        <div class="asset_title">Asset Title</div>
-                                        <div class="asset_desc">This is a long description</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="group_forum">
-
-                    </div>
-                    <div id="group_blog">
-
-                    </div>
-                    <div id="group_calendar">
-
-                    </div>
-                    <div id="group_assessment">
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Course viewer ends here -->
-    <!-- Add asset form -->
-    <div id="addAsset" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-        <div class="row" style="margin-top: 25px; margin-bottom: 25px;">
-            <div class="small-12 colums" >
-                <h3 class="left">Add a new asset</h3>
-                <button type="button" class="right orange-button">Save Asset</button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Asset name
-                    <input type="text" placeholder="" name="asset_name" />
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Asset description
-                    <input type="text" placeholder="" name="asset_desc" />
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Tags
-                    <input type="text" placeholder="" name="asset_tags" />
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Learning objectives met by this asset
-                    <Select name="asset_objectives" placeholder="Select topics">
-                        <option value="">Select topics</option>
-                    </Select>
-                </label>
-            </div>
-        </div>
-
-        <hr />
-
-        <h3>Resources for this asset</h3>
-        <div class="row">
-            <div class="small-12 medium-6 large-3 columns">
-                <div class="asset_tile">
-                    <div class="asset_preview"></div>
-                    <div class="asset_text">
-                        <div class="asset_title">Asset Title</div>
-                        <div class="asset_desc">This is a long description</div>
-                    </div>
-                </div>
-            </div>
-            <div class="small-12 medium-6 large-3 columns">
-                <div class="asset_tile">
-                    <div class="asset_preview"></div>
-                    <div class="asset_text">
-                        <div class="asset_title">Asset Title</div>
-                        <div class="asset_desc">This is a long description</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <hr />
-        <h6>
-            <b><u>All Assets</u>&nbsp; ></b>
-            Resource Name
-        </h6>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Resource name
-                    <input type="text" placeholder="" name="resource_name" />
-                </label>
-                <label>Upload Transcript
-                </label>
-                <div class="transcript_files">
-                    <input type="file" placeholder="" name="transcript_file" />
-                    <span class="add_more_files"><u>+ Transcript</u></span>
-                </div>
-                <label>Upload Subtitle
-                </label>
-                <div class="subtitle_files">
-                    <input type="file" placeholder="" name="subtitle_files" />
-                    <span class="add_more_files"><u>+ Subtitle</u></span>
-                </div>
-            </div>
-            <div class="small-12 medium-6 large-6 columns">
-                <div class="preview_asset"></div>
-            </div>
-        </div>
-        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    </div>
-    <!-- Add asset form ends here-->
-
-    <script type="text/javascript">
-        $(document).foundation();
-        $(function(){
-            $('.top-bar .toggle-topbar').on('click', function() {
-                $('.top-bar').find('.close-menu-dropdown, .side-bar-button').toggleClass('hide');
-                $('.top-bar-section ul.dropdown-menu').removeClass('hide');
-                $('.top-bar-section ul.side-bar-menu').addClass('hide');
-            });
-
-            $('.top-bar .side-bar-button').on('click', function() {
-                $('.top-bar').toggleClass('expanded');
-                $('.top-bar-section ul.dropdown-menu').addClass('hide');
-                $('.top-bar-section ul.side-bar-menu').removeClass('hide');
-            });
-
-            $('.top-bar .close-menu-dropdown').on('click', function() {
-                $('.top-bar .toggle-topbar').trigger('click');
-            });
-
-
-            /*Group sections tabs*/
-            $('.group_sections_content >div').hide();
-            $('.group_sections_content #group_elibrary').show();
-            $('.horizontal_tabs_gstudio').on('click', ' >li>a', function(e) {
-                e.preventDefault();
-                var id = $(this).attr('href');
-
-                if (id !== '#') { // If the id is hash then we will not handle it.
-                    $('.group_sections .selected').removeClass('selected');
-                    $(this).addClass('selected');
-
-                    $('.group_sections_content >div').hide();
-                    $('.group_sections_content '+id).show();
-                }
-            });
-
-            // Create Curriculum
-            $('.createAsset').on('click', function(){
-                $('#addAsset').foundation('reveal', 'open');
-            });
-
-            $('.transcript_files, .subtitle_files').on('click', 'span', function(){
-                var input = $(this).siblings('input');
-                $(this).closest('div').prepend('<input type="file" name="'+input.attr('name')+'"/>');
-            })
-        });
-    </script>
+    {% include "ndf/header_clix.html" %}
+    {% block extended_header %}{% endblock %}
+    
+    {% block body_content %} {% endblock %}
+             
 </body>
 </html>

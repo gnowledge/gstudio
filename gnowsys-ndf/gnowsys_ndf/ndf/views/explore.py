@@ -73,7 +73,8 @@ def explore_courses(request,page_no=1):
                     }
 
     return render_to_response(
-        "ndf/explore.html",
+        # "ndf/explore.html", changed as per new Clix UI
+        "ndf/explore_2017.html",
         context_variable,
         context_instance=RequestContext(request))
 
