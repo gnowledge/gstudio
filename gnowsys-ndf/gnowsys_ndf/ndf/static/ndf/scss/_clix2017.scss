@@ -457,7 +457,6 @@ input[type="file"] {
 ul.jqtree_common  {
     position: relative;
       &:before {
-        content: '';
         border-width: 0px 0px 1px 1px;
         position: absolute;
         left: 9px;
@@ -471,7 +470,6 @@ ul.jqtree_common  {
 /*li.jqtree-folder {
     position: relative;
     &:before {
-        content: '';
         border-width: 1px 0px 0px 0px;
         position: absolute;
         height: 0px;
@@ -486,7 +484,6 @@ ul.jqtree_common  {
 ul:not(:only-child) li:first-child {
     position: relative;
     &:before {
-        content: '';
         border-width: 1px 0px 0px 0px;
         position: absolute;
         height: 0px;
@@ -500,7 +497,7 @@ ul:not(:only-child) li:first-child {
 .jqtree_common .jqtree-element:not(.leaf_node):not(:only-child), .jqtree_common .jqtree-element.leaf_node {
     position: relative;
     &:before {
-        content: '';
+
         border-width: 1px 0px 0px 0px;
         position: absolute;
         height: 0px;

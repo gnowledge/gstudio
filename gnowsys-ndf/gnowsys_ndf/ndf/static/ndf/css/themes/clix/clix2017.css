@@ -454,7 +454,6 @@ ul.jqtree_common {
 }
 /* line 459, ../../../scss/_clix2017.scss */
 ul.jqtree_common:before {
-  content: '';
   border-width: 0px 0px 1px 1px;
   position: absolute;
   left: 9px;
@@ -468,7 +467,6 @@ ul.jqtree_common:before {
 /*li.jqtree-folder {
     position: relative;
     &:before {
-        content: '';
         border-width: 1px 0px 0px 0px;
         position: absolute;
         height: 0px;
@@ -479,13 +477,12 @@ ul.jqtree_common:before {
         width: 15px;
     }
 }*/
-/* line 486, ../../../scss/_clix2017.scss */
+/* line 484, ../../../scss/_clix2017.scss */
 ul:not(:only-child) li:first-child {
   position: relative;
 }
-/* line 488, ../../../scss/_clix2017.scss */
+/* line 486, ../../../scss/_clix2017.scss */
 ul:not(:only-child) li:first-child:before {
-  content: '';
   border-width: 1px 0px 0px 0px;
   position: absolute;
   height: 0px;
@@ -496,13 +493,12 @@ ul:not(:only-child) li:first-child:before {
   width: 30px;
 }
 
-/* line 500, ../../../scss/_clix2017.scss */
+/* line 497, ../../../scss/_clix2017.scss */
 .jqtree_common .jqtree-element:not(.leaf_node):not(:only-child), .jqtree_common .jqtree-element.leaf_node {
   position: relative;
 }
-/* line 502, ../../../scss/_clix2017.scss */
+/* line 499, ../../../scss/_clix2017.scss */
 .jqtree_common .jqtree-element:not(.leaf_node):not(:only-child):before, .jqtree_common .jqtree-element.leaf_node:before {
-  content: '';
   border-width: 1px 0px 0px 0px;
   position: absolute;
   height: 0px;
@@ -513,31 +509,31 @@ ul:not(:only-child) li:first-child:before {
   width: 10px;
 }
 
-/* line 515, ../../../scss/_clix2017.scss */
+/* line 512, ../../../scss/_clix2017.scss */
 ul.jqtree-tree .jqtree-element {
   margin-top: 15px;
 }
 
-/* line 519, ../../../scss/_clix2017.scss */
+/* line 516, ../../../scss/_clix2017.scss */
 ul.jqtree-tree ul.jqtree_common {
   margin-left: 35px;
 }
 
-/* line 523, ../../../scss/_clix2017.scss */
+/* line 520, ../../../scss/_clix2017.scss */
 ul.jqtree-tree li.jqtree-selected > .jqtree-element, ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
   background: transparent;
 }
 
-/* line 527, ../../../scss/_clix2017.scss */
+/* line 524, ../../../scss/_clix2017.scss */
 ul.jqtree-tree .jqtree-toggler {
   color: #aaa;
 }
-/* line 529, ../../../scss/_clix2017.scss */
+/* line 526, ../../../scss/_clix2017.scss */
 ul.jqtree-tree .jqtree-toggler:hover {
   color: #aaa;
 }
 
-/* line 534, ../../../scss/_clix2017.scss */
+/* line 531, ../../../scss/_clix2017.scss */
 .curriculum_creator {
   background: #fff;
   box-shadow: 0px 2px 6px #000;
@@ -548,7 +544,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 15px;
 }
 
-/* line 543, ../../../scss/_clix2017.scss */
+/* line 540, ../../../scss/_clix2017.scss */
 .curriculum_creator_header {
   width: 100%;
   height: 60px;
@@ -556,14 +552,14 @@ ul.jqtree-tree .jqtree-toggler:hover {
   padding: 5px 15px;
   box-shadow: 1px 0px 13px #000;
 }
-/* line 550, ../../../scss/_clix2017.scss */
+/* line 547, ../../../scss/_clix2017.scss */
 .curriculum_creator_header .course_heading span {
   letter-spacing: 0.9px;
   font-weight: 600;
   line-height: 50px;
   font-size: 25px;
 }
-/* line 558, ../../../scss/_clix2017.scss */
+/* line 555, ../../../scss/_clix2017.scss */
 .curriculum_creator_header .course_actions ul li {
   list-style-type: none;
   display: inline-block;
@@ -573,7 +569,7 @@ ul.jqtree-tree .jqtree-toggler:hover {
   font-size: 18px;
   letter-spacing: 0.8px;
 }
-/* line 567, ../../../scss/_clix2017.scss */
+/* line 564, ../../../scss/_clix2017.scss */
 .curriculum_creator_header .course_actions ul li.active, .curriculum_creator_header .course_actions ul li:hover {
   border-bottom: 3px solid #ffc14e;
 }
