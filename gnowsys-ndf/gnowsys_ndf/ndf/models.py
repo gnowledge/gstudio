@@ -539,7 +539,7 @@ class Node(DjangoDocument):
         else:
             status = request.POST.get('status', u'DRAFT')
         self.status = unicode(status)
-
+        print "\nkwargs: ", kwargs
         if kwargs.has_key('license'):
             license = kwargs.get('license', GSTUDIO_DEFAULT_LICENSE)
         else:

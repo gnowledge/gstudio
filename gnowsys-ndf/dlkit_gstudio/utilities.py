@@ -330,10 +330,14 @@ def split_osid_id(osid_id):
 def get_display_text_map(display_text=None):
     """Returns display text elements for map"""
     if display_text:
+        try:
+            display_text = display_text.get_text()
+        except Exception as e:
+            display_text = str(display_text)
         return {'formatTypeId': 'TextFormats%3APLAIN%40okapia.net',
         'languageTypeId': '639-2%3AENG%40ISO',
         'scriptTypeId': u'15924%3ALATN%40ISO',
-        'text': str(display_text.get_text())}
+        'text': display_text}
     else:
         # defualt blank_display_text
         return {'formatTypeId': 'TextFormats%3APLAIN%40okapia.net',
