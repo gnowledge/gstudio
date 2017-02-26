@@ -510,12 +510,12 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
             obj_map['title'] = get_display_text_map(title)
 
         # Copyright:
-        try:
-            copyright = self.get_copyright()
-        except errors.Unimplemented:
-            obj_map['copyright'] = get_display_text_map()
-        else:
-            obj_map['copyright'] = get_display_text_map(copyright)
+        # try:
+        #     copyright = self.get_copyright()
+        # except errors.Unimplemented:
+        #     obj_map['copyright'] = get_display_text_map()
+        # else:
+        #     obj_map['copyright'] = get_display_text_map(copyright)
 
         # Asset Contents:
         asset_content_list = []
