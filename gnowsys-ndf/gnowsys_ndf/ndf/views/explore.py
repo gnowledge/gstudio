@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES,GSTUDIO_DEFAULT_GROUPS
+from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES,GSTUDIO_DEFAULT_GROUPS_LIST
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_NO_OF_OBJS_PP
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
@@ -88,7 +88,7 @@ def explore_groups(request,page_no=1):
             'member_of': gst_group._id, 'status': u'PUBLISHED'}).sort('last_update', -1)
     else:
         group_cur = node_collection.find({'_type': 'Group', 'member_of': gst_group._id,
-            'status': u'PUBLISHED', 'name':{'$nin':GSTUDIO_DEFAULT_GROUPS }}).sort('last_update', -1)
+            'status': u'PUBLISHED', 'name':{'$nin':GSTUDIO_DEFAULT_GROUPS_LIST }}).sort('last_update', -1)
 
     ce_page_cur = paginator.Paginator(group_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variable = {'title': title, 'doc_cur': group_cur, 'card': 'ndf/simple_card.html',

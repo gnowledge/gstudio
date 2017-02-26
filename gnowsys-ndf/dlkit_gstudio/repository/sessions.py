@@ -14,10 +14,13 @@ from ..osid.sessions import OsidSession
 from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
 from .objects import Repository, RepositoryList
-from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection, Node
+from gnowsys_ndf.ndf.models import Group, GSystem, GSystemType, node_collection, Node, triple_collection
 from gnowsys_ndf.ndf.views.group import CreateGroup
+from dlkit.abstract_osid.id.primitives import Id as ABCId
+from dlkit.abstract_osid.type.primitives import Type as ABCType
 
 CREATED = True
+UPDATED = True
 
 
 class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessions.OsidSession):
@@ -178,8 +181,32 @@ class AssetLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessio
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        result = Node.get_node_by_id(ObjectId(asset_id.identifier))
-        return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy)
+        if asset_id:
+            result = Node.get_node_by_id(ObjectId(asset_id.identifier))
+
+            has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
+            asset_grels = triple_collection.find({'_type': 'GRelation', 
+                 'subject': result._id, 'relation_type': has_assetcontent_rt._id,
+            }, {'right_subject': 1})
+            asset_content_list = []
+            if asset_grels.count():
+                asset_content_ids = [each_rs['right_subject'] for each_rs in asset_grels]
+                result_cur = Node.get_nodes_by_ids_list(asset_content_ids)
+        
+                asset_content_objs = [objects.AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
+                for asset_content in asset_content_objs:
+                    asset_content_list.append(asset_content.get_object_map())
+
+
+
+            # asset_content_list = []
+            # asset_contents = self.get_asset_contents()
+            # for asset_content in asset_contents:
+            #     asset_content_list.append(asset_content.get_object_map())
+            # # self._gstudio_map['assetContents'] = asset_content_list
+
+            return objects.Asset(gstudio_node=result, runtime=self._runtime, proxy=self._proxy, assetContents=asset_content_list)
+
 
     @utilities.arguments_not_none
     def get_assets_by_ids(self, asset_ids):
@@ -895,32 +922,32 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
       if (!session.canCreateAssets()) {
           return "asset creation not permitted";
       }
-      
+
       Type types[1];
-      types[0] = assetPhotographType; 
+      types[0] = assetPhotographType;
       if (!session.canCreateAssetWithRecordTypes(types)) {
           return "creating an asset with a photograph type is not supported";
       }
-      
+
       AssetForm form = session.getAssetFormForCreate();
       Metadata metadata = form.getDisplayNameMetadata();
       if (metadata.isReadOnly()) {
           return "cannot set display name";
       }
-      
+
       form.setDisplayName("my photo");
-      
+
       PhotographRecordForm photoForm = (PhotographRecordForn) form.getRecordForm(assetPhotogaphType);
       Metadata metadata = form.getApertureMetadata();
       if (metadata.isReadOnly()) {
           return ("cannot set aperture");
       }
-      
+
       photoForm.setAperture("5.6");
       if (!form.isValid()) {
           return form.getValidationMessage();
       }
-      
+
       Asset newAsset = session.createAsset(form);
 
 
@@ -1029,16 +1056,25 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
 
+        for arg in asset_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if asset_record_types == []:
             obj_form = objects.AssetForm(
                 repository_id=self._catalog_id,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id(),
                 proxy=self._proxy)
-            self._forms[obj_form.get_id().get_identifier()] = not CREATED
-
+        else:
+            obj_form = objects.AssetForm(
+                repository_id=self._catalog_id,
+                record_types=asset_record_types,
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form
-        
+
 
     @utilities.arguments_not_none
     def create_asset(self, asset_form):
@@ -1072,10 +1108,13 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         self._forms[asset_form.get_id().get_identifier()] = CREATED
         # This should be part of _init_gstudio_map
-        asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
-         group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
+        asset_name = asset_form._gstudio_map['name'].strip()
+        asset_obj = gstudio_create_asset(name=asset_name,\
+         group_id=self._catalog_id.get_identifier(), created_by=1)
+        # asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
+        #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
 
-        # # asset_obj is gstudio node 
+        # # asset_obj is gstudio node
         if asset_obj:
             result = objects.Asset(
                 gstudio_node=asset_obj,
@@ -1119,7 +1158,21 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        if not isinstance(asset_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+        if asset_id.get_identifier_namespace() != 'repository.Asset':
+            if asset_id.get_authority() != self._authority:
+                raise errors.InvalidArgument()
+            else:
+                asset_id = self._get_asset_id_with_enclosure(asset_id)
+
+        result = Node.get_node_by_id(ObjectId(asset_id.get_identifier()))
+
+        obj_form = objects.AssetForm(gstudio_node=result, repository_id=self._catalog_id,
+                effective_agent_id=self.get_effective_agent_id(),runtime=self._runtime, proxy=self._proxy)
+        obj_form._for_update = True
+        self._forms[obj_form.get_id().get_identifier()] = not UPDATED
+        return obj_form
 
     @utilities.arguments_not_none
     def update_asset(self, asset_form):
@@ -1138,7 +1191,45 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        from dlkit.abstract_osid.repository.objects import AssetForm as ABCAssetForm
+        # collection = MongoClientValidated('repository',
+        #                                   collection='Asset',
+        #                                   runtime=self._runtime)
+        if not isinstance(asset_form, ABCAssetForm):
+            raise errors.InvalidArgument('argument type is not an AssetForm')
+        if not asset_form.is_for_update():
+            raise errors.InvalidArgument('the AssetForm is for update only, not create')
+        try:
+            if self._forms[asset_form.get_id().get_identifier()] == UPDATED:
+                raise errors.IllegalState('asset_form already used in an update transaction')
+        except KeyError:
+            raise errors.Unsupported('asset_form did not originate from this session')
+        if not asset_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+
+
+        from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
+        from gnowsys_ndf.ndf.views.asset import create_asset as gstudio_create_asset
+        req_obj = GStudioRequest(id=1)
+        asset_ident = asset_form._gstudio_map['asset_id']
+        print "\nasset_ident: ", asset_ident
+        asset_obj_id = ObjectId(asset_ident)
+        asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],node_id = asset_obj_id, \
+         group_id=self._catalog_id.get_identifier(), created_by=1)
+        # asset_obj = gstudio_create_asset(name=asset_form._gstudio_map['name'],\
+        #  group_id=self._catalog_id.get_identifier(), created_by=req_obj.user.id)
+
+        # # asset_obj is gstudio node
+        self._forms[asset_ident] = UPDATED
+        if asset_obj:
+            result = objects.Asset(
+                gstudio_node=asset_obj,
+                runtime=self._runtime,
+                proxy=self._proxy)
+
+            return result
+        raise errors.OperationFailed()
+
 
     def can_delete_assets(self):
         """Tests if this user can delete ``Assets``.
@@ -1271,11 +1362,22 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-
+        if not isinstance(asset_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        for arg in asset_content_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if asset_content_record_types == []:
-            ## WHY are we passing repository_id = self._catalog_id below, seems redundant:
             obj_form = objects.AssetContentForm(
                 repository_id=self._catalog_id,
+                asset_id=asset_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime,
+                proxy=self._proxy)
+        else:
+            obj_form = objects.AssetContentForm(
+                repository_id=self._catalog_id,
+                record_types=asset_content_record_types,
                 asset_id=asset_id,
                 catalog_id=self._catalog_id,
                 runtime=self._runtime,
@@ -1283,6 +1385,7 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form
+
 
     @utilities.arguments_not_none
     def create_asset_content(self, asset_content_form):
@@ -1327,8 +1430,12 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
             content_data = asset_content_form._gstudio_map['content']
         assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
          name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
-         created_by=req_obj.user.id, files=file_data, content=content_data,\
+         created_by=1, files=file_data, content=content_data,\
          resource_type=res_type)
+        # assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
+        #  name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
+        #  created_by=req_obj.user.id, files=file_data, content=content_data,\
+        #  resource_type=res_type)
 
         return objects.AssetContent(gstudio_node=assetcontent_obj,
                               runtime=self._runtime,
@@ -1369,7 +1476,39 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        from .objects import AssetContentForm
+        # collection = MongoClientValidated('repository',
+        #                                   collection='Asset',
+        #                                   runtime=self._runtime)
+        if not isinstance(asset_content_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+        document = Node.get_node_by_id(asset_content_id.get_identifier())
+        asset_id = None
+        has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
+        asset_content_ident = asset_content_id.identifier
+        assetcontent_grel = triple_collection.find_one({'_type': 'GRelation',
+            'right_subject': ObjectId(asset_content_ident), 'relation_type': has_assetcontent_rt._id,
+            'status': u'PUBLISHED'}, {'subject': 1})
+
+        if assetcontent_grel:
+            asset_id = assetcontent_grel['subject']
+            # asset_node = Node.get_node_by_id(asset_id)
+            # return Asset(gstudio_node=asset_node)
+            asset_id = (Id(identifier=str(asset_id), 
+                namespace="repository.AssetContent",
+                authority="GSTUDIO"))
+
+        obj_form = AssetContentForm(gstudio_node=document,
+                                    repository_id=self._catalog_id,
+                                    asset_id=asset_id,
+                                    catalog_id=self._catalog_id,
+                                    runtime=self._runtime,
+                                    proxy=self._proxy)
+
+        obj_form._for_update = True
+        self._forms[obj_form.get_id().get_identifier()] = not UPDATED
+        return obj_form
+
 
     @utilities.arguments_not_none
     def update_asset_content(self, asset_content_form):
@@ -1388,7 +1527,62 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        from dlkit.abstract_osid.repository.objects import AssetContentForm as ABCAssetContentForm
+        # collection = MongoClientValidated('repository',
+        #                                   collection='Asset',
+        #                                   runtime=self._runtime)
+        if not isinstance(asset_content_form, ABCAssetContentForm):
+            raise errors.InvalidArgument('argument type is not an AssetContentForm')
+        if not asset_content_form.is_for_update():
+            raise errors.InvalidArgument('the AssetContentForm is for update only, not create')
+        try:
+            if self._forms[asset_content_form.get_id().get_identifier()] == UPDATED:
+                raise errors.IllegalState('asset_content_form already used in an update transaction')
+        except KeyError:
+            raise errors.Unsupported('asset_content_form did not originate from this session')
+        if not asset_content_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        asset_id = Id(asset_content_form._my_map['assetId']).get_identifier()
+        asset = Node.get_node_by_id(ObjectId(asset_id))
+        # asset = collection.find_one(
+        #     {'$and': [{'_id': ObjectId(asset_id)},
+        #                {'assigned' + self._catalog_name + 'Ids': {'$in': [str(self._catalog_id)]}}]})
+        index = 0
+        found = False
+        from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
+        from gnowsys_ndf.ndf.views.asset import create_assetcontent as gstudio_create_assetcontent
+        req_obj = GStudioRequest(id=1)
+
+        asset_id = asset_content_form._gstudio_map['assetIdent']
+        file_data = [None]
+        content_data = None
+        res_type = 'Page'
+        if 'data' in asset_content_form._gstudio_map:
+            file_data = [asset_content_form._gstudio_map['data']]
+            res_type = 'File'
+        else:
+            content_data = asset_content_form._gstudio_map['content']
+        asset_content_id = None
+
+        if 'gstudio_node' in asset_content_form._gstudio_map:
+            asset_content_id = asset_content_form._gstudio_map['gstudio_node']['_id']
+        assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,node_id=asset_content_id,\
+         name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
+         created_by=1, files=file_data, content=content_data,\
+         resource_type=res_type)
+        # assetcontent_obj = gstudio_create_assetcontent(asset_id=asset_id,\
+        #  name=asset_content_form._gstudio_map['name'], group_name_or_id=ObjectId(asset_content_form._catalog_id.identifier),\
+        #  created_by=req_obj.user.id, files=file_data, content=content_data,\
+        #  resource_type=res_type)
+
+        self._forms[asset_content_form.get_id().get_identifier()] = UPDATED
+        # Note: this is out of spec. The OSIDs don't require an object to be returned:
+        from .objects import AssetContent
+
+        return objects.AssetContent(gstudio_node=assetcontent_obj,
+                              runtime=self._runtime,
+                              proxy=self._proxy)
+
 
     def can_delete_asset_contents(self):
         """Tests if this user can delete ``AssetsContents``.
@@ -3473,7 +3667,10 @@ class RepositoryLookupSession(abc_repository_sessions.RepositoryLookupSession, o
 
         """
         # repository_id will be of type  dlkit.primordium.id.primitives.Id
-        return objects.Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id.identifier)}))
+        #return objects.Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id.identifier)}))
+        # =======
+        # updated for aliasing
+        return objects.Repository(gstudio_node=node_collection.one({'_id': ObjectId(self._get_id(repository_id, 'repository').identifier)}))
 
     @utilities.arguments_not_none
     def get_repositories_by_ids(self, repository_ids):
@@ -3861,7 +4058,17 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        if not isinstance(repository_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+
+
+        self._forms[repository_form.get_id().get_identifier()] = CREATED
+
+        group_obj = Node.get_node_by_id(ObjectId(repository_form.get_id().get_identifier()))
+
+        cat_form = objects.RepositoryForm(gstudio_node=group_obj, runtime=self._runtime, proxy=self._proxy)
+        self._forms[cat_form.get_id().get_identifier()] = not UPDATED
+        return cat_form
 
     @utilities.arguments_not_none
     def update_repository(self, repository_form):
@@ -3880,7 +4087,33 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        if not isinstance(repository_form, ABCRepositoryForm):
+            raise errors.InvalidArgument('argument type is not an RepositoryForm')
+        if not repository_form.is_for_update():
+            raise errors.InvalidArgument('the RepositoryForm is for update only, not create')
+        try:
+            if self._forms[repository_form.get_id().get_identifier()] == UPDATED:
+                raise errors.IllegalState('repository_form already used in an update transaction')
+        except KeyError:
+            raise errors.Unsupported('repository_form did not originate from this session')
+        if not repository_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        from dlkit_gstudio.gstudio_user_proxy import GStudioRequest
+        req_obj = GStudioRequest(id=1)
+        group_ins = CreateGroup(req_obj)
+        group_obj = Node.get_node_by_id(ObjectId(repository_form.get_id().get_identifier()))
+        group_obj = group_ins.get_group_fields(group_name, **repository_form._gstudio_map)
+        group_obj.save()
+
+        if group_obj:
+            result = objects.Repository(
+                gstudio_node=group_obj,
+                runtime=self._runtime,
+                proxy=self._proxy)
+
+            return result
+        raise errors.OperationFailed("Error")
+
 
     def can_delete_repositories(self):
         """Tests if this user can delete ``Repositories``.
@@ -3930,7 +4163,8 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
 
         """
         raise errors.Unimplemented()
-
+# ===============
+# Updated for aliasing
     @utilities.arguments_not_none
     def alias_repository(self, repository_id, alias_id):
         """Adds an ``Id`` to a ``Repository`` for the purpose of creating compatibility.
@@ -3953,7 +4187,9 @@ class RepositoryAdminSession(abc_repository_sessions.RepositoryAdminSession, osi
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        #raise errors.Unimplemented()
+        self._alias_id(primary_id=repository_id, equivalent_id=alias_id)
+# ===============
 
 
 class RepositoryHierarchySession(abc_repository_sessions.RepositoryHierarchySession, osid_sessions.OsidSession):

@@ -31,6 +31,15 @@ from dlkit.primordium.id.primitives import Id
 from ..utilities import get_display_text_map
 from gnowsys_ndf.ndf.models import Node, node_collection, triple_collection
 
+#=================
+# for multi-language
+from ..types import Language, Script, Format
+from ..primitives import Type, DisplayText
+DEFAULT_LANGUAGE_TYPE = Type(**Language().get_type_data('DEFAULT'))
+DEFAULT_SCRIPT_TYPE = Type(**Script().get_type_data('DEFAULT'))
+DEFAULT_FORMAT_TYPE = Type(**Format().get_type_data('DEFAULT'))
+# ==============
+
 
 class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.Aggregateable, osid_markers.Sourceable):
     """An ``Asset`` represents some digital content.
@@ -112,6 +121,8 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         # Can remove object_name param
         self._catalog_name = 'repository'
 
+        if 'assetContents' in kwargs:
+            self.assetContents = kwargs['assetContents']
 
     def get_title(self):
         """Gets the proper title of this asset.
@@ -410,7 +421,6 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         asset_content_objs = []
         if asset_grels.count():
             asset_content_ids = [each_rs['right_subject'] for each_rs in asset_grels]
-            # print asset_content_ids
             result_cur = Node.get_nodes_by_ids_list(asset_content_ids)
             asset_content_objs = [AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
         # return AssetContentList(asset_content_objs, runtime=self._runtime, proxy=self._proxy)
@@ -543,6 +553,62 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         if not self.is_for_update():
             # self._init_form(**kwargs)
             self._init_map(**kwargs)
+            self._init_gstudio_map(**kwargs)
+
+    def get_asset_contents(self, asset_obj_id):
+        """Gets the content of this asset.
+
+        return: (osid.repository.AssetContentList) - the asset contents
+        raise:  OperationFailed - unable to complete request
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
+        asset_grels = triple_collection.find({'_type': 'GRelation', 
+            'subject': ObjectId(asset_obj_id), 'relation_type': has_assetcontent_rt._id,
+            'status': u'PUBLISHED'}, {'right_subject': 1})
+
+        asset_content_objs = []
+        if asset_grels.count():
+            asset_content_ids = [each_rs['right_subject'] for each_rs in asset_grels]
+            result_cur = Node.get_nodes_by_ids_list(asset_content_ids)
+            asset_content_objs = [AssetContent(gstudio_node=each_assetcontent) for each_assetcontent in result_cur]
+        # return AssetContentList(asset_content_objs, runtime=self._runtime, proxy=self._proxy)
+        return AssetContentList(asset_content_objs)
+
+
+
+    def _init_gstudio_map(self, **kwargs):
+        """Initialize form map"""
+        osid_objects.OsidObjectForm._init_gstudio_map(self, **kwargs)
+        # osid_objects.OsidSourceableForm._init_map(self)
+        # osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
+        if "gstudio_node" in kwargs:
+            repository_ident_list = kwargs['gstudio_node']['group_set']
+            repository_ids = [str(Id(identifier=str(each_repo_id),
+                namespace="repository.Repository",
+                authority="GSTUDIO")) for each_repo_id in repository_ident_list]
+            self._gstudio_map['assignedRepositoryIds'] = repository_ids
+            asset_content_list = []
+            gstudio_asset_id = kwargs['gstudio_node']['_id']
+            self._gstudio_map['asset_id'] = gstudio_asset_id
+            asset_contents = self.get_asset_contents(gstudio_asset_id)
+            for asset_content in asset_contents:
+                asset_content_list.append(asset_content.get_object_map())
+            self._gstudio_map['assetContents'] = asset_content_list
+        # self._my_map['copyright'] = self._copyright_default
+        # self._my_map['title'] = self._title_default
+        # self._my_map['distributeVerbatim'] = self._distribute_verbatim_default
+        # self._my_map['createdDate'] = self._created_date_default
+        # self._my_map['distributeAlterations'] = self._distribute_alterations_default
+        # self._my_map['principalCreditString'] = self._principal_credit_string_default
+        # self._my_map['publishedDate'] = self._published_date_default
+        # self._my_map['sourceId'] = self._source_default
+        # self._my_map['providerLinkIds'] = self._provider_links_default
+        # self._my_map['publicDomain'] = self._public_domain_default
+        # self._my_map['distributeCompositions'] = self._distribute_compositions_default
+        # self._my_map['compositionId'] = self._composition_default
+        # self._my_map['published'] = self._published_default
 
     def _init_metadata(self, **kwargs):
         """Initialize form metadata"""
@@ -691,7 +757,8 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        self._my_map['copyright'] = self._get_display_text(copyright_, self.get_copyright_metadata())
+        self._gstudio_map['license'] = self._get_display_text(copyright_, self.get_copyright_metadata())['text']
 
     def clear_copyright(self):
         """Removes the copyright.
@@ -701,7 +768,11 @@ class AssetForm(abc_repository_objects.AssetForm, osid_objects.OsidObjectForm, o
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        if (self.get_copyright_metadata().is_read_only() or
+                self.get_copyright_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['copyright'] = dict(self._copyright_default)
+        self._gstudio_map['license'] = dict(self._copyright_default)['text']
 
     copyright_ = property(fset=set_copyright, fdel=clear_copyright)
 
@@ -1246,10 +1317,10 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
-        asset_content_ident = self.get_id().identifier
         # asset_content_node = Node.get_node_by_id(ObjectId(asset_content_ident))
         # Since every AssetContent can have ONLY one Asset
+        has_assetcontent_rt = node_collection.one({'_type': 'RelationType', 'name': 'has_assetcontent'})
+        asset_content_ident = self.get_id().identifier
         assetcontent_grel = triple_collection.find_one({'_type': 'GRelation',
             'right_subject': ObjectId(asset_content_ident), 'relation_type': has_assetcontent_rt._id,
             'status': u'PUBLISHED'}, {'subject': 1})
@@ -1316,7 +1387,8 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        return bool(self['_gstudio_node']['if_file']['original']['relurl'])
+        #raise errors.Unimplemented()
 
     def get_url(self):
         """Gets the URL associated with this content for web-based retrieval.
@@ -1327,7 +1399,9 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         """
         # Return original url of AssetContent
-        return ("media/" + self['_gstudio_node']['if_file']['original']['relurl'])
+        if self.has_url():
+            return ("media/" + self['_gstudio_node']['if_file']['original']['relurl'])
+        raise errors.IllegalState()
 
     url = property(fget=get_url)
 
@@ -1390,9 +1464,109 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         # Data:
         # obj_map['data'] = None  # COLE: DO WE USE THIS IN OBJECT_MAP?
+        obj_map['genusTypeId'] = obj_map['genusType']
+        del obj_map['genusType']
+
+        # ======================
+        # added for multi-language support
+        obj_map['displayName'] = self._str_display_text(self.display_name)
+        obj_map['description'] = self._str_display_text(self.description)
+        # =====================
+        '''
+        obj_map['displayName'] = {'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+                                              'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                              'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                              'text': self['_gstudio_node']['name']}
+
+        obj_map['description'] =  {'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+                                              'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                              'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                              'text': self['_gstudio_node']['content']}
+        '''
         return obj_map
     object_map = property(fget=get_object_map)
 
+    # =====================
+    # added for multi-language support
+    @staticmethod
+    def _str_display_text(display_text):
+        return {
+            'text': display_text.text,
+            'languageTypeId': str(display_text.language_type),
+            'scriptTypeId': str(display_text.script_type),
+            'formatTypeId': str(display_text.format_type)
+        }
+
+    def get_default_language_value(self, field, dictionary):
+        default_texts = [t
+                         for t in dictionary[field]
+                         if t['languageTypeId'] == str(DEFAULT_LANGUAGE_TYPE)]
+        if len(default_texts) == 0:
+            return DisplayText(display_text_map=dictionary[field][0])
+        else:
+            return DisplayText(display_text_map=default_texts[0])
+
+    def get_matching_language_value(self, field, dictionary=None):
+        """get the text field that matches the proxy locale setting"""
+        if dictionary is None:
+            dictionary = self._gstudio_map
+
+        if (field not in dictionary or
+                len(dictionary[field]) == 0):
+            return self._empty_display_text()
+
+        proxy = self._proxy
+        try:
+            proxy_locale = proxy.locale
+        except Exception:
+            proxy_locale = None
+
+        if proxy_locale is None:
+            return self.get_default_language_value(field, dictionary)
+        else:
+            matching_texts = [t
+                              for t in dictionary[field]
+                              if t['languageTypeId'] == str(proxy.locale.language_type)]
+            if len(matching_texts) == 0:
+                return self.get_default_language_value(field, dictionary)
+            else:
+                return DisplayText(display_text_map=matching_texts[0])
+
+    def get_display_name(self):
+        """Uses the locale info in the osid object proxy to grab a display name,
+        falling back on English as default, then first one available if no English.
+
+        return: (displayText) - the displayText for the given display name
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        return self.get_matching_language_value('displayNames')
+
+    display_name = property(fget=get_display_name)
+
+    def get_description(self):
+        """Uses the locale info in the osid object proxy to grab a description,
+        falling back on English as default, then first one available if no English.
+
+        return: (displayText) - the displayText for the given description
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        return self.get_matching_language_value('descriptions')
+
+    description = property(fget=get_description)
+
+    @staticmethod
+    def _empty_display_text():
+        return DisplayText(display_text_map={
+            'text': '',
+            'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+            'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+            'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+        })
+    # =====================
+
+    
 class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.OsidObjectForm, osid_objects.OsidSubjugateableForm):
     """This is the form for creating and updating content for ``AssetContent``.
 
@@ -1431,15 +1605,160 @@ class AssetContentForm(abc_repository_objects.AssetContentForm, osid_objects.Osi
         self._my_map['assignedRepositoryIds'] = [str(kwargs['repository_id'])]
         self._my_map['assetId'] = str(kwargs['asset_id'])
 
+
     def _init_gstudio_map(self, record_types=None, **kwargs):
         """Initialize form map"""
         osid_objects.OsidObjectForm._init_gstudio_map(self, record_types, **kwargs)
         self._gstudio_map['assetId'] = str(kwargs['asset_id'])
+        if "gstudio_node" in kwargs:
+            self._gstudio_map['gstudio_node'] = kwargs['gstudio_node']
         # assetIdent is added to pass ObjectId instead of 
         # primitives.Id. to gstudio Asset api the 
         # as asset_id becomes str in further sessions.
         self._gstudio_map['assetIdent'] = str(kwargs['asset_id'].identifier)
 
+        # added for multi-language support
+        # there should be an IF statement here
+        self._gstudio_map['displayNames'] = []
+        self._gstudio_map['descriptions'] = []
+        
+# ==================
+# Added for multi-language support
+  
+    @staticmethod
+    def _str_display_text(display_text):
+        return {
+            'text': display_text.text,
+            'languageTypeId': str(display_text.language_type),
+            'scriptTypeId': str(display_text.script_type),
+            'formatTypeId': str(display_text.format_type)
+        }
+ 
+    def add_or_replace_value(self, field, new_value, dictionary=None):
+        """Helper method to replace a single text field in a list"""
+        if dictionary is None:
+            dictionary = self._gstudio_map
+        if not isinstance(new_value, DisplayText):
+            raise IllegalState('{0} is not a DisplayText'.format(field))
+
+        # need to check for an existing languageTypeId match. If found, replace that one
+        # instead. Otherwise, append.
+        current_language_types = [current_value['languageTypeId'] for current_value in dictionary[field]]
+        if str(new_value.language_type) in current_language_types:
+            dictionary[field][current_language_types.index(str(new_value.language_type))] = self._str_display_text(new_value)
+        else:
+            dictionary[field].append(self._str_display_text(new_value))
+ 
+    def add_display_name(self, display_name):
+        """Ideally this only gets called if the AssetContent has a multi-language record
+        Adds a display_name.
+
+        arg:    display_name (displayText): the new display name
+        raise:  InvalidArgument - ``display_name`` is invalid
+        raise:  NoAccess - ``Metadata.isReadOnly()`` is ``true``
+        raise:  NullArgument - ``display_name`` is ``null``
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        #if self.get_display_names_metadata().is_read_only():
+        #    raise NoAccess()
+        self.add_or_replace_value('displayNames', display_name)
+        if self._gstudio_map['displayNames']:
+            self._gstudio_map['name'] = self._gstudio_map['displayNames'][0]['text']
+        else:
+            self._gstudio_map['name'] = display_name.get_text()
+
+    def clear_display_names(self):
+        """Removes all display_names.
+
+        raise:  NoAccess - ``Metadata.isRequired()`` is ``true`` or
+                ``Metadata.isReadOnly()`` is ``true``
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        #if self.get_display_names_metadata().is_read_only():
+        #    raise NoAccess()
+        self.my_osid_object_form._my_map['displayNames'] = []
+
+    def clear_display_name(self, display_name):
+        """Removes the specified display_name.
+
+        raise:  NoAccess - ``Metadata.isRequired()`` is ``true`` or
+                ``Metadata.isReadOnly()`` is ``true``
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        #if self.get_display_names_metadata().is_read_only():
+        #    raise NoAccess()
+        self._gstudio_map['displayNames'] = [t
+                                             for t in self._gstudio_map['displayNames']
+                                             if t != self._str_display_text(display_name)]
+
+    def edit_display_name(self, old_display_name, new_display_name):
+        #if self.get_display_names_metadata().is_read_only():
+        #    raise NoAccess()
+        if not isinstance(new_display_name, DisplayText):
+            raise InvalidArgument()
+        if self._str_display_text(old_display_name) not in self._gstudio_map['displayNames']:
+            raise InvalidArgument('old display name not present in this object')
+        self._gstudio_map['displayNames'][self._gstudio_map['displayNames'].index(self._str_display_text(old_display_name))] = \
+            self._str_display_text(new_display_name)
+
+    def add_description(self, description):
+        """Adds a description.
+
+        arg:    description (displayText): the new description
+        raise:  InvalidArgument - ``description`` is invalid
+        raise:  NoAccess - ``Metadata.isReadOnly()`` is ``true``
+        raise:  NullArgument - ``description`` is ``null``
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        #if self.get_descriptions_metadata().is_read_only():
+        #    raise NoAccess()
+        self.add_or_replace_value('descriptions', description)
+        if self._gstudio_map['descriptions']:
+            self._gstudio_map['content'] = self._gstudio_map['descriptions'][0]['text']
+        else:
+            self._gstudio_map['content'] = display_name.get_text()
+
+    def clear_descriptions(self):
+        """Removes all descriptions.
+
+        raise:  NoAccess - ``Metadata.isRequired()`` is ``true`` or
+                ``Metadata.isReadOnly()`` is ``true``
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        #if self.get_descriptions_metadata().is_read_only():
+        #    raise NoAccess()
+        self._gstudio_map['descriptions'] = []
+
+    def clear_description(self, description):
+        """Removes the specified description.
+
+        raise:  NoAccess - ``Metadata.isRequired()`` is ``true`` or
+                ``Metadata.isReadOnly()`` is ``true``
+        *compliance: mandatory -- This method must be implemented.*
+
+        """
+        #if self.get_descriptions_metadata().is_read_only():
+        #    raise NoAccess()
+        self._gstudio_map['descriptions'] = [t
+                                             for t in self._gstudio_map['descriptions']
+                                             if t != self._str_display_text(description)]
+
+    def edit_description(self, old_description, new_description):
+        #if self.get_descriptions_metadata().is_read_only():
+        #    raise NoAccess()
+        if not isinstance(new_description, DisplayText):
+            raise InvalidArgument()
+        if self._str_display_text(old_description) not in self._gstudio_map['descriptions']:
+            raise InvalidArgument('old description not present in this object')
+        self._gstudio_map['descriptions'][self._gstudio_map['descriptions'].index(self._str_display_text(old_description))] = \
+            self._str_display_text(new_description)
+  
+# ==================
 
 
     def _init_form(self, record_types=None, **kwargs):
@@ -1774,12 +2093,16 @@ class CompositionForm(abc_repository_objects.CompositionForm, osid_objects.OsidO
         self._children_default = self._mdata['children']['default_id_values']
 
     def _init_map(self, record_types=None, **kwargs):
-        """Initialize form elements"""
+        """Initialize form map"""
 
         osid_objects.OsidContainableForm._init_map(self)
         osid_objects.OsidSourceableForm._init_map(self)
         osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         # Initialize all form elements to default values here
+        # self._my_map['childIds'] = self._children_default
+        # self._my_map['assignedRepositoryIds'] = [str(kwargs['repository_id'])]
+
+
 
     @utilities.arguments_not_none
     def get_composition_form_record(self, composition_record_type):
@@ -1860,8 +2183,8 @@ class Repository(abc_repository_objects.Repository, osid_objects.OsidCatalog):
     _namespace = 'repository.Repository'
 
     def __init__(self, **kwargs):
+        osid_objects.OsidCatalog.__init__(self, object_name='REPOSITORY', **kwargs)
         # self._record_type_data_sets = get_registry('REPOSITORY_RECORD_TYPES', runtime)
-        osid_objects.OsidCatalog.__init__(self, **kwargs)
 
 
     @utilities.arguments_not_none
@@ -1910,7 +2233,7 @@ class RepositoryForm(abc_repository_objects.RepositoryForm, osid_objects.OsidCat
     _namespace = 'repository.Repository'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidCatalogForm.__init__(self, **kwargs)
+        osid_objects.OsidCatalogForm.__init__(self, object_name='REPOSITORY', **kwargs)
         self._mdata = default_mdata.get_repository_mdata()
         self._init_metadata(**kwargs)
         # if not self.is_for_update():

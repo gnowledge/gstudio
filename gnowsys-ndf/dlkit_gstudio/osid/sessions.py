@@ -17,6 +17,12 @@ from dlkit.abstract_osid.osid import errors
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
 from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUP
+
+# =================
+# for aliasing ... there is probably a better way
+from pymongo import MongoClient
+# =================
 
 FEDERATED = 0
 
@@ -69,6 +75,11 @@ class OsidSession(abc_osid_sessions.OsidSession):
                 else:
                     raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
         else:
+            # Use GSTUDIO_DEFAULT_GROUP
+
+            self._my_catalog_map = node_collection.one({'_type': 'Group', 'name': GSTUDIO_DEFAULT_GROUP})
+            self._catalog_identifier = self._my_catalog_map._id
+            '''
             self._catalog_identifier = '000000000000000000000000'
             self._my_catalog_map = {
                 '_id': ObjectId(self._catalog_identifier),
@@ -83,6 +94,7 @@ class OsidSession(abc_osid_sessions.OsidSession):
                 'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
                 'recordTypeIds': [] # Could this somehow inherit source catalog records?
             }
+            '''
         # return Repository(gstudio_node=node_collection.one({'_id': ObjectId(repository_id)}))
         self._catalog = cat_class(gstudio_node=self._my_catalog_map, runtime=self._runtime, proxy=self._proxy)
         self._catalog._authority = self._authority  # there should be a better way...
@@ -260,3 +272,58 @@ class OsidSession(abc_osid_sessions.OsidSession):
     def _get_provider_manager(self, osid, local=False):
         """Gets the most appropriate provider manager depending on config."""
         return utilities.get_provider_manager(osid, runtime=self._runtime, proxy=self._proxy, local=local)
+
+# ===========
+# for aliasing
+    @staticmethod
+    def _set_mongo_client(runtime):
+        """set the host / port....could be somewhere else"""
+        try:
+            mongo_host_param_id = Id('parameter:mongoHostURI@mongo')
+            mongo_host = runtime.get_configuration().get_value_by_parameter(mongo_host_param_id).get_string_value()
+        except (AttributeError, KeyError, errors.NotFound):
+            return MongoClient()
+        else:
+            return MongoClient(mongo_host)
+
+    def _alias_id(self, primary_id, equivalent_id):
+        """Adds the given equivalent_id as an alias for primary_id if possible"""
+        pkg_name = primary_id.get_identifier_namespace().split('.')[0]
+        obj_name = primary_id.get_identifier_namespace().split('.')[1]
+        mongo = self._set_mongo_client(self._runtime)
+        # We should do a check here -- but would have to be
+        # with gstudio node_collection?
+        #collection.find_one({'_id': ObjectId(primary_id.get_identifier())}) # to raise NotFound
+        node_collection.one({'_id': ObjectId(primary_id.identifier)})
+        collection = mongo['id'][pkg_name + 'Ids']
+        result = collection.find_one({'aliasIds': {'$in': [str(equivalent_id)]}})
+        if result is not None:
+            result['aliasIds'].remove(str(equivalent_id))
+            collection.save(result)
+        id_map = collection.find_one({'_id': str(primary_id)})
+        if id_map is None:
+            try:
+                collection.insert_one({'_id': str(primary_id), 'aliasIds': [str(equivalent_id)]})
+            except TypeError:
+                collection.insert({'_id': str(primary_id), 'aliasIds': [str(equivalent_id)]})
+    
+        else:
+            id_map['aliasIds'].append(str(equivalent_id))
+            collection.save(id_map)
+
+    def _get_id(self, id_, pkg_name):
+        """
+        Returns the primary id given an alias.
+
+        If the id provided is not in the alias table, it will simply be
+        returned as is.
+
+        Only looks within the Id Alias namespace for the session package
+
+        """
+        mongo = self._set_mongo_client(self._runtime)
+        collection = mongo['id'][pkg_name + 'Ids']
+        result = collection.find_one({'aliasIds': {'$in': [str(id_)]}})
+        if result is None:
+            return id_
+        return Id(result['_id'])

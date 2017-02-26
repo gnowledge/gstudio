@@ -32,7 +32,14 @@ from dlkit.primordium.type.primitives import Type
 from dlkit.primordium.locale.types import language, script
 from dlkit.primordium.locale.types import format as text_format
 from ..utilities import get_display_text_map
-
+#=================
+# for multi-language
+from ..types import Language, Script, Format
+from ..primitives import Type, DisplayText
+DEFAULT_LANGUAGE_TYPE = Type(**Language().get_type_data('DEFAULT'))
+DEFAULT_SCRIPT_TYPE = Type(**Script().get_type_data('DEFAULT'))
+DEFAULT_FORMAT_TYPE = Type(**Format().get_type_data('DEFAULT'))
+# ==============
 
 
 class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_markers.Extensible, osid_markers.Browsable):
@@ -104,17 +111,50 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
 
     _namespace = 'osid.OsidObject'
 
-    def __init__(self, gstudio_node=None, **kwargs):
-        osid_markers.Identifiable.__init__(self)
+    def __init__(self, gstudio_node, runtime=None, **kwargs):
+        osid_markers.Identifiable.__init__(self, runtime=runtime)
+        osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
+        self._gstudio_map = {}
+        self._gstudio_map['gstudio_node'] = gstudio_node
+        self._gstudio_map['recordTypeIds'] = []
         self._gstudio_node = gstudio_node
+        self._my_map = {}
+        self._my_map['recordTypeIds'] = []
+        self._my_map['gstudio_node'] = gstudio_node
+        self._load_records(self._gstudio_map['recordTypeIds'])
+        self._load_records(self._my_map['recordTypeIds'])
+        self.copyright = DisplayText(display_text_map={
+                                'text':gstudio_node['license'],
+                                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+                            })
+
+        self._gstudio_map['displayName'] = DisplayText(display_text_map={
+                                'text':gstudio_node['name'],
+                                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+                            })
+        self._gstudio_map['description'] = DisplayText(display_text_map={
+                                'text':gstudio_node['content'],
+                                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+                            })
+        self._gstudio_map['displayNames'] = [get_display_text_map(self._gstudio_map['displayName'])]
+        self._gstudio_map['descriptions'] = [get_display_text_map(self._gstudio_map['description'])]
+
 
     def get_object_map(self, obj_map):
         """Adds OsidObject elements to object map"""
-
         super(OsidObject, self).get_object_map(obj_map)
         obj_map['id'] = str(self.get_id())
-        obj_map['displayName'] = get_display_text_map(self.get_display_name())
-        obj_map['description'] = get_display_text_map(self.get_description())
+
+        obj_map['displayName'] = get_display_text_map(self._gstudio_map['displayName'])
+        obj_map['description'] = get_display_text_map(self._gstudio_map['description'])
+        # obj_map['displayName'] = get_display_text_map(self.get_display_name())
+        # obj_map['description'] = get_display_text_map(self.get_description())
         try:
             obj_map['genusType'] = str(self.get_genus_type())
         except errors.Unimplemented:
@@ -153,12 +193,6 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
             script_type=Type(**script.get_type_data('LATN')),
             format_type=Type(**text_format.get_type_data('PLAIN')),
             )
-        # raise errors.Unimplemented()
-
-
-
-
-
 
     display_name = property(fget=get_display_name)
 
@@ -203,8 +237,10 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        raise errors.Unimplemented()
+        # raise errors.Unimplemented()
+        return Type('asset-content-genus-type%3Amp4%40ODL.MIT.EDU')
 
+    
     genus_type = property(fget=get_genus_type)
 
     @utilities.arguments_not_none
@@ -1226,13 +1262,42 @@ class OsidExtensibleForm(abc_osid_objects.OsidExtensibleForm, OsidForm, osid_mar
         osid_markers.Extensible.__init__(self, **kwargs)
         # sets runtime and proxy to the current object
     def _init_map(self, record_types):
+        self._gstudio_map['recordTypeIds'] = []
         self._my_map['recordTypeIds'] = []
         if record_types is not None:
             self._init_records(record_types)
+        self._supported_record_type_ids = self._gstudio_map['recordTypeIds']
         self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_gstudio_map(self, record_types=None):
         """Initialize gstudio map for form"""
+
+    def _get_record(self, record_type):
+        """This overrides _get_record in osid.Extensible.
+
+        Perhaps we should leverage it somehow?
+
+        """
+        if (not self.has_record_type(record_type) and
+                record_type.get_identifier() not in self._record_type_data_sets):
+            raise errors.Unsupported()
+        if str(record_type) not in self._records:
+            record_initialized = self._init_record(str(record_type))
+            if record_initialized and str(record_type) not in self._gstudio_map['recordTypeIds']:
+                self._gstudio_map['recordTypeIds'].append(str(record_type))
+        return self._records[str(record_type)]
+
+    def _init_record(self, record_type_idstr):
+        """Override this from osid.Extensible because Forms use a different
+        attribute in record_type_data."""
+        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = importlib.import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['form_record_class_name'])
+        if record is not None:
+            self._records[record_type_idstr] = record(self)
+            return True
+        else:
+            return False
 
     def get_required_record_types(self):
         """Gets the required record types for this form.
@@ -1387,6 +1452,9 @@ class OsidContainableForm(abc_osid_objects.OsidContainableForm, OsidForm):
     def _init_form(self):
         """Initialize form elements"""
 
+    def _init_map(self):
+        self._my_map['sequestered'] = self._sequestered_default
+
     def get_sequestered_metadata(self):
         """Gets the metadata for the sequestered flag.
 
@@ -1451,11 +1519,23 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         pass
 
     def _init_map(self, effective_agent_id=None, **kwargs):
-
         if 'effective_agent_id' in kwargs:
-            self._my_map['providerId'] = effective_agent_id
-            self._my_map['brandingIds'] = self._branding_default
-            self._my_map['license'] = dict(self._license_default)
+            try:
+                mgr = self._get_provider_manager('RESOURCE', local=True)
+                agent_session = mgr.get_resource_agent_session(proxy=self._proxy)
+                agent_session.use_federated_bin_view()
+                resource_idstr = str(agent_session.get_resource_id_by_agent(kwargs['effective_agent_id']))
+            except (errors.OperationFailed,
+                    errors.Unsupported,
+                    errors.Unimplemented,
+                    errors.NotFound):
+                resource_idstr = self._provider_default
+            self._my_map['providerId'] = resource_idstr
+        else:
+            self._my_map['providerId'] = self._provider_default
+        self._my_map['brandingIds'] = self._branding_default
+        self._my_map['license'] = self._license_default
+        # self._my_map['license'] = dict(self._license_default)
 
     def get_provider_metadata(self):
         """Gets the metadata for a provider.
@@ -1722,7 +1802,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if osid_object_map is not None:
             self._for_update = True
             self._my_map = osid_object_map
-            # self._load_records(osid_object_map['recordTypeIds'])
+            self._load_records(osid_object_map['recordTypeIds'])
         else:
             self._for_update = False
             self._my_map = {}
@@ -1738,8 +1818,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if 'default_description' in kwargs:
             self._mdata['description']['default_string_values'][0]['text'] = kwargs['default_description']
         update_display_text_defaults(self._mdata['description'], self._locale_map)
-        self._display_name_default = unicode(self._mdata['display_name']['default_string_values'][0]['text'])
-        self._description_default = unicode(self._mdata['description']['default_string_values'][0]['text'])
+        self._display_name_default = self._mdata['display_name']
+        self._description_default = self._mdata['description']
+        # self._display_name_default = unicode(self._mdata['display_name']['default_string_values'][0]['text'])
+        # self._description_default = unicode(self._mdata['description']['default_string_values'][0]['text'])
         self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
 
         if 'mdata' in kwargs:
@@ -1757,11 +1839,30 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
     def _init_gstudio_map(self, record_types=None, **kwargs):
         """Initialize map for form"""
         OsidForm._init_gstudio_map(self)
-        self._gstudio_map['name'] = self._display_name_default
-        self._gstudio_map['altnames'] = self._display_name_default
-        self._gstudio_map['content'] = self._description_default
-        self._gstudio_map['content_org'] = self._description_default
-        # self._my_map['genusTypeId'] = self._genus_type_default
+        """
+        Useful to fill map in 'edit' action 
+        by passing gstudio_node like 
+        repository.AssetForm.get_asset_content_form_for_update
+        """
+        if "gstudio_node" in kwargs:
+            self._gstudio_map['name'] = kwargs['gstudio_node']['name']
+            self._gstudio_map['altnames'] = kwargs['gstudio_node']['altnames']
+            self._gstudio_map['content'] = kwargs['gstudio_node']['content']
+            self._gstudio_map['content_org'] = kwargs['gstudio_node']['content']
+            self.copyright = DisplayText(display_text_map={
+                                    'text':kwargs['gstudio_node']['license'],
+                                    'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                    'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                    'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+                                })
+
+        else:
+            self._gstudio_map['name'] = self._display_name_default['default_string_values'][0]['text']
+            self._gstudio_map['altnames'] = self._display_name_default['default_string_values'][0]['text']
+            self._gstudio_map['content'] = self._description_default['default_string_values'][0]['text']
+            self._gstudio_map['content_org'] = self._description_default['default_string_values'][0]['text']
+        
+        self._my_map['genusTypeId'] = self._genus_type_default
         OsidExtensibleForm._init_gstudio_map(self, record_types)
 
     def get_display_name_metadata(self):
@@ -1794,7 +1895,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         """
         self._gstudio_map['name'] = unicode(display_name)
         self._gstudio_map['altnames'] = unicode(display_name)
-        # self._display_name = display_name
+        self._display_name = display_name
 
     def clear_display_name(self):
         """Clears the display name.
@@ -1841,7 +1942,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         """
         self._gstudio_map['content'] = unicode(description)
         self._gstudio_map['content_org'] = unicode(description)
-        # self._description = description
+        self._description = description
 
     def clear_description(self):
         """Clears the description.
@@ -1906,7 +2007,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
                 self.get_genus_type_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['genusTypeId'] = self._genus_type_default
-        # self._genus_type = self._genus_type_default
+        self._genus_type = self._genus_type_default
 
     genus_type = property(fset=set_genus_type, fdel=clear_genus_type)
 
@@ -1918,6 +2019,9 @@ class OsidRelationshipForm(abc_osid_objects.OsidRelationshipForm, OsidObjectForm
         OsidTemporalForm.__init__(self)
         OsidObjectForm.__init__(self, **kwargs)
 
+    def _init_map(self, record_types=None, **kwargs):
+        OsidTemporalForm._init_map(self)
+        OsidObjectForm._init_map(self, record_types=record_types, **kwargs)
 
 
 

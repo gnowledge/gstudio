@@ -1,4 +1,4 @@
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GROUPS_LIST
 # factory data to create in database for gnowsys-ndf project
 
 
@@ -286,4 +286,4 @@ factory_relation_types = [
 ]
 
 
-factory_default_groups = GSTUDIO_DEFAULT_GROUPS
+factory_default_groups = GSTUDIO_DEFAULT_GROUPS_LIST

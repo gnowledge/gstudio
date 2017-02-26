@@ -19,7 +19,7 @@ all_repos = repository_service_mgr.get_repositories()
 print "\nTotal repositories: ", all_repos.available()
 test_repo = None
 for each in all_repos:
-	print "\t- ", each.get_display_name().get_text()
+	# print "\t- ", each.get_display_name().get_text()
 	test_repo = each
 print "\n Asset creating for Group: ", test_repo.get_display_name().get_text()
 asset_form = test_repo.get_asset_form_for_create([])

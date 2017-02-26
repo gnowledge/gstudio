@@ -18,6 +18,7 @@ gst_file_name, gst_file_id = GSystemType.get_gst_name_id(u'File')
 def create_asset(name,
 				group_id,
 				created_by,
+				node_id=None,
 				content=None,
 				request=HttpRequest(),
 				**kwargs):
@@ -45,8 +46,10 @@ def create_asset(name,
 	author_obj_id  = author_obj._id
 
 	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
-
-	asset_gs_obj = node_collection.collection.GSystem()
+	if node_id:
+		asset_gs_obj = node_collection.one({'_id': ObjectId(node_id)})
+	else:
+		asset_gs_obj = node_collection.collection.GSystem()
 
 	asset_gs_obj.fill_gstystem_values(request=request,
 									name=name,
@@ -63,6 +66,7 @@ def create_assetcontent(asset_id,
 						name,
 						group_name_or_id,
 						created_by,
+						node_id=None,
 						content=None,
 						files=[None],
 						resource_type='Page',
@@ -77,11 +81,13 @@ def create_assetcontent(asset_id,
 
 	if not name:
 		name = request.POST.get('name') if request else None
-
 	if not created_by:
 		created_by = request.user.id if request else None
 
 	group_name, group_id = get_group_name_id(group_name_or_id)
+	print "group_id: ", group_id
+	group_id = ObjectId(group_id)
+	print "asset_obj['group_set']: ", asset_obj['group_set']
 	if group_id not in asset_obj['group_set']:
 		# AssetContent should fall under Asset. If 'group_id' arg is
 		# supplied, it should fall under asset's group id.
@@ -91,6 +97,7 @@ def create_assetcontent(asset_id,
 
 	# compulsory values, if not found raise error.
 	# if not all([name, created_by, group_id, uploaded_files]):
+
 	if not all([name, created_by, group_id, test_content]):
 		raise ValueError('"asset_id", "name", "created_by", "group" and ("content" or "files") are mandatory args.')
 
@@ -98,9 +105,6 @@ def create_assetcontent(asset_id,
 	author_obj_id  = author_obj._id
 
 	group_set = [ObjectId(group_id), ObjectId(author_obj_id)]
-
-	asset_content_obj = node_collection.collection.GSystem()
-
 	gst_name_id_dict = {
 		'Page': gst_page_id, 'page': gst_page_id,
 		'File': gst_file_id, 'file': gst_file_id
@@ -112,18 +116,24 @@ def create_assetcontent(asset_id,
 		print "resource_type arg is not supplied."
 		# handle condition based on files.
 		member_of_gst_id = gst_file_id if files[0] else gst_page_id
+	kwargs.update({'name': unicode(name)})
+	kwargs.update({'created_by': created_by})
+	kwargs.update({'member_of': member_of_gst_id})
+	kwargs.update({'group_set': group_set})
+	kwargs.update({'unique_gs_per_file': False})
+	if content:
+		kwargs.update({'content': content})
 
-	asset_content_obj.fill_gstystem_values(request=request,
-										name=name,
-										member_of=member_of_gst_id,
-										group_set=group_set,
-										created_by=created_by,
-										content=content,
-										uploaded_file=files[0],
-										unique_gs_per_file=True,
-										**kwargs)
-
-	asset_content_obj.save(group_id=group_id)
+	asset_content_obj = None
+	if node_id:
+		asset_content_obj = node_collection.one({'_id': ObjectId(node_id)})
+	else:
+		asset_content_obj = node_collection.collection.GSystem()
+		asset_content_obj.fill_gstystem_values(request=request,
+												uploaded_file=files[0],
+												**kwargs)
+	asset_content_obj.fill_node_values(**kwargs)
+	asset_content_obj.save(groupid=group_id)
 	asset_contents_list = [asset_content_obj._id]
 	rt_has_asset_content = node_collection.one({'_type': 'RelationType',
 		'name': 'has_assetcontent'})
@@ -132,6 +142,7 @@ def create_assetcontent(asset_id,
 		{'_id': 0, 'right_subject': 1})
 	for each_asset in asset_grels:
 		asset_contents_list.append(each_asset['right_subject'])
+	
 	create_grelation(asset_obj._id, rt_has_asset_content, asset_contents_list)
 
 	return asset_content_obj
