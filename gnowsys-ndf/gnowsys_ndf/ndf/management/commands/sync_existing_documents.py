@@ -483,6 +483,8 @@ class Command(BaseCommand):
     if res['updatedExisting']: # and res['nModified']:
         print "\n 'attribute_set' field added to following no. of documents: ", res['n']
 
+    '''
+    Replace foll. with legal field update code - katkamrachana
     # Adds "license" field (with default value as "") to all documents belonging to GSystems.
     res = node_collection.collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'license': {'$exists': False}},
                             {'$set': {'license': None}},
@@ -490,6 +492,7 @@ class Command(BaseCommand):
     )
     if res['updatedExisting']: # and res['nModified']:
         print "\n 'license' field added to following no. of documents: ", res['n']
+    '''
 
     # Adding "Agency_type" field adding to group documents with default values
     res = node_collection.collection.update({'_type': {'$in': ['Group']}, 'agency_type': {'$exists': False}},
