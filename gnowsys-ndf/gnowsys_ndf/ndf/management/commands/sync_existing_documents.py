@@ -11,7 +11,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -780,3 +780,12 @@ class Command(BaseCommand):
         i.save()
         print "Updated",i.name,"'s modified by feild from null to 1"
 
+    # Adds "legal" field (with default values) to all documents belonging to GSystems.
+    all_gs = node_collection.find({'_type': 'GSystem', 'legal': {'$exists': False}})
+    all_gs_count = all_gs.count()
+    print "\n Total GSystems found to update 'legal' field: ", all_gs_count
+    for index, each_gs in enumerate(all_gs):
+        print "\n GSystem: ", index, ' of ', all_gs_count
+        each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
+        each_gs.pop('license')
+        each_gs.save()
