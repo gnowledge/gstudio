@@ -759,7 +759,8 @@ class Node(DjangoDocument):
             if invalid_struct_fields:
                 for each_invalid_field in invalid_struct_fields:
                     if each_invalid_field in self.structure:
-                        print "=== removed from structure", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
+                        self.structure.pop(each_invalid_field)
+                        # print "=== removed from structure", each_invalid_field, ' : ', 
 
 
             keys_list = self.structure.keys()
@@ -769,7 +770,8 @@ class Node(DjangoDocument):
             if invalid_struct_fields_list:
                 for each_invalid_field in invalid_struct_fields_list:
                     if each_invalid_field in self:
-                        print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
+                        self.pop(each_invalid_field)
+                        # print "=== removed ", each_invalid_field, ' : ', 
 
 
         except Exception, e:
@@ -1619,7 +1621,7 @@ class GSystem(Node):
                     },
         'author_set': [int],        # List of Authors
         'annotations': [dict],      # List of json files for annotations on the page
-        'origin': []                # e.g:
+        'origin': [],                # e.g:
                                         # [
                                         #   {"csv-import": <fn name>},
                                         #   {"sync_source": "<system-pub-key>"}
