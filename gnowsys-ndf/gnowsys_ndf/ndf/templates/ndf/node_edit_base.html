@@ -446,16 +446,16 @@
 			</div>
 
 			<div class="small-12 large-4 columns">
-				<label><h5>License</h5></label>
-				<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
-				{% get_license as license %}
-				<select name="license"  required>
-						{% for each_license in license %}
-	        			{# <option value="{{each_license}}"  #}
-	        			{% if each_license == node.license %}
-	        				<option selected>{% trans each_license %}</option>
+				<label><h5>Copyright</h5></label>
+				<!-- <input id="copyright_id" name="Copyright" type="text" placeholder="Enter source name"/> -->
+				{% get_copyright as copyright %}
+				<select name="copyright"  required>
+						{% for each_copyright in copyright %}
+	        			{# <option value="{{each_copyright}}"  #}
+	        			{% if each_copyright == node.copyright %}
+	        				<option selected>{% trans each_copyright %}</option>
 	        			{% else %}>
-	        			 	<option>{% trans each_license %}</option>
+	        			 	<option>{% trans each_copyright %}</option>
 	        			{% endif %}>
 					{% endfor %}
 				</select>

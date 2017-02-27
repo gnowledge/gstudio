@@ -2578,7 +2578,8 @@ def upload_using_save_file(request,group_id):
     fileobj_id = fileobj_list[0]['_id']
     file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
 
-    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
+    # if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
+    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and title != "raw material" and title != "gallery":
         if request.POST:
             # mtitle = request.POST.get("docTitle", "")
             # userid = request.POST.get("user", "")
@@ -2591,7 +2592,7 @@ def upload_using_save_file(request,group_id):
             content_org = request.POST.get('content_org', '')
             access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
             tags = request.POST.get('tags', "")
-            license = request.POST.get("License", "")
+            copyright = request.POST.get("Copyright", "")
             source = request.POST.get("Source", "")
             Audience = request.POST.getlist("audience", "")
             fileType = request.POST.get("FileType", "")
@@ -2614,7 +2615,7 @@ def upload_using_save_file(request,group_id):
             else:
                 map_geojson_data = []
 
-            file_node.license = unicode(license)
+            file_node.legal['copyright'] = unicode(copyright)
 
             file_node.location = map_geojson_data
             # file_node.save(groupid=group_id)
