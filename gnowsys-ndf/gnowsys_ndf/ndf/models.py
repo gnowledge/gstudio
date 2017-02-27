@@ -349,14 +349,14 @@ class Node(DjangoDocument):
             self.name = kwargs.get('name', '')
         elif request:
             self.name = request.POST.get('name', '').strip()
-        # self.name = unicode(name)
+        self.name = unicode(self.name)
 
         # 'altnames': unicode,
         if kwargs.has_key('altnames'):
-            self.altnames = kwargs.get('altnames', name)
+            self.altnames = kwargs.get('altnames', self.name)
         elif request:
-            self.altnames = request.POST.get('altnames', name).strip()
-        # self.altnames = unicode(altnames)
+            self.altnames = request.POST.get('altnames', self.name).strip()
+        self.altnames = unicode(self.altnames)
 
         # 'plural': unicode,
         if kwargs.has_key('plural'):
@@ -463,14 +463,14 @@ class Node(DjangoDocument):
             self.content = kwargs.get('content', '')
         elif request:
             self.content = request.POST.get('content', '')
-            self.content = unicode(content)
+        self.content = unicode(self.content)
 
         # 'content_org': unicode
         if kwargs.has_key('content_org'):
             self.content_org = kwargs.get('content_org', '')
         elif request:
             self.content_org = request.POST.get('content_org', '')
-            self.content_org = unicode(content_org)
+        self.content_org = unicode(self.content_org)
 
         # 'group_set': [ObjectId]
         if kwargs.has_key('group_set'):
