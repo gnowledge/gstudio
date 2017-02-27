@@ -173,10 +173,12 @@ body {
 }
 
 .group_breadcumbs {
-    color: #fff;
-    display: block;
-    margin: 15px auto;
-    letter-spacing: 1px;
+    a {
+        color: #fff;
+        display: block;
+        margin: 15px auto;
+        letter-spacing: 1px;
+    }
 }
 
 ul.horizontal_tabs_gstudio {

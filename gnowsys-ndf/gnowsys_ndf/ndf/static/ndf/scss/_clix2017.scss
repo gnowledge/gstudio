@@ -234,10 +234,13 @@ body {
 }
 /*  group_list */
 .group_breadcumbs {
-    display: block;
-    margin: 15px auto;
     color: #fff;
-    letter-spacing: 1px;
+    a {
+        display: inline-block;
+        margin: 15px auto;
+        color: #fff;
+        letter-spacing: 1px;
+    }
 }
 
 .group_tile {
@@ -567,4 +570,62 @@ ul.jqtree-tree .jqtree-toggler {
         }
 
     }
+}
+
+
+.explore-header {            
+  line-height: 4em;
+  >div {          
+    vertical-align: middle;
+    display: inline-block;
+  }   
+  .heading {
+    font-size: 2em;
+    a {
+       color: #fff;
+    }
+  }          
+
+  .expore-type {
+                             
+  }                          
+                             
+  .explore-search {          
+                             
+  }                          
+}
+
+
+
+
+
+
+
+
+
+/*Common css*/
+.toggleButtons {
+  a{
+    padding: 0.5em 1em;
+    margin: 0px;
+    background: #dddddd;
+    color: #000;
+    border: 1px solid #B7B7B7;
+    display: inline;
+
+    &:first-child{
+      margin-right: -3px;
+      border-right: 0px solid #000;
+    }
+    &:first-child {
+      border-radius: 10px 0px 0px 10px;
+    }
+    &:last-child {
+      border-radius: 0px 10px 10px 0px;
+    }
+    &.active {
+      background-color: #908F8F;
+      color: #fff;
+    }
+  }
 }
