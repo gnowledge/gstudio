@@ -1,0 +1,148 @@
+{% load i18n %}
+{% load ndf_tags %}
+<style scoped="" type="text/css">hr {
+
+display: block;
+height: 1px;
+border: 0;
+border-top: 2px solid #808080;
+margin:1em 0;
+padding: 0;
+}
+
+blockquote{
+margin: 1.5em auto;
+color: #4a4a4a;
+background-color: #f7f6f6;
+border-left: 2px solid #573d8f;
+font-family: open_sanslight;
+font-size: 1.25rem;
+}
+
+h1 {
+margin-top: 3px;
+font-family: varela_round_regular;
+color: #a61680;
+
+}
+
+.toggle-me {
+display: block;
+width: 155px;
+height: 30px;
+margin: 0;
+padding: 9px 16px 2px;
+background: radial-gradient(hsla(259, 40%, 40%, 1), hsla(259, 40%,30%, 1));
+border-radius: 0 0 5px 5px;
+color: #fff;
+cursor: pointer;
+font-size: .75rem;
+text-transform: uppercase;
+}
+
+.toggle-me:hover {
+background-color: #666;
+background: radial-gradient(hsla(259, 40%, 30%, 1), hsla(259, 40%,20%, 1));
+}
+
+.toggle-me:active {
+background: radial-gradient(#f37f2f, #f54b32);
+}
+
+#toggler,
+#toggler01,
+#toggler02,
+#toggler03,
+#toggler04,
+#toggler05,
+#toggler06,
+#toggler07,
+#toggler08,
+#toggler09 {
+display: none;
+}
+
+#toggler ~ .transcript,
+#toggler01 ~ .transcript,
+#toggler02 ~ .transcript,
+#toggler03 ~ .transcript,
+#toggler04 ~ .transcript,
+#toggler05 ~ .transcript,
+#toggler06 ~ .transcript,
+#toggler07 ~ .transcript,
+#toggler08 ~ .transcript,
+#toggler09 ~ .transcript {
+height: 0;
+padding: 0 0 10px !important;
+border-bottom: 2px solid #ddd;
+opacity: 0;
+overflow-y: scroll;
+transition: all 1s ease-in-out;
+}
+
+#toggler:checked ~ .transcript,
+#toggler01:checked ~ .transcript,
+#toggler02:checked ~ .transcript,
+#toggler03:checked ~ .transcript,
+#toggler04:checked ~ .transcript,
+#toggler05:checked ~ .transcript,
+#toggler06:checked ~ .transcript,
+#toggler07:checked ~ .transcript,
+#toggler08:checked ~ .transcript,
+#toggler09:checked ~ .transcript {
+height: 100px !important;
+opacity: 1;
+}
+
+.trans-form {
+position: relative;
+}
+
+.arrow-toggle {
+position: absolute;
+top: 10px;
+left: 132px;
+transform: rotate(0deg);
+transition: transform 1s;
+}
+
+#toggler:checked ~ .arrow-toggle,
+#toggler01:checked ~ .arrow-toggle,
+#toggler02:checked ~ .arrow-toggle,
+#toggler03:checked ~ .arrow-toggle,
+#toggler04:checked ~ .arrow-toggle,
+#toggler05:checked ~ .arrow-toggle,
+#toggler06:checked ~ .arrow-toggle,
+#toggler07:checked ~ .arrow-toggle,
+#toggler08:checked ~ .arrow-toggle,
+#toggler09:checked ~ .arrow-toggle {
+transform: rotate(90deg);
+}
+</style>
+<div class="video-player-area" id="video-player-{{video_obj.pk}}">
+{% if 'video' in video_obj.if_file.mime_type %}
+	
+	<video width="768" height="432" controls="" id="{{video_obj.pk}}" onseeked="myFunction()" onseeking="myFunction()" preload="metadata">
+		<source src="{{MEDIA_URL}}{{video_obj.if_file.mid.relurl}}" type="video/webm" />
+        <source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/ogg" />
+        <source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/mp4" />
+	</video>
+	{% get_attribute_value video_obj.pk 'has_transcript' as node_transcript %}
+	{% if node_transcript %}
+		<form class="trans-form">
+			<input align="right" id="toggler" type="checkbox" /> 
+			<label class="toggle-me" for="toggler">Transcript</label> 
+		<div class="transcript">
+			{{node_transcript}}
+		</div>
+		</form>
+	{% endif %}
+
+{% endif %}
+</div>
+<script>
+function myFunction() {
+var vid = document.getElementById(id);
+document.getElementById("mySpan").innerHTML = "Seeking: " + vid.seeking;
+}
+</script>

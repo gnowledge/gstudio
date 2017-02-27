@@ -47,7 +47,6 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_w
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
-from gnowsys_ndf.ndf.views.moderation import *
 
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -136,6 +135,7 @@ def collection_create(request, group_id):
     create_gattribute(page_node._id, discussion_enable_at, True)
     return_status = create_thread_for_node(request,group_id, page_node)
     group_object = node_collection.one({'_id': ObjectId(group_id)})
+
     # if group_object.edit_policy == "EDITABLE_MODERATED":
     #                 # print "\n\n\n\ninside editable moderated block"
     #                 page_node.group_set = get_moderator_group_set(page_node.group_set, group_object._id)
@@ -6350,7 +6350,7 @@ def upload_file_ckeditor(request,group_id):
 
     gs_obj_list = write_files(request, group_id)
     gs_obj_id = gs_obj_list[0]['if_file']['original']['relurl']
-    # print "gs_obj_list: ", gs_obj_list
+    print "gs_obj_list: ", gs_obj_id
 
     discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
     for each_gs_file in gs_obj_list:
@@ -6501,3 +6501,52 @@ def get_templates_page(request, group_id):
   already_uploaded=request.GET.getlist('var',"")
   variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'templates_cur':templates_cur })
   return render_to_response(template, variable)
+
+
+@get_execution_time
+def add_transcript(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  if request.is_ajax() and request.method == "POST":
+    node_id = request.POST.get("nodeid", '')
+    trans_text = request.POST.get("transcript_text", '')
+    trans_of  = node_collection.one({'$and':[{'name':'has_transcript'},{'_type':'AttributeType'}]})
+    if node_id and trans_of:
+      create_gattribute(ObjectId(node_id), trans_of,unicode(trans_text))
+      
+  return HttpResponse(json.dumps("success"))
+
+
+@get_execution_time
+def get_video_player(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  node_id = request.GET.get("datasrc", '')
+  if node_id:
+    node_obj = node_collection.one({'_id': ObjectId(node_id) })
+  return render_to_response('ndf/widget_video_player.html',
+            {
+                'group_id': group_id, 'groupid': group_id,'video_obj':node_obj
+            },
+            context_instance=RequestContext(request))
+
+@get_execution_time
+def get_audio_player(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  node_id = request.GET.get("datasrc", '')
+  if node_id:
+    node_obj = node_collection.one({'_id': ObjectId(node_id) })
+
+  return render_to_response('ndf/widget_audio_player.html',
+            {
+                'group_id': group_id, 'groupid': group_id,'audio_obj':node_obj
+            },
+            context_instance=RequestContext(request))
+    

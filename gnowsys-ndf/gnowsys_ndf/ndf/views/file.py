@@ -46,7 +46,6 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
 from gnowsys_ndf.ndf.views.tasks import convertVideo
 
@@ -944,6 +943,8 @@ def submitDoc(request, group_id):
                     # print "----------4-----------"
                     fileobj = node_collection.one({'_id': ObjectId(f)})
                     # newly appended group id in group_set is at last
+                    from gnowsys_ndf.ndf.views.moderation import create_moderator_task
+
                     t = create_moderator_task(request, fileobj.group_set[0], fileobj._id,on_upload=True)
                     # return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': fileobj.group_set[1], 'node_id': f }))
                     return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_object.name, 'node_id': f }))
@@ -1053,6 +1054,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
             if "CourseEventGroup" not in group_object.member_of_names_list:
                 # if group is of EDITABLE_MODERATED, update group_set accordingly
                 if group_object.edit_policy == "EDITABLE_MODERATED":
+                    from gnowsys_ndf.ndf.views.moderation import get_moderator_group_set
                     fileobj.group_set = get_moderator_group_set(fileobj.group_set, group_object._id)
                     fileobj.status = u'MODERATION'
 

@@ -20,8 +20,10 @@ ALLOWED_HOSTS = ["*"]
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
-GSTUDIO_DEFAULT_GROUPS = ['home', 'Trash', 'desk', 'help', 'warehouse']
+GSTUDIO_DEFAULT_GROUPS_LIST = ['home', 'Trash', 'desk', 'help', 'warehouse']
+GSTUDIO_DEFAULT_GROUP = u'desk'
 LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'))
+GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
 OTHER_COMMON_LANGUAGES = [
     ('mr', 'Marathi'), ('mni','Manipuri'), ('ori','Oriya'),
     ('pi','Pali'), ('raj','Rajasthani'), ('gu','Gujarati'),
@@ -471,6 +473,7 @@ BROKER_URL = 'amqp://'
 
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
+    'dlkit',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -496,6 +499,8 @@ INSTALLED_APPS = (
     'memcache_admin',
     'django_mailbox',
     'djcelery',
+    'dlkit',
+    'dlkit_runtime'
 )
 
 AUTHENTICATION_BACKENDS = (

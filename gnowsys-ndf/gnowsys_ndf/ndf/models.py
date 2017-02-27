@@ -541,11 +541,17 @@ class Node(DjangoDocument):
 
         # 'status': STATUS_CHOICES_TU,
         if kwargs.has_key('status'):
-            self.status = kwargs.get('status', u'DRAFT')
-        elif request:
-            self.status = request.POST.get('status', u'DRAFT')
-        self.status = unicode(self.status)
-
+            status = kwargs.get('status', u'DRAFT')
+        else:
+            status = request.POST.get('status', u'DRAFT')
+        self.status = unicode(status)
+        print "\nkwargs: ", kwargs
+        if kwargs.has_key('license'):
+            license = kwargs.get('license', GSTUDIO_DEFAULT_LICENSE)
+        else:
+            license = request.POST.get('license', GSTUDIO_DEFAULT_LICENSE)
+        self.license = unicode(license)
+        print "\nself.license: ", self.license
         # 'rating':[{'score':int, 'user_id':int, 'ip_address':basestring}],
         #       - mostly, it's on detail view and by AJAX and not in/within forms.
 
@@ -553,6 +559,25 @@ class Node(DjangoDocument):
         #       - needs to think on this.
 
         return self
+
+    @staticmethod
+    def get_node_by_id(node_id):
+        '''
+            Takes ObjectId or objectId as string as arg
+                and return object
+        '''
+        if isinstance(node_id, ObjectId) or ObjectId.is_valid(node_id):
+            return node_collection.one({'_id': ObjectId(node_id)})
+        raise ValueError('No object found with id: ' + str(node_id))
+
+    @staticmethod
+    def get_nodes_by_ids_list(node_id_list):
+        '''
+            Takes list of ObjectIds or objectIds as string as arg
+                and return list of object
+        '''
+        node_id_list = map(ObjectId, node_id_list)
+        return node_collection.find({'_id': {'$in': node_id_list}})
 
 
     @staticmethod
@@ -570,6 +595,7 @@ class Node(DjangoDocument):
             raise RuntimeError('No Node class instance found with provided arg for get_node_obj_from_id_or_obj(' + str(node_obj_or_id) + ', expected_type=' + str(expected_type) + ')')
 
         return node_obj
+
 
 
     def type_of_names_list(self, smallcase=False):
@@ -1175,39 +1201,46 @@ class AttributeType(Node):
     '''
 
     structure = {
-	'data_type': basestring, # check required: only of the DATA_TYPE_CHOICES
-        'complex_data_type': [unicode], # can be a list or a dictionary
-        'subject_type': [ObjectId], # check required: only one of Type
+    'data_type': basestring, # check required: only of the DATA_TYPE_CHOICES
+    'complex_data_type': [unicode], # can be a list or a dictionary
+    'subject_type': [ObjectId], # check required: only one of Type
                                     # Nodes. GSystems cannot be set as
                                     # subject_types
-	'applicable_node_type': [basestring],	# can be one or more
+    'subject_scope': list,
+    'object_scope': list,
+    'attribute_type_scope': list,
+    'applicable_node_type': [basestring],	# can be one or more
                                                 # than one of
                                                 # NODE_TYPE_CHOICES
-
-	'verbose_name': basestring,
-	'null': bool,
-	'blank': bool,
-	'help_text': unicode,
-	'max_digits': int, # applicable if the datatype is a number
-	'decimal_places': int, # applicable if the datatype is a float
-	'auto_now': bool,
-	'auto_now_add': bool,
-	'upload_to': unicode,
-	'path': unicode,
-	'verify_exist': bool,
+    'verbose_name': basestring,
+    'null': bool,
+    'blank': bool,
+    'help_text': unicode,
+    'max_digits': int, # applicable if the datatype is a number
+    'decimal_places': int, # applicable if the datatype is a float
+    'auto_now': bool,
+    'auto_now_add': bool,
+    'upload_to': unicode,
+    'path': unicode,
+    'verify_exist': bool,
 
     #   raise issue y used
-	'min_length': int,
-	'required': bool,
-	'label': unicode,
-	'unique': bool,
-	'validators': list,
-	'default': unicode,
-	'editable': bool
+    'min_length': int,
+    'required': bool,
+    'label': unicode,
+    'unique': bool,
+    'validators': list,
+    'default': unicode,
+    'editable': bool
     }
 
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
+    default_values = {
+                        'subject_scope': [],
+                        'object_scope': [],
+                        'attribute_type_scope': [],
+                    }
 
     # validators={
     # 'data_type':x in DATA_TYPE_CHOICES
@@ -1346,6 +1379,9 @@ class RelationType(Node):
         'inverse_name': unicode,
         'subject_type': [ObjectId],  # ObjectId's of Any Class
         'object_type': [OR(ObjectId, list)],  # ObjectId's of Any Class
+        'subject_scope': list,
+        'object_scope': list,
+        'relation_type_scope': list,
         'subject_cardinality': int,
         'object_cardinality': int,
         'subject_applicable_nodetype': basestring,  # NODE_TYPE_CHOICES [default (GST)]
@@ -1358,6 +1394,11 @@ class RelationType(Node):
 
     required_fields = ['inverse_name', 'subject_type', 'object_type']
     use_dot_notation = True
+    default_values = {
+                        'subject_scope': [],
+                        'object_scope': [],
+                        'relation_type_scope': [],
+                    }
 
     # User-Defined Functions ##########
     @staticmethod
@@ -1650,7 +1691,7 @@ class GSystem(Node):
         existing_file_gs = None
         existing_file_gs_if_file = None
 
-        if uploaded_file:
+        if "_id" not in self and uploaded_file:
 
             fh_obj = filehive_collection.collection.Filehive()
             existing_fh_obj = fh_obj.check_if_file_exists(uploaded_file)
@@ -1664,6 +1705,7 @@ class GSystem(Node):
             if kwargs.has_key('unique_gs_per_file') and kwargs['unique_gs_per_file']:
 
                 if existing_file_gs:
+                    print "Returning:: "
                     return existing_file_gs
 
         self.fill_node_values(request, **kwargs)
@@ -3118,6 +3160,7 @@ class Triple(DjangoDocument):
     '_type': unicode,
     'name': unicode,
     'subject_scope': basestring,
+    'object_scope': basestring,
     'subject': ObjectId,  # ObjectId's of GSystem Class
     'lang': basestring,  # Put validation for standard language codes
     'status': STATUS_CHOICES_TU
@@ -3126,6 +3169,10 @@ class Triple(DjangoDocument):
   required_fields = ['name', 'subject']
   use_dot_notation = True
   use_autorefs = True
+  default_values = {
+                      'subject_scope': None,
+                      'object_scope': None
+                  }
 
   ########## Built-in Functions (Overridden) ##########
   def __unicode__(self):
@@ -3336,10 +3383,10 @@ class Triple(DjangoDocument):
 @connection.register
 class GAttribute(Triple):
     structure = {
-        'attribute_type_scope': basestring,
+        'attribute_type_scope': dict,
         # 'attribute_type': AttributeType,  # Embedded document of AttributeType Class
         'attribute_type': ObjectId,  # ObjectId of AttributeType node
-        'object_value_scope': basestring,
+        # 'object_value_scope': basestring,
         'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
 
@@ -3357,18 +3404,24 @@ class GAttribute(Triple):
     required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents
+    default_values = {
+                        'attribute_type_scope': {}
+                    }
 
 
 @connection.register
 class GRelation(Triple):
     structure = {
-        'relation_type_scope': basestring,
+        'relation_type_scope': dict,
         # 'relation_type': RelationType,  # DBRef of RelationType Class
         'relation_type': ObjectId,  # ObjectId of RelationType node
-        'right_subject_scope': basestring,
+        # 'right_subject_scope': basestring,
         # ObjectId's of GSystems Class / List of list of ObjectId's of GSystem Class
         'right_subject': OR(ObjectId, list)
     }
+    default_values = {
+                        'relation_type_scope': {}
+                    }
 
     indexes = [{
         # 1: Compound index
