@@ -2578,7 +2578,8 @@ def upload_using_save_file(request,group_id):
     fileobj_id = fileobj_list[0]['_id']
     file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
 
-    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
+    # if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
+    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and title != "raw material" and title != "gallery":
         if request.POST:
             # mtitle = request.POST.get("docTitle", "")
             # userid = request.POST.get("user", "")
