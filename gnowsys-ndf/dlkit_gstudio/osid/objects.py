@@ -1518,7 +1518,7 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
 
     def _init_gstudio_map(self, effective_agent_id=None, **kwargs):
         """Initialize map for form"""
-        pass
+        self._gstudio_map['license'] = self._license_default
 
     def _init_map(self, effective_agent_id=None, **kwargs):
         if 'effective_agent_id' in kwargs:
@@ -1642,6 +1642,7 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
+        # self._gstudio_map['license'] = 
         self._license_id = license_
 
     def clear_license(self):
@@ -1857,7 +1858,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
                                     'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                                     'formatTypeId': str(DEFAULT_FORMAT_TYPE)
                                 })
-            self._gstudio_map['license'] = self.copyright
+            self._gstudio_map['copyright'] = get_display_text_map(self.copyright)
         else:
             self._gstudio_map['name'] = self._display_name_default['default_string_values'][0]['text']
             self._gstudio_map['altnames'] = self._display_name_default['default_string_values'][0]['text']
