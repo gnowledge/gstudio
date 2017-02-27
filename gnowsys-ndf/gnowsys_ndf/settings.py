@@ -548,6 +548,7 @@ GSTUDIO_GROUP_AGENCY_TYPES = [
     "Other", "Partner", "GovernmentAgency", "NGO", "College", "University",
     "School", "Institution", "Project", "SpecialInterestGroup"
 ]
+GSTUDIO_GROUP_AGENCY_TYPES_DEFAULT = 'Other'
 
 GSTUDIO_AUTHOR_AGENCY_TYPES = [
     "Student", "Teacher", "Teacher Educator", "Faculty", "Researcher", "Other"
