@@ -30,9 +30,18 @@ def get_query_dict(**kwargs):
     for k, v in kwargs.items():
         temp_dict.update({k: {'$in':v if isinstance(v, list) else [v]}})
     # print temp_dict
-        
+
     # just for testing, for time being. no query will be in this method/file.
     q = node_collection.find(temp_dict)
     # print q.count()
 
     return q
+
+
+def add_to_list(list_to_update, value_to_append):
+    '''
+    adding <value_to_append> after checking it's presence in list_to_update
+    '''
+    if value_to_append not in list_to_update:
+        list_to_update.append(value_to_append)
+    return list_to_update
