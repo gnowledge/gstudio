@@ -95,96 +95,8 @@
                         {% endif %}
                     </div>
                     <div id="addAsset" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-        <div class="row" style="margin-top: 25px; margin-bottom: 25px;">
-            <div class="small-12 colums" >
-                <h3 class="left">Add a new asset</h3>
-                <button type="button" class="right orange-button">Save Asset</button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Asset name
-                    <input type="text" placeholder="" name="asset_name" />
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Asset description
-                    <input type="text" placeholder="" name="asset_desc" />
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Tags
-                    <input type="text" placeholder="" name="asset_tags" />
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Learning objectives met by this asset
-                    <Select name="asset_objectives" placeholder="Select topics">
-                        <option value="">Select topics</option>
-                    </Select>
-                </label>
-            </div>
-        </div>
-
-        <hr />
-
-        <h3>Resources for this asset</h3>
-        <div class="row">
-            <div class="small-12 medium-6 large-3 columns">
-                <div class="asset_tile">
-                    <div class="asset_preview"></div>
-                    <div class="asset_text">
-                        <div class="asset_title">Asset Title</div>
-                        <div class="asset_desc">This is a long description</div>
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                     </div>
-                </div>
-            </div>
-            <div class="small-12 medium-6 large-3 columns">
-                <div class="asset_tile">
-                    <div class="asset_preview"></div>
-                    <div class="asset_text">
-                        <div class="asset_title">Asset Title</div>
-                        <div class="asset_desc">This is a long description</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <hr />
-        <h6>
-            <b><u>All Assets</u>&nbsp; ></b>
-            Resource Name
-        </h6>
-        <div class="row">
-            <div class="small-12 medium-6 large-6 columns">
-                <label>Resource name
-                    <input type="text" placeholder="" name="resource_name" />
-                </label>
-                <label>Upload Transcript
-                </label>
-                <div class="transcript_files">
-                    <input type="file" placeholder="" name="transcript_file" />
-                    <span class="add_more_files"><u>+ Transcript</u></span>
-                </div>
-                <label>Upload Subtitle
-                </label>
-                <div class="subtitle_files">
-                    <input type="file" placeholder="" name="subtitle_files" />
-                    <span class="add_more_files"><u>+ Subtitle</u></span>
-                </div>
-            </div>
-            <div class="small-12 medium-6 large-6 columns">
-                <div class="preview_asset"></div>
-            </div>
-        </div>
-        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    </div>
                     <div id="group_forum">
 
                     </div>
@@ -221,15 +133,26 @@
             });
 
             // Create Curriculum
-            $('.createAsset').on('click', function(){
-                $('#addAsset').foundation('reveal', 'open');
-            });
 
             $('.transcript_files, .subtitle_files').on('click', 'span', function(){
                 var input = $(this).siblings('input');
                 $(this).closest('div').prepend('<input type="file" name="'+input.attr('name')+'"/>');
             })
         });
+
+        
+            $( ".createAsset" ).click(function() {
+                    $.ajax({
+                              type: "GET",
+                              url: "{% url 'add_asset' group_id %}",
+                              datatype: "html",
+                              success: function(data) {
+                                $('#addAsset').foundation('reveal', 'open');
+                                $('#addAsset').html(data);
+                            }
+
+                      });
+            });
     </script>
 
 {% endblock body_content %}

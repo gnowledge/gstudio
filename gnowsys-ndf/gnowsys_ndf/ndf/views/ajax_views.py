@@ -6568,3 +6568,13 @@ def get_jhapps(request,group_id):
   jhapp_res = node_collection.find({'member_of': {'$in': jhapp_list}})
 
   return render_to_response("ndf/jhapp_list.html",RequestContext(request, {"groupid":group_id, "group_id":group_id,'jhapp_res':jhapp_res}))
+
+@login_required
+@get_execution_time
+def add_asset(request,group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+
+  return render_to_response("ndf/add_asset.html",RequestContext(request))
