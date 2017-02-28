@@ -27,7 +27,7 @@ class Command(BaseCommand):
 
 
     # Adds "legal" field (with default values) to all documents belonging to GSystems.
-    all_gs = node_collection.find({'_type': {'$in':['GSystem', 'Group'. 'Author', 'File']}, 'legal': {'$exists': False}})
+    all_gs = node_collection.find({'_type': {'$in':['GSystem', 'Group', 'Author', 'File']}, 'legal': {'$exists': False}})
     all_gs_count = all_gs.count()
     print "\n Total GSystems found to update 'legal' field: ", all_gs_count
     for index, each_gs in enumerate(all_gs):
