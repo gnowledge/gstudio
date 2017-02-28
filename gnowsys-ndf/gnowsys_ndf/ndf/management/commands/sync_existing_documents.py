@@ -24,6 +24,18 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     # Keep latest changes in field(s) to be added at top
 
+
+    # Adds "legal" field (with default values) to all documents belonging to GSystems.
+    all_gs = node_collection.find({'_type': 'GSystem', 'legal': {'$exists': False}})
+    all_gs_count = all_gs.count()
+    print "\n Total GSystems found to update 'legal' field: ", all_gs_count
+    for index, each_gs in enumerate(all_gs):
+        print "\n GSystem: ", index, ' of ', all_gs_count
+        each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
+        each_gs.pop('license')
+        each_gs.save()
+
+
     # updating GRelation nodes to replace relation_type's data of DBRef with ObjectId.
     # 
     # all_grelations = triple_collection.find({'_type': 'GRelation'}, time_out=False)
@@ -780,12 +792,3 @@ class Command(BaseCommand):
         i.save()
         print "Updated",i.name,"'s modified by feild from null to 1"
 
-    # Adds "legal" field (with default values) to all documents belonging to GSystems.
-    all_gs = node_collection.find({'_type': 'GSystem', 'legal': {'$exists': False}})
-    all_gs_count = all_gs.count()
-    print "\n Total GSystems found to update 'legal' field: ", all_gs_count
-    for index, each_gs in enumerate(all_gs):
-        print "\n GSystem: ", index, ' of ', all_gs_count
-        each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
-        each_gs.pop('license')
-        each_gs.save()
