@@ -1806,8 +1806,8 @@ class GSystem(Node):
                             self.if_file[each_image_size]['relurl'] = each_image_size_id_url['relurl']
 
         # Add legal information[copyright and license] to GSystem node
-        license = kwargs.get('license', None):
-        copyright = kwargs.get('copyright', None):
+        license = kwargs.get('license', None)
+        copyright = kwargs.get('copyright', None)
 
         if license:
             if self.legal['license'] is not license:

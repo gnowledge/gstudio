@@ -154,7 +154,8 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         obj_map['displayName'] = get_display_text_map(self._gstudio_map['displayName'])
         obj_map['displayName'] = get_display_text_map(self._gstudio_map['displayName'])
         if 'gstudio_node' in self._gstudio_map:
-            obj_map['copyright'] = get_display_text_map(self._gstudio_map['gstudio_node']['legal']['license'])
+            obj_map['license'] = get_display_text_map(self._gstudio_map['gstudio_node']['legal']['license'])
+            obj_map['copyright'] = get_display_text_map(self._gstudio_map['gstudio_node']['legal']['copyright'])
         # obj_map['displayName'] = get_display_text_map(self.get_display_name())
         # obj_map['description'] = get_display_text_map(self.get_description())
         try:
@@ -1852,8 +1853,15 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             self._gstudio_map['altnames'] = kwargs['gstudio_node']['altnames']
             self._gstudio_map['content'] = kwargs['gstudio_node']['content']
             self._gstudio_map['content_org'] = kwargs['gstudio_node']['content']
-            self.copyright = DisplayText(display_text_map={
+            self.license = DisplayText(display_text_map={
                                     'text':kwargs['gstudio_node']['legal']['license'],
+                                    'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                    'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                    'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+                                })
+            self._gstudio_map['license'] = get_display_text_map(self.license)
+            self.copyright = DisplayText(display_text_map={
+                                    'text':kwargs['gstudio_node']['legal']['copyright'],
                                     'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                                     'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                                     'formatTypeId': str(DEFAULT_FORMAT_TYPE)
