@@ -17,6 +17,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
 from gnowsys_ndf.settings import *
 
 GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
+GST_POLICESQUAD = node_collection.one({"_type":"GSystemType","name":"PoliceSquad"})
 @login_required
 @get_execution_time
 def jhapp(request, group_id):
@@ -24,9 +25,15 @@ def jhapp(request, group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-  jhapp_res = node_collection.find({'member_of': {'$in': [GST_JSMOL._id]}})
+  jhapp_list = []
+  for each in GSTUDIO_SUPPORTED_JHAPPS:
+    each_node = node_collection.one({'name':unicode(each)})
+    if each_node:
+      jhapp_list.append(ObjectId(each_node._id))
+  jhapp_res = node_collection.find({'member_of': {'$in': jhapp_list}})
+  # print "*************",jhapp_res
 
-  return render_to_response("ndf/jhapp.html",RequestContext(request, {"groupid":group_id, "group_id":group_id,"jhapp_res":jhapp_res}))
+  return render_to_response("ndf/jhapp.html",RequestContext(request, {"groupid":group_id, "group_id":group_id,'jhapp_res':jhapp_res}))
 
 @login_required
 @get_execution_time

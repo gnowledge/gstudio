@@ -3092,3 +3092,21 @@ def manage_users(request, group_id):
                                 context_instance = RequestContext(request)
     )
 
+
+
+@get_execution_time
+def assets(request, group_id, node_id=None):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    asset_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Asset'})
+    asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst._id]}}).sort('last_update', -1)
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id,'asset_nodes': asset_nodes,'title':'assets'
+        }
+    template = 'ndf/gevent_base.html'
+    return render_to_response(template,
+                                context_variables,
+                                context_instance = RequestContext(request)
+    )
