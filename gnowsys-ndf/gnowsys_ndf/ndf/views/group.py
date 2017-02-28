@@ -111,6 +111,22 @@ class CreateGroup(object):
         else:
             altnames = self.request.POST.get('altnames', name).strip()
 
+        group_set = []
+        if kwargs.get('group_set', ''):
+            group_set = kwargs.get('group_set', [])
+        else:
+            group_set = self.request.POST.get('group_set', [])
+        group_set = list(group_set) if not isinstance(group_set, list) else group_set
+        group_set = [ObjectId(g) for g in group_set]
+
+        member_of = []
+        if kwargs.get('member_of', ''):
+            member_of = kwargs.get('member_of', [])
+        else:
+            member_of = self.request.POST.get('member_of', [])
+        member_of = list(member_of) if not isinstance(member_of, list) else member_of
+        member_of = [ObjectId(m) for m in member_of]
+
         if kwargs.get('group_type', ''):
             group_type = kwargs.get('group_type', u'PUBLIC')
         else:
@@ -175,6 +191,14 @@ class CreateGroup(object):
         group_obj.name = unicode(name)
         group_obj.altnames = unicode(altnames)
 
+        for each_gset in group_set:
+            if each_gset not in group_obj.group_set:
+                group_obj.group_set.append(each_gset)
+
+        for each_mof in member_of:
+            if each_mof not in group_obj.member_of:
+                group_obj.member_of.append(each_mof)
+                
         # while doing append operation make sure to-be-append is not in the list
         if gst_group._id not in group_obj.member_of:
             group_obj.member_of.append(gst_group._id)
