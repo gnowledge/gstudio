@@ -122,7 +122,7 @@ def landing_page(request):
 #     pattern_name = 'home'
 
 #     def get_redirect_url(self, *args, **kwargs):
-#     	if self.request.user.is_authenticated():
+#       if self.request.user.is_authenticated():
 #             auth_obj = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
 #             if auth_obj:
 #                 auth_type = auth_obj._id

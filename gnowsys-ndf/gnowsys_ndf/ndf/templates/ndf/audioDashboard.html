@@ -345,7 +345,6 @@
             else if(xhr.responseText )
             {
               var imageURL = "/media/"  + xhr.responseText;
-                      alert(imageURL);
                             var completeURL = imageURL
                             CKEDITOR.instances['ckeditor_textarea'].insertHtml('<audio controls loop src=' + completeURL +  '>' + '</audio>');
                             $('#group_imgs_on_modal').foundation('reveal', 'close');
