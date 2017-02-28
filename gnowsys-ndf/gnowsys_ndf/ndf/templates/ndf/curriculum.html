@@ -129,14 +129,14 @@ margin-top:15px;
 	      <li class="selected-app-set-item"> 
 	        <div>
 	  		  {% if user_access == "allow" %}
-	          <a href="{% url "theme_topic_create" groupid theme_GST.pk %}" style="float:right;" title="Add Theme">
-	            +&nbsp;Add
+	          <a href="{% url "theme_topic_create" groupid theme_GST.pk %}" style="float:right;" title="Add Theme" class="button tiny expand radius">
+	            +&nbsp;Add new curriculum
 	          </a>
 	          {% endif %}
 
 	          {# <a href="{% url "theme_list" groupid app_id theme_GST.pk %}" style="color:#0b8a91;"> #}
-	          <a href="{% url "list_themes" group_name_tag %}">
-	            Theme ({{nodes.count}})
+	          <a href="{% url "list_themes" group_name_tag %}" class="button tiny expand radius">
+	            Existing Curriculums ({{nodes.count}})
 	          </a> 
 
 	        </div>
@@ -160,14 +160,14 @@ margin-top:15px;
 
 					<div id="view_add_page" class="reveal-modal" data-reveal style="height:300px;"> 
 
-						<h3>Add New Theme Item:</h3>
+						<h3>Add New Specific LO:</h3>
 						<!-- To enter name of theme item -->
 						<div>
 							<input class="name_id" name="name" type="text" placeholder="Enter name...">
 						</div>
 						<br/>           
 
-						<input type="submit" id="add_theme_item" value="Save Theme Item" class="medium round button"/>
+						<input type="submit" id="add_theme_items" value="Save Theme Item" class="medium round button"/>
 
 						<a class="close-reveal-modal">&#215;</a>
 </div>
@@ -276,7 +276,7 @@ margin-top:15px;
 		<br/>
 		{% cache 300 theme_tree node.pk request.LANGUAGE_CODE tree unfold selected %}
 
-			{% include "ndf/hierarchy_tree.html" with topic_url="topics" %}
+			{% include "ndf/hierarchy_tree.html" with topic_url="curriculum" %}
 			<div id="app-set-item" class="themes hide" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}">
 			</div>
 
@@ -423,7 +423,7 @@ margin-top:15px;
 
 	{% if create_edit %}
 		{% if title == "Theme" or title == "Theme Item" %}
-			{% include "ndf/theme_create_edit.html" %}
+			{% include "ndf/curriculum_create_edit.html" %}
 		{% else %}
 			<!-- {#% include "ndf/topic_create_edit.html" %#} -->
 		{% endif %}
@@ -530,7 +530,7 @@ margin-top:15px;
 		// 	}	
 
 
-		$("#add_theme_item").click(function() {
+		$("#add_theme_items").click(function() {
 		    $.ajax({
 	        type: "POST",
 	        url: "{% url 'add_theme_item' groupid %}",

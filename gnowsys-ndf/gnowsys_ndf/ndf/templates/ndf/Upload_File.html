@@ -80,7 +80,15 @@
 						        </div>
 
 							</div>
-
+						choose topic :
+						<select name="topic_list" tabindex=3 required>
+								<option value="">--- Select Topic ---</option>
+								{% for each_topic in topic_nodes %}
+								<option value="{{ each_topic }}">
+									{{ each_topic.name }}
+								</option>
+								{% endfor %}
+						</select>
 							<!-- show tags error msg -->
 							<div class="row hide" id="tags_error">
 								<div class="small-10 columns">{% trans 'Non empty tags can have only alphanumeric characters, dash(-) and spaces.' %}</div>

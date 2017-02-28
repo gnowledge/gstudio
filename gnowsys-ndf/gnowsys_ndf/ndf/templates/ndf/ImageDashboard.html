@@ -188,7 +188,7 @@ $("#btnUploadCancel").click(function() {
   <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-6" >
     {% for each in imageCollection %}
     
-    <li class="card-image-wrapper">
+    <li class="card-image-wrapper" title="{{each.name}}">
             <img  class="gallery-image" style="" data-image-id="{{each.pk}}" 
               "{% if 'svg' in each.if_file.mime_type   %}"
               src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
@@ -196,7 +196,7 @@ $("#btnUploadCancel").click(function() {
               src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"
               "{% endif %}"
               data-image-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" >
-            <figcaption style="cursor:pointer">{{each.name}}</figcaption>
+            <figcaption style="cursor:pointer">{{each.name|truncatechars:10}}</figcaption>
     
     </li>
     {% endfor %}
