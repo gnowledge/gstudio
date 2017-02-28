@@ -110,6 +110,22 @@ class CreateGroup(object):
         elif self.request:
             altnames = self.request.POST.get('altnames', name).strip()
 
+        group_set = []
+        if kwargs.get('group_set', ''):
+            group_set = kwargs.get('group_set', [])
+        else:
+            group_set = self.request.POST.get('group_set', [])
+        group_set = list(group_set) if not isinstance(group_set, list) else group_set
+        group_set = [ObjectId(g) for g in group_set]
+
+        member_of = []
+        if kwargs.get('member_of', ''):
+            member_of = kwargs.get('member_of', [])
+        else:
+            member_of = self.request.POST.get('member_of', [])
+        member_of = list(member_of) if not isinstance(member_of, list) else member_of
+        member_of = [ObjectId(m) for m in member_of]
+
         if kwargs.get('group_type', ''):
             group_type = kwargs.get('group_type', u'PUBLIC')
         elif self.request:
@@ -181,6 +197,14 @@ class CreateGroup(object):
         group_obj.name = unicode(name)
         group_obj.altnames = unicode(altnames)
 
+        for each_gset in group_set:
+            if each_gset not in group_obj.group_set:
+                group_obj.group_set.append(each_gset)
+
+        for each_mof in member_of:
+            if each_mof not in group_obj.member_of:
+                group_obj.member_of.append(each_mof)
+                
         # while doing append operation make sure to-be-append is not in the list
         if gst_group._id not in group_obj.member_of:
             group_obj.member_of.append(gst_group._id)
@@ -2587,7 +2611,8 @@ def upload_using_save_file(request,group_id):
     fileobj_id = fileobj_list[0]['_id']
     file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
 
-    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
+    # if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and GSTUDIO_SITE_NAME == "NROER" and title != "raw material" and title != "gallery":
+    if GSTUDIO_FILE_UPLOAD_FORM == 'detail' and title != "raw material" and title != "gallery":
         if request.POST:
             # mtitle = request.POST.get("docTitle", "")
             # userid = request.POST.get("user", "")
@@ -2600,7 +2625,7 @@ def upload_using_save_file(request,group_id):
             content_org = request.POST.get('content_org', '')
             access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
             tags = request.POST.get('tags', "")
-            license = request.POST.get("License", "")
+            copyright = request.POST.get("Copyright", "")
             source = request.POST.get("Source", "")
             Audience = request.POST.getlist("audience", "")
             fileType = request.POST.get("FileType", "")
@@ -2623,7 +2648,7 @@ def upload_using_save_file(request,group_id):
             else:
                 map_geojson_data = []
 
-            file_node.license = unicode(license)
+            file_node.legal['copyright'] = unicode(copyright)
 
             file_node.location = map_geojson_data
             # file_node.save(groupid=group_id)

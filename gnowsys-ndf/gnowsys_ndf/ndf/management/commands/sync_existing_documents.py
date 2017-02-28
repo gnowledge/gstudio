@@ -11,7 +11,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node, db, AttributeType, RelationType
-from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES, LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_DEFAULT_LICENSE
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
@@ -24,6 +24,18 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
 
     # Keep latest changes in field(s) to be added at top
+
+
+    # Adds "legal" field (with default values) to all documents belonging to GSystems.
+    all_gs = node_collection.find({'_type': 'GSystem', 'legal': {'$exists': False}})
+    all_gs_count = all_gs.count()
+    print "\n Total GSystems found to update 'legal' field: ", all_gs_count
+    for index, each_gs in enumerate(all_gs):
+        print "\n GSystem: ", index, ' of ', all_gs_count
+        each_gs.legal = {'copyright': each_gs.license, 'license': GSTUDIO_DEFAULT_LICENSE}
+        each_gs.pop('license')
+        each_gs.save()
+
 
     # --------------------------------------------------------------------------
     # Adding <'relation_type_scope': []> field to all RelationType objects
@@ -529,6 +541,8 @@ class Command(BaseCommand):
     if res['updatedExisting']: # and res['nModified']:
         print "\n 'attribute_set' field added to following no. of documents: ", res['n']
 
+    '''
+    Replace foll. with legal field update code - katkamrachana
     # Adds "license" field (with default value as "") to all documents belonging to GSystems.
     res = node_collection.collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'license': {'$exists': False}},
                             {'$set': {'license': None}},
@@ -536,6 +550,7 @@ class Command(BaseCommand):
     )
     if res['updatedExisting']: # and res['nModified']:
         print "\n 'license' field added to following no. of documents: ", res['n']
+    '''
 
     # Adding "Agency_type" field adding to group documents with default values
     res = node_collection.collection.update({'_type': {'$in': ['Group']}, 'agency_type': {'$exists': False}},

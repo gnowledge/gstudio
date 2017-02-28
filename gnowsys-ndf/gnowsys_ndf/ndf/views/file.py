@@ -810,7 +810,7 @@ def submitDoc(request, group_id):
         content_org = request.POST.get('content_org', '')
         access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
         tags = request.POST.get('tags', "")
-        license = request.POST.get("License", "")
+        copyright = request.POST.get("Copyright", "")
         source = request.POST.get("Source", "")
         Audience = request.POST.getlist("audience", "")
         fileType = request.POST.get("FileType", "")
@@ -838,11 +838,11 @@ def submitDoc(request, group_id):
                 if index == 0:
                     # f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, copyright, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
 
                 else:
                     title = mtitle + "_" + str(i)  # increament title
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, copyright, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
                     i = i + 1
             else:
                 title = each.name
@@ -852,7 +852,7 @@ def submitDoc(request, group_id):
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
             # if isinstance(f, list):
-                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
+                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, copyright, source, Audience, fileType, subject, level, Based_url, co_contributors, request, map_geojson_data)
                 try:
                     ObjectId(f)
                 except:
@@ -965,7 +965,7 @@ def submitDoc(request, group_id):
 
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type=None, language=None, usrname=None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, co_contributors="", request=None, map_geojson_data=[], **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type=None, language=None, usrname=None, access_policy=None, copyright=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, co_contributors="", request=None, map_geojson_data=[], **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
@@ -1090,7 +1090,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type=None, l
                     fileobj.tags = tags
 
             # new fields added
-            fileobj.license = unicode(license)
+            fileobj.legal['copyright'] = unicode(copyright)
 
             fileobj.location = map_geojson_data
             fileobj.save(groupid=group_id)

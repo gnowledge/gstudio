@@ -41,7 +41,7 @@ from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_GROUP_AGENCY_TYPES_DEFAULT, GSTUDIO_AUTHOR_AGENCY_TYPES
-from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_COPYRIGHT, GSTUDIO_DEFAULT_LICENSE
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.ndf.rcslib import RCS
@@ -785,7 +785,8 @@ class Node(DjangoDocument):
             if invalid_struct_fields:
                 for each_invalid_field in invalid_struct_fields:
                     if each_invalid_field in self.structure:
-                        print "=== removed from structure", each_invalid_field, ' : ', self.structure.pop(each_invalid_field)
+                        self.structure.pop(each_invalid_field)
+                        # print "=== removed from structure", each_invalid_field, ' : ', 
 
 
             keys_list = self.structure.keys()
@@ -795,7 +796,8 @@ class Node(DjangoDocument):
             if invalid_struct_fields_list:
                 for each_invalid_field in invalid_struct_fields_list:
                     if each_invalid_field in self:
-                        print "=== removed ", each_invalid_field, ' : ', self.pop(each_invalid_field)
+                        self.pop(each_invalid_field)
+                        # print "=== removed ", each_invalid_field, ' : ', 
 
 
         except Exception, e:
@@ -1660,19 +1662,27 @@ class GSystem(Node):
                     },
         'author_set': [int],        # List of Authors
         'annotations': [dict],      # List of json files for annotations on the page
-        'license': basestring,      # contains license/s in string format
-        'origin': []                # e.g:
+        'origin': [],                # e.g:
                                         # [
                                         #   {"csv-import": <fn name>},
                                         #   {"sync_source": "<system-pub-key>"}
                                         # ]
+        # Replace field 'license': basestring with 
+        # legal: dict
+        'legal': {
+                    'copyright': basestring,
+                    'license': basestring
+                    }
     }
 
     use_dot_notation = True
 
     # default_values = "CC-BY-SA 4.0 unported"
     default_values = {
-                        'license': GSTUDIO_DEFAULT_LICENSE
+                        'legal': {
+                            'copyright': GSTUDIO_DEFAULT_COPYRIGHT,
+                            'license': GSTUDIO_DEFAULT_LICENSE
+                        }
                     }
 
     def fill_gstystem_values(self,
@@ -1680,7 +1690,7 @@ class GSystem(Node):
                             attribute_set=[],
                             relation_set=[],
                             author_set=[],
-                            license=GSTUDIO_DEFAULT_LICENSE,
+                            legal={},
                             origin=[],
                             uploaded_file=None,
                             **kwargs):

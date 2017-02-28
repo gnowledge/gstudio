@@ -1143,7 +1143,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         # print "\n\n\n content_org",content_org
         tags = request.POST.get('tags','')
     language = request.POST.get('lan')
-    license = request.POST.get('license')
+    copyright = request.POST.get('copyright')
     sub_theme_name = request.POST.get("sub_theme_name", '')
     add_topic_name = request.POST.get("add_topic_name", '')
     is_changed = False
@@ -1352,8 +1352,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         node.location = map_geojson_data  # Storing location data
         is_changed = True
 
-    if node.license != license:
-        node.license = license
+    if node.legal['copyright'] != copyright:
+        node.legal['copyright'] = copyright
         is_changed = True
 
     if user_last_visited_location:
