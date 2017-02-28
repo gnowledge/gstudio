@@ -545,13 +545,6 @@ class Node(DjangoDocument):
         else:
             status = request.POST.get('status', u'DRAFT')
         self.status = unicode(status)
-        print "\nkwargs: ", kwargs
-        if kwargs.has_key('license'):
-            license = kwargs.get('license', GSTUDIO_DEFAULT_LICENSE)
-        else:
-            license = request.POST.get('license', GSTUDIO_DEFAULT_LICENSE)
-        self.license = unicode(license)
-        print "\nself.license: ", self.license
         # 'rating':[{'score':int, 'user_id':int, 'ip_address':basestring}],
         #       - mostly, it's on detail view and by AJAX and not in/within forms.
 
@@ -1690,7 +1683,6 @@ class GSystem(Node):
                             attribute_set=[],
                             relation_set=[],
                             author_set=[],
-                            legal={},
                             origin=[],
                             uploaded_file=None,
                             **kwargs):
@@ -1812,6 +1804,22 @@ class GSystem(Node):
                             # print "each_image_size_id_url : ",each_image_size_id_url
                             self.if_file[each_image_size]['id']    = each_image_size_id_url['id']
                             self.if_file[each_image_size]['relurl'] = each_image_size_id_url['relurl']
+
+        # Add legal information[copyright and license] to GSystem node
+        license = kwargs.get('license', None):
+        copyright = kwargs.get('copyright', None):
+
+        if license:
+            if self.legal['license'] is not license:
+                self.legal['license'] = license
+        else:
+            self.legal['license'] = GSTUDIO_DEFAULT_LICENSE
+
+        if copyright:
+            if self.legal['copyright'] is not copyright:
+                self.legal['copyright'] = copyright
+        else:
+            self.legal['copyright'] = GSTUDIO_DEFAULT_COPYRIGHT
 
         return self
 
