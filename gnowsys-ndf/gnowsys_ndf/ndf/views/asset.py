@@ -56,8 +56,8 @@ def create_asset(name,
 		asset_gs_obj = node_collection.one({'_id': ObjectId(node_id)})
 	else:
 		asset_gs_obj = node_collection.collection.GSystem()
-		asset_gs_obj.fill_gstystem_values(request=request,
-										**kwargs)
+	asset_gs_obj.fill_gstystem_values(request=request,
+									**kwargs)
 	asset_gs_obj.fill_node_values(**kwargs)
 	asset_gs_obj.save(group_id=group_id)
 	return asset_gs_obj
@@ -129,9 +129,9 @@ def create_assetcontent(asset_id,
 		asset_content_obj = node_collection.one({'_id': ObjectId(node_id)})
 	else:
 		asset_content_obj = node_collection.collection.GSystem()
-		asset_content_obj.fill_gstystem_values(request=request,
-												uploaded_file=files[0],
-												**kwargs)
+	asset_content_obj.fill_gstystem_values(request=request,
+											uploaded_file=files[0],
+											**kwargs)
 	asset_content_obj.fill_node_values(**kwargs)
 	asset_content_obj.save(groupid=group_id)
 	asset_contents_list = [asset_content_obj._id]

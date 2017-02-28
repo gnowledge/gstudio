@@ -1650,8 +1650,9 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        # self._gstudio_map['license'] = 
         self._license_id = license_
+        self._my_map['license'] = self._get_display_text(license_, self.get_license_metadata())
+        self._gstudio_map['license'] = self._get_display_text(license_, self.get_license_metadata())['text']
 
     def clear_license(self):
         """Removes the license.
@@ -1662,6 +1663,8 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
 
         """
         self._license_id = self._license_default
+        self._my_map['copyright'] = dict(self._license_default)
+        self._gstudio_map['copyright'] = dict(self._license_default)['text']
 
     license_ = property(fset=set_license, fdel=clear_license)
 
