@@ -8,14 +8,14 @@
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label>Asset name
-                    <input type="text" placeholder="" name="asset_name" />
+                    <input type="text" placeholder=""  id = "asset-name" name="asset_name" />
                 </label>
             </div>
         </div>
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label>Asset description
-                    <input type="text" placeholder="" name="asset_desc" />
+                    <input type="text" placeholder="" id = "asset-descid" name="asset_desc" />
                 </label>
             </div>
         </div>
@@ -29,11 +29,11 @@
         <div class="row">
             <div class="small-12 medium-6 large-6 columns">
                 <label>Learning objectives met by this asset
-                    <Select name="asset_objectives" placeholder="Select topics">
+                    <Select name="asset_objectives" id = "asset_objectivesid" placeholder="Select topics" require>
                         <option value="">--- Select Topic ---</option>
                         {% for each_topic in topic_nodes %}
-                        <option value="{{ each_topic }}">
-                            {{ each_topic.name }}
+                        <option value="{{each_topic.name}}">
+                            {{each_topic.name}}
                         </option>
                         {% endfor %}
                     </Select>
@@ -94,8 +94,18 @@
         </div>
 <script type="text/javascript">
     $( ".save-asset" ).click(function() {
+        asset_name = $("#asset-name").val();
+        asset_description = $("#asset-descid").val();
+        asset_objective =  $('#asset_objectivesid').find(":selected").text();
+        alert(asset_description);
         $.ajax({
-              type: "GET",
+              type: "POST",
+              data:{ "works":"works",
+                    'csrfmiddlewaretoken': "{{csrf_token}}",
+                    "asset_name":asset_name,
+                    "asset_description":asset_description,
+                    "asset_objective":asset_objective
+                },
               url: "{% url 'create_edit_asset' group_id %}",
               datatype: "html",
               success: function(data) {

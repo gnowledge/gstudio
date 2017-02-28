@@ -6587,5 +6587,20 @@ def create_edit_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-  print "----------------------------------",request.POST.get("asset_name", '')
+  asset_name =  str(request.POST.get("asset_name", '')).strip()
+  asset_desc =  str(request.POST.get("asset_description", '')).strip()
+  print asset_desc,"---------------------------------"
+  asset_objective = str(request.POST.get("asset_objective", '')).strip()
+  asset_obj = create_asset(name=asset_name,group_id=group_id,created_by=request.user.id,content=unicode(asset_desc))
+  print asset_obj
+
+  # rt_has_asset_content = node_collection.one({'_type':'RelationType', 'name':'teaches'})
+  # asset_grels = triple_collection.find({'_type': 'GRelation', \
+  #   'relation_type': rt_has_asset_content._id,'subject': asset_obj._id},
+  #   {'_id': 0, 'right_subject': 1})
+  # for each_asset in asset_grels:
+  #   asset_contents_list.append(each_asset['right_subject'])
+  
+  # create_grelation(asset_obj._id, rt_has_asset_content, asset_contents_list)
+
   return HttpResponse(group_id)
