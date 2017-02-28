@@ -2,7 +2,7 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
             <div class="small-12 colums" >
                 <h3 class="left">Add a new asset</h3>
-                <button type="button" class="right orange-button">Save Asset</button>
+                <button type="button" class="right orange-button save-asset">Save Asset</button>
             </div>
         </div>
         <div class="row">
@@ -30,7 +30,12 @@
             <div class="small-12 medium-6 large-6 columns">
                 <label>Learning objectives met by this asset
                     <Select name="asset_objectives" placeholder="Select topics">
-                        <option value="">Select topics</option>
+                        <option value="">--- Select Topic ---</option>
+                        {% for each_topic in topic_nodes %}
+                        <option value="{{ each_topic }}">
+                            {{ each_topic.name }}
+                        </option>
+                        {% endfor %}
                     </Select>
                 </label>
             </div>
@@ -87,3 +92,19 @@
                 <div class="preview_asset"></div>
             </div>
         </div>
+<script type="text/javascript">
+    $( ".save-asset" ).click(function() {
+        $.ajax({
+              type: "GET",
+              url: "{% url 'create_edit_asset' group_id %}",
+              datatype: "html",
+              success: function(data) {
+                $('#addAsset').html(data);
+                $('#addAsset').foundation('reveal', 'open');
+                alert(data);
+            }
+
+      });
+
+    });
+</script>

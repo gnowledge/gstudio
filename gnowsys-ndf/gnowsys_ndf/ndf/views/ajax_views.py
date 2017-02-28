@@ -6576,5 +6576,16 @@ def add_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
+  topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+  topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
+  return render_to_response("ndf/add_asset.html",RequestContext(request,{'group_id':group_id,'groupid':group_id,'topic_nodes':topic_nodes}))
 
-  return render_to_response("ndf/add_asset.html",RequestContext(request))
+@login_required
+@get_execution_time
+def create_edit_asset(request,group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+  print "----------------------------------",request.POST.get("asset_name", '')
+  return HttpResponse(group_id)

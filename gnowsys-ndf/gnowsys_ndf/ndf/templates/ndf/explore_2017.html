@@ -9,8 +9,8 @@
 {% block body_content %}
 	{% check_is_gstaff groupid request.user as is_gstaff %}
 	<div class="row explore-header">
-		<div class="small-12 medium-2 columns heading"><a href="{% url 'explore' %}">Explore</a></div>
-		<div class="small-12 medium-3 columns expore-type">
+		<div class="small-12 medium-3 columns heading"><a href="{% url 'explore' %}">Explore</a></div>
+		<div class="small-12 medium-5 columns expore-type">
 			<div class="toggleButtons">
 				<a href="{% url 'explore_courses' %}" class="button {%if title == 'courses'%} active{% endif %}">
 					Courses

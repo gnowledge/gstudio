@@ -1,0 +1,23 @@
+<div class="elibrary-actions">
+    <button type="button" class="orange-button">
+        <i class="fi-filter"> </i>
+        Filter
+    </button>
+    <button type="button" class="right orange-button createAsset">
+        <i class="fi-plus"> </i>
+        Add Asset
+    </button>
+</div>
+<div class="row"> 
+      {% for each in asset_nodes %}
+      <div class="small-12 medium-6 large-3 columns">
+        <div class="asset_tile">
+            <div class="asset_preview"></div>
+            <div class="asset_text">
+                <div class="asset_title">{{each.name}}</div>
+                <div class="asset_desc"></div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
