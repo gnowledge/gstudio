@@ -2282,7 +2282,6 @@ class Group(GSystem):
         'disclosure_policy': basestring,     # Members of this group - disclosed or not
         'encryption_policy': basestring,     # Encryption - yes or no
         'agency_type': basestring,           # A choice field such as Pratner,Govt.Agency, NGO etc.
-
         'group_admin': [int],		     # ObjectId of Author class
         'moderation_level': int              # range from 0 till any integer level
     }
