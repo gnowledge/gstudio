@@ -123,7 +123,14 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         self._my_map['gstudio_node'] = gstudio_node
         self._load_records(self._gstudio_map['recordTypeIds'])
         self._load_records(self._my_map['recordTypeIds'])
+        print "\n gstudio_node: ", gstudio_node
         self.copyright = DisplayText(display_text_map={
+                                'text':gstudio_node['legal']['copyright'],
+                                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+                            })
+        self.license = DisplayText(display_text_map={
                                 'text':gstudio_node['legal']['license'],
                                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
