@@ -226,7 +226,7 @@ body {
         display: inline-block;
         margin: 5px 5px 0px 5px;
         overflow: hidden;
-    
+
 
     img {
             height: 100%;
@@ -575,26 +575,26 @@ ul.jqtree-tree .jqtree-toggler {
 }
 
 
-.explore-header {            
+.explore-header {
   line-height: 4em;
-  >div {          
+  >div {
     vertical-align: middle;
     display: inline-block;
-  }   
+  }
   .heading {
     font-size: 2em;
     a {
        color: #fff;
     }
-  }          
+  }
 
   .expore-type {
-                             
-  }                          
-                             
-  .explore-search {          
-                             
-  }                          
+
+  }
+
+  .explore-search {
+
+  }
 }
 
 
@@ -1432,7 +1432,7 @@ ul.jqtree-tree .jqtree-toggler {
                         &>a {
                             padding-left: 50px;
                             &:before {
-                                content: '&#8250';
+                                // content: '&#8250';
                                 position: absolute;
                                 left: 23px;
                                 font-size: 45px;

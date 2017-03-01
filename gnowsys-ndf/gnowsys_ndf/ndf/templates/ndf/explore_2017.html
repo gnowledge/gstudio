@@ -8,7 +8,7 @@
 
 {% block body_content %}
 	{% check_is_gstaff groupid request.user as is_gstaff %}
-	
+
 	<div class="row explore-header">
 		<div class="small-12 medium-2 columns heading">
 		<a href="{% url 'explore' %}">Explore</a>
@@ -49,7 +49,9 @@
 					{% include card with resource=each_obj has_logo=True no_footer=True url_name="groupchange" first_arg=each_obj.pk  %}
 				{% endif %}
 				{% else %}
-					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk  next_session=True %}
+					{% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="unit_detail" first_arg=groupid first_arg=groupid second_arg=each_obj.pk %}
+
+					{# {% include card with resource=each_obj is_event=True no_footer=True has_prof_pic=True url_name="groupchange" first_arg=each_obj.pk  next_session=True %} #}
 				{% endif %}
 	          <!--/li-->
 			{% endfor %}
