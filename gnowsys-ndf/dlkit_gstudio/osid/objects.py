@@ -248,8 +248,6 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        # raise errors.Unimplemented()
-        import pdb; pdb.set_trace()
         try:
             # Try to stand up full Type objects if they can be found
             # (Also need to LOOK FOR THE TYPE IN types or through type lookup)
@@ -257,12 +255,13 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
             genusType = Id(identifier=str(mimetype_val), 
             namespace="asset-content-genus-type",
             authority="ODL.MIT.EDU")
-            genus_type_identifier = genusType.get_identifier()
-            return Type(**types.Genus().get_type_data(genus_type_identifier))
+            # genus_type_identifier = genusType.get_identifier()
+            # return Type(**types.Genus().get_type_data(genus_type_identifier))
         except:
             # If that doesn't work, return the id only type, still useful for comparison.
             return Type(idstr=genusType)
-            pass
+        finally:
+            return Type(idstr=genusType)
 
         # return Type('asset-content-genus-type%3Amp4%40ODL.MIT.EDU')
 
