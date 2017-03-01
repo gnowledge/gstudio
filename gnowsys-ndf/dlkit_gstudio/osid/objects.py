@@ -1869,14 +1869,16 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
                                     'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                                     'formatTypeId': str(DEFAULT_FORMAT_TYPE)
                                 })
-            self._gstudio_map['license'] = get_display_text_map(self.license)
+            # self._gstudio_map['license'] = get_display_text_map(self.license)
+            self._gstudio_map['license'] = self.license.get_text()
             self.copyright = DisplayText(display_text_map={
                                     'text':kwargs['gstudio_node']['legal']['copyright'],
                                     'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                                     'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                                     'formatTypeId': str(DEFAULT_FORMAT_TYPE)
                                 })
-            self._gstudio_map['copyright'] = get_display_text_map(self.copyright)
+            # self._gstudio_map['copyright'] = get_display_text_map(self.copyright)
+            self._gstudio_map['copyright'] = self.copyright
         else:
             self._gstudio_map['name'] = self._display_name_default['default_string_values'][0]['text']
             self._gstudio_map['altnames'] = self._display_name_default['default_string_values'][0]['text']
@@ -1917,6 +1919,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         self._gstudio_map['name'] = unicode(display_name)
         self._gstudio_map['altnames'] = unicode(display_name)
         self._display_name = display_name
+        self._my_map['displayName'] = self._get_display_text(display_name, self.get_display_name_metadata())
 
     def clear_display_name(self):
         """Clears the display name.
@@ -1929,7 +1932,8 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if (self.get_display_name_metadata().is_read_only() or
                 self.get_display_name_metadata().is_required()):
             raise errors.NoAccess()
-        self._gstudio_map['name'] = self._display_name_default
+        self._gstudio_map['name'] = self._display_name_default['text']
+        self._my_map['displayName'] = dict(self._display_name_default)
 
         # self._display_name = self._display_name_default
 
@@ -1964,6 +1968,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         self._gstudio_map['content'] = unicode(description)
         self._gstudio_map['content_org'] = unicode(description)
         self._description = description
+        self._my_map['description'] = self._get_display_text(description, self.get_description_metadata())
 
     def clear_description(self):
         """Clears the description.
@@ -1976,8 +1981,9 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if (self.get_description_metadata().is_read_only() or
                 self.get_description_metadata().is_required()):
             raise errors.NoAccess()
-        self._gstudio_map['content'] = dict(self._description_default)
+        self._gstudio_map['content'] = self._description_default['text']
         # self._description = self._description_default
+        self._my_map['description'] = dict(self._description_default)
 
     description = property(fset=set_description, fdel=clear_description)
 
