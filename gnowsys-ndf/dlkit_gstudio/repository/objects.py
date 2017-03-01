@@ -1464,8 +1464,14 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         # Data:
         # obj_map['data'] = None  # COLE: DO WE USE THIS IN OBJECT_MAP?
-        obj_map['genusTypeId'] = obj_map['genusType']
-        del obj_map['genusType']
+        mimetype_val = str(self._gstudio_map['gstudio_node']['if_file']['mime_type'].split('/')[-1])
+        genusType = Id(identifier=str(mimetype_val), 
+        namespace="asset-content-genus-type",
+        authority="ODL.MIT.EDU")
+
+        obj_map['genusTypeId'] = str(genusType)
+
+        # del obj_map['genusType']
 
         # ======================
         # added for multi-language support
