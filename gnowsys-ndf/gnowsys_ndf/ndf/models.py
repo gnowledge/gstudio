@@ -1744,14 +1744,13 @@ class GSystem(Node):
             self['if_file'] = existing_file_gs_if_file
 
         elif uploaded_file and not existing_file_gs:
-
             original_filehive_obj   = filehive_collection.collection.Filehive()
             original_file           = uploaded_file
 
             file_name = original_filehive_obj.get_file_name(original_file)
             if not file_name:
                 file_name = self.name
-            mime_type = original_filehive_obj.get_file_mimetype(original_file)
+            mime_type = original_filehive_obj.get_file_mimetype(original_file, file_name)
             original_file_extension = original_filehive_obj.get_file_extension(file_name, mime_type)
 
             file_exists, original_filehive_obj = original_filehive_obj.save_file_in_filehive(
@@ -2083,10 +2082,12 @@ class Filehive(DjangoDocument):
         return file_metadata_dict
 
 
-    def get_file_mimetype(self, file_blob):
+    def get_file_mimetype(self, file_blob, file_name=None):
         file_mime_type = ''
-        file_content_type = file_blob.content_type if hasattr(file_blob, 'content_type') else None
 
+        file_content_type = file_blob.content_type if hasattr(file_blob, 'content_type') else None
+        if file_name and "vtt" in file_name:
+            return "text/vtt" 
         if file_content_type and file_content_type != 'application/octet-stream':
             file_mime_type = file_blob.content_type
         else:
