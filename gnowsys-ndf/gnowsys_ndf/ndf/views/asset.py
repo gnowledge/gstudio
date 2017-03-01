@@ -87,7 +87,7 @@ def create_assetcontent(asset_id,
 	group_name, group_id = get_group_name_id(group_name_or_id)
 	print "group_id: ", group_id
 	group_id = ObjectId(group_id)
-	print "asset_obj['group_set']: ", asset_obj['group_set']
+	print "kwargs: ", kwargs
 	if group_id not in asset_obj['group_set']:
 		# AssetContent should fall under Asset. If 'group_id' arg is
 		# supplied, it should fall under asset's group id.

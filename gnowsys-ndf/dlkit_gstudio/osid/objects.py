@@ -123,7 +123,7 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         self._my_map['gstudio_node'] = gstudio_node
         self._load_records(self._gstudio_map['recordTypeIds'])
         self._load_records(self._my_map['recordTypeIds'])
-        print "\n gstudio_node: ", gstudio_node
+        # print "\n gstudio_node: ", gstudio_node
         self.copyright = DisplayText(display_text_map={
                                 'text':gstudio_node['legal']['copyright'],
                                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
@@ -1526,7 +1526,7 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
 
     def _init_gstudio_map(self, effective_agent_id=None, **kwargs):
         """Initialize map for form"""
-        self._gstudio_map['license'] = self._license_default
+        self._gstudio_map['license'] = self._license_default.get_text()
 
     def _init_map(self, effective_agent_id=None, **kwargs):
         if 'effective_agent_id' in kwargs:
