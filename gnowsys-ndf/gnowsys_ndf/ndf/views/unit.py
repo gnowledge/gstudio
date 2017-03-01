@@ -14,7 +14,7 @@ from gnowsys_ndf.ndf.models import GSystemType, Group  # GSystem, Triple
 
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 
-def create_edit_unit(request, group_id_or_name, unit_group_id_or_name=None):
+def unit_create_edit(request, group_id_or_name, unit_group_id_or_name=None):
 
 	group_name = request.POST.get('name', '')
 	parent_group_name, parent_group_id = Group.get_group_name_id(group_id_or_name)
@@ -30,3 +30,11 @@ def create_edit_unit(request, group_id_or_name, unit_group_id_or_name=None):
 									node_id=unit_group_id)
 
 	return HttpResponse(int(result[0]))
+
+
+def unit_detail(request, group_id_or_name, unit_name_or_id):
+	pass
+
+
+def list_units(request, group_id_or_name):
+	pass
