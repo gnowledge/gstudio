@@ -1883,10 +1883,10 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             # self._gstudio_map['copyright'] = get_display_text_map(self.copyright)
             self._gstudio_map['copyright'] = self.copyright
         else:
-            self._gstudio_map['name'] = self._display_name_default['default_string_values'][0]['text']
-            self._gstudio_map['altnames'] = self._display_name_default['default_string_values'][0]['text']
-            self._gstudio_map['content'] = self._description_default['default_string_values'][0]['text']
-            self._gstudio_map['content_org'] = self._description_default['default_string_values'][0]['text']
+            self._gstudio_map['name'] = self._display_name_default['text']
+            self._gstudio_map['altnames'] = self._display_name_default['text']
+            self._gstudio_map['content'] = self._description_default['text']
+            self._gstudio_map['content_org'] = self._description_default['text']
         
         self._my_map['genusTypeId'] = self._genus_type_default
         OsidExtensibleForm._init_gstudio_map(self, record_types)
