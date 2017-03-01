@@ -2035,6 +2035,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
+        print "Genus value: ", genus_type, ' and : ', str(genus_type)
         if self.get_genus_type_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_type(genus_type):

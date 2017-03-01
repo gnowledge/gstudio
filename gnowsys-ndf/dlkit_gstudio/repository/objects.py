@@ -1466,7 +1466,10 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         # Data:
         # obj_map['data'] = None  # COLE: DO WE USE THIS IN OBJECT_MAP?
-        mimetype_val = str(self._gstudio_map['gstudio_node']['if_file']['mime_type'].split('/')[-1])
+        # mimetype_val = str(self._gstudio_map['gstudio_node']['if_file']['mime_type'].split('/')[-1])
+        assetcontent_ident = self.get_id().identifier
+        assetcontent_node = Node.get_node_by_id(ObjectId(assetcontent_ident))
+        mimetype_val = str(assetcontent_node['if_file']['mime_type'].split('/')[-1])
         genusType = Id(identifier=str(mimetype_val), 
         namespace="asset-content-genus-type",
         authority="ODL.MIT.EDU")
