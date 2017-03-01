@@ -248,7 +248,16 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
 
         """
         # raise errors.Unimplemented()
-        return Type('asset-content-genus-type%3Amp4%40ODL.MIT.EDU')
+        try:
+            # Try to stand up full Type objects if they can be found
+            # (Also need to LOOK FOR THE TYPE IN types or through type lookup)
+            genus_type_identifier = Id(self._my_map['genusTypeId']).get_identifier()
+            return Type(**types.Genus().get_type_data(genus_type_identifier))
+        except:
+            # If that doesn't work, return the id only type, still useful for comparison.
+            return Type(idstr=self._my_map['genusTypeId'])
+
+        # return Type('asset-content-genus-type%3Amp4%40ODL.MIT.EDU')
 
     
     genus_type = property(fget=get_genus_type)
