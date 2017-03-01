@@ -123,7 +123,14 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         self._my_map['gstudio_node'] = gstudio_node
         self._load_records(self._gstudio_map['recordTypeIds'])
         self._load_records(self._my_map['recordTypeIds'])
+        # print "\n gstudio_node: ", gstudio_node
         self.copyright = DisplayText(display_text_map={
+                                'text':gstudio_node['legal']['copyright'],
+                                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+                            })
+        self.license = DisplayText(display_text_map={
                                 'text':gstudio_node['legal']['license'],
                                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
@@ -154,7 +161,8 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         obj_map['displayName'] = get_display_text_map(self._gstudio_map['displayName'])
         obj_map['displayName'] = get_display_text_map(self._gstudio_map['displayName'])
         if 'gstudio_node' in self._gstudio_map:
-            obj_map['copyright'] = get_display_text_map(self._gstudio_map['gstudio_node']['legal']['license'])
+            obj_map['license'] = get_display_text_map(self._gstudio_map['gstudio_node']['legal']['license'])
+            obj_map['copyright'] = get_display_text_map(self._gstudio_map['gstudio_node']['legal']['copyright'])
         # obj_map['displayName'] = get_display_text_map(self.get_display_name())
         # obj_map['description'] = get_display_text_map(self.get_description())
         try:
@@ -1518,7 +1526,7 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
 
     def _init_gstudio_map(self, effective_agent_id=None, **kwargs):
         """Initialize map for form"""
-        self._gstudio_map['license'] = self._license_default
+        self._gstudio_map['license'] = self._license_default.get_text()
 
     def _init_map(self, effective_agent_id=None, **kwargs):
         if 'effective_agent_id' in kwargs:
@@ -1642,8 +1650,9 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        # self._gstudio_map['license'] = 
         self._license_id = license_
+        self._my_map['license'] = self._get_display_text(license_, self.get_license_metadata())
+        self._gstudio_map['license'] = self._get_display_text(license_, self.get_license_metadata())['text']
 
     def clear_license(self):
         """Removes the license.
@@ -1654,6 +1663,8 @@ class OsidSourceableForm(abc_osid_objects.OsidSourceableForm, OsidForm):
 
         """
         self._license_id = self._license_default
+        self._my_map['copyright'] = dict(self._license_default)
+        self._gstudio_map['copyright'] = dict(self._license_default)['text']
 
     license_ = property(fset=set_license, fdel=clear_license)
 
@@ -1852,8 +1863,15 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             self._gstudio_map['altnames'] = kwargs['gstudio_node']['altnames']
             self._gstudio_map['content'] = kwargs['gstudio_node']['content']
             self._gstudio_map['content_org'] = kwargs['gstudio_node']['content']
-            self.copyright = DisplayText(display_text_map={
+            self.license = DisplayText(display_text_map={
                                     'text':kwargs['gstudio_node']['legal']['license'],
+                                    'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                                    'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                                    'formatTypeId': str(DEFAULT_FORMAT_TYPE)
+                                })
+            self._gstudio_map['license'] = get_display_text_map(self.license)
+            self.copyright = DisplayText(display_text_map={
+                                    'text':kwargs['gstudio_node']['legal']['copyright'],
                                     'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                                     'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                                     'formatTypeId': str(DEFAULT_FORMAT_TYPE)
