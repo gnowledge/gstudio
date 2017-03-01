@@ -24,7 +24,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES,GSTUDIO_DEFAULT_GROUPS_LIST
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME, GSTUDIO_NO_OF_OBJS_PP
-from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
+from gnowsys_ndf.ndf.models import Node, Group, GSystemType,  AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_execution_time
 from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
@@ -56,16 +56,33 @@ def explore(request):
 @get_execution_time
 def explore_courses(request,page_no=1):
     title = 'courses'
-    ce_cur = node_collection.find({'member_of': ce_gst._id,
-                                        '$or': [
-                                          {'created_by': request.user.id},
-                                          {'group_admin': request.user.id},
-                                          {'author_set': request.user.id},
-                                          {'group_type': 'PUBLIC'}
-                                          ]}).sort('last_update', -1)
+    # ce_cur = node_collection.find({'member_of': ce_gst._id,
+    #                                     '$or': [
+    #                                       {'created_by': request.user.id},
+    #                                       {'group_admin': request.user.id},
+    #                                       {'author_set': request.user.id},
+    #                                       {'group_type': 'PUBLIC'}
+    #                                       ]}).sort('last_update', -1)
+    # ce_page_cur = paginator.Paginator(ce_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
 
+    gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+    # parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
+    ce_cur = node_collection.find({
+                                    '_type': 'Group',
+                                    # 'group_set': {'$in': [parent_group_id]},
+                                    'member_of': {'$in': [gst_base_unit_id]}#,
+                                    # '$or':[
+                                    #     {'status': u'PUBLIC'},
+                                    #     {
+                                    #         '$and': [
+                                    #             {'access_policy': u"PRIVATE"},
+                                    #             {'created_by': request.user.id}
+                                    #         ]
+                                    #     }
+                                    # ]
+                                }).sort('last_update', -1)
     ce_page_cur = paginator.Paginator(ce_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-
+    print ce_cur.count()
     context_variable = {
                         'title': title, 'doc_cur': ce_cur,
                         'group_id': group_id, 'groupid': group_id,
