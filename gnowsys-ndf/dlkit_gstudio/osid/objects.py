@@ -251,7 +251,11 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         try:
             # Try to stand up full Type objects if they can be found
             # (Also need to LOOK FOR THE TYPE IN types or through type lookup)
-            genus_type_identifier = Id(self._my_map['genusTypeId']).get_identifier()
+            if self._my_map['genusTypeId']:
+                genus_type_identifier = Id(self._my_map['genusTypeId']).get_identifier()
+            elif self._gstudio_map['genusTypeId']:
+                genus_type_identifier = Id(self._gstudio_map['genusTypeId']).get_identifier()
+
             return Type(**types.Genus().get_type_data(genus_type_identifier))
         except:
             # If that doesn't work, return the id only type, still useful for comparison.
@@ -1897,6 +1901,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             self._gstudio_map['content_org'] = self._description_default['text']
         
         self._my_map['genusTypeId'] = self._genus_type_default
+        self._gstudio_map['genusTypeId'] = self._genus_type_default
         OsidExtensibleForm._init_gstudio_map(self, record_types)
 
     def get_display_name_metadata(self):
@@ -2031,6 +2036,8 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         if not self._is_valid_type(genus_type):
             raise errors.InvalidArgument()
         self._my_map['genusTypeId'] = str(genus_type)
+        self._gstudio_map['genusTypeId'] = str(genus_type)
+        print "\n self._my_map['genusTypeId']: ", self._my_map['genusTypeId']
         # self._genus_type = genus_type
 
     def clear_genus_type(self):
@@ -2045,6 +2052,7 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
                 self.get_genus_type_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['genusTypeId'] = self._genus_type_default
+        self._gstudio_map['genusTypeId'] = self._genus_type_default
         self._genus_type = self._genus_type_default
 
     genus_type = property(fset=set_genus_type, fdel=clear_genus_type)
