@@ -1,14 +1,14 @@
 {% extends "ndf/gbase.html" %}
 
-{% block title %}GStudio - Course Creator - 1{% endblock %}
+{% block title %}GStudio - Course Creator{% endblock %}
 {% block body_content %}
     <div class="course_creator_header">
         <div class="left course_heading">
-            <input type="text" placeholder="Enter unit name" />
+            <input id="unit-name" type="text" placeholder="Enter unit name" data-id='{{node.pk}}'/>
         </div>
         <div class="right course_actions">
             <ul>
-                <li>Save & Close</li>
+                <li id='save-unit'>Save & Close</li>
                 <li>Announce</li>
                 <li>Delete this course</li>
             </ul>
@@ -27,3 +27,62 @@
         </div>
     </div>
 {% endblock %}
+
+{% block script %}
+// <script type="text/javascript">
+
+    function updateUnitName (unitName, unitId) {
+        /*
+        updateUnitName()
+        - to create/update name of unit.
+        */
+        result = undefined;
+        $.ajax({
+            type: "POST",
+            data:{
+                'csrfmiddlewaretoken': "{{csrf_token}}",
+                "name": unitName,
+                "id": unitId
+            },
+            url: "{% url 'unit_create_edit' group_id %}",
+            // datatype: "",
+            success: function(data) {
+                if(eval(data)){
+                    alert('Unit saved successfully');
+                    result = true;
+                    return result;
+                }
+                else{
+                    alert('Save did not happen. Please try agin.');
+                    result = false;
+                    // console.log(result)
+                    return result;
+                }
+            }
+        });
+
+        console.log(result)
+        return result;
+    }
+
+    $('#save-unit').click(
+        function () {
+            var inputUnitText = $('#unit-name').val();
+            var unitId = $('#unit-name').attr('data-id');
+
+            // if (unitId){
+            //     // New unit node
+            //     // url = "{% url 'unit_create_edit' group_id %}"
+            // }
+            // else{
+
+            // }
+            res = updateUnitName(inputUnitText, unitId);
+            // alert(res);
+            if(res){
+                location.href = '{% url "list_units" group_id %}' + '/' + inputUnitText.trim();
+            }
+        });
+
+// </script>
+{% endblock script %}
