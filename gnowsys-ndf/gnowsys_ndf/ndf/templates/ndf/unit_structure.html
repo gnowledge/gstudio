@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GStudio - Course Creator - 2</title>
+    <link rel="stylesheet" type="text/css" href="bower_components/foundation/css/foundation.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/foundation/css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/foundation-icon-fonts/foundation-icons.css">
+    <link rel="stylesheet" type="text/css" href="css/course-creator-2.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/jqtree/jqtree.css">
+    <link href="https://fonts.googleapis.com/css?family=Rubik:200,300,400,500,600,700,900" rel="stylesheet">
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="bower_components/foundation/js/foundation.min.js"></script>
+    <script type="text/javascript" src="bower_components/foundation/js/foundation/foundation.accordion.js"></script>
+    <script type="text/javascript" src="bower_components/modernizr/modernizr.js"></script>
+    <script type="text/javascript" src="bower_components/jqtree/tree.jquery.js"></script>
+    <script type="text/javascript" src="bower_components/handlebars/handlebars.js"></script>
+</head>
+<body>
+    <div class="course_creator_header">
+        <div class="left back_to_group">
+            <span>
+                <a href="#">
+                    <svg width="13px" height="48px" viewBox="20 14 13 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
+                        <desc>Created with Sketch.</desc>
+                        <defs></defs>
+                        <polyline id="Page-1-Copy-14" stroke="#7DBBD5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(26.500000, 24.885500) rotate(90.000000) translate(-26.500000, -24.885500) " points="35.9416239 20.16387 26.498364 29.60713 17.0583761 20.16387"></polyline>
+                    </svg>
+                </a>
+            </span>
+        </div>
+        <div class="left course_heading">
+            <span>Unit name </span>
+        </div>
+        <div class="right course_actions">
+            <ul>
+                <li>Save & Close</li>
+                <li>Announce</li>
+                <li>Delete this course</li>
+            </ul>
+        </div>
+    </div>
+    <div class="row course_creator">
+        <div class="small-12 columns">
+            <div class="course_editor ">
+                <div class="course_tree">
+                    <dl class="accordion course-lessons" data-accordion role="tablist">
+                    </dl>
+                    <button type="button" class="button-hollow-grey add-lesson">Add Lesson</button>
+                </div>
+                <div class="course-editor-section hide">
+                    <div class="activity-editor hide">
+                        <div class="actvity-editor-header editor-header">
+                            <div class="left header-left">
+                                <span class="">Activity Name</span>
+                                <button type="button" class="button-hollow-blue save_edit_activity"> Edit </button>
+                            </div>
+                            <div class="right custom_dropdown">
+                                <a href="">More</a>
+                                <ul class="dropdown_content right_align">
+                                    <li>
+                                        <a href="#" class="save_template">Save as template</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="delete_entity">Delete</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="editor-tool">
+                            <div class="editor_actions">
+                                <ul>
+                                    <li style="float: left;">
+                                        <span>Bold</span>
+                                        <span>Italics</span>
+                                        <span>OL</span>
+                                        <span>UL</span>
+                                    </li><li style="float: right;">
+                                        <span>+ Assessment</span>
+                                    </li><li style="float: right;">
+                                        <span data-reveal-id="imageModal">+ Image</span>
+                                        <span data-reveal-id="videoModal">+ Video</span>
+                                        <span>+ Sound</span>
+                                    </li><!--li style="width: 11%; float: right;">
+                                        <span data-reveal-id="appModal">+ App</span>
+                                    </li-->
+                                </ul>
+                            </div>
+                            Editor tool will come here. //CK Editor
+                        </div>
+                    </div>
+                    <div class="lesson-editor hide">
+                        <div class="lesson-editor-header editor-header">
+                            <span class="header-title left">Lesson Name</span>
+                            <div class="right custom_dropdown">
+                                <a href="">More</a>
+                                <ul class="dropdown_content right_align">
+                                    <li>
+                                        <a href="#">Delete</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="editor-tool">
+                            <div class="row">
+                                <div class="large-12 columns">
+                                    <label>Description
+                                        <textarea placeholder="Lesson brief description"></textarea>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="videoModal" class="reveal-modal editor_modal tile_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+        <div style="width: 100%; height: 50px;">
+            <div class="editor_modal_title left">Select an video to add it</div>
+            <div class="editor_modal_actions right">
+                <a class="button-hollow-purple close-reveal-modal" aria-label="Close">Cancel</a>
+                <a class="button-hollow-purple">Add selected video</a>
+            </div>
+        </div>
+        <div class="editor_modal_content">
+            <div class="row">
+                <div class="large-3 medium-6 small-12 columns modal_tile">
+                    <a class="th" href="#">
+                        <img src="">
+                        <span>Image </span>
+                    </a>
+                </div>
+                <div class="large-3 medium-6 small-12 columns modal_tile">
+                    <a class="th" href="#">
+                        <img src="">
+                        <span>Image </span>
+                    </a>
+                </div>
+                <div class="large-3 medium-6 small-12 columns modal_tile">
+                    <a class="th" href="#">
+                        <img src="">
+                        <span>Image </span>
+                    </a>
+                </div>
+                <div class="large-3 medium-6 small-12 columns modal_tile">
+                    <a class="th" href="#">
+                        <img src="">
+                        <span>Image </span>
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-3 medium-6 small-12 columns modal_tile">
+                    <a class="th" href="#">
+                        <img src="">
+                        <span>Image </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="reveal-modal editor_modal tile_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+        <div style="width: 100%; height: 50px;">
+            <div class="editor_modal_title left">Select an image to add it</div>
+            <div class="editor_modal_actions right">
+                <a class="button-hollow-purple close-reveal-modal" aria-label="Close">Cancel</a>
+                <a class="button-hollow-purple">Add selected image</a>
+            </div>
+        </div>
+        <div class="editor_modal_content">
+            <div class="row">
+                <div class="large-3 medium-6 small-12 columns modal_tile">
+                    <a class="th" href="#">
+                        <img src="">
+                        <span>Image </span>
+                    </a>
+                </div>
+                <div class="large-3 medium-6 small-12 columns modal_tile">
+                    <a class="th" href="#">
+                        <img src="">
+                        <span>Image </span>
+                    </a>
+                </div>
+                <div class="large-3 medium-6 small-12 columns modal_tile">
+                    <a class="th" href="#">
+                        <img src="">
+                        <span>Image </span>
+                    </a>
+                </div>
+                <div class="large-3 medium-6 small-12 columns modal_tile">
+                    <a class="th" href="#">
+                        <img src="">
+                        <span>Image </span>
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-3 medium-6 small-12 columns modal_tile">
+                    <a class="th" href="#">
+                        <img src="">
+                        <span>Image </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="appModal" class="reveal-modal editor_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+        <div style="width: 100%; height: 50px;">
+            <div class="editor_modal_title left">Select an app to add it</div>
+            <div class="editor_modal_actions right">
+                <a class="button-hollow-purple close-reveal-modal" aria-label="Close">Cancel</a>
+                <a class="button-hollow-purple">Add selected app</a>
+            </div>
+        </div>
+        <div class="editor_modal_content">
+            <div class="app_row">
+                <div style="width: 30%" class="app_image">
+                    <div>
+                        <img src=""/>
+                    </div>
+                </div>
+                <div style="width: 65%" class="app_desc">
+                    <h3>App name 1</h3>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+                        ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                        aliquip ex ea commodo consequat. Duis aute irure dolor in
+                        reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+                        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+                    </p>
+                    <button type="button" class="button-hollow-purple">Select this app</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Handlebar Templates for the course tree -->
+    <script id="lesson-template" type="text/x-handlebars-template">
+        <dd class="accordion-navigation">
+            <a href="#lesson-{{id}}" class="entity-title">
+                {{name}}
+                <div class="right edit_entity">
+                    <i class="fi-list right"></i>
+                    <ul class="entity_actions">
+                        <li class="lesson_move_up">Move up</li>
+                        <li class="lesson_move_down">Move down</li>
+                        <li class="lesson_edit">Edit</li>
+                        <li class="lesson_delete">Delete</li>
+                    </ul>
+                </div>
+            </a>
+            <div id="lesson-{{id}}" class="content">
+                <ul class="course-activities">
+                    {{#each activities}}
+                        <li id="activity-{{id}}">
+                            <a href="#" class="entity-title">{{name}}
+                                <div class="right edit_entity">
+                                    <i class="fi-list right"></i>
+                                    <ul class="entity_actions">
+                                        <li class="activity_move_up">Move up</li>
+                                        <li class="activity_move_down">Move down</li>
+                                        <li class="activity_edit">Edit</li>
+                                        <li class="activity_delete">Delete</li>
+                                    </ul>
+                                </div>
+                            </a>
+                        </li>
+                    {{/each}}
+                    <li>
+                        <div class="custom_dropdown">
+                            <a href="#" class="button-hollow-grey add_activity">Add Activity</a>
+                            <ul class="dropdown_content left_align">
+                                <li>
+                                    <a href="#">Create new</a>
+                                </li>
+                                <li>
+                                    <a href="#">Create from existing template</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </dd>
+    </script>
+
+    <!-- Javascript operations -->
+    <script type="text/javascript">
+        var course_data = [
+            {
+                name: 'Lesson1',
+                type: 'lesson',
+                id: 'l1',
+                activities: [
+                    {
+                        name: 'Activity 1',
+                        type: 'activity',
+                        id: 'a1'
+                    },
+                    {
+                        name: 'Activity 1',
+                        type: 'activity',
+                        id: 'a2'
+                    }
+                ]
+            }, {
+                name: 'Lesson2',
+                type: 'lesson',
+                id: 'l2',
+                activities: [
+                    {
+                        name: 'Activity 1',
+                        type: 'activity',
+                        id: 'a1'
+                    },
+                    {
+                        name: 'Activity 1',
+                        type: 'activity',
+                        id: 'a2'
+                    }
+                ]
+            }, {
+                name: 'Lesson3',
+                type: 'lesson',
+                id: 'l3',
+                activities: [
+                    {
+                        name: 'Activity 1',
+                        type: 'activity',
+                        id: 'a1'
+                    },
+                    {
+                        name: 'Activity 1',
+                        type: 'activity',
+                        id: 'a2'
+                    }
+                ]
+            }
+        ];
+        $(function(){
+
+            /**
+            *    Tree related javascript
+            *
+            */
+
+            // Initializing foundation accordian
+            $(document).foundation({
+                accordion: {
+                    multi_expand: true
+                }
+            });
+
+            // Rendering function for the course tree
+            var course_source = $("#lesson-template").html();
+            var course_template = Handlebars.compile(course_source);
+
+            function renderCourseTree(data) {
+                var courseHtml = '';
+                $.each(data, function(ind, lesson){
+                    courseHtml += course_template(lesson);
+                });
+                $('.course_editor .course-lessons').html(courseHtml);
+
+                assignEvents();
+
+            }
+
+
+            //Managing states and events on the tree.
+            var lastClickedActivity;
+            var selectedEntity;
+            var selectedEntityId;
+            var editorMode = 'view';
+
+            function assignEvents() {
+                lastClickedActivity = undefined;
+                $(document).foundation('accordion', 'reflow');
+            }
+
+
+            /*
+            * Handlers and actions for the lesson
+            */
+
+            $('.course-lessons').on('click', '.edit_lesson' ,function(e){
+                e.stopPropagation();
+                e.preventDefault();
+            });
+            // Edit a lesson
+            $('.course-lessons').on('click', '.lesson_edit' ,function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                $('.course_editor').addClass('edit_mode');
+                var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+
+                selectedEntity = 'lesson';
+                selectedEntityid = lesson_id;
+
+                setTimeout(function(){
+                    $('.course-editor-section').removeClass('hide');
+                }, 1000);
+                $('.lesson-editor').removeClass('hide');
+                $('.activity-editor').addClass('hide');
+
+                //Ajax to get the data for the activity
+            });
+
+
+            // Move a lesson down
+            $('.course-lessons').on('click', '.lesson_move_down' ,function(e){
+                e.stopPropagation();
+                e.preventDefault();
+
+                var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+
+                //Ajax to move the lesson up.
+                console.log('Ajax call to move an activity. ' + lesson_id);
+                //Update the course_data after successful movedown and call rerender.
+
+            });
+
+            // Move a lesson up
+            $('.course-lessons').on('click', '.lesson_move_up' ,function(e){
+                e.stopPropagation();
+                e.preventDefault();
+
+                var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+
+                //Ajax to move the lesson up.
+                console.log('Ajax call to move an activity. ' + lesson_id);
+                //Update the course_data after successful moveup and call rerender.
+
+            });
+
+            // Delete a lesson
+            $('.course-lessons').on('click', '.lesson_delete' ,function(e){
+                e.stopPropagation();
+                e.preventDefault();
+
+                var lesson_id = $(this).closest('a').attr('href').replace('#lesson-', '');
+
+                //Ajax to delete the lesson.
+                console.log('Ajax call to delete an activity. ' + lesson_id);
+                //Update the course_data after successful delete and call rerender.
+
+            });
+
+            //Add a lesson
+            $('.course_tree').on('click', '.add-lesson', function(){
+                console.log('Adding another lessson');
+                //Send the query and update the course_data and call 'renderCourseTree(course_data)'
+                //To edit the newly created lesson run this $('a[href="#lesson-'+newid+'"] .edit_lesson').trigger('click');
+            })
+
+
+
+
+
+            /*
+            * Handlers and actions for the Activity
+            */
+
+            // Selecting a activity.
+            $('.course-lessons').on('click', '.course-activities a', function(e){
+                e.preventDefault();
+
+                $('.course-lessons li[id^="activity-"]').removeClass('active');
+                $(this).closest('li').addClass('active');
+                var activity_id = $(this).closest('li').attr('id').replace('activity-', '');
+                selectedEntity = 'activity';
+                selectedEntityid = activity_id;
+
+                setTimeout(function(){
+                    $('.course-editor-section').removeClass('hide');
+                }, 1000);
+
+                //Ajax to get the data for this activity.
+                $('.lesson-editor').addClass('hide');
+                $('.activity-editor').removeClass('hide');
+                $('.course_editor').addClass('edit_mode');
+            });
+
+            // Add a new activity
+            $('.course-lessons').on('click', '.add_activity', function(){
+                var lesson_id = $(this).closest('div').attr('id').replace('lesson-', '');
+                console.log('Adding another activity for lessson ' + lesson_id);
+                //Send the query and update the course_data and call 'renderCourseTree(course_data)'
+                //To select the newly created activity run this $('#activity-' + newid).trigger('click');
+            });
+
+            renderCourseTree(course_data);
+
+
+
+            /**
+            *    Editor area related javascript
+            *   selectedEntity has the selected Entity type
+            *   selectedEntityId has the selected Entity Id.
+            */
+
+            // Add the jquery specific to the editor area such as the modal button handlers.
+
+            $('.course-editor-section').on('click', '.delete_entity', function(){
+                // Call ajax
+            });
+
+            $('.course-editor-section').on('click', '.save_template', function(){
+                //Call ajax
+            });
+
+            $('.course-editor-section').on('click', '.save_edit_activity', function(){
+                if (editorMode === 'view') {
+                    console.log('Editing the activity');
+                    editorMode = 'edit';
+                    $('.save_edit_activity').html('Save');
+                } else {
+                    editorMode = 'view';
+                    console.log('Saving the activity');
+                    //Do the ajax to save the activity and then following command;
+                    $('.save_edit_activity').html('Edit');
+                }
+            })
+        })
+    </script>
+</body>
+</html>
