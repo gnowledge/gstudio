@@ -25,35 +25,47 @@ gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 @login_required
 @staff_required
 @get_execution_time
-def unit_create_edit(request, group_id_or_name, unit_group_id_or_name=None):
+def unit_create_edit(request, group_id, unit_group_id=None):
     '''
     creation as well as eit of units
     '''
-    group_name = request.POST.get('name', '')
-    parent_group_name, parent_group_id = Group.get_group_name_id(group_id_or_name)
-    unit_group_name, unit_group_id = Group.get_group_name_id(unit_group_id_or_name)
+    parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
+    if request.method == "GET":
+        template = "ndf/create_unit.html"
+        req_context = RequestContext(request, {
+                                    'group_id': parent_group_id  #,
+                                    # 'unit_obj': unit_group_obj
+                                })
+        return render_to_response(template, req_context)
 
-    if not group_name:
-        raise ValueError('Unit Group must accompanied by name.')
+    elif request.method == "POST":
+        group_name = request.POST.get('name', '')
+        unit_id_post = request.POST.get('_id', '')
+        unit_group_id = unit_id_post if unit_id_post else unit_group_id
+        unit_group_name, unit_group_id = Group.get_group_name_id(unit_group_id)
 
-    unit_group = CreateGroup(request)
-    result = unit_group.create_group(group_name,
-                                    group_id=parent_group_id,
-                                    member_of=gst_base_unit_id,
-                                    node_id=unit_group_id)
+        if not group_name:
+            raise ValueError('Unit Group must accompanied by name.')
 
-    return HttpResponse(int(result[0]))
+        unit_group = CreateGroup(request)
+        result = unit_group.create_group(group_name,
+                                        group_id=parent_group_id,
+                                        member_of=gst_base_unit_id,
+                                        node_id=unit_group_id)
+
+        print result
+        return HttpResponse(int(result[0]))
 
 
 @get_execution_time
-def unit_detail(request, group_id_or_name, unit_name_or_id):
+def unit_detail(request, group_id, unit_group_id):
     '''
     detail of of selected units
     '''
-    parent_group_name, parent_group_id = Group.get_group_name_id(group_id_or_name)
-    unit_group_obj = Group.get_group_name_id(unit_group_id_or_name, get_obj=True)
+    parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
+    unit_group_obj = Group.get_group_name_id(unit_group_id, get_obj=True)
 
-    template = "ndf/unit_detail.html"
+    template = "ndf/unit_structure.html"
     req_context = RequestContext(request, {
                                 'group_id': parent_group_id,
                                 'unit_obj': unit_group_obj
@@ -62,11 +74,11 @@ def unit_detail(request, group_id_or_name, unit_name_or_id):
 
 
 @get_execution_time
-def list_units(request, group_id_or_name):
+def list_units(request, group_id):
     '''
     listing of units
     '''
-    parent_group_name, parent_group_id = Group.get_group_name_id(group_id_or_name)
+    parent_group_name, parent_group_id = Group.get_group_name_id(group_id)
     all_base_units = node_collection.find({
                                     '_type': 'Group',
                                     'group_set': {'$in': [parent_group_id]},
