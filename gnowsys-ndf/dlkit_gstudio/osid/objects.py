@@ -167,6 +167,7 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         # obj_map['description'] = get_display_text_map(self.get_description())
         try:
             obj_map['genusType'] = str(self.get_genus_type())
+            print "\n\nobj_map: \n", obj_map, "\n\n"
             # asset-content-genus-type%3A<mimetytpe>%40ODL.MIT.EDU
         except errors.Unimplemented:
             obj_map['genusType'] = 'Default%3ADefault%40Default'
@@ -259,9 +260,9 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
             # return Type(**types.Genus().get_type_data(genus_type_identifier))
         except:
             # If that doesn't work, return the id only type, still useful for comparison.
-            return Type(idstr=genusType)
+            return Type(idstr=str(genusType))
         finally:
-            return Type(idstr=genusType)
+            return Type(idstr=str(genusType))
 
         # return Type('asset-content-genus-type%3Amp4%40ODL.MIT.EDU')
 
@@ -2033,8 +2034,6 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        print "\n genus_type id: ", genus_type
-        print "\n genus_type id: ", genus_type.get_identifier()
         if self.get_genus_type_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_type(genus_type):
