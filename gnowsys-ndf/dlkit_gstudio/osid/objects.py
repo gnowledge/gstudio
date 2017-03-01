@@ -249,10 +249,11 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
 
         """
         # raise errors.Unimplemented()
+        import pdb; pdb.set_trace()
         try:
             # Try to stand up full Type objects if they can be found
             # (Also need to LOOK FOR THE TYPE IN types or through type lookup)
-            mimetype_val = self._gstudio_map['gstudio_node']['if_file']['mime_type'].split('/')[-1]
+            mimetype_val = str(self._gstudio_map['gstudio_node']['if_file']['mime_type'].split('/')[-1])
             genusType = Id(identifier=str(mimetype_val), 
             namespace="asset-content-genus-type",
             authority="ODL.MIT.EDU")
@@ -260,7 +261,7 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
             return Type(**types.Genus().get_type_data(genus_type_identifier))
         except:
             # If that doesn't work, return the id only type, still useful for comparison.
-            # return Type(idstr=)
+            return Type(idstr=genusType)
             pass
 
         # return Type('asset-content-genus-type%3Amp4%40ODL.MIT.EDU')
@@ -2033,6 +2034,8 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
         *compliance: mandatory -- This method must be implemented.*
 
         """
+        print "\n genus_type id: ", genus_type
+        print "\n genus_type id: ", genus_type.get_identifier()
         if self.get_genus_type_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_type(genus_type):
