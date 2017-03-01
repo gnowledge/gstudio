@@ -301,7 +301,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 .group_content .group_header {
   height: 80px;
   padding: 20px;
-  background-color: #000;
+  background-color: #482667;
   color: #fff;
 }
 /* line 330, ../../../scss/_clix2017.scss */
@@ -623,4 +623,650 @@ ul.jqtree-tree .jqtree-toggler:hover {
 .toggleButtons a.active {
   background-color: #908F8F;
   color: #fff;
+}
+
+/* about_course style */
+/* abput and modules */
+/* line 637, ../../../scss/_clix2017.scss */
+.about-course {
+  border: 1px solid rgba(102, 102, 102, 0.43);
+  padding: 10px 23px;
+}
+/* line 640, ../../../scss/_clix2017.scss */
+.about-course > h5 {
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  font-size: 14px;
+  display: block;
+  margin: 2px 0px 0px;
+  color: #888;
+}
+/* line 649, ../../../scss/_clix2017.scss */
+.about-course .course-desc {
+  font-size: 19px;
+  letter-spacing: 0.7px;
+}
+/* line 653, ../../../scss/_clix2017.scss */
+.about-course .course-highlight {
+  color: #aaa;
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+/* group analytics and notifications */
+/* line 665, ../../../scss/_clix2017.scss */
+.course-overview-container .course-overview > .columns {
+  padding: 0px 10px;
+}
+/* line 668, ../../../scss/_clix2017.scss */
+.course-overview-container h5 {
+  text-transform: uppercase;
+}
+/* line 671, ../../../scss/_clix2017.scss */
+.course-overview-container .correct-count {
+  color: #367714;
+}
+/* line 674, ../../../scss/_clix2017.scss */
+.course-overview-container .incorrect-count {
+  color: #9b0000;
+}
+/* line 677, ../../../scss/_clix2017.scss */
+.course-overview-container .course-metric-heading {
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.9px;
+  font-weight: 600;
+  color: #8E8E8E;
+  display: block;
+}
+/* line 685, ../../../scss/_clix2017.scss */
+.course-overview-container .course-metric-count {
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  display: block;
+}
+/* line 691, ../../../scss/_clix2017.scss */
+.course-overview-container .ongoing-session {
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 12px;
+  padding-bottom: 15px;
+}
+/* line 696, ../../../scss/_clix2017.scss */
+.course-overview-container .ongoing-session h5, .course-overview-container .ongoing-session h3 {
+  color: #2b78e4;
+}
+/* line 699, ../../../scss/_clix2017.scss */
+.course-overview-container .ongoing-session button {
+  font-size: 14px;
+  padding: 7px;
+  margin: 0px;
+  background-color: #2B78E4;
+}
+/* line 707, ../../../scss/_clix2017.scss */
+.course-overview-container .course-status > h5 {
+  color: #888;
+}
+/* line 710, ../../../scss/_clix2017.scss */
+.course-overview-container .course-status > .row {
+  margin: 10px 0px;
+}
+/* line 713, ../../../scss/_clix2017.scss */
+.course-overview-container .course-status .tabs {
+  width: 100%;
+  margin: 0em 0em 0.5em;
+  border-bottom: 1px solid #CCC;
+}
+/* line 718, ../../../scss/_clix2017.scss */
+.course-overview-container .course-status .tabs .tab-title {
+  width: 40%;
+  background-color: #DEDEDE;
+  margin-left: 1em;
+  position: relative;
+  top: 1px;
+  text-transform: uppercase;
+}
+/* line 726, ../../../scss/_clix2017.scss */
+.course-overview-container .course-status .tabs .tab-title.active {
+  background-color: #fff;
+  border: 1px solid #CCC;
+  border-bottom: 0px;
+}
+/* line 737, ../../../scss/_clix2017.scss */
+.course-overview-container .course-notif-logs ul {
+  list-style: none;
+}
+/* line 741, ../../../scss/_clix2017.scss */
+.course-overview-container .course-section {
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+  margin: 40px 0px;
+  position: relative;
+}
+/* line 748, ../../../scss/_clix2017.scss */
+.course-overview-container .course-section > .row {
+  margin: 20px 0px;
+}
+/* line 752, ../../../scss/_clix2017.scss */
+.course-overview-container .course-section .course-section-heading {
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  font-size: 14px;
+  display: block;
+  margin: 2px 0px 15px;
+  color: #888;
+}
+/* line 762, ../../../scss/_clix2017.scss */
+.course-overview-container .course-section .course-section-icon {
+  position: absolute;
+  font-size: 40px;
+  top: -35px;
+  right: 5px;
+  color: #aaa;
+  background: #fff;
+}
+/* line 786, ../../../scss/_clix2017.scss */
+.course-overview-container .course-warning {
+  background-color: #fffdd7;
+}
+/* line 788, ../../../scss/_clix2017.scss */
+.course-overview-container .course-warning > h5 {
+  color: #c09100;
+}
+/* line 791, ../../../scss/_clix2017.scss */
+.course-overview-container .course-warning i {
+  padding: 10px;
+  margin-right: 5px;
+  color: #c09100;
+}
+/* line 796, ../../../scss/_clix2017.scss */
+.course-overview-container .course-warning a {
+  text-decoration: underline;
+}
+/* line 800, ../../../scss/_clix2017.scss */
+.course-overview-container .course-students-data {
+  margin: 20px 0px;
+}
+/* line 804, ../../../scss/_clix2017.scss */
+.course-overview-container .course-students-data .students-table-legends > span:nth-child(odd) {
+  margin: 0px 10px;
+}
+/* line 807, ../../../scss/_clix2017.scss */
+.course-overview-container .course-students-data .students-table-legends > span:nth-child(even) {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 10px;
+}
+/* line 814, ../../../scss/_clix2017.scss */
+.course-overview-container .student-overview-table {
+  width: 100%;
+  margin: 15px 0px;
+}
+/* line 818, ../../../scss/_clix2017.scss */
+.course-overview-container .student-overview-table tr {
+  border: none;
+}
+/* line 822, ../../../scss/_clix2017.scss */
+.course-overview-container .student-overview-table .progress .merter-val {
+  margin-left: 5px;
+}
+
+/* line 830, ../../../scss/_clix2017.scss */
+.notifications-analytics-tabs .tabs {
+  width: 100%;
+  margin: 0em 0em 0.5em;
+  border-bottom: 1px solid #CCC;
+}
+/* line 835, ../../../scss/_clix2017.scss */
+.notifications-analytics-tabs .tabs .tab-title {
+  width: 40%;
+  background-color: #DEDEDE;
+  margin-left: 1em;
+  position: relative;
+  top: 1px;
+  text-transform: uppercase;
+}
+/* line 843, ../../../scss/_clix2017.scss */
+.notifications-analytics-tabs .tabs .tab-title.active {
+  background-color: #ffc14e;
+  border: 1px solid #CCC;
+  border-bottom: 0px;
+}
+
+/* The notification Dashboard */
+/* line 859, ../../../scss/_clix2017.scss */
+.course-dashboard .course-status > ul, .course-dashboard .course-notifications > ul,
+.course-dashboard .course-performance > ul {
+  list-style: none;
+}
+/* line 863, ../../../scss/_clix2017.scss */
+.course-dashboard .course-status > .row, .course-dashboard .course-notifications > .row,
+.course-dashboard .course-performance > .row {
+  padding: 0px;
+  min-height: 22rem;
+  position: relative;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+  background-color: #F9F9F9;
+  min-height: 20em;
+  margin: 0em 0em;
+  border-radius: 10px;
+}
+/* line 875, ../../../scss/_clix2017.scss */
+.course-dashboard .dash-tile-heading {
+  padding: 0.2em 0.7em;
+  border-bottom: 1px solid #DADADA;
+  font-weight: 500;
+  font-size: 1.3em;
+}
+/* line 881, ../../../scss/_clix2017.scss */
+.course-dashboard .dash-tile-row {
+  padding: 1em;
+}
+/* line 884, ../../../scss/_clix2017.scss */
+.course-dashboard .dash-tile-row:nth-child(n+3) {
+  border-top: 1px solid #DCDCDC;
+}
+/* line 890, ../../../scss/_clix2017.scss */
+.course-dashboard .course-status .course-update .course-current-state {
+  color: #000;
+  font-weight: bold;
+  font-size: 1.2em;
+  padding: 0.5em 0.8em 0.6em;
+}
+/* line 900, ../../../scss/_clix2017.scss */
+.course-dashboard .course-notifications {
+  position: relative;
+}
+/* line 905, ../../../scss/_clix2017.scss */
+.course-dashboard .course-notifications .notification-row .notification-text {
+  font-size: 0.85em;
+  letter-spacing: 0em;
+  word-spacing: 0.2em;
+}
+/* line 910, ../../../scss/_clix2017.scss */
+.course-dashboard .course-notifications .notification-row .time-elapsed {
+  font-size: 0.6em;
+  color: #424242;
+  cursor: pointer;
+}
+/* line 917, ../../../scss/_clix2017.scss */
+.course-dashboard .course-notifications .notification-count {
+  font-size: 1em;
+  position: absolute;
+  right: 0.5em;
+  top: 0.3em;
+}
+
+/* line 928, ../../../scss/_clix2017.scss */
+.notebook .notebook-header {
+  border-color: black;
+  border-style: solid;
+  border-width: 1px 0px;
+  padding-top: 1em;
+}
+/* line 934, ../../../scss/_clix2017.scss */
+.notebook .notebook-header a, .notebook .notebook-header input {
+  margin: 0px;
+}
+/* line 937, ../../../scss/_clix2017.scss */
+.notebook .notebook-header .notes-count {
+  text-align: center;
+}
+/* line 942, ../../../scss/_clix2017.scss */
+.notebook .notebook-header .notes-count span:first-child {
+  font-size: 21px;
+  font-weight: 600;
+  padding: 15px;
+}
+/* line 947, ../../../scss/_clix2017.scss */
+.notebook .notebook-header .notes-count span:last-child {
+  background: lightgrey;
+  padding: 2px 5px;
+  vertical-align: text-bottom;
+}
+/* line 957, ../../../scss/_clix2017.scss */
+.notebook .notebook-body {
+  padding: 0px 0px;
+}
+/* line 961, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .row {
+  margin: 30px 0px;
+}
+/* line 964, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-card, .notebook .notebook-body .note-cards .note-details {
+  border: 1px solid #ccc;
+  padding: 10px 15px;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  line-height: 23px;
+  cursor: pointer;
+  position: relative;
+}
+/* line 973, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-card .note-heading, .notebook .notebook-body .note-cards .note-details .note-heading {
+  font-weight: 800;
+  font-size: 20px;
+}
+/* line 977, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-card .note-close, .notebook .notebook-body .note-cards .note-details .note-close {
+  position: absolute;
+  right: 7px;
+  top: 3px;
+  font-size: 25px;
+  font-weight: 700;
+  color: #929292;
+}
+/* line 985, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-card .note-summary, .notebook .notebook-body .note-cards .note-details .note-summary {
+  margin: 15px 0px;
+}
+/* line 988, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-card .note-info, .notebook .notebook-body .note-cards .note-card .note-extra-data, .notebook .notebook-body .note-cards .note-details .note-info, .notebook .notebook-body .note-cards .note-details .note-extra-data {
+  color: #989898;
+  font-size: 13px;
+  letter-spacing: 0.9px;
+  font-weight: 500;
+}
+/* line 994, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-card .note-info > span, .notebook .notebook-body .note-cards .note-card .note-extra-data > span, .notebook .notebook-body .note-cards .note-details .note-info > span, .notebook .notebook-body .note-cards .note-details .note-extra-data > span {
+  margin-right: 5px;
+}
+/* line 999, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-card .note-tags > span, .notebook .notebook-body .note-cards .note-details .note-tags > span {
+  display: inline-block;
+  margin: 10px;
+  background: #ffebb2;
+  color: #cba552;
+  padding: 2px 5px;
+}
+/* line 1007, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-card .note-actions, .notebook .notebook-body .note-cards .note-details .note-actions {
+  color: #989898;
+  cursor: pointer;
+}
+/* line 1011, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-card .note-actions span, .notebook .notebook-body .note-cards .note-details .note-actions span {
+  margin-right: 10px 5px;
+}
+/* line 1017, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-details .note-info, .notebook .notebook-body .note-cards .note-details .note-extra-data, .notebook .notebook-body .note-cards .note-details .note-tags, .notebook .notebook-body .note-cards .note-details .note-actions {
+  display: inline-block;
+  margin-right: 10px;
+}
+/* line 1024, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-details .note-tags {
+  float: right;
+}
+/* line 1026, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-cards .note-details .note-tags > span {
+  margin: 0px;
+}
+/* line 1035, ../../../scss/_clix2017.scss */
+.notebook .notebook-body > div {
+  padding: 0px;
+}
+/* line 1041, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index {
+  border-right: 1px solid #AFAEAE;
+  padding: 4px 0px;
+  background-color: #F1F1F1;
+}
+/* line 1046, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .tabs-content {
+  padding: 0px;
+}
+/* line 1049, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .tabs-content .active {
+  padding: 0px;
+}
+/* line 1053, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .tabs {
+  width: 100%;
+  margin: 0em 0em 0.5em;
+  border-bottom: 1px solid #CCC;
+}
+/* line 1058, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .tabs .tab-title {
+  width: 50%;
+  /*background-color: #DEDEDE;*/
+  border-radius: 5px 5px 0px 0px;
+  position: relative;
+  top: 1px;
+}
+/* line 1065, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .tabs .tab-title a {
+  border-radius: inherit;
+  font-size: 0.9rem;
+  text-align: center;
+  color: #989898;
+}
+/* line 1072, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .tabs .tab-title.active {
+  background-color: #fff;
+  border: 1px solid #CCC;
+  border-bottom: 0px;
+}
+/* line 1076, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .tabs .tab-title.active a {
+  color: #3a3169;
+}
+/* line 1083, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .tab-content {
+  padding: 0px;
+}
+/* line 1088, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .date {
+  font-size: 12px;
+  font-weight: bold;
+  background: #EFEFEF;
+  padding: 7px 10px;
+}
+/* line 1094, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .date .note-count {
+  font-size: 11px;
+  line-height: 2em;
+}
+/* line 1099, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes > div {
+  border-bottom: 1px solid #AFAEAE;
+}
+/* line 1102, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .note {
+  padding: 5px 15px;
+  background: #FFF;
+  cursor: pointer;
+  color: #A2A2A2;
+}
+/* line 1108, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-heading {
+  font-weight: 400;
+  font-size: 17px;
+}
+/* line 1113, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-meta {
+  font-size: 13px;
+}
+/* line 1116, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-meta > span:not(:first-child) {
+  font-size: 11px;
+  font-weight: 600;
+  color: #717171;
+}
+/* line 1123, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-footer {
+  color: #888888;
+}
+/* line 1126, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .note .note-footer span {
+  margin-right: 10px;
+}
+/* line 1131, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .note.active {
+  border-left: 5px solid #6153AE;
+  background: #F4E7FF;
+  font-weight: 800;
+  color: #6153AE;
+}
+/* line 1137, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .note.active .note-heading {
+  font-weight: 500;
+  font-size: 17px;
+}
+/* line 1141, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .notebook-index .notes .note.active .note-meta > span:not(:first-child) {
+  color: #6153AE;
+}
+/* line 1149, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page {
+  background-color: #fff;
+  padding-bottom: 30px;
+}
+/* line 1154, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page > div {
+  background-color: #fff;
+}
+/* line 1158, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .note-toolbar {
+  padding: 1.8em 1.2em 0em;
+  margin: 0em;
+  background-color: #FFF;
+}
+/* line 1163, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .note-toolbar .note-creator {
+  font-weight: bold;
+}
+/* line 1166, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .note-toolbar .creator-title {
+  text-align: left;
+  color: #C3C3C3;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  margin-top: 5px;
+}
+/* line 1173, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .note-toolbar .creator-rating {
+  text-align: right;
+}
+/* line 1175, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .note-toolbar .creator-rating > div {
+  display: inline-block;
+}
+/* line 1180, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .note-title {
+  font-size: 2.3em;
+  font-weight: 500;
+  margin-right: 1em;
+}
+/* line 1185, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .note-content {
+  padding: 2em 2em 1em;
+  background: #fff;
+  margin: 0em;
+}
+/* line 1192, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .note-content .note-header > div {
+  display: inline-block;
+}
+/* line 1197, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .note-content .note-text {
+  font-size: 19px;
+  letter-spacing: 0.7px;
+}
+/* line 1200, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .note-content .note-text p {
+  padding: 0px;
+}
+/* line 1206, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .comment-sections {
+  padding: 0em 1em 0em;
+}
+/* line 1210, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .comment-sections .comments-header span {
+  font-weight: bold;
+}
+/* line 1213, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .comment-sections .comments-header i:not(:first-child) {
+  margin-left: 15px;
+}
+/* line 1218, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .comment-sections .new-comment {
+  border-top: 1px solid grey;
+  padding: 15px 10px;
+  margin-top: 5px;
+}
+/* line 1223, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-box,
+.notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-editor {
+  min-height: 200px;
+  margin-top: 0px;
+}
+/* line 1229, ../../../scss/_clix2017.scss */
+.notebook .notebook-body .note-page .comment-sections .new-comment .user-prof-image {
+  font-size: 90px;
+  line-height: 0em;
+}
+
+/* Explore badges */
+/* line 1241, ../../../scss/_clix2017.scss */
+.badge_ex {
+  display: inline-block;
+  line-height: 22px;
+  height: 22px;
+  font-weight: bolder;
+  padding: 0px 7px;
+  /*font-family: Arial, sans-serif;*/
+  color: white;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+  border: 1px solid;
+  border-radius: 18px;
+  -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
+  font-size: 1.8em;
+}
+
+/* line 1257, ../../../scss/_clix2017.scss */
+.badge_ex {
+  background: #67c1ef;
+  border-color: #30aae9;
+  background-image: -webkit-linear-gradient(top, #acddf6, #67c1ef);
+  background-image: -moz-linear-gradient(top, #acddf6, #67c1ef);
+  background-image: -o-linear-gradient(top, #acddf6, #67c1ef);
+  background-image: linear-gradient(to bottom, #acddf6, #67c1ef);
+}
+
+/* line 4120, ../../../scss/_app_styles.scss */
+/* line 1267, ../../../scss/_clix2017.scss */
+.badge_ex.green {
+  background: #77cc51;
+  border-color: #59ad33;
+  background-image: -webkit-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: -moz-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: -o-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
+}
+
+/* line 4129, ../../../scss/_app_styles.scss */
+/* line 1277, ../../../scss/_clix2017.scss */
+.badge_ex.yellow {
+  background: #faba3e;
+  border-color: #f4a306;
+  background-image: -webkit-linear-gradient(top, #fcd589, #faba3e);
+  background-image: -moz-linear-gradient(top, #fcd589, #faba3e);
+  background-image: -o-linear-gradient(top, #fcd589, #faba3e);
+  background-image: linear-gradient(to bottom, #fcd589, #faba3e);
+}
+
+/* line 4139, ../../../scss/_app_styles.scss */
+/* line 1287, ../../../scss/_clix2017.scss */
+.badge_ex.red {
+  background: #fa623f;
+  border-color: #fa5a35;
+  background-image: -webkit-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: -moz-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: -o-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: linear-gradient(to bottom, #fc9f8a, #fa623f);
 }

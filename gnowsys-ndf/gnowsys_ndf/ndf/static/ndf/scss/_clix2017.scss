@@ -325,7 +325,7 @@ ul.horizontal_tabs_gstudio {
     .group_header {
         height: 80px;
         padding: 20px;
-        background-color: #000;
+        background-color: #482667;
         color: #fff;
         .group_title {
             font-size: 30px;
@@ -628,4 +628,667 @@ ul.jqtree-tree .jqtree-toggler {
       color: #fff;
     }
   }
+}
+
+
+/* about_course style */
+
+/* abput and modules */
+.about-course {
+  border: 1px solid rgba(102,102,102,0.43);
+  padding: 10px 23px ;
+  >h5 {
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-size: 14px;
+    display: block;
+    margin: 2px 0px 0px;
+    color: #888;
+  }
+  .course-desc {
+    font-size: 19px;
+    letter-spacing: 0.7px;
+  }
+  .course-highlight {
+    color: #aaa;
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 5px;
+  }
+}
+
+/* group analytics and notifications */
+
+
+.course-overview-container {
+  .course-overview >.columns {
+    padding: 0px 10px;
+  }
+  h5 {
+    text-transform: uppercase;
+  }
+  .correct-count {
+    color: #367714;
+  }
+  .incorrect-count {
+    color: #9b0000;
+  }
+  .course-metric-heading {
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.9px;
+    font-weight: 600;
+    color: #8E8E8E;
+    display: block;
+  }
+  .course-metric-count {
+    font-size: 30px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    display: block;
+  }
+  .ongoing-session {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 12px;
+    padding-bottom: 15px;
+
+    h5,h3 {
+      color: #2b78e4;
+    }
+    button {
+      font-size: 14px;
+      padding: 7px;
+      margin: 0px;
+      background-color: #2B78E4;
+    }
+  }
+  .course-status {
+    >h5 {
+      color: #888;
+    }
+    >.row {
+      margin: 10px 0px;
+    }
+    .tabs {
+      width: 100%;
+      margin: 0em 0em 0.5em;
+      border-bottom: 1px solid #CCC;
+
+      .tab-title {
+        width: 40%;
+        background-color: #DEDEDE;
+        margin-left: 1em;
+        position: relative;
+        top: 1px;
+        text-transform: uppercase;
+
+        &.active {
+          background-color: #fff;
+          border: 1px solid #CCC;
+          border-bottom: 0px;
+        }
+      }
+    }
+  }
+
+
+  .course-notif-logs {
+    ul {
+      list-style: none;
+    }
+  }
+  .course-section {
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0,0.5);
+    margin: 40px 0px;
+    position: relative;
+
+    >.row {
+      margin: 20px 0px;
+    }
+
+    .course-section-heading {
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      font-size: 14px;
+      display: block;
+      margin: 2px 0px 15px;
+      color: #888;
+    }
+
+    .course-section-icon {
+      position: absolute;
+      font-size: 40px;
+      top: -35px;
+      right: 5px;
+      color: #aaa;
+      background: #fff;
+    }
+  }
+  .course-points-breakup {
+
+  }
+  .course-interactions {
+
+  }
+  .course-gallery-uploads {
+
+  }
+  .course-quiz-perf {
+
+  }
+  .course-notes{
+
+  }
+  .course-warning{
+    background-color: #fffdd7;
+    >h5 {
+      color: #c09100;
+    }
+    i {
+      padding: 10px;
+      margin-right: 5px;
+      color: #c09100;
+    }
+    a {
+      text-decoration: underline;
+    }
+  }
+  .course-students-data {
+    margin: 20px 0px;
+
+    .students-table-legends {
+      >span:nth-child(odd) {
+        margin: 0px 10px;
+      }
+      >span:nth-child(even) {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: 10px;
+      }
+    }
+  }
+  .student-overview-table {
+    width: 100%;
+    margin: 15px 0px;
+
+    tr {
+      border: none;
+    }
+    .progress {
+      .merter-val {
+        margin-left: 5px;
+      }
+    }
+  }
+}
+
+.notifications-analytics-tabs{
+    .tabs {
+      width: 100%;
+      margin: 0em 0em 0.5em;
+      border-bottom: 1px solid #CCC;
+
+      .tab-title {
+        width: 40%;
+        background-color: #DEDEDE;
+        margin-left: 1em;
+        position: relative;
+        top: 1px;
+        text-transform: uppercase;
+
+        &.active {
+          background-color: $secondary-orange;
+          border: 1px solid #CCC;
+          border-bottom: 0px;
+        }
+      }
+
+  }
+}
+
+/* The notification Dashboard */
+
+.course-dashboard {
+
+  .course-status, .course-notifications,
+  .course-performance {
+    >ul {
+      list-style: none;
+    }
+
+    >.row {
+      padding: 0px;
+      min-height: 22rem;
+      position: relative;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+      background-color: #F9F9F9;
+      min-height: 20em;
+      margin: 0em 0em;
+      border-radius: 10px;
+    }
+  }
+
+  .dash-tile-heading {
+    padding: 0.2em 0.7em;
+    border-bottom: 1px solid #DADADA;
+    font-weight: 500;
+    font-size: 1.3em;
+  }
+  .dash-tile-row {
+    padding: 1em;
+  }
+  .dash-tile-row:nth-child(n+3) {
+    border-top: 1px solid #DCDCDC;
+  }
+
+  .course-status {
+    .course-update {
+      .course-current-state {
+        color: #000;
+        font-weight: bold;
+        font-size: 1.2em;
+        padding: 0.5em 0.8em 0.6em;
+      }
+    }
+    .course-progress {
+    }
+  }
+  .course-notifications {
+    position: relative;
+
+    .notification-row {
+
+      .notification-text{
+        font-size: 0.85em;
+        letter-spacing: 0em;
+        word-spacing: 0.2em;
+      }
+      .time-elapsed {
+        font-size: 0.6em;
+        color: #424242;
+        cursor: pointer;
+      }
+    }
+
+    .notification-count {
+      font-size: 1em;
+      position: absolute;
+      right: 0.5em;
+      top: 0.3em;
+    }
+  }
+}
+
+
+.notebook {
+  .notebook-header {
+    border-color: black;
+    border-style: solid;
+    border-width: 1px 0px;
+    padding-top: 1em;
+
+    a, input {
+      margin: 0px;
+    }
+    .notes-count {
+      text-align: center;
+
+      span
+        {
+          &:first-child {
+            font-size: 21px;
+            font-weight: 600;
+            padding: 15px;
+          }
+          &:last-child {
+            background: lightgrey;
+            padding: 2px 5px;
+            vertical-align: text-bottom;
+          }
+
+        }
+    }
+
+  }
+  .notebook-body {
+    padding: 0px 0px;
+
+    .note-cards {
+      .row {
+        margin: 30px 0px;
+      }
+      .note-card, .note-details {
+        border: 1px solid #ccc;
+        padding: 10px 15px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+        border-radius: 5px;
+        line-height: 23px;
+        cursor: pointer;
+        position: relative;
+
+        .note-heading{
+          font-weight: 800;
+          font-size: 20px;
+        }
+        .note-close {
+            position: absolute;
+            right: 7px;
+            top: 3px;
+            font-size: 25px;
+            font-weight: 700;
+            color: #929292;
+        }
+        .note-summary{
+          margin: 15px 0px;
+        }
+        .note-info,.note-extra-data{
+          color: #989898;
+          font-size: 13px;
+          letter-spacing: 0.9px;
+          font-weight: 500;
+
+          >span{
+            margin-right: 5px;
+          }
+        }
+        .note-tags {
+            >span {
+              display: inline-block;
+              margin: 10px;
+              background: #ffebb2;
+              color: #cba552;
+              padding: 2px 5px;
+            }
+        }
+        .note-actions {
+          color: #989898;
+          cursor: pointer;
+
+          span {
+            margin-right: 10px 5px;
+          }
+        }
+      }
+      .note-details {
+          .note-info, .note-extra-data, .note-tags, .note-actions {
+              display: inline-block;
+              margin-right: 10px;
+          }
+          .note-extra-data {
+
+          }
+          .note-tags {
+              float: right;
+              >span {
+                margin: 0px;
+              }
+          }
+          .note-actions {
+          }
+      }
+    }
+
+    >div {
+      padding: 0px;
+      //height: 50em;
+      //overflow: scroll;
+    }
+
+    .notebook-index {
+      border-right: 1px solid #AFAEAE;
+      padding: 4px 0px;
+      background-color: #F1F1F1;
+
+      .tabs-content {
+        padding: 0px;
+
+        .active {
+          padding: 0px;
+        }
+      }
+      .tabs {
+        width: 100%;
+        margin:0em 0em 0.5em;
+        border-bottom: 1px solid #CCC;
+
+        .tab-title {
+          width: 50%;
+          /*background-color: #DEDEDE;*/
+          border-radius: 5px 5px 0px 0px ;
+          position: relative;
+          top: 1px;
+
+          a {
+            border-radius: inherit;
+            font-size: 0.9rem;
+            text-align: center;
+            color: #989898;
+          }
+
+          &.active {
+            background-color: #fff;
+            border: 1px solid #CCC;
+            border-bottom: 0px;
+            a {
+              color: rgb(58, 49, 105);
+            }
+          }
+        }
+      }
+
+      .tab-content {
+        padding: 0px;
+      }
+
+      .notes {
+        .date {
+          font-size: 12px;
+          font-weight: bold;
+          background: #EFEFEF;
+          padding: 7px 10px;
+
+          .note-count {
+            font-size: 11px;
+            line-height: 2em;
+          }
+        }
+        >div {
+          border-bottom: 1px solid #AFAEAE;
+        }
+        .note {
+          padding: 5px 15px;
+          background: #FFF;
+          cursor: pointer;
+          color: #A2A2A2;
+
+          .note-heading {
+            font-weight: 400;
+            font-size: 17px;
+          }
+
+          .note-meta {
+            font-size: 13px;
+
+            >span:not(:first-child) {
+              font-size: 11px;
+              font-weight: 600;
+              color: #717171;
+            }
+          }
+
+          .note-footer {
+            color: #888888;
+
+            span {
+              margin-right:10px;
+            }
+          }
+
+          &.active {
+            border-left: 5px solid #6153AE;
+            background: #F4E7FF;
+            font-weight: 800;
+            color: #6153AE;
+
+            .note-heading {
+              font-weight: 500;
+              font-size: 17px;
+            }
+            .note-meta>span:not(:first-child) {
+              color: #6153AE;
+            }
+          }
+        }
+      }
+    }
+
+    .note-page {
+      // display: none;
+      background-color: #fff;
+      padding-bottom: 30px;
+
+      >div{
+        background-color: #fff;
+      }
+
+      .note-toolbar {
+        padding: 1.8em 1.2em 0em;
+        margin: 0em;
+        background-color: #FFF;
+
+        .note-creator {
+          font-weight:bold;
+        }
+        .creator-title {
+          text-align: left;
+          color: #C3C3C3;
+          font-size: 12px;
+          letter-spacing: 0.3px;
+          margin-top: 5px;
+        }
+        .creator-rating {
+          text-align: right;
+          >div {
+            display: inline-block;
+          }
+        }
+      }
+      .note-title {
+        font-size: 2.3em;
+        font-weight: 500;
+        margin-right: 1em;
+      }
+      .note-content {
+        padding: 2em 2em 1em;
+        background: #fff;
+        margin: 0em;
+
+        .note-header {
+
+          >div {
+            display: inline-block;
+          }
+
+        }
+        .note-text {
+          font-size: 19px;
+          letter-spacing: 0.7px;
+          p{
+            padding: 0px;
+          }
+        }
+      }
+
+      .comment-sections {
+        padding: 0em 1em 0em;
+
+        .comments-header {
+          span {
+            font-weight: bold;
+          }
+          i:not(:first-child) {
+            margin-left: 15px;
+          }
+        }
+
+        .new-comment {
+          border-top: 1px solid grey;
+          padding: 15px 10px;
+          margin-top: 5px;
+
+          .trumbowyg-box,
+          .trumbowyg-editor {
+            min-height: 200px;
+            margin-top: 0px;
+          }
+
+          .user-prof-image {
+            font-size: 90px;
+            line-height: 0em;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Explore badges */
+
+.badge_ex {
+  display: inline-block;
+  line-height: 22px;
+  height: 22px;
+  font-weight: bolder;
+  padding: 0px 7px;
+  /*font-family: Arial, sans-serif;*/
+  color: white;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+  border: 1px solid;
+  border-radius: 18px;
+  -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
+  font-size: 1.8em;
+}
+
+.badge_ex {
+  background: #67c1ef;
+  border-color: #30aae9;
+  background-image: -webkit-linear-gradient(top, #acddf6, #67c1ef);
+  background-image: -moz-linear-gradient(top, #acddf6, #67c1ef);
+  background-image: -o-linear-gradient(top, #acddf6, #67c1ef);
+  background-image: linear-gradient(to bottom, #acddf6, #67c1ef);
+}
+
+/* line 4120, ../../../scss/_app_styles.scss */
+.badge_ex.green {
+  background: #77cc51;
+  border-color: #59ad33;
+  background-image: -webkit-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: -moz-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: -o-linear-gradient(top, #a5dd8c, #77cc51);
+  background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
+}
+
+/* line 4129, ../../../scss/_app_styles.scss */
+.badge_ex.yellow {
+  background: #faba3e;
+  border-color: #f4a306;
+  background-image: -webkit-linear-gradient(top, #fcd589, #faba3e);
+  background-image: -moz-linear-gradient(top, #fcd589, #faba3e);
+  background-image: -o-linear-gradient(top, #fcd589, #faba3e);
+  background-image: linear-gradient(to bottom, #fcd589, #faba3e);
+}
+
+/* line 4139, ../../../scss/_app_styles.scss */
+.badge_ex.red {
+  background: #fa623f;
+  border-color: #fa5a35;
+  background-image: -webkit-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: -moz-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: -o-linear-gradient(top, #fc9f8a, #fa623f);
+  background-image: linear-gradient(to bottom, #fc9f8a, #fa623f);
 }
