@@ -491,7 +491,7 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         """Returns object map dictionary"""
 
         obj_map = dict()
-        super(Asset, self).get_object_map(obj_map)
+        # super(Asset, self).get_object_map(obj_map)
         obj_map['type'] = 'Asset'
 
         # THIS NEEDS TO BE IMPLEMENTED BY GSTUDIO TEAM - Done
@@ -529,7 +529,9 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         obj_map['assetContents'] = asset_content_list
 
         # CONTINUE IN THIS VEIN FOR ANY OTHER ATTRIBUTES NEEDED FOR ASSET ...
-        return obj_map
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+        # super(osid_objects.OsidObject, self).get_object_map(obj_map)
+        # return obj_map
     object_map = property(fget=get_object_map)
 
 
