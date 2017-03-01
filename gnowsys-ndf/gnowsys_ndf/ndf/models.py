@@ -1744,12 +1744,13 @@ class GSystem(Node):
             self['if_file'] = existing_file_gs_if_file
 
         elif uploaded_file and not existing_file_gs:
-
             original_filehive_obj   = filehive_collection.collection.Filehive()
             original_file           = uploaded_file
 
-            mime_type = original_filehive_obj.get_file_mimetype(original_file)
             file_name = original_filehive_obj.get_file_name(original_file)
+            if not file_name:
+                file_name = self.name
+            mime_type = original_filehive_obj.get_file_mimetype(original_file, file_name)
             original_file_extension = original_filehive_obj.get_file_extension(file_name, mime_type)
 
             file_exists, original_filehive_obj = original_filehive_obj.save_file_in_filehive(
@@ -2035,6 +2036,7 @@ class Filehive(DjangoDocument):
         }
 
         file_name = file_name if file_name else file_blob.name if hasattr(file_blob, 'name') else ''
+
         file_metadata_dict['file_name'] = file_name
 
         file_mime_type = mime_type if mime_type else self.get_file_mimetype(file_blob)
@@ -2080,11 +2082,12 @@ class Filehive(DjangoDocument):
         return file_metadata_dict
 
 
-    def get_file_mimetype(self, file_blob):
-
+    def get_file_mimetype(self, file_blob, file_name=None):
         file_mime_type = ''
-        file_content_type = file_blob.content_type if hasattr(file_blob, 'content_type') else None
 
+        file_content_type = file_blob.content_type if hasattr(file_blob, 'content_type') else None
+        if file_name and "vtt" in file_name:
+            return "text/vtt" 
         if file_content_type and file_content_type != 'application/octet-stream':
             file_mime_type = file_blob.content_type
         else:
@@ -2099,7 +2102,6 @@ class Filehive(DjangoDocument):
 
         file_name = file_blob.name if hasattr(file_blob, 'name') else ''
         return file_name
-
 
     def get_file_extension(self, file_name, file_mime_type):
         # if uploaded file is of mimetype: 'text/plain':
@@ -2118,6 +2120,10 @@ class Filehive(DjangoDocument):
 
         if poss_ext in all_poss_ext:
             file_extension = poss_ext
+
+        elif poss_ext == '.vtt':
+            file_mime_type = 'text/vtt'
+            file_extension = '.vtt'
 
         elif file_mime_type == 'text/plain':
             file_extension = '.txt'
