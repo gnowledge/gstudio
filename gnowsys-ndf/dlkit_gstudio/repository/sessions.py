@@ -1212,7 +1212,6 @@ class AssetAdminSession(abc_repository_sessions.AssetAdminSession, osid_sessions
         from gnowsys_ndf.ndf.views.asset import create_asset as gstudio_create_asset
         req_obj = GStudioRequest(id=1)
         asset_ident = asset_form._gstudio_map['asset_id']
-        print "\nasset_ident: ", asset_ident
         asset_obj_id = ObjectId(asset_ident)
         asset_obj = gstudio_create_asset(node_id = asset_obj_id, \
          group_id=self._catalog_id.get_identifier(), created_by=1, **asset_form._gstudio_map)

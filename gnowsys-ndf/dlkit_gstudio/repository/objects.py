@@ -491,7 +491,7 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         """Returns object map dictionary"""
 
         obj_map = dict()
-        super(Asset, self).get_object_map(obj_map)
+        # super(Asset, self).get_object_map(obj_map)
         obj_map['type'] = 'Asset'
 
         # THIS NEEDS TO BE IMPLEMENTED BY GSTUDIO TEAM - Done
@@ -529,7 +529,9 @@ class Asset(abc_repository_objects.Asset, osid_objects.OsidObject, osid_markers.
         obj_map['assetContents'] = asset_content_list
 
         # CONTINUE IN THIS VEIN FOR ANY OTHER ATTRIBUTES NEEDED FOR ASSET ...
-        return obj_map
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+        # super(osid_objects.OsidObject, self).get_object_map(obj_map)
+        # return obj_map
     object_map = property(fget=get_object_map)
 
 
@@ -1464,8 +1466,14 @@ class AssetContent(abc_repository_objects.AssetContent, osid_objects.OsidObject,
 
         # Data:
         # obj_map['data'] = None  # COLE: DO WE USE THIS IN OBJECT_MAP?
-        obj_map['genusTypeId'] = obj_map['genusType']
-        del obj_map['genusType']
+        mimetype_val = str(self._gstudio_map['gstudio_node']['if_file']['mime_type'].split('/')[-1])
+        genusType = Id(identifier=str(mimetype_val), 
+        namespace="asset-content-genus-type",
+        authority="ODL.MIT.EDU")
+
+        obj_map['genusTypeId'] = str(genusType)
+
+        # del obj_map['genusType']
 
         # ======================
         # added for multi-language support
