@@ -167,6 +167,7 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         # obj_map['description'] = get_display_text_map(self.get_description())
         try:
             obj_map['genusType'] = str(self.get_genus_type())
+            # asset-content-genus-type%3A<mimetytpe>%40ODL.MIT.EDU
         except errors.Unimplemented:
             obj_map['genusType'] = 'Default%3ADefault%40Default'
         return obj_map
@@ -251,15 +252,16 @@ class OsidObject(abc_osid_objects.OsidObject, osid_markers.Identifiable, osid_ma
         try:
             # Try to stand up full Type objects if they can be found
             # (Also need to LOOK FOR THE TYPE IN types or through type lookup)
-            if self._my_map['genusTypeId']:
-                genus_type_identifier = Id(self._my_map['genusTypeId']).get_identifier()
-            elif self._gstudio_map['genusTypeId']:
-                genus_type_identifier = Id(self._gstudio_map['genusTypeId']).get_identifier()
-
+            mimetype_val = self._gstudio_map['gstudio_node']['if_file']['mime_type'].split('/')[-1]
+            genusType = Id(identifier=str(mimetype_val), 
+            namespace="asset-content-genus-type",
+            authority="ODL.MIT.EDU")
+            genus_type_identifier = genusType.get_identifier()
             return Type(**types.Genus().get_type_data(genus_type_identifier))
         except:
             # If that doesn't work, return the id only type, still useful for comparison.
-            return Type(idstr=self._my_map['genusTypeId'])
+            # return Type(idstr=)
+            pass
 
         # return Type('asset-content-genus-type%3Amp4%40ODL.MIT.EDU')
 
@@ -2037,7 +2039,6 @@ class OsidObjectForm(abc_osid_objects.OsidObjectForm, OsidIdentifiableForm, Osid
             raise errors.InvalidArgument()
         self._my_map['genusTypeId'] = str(genus_type)
         self._gstudio_map['genusTypeId'] = str(genus_type)
-        print "\n self._my_map['genusTypeId']: ", self._my_map['genusTypeId']
         # self._genus_type = genus_type
 
     def clear_genus_type(self):
